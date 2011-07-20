@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110720202049) do
+ActiveRecord::Schema.define(:version => 20110720202442) do
 
   create_table "courses", :force => true do |t|
     t.string   "name"
@@ -31,6 +31,15 @@ ActiveRecord::Schema.define(:version => 20110720202049) do
   create_table "dismissal_reasons", :force => true do |t|
     t.string   "name"
     t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "dismissals", :force => true do |t|
+    t.date     "date"
+    t.integer  "enrollment_id"
+    t.integer  "dismissal_reason_id"
+    t.text     "obs"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
