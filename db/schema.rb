@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110720195646) do
+ActiveRecord::Schema.define(:version => 20110720200739) do
 
   create_table "courses", :force => true do |t|
     t.string   "name"
@@ -68,6 +68,7 @@ ActiveRecord::Schema.define(:version => 20110720195646) do
     t.string   "cpf"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.text     "obs"
   end
 
 end
