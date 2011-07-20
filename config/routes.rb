@@ -1,4 +1,6 @@
 Sapos::Application.routes.draw do
+  resources :students do as_routes end
+
   resources :courses do as_routes end
 
   resources :levels do as_routes end
