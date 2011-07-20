@@ -2,3 +2,4 @@ This file lists all commands used to create models/views/controllers:
 
 Sponsor: rails g active_scaffold Sponsor name:string
 Institution: rails g active_scaffold Institution name:string
+Level: rails g active_scaffold Level name:string
