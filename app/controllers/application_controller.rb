@@ -6,6 +6,8 @@ class ApplicationController < ActionController::Base
     config.delete.link.label = "Excluir"    
     config.show.link.label = "Visualizar"
     config.update.link.label = "Editar"
-    config.search.link.label = "Pesquisar"    
+    config.search.link.label = "Pesquisar"        
+    #Faz com que a busca seja enviada ao servidor enquanto o usuário digita
+    config.search.live = true  
   end
 end

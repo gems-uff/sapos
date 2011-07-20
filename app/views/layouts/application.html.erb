@@ -11,10 +11,20 @@
   <%= javascript_include_tag 'jquery-ui-timepicker-addon.js' %>
   <%= javascript_include_tag 'application.js' %>
   <%= active_scaffold_includes %>
+  <%= stylesheet_link_tag 'active_scaffold_overrides' %>
   <%= csrf_meta_tag %>
 </head>
-<body>
-
+<body> 
+  <table width="100%">
+    <tr>      
+      <td width="95%"><a href="sponsors">[Agências de Fomento]</a>
+      <a href="institutions">[Instituições]</a>
+      <a href="courses">[Cursos]</a>
+      </td>
+      <td width="5%" align="left"><img src="images/sapo.jpg" width="70"/></td>
+    </tr>
+  </table>
+  
 <%= yield %>
 
 </body>
