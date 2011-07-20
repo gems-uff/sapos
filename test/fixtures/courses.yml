@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  name: MyString
+  level: 
+  institution: 
+
+two:
+  name: MyString
+  level: 
+  institution: 
