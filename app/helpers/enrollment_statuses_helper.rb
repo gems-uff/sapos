@@ -1,0 +1,2 @@
+module EnrollmentStatusesHelper
+end

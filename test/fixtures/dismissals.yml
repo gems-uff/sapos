@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  date: 2011-07-20
+  enrollment: 
+  dismissal_reason: 
+  obs: MyText
+
+two:
+  date: 2011-07-20
+  enrollment: 
+  dismissal_reason: 
+  obs: MyText

@@ -1,6 +1,25 @@
-This file lists all commands used to create models/views/controllers:
+This file lists all commands used to create entities and their CRUD:
 
-Sponsor: rails g active_scaffold Sponsor name:string
-Institution: rails g active_scaffold Institution name:string
-Level: rails g active_scaffold Level name:string
-Course: rails g active_scaffold Course name:string level:references institution:references
+Sponsor: 
+    rails generate active_scaffold Sponsor name:string
+Institution: 
+    rails generate active_scaffold Institution name:string
+Level: 
+    rails generate active_scaffold Level name:string
+Course: 
+    rails generate active_scaffold Course name:string level:references institution:references
+Student: 
+    rails generate active_scaffold Student name:string cpf:string
+    rails generate migration AddObsToStudent obs:text
+    (this migration was necessary because I forgot to add obs when generating Student)
+Course-Student:
+    rails generate migration CreateCoursesStudents
+    (followed by the edition of the created migration. Check the migration for future join tables)
+EnrollmentStatus:
+    rails generate active_scaffold EnrollmentStatus name:string
+Enrollment:
+    rails generate active_scaffold Enrollment enrollment_number:string student:references level:references enrollment_status:references admission_date:date obs:text
+DismissalReason:
+    rails generate active_scaffold DismissalReason name:string description:text
+Dismissal:
+    rails generate active_scaffold Dismissal date:date enrollment:references dismissal_reason:references obs:text

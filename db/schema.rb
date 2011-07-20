@@ -10,12 +10,53 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110720143713) do
+ActiveRecord::Schema.define(:version => 20110720202442) do
 
   create_table "courses", :force => true do |t|
     t.string   "name"
     t.integer  "level_id"
     t.integer  "institution_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "courses_students", :id => false, :force => true do |t|
+    t.integer "course_id",  :null => false
+    t.integer "student_id", :null => false
+  end
+
+  add_index "courses_students", ["course_id"], :name => "index_courses_students_on_course_id"
+  add_index "courses_students", ["student_id"], :name => "index_courses_students_on_student_id"
+
+  create_table "dismissal_reasons", :force => true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "dismissals", :force => true do |t|
+    t.date     "date"
+    t.integer  "enrollment_id"
+    t.integer  "dismissal_reason_id"
+    t.text     "obs"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "enrollment_statuses", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "enrollments", :force => true do |t|
+    t.string   "enrollment_number"
+    t.integer  "student_id"
+    t.integer  "level_id"
+    t.integer  "enrollment_status_id"
+    t.date     "admission_date"
+    t.text     "obs"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -36,6 +77,14 @@ ActiveRecord::Schema.define(:version => 20110720143713) do
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "students", :force => true do |t|
+    t.string   "name"
+    t.string   "cpf"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "obs"
   end
 
 end

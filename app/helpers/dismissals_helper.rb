@@ -1,0 +1,2 @@
+module DismissalsHelper
+end
