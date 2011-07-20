@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110720165055) do
+ActiveRecord::Schema.define(:version => 20110720173251) do
 
   create_table "courses", :force => true do |t|
     t.string   "name"
@@ -19,6 +19,14 @@ ActiveRecord::Schema.define(:version => 20110720165055) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "courses_students", :id => false, :force => true do |t|
+    t.integer "course_id",  :null => false
+    t.integer "student_id", :null => false
+  end
+
+  add_index "courses_students", ["course_id"], :name => "index_courses_students_on_course_id"
+  add_index "courses_students", ["student_id"], :name => "index_courses_students_on_student_id"
 
   create_table "institutions", :force => true do |t|
     t.string   "name"
