@@ -275,4 +275,8 @@ pt:
     show_link: "Visualizar"
     search_link: "Buscar"
     delete_message: "Tem certeza que deseja excluir?"
+    create_course_label: "Adicionar Curso"
+    create_institution_label: "Adicionar Instituição"
+    create_level_label: "Adicionar Nível"
+    create_sponsor_label: "Adicionar Agência de Fomento"
       

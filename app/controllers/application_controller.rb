@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
     config.search.link.label = :search_link    
     config.delete.link.confirm = :delete_message       
     #Faz com que a busca seja enviada ao servidor enquanto o usuário digita
-    config.search.live = true      
+    config.search.live = true              
+    #config.search.link.cancel = false     
   end
 end
