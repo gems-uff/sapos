@@ -1,19 +1,19 @@
-This file lists all commands used to create models/views/controllers:
+This file lists all commands used to create entities and their CRUD:
 
 Sponsor: 
-    rails g active_scaffold Sponsor name:string
+    rails generate active_scaffold Sponsor name:string
 Institution: 
-    rails g active_scaffold Institution name:string
+    rails generate active_scaffold Institution name:string
 Level: 
-    rails g active_scaffold Level name:string
+    rails generate active_scaffold Level name:string
 Course: 
-    rails g active_scaffold Course name:string level:references institution:references
+    rails generate active_scaffold Course name:string level:references institution:references
 Student: 
-    rails g active_scaffold Student name:string cpf:string
+    rails generate active_scaffold Student name:string cpf:string
 Course-Student:
-    rails g migration CreateCoursesStudents
+    rails generate migration CreateCoursesStudents
     (followed by the edition of the created migration. Check the migration for future join tables)
-StudentStatus:
-    rails g active_scaffold StudentStatus name:string
+EnrollmentStatus:
+    rails generate active_scaffold EnrollmentStatus name:string
 Enrollment:
-    rails g active_scaffold Enrollment number:string level:references student_status:references admission_date:date
+    rails generate active_scaffold Enrollment enrollment_number:string student:references level:references enrollment_status:references admission_date:date obs:text
