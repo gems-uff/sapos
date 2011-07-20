@@ -19,3 +19,7 @@ EnrollmentStatus:
     rails generate active_scaffold EnrollmentStatus name:string
 Enrollment:
     rails generate active_scaffold Enrollment enrollment_number:string student:references level:references enrollment_status:references admission_date:date obs:text
+DismissalReason:
+    rails generate active_scaffold DismissalReason name:string description:text
+Dismissal:
+    rails generate active_scaffold Dismissal date:date enrollment:references dismissal_reason:references obs:text

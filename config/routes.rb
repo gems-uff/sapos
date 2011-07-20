@@ -1,4 +1,6 @@
 Sapos::Application.routes.draw do
+  resources :dismissal_reasons do as_routes end
+
   resources :enrollments do as_routes end
 
   resources :enrollment_statuses do as_routes end
