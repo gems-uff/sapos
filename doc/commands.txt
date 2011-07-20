@@ -13,3 +13,7 @@ Student:
 Course-Student:
     rails g migration CreateCoursesStudents
     (followed by the edition of the created migration. Check the migration for future join tables)
+StudentStatus:
+    rails g active_scaffold StudentStatus name:string
+Enrollment:
+    rails g active_scaffold Enrollment number:string level:references student_status:references admission_date:date
