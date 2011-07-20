@@ -243,17 +243,17 @@ padding-right: 18px;
 
 .active-scaffold th.asc a,
 .active-scaffold th.asc a:hover {
-background: #333 url(../images/active_scaffold/default/arrow_up.gif) right 50% no-repeat;
+background: #333 url(../../../images/active_scaffold/default/arrow_up.gif) right 50% no-repeat;
 }
 
 .active-scaffold th.desc a,
 .active-scaffold th.desc a:hover {
-background: #333 url(../images/active_scaffold/default/arrow_down.gif) right 50% no-repeat;
+background: #333 url(../../../images/active_scaffold/default/arrow_down.gif) right 50% no-repeat;
 }
 
 .active-scaffold th.loading a,
 .active-scaffold th.loading a:hover {
-background: #333 url(../images/active_scaffold/default/indicator-small.gif) right 50% no-repeat;
+background: #333 url(../../../images/active_scaffold/default/indicator-small.gif) right 50% no-repeat;
 }
 
 .active-scaffold th .mark_heading {
@@ -432,7 +432,7 @@ float: right;
 text-indent: -4000px;
 width: 16px;
 height: 17px;
-background: url(../images/active_scaffold/default/close.gif) 0 0 no-repeat;
+background: url(../../../images/active_scaffold/default/close.gif) 0 0 no-repeat;
 }
 
 /* Nested
@@ -954,7 +954,7 @@ height: 16px;
 padding: 0;
 width: 16px;
 text-indent: -4000px;
-background: url(../images/active_scaffold/default/cross.png) 0 0 no-repeat;
+background: url(../../../images/active_scaffold/default/cross.png) 0 0 no-repeat;
 }
 
 .active-scaffold .sub-form .locked a.destroy {
@@ -999,7 +999,7 @@ font-size: 100%;
 .as_touch a.inline-adapter-close {
 width: 25px;
 height: 27px;
-background: url(../images/active_scaffold/default/close_touch.png) 0 0 no-repeat;
+background: url(../../../images/active_scaffold/default/close_touch.png) 0 0 no-repeat;
 }
 
 .as_touch .as_paginate {

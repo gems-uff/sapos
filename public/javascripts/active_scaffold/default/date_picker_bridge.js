@@ -1,11 +1,11 @@
 jQuery(function($){
   if (typeof($.datepicker) === 'object') {
-    $.datepicker.regional['en'] = {"closeText":"Close","monthNamesShort":["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],"nextText":"Next","changeMonth":true,"prevText":"Previous","showMonthAfterYear":false,"firstDay":0,"weekHeader":"Wk","isRTL":false,"changeYear":true,"dayNames":["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],"dateFormat":"yy-mm-dd","dayNamesMin":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],"dayNamesShort":["Sun","Mon","Tue","Wed","Thu","Fri","Sat"],"currentText":"Today","monthNames":["January","February","March","April","May","June","July","August","September","October","November","December"]};
-    $.datepicker.setDefaults($.datepicker.regional['en']);
+    $.datepicker.regional['pt'] = {"nextText":"Next","changeMonth":true,"prevText":"Previous","closeText":"Close","monthNamesShort":["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"],"changeYear":true,"dayNames":["Domingo","Segunda","Ter\u00e7a","Quarta","Quinta","Sexta","S\u00e1bado"],"dateFormat":"dd/mm/yy","dayNamesMin":["Dom","Seg","Ter","Qua","Qui","Sex","S\u00e1b"],"dayNamesShort":["Dom","Seg","Ter","Qua","Qui","Sex","S\u00e1b"],"currentText":"Today","monthNames":["Janeiro","Fevereiro","Mar\u00e7o","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"]};
+    $.datepicker.setDefaults($.datepicker.regional['pt']);
   }
   if (typeof($.timepicker) === 'object') {
-    $.timepicker.regional['en'] = {"ampm":false,"minuteText":"Minute","secondText":"Seconds","dateFormat":"D, dd M yy ","timeFormat":"hh:mm:ss","hourText":"Hour"};
-    $.timepicker.setDefaults($.timepicker.regional['en']);
+    $.timepicker.regional['pt'] = {"ampm":false,"secondText":"Segundo","minuteText":"Minuto","dateFormat":"DD, dd de %B de yy, ","timeFormat":"hh:mm h","hourText":"Hora"};
+    $.timepicker.setDefaults($.timepicker.regional['pt']);
   }
 });
 $(document).ready(function() {
