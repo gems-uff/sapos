@@ -254,7 +254,22 @@ pt:
         other: "Níveis"
       institution:
         one: "Instituição"
-        other: "Instituições"               
+        other: "Instituições"  
+      dismissal_reason:
+        one: "Razão de Desligamento"
+        other: "Razões de Desligamento"
+      dismissal:
+        one: "Desligamento"
+        other: "Desligamentos"
+      enrollment_status:
+        one: "Status de Matrícula"
+        other: "Status de Matrícula"
+      enrollment: 
+        one: "Matrícula"
+        other: "Matrículas"
+      student:
+        one: "Aluno"
+        other: "Alunos"
     attributes:
       course: 
         name: "Nome"
@@ -267,6 +282,28 @@ pt:
       institution:
         name: "Nome"
         courses: "Cursos"
+      dismissal_reason:
+        name: "Nome"
+        description: "Descrição"
+      enrollment:
+        admission_date: "Data de Admissão"
+        enrollment_number: "Número de Matrícula"
+        dismissal: "Desligamento"
+        enrollment_status: "Status de Matrícula"
+        level: "Nível"
+        student: "Aluno"
+      dismissal:
+        date: "Data"
+        dismissal_reason: "Motivo do Desligamento"
+      enrollment_status:
+        name: "Nome"
+      student:
+        name: "Nome"
+        courses: "Cursos"
+        cpf: "CPF"
+        enrollments: "Matrículas"
+        
+        
         
   active_scaffold:    
     update_link: "Editar"
@@ -279,4 +316,10 @@ pt:
     create_institution_label: "Adicionar Instituição"
     create_level_label: "Adicionar Nível"
     create_sponsor_label: "Adicionar Agência de Fomento"
+    create_dismissal_reason_label: "Adicionar Razão de Desligamento"
+    create_dismissal_label: "Adicionar Desligamento"
+    create_enrollment_label: "Adicionar Matrícula"
+    create_enrollment_status_label: "Adicionar Status de Matrícula"
+    create_student_label: "Adicionar Aluno"
+    update_course_label: "Modificar Curso"
       
