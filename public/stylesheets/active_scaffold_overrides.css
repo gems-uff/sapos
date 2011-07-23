@@ -815,14 +815,15 @@ font-weight: bold;
 }
 
 .active-scaffold label.example {
-font-size: 11px;
+font-size: 12px;  
+font-weight: bold;
 font-family: arial;
 color: #888;
 }
 
 .active-scaffold input.text-input,
 .active-scaffold select {
-font: bold 16px arial;
+font: bold 12px arial; 
 letter-spacing: -1px;
 border: solid 1px #1F7F00;
 }
