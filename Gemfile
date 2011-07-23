@@ -11,6 +11,9 @@ gem 'sqlite3'
 gem 'active_scaffold_vho'
 gem 'recordselect_vho'
 
+# Menu
+gem 'simple-navigation'
+
 # Use unicorn as the web server
 # gem 'unicorn'
 
