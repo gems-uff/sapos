@@ -44,11 +44,21 @@ SimpleNavigation::Configuration.run do |navigation|
     #                            when the item should be highlighted, you can set a regexp which is matched
     #                            against the current URI.
     #
-    primary.item :enrollment, 'Matrícula', enrollments_path
-    primary.item :institution, 'Instituição', institutions_path
-    primary.item :configuration, 'Configuração', sponsors_path do |configuration|
+    primary.item :stud, 'Alunos e Matrículas', enrollments_path do |stud|
+      stud.item :student, 'Alunos', students_path
+      stud.item :enrollment, 'Matrículas', enrollments_path
+    end
+        
+    primary.item :inst, 'Instituições e Cursos', institutions_path do |inst|
+      inst.item :institution, 'Instituições', institutions_path
+      inst.item :course, 'Cursos', courses_path
+    end
+    
+    primary.item :configuration, 'Configurações', sponsors_path do |configuration|
       configuration.item :sponsor, 'Agências de Fomento', sponsors_path
-      configuration.item :level, 'Níveis', levels_path      
+      configuration.item :level, 'Níveis', levels_path   
+      configuration.item :dismissal_reason, 'Razões de Desligamento', dismissal_reasons_path
+      configuration.item :enrollment_status, 'Tipos de Matrícula', enrollment_statuses_path
     end    
 
     # Add an item which has a sub navigation (same params, but with block)

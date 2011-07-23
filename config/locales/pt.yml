@@ -262,8 +262,8 @@ pt:
         one: "Desligamento"
         other: "Desligamentos"
       enrollment_status:
-        one: "Status de Matrícula"
-        other: "Status de Matrícula"
+        one: "Tipo de Matrícula"
+        other: "Tipos de Matrícula"
       enrollment: 
         one: "Matrícula"
         other: "Matrículas"
@@ -289,7 +289,7 @@ pt:
         admission_date: "Data de Admissão"
         enrollment_number: "Número de Matrícula"
         dismissal: "Desligamento"
-        enrollment_status: "Status de Matrícula"
+        enrollment_status: "Tipo de Matrícula"
         level: "Nível"
         student: "Aluno"
       dismissal:
@@ -319,7 +319,7 @@ pt:
     create_dismissal_reason_label: "Adicionar Razão de Desligamento"
     create_dismissal_label: "Adicionar Desligamento"
     create_enrollment_label: "Adicionar Matrícula"
-    create_enrollment_status_label: "Adicionar Status de Matrícula"
+    create_enrollment_status_label: "Adicionar Tipo de Matrícula"
     create_student_label: "Adicionar Aluno"
     update_course_label: "Modificar Curso"
       
