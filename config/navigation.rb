@@ -46,7 +46,7 @@ SimpleNavigation::Configuration.run do |navigation|
     #
     primary.item :enrollment, 'Matrícula', enrollments_path
     primary.item :institution, 'Instituição', institutions_path
-    primary.item :configuration, 'Configuração', configurations_path do |configuration|
+    primary.item :configuration, 'Configuração', sponsors_path do |configuration|
       configuration.item :sponsor, 'Agências de Fomento', sponsors_path
       configuration.item :level, 'Níveis', levels_path      
     end    
