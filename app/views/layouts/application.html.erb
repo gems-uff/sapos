@@ -15,7 +15,8 @@
   <%= stylesheet_link_tag 'active_scaffold_overrides' %> 
   <%= csrf_meta_tag %>
 </head>
-<body> 
+<body>
+  <%= render_navigation %>
   <table width="100%">
     <tr>      
       <td width="95%"><a href="sponsors">[Agências de Fomento]</a>
@@ -32,6 +33,7 @@
     </tr>
   </table>
   
+<%= render_navigation :renderer => :breadcrumbs, :join_with => " &gt; " %>
 <%= yield %>
 
 </body>

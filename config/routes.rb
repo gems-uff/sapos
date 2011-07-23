@@ -19,6 +19,8 @@ Sapos::Application.routes.draw do
   resources :institutions do as_routes end
 
   resources :sponsors do as_routes end
+  
+  resources :configurations
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

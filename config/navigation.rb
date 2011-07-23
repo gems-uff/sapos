@@ -6,7 +6,7 @@ SimpleNavigation::Configuration.run do |navigation|
   # navigation.renderer = Your::Custom::Renderer
 
   # Specify the class that will be applied to active navigation items. Defaults to 'selected'
-  # navigation.selected_class = 'your_selected_class'
+  # navigation.selected_class = 'selected'
 
   # Item keys are normally added to list items as id.
   # This setting turns that off
@@ -44,19 +44,24 @@ SimpleNavigation::Configuration.run do |navigation|
     #                            when the item should be highlighted, you can set a regexp which is matched
     #                            against the current URI.
     #
-    primary.item :key_1, 'name', url, options
+    primary.item :enrollment, 'Matrícula', enrollments_path
+    primary.item :institution, 'Instituição', institutions_path
+    primary.item :configuration, 'Configuração', configurations_path do |configuration|
+      configuration.item :sponsor, 'Agências de Fomento', sponsors_path
+      configuration.item :level, 'Níveis', levels_path      
+    end    
 
     # Add an item which has a sub navigation (same params, but with block)
-    primary.item :key_2, 'name', url, options do |sub_nav|
+    #primary.item :key_2, 'name', url, options do |sub_nav|
       # Add an item to the sub navigation (same params again)
-      sub_nav.item :key_2_1, 'name', url, options
-    end
+    #  sub_nav.item :key_2_1, 'name', url, options
+    #end
 
     # You can also specify a condition-proc that needs to be fullfilled to display an item.
     # Conditions are part of the options. They are evaluated in the context of the views,
     # thus you can use all the methods and vars you have available in the views.
-    primary.item :key_3, 'Admin', url, :class => 'special', :if => Proc.new { current_user.admin? }
-    primary.item :key_4, 'Account', url, :unless => Proc.new { logged_in? }
+    #primary.item :key_3, 'Admin', url, :class => 'special', :if => Proc.new { current_user.admin? }
+    #primary.item :key_4, 'Account', url, :unless => Proc.new { logged_in? }
 
     # you can also specify a css id or class to attach to this particular level
     # works for all levels of the menu
