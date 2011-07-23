@@ -6,7 +6,10 @@ gem 'rails', '3.0.9'
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'sqlite3'
+
+# Active scaffold support for Rails 3
 gem 'active_scaffold_vho'
+gem 'recordselect_vho'
 
 # Use unicorn as the web server
 # gem 'unicorn'
