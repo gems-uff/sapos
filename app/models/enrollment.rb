@@ -7,4 +7,6 @@ class Enrollment < ActiveRecord::Base
   def to_label
     "#{enrollment_number}"
   end
+  
+  validates_uniqueness_of :enrollment_number
 end
