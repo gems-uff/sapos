@@ -17,8 +17,8 @@ body a {
     background-color: #f4fcf2;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
-    margin-bottom: 30px;
-    width: 1000px; }
+    width: 1000px; 
+    margin: 0px auto -1px auto;}
 .menu .header {
     background-color: #464d57;
     color: #d4e8d3;
