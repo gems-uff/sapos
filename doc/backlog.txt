@@ -1,0 +1,11 @@
+Pending tasks:
+
+- Access control: https://github.com/activescaffold/active_scaffold/wiki/Security
+- Date format
+- Fix record_select problem in courses (probably due to to_label)
+- Adding record_select to the expected fields
+- Generate the remaining active_scaffold elements
+- Fix layout color
+- Fix the field order in create/update forms
+- Add validators to the required elements
+- Update UML model
