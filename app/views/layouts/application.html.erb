@@ -11,29 +11,40 @@
     <%= javascript_include_tag 'jquery-ui-timepicker-addon.js' %>
     <%= javascript_include_tag 'application.js' %>
     <%= active_scaffold_includes %>
-    <%= record_select_includes %>
-    <%= stylesheet_link_tag 'active_scaffold_overrides' %> 
-    <%= stylesheet_link_tag 'menu' %> 
+    <%= record_select_includes %>    
     <%= csrf_meta_tag %>
   </head>
-  <body>  
-    <div class='menu'>  
-      <div class='header'></div> 
-      <div class='menu_content' id='menu'> 
-        <div id='top_navigation'><%= render_navigation :level=>1 %></div>           
-        <div class='clear_float'></div> 
-        <div class='content_wrapper'> 
-          <div id='sub_navigation'><%= render_navigation :level=>2 %></div> 
-          <div class='content'> 
-            <div class='breadcrumbs'> 
-              <div class='title'><%= render_navigation :renderer => :breadcrumbs, :join_with => " &gt;&gt; " %></div>                 
+  <body>
+    
+    <div id='main_content'> 
+      <div class='menu'>  
+        <div class='header'>
+          <div class='title'>SAPOS - Sistema de Apoio à Pós-Graduação</div> 
+          <div class='sub'> 
+            <%= render_navigation :renderer => :breadcrumbs, :join_with => " &gt;&gt; " %> 
+          </div> </div> 
+        <div class='menu_content'> 
+          <div id='top_navigation'><%= render_navigation :level=>1 %></div>           
+          <div class='clear_float'></div> 
+          <div class='content_wrapper'> 
+            <div id='sub_navigation'><%= render_navigation :level=>2 %></div> 
+            <div class='content'>
               <%= yield %>
-            </div> 
-          </div>
+            </div>
+            <div class='clear_float'></div> 
+          </div> 
+        </div>
+        <div class='footer'>
+          <div class='src_code'> 
+            <a href="http://www.ic.uff.br" target="_blank">Instituto de Computação</a> / 
+            <a href="http://www.uff.br" target="_blank">UFF</a>
+          </div> 
+          <div class='styling'> 
+            Versão 1.0 <img src="images/sapo.jpg" width="20"/>
+          </div> 
           <div class='clear_float'></div> 
         </div> 
-      </div>
-      <div class='footer'></div> 
-    </div> 
-  </body>
-</html>
+      </div>  
+
+  </body> 
+</html> 
