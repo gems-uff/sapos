@@ -12,4 +12,10 @@ class ApplicationController < ActionController::Base
     config.search.live = true              
     #config.search.link.cancel = false        
   end
+  
+  # Defines which controller and action should be shown when the base
+  # URL is acessed (root route in routes.rb).
+  def root
+    redirect_to :controller => 'enrollments', :action => 'index'
+  end
 end
