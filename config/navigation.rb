@@ -45,8 +45,8 @@ SimpleNavigation::Configuration.run do |navigation|
     #                            against the current URI.
     #
     primary.item :stud, 'Alunos e Matrículas', enrollments_path do |stud|
-      stud.item :student, 'Alunos', students_path
       stud.item :enrollment, 'Matrículas', enrollments_path
+      stud.item :student, 'Alunos', students_path      
     end
         
     primary.item :inst, 'Instituições e Cursos', institutions_path do |inst|
