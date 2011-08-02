@@ -23,3 +23,5 @@ DismissalReason:
     rails generate active_scaffold DismissalReason name:string description:text
 Dismissal:
     rails generate active_scaffold Dismissal date:date enrollment:references dismissal_reason:references obs:text
+ScholarshipType: 
+    rails generate active_scaffold ScholarshipType name:string

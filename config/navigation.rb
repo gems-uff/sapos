@@ -58,6 +58,7 @@ SimpleNavigation::Configuration.run do |navigation|
       configuration.item :sponsor, 'Agências de Fomento', sponsors_path
       configuration.item :level, 'Níveis', levels_path   
       configuration.item :dismissal_reason, 'Razões de Desligamento', dismissal_reasons_path
+      configuration.item :scholarship_type, 'Tipos de Bolsa', scholarship_types_path
       configuration.item :enrollment_status, 'Tipos de Matrícula', enrollment_statuses_path
     end    
 
