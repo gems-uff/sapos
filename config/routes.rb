@@ -1,4 +1,6 @@
 Sapos::Application.routes.draw do
+  resources :professors do as_routes end
+
   resources :scholarship_types do as_routes end
 
   resources :dismissals do as_routes end

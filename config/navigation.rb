@@ -44,6 +44,10 @@ SimpleNavigation::Configuration.run do |navigation|
     #                            when the item should be highlighted, you can set a regexp which is matched
     #                            against the current URI.
     #
+    primary.item :prof, 'Professores', professors_path do |prof|
+      prof.item :professor, 'Professores', professors_path      
+    end
+
     primary.item :stud, 'Alunos e Matrículas', enrollments_path do |stud|
       stud.item :enrollment, 'Matrículas', enrollments_path
       stud.item :student, 'Alunos', students_path      

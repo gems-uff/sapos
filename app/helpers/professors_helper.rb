@@ -1,0 +1,2 @@
+module ProfessorsHelper
+end
