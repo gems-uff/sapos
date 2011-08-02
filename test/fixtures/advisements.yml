@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  professor: 
+  enrollment: 
+  main_advisor: false
+
+two:
+  professor: 
+  enrollment: 
+  main_advisor: false

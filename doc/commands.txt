@@ -27,3 +27,7 @@ ScholarshipType:
     rails generate active_scaffold ScholarshipType name:string
 Professor:
     rails generate active_scaffold Professor name:string cpf:string birthdate:date
+Advisement:
+    rails generate active_scaffold Advisement professor:references enrollment:references main_advisor:boolean
+    (followed by the edition of the created migration. Check the migration for future join tables with attributes)
+    (basically, were added indexes to the migration and has_many and has_many :through attributes to the related models)
