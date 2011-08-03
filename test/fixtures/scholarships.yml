@@ -1,0 +1,19 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  scholarship_number: MyString
+  level: 
+  sponsor: 
+  scholarship_type: 
+  start_date: 2011-08-02
+  end_date: 2011-08-02
+  obs: MyText
+
+two:
+  scholarship_number: MyString
+  level: 
+  sponsor: 
+  scholarship_type: 
+  start_date: 2011-08-02
+  end_date: 2011-08-02
+  obs: MyText

@@ -48,9 +48,10 @@ SimpleNavigation::Configuration.run do |navigation|
       prof.item :professor, 'Professores', professors_path      
     end
 
-    primary.item :stud, 'Alunos e Matrículas', enrollments_path do |stud|
+    primary.item :stud, 'Alunos', enrollments_path do |stud|
       stud.item :enrollment, 'Matrículas', enrollments_path
-      stud.item :student, 'Alunos', students_path      
+      stud.item :student, 'Alunos', students_path
+      stud.item :scholarship, 'Bolsas', scholarships_path      
     end
         
     primary.item :inst, 'Instituições e Cursos', institutions_path do |inst|
