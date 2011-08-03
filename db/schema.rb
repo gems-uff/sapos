@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110803014203) do
+ActiveRecord::Schema.define(:version => 20110803015824) do
 
   create_table "advisements", :force => true do |t|
     t.integer  "professor_id",  :null => false
@@ -91,6 +91,19 @@ ActiveRecord::Schema.define(:version => 20110803014203) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "scholarship_durations", :force => true do |t|
+    t.integer  "scholarship_id", :null => false
+    t.integer  "enrollment_id",  :null => false
+    t.date     "start_date"
+    t.date     "end_date"
+    t.text     "obs"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "scholarship_durations", ["enrollment_id"], :name => "index_scholarship_durations_on_enrollment_id"
+  add_index "scholarship_durations", ["scholarship_id"], :name => "index_scholarship_durations_on_scholarship_id"
 
   create_table "scholarship_types", :force => true do |t|
     t.string   "name"

@@ -5,6 +5,8 @@ class Enrollment < ActiveRecord::Base
   has_one :dismissal
   has_many :advisements
   has_many :professors, :through => :advisements
+  has_many :scholarship_durations
+  has_many :scholarships, :through => :scholarship_durations
     
   def to_label
     "#{enrollment_number}"

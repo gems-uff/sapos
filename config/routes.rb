@@ -1,4 +1,6 @@
 Sapos::Application.routes.draw do
+  resources :scholarship_durations do as_routes end
+
   resources :scholarships do as_routes end
 
   resources :advisements do as_routes end

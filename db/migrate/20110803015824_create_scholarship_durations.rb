@@ -1,0 +1,20 @@
+class CreateScholarshipDurations < ActiveRecord::Migration
+  def self.up
+    create_table :scholarship_durations do |t|
+      t.references :scholarship, :null => false
+      t.references :enrollment, :null => false
+      t.date :start_date
+      t.date :end_date
+      t.text :obs
+
+      t.timestamps
+    end
+    
+    add_index :scholarship_durations, :scholarship_id
+    add_index :scholarship_durations, :enrollment_id
+  end
+
+  def self.down
+    drop_table :scholarship_durations
+  end
+end
