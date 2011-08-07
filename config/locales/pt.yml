@@ -208,7 +208,7 @@ pt:
       inclusion: "não está incluído na lista"
       exclusion: "não está disponível"
       invalid: "não é válido"
-      confirmation: "não está de acordo com a confirmação"
+      confirmation: "não são iguais"
       accepted: "deve ser aceito"
       empty: "não pode ficar vazio"
       blank: "não pode ficar em branco"
@@ -270,6 +270,18 @@ pt:
       student:
         one: "Aluno"
         other: "Alunos"
+      scholarship:
+        one: "Bolsa"
+        other: "Bolsas"
+      scholarship_type:
+        one: "Tipo de Bolsa"
+        other: "Tipos de Bolsa"
+      sholarship_duration:
+        one: "Duração da Bolsa"
+        other: "Durações da Bolsa"
+      professor:
+        one: "Professor"
+        other: "Professores"
     attributes:
       course: 
         name: "Nome"
@@ -302,7 +314,18 @@ pt:
         courses: "Cursos"
         cpf: "CPF"
         enrollments: "Matrículas"
-        
+      scholarship:
+        scholarship_number: "Número da Bolsa"
+        level: "Nível"
+        sponsor: "Agência"
+        scholarship_type: "Tipo"
+        start_date: "Data de Início"
+        end_date: "Data de Fim"                
+        enrollments: "Matrículas"
+      professor: 
+        name: "Nome"
+        cpf: "CPF"
+        birthdate: "Data de Nascimento"
         
         
   active_scaffold:    
@@ -321,5 +344,6 @@ pt:
     create_enrollment_label: "Adicionar Matrícula"
     create_enrollment_status_label: "Adicionar Tipo de Matrícula"
     create_student_label: "Adicionar Aluno"
+    create_scholarship_label: "Adicionar Bolsa"
     update_course_label: "Modificar Curso"
       
