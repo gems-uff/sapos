@@ -1,12 +1,14 @@
 Pending tasks:
 
 - Date format
-- Fix record_select problem in courses (probably due to to_label)
 - Adding record_select to the expected fields
 - Fix layout color
 - Fix the field order in create/update forms
 - Add validators to the required elements
 - Update UML model
+- Allow users to logout
+- Timeout user section after a certain period of inactivity
+- delete cascade
 
 - Access control: we implemented a very basic support. It is missing a logout 
 option and the definition of different types of users (admin, plain). Only
