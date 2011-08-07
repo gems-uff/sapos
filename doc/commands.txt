@@ -33,6 +33,8 @@ Advisement:
     (basically, were added indexes to the migration and has_many and has_many :through attributes to the related models)
 Scholarship:
     rails generate active_scaffold Scholarship scholarship_number:string level:references sponsor:references scholarship_type:references start_date:date end_date:date obs:text
+    rails generate migration AddProfessorToScholarship professor_id:integer
+    (this migration was necessary because I forgot to add relationship to Professor when generating Scholarship)
 ScholarshipDuration:
     rails generate active_scaffold ScholarshipDuration scholarship:references enrollment:references start_date:date end_date:date obs:text
     (followed by the edition of the created migration. Check the migration for future join tables with attributes)
