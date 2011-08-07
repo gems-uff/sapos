@@ -276,9 +276,9 @@ pt:
       scholarship_type:
         one: "Tipo de Bolsa"
         other: "Tipos de Bolsa"
-      sholarship_duration:
-        one: "Duração da Bolsa"
-        other: "Durações da Bolsa"
+      scholarship_duration:
+        one: "Bolsa do Aluno"
+        other: "Bolsas do Aluno"
       professor:
         one: "Professor"
         other: "Professores"
@@ -304,6 +304,8 @@ pt:
         enrollment_status: "Tipo de Matrícula"
         level: "Nível"
         student: "Aluno"
+        scholarship_durations: "Bolsas do Aluno"
+        scholarships: "Números das Bolsas"        
       dismissal:
         date: "Data"
         dismissal_reason: "Motivo do Desligamento"
@@ -319,6 +321,11 @@ pt:
         level: "Nível"
         sponsor: "Agência"
         scholarship_type: "Tipo"
+        start_date: "Data de Início"
+        end_date: "Data de Fim"                
+        enrollments: "Matrículas"
+      scholarship_duration:
+        scholarship: "Número da Bolsa"        
         start_date: "Data de Início"
         end_date: "Data de Fim"                
         enrollments: "Matrículas"
@@ -345,5 +352,6 @@ pt:
     create_enrollment_status_label: "Adicionar Tipo de Matrícula"
     create_student_label: "Adicionar Aluno"
     create_scholarship_label: "Adicionar Bolsa"
+    create_scholarship_duration_label: "Adicionar Bolsa"
     update_course_label: "Modificar Curso"
       
