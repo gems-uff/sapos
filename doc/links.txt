@@ -1,0 +1,5 @@
+Information sources: 
+- http://guides.rubyonrails.org
+- http://api.rubyonrails.org
+- https://github.com/activescaffold/active_scaffold/wiki
+- https://github.com/vhochstein/active_scaffold/wiki

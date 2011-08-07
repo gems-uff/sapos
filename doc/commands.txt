@@ -37,3 +37,5 @@ ScholarshipDuration:
     rails generate active_scaffold ScholarshipDuration scholarship:references enrollment:references start_date:date end_date:date obs:text
     (followed by the edition of the created migration. Check the migration for future join tables with attributes)
     (basically, were added indexes to the migration and has_many and has_many :through attributes to the related models)
+User:
+    rails generate active_scaffold User name:string hashed_password:string salt:string

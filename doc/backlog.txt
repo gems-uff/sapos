@@ -1,6 +1,5 @@
 Pending tasks:
 
-- Access control: https://github.com/activescaffold/active_scaffold/wiki/Security
 - Date format
 - Fix record_select problem in courses (probably due to to_label)
 - Adding record_select to the expected fields
@@ -8,3 +7,9 @@ Pending tasks:
 - Fix the field order in create/update forms
 - Add validators to the required elements
 - Update UML model
+
+- Access control: we implemented a very basic support. It is missing a logout 
+option and the definition of different types of users (admin, plain). Only
+admin users should be able to create new users or edit their data. Plain
+users would be allowed only to change his data. At that moment, all 
+functionalities are open to all users.

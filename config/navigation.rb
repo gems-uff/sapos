@@ -65,6 +65,7 @@ SimpleNavigation::Configuration.run do |navigation|
       configuration.item :dismissal_reason, 'Razões de Desligamento', dismissal_reasons_path
       configuration.item :scholarship_type, 'Tipos de Bolsa', scholarship_types_path
       configuration.item :enrollment_status, 'Tipos de Matrícula', enrollment_statuses_path
+      configuration.item :user, 'Usuários', users_path
     end    
 
     # Add an item which has a sub navigation (same params, but with block)

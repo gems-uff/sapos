@@ -1,5 +1,8 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
+  
+  before_filter :authenticate
+  
   ActiveScaffold.set_defaults do |config| 
     config.ignore_columns.add [:created_at, :updated_at, :lock_version]
     config.create.link.label = :create_link
@@ -17,5 +20,13 @@ class ApplicationController < ActionController::Base
   # URL is acessed (root route in routes.rb).
   def root
     redirect_to :controller => 'enrollments', :action => 'index'
+  end
+  
+  private
+ 
+  def authenticate
+    authenticate_or_request_with_http_basic("Sapos") do |username, password|
+      User.authenticate(username, password)
+    end
   end
 end
