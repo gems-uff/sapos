@@ -1,4 +1,4 @@
 class Professor < ActiveRecord::Base
-  has_many :advisements
+  has_many :advisements, :dependent => :destroy
   has_many :enrollments, :through => :advisements
 end
