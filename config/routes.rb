@@ -12,7 +12,10 @@ Sapos::Application.routes.draw do
     as_routes     
   end
 
-  resources :professors do as_routes end
+  resources :professors do 
+    as_routes 
+    record_select_routes
+  end
 
   resources :scholarship_types do as_routes end
 
@@ -26,8 +29,7 @@ Sapos::Application.routes.draw do
   resources :enrollments do as_routes end
 
   resources :enrollment_statuses do 
-    as_routes 
-    record_select_routes
+    as_routes     
   end
 
   resources :students do 
@@ -41,8 +43,7 @@ Sapos::Application.routes.draw do
   end
 
   resources :levels do 
-    as_routes 
-    record_select_routes
+    as_routes     
   end
 
   resources :institutions do 

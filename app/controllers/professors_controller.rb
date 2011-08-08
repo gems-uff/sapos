@@ -5,7 +5,7 @@ class ProfessorsController < ApplicationController
     config.create.label = :create_professor_label    
     config.create.columns = [:name, :cpf, :birthdate]
     config.update.columns = [:name, :cpf, :birthdate]
-    config.show.columns = [:name, :cpf, :birthdate, :scholarships, :advisements]
-    
+    config.show.columns = [:name, :cpf, :birthdate, :scholarships, :advisements]    
   end
+  record_select :per_page => 10, :search_on => [:name], :order_by => 'name'
 end 

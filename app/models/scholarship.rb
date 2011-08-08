@@ -10,6 +10,6 @@ class Scholarship < ActiveRecord::Base
     "#{scholarship_number}"
   end
   
-  validates :scholarshio_number, :presence => true, :uniqueness => true
+  validates :scholarship_number, :presence => true, :uniqueness => true
   
 end
