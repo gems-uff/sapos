@@ -349,7 +349,7 @@ pt:
         password_confirmation: "Digite a senha novamente"
         
         
-  active_scaffold:    
+  active_scaffold:     
     update_link: "Editar"
     create_link: "Adicionar"
     delete_link: "Excluir"
@@ -369,5 +369,6 @@ pt:
     create_scholarship_duration_label: "Adicionar Bolsa"
     create_professor_label: "Adicionar Professor"
     create_user_label: "Adicionar Usuário"
+    update_enrollment_label: "Modificar Matrícula"
     update_course_label: "Modificar Curso"
     update_user_label: "Modificar Usuário"    
