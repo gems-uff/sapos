@@ -208,7 +208,7 @@ pt:
       inclusion: "não está incluído na lista"
       exclusion: "não está disponível"
       invalid: "não é válido"
-      confirmation: "não são iguais"
+      confirmation: "não está igual"
       accepted: "deve ser aceito"
       empty: "não pode ficar vazio"
       blank: "não pode ficar em branco"
