@@ -6,15 +6,23 @@
 #   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
 #   Mayor.create(:name => 'Daley', :city => cities.first)
 User.create(:name => 'admin', :password => 'admin')
+
 Sponsor.create(:name => "CAPES")
 Sponsor.create(:name => "CNPq")
 Sponsor.create(:name => "FAPERJ")
 Sponsor.create(:name => "PETROBRAS")
-Level.create(:name => "Regular")
-Level.create(:name => "Especial")
-Dismissal_reason.create(:name => "Defesa", :description => "Aluno defendeu")
-Dismissal_reason.create(:name => "Desempenho", :description => "Aluno não cumpriu critérios de desempenho")
-Dismissal_reason.create(:name => "Desistência", :description => "Aluno desistiu")
-Dismissal_reason.create(:name => "Prazo", :description => "Prazo para defesa esgotado")
-Dismissal_reason.create(:name => "Regular", :description => "Aluno foi admitido como aluno regular")
+
+Level.create(:name => "Graduação")
+Level.create(:name => "Especialização")
+Level.create(:name => "Mestrado")
+Level.create(:name => "Doutorado")
+
+EnrollmentStatus.create(:name => "Especial")
+EnrollmentStatus.create(:name => "Regular")
+
+DismissalReason.create(:name => "Defesa", :description => "Aluno defendeu")
+DismissalReason.create(:name => "Rendimento", :description => "Aluno não cumpriu critérios de rendimento")
+DismissalReason.create(:name => "Desistência", :description => "Aluno desistiu")
+DismissalReason.create(:name => "Prazo", :description => "Prazo para defesa esgotado")
+DismissalReason.create(:name => "Especial -> Regular", :description => "Aluno foi admitido como aluno regular")
 

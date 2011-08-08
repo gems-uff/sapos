@@ -1,0 +1,26 @@
+Stage 1: Setup
+
+- install Ruby 1.8.7-p352: http://rubyforge.org/frs/?group_id=167
+- execute: gem update --system
+- execute: gem install rails
+- execute: gem update
+
+- install Git 1.7.6: http://code.google.com/p/msysgit/downloads/list?can=3
+- install TortoiseGIT 1.6.5: http://code.google.com/p/tortoisegit/downloads/list
+
+- install Netbeans 7.0.1 completo: http://netbeans.org/downloads/index.html
+- install plug-ins Git e Rails de dentro do NetBeans.
+
+- extract http://www.sqlite.org/sqlite-shell-win32-x86-3070701.zip in the bin directory of ruby installation.
+- extract http://www.sqlite.org/sqlite-dll-win32-x86-3070701.zip in the bin directory of ruby installation.
+
+
+Stage 2: Prepare
+
+- clone sapos repository from git@sel.ic.uff.br:gems/sapos.git
+- install required gems executing (in the root of sapos): bundle install
+- rake db:setup
+
+Stage 3: Run!
+
+- builtin user is admin with password admin.
