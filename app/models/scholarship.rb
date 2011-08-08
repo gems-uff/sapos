@@ -9,4 +9,6 @@ class Scholarship < ActiveRecord::Base
   def to_label
     "#{scholarship_number}"
   end
+  
+  validates_uniqueness_of :scholarship_number
 end

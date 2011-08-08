@@ -306,6 +306,7 @@ pt:
         student: "Aluno"
         scholarship_durations: "Bolsas do Aluno"
         scholarships: "Números das Bolsas"        
+        advisements: "Orientadores"
       dismissal:
         date: "Data"
         dismissal_reason: "Motivo do Desligamento"
@@ -333,6 +334,10 @@ pt:
         name: "Nome"
         cpf: "CPF"
         birthdate: "Data de Nascimento"
+      advisement:
+        professor: "Professor"
+        enrollment: "Matrícula"
+        main_advisor: "Orientador Principal"
         
         
   active_scaffold:    
