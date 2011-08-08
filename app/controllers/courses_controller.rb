@@ -6,6 +6,7 @@ class CoursesController < ApplicationController
     config.update.label = :update_course_label
     
     config.columns[:level].form_ui = :select
+    config.columns[:institution].form_ui = :select
     config.create.columns = [:name, :level, :institution]
     config.update.columns = [:name, :level, :institution]
     

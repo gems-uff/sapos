@@ -282,6 +282,9 @@ pt:
       professor:
         one: "Professor"
         other: "Professores"
+      user:
+        one: "Usuário"
+        other: "Usuários"
     attributes:
       course: 
         name: "Nome"
@@ -340,6 +343,10 @@ pt:
         professor: "Professor"
         enrollment: "Matrícula"
         main_advisor: "Orientador Principal"
+      user:
+        name: "Nome do usuário"
+        password: "Senha"
+        password_confirmation: "Digite a senha novamente"
         
         
   active_scaffold:    
@@ -361,5 +368,7 @@ pt:
     create_scholarship_label: "Adicionar Bolsa"
     create_scholarship_duration_label: "Adicionar Bolsa"
     create_professor_label: "Adicionar Professor"
+    create_user_label: "Adicionar Usuário"
     update_course_label: "Modificar Curso"
+    update_user_label: "Modificar Usuário"
       
