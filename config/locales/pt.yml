@@ -334,6 +334,8 @@ pt:
         name: "Nome"
         cpf: "CPF"
         birthdate: "Data de Nascimento"
+        advisements: "Orientandos"
+        scholarships: "Bolsas"
       advisement:
         professor: "Professor"
         enrollment: "Matrícula"
@@ -358,5 +360,6 @@ pt:
     create_student_label: "Adicionar Aluno"
     create_scholarship_label: "Adicionar Bolsa"
     create_scholarship_duration_label: "Adicionar Bolsa"
+    create_professor_label: "Adicionar Professor"
     update_course_label: "Modificar Curso"
       
