@@ -7,7 +7,7 @@ pt:
   # formatos de data e hora
   date:
     formats:
-      default: "%d/%m/%Y"
+      default: "%d-%m-%Y"
       short: "%d de %B"
       long: "%d de %B de %Y"
 
@@ -370,5 +370,4 @@ pt:
     create_professor_label: "Adicionar Professor"
     create_user_label: "Adicionar Usuário"
     update_course_label: "Modificar Curso"
-    update_user_label: "Modificar Usuário"
-      
+    update_user_label: "Modificar Usuário"    

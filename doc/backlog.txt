@@ -1,17 +1,11 @@
 Pending tasks:
 
-- Date format
-- Adding record_select to the expected fields
-- Fix layout color
-- Fix the field order in create/update forms
 - Add validators to the required elements
 - Update UML model
-- Allow users to logout
-- Timeout user section after a certain period of inactivity
-- delete cascade
 
 - Access control: we implemented a very basic support. It is missing a logout 
-option and the definition of different types of users (admin, plain). Only
+option, timeout and the definition of different types of users (admin, plain). Only
 admin users should be able to create new users or edit their data. Plain
 users would be allowed only to change his data. At that moment, all 
-functionalities are open to all users.
+functionalities are open to all users. Check restful_authentication and 
+AuthLogic as alternatives to implement a real authentication support.
