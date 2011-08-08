@@ -4,4 +4,7 @@ class Dismissal < ActiveRecord::Base
   def to_label
     "#{date}"
   end
+  
+  validates :dismissal_reason, :presence => true
+  validates :date, :presence => true
 end

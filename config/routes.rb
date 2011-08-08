@@ -3,9 +3,14 @@ Sapos::Application.routes.draw do
 
   resources :scholarship_durations do as_routes end
 
-  resources :scholarships do as_routes end
+  resources :scholarships do 
+    as_routes 
+    record_select_routes
+  end
 
-  resources :advisements do as_routes end
+  resources :advisements do 
+    as_routes     
+  end
 
   resources :professors do as_routes end
 
@@ -13,22 +18,37 @@ Sapos::Application.routes.draw do
 
   resources :dismissals do as_routes end
 
-  resources :dismissal_reasons do as_routes end
+  resources :dismissal_reasons do 
+    as_routes 
+    record_select_routes
+  end
 
   resources :enrollments do as_routes end
 
-  resources :enrollment_statuses do as_routes end
+  resources :enrollment_statuses do 
+    as_routes 
+    record_select_routes
+  end
 
-  resources :students do as_routes end
+  resources :students do 
+    as_routes 
+    record_select_routes
+  end
 
   resources :courses do 
     as_routes 
     record_select_routes
   end
 
-  resources :levels do as_routes end
+  resources :levels do 
+    as_routes 
+    record_select_routes
+  end
 
-  resources :institutions do as_routes end
+  resources :institutions do 
+    as_routes 
+    record_select_routes
+  end
 
   resources :sponsors do as_routes end
 

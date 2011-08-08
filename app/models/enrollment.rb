@@ -12,5 +12,8 @@ class Enrollment < ActiveRecord::Base
     "#{enrollment_number}"
   end
   
-  validates_uniqueness_of :enrollment_number
+  validates :enrollment_number, :presence => true, :uniqueness => true
+  validates :level, :presence => true
+  validates :enrollment_status, :presence => true  
+  validates :student, :presence => true
 end

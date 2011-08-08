@@ -3,5 +3,6 @@ class Professor < ActiveRecord::Base
   has_many :enrollments, :through => :advisements
   has_many :scholarships, :dependent => :destroy
 
-  validates_uniqueness_of :cpf
+  validates :cpf, :presence => true, :uniqueness => true
+  validates :name, :presence => true
 end

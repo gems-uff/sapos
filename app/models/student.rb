@@ -3,5 +3,7 @@ class Student < ActiveRecord::Base
   #delete cascade for enrollment -- when a student is deleted, so are his enrollments
   has_many :enrollments, :dependent => :destroy
   
-  validates_uniqueness_of :cpf
+  validates :name, :presence => true
+  validates :cpf, :presence => true, :uniqueness => true
+  
 end

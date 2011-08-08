@@ -11,4 +11,5 @@ class ScholarshipsController < ApplicationController
     config.update.columns = [:scholarship_number, :level, :scholarship_type, :sponsor, :professor, :start_date, :end_date, :obs, :enrollments]
     config.show.columns = [:scholarship_number, :level, :scholarship_type, :sponsor, :professor, :start_date, :end_date, :obs, :enrollments]
   end
+  record_select :per_page => 10, :search_on => [:scholarship_number], :order_by => 'scholarship_number'
 end 

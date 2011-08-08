@@ -6,4 +6,8 @@ class Course < ActiveRecord::Base
   def to_label
     "#{name} - #{institution.name} - (#{level.name})"    
   end
+  
+  validates :name, :presence => true
+  validates :institution, :presence => true
+  validates :level, :presence => true
 end
