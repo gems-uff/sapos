@@ -7,7 +7,8 @@ pt:
   # formatos de data e hora
   date:
     formats:
-      default: "%d-%m-%Y"
+      #default: "%d-%m-%Y"
+      default: "%Y-%m-%d"
       short: "%d de %B"
       long: "%d de %B de %Y"
 

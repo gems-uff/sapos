@@ -3,7 +3,8 @@ class Dismissal < ActiveRecord::Base
   belongs_to :enrollment
   
   def to_label
-    "#{date.day}-#{date.month}-#{date.year}"    
+    #"#{date.day}-#{date.month}-#{date.year}"    
+    "#{date}"    
   end
   
   validates :dismissal_reason, :presence => true
