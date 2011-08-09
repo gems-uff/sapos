@@ -1,7 +1,8 @@
 .bundle
-db/*.sqlite3
-log/*.log
-tmp/
+/db/*.sqlite3
+/log/*.log
+/tmp/
 /nbproject/private/
-public/javascripts/active_scaffold/default/date_picker_bridge.js
-config/database.yml
+/public/images/active_scaffold
+/public/javascripts/active_scaffold
+/public/stylesheets/active_scaffold
