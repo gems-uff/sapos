@@ -10,7 +10,7 @@ class EnrollmentsController < ApplicationController
     #config.columns[:student].form_ui = :record_select        
     config.create.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :scholarship_durations, :dismissal]
     config.update.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :scholarship_durations, :dismissal]
-    config.show.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :scholarship_durations, :dismissal]    
-    
+    config.show.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :scholarship_durations, :dismissal]        
   end
+  record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
 end 
