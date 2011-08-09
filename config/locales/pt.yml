@@ -277,8 +277,8 @@ pt:
         one: "Tipo de Bolsa"
         other: "Tipos de Bolsa"
       scholarship_duration:
-        one: "Bolsa do Aluno"
-        other: "Bolsas do Aluno"
+        one: "Alocação de Bolsa"
+        other: "Alocação de Bolsas"
       professor:
         one: "Professor"
         other: "Professores"
@@ -332,7 +332,7 @@ pt:
         scholarship: "Número da Bolsa"        
         start_date: "Data de Início"
         end_date: "Data de Fim"                
-        enrollments: "Matrículas"
+        enrollment: "Matrícula"
       professor: 
         name: "Nome"
         cpf: "CPF"

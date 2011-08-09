@@ -52,6 +52,7 @@ SimpleNavigation::Configuration.run do |navigation|
       stud.item :enrollment, 'Matrículas', enrollments_path
       stud.item :student, 'Alunos', students_path
       stud.item :scholarship, 'Bolsas', scholarships_path      
+      stud.item :scholarship_duration, 'Alocação de Bolsas', scholarship_durations_path      
     end
         
     primary.item :inst, 'Instituições e Cursos', institutions_path do |inst|

@@ -7,5 +7,5 @@ class ProfessorsController < ApplicationController
     config.update.columns = [:name, :cpf, :birthdate]
     config.show.columns = [:name, :cpf, :birthdate, :scholarships, :advisements]    
   end
-  record_select :per_page => 10, :search_on => [:name], :order_by => 'name'
+  record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 end 

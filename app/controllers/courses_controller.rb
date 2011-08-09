@@ -11,5 +11,5 @@ class CoursesController < ApplicationController
     config.update.columns = [:name, :level, :institution]
     
   end
-  record_select :per_page => 10, :search_on => [:name], :order_by => 'name'
+  record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 end 
