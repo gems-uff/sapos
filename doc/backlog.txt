@@ -1,6 +1,9 @@
 Pending tasks:
 
-- Add validators to the required elements
+- Add complex validators, such as: 
+   - do not allow a scholarship to be alocated to more than one scholarship if the start-date and end-date overlap
+   - do not allow a new enrollment to the same student unless his other enrollments have assigned dismissals
+   - ...
 - Update UML model
 
 - Access control: we implemented a very basic support. It is missing a logout 
