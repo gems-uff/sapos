@@ -36,3 +36,8 @@ gem 'simple-navigation'
 # group :development, :test do
 #   gem 'webrat'
 # end
+
+# Mysql
+group :production do
+  gem 'mysql2', '~> 0.2.6'
+end
