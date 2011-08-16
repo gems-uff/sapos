@@ -244,6 +244,9 @@ pt:
         format: "%{attribute} %{message}"
                        
     models:
+      advisement:
+        one: "Orientação"
+        other: "Orientações"
       course: 
         one: "Curso"
         other: "Cursos"
@@ -370,6 +373,7 @@ pt:
     create_scholarship_duration_label: "Adicionar Bolsa"
     create_professor_label: "Adicionar Professor"
     create_user_label: "Adicionar Usuário"
+    create_advisement_label: "Adicionar Orientação"
     update_enrollment_label: "Modificar Matrícula"
     update_course_label: "Modificar Curso"
     update_user_label: "Modificar Usuário"    

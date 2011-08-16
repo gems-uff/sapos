@@ -45,7 +45,8 @@ SimpleNavigation::Configuration.run do |navigation|
     #                            against the current URI.
     #
     primary.item :prof, 'Professores', professors_path do |prof|
-      prof.item :professor, 'Professores', professors_path      
+      prof.item :professor, 'Professores', professors_path     
+      prof.item :advisement, 'Orientações', advisements_path
     end
 
     primary.item :stud, 'Alunos', enrollments_path do |stud|
