@@ -289,6 +289,16 @@ pt:
       user:
         one: "Usuário"
         other: "Usuários"
+      country:
+        one: "País"
+        other: "Países"
+      state:
+        one: "Estado"
+        other: "Estados"
+      city:
+        one: "Cidade"
+        other: "Cidades"
+        
     attributes:
       course: 
         name: "Nome"
@@ -351,7 +361,15 @@ pt:
         name: "Nome do usuário"
         password: "Senha"
         password_confirmation: "Digite a senha novamente"
-        
+      country:
+        name: "Nome"
+      state:
+        name: "Nome"
+        code: "Sigla"
+        country: "País"
+      city:
+        name: "Nome"
+        state: "Estado"
         
   active_scaffold:     
     update_link: "Editar"
@@ -376,4 +394,11 @@ pt:
     create_advisement_label: "Adicionar Orientação"
     update_enrollment_label: "Modificar Matrícula"
     update_course_label: "Modificar Curso"
-    update_user_label: "Modificar Usuário"    
+    update_user_label: "Modificar Usuário"
+    
+    create_country_label: "Adicionar País"
+    create_state_label: "Adicionar Estado"
+    create_city_label: "Adicionar Cidade"
+    update_country_label: "Editar País"
+    update_state_label: "Editar Estado"
+    update_city_label: "Editar Cidade"

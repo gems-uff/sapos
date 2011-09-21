@@ -1,4 +1,10 @@
 Sapos::Application.routes.draw do
+  resources :cities do as_routes end
+
+  resources :states do as_routes end
+
+  resources :countries do as_routes end
+
   resources :users do as_routes end
 
   resources :scholarship_durations do as_routes end

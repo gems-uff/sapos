@@ -68,6 +68,9 @@ SimpleNavigation::Configuration.run do |navigation|
       configuration.item :scholarship_type, 'Tipos de Bolsa', scholarship_types_path
       configuration.item :enrollment_status, 'Tipos de Matrícula', enrollment_statuses_path
       configuration.item :user, 'Usuários', users_path
+      configuration.item :city, 'Cidades', cities_path 
+      configuration.item :state, 'Estados', states_path 
+      configuration.item :country, 'Países', countries_path
     end    
 
     # Add an item which has a sub navigation (same params, but with block)
