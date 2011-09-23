@@ -310,6 +310,7 @@ pt:
         name: "Nome"
       institution:
         name: "Nome"
+        code: "Sigla"
         courses: "Cursos"
       dismissal_reason:
         name: "Nome"
