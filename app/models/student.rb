@@ -1,7 +1,5 @@
 class Student < ActiveRecord::Base
-  has_and_belongs_to_many :courses
-      
-  belongs_to :level
+  has_and_belongs_to_many :courses        
     
   belongs_to :birthplace, :foreign_key => "state_id", :class_name => "State"
   belongs_to :state

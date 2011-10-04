@@ -5,9 +5,7 @@ class StudentsController < ApplicationController
     config.create.label = :create_student_label   
     config.update.label = :update_student_label
 
-#    config.columns[:birthdate].form_ui = :calendar_date_select 
-    
-    config.columns[:level].form_ui = :select
+#    config.columns[:birthdate].form_ui = :calendar_date_select         
 
     config.columns[:country].form_ui = :select
     
@@ -29,8 +27,7 @@ class StudentsController < ApplicationController
         config.columns =
        [:name,
         :sex,
-        :civil_status,
-        :level,
+        :civil_status,        
         :birthdate,
         :state,
         :city,
