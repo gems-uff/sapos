@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111004011410) do
+ActiveRecord::Schema.define(:version => 20111006030627) do
 
   create_table "advisements", :force => true do |t|
     t.integer  "professor_id",  :null => false
@@ -101,9 +101,21 @@ ActiveRecord::Schema.define(:version => 20111004011410) do
   create_table "professors", :force => true do |t|
     t.string   "name"
     t.string   "cpf"
-    t.date     "birthdate"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "sex"
+    t.string   "civil_status"
+    t.string   "identity"
+    t.string   "identity_issuing_body"
+    t.string   "identity_expedition_date"
+    t.string   "neighbourhood"
+    t.string   "address"
+    t.integer  "state_id"
+    t.integer  "city_id"
+    t.string   "zip_code"
+    t.string   "telephone1"
+    t.string   "telephone2"
+    t.string   "siape"
   end
 
   create_table "scholarship_durations", :force => true do |t|
