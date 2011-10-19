@@ -7,8 +7,8 @@ class CoursesController < ApplicationController
     
     config.columns[:level].form_ui = :select
     config.columns[:institution].form_ui = :record_select
-    config.create.columns = [:name, :level, :institution]
-    config.update.columns = [:name, :level, :institution]
+    config.create.columns = [:name, :level, :institution, :students]
+    config.update.columns = [:name, :level, :institution, :students]
     
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true

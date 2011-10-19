@@ -370,7 +370,17 @@ pt:
       professor: 
         name: "Nome"
         cpf: "CPF"
+        address: "Logradouro"
+        civil_status: "Estado Civil"
         birthdate: "Data de Nascimento"
+        identity_expedition_date: "Data de expedição da Identidade"
+        identity_issuing_body: "Órgão Expeditor"
+        identity_number: "Número da identidade"
+        neighbourhood: "Bairro"
+        sex: "Sexo"
+        telephone1: "1º Telefone"
+        telephone2: "2º Telefone"
+        zip_code: "CEP"
         advisements: "Orientandos"
         scholarships: "Bolsas"
       advisement:
