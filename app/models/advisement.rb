@@ -3,6 +3,6 @@ class Advisement < ActiveRecord::Base
   belongs_to :enrollment
 
   def to_label
-    "#{enrollment.enrollment_number} - #{enrollment.student.name}"    
+    "#{enrollment.enrollment_number} - #{professor.name}"    
   end
 end
