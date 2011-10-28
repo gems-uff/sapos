@@ -6,6 +6,7 @@ class StudentsController < ApplicationController
     config.update.label = :update_student_label
 
 #    config.columns[:birthdate].form_ui = :calendar_date_select         
+    config.columns[:birthdate].options = {'date:yearRange' => 'c-100:c'}
 
     config.columns[:country].form_ui = :select
     
