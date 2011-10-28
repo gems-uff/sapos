@@ -3,6 +3,8 @@ class ScholarshipDurationsController < ApplicationController
     config.list.sorting = {:scholarship => 'ASC'}
     config.list.columns = [:scholarship, :start_date, :end_date, :enrollment]
     config.create.label = :create_scholarship_duration_label
+    config.search.columns = [:scholarship] 
+    config.columns[:scholarship].search_sql = 'scholarships.scholarship_number'
     config.columns[:scholarship].form_ui = :record_select
     config.columns[:enrollment].form_ui = :record_select
     config.create.columns = [:scholarship, :enrollment, :start_date, :end_date, :obs]
