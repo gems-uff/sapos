@@ -9,7 +9,7 @@ class Enrollment < ActiveRecord::Base
   has_many :scholarships, :through => :scholarship_durations
     
   def to_label
-    "#{enrollment_number} - #{student.name.split(" ",20)[0]}"
+    "#{enrollment_number} - #{student.name}"
   end
   
   validates :enrollment_number, :presence => true, :uniqueness => true
