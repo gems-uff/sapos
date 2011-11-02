@@ -304,6 +304,7 @@ pt:
         name: "Nome"
         institution: "Instituição"
         level: "Nível"
+        students: "Alunos"
       sponsor:
         name: "Nome"
       level: 
@@ -383,6 +384,7 @@ pt:
         zip_code: "CEP"
         advisements: "Orientandos"
         scholarships: "Bolsas"
+        enrollments: "Orientandos"
       advisement:
         professor: "Professor"
         enrollment: "Matrícula"
@@ -402,6 +404,15 @@ pt:
         state: "Estado"
         
   active_scaffold:     
+    close: "Fechar"
+    create: "Salvar"
+    cancel: "Cancelar"
+    create_another : "Criar Outro"
+    no_options: "Sem Opções"
+    create_new: "Criar Novo"
+    update: "Atualizar"
+    add_existing: "Adicionar Existente"
+    add: "Adicionar"
     update_link: "Editar"
     create_link: "Adicionar"
     delete_link: "Excluir"
