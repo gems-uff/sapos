@@ -7,6 +7,8 @@ class ScholarshipDurationsController < ApplicationController
     config.columns[:scholarship].search_sql = 'scholarships.scholarship_number'
     config.columns[:scholarship].form_ui = :record_select
     config.columns[:enrollment].form_ui = :record_select
+    config.columns[:start_date].options = {:format => :monthyear}
+    config.columns[:end_date].options = {:format => :monthyear}
     config.create.columns = [:scholarship, :enrollment, :start_date, :end_date, :obs]
     config.update.columns = [:scholarship, :enrollment, :start_date, :end_date, :obs]
   end
