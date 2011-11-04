@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  approval_date: 2011-11-03
+  obs: MyString
+  enrollment: 
+  deferral_type: 
+
+two:
+  approval_date: 2011-11-03
+  obs: MyString
+  enrollment: 
+  deferral_type: 

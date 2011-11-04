@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  name: MyString
+  description: MyString
+  duration: 1
+  phase: 
+
+two:
+  name: MyString
+  description: MyString
+  duration: 1
+  phase: 

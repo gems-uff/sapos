@@ -55,6 +55,13 @@ SimpleNavigation::Configuration.run do |navigation|
       stud.item :scholarship, 'Bolsas', scholarships_path      
       stud.item :scholarship_duration, 'Alocação de Bolsas', scholarship_durations_path      
     end
+    
+    primary.item :stud, 'Controle de Etapas', phases_path do |cont|
+      cont.item :phase, 'Etapas', phases_path
+      cont.item :deferral, 'Prorrogação', deferrals_path
+      cont.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path      
+      cont.item :accomplishment, 'Realização de Etapa', accomplishments_path
+    end
         
     primary.item :inst, 'Instituições e Cursos', institutions_path do |inst|
       inst.item :institution, 'Instituições', institutions_path

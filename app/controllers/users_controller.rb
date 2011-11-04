@@ -10,4 +10,4 @@ class UsersController < ApplicationController
     config.columns[:password].form_ui = :password
     config.columns[:password_confirmation].form_ui = :password
   end
-end 
+end

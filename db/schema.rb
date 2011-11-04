@@ -10,7 +10,16 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111019125803) do
+ActiveRecord::Schema.define(:version => 20111103213240) do
+
+  create_table "accomplishments", :force => true do |t|
+    t.integer  "enrollment_id"
+    t.integer  "phase_id"
+    t.date     "conclusion_date"
+    t.string   "obs"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "advisements", :force => true do |t|
     t.integer  "professor_id",  :null => false
@@ -51,6 +60,24 @@ ActiveRecord::Schema.define(:version => 20111019125803) do
 
   add_index "courses_students", ["course_id"], :name => "index_courses_students_on_course_id"
   add_index "courses_students", ["student_id"], :name => "index_courses_students_on_student_id"
+
+  create_table "deferral_types", :force => true do |t|
+    t.string   "name"
+    t.string   "description"
+    t.integer  "duration"
+    t.integer  "phase_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "deferrals", :force => true do |t|
+    t.date     "approval_date"
+    t.string   "obs"
+    t.integer  "enrollment_id"
+    t.integer  "deferral_type_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "dismissal_reasons", :force => true do |t|
     t.string   "name"
@@ -94,6 +121,14 @@ ActiveRecord::Schema.define(:version => 20111019125803) do
 
   create_table "levels", :force => true do |t|
     t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "phases", :force => true do |t|
+    t.string   "name"
+    t.string   "description"
+    t.integer  "deadline"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
