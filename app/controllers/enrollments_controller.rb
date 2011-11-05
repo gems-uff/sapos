@@ -7,6 +7,9 @@ class EnrollmentsController < ApplicationController
     config.columns[:student].sort_by :sql => 'students.name'
     config.columns[:level].form_ui = :select
     config.columns[:enrollment_status].form_ui = :select    
+    config.columns[:level].clear_link
+    config.columns[:enrollment_status].clear_link
+    config.columns[:student].form_ui = :record_select
     #Student can not be configured as record select because it does not allow the user to create a new one, if needed
     #config.columns[:student].form_ui = :record_select        
     config.create.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :scholarship_durations, :dismissal]

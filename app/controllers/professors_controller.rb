@@ -6,6 +6,11 @@ class ProfessorsController < ApplicationController
 #    config.create.columns = [:name, :cpf, :birthdate]
 #    config.update.columns = [:name, :cpf, :birthdate]
     config.columns[:enrollments].associated_limit = nil
+    config.columns[:birthdate].options = {'date:yearRange' => 'c-100:c'}    
+    config.columns[:civil_status].form_ui = :select
+    config.columns[:civil_status].options = {:options => [['Solteiro(a)','solteiro'],
+                                                          ['Casado(a)','casado']]}                                                      
+    config.columns[:scholarships].form_ui = :record_select               
     config.show.columns = [:name,
                            :cpf,
                            :birthdate,

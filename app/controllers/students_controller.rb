@@ -24,7 +24,9 @@ class StudentsController < ApplicationController
     
     config.columns[:civil_status].form_ui = :select
     config.columns[:civil_status].options = {:options => ['Solteiro(a)','Casado(a)']}
-
+    
+    config.columns[:enrollments].clear_link
+    
         config.columns =
        [:name,
         :sex,
