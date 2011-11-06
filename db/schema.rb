@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111103213240) do
+ActiveRecord::Schema.define(:version => 20111106003916) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -131,6 +131,7 @@ ActiveRecord::Schema.define(:version => 20111103213240) do
     t.integer  "deadline"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "level_id"
   end
 
   create_table "professors", :force => true do |t|

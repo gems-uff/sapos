@@ -50,17 +50,13 @@ SimpleNavigation::Configuration.run do |navigation|
     end
 
     primary.item :stud, 'Alunos', enrollments_path do |stud|
-      stud.item :enrollment, 'Matrículas', enrollments_path
       stud.item :student, 'Alunos', students_path
+      stud.item :enrollment, 'Matrículas', enrollments_path
+      stud.item :phase, 'Etapas', phases_path
+      stud.item :accomplishment, 'Realização de Etapa', accomplishments_path
       stud.item :scholarship, 'Bolsas', scholarships_path      
-      stud.item :scholarship_duration, 'Alocação de Bolsas', scholarship_durations_path      
-    end
-    
-    primary.item :stud, 'Controle de Etapas', phases_path do |cont|
-      cont.item :phase, 'Etapas', phases_path
-      cont.item :deferral, 'Prorrogação', deferrals_path
-      cont.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path      
-      cont.item :accomplishment, 'Realização de Etapa', accomplishments_path
+      stud.item :scholarship_duration, 'Alocação de Bolsas', scholarship_durations_path
+      stud.item :deferral, 'Prorrogações', deferrals_path
     end
         
     primary.item :inst, 'Instituições e Cursos', institutions_path do |inst|
@@ -73,6 +69,7 @@ SimpleNavigation::Configuration.run do |navigation|
       configuration.item :level, 'Níveis', levels_path   
       configuration.item :dismissal_reason, 'Razões de Desligamento', dismissal_reasons_path
       configuration.item :scholarship_type, 'Tipos de Bolsa', scholarship_types_path
+      configuration.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path      
       configuration.item :enrollment_status, 'Tipos de Matrícula', enrollment_statuses_path
       configuration.item :user, 'Usuários', users_path
       configuration.item :city, 'Cidades', cities_path 

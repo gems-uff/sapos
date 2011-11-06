@@ -1,7 +1,7 @@
 class AccomplishmentsController < ApplicationController
   active_scaffold :accomplishment do |config|
-    config.list.sorting = {:phase => 'ASC'}
-    config.list.columns = [:phase, :enrollment, :conclusion_date, :obs]
+    config.list.sorting = {:enrollment => 'ASC'}
+    config.list.columns = [:enrollment, :phase, :conclusion_date, :obs]
     config.create.label = :create_accomplishment_label
     config.search.columns = [:phase] 
 #    config.columns[:phase].search_sql = 'phases.name'

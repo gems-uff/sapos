@@ -299,6 +299,18 @@ pt:
       city:
         one: "Cidade"
         other: "Cidades"
+      phase:
+        one: "Etapa"
+        other: "Etapas"
+      accomplishment:
+        one: "Realização de Etapa"
+        other: "Realização de Etapas"
+      deferral:
+        one: "Prorrogação"
+        other: "Prorrogações"
+      deferral_type:
+        one: "Tipo de Prorrogação"
+        other: "Tipos de Prorrogação"
         
     attributes:
       course: 
@@ -403,6 +415,24 @@ pt:
       city:
         name: "Nome"
         state: "Estado"
+      phase:
+        name: "Nome"
+        description: "Descrição"
+        deadline: "Prazo"
+      accomplishment:
+        phase: "Etapa"
+        enrollment: "Matrícula"
+        conclusion_date: "Data de conclusão"
+        obs: "Observação"
+      deferral:
+        enrollment: "Matrícula"
+        approval_date: "Data de aprovação"
+        obs: "Observação"
+        deferral_type: "Tipo de Prorrogação"
+      deferral_type:
+        name: "Nome"
+        description: "Descrição"
+        duration: "Duração"
         
   active_scaffold:     
     close: "Fechar"
