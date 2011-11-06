@@ -243,6 +243,9 @@ pt:
 
       full_messages:
         format: "%{attribute} %{message}"
+        
+      scholarship_duration:
+        start_date_greater_than_end_date: "maior do que Data Final"
                        
     models:
       advisement:
