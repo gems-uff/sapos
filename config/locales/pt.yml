@@ -389,8 +389,9 @@ pt:
       scholarship_duration:
         scholarship: "Número da Bolsa"        
         start_date: "Data de Início"
-        end_date: "Data de Fim"                
+        end_date: "Data Limite de Concessão"                
         enrollment: "Matrícula"
+        scholarship_end_date: "Data de Encerramento"
       professor: 
         name: "Nome"
         cpf: "CPF"

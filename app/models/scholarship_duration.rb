@@ -6,6 +6,10 @@ class ScholarshipDuration < ActiveRecord::Base
     "#{start_date} - #{end_date}"
   end
   
+  def scholarship_end_date
+    scholarship.end_date
+  end
+  
   validate :start_date_greater_than_end_date
   validate :invalid_scholarship_duration_date
   validate :scholarship_with_another_student  
