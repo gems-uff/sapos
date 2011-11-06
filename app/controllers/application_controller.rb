@@ -3,6 +3,9 @@ class ApplicationController < ActionController::Base
   
   before_filter :authenticate
   
+  # disable implicit helper(:all) in rails3
+  clear_helpers
+  
   ActiveScaffold.set_defaults do |config| 
     config.ignore_columns.add [:created_at, :updated_at, :lock_version]
     config.create.link.label = :create_link
