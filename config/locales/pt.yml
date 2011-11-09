@@ -245,7 +245,7 @@ pt:
         format: "%{attribute} %{message}"
         
       scholarship_duration:
-        start_date_greater_than_end_date: "maior do que Data Final"
+        start_date_greater_than_end_date: "maior do que Data de Limite de Concessão"
         
         start_date_smaller_than_scholarship_start_date: "menor do que Data Inicial de Bolsa"
         start_date_greater_than_scholarship_end_date: "maior do que Data Final de Bolsa"
@@ -391,7 +391,7 @@ pt:
         start_date: "Data de Início"
         end_date: "Data Limite de Concessão"                
         enrollment: "Matrícula"
-        scholarship_end_date: "Data de Encerramento"
+        cancel_date: "Data de Encerramento"       
       professor: 
         name: "Nome"
         cpf: "CPF"

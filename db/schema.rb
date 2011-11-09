@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111106003916) do
+ActiveRecord::Schema.define(:version => 20111109011424) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -163,6 +163,7 @@ ActiveRecord::Schema.define(:version => 20111106003916) do
     t.text     "obs"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.date     "cancel_date"
   end
 
   add_index "scholarship_durations", ["enrollment_id"], :name => "index_scholarship_durations_on_enrollment_id"
