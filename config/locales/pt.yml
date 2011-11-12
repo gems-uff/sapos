@@ -246,13 +246,14 @@ pt:
         
       scholarship_duration:
         start_date_greater_than_end_date: "maior do que Data de Limite de Concessão"
-        
         start_date_smaller_than_scholarship_start_date: "menor do que Data Inicial de Bolsa"
         start_date_greater_than_scholarship_end_date: "maior do que Data Final de Bolsa"
         end_date_smaller_than_scholarship_start_date: "menor do que Data Inicial de Bolsa"
         end_date_greater_than_scholarship_end_date: "maior do que Data Final de Bolsa"
-        
         already_associated_with_student: "já está associada com outro aluno"
+        
+      advisement:
+        already_with_main_advisor: "já possui um orientador principal"     
                        
     models:
       advisement:
@@ -473,6 +474,7 @@ pt:
     filtered: ""
     reset: "Resetar"
     click_to_reset: "Clique aqui para remover o filtro criado"
+    replace_with_new: "Substituir por novo"
     
     create_course_label: "Adicionar Curso"
     create_institution_label: "Adicionar Instituição"
