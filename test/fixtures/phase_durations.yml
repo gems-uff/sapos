@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  phase: 
+  level: 
+  deadline: 1
+
+two:
+  phase: 
+  level: 
+  deadline: 1

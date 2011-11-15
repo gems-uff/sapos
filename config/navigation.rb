@@ -52,7 +52,6 @@ SimpleNavigation::Configuration.run do |navigation|
     primary.item :stud, 'Alunos', enrollments_path do |stud|
       stud.item :student, 'Alunos', students_path
       stud.item :enrollment, 'Matrículas', enrollments_path
-      stud.item :phase, 'Etapas', phases_path
       stud.item :accomplishment, 'Realização de Etapa', accomplishments_path
       stud.item :scholarship, 'Bolsas', scholarships_path      
       stud.item :scholarship_duration, 'Alocação de Bolsas', scholarship_durations_path
@@ -65,6 +64,7 @@ SimpleNavigation::Configuration.run do |navigation|
     end
     
     primary.item :configuration, 'Configurações', sponsors_path do |configuration|
+      configuration.item :phase, 'Etapas', phases_path
       configuration.item :sponsor, 'Agências de Fomento', sponsors_path
       configuration.item :level, 'Níveis', levels_path   
       configuration.item :dismissal_reason, 'Razões de Desligamento', dismissal_reasons_path

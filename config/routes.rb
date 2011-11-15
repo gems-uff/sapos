@@ -1,4 +1,6 @@
 Sapos::Application.routes.draw do
+  resources :phase_durations do as_routes end
+
   resources :deferrals do as_routes end
 
   resources :deferral_types do as_routes end

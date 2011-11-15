@@ -430,7 +430,7 @@ pt:
       phase:
         name: "Nome"
         description: "Descrição"
-        deadline: "Prazo"
+#        deadline: "Prazo"
       accomplishment:
         phase: "Etapa"
         enrollment: "Matrícula"
