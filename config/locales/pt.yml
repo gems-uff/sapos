@@ -350,6 +350,7 @@ pt:
         scholarship_durations: "Bolsas do Aluno"
         scholarships: "Números das Bolsas"        
         advisements: "Orientadores"
+        accomplishments: "Realização de Etapa"
       dismissal:
         date: "Data"
         dismissal_reason: "Motivo do Desligamento"
@@ -430,7 +431,12 @@ pt:
       phase:
         name: "Nome"
         description: "Descrição"
-#        deadline: "Prazo"
+        phase_durations: "Duração de Etapas"
+        accomplishments: "Realização de Etapas"
+        enrollments: "Matrículas"
+      phase_duration:
+        deadline: "Prazo Máximo(em meses)"
+        level: "Nível"
       accomplishment:
         phase: "Etapa"
         enrollment: "Matrícula"
@@ -444,7 +450,8 @@ pt:
       deferral_type:
         name: "Nome"
         description: "Descrição"
-        duration: "Duração"
+        duration: "Duração(meses)"
+        phase: "Etapa"
         
   active_scaffold:     
     close: "Fechar"
@@ -493,6 +500,8 @@ pt:
     create_country_label: "Adicionar País"
     create_state_label: "Adicionar Estado"
     create_city_label: "Adicionar Cidade"
+    create_deferral_type_label: "Adicionar Tipo de Prorrogação"
+    create_phase_label: "Adicionar Fase"
     update_enrollment_label: "Modificar Matrícula"
     update_course_label: "Modificar Curso"
     update_user_label: "Modificar Usuário"
