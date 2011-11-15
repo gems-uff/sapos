@@ -17,4 +17,4 @@ class EnrollmentsController < ApplicationController
     config.show.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :accomplishments, :scholarship_durations, :dismissal]        
   end
   record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
-end 
+end
