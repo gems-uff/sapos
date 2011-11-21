@@ -9,6 +9,7 @@ class Enrollment < ActiveRecord::Base
   has_many :scholarships, :through => :scholarship_durations
   has_many :accomplishments, :dependent => :destroy
   has_many :phases, :through => :accomplishments
+  has_many :deferrals, :dependent => :destroy
     
   def to_label
     "#{enrollment_number} - #{student.name}"
