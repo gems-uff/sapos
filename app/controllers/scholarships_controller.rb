@@ -7,6 +7,10 @@ class ScholarshipsController < ApplicationController
     config.columns[:scholarship_type].form_ui = :select
     config.columns[:level].form_ui = :select
     config.columns[:professor].form_ui = :record_select
+    
+    config.columns[:start_date].options = {:format => :monthyear}
+    config.columns[:end_date].options = {:format => :monthyear}
+    
     config.create.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs, :enrollments]
     config.update.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs, :enrollments]
     config.show.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs, :enrollments]
