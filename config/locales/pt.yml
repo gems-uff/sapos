@@ -350,6 +350,7 @@ pt:
         scholarship_durations: "Bolsas do Aluno"
         scholarships: "Números das Bolsas"        
         advisements: "Orientadores"
+        deferrals: "Prorrogações"
         accomplishments: "Realização de Etapa"
       dismissal:
         date: "Data"
