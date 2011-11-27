@@ -8,8 +8,8 @@ module ScholarshipDurationsHelper
          :start_year => Time.now.year - @@range,
          :end_year => Time.now.year + @@range,
          :include_blank => true,
-         :default => nil  
-    }    
+         :default => nil
+    }.merge(options)
   end
   
   def start_date_form_column(record,options)                
@@ -17,7 +17,7 @@ module ScholarshipDurationsHelper
          :discard_day => true,
          :start_year => Time.now.year - @@range,
          :end_year => Time.now.year + @@range
-    }    
+    }.merge(options)
   end
   
   def end_date_form_column(record,options)    
@@ -25,6 +25,6 @@ module ScholarshipDurationsHelper
          :discard_day => true,
          :start_year => Time.now.year - @@range,
          :end_year => Time.now.year + @@range
-    }        
+    }.merge(options)
   end  
 end

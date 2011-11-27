@@ -11,6 +11,9 @@ gem 'sqlite3'
 gem 'active_scaffold_vho'
 gem 'recordselect_vho'
 
+#Date Validation Plugin
+gem 'validates_timeliness', '~> 3.0.2'
+
 # Menu
 gem 'simple-navigation'
 

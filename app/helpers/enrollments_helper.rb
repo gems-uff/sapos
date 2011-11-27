@@ -1,4 +1,4 @@
-module EnrollmentsHelper
+module EnrollmentsHelper   
   @@config = YAML::load_file("#{Rails.root}/config/properties.yml")    
   @@range = @@config["scholarship_year_range"]    
       
@@ -8,16 +8,16 @@ module EnrollmentsHelper
          :start_year => Time.now.year - @@range,
          :end_year => Time.now.year + @@range,
          :include_blank => true,
-         :default => nil  
-    }    
+         :default => nil,
+    }.merge(options)
   end
   
-  def start_date_form_column(record,options)                
+  def start_date_form_column(record,options)
     date_select :record, :start_date, {
          :discard_day => true,
          :start_year => Time.now.year - @@range,
          :end_year => Time.now.year + @@range
-    }    
+       }.merge(options)
   end
   
   def end_date_form_column(record,options)    
@@ -25,6 +25,6 @@ module EnrollmentsHelper
          :discard_day => true,
          :start_year => Time.now.year - @@range,
          :end_year => Time.now.year + @@range
-    }        
+    }.merge(options)
   end    
 end
