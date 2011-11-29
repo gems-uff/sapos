@@ -250,6 +250,7 @@ pt:
       models:
         scholarship_duration:
           attributes:
+            start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
             start_date_after_end_date: "posterior a Data Limite de Concessão"            
             start_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
             end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
