@@ -511,6 +511,7 @@ pt:
     create_city_label: "Adicionar Cidade"
     create_deferral_type_label: "Adicionar Tipo de Prorrogação"
     create_phase_label: "Adicionar Fase"
+    create_deferral_label: "Adicionar Prorrogação"
     update_enrollment_label: "Modificar Matrícula"
     update_course_label: "Modificar Curso"
     update_user_label: "Modificar Usuário"
