@@ -10,6 +10,7 @@ class EnrollmentsController < ApplicationController
     config.columns[:level].clear_link
     config.columns[:enrollment_status].clear_link
     config.columns[:student].form_ui = :record_select
+    config.columns[:admission_date].options = {:format => :monthyear}    
     #Student can not be configured as record select because it does not allow the user to create a new one, if needed
     #config.columns[:student].form_ui = :record_select        
     config.create.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal]
