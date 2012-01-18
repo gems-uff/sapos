@@ -47,4 +47,21 @@ module EnrollmentsHelper
        :default => nil       
      }.merge(options)                      
   end   
+  
+#  TODO verificar update de coluna, javascript não funcional
+#  def options_for_association_conditions(association)
+#    if association.name == :phase      
+#      level_id = params[:value] #recupera level_id vindo do parâmetro de atualização
+#      
+#      ["phases.id IN (
+#       SELECT phases.id
+#       FROM phases
+#       LEFT OUTER JOIN phase_durations
+#       ON phase_durations.phase_id = phases.id
+#       WHERE phase_durations.level_id = ?
+#       )#",level_id]
+#    else
+#      super
+#    end
+#  end  
 end
