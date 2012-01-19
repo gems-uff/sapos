@@ -10,6 +10,14 @@ module ScholarshipsHelper
     }    
   end
   
+  def start_date_search_column(record,options)                
+    date_select :record, :start_date, {
+         :discard_day => true,
+         :start_year => Time.now.year - @@range,
+         :end_year => Time.now.year + @@range
+    }    
+  end  
+  
   def end_date_form_column(record,options)    
     date_select :record, :end_date, {
          :discard_day => true,
