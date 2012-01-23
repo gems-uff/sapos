@@ -1,6 +1,5 @@
 class EnrollmentsController < ApplicationController
   active_scaffold :enrollment do |config|
-    config.action_links.add 'to_pdf', :label => 'Gerar Relatório', :page => true, :type => :collection, :inline => true
     config.list.columns = [:student, :enrollment_number, :level, :enrollment_status, :admission_date, :dismissal]
     config.list.sorting = {:enrollment_number => 'ASC'}    
     config.create.label = :create_enrollment_label  
@@ -21,11 +20,4 @@ class EnrollmentsController < ApplicationController
     config.show.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal]        
   end
   record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
-  
-  def generate_pdf
-    pdf = Prawn::Document.new
-    pdf.text "Aqui vai a variável que eu digitei --> " + params[:matricula]
-    
-    send_data(pdf.render, :filename => 'relatorio.pdf', :type =>'application/pdf') 
-  end
 end

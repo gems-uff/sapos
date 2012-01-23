@@ -22,6 +22,9 @@ Sapos::Application.routes.draw do
   resources :scholarships do 
     as_routes 
     record_select_routes
+    collection do
+       get 'to_pdf'
+     end
   end
 
   resources :advisements do 
@@ -37,17 +40,11 @@ Sapos::Application.routes.draw do
 
   resources :dismissals do as_routes end
 
-  resources :dismissal_reasons do 
-    as_routes     
-  end
+  resources :dismissal_reasons do as_routes end
 
   resources :enrollments do 
     as_routes 
     record_select_routes
-    collection do
-      get 'to_pdf'            
-      post 'generate_pdf'
-    end    
   end
 
   resources :enrollment_statuses do 

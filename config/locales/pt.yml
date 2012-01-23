@@ -469,6 +469,7 @@ pt:
     create_another : "Criar Outro"
     no_options: "Sem Opções"
     create_new: "Criar Novo"
+    to_pdf: "Gerar relatório"
     update: "Atualizar"
     add_existing: "Adicionar Existente"
     add: "Adicionar"
