@@ -48,20 +48,25 @@ module EnrollmentsHelper
      }.merge(options)                      
   end   
   
-#  TODO verificar update de coluna, javascript não funcional
-#  def options_for_association_conditions(association)
-#    if association.name == :phase      
-#      level_id = params[:value] #recupera level_id vindo do parâmetro de atualização
-#      
-#      ["phases.id IN (
-#       SELECT phases.id
-#       FROM phases
-#       LEFT OUTER JOIN phase_durations
-#       ON phase_durations.phase_id = phases.id
-#       WHERE phase_durations.level_id = ?
-#       )#",level_id]
-#    else
-#      super
-#    end
-#  end  
+#  TODO , quando se edita uma matrícula, esta retorna todas as Realizações de etapa que o nível da matrícula
+#  porém o evento de on change do select de nível não está sendo possível por causa do javascript (pesquisar mais a fundo)
+#  métodos envolvidos "active_scaffold.js" -> render_form_field & replace_html
+  def options_for_association_conditions(association)
+    if association.name == :phase      
+      enrollment_id = params[:id]
+      enrollment = Enrollment.find_by_id(enrollment_id) 
+      
+      level_id = enrollment.nil? ? params[:value] : enrollment.level_id #recupera level_id vindo do parâmetro de atualização
+      
+      ["phases.id IN (
+       SELECT phases.id
+       FROM phases
+       LEFT OUTER JOIN phase_durations
+       ON phase_durations.phase_id = phases.id
+       WHERE phase_durations.level_id = ?
+       )",level_id]
+    else
+      super
+    end
+  end  
 end
