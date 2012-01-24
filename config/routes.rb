@@ -26,9 +26,13 @@ Sapos::Application.routes.draw do
        get 'to_pdf'
      end
   end
-
+  
   resources :advisements do 
-    as_routes     
+    as_routes 
+    record_select_routes
+    collection do
+       get 'to_pdf'
+     end
   end
 
   resources :professors do 

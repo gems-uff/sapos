@@ -1,7 +1,9 @@
 class ScholarshipsController < ApplicationController
   active_scaffold :scholarship do |config|
     config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
-    config.actions.swap :search, :field_search #Enables advanced search A.K.A FieldSearch
+    
+    #Enables advanced search A.K.A FieldSearch
+    config.actions.swap :search, :field_search
     
     config.list.sorting = {:scholarship_number => 'ASC'}
     config.list.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :start_date, :end_date]
