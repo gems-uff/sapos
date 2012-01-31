@@ -1,7 +1,7 @@
 class AdvisementsController < ApplicationController
   active_scaffold :advisement do |config|    
     
-    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
+#    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
     
     #Enables advanced search A.K.A FieldSearch
     config.actions.swap :search, :field_search
