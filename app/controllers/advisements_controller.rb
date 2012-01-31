@@ -6,9 +6,14 @@ class AdvisementsController < ApplicationController
     #Enables advanced search A.K.A FieldSearch
     config.actions.swap :search, :field_search
     
-    config.field_search.columns = [:professor, :enrollment, :main_advisor]
+    #Adiciona coluna virtual para orientações ativas    
+    config.columns.add :active        
     
-    config.list.columns = [:professor, :enrollment, :main_advisor]    
+    config.field_search.columns = [:professor, :enrollment, :main_advisor, :active]        
+            
+    config.columns[:active].search_sql = ""
+    
+    config.list.columns = [:professor, :enrollment, :main_advisor]        
     config.columns[:professor].sort_by :sql => 'professors.name'
     config.list.sorting = {:enrollment => 'ASC'}
     config.create.label = :create_advisement_label        
@@ -16,6 +21,33 @@ class AdvisementsController < ApplicationController
     config.columns[:enrollment].form_ui = :record_select
     config.create.columns = [:professor, :enrollment, :main_advisor]
     config.update.columns = [:professor, :enrollment, :main_advisor]    
+  end
+  
+  def self.condition_for_active_column(column, value, like_pattern)
+    is_active = value == "true" 
+    
+#    TODO , como injetar SQL sem ser parametrizado
+    sql_null = "enrollments.id IN(
+      SELECT enrollments.id
+      FROM enrollments
+      LEFT OUTER JOIN dismissals
+      ON dismissals.enrollment_id = enrollments.id
+      WHERE dismissals.id IS NULL
+    )"
+    
+    sql_not_null = "enrollments.id IN(
+      SELECT enrollments.id
+      FROM enrollments
+      LEFT OUTER JOIN dismissals
+      ON dismissals.enrollment_id = enrollments.id
+      WHERE dismissals.id IS NOT NULL
+    )"
+            
+    if is_active
+      [sql_null]
+    else
+      [sql_not_null]
+    end    
   end
   
   def to_pdf
