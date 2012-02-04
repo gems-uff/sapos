@@ -1,7 +1,7 @@
 class AdvisementsController < ApplicationController
   active_scaffold :advisement do |config|    
     
-#    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
+    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
     
     #Enables advanced search A.K.A FieldSearch
     config.actions.swap :search, :field_search
@@ -51,18 +51,60 @@ class AdvisementsController < ApplicationController
   end
   
   def to_pdf
-    each_record_in_page{}
-    advisements = find_page().items
     
-    return if advisements.empty?
+    Prawn::Document.generate "relatorio.pdf" do |pdf|
+      
+      y_position = pdf.cursor
+
+      # Tive que definir o lugar da foto manualmente... O :position => :right não estava
+      # funcionando
+      pdf.image( "#{Prawn::BASEDIR}/data/images/logoIC.jpg", :at => [455, y_position],
+                                                             :vposition => :top,
+                                                             :scale => 0.3
+               )
+      
+      pdf.font("Courier", :size => 14) do
+        pdf.text "Universidade Federal Fluminense
+                  Instituto de Computação
+                  Pós-Graduação"
+      end
+
+      pdf.move_down 30
+
+      header = [["<b>Professor</b>","<b>Aluno</b>","<b>Nível</b>"]]
+      pdf.table( header, :column_widths => [210, 210, 100],
+                         :row_colors => ["BFBFBF"], 
+                         :cell_style => { :font => "Courier", 
+                                          :size => 10, 
+                                          :inline_format => true, 
+                                          :border_width => 0
+                                        }
+               )  
+
+      each_record_in_page{}
+      advisements = find_page().items
+      
+      advs = advisements.map do |adv|
+      [
+        adv.professor[:name],
+        adv.enrollment.student[:name],
+        adv.enrollment.level[:name]
+      ]
+      end
+        
+      pdf.table( advs, :column_widths => [210, 210, 100],
+                       :row_colors => ["FFFFFF","F0F0F0"], 
+                       :cell_style => { :font => "Courier", 
+                                        :size => 8, 
+                                        :inline_format => true,                                   
+                                        :border_width => 0
+                                      }
+               )
+      
+      send_data(pdf.render, :filename => 'relatorio.pdf', :type =>'application/pdf')     
     
-    pdf = Prawn::Document.new
+    end
     
-    advisements.each { |a|
-      pdf.text a.professor[:name] + " - " + a.enrollment.student[:name]
-    }    
-    
-    send_data(pdf.render, :filename => 'relatorio.pdf', :type =>'application/pdf')     
   end
   
 end 

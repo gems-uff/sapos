@@ -9,4 +9,4 @@ class DeferralTypesController < ApplicationController
     config.update.columns = [:name, :description, :duration, :phase]
     config.show.columns = [:name, :description, :duration, :phase]
   end
-end 
+end
