@@ -52,60 +52,53 @@ class AdvisementsController < ApplicationController
   end
   
   def to_pdf
-    
-    Prawn::Document.generate "relatorio.pdf" do |pdf|
+    pdf = Prawn::Document.new
       
-      y_position = pdf.cursor
+    y_position = pdf.cursor
 
-      # Tive que definir o lugar da foto manualmente... O :position => :right não estava
-      # funcionando
-      pdf.image( "#{Prawn::BASEDIR}/data/images/logoIC.jpg", :at => [455, y_position],
-                                                             :vposition => :top,
-                                                             :scale => 0.3
-               )
-      
-      pdf.font("Courier", :size => 14) do
-        pdf.text "Universidade Federal Fluminense
-                  Instituto de Computação
-                  Pós-Graduação"
-      end
+    pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [455, y_position],
+                                                           :vposition => :top,
+                                                           :scale => 0.3
+    )
 
-      pdf.move_down 30
+    pdf.font("Courier", :size => 14) do
+      pdf.text "Universidade Federal Fluminense
+                Instituto de Computação
+                Pós-Graduação"
+    end
 
-      header = [["<b>Professor</b>","<b>Aluno</b>","<b>Nível</b>"]]
-      pdf.table( header, :column_widths => [210, 210, 100],
-                         :row_colors => ["BFBFBF"], 
-                         :cell_style => { :font => "Courier", 
-                                          :size => 10, 
-                                          :inline_format => true, 
-                                          :border_width => 0
-                                        }
-               )  
+    pdf.move_down 30
 
-      each_record_in_page{}
-      advisements = find_page().items
-      
-      advs = advisements.map do |adv|
-      [
-        adv.professor[:name],
-        adv.enrollment.student[:name],
-        adv.enrollment.level[:name]
-      ]
-      end
-        
-      pdf.table( advs, :column_widths => [210, 210, 100],
-                       :row_colors => ["FFFFFF","F0F0F0"], 
+    header = [["<b>Professor</b>","<b>Aluno</b>","<b>Nível</b>"]]
+    pdf.table( header, :column_widths => [210, 210, 100],
+                       :row_colors => ["BFBFBF"], 
                        :cell_style => { :font => "Courier", 
-                                        :size => 8, 
-                                        :inline_format => true,                                   
+                                        :size => 10, 
+                                        :inline_format => true, 
                                         :border_width => 0
                                       }
-               )
-      
-      send_data(pdf.render, :filename => 'relatorio.pdf', :type =>'application/pdf')     
-    
+    )  
+
+    each_record_in_page{}
+    advisements = find_page().items
+
+    advs = advisements.map do |adv|
+    [
+      adv.professor[:name],
+      adv.enrollment.student[:name],
+      adv.enrollment.level[:name]
+    ]
     end
-    
+
+    pdf.table( advs, :column_widths => [210, 210, 100],
+                     :row_colors => ["FFFFFF","F0F0F0"], 
+                     :cell_style => { :font => "Courier", 
+                                      :size => 8, 
+                                      :inline_format => true,                                   
+                                      :border_width => 0
+                                    }
+             )
+
+    send_data(pdf.render, :filename => 'relatorio.pdf', :type =>'application/pdf')     
   end
-  
 end 
