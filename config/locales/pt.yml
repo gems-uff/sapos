@@ -420,6 +420,7 @@ pt:
         advisements: "Orientandos"
         scholarships: "Bolsas"
         enrollments: "Orientandos"
+        advisement_points: "Pontos de Orientação"
       advisement:
         professor: "Professor"
         enrollment: "Matrícula"
