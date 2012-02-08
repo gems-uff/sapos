@@ -445,7 +445,7 @@ pt:
         accomplishments: "Realização de Etapas"
         enrollments: "Matrículas"
       phase_duration:
-        deadline: "Prazo Máximo(em meses)"
+        deadline: "Prazo Máximo(em períodos)"
         level: "Nível"
       accomplishment:
         phase: "Etapa"
@@ -460,7 +460,7 @@ pt:
       deferral_type:
         name: "Nome"
         description: "Descrição"
-        duration: "Duração(meses)"
+        duration: "Duração(períodos)"
         phase: "Etapa"
         
   active_scaffold:     
