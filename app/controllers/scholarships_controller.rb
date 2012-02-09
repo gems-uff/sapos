@@ -1,6 +1,6 @@
 class ScholarshipsController < ApplicationController
   active_scaffold :scholarship do |config|
-#    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
+    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
     
     #Enables advanced search A.K.A FieldSearch
     config.actions.swap :search, :field_search
@@ -55,17 +55,56 @@ class ScholarshipsController < ApplicationController
   end  
   
   def to_pdf
-    each_record_in_page{}
-    scholarships = find_page().items
-    
-    return if scholarships.empty?
-    
     pdf = Prawn::Document.new
+      
+    y_position = pdf.cursor
+
+    pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [455, y_position],
+                                                           :vposition => :top,
+                                                           :scale => 0.3
+    )
+
+    pdf.font("Courier", :size => 14) do
+      pdf.text "Universidade Federal Fluminense
+                Instituto de Computação
+                Pós-Graduação"
+    end
+
+    pdf.move_down 30
+
+    header = [["<b>Número da Bolsa</b>","<b>Nível</b>","<b>Agência</b>","<b>Tipo</b>","<b>Data de Início</b>","<b>Data de Fim</b>"]]
+    pdf.table( header, :column_widths => [110, 70, 80, 70, 100 ,100],
+                       :row_colors => ["BFBFBF"], 
+                       :cell_style => { :font => "Courier", 
+                                        :size => 10, 
+                                        :inline_format => true, 
+                                        :border_width => 0
+                                      }
+    )  
+
+    each_record_in_page{}
+    scholarships_from_page = find_page().items
     
-    scholarships.each { |s|
-      pdf.text s.scholarship_number
-    }    
-    
+    scholarships = scholarships_from_page.map! do |s| 
+        [
+          s[:scholarship_number],
+          s.level.nil? ? nil : s.level[:name],
+          s.sponsor.nil? ? nil : s.sponsor[:name],
+          s.scholarship_type.nil? ? nil : s.scholarship_type[:name],
+          s[:start_date].nil? ? nil : I18n.l(s[:start_date], :format => :monthyear),
+          s[:end_date].nil? ? nil : I18n.l(s[:end_date], :format => :monthyear)
+        ] 
+    end
+
+    pdf.table( scholarships, :column_widths => [110, 70, 80, 70, 100 ,100],
+                     :row_colors => ["FFFFFF","F0F0F0"], 
+                     :cell_style => { :font => "Courier", 
+                                      :size => 8, 
+                                      :inline_format => true,                                   
+                                      :border_width => 0
+                                    }
+             )
+
     send_data(pdf.render, :filename => 'relatorio.pdf', :type =>'application/pdf')     
   end
 end 
