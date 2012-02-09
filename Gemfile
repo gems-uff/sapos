@@ -7,6 +7,10 @@ gem 'rails', '3.0.9'
 
 gem 'sqlite3'
 
+
+# Prawn to PDF
+gem 'prawn'
+
 # Active scaffold support for Rails 3
 gem 'active_scaffold_vho'
 gem 'recordselect_vho'
