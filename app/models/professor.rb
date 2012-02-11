@@ -8,19 +8,17 @@ class Professor < ActiveRecord::Base
   
 #  It was considered that active advisements were enrollments without dismissals reasons
   def advisement_points
-    search_sql = ["SELECT *
-                  FROM  advisements AS a,
-                      enrollments AS e
-                  LEFT OUTER JOIN dismissals AS d
-                  ON    d.enrollment_id = e.id
-                  WHERE a.enrollment_id = e.id
-                  AND   d.id IS NULL
-                  AND   a.professor_id = ?",self.id]
+    enrollments_with_single_advisor = Enrollment.find(:all,
+                                  :joins => ["LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id",:advisements],
+                                  :conditions => ["advisements.professor_id = ? AND dismissals.id IS NULL AND  1 = (SELECT COUNT(*) FROM advisements WHERE advisements.enrollment_id = enrollments.id)",self.id])
+
+    enrollments_with_multiple_advisors = Enrollment.find(:all,
+                                  :joins => ["LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id",:advisements],
+                                  :conditions => ["advisements.professor_id = ? AND dismissals.id IS NULL AND  1 < (SELECT COUNT(*) FROM advisements WHERE advisements.enrollment_id = enrollments.id)",self.id])
+    
     points = 0
-    advisements = Advisement.find_by_sql(search_sql)
-    advisements.each do |adv| 
-      adv.main_advisor ? points += 1 : points += 0.5
-    end
+    enrollments_with_multiple_advisors.each { points += 0.5 }
+    enrollments_with_single_advisor.each { points += 1 }
     
     "#{points}"
   end
