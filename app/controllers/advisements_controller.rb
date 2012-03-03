@@ -7,14 +7,22 @@ class AdvisementsController < ApplicationController
     config.actions.swap :search, :field_search
     
     #Adiciona coluna virtual para orientações ativas    
-    config.columns.add :active        
+    config.columns.add :active,:enrollment_number,:student_name
     
-    config.field_search.columns = [:professor, :enrollment, :main_advisor, :active]        
+    config.field_search.columns = [:professor, :enrollment_number, :student_name , :main_advisor, :active]        
             
-    config.columns[:active].search_sql = ""
+    config.columns[:enrollment_number].includes = [:enrollment]
+    config.columns[:student_name].includes = [{:enrollment => :student}]
     
-    config.list.columns = [:professor, :enrollment, :main_advisor]        
-    config.columns[:professor].sort_by :sql => 'professors.name'
+    config.columns[:active].search_sql = ""
+    config.columns[:active].search_ui = :select
+    config.columns[:enrollment_number].search_sql = "enrollments.enrollment_number"
+    config.columns[:student_name].search_sql = "students.name"
+    
+    config.list.columns = [:professor, :enrollment_number, :student_name , :main_advisor]
+    config.columns[:professor].sort_by :sql => "professors.name"
+    config.columns[:enrollment_number].sort_by :sql => "enrollments.enrollment_number"
+    config.columns[:student_name].sort_by :sql => "students.name"
     config.list.sorting = {:enrollment => 'ASC'}
     config.create.label = :create_advisement_label        
     config.columns[:professor].form_ui = :record_select
@@ -69,8 +77,11 @@ class AdvisementsController < ApplicationController
 
     pdf.move_down 30
 
-    header = [["<b>Professor</b>","<b>Aluno</b>","<b>Nível</b>"]]
-    pdf.table( header, :column_widths => [210, 210, 100],
+    header = [["<b>Professor</b>",
+               "<b>Número de Matrícula</b>",
+               "<b>Aluno</b>",
+               "<b>Nível</b>"]]
+    pdf.table( header, :column_widths => [135, 135, 135, 135],
                        :row_colors => ["BFBFBF"], 
                        :cell_style => { :font => "Courier", 
                                         :size => 10, 
@@ -85,12 +96,13 @@ class AdvisementsController < ApplicationController
     advs = advisements.map do |adv|
     [
       adv.professor[:name],
+      adv.enrollment[:enrollment_number],
       adv.enrollment.student[:name],
       adv.enrollment.level[:name]
     ]
     end
 
-    pdf.table( advs, :column_widths => [210, 210, 100],
+    pdf.table( advs, :column_widths => [135, 135, 135, 135],
                      :row_colors => ["FFFFFF","F0F0F0"], 
                      :cell_style => { :font => "Courier", 
                                       :size => 8, 

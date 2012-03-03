@@ -425,6 +425,8 @@ pt:
         professor: "Professor"
         enrollment: "Matrícula"
         main_advisor: "Orientador Principal"
+        enrollment_number: "Número de Matrícula"
+        student_name: "Nome do Aluno"
         active: "Ativas"
       user:
         name: "Nome do usuário"
