@@ -1,6 +1,5 @@
 module AdvisementsHelper
   def active_search_column(record,options)
-    checked_default = {:checked => true}
-    check_box(record, :active, options.merge(checked_default), true, false) 
+    select(record, :active, [["Ativas","active"],["Inativas","not_active"],["Todas","all"]], options, options)
   end
 end

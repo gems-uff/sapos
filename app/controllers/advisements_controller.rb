@@ -33,10 +33,8 @@ class AdvisementsController < ApplicationController
   end
   
   def self.condition_for_active_column(column, value, like_pattern)
-    is_active = value == "true" 
-    
 #    TODO , como injetar SQL sem ser parametrizado
-    sql_null = "enrollments.id IN(
+    sql_actives = "enrollments.id IN(
       SELECT enrollments.id
       FROM enrollments
       LEFT OUTER JOIN dismissals
@@ -44,19 +42,29 @@ class AdvisementsController < ApplicationController
       WHERE dismissals.id IS NULL
     )"
     
-    sql_not_null = "enrollments.id IN(
+    sql_not_actives = "enrollments.id IN(
       SELECT enrollments.id
       FROM enrollments
       LEFT OUTER JOIN dismissals
       ON dismissals.enrollment_id = enrollments.id
       WHERE dismissals.id IS NOT NULL
     )"
+    
+    sql_all = "enrollments.id IN(
+      SELECT enrollments.id
+      FROM enrollments
+      LEFT OUTER JOIN dismissals
+      ON dismissals.enrollment_id = enrollments.id   
+    )"
+    
+    case value
+      when "active" then sql_to_use = sql_actives
+      when "not_active" then sql_to_use = sql_not_actives
+      when "all" then sql_to_use = sql_all
+      else sql_to_use = sql_all
+    end
             
-    if is_active
-      [sql_null]
-    else
-      [sql_not_null]
-    end    
+    [sql_to_use]
   end
   
   def to_pdf
