@@ -20,6 +20,6 @@ class Professor < ActiveRecord::Base
     enrollments_with_multiple_advisors.each { points += 0.5 }
     enrollments_with_single_advisor.each { points += 1 }
     
-    "#{points}"
+    "#{points.to_f.round(1)}"
   end
 end
