@@ -8,6 +8,7 @@ class ScholarshipDuration < ActiveRecord::Base
       
   def last_scholarship_duration_end_date
     #we take care that the last scholarship duration found is not the same scholarship duration being edited
+    return nil if scholarship.nil? or enrollment.nil?
     last_scholarship_duration = ScholarshipDuration.find :last, :conditions => ["scholarship_id = ? AND enrollment_id <> ?",scholarship.id,enrollment.id]
     last_scholarship_duration.end_date unless last_scholarship_duration.nil?    
   end
@@ -28,7 +29,7 @@ class ScholarshipDuration < ActiveRecord::Base
   end   
            
   validates :scholarship, :presence => true
-  validates :enrollment,  :presence => true
+  validates :enrollment_id,  :presence => true, :uniqueness => {:scope => :scholarship_id ,:message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.entollment_and_scholarship_uniqueness")} 
   
   #validates if scholarship isn't with another student
   validates_date :last_scholarship_duration_end_date, :on_or_before => :start_date, :unless => :last_scholarship_duration_end_date_is_null, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.last_scholarship_duration_end_date")
