@@ -7,9 +7,9 @@ class AdvisementsController < ApplicationController
     config.actions.swap :search, :field_search
     
     #Adiciona coluna virtual para orientações ativas    
-    config.columns.add :active,:enrollment_number,:student_name
+    config.columns.add :active,:enrollment_number,:student_name,:level
     
-    config.field_search.columns = [:professor, :enrollment_number, :student_name , :main_advisor, :active]        
+    config.field_search.columns = [:professor, :enrollment_number,:level ,:student_name , :main_advisor, :active]        
             
     config.columns[:enrollment_number].includes = [:enrollment]
     config.columns[:student_name].includes = [{:enrollment => :student}]
@@ -18,6 +18,8 @@ class AdvisementsController < ApplicationController
     config.columns[:active].search_ui = :select
     config.columns[:enrollment_number].search_sql = "enrollments.enrollment_number"
     config.columns[:student_name].search_sql = "students.name"
+    config.columns[:level].search_sql = "enrollments.level_id"
+    config.columns[:level].search_ui = :select
     
     config.list.columns = [:professor, :enrollment_number, :student_name , :main_advisor]
     config.columns[:professor].sort_by :sql => "professors.name"
