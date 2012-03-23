@@ -21,9 +21,10 @@ class AdvisementsController < ApplicationController
     config.columns[:level].search_sql = "enrollments.level_id"
     config.columns[:level].search_ui = :select
     
-    config.list.columns = [:professor, :enrollment_number, :student_name , :main_advisor]
+    config.list.columns = [:professor, :enrollment_number, :student_name , :main_advisor, :active]
     config.columns[:professor].sort_by :sql => "professors.name"
     config.columns[:enrollment_number].sort_by :sql => "enrollments.enrollment_number"
+    config.columns[:active].sort_by :method => "active_order"
     config.columns[:student_name].sort_by :sql => "students.name"
     config.list.sorting = {:enrollment => 'ASC'}
     config.create.label = :create_advisement_label        

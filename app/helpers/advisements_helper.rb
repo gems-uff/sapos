@@ -5,6 +5,7 @@ module AdvisementsHelper
   
   def level_search_column(record,options)
     levels = Level.all.map { |level| [level.name,level.id]}
+    levels.push(["Todos",nil])
     select(record, :level, levels, options,options)
   end
 end

@@ -6,6 +6,17 @@ class Advisement < ActiveRecord::Base
     "#{enrollment.enrollment_number} - #{professor.name}"    
   end
   
+  #defines if an certain advisement is active (An active advisement is an advisement which the student doesn't have a dismissal reason
+  def active
+    return false if enrollment.nil?
+    dismissals = Dismissal.find(:all, :conditions => ["enrollment_id = ?",enrollment.id])
+    return dismissals.empty?
+  end
+ 
+  def active_order
+    return active.to_s
+  end
+  
   def enrollment_number
     return nil if enrollment.nil?
     return enrollment.enrollment_number
