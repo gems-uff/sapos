@@ -17,6 +17,16 @@ class Advisement < ActiveRecord::Base
     return active.to_s
   end
   
+  def co_advisor
+      return false if enrollment.nil?
+      co_advisors = Advisement.find(:all, :conditions => ["main_advisor = false and enrollment_id = ?", enrollment.id])
+      return !co_advisors.empty?
+  end
+  
+  def co_advisor_order
+    return co_advisor.to_s
+  end
+  
   def enrollment_number
     return nil if enrollment.nil?
     return enrollment.enrollment_number

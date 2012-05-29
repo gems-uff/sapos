@@ -429,7 +429,8 @@ pt:
         main_advisor: "Orientador Principal"
         enrollment_number: "Número de Matrícula"
         student_name: "Nome do Aluno"
-        active: "Ativas"
+        active: "Matrícula ativa?"
+        co_advisor: "Possui coorientador?"
       user:
         name: "Nome do usuário"
         password: "Senha"
