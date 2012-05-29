@@ -7,6 +7,7 @@ class DeferralsController < ApplicationController
     config.create.label = :create_deferral_label
     config.columns[:enrollment].form_ui = :record_select
     config.columns[:deferral_type].form_ui = :select
+    config.columns[:deferral_type].clear_link
     config.create.columns = [:enrollment, :approval_date, :obs, :deferral_type]
     config.update.columns = [:enrollment, :approval_date, :obs, :deferral_type]
     config.show.columns = [:enrollment, :approval_date, :obs, :deferral_type]
