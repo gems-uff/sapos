@@ -430,6 +430,7 @@ pt:
         enrollment_number: "Número de Matrícula"
         student_name: "Nome do Aluno"
         active: "Ativas"
+        level: "Nível"
       user:
         name: "Nome do usuário"
         password: "Senha"
@@ -510,6 +511,7 @@ pt:
     create_sponsor_label: "Adicionar Agência de Fomento"
     create_dismissal_reason_label: "Adicionar Razão de Desligamento"
     create_dismissal_label: "Adicionar Desligamento"
+    create_accomplishment_label: "Criar Realização de Etapas"
     create_enrollment_label: "Adicionar Matrícula"
     create_enrollment_status_label: "Adicionar Tipo de Matrícula"
     create_student_label: "Adicionar Aluno"

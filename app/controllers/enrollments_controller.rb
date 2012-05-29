@@ -3,12 +3,13 @@ class EnrollmentsController < ApplicationController
     config.list.columns = [:student, :enrollment_number, :level, :enrollment_status, :admission_date, :dismissal]
     config.list.sorting = {:enrollment_number => 'ASC'}    
     config.create.label = :create_enrollment_label  
-    config.update.label = :update_enrollment_label        
+    config.update.label = :update_enrollment_label
 #    config.columns[:level].update_columns = :accomplishments
     config.columns[:accomplishments].allow_add_existing = false;
     config.columns[:student].sort_by :sql => 'students.name'
     config.columns[:level].form_ui = :select
-    config.columns[:enrollment_status].form_ui = :select    
+    config.columns[:enrollment_status].form_ui = :select
+    config.columns[:dismissal].clear_link
     config.columns[:level].clear_link
     config.columns[:enrollment_status].clear_link
     config.columns[:student].form_ui = :record_select
