@@ -1,6 +1,10 @@
 module AdvisementsHelper
   def active_search_column(record,options)
-    select(record, :active, [["Ativas","active"],["Inativas","not_active"],["Todas","all"]], options, options)
+    select(record, :active, [["Todas","all"],["Ativas","active"],["Inativas","not_active"]], options, options)
+  end
+  
+  def co_advisor_search_column(record,options)
+    select(record, :co_advisor, [[I18n.t("active_scaffold._select_"),"all"],["Sim","sim"],["Não","nao"]], options, options)
   end
   
   def level_search_column(record,options)

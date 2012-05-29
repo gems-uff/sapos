@@ -9,13 +9,15 @@ class AdvisementsController < ApplicationController
     #Adiciona coluna virtual para orientações ativas    
     config.columns.add :active,:co_advisor, :enrollment_number,:student_name,:level
     
-    config.field_search.columns = [:professor, :enrollment_number,:level ,:student_name , :main_advisor, :active]        
+    config.field_search.columns = [:professor, :enrollment_number,:level ,:student_name , :main_advisor, :active, :co_advisor]        
             
     config.columns[:enrollment_number].includes = [:enrollment]
     config.columns[:student_name].includes = [{:enrollment => :student}]
     
     config.columns[:active].search_sql = ""
     config.columns[:active].search_ui = :select
+    config.columns[:co_advisor].search_sql = ""
+    config.columns[:co_advisor].search_ui = :select
     config.columns[:enrollment_number].search_sql = "enrollments.enrollment_number"
     config.columns[:student_name].search_sql = "students.name"
     config.columns[:level].search_sql = "enrollments.level_id"
@@ -45,7 +47,6 @@ class AdvisementsController < ApplicationController
       ON dismissals.enrollment_id = enrollments.id
       WHERE dismissals.id IS NULL
     )"
-    
     sql_not_actives = "enrollments.id IN(
       SELECT enrollments.id
       FROM enrollments
@@ -53,7 +54,6 @@ class AdvisementsController < ApplicationController
       ON dismissals.enrollment_id = enrollments.id
       WHERE dismissals.id IS NOT NULL
     )"
-    
     sql_all = "enrollments.id IN(
       SELECT enrollments.id
       FROM enrollments
@@ -68,6 +68,38 @@ class AdvisementsController < ApplicationController
       else sql_to_use = sql_all
     end
             
+    [sql_to_use]
+  end
+  
+  def self.condition_for_co_advisor_column(column, value, like_pattern)
+    sql_sim = "enrollments.id IN(
+                SELECT enrollments.id
+                FROM enrollments
+                LEFT OUTER JOIN advisements
+                ON enrollments.id = advisements.enrollment_id
+                WHERE advisements.main_advisor = FALSE
+              )"
+    sql_nao = "enrollments.id NOT IN(
+                SELECT enrollments.id
+                FROM enrollments
+                LEFT OUTER JOIN advisements
+                ON enrollments.id = advisements.enrollment_id
+                WHERE advisements.main_advisor = FALSE
+              )"
+    sql_all = "professors.id IN(
+                SELECT professors.id
+                FROM professors
+                LEFT OUTER JOIN advisements
+                ON professors.id = advisements.professor_id
+              )"
+    
+    case value
+      when "all" then sql_to_use = sql_all
+      when "nao" then sql_to_use = sql_nao
+      when "sim" then sql_to_use = sql_sim
+      else sql_to_use = sql_all
+    end
+    
     [sql_to_use]
   end
   
