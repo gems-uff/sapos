@@ -39,7 +39,6 @@ class AdvisementsController < ApplicationController
   end
   
   def self.condition_for_active_column(column, value, like_pattern)
-#    TODO , como injetar SQL sem ser parametrizado
     sql_actives = "enrollments.id IN(
       SELECT enrollments.id
       FROM enrollments

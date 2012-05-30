@@ -5,4 +5,6 @@ class Deferral < ActiveRecord::Base
   def to_label
     "#{deferral_type.name}" unless deferral_type.nil?    
   end
+  
+  validates :enrollment, :presence => true
 end

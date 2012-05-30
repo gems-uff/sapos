@@ -1,7 +1,57 @@
 module EnrollmentsHelper   
   @@config = YAML::load_file("#{Rails.root}/config/properties.yml")    
   @@range = @@config["scholarship_year_range"]    
-      
+  
+  #overriding dismissal date to_label
+  def dismissal_column(record)
+    I18n.localize(record.dismissal.to_label.to_date, {:format => :monthyear}) unless record.dismissal.nil? or record.nil?
+  end
+
+  def approval_date_form_column(record,options)
+    #    TODO solução temporária para datas vazias (dia padrão vindo 1 por causa do discard_day)
+    #    NOTE: Discarded selects will default to 1. So if no month select is available, January will be assumed
+    # => http://api.rubyonrails.org/classes/ActionView/Helpers/DateHelper.html#M001698
+    record.approval_date = nil if record.approval_date.year < 1000 unless record.approval_date.nil?
+    
+    date_select :record, :approval_date, {
+         :discard_day => true,
+         :start_year => Time.now.year - @@range,
+         :end_year => Time.now.year + @@range,
+         :include_blank => true,
+         :default => nil,
+    }.merge(options)
+  end    
+  
+  def conclusion_date_form_column(record,options)
+    #    TODO solução temporária para datas vazias (dia padrão vindo 1 por causa do discard_day)
+    #    NOTE: Discarded selects will default to 1. So if no month select is available, January will be assumed
+    # => http://api.rubyonrails.org/classes/ActionView/Helpers/DateHelper.html#M001698
+    record.conclusion_date = nil if record.conclusion_date.year < 1000 unless record.conclusion_date.nil?
+    
+    date_select :record, :conclusion_date, {
+         :discard_day => true,
+         :start_year => Time.now.year - @@range,
+         :end_year => Time.now.year + @@range,
+         :include_blank => true,
+         :default => nil,
+    }.merge(options)
+  end  
+  
+  def date_form_column(record,options)
+    #    TODO solução temporária para datas vazias (dia padrão vindo 1 por causa do discard_day)
+    #    NOTE: Discarded selects will default to 1. So if no month select is available, January will be assumed
+    # => http://api.rubyonrails.org/classes/ActionView/Helpers/DateHelper.html#M001698
+    record.date = nil if record.date.year < 1000 unless record.date.nil?
+    
+    date_select :record, :date, {
+         :discard_day => true,
+         :start_year => Time.now.year - @@range,
+         :end_year => Time.now.year + @@range,
+         :include_blank => true,
+         :default => nil,
+    }.merge(options)
+  end
+  
   def cancel_date_form_column(record,options)   
 #    TODO solução temporária para datas vazias (dia padrão vindo 1 por causa do discard_day)
 #    NOTE: Discarded selects will default to 1. So if no month select is available, January will be assumed
