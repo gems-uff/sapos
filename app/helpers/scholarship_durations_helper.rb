@@ -32,4 +32,40 @@ module ScholarshipDurationsHelper
          :end_year => Time.now.year + @@range
     }.merge(options)
   end  
+  
+  def start_date_search_column(record,options)                
+    local_options = {
+         :discard_day => true,
+         :start_year => Time.now.year - @@range,
+         :end_year => Time.now.year + @@range,
+         :include_blank => true,
+         :prefix => options[:name]
+    }
+    
+    select_date record[:start_date], options.merge(local_options)
+  end 
+  
+  def end_date_search_column(record,options)                
+    local_options = {
+         :discard_day => true,
+         :start_year => Time.now.year - @@range,
+         :end_year => Time.now.year + @@range,
+         :include_blank => true,
+         :prefix => options[:name]
+    }
+    
+    select_date record[:start_date], options.merge(local_options)
+  end 
+  
+  def cancel_date_search_column(record,options)                
+    local_options = {
+         :discard_day => true,
+         :start_year => Time.now.year - @@range,
+         :end_year => Time.now.year + @@range,
+         :include_blank => true,
+         :prefix => options[:name]
+    }
+    
+    select_date record[:start_date], options.merge(local_options)
+  end 
 end

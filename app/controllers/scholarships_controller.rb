@@ -8,12 +8,13 @@ class ScholarshipsController < ApplicationController
     config.list.sorting = {:scholarship_number => 'ASC'}
     config.list.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :start_date, :end_date]
     
-    config.field_search.columns = [:level, :sponsor, :scholarship_type, :start_date, :end_date]
+    config.field_search.columns = [:scholarship_number ,:level, :sponsor, :scholarship_type, :start_date, :end_date]
     
     config.create.label = :create_scholarship_label
     
     config.columns[:start_date].search_sql = "scholarships.start_date"
     config.columns[:end_date].search_sql = "scholarships.end_date"
+    config.columns[:scholarship_number].search_ui = :text
     
     config.columns[:sponsor].form_ui = :select
     config.columns[:scholarship_type].form_ui = :select
