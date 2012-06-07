@@ -7,6 +7,7 @@ class EnrollmentsController < ApplicationController
 #    config.columns[:level].update_columns = :accomplishments
     config.columns[:accomplishments].allow_add_existing = false;
     config.columns[:student].sort_by :sql => 'students.name'
+    config.columns[:dismissal].sort_by :sql => 'dismissals.date'
     config.columns[:level].form_ui = :select
     config.columns[:enrollment_status].form_ui = :select
     config.columns[:dismissal].clear_link
