@@ -1,50 +1,67 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Sapos</title>
-    <%= stylesheet_link_tag :all %>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+  <title>Sapos</title>
+  <%= stylesheet_link_tag :all %>
 <%# javascript_include_tag :defaults %>
-    <%= stylesheet_link_tag 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/ui-lightness/jquery-ui.css' %>
-    <%= javascript_include_tag 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js' %>
-    <%= javascript_include_tag 'rails_jquery.js' %>
-    <%= javascript_include_tag 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js' %>
-    <%= javascript_include_tag 'jquery-ui-timepicker-addon.js' %>
-    <%= javascript_include_tag 'application.js' %>
-    <%= active_scaffold_includes %>
-    <%= record_select_includes %>    
-    <%= csrf_meta_tag %>
-  </head>
-  <body>
-    
-    <div id='main_content'> 
-      <div class='menu'>  
-        <div class='header'>
-          <div class='title'>SAPOS - Sistema de Apoio à Pós-Graduação</div> 
-          <div class='sub'> 
-            <%= render_navigation :renderer => :breadcrumbs, :join_with => " &gt;&gt; " %> 
-          </div> </div> 
-        <div class='menu_content'> 
-          <div id='top_navigation'><%= render_navigation :level=>1 %></div>           
-          <div class='clear_float'></div> 
-          <div class='content_wrapper'> 
-            <div id='sub_navigation'><%= render_navigation :level=>2 %></div> 
-            <div class='content'>
-              <%= yield %>
-            </div>
-            <div class='clear_float'></div> 
-          </div> 
-        </div>
-        <div class='footer'>
-          <div class='src_code'> 
-            <a href="http://www.ic.uff.br" target="_blank">Instituto de Computação</a> / 
-            <a href="http://www.uff.br" target="_blank">UFF</a>
-          </div> 
-          <div class='styling'> 
-            Versão <%= APP_VERSION %> <img src="images/sapo.gif" width="20"/>
-          </div> 
-          <div class='clear_float'></div> 
-        </div> 
-      </div>  
+  <%= stylesheet_link_tag 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/ui-lightness/jquery-ui.css' %>
+  <%= javascript_include_tag 'http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js' %>
+  <%= javascript_include_tag 'rails_jquery.js' %>
+  <%= javascript_include_tag 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js' %>
+  <%= javascript_include_tag 'jquery-ui-timepicker-addon.js' %>
+  <%= javascript_include_tag 'application.js' %>
+  <%= active_scaffold_includes %>
+  <%= stylesheet_link_tag 'active_scaffold_overrides' %>
+  <%= record_select_includes %>
+  <%= csrf_meta_tag %>
+</head>
+<body>
 
-  </body> 
+<div id="menubardiv"></div>
+
+<div id='main_content'>
+  <div class='menu'>
+    <div class='header'>
+      <div class='title'>
+        <img src="images/logoSapos.png"/>
+      </div>
+      <div class="sub">
+        <span>
+          <a href="http://www.ic.uff.br" target="_blank">Instituto de Computação /</a>
+          <a href="http://www.uff.br" target="_blank">UFF</a>
+        </span>
+        <span id="saposgif">
+          Versão <%= APP_VERSION %> <img src="images/sapo.gif" width="20"/>
+        </span>
+      </div>
+      <!--<div class='sub'>-->
+        <!--<%= render_navigation :renderer => :breadcrumbs, :join_with => " &gt;&gt; " %>-->
+      <!--</div>-->
+    </div>
+
+    <div class='menu_content'>
+      <div id='top_navigation'><%= render_navigation :level => 1 %></div>
+      <div class='clear_float'></div>
+      <div class='content_wrapper'>
+        <div id='sub_navigation'><%= render_navigation :level => 2 %></div>
+        <div class='content'>
+          <%= yield %>
+        </div>
+        <div class='clear_float'></div>
+      </div>
+    </div>
+    <!--<div class='footer'>-->
+      <!--<div class='src_code'>-->
+        <!--<a href="http://www.ic.uff.br" target="_blank">Instituto de Computação</a> /-->
+        <!--<a href="http://www.uff.br" target="_blank">UFF</a>-->
+      <!--</div>-->
+      <!--<div class='styling'>-->
+        <!--Versão <%= APP_VERSION %> <img src="images/sapo.gif" width="20"/>-->
+      <!--</div>-->
+      <!--<div class='clear_float'></div>-->
+    <!--</div>-->
+  </div>
+</div>
+
+</body>
 </html> 
