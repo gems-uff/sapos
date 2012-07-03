@@ -3,7 +3,8 @@ body {
     font-size: 11pt;
     padding: 0;
     margin: 0 auto;
-    background-color: #f0f0f0;
+    background: #f0f0f0 url(../images/steel-mesh-pattern.png);
+    height: 100%;
 }
 
 body a {
@@ -32,6 +33,7 @@ body a {
 
 .menu .header .sub {
     font-size: 10pt;
+    font-weight: bold;
 }
 
 .menu .header .sub a {
@@ -39,11 +41,19 @@ body a {
 }
 
 #menubardiv{
-    background: url(../../../images/menubardiv.png) repeat-x;
+    background: url(../images/menubardiv.png) repeat-x;
     height: 12px;
     width: 100%;
     position: absolute;
     margin-top: 129px;
+}
+
+#steelmeshdark{
+    position: absolute;
+    height: 129px;
+    width: 100%;
+    z-index: -100;
+    background: url("../images/steel-mesh-pattern-dark.png");
 }
 
 #saposgif{
@@ -70,13 +80,14 @@ body a {
     padding: 0px;
     border: 1px solid #c8c6c6;
     border-top: none;
+    background-color: #FFFFFF;
 }
 
 .menu_content .content {
     float: left;
     min-height: 100px;
     margin-bottom: 10px;
-    width: 877px;
+    width: 879px;
 }
 
 /*Top Navigation*/
@@ -145,14 +156,17 @@ body a {
 }
 
 /*sub navigation*/
+.menu_content .content_wrapper{
+    min-height: 100%;
+}
+
 .menu_content #sub_navigation {
     float: left;
     background-color: #FFFFFF;
-    min-height: 10px;
     width: 120px;
     margin-top: 33px;
     margin-right: -1px;
-    border: 1px solid #c8c6c6;
+    border-top: 1px solid #c8c6c6;
     border-bottom: none;
 
     -webkit-border-top-left-radius: 10px;
@@ -181,12 +195,16 @@ body a {
     font-weight: normal;
     padding: 10px 10px;
     background-size: 10px 10px;
-    background: #FFFFFF no-repeat 97% 50% url(../../../images/rightarrow.png);
+    background: #FFFFFF no-repeat 97% 50% url(../images/rightarrow.png);
     border-bottom: 1px dotted #9f9f9f;
     color: #656464;
     text-decoration: none;
     width: 100px;
     text-align: left;
+}
+
+.menu_content #sub_navigation li:last-child a{
+    border-bottom: none;
 }
 
 .menu_content #sub_navigation li a:hover {

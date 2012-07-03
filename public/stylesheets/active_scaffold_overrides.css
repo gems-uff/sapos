@@ -90,7 +90,7 @@ noscript.active-scaffold {
 }
 
 .active-scaffold-header h2 {
-    padding: 2px 0px;
+    padding: 2px 0;
     margin: 0;
     color: #656464;
     text-shadow: -1px 1px 1px #FFFFFF;
@@ -118,7 +118,7 @@ noscript.active-scaffold {
 
 .active-scaffold-header div.actions a {
     padding: 5px 5px;
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 .active-scaffold .active-scaffold .active-scaffold-header div.actions > a {
@@ -189,24 +189,24 @@ noscript.active-scaffold {
 }
 
 .active-scaffold-header div.actions div.action_group div {
-    background-image: url(../../../images/active_scaffold/default/gears.png); /* default icon for actions or override with css */
+    background-image: url(../images/active_scaffold/default/gears.png); /* default icon for actions or override with css */
 }
 
 .active-scaffold-header div.actions a.show_config_list {
-    background-image: url(../../../images/active_scaffold/default/config.png);
+    background-image: url(../images/active_scaffold/default/config.png);
 }
 
 .active-scaffold-header div.actions a.new,
 .active-scaffold-header div.actions a.new_existing {
-    background-image: url(../../../images/active_scaffold/default/add.gif);
+    background-image: url(../images/active_scaffold/default/add.gif);
 }
 
 .active-scaffold-header div.actions a.show_search {
-    background-image: url(../../../images/active_scaffold/default/magnifier.png);
+    background-image: url(../images/active_scaffold/default/magnifier.png);
 }
 
 .active-scaffold-header div.actions a.to_pdf {
-    background-image: url(../../../images/pdfIcon.gif);
+    background-image: url(../images/pdfIcon.gif);
 }
 
 .blue-theme .active-scaffold-header div.actions a:hover {
@@ -265,17 +265,17 @@ noscript.active-scaffold {
 
 .active-scaffold th.asc a,
 .active-scaffold th.asc a:hover {
-    background: #33506d url(../../../images/active_scaffold/default/arrow_up.gif) right 50% no-repeat;
+    background: #33506d url(../images/active_scaffold/default/arrow_up.gif) right 50% no-repeat;
 }
 
 .active-scaffold th.desc a,
 .active-scaffold th.desc a:hover {
-    background: #33506d url(../../../images/active_scaffold/default/arrow_down.gif) right 50% no-repeat;
+    background: #33506d url(../images/active_scaffold/default/arrow_down.gif) right 50% no-repeat;
 }
 
 .active-scaffold th.loading a,
 .active-scaffold th.loading a:hover {
-    background: #33506d url(../../../images/active_scaffold/default/indicator-small.gif) right 50% no-repeat;
+    background: #33506d url(../images/active_scaffold/default/indicator-small.gif) right 50% no-repeat;
 }
 
 .active-scaffold th .mark_heading {
@@ -299,7 +299,7 @@ noscript.active-scaffold {
 }
 
 .active-scaffold tr.record td.messages-container {
-    padding: 0px;
+    padding: 0;
 }
 
 .active-scaffold tr.even-record {
@@ -384,7 +384,7 @@ noscript.active-scaffold {
     line-height: 200%;
     display: none;
     width: 150px;
-    right: 0px;
+    right: 0;
 }
 
 .active-scaffold .actions .action_group ul ul {
@@ -420,7 +420,7 @@ noscript.active-scaffold {
 }
 
 .active-scaffold .actions .action_group ul li.top {
-    border-top: 0px solid #005CB8;
+    border-top: 0 solid #005CB8;
 }
 
 .active-scaffold .actions .action_group:hover ul ul,
@@ -456,7 +456,7 @@ noscript.active-scaffold {
     text-indent: -4000px;
     width: 16px;
     height: 17px;
-    background: url(../../../images/closeBlueIcon.jpg) 0 0 no-repeat;
+    background: url(../images/closeBlueIcon.jpg) 0 0 no-repeat;
 }
 
 /* Nested
@@ -482,8 +482,8 @@ noscript.active-scaffold {
 }
 
 .active-scaffold .active-scaffold .active-scaffold-header div.actions {
-    top: 0px;
-    right: 0px;
+    top: 0;
+    right: 0;
 }
 
 .active-scaffold .active-scaffold .active-scaffold-header div.actions a,
@@ -502,7 +502,7 @@ noscript.active-scaffold {
 
 .active-scaffold .active-scaffold .view {
     background-color: transparent;
-    padding: 0px;
+    padding: 0;
     border: none;
 }
 
@@ -540,7 +540,7 @@ noscript.active-scaffold {
 }
 
 .active-scaffold .active-scaffold-footer {
-    padding: 3px 0px 2px 10px;
+    padding: 3px 0 2px 10px;
     border-bottom: none;
     font: bold 12px arial, sans-serif;
 }
@@ -676,7 +676,7 @@ noscript.active-scaffold {
 .active-scaffold .errorExplanation p {
     font-size: 11px;
     padding: 2px 5px;
-    font-family: Verdana;
+    font-family: Verdana,serif;
     margin: 0;
 }
 
@@ -732,8 +732,7 @@ noscript.active-scaffold {
     font-size: 14px;
     font-family: Arial, sans-serif;
     letter-spacing: 0;
-    margin: 0;
-    margin-top: 5px;
+    margin: 5px 0 0 0;
 }
 
 .active-scaffold form p {
@@ -823,7 +822,7 @@ noscript.active-scaffold {
 .active-scaffold label.example {
     font-size: 12px;
     font-weight: bold;
-    font-family: arial;
+    font-family: arial,serif;
     color: #888;
 }
 
@@ -868,7 +867,7 @@ noscript.active-scaffold {
 }
 
 .active-scaffold .checkbox-list {
-    padding-left: 0px;
+    padding-left: 0;
 }
 
 .active-scaffold .checkbox-list li {
@@ -920,8 +919,7 @@ noscript.active-scaffold {
 .active-scaffold .sub-form {
     float: left;
     clear: left;
-    padding: 5px 0;
-    padding-left: 5px;
+    padding: 5px 0 5px 5px;
 }
 
 .active-scaffold .sub-form h5 {
@@ -976,7 +974,7 @@ noscript.active-scaffold {
     padding: 0;
     width: 16px;
     text-indent: -4000px;
-    background: url(../../../images/active_scaffold/default/cross.png) 0 0 no-repeat;
+    background: url(../images/active_scaffold/default/cross.png) 0 0 no-repeat;
 }
 
 .active-scaffold .sub-form .locked a.destroy {
@@ -1021,7 +1019,7 @@ noscript.active-scaffold {
 .as_touch a.inline-adapter-close {
     width: 25px;
     height: 27px;
-    background: url(../../../images/active_scaffold/default/close_touch.png) 0 0 no-repeat;
+    background: url(../images/active_scaffold/default/close_touch.png) 0 0 no-repeat;
 }
 
 .as_touch .as_paginate {
@@ -1072,7 +1070,7 @@ noscript.active-scaffold {
 }
 
 .as_touch .active-scaffold-header h2 {
-    padding: 4px 0px;
+    padding: 4px 0;
 }
 
 .as_touch .active-scaffold .active-scaffold-header div.actions a,
