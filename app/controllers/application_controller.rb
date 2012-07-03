@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
   
   before_filter :authenticate
+  before_filter :parse_date
   
   # disable implicit helper(:all) in rails3
   clear_helpers
@@ -30,6 +31,30 @@ class ApplicationController < ActionController::Base
   def authenticate
     authenticate_or_request_with_http_basic("Sapos") do |username, password|
       User.authenticate(username, password)
+    end
+  end
+
+  # This application has custom values for date inputs, having month and year as default for most dates
+  # here we nullify invalid dates that comes from the request
+  # invalid dates consists in dates with year < 1000
+  def parse_date
+    if params[:record]
+      external_key = "";
+      invalid_year = false;
+      params[:record].each {|key,value|
+        if key.include?("1i")
+          invalid_year = value.to_i < 1000
+          external_key = key.split("(")[0]
+        end
+      }
+
+      if invalid_year
+        params[:record].delete_if{|key,value|
+          key.include?("date")
+        }
+
+        params[:record][external_key] = nil
+      end
     end
   end
 end
