@@ -62,7 +62,7 @@ a {
 
 .active-scaffold div.actions a.disabled img,
 .active-scaffold td.actions a.disabled img {
-    opacity: 0.5;
+    opacity: 1;
 }
 
 .active-scaffold .clear-fix {
@@ -157,12 +157,12 @@ noscript.active-scaffold {
 
 .active-scaffold-header div.actions a.disabled {
     color: #666;
-    opacity: 0.5;
+    opacity: 1;
 }
 
 .blue-theme .active-scaffold-header div.actions a.disabled {
     color: #fff;
-    opacity: 0.5;
+    opacity: 1;
 }
 
 .active-scaffold-header div.actions a.new,
@@ -175,6 +175,20 @@ noscript.active-scaffold {
     padding: 5px 5px 5px 25px;
     background-position: 5px 50%;
     background-repeat: no-repeat;
+
+    background-color: #FFFFFF;
+
+    border-left: 1px solid #c8c6c6;
+    border-right: 1px solid #c8c6c6;
+    border-top: 1px solid #c8c6c6;
+
+    /*border radius*/
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 
 .active-scaffold .active-scaffold .active-scaffold-header div.actions > a.new,
@@ -214,14 +228,19 @@ noscript.active-scaffold {
 }
 
 .active-scaffold-header div.actions a.disabled:hover {
-    background-color: transparent;
+    background-color: #FFFFFF;
     cursor: default;
+}
+
+.active-scaffold-header div.actions a.disabled {
+    height: 21px;
+    margin-top: -4px;
 }
 
 .active-scaffold-header div.actions {
     position: absolute;
-    right: 5px;
-    top: 5px;
+    right: -2px;
+    top: 4px;
     text-align: right;
 }
 
@@ -362,7 +381,7 @@ noscript.active-scaffold {
 
 .active-scaffold tr.record td.actions a.disabled {
     color: #666;
-    opacity: 0.5;
+    opacity: 1;
 }
 
 .active-scaffold .actions .action_group div:hover {
@@ -698,7 +717,7 @@ noscript.active-scaffold {
 }
 
 .active-scaffold .active-scaffold-header .loading-indicator {
-    margin-bottom: 3px;
+    margin: 0 6px -6px 0;
 }
 
 /* Show
