@@ -431,6 +431,7 @@ pt:
         student_name: "Nome do Aluno"
         active: "Matrícula ativa?"
         co_advisor: "Possui coorientador?"
+        co_advisor_list: "Lista de Coorientadores"
         level: "Nível"
       user:
         name: "Nome do usuário"

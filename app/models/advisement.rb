@@ -3,7 +3,7 @@ class Advisement < ActiveRecord::Base
   belongs_to :enrollment
 
   def to_label
-    "#{enrollment.enrollment_number} - #{professor.name}"    
+    "#{enrollment.enrollment_number} - #{professor.name}"
   end
   
   #defines if an certain advisement is active (An active advisement is an advisement which the student doesn't have a dismissal reason
@@ -16,7 +16,20 @@ class Advisement < ActiveRecord::Base
   def active_order
     return active.to_s
   end
-  
+
+  def co_advisor_list
+    return "" if enrollment.nil?
+    return "" if professor.nil?
+    professor_list = Professor.
+                     joins(:advisements).
+                     order("professors.name").
+                     where("advisements.main_advisor" => false,
+                           "advisements.enrollment_id" => enrollment.id
+                     )
+
+    return professor_list.map(&:name).join(" , ")
+  end
+
   def co_advisor
       return false if enrollment.nil?
       co_advisors = Advisement.find(:all, :conditions => ["main_advisor = false and enrollment_id = ?", enrollment.id])
