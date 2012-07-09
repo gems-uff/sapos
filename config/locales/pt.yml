@@ -405,6 +405,11 @@ pt:
         scholarship_start_date: "Data de Início de Bolsa"
         scholarship_end_date: "Data de Fim de Bolsa"
         last_scholarship_duration_end_date: "Bolsa"
+        adviser: "Orientador"
+        sponsors: "Agência de Fomento"
+        scholarship_types: "Tipo de Bolsa"
+        level: "Nível"
+        active: "Ativa?"
       professor: 
         name: "Nome"
         cpf: "CPF"

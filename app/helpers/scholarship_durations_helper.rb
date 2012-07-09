@@ -62,5 +62,41 @@ module ScholarshipDurationsHelper
     }
     
     select_date record[:start_date], options.merge(local_options)
-  end 
+  end
+
+  def adviser_search_column(record,options)
+    local_options = {
+        :include_blank => true
+    }
+
+    select_tag record[:adviser], options_from_collection_for_select(Professor.all(:order => "name"), "id","name"), options.merge(local_options)
+  end
+
+  def sponsors_search_column(record,options)
+    local_options = {
+        :include_blank => true
+    }
+
+    select_tag record[:sponsor], options_from_collection_for_select(Sponsor.all(:order => "name"), "id", "name"), options.merge(local_options)
+  end
+
+  def scholarship_types_search_column(record,options)
+    local_options = {
+        :include_blank => true
+    }
+
+    select_tag record[:scholarship_types], options_from_collection_for_select(ScholarshipType.all(:order => "name"), "id", "name"), options.merge(local_options)
+  end
+
+  def active_search_column(record,options)
+    select(record, :active, [["Todas","all"],["Ativas","active"],["Inativas","not_active"]], options, options)
+  end
+
+  def level_search_column(record,options)
+    local_options = {
+        :include_blank => true
+    }
+
+    select_tag record[:level], options_from_collection_for_select(Level.all(:order => "name"), "id", "name"), options.merge(local_options)
+  end
 end
