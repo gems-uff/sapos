@@ -22,4 +22,8 @@ class Professor < ActiveRecord::Base
     
     "#{points.to_f.round(1)}"
   end
+
+  def advisement_points_order
+    advisement_points.to_f
+  end
 end
