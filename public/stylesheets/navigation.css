@@ -101,7 +101,7 @@ body a {
 .menu_content #top_navigation {
     float: left;
     width: 100%;
-    margin-left: 120px;
+    margin-left: 119px;
     background-color: transparent;
 }
 
@@ -119,15 +119,6 @@ body a {
 }
 
 /*rounded corners of top-menu navigation*/
-.menu_content #top_navigation ul li:first-child a{
-    -webkit-border-top-left-radius: 5px;
-    -webkit-border-bottom-left-radius: 5px;
-    -moz-border-radius-topleft: 5px;
-    -moz-border-radius-bottomleft: 5px;
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
-}
-
 .menu_content #top_navigation ul li:last-child a{
     -webkit-border-top-right-radius: 5px;
     -webkit-border-bottom-right-radius: 5px;
@@ -142,7 +133,7 @@ body a {
     font-size: 10pt;
     font-weight: normal;
     margin: 0;
-    padding: 4px 8px 6px;
+    padding: 7px 10px;
     border-right: 1px dotted #919191;
     color: #656565;
     text-decoration: none;
