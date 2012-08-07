@@ -2,8 +2,8 @@ require 'digest/sha2'
 
 class User < ActiveRecord::Base
   validates :name, :presence => true, :uniqueness => true
-
   validates :password, :confirmation => true
+
   attr_accessor :password_confirmation
   attr_reader   :password
 
@@ -33,8 +33,17 @@ class User < ActiveRecord::Base
 
   #Application need a user to log in
   def before_destroy
+    errors.add(:base, I18n.t("activerecord.errors.models.user.self_delete")) if current_user_id == self.id
     errors.add(:base, I18n.t("activerecord.errors.models.user.delete")) if User.count == 1
     errors.blank?
+  end
+
+  def current_user_id
+    @@user_id
+  end
+
+  def self.set_current_user_id(user_id)
+    @@user_id = user_id
   end
 
   private

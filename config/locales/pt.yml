@@ -262,6 +262,7 @@ pt:
               on_or_after:  "anterior a Data de Início"
         user:
           delete: "O sistema precisa ter ao menos um usuário"
+          self_delete: "Você não pode se deletar"
         
     models:
       advisement:

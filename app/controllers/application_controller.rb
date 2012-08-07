@@ -3,11 +3,14 @@ class ApplicationController < ActionController::Base
   
   before_filter :authenticate
   before_filter :parse_date
-  
+
   # disable implicit helper(:all) in rails3
   clear_helpers
-  
-  ActiveScaffold.set_defaults do |config| 
+
+  #Set class variable user_id on User
+  before_filter :set_current_user_id
+
+  ActiveScaffold.set_defaults do |config|
     config.ignore_columns.add [:created_at, :updated_at, :lock_version]
     config.create.link.label = :create_link
     config.delete.link.label = :delete_link
@@ -54,5 +57,9 @@ class ApplicationController < ActionController::Base
         params[:record][external_key] = nil
       end
     end
+  end
+
+  def set_current_user_id
+    User.set_current_user_id(session[:user_id])
   end
 end
