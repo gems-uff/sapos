@@ -260,6 +260,8 @@ pt:
             cancel_date:
               on_or_before: "posterior a Data Limite de Concessão"
               on_or_after:  "anterior a Data de Início"
+        user:
+          delete: "O sistema precisa ter ao menos um usuário"
         
     models:
       advisement:

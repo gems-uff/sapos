@@ -1,0 +1,27 @@
+<div id="login_form_wrapper">
+  <% if flash[:alert] %>
+      <div id="error_login"><%= flash[:alert] %></div>
+  <% end %>
+
+  <div id="form_border">
+    <%= form_for('login', :html => {:id => 'login_form'}) do %>
+        <%= flash[:name] %>
+
+        <div id="login_input">
+          <label for="name">Login:</label>
+          <%= text_field_tag :name %>
+        </div>
+
+        <br/>
+
+        <div id="password_input">
+          <label for="password">Senha:</label>
+          <%= password_field_tag :password %>
+        </div>
+
+        <br/>
+
+        <%= submit_tag "Login" %>
+    <% end %>
+  </div>
+</div>

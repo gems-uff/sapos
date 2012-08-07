@@ -27,11 +27,9 @@ class ApplicationController < ActionController::Base
   end
   
   private
- 
+
   def authenticate
-    authenticate_or_request_with_http_basic("Sapos") do |username, password|
-      User.authenticate(username, password)
-    end
+    redirect_to login_url unless User.find_by_id(session[:user_id])
   end
 
   # This application has custom values for date inputs, having month and year as default for most dates

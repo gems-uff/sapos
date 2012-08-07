@@ -76,7 +76,7 @@ body a {
 }
 
 .menu_content {
-    margin-top: 15px;
+    margin-top: 10px;
     padding: 0 0 10px 0;
     border: 1px solid #c8c6c6;
     border-top: none;
@@ -231,4 +231,62 @@ body a {
 
 .breadcrumbs a:hover {
     text-decoration: underline;
+}
+
+
+/*Login module CSS*/
+#logout_button{
+    float: right;
+}
+
+#logout_button > *{
+    color: #3e82ae;
+    font-size: 12px;
+    text-decoration: underline;
+}
+
+#login_form_wrapper{
+    width: 300px;
+    margin-left: 33%;
+    padding: 30px;
+}
+
+#form_border{
+    border: 2px solid #bbc5d1;
+    padding: 20px;
+
+    /*rounded border*/
+    -webkit-border-radius: 10px;
+    -moz-border-radius: 10px;
+    border-radius: 10px;
+
+    /*background gradient*/
+    background-image: linear-gradient(bottom, rgb(213,224,237) 47%, rgb(230,242,255) 97%);
+    background-image: -o-linear-gradient(bottom, rgb(213,224,237) 47%, rgb(230,242,255) 97%);
+    background-image: -moz-linear-gradient(bottom, rgb(213,224,237) 47%, rgb(230,242,255) 97%);
+    background-image: -webkit-linear-gradient(bottom, rgb(213,224,237) 47%, rgb(230,242,255) 97%);
+    background-image: -ms-linear-gradient(bottom, rgb(213,224,237) 47%, rgb(230,242,255) 97%);
+
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0.47, rgb(213,224,237)),
+        color-stop(0.97, rgb(230,242,255))
+    );
+}
+
+#login_form{
+    border-style: none;
+}
+
+#login_input > label{
+    margin-right: 6px;
+}
+
+#error_login{
+    background-color: #fcc;
+    margin: 10px 0px;
+    border: solid 1px #f66;
+    padding: 5px 0 5px 12px;
 }

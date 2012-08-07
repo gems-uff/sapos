@@ -23,6 +23,11 @@
 <div id='main_content'>
   <div class='menu'>
     <div class='header'>
+
+      <div id="logout_button" <%= set_style_display_none_if_logged_out%>>
+        <%= button_to 'Logout', logout_path, :method => :delete %>
+      </div>
+
       <div class='title'>
         <img src="images/logoSapos.png"/>
       </div>
@@ -36,15 +41,15 @@
         </span>
       </div>
       <!--<div class='sub'>-->
-        <!--<%= render_navigation :renderer => :breadcrumbs, :join_with => " &gt;&gt; " %>-->
+      <!--<%= render_navigation :renderer => :breadcrumbs, :join_with => " &gt;&gt; " %>-->
       <!--</div>-->
     </div>
 
-    <div class='menu_content'>
-      <div id='top_navigation'><%= render_navigation :level => 1 %></div>
+    <div class='menu_content' <%= set_style_menu_content_if_logged_out%>>
+      <div id='top_navigation' <%= set_style_display_none_if_logged_out%>><%= render_navigation :level => 1 %></div>
       <div class='clear_float'></div>
       <div class='content_wrapper'>
-        <div id='sub_navigation'><%= render_navigation :level => 2 %></div>
+        <div id='sub_navigation' <%= set_style_display_none_if_logged_out%>><%= render_navigation :level => 2 %></div>
         <div class='content'>
           <%= yield %>
         </div>
