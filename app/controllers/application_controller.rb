@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   
+  before_filter :remember_me_if_cookie_is_set
   before_filter :authenticate
   before_filter :parse_date
 
@@ -61,5 +62,15 @@ class ApplicationController < ActionController::Base
 
   def set_current_user_id
     User.set_current_user_id(session[:user_id])
+  end
+
+  def remember_me_if_cookie_is_set
+    if (cookies[:remember_me_id]   and
+        cookies[:remember_me_code] and
+        User.find( cookies[:remember_me_id]) and
+        Digest::SHA1.hexdigest( User.find( cookies[:remember_me_id] ).name )[4,18] == cookies[:remember_me_code])
+      @user = User.find( cookies[:remember_me_id] )
+      session[:user_id] = @user.id
+    end
   end
 end

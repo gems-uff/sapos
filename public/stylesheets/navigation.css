@@ -246,7 +246,7 @@ body a {
 }
 
 #login_form_wrapper{
-    width: 300px;
+    width: 310px;
     margin-left: 33%;
     padding: 30px;
 }
@@ -289,4 +289,9 @@ body a {
     margin: 10px 0px;
     border: solid 1px #f66;
     padding: 5px 0 5px 12px;
+}
+
+#remember_me_input > label{
+    font-size: 12px;
+    margin-top: -1px;
 }
