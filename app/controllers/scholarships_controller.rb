@@ -49,8 +49,6 @@ class ScholarshipsController < ApplicationController
     if year != 1
       date = Date.new(year.to_i,month.to_i)
 
-      puts date
-      
       ["#{column.search_sql} >= ?", date]
     end
   end  
@@ -84,7 +82,7 @@ class ScholarshipsController < ApplicationController
     )  
 
     each_record_in_page{}
-    scholarships_from_page = find_page().items
+    scholarships_from_page = find_page(:sorting => active_scaffold_config.list.user.sorting).items
     
     scholarships = scholarships_from_page.map! do |s| 
         [

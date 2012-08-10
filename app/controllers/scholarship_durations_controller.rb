@@ -154,7 +154,7 @@ class ScholarshipDurationsController < ApplicationController
     )
 
     each_record_in_page{}
-    scholarship_durations_list = find_page().items
+    scholarship_durations_list = find_page(:sorting => active_scaffold_config.list.user.sorting).items
 
     scholarship_durations = scholarship_durations_list.map do |scp|
       [
