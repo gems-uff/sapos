@@ -25,7 +25,8 @@ class Advisement < ActiveRecord::Base
                      order("professors.name").
                      where("advisements.main_advisor" => false,
                            "advisements.enrollment_id" => enrollment.id
-                     )
+                     ).
+                     where("professors.id <> ? ",professor.id)
 
     return professor_list.map(&:name).join(" , ")
   end
