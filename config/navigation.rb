@@ -56,6 +56,7 @@ SimpleNavigation::Configuration.run do |navigation|
       stud.item :scholarship, 'Bolsas', scholarships_path      
       stud.item :scholarship_duration, 'Alocação de Bolsas', scholarship_durations_path
       stud.item :deferral, 'Prorrogações', deferrals_path
+      stud.item :dismissal, 'Desligamentos', dismissals_path
     end
         
     primary.item :inst, 'Instituições e Cursos', institutions_path do |inst|

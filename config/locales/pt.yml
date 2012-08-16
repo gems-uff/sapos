@@ -364,6 +364,8 @@ pt:
       dismissal:
         date: "Data"
         dismissal_reason: "Motivo do Desligamento"
+        enrollment: "Matrícula"
+        obs: "Observação"
       enrollment_status:
         name: "Nome"
       student:
@@ -479,7 +481,9 @@ pt:
         duration: "Duração(períodos)"
         phase: "Etapa"
         
-  active_scaffold:     
+  active_scaffold:
+    hide: "Ocultar"
+    show: "Mostrar"
     close: "Fechar"
     create: "Salvar"
     cancel: "Cancelar"
