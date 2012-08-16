@@ -11,7 +11,10 @@ class ProfessorsController < ApplicationController
     config.columns[:birthdate].options = {'date:yearRange' => 'c-100:c'}    
     config.columns[:civil_status].form_ui = :select
     config.columns[:civil_status].options = {:options => [['Solteiro(a)','solteiro'],
-                                                          ['Casado(a)','casado']]}                                                      
+                                                          ['Casado(a)','casado']]}
+    config.columns[:sex].form_ui = :select
+    config.columns[:sex].options = {:options => [['Masculino','M'],
+                                                          ['Feminino','F']]}
     config.columns[:scholarships].form_ui = :record_select               
     config.show.columns = [:name,
                            :cpf,

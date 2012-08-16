@@ -48,15 +48,16 @@ class ApplicationController < ActionController::Base
           invalid_year = value.to_i < 1000
           external_key = key.split("(")[0]
         end
+
+        if invalid_year
+          invalid_year = false
+          params[:record].delete_if{|key,value|
+            key.include?("date")
+          }
+
+          params[:record][external_key] = nil
+        end
       }
-
-      if invalid_year
-        params[:record].delete_if{|key,value|
-          key.include?("date")
-        }
-
-        params[:record][external_key] = nil
-      end
     end
   end
 
