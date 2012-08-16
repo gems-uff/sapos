@@ -11,6 +11,7 @@ class EnrollmentsController < ApplicationController
     config.columns[:level].form_ui = :select
     config.columns[:enrollment_status].form_ui = :select
     config.columns[:dismissal].clear_link
+    config.columns[:student].clear_link
     config.columns[:level].clear_link
     config.columns[:enrollment_status].clear_link
     config.columns[:student].form_ui = :record_select

@@ -20,7 +20,9 @@ class ScholarshipDurationsController < ApplicationController
     config.columns[:level].search_sql = ''
     config.columns[:scholarship].search_ui = :text
     config.columns[:enrollment].search_ui = :text
-    
+
+    config.columns[:scholarship].clear_link
+    config.columns[:enrollment].clear_link
     config.list.sorting = {:scholarship => 'ASC'}
     config.list.columns = [:scholarship, :start_date, :end_date, :cancel_date,:enrollment]
     config.create.label = :create_scholarship_duration_label     

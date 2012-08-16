@@ -260,6 +260,10 @@ pt:
             cancel_date:
               on_or_before: "posterior a Data Limite de Concessão"
               on_or_after:  "anterior a Data de Início"
+        scholarship:
+          attributes:
+            end_date:
+              on_or_after: "anterior a Data de Início"
         user:
           delete: "O sistema precisa ter ao menos um usuário"
           self_delete: "Você não pode se deletar"
@@ -517,7 +521,7 @@ pt:
     filtered: ""
     reset: "Resetar"
     click_to_reset: "Clique aqui para remover o filtro criado"
-    replace_with_new: "Substituir por novo"
+    replace_with_new: ""
     
     create_course_label: "Adicionar Curso"
     create_institution_label: "Adicionar Instituição"

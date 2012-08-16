@@ -4,7 +4,10 @@ class CoursesController < ApplicationController
     config.create.label = :create_course_label
     #este abaixo não está funcionando...
     config.update.label = :update_course_label
-    
+
+    config.columns[:institution].clear_link
+    config.columns[:level].clear_link
+    config.columns[:students].clear_link
     config.columns[:level].form_ui = :select
     config.columns[:institution].form_ui = :record_select
     config.columns[:students].form_ui = :record_select

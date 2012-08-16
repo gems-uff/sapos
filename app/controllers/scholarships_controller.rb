@@ -21,6 +21,8 @@ class ScholarshipsController < ApplicationController
     config.columns[:level].form_ui = :select
     config.columns[:professor].form_ui = :record_select
     config.columns[:scholarship_type].clear_link
+    config.columns[:level].clear_link
+    config.columns[:sponsor].clear_link
     
     config.columns[:start_date].options = {:format => :monthyear}
     config.columns[:end_date].options = {:format => :monthyear}

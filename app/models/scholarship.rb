@@ -11,5 +11,7 @@ class Scholarship < ActiveRecord::Base
   end
   
   validates :scholarship_number, :presence => true, :uniqueness => true
-  
+
+  #validates date
+  validates_date :end_date, :on_or_after => :start_date, :allow_nil => true
 end

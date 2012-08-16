@@ -52,7 +52,7 @@ class ApplicationController < ActionController::Base
         if invalid_year
           invalid_year = false
           params[:record].delete_if{|key,value|
-            key.include?("date")
+            key.include?(external_key)
           }
 
           params[:record][external_key] = nil

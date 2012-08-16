@@ -14,6 +14,7 @@ class AdvisementsController < ApplicationController
     config.columns[:enrollment_number].includes = [:enrollment]
     config.columns[:student_name].includes = [{:enrollment => :student}]
 
+    config.columns[:professor].clear_link
     config.columns[:active].search_sql = ""
     config.columns[:active].search_ui = :select
     config.columns[:co_advisor].search_sql = ""
