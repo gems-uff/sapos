@@ -23,8 +23,7 @@ class Advisement < ActiveRecord::Base
     professor_list = Professor.
                      joins(:advisements).
                      order("professors.name").
-                     where("advisements.main_advisor" => false,
-                           "advisements.enrollment_id" => enrollment.id
+                     where("advisements.enrollment_id" => enrollment.id
                      ).
                      where("professors.id <> ? ",professor.id)
 
