@@ -1,0 +1,10 @@
+SAPOS require an user to login.
+
+There are two ways to deal with user creation in SAPOS:
+
+1 - If your database is empty and you already made all migrations, don't worry, just log in and this user will be registered automatically.
+    This procedure will always occur if your 'Users' table is empty.
+
+2 - It is possible to register a new User using IRB console. IRB console is accessible by typing the command "Rails c".
+    The password of this newly created user, will be hashed automatically
+    Example: @u = User.new(:name => "admin", :password => "123456"); @u.save!
