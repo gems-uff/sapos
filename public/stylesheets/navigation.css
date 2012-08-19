@@ -138,12 +138,26 @@ body a {
     color: #656565;
     text-decoration: none;
     /*background gradient*/
-    background: -webkit-gradient(linear, left bottom, left top, color-stop(0.04, rgb(218, 218, 218)), color-stop(0.47, rgb(232, 232, 232)), color-stop(1, rgb(255, 255, 255)));
+    background: #ffffff; /* Old browsers */
+    background: -moz-linear-gradient(top,  #ffffff 0%, #e8e8e8 50%, #dadada 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(50%,#e8e8e8), color-stop(100%,#dadada)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #ffffff 0%,#e8e8e8 50%,#dadada 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #ffffff 0%,#e8e8e8 50%,#dadada 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #ffffff 0%,#e8e8e8 50%,#dadada 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #ffffff 0%,#e8e8e8 50%,#dadada 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dadada',GradientType=0 ); /* IE6-9 */
 }
 
 .menu_content #top_navigation ul li a:hover {
     /*background gradient*/
-    background: -webkit-gradient(linear, left bottom, left top, color-stop(0.28, rgb(175, 198, 213)), color-stop(0.64, rgb(211, 219, 224)), color-stop(1, rgb(255, 255, 255)));
+    background: #ffffff; /* Old browsers */
+    background: -moz-linear-gradient(top,  #ffffff 0%, #d3dbe0 50%, #afc6d5 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(50%,#d3dbe0), color-stop(100%,#afc6d5)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  #ffffff 0%,#d3dbe0 50%,#afc6d5 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  #ffffff 0%,#d3dbe0 50%,#afc6d5 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  #ffffff 0%,#d3dbe0 50%,#afc6d5 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  #ffffff 0%,#d3dbe0 50%,#afc6d5 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#afc6d5',GradientType=0 ); /* IE6-9 */
 }
 
 .menu_content #top_navigation ul li a.selected {
