@@ -443,7 +443,7 @@ pt:
         main_advisor: "Orientador Principal"
         enrollment_number: "Número de Matrícula"
         student_name: "Nome do Aluno"
-        active: "Matrícula ativa?"
+        active: "Orientação ativa?"
         co_advisor: "Possui coorientador?"
         co_advisor_list: "Lista de Coorientadores"
         level: "Nível"
