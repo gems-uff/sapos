@@ -7,6 +7,8 @@ class ProfessorsController < ApplicationController
 #    config.create.columns = [:name, :cpf, :birthdate]
 #    config.update.columns = [:name, :cpf, :birthdate]
     config.columns[:advisement_points].sort_by :method => "advisement_points_order"
+    config.create.columns.exclude :advisement_points
+    config.update.columns.exclude :advisement_points
     config.columns[:enrollments].associated_limit = nil
     config.columns[:birthdate].options = {'date:yearRange' => 'c-100:c'}    
     config.columns[:civil_status].form_ui = :select
