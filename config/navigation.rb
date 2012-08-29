@@ -46,12 +46,11 @@ SimpleNavigation::Configuration.run do |navigation|
     #
     primary.item :stud, 'Alunos', enrollments_path do |stud|
       stud.item :student, 'Alunos', students_path
-      stud.item :scholarship_duration, 'Alocação de Bolsas', scholarship_durations_path
-      stud.item :scholarship, 'Bolsas', scholarships_path
       stud.item :dismissal, 'Desligamentos', dismissals_path
       stud.item :enrollment, 'Matrículas', enrollments_path
-      stud.item :deferral, 'Prorrogações', deferrals_path
-      stud.item :accomplishment, 'Realização de Etapa', accomplishments_path
+      stud.item :level, 'Níveis', levels_path
+      stud.item :dismissal_reason, 'Razões de Desligamento', dismissal_reasons_path
+      stud.item :enrollment_status, 'Tipos de Matrícula', enrollment_statuses_path
     end
 
     primary.item :prof, 'Professores', professors_path do |prof|
@@ -59,23 +58,33 @@ SimpleNavigation::Configuration.run do |navigation|
       prof.item :advisement, 'Orientações', advisements_path
     end
 
-    primary.item :inst, 'Instituições e Cursos', institutions_path do |inst|
-      inst.item :course, 'Cursos', courses_path
-      inst.item :institution, 'Instituições', institutions_path
+    primary.item :scholarships, 'Bolsas', scholarship_durations_path do |scholarships|
+      scholarships.item :sponsor, 'Agências de Fomento', sponsors_path
+      scholarships.item :scholarship_duration, 'Alocação de Bolsas', scholarship_durations_path
+      scholarships.item :scholarship, 'Bolsas', scholarships_path
+      scholarships.item :scholarship_type, 'Tipos de Bolsa', scholarship_types_path
     end
-    
-    primary.item :configuration, 'Configurações', sponsors_path do |configuration|
-      configuration.item :sponsor, 'Agências de Fomento', sponsors_path
-      configuration.item :phase, 'Etapas', phases_path
-      configuration.item :level, 'Níveis', levels_path
-      configuration.item :dismissal_reason, 'Razões de Desligamento', dismissal_reasons_path
-      configuration.item :scholarship_type, 'Tipos de Bolsa', scholarship_types_path
-      configuration.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path
-      configuration.item :enrollment_status, 'Tipos de Matrícula', enrollment_statuses_path
+
+    primary.item :phases, 'Etapas', phases_path do |phases|
+      phases.item :phase, 'Etapas', phases_path
+      phases.item :deferral, 'Prorrogações', deferrals_path
+      phases.item :accomplishment, 'Realização de Etapa', accomplishments_path
+      phases.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path
+    end
+
+    primary.item :grade, 'Formação', courses_path do |grade|
+      grade.item :course, 'Cursos', courses_path
+      grade.item :institution, 'Instituições', institutions_path
+    end
+
+    primary.item :locations, 'Localidades', cities_path do |locations|
+      locations.item :city, 'Cidades', cities_path
+      locations.item :state, 'Estados', states_path
+      locations.item :country, 'Países', countries_path
+    end
+
+    primary.item :configuration, 'Configurações', users_path do |configuration|
       configuration.item :user, 'Usuários', users_path
-      configuration.item :country, 'Países', countries_path
-      configuration.item :state, 'Estados', states_path
-      configuration.item :city, 'Cidades', cities_path
     end
 
     # Add an item which has a sub navigation (same params, but with block)
