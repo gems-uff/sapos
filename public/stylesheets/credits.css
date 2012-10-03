@@ -1,0 +1,16 @@
+/* Credits div*/
+#credits_footer {
+    float: right;
+    margin-top: 5px;
+    font-size: 13px;
+}
+
+#credits_footer:hover {
+    text-decoration: underline;
+}
+
+#credits {
+    border: 1px solid #C8C6C6;
+    height: 100%;
+    padding: 20px;
+}

@@ -11,6 +11,9 @@ gem 'sqlite3'
 # Prawn to PDF
 gem 'prawn'
 
+# Redcarpet for Readme MarkDown (or README.md)
+gem 'redcarpet', '2.1.0'
+
 # Active scaffold support for Rails 3
 gem 'active_scaffold_vho'
 gem 'recordselect_vho'

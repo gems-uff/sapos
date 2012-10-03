@@ -1,4 +1,6 @@
 Sapos::Application.routes.draw do
+  get "credits/show"
+
   controller :session do
     get 'login' => :new
     post 'login' => :create
