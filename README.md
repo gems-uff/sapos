@@ -12,15 +12,15 @@ A realização do projeto foi resultado do trabalho de conclusão de curso dos a
 
 #Equipe
 
-> ### Orientadores
+- Orientadores
 
-  >  * Leonardo Gresta Paulino Murta
-  >  * Vanessa Braganholo Murta
+  * Leonardo Gresta Paulino Murta
+  * Vanessa Braganholo Murta
 
-> ### Alunos
+- Alunos
 
-  >  * Rodrigo Dias Ferreira
-  >  * Tiago Manuel Padrela Ferreira Amaro
+  * Rodrigo Dias Ferreira
+  * Tiago Manuel Padrela Ferreira Amaro
 
 #Agradecimentos
 
