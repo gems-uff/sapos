@@ -1,21 +1,20 @@
 #Sobre:
 
-O Projeto SAPOS tem como proposta facilitar a gestão de informações referentes a coordenação de pós-graduação de ciência da computação da Universidade Federal Fluminense.
+O Projeto SAPOS tem como proposta facilitar a gestão de informações referentes à coordenação de Pós-Graduação em Computação da Universidade Federal Fluminense.
 
 <br>
 
-Atualmente o sistema é hospedado no laboratório de engenharia de software, graças a colaboração do professor **Leonardo Gresta Paulino Murta**.
+Atualmente o sistema é hospedado no Laboratório de Engenharia de Software, graças à colaboração do professor **Leonardo Gresta Paulino Murta**.
 
 <br>
 
-A realização do projeto foi resultado do trabalho de conclusão de curso dos alunos **Rodrigo Dias** e **Tiago Amaro**, finalizando bacharel em Ciência da Computação pela Universidade Federal Fluminense e orientados pelos professores **Leonardo Murta** e **Vanessa Braganholo**.
-
+O projeto foi resultado do trabalho de conclusão de curso dos alunos **Rodrigo Dias** e **Tiago Amaro**, ambos do Bacharelado em Ciência da Computação da Universidade Federal Fluminense. O trabalho foi orientado pelos professores **Leonardo Murta** e **Vanessa Braganholo**.
 #Equipe
 
 - Orientadores
 
   * Leonardo Gresta Paulino Murta
-  * Vanessa Braganholo Murta
+  * Vanessa Braganholo 
 
 - Alunos
 
