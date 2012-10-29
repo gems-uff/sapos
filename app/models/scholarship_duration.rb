@@ -53,6 +53,7 @@ class ScholarshipDuration < ActiveRecord::Base
 
   def cancel_dates_are_null
     last_scholarship_duration = ScholarshipDuration.find :last, :conditions => ["scholarship_id = ? AND enrollment_id <> ?",scholarship.id,enrollment.id]
+    return cancel_date.nil? if last_scholarship_duration.nil?
     last_scholarship_duration.cancel_date.nil? and cancel_date.nil?
   end
   
