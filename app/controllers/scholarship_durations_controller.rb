@@ -7,7 +7,7 @@ class ScholarshipDurationsController < ApplicationController
 
     #virtual columns for advanced search
     config.columns.add :adviser, :sponsors, :scholarship_types, :active, :level
-    
+
     config.field_search.columns = [:scholarship, :start_date, :end_date, :cancel_date,:enrollment, :adviser, :sponsors, :scholarship_types, :level, :active]
     config.columns[:start_date].search_sql = 'scholarship_durations.start_date'
     config.columns[:end_date].search_sql = 'scholarship_durations.end_date'
@@ -24,8 +24,8 @@ class ScholarshipDurationsController < ApplicationController
     config.columns[:scholarship].clear_link
     config.columns[:enrollment].clear_link
     config.list.sorting = {:scholarship => 'ASC'}
-    config.list.columns = [:scholarship, :start_date, :end_date, :cancel_date,:enrollment]
-    config.create.label = :create_scholarship_duration_label     
+    config.list.columns = [:scholarship, :start_date, :cancel_date, :end_date, :enrollment]
+    config.create.label = :create_scholarship_duration_label
     config.columns = [:scholarship,:enrollment,:start_date,:cancel_date,:end_date,:obs]
     config.columns[:scholarship].search_sql = 'scholarships.scholarship_number'
     config.columns[:scholarship].sort_by :sql => 'scholarships.scholarship_number'
@@ -89,7 +89,7 @@ class ScholarshipDurationsController < ApplicationController
       WHERE  scholarships.level_id = ?
     )",value]
   end
-  
+
   def self.condition_for_start_date_column(column, value, like_pattern)
     month = value[:month].empty? ? 1 : value[:month]
     year = value[:year].empty?  ? 1 : value[:year]
@@ -100,7 +100,7 @@ class ScholarshipDurationsController < ApplicationController
       ["#{column.search_sql} >= ?", date]
     end
   end
-  
+
   def self.condition_for_end_date_column(column, value, like_pattern)
     month = value[:month].empty? ? 1 : value[:month]
     year = value[:year].empty?  ? 1 : value[:year]
@@ -111,7 +111,7 @@ class ScholarshipDurationsController < ApplicationController
       ["#{column.search_sql} >= ?", date]
     end
   end
-  
+
   def self.condition_for_cancel_date_column(column, value, like_pattern)
     month = value[:month].empty? ? 1 : value[:month]
     year = value[:year].empty?  ? 1 : value[:year]

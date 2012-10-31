@@ -11,18 +11,14 @@ class ScholarshipDuration < ActiveRecord::Base
   def validation_of_date_in_uniqueness
     return false if enrollment.nil?
 
-    scholarships_with_student = ScholarshipDuration.find :all, :conditions => ["enrollment_id = ?",enrollment.id]
-    unless scholarships_with_student.nil?
-      scholarships_with_student.each do |scholarship|
-        unless scholarship.end_date.nil?
-            return true if scholarship.end_date > start_date
-        end
-        unless scholarship.cancel_date.nil?
-            return true if scholarship.cancel_date > start_date
-        end
+    scholarships_with_student = ScholarshipDuration.all :conditions => ["enrollment_id = ?",enrollment.id]
+    scholarships_with_student.each do |scholarship|
+      if scholarship.cancel_date.nil?
+        return scholarship.end_date > start_date
+      else
+        return scholarship.cancel_date > start_date
       end
     end
-    false
   end
 
   def last_scholarship_duration
@@ -72,7 +68,7 @@ class ScholarshipDuration < ActiveRecord::Base
   end
 
   validates :scholarship, :presence => true
-  validates :enrollment_id,  :presence => true, :uniqueness => {:scope => :scholarship_id ,:message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.entollment_and_scholarship_uniqueness"), :if => :validation_of_date_in_uniqueness }
+  validates :enrollment_id,  :presence => true, :uniqueness => { :message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.entollment_and_scholarship_uniqueness"), :if => :validation_of_date_in_uniqueness }
 
   #validates if scholarship isn't with another student
   validates_date :start_date, :on_or_after => :last_scholarship_duration_cancel_date, :allow_nil => true, :on_or_after_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_after_scholarship_cancel_date")

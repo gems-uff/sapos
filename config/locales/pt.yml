@@ -257,7 +257,7 @@ pt:
             end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
             end_date_before_scholarship_start_date: "anterior a Data de Início da Bolsa"
             last_scholarship_duration_end_date: "já pertence a outro aluno no período de tempo determinado"
-            entollment_and_scholarship_uniqueness: "e Bolsa já existem cadastradas nesta combinação"
+            entollment_and_scholarship_uniqueness: "já possui uma Bolsa alocada nesse período"
             cancel_date:
               on_or_before: "posterior a Data Limite de Concessão"
               on_or_after:  "anterior a Data de Início"
