@@ -45,7 +45,7 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.16)
-    mysql2 (0.3.11)
+    mysql2 (0.2.11)
     pdf-reader (1.2.0)
       Ascii85 (~> 1.0.0)
       hashery (~> 2.0)
@@ -103,7 +103,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_scaffold_vho
-  mysql2
+  mysql2 (= 0.2.11)
   prawn
   rails (= 3.0.9)
   recordselect_vho
