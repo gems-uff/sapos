@@ -5,8 +5,13 @@ gem 'rails', '3.0.9'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'sqlite3'
+group :development, :test do
+	gem 'sqlite3'
+end
 
+group :production, :homologacao do
+	gem 'mysql2'
+end
 
 # Prawn to PDF
 gem 'prawn'
