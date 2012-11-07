@@ -53,15 +53,27 @@ class ScholarshipDuration < ActiveRecord::Base
     scholarships_with_student.each do |scholarship|
       if scholarship.start_date <= start_date # se a bolsa é antiga
         if scholarship.cancel_date.nil?
-          errors.add(:start_date, I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_before_scholarship_end_date"));break if scholarship.end_date >= start_date
+          if scholarship.end_date >= start_date
+            errors.add(:start_date, I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_before_scholarship_end_date"))
+            break
+          end
         else
-          errors.add(:start_date,I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_before_scholarship_cancel_date"));break if scholarship.cancel_date >= start_date
+          if scholarship.cancel_date >= start_date
+            errors.add(:start_date,I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_before_scholarship_cancel_date"))
+            break
+          end
         end
       else # se a bolsa é futura
         if cancel_date.nil?
-          errors.add(:end_date,I18n.t("activerecord.errors.models.scholarship_duration.attributes.scholarship_start_date_after_end_or_cancel_date"));break if scholarship.start_date <= end_date
+          if scholarship.start_date <= end_date
+            errors.add(:end_date,I18n.t("activerecord.errors.models.scholarship_duration.attributes.scholarship_start_date_after_end_or_cancel_date"))
+            break
+          end
         else
-          errors.add(:cancel_date,I18n.t("activerecord.errors.models.scholarship_duration.attributes.scholarship_start_date_after_end_or_cancel_date"));break if scholarship.start_date <= cancel_date
+          if scholarship.start_date <= cancel_date
+            errors.add(:cancel_date,I18n.t("activerecord.errors.models.scholarship_duration.attributes.scholarship_start_date_after_end_or_cancel_date"))
+            break
+          end
         end
       end
     end
