@@ -113,6 +113,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_scaffold_vho
+  kaminari
   mysql2 (= 0.2.11)
   prawn
   rails (= 3.0.19)
