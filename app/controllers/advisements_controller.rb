@@ -1,3 +1,5 @@
+# encoding: utf-8
+
 class AdvisementsController < ApplicationController
   active_scaffold :advisement do |config|
 

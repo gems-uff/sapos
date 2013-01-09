@@ -1,3 +1,4 @@
+# encoding: utf-8
 class ScholarshipDurationsController < ApplicationController
   active_scaffold :scholarship_duration do |config|
     config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
