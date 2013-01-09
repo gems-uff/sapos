@@ -1,0 +1,109 @@
+class YearSemester
+  attr_accessor :year, :semester
+
+  FIRST_SEMESTER = 1
+  SECOND_SEMESTER = 2
+
+  FIRST_SEMESTER_BEGIN_MONTH = 3
+  FIRST_SEMESTER_BEGIN_DAY = 1
+  SECOND_SEMESTER_BEGIN_MONTH = 8
+  SECOND_SEMESTER_BEGIN_DAY = 1
+
+  def self.current
+    today = Date.today
+    self.on_date(today)
+  end
+
+  def self.on_date(date)
+    first_semester = Date.parse("#{date.year}/#{FIRST_SEMESTER_BEGIN_MONTH}/#{FIRST_SEMESTER_BEGIN_DAY}")
+    second_semester = Date.parse("#{date.year}/#{SECOND_SEMESTER_BEGIN_MONTH}/#{SECOND_SEMESTER_BEGIN_DAY}")
+
+    if date.between?(first_semester, second_semester - 1.day)
+      current_semester = FIRST_SEMESTER
+      current_year = date.year
+    else
+      current_semester = SECOND_SEMESTER
+      if date < first_semester
+        current_year = date.year - 1
+      else
+        current_year = date.year
+      end
+    end
+    year_semester = YearSemester.new
+    year_semester.year = current_year
+    year_semester.semester= current_semester
+    year_semester
+  end
+
+  def semester_end
+    self.next_semester_start - 1.day
+  end
+
+  def semester_begin
+    if self.first_semester?
+      semester_begin_month = FIRST_SEMESTER_BEGIN_MONTH
+      semester_begin_day = FIRST_SEMESTER_BEGIN_DAY
+    else
+      semester_begin_month = SECOND_SEMESTER_BEGIN_MONTH
+      semester_begin_day = SECOND_SEMESTER_BEGIN_DAY
+    end
+    Date.parse("#{self.year}/#{semester_begin_month}/#{semester_begin_day}")
+  end
+
+  def next_semester_start
+    next_semester = first_semester? ? SECOND_SEMESTER : FIRST_SEMESTER
+    if next_semester == FIRST_SEMESTER
+      next_semester_begin_year = self.year + 1
+      next_semester_begin_month = FIRST_SEMESTER_BEGIN_MONTH
+      next_semester_begin_day = FIRST_SEMESTER_BEGIN_DAY
+    else
+      next_semester_begin_year = self.year
+      next_semester_begin_month = SECOND_SEMESTER_BEGIN_MONTH
+      next_semester_begin_day = SECOND_SEMESTER_BEGIN_DAY
+    end
+    Date.parse("#{next_semester_begin_year}/#{next_semester_begin_month}/#{next_semester_begin_day}")
+  end
+
+  def first_semester?
+    self.semester == FIRST_SEMESTER
+  end
+
+  def second_semester?
+    self.semester == SECOND_SEMESTER
+  end
+
+  def toggle_semester
+    if first_semester?
+      self.semester = SECOND_SEMESTER
+    else
+      self.semester = FIRST_SEMESTER
+    end
+  end
+
+  def increase_semesters(number_of_semesters)
+    if number_of_semesters < 0
+      self.decrease_semesters(number_of_semesters*-1)
+    else
+      if (number_of_semesters % 2 == 1)
+        self.year += 1 if self.second_semester?
+        self.toggle_semester
+      end
+      self.year += (number_of_semesters/2)
+      self
+    end
+  end
+
+  def decrease_semesters(number_of_semesters)
+    if number_of_semesters < 0
+      self.increase_semesters(number_of_semesters*-1)
+    else
+      if (number_of_semesters % 2 == 1)
+        self.year -= 1 if self.first_semester?
+        self.toggle_semester
+      end
+      self.year -= (number_of_semesters/2)
+      self
+    end
+  end
+
+end
