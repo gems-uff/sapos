@@ -8,13 +8,7 @@ class EnrollmentsController < ApplicationController
 #    config.columns[:level].update_columns = :accomplishments
     config.columns[:accomplishments].allow_add_existing = false;
 
-    config.columns << :student
-    config.columns.exclude :student
-    config.columns << :professor
-    config.columns.exclude :professor
-    config.columns << :phase
-    config.columns.exclude :phase
-    config.columns.add :scholarship_durations_active, :active
+    config.columns.add :scholarship_durations_active, :active, :professor, :phase
     config.actions.swap :search, :field_search
     config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :phase]
 
@@ -47,9 +41,9 @@ class EnrollmentsController < ApplicationController
     config.columns[:enrollment_status].clear_link
     config.columns[:admission_date].options = {:format => :monthyear}
 #Student can not be configured as record select because it does not allow the user to create a new one, if needed
-#config.columns[:student].form_ui = :record_select
+    config.columns[:student].form_ui = :record_select
     config.create.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal]
-    config.update.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal]
+    config.update.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal]
     config.show.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal]
   end
   record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
