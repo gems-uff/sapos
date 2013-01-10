@@ -61,7 +61,7 @@ class EnrollmentsController < ApplicationController
   end
 
   def self.condition_for_scholarship_durations_active_column(column, value, like_pattern)
-    query_active_scholarships = "select enrollment_id from scholarship_durations where DATE(scholarship_durations.end_date) >= DATE(?) AND  DATE(scholarship_durations.cancel_date) >= DATE(?)"
+    query_active_scholarships = "select enrollment_id from scholarship_durations where DATE(scholarship_durations.end_date) >= DATE(?) AND  (scholarship_durations.cancel_date is NULL OR DATE(scholarship_durations.cancel_date) >= DATE(?))"
     case value
       when '0' then
         sql = "enrollments.id not in (#{query_active_scholarships})"
