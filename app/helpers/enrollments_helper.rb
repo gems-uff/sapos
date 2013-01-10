@@ -9,8 +9,12 @@ module EnrollmentsHelper
   end
 
   # display the "user_type" field as a dropdown with options
-  def scholarship_durations_search_column(record, input_name)
+  def scholarship_durations_active_search_column(record, input_name)
     select :record, :scholarship_durations, options_for_select([["Sim", 1], ["Não", 0]]), {:include_blank => as_(:_select_)}, input_name
+  end
+
+  def active_search_column(record, input_name)
+    select :record, :dismissal, options_for_select([["Sim", 1], ["Não", 0]]), {:include_blank => as_(:_select_)}, input_name
   end
 
   def approval_date_form_column(record, options)

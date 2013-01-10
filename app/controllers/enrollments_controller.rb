@@ -14,8 +14,9 @@ class EnrollmentsController < ApplicationController
     config.columns.exclude :professor
     config.columns << :phase
     config.columns.exclude :phase
+    config.columns.add :scholarship_durations_active, :active
     config.actions.swap :search, :field_search
-    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :scholarship_durations, :professor, :phase]
+    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :phase]
 
     config.columns[:enrollment_number].search_sql = "enrollments.enrollment_number"
     config.columns[:enrollment_number].search_ui = :text
@@ -25,7 +26,10 @@ class EnrollmentsController < ApplicationController
     config.columns[:enrollment_status].search_sql = "enrollment_statuses.id"
     config.columns[:enrollment_status].search_ui = :select
     config.columns[:admission_date].search_sql = "enrollments.admission_date"
-    config.columns[:scholarship_durations].search_ui = :select
+    config.columns[:scholarship_durations_active].search_ui = :select
+    config.columns[:scholarship_durations_active].search_sql = ""
+    config.columns[:active].search_ui = :select
+    config.columns[:active].search_sql = ""
     config.columns[:professor].clear_link
     config.columns[:professor].search_sql = "professors.name"
     config.columns[:professor].includes = {:advisements => :professor}
@@ -42,28 +46,28 @@ class EnrollmentsController < ApplicationController
     config.columns[:level].clear_link
     config.columns[:enrollment_status].clear_link
     config.columns[:admission_date].options = {:format => :monthyear}
-    #Student can not be configured as record select because it does not allow the user to create a new one, if needed
-    #config.columns[:student].form_ui = :record_select        
+#Student can not be configured as record select because it does not allow the user to create a new one, if needed
+#config.columns[:student].form_ui = :record_select
     config.create.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal]
-    config.update.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal]
+    config.update.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal]
     config.show.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal]
   end
   record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
 
   def self.condition_for_admission_date_column(column, value, like_pattern)
     month = value[:month].empty? ? 1 : value[:month]
-    year = value[:year].empty?  ? 1 : value[:year]
+    year = value[:year].empty? ? 1 : value[:year]
 
     if year != 1
-      date1 = Date.new(year.to_i,month.to_i)
-      date2 = Date.new(month.to_i==12 ? year.to_i + 1 : year.to_i ,(month.to_i % 12) + 1)
+      date1 = Date.new(year.to_i, month.to_i)
+      date2 = Date.new(month.to_i==12 ? year.to_i + 1 : year.to_i, (month.to_i % 12) + 1)
 
       ["DATE(#{column.search_sql}) >= ? and DATE(#{column.search_sql}) < ?", date1, date2]
     end
   end
 
-  def self.condition_for_scholarship_durations_column(column, value, like_pattern)
-    query_active_scholarships = "select enrollment_id from scholarship_durations where DATE(scholarship_durations.end_date) >= DATE(?) OR  DATE(scholarship_durations.cancel_date) >= DATE(?)"
+  def self.condition_for_scholarship_durations_active_column(column, value, like_pattern)
+    query_active_scholarships = "select enrollment_id from scholarship_durations where DATE(scholarship_durations.end_date) >= DATE(?) AND  DATE(scholarship_durations.cancel_date) >= DATE(?)"
     case value
       when '0' then
         sql = "enrollments.id not in (#{query_active_scholarships})"
@@ -73,6 +77,21 @@ class EnrollmentsController < ApplicationController
         sql = ""
     end
 
-    [sql,Time.now,Time.now]
+    [sql, Time.now, Time.now]
   end
+
+  def self.condition_for_active_column(column, value, like_pattern)
+    query_inactive_enrollment = "select enrollment_id from dismissals where DATE(dismissals.date) <= DATE(?)"
+    case value
+      when '0' then
+        sql = "enrollments.id in (#{query_inactive_enrollment})"
+      when '1' then
+        sql = "enrollments.id not in (#{query_inactive_enrollment})"
+      else
+        sql = ""
+    end
+
+    [sql, Time.now]
+  end
+
 end
