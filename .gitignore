@@ -9,3 +9,5 @@
 /public/stylesheets/active_scaffold
 .idea/
 .rvmrc
+/vendor/bundle
+.DS_Store
