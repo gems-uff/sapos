@@ -71,11 +71,13 @@ class ScholarshipDurationsController < ApplicationController
   end
 
   def self.condition_for_active_column(column, value, like_pattern)
+    query_active_scholarships = "DATE(scholarship_durations.end_date) >= DATE(?) AND  (scholarship_durations.cancel_date is NULL OR DATE(scholarship_durations.cancel_date) >= DATE(?))"
+    query_inactive_scholarships = "DATE(scholarship_durations.end_date) < DATE(?) OR DATE(scholarship_durations.cancel_date) < DATE(?)"
     case value
       when "active" then
-        sql = "scholarship_durations.end_date >= ? OR scholarship_durations.cancel_date >= ?"
+        sql = query_active_scholarships
       when "not_active" then
-        sql = "scholarship_durations.end_date < ? OR scholarship_durations.cancel_date < ?"
+        sql = query_inactive_scholarships
       else
         sql = ""
     end
