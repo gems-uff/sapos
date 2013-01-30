@@ -97,7 +97,7 @@ class EnrollmentsController < ApplicationController
     date = value.nil? ? value : Date.parse("#{value[:year]}/#{value[:month]}/#{value[:day]}")
     phase = value[:phase] == "all" ? nil : value[:phase]
     enrollments_ids = Enrollment.with_delayed_phases_on(date, phase)
-    query_delayed_phase = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{enrollments_ids})"
+    query_delayed_phase = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{enrollments_ids.join(',')})"
     query_delayed_phase
   end
 

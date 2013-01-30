@@ -42,7 +42,7 @@ class Enrollment < ActiveRecord::Base
         phases_duration_deadline_months = phase_duration.deadline_months
         phases_duration_deadline_days = phase_duration.deadline_days
 
-        deferral_types = DeferralType.joins(:deferrals).where("deferrals.enrollment_id = #{enrollments.id}", :phase_id => phase_duration.phase_id)
+        deferral_types = DeferralType.joins(:deferrals).where("deferrals.enrollment_id = :enrollment_id and phase_id = :phase_id", :enrollment_id => enrollment.id, :phase_id => phase_duration.phase_id)
 
         final_ys = phase_duration_deadline_ys
         final_months = phases_duration_deadline_months
@@ -54,8 +54,7 @@ class Enrollment < ActiveRecord::Base
           final_days += deferral_type.duration_days
         end
 
-        deadline_date = final_ys.semester_end + final_months.months + final_days.days
-
+        deadline_date = final_ys.semester_begin + final_months.months + final_days.days
         if deadline_date <= date
           delayed_enrollments << enrollment.id
           break
