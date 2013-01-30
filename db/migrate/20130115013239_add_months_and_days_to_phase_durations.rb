@@ -1,0 +1,13 @@
+class AddMonthsAndDaysToPhaseDurations < ActiveRecord::Migration
+  def self.up
+    rename_column :phase_durations, :deadline, :deadline_semesters
+    add_column :phase_durations, :deadline_months, :integer, :default => 0
+    add_column :phase_durations, :deadline_days, :integer, :default => 0
+  end
+
+  def self.down
+    rename_column :phase_durations, :deadline_semesters, :deadline
+    remove_column :phase_durations, :deadline_months
+    remove_column :phase_durations, :deadline_days
+  end
+end
