@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20111115170655) do
+ActiveRecord::Schema.define(:version => 20130115013239) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -64,10 +64,12 @@ ActiveRecord::Schema.define(:version => 20111115170655) do
   create_table "deferral_types", :force => true do |t|
     t.string   "name"
     t.string   "description"
-    t.integer  "duration"
+    t.integer  "duration_semesters"
     t.integer  "phase_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "duration_months",    :default => 0
+    t.integer  "duration_days",      :default => 0
   end
 
   create_table "deferrals", :force => true do |t|
@@ -128,9 +130,11 @@ ActiveRecord::Schema.define(:version => 20111115170655) do
   create_table "phase_durations", :force => true do |t|
     t.integer  "phase_id"
     t.integer  "level_id"
-    t.integer  "deadline"
+    t.integer  "deadline_semesters"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "deadline_months",    :default => 0
+    t.integer  "deadline_days",      :default => 0
   end
 
   create_table "phases", :force => true do |t|

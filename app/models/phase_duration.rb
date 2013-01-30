@@ -3,8 +3,10 @@ class PhaseDuration < ActiveRecord::Base
   belongs_to :level
   
   def to_label
-    "#{deadline}"
+    "#{deadline_semesters} períodos, #{deadline_months} meses e #{deadline_days} dias"
   end
   
-  validates :deadline, :numericality => true
+  validates :deadline_semesters, :numericality => true
+  validates :deadline_months, :numericality => true
+  validates :deadline_days, :numericality => true
 end

@@ -8,9 +8,9 @@ class EnrollmentsController < ApplicationController
 #    config.columns[:level].update_columns = :accomplishments
     config.columns[:accomplishments].allow_add_existing = false;
 
-    config.columns.add :scholarship_durations_active, :active, :professor, :phase
+    config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase
     config.actions.swap :search, :field_search
-    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :phase]
+    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :phase, :delayed_phase]
 
     config.columns[:enrollment_number].search_sql = "enrollments.enrollment_number"
     config.columns[:enrollment_number].search_ui = :text
@@ -24,6 +24,8 @@ class EnrollmentsController < ApplicationController
     config.columns[:scholarship_durations_active].search_sql = ""
     config.columns[:active].search_ui = :select
     config.columns[:active].search_sql = ""
+    config.columns[:delayed_phase].search_sql = ""
+    config.columns[:delayed_phase].search_ui = :select
     config.columns[:professor].clear_link
     config.columns[:professor].search_sql = "professors.name"
     config.columns[:professor].includes = {:advisements => :professor}
@@ -87,5 +89,15 @@ class EnrollmentsController < ApplicationController
 
     [sql, Time.now]
   end
+
+  def self.condition_for_delayed_phase_column(column, value, like_pattern)
+    return "" if value[:phase].blank?
+    date = value.nil? ? value : Date.parse("#{value[:year]}/#{value[:month]}/#{value[:day]}")
+    phase = value[:phase] == "all" ? nil : value[:phase]
+    enrollments_ids = Enrollment.with_delayed_phases_on(date, phase)
+    query_delayed_phase = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{enrollments_ids})"
+    query_delayed_phase
+  end
+
 
 end
