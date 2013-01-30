@@ -72,38 +72,66 @@ class YearSemester
     self.semester == SECOND_SEMESTER
   end
 
-  def toggle_semester
+  def opposite_semester
     if first_semester?
-      self.semester = SECOND_SEMESTER
+      SECOND_SEMESTER
     else
-      self.semester = FIRST_SEMESTER
+      FIRST_SEMESTER
+    end
+  end
+
+  def toggle_semester
+    self.semester = self.opposite_semester
+  end
+
+  def -(number_of_semesters)
+    if number_of_semesters < 0
+      self.+(number_of_semesters*-1)
+    else
+      result_year = self.year
+      result_semester = self.semester
+      if (number_of_semesters % 2 == 1)
+        result_year -= 1 if self.first_semester?
+        result_semester = self.opposite_semester
+      end
+      result_year -= (number_of_semesters/2)
+      year_semester = YearSemester.new
+      year_semester.semester = result_semester
+      year_semester.year = result_year
+      year_semester
+    end
+  end
+
+  def +(number_of_semesters)
+    if number_of_semesters < 0
+      self.-(number_of_semesters*-1)
+    else
+      result_year = self.year
+      result_semester = self.semester
+      if (number_of_semesters % 2 == 1)
+        result_year += 1 if self.second_semester?
+        result_semester = self.opposite_semester
+      end
+      result_year += (number_of_semesters/2)
+      year_semester = YearSemester.new
+      year_semester.semester = result_semester
+      year_semester.year = result_year
+      year_semester
     end
   end
 
   def increase_semesters(number_of_semesters)
-    if number_of_semesters < 0
-      self.decrease_semesters(number_of_semesters*-1)
-    else
-      if (number_of_semesters % 2 == 1)
-        self.year += 1 if self.second_semester?
-        self.toggle_semester
-      end
-      self.year += (number_of_semesters/2)
-      self
-    end
+    result = self.+ number_of_semesters
+    self.year = result.year
+    self.semester = result.semester
+    self
   end
 
   def decrease_semesters(number_of_semesters)
-    if number_of_semesters < 0
-      self.increase_semesters(number_of_semesters*-1)
-    else
-      if (number_of_semesters % 2 == 1)
-        self.year -= 1 if self.first_semester?
-        self.toggle_semester
-      end
-      self.year -= (number_of_semesters/2)
-      self
-    end
+    result = self.- number_of_semesters
+    self.year = result.year
+    self.semester = result.semester
+    self
   end
 
 end
