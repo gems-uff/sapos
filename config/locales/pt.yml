@@ -370,6 +370,8 @@ pt:
         accomplishments: "Realização de Etapa"
         phase: "Etapa"
         professor: "Orientador"
+        delayed_phase: "Etapa atrasada"
+        delayed_phase_date: "em"
       dismissal:
         date: "Data"
         dismissal_reason: "Motivo do Desligamento"
@@ -472,7 +474,9 @@ pt:
         accomplishments: "Realização de Etapas"
         enrollments: "Matrículas"
       phase_duration:
-        deadline: "Prazo Máximo(em períodos)"
+        deadline_semesters: "Prazo Máximo(períodos)"
+        deadline_months: "Prazo Máximo(meses)"
+        deadline_days: "Prazo Máximo(dias)"
         level: "Nível"
       accomplishment:
         phase: "Etapa"
@@ -487,7 +491,9 @@ pt:
       deferral_type:
         name: "Nome"
         description: "Descrição"
-        duration: "Duração(períodos)"
+        duration_semesters: "Duração(períodos)"
+        duration_months: "Duração(meses)"
+        duration_days: "Duração(dias)"
         phase: "Etapa"
         
   active_scaffold:
@@ -510,13 +516,14 @@ pt:
     search_link: "Buscar"
     search: "Buscar"
     live_search: "Buscar"
-    _select_: "Selecione uma opção"    
+    _select_: "Selecione uma opção"
     'true': "Sim"
     'false': "Não"
     delete_message: "Tem certeza que deseja excluir?"
-    nested_for_model: ""    
+    nested_for_model: ""
     show_model: ""
     update_model: ""
+    delayed_phases_report: "Relatório"
     found:
       one: "Registro Encontrado"
       other: "Registros Encontrados"
