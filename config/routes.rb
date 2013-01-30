@@ -62,6 +62,9 @@ Sapos::Application.routes.draw do
   resources :enrollments do 
     as_routes 
     record_select_routes
+    collection do
+      get 'to_pdf'
+    end
   end
 
   resources :enrollment_statuses do 

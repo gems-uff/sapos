@@ -1,6 +1,8 @@
 class EnrollmentsController < ApplicationController
   active_scaffold :enrollment do |config|
 
+    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
+
     config.list.columns = [:student, :enrollment_number, :level, :enrollment_status, :admission_date, :dismissal]
     config.list.sorting = {:enrollment_number => 'ASC'}
     config.create.label = :create_enrollment_label
@@ -97,6 +99,64 @@ class EnrollmentsController < ApplicationController
     enrollments_ids = Enrollment.with_delayed_phases_on(date, phase)
     query_delayed_phase = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{enrollments_ids})"
     query_delayed_phase
+  end
+
+
+  def to_pdf
+    pdf = Prawn::Document.new
+
+    y_position = pdf.cursor
+
+    pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [455, y_position],
+              :vposition => :top,
+              :scale => 0.3
+    )
+
+    pdf.font("Courier", :size => 14) do
+      pdf.text "Universidade Federal Fluminense
+                Instituto de Computação
+                Pós-Graduação"
+    end
+
+    pdf.move_down 30
+
+    header = [["<b>#{I18n.t("activerecord.attributes.enrollment.student")}</b>",
+               "<b>#{I18n.t("activerecord.attributes.enrollment.enrollment_number")}</b>",
+               "<b>#{I18n.t("activerecord.attributes.enrollment.admission_date")}</b>",
+               "<b>#{I18n.t("activerecord.attributes.enrollment.dismissal")}</b>"]]
+    pdf.table(header, :column_widths => [208, 108, 108, 108],
+              :row_colors => ["BFBFBF"],
+              :cell_style => {:font => "Courier",
+                              :size => 10,
+                              :inline_format => true,
+                              :border_width => 0
+              }
+    )
+
+    each_record_in_page {}
+    enrollments_list = find_page(:sorting => active_scaffold_config.list.user.sorting).items
+
+    enrollments = enrollments_list.map do |enrollment|
+      [
+          enrollment.student[:name],
+          enrollment[:enrollment_number],
+          enrollment[:admission_date],
+          if enrollment.dismissal
+            enrollment.dismissal[:date]
+          end
+      ]
+    end
+
+    pdf.table(enrollments, :column_widths => [208, 108, 108, 108],
+              :row_colors => ["FFFFFF", "F0F0F0"],
+              :cell_style => {:font => "Courier",
+                              :size => 8,
+                              :inline_format => true,
+                              :border_width => 0
+              }
+    )
+
+    send_data(pdf.render, :filename => 'relatorio.pdf', :type => 'application/pdf')
   end
 
 
