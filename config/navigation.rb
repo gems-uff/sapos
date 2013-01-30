@@ -66,9 +66,9 @@ SimpleNavigation::Configuration.run do |navigation|
     end
 
     primary.item :phases, 'Etapas', phases_path do |phases|
-      phases.item :phase, 'Etapas', phases_path
-      phases.item :deferral, 'Prorrogações', deferrals_path
-      phases.item :accomplishment, 'Realização de Etapa', accomplishments_path
+      phases.item :deferral, 'Prorrogações Concedidas', deferrals_path
+      phases.item :accomplishment, 'Realizações de Etapas', accomplishments_path
+      phases.item :phase, 'Tipos de Etapas', phases_path
       phases.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path
     end
 
