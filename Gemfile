@@ -9,6 +9,8 @@ gem "kaminari"
 
 group :development, :test do
 	gem 'sqlite3'
+  gem 'ruby-debug'
+  gem 'awesome_print'
 end
 
 group :production, :homologacao do
