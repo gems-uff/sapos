@@ -95,7 +95,7 @@ class EnrollmentsController < ApplicationController
   def self.condition_for_delayed_phase_column(column, value, like_pattern)
     return "" if value[:phase].blank?
     date = value.nil? ? value : Date.parse("#{value[:year]}/#{value[:month]}/#{value[:day]}")
-    phase = value[:phase] == "all" ? nil : value[:phase]
+    phase = value[:phase] == "all" ? Phase.all : [Phase.find(value[:phase])]
     enrollments_ids = Enrollment.with_delayed_phases_on(date, phase)
     query_delayed_phase = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{enrollments_ids.join(',')})"
     query_delayed_phase

@@ -23,16 +23,18 @@ class Enrollment < ActiveRecord::Base
   validates :enrollment_status, :presence => true
   validates :student, :presence => true
 
-  def self.with_delayed_phases_on(date, phase = nil)
+  def self.with_delayed_phases_on(date, phases)
     date = Date.today if date.nil?
-    phase = Phase.all if phase.nil?
-    enrollments = Enrollment.where("enrollments.id not in (select enrollment_id from dismissals where DATE(dismissals.date) <= DATE(?))", date)
+    phases = Phase.all if phases.nil?
+
+    active_enrollments = Enrollment.where("enrollments.id not in (select enrollment_id from dismissals where DATE(dismissals.date) <= DATE(?))", date)
 
     delayed_enrollments = []
 
-    enrollments.each do |enrollment|
+    active_enrollments.each do |enrollment|
 
-      phases_duration = PhaseDuration.where(:level_id => enrollment.level_id, :phase_id => phase)
+      accomplished_phases = Accomplishment.where(:enrollment_id => enrollment, :phase_id => phases).map{|ac| ac.phase}
+      phases_duration = PhaseDuration.where("level_id = :level_id and phase_id in (:phases)", :level_id => enrollment.level_id, :phases => (phases - accomplished_phases))
 
       begin_ys = YearSemester.on_date(enrollment.admission_date)
 
