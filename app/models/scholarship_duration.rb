@@ -8,53 +8,75 @@ class ScholarshipDuration < ActiveRecord::Base
 
   #this validation is only called for checking uniqueness of scholarship durations
   #if start date of a new scholarship duration is earlier than an existing scholarship duration then 
-  def validation_of_date_in_uniqueness
+  def student_has_other_scholarship_duration
     return false if enrollment.nil?
 
-    scholarships_with_student = ScholarshipDuration.all :conditions => ["enrollment_id = ?",enrollment.id]
+    #Se a bolsa é mais antiga que a atual    scholarship.start_date < start_date
+    # -> scholarship.cancel_date não é nulo -> scholarhsip.cancel < start_date
+    # -> scholarship.cancel_date é nulo -> schoarslhip.end_date < start_date
+    #Senão
+    # -> cancel_date não é nulo -> schoarslhip.start_date > cancel_date
+    # -> scholarship.cancel_date é nulo -> schoarslhip.start_date > end_date
+
+    if self.id.nil?
+      scholarships_with_student = ScholarshipDuration.all :conditions => ["enrollment_id = ?",enrollment.id]
+    else
+      scholarships_with_student = ScholarshipDuration.all :conditions => ["enrollment_id = ? AND id <> ?",enrollment.id,self.id]
+    end
+
     scholarships_with_student.each do |scholarship|
-      if scholarship.cancel_date.nil?
-        return scholarship.end_date > start_date
-      else
-        return scholarship.cancel_date > start_date
+      if scholarship.start_date <= start_date # se a bolsa é antiga
+        if scholarship.cancel_date.nil?
+          return true if scholarship.end_date >= start_date
+        else
+          return true if scholarship.cancel_date >= start_date
+        end
+      else # se a bolsa é futura
+        if cancel_date.nil?
+          return true if scholarship.start_date <= end_date
+        else
+          return true if scholarship.start_date <= cancel_date
+        end
       end
     end
+
+    false
   end
 
-  def last_scholarship_duration
-    ScholarshipDuration.first :conditions => ["scholarship_id = ? AND enrollment_id <> ?",scholarship.id,enrollment.id], :order => 'end_date DESC'
-  end
+  def if_scholarship_is_not_with_another_student
+    if self.id.nil?
+      scholarships_with_student = ScholarshipDuration.all :conditions => ["scholarship_id = ?", scholarship.id]
+    else
+      scholarships_with_student = ScholarshipDuration.all :conditions => ["scholarship_id = ? AND id <> ?",scholarship.id,self.id]
+    end
 
-  def last_scholarship_duration_end_date
-    #we take care that the last scholarship duration found is not the same scholarship duration being edited
-    return nil if scholarship.nil? or enrollment.nil?
-    last_scholarship_duration.end_date unless last_scholarship_duration.nil?
-  end
-
-  def last_scholarship_duration_cancel_date
-    #we take care that the last scholarship duration found is not the same scholarship duration being edited
-    return nil if scholarship.nil? or enrollment.nil?
-    last_scholarship_duration.cancel_date unless last_scholarship_duration.nil?
-  end
-
-  def last_scholarship_duration_start_date
-    #we take care that the last scholarship duration found is not the same scholarship duration being edited
-    return nil if scholarship.nil? or enrollment.nil?
-    last_scholarship_duration.start_date unless last_scholarship_duration.nil?
-  end
-
-  def last_scholarship_duration_end_date_is_null
-    l = last_scholarship_duration_end_date
-    l.nil?
-  end
-
-  def last_scholarship_cancel_date_is_null
-    l = last_scholarship_duration_cancel_date
-    l.nil?
-  end
-
-  def cancel_date_is_nil
-    cancel_date.nil?
+    scholarships_with_student.each do |scholarship|
+      if scholarship.start_date <= start_date # se a bolsa é antiga
+        if scholarship.cancel_date.nil?
+          if scholarship.end_date >= start_date
+            errors.add(:start_date, I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_before_scholarship_end_date"))
+            break
+          end
+        else
+          if scholarship.cancel_date >= start_date
+            errors.add(:start_date,I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_before_scholarship_cancel_date"))
+            break
+          end
+        end
+      else # se a bolsa é futura
+        if cancel_date.nil?
+          if scholarship.start_date <= end_date
+            errors.add(:end_date,I18n.t("activerecord.errors.models.scholarship_duration.attributes.scholarship_start_date_after_end_or_cancel_date"))
+            break
+          end
+        else
+          if scholarship.start_date <= cancel_date
+            errors.add(:cancel_date,I18n.t("activerecord.errors.models.scholarship_duration.attributes.scholarship_start_date_after_end_or_cancel_date"))
+            break
+          end
+        end
+      end
+    end
   end
 
   def scholarship_end_date
@@ -68,11 +90,10 @@ class ScholarshipDuration < ActiveRecord::Base
   end
 
   validates :scholarship, :presence => true
-  validates :enrollment_id,  :presence => true, :uniqueness => { :message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.entollment_and_scholarship_uniqueness"), :if => :validation_of_date_in_uniqueness }
+  validates :enrollment_id,  :presence => true, :uniqueness => { :message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.entollment_and_scholarship_uniqueness"), :if => :student_has_other_scholarship_duration }
 
   #validates if scholarship isn't with another student
-  validates_date :start_date, :on_or_after => :last_scholarship_duration_cancel_date, :allow_nil => true, :on_or_after_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_after_scholarship_cancel_date")
-  validates_date :start_date, :on_or_after => :last_scholarship_duration_end_date, :if => :last_scholarship_cancel_date_is_null,:on_or_after_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_after_scholarship_end_date")
+  validate :if_scholarship_is_not_with_another_student
 
 #  #validates if a scholarship duration start date isn't before it's end date
   validates_date :start_date, :on_or_before => :end_date, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_after_end_date")

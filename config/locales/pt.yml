@@ -250,13 +250,12 @@ pt:
       models:
         scholarship_duration:
           attributes:
+            start_date_before_scholarship_end_date: "anterior a Data de Limite de Concessão de outra alocação de bolsa"
+            start_date_before_scholarship_cancel_date: "anterior a Data de Encerramento de outra alocação de bolsa"
+            scholarship_start_date_after_end_or_cancel_date: "posterior a Data de Início de outra alocação de bolsa"
             start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
-            start_date_after_end_date: "posterior a Data Limite de Concessão"            
             start_date_after_scholarship_end_date: "da alocação de bolsa deve ser posterior a data de limite de concessão de uma alocação que não tem data de encerramento"
-            start_date_after_scholarship_cancel_date: "de uma alocação de bolsas deve ser posterior a data de encerramento de uma outra alocação de bolsa"
             end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
-            end_date_before_scholarship_start_date: "anterior a Data de Início da Bolsa"
-            last_scholarship_duration_end_date: "já pertence a outro aluno no período de tempo determinado"
             entollment_and_scholarship_uniqueness: "já possui uma Bolsa alocada nesse período"
             cancel_date:
               on_or_before: "posterior a Data Limite de Concessão"
