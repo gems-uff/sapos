@@ -34,6 +34,9 @@ GEM
     activesupport (3.0.20)
     afm (0.2.0)
     arel (2.0.10)
+    automatic_foreign_key (1.3.0)
+      activerecord (>= 2)
+      redhillonrails_core (>= 1.2.0)
     awesome_print (1.1.0)
     builder (2.1.2)
     choice (0.1.6)
@@ -96,6 +99,8 @@ GEM
     recordselect_vho (3.0.3)
       rails (~> 3.0.0)
     redcarpet (2.1.0)
+    redhillonrails_core (1.2.0)
+      activerecord (>= 2)
     ruby-debug (0.10.4)
       columnize (>= 0.1)
       ruby-debug-base (~> 0.10.4.0)
@@ -123,6 +128,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_scaffold_vho
+  automatic_foreign_key
   awesome_print
   kaminari
   mysql2 (= 0.2.11)

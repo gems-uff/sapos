@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130115013239) do
+ActiveRecord::Schema.define(:version => 20130204164909) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -20,6 +20,9 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "accomplishments", ["enrollment_id"], :name => "accomplishments_enrollment_id_fkey"
+  add_index "accomplishments", ["phase_id"], :name => "accomplishments_phase_id_fkey"
 
   create_table "advisements", :force => true do |t|
     t.integer  "professor_id",  :null => false
@@ -39,6 +42,8 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.datetime "updated_at"
   end
 
+  add_index "cities", ["state_id"], :name => "cities_state_id_fkey"
+
   create_table "countries", :force => true do |t|
     t.string   "name"
     t.datetime "created_at"
@@ -52,6 +57,9 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "courses", ["institution_id"], :name => "courses_institution_id_fkey"
+  add_index "courses", ["level_id"], :name => "courses_level_id_fkey"
 
   create_table "courses_students", :id => false, :force => true do |t|
     t.integer "course_id",  :null => false
@@ -72,6 +80,8 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.integer  "duration_days",      :default => 0
   end
 
+  add_index "deferral_types", ["phase_id"], :name => "deferral_types_phase_id_fkey"
+
   create_table "deferrals", :force => true do |t|
     t.date     "approval_date"
     t.string   "obs"
@@ -80,6 +90,9 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "deferrals", ["deferral_type_id"], :name => "deferrals_deferral_type_id_fkey"
+  add_index "deferrals", ["enrollment_id"], :name => "deferrals_enrollment_id_fkey"
 
   create_table "dismissal_reasons", :force => true do |t|
     t.string   "name"
@@ -97,6 +110,9 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.datetime "updated_at"
   end
 
+  add_index "dismissals", ["dismissal_reason_id"], :name => "dismissals_dismissal_reason_id_fkey"
+  add_index "dismissals", ["enrollment_id"], :name => "dismissals_enrollment_id_fkey"
+
   create_table "enrollment_statuses", :force => true do |t|
     t.string   "name"
     t.datetime "created_at"
@@ -113,6 +129,10 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "enrollments", ["enrollment_status_id"], :name => "enrollments_enrollment_status_id_fkey"
+  add_index "enrollments", ["level_id"], :name => "enrollments_level_id_fkey"
+  add_index "enrollments", ["student_id"], :name => "enrollments_student_id_fkey"
 
   create_table "institutions", :force => true do |t|
     t.string   "name"
@@ -136,6 +156,9 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.integer  "deadline_months",    :default => 0
     t.integer  "deadline_days",      :default => 0
   end
+
+  add_index "phase_durations", ["level_id"], :name => "phase_durations_level_id_fkey"
+  add_index "phase_durations", ["phase_id"], :name => "phase_durations_phase_id_fkey"
 
   create_table "phases", :force => true do |t|
     t.string   "name"
@@ -164,6 +187,9 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.string   "telephone2"
     t.string   "siape"
   end
+
+  add_index "professors", ["city_id"], :name => "professors_city_id_fkey"
+  add_index "professors", ["state_id"], :name => "professors_state_id_fkey"
 
   create_table "scholarship_durations", :force => true do |t|
     t.integer  "scholarship_id", :null => false
@@ -198,6 +224,11 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.integer  "professor_id"
   end
 
+  add_index "scholarships", ["level_id"], :name => "scholarships_level_id_fkey"
+  add_index "scholarships", ["professor_id"], :name => "scholarships_professor_id_fkey"
+  add_index "scholarships", ["scholarship_type_id"], :name => "scholarships_scholarship_type_id_fkey"
+  add_index "scholarships", ["sponsor_id"], :name => "scholarships_sponsor_id_fkey"
+
   create_table "sponsors", :force => true do |t|
     t.string   "name"
     t.datetime "created_at"
@@ -211,6 +242,8 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "states", ["country_id"], :name => "states_country_id_fkey"
 
   create_table "students", :force => true do |t|
     t.string   "name"
@@ -240,6 +273,10 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.string   "email"
   end
 
+  add_index "students", ["city_id"], :name => "students_city_id_fkey"
+  add_index "students", ["country_id"], :name => "students_country_id_fkey"
+  add_index "students", ["state_id"], :name => "students_state_id_fkey"
+
   create_table "users", :force => true do |t|
     t.string   "name"
     t.string   "hashed_password"
@@ -247,5 +284,51 @@ ActiveRecord::Schema.define(:version => 20130115013239) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_foreign_key "accomplishments", ["enrollment_id"], "enrollments", ["id"], :name => "accomplishments_enrollment_id_fkey"
+  add_foreign_key "accomplishments", ["phase_id"], "phases", ["id"], :name => "accomplishments_phase_id_fkey"
+
+  add_foreign_key "advisements", ["enrollment_id"], "enrollments", ["id"], :name => "advisements_enrollment_id_fkey"
+  add_foreign_key "advisements", ["professor_id"], "professors", ["id"], :name => "advisements_professor_id_fkey"
+
+  add_foreign_key "cities", ["state_id"], "states", ["id"], :name => "cities_state_id_fkey"
+
+  add_foreign_key "courses", ["institution_id"], "institutions", ["id"], :name => "courses_institution_id_fkey"
+  add_foreign_key "courses", ["level_id"], "levels", ["id"], :name => "courses_level_id_fkey"
+
+  add_foreign_key "courses_students", ["course_id"], "courses", ["id"], :name => "courses_students_course_id_fkey"
+  add_foreign_key "courses_students", ["student_id"], "students", ["id"], :name => "courses_students_student_id_fkey"
+
+  add_foreign_key "deferral_types", ["phase_id"], "phases", ["id"], :name => "deferral_types_phase_id_fkey"
+
+  add_foreign_key "deferrals", ["deferral_type_id"], "deferral_types", ["id"], :name => "deferrals_deferral_type_id_fkey"
+  add_foreign_key "deferrals", ["enrollment_id"], "enrollments", ["id"], :name => "deferrals_enrollment_id_fkey"
+
+  add_foreign_key "dismissals", ["dismissal_reason_id"], "dismissal_reasons", ["id"], :name => "dismissals_dismissal_reason_id_fkey"
+  add_foreign_key "dismissals", ["enrollment_id"], "enrollments", ["id"], :name => "dismissals_enrollment_id_fkey"
+
+  add_foreign_key "enrollments", ["enrollment_status_id"], "enrollment_statuses", ["id"], :name => "enrollments_enrollment_status_id_fkey"
+  add_foreign_key "enrollments", ["level_id"], "levels", ["id"], :name => "enrollments_level_id_fkey"
+  add_foreign_key "enrollments", ["student_id"], "students", ["id"], :name => "enrollments_student_id_fkey"
+
+  add_foreign_key "phase_durations", ["level_id"], "levels", ["id"], :name => "phase_durations_level_id_fkey"
+  add_foreign_key "phase_durations", ["phase_id"], "phases", ["id"], :name => "phase_durations_phase_id_fkey"
+
+  add_foreign_key "professors", ["city_id"], "cities", ["id"], :name => "professors_city_id_fkey"
+  add_foreign_key "professors", ["state_id"], "states", ["id"], :name => "professors_state_id_fkey"
+
+  add_foreign_key "scholarship_durations", ["enrollment_id"], "enrollments", ["id"], :name => "scholarship_durations_enrollment_id_fkey"
+  add_foreign_key "scholarship_durations", ["scholarship_id"], "scholarships", ["id"], :name => "scholarship_durations_scholarship_id_fkey"
+
+  add_foreign_key "scholarships", ["level_id"], "levels", ["id"], :name => "scholarships_level_id_fkey"
+  add_foreign_key "scholarships", ["professor_id"], "professors", ["id"], :name => "scholarships_professor_id_fkey"
+  add_foreign_key "scholarships", ["scholarship_type_id"], "scholarship_types", ["id"], :name => "scholarships_scholarship_type_id_fkey"
+  add_foreign_key "scholarships", ["sponsor_id"], "sponsors", ["id"], :name => "scholarships_sponsor_id_fkey"
+
+  add_foreign_key "states", ["country_id"], "countries", ["id"], :name => "states_country_id_fkey"
+
+  add_foreign_key "students", ["city_id"], "cities", ["id"], :name => "students_city_id_fkey"
+  add_foreign_key "students", ["country_id"], "countries", ["id"], :name => "students_country_id_fkey"
+  add_foreign_key "students", ["state_id"], "states", ["id"], :name => "students_state_id_fkey"
 
 end
