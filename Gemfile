@@ -14,7 +14,7 @@ group :development, :test do
   gem 'awesome_print'
 end
 
-group :production, :homologacao do
+group :production, :staging do
 	gem 'mysql2', '0.2.11'
 end
 
