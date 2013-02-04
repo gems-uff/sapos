@@ -12,7 +12,7 @@ class EnrollmentsController < ApplicationController
 
     config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase
     config.actions.swap :search, :field_search
-    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :phase, :delayed_phase]
+    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :accomplishments, :delayed_phase]
 
     config.columns[:enrollment_number].search_sql = "enrollments.enrollment_number"
     config.columns[:enrollment_number].search_ui = :text
@@ -32,9 +32,7 @@ class EnrollmentsController < ApplicationController
     config.columns[:professor].search_sql = "professors.name"
     config.columns[:professor].includes = {:advisements => :professor}
     config.columns[:professor].search_ui = :text
-    config.columns[:phase].search_sql = "phases.name"
-    config.columns[:phase].includes = {:accomplishments => :phase}
-    config.columns[:phase].search_ui = :text
+    config.columns[:accomplishments].search_sql = ""
 
     config.columns[:dismissal].sort_by :sql => 'dismissals.date'
     config.columns[:level].form_ui = :select
@@ -99,6 +97,19 @@ class EnrollmentsController < ApplicationController
     enrollments_ids = Enrollment.with_delayed_phases_on(date, phase)
     query_delayed_phase = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{enrollments_ids.join(',')})"
     query_delayed_phase
+  end
+
+  def self.condition_for_accomplishments_column(column, value, like_pattern)
+    return "" if value[:phase].blank?
+    date = value.nil? ? value : Date.parse("#{value[:year]}/#{value[:month]}/#{value[:day]}")
+    phase = value[:phase] == "all" ? nil : value[:phase]
+    if (value[:phase] == "all")
+      enrollments_ids = Enrollment.with_all_phases_accomplished_on(date)
+      query = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{enrollments_ids.join(',')})"
+    else
+      query = "enrollments.id in (select enrollment_id from accomplishments where DATE(conclusion_date) <= DATE('#{date}') and phase_id = #{phase})"
+    end
+    query
   end
 
 

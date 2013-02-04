@@ -30,7 +30,7 @@ class Enrollment < ActiveRecord::Base
 
     active_enrollments.each do |enrollment|
 
-      accomplished_phases = Accomplishment.where(:enrollment_id => enrollment, :phase_id => phases).map{|ac| ac.phase}
+      accomplished_phases = Accomplishment.where(:enrollment_id => enrollment, :phase_id => phases).map { |ac| ac.phase }
       phases_duration = PhaseDuration.where("level_id = :level_id and phase_id in (:phases)", :level_id => enrollment.level_id, :phases => (phases - accomplished_phases))
 
       begin_ys = YearSemester.on_date(enrollment.admission_date)
@@ -61,5 +61,16 @@ class Enrollment < ActiveRecord::Base
       end
     end
     delayed_enrollments
+  end
+
+  def self.with_all_phases_accomplished_on(date)
+    enrollments = Enrollment.all
+    enrollments_with_all_phases_accomplished = []
+    enrollments.each do |enrollment|
+      accomplished_phases = Accomplishment.where("enrollment_id = :enrollment_id and DATE(conclusion_date) <= DATE(:conclusion_date)", :enrollment_id =>enrollment.id, :conclusion_date => date).map { |ac| ac.phase }
+      phases_duration = PhaseDuration.where("level_id = :level_id and phase_id not in (:accomplished_phases)",:level_id => enrollment.level_id, :accomplished_phases => accomplished_phases)
+      enrollments_with_all_phases_accomplished << enrollment.id if phases_duration.blank?
+    end
+    enrollments_with_all_phases_accomplished
   end
 end
