@@ -2,6 +2,27 @@ class ScholarshipDuration < ActiveRecord::Base
   belongs_to :scholarship
   belongs_to :enrollment
 
+  validates :scholarship, :presence => true
+  validates :enrollment_id,  :presence => true, :uniqueness => { :message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.entollment_and_scholarship_uniqueness"), :if => :student_has_other_scholarship_duration }
+  validates :enrollment, :presence => true
+
+
+  #validates if scholarship isn't with another student
+  validate :if_scholarship_is_not_with_another_student
+
+#  #validates if a scholarship duration start date isn't before it's end date
+  validates_date :start_date, :on_or_before => :end_date, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_after_end_date")
+#
+#  #validates if a scholarship duration isn't invalid according to the selected scholarship
+  validates_date :start_date, :on_or_after  => :scholarship_start_date, :on_or_after_message  => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_before_scholarship_start_date")
+  validates_date :start_date, :on_or_before => :scholarship_end_date,   :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_after_scholarship_end_date")
+  validates_date :end_date,   :on_or_after  => :scholarship_start_date, :on_or_after_message  => I18n.t("activerecord.errors.models.scholarship_duration.attributes.end_date_before_scholarship_start_date")
+  validates_date :end_date,   :on_or_before => :scholarship_end_date,   :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.end_date_after_scholarship_end_date")
+#
+#  #validates if a cancel date of an scholarship duration is valid
+  validates_date :cancel_date,:on_or_before => :end_date  , :allow_nil => true
+  validates_date :cancel_date,:on_or_after  => :start_date, :allow_nil => true
+
   def to_label
     "#{start_date} - #{end_date}"
   end
@@ -89,22 +110,4 @@ class ScholarshipDuration < ActiveRecord::Base
     finder_scholarship.start_date unless scholarship.nil?
   end
 
-  validates :scholarship, :presence => true
-  validates :enrollment_id,  :presence => true, :uniqueness => { :message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.entollment_and_scholarship_uniqueness"), :if => :student_has_other_scholarship_duration }
-
-  #validates if scholarship isn't with another student
-  validate :if_scholarship_is_not_with_another_student
-
-#  #validates if a scholarship duration start date isn't before it's end date
-  validates_date :start_date, :on_or_before => :end_date, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_after_end_date")
-#
-#  #validates if a scholarship duration isn't invalid according to the selected scholarship
-  validates_date :start_date, :on_or_after  => :scholarship_start_date, :on_or_after_message  => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_before_scholarship_start_date")
-  validates_date :start_date, :on_or_before => :scholarship_end_date,   :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_after_scholarship_end_date")
-  validates_date :end_date,   :on_or_after  => :scholarship_start_date, :on_or_after_message  => I18n.t("activerecord.errors.models.scholarship_duration.attributes.end_date_before_scholarship_start_date")
-  validates_date :end_date,   :on_or_before => :scholarship_end_date,   :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.end_date_after_scholarship_end_date")
-#
-#  #validates if a cancel date of an scholarship duration is valid
-  validates_date :cancel_date,:on_or_before => :end_date  , :allow_nil => true
-  validates_date :cancel_date,:on_or_after  => :start_date, :allow_nil => true
 end

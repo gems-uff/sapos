@@ -6,4 +6,5 @@ class DeferralType < ActiveRecord::Base
   validates :duration_months ,:numericality => true
   validates :duration_days ,:numericality => true
   validates :name, :presence => true
+  validates :phase, :presence => true
 end

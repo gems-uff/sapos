@@ -11,17 +11,14 @@ class Enrollment < ActiveRecord::Base
   has_many :phases, :through => :accomplishments
   has_many :deferrals, :dependent => :destroy
 
-  def to_label
-    "#{enrollment_number} - #{student.name}"
-  end
-
-  validates_associated :advisements
-  validates_associated :scholarship_durations
-
   validates :enrollment_number, :presence => true, :uniqueness => true
   validates :level, :presence => true
   validates :enrollment_status, :presence => true
   validates :student, :presence => true
+
+  def to_label
+    "#{enrollment_number} - #{student.name}"
+  end
 
   def self.with_delayed_phases_on(date, phases)
     date = Date.today if date.nil?
