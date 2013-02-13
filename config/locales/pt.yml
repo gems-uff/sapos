@@ -272,6 +272,9 @@ pt:
       advisement:
         one: "Orientação"
         other: "Orientações"
+      advisement_authorization:
+        one: "Credenciamento"
+        other: "Credenciamentos"
       course: 
         one: "Curso"
         other: "Cursos"
@@ -346,6 +349,7 @@ pt:
         name: "Nome"
       level: 
         name: "Nome"
+        advisement_authorizations: "Credenciamentos"
       institution:
         name: "Nome"
         code: "Sigla"
@@ -440,6 +444,7 @@ pt:
         telephone2: "2º Telefone"
         zip_code: "CEP"
         advisements: "Orientandos"
+        advisement_authorizations: "Credenciamentos"
         scholarships: "Bolsas"
         enrollments: "Orientandos"
         advisement_points: "Pontos de Orientação"
@@ -452,6 +457,9 @@ pt:
         active: "Orientação ativa?"
         co_advisor: "Possui coorientador?"
         co_advisor_list: "Lista de Coorientadores"
+        level: "Nível"
+      advisement_authorization:
+        professor: "Orientador"
         level: "Nível"
       user:
         name: "Nome do usuário"
