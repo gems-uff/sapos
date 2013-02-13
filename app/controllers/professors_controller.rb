@@ -34,7 +34,8 @@ class ProfessorsController < ApplicationController
                            :telephone2,
                            :zip_code,                           
                            :scholarships, 
-                           :enrollments]    
+                           :enrollments,
+                           :advisement_authorizations]
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 end 
