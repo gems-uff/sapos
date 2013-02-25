@@ -573,6 +573,7 @@ pt:
     update_state_label: "Editar Estado"
     update_city_label: "Editar Cidade"
     update_advisement_authorization_label: "Editar Credenciamento"
+    total_label: "Total"
 
     errors:
       template:

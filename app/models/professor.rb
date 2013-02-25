@@ -6,20 +6,20 @@ class Professor < ActiveRecord::Base
 
   validates :cpf, :presence => true, :uniqueness => true
   validates :name, :presence => true
-  
+
 #  It was considered that active advisements were enrollments without dismissals reasons
   def advisement_points
     return "#{0}" if self.advisement_authorizations.empty?
 
-    enrollments = Enrollment.joins(["LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id",:advisements]).
-                  where("advisements.professor_id = :professor_id AND dismissals.id IS NULL", :professor_id => self.id).scoped
+    enrollments = Enrollment.joins(["LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id", :advisements]).
+        where("advisements.professor_id = :professor_id AND dismissals.id IS NULL", :professor_id => self.id).scoped
 
     enrollments_with_single_advisor = enrollments.where("1 = (SELECT COUNT(*) FROM advisements WHERE advisements.enrollment_id = enrollments.id AND advisements.professor_id in (SELECT advisement_authorizations.professor_id from advisement_authorizations))")
 
     enrollments_with_multiple_advisors = enrollments.where("1 < (SELECT COUNT(*) FROM advisements WHERE advisements.enrollment_id = enrollments.id AND advisements.professor_id in (SELECT advisement_authorizations.professor_id from advisement_authorizations))")
-    
+
     points = 0
-    points += 0.5*enrollments_with_multiple_advisors.count +  enrollments_with_single_advisor.count
+    points += 0.5*enrollments_with_multiple_advisors.count + enrollments_with_single_advisor.count
 
     "#{points.to_f}"
   end
@@ -31,7 +31,7 @@ class Professor < ActiveRecord::Base
   def advisement_point(enrollment)
     return 0 if self.advisement_authorizations.empty? || enrollment.advisements.where(:professor_id => self.id).empty?
     authorized_advisors = enrollment.advisements.joins([:professor => :advisement_authorizations]).count
-    (authorized_advisors == 1) ? 1 : 0.5
+    (authorized_advisors == 1) ? 1.0 : 0.5
   end
 
   def advisements_with_points
@@ -39,15 +39,24 @@ class Professor < ActiveRecord::Base
 
     body = ""
     count = 0
-    self.advisements.each do |advisement|
+    total_point = 0
+    self.advisements.joins([:enrollment, "LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id"]).where("dismissals.id IS NULL").each do |advisement|
       count +=1;
       tr_class = count.even? ? "even-record" : ""
+      point = advisement_point(advisement.enrollment)
+      total_point += point
       body += "<tr class=\"record #{tr_class}\">
                 <td>#{advisement.enrollment.student.name}</td>
                 <td>#{advisement.enrollment.enrollment_number}</td>
-                <td>#{advisement_point(advisement.enrollment)}</td>
+                <td>#{point}</td>
               </tr>"
     end
+    body += "<tr class=\"record total_points\">
+                <td colspan=2>#{I18n.t("active_scaffold.total_label")}</td>
+                <td>#{total_point}</td>
+              </tr>"
+
+
     resp = "<table style=\"border-collapse: collapse\">
               <thead style=\"color: white; font-size: 12px\">
                 <tr>
@@ -60,6 +69,6 @@ class Professor < ActiveRecord::Base
               #{body}
               </tbody>
             </table>"
-   resp.html_safe
+    resp.html_safe
   end
 end
