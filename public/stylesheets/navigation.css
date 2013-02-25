@@ -21,7 +21,7 @@ body a {
 
 .menu {
     background-color: transparent;
-    width: 1000px;
+    width: 1020px;
     margin: 0px auto -1px auto;
 }
 
@@ -101,7 +101,7 @@ body a {
 .menu_content #top_navigation {
     float: left;
     width: 100%;
-    margin-left: 119px;
+    margin-left: 139px;
     background-color: transparent;
 }
 
@@ -175,7 +175,7 @@ body a {
 .menu_content #sub_navigation {
     float: left;
     background-color: #FFFFFF;
-    width: 120px;
+    width: 140px;
     margin-top: 33px;
     margin-right: -1px;
     border-top: 1px solid #c8c6c6;
@@ -211,7 +211,7 @@ body a {
     border-bottom: 1px dotted #9f9f9f;
     color: #656464;
     text-decoration: none;
-    width: 100px;
+    width: 120px;
     text-align: left;
 }
 
