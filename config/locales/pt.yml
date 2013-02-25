@@ -448,6 +448,7 @@ pt:
         scholarships: "Bolsas"
         enrollments: "Orientandos"
         advisement_points: "Pontos de Orientação"
+        advisements_with_points: "Orientandos"
       advisement:
         professor: "Orientador"
         enrollment: "Matrícula"
@@ -563,6 +564,7 @@ pt:
     create_deferral_type_label: "Adicionar Tipo de Prorrogação"
     create_phase_label: "Adicionar Fase"
     create_deferral_label: "Adicionar Prorrogação"
+    create_advisement_authorization_label: "Adicionar Credenciamento"
     update_enrollment_label: "Modificar Matrícula"
     update_course_label: "Modificar Curso"
     update_user_label: "Modificar Usuário"
@@ -570,6 +572,7 @@ pt:
     update_country_label: "Editar País"
     update_state_label: "Editar Estado"
     update_city_label: "Editar Cidade"
+    update_advisement_authorization_label: "Editar Credenciamento"
 
     errors:
       template:
