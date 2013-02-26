@@ -30,7 +30,7 @@ class Professor < ActiveRecord::Base
 
   def advisement_point(enrollment)
     return 0.0 if self.advisement_authorizations.empty? || enrollment.advisements.where(:professor_id => self.id).empty? || enrollment.dismissal
-    authorized_advisors = enrollment.advisements.joins([:professor => :advisement_authorizations]).count
+    authorized_advisors = enrollment.advisements.joins(:professor).where("professors.id in (SELECT advisement_authorizations.professor_id from advisement_authorizations)").count
     (authorized_advisors.to_i == 1) ? 1.0 : 0.5
   end
 
