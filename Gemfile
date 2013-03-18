@@ -5,6 +5,8 @@ gem "rails-erd", "~> 1.0.0"
 gem "kaminari"
 gem "automatic_foreign_key"
 
+gem "devise"
+
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
