@@ -88,6 +88,8 @@ SimpleNavigation::Configuration.run do |navigation|
       configuration.item :user, 'Usuários', users_path
     end
 
+    primary.item :logout, 'Logout', destroy_user_session_path
+
     # Add an item which has a sub navigation (same params, but with block)
     #primary.item :key_2, 'name', url, options do |sub_nav|
       # Add an item to the sub navigation (same params again)
