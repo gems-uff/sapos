@@ -1,0 +1,38 @@
+<div id="login_form_wrapper">
+  <% if flash[:alert] %>
+      <div id="error_login"><%= flash[:alert] %></div>
+  <% end %>
+
+  <div id="form_border">
+    <%= form_for(resource, :as => resource_name, :url => session_path(resource_name), :html => {:id => 'login_form'}) do |f| %>
+        <%= flash[:name] %>
+
+        <div id="login_input">
+          <%= f.label :email %>
+          <%= f.email_field :email %>
+        </div>
+
+        <br/>
+
+        <div id="password_input">
+          <%= f.label :password %>
+          <%= f.password_field :password %>
+        </div>
+
+        <br/>
+
+
+        <% if devise_mapping.rememberable? -%>
+            <div id="remember_me_input">
+              <div><%= f.check_box :remember_me %> <%= f.label :remember_me %></div>
+            </div>
+
+        <% end -%>
+
+        <br/>
+
+        <%= f.submit "Login" %>
+    <% end %>
+  </div>
+</div>
+<%= render :partial => "devise/shared/links" %>
