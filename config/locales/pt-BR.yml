@@ -270,6 +270,9 @@ pt:
       advisement:
         one: "Orientação"
         other: "Orientações"
+      advisement_authorization:
+        one: "Credenciamento"
+        other: "Credenciamentos"
       course: 
         one: "Curso"
         other: "Cursos"
@@ -344,6 +347,7 @@ pt:
         name: "Nome"
       level: 
         name: "Nome"
+        advisement_authorizations: "Credenciamentos"
       institution:
         name: "Nome"
         code: "Sigla"
@@ -438,9 +442,11 @@ pt:
         telephone2: "2º Telefone"
         zip_code: "CEP"
         advisements: "Orientandos"
+        advisement_authorizations: "Credenciamentos"
         scholarships: "Bolsas"
         enrollments: "Orientandos"
         advisement_points: "Pontos de Orientação"
+        advisements_with_points: "Orientandos"
       advisement:
         professor: "Orientador"
         enrollment: "Matrícula"
@@ -450,6 +456,9 @@ pt:
         active: "Orientação ativa?"
         co_advisor: "Possui coorientador?"
         co_advisor_list: "Lista de Coorientadores"
+        level: "Nível"
+      advisement_authorization:
+        professor: "Orientador"
         level: "Nível"
       user:
         name: "Nome do usuário"
@@ -553,6 +562,7 @@ pt:
     create_deferral_type_label: "Adicionar Tipo de Prorrogação"
     create_phase_label: "Adicionar Fase"
     create_deferral_label: "Adicionar Prorrogação"
+    create_advisement_authorization_label: "Adicionar Credenciamento"
     update_enrollment_label: "Modificar Matrícula"
     update_course_label: "Modificar Curso"
     update_user_label: "Modificar Usuário"
@@ -560,6 +570,8 @@ pt:
     update_country_label: "Editar País"
     update_state_label: "Editar Estado"
     update_city_label: "Editar Cidade"
+    update_advisement_authorization_label: "Editar Credenciamento"
+    total_label: "Total"
 
     errors:
       template:

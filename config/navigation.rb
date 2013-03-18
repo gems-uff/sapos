@@ -56,6 +56,7 @@ SimpleNavigation::Configuration.run do |navigation|
     primary.item :prof, 'Professores', professors_path do |prof|
       prof.item :professor, 'Professores', professors_path     
       prof.item :advisement, 'Orientações', advisements_path
+      prof.item :advisement_authorizations, 'Credenciamentos', advisement_authorizations_path
     end
 
     primary.item :scholarships, 'Bolsas', scholarship_durations_path do |scholarships|
