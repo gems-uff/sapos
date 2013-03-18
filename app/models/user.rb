@@ -1,6 +1,8 @@
 class User < ActiveRecord::Base
   validates :name, :presence => true, :uniqueness => true
 
+  belongs_to :role
+
   attr_accessible :email, :password, :password_confirmation, :remember_me
 
   devise :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,

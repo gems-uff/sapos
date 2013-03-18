@@ -21,6 +21,8 @@ Sapos::Application.routes.draw do
 
   resources :users do as_routes end
 
+  resources :roles do as_routes end
+
   resources :scholarship_durations do
     as_routes
     collection do

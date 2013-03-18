@@ -86,6 +86,7 @@ SimpleNavigation::Configuration.run do |navigation|
 
     primary.item :configuration, 'Configurações', users_path do |configuration|
       configuration.item :user, 'Usuários', users_path
+      configuration.item :roles, 'Papéis', roles_path
     end
 
     primary.item :logout, 'Logout', destroy_user_session_path

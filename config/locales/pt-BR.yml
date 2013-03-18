@@ -462,6 +462,7 @@ pt-BR:
         level: "Nível"
       user:
         name: "Nome do usuário"
+        role: Papel
         password: "Senha"
         password_confirmation: "Digite a senha novamente"
       country:

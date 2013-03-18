@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130213143800) do
+ActiveRecord::Schema.define(:version => 20130318204436) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -201,6 +201,13 @@ ActiveRecord::Schema.define(:version => 20130213143800) do
   add_index "professors", ["city_id"], :name => "professors_city_id_fkey"
   add_index "professors", ["state_id"], :name => "professors_state_id_fkey"
 
+  create_table "roles", :force => true do |t|
+    t.string   "name",        :limit => 50, :null => false
+    t.string   "description",               :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "scholarship_durations", :force => true do |t|
     t.integer  "scholarship_id", :null => false
     t.integer  "enrollment_id",  :null => false
@@ -310,7 +317,10 @@ ActiveRecord::Schema.define(:version => 20130213143800) do
     t.integer  "failed_attempts",        :default => 0
     t.string   "unlock_token"
     t.datetime "locked_at"
+    t.integer  "role_id",                :default => 1,  :null => false
   end
+
+  add_index "users", ["role_id"], :name => "users_role_id_fkey"
 
   add_foreign_key "accomplishments", ["enrollment_id"], "enrollments", ["id"], :name => "accomplishments_enrollment_id_fkey"
   add_foreign_key "accomplishments", ["phase_id"], "phases", ["id"], :name => "accomplishments_phase_id_fkey"
@@ -360,5 +370,7 @@ ActiveRecord::Schema.define(:version => 20130213143800) do
   add_foreign_key "students", ["city_id"], "cities", ["id"], :name => "students_city_id_fkey"
   add_foreign_key "students", ["country_id"], "countries", ["id"], :name => "students_country_id_fkey"
   add_foreign_key "students", ["state_id"], "states", ["id"], :name => "students_state_id_fkey"
+
+  add_foreign_key "users", ["role_id"], "roles", ["id"], :name => "users_role_id_fkey"
 
 end
