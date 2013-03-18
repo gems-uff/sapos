@@ -5,6 +5,7 @@ gem "rails-erd", "~> 1.0.0"
 gem "kaminari"
 gem "automatic_foreign_key"
 
+gem 'cancan'
 gem "devise"
 
 # Bundle edge Rails instead:
@@ -12,7 +13,6 @@ gem "devise"
 
 group :development, :test do
 	gem 'sqlite3'
-  gem 'ruby-debug'
   gem 'awesome_print'
 end
 

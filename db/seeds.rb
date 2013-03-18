@@ -28,8 +28,9 @@ DismissalReason.create(:name => "Desistência", :description => "Aluno desistiu"
 DismissalReason.create(:name => "Prazo", :description => "Prazo para defesa esgotado")
 DismissalReason.create(:name => "Especial -> Regular", :description => "Aluno foi admitido como aluno regular")
 
-Role.create(:name => "Administrador", :description => "Administrador")
+Role.create(:name => "Desconhecido", :description => "Desconhecido")
 Role.create(:name => "Coordenação", :description => "Coordenação")
 Role.create(:name => "Secretaria", :description => "Secretaria")
 Role.create(:name => "Professor", :description => "Professor")
 Role.create(:name => "Aluno", :description => "Aluno")
+Role.create(:name => "Administrador", :description => "Administrador")
