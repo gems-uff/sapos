@@ -1,12 +1,13 @@
 Sapos::Application.routes.draw do
   devise_for :users
 
-  controller :session do
-    get 'login' => :new
-    post 'login' => :create
-    delete 'logout' => :destroy
-  end
   get "credits/show"
+
+  #controller :session do
+  #  get 'login' => :new
+  #  post 'login' => :create
+  #  delete 'logout' => :destroy
+  #end
 
   resources :phase_durations do as_routes end
 
