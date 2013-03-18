@@ -1,6 +1,4 @@
 Sapos::Application.routes.draw do
-  get "credits/show"
-
   devise_for :users
 
   controller :session do
@@ -8,6 +6,7 @@ Sapos::Application.routes.draw do
     post 'login' => :create
     delete 'logout' => :destroy
   end
+  get "credits/show"
 
   resources :phase_durations do as_routes end
 
