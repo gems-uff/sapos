@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130205202210) do
+ActiveRecord::Schema.define(:version => 20130213143800) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -23,6 +23,16 @@ ActiveRecord::Schema.define(:version => 20130205202210) do
 
   add_index "accomplishments", ["enrollment_id"], :name => "accomplishments_enrollment_id_fkey"
   add_index "accomplishments", ["phase_id"], :name => "accomplishments_phase_id_fkey"
+
+  create_table "advisement_authorizations", :force => true do |t|
+    t.integer  "professor_id"
+    t.integer  "level_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "advisement_authorizations", ["level_id"], :name => "advisement_authorizations_level_id_fkey"
+  add_index "advisement_authorizations", ["professor_id"], :name => "advisement_authorizations_professor_id_fkey"
 
   create_table "advisements", :force => true do |t|
     t.integer  "professor_id",  :null => false
@@ -304,6 +314,9 @@ ActiveRecord::Schema.define(:version => 20130205202210) do
 
   add_foreign_key "accomplishments", ["enrollment_id"], "enrollments", ["id"], :name => "accomplishments_enrollment_id_fkey"
   add_foreign_key "accomplishments", ["phase_id"], "phases", ["id"], :name => "accomplishments_phase_id_fkey"
+
+  add_foreign_key "advisement_authorizations", ["level_id"], "levels", ["id"], :name => "advisement_authorizations_level_id_fkey"
+  add_foreign_key "advisement_authorizations", ["professor_id"], "professors", ["id"], :name => "advisement_authorizations_professor_id_fkey"
 
   add_foreign_key "advisements", ["enrollment_id"], "enrollments", ["id"], :name => "advisements_enrollment_id_fkey"
   add_foreign_key "advisements", ["professor_id"], "professors", ["id"], :name => "advisements_professor_id_fkey"
