@@ -3,12 +3,6 @@ Sapos::Application.routes.draw do
 
   get "credits/show"
 
-  #controller :session do
-  #  get 'login' => :new
-  #  post 'login' => :create
-  #  delete 'logout' => :destroy
-  #end
-
   resources :phase_durations do as_routes end
 
   resources :deferrals do as_routes end
