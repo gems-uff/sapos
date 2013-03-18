@@ -1,15 +1,11 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
-  
-  before_filter :remember_me_if_cookie_is_set
-  before_filter :authenticate
+
+  before_filter :authenticate_user!
   before_filter :parse_date
 
-  # disable implicit helper(:all) in rails3
   clear_helpers
 
-  #Set class variable user_id on User
-  before_filter :set_current_user_id
 
   ActiveScaffold.set_defaults do |config|
     config.ignore_columns.add [:created_at, :updated_at, :lock_version]
@@ -32,9 +28,9 @@ class ApplicationController < ActionController::Base
   
   private
 
-  def authenticate
-    redirect_to login_url unless User.find_by_id(session[:user_id])
-  end
+  #def authenticate
+  #  redirect_to login_url unless User.find_by_id(session[:user_id])
+  #end
 
   # This application has custom values for date inputs, having month and year as default for most dates
   # here we nullify invalid dates that comes from the request
@@ -58,20 +54,6 @@ class ApplicationController < ActionController::Base
           params[:record][external_key] = nil
         end
       }
-    end
-  end
-
-  def set_current_user_id
-    User.set_current_user_id(session[:user_id])
-  end
-
-  def remember_me_if_cookie_is_set
-    if (cookies[:remember_me_id]   and
-        cookies[:remember_me_code] and
-        User.find( cookies[:remember_me_id]) and
-        Digest::SHA1.hexdigest( User.find( cookies[:remember_me_id] ).name )[4,18] == cookies[:remember_me_code])
-      @user = User.find( cookies[:remember_me_id] )
-      session[:user_id] = @user.id
     end
   end
 end
