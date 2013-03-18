@@ -1,7 +1,7 @@
 Sapos::Application.routes.draw do
   get "credits/show"
 
-  #devise_for :users
+  devise_for :users
 
   controller :session do
     get 'login' => :new
