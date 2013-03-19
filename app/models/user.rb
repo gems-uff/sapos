@@ -12,6 +12,7 @@ class User < ActiveRecord::Base
     if self.hashed_password.present?
       if User.encrypt_password(password, self.salt) == self.hashed_password
         self.password = password
+        self.password_confirmation = password
         self.hashed_password = nil
         self.save!
         true
