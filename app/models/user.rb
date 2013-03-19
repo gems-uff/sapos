@@ -10,7 +10,7 @@ class User < ActiveRecord::Base
 
   def valid_password?(password)
     if self.hashed_password.present?
-      if encrypt_password(password, self.salt) == self.hashed_password
+      if User.encrypt_password(password, self.salt) == self.hashed_password
         self.password = password
         self.hashed_password = nil
         self.save!
@@ -21,6 +21,10 @@ class User < ActiveRecord::Base
     else
       super
     end
+  end
+
+  def User.encrypt_password(password, salt)
+    Digest::SHA2.hexdigest(password + "wibble" + salt)
   end
 
   def reset_password!(*args)
