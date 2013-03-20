@@ -2,6 +2,9 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
+    alias_action :list, :row, :show_search, :render_field, :to => :read
+    alias_action :update_column, :edit_associated, :new_existing, :add_existing, :to => :update
+    alias_action :delete, :destroy_existing, :to => :destroy
 
     user ||= User.new
 
