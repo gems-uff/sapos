@@ -13,7 +13,7 @@ class Ability
       can :manage, :all
     elsif role_id == Role::ROLE_PROFESSOR
       can :read, :all
-    elsif role_id == Role::ROLE_SECRETARIA_MATRICULAS
+    elsif role_id == Role::ROLE_SECRETARIA_BOLSAS
       can :read, :all
       can :update, [Scholarship, ScholarshipDuration]
     elsif role_id == Role::ROLE_SECRETARIA_MATRICULAS
