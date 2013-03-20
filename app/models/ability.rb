@@ -5,10 +5,23 @@ class Ability
 
     user ||= User.new
 
-    role_name = user.role.name
+    role_id = user.role_id
 
-    if role_name == "Administrador"
+    if role_id == Role::ROLE_ADMINISTRADOR
       can :manage, :all
+    elsif role_id == Role::ROLE_COORDENACAO
+      can :manage, :all
+    elsif role_id == Role::ROLE_PROFESSOR
+      can :read, :all
+    elsif role_id == Role::ROLE_SECRETARIA_MATRICULAS
+      can :read, :all
+      can :update, [Scholarship, ScholarshipDuration]
+    elsif role_id == Role::ROLE_SECRETARIA_MATRICULAS
+      can :read, :all
+      can :update , [Student, Enrollment, Dismissal, Institution]
+    elsif role_id == Role::ROLE_SECRETARIA_MANUTENCAO_MATRICULAS
+      can :read, :all
+      can :update, [Deferral, Accomplishment]
     end
 
     # Define abilities for the passed in user here. For example:
