@@ -5,9 +5,9 @@
 #
 # Examples:
 #
-#   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
-#   Mayor.create(:name => 'Daley', :city => cities.first)
-User.create(:name => 'admin', :password => 'admin')
+#   cities = City.create([{ :name => 'Chicago', :description =>'Chicago' }, { :name => 'Copenhagen', :description =>'Copenhagen' }])
+#   Mayor.create(:name => 'Daley', :description =>'Daley', :city => cities.first)
+User.create(:name => 'admin', :description => 'admin', :password => 'admin')
 
 Sponsor.create(:name => "CAPES")
 Sponsor.create(:name => "CNPq")
@@ -28,9 +28,26 @@ DismissalReason.create(:name => "Desistência", :description => "Aluno desistiu"
 DismissalReason.create(:name => "Prazo", :description => "Prazo para defesa esgotado")
 DismissalReason.create(:name => "Especial -> Regular", :description => "Aluno foi admitido como aluno regular")
 
-Role.create(:name => "Desconhecido", :description => "Desconhecido")
-Role.create(:name => "Coordenação", :description => "Coordenação")
-Role.create(:name => "Secretaria", :description => "Secretaria")
-Role.create(:name => "Professor", :description => "Professor")
-Role.create(:name => "Aluno", :description => "Aluno")
-Role.create(:name => "Administrador", :description => "Administrador")
+[
+    {:id => 1, :name => 'Desconhecido', :description => 'Desconhecido'},
+    {:id => 2, :name => 'Coordenação', :description => 'Coordenação'},
+    {:id => 3, :name => 'Secretaria de bolsas', :description => 'Secretaria de bolsas'},
+    {:id => 4, :name => 'Secretaria de matrículas', :description => 'Secretaria de matrículas'},
+    {:id => 5, :name => 'Secretaria de Manutenção de Matrícula', :description => 'Secretaria de Manutenção de Matrícula'},
+    {:id => 6, :name => 'Professor', :description => 'Professor'},
+    {:id => 7, :name => 'Aluno', :description => 'Aluno'},
+    {:id => 8, :name => 'Administrador', :description => 'Administrador'}
+].each do |role|
+  current_role = Role.find_by_id(role[:id])
+  if current_role
+    current_role.name = role[:name]
+    current_role.description = role[:description]
+    current_role.save!
+  else
+    Role.new do |r|
+      r.id = role[:id]
+      r.name = role[:name]
+      r.description = role[:description]
+    end.save!
+  end
+end
