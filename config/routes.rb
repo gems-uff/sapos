@@ -76,7 +76,7 @@ Sapos::Application.routes.draw do
     record_select_routes
   end
 
-  resources :courses do 
+  resources :majors do
     as_routes 
     record_select_routes
   end

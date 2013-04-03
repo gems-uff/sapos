@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130213143800) do
+ActiveRecord::Schema.define(:version => 20130403204033) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -59,25 +59,6 @@ ActiveRecord::Schema.define(:version => 20130213143800) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  create_table "courses", :force => true do |t|
-    t.string   "name"
-    t.integer  "level_id"
-    t.integer  "institution_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "courses", ["institution_id"], :name => "courses_institution_id_fkey"
-  add_index "courses", ["level_id"], :name => "courses_level_id_fkey"
-
-  create_table "courses_students", :id => false, :force => true do |t|
-    t.integer "course_id",  :null => false
-    t.integer "student_id", :null => false
-  end
-
-  add_index "courses_students", ["course_id"], :name => "index_courses_students_on_course_id"
-  add_index "courses_students", ["student_id"], :name => "index_courses_students_on_student_id"
 
   create_table "deferral_types", :force => true do |t|
     t.string   "name"
@@ -156,6 +137,25 @@ ActiveRecord::Schema.define(:version => 20130213143800) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "majors", :force => true do |t|
+    t.string   "name"
+    t.integer  "level_id"
+    t.integer  "institution_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "majors", ["institution_id"], :name => "courses_institution_id_fkey"
+  add_index "majors", ["level_id"], :name => "courses_level_id_fkey"
+
+  create_table "majors_students", :id => false, :force => true do |t|
+    t.integer "major_id",   :null => false
+    t.integer "student_id", :null => false
+  end
+
+  add_index "majors_students", ["major_id"], :name => "index_courses_students_on_course_id"
+  add_index "majors_students", ["student_id"], :name => "index_courses_students_on_student_id"
 
   create_table "phase_durations", :force => true do |t|
     t.integer  "phase_id"
@@ -306,12 +306,6 @@ ActiveRecord::Schema.define(:version => 20130213143800) do
 
   add_foreign_key "cities", ["state_id"], "states", ["id"], :name => "cities_state_id_fkey"
 
-  add_foreign_key "courses", ["institution_id"], "institutions", ["id"], :name => "courses_institution_id_fkey"
-  add_foreign_key "courses", ["level_id"], "levels", ["id"], :name => "courses_level_id_fkey"
-
-  add_foreign_key "courses_students", ["course_id"], "courses", ["id"], :name => "courses_students_course_id_fkey"
-  add_foreign_key "courses_students", ["student_id"], "students", ["id"], :name => "courses_students_student_id_fkey"
-
   add_foreign_key "deferral_types", ["phase_id"], "phases", ["id"], :name => "deferral_types_phase_id_fkey"
 
   add_foreign_key "deferrals", ["deferral_type_id"], "deferral_types", ["id"], :name => "deferrals_deferral_type_id_fkey"
@@ -323,6 +317,12 @@ ActiveRecord::Schema.define(:version => 20130213143800) do
   add_foreign_key "enrollments", ["enrollment_status_id"], "enrollment_statuses", ["id"], :name => "enrollments_enrollment_status_id_fkey"
   add_foreign_key "enrollments", ["level_id"], "levels", ["id"], :name => "enrollments_level_id_fkey"
   add_foreign_key "enrollments", ["student_id"], "students", ["id"], :name => "enrollments_student_id_fkey"
+
+  add_foreign_key "majors", ["institution_id"], "institutions", ["id"], :name => "courses_institution_id_fkey"
+  add_foreign_key "majors", ["level_id"], "levels", ["id"], :name => "courses_level_id_fkey"
+
+  add_foreign_key "majors_students", ["major_id"], "majors", ["id"], :name => "courses_students_major_id_fkey"
+  add_foreign_key "majors_students", ["student_id"], "students", ["id"], :name => "courses_students_student_id_fkey"
 
   add_foreign_key "phase_durations", ["level_id"], "levels", ["id"], :name => "phase_durations_level_id_fkey"
   add_foreign_key "phase_durations", ["phase_id"], "phases", ["id"], :name => "phase_durations_phase_id_fkey"

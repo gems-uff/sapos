@@ -1,0 +1,2 @@
+module MajorsHelper
+end

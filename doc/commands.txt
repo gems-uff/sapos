@@ -6,14 +6,14 @@ Institution:
     rails generate active_scaffold Institution name:string
 Level: 
     rails generate active_scaffold Level name:string
-Course: 
-    rails generate active_scaffold Course name:string level:references institution:references
+Major:
+    rails generate active_scaffold Major name:string level:references institution:references
 Student: 
     rails generate active_scaffold Student name:string cpf:string
     rails generate migration AddObsToStudent obs:text
     (this migration was necessary because I forgot to add obs when generating Student)
-Course-Student:
-    rails generate migration CreateCoursesStudents
+Major-Student:
+    rails generate migration CreateMajorsStudents
     (followed by the edition of the created migration. Check the migration for future join tables)
 EnrollmentStatus:
     rails generate active_scaffold EnrollmentStatus name:string

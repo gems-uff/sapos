@@ -275,7 +275,7 @@ pt:
       advisement_authorization:
         one: "Credenciamento"
         other: "Credenciamentos"
-      course: 
+      major:
         one: "Curso"
         other: "Cursos"
       sponsor:
@@ -340,7 +340,7 @@ pt:
         other: "Tipos de Prorrogação"
         
     attributes:
-      course: 
+      major:
         name: "Nome"
         institution: "Instituição"
         level: "Nível"
@@ -353,7 +353,7 @@ pt:
       institution:
         name: "Nome"
         code: "Sigla"
-        courses: "Cursos"
+        majors: "Cursos"
       dismissal_reason:
         name: "Nome"
         description: "Descrição"
@@ -384,7 +384,7 @@ pt:
         name: "Nome"
       student:
         name: "Nome"
-        courses: "Cursos"        
+        majors: "Cursos"
         cpf: "CPF"
         enrollments: "Matrículas"
         address: "Logradouro"        
@@ -543,7 +543,7 @@ pt:
     click_to_reset: "Clique aqui para remover o filtro criado"
     replace_with_new: ""
     
-    create_course_label: "Adicionar Curso"
+    create_major_label: "Adicionar Curso"
     create_institution_label: "Adicionar Instituição"
     create_level_label: "Adicionar Nível"
     create_sponsor_label: "Adicionar Agência de Fomento"
@@ -566,7 +566,7 @@ pt:
     create_deferral_label: "Adicionar Prorrogação"
     create_advisement_authorization_label: "Adicionar Credenciamento"
     update_enrollment_label: "Modificar Matrícula"
-    update_course_label: "Modificar Curso"
+    update_major_label: "Modificar Curso"
     update_user_label: "Modificar Usuário"
     update_student_label: "Modificar Aluno"
     update_country_label: "Editar País"

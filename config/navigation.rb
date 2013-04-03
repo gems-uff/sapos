@@ -73,8 +73,8 @@ SimpleNavigation::Configuration.run do |navigation|
       phases.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path
     end
 
-    primary.item :grade, 'Formação', courses_path do |grade|
-      grade.item :course, 'Cursos', courses_path
+    primary.item :grade, 'Formação', majors_path do |grade|
+      grade.item :major, 'Cursos', majors_path
       grade.item :institution, 'Instituições', institutions_path
     end
 
