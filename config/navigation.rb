@@ -73,6 +73,15 @@ SimpleNavigation::Configuration.run do |navigation|
       phases.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path
     end
 
+    primary.item :courses, 'Disciplinas',courses_path do |courses|
+      courses.item :research_area, 'Áreas de Pesquisa', research_areas_path
+      courses.item :course, 'Disciplinas', courses_path
+      courses.item :course_type, 'Tipos de Disciplinas', course_types_path
+      courses.item :course_class, 'Turmas', course_classes_path
+      courses.item :class_enrollment, 'Inscrições', class_enrollments_path
+      courses.item :allocation, 'Alocações', allocations_path
+    end
+
     primary.item :grade, 'Formação', majors_path do |grade|
       grade.item :major, 'Cursos', majors_path
       grade.item :institution, 'Instituições', institutions_path

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130403204033) do
+ActiveRecord::Schema.define(:version => 20130404150706) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -45,6 +45,18 @@ ActiveRecord::Schema.define(:version => 20130403204033) do
   add_index "advisements", ["enrollment_id"], :name => "index_advisements_on_enrollment_id"
   add_index "advisements", ["professor_id"], :name => "index_advisements_on_professor_id"
 
+  create_table "allocations", :force => true do |t|
+    t.string   "day"
+    t.string   "room"
+    t.time     "start_time"
+    t.time     "end_time"
+    t.integer  "course_class_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "allocations", ["course_class_id"], :name => "allocations_course_class_id_fkey"
+
   create_table "cities", :force => true do |t|
     t.string   "name"
     t.integer  "state_id"
@@ -54,11 +66,57 @@ ActiveRecord::Schema.define(:version => 20130403204033) do
 
   add_index "cities", ["state_id"], :name => "cities_state_id_fkey"
 
+  create_table "class_enrollments", :force => true do |t|
+    t.text     "obs"
+    t.integer  "grade"
+    t.boolean  "attendance"
+    t.string   "situation"
+    t.integer  "course_class_id"
+    t.integer  "enrollment_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "class_enrollments", ["course_class_id"], :name => "class_enrollments_course_class_id_fkey"
+  add_index "class_enrollments", ["enrollment_id"], :name => "class_enrollments_enrollment_id_fkey"
+
   create_table "countries", :force => true do |t|
     t.string   "name"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "course_classes", :force => true do |t|
+    t.string   "name"
+    t.integer  "course_id"
+    t.integer  "professor_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "course_classes", ["course_id"], :name => "course_classes_course_id_fkey"
+  add_index "course_classes", ["professor_id"], :name => "course_classes_professor_id_fkey"
+
+  create_table "course_types", :force => true do |t|
+    t.string   "name"
+    t.boolean  "has_score"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "courses", :force => true do |t|
+    t.string   "name"
+    t.string   "code"
+    t.text     "content"
+    t.integer  "credits"
+    t.integer  "research_area_id"
+    t.integer  "course_type_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "courses", ["course_type_id"], :name => "courses_course_type_id_fkey"
+  add_index "courses", ["research_area_id"], :name => "courses_research_area_id_fkey"
 
   create_table "deferral_types", :force => true do |t|
     t.string   "name"
@@ -177,6 +235,16 @@ ActiveRecord::Schema.define(:version => 20130403204033) do
     t.datetime "updated_at"
   end
 
+  create_table "professor_research_areas", :force => true do |t|
+    t.integer  "professor_id"
+    t.integer  "research_area_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "professor_research_areas", ["professor_id"], :name => "professor_research_areas_professor_id_fkey"
+  add_index "professor_research_areas", ["research_area_id"], :name => "professor_research_areas_research_area_id_fkey"
+
   create_table "professors", :force => true do |t|
     t.string   "name"
     t.string   "cpf"
@@ -200,6 +268,13 @@ ActiveRecord::Schema.define(:version => 20130403204033) do
 
   add_index "professors", ["city_id"], :name => "professors_city_id_fkey"
   add_index "professors", ["state_id"], :name => "professors_state_id_fkey"
+
+  create_table "research_areas", :force => true do |t|
+    t.string   "name"
+    t.string   "code"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "scholarship_durations", :force => true do |t|
     t.integer  "scholarship_id", :null => false
@@ -304,7 +379,18 @@ ActiveRecord::Schema.define(:version => 20130403204033) do
   add_foreign_key "advisements", ["enrollment_id"], "enrollments", ["id"], :name => "advisements_enrollment_id_fkey"
   add_foreign_key "advisements", ["professor_id"], "professors", ["id"], :name => "advisements_professor_id_fkey"
 
+  add_foreign_key "allocations", ["course_class_id"], "course_classes", ["id"], :name => "allocations_course_class_id_fkey"
+
   add_foreign_key "cities", ["state_id"], "states", ["id"], :name => "cities_state_id_fkey"
+
+  add_foreign_key "class_enrollments", ["course_class_id"], "course_classes", ["id"], :name => "class_enrollments_course_class_id_fkey"
+  add_foreign_key "class_enrollments", ["enrollment_id"], "enrollments", ["id"], :name => "class_enrollments_enrollment_id_fkey"
+
+  add_foreign_key "course_classes", ["course_id"], "courses", ["id"], :name => "course_classes_course_id_fkey"
+  add_foreign_key "course_classes", ["professor_id"], "professors", ["id"], :name => "course_classes_professor_id_fkey"
+
+  add_foreign_key "courses", ["course_type_id"], "course_types", ["id"], :name => "courses_course_type_id_fkey"
+  add_foreign_key "courses", ["research_area_id"], "research_areas", ["id"], :name => "courses_research_area_id_fkey"
 
   add_foreign_key "deferral_types", ["phase_id"], "phases", ["id"], :name => "deferral_types_phase_id_fkey"
 
@@ -326,6 +412,9 @@ ActiveRecord::Schema.define(:version => 20130403204033) do
 
   add_foreign_key "phase_durations", ["level_id"], "levels", ["id"], :name => "phase_durations_level_id_fkey"
   add_foreign_key "phase_durations", ["phase_id"], "phases", ["id"], :name => "phase_durations_phase_id_fkey"
+
+  add_foreign_key "professor_research_areas", ["professor_id"], "professors", ["id"], :name => "professor_research_areas_professor_id_fkey"
+  add_foreign_key "professor_research_areas", ["research_area_id"], "research_areas", ["id"], :name => "professor_research_areas_research_area_id_fkey"
 
   add_foreign_key "professors", ["city_id"], "cities", ["id"], :name => "professors_city_id_fkey"
   add_foreign_key "professors", ["state_id"], "states", ["id"], :name => "professors_state_id_fkey"

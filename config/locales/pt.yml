@@ -1,3 +1,4 @@
+# encoding utf-8
 # Sample localization file for English. Add more files in this directory for other locales.
 # See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
@@ -338,7 +339,28 @@ pt:
       deferral_type:
         one: "Tipo de Prorrogação"
         other: "Tipos de Prorrogação"
-        
+      research_area:
+        one: "Área de Pesquisa"
+        other: "Áreas de Pesquisa"
+      course:
+        one: "Disciplina"
+        other: "Disciplinas"
+      course_type:
+        one: "Tipo de Disciplina"
+        other: "Tipos de Disciplina"
+      course_class:
+        one: "Turma"
+        other: "Turmas"
+      allocation:
+        one: "Alocação"
+        other: "Alocações"
+      class_enrollment:
+        one: "Inscrição"
+        other: "Inscrições"
+      professor_research_area:
+        one: "Área de Pesquisa do Professor"
+        other: "Área de Pesquisa dos Professores"
+
     attributes:
       major:
         name: "Nome"
@@ -449,6 +471,7 @@ pt:
         enrollments: "Orientandos"
         advisement_points: "Pontos de Orientação"
         advisements_with_points: "Orientandos"
+        professor_research_areas: "Áreas de Pesquisa"
       advisement:
         professor: "Orientador"
         enrollment: "Matrícula"
@@ -503,7 +526,41 @@ pt:
         duration_months: "Duração(meses)"
         duration_days: "Duração(dias)"
         phase: "Etapa"
-        
+      research_area:
+        name: "Nome"
+        code: "Código"
+        professor_research_areas: "Professores"
+      course:
+        name: "Nome"
+        code: "Código"
+        content: "Ementa"
+        credits: "Créditos"
+        research_area: "Área de Pesquisa"
+        course_type: "Tipo de Disciplina"
+      course_type:
+        name: "Nome"
+        has_score: "Tem nota"
+      course_class:
+         name: "Nome"
+         course: "Disciplina"
+         enrollment: "Matrícula"
+      allocation:
+        day: "Dia"
+        room: "Sala"
+        start_time: "Hora de início"
+        end_time: "Hora de fim"
+        course_class: "Turma"
+      class_enrollment:
+        obs: "Observações"
+        grade: "Nota"
+        attendance: "Frequência"
+        situation: "Situação"
+        course_class: "Turma"
+        enrollment: "Matrícula"
+      professor_research_area:
+        professor: "Professor"
+        research_area: "Área de Pesquisa"
+
   active_scaffold:
     hide: "Ocultar"
     show: "Mostrar"
@@ -565,6 +622,13 @@ pt:
     create_phase_label: "Adicionar Fase"
     create_deferral_label: "Adicionar Prorrogação"
     create_advisement_authorization_label: "Adicionar Credenciamento"
+    create_research_area_label: "Adicionar Área de Pesquisa"
+    create_course_label: "Adicionar Disciplina"
+    create_course_type_label: "Adicionar Tipo de Disciplina"
+    create_course_class_label: "Adicionar Turma"
+    create_allocation_label: "Adicionar Alocação"
+    create_class_enrollment_label: "Adicionar Inscrição"
+    create_professor_research_area_label: "Adicionar Área de Pesquisa do Professor"
     update_enrollment_label: "Modificar Matrícula"
     update_major_label: "Modificar Curso"
     update_user_label: "Modificar Usuário"
@@ -573,6 +637,13 @@ pt:
     update_state_label: "Editar Estado"
     update_city_label: "Editar Cidade"
     update_advisement_authorization_label: "Editar Credenciamento"
+    update_research_area_label: "Editar Área de Pesquisa"
+    update_course_label: "Editar Disciplina"
+    update_course_type_label: "Editar Tipo de Disciplina"
+    update_course_class_label: "Editar Turma"
+    update_allocation_label: "Editar Alocação"
+    update_class_enrollment_label: "Editar Inscrição"
+    update_professor_research_area_label: "Área de Pesquisa do Professor"
     total_label: "Total"
 
     errors:

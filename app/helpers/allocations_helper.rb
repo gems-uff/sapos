@@ -1,0 +1,2 @@
+module AllocationsHelper
+end

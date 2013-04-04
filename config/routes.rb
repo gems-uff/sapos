@@ -1,4 +1,33 @@
 Sapos::Application.routes.draw do
+  resources :professor_research_areas do
+    as_routes
+  end
+
+  resources :class_enrollments do
+    as_routes
+  end
+
+  resources :allocations do
+    as_routes
+  end
+
+  resources :course_classes do
+    as_routes
+  end
+
+  resources :course_types do
+    as_routes
+  end
+
+  resources :courses do
+    as_routes
+  end
+
+  resources :research_areas do
+    as_routes
+    record_select_routes
+  end
+
   get "credits/show"
 
   controller :session do
@@ -7,23 +36,41 @@ Sapos::Application.routes.draw do
     delete 'logout' => :destroy
   end
 
-  resources :phase_durations do as_routes end
+  resources :phase_durations do
+    as_routes
+  end
 
-  resources :deferrals do as_routes end
+  resources :deferrals do
+    as_routes
+  end
 
-  resources :deferral_types do as_routes end
+  resources :deferral_types do
+    as_routes
+  end
 
-  resources :accomplishments do as_routes end
+  resources :accomplishments do
+    as_routes
+  end
 
-  resources :phases do as_routes end
+  resources :phases do
+    as_routes
+  end
 
-  resources :cities do as_routes end
+  resources :cities do
+    as_routes
+  end
 
-  resources :states do as_routes end
+  resources :states do
+    as_routes
+  end
 
-  resources :countries do as_routes end
+  resources :countries do
+    as_routes
+  end
 
-  resources :users do as_routes end
+  resources :users do
+    as_routes
+  end
 
   resources :scholarship_durations do
     as_routes
@@ -32,67 +79,77 @@ Sapos::Application.routes.draw do
     end
   end
 
-  resources :scholarships do 
-    as_routes 
-    record_select_routes
-    collection do
-       get 'to_pdf'
-     end
-  end
-  
-  resources :advisements do 
-    as_routes 
-    record_select_routes
-    collection do
-       get 'to_pdf'
-     end
-  end
-
-  resources :professors do 
-    as_routes 
-    record_select_routes
-  end
-
-  resources :scholarship_types do as_routes end
-
-  resources :dismissals do as_routes end
-
-  resources :dismissal_reasons do as_routes end
-
-  resources :enrollments do 
-    as_routes 
+  resources :scholarships do
+    as_routes
     record_select_routes
     collection do
       get 'to_pdf'
     end
   end
 
-  resources :enrollment_statuses do 
-    as_routes     
+  resources :advisements do
+    as_routes
+    record_select_routes
+    collection do
+      get 'to_pdf'
+    end
   end
 
-  resources :students do 
-    as_routes 
+  resources :professors do
+    as_routes
+    record_select_routes
+  end
+
+  resources :scholarship_types do
+    as_routes
+  end
+
+  resources :dismissals do
+    as_routes
+  end
+
+  resources :dismissal_reasons do
+    as_routes
+  end
+
+  resources :enrollments do
+    as_routes
+    record_select_routes
+    collection do
+      get 'to_pdf'
+    end
+  end
+
+  resources :enrollment_statuses do
+    as_routes
+  end
+
+  resources :students do
+    as_routes
     record_select_routes
   end
 
   resources :majors do
-    as_routes 
+    as_routes
     record_select_routes
   end
 
-  resources :levels do 
-    as_routes     
+  resources :levels do
+    as_routes
   end
 
-  resources :institutions do 
-    as_routes 
+  resources :institutions do
+    as_routes
     record_select_routes
   end
 
-  resources :sponsors do as_routes end
+  resources :sponsors do
+    as_routes
+  end
 
-  resources :advisement_authorizations do as_routes end
+  resources :advisement_authorizations do
+    as_routes
+  end
 
   # The priority is based upon order of creation:
   # first created -> highest priority.
