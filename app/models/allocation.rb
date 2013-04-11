@@ -12,9 +12,9 @@ class Allocation < ActiveRecord::Base
 
   private
   def standardize_times
-    standard_date = Time.parse('2000/01/01')
-    self.start_time = (Time.parse(standard_date.strftime("%Y/%m/%d") + start_time.strftime(" %H:%M:%S")) + self.start_time.utc_offset).utc
-    self.end_time = (Time.parse(standard_date.strftime("%Y/%m/%d") + end_time.strftime(" %H:%M:%S")) + self.end_time.utc_offset).utc
+    standard_date = Time.zone.parse('2000/01/01')
+    self.start_time = Time.zone.parse(standard_date.strftime("%Y/%m/%d") + start_time.strftime(" %H:%M:%S"))
+    self.end_time = Time.zone.parse(standard_date.strftime("%Y/%m/%d") + end_time.strftime(" %H:%M:%S"))
   end
 
   def start_end_time_validation
