@@ -61,6 +61,22 @@ describe Advisement do
         end
       end
     end
+    describe "professor_id" do
+      context "should be valid when" do
+        it "don't exists another advisement for the same enrollment" do
+          advisement.professor = Professor.new
+          advisement.should have(0).errors_on :professor_id
+        end
+      end
+      context "should have uniqueness error when" do
+        it "already exists another advisement for the same enrollment" do
+          advisement.professor = FactoryGirl.create(:professor)
+          advisement.enrollment = FactoryGirl.create(:enrollment)
+          FactoryGirl.create(:advisement, :professor => advisement.professor, :enrollment => advisement.enrollment)
+          advisement.should have_error(:taken).on :professor_id
+        end
+      end
+    end
   end
   describe "Methods" do
     describe "to_label" do
@@ -70,6 +86,62 @@ describe Advisement do
         advisement.enrollment = Enrollment.new(:enrollment_number => enrollment_number)
         advisement.professor = Professor.new(:name => professor_name)
         advisement.to_label.should eql("#{enrollment_number} - #{professor_name}")
+      end
+    end
+    describe "co_advisor_list" do
+      it "should return the expected string" do
+        professor1_name = "Leonardo"
+        professor2_name = "Vanessa"
+        professor1 = FactoryGirl.create(:professor, :name => professor1_name)
+        professor2 = FactoryGirl.create(:professor, :name => professor2_name)
+        advisement = FactoryGirl.create(:advisement)
+        FactoryGirl.create(:advisement, :professor => professor1, :enrollment => advisement.enrollment, :main_advisor => false)
+        FactoryGirl.create(:advisement, :professor => professor2, :enrollment => advisement.enrollment, :main_advisor => false)
+        advisement.co_advisor_list.should eql("#{professor1_name} , #{professor2_name}")
+      end
+    end
+    describe "active" do
+      context "should return true when " do
+        it "the enrollment does not have a dismissal" do
+          advisement = FactoryGirl.create(:advisement)
+          advisement.active.should be_true
+        end
+      end
+      context "should return false when " do
+        it "the enrollment have a dismissal" do
+          advisement = FactoryGirl.create(:advisement)
+          FactoryGirl.create(:dismissal, :enrollment => advisement.enrollment)
+          advisement.active.should be_false
+        end
+      end
+    end
+    describe "co_advisor" do
+      context "should return true when " do
+        it "the enrollment have another advisement" do
+          other_advisement = FactoryGirl.create(:advisement)
+          FactoryGirl.create(:advisement, :enrollment => other_advisement.enrollment, :main_advisor => false)
+          other_advisement.co_advisor.should be_true
+        end
+      end
+      context "should return false when " do
+        it "the enrollment does not have another advisement" do
+          advisement = FactoryGirl.create(:advisement)
+          advisement.co_advisor.should be_false
+        end
+      end
+    end
+    describe "enrollment_has_advisors" do
+      context "should return true when " do
+        it "the enrollment have one advisement" do
+          advisement = FactoryGirl.create(:advisement)
+          advisement.enrollment_has_advisors.should be_true
+        end
+      end
+      context "should return false when " do
+        it "the enrollment does not have any advisements" do
+          advisement.enrollment = FactoryGirl.create(:enrollment)
+          advisement.enrollment_has_advisors.should be_false
+        end
       end
     end
   end
