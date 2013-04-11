@@ -13,6 +13,7 @@ Sapos::Application.routes.draw do
 
   resources :course_classes do
     as_routes
+    record_select_routes
   end
 
   resources :course_types do
@@ -21,6 +22,7 @@ Sapos::Application.routes.draw do
 
   resources :courses do
     as_routes
+    record_select_routes
   end
 
   resources :research_areas do
