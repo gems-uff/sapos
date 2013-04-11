@@ -4,6 +4,8 @@ class CreateCourseClasses < ActiveRecord::Migration
       t.string :name
       t.references :course
       t.references :professor
+      t.integer :year
+      t.integer :semester
 
       t.timestamps
     end

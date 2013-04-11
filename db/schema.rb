@@ -90,6 +90,8 @@ ActiveRecord::Schema.define(:version => 20130404150706) do
     t.string   "name"
     t.integer  "course_id"
     t.integer  "professor_id"
+    t.integer  "year"
+    t.integer  "semester"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
