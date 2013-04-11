@@ -12,6 +12,8 @@ group :development, :test do
 	gem 'sqlite3'
   gem 'ruby-debug'
   gem 'awesome_print'
+  gem 'rspec-rails', '~> 2.0'
+  gem 'factory_girl_rails', '1.7.0'
 end
 
 group :production, :staging do
