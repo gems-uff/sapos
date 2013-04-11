@@ -1,7 +1,7 @@
 class ClassEnrollmentsController < ApplicationController
   active_scaffold :class_enrollment do |config|
     config.list.sorting = {:enrollment => 'ASC'}
-    config.list.columns = [:enrollment, :situation, :grade, :attendance]
+    config.list.columns = [:enrollment,:course_class, :situation, :grade, :attendance]
     config.create.label = :create_class_enrollment_label
     config.update.label = :update_class_enrollment_label
 
