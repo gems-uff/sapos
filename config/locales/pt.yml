@@ -208,6 +208,7 @@ pt:
       body: "Por favor, verifique o(s) seguinte(s) campo(s):"
 
     messages: &errors_messages
+      taken: "já existe"
       inclusion: "não está incluído na lista"
       exclusion: "não está disponível"
       invalid: "não é válido"
