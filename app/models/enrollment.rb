@@ -10,6 +10,7 @@ class Enrollment < ActiveRecord::Base
   has_many :accomplishments, :dependent => :destroy
   has_many :phases, :through => :accomplishments
   has_many :deferrals, :dependent => :destroy
+  has_many :class_enrollments, :dependent => :destroy
 
   validates :enrollment_number, :presence => true, :uniqueness => true
   validates :level, :presence => true
