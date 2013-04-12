@@ -25,26 +25,15 @@ class Allocation < ActiveRecord::Base
 
   def scheduling_conflict_validation
     allocations = Allocation.where(:course_class_id => self.course_class, :day => self.day)
-    puts "allocations #{allocations.inspect}"
 
     if allocations and !self.start_time.blank? and !self.end_time.blank?
-      puts "dentro do if"
-      puts
       allocations.each do |allocation|
         if allocation.id != self.id
-          puts "self #{self.inspect}"
-          puts "allocation #{allocation.inspect}"
-          puts
           if self.start_time.between?(allocation.start_time, allocation.end_time)
-            puts "vou colocar erro no start time!"
-
             errors.add(:start_time, I18n.t("activerecord.errors.models.allocation.scheduling_conflict"))
-            puts "coloquei erro no start time!"
             break
           elsif self.end_time.between?(allocation.start_time, allocation.end_time)
-            puts "vou colocar erro no end time!"
             errors.add(:end_time, I18n.t("activerecord.errors.models.allocation.scheduling_conflict"))
-            puts "coloquei erro no end time!"
             break
           end
         end
