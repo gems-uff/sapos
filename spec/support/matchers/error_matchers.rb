@@ -2,7 +2,10 @@
 RSpec::Matchers.define :have_error do |erro|
 
   def error_message(record, atributo, erro)
-    I18n.translate("errors.messages.#{erro}")
+    translation_missing_message = "translation missing:"
+    message = I18n.translate("errors.messages.#{erro}")
+
+    return message.include?(translation_missing_message) ? I18n.translate("activerecord.errors.models.#{record.class.to_s.underscore}.#{erro}") : message
   end
 
   chain :on do |atributo|
