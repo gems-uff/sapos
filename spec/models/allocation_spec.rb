@@ -32,6 +32,26 @@ describe Allocation do
         end
       end
     end
+    describe "day" do
+      context "should be valid when" do
+        it "day is in the list" do
+          allocation.day = I18n.translate("date.day_names").first
+          allocation.should have(0).errors_on :day
+        end
+      end
+      context "should have error blank when" do
+        it "day is null" do
+          allocation.day = nil
+          allocation.should have_error(:blank).on :day
+        end
+      end
+      context "should have error inclusion when" do
+        it "day is not in the list" do
+          allocation.day = "ANYTHING NOT IN THE LIST"
+          allocation.should have_error(:inclusion).on :day
+        end
+      end
+    end
     describe "end_time" do
       context "should be valid when" do
         it "end_time is not null" do
