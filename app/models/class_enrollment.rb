@@ -6,6 +6,7 @@ class ClassEnrollment < ActiveRecord::Base
 
   validates :enrollment, :presence => true
   validates :course_class, :presence => true
+  validates :course_class_id, :uniqueness => {:scope => :enrollment_id}
   validates :situation, :presence => true, :inclusion => { :in => SITUATIONS }
   validates :grade, :numericality => {:greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}, :if => :grade_filled?
 
