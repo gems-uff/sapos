@@ -272,6 +272,8 @@ pt:
         allocation:
           end_time_before_start_time: "menor do que a hora de fim"
           scheduling_conflict: "este horário já está sendo usado em outra alocação da mesma turma"
+        deferral_type:
+          blank_duration: "duração deve ser de pelo menos um dia"
 
     models:
       advisement:
@@ -529,6 +531,7 @@ pt:
         duration_semesters: "Duração(períodos)"
         duration_months: "Duração(meses)"
         duration_days: "Duração(dias)"
+        duration: "Duração"
         phase: "Etapa"
       research_area:
         name: "Nome"
