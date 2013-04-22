@@ -51,4 +51,18 @@ describe PhaseDuration do
       end
     end
   end
+  describe "Methods" do
+    describe "to_label" do
+      it "should return the expected string" do
+        deadline_semesters = 1
+        deadline_months = 2
+        deadline_days = 3
+        phase_duration.deadline_semesters = deadline_semesters
+        phase_duration.deadline_months = deadline_months
+        phase_duration.deadline_days = deadline_days
+        expected = "#{deadline_semesters} períodos, #{deadline_months} meses e #{deadline_days} dias"
+        phase_duration.to_label.should eql(expected)
+      end
+    end
+  end
 end
