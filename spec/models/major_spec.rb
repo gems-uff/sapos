@@ -48,9 +48,6 @@ describe Major do
     end
   end
 
-  def to_label
-    "#{name} - #{institution.name} - (#{level.name})"
-  end
   describe "Methods" do
     describe "to_label" do
       it "should return the expected string" do
