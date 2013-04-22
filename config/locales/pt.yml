@@ -274,6 +274,8 @@ pt:
           scheduling_conflict: "este horário já está sendo usado em outra alocação da mesma turma"
         deferral_type:
           blank_duration: "duração deve ser de pelo menos um dia"
+        phase_duration:
+          blank_deadline: "prazo deve ser de pelo menos um dia"
 
     models:
       advisement:
