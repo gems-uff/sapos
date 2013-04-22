@@ -8,5 +8,6 @@ FactoryGirl.define do
     sequence :enrollment_number do |number|
       number
     end
+    admission_date YearSemester.current.semester_begin
   end
 end
