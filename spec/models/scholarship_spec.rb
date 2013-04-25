@@ -40,10 +40,10 @@ describe Scholarship do
           scholarship.should have(0).errors_on :end_date
         end
       end
-      context "should have error blank when" do
+      context "should have error on_or_after when" do
         it "start_date is greater than end_date" do
-          scholarship.start_date = Date.today
-          scholarship.end_date = 1.day.ago
+          scholarship.start_date = 2.days.from_now
+          scholarship.end_date = 2.days.ago
           scholarship.should have_error(:on_or_after).on :end_date
         end
       end
