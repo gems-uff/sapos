@@ -35,6 +35,7 @@ class Professor < ActiveRecord::Base
   end
 
   def advisements_with_points
+    #TODO Find out how to move this code to a helper
     return "-" if self.advisements.empty?
 
     body = ""
