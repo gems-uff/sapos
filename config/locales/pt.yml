@@ -251,14 +251,15 @@ pt:
         
       models:
         scholarship_duration:
+          start_date_before_scholarship_end_date: "anterior a Data de Limite de Concessão de outra alocação de bolsa"
+          start_date_before_scholarship_cancel_date: "anterior a Data de Encerramento de outra alocação de bolsa"
+          scholarship_start_date_after_end_or_cancel_date: "posterior a Data de Início de outra alocação de bolsa"
+          start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
+          start_date_after_scholarship_end_date: "da alocação de bolsa deve ser posterior a data de limite de concessão de uma alocação que não tem data de encerramento"
+          end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
+          enrollment_and_scholarship_uniqueness: "já possui uma Bolsa alocada nesse período"
           attributes:
-            start_date_before_scholarship_end_date: "anterior a Data de Limite de Concessão de outra alocação de bolsa"
-            start_date_before_scholarship_cancel_date: "anterior a Data de Encerramento de outra alocação de bolsa"
-            scholarship_start_date_after_end_or_cancel_date: "posterior a Data de Início de outra alocação de bolsa"
-            start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
-            start_date_after_scholarship_end_date: "da alocação de bolsa deve ser posterior a data de limite de concessão de uma alocação que não tem data de encerramento"
-            end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
-            entollment_and_scholarship_uniqueness: "já possui uma Bolsa alocada nesse período"
+
             cancel_date:
               on_or_before: "posterior a Data Limite de Concessão"
               on_or_after:  "anterior a Data de Início"
