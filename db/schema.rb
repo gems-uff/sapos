@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130404150706) do
+ActiveRecord::Schema.define(:version => 20130429224107) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -48,8 +48,8 @@ ActiveRecord::Schema.define(:version => 20130404150706) do
   create_table "allocations", :force => true do |t|
     t.string   "day"
     t.string   "room"
-    t.time     "start_time"
-    t.time     "end_time"
+    t.integer  "start_time"
+    t.integer  "end_time"
     t.integer  "course_class_id"
     t.datetime "created_at"
     t.datetime "updated_at"
