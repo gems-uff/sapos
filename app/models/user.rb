@@ -49,7 +49,7 @@ class User < ActiveRecord::Base
   private
 
     def password_must_be_present
-      errors.add(:password, "Missing password") unless hashed_password.present?
+      errors.add(:password, I18n.t("activerecord.errors.models.user.missing_password")) unless hashed_password.present?
     end
 
     def generate_salt

@@ -270,6 +270,7 @@ pt:
         user:
           delete: "O sistema precisa ter ao menos um usuário"
           self_delete: "Você não pode se deletar"
+          missing_password: "A senha não foi definida"
         allocation:
           end_time_before_start_time: "menor do que a hora de fim"
           scheduling_conflict: "este horário já está sendo usado em outra alocação da mesma turma"
