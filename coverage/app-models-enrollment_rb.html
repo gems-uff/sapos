@@ -28,17 +28,17 @@
         <tbody>
           <tr>
             <td class="left_align"><a href="app-models-enrollment_rb.html">app/models/enrollment.rb</a></td>
-            <td class='right_align'><tt>77</tt></td>
-            <td class='right_align'><tt>62</tt></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>31.17%</tt></div>
+            <td class='right_align'><tt>78</tt></td>
+            <td class='right_align'><tt>63</tt></td>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:31px"></div>
-            <div class="uncovered" style="width:69px"></div>
+            <div class="covered" style="width:100px"></div>
+            <div class="uncovered" style="width:0px"></div>
           </div></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>32.26%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:32px"></div>
-            <div class="uncovered" style="width:68px"></div>
+            <div class="covered" style="width:100px"></div>
+            <div class="uncovered" style="width:0px"></div>
           </div></td>
           </tr>
         </tbody>
@@ -176,13 +176,13 @@
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line21">21</a>     &quot;#{enrollment_number} - #{student.name}&quot;</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line22">22</a>   end</pre></td>
           </tr>
         
@@ -200,247 +200,247 @@
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line25">25</a>     date = Date.today if date.nil?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line26">26</a>     phases = Phase.all if phases.nil?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line27">27</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line28">28</a>     active_enrollments = Enrollment.where(&quot;enrollments.id not in (select enrollment_id from dismissals where DATE(dismissals.date) &lt;= DATE(?))&quot;, date)</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line29">29</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line30">30</a>     delayed_enrollments = []</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line31">31</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line32">32</a>     active_enrollments.each do |enrollment|</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line33">33</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line34">34</a>       accomplished_phases = Accomplishment.where(:enrollment_id =&gt; enrollment, :phase_id =&gt; phases).map { |ac| ac.phase }</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line35">35</a>       phases_duration = PhaseDuration.where(&quot;level_id = :level_id and phase_id in (:phases)&quot;, :level_id =&gt; enrollment.level_id, :phases =&gt; (phases - accomplished_phases))</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line36">36</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line37">37</a>       begin_ys = YearSemester.on_date(enrollment.admission_date)</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line38">38</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line39">39</a>       phases_duration.each do |phase_duration|</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line40">40</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line41">41</a>         phase_duration_deadline_ys = begin_ys + phase_duration.deadline_semesters</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line42">42</a>         phases_duration_deadline_months = phase_duration.deadline_months</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line43">43</a>         phases_duration_deadline_days = phase_duration.deadline_days</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line44">44</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line45">45</a>         deferral_types = DeferralType.joins(:deferrals).where(&quot;deferrals.enrollment_id = :enrollment_id and phase_id = :phase_id&quot;, :enrollment_id =&gt; enrollment.id, :phase_id =&gt; phase_duration.phase_id)</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line46">46</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line47">47</a>         final_ys = phase_duration_deadline_ys</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line48">48</a>         final_months = phases_duration_deadline_months</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line49">49</a>         final_days = phases_duration_deadline_days</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line50">50</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line51">51</a>         deferral_types.each do |deferral_type|</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line52">52</a>           final_ys.increase_semesters(deferral_type.duration_semesters)</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line53">53</a>           final_months += deferral_type.duration_months</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line54">54</a>           final_days += deferral_type.duration_days</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line55">55</a>         end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line56">56</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line57">57</a>         deadline_date = final_ys.semester_begin + final_months.months + final_days.days</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line58">58</a>         if deadline_date &lt;= date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line59">59</a>           delayed_enrollments &lt;&lt; enrollment.id</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line60">60</a>           break</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line61">61</a>         end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line62">62</a>       end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line63">63</a>     end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line64">64</a>     delayed_enrollments</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line65">65</a>   end</pre></td>
           </tr>
         
@@ -458,68 +458,74 @@
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line68">68</a>     enrollments = Enrollment.all</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line69">69</a>     enrollments_with_all_phases_accomplished = []</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line70">70</a>     enrollments.each do |enrollment|</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line71">71</a>       accomplished_phases = Accomplishment.where(&quot;enrollment_id = :enrollment_id and DATE(conclusion_date) &lt;= DATE(:conclusion_date)&quot;, :enrollment_id =&gt;enrollment.id, :conclusion_date =&gt; date).map { |ac| ac.phase }</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line71">71</a>       accomplished_phases = Accomplishment.where(&quot;enrollment_id = :enrollment_id and DATE(conclusion_date) &lt;= DATE(:conclusion_date)&quot;, :enrollment_id =&gt; enrollment.id, :conclusion_date =&gt; date).map { |ac| ac.phase }</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line72">72</a>       phases_duration = PhaseDuration.where(&quot;level_id = :level_id and phase_id not in (:accomplished_phases)&quot;,:level_id =&gt; enrollment.level_id, :accomplished_phases =&gt; accomplished_phases)</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line72">72</a>       phases_duration = PhaseDuration.where(&quot;level_id = :level_id&quot;, :level_id =&gt; enrollment.level_id).scoped</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line73">73</a>       enrollments_with_all_phases_accomplished &lt;&lt; enrollment.id if phases_duration.blank?</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line73">73</a>       phases_duration = phases_duration.where(&quot;phase_id not in (:accomplished_phases)&quot;, :accomplished_phases =&gt; accomplished_phases) unless accomplished_phases.blank?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line74">74</a>     end</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line74">74</a>       enrollments_with_all_phases_accomplished &lt;&lt; enrollment.id if phases_duration.blank?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line75">75</a>     enrollments_with_all_phases_accomplished</pre></td>
+          <tr class="inferred">
+            <td><pre><a name="line75">75</a>     end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line76">76</a>   end</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line76">76</a>     enrollments_with_all_phases_accomplished</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line77">77</a> end</pre></td>
+          <tr class="inferred">
+            <td><pre><a name="line77">77</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line78">78</a> end</pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Thu Apr 11 17:45:13 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
+    <p>Generated on Mon Apr 29 18:13:33 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
 
   </body>
 </html>

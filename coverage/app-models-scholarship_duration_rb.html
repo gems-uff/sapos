@@ -30,15 +30,15 @@
             <td class="left_align"><a href="app-models-scholarship_duration_rb.html">app/models/scholarship_duration.rb</a></td>
             <td class='right_align'><tt>113</tt></td>
             <td class='right_align'><tt>84</tt></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>31.86%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>94.69%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:32px"></div>
-            <div class="uncovered" style="width:68px"></div>
+            <div class="covered" style="width:95px"></div>
+            <div class="uncovered" style="width:5px"></div>
           </div></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>22.62%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>92.86%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:23px"></div>
-            <div class="uncovered" style="width:77px"></div>
+            <div class="covered" style="width:93px"></div>
+            <div class="uncovered" style="width:7px"></div>
           </div></td>
           </tr>
         </tbody>
@@ -87,7 +87,7 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line6">6</a>   validates :enrollment_id,  :presence =&gt; true, :uniqueness =&gt; { :message =&gt; I18n.t(&quot;activerecord.errors.models.scholarship_duration.attributes.entollment_and_scholarship_uniqueness&quot;), :if =&gt; :student_has_other_scholarship_duration }</pre></td>
+            <td><pre><a name="line6">6</a>   validates :enrollment_id,  :presence =&gt; true, :uniqueness =&gt; { :message =&gt; I18n.t(&quot;activerecord.errors.models.scholarship_duration.enrollment_and_scholarship_uniqueness&quot;), :if =&gt; :student_has_other_scholarship_duration }</pre></td>
           </tr>
         
           
@@ -153,25 +153,25 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line17">17</a>   validates_date :start_date, :on_or_after  =&gt; :scholarship_start_date, :on_or_after_message  =&gt; I18n.t(&quot;activerecord.errors.models.scholarship_duration.attributes.start_date_before_scholarship_start_date&quot;)</pre></td>
+            <td><pre><a name="line17">17</a>   validates_date :start_date, :on_or_after  =&gt; :scholarship_start_date, :on_or_after_message  =&gt; I18n.t(&quot;activerecord.errors.models.scholarship_duration.start_date_before_scholarship_start_date&quot;)</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line18">18</a>   validates_date :start_date, :on_or_before =&gt; :scholarship_end_date,   :on_or_before_message =&gt; I18n.t(&quot;activerecord.errors.models.scholarship_duration.attributes.start_date_after_scholarship_end_date&quot;)</pre></td>
+            <td><pre><a name="line18">18</a>   validates_date :start_date, :on_or_before =&gt; :scholarship_end_date,   :on_or_before_message =&gt; I18n.t(&quot;activerecord.errors.models.scholarship_duration.start_date_after_scholarship_end_date&quot;)</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line19">19</a>   validates_date :end_date,   :on_or_after  =&gt; :scholarship_start_date, :on_or_after_message  =&gt; I18n.t(&quot;activerecord.errors.models.scholarship_duration.attributes.end_date_before_scholarship_start_date&quot;)</pre></td>
+            <td><pre><a name="line19">19</a>   validates_date :end_date,   :on_or_after  =&gt; :scholarship_start_date, :on_or_after_message  =&gt; I18n.t(&quot;activerecord.errors.models.scholarship_duration.end_date_before_scholarship_start_date&quot;)</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line20">20</a>   validates_date :end_date,   :on_or_before =&gt; :scholarship_end_date,   :on_or_before_message =&gt; I18n.t(&quot;activerecord.errors.models.scholarship_duration.attributes.end_date_after_scholarship_end_date&quot;)</pre></td>
+            <td><pre><a name="line20">20</a>   validates_date :end_date,   :on_or_before =&gt; :scholarship_end_date,   :on_or_before_message =&gt; I18n.t(&quot;activerecord.errors.models.scholarship_duration.end_date_after_scholarship_end_date&quot;)</pre></td>
           </tr>
         
           
@@ -212,13 +212,13 @@
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line27">27</a>     &quot;#{start_date} - #{end_date}&quot;</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line28">28</a>   end</pre></td>
           </tr>
         
@@ -248,67 +248,67 @@
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line33">33</a>     return false if enrollment.nil?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line34">34</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line35">35</a>     #Se a bolsa é mais antiga que a atual    scholarship.start_date &lt; start_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line36">36</a>     # -&gt; scholarship.cancel_date não é nulo -&gt; scholarhsip.cancel &lt; start_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line37">37</a>     # -&gt; scholarship.cancel_date é nulo -&gt; schoarslhip.end_date &lt; start_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line38">38</a>     #Senão</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line39">39</a>     # -&gt; cancel_date não é nulo -&gt; schoarslhip.start_date &gt; cancel_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line40">40</a>     # -&gt; scholarship.cancel_date é nulo -&gt; schoarslhip.start_date &gt; end_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line41">41</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line42">42</a>     if self.id.nil?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line43">43</a>       scholarships_with_student = ScholarshipDuration.all :conditions =&gt; [&quot;enrollment_id = ?&quot;,enrollment.id]</pre></td>
           </tr>
         
@@ -332,115 +332,115 @@
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line47">47</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line48">48</a>     scholarships_with_student.each do |scholarship|</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line49">49</a>       if scholarship.start_date &lt;= start_date # se a bolsa é antiga</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line50">50</a>         if scholarship.cancel_date.nil?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line51">51</a>           return true if scholarship.end_date &gt;= start_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line52">52</a>         else</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line53">53</a>           return true if scholarship.cancel_date &gt;= start_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line54">54</a>         end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line55">55</a>       else # se a bolsa é futura</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line56">56</a>         if cancel_date.nil?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line57">57</a>           return true if scholarship.start_date &lt;= end_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line58">58</a>         else</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line59">59</a>           return true if scholarship.start_date &lt;= cancel_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line60">60</a>         end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line61">61</a>       end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line62">62</a>     end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line63">63</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line64">64</a>     false</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line65">65</a>   end</pre></td>
           </tr>
         
@@ -458,13 +458,13 @@
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line68">68</a>     if self.id.nil?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line69">69</a>       scholarships_with_student = ScholarshipDuration.all :conditions =&gt; [&quot;scholarship_id = ?&quot;, scholarship.id]</pre></td>
           </tr>
         
@@ -488,175 +488,175 @@
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line73">73</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line74">74</a>     scholarships_with_student.each do |scholarship|</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line75">75</a>       if scholarship.start_date &lt;= start_date # se a bolsa é antiga</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line76">76</a>         if scholarship.cancel_date.nil?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line77">77</a>           if scholarship.end_date &gt;= start_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line78">78</a>             errors.add(:start_date, I18n.t(&quot;activerecord.errors.models.scholarship_duration.attributes.start_date_before_scholarship_end_date&quot;))</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line78">78</a>             errors.add(:start_date, I18n.t(&quot;activerecord.errors.models.scholarship_duration.start_date_before_scholarship_end_date&quot;))</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line79">79</a>             break</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line80">80</a>           end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line81">81</a>         else</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line82">82</a>           if scholarship.cancel_date &gt;= start_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line83">83</a>             errors.add(:start_date,I18n.t(&quot;activerecord.errors.models.scholarship_duration.attributes.start_date_before_scholarship_cancel_date&quot;))</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line83">83</a>             errors.add(:start_date,I18n.t(&quot;activerecord.errors.models.scholarship_duration.start_date_before_scholarship_cancel_date&quot;))</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line84">84</a>             break</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line85">85</a>           end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line86">86</a>         end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line87">87</a>       else # se a bolsa é futura</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line88">88</a>         if cancel_date.nil?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line89">89</a>           if scholarship.start_date &lt;= end_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line90">90</a>             errors.add(:end_date,I18n.t(&quot;activerecord.errors.models.scholarship_duration.attributes.scholarship_start_date_after_end_or_cancel_date&quot;))</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line90">90</a>             errors.add(:end_date,I18n.t(&quot;activerecord.errors.models.scholarship_duration.scholarship_start_date_after_end_or_cancel_date&quot;))</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line91">91</a>             break</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line92">92</a>           end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line93">93</a>         else</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line94">94</a>           if scholarship.start_date &lt;= cancel_date</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line95">95</a>             errors.add(:cancel_date,I18n.t(&quot;activerecord.errors.models.scholarship_duration.attributes.scholarship_start_date_after_end_or_cancel_date&quot;))</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line95">95</a>             errors.add(:cancel_date,I18n.t(&quot;activerecord.errors.models.scholarship_duration.scholarship_start_date_after_end_or_cancel_date&quot;))</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line96">96</a>             break</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line97">97</a>           end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line98">98</a>         end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line99">99</a>       end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line100">100</a>     end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line101">101</a>   end</pre></td>
           </tr>
         
@@ -674,19 +674,19 @@
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line104">104</a>     finder_scholarship = Scholarship.find :last, :conditions =&gt; [&quot;id = ?&quot;,scholarship]</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line105">105</a>     finder_scholarship.end_date unless scholarship.nil?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line106">106</a>   end</pre></td>
           </tr>
         
@@ -704,38 +704,38 @@
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line109">109</a>     finder_scholarship = Scholarship.find :last, :conditions =&gt; [&quot;id = ?&quot;,scholarship]</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="marked">
             <td><pre><a name="line110">110</a>     finder_scholarship.start_date unless scholarship.nil?</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line111">111</a>   end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line112">112</a> </pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
+          <tr class="inferred">
             <td><pre><a name="line113">113</a> end</pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Thu Apr 11 17:45:13 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
+    <p>Generated on Mon Apr 29 18:13:33 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
 
   </body>
 </html>

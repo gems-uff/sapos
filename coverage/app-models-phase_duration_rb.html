@@ -28,17 +28,17 @@
         <tbody>
           <tr>
             <td class="left_align"><a href="app-models-phase_duration_rb.html">app/models/phase_duration.rb</a></td>
+            <td class='right_align'><tt>19</tt></td>
             <td class='right_align'><tt>15</tt></td>
-            <td class='right_align'><tt>12</tt></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>80.00%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:80px"></div>
-            <div class="uncovered" style="width:20px"></div>
+            <div class="covered" style="width:100px"></div>
+            <div class="uncovered" style="width:0px"></div>
           </div></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>75.00%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:75px"></div>
-            <div class="uncovered" style="width:25px"></div>
+            <div class="covered" style="width:100px"></div>
+            <div class="uncovered" style="width:0px"></div>
           </div></td>
           </tr>
         </tbody>
@@ -81,73 +81,97 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line5">5</a>   validates :deadline_semesters, :numericality =&gt; true</pre></td>
+            <td><pre><a name="line5">5</a>   validates :phase, :presence =&gt; true</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line6">6</a>   validates :deadline_months, :numericality =&gt; true</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line7">7</a>   validates :deadline_days, :numericality =&gt; true</pre></td>
+            <td><pre><a name="line6">6</a>   validates :level, :presence =&gt; true</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line8">8</a> </pre></td>
+            <td><pre><a name="line7">7</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line9">9</a>   validates :phase, :presence =&gt; true</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line10">10</a>   validates :level, :presence =&gt; true</pre></td>
+            <td><pre><a name="line8">8</a>   validate :deadline_validation</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line11">11</a> </pre></td>
+            <td><pre><a name="line9">9</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line12">12</a>   def to_label</pre></td>
+            <td><pre><a name="line10">10</a>   def to_label</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line13">13</a>     &quot;#{deadline_semesters} períodos, #{deadline_months} meses e #{deadline_days} dias&quot;</pre></td>
+          <tr class="marked">
+            <td><pre><a name="line11">11</a>     &quot;#{deadline_semesters} períodos, #{deadline_months} meses e #{deadline_days} dias&quot;</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line14">14</a>   end</pre></td>
+          <tr class="inferred">
+            <td><pre><a name="line12">12</a>   end</pre></td>
           </tr>
         
           
           
-          <tr class="uncovered">
-            <td><pre><a name="line15">15</a> end</pre></td>
+          <tr class="inferred">
+            <td><pre><a name="line13">13</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line14">14</a>   def deadline_validation</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line15">15</a>     if (([0,nil].include?(self.deadline_semesters)) &amp;&amp; ([0,nil].include?(self.deadline_months)) &amp;&amp; ([0,nil].include?(self.deadline_days)))</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line16">16</a>       errors.add(:deadline, I18n.t(&quot;activerecord.errors.models.phase_duration.blank_deadline&quot;))</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line17">17</a>     end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line18">18</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line19">19</a> end</pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Thu Apr 11 17:45:13 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
+    <p>Generated on Mon Apr 29 18:13:33 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
 
   </body>
 </html>
