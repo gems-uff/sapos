@@ -7,8 +7,6 @@ class AllocationsController < ApplicationController
 
     config.columns[:course_class].clear_link
     config.columns[:course_class].form_ui = :record_select
-    config.columns[:start_time].options = {:format => :short}
-    config.columns[:end_time].options = {:format => :short}
     config.columns[:day].form_ui = :select
     config.columns[:day].options = {:options => I18n.translate("date.day_names")}
 
