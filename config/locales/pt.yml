@@ -407,6 +407,7 @@ pt:
         professor: "Orientador"
         delayed_phase: "Etapa atrasada"
         delayed_phase_date: "em"
+        class_enrollments: "Inscrições"
       dismissal:
         date: "Data"
         dismissal_reason: "Motivo do Desligamento"
