@@ -15,10 +15,10 @@ class CourseClassesController < ApplicationController
     config.columns[:year].options = {:options => ((Date.today.year-5)..Date.today.year).map {|y| y}.reverse}
 
     config.create.columns =
-        [:name, :course, :professor, :year, :semester]
+        [:name, :course, :professor, :year, :semester, :allocations]
 
     config.update.columns =
-        [:name, :course, :professor, :class_enrollments, :allocations, :year, :semester]
+        [:name, :course, :professor, :year, :semester, :class_enrollments, :allocations]
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 end 
