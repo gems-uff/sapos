@@ -3,16 +3,25 @@ RSpec::Matchers.define :have_error do |erro|
 
   def error_message(record, atributo, erro)
     translation_missing_message = "translation missing:"
-    message = I18n.translate("errors.messages.#{erro}")
+    parametro = @parametro.nil? ?  {} : {@parametro => @valor}
+
+
+
+    message = I18n.translate("errors.messages.#{erro}", parametro)
     if message.include?(translation_missing_message)
-      message = I18n.translate("activerecord.errors.models.#{record.class.to_s.underscore}.#{erro}")
-      message = message.include?(translation_missing_message) ? I18n.translate("activerecord.errors.models.#{record.class.to_s.underscore}.attributes.#{atributo}.#{erro}") : message
+      message = I18n.translate("activerecord.errors.models.#{record.class.to_s.underscore}.#{erro}", parametro)
+      message = message.include?(translation_missing_message) ? I18n.translate("activerecord.errors.models.#{record.class.to_s.underscore}.attributes.#{atributo}.#{erro}", parametro) : message
     end
     return message
   end
 
   chain :on do |atributo|
     @atributo = atributo
+  end
+
+  chain :with_parameter do |parametro, valor|
+    @parametro = parametro.is_a?(Symbol) ? parametro : parametro.to_sym
+    @valor = valor
   end
 
   match do |record|
