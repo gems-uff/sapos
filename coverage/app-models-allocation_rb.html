@@ -28,8 +28,8 @@
         <tbody>
           <tr>
             <td class="left_align"><a href="app-models-allocation_rb.html">app/models/allocation.rb</a></td>
-            <td class='right_align'><tt>44</tt></td>
-            <td class='right_align'><tt>37</tt></td>
+            <td class='right_align'><tt>36</tt></td>
+            <td class='right_align'><tt>31</tt></td>
             <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
           <div class="percent_graph">
             <div class="covered" style="width:100px"></div>
@@ -87,13 +87,13 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line6">6</a>   validates :start_time, :presence =&gt; true</pre></td>
+            <td><pre><a name="line6">6</a>   validates :start_time, :presence =&gt; true, :numericality =&gt; { :greater_than_or_equal_to =&gt; 0, :less_than_or_equal_to =&gt; 23 }</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line7">7</a>   validates :end_time, :presence =&gt; true</pre></td>
+            <td><pre><a name="line7">7</a>   validates :end_time, :presence =&gt; true,  :numericality =&gt; { :greater_than_or_equal_to =&gt; 0, :less_than_or_equal_to =&gt; 23 }</pre></td>
           </tr>
         
           
@@ -117,211 +117,163 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line11">11</a>   before_validation :standardize_times</pre></td>
+            <td><pre><a name="line11">11</a>   private</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line12">12</a>   def start_end_time_validation</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line13">13</a>     if !self.start_time.blank? and !self.end_time.blank? and self.end_time &lt;= self.start_time</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line14">14</a>       errors.add(:start_time, I18n.t(&quot;activerecord.errors.models.allocation.end_time_before_start_time&quot;))</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line12">12</a> </pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line13">13</a>   private</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line14">14</a>   def standardize_times</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line15">15</a>     standard_date = Time.zone.parse('2000/01/01')</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line16">16</a>     self.start_time = Time.zone.parse(standard_date.strftime(&quot;%Y/%m/%d&quot;) + start_time.strftime(&quot; %H:%M:%S&quot;)) if self.start_time</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line17">17</a>     self.end_time = Time.zone.parse(standard_date.strftime(&quot;%Y/%m/%d&quot;) + end_time.strftime(&quot; %H:%M:%S&quot;)) if self.end_time</pre></td>
+            <td><pre><a name="line15">15</a>     end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line18">18</a>   end</pre></td>
+            <td><pre><a name="line16">16</a>   end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line19">19</a> </pre></td>
+            <td><pre><a name="line17">17</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line20">20</a>   def start_end_time_validation</pre></td>
+            <td><pre><a name="line18">18</a>   def scheduling_conflict_validation</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line21">21</a>     if !self.start_time.blank? and !self.end_time.blank? and self.end_time &lt;= self.start_time</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line22">22</a>       errors.add(:start_time, I18n.t(&quot;activerecord.errors.models.allocation.end_time_before_start_time&quot;))</pre></td>
+            <td><pre><a name="line19">19</a>     allocations = Allocation.where(:course_class_id =&gt; self.course_class, :day =&gt; self.day)</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line23">23</a>     end</pre></td>
+            <td><pre><a name="line20">20</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line21">21</a>     if allocations and !self.start_time.blank? and !self.end_time.blank?</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line22">22</a>       allocations.each do |allocation|</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line23">23</a>         if allocation.id != self.id</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line24">24</a>           if self.start_time.between?(allocation.start_time, allocation.end_time)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line25">25</a>             errors.add(:start_time, I18n.t(&quot;activerecord.errors.models.allocation.scheduling_conflict&quot;))</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line26">26</a>             break</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line27">27</a>           elsif self.end_time.between?(allocation.start_time, allocation.end_time)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line28">28</a>             errors.add(:end_time, I18n.t(&quot;activerecord.errors.models.allocation.scheduling_conflict&quot;))</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line29">29</a>             break</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line24">24</a>   end</pre></td>
+            <td><pre><a name="line30">30</a>           end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line25">25</a> </pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line26">26</a>   def scheduling_conflict_validation</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line27">27</a>     allocations = Allocation.where(:course_class_id =&gt; self.course_class, :day =&gt; self.day)</pre></td>
+            <td><pre><a name="line31">31</a>         end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line28">28</a> </pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line29">29</a>     if allocations and !self.start_time.blank? and !self.end_time.blank?</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line30">30</a>       allocations.each do |allocation|</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line31">31</a>         if allocation.id != self.id</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line32">32</a>           if self.start_time.between?(allocation.start_time, allocation.end_time)</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line33">33</a>             errors.add(:start_time, I18n.t(&quot;activerecord.errors.models.allocation.scheduling_conflict&quot;))</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line34">34</a>             break</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line35">35</a>           elsif self.end_time.between?(allocation.start_time, allocation.end_time)</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line36">36</a>             errors.add(:end_time, I18n.t(&quot;activerecord.errors.models.allocation.scheduling_conflict&quot;))</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line37">37</a>             break</pre></td>
+            <td><pre><a name="line32">32</a>       end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line38">38</a>           end</pre></td>
+            <td><pre><a name="line33">33</a>     end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line39">39</a>         end</pre></td>
+            <td><pre><a name="line34">34</a>   end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line40">40</a>       end</pre></td>
+            <td><pre><a name="line35">35</a> </pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line41">41</a>     end</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line42">42</a>   end</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line43">43</a> </pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line44">44</a> end</pre></td>
+            <td><pre><a name="line36">36</a> end</pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Mon Apr 29 18:13:33 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
+    <p>Generated on Mon Apr 29 22:59:33 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
 
   </body>
 </html>
