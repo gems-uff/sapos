@@ -7,11 +7,37 @@ class ClassEnrollment < ActiveRecord::Base
   validates :enrollment, :presence => true
   validates :course_class, :presence => true
   validates :course_class_id, :uniqueness => {:scope => :enrollment_id}
-  validates :situation, :presence => true, :inclusion => { :in => SITUATIONS }
+  validates :situation, :presence => true, :inclusion => {:in => SITUATIONS}
   validates :grade, :numericality => {:greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}, :if => :grade_filled?
+  validate :grade_for_situation
 
   def grade_filled?
     !grade.nil?
+  end
+
+  def course_has_grade
+    if self.try(:course_class).try(:course).try(:course_type).nil?
+      true
+    else
+      self.course_class.course.course_type.has_score
+    end
+  end
+
+  private
+  def grade_for_situation
+    if course_has_grade
+      case self.situation
+        when I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
+          self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_registered")) if !self.grade.nil?
+        when I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
+          self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_aproved")) if (self.grade.nil? || self.grade < 60)
+        when I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
+          self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_disapproved")) if (self.grade.nil? || self.grade >= 60)
+      end
+    else
+      self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_filled_for_course_without_score")) if !self.grade.nil?
+    end
+    self.errors.blank?
   end
 
 end

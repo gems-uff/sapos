@@ -274,6 +274,11 @@ pt:
         allocation:
           end_time_before_start_time: "menor do que a hora de fim"
           scheduling_conflict: "este horário já está sendo usado em outra alocação da mesma turma"
+        class_enrollment:
+          grade_for_situation_registered: "A nota deve estar em branco para situação 'Incompleto'"
+          grade_for_situation_aproved: "A nota deve ser maior ou igual a 60 para situação 'Aprovado'"
+          grade_for_situation_disapproved: "A nota deve menor que 60 para situação 'Reprovado'"
+          grade_filled_for_course_without_score: "Esta disciplina não possui nota"
         deferral_type:
           blank_duration: "duração deve ser de pelo menos um dia"
         phase_duration:
@@ -574,7 +579,7 @@ pt:
         course_class: "Turma"
         enrollment: "Matrícula"
         situations:
-          registered: "Inscrito"
+          registered: "Incompleto"
           aproved: "Aprovado"
           disapproved: "Reprovado"
       professor_research_area:
