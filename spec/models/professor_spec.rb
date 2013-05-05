@@ -40,6 +40,25 @@ describe Professor do
         end
       end
     end
+    describe "enrollment_number" do
+      context "should be valid when" do
+        it "enrollment_number is null" do
+          professor.enrollment_number = nil
+          professor.should have(0).errors_on :enrollment_number
+        end
+        it "enrollment_number is not null and not taken" do
+          professor.enrollment_number = "Professor Enrollment Number"
+          professor.should have(0).errors_on :enrollment_number
+        end
+      end
+      context "should have error taken when" do
+        it "enrollment_number is already in use" do
+          other_professor = FactoryGirl.create(:professor, :enrollment_number => "Enrollment number")
+          professor.enrollment_number = other_professor.enrollment_number
+          professor.should have_error(:taken).on :enrollment_number
+        end
+      end
+    end
   end
   describe "Methods" do
     describe "advisement_points" do

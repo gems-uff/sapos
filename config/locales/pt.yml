@@ -485,6 +485,7 @@ pt:
         advisement_authorizations: "Credenciamentos"
         scholarships: "Bolsas"
         enrollments: "Orientandos"
+        enrollment_number: "Matrícula"
         advisement_points: "Pontos de Orientação"
         advisements_with_points: "Orientandos"
         professor_research_areas: "Áreas de Pesquisa"

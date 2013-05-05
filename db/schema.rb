@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130429224107) do
+ActiveRecord::Schema.define(:version => 20130505201516) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -266,6 +266,7 @@ ActiveRecord::Schema.define(:version => 20130429224107) do
     t.string   "telephone1"
     t.string   "telephone2"
     t.string   "siape"
+    t.string   "enrollment_number"
   end
 
   add_index "professors", ["city_id"], :name => "professors_city_id_fkey"
