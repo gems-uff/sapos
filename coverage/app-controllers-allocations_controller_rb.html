@@ -28,8 +28,8 @@
         <tbody>
           <tr>
             <td class="left_align"><a href="app-controllers-allocations_controller_rb.html">app/controllers/allocations_controller.rb</a></td>
-            <td class='right_align'><tt>20</tt></td>
-            <td class='right_align'><tt>17</tt></td>
+            <td class='right_align'><tt>18</tt></td>
+            <td class='right_align'><tt>15</tt></td>
             <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
           <div class="percent_graph">
             <div class="covered" style="width:100px"></div>
@@ -111,73 +111,61 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line10">10</a>     config.columns[:start_time].options = {:format =&gt; :short}</pre></td>
+            <td><pre><a name="line10">10</a>     config.columns[:day].form_ui = :select</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line11">11</a>     config.columns[:end_time].options = {:format =&gt; :short}</pre></td>
+            <td><pre><a name="line11">11</a>     config.columns[:day].options = {:options =&gt; I18n.translate(&quot;date.day_names&quot;)}</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line12">12</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line12">12</a>     config.columns[:day].form_ui = :select</pre></td>
+            <td><pre><a name="line13">13</a>     config.columns =</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line14">14</a>         [:course_class, :day, :room, :start_time, :end_time]</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line15">15</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line16">16</a>   end</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line13">13</a>     config.columns[:day].options = {:options =&gt; I18n.translate(&quot;date.day_names&quot;)}</pre></td>
+            <td><pre><a name="line17">17</a>   record_select :per_page =&gt; 10, :search_on =&gt; [:name], :order_by =&gt; 'name', :full_text_search =&gt; true</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line14">14</a> </pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line15">15</a>     config.columns =</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line16">16</a>         [:course_class, :day, :room, :start_time, :end_time]</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line17">17</a> </pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line18">18</a>   end</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line19">19</a>   record_select :per_page =&gt; 10, :search_on =&gt; [:name], :order_by =&gt; 'name', :full_text_search =&gt; true</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line20">20</a> end</pre></td>
+            <td><pre><a name="line18">18</a> end</pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Mon Apr 29 22:59:33 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
+    <p>Generated on Thu May 02 11:10:39 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
 
   </body>
 </html>
