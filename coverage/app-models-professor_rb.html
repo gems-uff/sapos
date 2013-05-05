@@ -28,17 +28,17 @@
         <tbody>
           <tr>
             <td class="left_align"><a href="app-models-professor_rb.html">app/models/professor.rb</a></td>
-            <td class='right_align'><tt>75</tt></td>
-            <td class='right_align'><tt>59</tt></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>46.67%</tt></div>
+            <td class='right_align'><tt>76</tt></td>
+            <td class='right_align'><tt>60</tt></td>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>47.37%</tt></div>
           <div class="percent_graph">
             <div class="covered" style="width:47px"></div>
             <div class="uncovered" style="width:53px"></div>
           </div></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>40.68%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>41.67%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:41px"></div>
-            <div class="uncovered" style="width:59px"></div>
+            <div class="covered" style="width:42px"></div>
+            <div class="uncovered" style="width:58px"></div>
           </div></td>
           </tr>
         </tbody>
@@ -104,308 +104,308 @@
         
           
           
-          <tr class="inferred">
-            <td><pre><a name="line9">9</a> </pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line10">10</a> #  It was considered that active advisements were enrollments without dismissals reasons</pre></td>
-          </tr>
-        
-          
-          
           <tr class="marked">
-            <td><pre><a name="line11">11</a>   def advisement_points</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line12">12</a>     return &quot;#{0.0}&quot; if self.advisement_authorizations.empty?</pre></td>
+            <td><pre><a name="line9">9</a>   validates :enrollment_number, :uniqueness =&gt; true, :allow_blank =&gt; true</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line13">13</a> </pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line14">14</a>     enrollments = Enrollment.joins([&quot;LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id&quot;, :advisements]).</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line15">15</a>         where(&quot;advisements.professor_id = :professor_id AND dismissals.id IS NULL&quot;, :professor_id =&gt; self.id).scoped</pre></td>
+            <td><pre><a name="line10">10</a> </pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line16">16</a> </pre></td>
+            <td><pre><a name="line11">11</a> #  It was considered that active advisements were enrollments without dismissals reasons</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line17">17</a>     enrollments_with_single_advisor = enrollments.where(&quot;1 = (SELECT COUNT(*) FROM advisements WHERE advisements.enrollment_id = enrollments.id AND advisements.professor_id in (SELECT advisement_authorizations.professor_id from advisement_authorizations))&quot;)</pre></td>
+            <td><pre><a name="line12">12</a>   def advisement_points</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line13">13</a>     return &quot;#{0.0}&quot; if self.advisement_authorizations.empty?</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line18">18</a> </pre></td>
+            <td><pre><a name="line14">14</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line19">19</a>     enrollments_with_multiple_advisors = enrollments.where(&quot;1 &lt; (SELECT COUNT(*) FROM advisements WHERE advisements.enrollment_id = enrollments.id AND advisements.professor_id in (SELECT advisement_authorizations.professor_id from advisement_authorizations))&quot;)</pre></td>
+            <td><pre><a name="line15">15</a>     enrollments = Enrollment.joins([&quot;LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id&quot;, :advisements]).</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line16">16</a>         where(&quot;advisements.professor_id = :professor_id AND dismissals.id IS NULL&quot;, :professor_id =&gt; self.id).scoped</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line20">20</a> </pre></td>
+            <td><pre><a name="line17">17</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line21">21</a>     points = 0.0</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line22">22</a>     points += 0.5*enrollments_with_multiple_advisors.count + enrollments_with_single_advisor.count</pre></td>
+            <td><pre><a name="line18">18</a>     enrollments_with_single_advisor = enrollments.where(&quot;1 = (SELECT COUNT(*) FROM advisements WHERE advisements.enrollment_id = enrollments.id AND advisements.professor_id in (SELECT advisement_authorizations.professor_id from advisement_authorizations))&quot;)</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line23">23</a> </pre></td>
+            <td><pre><a name="line19">19</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line24">24</a>     &quot;#{points.to_f}&quot;</pre></td>
+            <td><pre><a name="line20">20</a>     enrollments_with_multiple_advisors = enrollments.where(&quot;1 &lt; (SELECT COUNT(*) FROM advisements WHERE advisements.enrollment_id = enrollments.id AND advisements.professor_id in (SELECT advisement_authorizations.professor_id from advisement_authorizations))&quot;)</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line25">25</a>   end</pre></td>
+            <td><pre><a name="line21">21</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line22">22</a>     points = 0.0</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line23">23</a>     points += 0.5*enrollments_with_multiple_advisors.count + enrollments_with_single_advisor.count</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line26">26</a> </pre></td>
+            <td><pre><a name="line24">24</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line27">27</a>   def advisement_points_order</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="uncovered">
-            <td><pre><a name="line28">28</a>     advisement_points.to_f</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="uncovered">
-            <td><pre><a name="line29">29</a>   end</pre></td>
+            <td><pre><a name="line25">25</a>     &quot;#{points.to_f}&quot;</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line30">30</a> </pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line31">31</a>   def advisement_point(enrollment)</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line32">32</a>     return 0.0 if self.advisement_authorizations.empty? || enrollment.advisements.where(:professor_id =&gt; self.id).empty? || enrollment.dismissal</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line33">33</a>     authorized_advisors = enrollment.advisements.joins(:professor).where(&quot;professors.id in (SELECT advisement_authorizations.professor_id from advisement_authorizations)&quot;).count</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line34">34</a>     (authorized_advisors.to_i == 1) ? 1.0 : 0.5</pre></td>
+            <td><pre><a name="line26">26</a>   end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line35">35</a>   end</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line36">36</a> </pre></td>
+            <td><pre><a name="line27">27</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line37">37</a>   def advisements_with_points</pre></td>
+            <td><pre><a name="line28">28</a>   def advisement_points_order</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line38">38</a>     #TODO Find out how to move this code to a helper</pre></td>
+            <td><pre><a name="line29">29</a>     advisement_points.to_f</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line39">39</a>     return &quot;-&quot; if self.advisements.empty?</pre></td>
+            <td><pre><a name="line30">30</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line31">31</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line32">32</a>   def advisement_point(enrollment)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line33">33</a>     return 0.0 if self.advisement_authorizations.empty? || enrollment.advisements.where(:professor_id =&gt; self.id).empty? || enrollment.dismissal</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line34">34</a>     authorized_advisors = enrollment.advisements.joins(:professor).where(&quot;professors.id in (SELECT advisement_authorizations.professor_id from advisement_authorizations)&quot;).count</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line35">35</a>     (authorized_advisors.to_i == 1) ? 1.0 : 0.5</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line36">36</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line37">37</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line38">38</a>   def advisements_with_points</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line40">40</a> </pre></td>
+            <td><pre><a name="line39">39</a>     #TODO Find out how to move this code to a helper</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line41">41</a>     body = &quot;&quot;</pre></td>
+            <td><pre><a name="line40">40</a>     return &quot;-&quot; if self.advisements.empty?</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line42">42</a>     count = 0</pre></td>
+            <td><pre><a name="line41">41</a> </pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line43">43</a>     total_point = 0.0</pre></td>
+            <td><pre><a name="line42">42</a>     body = &quot;&quot;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line44">44</a>     self.advisements.joins([:enrollment, &quot;LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id&quot;]).where(&quot;dismissals.id IS NULL&quot;).each do |advisement|</pre></td>
+            <td><pre><a name="line43">43</a>     count = 0</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line45">45</a>       count +=1;</pre></td>
+            <td><pre><a name="line44">44</a>     total_point = 0.0</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line46">46</a>       tr_class = count.even? ? &quot;even-record&quot; : &quot;&quot;</pre></td>
+            <td><pre><a name="line45">45</a>     self.advisements.joins([:enrollment, &quot;LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id&quot;]).where(&quot;dismissals.id IS NULL&quot;).each do |advisement|</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line47">47</a>       point = advisement_point(advisement.enrollment)</pre></td>
+            <td><pre><a name="line46">46</a>       count +=1;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line48">48</a>       total_point += point</pre></td>
+            <td><pre><a name="line47">47</a>       tr_class = count.even? ? &quot;even-record&quot; : &quot;&quot;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line49">49</a>       body += &quot;&lt;tr class=\&quot;record #{tr_class}\&quot;&gt;</pre></td>
+            <td><pre><a name="line48">48</a>       point = advisement_point(advisement.enrollment)</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line50">50</a>                 &lt;td&gt;#{advisement.enrollment.student.name}&lt;/td&gt;</pre></td>
+            <td><pre><a name="line49">49</a>       total_point += point</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line51">51</a>                 &lt;td&gt;#{advisement.enrollment.enrollment_number}&lt;/td&gt;</pre></td>
+            <td><pre><a name="line50">50</a>       body += &quot;&lt;tr class=\&quot;record #{tr_class}\&quot;&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line52">52</a>                 &lt;td&gt;#{point}&lt;/td&gt;</pre></td>
+            <td><pre><a name="line51">51</a>                 &lt;td&gt;#{advisement.enrollment.student.name}&lt;/td&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line53">53</a>               &lt;/tr&gt;&quot;</pre></td>
+            <td><pre><a name="line52">52</a>                 &lt;td&gt;#{advisement.enrollment.enrollment_number}&lt;/td&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line54">54</a>     end</pre></td>
+            <td><pre><a name="line53">53</a>                 &lt;td&gt;#{point}&lt;/td&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line55">55</a>     body += &quot;&lt;tr class=\&quot;record total_points\&quot;&gt;</pre></td>
+            <td><pre><a name="line54">54</a>               &lt;/tr&gt;&quot;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line56">56</a>                 &lt;td colspan=2&gt;#{I18n.t(&quot;active_scaffold.total_label&quot;)}&lt;/td&gt;</pre></td>
+            <td><pre><a name="line55">55</a>     end</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line57">57</a>                 &lt;td&gt;#{total_point}&lt;/td&gt;</pre></td>
+            <td><pre><a name="line56">56</a>     body += &quot;&lt;tr class=\&quot;record total_points\&quot;&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line58">58</a>               &lt;/tr&gt;&quot;</pre></td>
+            <td><pre><a name="line57">57</a>                 &lt;td colspan=2&gt;#{I18n.t(&quot;active_scaffold.total_label&quot;)}&lt;/td&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line59">59</a> </pre></td>
+            <td><pre><a name="line58">58</a>                 &lt;td&gt;#{total_point}&lt;/td&gt;</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line59">59</a>               &lt;/tr&gt;&quot;</pre></td>
           </tr>
         
           
@@ -417,97 +417,103 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line61">61</a>     resp = &quot;&lt;table style=\&quot;border-collapse: collapse\&quot;&gt;</pre></td>
+            <td><pre><a name="line61">61</a> </pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line62">62</a>               &lt;thead style=\&quot;color: white; font-size: 12px\&quot;&gt;</pre></td>
+            <td><pre><a name="line62">62</a>     resp = &quot;&lt;table style=\&quot;border-collapse: collapse\&quot;&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line63">63</a>                 &lt;tr&gt;</pre></td>
+            <td><pre><a name="line63">63</a>               &lt;thead style=\&quot;color: white; font-size: 12px\&quot;&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line64">64</a>                   &lt;th style=\&quot;padding-right: 15px\&quot;&gt;#{I18n.t(&quot;activerecord.attributes.advisement.student_name&quot;)}&lt;/th&gt;</pre></td>
+            <td><pre><a name="line64">64</a>                 &lt;tr&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line65">65</a>                   &lt;th style=\&quot;padding-right: 15px\&quot;&gt;#{I18n.t(&quot;activerecord.attributes.enrollment.enrollment_number&quot;)}&lt;/th&gt;</pre></td>
+            <td><pre><a name="line65">65</a>                   &lt;th style=\&quot;padding-right: 15px\&quot;&gt;#{I18n.t(&quot;activerecord.attributes.advisement.student_name&quot;)}&lt;/th&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line66">66</a>                   &lt;th style=\&quot;padding-right: 15px\&quot;&gt;#{I18n.t(&quot;activerecord.attributes.professor.advisement_points&quot;)}&lt;/th&gt;</pre></td>
+            <td><pre><a name="line66">66</a>                   &lt;th style=\&quot;padding-right: 15px\&quot;&gt;#{I18n.t(&quot;activerecord.attributes.enrollment.enrollment_number&quot;)}&lt;/th&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line67">67</a>                 &lt;/tr&gt;</pre></td>
+            <td><pre><a name="line67">67</a>                   &lt;th style=\&quot;padding-right: 15px\&quot;&gt;#{I18n.t(&quot;activerecord.attributes.professor.advisement_points&quot;)}&lt;/th&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line68">68</a>               &lt;/thead&gt;</pre></td>
+            <td><pre><a name="line68">68</a>                 &lt;/tr&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line69">69</a>               &lt;tboby class=\&quot;records\&quot;&gt;</pre></td>
+            <td><pre><a name="line69">69</a>               &lt;/thead&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line70">70</a>               #{body}</pre></td>
+            <td><pre><a name="line70">70</a>               &lt;tboby class=\&quot;records\&quot;&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line71">71</a>               &lt;/tbody&gt;</pre></td>
+            <td><pre><a name="line71">71</a>               #{body}</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line72">72</a>             &lt;/table&gt;&quot;</pre></td>
+            <td><pre><a name="line72">72</a>               &lt;/tbody&gt;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line73">73</a>     resp.html_safe</pre></td>
+            <td><pre><a name="line73">73</a>             &lt;/table&gt;&quot;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line74">74</a>   end</pre></td>
+            <td><pre><a name="line74">74</a>     resp.html_safe</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line75">75</a> end</pre></td>
+            <td><pre><a name="line75">75</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line76">76</a> end</pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Thu May 02 11:10:39 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
+    <p>Generated on Sun May 05 17:26:14 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
 
   </body>
 </html>

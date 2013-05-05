@@ -28,8 +28,8 @@
         <tbody>
           <tr>
             <td class="left_align"><a href="app-controllers-professors_controller_rb.html">app/controllers/professors_controller.rb</a></td>
-            <td class='right_align'><tt>44</tt></td>
-            <td class='right_align'><tt>42</tt></td>
+            <td class='right_align'><tt>45</tt></td>
+            <td class='right_align'><tt>43</tt></td>
             <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
           <div class="percent_graph">
             <div class="covered" style="width:100px"></div>
@@ -81,7 +81,7 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line5">5</a>     config.list.columns = [:name, :cpf, :birthdate, :advisement_points]</pre></td>
+            <td><pre><a name="line5">5</a>     config.list.columns = [:name, :cpf, :birthdate, :advisement_points, :enrollment_number]</pre></td>
           </tr>
         
           
@@ -261,67 +261,73 @@
           
           
           <tr class="inferred">
-            <td><pre><a name="line35">35</a>                            :siape,</pre></td>
+            <td><pre><a name="line35">35</a>                            :enrollment_number,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line36">36</a>                            :telephone1,</pre></td>
+            <td><pre><a name="line36">36</a>                            :siape,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line37">37</a>                            :telephone2,</pre></td>
+            <td><pre><a name="line37">37</a>                            :telephone1,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line38">38</a>                            :zip_code,</pre></td>
+            <td><pre><a name="line38">38</a>                            :telephone2,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line39">39</a>                            :scholarships,</pre></td>
+            <td><pre><a name="line39">39</a>                            :zip_code,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line40">40</a>                            :advisement_authorizations,</pre></td>
+            <td><pre><a name="line40">40</a>                            :scholarships,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line41">41</a>                            :advisements_with_points]</pre></td>
+            <td><pre><a name="line41">41</a>                            :advisement_authorizations,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line42">42</a>   end</pre></td>
+            <td><pre><a name="line42">42</a>                            :advisements_with_points]</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line43">43</a>   end</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line43">43</a>   record_select :per_page =&gt; 10, :search_on =&gt; [:name], :order_by =&gt; 'name', :full_text_search =&gt; true</pre></td>
+            <td><pre><a name="line44">44</a>   record_select :per_page =&gt; 10, :search_on =&gt; [:name], :order_by =&gt; 'name', :full_text_search =&gt; true</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line44">44</a> end</pre></td>
+            <td><pre><a name="line45">45</a> end</pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Thu May 02 11:10:39 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
+    <p>Generated on Sun May 05 17:26:14 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
 
   </body>
 </html>
