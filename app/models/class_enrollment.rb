@@ -28,14 +28,14 @@ class ClassEnrollment < ActiveRecord::Base
     if course_has_grade
       case self.situation
         when I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
-          self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_registered")) if !self.grade.nil?
+          self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_registered")) unless self.grade.blank?
         when I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
-          self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_aproved")) if (self.grade.nil? || self.grade < 60)
+          self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_aproved")) if (self.grade.blank? || self.grade < 60)
         when I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
-          self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_disapproved")) if (self.grade.nil? || self.grade >= 60)
+          self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_disapproved")) if (self.grade.blank? || self.grade >= 60)
       end
     else
-      self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_filled_for_course_without_score")) if !self.grade.nil?
+      self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_filled_for_course_without_score")) unless self.grade.blank?
     end
     self.errors.blank?
   end
