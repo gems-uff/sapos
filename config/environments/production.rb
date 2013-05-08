@@ -37,6 +37,8 @@ Sapos::Application.configure do
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
   config.action_mailer.delivery_method = :sendmail
+  config.action_mailer.default_url_options = { :host => 'sel.ic.uff.br/sapos' }
+  config.action_mailer.sendmail_settings = { :arguments => '-t -f sapos@sel.ic.uff.br', :location => '/usr/sbin/sendmail' }
 
   # Enable threaded mode
   # config.threadsafe!
