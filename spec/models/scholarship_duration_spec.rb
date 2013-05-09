@@ -166,7 +166,7 @@ describe ScholarshipDuration do
       it "should return the expected string" do
         scholarship_duration.start_date = start_date
         scholarship_duration.end_date = end_date
-        scholarship_duration.to_label.should eql("#{start_date} - #{end_date}")
+        scholarship_duration.to_label.should eql("#{I18n.localize(start_date, :format => :monthyear)} - #{I18n.localize(end_date, :format => :monthyear)}")
       end
     end
   end
