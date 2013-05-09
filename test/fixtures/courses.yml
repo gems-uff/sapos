@@ -2,10 +2,14 @@
 
 one:
   name: MyString
-  level: 
-  institution: 
+  code: MyString
+  content: MyText
+  credits: 1
+  research_area: 
 
 two:
   name: MyString
-  level: 
-  institution: 
+  code: MyString
+  content: MyText
+  credits: 1
+  research_area: 

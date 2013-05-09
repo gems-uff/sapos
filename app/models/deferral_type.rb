@@ -2,9 +2,14 @@ class DeferralType < ActiveRecord::Base
   belongs_to :phase
   has_many :deferrals
 
-  validates :duration_semesters ,:numericality => true
-  validates :duration_months ,:numericality => true
-  validates :duration_days ,:numericality => true
   validates :name, :presence => true
   validates :phase, :presence => true
+
+  validate :duration_validation
+
+  def duration_validation
+    if (([0,nil].include?(self.duration_semesters)) && ([0,nil].include?(self.duration_months)) && ([0,nil].include?(self.duration_days)))
+      errors.add(:duration, I18n.t("activerecord.errors.models.deferral_type.blank_duration"))
+    end
+  end
 end

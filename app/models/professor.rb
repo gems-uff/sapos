@@ -6,6 +6,7 @@ class Professor < ActiveRecord::Base
 
   validates :cpf, :presence => true, :uniqueness => true
   validates :name, :presence => true
+  validates :enrollment_number, :uniqueness => true, :allow_blank => true
 
 #  It was considered that active advisements were enrollments without dismissals reasons
   def advisement_points
@@ -35,6 +36,7 @@ class Professor < ActiveRecord::Base
   end
 
   def advisements_with_points
+    #TODO Find out how to move this code to a helper
     return "-" if self.advisements.empty?
 
     body = ""

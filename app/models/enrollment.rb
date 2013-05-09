@@ -10,6 +10,7 @@ class Enrollment < ActiveRecord::Base
   has_many :accomplishments, :dependent => :destroy
   has_many :phases, :through => :accomplishments
   has_many :deferrals, :dependent => :destroy
+  has_many :class_enrollments, :dependent => :destroy
 
   validates :enrollment_number, :presence => true, :uniqueness => true
   validates :level, :presence => true
@@ -67,8 +68,9 @@ class Enrollment < ActiveRecord::Base
     enrollments = Enrollment.all
     enrollments_with_all_phases_accomplished = []
     enrollments.each do |enrollment|
-      accomplished_phases = Accomplishment.where("enrollment_id = :enrollment_id and DATE(conclusion_date) <= DATE(:conclusion_date)", :enrollment_id =>enrollment.id, :conclusion_date => date).map { |ac| ac.phase }
-      phases_duration = PhaseDuration.where("level_id = :level_id and phase_id not in (:accomplished_phases)",:level_id => enrollment.level_id, :accomplished_phases => accomplished_phases)
+      accomplished_phases = Accomplishment.where("enrollment_id = :enrollment_id and DATE(conclusion_date) <= DATE(:conclusion_date)", :enrollment_id => enrollment.id, :conclusion_date => date).map { |ac| ac.phase }
+      phases_duration = PhaseDuration.where("level_id = :level_id", :level_id => enrollment.level_id).scoped
+      phases_duration = phases_duration.where("phase_id not in (:accomplished_phases)", :accomplished_phases => accomplished_phases) unless accomplished_phases.blank?
       enrollments_with_all_phases_accomplished << enrollment.id if phases_duration.blank?
     end
     enrollments_with_all_phases_accomplished

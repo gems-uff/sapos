@@ -1,0 +1,17 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  obs: MyText
+  grade: 1
+  attendance: false
+  situation: MyString
+  course_class: 
+  enrollment: 
+
+two:
+  obs: MyText
+  grade: 1
+  attendance: false
+  situation: MyString
+  course_class: 
+  enrollment: 

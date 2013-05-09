@@ -1,0 +1,2 @@
+module ProfessorResearchAreasHelper
+end

@@ -1,13 +1,9 @@
 class Course < ActiveRecord::Base
-  belongs_to :level
-  belongs_to :institution
-  has_and_belongs_to_many :students, :join_table => "courses_students"
+  belongs_to :research_area
+  belongs_to :course_type
 
-  validates :name, :presence => true
-  validates :institution, :presence => true
-  validates :level, :presence => true
-
-  def to_label
-    "#{name} - #{institution.name} - (#{level.name})"
-  end
+  validates :course_type, :presence => true
+  validates :name, :presence => true, :uniqueness => true
+  validates :code, :presence => true, :uniqueness => true
+  validates :credits, :presence => true
 end

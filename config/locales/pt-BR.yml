@@ -1,3 +1,4 @@
+# encoding utf-8
 # Sample localization file for English. Add more files in this directory for other locales.
 # See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
@@ -64,7 +65,7 @@ pt-BR:
   time:
     formats:
       default: "%A, %d de %B de %Y, %H:%M h"
-      short: "%d/%m, %H:%M h"
+      short: "%H:%M h"
       long: "%A, %d de %B de %Y, %H:%M h"
     am: ''
     pm: ''
@@ -205,6 +206,7 @@ pt-BR:
       body: "Por favor, verifique o(s) seguinte(s) campo(s):"
 
     messages: &errors_messages
+      taken: "já existe"
       inclusion: "não está incluído na lista"
       exclusion: "não está disponível"
       invalid: "não é válido"
@@ -247,14 +249,15 @@ pt-BR:
         
       models:
         scholarship_duration:
+          start_date_before_scholarship_end_date: "anterior a Data de Limite de Concessão de outra alocação de bolsa"
+          start_date_before_scholarship_cancel_date: "anterior a Data de Encerramento de outra alocação de bolsa"
+          scholarship_start_date_after_end_or_cancel_date: "posterior a Data de Início de outra alocação de bolsa"
+          start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
+          start_date_after_scholarship_end_date: "da alocação de bolsa deve ser posterior a data de limite de concessão de uma alocação que não tem data de encerramento"
+          end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
+          enrollment_and_scholarship_uniqueness: "já possui uma Bolsa alocada nesse período"
           attributes:
-            start_date_before_scholarship_end_date: "anterior a Data de Limite de Concessão de outra alocação de bolsa"
-            start_date_before_scholarship_cancel_date: "anterior a Data de Encerramento de outra alocação de bolsa"
-            scholarship_start_date_after_end_or_cancel_date: "posterior a Data de Início de outra alocação de bolsa"
-            start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
-            start_date_after_scholarship_end_date: "da alocação de bolsa deve ser posterior a data de limite de concessão de uma alocação que não tem data de encerramento"
-            end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
-            entollment_and_scholarship_uniqueness: "já possui uma Bolsa alocada nesse período"
+
             cancel_date:
               on_or_before: "posterior a Data Limite de Concessão"
               on_or_after:  "anterior a Data de Início"
@@ -265,7 +268,20 @@ pt-BR:
         user:
           delete: "O sistema precisa ter ao menos um usuário"
           self_delete: "Você não pode se deletar"
-        
+          missing_password: "A senha não foi definida"
+        allocation:
+          end_time_before_start_time: "menor do que a hora de fim"
+          scheduling_conflict: "este horário já está sendo usado em outra alocação da mesma turma"
+        class_enrollment:
+          grade_for_situation_registered: "A nota deve estar em branco para situação 'Incompleto'"
+          grade_for_situation_aproved: "A nota deve ser maior ou igual a 60 para situação 'Aprovado'"
+          grade_for_situation_disapproved: "A nota deve menor que 60 para situação 'Reprovado'"
+          grade_filled_for_course_without_score: "Esta disciplina não possui nota"
+        deferral_type:
+          blank_duration: "duração deve ser de pelo menos um dia"
+        phase_duration:
+          blank_deadline: "prazo deve ser de pelo menos um dia"
+
     models:
       advisement:
         one: "Orientação"
@@ -273,7 +289,7 @@ pt-BR:
       advisement_authorization:
         one: "Credenciamento"
         other: "Credenciamentos"
-      course: 
+      major:
         one: "Curso"
         other: "Cursos"
       sponsor:
@@ -336,9 +352,30 @@ pt-BR:
       deferral_type:
         one: "Tipo de Prorrogação"
         other: "Tipos de Prorrogação"
-        
+      research_area:
+        one: "Área de Pesquisa"
+        other: "Áreas de Pesquisa"
+      course:
+        one: "Disciplina"
+        other: "Disciplinas"
+      course_type:
+        one: "Tipo de Disciplina"
+        other: "Tipos de Disciplina"
+      course_class:
+        one: "Turma"
+        other: "Turmas"
+      allocation:
+        one: "Alocação"
+        other: "Alocações"
+      class_enrollment:
+        one: "Inscrição"
+        other: "Inscrições"
+      professor_research_area:
+        one: "Área de Pesquisa do Professor"
+        other: "Área de Pesquisa dos Professores"
+
     attributes:
-      course: 
+      major:
         name: "Nome"
         institution: "Instituição"
         level: "Nível"
@@ -351,7 +388,7 @@ pt-BR:
       institution:
         name: "Nome"
         code: "Sigla"
-        courses: "Cursos"
+        majors: "Cursos"
       dismissal_reason:
         name: "Nome"
         description: "Descrição"
@@ -373,6 +410,7 @@ pt-BR:
         professor: "Orientador"
         delayed_phase: "Etapa atrasada"
         delayed_phase_date: "em"
+        class_enrollments: "Inscrições"
       dismissal:
         date: "Data"
         dismissal_reason: "Motivo do Desligamento"
@@ -382,7 +420,7 @@ pt-BR:
         name: "Nome"
       student:
         name: "Nome"
-        courses: "Cursos"        
+        majors: "Cursos"
         cpf: "CPF"
         enrollments: "Matrículas"
         address: "Logradouro"        
@@ -445,8 +483,10 @@ pt-BR:
         advisement_authorizations: "Credenciamentos"
         scholarships: "Bolsas"
         enrollments: "Orientandos"
+        enrollment_number: "Matrícula"
         advisement_points: "Pontos de Orientação"
         advisements_with_points: "Orientandos"
+        professor_research_areas: "Áreas de Pesquisa"
       advisement:
         professor: "Orientador"
         enrollment: "Matrícula"
@@ -501,8 +541,51 @@ pt-BR:
         duration_semesters: "Duração(períodos)"
         duration_months: "Duração(meses)"
         duration_days: "Duração(dias)"
+        duration: "Duração"
         phase: "Etapa"
-        
+      research_area:
+        name: "Nome"
+        code: "Código"
+        professor_research_areas: "Professores"
+      course:
+        name: "Nome"
+        code: "Código"
+        content: "Ementa"
+        credits: "Créditos"
+        research_area: "Área de Pesquisa"
+        course_type: "Tipo de Disciplina"
+      course_type:
+        name: "Nome"
+        has_score: "Tem nota"
+      course_class:
+         name: "Nome"
+         course: "Disciplina"
+         professor: "Professor"
+         class_enrollments: "Inscrições"
+         allocations: "Alocações"
+         year: "Ano"
+         semester: "Semestre"
+      allocation:
+        day: "Dia"
+        room: "Sala"
+        start_time: "Hora de início"
+        end_time: "Hora de fim"
+        course_class: "Turma"
+      class_enrollment:
+        obs: "Observações"
+        grade: "Nota"
+        attendance: "Frequência"
+        situation: "Situação"
+        course_class: "Turma"
+        enrollment: "Matrícula"
+        situations:
+          registered: "Incompleto"
+          aproved: "Aprovado"
+          disapproved: "Reprovado"
+      professor_research_area:
+        professor: "Professor"
+        research_area: "Área de Pesquisa"
+
   active_scaffold:
     hide: "Ocultar"
     show: "Mostrar"
@@ -542,7 +625,7 @@ pt-BR:
     click_to_reset: "Clique aqui para remover o filtro criado"
     replace_with_new: ""
     
-    create_course_label: "Adicionar Curso"
+    create_major_label: "Adicionar Curso"
     create_institution_label: "Adicionar Instituição"
     create_level_label: "Adicionar Nível"
     create_sponsor_label: "Adicionar Agência de Fomento"
@@ -564,14 +647,28 @@ pt-BR:
     create_phase_label: "Adicionar Fase"
     create_deferral_label: "Adicionar Prorrogação"
     create_advisement_authorization_label: "Adicionar Credenciamento"
+    create_research_area_label: "Adicionar Área de Pesquisa"
+    create_course_label: "Adicionar Disciplina"
+    create_course_type_label: "Adicionar Tipo de Disciplina"
+    create_course_class_label: "Adicionar Turma"
+    create_allocation_label: "Adicionar Alocação"
+    create_class_enrollment_label: "Adicionar Inscrição"
+    create_professor_research_area_label: "Adicionar Área de Pesquisa do Professor"
     update_enrollment_label: "Modificar Matrícula"
-    update_course_label: "Modificar Curso"
+    update_major_label: "Modificar Curso"
     update_user_label: "Modificar Usuário"
     update_student_label: "Modificar Aluno"
     update_country_label: "Editar País"
     update_state_label: "Editar Estado"
     update_city_label: "Editar Cidade"
     update_advisement_authorization_label: "Editar Credenciamento"
+    update_research_area_label: "Editar Área de Pesquisa"
+    update_course_label: "Editar Disciplina"
+    update_course_type_label: "Editar Tipo de Disciplina"
+    update_course_class_label: "Editar Turma"
+    update_allocation_label: "Editar Alocação"
+    update_class_enrollment_label: "Editar Inscrição"
+    update_professor_research_area_label: "Área de Pesquisa do Professor"
     total_label: "Total"
 
     errors:

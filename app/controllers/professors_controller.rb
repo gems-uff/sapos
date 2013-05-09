@@ -2,7 +2,7 @@ class ProfessorsController < ApplicationController
   active_scaffold :professor do |config|
     config.columns.add :advisement_points
     config.columns.add :advisements_with_points
-    config.list.columns = [:name, :cpf, :birthdate, :advisement_points]
+    config.list.columns = [:name, :cpf, :birthdate, :advisement_points, :enrollment_number]
     config.list.sorting = {:name => 'ASC'}
     config.create.label = :create_professor_label
 #    config.create.columns = [:name, :cpf, :birthdate]
@@ -32,6 +32,7 @@ class ProfessorsController < ApplicationController
                            :identity_number,
                            :neighbourhood,
                            :sex,
+                           :enrollment_number,
                            :siape,
                            :telephone1,
                            :telephone2,

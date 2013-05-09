@@ -7,7 +7,7 @@ class Advisement < ActiveRecord::Base
 
   validates :professor_id, :uniqueness => {:scope => :enrollment_id} #A professor can't be advisor more than once of an enrollment
   validates :main_advisor, :uniqueness => {:scope => :enrollment_id}, :if => :main_advisor #only check if main_advisor is unique if the user tries to insert another main advisor
-  validates :main_advisor, :presence => true, :if => :enrollment_has_no_advisors
+  validates :main_advisor, :presence => true, :unless => :enrollment_has_advisors
 
 
   def to_label
@@ -17,7 +17,7 @@ class Advisement < ActiveRecord::Base
   #defines if an certain advisement is active (An active advisement is an advisement which the student doesn't have a dismissal reason
   def active
     return false if enrollment.nil?
-    dismissals = Dismissal.find(:all, :conditions => ["enrollment_id = ?",enrollment.id])
+    dismissals = Dismissal.where(:enrollment_id => enrollment.id)
     return dismissals.empty?
   end
  
@@ -40,7 +40,7 @@ class Advisement < ActiveRecord::Base
 
   def co_advisor
       return false if enrollment.nil?
-      co_advisors = Advisement.find(:all, :conditions => ["main_advisor = false and enrollment_id = ?", enrollment.id])
+      co_advisors = Advisement.where(:main_advisor => false, :enrollment_id => enrollment.id)
       return !co_advisors.empty?
   end
   
@@ -59,8 +59,8 @@ class Advisement < ActiveRecord::Base
     return enrollment.student.name
   end
   
-  def enrollment_has_no_advisors
-    return true if enrollment.nil?
-    Advisement.find_all_by_enrollment_id(enrollment.id).empty?
+  def enrollment_has_advisors
+    return false if enrollment.nil?
+    !Advisement.where(:enrollment_id => enrollment.id).empty?
   end
 end

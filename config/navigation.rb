@@ -99,10 +99,18 @@ SimpleNavigation::Configuration.run do |navigation|
       phases.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path, :if => can_read?(DeferralType)
     end
 
-    formacao_models = [Course, Institution]
-    primary.item :grade, 'Formação', get_path_from(formacao_models), :if => can_read?(formacao_models) do |grade|
-      grade.item :course, 'Cursos', courses_path, :if => can_read?(Course)
-      grade.item :institution, 'Instituições', institutions_path, :if => can_read?(Institution)
+    primary.item :courses, 'Disciplinas', courses_path do |courses|
+      courses.item :research_area, 'Áreas de Pesquisa', research_areas_path
+      courses.item :course, 'Disciplinas', courses_path
+      courses.item :course_type, 'Tipos de Disciplinas', course_types_path
+      courses.item :course_class, 'Turmas', course_classes_path
+      courses.item :class_enrollment, 'Inscrições', class_enrollments_path
+      courses.item :allocation, 'Alocações', allocations_path
+    end
+
+    primary.item :grade, 'Formação', majors_path do |grade|
+      grade.item :major, 'Cursos', majors_path
+      grade.item :institution, 'Instituições', institutions_path
     end
 
     localidades_models = [City, State, Country]
@@ -113,7 +121,7 @@ SimpleNavigation::Configuration.run do |navigation|
     end
 
     configuracoes_models = [User, Role]
-    primary.item :configuration, 'Configurações', get_path_from(configuracoes_models), :if => can_read?(configuracoes_models)  do |configuration|
+    primary.item :configuration, 'Configurações', get_path_from(configuracoes_models), :if => can_read?(configuracoes_models) do |configuration|
       configuration.item :user, 'Usuários', users_path, :if => can_read?(User)
       configuration.item :roles, 'Papéis', roles_path, :if => can_read?(Role)
     end
