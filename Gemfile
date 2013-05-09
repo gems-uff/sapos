@@ -28,7 +28,7 @@ gem 'prawn'
 gem 'redcarpet', '2.1.0'
 
 # Active scaffold support for Rails 3
-gem 'active_scaffold_vho'
+gem 'active_scaffold_vho', '3.0.20'
 gem 'recordselect_vho'
 
 #Date Validation Plugin
