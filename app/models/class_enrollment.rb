@@ -23,6 +23,16 @@ class ClassEnrollment < ActiveRecord::Base
     end
   end
 
+  def grade=(new_grade)
+    if new_grade.is_a?(String)
+      split = new_grade.split('.')
+      #if the string represents a float, convert the float to integer
+      #ex: if new_grade is 9.0, it will be converted to 90
+      new_grade = split[0].to_i*10 + split[1].to_i if split.size > 1
+    end
+    super(new_grade)
+  end
+
   private
   def grade_for_situation
     if course_has_grade

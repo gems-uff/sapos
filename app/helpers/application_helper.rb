@@ -1,4 +1,6 @@
 module ApplicationHelper
+  include NumbersHelper
+
   def display_none_if_logged_out
     "style='display:none;'" unless session[:user_id]
   end
