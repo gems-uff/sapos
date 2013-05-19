@@ -24,7 +24,7 @@ class ScholarshipDuration < ActiveRecord::Base
   validates_date :cancel_date,:on_or_after  => :start_date, :allow_nil => true
 
   def to_label
-    "#{start_date} - #{end_date}"
+    "#{I18n.localize(start_date, :format => :monthyear)} - #{I18n.localize(end_date, :format => :monthyear)}"
   end
 
   #this validation is only called for checking uniqueness of scholarship durations
