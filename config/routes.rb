@@ -1,6 +1,6 @@
 Sapos::Application.routes.draw do
 
-  devise_for :users
+  devise_for :users, :controllers => {:registrations => "users" }
 
   resources :professor_research_areas do
     as_routes
