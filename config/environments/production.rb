@@ -49,4 +49,9 @@ Sapos::Application.configure do
 
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
+
+  config.middleware.use ExceptionNotifier,
+    :email_prefix => "[SAPOS: Erro em Produção] ",
+    :sender_address => %{"Exception Notifier Sapos Produção" <erro-sapos@sel.ic.uff.br>},
+    :exception_recipients => %w{everton.moreth@gmail.com bschettino@id.uff.br}
 end
