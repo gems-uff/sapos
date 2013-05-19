@@ -5,12 +5,14 @@ gem "rails-erd", "~> 1.0.0"
 gem "kaminari"
 gem "automatic_foreign_key"
 
+gem 'cancan'
+gem "devise"
+
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 group :development, :test do
 	gem 'sqlite3'
-  gem 'ruby-debug'
   gem 'awesome_print'
   gem 'rspec-rails', '~> 2.0'
   gem 'factory_girl_rails', '1.7.0'

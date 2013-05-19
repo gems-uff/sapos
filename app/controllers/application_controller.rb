@@ -1,15 +1,11 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
-  
-  before_filter :remember_me_if_cookie_is_set
-  before_filter :authenticate
+
+  before_filter :authenticate_user!
   before_filter :parse_date
 
-  # disable implicit helper(:all) in rails3
   clear_helpers
 
-  #Set class variable user_id on User
-  before_filter :set_current_user_id
 
   ActiveScaffold.set_defaults do |config|
     config.ignore_columns.add [:created_at, :updated_at, :lock_version]
@@ -17,24 +13,29 @@ class ApplicationController < ActionController::Base
     config.delete.link.label = :delete_link
     config.show.link.label = :show_link
     config.update.link.label = :update_link
-    config.search.link.label = :search_link    
-    config.delete.link.confirm = :delete_message       
+    config.search.link.label = :search_link
+    config.delete.link.confirm = :delete_message
     #Faz com que a busca seja enviada ao servidor enquanto o usuário digita
-    config.search.live = true              
+    config.search.live = true
     #config.search.link.cancel = false        
   end
-  
+
   # Defines which controller and action should be shown when the base
   # URL is acessed (root route in routes.rb).
   def root
-    redirect_to :controller => 'enrollments', :action => 'index'
+    [Enrollment, Professor, ScholarshipDuration, Phase, Course, City, User].each do |model|
+      if can? :read, model
+        redirect_to(:controller => model.name.underscore.pluralize.downcase, :action => 'index') and return
+      end
+    end
+
   end
-  
+
   private
 
-  def authenticate
-    redirect_to login_url unless User.find_by_id(session[:user_id])
-  end
+  #def authenticate
+  #  redirect_to login_url unless User.find_by_id(session[:user_id])
+  #end
 
   # This application has custom values for date inputs, having month and year as default for most dates
   # here we nullify invalid dates that comes from the request
@@ -43,7 +44,7 @@ class ApplicationController < ActionController::Base
     if params[:record]
       external_key = "";
       invalid_year = false;
-      params[:record].each {|key,value|
+      params[:record].each { |key, value|
         if key.include?("1i")
           invalid_year = value.to_i < 1000
           external_key = key.split("(")[0]
@@ -51,27 +52,13 @@ class ApplicationController < ActionController::Base
 
         if invalid_year
           invalid_year = false
-          params[:record].delete_if{|key,value|
+          params[:record].delete_if { |key, value|
             key.include?(external_key)
           }
 
           params[:record][external_key] = nil
         end
       }
-    end
-  end
-
-  def set_current_user_id
-    User.set_current_user_id(session[:user_id])
-  end
-
-  def remember_me_if_cookie_is_set
-    if (cookies[:remember_me_id]   and
-        cookies[:remember_me_code] and
-        User.find( cookies[:remember_me_id]) and
-        Digest::SHA1.hexdigest( User.find( cookies[:remember_me_id] ).name )[4,18] == cookies[:remember_me_code])
-      @user = User.find( cookies[:remember_me_id] )
-      session[:user_id] = @user.id
     end
   end
 end

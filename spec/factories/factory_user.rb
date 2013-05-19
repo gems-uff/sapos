@@ -5,6 +5,7 @@ FactoryGirl.define do
     sequence :name do |name|
       "User_#{name}"
     end
-    hashed_password "password"
+    password "password"
+    role_id Role::ROLE_ADMINISTRADOR
   end
 end

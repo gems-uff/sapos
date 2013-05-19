@@ -1,19 +1,26 @@
-require 'digest/sha2'
-
 class User < ActiveRecord::Base
   validates :name, :presence => true, :uniqueness => true
-  validates :password, :confirmation => true
 
-  attr_accessor :password_confirmation
-  attr_reader   :password
+  belongs_to :role
 
-  validate :password_must_be_present
+  attr_accessible :email, :password, :password_confirmation, :remember_me
 
-  def User.authenticate(name, password)
-    if user = find_by_name(name)
-      if user.hashed_password == encrypt_password(password, user.salt)
-        user
+  devise :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,
+         :lockable
+
+  def valid_password?(password)
+    if self.hashed_password.present?
+      if User.encrypt_password(password, self.salt) == self.hashed_password
+        self.password = password
+        self.password_confirmation = password
+        self.hashed_password = nil
+        self.save!
+        true
+      else
+        false
       end
+    else
+      super
     end
   end
 
@@ -21,14 +28,9 @@ class User < ActiveRecord::Base
     Digest::SHA2.hexdigest(password + "wibble" + salt)
   end
 
-  # 'password' is a virtual attribute
-  def password=(password)
-    @password = password
-
-    if password.present?
-      generate_salt
-      self.hashed_password = self.class.encrypt_password(password, salt)
-    end
+  def reset_password!(*args)
+    self.hashed_password = nil
+    super
   end
 
   #Application need a user to log in
@@ -37,22 +39,4 @@ class User < ActiveRecord::Base
     errors.add(:base, I18n.t("activerecord.errors.models.user.delete")) if User.count == 1
     errors.blank?
   end
-
-  def current_user_id
-    @@user_id
-  end
-
-  def self.set_current_user_id(user_id)
-    @@user_id = user_id
-  end
-
-  private
-
-    def password_must_be_present
-      errors.add(:password, I18n.t("activerecord.errors.models.user.missing_password")) unless hashed_password.present?
-    end
-
-    def generate_salt
-      self.salt = self.object_id.to_s + rand.to_s
-    end
 end

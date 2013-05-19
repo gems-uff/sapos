@@ -44,36 +44,62 @@ SimpleNavigation::Configuration.run do |navigation|
     #                            when the item should be highlighted, you can set a regexp which is matched
     #                            against the current URI.
     #
-    primary.item :stud, 'Alunos', enrollments_path do |stud|
-      stud.item :student, 'Alunos', students_path
-      stud.item :dismissal, 'Desligamentos', dismissals_path
-      stud.item :enrollment, 'Matrículas', enrollments_path
-      stud.item :level, 'Níveis', levels_path
-      stud.item :dismissal_reason, 'Razões de Desligamento', dismissal_reasons_path
-      stud.item :enrollment_status, 'Tipos de Matrícula', enrollment_statuses_path
+
+    def get_path_from(models)
+      models = models.is_a?(Array) ? models : [models]
+      models.each do |model|
+        if can_read?(model, false)
+          return self.send("#{model.name.underscore.pluralize.downcase}_path")
+        end
+      end
     end
 
-    primary.item :prof, 'Professores', professors_path do |prof|
-      prof.item :professor, 'Professores', professors_path     
-      prof.item :advisement, 'Orientações', advisements_path
-      prof.item :advisement_authorizations, 'Credenciamentos', advisement_authorizations_path
+    def can_read?(models, proc = true)
+      can_read = false
+      models = models.is_a?(Array) ? models : [models]
+      models.each do |model|
+        can_read ||= can?(:read, model)
+      end
+      return can_read ? Proc.new { true } : Proc.new { false } if proc
+      can_read
     end
 
-    primary.item :scholarships, 'Bolsas', scholarship_durations_path do |scholarships|
-      scholarships.item :sponsor, 'Agências de Fomento', sponsors_path
-      scholarships.item :scholarship_duration, 'Alocação de Bolsas', scholarship_durations_path
-      scholarships.item :scholarship, 'Bolsas', scholarships_path
-      scholarships.item :scholarship_type, 'Tipos de Bolsa', scholarship_types_path
+    alunos_models = [Student, Dismissal, Enrollment, Level, DismissalReason, EnrollmentStatus]
+
+    primary.item :stud, 'Alunos', get_path_from(alunos_models), :if => can_read?(alunos_models) do |stud|
+      stud.item :student, 'Alunos', students_path, :if => can_read?(Student)
+      stud.item :dismissal, 'Desligamentos', dismissals_path, :if => can_read?(Dismissal)
+      stud.item :enrollment, 'Matrículas', enrollments_path, :if => can_read?(Enrollment)
+      stud.item :level, 'Níveis', levels_path, :if => can_read?(Level)
+      stud.item :dismissal_reason, 'Razões de Desligamento', dismissal_reasons_path, :if => can_read?(DismissalReason)
+      stud.item :enrollment_status, 'Tipos de Matrícula', enrollment_statuses_path, :if => can_read?(EnrollmentStatus)
     end
 
-    primary.item :phases, 'Etapas', phases_path do |phases|
-      phases.item :deferral, 'Prorrogações Concedidas', deferrals_path
-      phases.item :accomplishment, 'Realizações de Etapas', accomplishments_path
-      phases.item :phase, 'Tipos de Etapas', phases_path
-      phases.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path
+
+    professores_models = [Professor, Advisement, AdvisementAuthorization]
+    primary.item :prof, 'Professores', get_path_from(professores_models), :if => can_read?(professores_models) do |prof|
+      prof.item :professor, 'Professores', professors_path, :if => can_read?(Professor)
+      prof.item :advisement, 'Orientações', advisements_path, :if => can_read?(Advisement)
+      prof.item :advisement_authorizations, 'Credenciamentos', advisement_authorizations_path, :if => can_read?(AdvisementAuthorization)
     end
 
-    primary.item :courses, 'Disciplinas',courses_path do |courses|
+    bolsas_models = [Scholarship, ScholarshipType, ScholarshipDuration]
+    primary.item :scholarships, 'Bolsas', get_path_from(bolsas_models), :if => can_read?(bolsas_models) do |scholarships|
+      scholarships.item :sponsor, 'Agências de Fomento', sponsors_path, :if => can_read?(Sponsor)
+      scholarships.item :scholarship_duration, 'Alocação de Bolsas', scholarship_durations_path, :if => can_read?(ScholarshipDuration)
+      scholarships.item :scholarship, 'Bolsas', scholarships_path, :if => can_read?(Scholarship)
+      scholarships.item :scholarship_type, 'Tipos de Bolsa', scholarship_types_path, :if => can_read?(ScholarshipType)
+    end
+
+    etapas_models = [Deferral, Accomplishment, Phase, DeferralType]
+    primary.item :phases, 'Etapas', get_path_from(etapas_models), :if => can_read?(etapas_models) do |phases|
+      phases.item :deferral, 'Prorrogações Concedidas', deferrals_path, :if => can_read?(Deferral)
+      phases.item :accomplishment, 'Realizações de Etapas', accomplishments_path, :if => can_read?(Accomplishment)
+      phases.item :phase, 'Tipos de Etapas', phases_path, :if => can_read?(Phase)
+      phases.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path, :if => can_read?(DeferralType)
+    end
+
+    primary.item :courses, 'Disciplinas', courses_path do |courses|
       courses.item :research_area, 'Áreas de Pesquisa', research_areas_path
       courses.item :course, 'Disciplinas', courses_path
       courses.item :course_type, 'Tipos de Disciplinas', course_types_path
@@ -87,19 +113,24 @@ SimpleNavigation::Configuration.run do |navigation|
       grade.item :institution, 'Instituições', institutions_path
     end
 
-    primary.item :locations, 'Localidades', cities_path do |locations|
-      locations.item :city, 'Cidades', cities_path
-      locations.item :state, 'Estados', states_path
-      locations.item :country, 'Países', countries_path
+    localidades_models = [City, State, Country]
+    primary.item :locations, 'Localidades', get_path_from(localidades_models), :if => can_read?(localidades_models) do |locations|
+      locations.item :city, 'Cidades', cities_path, :if => can_read?(City)
+      locations.item :state, 'Estados', states_path, :if => can_read?(State)
+      locations.item :country, 'Países', countries_path, :if => can_read?(Country)
     end
 
-    primary.item :configuration, 'Configurações', users_path do |configuration|
-      configuration.item :user, 'Usuários', users_path
+    configuracoes_models = [User, Role]
+    primary.item :configuration, 'Configurações', get_path_from(configuracoes_models), :if => can_read?(configuracoes_models) do |configuration|
+      configuration.item :user, 'Usuários', users_path, :if => can_read?(User)
+      configuration.item :roles, 'Papéis', roles_path, :if => can_read?(Role)
     end
+
+    primary.item :logout, 'Logout', destroy_user_session_path
 
     # Add an item which has a sub navigation (same params, but with block)
     #primary.item :key_2, 'name', url, options do |sub_nav|
-      # Add an item to the sub navigation (same params again)
+    # Add an item to the sub navigation (same params again)
     #  sub_nav.item :key_2_1, 'name', url, options
     #end
 

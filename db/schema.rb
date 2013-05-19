@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130505201516) do
+ActiveRecord::Schema.define(:version => 20130508231824) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -266,15 +266,40 @@ ActiveRecord::Schema.define(:version => 20130505201516) do
     t.string   "telephone1"
     t.string   "telephone2"
     t.string   "siape"
+    t.integer  "user_id"
     t.string   "enrollment_number"
   end
 
   add_index "professors", ["city_id"], :name => "professors_city_id_fkey"
   add_index "professors", ["state_id"], :name => "professors_state_id_fkey"
+  add_index "professors", ["user_id"], :name => "professors_user_id_fkey"
+
+  create_table "queries", :force => true do |t|
+    t.string   "querystring", :limit => 2000
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "query_variables", :force => true do |t|
+    t.integer  "query_id"
+    t.string   "name"
+    t.string   "value"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "query_variables", ["query_id"], :name => "query_variables_query_id_fkey"
 
   create_table "research_areas", :force => true do |t|
     t.string   "name"
     t.string   "code"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "roles", :force => true do |t|
+    t.string   "name",        :limit => 50, :null => false
+    t.string   "description",               :null => false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -371,7 +396,27 @@ ActiveRecord::Schema.define(:version => 20130505201516) do
     t.string   "salt"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "unconfirmed_email"
+    t.string   "email",                  :default => "", :null => false
+    t.string   "encrypted_password",     :default => "", :null => false
+    t.string   "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",          :default => 0
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.string   "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.integer  "failed_attempts",        :default => 0
+    t.string   "unlock_token"
+    t.datetime "locked_at"
+    t.integer  "role_id",                :default => 1,  :null => false
   end
+
+  add_index "users", ["role_id"], :name => "users_role_id_fkey"
 
   add_foreign_key "accomplishments", ["enrollment_id"], "enrollments", ["id"], :name => "accomplishments_enrollment_id_fkey"
   add_foreign_key "accomplishments", ["phase_id"], "phases", ["id"], :name => "accomplishments_phase_id_fkey"
@@ -421,6 +466,9 @@ ActiveRecord::Schema.define(:version => 20130505201516) do
 
   add_foreign_key "professors", ["city_id"], "cities", ["id"], :name => "professors_city_id_fkey"
   add_foreign_key "professors", ["state_id"], "states", ["id"], :name => "professors_state_id_fkey"
+  add_foreign_key "professors", ["user_id"], "users", ["id"], :name => "professors_user_id_fkey"
+
+  add_foreign_key "query_variables", ["query_id"], "queries", ["id"], :name => "query_variables_query_id_fkey"
 
   add_foreign_key "scholarship_durations", ["enrollment_id"], "enrollments", ["id"], :name => "scholarship_durations_enrollment_id_fkey"
   add_foreign_key "scholarship_durations", ["scholarship_id"], "scholarships", ["id"], :name => "scholarship_durations_scholarship_id_fkey"
@@ -435,5 +483,7 @@ ActiveRecord::Schema.define(:version => 20130505201516) do
   add_foreign_key "students", ["city_id"], "cities", ["id"], :name => "students_city_id_fkey"
   add_foreign_key "students", ["country_id"], "countries", ["id"], :name => "students_country_id_fkey"
   add_foreign_key "students", ["state_id"], "states", ["id"], :name => "students_state_id_fkey"
+
+  add_foreign_key "users", ["role_id"], "roles", ["id"], :name => "users_role_id_fkey"
 
 end
