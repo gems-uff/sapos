@@ -9,20 +9,4 @@ class UsersController < ApplicationController
     config.columns[:password].form_ui = :password
     config.columns[:password_confirmation].form_ui = :password
   end
-
-  def update_authorized?(record=nil)
-    can? :update, record
-  end
-
-  def create_authorized?(record=nil)
-    can? :create, record
-  end
-
-  def show_authorized?(record=nil)
-    can? :read, record
-  end
-
-  def delete_authorized?(record=nil)
-    can? :delete, record
-  end
 end

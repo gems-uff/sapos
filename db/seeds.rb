@@ -31,12 +31,10 @@ DismissalReason.create(:name => "Especial -> Regular", :description => "Aluno fo
 [
     {:id => 1, :name => 'Desconhecido', :description => 'Desconhecido'},
     {:id => 2, :name => 'Coordenação', :description => 'Coordenação'},
-    {:id => 3, :name => 'Secretaria de bolsas', :description => 'Secretaria de bolsas'},
-    {:id => 4, :name => 'Secretaria de matrículas', :description => 'Secretaria de matrículas'},
-    {:id => 5, :name => 'Secretaria de Manutenção de Matrícula', :description => 'Secretaria de Manutenção de Matrícula'},
-    {:id => 6, :name => 'Professor', :description => 'Professor'},
-    {:id => 7, :name => 'Aluno', :description => 'Aluno'},
-    {:id => 8, :name => 'Administrador', :description => 'Administrador'}
+    {:id => 3, :name => 'Secretaria', :description => 'Secretaria'},
+    {:id => 4, :name => 'Professor', :description => 'Professor'},
+    {:id => 5, :name => 'Aluno', :description => 'Aluno'},
+    {:id => 6, :name => 'Administrador', :description => 'Administrador'}
 ].each do |role|
   current_role = Role.find_by_id(role[:id])
   if current_role

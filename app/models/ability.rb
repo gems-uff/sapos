@@ -1,6 +1,15 @@
 class Ability
   include CanCan::Ability
 
+  ALL_MODELS = [Accomplishment, Advisement, AdvisementAuthorization, Allocation,
+                City, ClassEnrollment, Country, Course, CourseClass, CourseType,
+                Deferral, DeferralType, Dismissal, DismissalReason, Enrollment,
+                EnrollmentStatus, Institution, Level, Major, Phase, PhaseDuration,
+                Professor, ProfessorResearchArea, Role, Scholarship,
+                ScholarshipDuration, ScholarshipType, Sponsor, State, Student,
+                User, YearSemester]
+
+
   def initialize(user)
     alias_action :list, :row, :show_search, :render_field, :to => :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing, :to => :update
@@ -10,21 +19,16 @@ class Ability
 
     role_id = user.role_id
 
+
     if role_id == Role::ROLE_ADMINISTRADOR
       can :manage, :all
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, :all
     elsif role_id == Role::ROLE_PROFESSOR
       can :read, :all
-    elsif role_id == Role::ROLE_SECRETARIA_BOLSAS
-      can :read, :all
-      can :update, [Scholarship, ScholarshipDuration]
-    elsif role_id == Role::ROLE_SECRETARIA_MATRICULAS
-      can :read, :all
-      can :update , [Student, Enrollment, Dismissal, Institution]
-    elsif role_id == Role::ROLE_SECRETARIA_MANUTENCAO_MATRICULAS
-      can :read, :all
-      can :update, [Deferral, Accomplishment]
+    elsif role_id == Role::ROLE_SECRETARIA
+      can :read, User
+      can :manage, (Ability::ALL_MODELS - [User])
     end
 
     # Define abilities for the passed in user here. For example:
