@@ -42,4 +42,20 @@ class ProfessorsController < ApplicationController
                            :advisements_with_points]
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
+
+  def update_authorized?(record=nil)
+    can? :update, record
+  end
+
+  def create_authorized?(record=nil)
+    can? :create, record
+  end
+
+  def show_authorized?(record=nil)
+    can? :read, record
+  end
+
+  def delete_authorized?(record=nil)
+    can? :delete, record
+  end
 end

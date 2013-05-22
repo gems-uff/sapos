@@ -2,9 +2,7 @@
 # Sample localization file for English. Add more files in this directory for other locales.
 # See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
 
-pt: 
-  
-        
+pt-BR:
   # formatos de data e hora
   date:
     formats:
@@ -504,6 +502,7 @@ pt:
         level: "Nível"
       user:
         name: "Nome do usuário"
+        role: Papel
         password: "Senha"
         password_confirmation: "Digite a senha novamente"
       country:

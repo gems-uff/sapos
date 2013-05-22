@@ -9,7 +9,7 @@ class ScholarshipDurationsController < ApplicationController
     #virtual columns for advanced search
     config.columns.add :adviser, :sponsors, :scholarship_types, :active, :level
 
-    config.field_search.columns = [:scholarship, :start_date, :end_date, :cancel_date,:enrollment, :adviser, :sponsors, :scholarship_types, :level, :active]
+    config.field_search.columns = [:scholarship, :start_date, :end_date, :cancel_date, :enrollment, :adviser, :sponsors, :scholarship_types, :level, :active]
     config.columns[:start_date].search_sql = 'scholarship_durations.start_date'
     config.columns[:end_date].search_sql = 'scholarship_durations.end_date'
     config.columns[:cancel_date].search_sql = 'scholarship_durations.cancel_date'
@@ -27,7 +27,7 @@ class ScholarshipDurationsController < ApplicationController
     config.list.sorting = {:scholarship => 'ASC'}
     config.list.columns = [:scholarship, :start_date, :cancel_date, :end_date, :enrollment]
     config.create.label = :create_scholarship_duration_label
-    config.columns = [:scholarship,:enrollment,:start_date,:cancel_date,:end_date,:obs]
+    config.columns = [:scholarship, :enrollment, :start_date, :cancel_date, :end_date, :obs]
     config.columns[:scholarship].search_sql = 'scholarships.scholarship_number'
     config.columns[:scholarship].sort_by :sql => 'scholarships.scholarship_number'
     config.columns[:scholarship].form_ui = :record_select
@@ -48,7 +48,7 @@ class ScholarshipDurationsController < ApplicationController
              WHERE professors.id = ?
 	         )"
 
-    [sql,value]
+    [sql, value]
   end
 
   def self.condition_for_sponsors_column(column, value, like_pattern)
@@ -60,14 +60,14 @@ class ScholarshipDurationsController < ApplicationController
             WHERE sponsors.id = ?
           )"
 
-    [sql,value]
+    [sql, value]
   end
 
 
   def self.condition_for_scholarship_types_column(column, value, like_pattern)
     sql = "scholarships.scholarship_type_id = ?"
 
-    [sql,value]
+    [sql, value]
   end
 
   def self.condition_for_active_column(column, value, like_pattern)
@@ -82,7 +82,7 @@ class ScholarshipDurationsController < ApplicationController
         sql = ""
     end
 
-    [sql,Time.now,Time.now]
+    [sql, Time.now, Time.now]
   end
 
   def self.condition_for_level_column(column, value, like_pattern)
@@ -90,15 +90,15 @@ class ScholarshipDurationsController < ApplicationController
       SELECT scholarships.id
       FROM   scholarships
       WHERE  scholarships.level_id = ?
-    )",value]
+    )", value]
   end
 
   def self.condition_for_start_date_column(column, value, like_pattern)
     month = value[:month].empty? ? 1 : value[:month]
-    year = value[:year].empty?  ? 1 : value[:year]
+    year = value[:year].empty? ? 1 : value[:year]
 
     if year != 1
-      date = Date.new(year.to_i,month.to_i)
+      date = Date.new(year.to_i, month.to_i)
 
       ["#{column.search_sql} >= ?", date]
     end
@@ -106,10 +106,10 @@ class ScholarshipDurationsController < ApplicationController
 
   def self.condition_for_end_date_column(column, value, like_pattern)
     month = value[:month].empty? ? 1 : value[:month]
-    year = value[:year].empty?  ? 1 : value[:year]
+    year = value[:year].empty? ? 1 : value[:year]
 
     if year != 1
-      date = Date.new(year.to_i,month.to_i)
+      date = Date.new(year.to_i, month.to_i)
 
       ["#{column.search_sql} >= ?", date]
     end
@@ -117,10 +117,10 @@ class ScholarshipDurationsController < ApplicationController
 
   def self.condition_for_cancel_date_column(column, value, like_pattern)
     month = value[:month].empty? ? 1 : value[:month]
-    year = value[:year].empty?  ? 1 : value[:year]
+    year = value[:year].empty? ? 1 : value[:year]
 
     if year != 1
-      date = Date.new(year.to_i,month.to_i)
+      date = Date.new(year.to_i, month.to_i)
 
       ["#{column.search_sql} >= ?", date]
     end
@@ -149,16 +149,16 @@ class ScholarshipDurationsController < ApplicationController
                "<b>Data de Limite de Concessão</b>",
                "<b>Data de Encerramento</b>",
                "<b>Matrícula</b>"]]
-    pdf.table( header, :column_widths => [108, 108, 108, 108, 108],
-               :row_colors => ["BFBFBF"],
-               :cell_style => { :font => "Courier",
-                                :size => 10,
-                                :inline_format => true,
-                                :border_width => 0
-               }
+    pdf.table(header, :column_widths => [108, 108, 108, 108, 108],
+              :row_colors => ["BFBFBF"],
+              :cell_style => {:font => "Courier",
+                              :size => 10,
+                              :inline_format => true,
+                              :border_width => 0
+              }
     )
 
-    each_record_in_page{}
+    each_record_in_page {}
     scholarship_durations_list = find_page(:sorting => active_scaffold_config.list.user.sorting).items
 
     scholarship_durations = scholarship_durations_list.map do |scp|
@@ -171,15 +171,31 @@ class ScholarshipDurationsController < ApplicationController
       ]
     end
 
-    pdf.table( scholarship_durations, :column_widths => [108, 108, 108, 108, 108],
-               :row_colors => ["FFFFFF","F0F0F0"],
-               :cell_style => { :font => "Courier",
-                                :size => 8,
-                                :inline_format => true,
-                                :border_width => 0
-               }
+    pdf.table(scholarship_durations, :column_widths => [108, 108, 108, 108, 108],
+              :row_colors => ["FFFFFF", "F0F0F0"],
+              :cell_style => {:font => "Courier",
+                              :size => 8,
+                              :inline_format => true,
+                              :border_width => 0
+              }
     )
 
-    send_data(pdf.render, :filename => 'relatorio.pdf', :type =>'application/pdf')
+    send_data(pdf.render, :filename => 'relatorio.pdf', :type => 'application/pdf')
+  end
+
+  def update_authorized?(record=nil)
+    can? :update, record
+  end
+
+  def create_authorized?(record=nil)
+    can? :create, record
+  end
+
+  def show_authorized?(record=nil)
+    can? :read, record
+  end
+
+  def delete_authorized?(record=nil)
+    can? :delete, record
   end
 end 

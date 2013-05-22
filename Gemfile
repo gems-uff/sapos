@@ -5,12 +5,14 @@ gem "rails-erd", "~> 1.0.0"
 gem "kaminari"
 gem "automatic_foreign_key"
 
+gem 'cancan'
+gem "devise"
+
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 group :development, :test do
 	gem 'sqlite3'
-  gem 'ruby-debug'
   gem 'awesome_print'
   gem 'rspec-rails', '~> 2.0'
   gem 'factory_girl_rails', '1.7.0'
@@ -19,6 +21,7 @@ end
 
 group :production, :staging do
 	gem 'mysql2', '0.2.11'
+	gem 'exception_notification', '2.6.1', :require => 'exception_notifier'
 end
 
 # Prawn to PDF
@@ -28,8 +31,8 @@ gem 'prawn'
 gem 'redcarpet', '2.1.0'
 
 # Active scaffold support for Rails 3
-gem 'active_scaffold_vho', '3.0.21'
-gem 'recordselect_vho'
+gem 'active_scaffold'
+gem 'recordselect'
 
 #Date Validation Plugin
 gem 'validates_timeliness', '~> 3.0.2'

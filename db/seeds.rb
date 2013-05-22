@@ -5,9 +5,9 @@
 #
 # Examples:
 #
-#   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
-#   Mayor.create(:name => 'Daley', :city => cities.first)
-User.create(:name => 'admin', :password => 'admin')
+#   cities = City.create([{ :name => 'Chicago', :description =>'Chicago' }, { :name => 'Copenhagen', :description =>'Copenhagen' }])
+#   Mayor.create(:name => 'Daley', :description =>'Daley', :city => cities.first)
+User.create(:name => 'admin', :description => 'admin', :password => 'admin')
 
 Sponsor.create(:name => "CAPES")
 Sponsor.create(:name => "CNPq")
@@ -27,3 +27,25 @@ DismissalReason.create(:name => "Rendimento", :description => "Aluno não cumpri
 DismissalReason.create(:name => "Desistência", :description => "Aluno desistiu")
 DismissalReason.create(:name => "Prazo", :description => "Prazo para defesa esgotado")
 DismissalReason.create(:name => "Especial -> Regular", :description => "Aluno foi admitido como aluno regular")
+
+[
+    {:id => 1, :name => 'Desconhecido', :description => 'Desconhecido'},
+    {:id => 2, :name => 'Coordenação', :description => 'Coordenação'},
+    {:id => 3, :name => 'Secretaria', :description => 'Secretaria'},
+    {:id => 4, :name => 'Professor', :description => 'Professor'},
+    {:id => 5, :name => 'Aluno', :description => 'Aluno'},
+    {:id => 6, :name => 'Administrador', :description => 'Administrador'}
+].each do |role|
+  current_role = Role.find_by_id(role[:id])
+  if current_role
+    current_role.name = role[:name]
+    current_role.description = role[:description]
+    current_role.save!
+  else
+    Role.new do |r|
+      r.id = role[:id]
+      r.name = role[:name]
+      r.description = role[:description]
+    end.save!
+  end
+end

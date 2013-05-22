@@ -2,7 +2,7 @@ class StudentsController < ApplicationController
   active_scaffold :student do |config|
     config.list.sorting = {:name => 'ASC'}
     config.list.columns = [:name, :cpf, :enrollments]
-    config.create.label = :create_student_label   
+    config.create.label = :create_student_label
     config.update.label = :update_student_label
 
 #    config.columns[:birthdate].form_ui = :calendar_date_select         
@@ -13,36 +13,53 @@ class StudentsController < ApplicationController
     config.columns[:birthplace].form_ui = :select
     config.columns[:majors].form_ui = :record_select
     config.columns[:sex].form_ui = :select
-    config.columns[:sex].options = {:options => [['Masculino','M'],['Feminino','F']]}
+    config.columns[:sex].options = {:options => [['Masculino', 'M'], ['Feminino', 'F']]}
     config.columns[:birthdate].options = {'date:yearRange' => 'c-100:c'}
-    config.columns[:civil_status].options = {:options => ['Solteiro(a)','Casado(a)']}
+    config.columns[:civil_status].options = {:options => ['Solteiro(a)', 'Casado(a)']}
     config.columns[:enrollments].clear_link
-    
+
     config.columns =
-       [:name,
-        :sex,
-        :civil_status,        
-        :birthdate,
-        :state,
-        :city,
-        :neighbourhood,
-        :address,
-        :zip_code,
-        :telephone1,
-        :telephone2,
-        :email,
-        :employer,
-        :job_position,
-        :cpf,
-        :identity_number,
-        :identity_issuing_body,
-        :identity_expedition_date,
-        :country,
-        :birthplace,
-        :father_name,
-        :mother_name,
-        :obs,
-        :majors]
-  end          
+        [:name,
+         :sex,
+         :civil_status,
+         :birthdate,
+         :state,
+         :city,
+         :neighbourhood,
+         :address,
+         :zip_code,
+         :telephone1,
+         :telephone2,
+         :email,
+         :employer,
+         :job_position,
+         :cpf,
+         :identity_number,
+         :identity_issuing_body,
+         :identity_expedition_date,
+         :country,
+         :birthplace,
+         :father_name,
+         :mother_name,
+         :obs,
+         :majors]
+  end
+
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
+
+  def update_authorized?(record=nil)
+    can? :update, record
+  end
+
+  def create_authorized?(record=nil)
+    can? :create, record
+  end
+
+  def show_authorized?(record=nil)
+    can? :read, record
+  end
+
+  def delete_authorized?(record=nil)
+    can? :delete, record
+  end
 end 
