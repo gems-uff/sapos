@@ -5,7 +5,7 @@ class Ability
                 City, ClassEnrollment, Country, Course, CourseClass, CourseType,
                 Deferral, DeferralType, Dismissal, DismissalReason, Enrollment,
                 EnrollmentStatus, Institution, Level, Major, Phase, PhaseDuration,
-                Professor, ProfessorResearchArea, Role, Scholarship,
+                Professor, ProfessorResearchArea, ResearchArea, Role, Scholarship,
                 ScholarshipDuration, ScholarshipType, Sponsor, State, Student,
                 User, YearSemester]
 
@@ -25,9 +25,8 @@ class Ability
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, :all
     elsif role_id == Role::ROLE_PROFESSOR
-      can :read, :all
+      can :read, (Ability::ALL_MODELS - [User])
     elsif role_id == Role::ROLE_SECRETARIA
-      can :read, User
       can :manage, (Ability::ALL_MODELS - [User])
     end
 
