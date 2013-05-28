@@ -10,6 +10,7 @@ class ClassEnrollment < ActiveRecord::Base
   validates :situation, :presence => true, :inclusion => {:in => SITUATIONS}
   validates :grade, :numericality => {:greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}, :if => :grade_filled?
   validate :grade_for_situation
+  validate :disapproved_by_absence_for_situation
 
   def grade_filled?
     !grade.nil?
@@ -46,6 +47,16 @@ class ClassEnrollment < ActiveRecord::Base
       end
     else
       self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_filled_for_course_without_score")) unless self.grade.blank?
+    end
+    self.errors.blank?
+  end
+
+  def disapproved_by_absence_for_situation
+    case self.situation
+      when I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
+        self.errors.add(:disapproved_by_absence, I18n.translate("activerecord.errors.models.class_enrollment.disapproved_by_absence_for_situation_registered")) if self.disapproved_by_absence
+      when I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
+        self.errors.add(:disapproved_by_absence, I18n.translate("activerecord.errors.models.class_enrollment.disapproved_by_absence_for_situation_aproved")) if self.disapproved_by_absence
     end
     self.errors.blank?
   end

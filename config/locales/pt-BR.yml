@@ -277,6 +277,8 @@ pt-BR:
           grade_for_situation_aproved: "A nota deve ser maior ou igual a 60 para situação 'Aprovado'"
           grade_for_situation_disapproved: "A nota deve menor que 60 para situação 'Reprovado'"
           grade_filled_for_course_without_score: "Esta disciplina não possui nota"
+          disapproved_by_absence_for_situation_registered: "deve estar desmarcado para situação 'Incompleto'"
+          disapproved_by_absence_for_situation_aproved: "deve estar desmarcado para situação'Aprovado'"
         deferral_type:
           blank_duration: "duração deve ser de pelo menos um dia"
         phase_duration:

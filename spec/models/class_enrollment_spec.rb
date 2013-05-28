@@ -33,8 +33,8 @@ describe ClassEnrollment do
       end
       context "should have error taken when" do
         it "course_class is already assigned for the same enrollment" do
-          course_class =  FactoryGirl.create(:course_class)
-          enrollment =  FactoryGirl.create(:enrollment)
+          course_class = FactoryGirl.create(:course_class)
+          enrollment = FactoryGirl.create(:enrollment)
           FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => course_class)
 
           class_enrollment.course_class = course_class
@@ -132,6 +132,44 @@ describe ClassEnrollment do
           class_enrollment.grade = 59
           class_enrollment.stub!(:course_has_grade).and_return(false)
           class_enrollment.should have_error(:grade_filled_for_course_without_score).on :grade
+        end
+      end
+    end
+    describe "disapproved_by_absence for situation" do
+      context "should be valid when" do
+        it "situation is registered and disapproved_by_absence is false" do
+          class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
+          class_enrollment.disapproved_by_absence = false
+          class_enrollment.should have(0).errors_on :disapproved_by_absence
+        end
+        it "situation is aproved and disapproved_by_absence is false" do
+          class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
+          class_enrollment.disapproved_by_absence = false
+          class_enrollment.should have(0).errors_on :disapproved_by_absence
+        end
+        it "situation is disapproved and disapproved_by_absence is false" do
+          class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
+          class_enrollment.disapproved_by_absence = false
+          class_enrollment.should have(0).errors_on :disapproved_by_absence
+        end
+        it "situation is disapproved and disapproved_by_absence is true" do
+          class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
+          class_enrollment.disapproved_by_absence = true
+          class_enrollment.should have(0).errors_on :disapproved_by_absence
+        end
+      end
+      context "should have error disapproved_by_absence_for_situation_registered when" do
+        it "situation is registered and disapproved_by_absence is true" do
+          class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
+          class_enrollment.disapproved_by_absence = true
+          class_enrollment.should have_error(:disapproved_by_absence_for_situation_registered).on :disapproved_by_absence
+        end
+      end
+      context "should have error disapproved_by_absence_for_situation_aproved when" do
+        it "situation is aproved and grade is null" do
+          class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
+          class_enrollment.disapproved_by_absence = true
+          class_enrollment.should have_error(:disapproved_by_absence_for_situation_aproved).on :disapproved_by_absence
         end
       end
     end
