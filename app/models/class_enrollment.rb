@@ -25,7 +25,7 @@ class ClassEnrollment < ActiveRecord::Base
   end
 
   def grade=(new_grade)
-    if new_grade.is_a?(String)
+    if new_grade.is_a?(String) && !new_grade.blank?
       split = new_grade.split('.')
       #convert the float to grade integer
       #ex: if new_grade is 9.0, it will be converted to 90
