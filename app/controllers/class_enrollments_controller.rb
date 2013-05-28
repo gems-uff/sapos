@@ -1,7 +1,7 @@
 class ClassEnrollmentsController < ApplicationController
   active_scaffold :class_enrollment do |config|
     config.list.sorting = {:enrollment => 'ASC'}
-    config.list.columns = [:enrollment,:course_class, :situation, :grade, :attendance]
+    config.list.columns = [:enrollment,:course_class, :situation, :grade, :disapproved_by_absence]
     config.create.label = :create_class_enrollment_label
     config.update.label = :update_class_enrollment_label
 
@@ -14,7 +14,7 @@ class ClassEnrollmentsController < ApplicationController
     config.columns[:situation].options = {:options => ClassEnrollment::SITUATIONS, :include_blank => I18n.t("active_scaffold._select_")}
 
     config.columns =
-        [:enrollment, :course_class, :situation, :grade, :attendance, :obs]
+        [:enrollment, :course_class, :situation, :grade, :disapproved_by_absence, :obs]
 
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true

@@ -3,7 +3,7 @@
 one:
   obs: MyText
   grade: 1
-  attendance: false
+  disapproved_by_absence: false
   situation: MyString
   course_class: 
   enrollment: 
@@ -11,7 +11,7 @@ one:
 two:
   obs: MyText
   grade: 1
-  attendance: false
+  disapproved_by_absence: false
   situation: MyString
   course_class: 
   enrollment: 

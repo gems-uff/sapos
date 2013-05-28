@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130520190910) do
+ActiveRecord::Schema.define(:version => 20130527235843) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -69,12 +69,12 @@ ActiveRecord::Schema.define(:version => 20130520190910) do
   create_table "class_enrollments", :force => true do |t|
     t.text     "obs"
     t.integer  "grade"
-    t.boolean  "attendance"
     t.string   "situation"
     t.integer  "course_class_id"
     t.integer  "enrollment_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "disapproved_by_absence", :default => false
   end
 
   add_index "class_enrollments", ["course_class_id"], :name => "class_enrollments_course_class_id_fkey"
@@ -266,29 +266,11 @@ ActiveRecord::Schema.define(:version => 20130520190910) do
     t.string   "telephone1"
     t.string   "telephone2"
     t.string   "siape"
-    t.integer  "user_id"
     t.string   "enrollment_number"
   end
 
   add_index "professors", ["city_id"], :name => "professors_city_id_fkey"
   add_index "professors", ["state_id"], :name => "professors_state_id_fkey"
-  add_index "professors", ["user_id"], :name => "professors_user_id_fkey"
-
-  create_table "queries", :force => true do |t|
-    t.string   "querystring", :limit => 2000
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "query_variables", :force => true do |t|
-    t.integer  "query_id"
-    t.string   "name"
-    t.string   "value"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "query_variables", ["query_id"], :name => "query_variables_query_id_fkey"
 
   create_table "research_areas", :force => true do |t|
     t.string   "name"
@@ -386,6 +368,7 @@ ActiveRecord::Schema.define(:version => 20130520190910) do
     t.string   "email"
   end
 
+  add_index "students", ["birthplace"], :name => "students_birthplace_fkey"
   add_index "students", ["city_id"], :name => "students_city_id_fkey"
   add_index "students", ["country_id"], :name => "students_country_id_fkey"
   add_index "students", ["state_id"], :name => "students_state_id_fkey"
@@ -396,7 +379,6 @@ ActiveRecord::Schema.define(:version => 20130520190910) do
     t.string   "salt"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "unconfirmed_email"
     t.string   "email",                  :default => "", :null => false
     t.string   "encrypted_password",     :default => "", :null => false
     t.string   "reset_password_token"
@@ -466,9 +448,6 @@ ActiveRecord::Schema.define(:version => 20130520190910) do
 
   add_foreign_key "professors", ["city_id"], "cities", ["id"], :name => "professors_city_id_fkey"
   add_foreign_key "professors", ["state_id"], "states", ["id"], :name => "professors_state_id_fkey"
-  add_foreign_key "professors", ["user_id"], "users", ["id"], :name => "professors_user_id_fkey"
-
-  add_foreign_key "query_variables", ["query_id"], "queries", ["id"], :name => "query_variables_query_id_fkey"
 
   add_foreign_key "scholarship_durations", ["enrollment_id"], "enrollments", ["id"], :name => "scholarship_durations_enrollment_id_fkey"
   add_foreign_key "scholarship_durations", ["scholarship_id"], "scholarships", ["id"], :name => "scholarship_durations_scholarship_id_fkey"
@@ -480,6 +459,7 @@ ActiveRecord::Schema.define(:version => 20130520190910) do
 
   add_foreign_key "states", ["country_id"], "countries", ["id"], :name => "states_country_id_fkey"
 
+  add_foreign_key "students", ["birthplace"], "states", ["id"], :name => "students_birthplace_fkey"
   add_foreign_key "students", ["city_id"], "cities", ["id"], :name => "students_city_id_fkey"
   add_foreign_key "students", ["country_id"], "countries", ["id"], :name => "students_country_id_fkey"
   add_foreign_key "students", ["state_id"], "states", ["id"], :name => "students_state_id_fkey"

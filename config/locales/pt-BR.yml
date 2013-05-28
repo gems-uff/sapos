@@ -574,7 +574,7 @@ pt-BR:
       class_enrollment:
         obs: "Observações"
         grade: "Nota"
-        attendance: "Frequência"
+        disapproved_by_absence: "Reprovado por Falta"
         situation: "Situação"
         course_class: "Turma"
         enrollment: "Matrícula"
