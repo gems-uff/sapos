@@ -48,7 +48,11 @@ module NumbersHelper
   end
 
   def number_to_grade(number, options = {})
-    "#{number/10.0}"
+    "#{number/10.0}" if number
+  end
+
+  def self.number_to_grade(number, options = {})
+    "#{number/10.0}" if number
   end
 
 end

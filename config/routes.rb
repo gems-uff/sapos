@@ -17,6 +17,9 @@ Sapos::Application.routes.draw do
   resources :course_classes do
     as_routes
     record_select_routes
+    member do
+      get 'summary_pdf'
+    end
   end
 
   resources :course_types do

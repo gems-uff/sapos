@@ -227,6 +227,20 @@ pt-BR:
       odd: "deve ser ímpar"
       even: "deve ser par"
 
+  pdf_content:
+    course_class:
+      summary:
+        title: "Resumo Semestral"
+        course_name: "Nome da Disciplina"
+        year_semester: "Semestre/Ano"
+        lesson: "Aulas Dadas"
+        sequential_number: "Nº"
+        enrollment_number: "Matrícula"
+        student_name: "Nome do Aluno"
+        final_grade: "Nota Final"
+        attendance: "Freq S/I"
+        obs: "Obs.:"
+
   activerecord:   
         
     errors:
