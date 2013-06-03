@@ -240,6 +240,11 @@ pt-BR:
         final_grade: "Nota Final"
         attendance: "Freq S/I"
         obs: "Obs.:"
+        link: "Pauta"
+    enrollment:
+      academic_transcript:
+        title: "Histórico Escolar"
+        link: "Histórico"
 
   activerecord:   
         

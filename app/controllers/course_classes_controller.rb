@@ -1,5 +1,4 @@
 class CourseClassesController < ApplicationController
-  include NumbersHelper
 
   active_scaffold :course_class do |config|
     config.list.sorting = {:name => 'ASC'}
@@ -7,7 +6,7 @@ class CourseClassesController < ApplicationController
     config.create.label = :create_course_class_label
     config.update.label = :update_course_class_label
 
-    config.action_links.add 'summary_pdf', :label => I18n.t('pdf_content.course_class.summary.title'), :page => true, :type => :member
+    config.action_links.add 'summary_pdf', :label => I18n.t('pdf_content.course_class.summary.link'), :page => true, :type => :member
 
     config.columns[:course].clear_link
     config.columns[:professor].clear_link
@@ -40,15 +39,15 @@ class CourseClassesController < ApplicationController
               :scale => 0.3
     )
 
-    pdf.font("Courier", :size => 14) do
-      pdf.text "Universidade Federal Fluminense
+    pdf.font('Courier', :size => 14) do
+      pdf.text 'Universidade Federal Fluminense
                 Instituto de Computação
-                Pós-Graduação"
+                Pós-Graduação'
     end
 
     pdf.move_down 20
 
-    pdf.font("Courier", :size => 12) do
+    pdf.font('Courier', :size => 12) do
       pdf.text "#{I18n.t('pdf_content.course_class.summary.title')}".upcase, :align => :center
     end
 
@@ -63,7 +62,7 @@ class CourseClassesController < ApplicationController
     top_width = [360, 90, 90]
     pdf.table(top_header, :column_widths => top_width,
               :row_colors => ["BFBFBF"],
-              :cell_style => {:font => "Courier",
+              :cell_style => {:font => 'Courier',
                               :size => 10,
                               :inline_format => true,
                               :border_width => 0,
@@ -79,7 +78,7 @@ class CourseClassesController < ApplicationController
 
     pdf.table(top_data, :column_widths => top_width,
               :row_colors => ["FFFFFF"],
-              :cell_style => {:font => "Courier",
+              :cell_style => {:font => 'Courier',
                               :size => 8,
                               :inline_format => true,
                               :border_width => 0
@@ -111,9 +110,9 @@ class CourseClassesController < ApplicationController
           i+=1,
           class_enrollment.enrollment.enrollment_number,
           class_enrollment.enrollment.student.name,
-          NumbersHelper.number_to_grade(class_enrollment.grade),
-          class_enrollment.disapproved_by_absence ? 'I' : 'S',
-          class_enrollment.obs
+          '',
+          '',
+          ''
       ]
     end
 
@@ -128,12 +127,12 @@ class CourseClassesController < ApplicationController
 
     pdf.move_down 50
 
-    pdf.text "_________________________________________________________", :align => :center
+    pdf.text '_________________________________________________________', :align => :center
     pdf.move_down 5
     pdf.font_size 10
-    pdf.text "#{I18n.t("activerecord.attributes.course_class.professor").upcase} #{course_class.professor.name.upcase}", :align => :center
+    pdf.text "#{I18n.t('activerecord.attributes.course_class.professor').upcase} #{course_class.professor.name.upcase}", :align => :center
 
-    send_data(pdf.render, :filename => "#{I18n.t("pdf_content.course_class.summary.title")} -  #{course_class.name || course_class.course.name}", :type => 'application/pdf')
+    send_data(pdf.render, :filename => "#{I18n.t('pdf_content.course_class.summary.title')} -  #{course_class.name || course_class.course.name}", :type => 'application/pdf')
   end
 
 
