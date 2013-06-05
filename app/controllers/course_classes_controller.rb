@@ -30,11 +30,11 @@ class CourseClassesController < ApplicationController
 
     course_class = CourseClass.find(params[:id])
 
-    pdf = Prawn::Document.new
+    pdf = Prawn::Document.new(:page_layout => :landscape)
 
     y_position = pdf.cursor
 
-    pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [455, y_position],
+    pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [pdf.bounds.right - 50, y_position],
               :vposition => :top,
               :scale => 0.3
     )
@@ -59,7 +59,7 @@ class CourseClassesController < ApplicationController
                    "<b>#{I18n.t("pdf_content.course_class.summary.lesson").upcase}</b>"
                   ]]
 
-    top_width = [360, 90, 90]
+    top_width = [490, 100, 130]
     pdf.table(top_header, :column_widths => top_width,
               :row_colors => ["BFBFBF"],
               :cell_style => {:font => 'Courier',
@@ -71,7 +71,7 @@ class CourseClassesController < ApplicationController
     )
 
     top_data = [[
-                    course_class.name.try(:upcase) || course_class.course.name.upcase,
+                    course_class.course.name + (course_class.name.blank? ? '' : " (#{course_class.name})"),
                     "#{course_class.semester}º/#{course_class.year}",
                     ''
                 ]]
@@ -85,14 +85,14 @@ class CourseClassesController < ApplicationController
               }
     )
 
-    table_width = [30, 90, 240, 45, 45, 90]
+    table_width = [30, 105, 315, 45, 45, 180]
 
-    header = [["<b>#{I18n.t("pdf_content.course_class.summary.sequential_number").upcase}</b>",
-               "<b>#{I18n.t("pdf_content.course_class.summary.enrollment_number").upcase}</b>",
-               "<b>#{I18n.t("pdf_content.course_class.summary.student_name").upcase}</b>",
-               "<b>#{I18n.t("pdf_content.course_class.summary.final_grade").upcase}</b>",
-               "<b>#{I18n.t("pdf_content.course_class.summary.attendance").upcase}</b>",
-               "<b>#{I18n.t("pdf_content.course_class.summary.obs").upcase}</b>"]]
+    header = [["<b>#{I18n.t("pdf_content.course_class.summary.sequential_number")}</b>",
+               "<b>#{I18n.t("pdf_content.course_class.summary.enrollment_number")}</b>",
+               "<b>#{I18n.t("pdf_content.course_class.summary.student_name")}</b>",
+               "<b>#{I18n.t("pdf_content.course_class.summary.final_grade")}</b>",
+               "<b>#{I18n.t("pdf_content.course_class.summary.attendance")}</b>",
+               "<b>#{I18n.t("pdf_content.course_class.summary.obs")}</b>"]]
 
     pdf.table(header, :column_widths => table_width,
               :row_colors => ["BFBFBF"],
@@ -130,7 +130,7 @@ class CourseClassesController < ApplicationController
     pdf.text '_________________________________________________________', :align => :center
     pdf.move_down 5
     pdf.font_size 10
-    pdf.text "#{I18n.t('activerecord.attributes.course_class.professor').upcase} #{course_class.professor.name.upcase}", :align => :center
+    pdf.text "#{course_class.professor.name}", :align => :center
 
     send_data(pdf.render, :filename => "#{I18n.t('pdf_content.course_class.summary.title')} -  #{course_class.name || course_class.course.name}", :type => 'application/pdf')
   end
