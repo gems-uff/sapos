@@ -132,7 +132,7 @@ class CourseClassesController < ApplicationController
     pdf.font_size 10
     pdf.text "#{course_class.professor.name}", :align => :center
 
-    send_data(pdf.render, :filename => "#{I18n.t('pdf_content.course_class.summary.title')} -  #{course_class.name || course_class.course.name}", :type => 'application/pdf')
+    send_data(pdf.render, :filename => "#{I18n.t('pdf_content.course_class.summary.title')} -  #{course_class.name || course_class.course.name}.pdf", :type => 'application/pdf')
   end
 
 
