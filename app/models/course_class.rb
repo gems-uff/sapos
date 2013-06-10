@@ -2,8 +2,8 @@ class CourseClass < ActiveRecord::Base
   belongs_to :course
   belongs_to :professor
 
-  has_many :class_enrollments
-  has_many :allocations
+  has_many :class_enrollments, :dependent => :destroy
+  has_many :allocations, :dependent => :destroy
 
   SEMESTERS = [1,2]
 
