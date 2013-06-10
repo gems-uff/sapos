@@ -16,6 +16,12 @@ class ClassEnrollment < ActiveRecord::Base
     "#{self.enrollment.student.name} - #{self.course_class.name || self.course_class.course.name}"
   end
 
+  def attendance_to_label
+    unless self.disapproved_by_absence.nil? || self.situation == I18n.t("activerecord.attributes.class_enrollment.situations.registered")
+      self.disapproved_by_absence ? I18n.t("pdf_content.course_class.summary.attendance_false") : I18n.t("pdf_content.course_class.summary.attendance_true")
+    end
+  end
+
   def grade_filled?
     !grade.nil?
   end

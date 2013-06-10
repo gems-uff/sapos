@@ -238,7 +238,10 @@ pt-BR:
         enrollment_number: "Matrícula"
         student_name: "Nome do Aluno"
         final_grade: "Nota Final"
+        situation: "Situação"
         attendance: "Freq S/I"
+        attendance_true: "S"
+        attendance_false: "I"
         obs: "Obs.:"
         link: "Pauta"
     enrollment:

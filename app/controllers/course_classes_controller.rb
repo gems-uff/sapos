@@ -85,13 +85,14 @@ class CourseClassesController < ApplicationController
               }
     )
 
-    table_width = [30, 105, 315, 45, 45, 180]
+    table_width = [30, 105, 285, 45, 45, 60, 150]
 
     header = [["<b>#{I18n.t("pdf_content.course_class.summary.sequential_number")}</b>",
                "<b>#{I18n.t("pdf_content.course_class.summary.enrollment_number")}</b>",
                "<b>#{I18n.t("pdf_content.course_class.summary.student_name")}</b>",
                "<b>#{I18n.t("pdf_content.course_class.summary.final_grade")}</b>",
                "<b>#{I18n.t("pdf_content.course_class.summary.attendance")}</b>",
+               "<b>#{I18n.t("pdf_content.course_class.summary.situation")}</b>",
                "<b>#{I18n.t("pdf_content.course_class.summary.obs")}</b>"]]
 
     pdf.table(header, :column_widths => table_width,
@@ -100,30 +101,33 @@ class CourseClassesController < ApplicationController
                               :size => 10,
                               :inline_format => true,
                               :border_width => 0,
-                              :align => :center
+                              :align => :left
               }
     )
 
-    i=0
-    table_data = course_class.class_enrollments.map do |class_enrollment|
-      [
-          i+=1,
-          class_enrollment.enrollment.enrollment_number,
-          class_enrollment.enrollment.student.name,
-          '',
-          '',
-          ''
-      ]
+    unless course_class.class_enrollments.empty?
+      i=0
+      table_data = course_class.class_enrollments.map do |class_enrollment|
+        [
+            i+=1,
+            class_enrollment.enrollment.enrollment_number,
+            class_enrollment.enrollment.student.name,
+            class_enrollment.grade,
+            class_enrollment.attendance_to_label,
+            class_enrollment.situation,
+            class_enrollment.obs
+        ]
+      end
+
+      pdf.table(table_data, :column_widths => table_width,
+                :row_colors => ["FFFFFF", "F0F0F0"],
+                :cell_style => {:font => "Courier",
+                                :size => 8,
+                                :inline_format => true,
+                                :border_width => 0
+                }
+      )
     end
-
-    pdf.table(table_data, :column_widths => table_width,
-              :row_colors => ["FFFFFF", "F0F0F0"],
-              :cell_style => {:font => "Courier",
-                              :size => 8,
-                              :inline_format => true,
-                              :border_width => 0
-              }
-    )
 
     pdf.move_down 50
 
