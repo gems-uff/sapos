@@ -12,6 +12,10 @@ class ClassEnrollment < ActiveRecord::Base
   validate :grade_for_situation
   validate :disapproved_by_absence_for_situation
 
+  def to_label
+    "#{self.enrollment.student.name} - #{self.course_class.name || self.course_class.course.name}"
+  end
+
   def grade_filled?
     !grade.nil?
   end
