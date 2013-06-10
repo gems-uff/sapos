@@ -8,6 +8,11 @@ class Allocation < ActiveRecord::Base
   validate :start_end_time_validation
   validate :scheduling_conflict_validation
 
+  def to_label
+    "#{self.course_class.name || self.course_class.course.name} - #{self.day},
+      #{self.start_time}:00 - #{self.end_time}:00 #{"- #{I18n.t("activerecord.attributes.allocation.room")} : #{self.room}" if self.room }"
+  end
+
   private
   def start_end_time_validation
     if !self.start_time.blank? and !self.end_time.blank? and self.end_time <= self.start_time

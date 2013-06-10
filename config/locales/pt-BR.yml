@@ -589,6 +589,7 @@ pt-BR:
          allocations: "Alocações"
          year: "Ano"
          semester: "Semestre"
+         class_enrollments_count: "Alunos Inscritos"
       allocation:
         day: "Dia"
         room: "Sala"

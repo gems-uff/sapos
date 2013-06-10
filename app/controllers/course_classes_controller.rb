@@ -1,8 +1,11 @@
 class CourseClassesController < ApplicationController
 
   active_scaffold :course_class do |config|
+
+    config.columns.add :class_enrollments_count
+
     config.list.sorting = {:name => 'ASC'}
-    config.list.columns = [:name, :course, :professor, :year, :semester]
+    config.list.columns = [:name, :course, :professor, :year, :semester, :class_enrollments_count]
     config.create.label = :create_course_class_label
     config.update.label = :update_course_class_label
 

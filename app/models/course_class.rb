@@ -15,4 +15,8 @@ class CourseClass < ActiveRecord::Base
   def to_label
     "#{name || course.name} - #{year}/#{semester}"
   end
+
+  def class_enrollments_count
+    self.class_enrollments.count
+  end
 end
