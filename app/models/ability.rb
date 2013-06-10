@@ -32,8 +32,12 @@ class Ability
       can :delete, :all
     elsif role_id == Role::ROLE_PROFESSOR
       can :read, (Ability::ALL_MODELS - [User])
+      can :list, (Ability::ALL_MODELS - [User])
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User])
+      can :list, (Ability::ALL_MODELS - [User])
+      can :update_column, (Ability::ALL_MODELS - [User])
+      can :delete, (Ability::ALL_MODELS - [User])
     end
 
     # Define abilities for the passed in user here. For example:
