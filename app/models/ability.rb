@@ -22,8 +22,14 @@ class Ability
 
     if role_id == Role::ROLE_ADMINISTRADOR
       can :manage, :all
+      can :list, :all
+      can :update_column, :all
+      can :delete, :all
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, :all
+      can :list, :all
+      can :update_column, :all
+      can :delete, :all
     elsif role_id == Role::ROLE_PROFESSOR
       can :read, (Ability::ALL_MODELS - [User])
     elsif role_id == Role::ROLE_SECRETARIA
