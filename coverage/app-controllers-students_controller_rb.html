@@ -28,17 +28,17 @@
         <tbody>
           <tr>
             <td class="left_align"><a href="app-controllers-students_controller_rb.html">app/controllers/students_controller.rb</a></td>
-            <td class='right_align'><tt>48</tt></td>
-            <td class='right_align'><tt>45</tt></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
+            <td class='right_align'><tt>65</tt></td>
+            <td class='right_align'><tt>57</tt></td>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>86.15%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:100px"></div>
-            <div class="uncovered" style="width:0px"></div>
+            <div class="covered" style="width:86px"></div>
+            <div class="uncovered" style="width:14px"></div>
           </div></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>84.21%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:100px"></div>
-            <div class="uncovered" style="width:0px"></div>
+            <div class="covered" style="width:84px"></div>
+            <div class="uncovered" style="width:16px"></div>
           </div></td>
           </tr>
         </tbody>
@@ -81,7 +81,7 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line5">5</a>     config.create.label = :create_student_label   </pre></td>
+            <td><pre><a name="line5">5</a>     config.create.label = :create_student_label</pre></td>
           </tr>
         
           
@@ -147,7 +147,7 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line16">16</a>     config.columns[:sex].options = {:options =&gt; [['Masculino','M'],['Feminino','F']]}</pre></td>
+            <td><pre><a name="line16">16</a>     config.columns[:sex].options = {:options =&gt; [['Masculino', 'M'], ['Feminino', 'F']]}</pre></td>
           </tr>
         
           
@@ -159,7 +159,7 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line18">18</a>     config.columns[:civil_status].options = {:options =&gt; ['Solteiro(a)','Casado(a)']}</pre></td>
+            <td><pre><a name="line18">18</a>     config.columns[:civil_status].options = {:options =&gt; ['Solteiro(a)', 'Casado(a)']}</pre></td>
           </tr>
         
           
@@ -171,7 +171,7 @@
           
           
           <tr class="inferred">
-            <td><pre><a name="line20">20</a>     </pre></td>
+            <td><pre><a name="line20">20</a> </pre></td>
           </tr>
         
           
@@ -183,169 +183,271 @@
           
           
           <tr class="inferred">
-            <td><pre><a name="line22">22</a>        [:name,</pre></td>
+            <td><pre><a name="line22">22</a>         [:name,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line23">23</a>         :sex,</pre></td>
+            <td><pre><a name="line23">23</a>          :sex,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line24">24</a>         :civil_status,        </pre></td>
+            <td><pre><a name="line24">24</a>          :civil_status,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line25">25</a>         :birthdate,</pre></td>
+            <td><pre><a name="line25">25</a>          :birthdate,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line26">26</a>         :state,</pre></td>
+            <td><pre><a name="line26">26</a>          :state,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line27">27</a>         :city,</pre></td>
+            <td><pre><a name="line27">27</a>          :city,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line28">28</a>         :neighbourhood,</pre></td>
+            <td><pre><a name="line28">28</a>          :neighbourhood,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line29">29</a>         :address,</pre></td>
+            <td><pre><a name="line29">29</a>          :address,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line30">30</a>         :zip_code,</pre></td>
+            <td><pre><a name="line30">30</a>          :zip_code,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line31">31</a>         :telephone1,</pre></td>
+            <td><pre><a name="line31">31</a>          :telephone1,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line32">32</a>         :telephone2,</pre></td>
+            <td><pre><a name="line32">32</a>          :telephone2,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line33">33</a>         :email,</pre></td>
+            <td><pre><a name="line33">33</a>          :email,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line34">34</a>         :employer,</pre></td>
+            <td><pre><a name="line34">34</a>          :employer,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line35">35</a>         :job_position,</pre></td>
+            <td><pre><a name="line35">35</a>          :job_position,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line36">36</a>         :cpf,</pre></td>
+            <td><pre><a name="line36">36</a>          :cpf,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line37">37</a>         :identity_number,</pre></td>
+            <td><pre><a name="line37">37</a>          :identity_number,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line38">38</a>         :identity_issuing_body,</pre></td>
+            <td><pre><a name="line38">38</a>          :identity_issuing_body,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line39">39</a>         :identity_expedition_date,</pre></td>
+            <td><pre><a name="line39">39</a>          :identity_expedition_date,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line40">40</a>         :country,</pre></td>
+            <td><pre><a name="line40">40</a>          :country,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line41">41</a>         :birthplace,</pre></td>
+            <td><pre><a name="line41">41</a>          :birthplace,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line42">42</a>         :father_name,</pre></td>
+            <td><pre><a name="line42">42</a>          :father_name,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line43">43</a>         :mother_name,</pre></td>
+            <td><pre><a name="line43">43</a>          :mother_name,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line44">44</a>         :obs,</pre></td>
+            <td><pre><a name="line44">44</a>          :obs,</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line45">45</a>         :majors]</pre></td>
+            <td><pre><a name="line45">45</a>          :majors]</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line46">46</a>   end          </pre></td>
+            <td><pre><a name="line46">46</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line47">47</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line47">47</a>   record_select :per_page =&gt; 10, :search_on =&gt; [:name], :order_by =&gt; 'name', :full_text_search =&gt; true</pre></td>
+            <td><pre><a name="line48">48</a>   record_select :per_page =&gt; 10, :search_on =&gt; [:name], :order_by =&gt; 'name', :full_text_search =&gt; true</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line48">48</a> end </pre></td>
+            <td><pre><a name="line49">49</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line50">50</a>   def update_authorized?(record=nil)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line51">51</a>     can? :update, record</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line52">52</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line53">53</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line54">54</a>   def create_authorized?(record=nil)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line55">55</a>     can? :create, record</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line56">56</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line57">57</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line58">58</a>   def show_authorized?(record=nil)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line59">59</a>     can? :read, record</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line60">60</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line61">61</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line62">62</a>   def delete_authorized?(record=nil)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line63">63</a>     can? :delete, record</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line64">64</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line65">65</a> end </pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Fri May 10 21:06:29 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
+    <p>Generated on Mon Jun 10 11:58:12 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
 
   </body>
 </html>

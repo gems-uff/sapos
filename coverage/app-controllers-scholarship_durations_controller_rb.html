@@ -28,17 +28,17 @@
         <tbody>
           <tr>
             <td class="left_align"><a href="app-controllers-scholarship_durations_controller_rb.html">app/controllers/scholarship_durations_controller.rb</a></td>
-            <td class='right_align'><tt>185</tt></td>
-            <td class='right_align'><tt>149</tt></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>31.89%</tt></div>
+            <td class='right_align'><tt>201</tt></td>
+            <td class='right_align'><tt>161</tt></td>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>33.33%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:32px"></div>
-            <div class="uncovered" style="width:68px"></div>
+            <div class="covered" style="width:33px"></div>
+            <div class="uncovered" style="width:67px"></div>
           </div></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>28.19%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>28.57%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:28px"></div>
-            <div class="uncovered" style="width:72px"></div>
+            <div class="covered" style="width:29px"></div>
+            <div class="uncovered" style="width:71px"></div>
           </div></td>
           </tr>
         </tbody>
@@ -123,7 +123,7 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line12">12</a>     config.field_search.columns = [:scholarship, :start_date, :end_date, :cancel_date,:enrollment, :adviser, :sponsors, :scholarship_types, :level, :active]</pre></td>
+            <td><pre><a name="line12">12</a>     config.field_search.columns = [:scholarship, :start_date, :end_date, :cancel_date, :enrollment, :adviser, :sponsors, :scholarship_types, :level, :active]</pre></td>
           </tr>
         
           
@@ -231,7 +231,7 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line30">30</a>     config.columns = [:scholarship,:enrollment,:start_date,:cancel_date,:end_date,:obs]</pre></td>
+            <td><pre><a name="line30">30</a>     config.columns = [:scholarship, :enrollment, :start_date, :cancel_date, :end_date, :obs]</pre></td>
           </tr>
         
           
@@ -357,7 +357,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line51">51</a>     [sql,value]</pre></td>
+            <td><pre><a name="line51">51</a>     [sql, value]</pre></td>
           </tr>
         
           
@@ -429,7 +429,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line63">63</a>     [sql,value]</pre></td>
+            <td><pre><a name="line63">63</a>     [sql, value]</pre></td>
           </tr>
         
           
@@ -471,7 +471,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line70">70</a>     [sql,value]</pre></td>
+            <td><pre><a name="line70">70</a>     [sql, value]</pre></td>
           </tr>
         
           
@@ -561,7 +561,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line85">85</a>     [sql,Time.now,Time.now]</pre></td>
+            <td><pre><a name="line85">85</a>     [sql, Time.now, Time.now]</pre></td>
           </tr>
         
           
@@ -609,7 +609,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line93">93</a>     )&quot;,value]</pre></td>
+            <td><pre><a name="line93">93</a>     )&quot;, value]</pre></td>
           </tr>
         
           
@@ -639,7 +639,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line98">98</a>     year = value[:year].empty?  ? 1 : value[:year]</pre></td>
+            <td><pre><a name="line98">98</a>     year = value[:year].empty? ? 1 : value[:year]</pre></td>
           </tr>
         
           
@@ -657,7 +657,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line101">101</a>       date = Date.new(year.to_i,month.to_i)</pre></td>
+            <td><pre><a name="line101">101</a>       date = Date.new(year.to_i, month.to_i)</pre></td>
           </tr>
         
           
@@ -705,7 +705,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line109">109</a>     year = value[:year].empty?  ? 1 : value[:year]</pre></td>
+            <td><pre><a name="line109">109</a>     year = value[:year].empty? ? 1 : value[:year]</pre></td>
           </tr>
         
           
@@ -723,7 +723,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line112">112</a>       date = Date.new(year.to_i,month.to_i)</pre></td>
+            <td><pre><a name="line112">112</a>       date = Date.new(year.to_i, month.to_i)</pre></td>
           </tr>
         
           
@@ -771,7 +771,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line120">120</a>     year = value[:year].empty?  ? 1 : value[:year]</pre></td>
+            <td><pre><a name="line120">120</a>     year = value[:year].empty? ? 1 : value[:year]</pre></td>
           </tr>
         
           
@@ -789,7 +789,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line123">123</a>       date = Date.new(year.to_i,month.to_i)</pre></td>
+            <td><pre><a name="line123">123</a>       date = Date.new(year.to_i, month.to_i)</pre></td>
           </tr>
         
           
@@ -963,43 +963,43 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line152">152</a>     pdf.table( header, :column_widths =&gt; [108, 108, 108, 108, 108],</pre></td>
+            <td><pre><a name="line152">152</a>     pdf.table(header, :column_widths =&gt; [108, 108, 108, 108, 108],</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line153">153</a>                :row_colors =&gt; [&quot;BFBFBF&quot;],</pre></td>
+            <td><pre><a name="line153">153</a>               :row_colors =&gt; [&quot;BFBFBF&quot;],</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line154">154</a>                :cell_style =&gt; { :font =&gt; &quot;Courier&quot;,</pre></td>
+            <td><pre><a name="line154">154</a>               :cell_style =&gt; {:font =&gt; &quot;Courier&quot;,</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line155">155</a>                                 :size =&gt; 10,</pre></td>
+            <td><pre><a name="line155">155</a>                               :size =&gt; 10,</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line156">156</a>                                 :inline_format =&gt; true,</pre></td>
+            <td><pre><a name="line156">156</a>                               :inline_format =&gt; true,</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line157">157</a>                                 :border_width =&gt; 0</pre></td>
+            <td><pre><a name="line157">157</a>                               :border_width =&gt; 0</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line158">158</a>                }</pre></td>
+            <td><pre><a name="line158">158</a>               }</pre></td>
           </tr>
         
           
@@ -1017,7 +1017,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line161">161</a>     each_record_in_page{}</pre></td>
+            <td><pre><a name="line161">161</a>     each_record_in_page {}</pre></td>
           </tr>
         
           
@@ -1095,43 +1095,43 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line174">174</a>     pdf.table( scholarship_durations, :column_widths =&gt; [108, 108, 108, 108, 108],</pre></td>
+            <td><pre><a name="line174">174</a>     pdf.table(scholarship_durations, :column_widths =&gt; [108, 108, 108, 108, 108],</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line175">175</a>                :row_colors =&gt; [&quot;FFFFFF&quot;,&quot;F0F0F0&quot;],</pre></td>
+            <td><pre><a name="line175">175</a>               :row_colors =&gt; [&quot;FFFFFF&quot;, &quot;F0F0F0&quot;],</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line176">176</a>                :cell_style =&gt; { :font =&gt; &quot;Courier&quot;,</pre></td>
+            <td><pre><a name="line176">176</a>               :cell_style =&gt; {:font =&gt; &quot;Courier&quot;,</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line177">177</a>                                 :size =&gt; 8,</pre></td>
+            <td><pre><a name="line177">177</a>                               :size =&gt; 8,</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line178">178</a>                                 :inline_format =&gt; true,</pre></td>
+            <td><pre><a name="line178">178</a>                               :inline_format =&gt; true,</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line179">179</a>                                 :border_width =&gt; 0</pre></td>
+            <td><pre><a name="line179">179</a>                               :border_width =&gt; 0</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line180">180</a>                }</pre></td>
+            <td><pre><a name="line180">180</a>               }</pre></td>
           </tr>
         
           
@@ -1149,7 +1149,7 @@
           
           
           <tr class="uncovered">
-            <td><pre><a name="line183">183</a>     send_data(pdf.render, :filename =&gt; 'relatorio.pdf', :type =&gt;'application/pdf')</pre></td>
+            <td><pre><a name="line183">183</a>     send_data(pdf.render, :filename =&gt; 'relatorio.pdf', :type =&gt; 'application/pdf')</pre></td>
           </tr>
         
           
@@ -1160,14 +1160,110 @@
         
           
           
+          <tr class="inferred">
+            <td><pre><a name="line185">185</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line186">186</a>   def update_authorized?(record=nil)</pre></td>
+          </tr>
+        
+          
+          
           <tr class="uncovered">
-            <td><pre><a name="line185">185</a> end </pre></td>
+            <td><pre><a name="line187">187</a>     can? :update, record</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line188">188</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line189">189</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line190">190</a>   def create_authorized?(record=nil)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line191">191</a>     can? :create, record</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line192">192</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line193">193</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line194">194</a>   def show_authorized?(record=nil)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line195">195</a>     can? :read, record</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line196">196</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line197">197</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line198">198</a>   def delete_authorized?(record=nil)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line199">199</a>     can? :delete, record</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line200">200</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line201">201</a> end </pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Fri May 10 21:06:29 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
+    <p>Generated on Mon Jun 10 11:58:12 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
 
   </body>
 </html>

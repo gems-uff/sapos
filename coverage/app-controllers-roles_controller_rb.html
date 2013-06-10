@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html lang='en' xml:lang='en' xmlns='http://www.w3.org/1999/xhtml'>
   <head>
-    <title>app/models/scholarship.rb</title>
+    <title>app/controllers/roles_controller.rb</title>
     <link href="screen.css" media="all" rel="stylesheet" type="text/css" />
     <link href="print.css" media="print" rel="stylesheet" type="text/css" />
     
@@ -10,7 +10,7 @@
   </head>
   <body>
     <h1>Sapos C0 Coverage Information - RCov</h1>
-    <h2>app/models/scholarship.rb</h2>
+    <h2>app/controllers/roles_controller.rb</h2>
 
     
 
@@ -27,18 +27,18 @@
         </thead>
         <tbody>
           <tr>
-            <td class="left_align"><a href="app-models-scholarship_rb.html">app/models/scholarship.rb</a></td>
+            <td class="left_align"><a href="app-controllers-roles_controller_rb.html">app/controllers/roles_controller.rb</a></td>
+            <td class='right_align'><tt>24</tt></td>
             <td class='right_align'><tt>20</tt></td>
-            <td class='right_align'><tt>15</tt></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>62.50%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:100px"></div>
-            <div class="uncovered" style="width:0px"></div>
+            <div class="covered" style="width:63px"></div>
+            <div class="uncovered" style="width:37px"></div>
           </div></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>55.00%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:100px"></div>
-            <div class="uncovered" style="width:0px"></div>
+            <div class="covered" style="width:55px"></div>
+            <div class="uncovered" style="width:45px"></div>
           </div></td>
           </tr>
         </tbody>
@@ -57,43 +57,43 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line1">1</a> class Scholarship &lt; ActiveRecord::Base</pre></td>
+            <td><pre><a name="line1">1</a> class RolesController &lt; ApplicationController</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line2">2</a>   belongs_to :level</pre></td>
+            <td><pre><a name="line2">2</a>   active_scaffold :role do |config|</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line3">3</a>   belongs_to :sponsor</pre></td>
+            <td><pre><a name="line3">3</a>     config.list.columns = [:id, :name, :description]</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line4">4</a>   belongs_to :scholarship_type</pre></td>
+            <td><pre><a name="line4">4</a>     config.columns = [:name, :description]</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line5">5</a>   belongs_to :professor</pre></td>
+            <td><pre><a name="line5">5</a>     config.columns[:description].form_ui = :textarea</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line6">6</a>   has_many :scholarship_durations, :dependent =&gt; :destroy</pre></td>
+            <td><pre><a name="line6">6</a>     config.show.link = false</pre></td>
           </tr>
         
           
           
-          <tr class="marked">
-            <td><pre><a name="line7">7</a>   has_many :enrollments, :through =&gt; :scholarship_durations</pre></td>
+          <tr class="inferred">
+            <td><pre><a name="line7">7</a>   end</pre></td>
           </tr>
         
           
@@ -105,19 +105,19 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line9">9</a>   validates :scholarship_number, :presence =&gt; true, :uniqueness =&gt; true</pre></td>
+            <td><pre><a name="line9">9</a>   def update_authorized?(record=nil)</pre></td>
           </tr>
         
           
           
-          <tr class="marked">
-            <td><pre><a name="line10">10</a>   validates :level, :presence =&gt; true</pre></td>
+          <tr class="uncovered">
+            <td><pre><a name="line10">10</a>     can? :update, record</pre></td>
           </tr>
         
           
           
-          <tr class="marked">
-            <td><pre><a name="line11">11</a>   validates :sponsor, :presence =&gt; true</pre></td>
+          <tr class="uncovered">
+            <td><pre><a name="line11">11</a>   end</pre></td>
           </tr>
         
           
@@ -128,56 +128,80 @@
         
           
           
+          <tr class="marked">
+            <td><pre><a name="line13">13</a>   def create_authorized?(record=nil)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line14">14</a>     can? :create, record</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line15">15</a>   end</pre></td>
+          </tr>
+        
+          
+          
           <tr class="inferred">
-            <td><pre><a name="line13">13</a>   #validates date</pre></td>
+            <td><pre><a name="line16">16</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line14">14</a>   validates_date :end_date, :on_or_after =&gt; :start_date, :allow_nil =&gt; true</pre></td>
+            <td><pre><a name="line17">17</a>   def show_authorized?(record=nil)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line18">18</a>     can? :read, record</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line19">19</a>   end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line15">15</a>   </pre></td>
+            <td><pre><a name="line20">20</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line16">16</a>   def to_label</pre></td>
+            <td><pre><a name="line21">21</a>   def delete_authorized?(record=nil)</pre></td>
           </tr>
         
           
           
-          <tr class="marked">
-            <td><pre><a name="line17">17</a>     &quot;#{scholarship_number}&quot;</pre></td>
+          <tr class="uncovered">
+            <td><pre><a name="line22">22</a>     can? :delete, record</pre></td>
           </tr>
         
           
           
-          <tr class="inferred">
-            <td><pre><a name="line18">18</a>   end</pre></td>
+          <tr class="uncovered">
+            <td><pre><a name="line23">23</a>   end</pre></td>
           </tr>
         
           
           
-          <tr class="inferred">
-            <td><pre><a name="line19">19</a>   </pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line20">20</a> end</pre></td>
+          <tr class="uncovered">
+            <td><pre><a name="line24">24</a> end</pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Mon Jun 10 12:02:11 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
+    <p>Generated on Mon Jun 10 11:58:12 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
 
   </body>
 </html>

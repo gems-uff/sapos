@@ -28,17 +28,17 @@
         <tbody>
           <tr>
             <td class="left_align"><a href="app-models-class_enrollment_rb.html">app/models/class_enrollment.rb</a></td>
-            <td class='right_align'><tt>53</tt></td>
-            <td class='right_align'><tt>44</tt></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>90.57%</tt></div>
+            <td class='right_align'><tt>74</tt></td>
+            <td class='right_align'><tt>62</tt></td>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>85.14%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:91px"></div>
-            <div class="uncovered" style="width:9px"></div>
+            <div class="covered" style="width:85px"></div>
+            <div class="uncovered" style="width:15px"></div>
           </div></td>
-            <td class="left_align"><div class="percent_graph_legend"><tt class=''>93.18%</tt></div>
+            <td class="left_align"><div class="percent_graph_legend"><tt class=''>85.48%</tt></div>
           <div class="percent_graph">
-            <div class="covered" style="width:93px"></div>
-            <div class="uncovered" style="width:7px"></div>
+            <div class="covered" style="width:85px"></div>
+            <div class="uncovered" style="width:15px"></div>
           </div></td>
           </tr>
         </tbody>
@@ -128,254 +128,380 @@
         
           
           
-          <tr class="inferred">
-            <td><pre><a name="line13">13</a> </pre></td>
-          </tr>
-        
-          
-          
           <tr class="marked">
-            <td><pre><a name="line14">14</a>   def grade_filled?</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line15">15</a>     !grade.nil?</pre></td>
+            <td><pre><a name="line13">13</a>   validate :disapproved_by_absence_for_situation</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line16">16</a>   end</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line17">17</a> </pre></td>
+            <td><pre><a name="line14">14</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line18">18</a>   def course_has_grade</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line19">19</a>     if self.try(:course_class).try(:course).try(:course_type).nil?</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line20">20</a>       true</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line21">21</a>     else</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line22">22</a>       self.course_class.course.course_type.has_score</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line23">23</a>     end</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line24">24</a>   end</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line25">25</a> </pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line26">26</a>   def grade=(new_grade)</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line27">27</a>     if new_grade.is_a?(String)</pre></td>
+            <td><pre><a name="line15">15</a>   def to_label</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line28">28</a>       split = new_grade.split('.')</pre></td>
+            <td><pre><a name="line16">16</a>     &quot;#{self.enrollment.student.name} - #{self.course_class.name || self.course_class.course.name}&quot;</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line29">29</a>       #if the string represents a float, convert the float to integer</pre></td>
+            <td><pre><a name="line17">17</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line18">18</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line19">19</a>   def attendance_to_label</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line30">30</a>       #ex: if new_grade is 9.0, it will be converted to 90</pre></td>
+            <td><pre><a name="line20">20</a>     unless self.disapproved_by_absence.nil? || self.situation == I18n.t(&quot;activerecord.attributes.class_enrollment.situations.registered&quot;)</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line31">31</a>       new_grade = split[0].to_i*10 + split[1].to_i if split.size &gt; 1</pre></td>
+            <td><pre><a name="line21">21</a>       self.disapproved_by_absence ? I18n.t(&quot;pdf_content.course_class.summary.attendance_false&quot;) : I18n.t(&quot;pdf_content.course_class.summary.attendance_true&quot;)</pre></td>
           </tr>
         
           
           
           <tr class="uncovered">
-            <td><pre><a name="line32">32</a>     end</pre></td>
+            <td><pre><a name="line22">22</a>     end</pre></td>
           </tr>
         
           
           
-          <tr class="marked">
-            <td><pre><a name="line33">33</a>     super(new_grade)</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line34">34</a>   end</pre></td>
+          <tr class="uncovered">
+            <td><pre><a name="line23">23</a>   end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line35">35</a> </pre></td>
+            <td><pre><a name="line24">24</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line36">36</a>   private</pre></td>
+            <td><pre><a name="line25">25</a>   def grade_filled?</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line37">37</a>   def grade_for_situation</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line38">38</a>     if course_has_grade</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line39">39</a>       case self.situation</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line40">40</a>         when I18n.translate(&quot;activerecord.attributes.class_enrollment.situations.registered&quot;)</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line41">41</a>           self.errors.add(:grade, I18n.translate(&quot;activerecord.errors.models.class_enrollment.grade_for_situation_registered&quot;)) unless self.grade.blank?</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line42">42</a>         when I18n.translate(&quot;activerecord.attributes.class_enrollment.situations.aproved&quot;)</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line43">43</a>           self.errors.add(:grade, I18n.translate(&quot;activerecord.errors.models.class_enrollment.grade_for_situation_aproved&quot;)) if (self.grade.blank? || self.grade &lt; 60)</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line44">44</a>         when I18n.translate(&quot;activerecord.attributes.class_enrollment.situations.disapproved&quot;)</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line45">45</a>           self.errors.add(:grade, I18n.translate(&quot;activerecord.errors.models.class_enrollment.grade_for_situation_disapproved&quot;)) if (self.grade.blank? || self.grade &gt;= 60)</pre></td>
+            <td><pre><a name="line26">26</a>     !grade.nil?</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line46">46</a>       end</pre></td>
+            <td><pre><a name="line27">27</a>   end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line47">47</a>     else</pre></td>
+            <td><pre><a name="line28">28</a> </pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line48">48</a>       self.errors.add(:grade, I18n.translate(&quot;activerecord.errors.models.class_enrollment.grade_filled_for_course_without_score&quot;)) unless self.grade.blank?</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="inferred">
-            <td><pre><a name="line49">49</a>     end</pre></td>
+            <td><pre><a name="line29">29</a>   def course_has_grade</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line50">50</a>     self.errors.blank?</pre></td>
+            <td><pre><a name="line30">30</a>     if self.try(:course_class).try(:course).try(:course_type).nil?</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line31">31</a>       true</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line51">51</a>   end</pre></td>
+            <td><pre><a name="line32">32</a>     else</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line33">33</a>       self.course_class.course.course_type.has_score</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line52">52</a> </pre></td>
+            <td><pre><a name="line34">34</a>     end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line53">53</a> end</pre></td>
+            <td><pre><a name="line35">35</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line36">36</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line37">37</a>   def grade=(new_grade)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line38">38</a>     if new_grade.is_a?(String) &amp;&amp; !new_grade.blank?</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line39">39</a>       split = new_grade.split('.')</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line40">40</a>       #convert the float to grade integer</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line41">41</a>       #ex: if new_grade is 9.0, it will be converted to 90</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line42">42</a>       new_grade = split[0].to_i*10 + split[1].to_i</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="uncovered">
+            <td><pre><a name="line43">43</a>     end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line44">44</a>     super(new_grade)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line45">45</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line46">46</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line47">47</a>   private</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line48">48</a>   def grade_for_situation</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line49">49</a>     if course_has_grade</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line50">50</a>       case self.situation</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line51">51</a>         when I18n.translate(&quot;activerecord.attributes.class_enrollment.situations.registered&quot;)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line52">52</a>           self.errors.add(:grade, I18n.translate(&quot;activerecord.errors.models.class_enrollment.grade_for_situation_registered&quot;)) unless self.grade.blank?</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line53">53</a>         when I18n.translate(&quot;activerecord.attributes.class_enrollment.situations.aproved&quot;)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line54">54</a>           self.errors.add(:grade, I18n.translate(&quot;activerecord.errors.models.class_enrollment.grade_for_situation_aproved&quot;)) if (self.grade.blank? || self.grade &lt; 60)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line55">55</a>         when I18n.translate(&quot;activerecord.attributes.class_enrollment.situations.disapproved&quot;)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line56">56</a>           self.errors.add(:grade, I18n.translate(&quot;activerecord.errors.models.class_enrollment.grade_for_situation_disapproved&quot;)) if (self.grade.blank? || self.grade &gt;= 60)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line57">57</a>       end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line58">58</a>     else</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line59">59</a>       self.errors.add(:grade, I18n.translate(&quot;activerecord.errors.models.class_enrollment.grade_filled_for_course_without_score&quot;)) unless self.grade.blank?</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line60">60</a>     end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line61">61</a>     self.errors.blank?</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line62">62</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line63">63</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line64">64</a>   def disapproved_by_absence_for_situation</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line65">65</a>     case self.situation</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line66">66</a>       when I18n.translate(&quot;activerecord.attributes.class_enrollment.situations.registered&quot;)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line67">67</a>         self.errors.add(:disapproved_by_absence, I18n.translate(&quot;activerecord.errors.models.class_enrollment.disapproved_by_absence_for_situation_registered&quot;)) if self.disapproved_by_absence</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line68">68</a>       when I18n.translate(&quot;activerecord.attributes.class_enrollment.situations.aproved&quot;)</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line69">69</a>         self.errors.add(:disapproved_by_absence, I18n.translate(&quot;activerecord.errors.models.class_enrollment.disapproved_by_absence_for_situation_aproved&quot;)) if self.disapproved_by_absence</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line70">70</a>     end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="marked">
+            <td><pre><a name="line71">71</a>     self.errors.blank?</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line72">72</a>   end</pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line73">73</a> </pre></td>
+          </tr>
+        
+          
+          
+          <tr class="inferred">
+            <td><pre><a name="line74">74</a> end</pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Fri May 10 21:06:29 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
+    <p>Generated on Mon Jun 10 12:02:11 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
 
   </body>
 </html>

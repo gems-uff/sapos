@@ -28,8 +28,8 @@
         <tbody>
           <tr>
             <td class="left_align"><a href="app-controllers-users_controller_rb.html">app/controllers/users_controller.rb</a></td>
-            <td class='right_align'><tt>13</tt></td>
-            <td class='right_align'><tt>13</tt></td>
+            <td class='right_align'><tt>12</tt></td>
+            <td class='right_align'><tt>12</tt></td>
             <td class="left_align"><div class="percent_graph_legend"><tt class=''>100.00%</tt></div>
           <div class="percent_graph">
             <div class="covered" style="width:100px"></div>
@@ -63,79 +63,73 @@
           
           
           <tr class="marked">
-            <td><pre><a name="line2">2</a>   active_scaffold :user do |config|    </pre></td>
+            <td><pre><a name="line2">2</a>   active_scaffold :user do |config|</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line3">3</a>     config.list.columns = [:name]</pre></td>
+            <td><pre><a name="line3">3</a>     config.list.columns = [:email, :name, :role]</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line4">4</a>     config.columns = [:name,:password,:password_confirmation]    </pre></td>
+            <td><pre><a name="line4">4</a>     config.columns = [:email, :name, :role, :password, :password_confirmation]</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line5">5</a>     config.create.columns = [:name, :password, :password_confirmation]</pre></td>
+            <td><pre><a name="line5">5</a>     config.show.link = nil</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line6">6</a>     config.update.columns = [:name, :password, :password_confirmation]</pre></td>
+            <td><pre><a name="line6">6</a>     config.update.label = :update_user_label</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line7">7</a>     config.show.link = nil</pre></td>
+            <td><pre><a name="line7">7</a>     config.create.label = :create_user_label</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line8">8</a>     config.update.label = :update_user_label</pre></td>
+            <td><pre><a name="line8">8</a>     config.columns[:role].form_ui = :select</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line9">9</a>     config.create.label = :create_user_label</pre></td>
+            <td><pre><a name="line9">9</a>     config.columns[:password].form_ui = :password</pre></td>
           </tr>
         
           
           
           <tr class="marked">
-            <td><pre><a name="line10">10</a>     config.columns[:password].form_ui = :password</pre></td>
-          </tr>
-        
-          
-          
-          <tr class="marked">
-            <td><pre><a name="line11">11</a>     config.columns[:password_confirmation].form_ui = :password</pre></td>
+            <td><pre><a name="line10">10</a>     config.columns[:password_confirmation].form_ui = :password</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line12">12</a>   end</pre></td>
+            <td><pre><a name="line11">11</a>   end</pre></td>
           </tr>
         
           
           
           <tr class="inferred">
-            <td><pre><a name="line13">13</a> end</pre></td>
+            <td><pre><a name="line12">12</a> end</pre></td>
           </tr>
         
       </tbody>
     </table>
 
-    <p>Generated on Fri May 10 21:06:29 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
+    <p>Generated on Mon Jun 10 11:58:12 -0300 2013 with <a href="http://github.com/relevance/rcov">rcov 1.0.0</a></p>
 
   </body>
 </html>
