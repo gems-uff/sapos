@@ -1,3 +1,6 @@
+# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 class LevelsController < ApplicationController
   active_scaffold :level do |config|
     config.list.sorting = {:name => 'ASC'}

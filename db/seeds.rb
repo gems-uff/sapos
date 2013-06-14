@@ -1,3 +1,6 @@
+# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 # encoding: utf-8
 # 
 # This file should contain all the record creation needed to seed the database with its default values.

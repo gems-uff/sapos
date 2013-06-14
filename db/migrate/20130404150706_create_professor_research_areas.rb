@@ -1,3 +1,6 @@
+# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 class CreateProfessorResearchAreas < ActiveRecord::Migration
   def self.up
     create_table :professor_research_areas do |t|

@@ -1,3 +1,6 @@
+# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 class AdvisementAuthorizationsController < ApplicationController
   active_scaffold :advisement_authorization do |config|
     config.columns = [:professor, :level]

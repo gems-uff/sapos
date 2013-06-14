@@ -1,3 +1,6 @@
+# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 class CoursesController < ApplicationController
   active_scaffold :course do |config|
     config.list.sorting = {:name => 'ASC'}

@@ -1,3 +1,6 @@
+# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 Sapos::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb
 
