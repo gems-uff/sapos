@@ -11,6 +11,7 @@ Sapos::Application.routes.draw do
 
   resources :class_enrollments do
     as_routes
+    record_select_routes
   end
 
   resources :allocations do
