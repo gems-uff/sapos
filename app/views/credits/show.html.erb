@@ -1,11 +1,12 @@
 <div class="content">
   <div id="as_users-active-scaffold" class="active-scaffold active-scaffold-as_users users-view default-theme" data-closelabel="Fechar" data-controller="users">
     <div class="active-scaffold-header">
-      <h2>Créditos</h2>
+      <h2><%=I18n.t("doc.credits")%></h2>
     </div>
 
     <div id="credits">
       <%= markdown(@credits) %>
+      <%= markdown("#Outros\n * "  + link_to(I18n.t("doc.authors"), credits_authors_path)  + "\n * "  + link_to(I18n.t("doc.license"), credits_license_path)) %>
     </div>
   </div>
 </div>

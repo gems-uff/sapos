@@ -59,11 +59,9 @@
       </div>
     </div>
 
-    <% if session[:user_id] %>
-        <div id="credits_footer">
-          <%= link_to 'Créditos', credits_show_path %>
-        </div>
-    <% end %>
+    <div id="credits_footer">
+      <%= link_to I18n.t("doc.credits"), credits_show_path %>
+    </div>
 
   </div>
 </div>
