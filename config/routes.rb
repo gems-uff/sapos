@@ -42,6 +42,8 @@ Sapos::Application.routes.draw do
 
 
   get "credits/show"
+  get "credits/authors"
+  get "credits/license"
 
   resources :phase_durations do
     as_routes
