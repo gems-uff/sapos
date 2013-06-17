@@ -10,6 +10,22 @@ class CreditsController < ApplicationController
     @credits = file_content
   end
 
+  def authors
+    file_to_open = [Rails.root, 'AUTHORS'].join(File::Separator)
+    readme_file = File.open(file_to_open, "rb")
+    file_content = readme_file.read
+
+    @authors = file_content
+  end
+
+  def license
+    file_to_open = [Rails.root, 'LICENSE'].join(File::Separator)
+    readme_file = File.open(file_to_open, "rb")
+    file_content = readme_file.read
+
+    @license = file_content
+  end
+
   def update_authorized?(record=nil)
     can? :update, record
   end
