@@ -1,7 +1,7 @@
+#coding: utf-8
 # Copyright (c) 2013 Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-# encoding: utf-8
 module AdvisementsHelper
   def active_search_column(record,options)
     select(record, :active, [["Todas","all"],["Ativas","active"],["Inativas","not_active"]], options, options)

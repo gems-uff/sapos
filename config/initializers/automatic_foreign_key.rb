@@ -1,7 +1,7 @@
 # Copyright (c) 2013 Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-AutomaticForeignKey.setup do |config|
+#AutomaticForeignKey.setup do |config|
 
   # Default ON UPDATE action
   # Available values are :cascade, :restrict, :set_null, :set_default, :no_action
@@ -17,6 +17,6 @@ AutomaticForeignKey.setup do |config|
   # config.auto_index = true
   #
   # Disable automatic foreign key creation.
-  config.disable = false
+  #config.disable = false
 
-end
+#end
