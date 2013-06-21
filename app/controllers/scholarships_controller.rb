@@ -31,11 +31,14 @@ class ScholarshipsController < ApplicationController
     config.columns[:start_date].options = {:format => :monthyear}
     config.columns[:end_date].options = {:format => :monthyear}
 
+    config.columns[:enrollments].form_ui = :record_select
+
     config.create.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs, :enrollments]
     config.update.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs, :enrollments]
     config.show.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs, :enrollments]
   end
   record_select :per_page => 10, :search_on => [:scholarship_number], :order_by => 'scholarship_number', :full_text_search => true
+
 
   def self.condition_for_start_date_column(column, value, like_pattern)
     month = value[:month].empty? ? 1 : value[:month]
