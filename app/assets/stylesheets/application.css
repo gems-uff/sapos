@@ -9,7 +9,10 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require_self
- *= require active_scaffold
+ *= require active_scaffold_layout
+ *= require active_scaffold_images
+ *= require active_scaffold_extensions
+ *= require active_scaffold_colors
  *= require jquery.ui.all
  *= require active_scaffold_overrides
  *= require_tree .

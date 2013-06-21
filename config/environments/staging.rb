@@ -9,17 +9,17 @@ Sapos::Application.configure do
   config.cache_classes = true
 
   # Full error reports are disabled and caching is turned on
-  config.consider_all_requests_local       = false
-  config.action_controller.perform_caching = true
+  config.consider_all_requests_local = false
+  config.action_controller.perform_caching = false
 
   # Disable Rails's static asset server (Apache or nginx will already do this)
   config.serve_static_assets = false
 
   # Compress JavaScripts and CSS
-  config.assets.compress = false
+  config.assets.compress = true
 
   # Don't fallback to assets pipeline if a precompiled asset is missed
-  config.assets.compile = false
+  config.assets.compile = true
 
   # Generate digests for assets URLs
   config.assets.digest = false
@@ -47,7 +47,7 @@ Sapos::Application.configure do
   # config.cache_store = :mem_cache_store
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server
-  # config.action_controller.asset_host = "http://assets.example.com"
+  config.action_controller.asset_host = "https://sel.ic.uff.br/sapos-homologacao"
 
   # Precompile additional assets (application.js, application.css, and all non-JS/CSS are already added)
   # config.assets.precompile += %w( search.js )
@@ -55,8 +55,8 @@ Sapos::Application.configure do
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
   config.action_mailer.delivery_method = :sendmail
-  config.action_mailer.default_url_options = { :host => 'sel.ic.uff.br/sapos-homologacao' }
-  config.action_mailer.sendmail_settings = { :arguments => '-i -f sapos@sel.ic.uff.br', :location => '/usr/sbin/sendmail' }
+  config.action_mailer.default_url_options = {:host => 'sel.ic.uff.br/sapos-homologacao'}
+  config.action_mailer.sendmail_settings = {:arguments => '-i -f sapos@sel.ic.uff.br', :location => '/usr/sbin/sendmail'}
 
   # Enable threaded mode
   # config.threadsafe!
@@ -69,7 +69,7 @@ Sapos::Application.configure do
   config.active_support.deprecation = :notify
 
   config.middleware.use ExceptionNotifier,
-    :email_prefix => "[SAPOS: Erro em Staging] ",
-    :sender_address => %{"Exception Notifier Sapos Staging" <erro-sapos@sel.ic.uff.br>},
-    :exception_recipients => %w{everton.moreth@gmail.com bschettino@id.uff.br}
+                        :email_prefix => "[SAPOS: Erro em Staging] ",
+                        :sender_address => %{"Exception Notifier Sapos Staging" <erro-sapos@sel.ic.uff.br>},
+                        :exception_recipients => %w{everton.moreth@gmail.com bschettino@id.uff.br}
 end
