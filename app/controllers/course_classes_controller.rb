@@ -3,6 +3,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class CourseClassesController < ApplicationController
+  include NumbersHelper
 
   active_scaffold :course_class do |config|
 
@@ -119,7 +120,7 @@ class CourseClassesController < ApplicationController
             i+=1,
             class_enrollment.enrollment.enrollment_number,
             class_enrollment.enrollment.student.name,
-            class_enrollment.grade,
+            number_to_grade(class_enrollment.grade),
             class_enrollment.attendance_to_label,
             class_enrollment.situation,
             class_enrollment.obs
