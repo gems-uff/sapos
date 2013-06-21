@@ -13,5 +13,6 @@
 //= require jquery
 //= require jquery.ui.all
 //= require jquery_ujs
+//= require record_select
 //= require active_scaffold
 //= require_tree .
