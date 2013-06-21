@@ -3,27 +3,13 @@
 
 class CreditsController < ApplicationController
   def show
-    file_to_open = [Rails.root, 'README.md'].join(File::Separator)
-    readme_file = File.open(file_to_open, "rb")
-    file_content = readme_file.read
-
-    @credits = file_content
-  end
-
-  def authors
-    file_to_open = [Rails.root, 'AUTHORS'].join(File::Separator)
-    readme_file = File.open(file_to_open, "rb")
-    file_content = readme_file.read
-
-    @authors = file_content
-  end
-
-  def license
-    file_to_open = [Rails.root, 'LICENSE'].join(File::Separator)
-    readme_file = File.open(file_to_open, "rb")
-    file_content = readme_file.read
-
-    @license = file_content
+    links_content = FileUtils.file_content('LINKS')
+    authors_content = FileUtils.file_content('AUTHORS')
+    license_content = FileUtils.file_content('LICENSE')
+    @header = "SAPOS main goal is to ease the management of information related to graduate programs such as enrollments, courses, advisement, scholarships, requirements, among others."
+    @links = links_content
+    @authors = authors_content
+    @license = license_content
   end
 
   def update_authorized?(record=nil)
