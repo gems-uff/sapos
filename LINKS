@@ -1,14 +1,17 @@
-#Links
+#Development
 
 * [SAPOS Source Code](https://github.com/gems-uff/sapos)
-* [Bug Tracking: Redmine](http://www.redmine.org/)
+* [Issue Tracking](https://github.com/gems-uff/sapos/issues)
+
+#Documentation
+
 * [Monograph about the first version of SAPOS](https://github.com/gems-uff/sapos/blob/bca8f0420ab12d3cfe1ae3a84cdb242c747b9fc9/doc/TCC%20Rodrigo%20e%20Tiago.pdf)
-* [Help: WIKI](https://github.com/gems-uff/sapos/wiki)
+* [Wiki](https://github.com/gems-uff/sapos/wiki)
 
 #Technologies
 
-* [ActiveScaffold](https://github.com/activescaffold/active_scaffold)
-* [Prawn](https://github.com/prawnpdf/prawn)
 * [Ruby](https://github.com/ruby/ruby)
 * [Ruby on Rails](https://github.com/rails/rails)
+* [ActiveScaffold](https://github.com/activescaffold/active_scaffold)
+* [Prawn](https://github.com/prawnpdf/prawn)
 * [MySQL](http://www.mysql.com/)
