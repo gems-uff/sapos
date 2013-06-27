@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class DismissalReasonsController < ApplicationController
+  authorize_resource
+
   active_scaffold :dismissal_reason do |config|
     config.list.sorting = {:name => 'ASC'}
     config.create.label = :create_dismissal_reason_label

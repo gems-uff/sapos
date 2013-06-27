@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class PhasesController < ApplicationController
+  authorize_resource
+
   active_scaffold :phase do |config|
     config.list.sorting = {:name => 'ASC'}
     config.list.columns = [:name, :description]

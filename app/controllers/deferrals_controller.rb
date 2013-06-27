@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class DeferralsController < ApplicationController
+  authorize_resource
+
   active_scaffold :deferral do |config|
     config.list.sorting = {:enrollment => 'ASC'}
     config.search.columns = [:enrollment]

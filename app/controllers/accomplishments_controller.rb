@@ -2,6 +2,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class AccomplishmentsController < ApplicationController
+  authorize_resource
+
   active_scaffold :accomplishment do |config|
     config.list.sorting = {:enrollment => 'ASC'}
     config.search.columns = [:enrollment]
@@ -18,19 +20,4 @@ class AccomplishmentsController < ApplicationController
     config.update.columns = [:phase, :enrollment, :conclusion_date, :obs]
   end
 
-  def update_authorized?(record=nil)
-    can? :update, record
-  end
-
-  def create_authorized?(record=nil)
-    can? :create, record
-  end
-
-  def show_authorized?(record=nil)
-    can? :read, record
-  end
-
-  def delete_authorized?(record=nil)
-    can? :delete, record
-  end
 end

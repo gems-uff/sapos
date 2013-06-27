@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class CreditsController < ApplicationController
+  skip_authorization_check
+
   def show
     file_to_open = [Rails.root, 'README.md'].join(File::Separator)
     readme_file = File.open(file_to_open, "rb")

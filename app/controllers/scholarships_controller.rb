@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class ScholarshipsController < ApplicationController
+  authorize_resource
+
   active_scaffold :scholarship do |config|
     config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
 
@@ -31,10 +33,9 @@ class ScholarshipsController < ApplicationController
     config.columns[:start_date].options = {:format => :monthyear}
     config.columns[:end_date].options = {:format => :monthyear}
 
-    config.columns[:enrollments].form_ui = :record_select
 
-    config.create.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs, :enrollments]
-    config.update.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs, :enrollments]
+    config.create.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs]
+    config.update.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs]
     config.show.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs, :enrollments]
   end
   record_select :per_page => 10, :search_on => [:scholarship_number], :order_by => 'scholarship_number', :full_text_search => true

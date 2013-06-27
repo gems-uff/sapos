@@ -2,6 +2,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class AdvisementAuthorizationsController < ApplicationController
+  authorize_resource
+
   active_scaffold :advisement_authorization do |config|
     config.columns = [:professor, :level]
     config.actions.swap :search, :field_search
@@ -13,20 +15,4 @@ class AdvisementAuthorizationsController < ApplicationController
 
   end
   record_select :per_page => 10
-
-  def update_authorized?(record=nil)
-    can? :update, record
-  end
-
-  def create_authorized?(record=nil)
-    can? :create, record
-  end
-
-  def show_authorized?(record=nil)
-    can? :read, record
-  end
-
-  def delete_authorized?(record=nil)
-    can? :delete, record
-  end
-end 
+end

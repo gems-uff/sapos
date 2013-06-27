@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class UsersController < ApplicationController
+  authorize_resource
+
   active_scaffold :user do |config|
     config.list.columns = [:email, :name, :role]
     config.columns = [:email, :name, :role, :password, :password_confirmation]

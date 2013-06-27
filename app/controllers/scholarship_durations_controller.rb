@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class ScholarshipDurationsController < ApplicationController
+  authorize_resource
+
   active_scaffold :scholarship_duration do |config|
     config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
 
