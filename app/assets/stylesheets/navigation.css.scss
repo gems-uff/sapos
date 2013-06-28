@@ -42,7 +42,7 @@ body a {
 }
 
 #menubardiv{
-    background: image-url("menubardiv.png") repeat-x;
+    background: url("menubardiv.png") repeat-x;
     height: 12px;
     width: 100%;
     position: absolute;
@@ -54,7 +54,7 @@ body a {
     height: 129px;
     width: 100%;
     z-index: -100;
-    background: image-url("steel-mesh-pattern.png");
+    background: url("steel-mesh-pattern.png");
 }
 
 #saposgif{
@@ -208,7 +208,7 @@ body a {
     font-weight: normal;
     padding: 10px 10px;
     background-size: 10px 10px;
-    background: #FFFFFF no-repeat 97% 50% image-url("rightarrow.png");
+    background: #FFFFFF no-repeat 97% 50% url("rightarrow.png");
     border-bottom: 1px dotted #9f9f9f;
     color: #656464;
     text-decoration: none;
