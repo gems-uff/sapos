@@ -4,6 +4,7 @@
 /log/*.log
 /tmp/
 /nbproject/private/
+/public/assets
 /public/images/active_scaffold
 /public/javascripts/active_scaffold
 /public/stylesheets/active_scaffold
