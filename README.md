@@ -33,7 +33,7 @@ O projeto foi resultado do trabalho de conclusão de curso dos alunos **Rodrigo 
 #Links
 
 * [SAPOS](http://sel.ic.uff.br/sapos)
-* [Redmine](http://sel.ic.uff.br/redmine)
+* [Issue Tracking](http://github.com/gems-uff/sapos/issues)
 * Monografia
 
 #Tecnologias
