@@ -5,6 +5,10 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
 
+  check_authorization :unless => :devise_controller?
+
+  skip_authorization_check :only => [:root]
+
   before_filter :authenticate_user!
   before_filter :parse_date
 

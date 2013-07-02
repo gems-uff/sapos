@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class DismissalsController < ApplicationController
+  authorize_resource
+
   active_scaffold :dismissal do |config|
     #Enables advanced search A.K.A FieldSearch
     config.actions.swap :search, :field_search
@@ -23,19 +25,4 @@ class DismissalsController < ApplicationController
     config.create.columns = [:enrollment, :date, :dismissal_reason, :obs]
   end
 
-  def update_authorized?(record=nil)
-    can? :update, record
-  end
-
-  def create_authorized?(record=nil)
-    can? :create, record
-  end
-
-  def show_authorized?(record=nil)
-    can? :read, record
-  end
-
-  def delete_authorized?(record=nil)
-    can? :delete, record
-  end
 end

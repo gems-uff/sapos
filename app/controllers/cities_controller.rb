@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class CitiesController < ApplicationController
+  authorize_resource
+
   active_scaffold :city do |config|
     config.list.sorting = {:name => 'ASC'}
     config.list.columns = [:name, :state]
@@ -14,19 +16,4 @@ class CitiesController < ApplicationController
     config.update.columns = [:state, :name]
   end
 
-  def update_authorized?(record=nil)
-    can? :update, record
-  end
-
-  def create_authorized?(record=nil)
-    can? :create, record
-  end
-
-  def show_authorized?(record=nil)
-    can? :read, record
-  end
-
-  def delete_authorized?(record=nil)
-    can? :delete, record
-  end
 end 

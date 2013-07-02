@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class ClassEnrollmentsController < ApplicationController
+  authorize_resource
+
   active_scaffold :class_enrollment do |config|
     config.list.sorting = {:enrollment => 'ASC'}
     config.list.columns = [:enrollment,:course_class, :situation, :grade, :disapproved_by_absence]

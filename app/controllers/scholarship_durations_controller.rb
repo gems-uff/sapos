@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class ScholarshipDurationsController < ApplicationController
+  authorize_resource
+
   active_scaffold :scholarship_duration do |config|
     config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
 
@@ -186,19 +188,4 @@ class ScholarshipDurationsController < ApplicationController
     send_data(pdf.render, :filename => 'relatorio.pdf', :type => 'application/pdf')
   end
 
-  def update_authorized?(record=nil)
-    can? :update, record
-  end
-
-  def create_authorized?(record=nil)
-    can? :create, record
-  end
-
-  def show_authorized?(record=nil)
-    can? :read, record
-  end
-
-  def delete_authorized?(record=nil)
-    can? :delete, record
-  end
 end 

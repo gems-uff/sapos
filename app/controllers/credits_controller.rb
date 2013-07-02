@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class CreditsController < ApplicationController
+  skip_authorization_check
+
   def show
     links_content = FileUtils.file_content('LINKS')
     authors_content = FileUtils.file_content('AUTHORS')
@@ -13,19 +15,4 @@ class CreditsController < ApplicationController
     @license = license_content
   end
 
-  def update_authorized?(record=nil)
-    can? :update, record
-  end
-
-  def create_authorized?(record=nil)
-    can? :create, record
-  end
-
-  def show_authorized?(record=nil)
-    can? :read, record
-  end
-
-  def delete_authorized?(record=nil)
-    can? :delete, record
-  end
 end

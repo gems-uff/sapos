@@ -3,6 +3,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class CourseClassesController < ApplicationController
+  authorize_resource
   include NumbersHelper
 
   active_scaffold :course_class do |config|

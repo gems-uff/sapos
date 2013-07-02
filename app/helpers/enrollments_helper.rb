@@ -7,9 +7,9 @@ module EnrollmentsHelper
   @@range = @@config["scholarship_year_range"]
 
   #overriding dismissal date to_label
-  #def dismissal_column(record)
-  #  I18n.localize(record.dismissal.to_label.to_date, {:format => :monthyear}) unless record.dismissal.nil? or record.nil?
-  #end
+  def dismissal_column(record, input_name)
+    I18n.localize(record.dismissal.to_label.to_date, {:format => :monthyear}) unless record.dismissal.nil? or record.nil?
+  end
 
   # display the "user_type" field as a dropdown with options
   def scholarship_durations_active_search_column(record, input_name)

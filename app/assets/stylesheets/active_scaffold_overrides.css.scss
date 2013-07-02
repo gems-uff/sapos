@@ -203,24 +203,24 @@ noscript.active-scaffold {
 }
 
 .active-scaffold-header div.actions div.action_group div {
-    background-image: image-url("active_scaffold/default/gears.png"); /* default icon for actions or override with css */
+    background-image: url("active_scaffold/default/gears.png"); /* default icon for actions or override with css */
 }
 
 .active-scaffold-header div.actions a.show_config_list {
-    background-image: image-url("active_scaffold/default/config.png");
+    background-image: url("active_scaffold/default/config.png");
 }
 
 .active-scaffold-header div.actions a.new,
 .active-scaffold-header div.actions a.new_existing {
-    background-image: image-url("active_scaffold/default/add.gif");
+    background-image: url("active_scaffold/default/add.png");
 }
 
 .active-scaffold-header div.actions a.show_search {
-    background-image: image-url("active_scaffold/magnifier.png");
+    background-image: url("active_scaffold/magnifier.png");
 }
 
 .active-scaffold-header div.actions a.to_pdf {
-    background-image: image-url("pdfIcon.gif");
+    background-image: url("pdfIcon.gif");
 }
 
 .blue-theme .active-scaffold-header div.actions a:hover {
@@ -284,17 +284,17 @@ noscript.active-scaffold {
 
 .active-scaffold th.asc a,
 .active-scaffold th.asc a:hover {
-    background: #33506d image-url("active_scaffold/default/arrow_up.gif") right 50% no-repeat;
+    background: #33506d url("active_scaffold/default/arrow_up.png") right 50% no-repeat;
 }
 
 .active-scaffold th.desc a,
 .active-scaffold th.desc a:hover {
-    background: #33506d image-url("active_scaffold/default/arrow_down.gif") right 50% no-repeat;
+    background: #33506d url("active_scaffold/default/arrow_down.png") right 50% no-repeat;
 }
 
 .active-scaffold th.loading a,
 .active-scaffold th.loading a:hover {
-    background: #33506d image-url("active_scaffold/default/indicator-small.gif") right 50% no-repeat;
+    background: #33506d url("active_scaffold/default/indicator-small.png") right 50% no-repeat;
 }
 
 .active-scaffold th .mark_heading {
@@ -475,7 +475,7 @@ noscript.active-scaffold {
     text-indent: -4000px;
     width: 16px;
     height: 17px;
-    background: image-url("closeBlueIcon.jpg") 0 0 no-repeat;
+    background: url("closeBlueIcon.jpg") 0 0 no-repeat;
 }
 
 /* Nested
@@ -993,7 +993,7 @@ noscript.active-scaffold {
     padding: 0;
     width: 16px;
     text-indent: -4000px;
-    background: image-url("active_scaffold/default/cross.png") 0 0 no-repeat;
+    background: url("active_scaffold/default/cross.png") 0 0 no-repeat;
 }
 
 .active-scaffold .sub-form .locked a.destroy {
@@ -1038,7 +1038,7 @@ noscript.active-scaffold {
 .as_touch a.inline-adapter-close {
     width: 25px;
     height: 27px;
-    background: image-url("active_scaffold/default/close_touch.png") 0 0 no-repeat;
+    background: url("active_scaffold/default/close_touch.png") 0 0 no-repeat;
 }
 
 .as_touch .as_paginate {

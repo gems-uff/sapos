@@ -17,6 +17,7 @@ class Ability
     alias_action :list, :row, :show_search, :render_field, :to => :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing, :to => :update
     alias_action :delete, :destroy_existing, :to => :destroy
+    #as_action_aliases
 
     user ||= User.new
 
@@ -25,22 +26,13 @@ class Ability
 
     if role_id == Role::ROLE_ADMINISTRADOR
       can :manage, :all
-      can :list, :all
-      can :update_column, :all
-      can :delete, :all
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, :all
-      can :list, :all
-      can :update_column, :all
-      can :delete, :all
     elsif role_id == Role::ROLE_PROFESSOR
-      can :read, (Ability::ALL_MODELS - [User])
-      can :list, (Ability::ALL_MODELS - [User])
+      can :read, (Ability::ALL_MODELS - [User, Role])
+      can :manage, CourseClass
     elsif role_id == Role::ROLE_SECRETARIA
-      can :manage, (Ability::ALL_MODELS - [User])
-      can :list, (Ability::ALL_MODELS - [User])
-      can :update_column, (Ability::ALL_MODELS - [User])
-      can :delete, (Ability::ALL_MODELS - [User])
+      can :manage, (Ability::ALL_MODELS - [User, Role])
     end
 
     # Define abilities for the passed in user here. For example:

@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class ProfessorResearchAreasController < ApplicationController
+  authorize_resource
+
   active_scaffold :professor_research_area do |conf|
   end
 end 

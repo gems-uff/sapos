@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class DeferralsController < ApplicationController
+  authorize_resource
+
   active_scaffold :deferral do |config|
     config.list.sorting = {:enrollment => 'ASC'}
     config.search.columns = [:enrollment]
@@ -19,19 +21,4 @@ class DeferralsController < ApplicationController
     config.show.columns = [:enrollment, :approval_date, :obs, :deferral_type]
   end
 
-  def update_authorized?(record=nil)
-    can? :update, record
-  end
-
-  def create_authorized?(record=nil)
-    can? :create, record
-  end
-
-  def show_authorized?(record=nil)
-    can? :read, record
-  end
-
-  def delete_authorized?(record=nil)
-    can? :delete, record
-  end
 end 
