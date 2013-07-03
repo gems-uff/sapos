@@ -11,13 +11,6 @@
 #
 #   cities = City.create([{ :name => 'Chicago', :description =>'Chicago' }, { :name => 'Copenhagen', :description =>'Copenhagen' }])
 #   Mayor.create(:name => 'Daley', :description =>'Daley', :city => cities.first)
-user = User.new do |u| 
-  u.name = 'admin'
-  u.email = 'admin@admin.com'
-  u.password = 'admin'
-end
-user.save
-user.confirm!
 
 ['CAPES', 'CNPq', 'FAPERJ', 'PETROBRAS'].each do |sponsor|
   Sponsor.new do |s|
@@ -79,3 +72,12 @@ end
     end.save!
   end
 end
+
+
+user = User.new do |u| 
+  u.name = 'admin'
+  u.email = 'admin@admin.com'
+  u.password = 'admin'
+end
+user.save
+user.confirm!
