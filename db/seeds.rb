@@ -11,26 +11,52 @@
 #
 #   cities = City.create([{ :name => 'Chicago', :description =>'Chicago' }, { :name => 'Copenhagen', :description =>'Copenhagen' }])
 #   Mayor.create(:name => 'Daley', :description =>'Daley', :city => cities.first)
-User.create(:name => 'admin', :description => 'admin', :password => 'admin')
+user = User.new do |u| 
+  u.name = 'admin'
+  u.email = 'admin@admin.com'
+  u.password = 'admin'
+end
+user.save
+user.confirm!
 
-Sponsor.create(:name => "CAPES")
-Sponsor.create(:name => "CNPq")
-Sponsor.create(:name => "FAPERJ")
-Sponsor.create(:name => "PETROBRAS")
+['CAPES', 'CNPq', 'FAPERJ', 'PETROBRAS'].each do |sponsor|
+  Sponsor.new do |s|
+    s.name = sponsor
+  end.save
+end
 
-Level.create(:name => "Graduação")
-Level.create(:name => "Especialização")
-Level.create(:name => "Mestrado")
-Level.create(:name => "Doutorado")
+['Graduação', 'Especialização', 'Mestrado', 'Doutorado'].each do |level|
+    Level.new do |l|
+      l.name = level
+    end.save
+end
 
-EnrollmentStatus.create(:name => "Especial")
-EnrollmentStatus.create(:name => "Regular")
+['Especial', 'Regular'].each do |enrollment|
+      EnrollmentStatus.new do |e|
+        e.name = enrollment
+      end.save
+end
 
-DismissalReason.create(:name => "Defesa", :description => "Aluno defendeu")
-DismissalReason.create(:name => "Rendimento", :description => "Aluno não cumpriu critérios de rendimento")
-DismissalReason.create(:name => "Desistência", :description => "Aluno desistiu")
-DismissalReason.create(:name => "Prazo", :description => "Prazo para defesa esgotado")
-DismissalReason.create(:name => "Especial -> Regular", :description => "Aluno foi admitido como aluno regular")
+DismissalReason.new do |d| 
+  d.name = "Defesa"
+  d.description = "Aluno defendeu"
+end
+DismissalReason.new do |d|
+  d.name = "Rendimento"
+  d.description = "Aluno não cumpriu critérios de rendimento"
+end
+DismissalReason.new do |d|
+  d.name = "Desistência"
+  d.description = "Aluno desistiu"
+end
+DismissalReason.new do |d|
+  d.name = "Prazo"
+  d.description = "Prazo para defesa esgotado"
+end
+DismissalReason.new do |d|
+  d.name = "Especial -> Regular"
+  d.description = "Aluno foi admitido como aluno regular"
+end
 
 [
     {:id => 1, :name => 'Desconhecido', :description => 'Desconhecido'},
