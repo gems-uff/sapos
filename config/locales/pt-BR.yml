@@ -248,6 +248,11 @@ pt-BR:
       academic_transcript:
         title: "Histórico Escolar"
         link: "Histórico"
+        course_code: "Código"
+        course_name: "Nome da Disciplina"
+        course_grade: "Nota"
+        course_credits: "Créditos"
+        course_year_semester: "Período"
 
   doc:
     credits: "Créditos"

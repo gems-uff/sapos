@@ -2,9 +2,15 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class EnrollmentsController < ApplicationController
+
+  authorize_resource
+  include NumbersHelper
+
+
   active_scaffold :enrollment do |config|
 
     config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
+    config.action_links.add 'academic_transcript_pdf', :label => I18n.t('pdf_content.enrollment.academic_transcript.link'), :page => true, :type => :member
 
     config.list.columns = [:student, :enrollment_number, :level, :enrollment_status, :admission_date, :dismissal]
     config.list.sorting = {:enrollment_number => 'ASC'}
@@ -188,4 +194,78 @@ class EnrollmentsController < ApplicationController
   def delete_authorized?(record=nil)
     can? :delete, record
   end
+
+  def academic_transcript_pdf
+
+    enrollment = Enrollment.find(params[:id])
+
+    pdf = Prawn::Document.new
+
+    y_position = pdf.cursor
+
+    pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [pdf.bounds.right - 50, y_position],
+              :vposition => :top,
+              :scale => 0.3
+    )
+
+    pdf.font('Courier', :size => 14) do
+      pdf.text 'Universidade Federal Fluminense
+                Instituto de Computação
+                Pós-Graduação'
+    end
+
+    pdf.move_down 20
+
+    pdf.font('Courier', :size => 12) do
+      pdf.text "#{I18n.t('pdf_content.enrollment.academic_transcript.title')}".upcase, :align => :center
+    end
+
+    pdf.move_down 20
+
+    table_width = [60, 252, 60, 60, 108]
+
+    header = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_code")}</b>",
+               "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_name")}</b>",
+               "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_grade")}</b>",
+               "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_credits")}</b>",
+               "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_year_semester")}</b>"
+               ]]
+
+    pdf.table(header, :column_widths => table_width,
+              :row_colors => ["BFBFBF"],
+              :cell_style => {:font => "Courier",
+                              :size => 10,
+                              :inline_format => true,
+                              :border_width => 0,
+                              :align => :left
+              }
+    )
+    class_enrollments = enrollment.class_enrollments.where(:situation => I18n.translate("activerecord.attributes.class_enrollment.situations.aproved"))
+    unless class_enrollments.empty?
+      table_data = class_enrollments.map do |class_enrollment|
+        [
+            class_enrollment.course_class.course.code,
+            class_enrollment.course_class.course.name,
+            number_to_grade(class_enrollment.grade),
+            class_enrollment.course_class.course.credits,
+            "#{class_enrollment.course_class.semester}º/#{class_enrollment.course_class.year}"
+        ]
+      end
+
+      pdf.table(table_data, :column_widths => table_width,
+                :row_colors => ["FFFFFF", "F0F0F0"],
+                :cell_style => {:font => "Courier",
+                                :size => 8,
+                                :inline_format => true,
+                                :border_width => 0
+                }
+      )
+    end
+
+    pdf.move_down 50
+
+    send_data(pdf.render, :filename => "#{I18n.t('pdf_content.enrollment.academic_transcript.title')} -  #{enrollment.student.name}.pdf", :type => 'application/pdf')
+  end
+
+
 end

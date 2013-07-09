@@ -127,6 +127,9 @@ Sapos::Application.routes.draw do
     collection do
       get 'to_pdf'
     end
+    member do
+      get 'academic_transcript_pdf'
+    end
   end
 
   resources :enrollment_statuses do
