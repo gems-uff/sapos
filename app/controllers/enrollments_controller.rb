@@ -375,7 +375,7 @@ class EnrollmentsController < ApplicationController
 
       phases_table_data = accomplished_phases.map do |accomplishment|
         [
-            "#{accomplishment.phase.name} #{I18n.localize(accomplishment.conclusion_date, :format => :monthyear2)}"
+            "#{I18n.localize(accomplishment.conclusion_date, :format => :monthyear2)} #{accomplishment.phase.name}"
         ]
       end
 
