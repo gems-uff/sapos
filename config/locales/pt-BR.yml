@@ -251,8 +251,7 @@ pt-BR:
         link: "Histórico"
         course_code: "Código"
         course_name: "Nome da Disciplina"
-
-        course_grade: "Nota / Conceito"
+        course_grade: "Nota"
         course_credits: "Créditos"
         course_year_semester: "Período"
         student_name: "Aluno"
@@ -267,6 +266,12 @@ pt-BR:
         graduation: "em Computação"
         enrollment_admission_date: "Mês/Ano de ingresso no curso"
         total_credits: "Total"
+        accomplished_phases: "Etapas obrigatórias concluídas"
+        advisors: "Orientadores"
+        location: "Niterói"
+        warning1: "Este documento só é válido sem rasuras, com selo da UFF e com a assinatura do Coordenador."
+        coordinator_signature: "ASSINATURA DO COORDENADOR"
+        page: "Pág. nº "
 
   rescue_blank_text: "Não informado"
 
