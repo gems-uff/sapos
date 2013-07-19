@@ -2,6 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Professor < ActiveRecord::Base
+  attr_accessible :name
   has_many :advisements, :dependent => :destroy
   has_many :enrollments, :through => :advisements
   has_many :scholarships, :dependent => :destroy

@@ -2,6 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class DeferralType < ActiveRecord::Base
+  attr_accessible :name
   belongs_to :phase
   has_many :deferrals
 

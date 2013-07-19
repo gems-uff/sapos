@@ -2,6 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Student < ActiveRecord::Base
+  attr_accessible :name
   has_and_belongs_to_many :majors
     
   belongs_to :birthplace, :foreign_key => "state_id", :class_name => "State"

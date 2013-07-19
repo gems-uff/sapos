@@ -33,7 +33,7 @@ class ScholarshipDuration < ActiveRecord::Base
       label = I18n.localize(start_date, :format => :monthyear)
     end
     if end_date
-      label = "- #{I18n.localize(end_date, :format => :monthyear)}"
+      label += " - #{I18n.localize(end_date, :format => :monthyear)}"
     end
     label
   end

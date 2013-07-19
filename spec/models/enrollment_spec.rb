@@ -91,11 +91,11 @@ describe Enrollment do
       FactoryGirl.create(:accomplishment, :enrollment => @enrollment_accomplished, :phase => one_month_phase, :conclusion_date => 1.day.ago)
 
       enrollment_active_deferral = FactoryGirl.create(:enrollment, :level => level, :admission_date => admission_date)
-      three_months_deferral_type = FactoryGirl.create(:deferral_type, :phase => one_month_phase, :duration_days => 0, :duration_months => 3, :duration_semesters => 0)
-      FactoryGirl.create(:deferral, :enrollment => enrollment_active_deferral, :deferral_type => three_months_deferral_type)
+      one_semester_deferral_type = FactoryGirl.create(:deferral_type, :phase => one_month_phase, :duration_days => 0, :duration_months => 0, :duration_semesters => 1)
+      FactoryGirl.create(:deferral, :enrollment => enrollment_active_deferral, :deferral_type => one_semester_deferral_type)
 
       @enrollment_expired_deferral = FactoryGirl.create(:enrollment, :level => level, :admission_date => (admission_date - 2.months))
-      FactoryGirl.create(:deferral, :enrollment => @enrollment_expired_deferral, :deferral_type => three_months_deferral_type)
+      FactoryGirl.create(:deferral, :enrollment => @enrollment_expired_deferral, :deferral_type => one_semester_deferral_type)
 
     end
 
