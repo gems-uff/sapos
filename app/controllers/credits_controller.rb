@@ -4,6 +4,7 @@
 
 class CreditsController < ApplicationController
   skip_authorization_check
+  require 'file_utils'
 
   def show
     links_content = FileUtils.file_content('LINKS')
