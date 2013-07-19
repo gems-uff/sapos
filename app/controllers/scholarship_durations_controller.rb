@@ -45,7 +45,8 @@ class ScholarshipDurationsController < ApplicationController
   end
 
   def self.condition_for_adviser_column(column, value, like_pattern)
-    sql = "enrollments.id IN (
+    unless value.blank?
+      sql = "enrollments.id IN (
              SELECT adv.enrollment_id
              FROM advisements AS adv
              INNER JOIN professors
@@ -53,11 +54,13 @@ class ScholarshipDurationsController < ApplicationController
              WHERE professors.id = ?
 	         )"
 
-    [sql, value]
+      [sql, value]
+    end
   end
 
   def self.condition_for_sponsors_column(column, value, like_pattern)
-    sql = "scholarship_durations.scholarship_id IN(
+    unless value.blank?
+      sql = "scholarship_durations.scholarship_id IN(
             SELECT scholarships.id
             FROM   scholarships
             INNER JOIN sponsors
@@ -65,69 +68,83 @@ class ScholarshipDurationsController < ApplicationController
             WHERE sponsors.id = ?
           )"
 
-    [sql, value]
+      [sql, value]
+    end
   end
 
 
   def self.condition_for_scholarship_types_column(column, value, like_pattern)
-    sql = "scholarships.scholarship_type_id = ?"
+    unless value.blank?
+      sql = "scholarships.scholarship_type_id = ?"
 
-    [sql, value]
+      [sql, value]
+    end
   end
 
   def self.condition_for_active_column(column, value, like_pattern)
-    query_active_scholarships = "DATE(scholarship_durations.end_date) >= DATE(?) AND  (scholarship_durations.cancel_date is NULL OR DATE(scholarship_durations.cancel_date) >= DATE(?))"
-    query_inactive_scholarships = "DATE(scholarship_durations.end_date) < DATE(?) OR DATE(scholarship_durations.cancel_date) < DATE(?)"
-    case value
-      when "active" then
-        sql = query_active_scholarships
-      when "not_active" then
-        sql = query_inactive_scholarships
-      else
-        sql = ""
-    end
+    unless value.blank?
+      query_active_scholarships = "DATE(scholarship_durations.end_date) >= DATE(?) AND  (scholarship_durations.cancel_date is NULL OR DATE(scholarship_durations.cancel_date) >= DATE(?))"
+      query_inactive_scholarships = "DATE(scholarship_durations.end_date) < DATE(?) OR DATE(scholarship_durations.cancel_date) < DATE(?)"
+      case value
+        when "active" then
+          sql = query_active_scholarships
+        when "not_active" then
+          sql = query_inactive_scholarships
+        else
+          sql = ""
+      end
 
-    [sql, Time.now, Time.now]
+
+      [sql, Time.now, Time.now]
+    end
   end
 
   def self.condition_for_level_column(column, value, like_pattern)
-    ["scholarships.id IN (
+    unless value.blank?
+      ["scholarships.id IN (
       SELECT scholarships.id
       FROM   scholarships
       WHERE  scholarships.level_id = ?
     )", value]
+    end
   end
 
   def self.condition_for_start_date_column(column, value, like_pattern)
-    month = value[:month].empty? ? 1 : value[:month]
-    year = value[:year].empty? ? 1 : value[:year]
+    unless value.blank?
+      month = value[:month].empty? ? 1 : value[:month]
+      year = value[:year].empty? ? 1 : value[:year]
 
-    if year != 1
-      date = Date.new(year.to_i, month.to_i)
+      if year != 1
+        date = Date.new(year.to_i, month.to_i)
 
-      ["#{column.search_sql} >= ?", date]
+        ["#{column.search_sql} >= ?", date]
+      end
     end
   end
 
   def self.condition_for_end_date_column(column, value, like_pattern)
-    month = value[:month].empty? ? 1 : value[:month]
-    year = value[:year].empty? ? 1 : value[:year]
+    unless value.blank?
+      month = value[:month].empty? ? 1 : value[:month]
+      year = value[:year].empty? ? 1 : value[:year]
 
-    if year != 1
-      date = Date.new(year.to_i, month.to_i)
+      if year != 1
+        date = Date.new(year.to_i, month.to_i)
 
-      ["#{column.search_sql} >= ?", date]
+        ["#{column.search_sql} >= ?", date]
+      end
     end
   end
 
   def self.condition_for_cancel_date_column(column, value, like_pattern)
-    month = value[:month].empty? ? 1 : value[:month]
-    year = value[:year].empty? ? 1 : value[:year]
+    unless value.blank?
+      month = value[:month].empty? ? 1 : value[:month]
+      year = value[:year].empty? ? 1 : value[:year]
 
-    if year != 1
-      date = Date.new(year.to_i, month.to_i)
+      if year != 1
+        date = Date.new(year.to_i, month.to_i)
 
-      ["#{column.search_sql} >= ?", date]
+        ["#{column.search_sql} >= ?", date]
+      end
     end
   end
 
