@@ -52,7 +52,7 @@ class ApplicationController < ActionController::Base
     if params[:record]
       external_key = "";
       invalid_year = false;
-      params[:record].each { |key, value|
+      params[:record].dup.each { |key, value|
         if key.include?("1i")
           invalid_year = value.to_i < 1000
           external_key = key.split("(")[0]
@@ -64,7 +64,7 @@ class ApplicationController < ActionController::Base
             key.include?(external_key)
           }
 
-          params[:record][external_key] = nil
+          params[:record][external_key] = params[:record].delete(external_key)
         end
       }
     end
