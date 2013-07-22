@@ -14,7 +14,7 @@ class Ability
 
 
   def initialize(user)
-    alias_action :list, :row, :show_search, :render_field, :to => :read
+    alias_action :list, :row, :show_search, :render_field, :to_pdf, :to => :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing, :to => :update
     alias_action :delete, :destroy_existing, :to => :destroy
     #as_action_aliases
@@ -30,9 +30,12 @@ class Ability
       can :manage, :all
     elsif role_id == Role::ROLE_PROFESSOR
       can :read, (Ability::ALL_MODELS - [User, Role])
-      can :manage, CourseClass
+      can :summary_pdf, CourseClass
+      can :academic_transcript, Enrollment
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role])
+      can :summary_pdf, CourseClass
+      can :academic_transcript, Enrollment
     end
 
     # Define abilities for the passed in user here. For example:
