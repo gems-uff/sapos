@@ -384,6 +384,9 @@ pt-BR:
       research_area:
         one: "Área de Pesquisa"
         other: "Áreas de Pesquisa"
+      role:
+        one: "Papel"
+        other: "Papéis"
       course:
         one: "Disciplina"
         other: "Disciplinas"
