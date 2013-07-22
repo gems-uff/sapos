@@ -283,7 +283,7 @@ class EnrollmentsController < ApplicationController
       end
     end
     pdf.font('Courier', :size => 9) do
-      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 60) do
+      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 80) do
         pdf.stroke_bounds
         current_x = x_start_position
         pdf.move_down default_margin
@@ -292,19 +292,26 @@ class EnrollmentsController < ApplicationController
         pdf.move_down default_margin
 
         pdf.draw_text("#{I18n.t("pdf_content.enrollment.academic_transcript.enrollment_admission_date")}: #{I18n.localize(enrollment.admission_date, :format => :monthyear2)}", :at => [current_x, pdf.cursor])
+        pdf.move_down default_margin
+
+        enrollment_dismissal_date_text =  "#{I18n.t("pdf_content.enrollment.academic_transcript.enrollment_dismissal_date")}: #{"#{I18n.localize(enrollment.dismissal.date, :format => :monthyear2)}" if enrollment.dismissal}"
+        pdf.draw_text(enrollment_dismissal_date_text, :at => [current_x, pdf.cursor])
+        current_x += enrollment_dismissal_date_text.size*font_width + default_margin_x
+
+        pdf.draw_text("#{I18n.t("pdf_content.enrollment.academic_transcript.enrollment_dismissal_reason")}: #{"#{enrollment.dismissal.dismissal_reason.name}" if enrollment.dismissal}", :at => [current_x, pdf.cursor])
       end
     end
 
 
     pdf.move_down 20
 
-    table_width = [65, 314, 60, 65, 68]
+    table_width = [68, 65, 314, 60, 65]
 
-    header = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_code")}</b>",
+    header = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_year_semester")}</b>",
+               "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_code")}</b>",
                "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_name")}</b>",
                "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_grade")}</b>",
-               "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_credits")}</b>",
-               "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_year_semester")}</b>"
+               "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_credits")}</b>"
               ]]
 
     pdf.table(header, :column_widths => table_width,
@@ -316,15 +323,15 @@ class EnrollmentsController < ApplicationController
                               :align => :center
               }
     )
-    class_enrollments = enrollment.class_enrollments.where(:situation => I18n.translate("activerecord.attributes.class_enrollment.situations.aproved"))
+    class_enrollments = enrollment.class_enrollments.where(:situation => I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")).joins(:course_class).order("CONCAT(course_classes.year, course_classes.semester)")
     unless class_enrollments.empty?
       table_data = class_enrollments.map do |class_enrollment|
         [
+            "#{class_enrollment.course_class.semester}/#{class_enrollment.course_class.year}",
             class_enrollment.course_class.course.code,
             class_enrollment.course_class.course.name,
             class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : I18n.t("pdf_content.enrollment.academic_transcript.course_approved"),
-            class_enrollment.course_class.course.credits,
-            "#{class_enrollment.course_class.semester}/#{class_enrollment.course_class.year % 1000}"
+            class_enrollment.course_class.course.credits
         ]
       end
 
@@ -337,10 +344,10 @@ class EnrollmentsController < ApplicationController
                                 :align => :center
                 }
       ) do |table|
-        table.column(1).align = :left
+        table.column(2).align = :left
       end
 
-      footer = [["", "<b>#{I18n.t('pdf_content.enrollment.academic_transcript.total_credits')}</b>", "", class_enrollments.joins({:course_class => :course}).sum(:credits).to_i, ""]]
+      footer = [["", "", "<b>#{I18n.t('pdf_content.enrollment.academic_transcript.total_credits')}</b>", "", class_enrollments.joins({:course_class => :course}).sum(:credits).to_i]]
       pdf.table(footer, :column_widths => table_width,
                 :row_colors => ["BFBFBF"],
                 :cell_style => {:font => "Courier",
@@ -350,7 +357,7 @@ class EnrollmentsController < ApplicationController
                                 :align => :center
                 }
       ) do |table|
-        table.column(1).align = :right
+        table.column(2).align = :right
       end
     end
 
@@ -393,18 +400,18 @@ class EnrollmentsController < ApplicationController
 
     pdf.move_down 10
 
-    pdf.font('Courier', :size => 9) do
-      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 25) do
-        pdf.stroke_bounds
-        current_x = x_start_position
-        pdf.move_down 15
-        pdf.draw_text("#{I18n.t("pdf_content.enrollment.academic_transcript.advisors")}: #{(enrollment.professors.map { |professor| professor.name }).join(", ") }", :at => [current_x, pdf.cursor])
-      end
-    end
+    #pdf.font('Courier', :size => 9) do
+    #  pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 25) do
+    #    pdf.stroke_bounds
+    #    current_x = x_start_position
+    #    pdf.move_down 15
+    #    pdf.draw_text("#{I18n.t("pdf_content.enrollment.academic_transcript.advisors")}: #{(enrollment.professors.map { |professor| professor.name }).join(", ") }", :at => [current_x, pdf.cursor])
+    #  end
+    #end
 
     last_box_height = 50
     last_box_width1 = 150
-    last_box_y = pdf.cursor
+    last_box_y = pdf.cursor - 15
     pdf.font('Courier', :size => 8) do
       pdf.bounding_box([0, last_box_y], :width => last_box_width1, :height => last_box_height) do
         pdf.stroke_bounds

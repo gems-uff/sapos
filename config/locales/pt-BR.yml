@@ -265,6 +265,8 @@ pt-BR:
         course: "Curso"
         graduation: "em Computação"
         enrollment_admission_date: "Mês/Ano de ingresso no curso"
+        enrollment_dismissal_date: "Mês/Ano de desligamento do curso"
+        enrollment_dismissal_reason: "Motivo"
         total_credits: "Total"
         accomplished_phases: "Etapas obrigatórias concluídas"
         advisors: "Orientadores"
