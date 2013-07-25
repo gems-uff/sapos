@@ -11,6 +11,7 @@ pt-BR:
       short: "%d de %B"
       long: "%d de %B de %Y"
       monthyear: "%B-%Y"
+      monthyear2: "%B/%Y"
 
     day_names:
       - Domingo
@@ -248,6 +249,35 @@ pt-BR:
       academic_transcript:
         title: "Histórico Escolar"
         link: "Histórico"
+        course_code: "Código"
+        course_name: "Nome da Disciplina"
+        course_grade: "Nota"
+        course_credits: "Créditos"
+        course_year_semester: "Período"
+        student_name: "Aluno"
+        enrollment_number: "Matrícula"
+        student_identity_number: "Identidade"
+        student_birthplace: "Naturalidade"
+        student_birthdate: "Data de Nascimento"
+        identity_issuing_body: "Órgão Expeditor"
+        student_cpf: "C.P.F."
+        course_approved: "AP"
+        course: "Curso"
+        graduation: "em Computação"
+        enrollment_admission_date: "Mês/Ano de ingresso no curso"
+        enrollment_dismissal_date: "Mês/Ano de desligamento do curso"
+        enrollment_dismissal_reason: "Motivo"
+        total_credits: "Total"
+        accomplished_phases: "Etapas obrigatórias concluídas"
+        advisors: "Orientadores"
+        location: "Niterói"
+        warning1: "Este documento só é válido sem rasuras, com selo da UFF e com a assinatura do Coordenador."
+        coordinator_signature: "ASSINATURA DO COORDENADOR"
+        page: "Pág. nº "
+
+  rescue_blank_text: "Não informado"
+
+
 
   doc:
     credits: "Créditos"

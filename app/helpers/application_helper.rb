@@ -11,4 +11,12 @@ module ApplicationHelper
   def transparent_if_logged_out
     'style="background: transparent;border: 0;"'.html_safe unless user_signed_in?
   end
+
+  def rescue_blank_text(text = nil, method_call = nil)
+    if method_call
+      text.blank? ? I18n.t('rescue_blank_text') : text.send(method_call)
+    else
+      text.blank? ? I18n.t('rescue_blank_text') : text
+    end
+  end
 end

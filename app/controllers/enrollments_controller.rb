@@ -3,11 +3,16 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class EnrollmentsController < ApplicationController
+
   authorize_resource
+  include NumbersHelper
+  include ApplicationHelper
+
 
   active_scaffold :enrollment do |config|
 
     config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
+    config.action_links.add 'academic_transcript_pdf', :label => I18n.t('pdf_content.enrollment.academic_transcript.link'), :page => true, :type => :member
 
     config.list.columns = [:student, :enrollment_number, :level, :enrollment_status, :admission_date, :dismissal]
     config.list.sorting = {:enrollment_number => 'ASC'}
@@ -175,5 +180,283 @@ class EnrollmentsController < ApplicationController
 
     send_data(pdf.render, :filename => 'relatorio.pdf', :type => 'application/pdf')
   end
+
+  def update_authorized?(record=nil)
+    can? :update, record
+  end
+
+  def create_authorized?(record=nil)
+    can? :create, record
+  end
+
+  def show_authorized?(record=nil)
+    can? :read, record
+  end
+
+  def delete_authorized?(record=nil)
+    can? :delete, record
+  end
+
+  def academic_transcript_pdf
+
+    enrollment = Enrollment.find(params[:id])
+
+    pdf = Prawn::Document.new(:left_margin => 20, :right_margin => 20, :top_margin => 30, :bottom_margin => 30)
+
+    x_start_position = 5
+    default_margin = 22
+    default_margin_x = 50
+    current_x = x_start_position
+    font_width = 5.7
+
+    pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [pdf.bounds.right - 65, pdf.cursor],
+              :vposition => :top,
+              :scale => 0.3
+    )
+    pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right - 85, :height => 50) do
+      pdf.font('Courier', :size => 14) do
+        pdf.text('Universidade Federal Fluminense
+                Instituto de Computação
+                Programa de Pós-Graduação em Computação', :align => :center)
+      end
+    end
+
+    pdf.move_down 20
+
+    pdf.font('Courier', :size => 15) do
+      pdf.text "#{I18n.t('pdf_content.enrollment.academic_transcript.title')}", :align => :center
+    end
+
+    pdf.move_down 20
+    pdf.font('Courier', :size => 9) do
+      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 100) do
+        pdf.stroke_bounds
+
+
+        first_colummn_labels_sizes = [
+            I18n.t('pdf_content.enrollment.academic_transcript.student_name').size,
+            I18n.t('pdf_content.enrollment.academic_transcript.enrollment_number').size,
+            I18n.t('pdf_content.enrollment.academic_transcript.student_identity_number').size,
+            I18n.t('pdf_content.enrollment.academic_transcript.student_cpf').size
+        ]
+
+        first_column_text_x = first_colummn_labels_sizes.sort.last*font_width + default_margin_x/3
+
+        pdf.move_down default_margin
+        pdf.draw_text("#{I18n.t('pdf_content.enrollment.academic_transcript.student_name')}:", :at => [current_x, pdf.cursor])
+        pdf.draw_text("#{enrollment.student.name}", :at => [first_column_text_x, pdf.cursor])
+
+        pdf.move_down default_margin
+        enrollment_number_label = "#{I18n.t('pdf_content.enrollment.academic_transcript.enrollment_number')}:"
+        pdf.draw_text(enrollment_number_label, :at => [current_x, pdf.cursor])
+        enrollment_number_text = "#{enrollment.enrollment_number}"
+        current_x = first_column_text_x
+        pdf.draw_text(enrollment_number_text, :at => [current_x, pdf.cursor])
+
+        current_x += enrollment_number_text.size*font_width + default_margin_x
+        student_birthplace_text = "#{I18n.t('pdf_content.enrollment.academic_transcript.student_birthplace')}: #{rescue_blank_text(enrollment.student.birthplace, :name)}"
+        pdf.draw_text(student_birthplace_text, :at => [current_x, pdf.cursor])
+
+        current_x += student_birthplace_text.size*font_width + default_margin_x
+        pdf.draw_text("#{I18n.t('pdf_content.enrollment.academic_transcript.student_birthdate')}: #{rescue_blank_text(enrollment.student.birthdate)}", :at => [current_x, pdf.cursor])
+        pdf.move_down default_margin
+        current_x = x_start_position
+
+        student_identity_number_label = "#{I18n.t('pdf_content.enrollment.academic_transcript.student_identity_number')}:"
+        pdf.draw_text(student_identity_number_label, :at => [current_x, pdf.cursor])
+        student_identity_number_text = "#{rescue_blank_text(enrollment.student.identity_number)}"
+        current_x = first_column_text_x
+        pdf.draw_text(student_identity_number_text, :at => [current_x, pdf.cursor])
+
+        current_x += student_identity_number_text.size*font_width + default_margin_x
+        identity_issuing_body = "#{I18n.t('pdf_content.enrollment.academic_transcript.identity_issuing_body')}: #{rescue_blank_text(enrollment.student.identity_issuing_body)}"
+        pdf.draw_text(identity_issuing_body, :at => [current_x, pdf.cursor])
+        pdf.move_down default_margin
+        current_x = x_start_position
+
+        student_cpf_label = "#{I18n.t('pdf_content.enrollment.academic_transcript.student_cpf')}:"
+        pdf.draw_text(student_cpf_label, :at => [current_x, pdf.cursor])
+        student_cpf_text = "#{rescue_blank_text(enrollment.student.cpf)}"
+        current_x = first_column_text_x
+        pdf.draw_text(student_cpf_text, :at => [current_x, pdf.cursor])
+
+      end
+    end
+    pdf.font('Courier', :size => 9) do
+      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 80) do
+        pdf.stroke_bounds
+        current_x = x_start_position
+        pdf.move_down default_margin
+
+        pdf.draw_text("#{I18n.t("pdf_content.enrollment.academic_transcript.course")}: #{enrollment.level.name} #{I18n.t("pdf_content.enrollment.academic_transcript.graduation")}", :at => [current_x, pdf.cursor])
+        pdf.move_down default_margin
+
+        pdf.draw_text("#{I18n.t("pdf_content.enrollment.academic_transcript.enrollment_admission_date")}: #{I18n.localize(enrollment.admission_date, :format => :monthyear2)}", :at => [current_x, pdf.cursor])
+        pdf.move_down default_margin
+
+        enrollment_dismissal_date_text =  "#{I18n.t("pdf_content.enrollment.academic_transcript.enrollment_dismissal_date")}: #{"#{I18n.localize(enrollment.dismissal.date, :format => :monthyear2)}" if enrollment.dismissal}"
+        pdf.draw_text(enrollment_dismissal_date_text, :at => [current_x, pdf.cursor])
+        current_x += enrollment_dismissal_date_text.size*font_width + default_margin_x
+
+        pdf.draw_text("#{I18n.t("pdf_content.enrollment.academic_transcript.enrollment_dismissal_reason")}: #{"#{enrollment.dismissal.dismissal_reason.name}" if enrollment.dismissal}", :at => [current_x, pdf.cursor])
+      end
+    end
+
+
+    pdf.move_down 20
+
+    table_width = [68, 65, 314, 60, 65]
+
+    header = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_year_semester")}</b>",
+               "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_code")}</b>",
+               "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_name")}</b>",
+               "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_grade")}</b>",
+               "<b>#{I18n.t("pdf_content.enrollment.academic_transcript.course_credits")}</b>"
+              ]]
+
+    pdf.table(header, :column_widths => table_width,
+              :row_colors => ["BFBFBF"],
+              :cell_style => {:font => "Courier",
+                              :size => 10,
+                              :inline_format => true,
+                              :border_width => 0,
+                              :align => :center
+              }
+    )
+    class_enrollments = enrollment.class_enrollments.where(:situation => I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")).joins(:course_class).order("CONCAT(course_classes.year, course_classes.semester)")
+    unless class_enrollments.empty?
+      table_data = class_enrollments.map do |class_enrollment|
+        [
+            "#{class_enrollment.course_class.semester}/#{class_enrollment.course_class.year}",
+            class_enrollment.course_class.course.code,
+            class_enrollment.course_class.course.name,
+            class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : I18n.t("pdf_content.enrollment.academic_transcript.course_approved"),
+            class_enrollment.course_class.course.credits
+        ]
+      end
+
+      pdf.table(table_data, :column_widths => table_width,
+                :row_colors => ["F9F9F9", "F0F0F0"],
+                :cell_style => {:font => "Courier",
+                                :size => 8,
+                                :inline_format => true,
+                                :border_width => 0,
+                                :align => :center
+                }
+      ) do |table|
+        table.column(2).align = :left
+      end
+
+      footer = [["", "", "<b>#{I18n.t('pdf_content.enrollment.academic_transcript.total_credits')}</b>", "", class_enrollments.joins({:course_class => :course}).sum(:credits).to_i]]
+      pdf.table(footer, :column_widths => table_width,
+                :row_colors => ["BFBFBF"],
+                :cell_style => {:font => "Courier",
+                                :size => 8,
+                                :inline_format => true,
+                                :border_width => 0,
+                                :align => :center
+                }
+      ) do |table|
+        table.column(2).align = :right
+      end
+    end
+
+    pdf.move_down 20
+
+    accomplished_phases = enrollment.accomplishments.order(:conclusion_date)
+
+    unless accomplished_phases.empty?
+      phases_table_width = [pdf.bounds.right]
+
+      phases_table_header = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.accomplished_phases")}</b>"]]
+
+      pdf.table(phases_table_header, :column_widths => phases_table_width,
+                :row_colors => ["BFBFBF"],
+                :cell_style => {:font => "Courier",
+                                :size => 10,
+                                :inline_format => true,
+                                :border_width => 0,
+                                :align => :center
+                }
+      )
+
+      phases_table_data = accomplished_phases.map do |accomplishment|
+        [
+            "#{I18n.localize(accomplishment.conclusion_date, :format => :monthyear2)} #{accomplishment.phase.name}"
+        ]
+      end
+
+      pdf.table(phases_table_data, :column_widths => phases_table_width,
+                :row_colors => ["F9F9F9", "F0F0F0"],
+                :cell_style => {:font => "Courier",
+                                :size => 8,
+                                :inline_format => true,
+                                :border_width => 0,
+                                :align => :left
+                }
+      )
+
+    end
+
+    pdf.move_down 10
+
+    #pdf.font('Courier', :size => 9) do
+    #  pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 25) do
+    #    pdf.stroke_bounds
+    #    current_x = x_start_position
+    #    pdf.move_down 15
+    #    pdf.draw_text("#{I18n.t("pdf_content.enrollment.academic_transcript.advisors")}: #{(enrollment.professors.map { |professor| professor.name }).join(", ") }", :at => [current_x, pdf.cursor])
+    #  end
+    #end
+
+    last_box_height = 50
+    last_box_width1 = 150
+    last_box_y = pdf.cursor - 15
+    pdf.font('Courier', :size => 8) do
+      pdf.bounding_box([0, last_box_y], :width => last_box_width1, :height => last_box_height) do
+        pdf.stroke_bounds
+        current_x = x_start_position
+        pdf.move_down last_box_height/2
+        pdf.draw_text("#{I18n.t("pdf_content.enrollment.academic_transcript.location")}, #{I18n.localize(Date.today, :format => :long)}", :at => [current_x, pdf.cursor])
+      end
+    end
+
+    last_box_width2 = 350
+    pdf.font('Courier', :size => 6) do
+      pdf.bounding_box([last_box_width1, last_box_y], :width => last_box_width2, :height => last_box_height) do
+        pdf.stroke_bounds
+        current_x = x_start_position
+        pdf.move_down 8
+
+        pdf.draw_text("#{I18n.t("pdf_content.enrollment.academic_transcript.warning1")}", :at => [current_x, pdf.cursor])
+
+        underline_width = 3.8
+        pdf.move_down 30
+        underline = "__________________________________________________________________________"
+        current_x += (last_box_width2 - underline.size*underline_width)/2
+
+        pdf.draw_text(underline, :at => [current_x, pdf.cursor])
+
+        pdf.move_down 8
+        font_width = 7.5
+        coordinator_signature = I18n.t("pdf_content.enrollment.academic_transcript.coordinator_signature")
+        current_x += (last_box_width2 - coordinator_signature.size*font_width)/2
+        pdf.draw_text(coordinator_signature, :at => [current_x, pdf.cursor])
+      end
+    end
+
+    pdf.font('Courier', :size => 8) do
+      pdf.bounding_box([last_box_width1 + last_box_width2, last_box_y], :width => pdf.bounds.right - last_box_width1 - last_box_width2, :height => last_box_height) do
+        pdf.stroke_bounds
+        current_x = x_start_position
+        pdf.move_down last_box_height/2
+        pdf.draw_text("#{I18n.t("pdf_content.enrollment.academic_transcript.page")} #{pdf.page_count}", :at => [current_x, pdf.cursor])
+      end
+    end
+
+
+    send_data(pdf.render, :filename => "#{I18n.t('pdf_content.enrollment.academic_transcript.title')} -  #{enrollment.student.name}.pdf", :type => 'application/pdf')
+  end
+
 
 end
