@@ -14,7 +14,7 @@ class Ability
 
 
   def initialize(user)
-    alias_action :list, :row, :show_search, :render_field, :to_pdf, :summary_pdf, :academic_transcript_pdf :to => :read
+    alias_action :list, :row, :show_search, :render_field, :to_pdf, :summary_pdf, :academic_transcript_pdf, :to => :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing, :to => :update
     alias_action :delete, :destroy_existing, :to => :destroy
     #as_action_aliases
