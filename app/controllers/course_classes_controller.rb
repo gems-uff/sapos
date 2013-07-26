@@ -15,6 +15,16 @@ class CourseClassesController < ApplicationController
     config.create.label = :create_course_class_label
     config.update.label = :update_course_class_label
 
+    config.actions.swap :search, :field_search
+    config.field_search.columns = [:name, :year, :semester, :professor, :course, :enrollments]
+
+    config.columns[:professor].search_sql = "professors.name"
+    config.columns[:professor].search_ui = :text
+    config.columns[:course].search_sql = "courses.name"
+    config.columns[:course].search_ui = :text
+    config.columns[:name].search_ui = :text
+    config.columns[:enrollments].search_ui = :record_select
+
     config.action_links.add 'summary_pdf', :label => I18n.t('pdf_content.course_class.summary.link'), :page => true, :type => :member
 
     config.columns[:course].clear_link
@@ -32,7 +42,7 @@ class CourseClassesController < ApplicationController
     config.update.columns =
         [:name, :course, :professor, :year, :semester, :class_enrollments, :allocations]
   end
-  record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
+  record_select :per_page => 10, :order_by => 'name', :full_text_search => true
 
 
   def summary_pdf
