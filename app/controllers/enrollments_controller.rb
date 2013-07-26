@@ -614,7 +614,7 @@ CONCAT(course_classes.year, course_classes.semester)")
 
         end
         bold_rows<< row_index
-        table_data << ["", "", "#{I18n.t("pdf_content.enrollment.grades_report.semester_summary")} ", number_to_grade(gpr), semester_credits, ""]
+        table_data << ["", "", "#{I18n.t("pdf_content.enrollment.grades_report.semester_summary")} ", number_to_grade(gpr, :precision => 1), semester_credits, ""]
         row_index+=1
         total_credits += semester_credits
       end
@@ -645,7 +645,7 @@ CONCAT(course_classes.year, course_classes.semester)")
 
       footer = [
           ["", "", "#{I18n.t('pdf_content.enrollment.grades_report.total_credits')} ", "", total_credits, ""],
-          ["", "", "#{I18n.t('pdf_content.enrollment.grades_report.total_gpr')} ", number_to_grade(total_gpr.first.first), "", ""]
+          ["", "", "#{I18n.t('pdf_content.enrollment.grades_report.total_gpr')} ", number_to_grade(total_gpr.first.first, :precision => 1), "", ""]
       ]
       pdf.table(footer, :column_widths => table_width,
                 :row_colors => ["BFBFBF"],
