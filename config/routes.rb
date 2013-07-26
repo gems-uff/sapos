@@ -129,6 +129,7 @@ Sapos::Application.routes.draw do
     end
     member do
       get 'academic_transcript_pdf'
+      get 'grades_report_pdf'
     end
   end
 

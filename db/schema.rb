@@ -1,9 +1,4 @@
-
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
-# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
-
 # encoding: UTF-8
-
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -16,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130527235843) do
+ActiveRecord::Schema.define(:version => 20130726195041) do
 
   create_table "enrollment_statuses", :force => true do |t|
     t.string   "name"
@@ -308,20 +303,20 @@ ActiveRecord::Schema.define(:version => 20130527235843) do
     t.integer  "institution_id"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
-    t.index ["institution_id"], :name => "fk__majors_institution_id"
     t.index ["level_id"], :name => "fk__majors_level_id"
+    t.index ["institution_id"], :name => "fk__majors_institution_id"
     t.foreign_key ["institution_id"], "institutions", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_majors_institution_id"
     t.foreign_key ["level_id"], "levels", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_majors_level_id"
   end
 
   create_table "majors_students", :id => false, :force => true do |t|
-    t.integer "course_id",  :null => false
+    t.integer "major_id",   :null => false
     t.integer "student_id", :null => false
-    t.index ["course_id"], :name => "index_majors_students_on_course_id"
+    t.index ["major_id"], :name => "index_majors_students_on_course_id"
     t.index ["student_id"], :name => "index_majors_students_on_student_id"
-    t.index ["course_id"], :name => "fk__majors_students_course_id"
+    t.index ["major_id"], :name => "fk__majors_students_course_id"
     t.index ["student_id"], :name => "fk__majors_students_student_id"
-    t.foreign_key ["course_id"], "majors", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_majors_students_course_id"
+    t.foreign_key ["major_id"], "majors", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_majors_students_major_id"
     t.foreign_key ["student_id"], "students", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_majors_students_student_id"
   end
 
@@ -342,41 +337,6 @@ ActiveRecord::Schema.define(:version => 20130527235843) do
   create_table "professor_research_areas", :force => true do |t|
     t.integer  "professor_id"
     t.integer  "research_area_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "professor_research_areas", ["professor_id"], :name => "professor_research_areas_professor_id_fkey"
-  add_index "professor_research_areas", ["research_area_id"], :name => "professor_research_areas_research_area_id_fkey"
-
-  create_table "professors", :force => true do |t|
-    t.string   "name"
-    t.string   "cpf"
-    t.date     "birthdate"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "sex"
-    t.string   "civil_status"
-    t.string   "identity_number"
-    t.string   "identity_issuing_body"
-    t.string   "identity_expedition_date"
-    t.string   "neighbourhood"
-    t.string   "address"
-    t.integer  "state_id"
-    t.integer  "city_id"
-    t.string   "zip_code"
-    t.string   "telephone1"
-    t.string   "telephone2"
-    t.string   "siape"
-    t.string   "enrollment_number"
-  end
-
-  add_index "professors", ["city_id"], :name => "professors_city_id_fkey"
-  add_index "professors", ["state_id"], :name => "professors_state_id_fkey"
-
-  create_table "research_areas", :force => true do |t|
-    t.string   "name"
-    t.string   "code"
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
     t.index ["professor_id"], :name => "fk__professor_research_areas_professor_id"
@@ -442,20 +402,12 @@ ActiveRecord::Schema.define(:version => 20130527235843) do
     t.foreign_key ["scholarship_id"], "scholarships", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_scholarship_durations_scholarship_id"
   end
 
-
-  add_index "students", ["birthplace"], :name => "students_birthplace_fkey"
-  add_index "students", ["city_id"], :name => "students_city_id_fkey"
-  add_index "students", ["country_id"], :name => "students_country_id_fkey"
-  add_index "students", ["state_id"], :name => "students_state_id_fkey"
-
-
   create_table "users", :force => true do |t|
     t.string   "name"
     t.string   "hashed_password"
     t.string   "salt"
-
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                             :null => false
+    t.datetime "updated_at",                             :null => false
     t.string   "email",                  :default => "", :null => false
     t.string   "encrypted_password",     :default => "", :null => false
     t.string   "reset_password_token"
@@ -476,74 +428,5 @@ ActiveRecord::Schema.define(:version => 20130527235843) do
     t.index ["role_id"], :name => "fk__users_role_id"
     t.foreign_key ["role_id"], "roles", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_users_role_id"
   end
-
-
-  add_index "users", ["role_id"], :name => "users_role_id_fkey"
-
-  add_foreign_key "accomplishments", ["enrollment_id"], "enrollments", ["id"], :name => "accomplishments_enrollment_id_fkey"
-  add_foreign_key "accomplishments", ["phase_id"], "phases", ["id"], :name => "accomplishments_phase_id_fkey"
-
-  add_foreign_key "advisement_authorizations", ["level_id"], "levels", ["id"], :name => "advisement_authorizations_level_id_fkey"
-  add_foreign_key "advisement_authorizations", ["professor_id"], "professors", ["id"], :name => "advisement_authorizations_professor_id_fkey"
-
-  add_foreign_key "advisements", ["enrollment_id"], "enrollments", ["id"], :name => "advisements_enrollment_id_fkey"
-  add_foreign_key "advisements", ["professor_id"], "professors", ["id"], :name => "advisements_professor_id_fkey"
-
-  add_foreign_key "allocations", ["course_class_id"], "course_classes", ["id"], :name => "allocations_course_class_id_fkey"
-
-  add_foreign_key "cities", ["state_id"], "states", ["id"], :name => "cities_state_id_fkey"
-
-  add_foreign_key "class_enrollments", ["course_class_id"], "course_classes", ["id"], :name => "class_enrollments_course_class_id_fkey"
-  add_foreign_key "class_enrollments", ["enrollment_id"], "enrollments", ["id"], :name => "class_enrollments_enrollment_id_fkey"
-
-  add_foreign_key "course_classes", ["course_id"], "courses", ["id"], :name => "course_classes_course_id_fkey"
-  add_foreign_key "course_classes", ["professor_id"], "professors", ["id"], :name => "course_classes_professor_id_fkey"
-
-  add_foreign_key "courses", ["course_type_id"], "course_types", ["id"], :name => "courses_course_type_id_fkey"
-  add_foreign_key "courses", ["research_area_id"], "research_areas", ["id"], :name => "courses_research_area_id_fkey"
-
-  add_foreign_key "deferral_types", ["phase_id"], "phases", ["id"], :name => "deferral_types_phase_id_fkey"
-
-  add_foreign_key "deferrals", ["deferral_type_id"], "deferral_types", ["id"], :name => "deferrals_deferral_type_id_fkey"
-  add_foreign_key "deferrals", ["enrollment_id"], "enrollments", ["id"], :name => "deferrals_enrollment_id_fkey"
-
-  add_foreign_key "dismissals", ["dismissal_reason_id"], "dismissal_reasons", ["id"], :name => "dismissals_dismissal_reason_id_fkey"
-  add_foreign_key "dismissals", ["enrollment_id"], "enrollments", ["id"], :name => "dismissals_enrollment_id_fkey"
-
-  add_foreign_key "enrollments", ["enrollment_status_id"], "enrollment_statuses", ["id"], :name => "enrollments_enrollment_status_id_fkey"
-  add_foreign_key "enrollments", ["level_id"], "levels", ["id"], :name => "enrollments_level_id_fkey"
-  add_foreign_key "enrollments", ["student_id"], "students", ["id"], :name => "enrollments_student_id_fkey"
-
-  add_foreign_key "majors", ["institution_id"], "institutions", ["id"], :name => "courses_institution_id_fkey"
-  add_foreign_key "majors", ["level_id"], "levels", ["id"], :name => "courses_level_id_fkey"
-
-  add_foreign_key "majors_students", ["major_id"], "majors", ["id"], :name => "courses_students_major_id_fkey"
-  add_foreign_key "majors_students", ["student_id"], "students", ["id"], :name => "courses_students_student_id_fkey"
-
-  add_foreign_key "phase_durations", ["level_id"], "levels", ["id"], :name => "phase_durations_level_id_fkey"
-  add_foreign_key "phase_durations", ["phase_id"], "phases", ["id"], :name => "phase_durations_phase_id_fkey"
-
-  add_foreign_key "professor_research_areas", ["professor_id"], "professors", ["id"], :name => "professor_research_areas_professor_id_fkey"
-  add_foreign_key "professor_research_areas", ["research_area_id"], "research_areas", ["id"], :name => "professor_research_areas_research_area_id_fkey"
-
-  add_foreign_key "professors", ["city_id"], "cities", ["id"], :name => "professors_city_id_fkey"
-  add_foreign_key "professors", ["state_id"], "states", ["id"], :name => "professors_state_id_fkey"
-
-  add_foreign_key "scholarship_durations", ["enrollment_id"], "enrollments", ["id"], :name => "scholarship_durations_enrollment_id_fkey"
-  add_foreign_key "scholarship_durations", ["scholarship_id"], "scholarships", ["id"], :name => "scholarship_durations_scholarship_id_fkey"
-
-  add_foreign_key "scholarships", ["level_id"], "levels", ["id"], :name => "scholarships_level_id_fkey"
-  add_foreign_key "scholarships", ["professor_id"], "professors", ["id"], :name => "scholarships_professor_id_fkey"
-  add_foreign_key "scholarships", ["scholarship_type_id"], "scholarship_types", ["id"], :name => "scholarships_scholarship_type_id_fkey"
-  add_foreign_key "scholarships", ["sponsor_id"], "sponsors", ["id"], :name => "scholarships_sponsor_id_fkey"
-
-  add_foreign_key "states", ["country_id"], "countries", ["id"], :name => "states_country_id_fkey"
-
-  add_foreign_key "students", ["birthplace"], "states", ["id"], :name => "students_birthplace_fkey"
-  add_foreign_key "students", ["city_id"], "cities", ["id"], :name => "students_city_id_fkey"
-  add_foreign_key "students", ["country_id"], "countries", ["id"], :name => "students_country_id_fkey"
-  add_foreign_key "students", ["state_id"], "states", ["id"], :name => "students_state_id_fkey"
-
-  add_foreign_key "users", ["role_id"], "roles", ["id"], :name => "users_role_id_fkey"
 
 end
