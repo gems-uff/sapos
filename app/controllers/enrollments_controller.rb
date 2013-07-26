@@ -182,22 +182,6 @@ class EnrollmentsController < ApplicationController
     send_data(pdf.render, :filename => 'relatorio.pdf', :type => 'application/pdf')
   end
 
-  def update_authorized?(record=nil)
-    can? :update, record
-  end
-
-  def create_authorized?(record=nil)
-    can? :create, record
-  end
-
-  def show_authorized?(record=nil)
-    can? :read, record
-  end
-
-  def delete_authorized?(record=nil)
-    can? :delete, record
-  end
-
   def academic_transcript_pdf
 
     enrollment = Enrollment.find(params[:id])
