@@ -95,6 +95,8 @@ GEM
     prawn (0.12.0)
       pdf-reader (>= 0.9.0)
       ttfunk (~> 1.0.2)
+    prawn-rails (0.0.2)
+      prawn
     rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
@@ -195,6 +197,7 @@ DEPENDENCIES
   kaminari
   mysql2
   prawn
+  prawn-rails
   rails (= 3.2.13)
   rails-erd (~> 1.0.0)
   recordselect

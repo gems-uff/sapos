@@ -3,6 +3,7 @@
 
 module ApplicationHelper
   include NumbersHelper
+  include PdfHelper
 
   def display_none_if_logged_out
     'style="display:none;"'.html_safe unless user_signed_in?
@@ -13,10 +14,7 @@ module ApplicationHelper
   end
 
   def rescue_blank_text(text = nil, options = {})
-    puts "text #{text.inspect}"
-    puts "options #{options.inspect}"
     options[:blank_text] ||= I18n.t('rescue_blank_text')
-    puts "options2 #{options.inspect}"
     if options[:method_call]
       text.blank? ? options[:blank_text] : text.send(options[:method_call])
     else

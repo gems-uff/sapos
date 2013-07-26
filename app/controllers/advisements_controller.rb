@@ -9,7 +9,7 @@ class AdvisementsController < ApplicationController
 
   active_scaffold :advisement do |config|
 
-    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
+    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection, :parameters => {:format => 'pdf'}
 
     #Enables advanced search A.K.A FieldSearch
     config.actions.swap :search, :field_search
@@ -120,57 +120,12 @@ class AdvisementsController < ApplicationController
   end
 
   def to_pdf
-    pdf = Prawn::Document.new
-
-    y_position = pdf.cursor
-
-    pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [455, y_position],
-              :vposition => :top,
-              :scale => 0.3
-    )
-
-    pdf.font("Courier", :size => 14) do
-      pdf.text "Universidade Federal Fluminense
-                Instituto de Computação
-                Pós-Graduação"
-    end
-
-    pdf.move_down 30
-
-    header = [["<b>Professor</b>",
-               "<b>Número de Matrícula</b>",
-               "<b>Aluno</b>",
-               "<b>Nível</b>"]]
-    pdf.table(header, :column_widths => [135, 135, 135, 135],
-              :row_colors => ["BFBFBF"],
-              :cell_style => {:font => "Courier",
-                              :size => 10,
-                              :inline_format => true,
-                              :border_width => 0
-              }
-    )
-
     each_record_in_page {}
-    advisements = find_page(:sorting => active_scaffold_config.list.user.sorting).items
-
-    advs = advisements.map do |adv|
-      [
-          adv.professor[:name],
-          adv.enrollment[:enrollment_number],
-          adv.enrollment.student[:name],
-          adv.enrollment.level[:name]
-      ]
+    @advisements = find_page(:sorting => active_scaffold_config.list.user.sorting).items
+    respond_to do |format|
+      format.pdf do
+        send_data render_to_string, :filename => "#{I18n.t("pdf_content.advisements.to_pdf.filename")}.pdf", :type => "application/pdf"
+      end
     end
-
-    pdf.table(advs, :column_widths => [135, 135, 135, 135],
-              :row_colors => ["FFFFFF", "F0F0F0"],
-              :cell_style => {:font => "Courier",
-                              :size => 8,
-                              :inline_format => true,
-                              :border_width => 0
-              }
-    )
-
-    send_data(pdf.render, :filename => 'relatorio.pdf', :type => 'application/pdf')
   end
-end 
+end

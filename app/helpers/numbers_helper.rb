@@ -51,7 +51,8 @@ module NumbersHelper
   end
 
   def number_to_grade(number, options = {})
-    "#{(number/10.0).round(2)}" if number
+    options[:precision] ||= 2
+    "#{(number/10.0).round(options[:precision])}" if number
   end
 
 end
