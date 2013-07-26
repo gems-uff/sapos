@@ -12,11 +12,15 @@ module ApplicationHelper
     'style="background: transparent;border: 0;"'.html_safe unless user_signed_in?
   end
 
-  def rescue_blank_text(text = nil, method_call = nil)
-    if method_call
-      text.blank? ? I18n.t('rescue_blank_text') : text.send(method_call)
+  def rescue_blank_text(text = nil, options = {})
+    puts "text #{text.inspect}"
+    puts "options #{options.inspect}"
+    options[:blank_text] ||= I18n.t('rescue_blank_text')
+    puts "options2 #{options.inspect}"
+    if options[:method_call]
+      text.blank? ? options[:blank_text] : text.send(options[:method_call])
     else
-      text.blank? ? I18n.t('rescue_blank_text') : text
+      text.blank? ? options[:blank_text] : text
     end
   end
 end

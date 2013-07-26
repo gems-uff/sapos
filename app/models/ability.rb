@@ -32,10 +32,12 @@ class Ability
       can :read, (Ability::ALL_MODELS - [User, Role])
       can :summary_pdf, CourseClass
       can :academic_transcript_pdf, Enrollment
+      can :grades_report_pdf, Enrollment
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role])
       can :summary_pdf, CourseClass
       can :academic_transcript_pdf, Enrollment
+      can :grades_report_pdf, Enrollment
     end
 
     # Define abilities for the passed in user here. For example:
