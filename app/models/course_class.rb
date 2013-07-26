@@ -8,6 +8,8 @@ class CourseClass < ActiveRecord::Base
   has_many :class_enrollments, :dependent => :destroy
   has_many :allocations, :dependent => :destroy
 
+  has_many :enrollments, :through => :class_enrollments
+
   SEMESTERS = [1,2]
 
   validates :course, :presence => true

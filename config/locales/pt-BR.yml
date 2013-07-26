@@ -665,6 +665,7 @@ pt-BR:
          allocations: "Alocações"
          year: "Ano"
          semester: "Semestre"
+         enrollments: "Matrículas"
          class_enrollments_count: "Alunos Inscritos"
       allocation:
         day: "Dia"
