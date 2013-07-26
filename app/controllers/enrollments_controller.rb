@@ -662,7 +662,7 @@ CONCAT(course_classes.year, course_classes.semester)")
 
       last_box_height = 50
       last_box_width1 = 150
-      last_box_y = pdf.cursor - 15
+      last_box_y = pdf.bounds.bottom + last_box_height
       pdf.font('Courier', :size => 8) do
         pdf.bounding_box([0, last_box_y], :width => last_box_width1, :height => last_box_height) do
           pdf.stroke_bounds
@@ -671,6 +671,7 @@ CONCAT(course_classes.year, course_classes.semester)")
           pdf.draw_text("#{I18n.t("pdf_content.enrollment.grades_report.location")}, #{I18n.localize(Date.today, :format => :long)}", :at => [current_x, pdf.cursor])
         end
       end
+
 
       last_box_width2 = 350
       pdf.font('Courier', :size => 6) do
@@ -760,7 +761,7 @@ CONCAT(course_classes.year, course_classes.semester)")
 
     last_box_height = 50
     last_box_width1 = 150
-    last_box_y = pdf.cursor - 15
+    last_box_y = pdf.bounds.bottom + last_box_height
     pdf.font('Courier', :size => 8) do
       pdf.bounding_box([0, last_box_y], :width => last_box_width1, :height => last_box_height) do
         pdf.stroke_bounds
