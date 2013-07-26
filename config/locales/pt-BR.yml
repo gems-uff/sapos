@@ -245,6 +245,13 @@ pt-BR:
         attendance_false: "I"
         obs: "Obs.:"
         link: "Pauta"
+    advisements:
+      to_pdf:
+        filename: "Relatório de Orientações"
+        professor_name: "Professor"
+        enrollment_number: "Número de Matrícula"
+        student_name: "Aluno"
+        level_name: "Nível"
     enrollment:
       academic_transcript:
         title: "Histórico Escolar"
