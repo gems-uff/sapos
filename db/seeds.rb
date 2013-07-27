@@ -15,40 +15,32 @@
 ['CAPES', 'CNPq', 'FAPERJ'].each do |sponsor|
   Sponsor.new do |s|
     s.name = sponsor
-  end.save
+  end.save!
 end
 
 ['Graduação', 'Especialização', 'Mestrado', 'Doutorado'].each do |level|
     Level.new do |l|
       l.name = level
-    end.save
+    end.save!
 end
 
 ['Avulso', 'Especial', 'Regular'].each do |enrollment|
       EnrollmentStatus.new do |e|
         e.name = enrollment
-      end.save
+      end.save!
 end
 
-DismissalReason.new do |d| 
-  d.name = "Defesa"
-  d.description = "Aluno defendeu"
-end
-DismissalReason.new do |d|
-  d.name = "Rendimento"
-  d.description = "Aluno não cumpriu critérios de rendimento"
-end
-DismissalReason.new do |d|
-  d.name = "Desistência"
-  d.description = "Aluno desistiu"
-end
-DismissalReason.new do |d|
-  d.name = "Prazo"
-  d.description = "Prazo para defesa esgotado"
-end
-DismissalReason.new do |d|
-  d.name = "Especial -> Regular"
-  d.description = "Aluno foi admitido como aluno regular"
+[
+    {:name => 'Defesa', :description => 'Aluno defendeu'},
+    {:name => 'Rendimento', :description => 'Aluno não cumpriu critérios de rendimento'},
+    {:name => 'Desistência', :description => 'Aluno desistiu'},
+    {:name => 'Prazo', :description => 'Prazo para defesa esgotado'},
+    {:name => 'Especial -> Regular', :description => 'Aluno foi admitido como aluno regular'}
+].each do |reason|
+    DismissalReason.new do |d|
+        d.name = reason[:name]
+        d.description = reason[:description]
+    end.save!
 end
 
 [
@@ -75,92 +67,92 @@ end
 user.skip_confirmation!
 user.save!
 
-Institution.create(	:name =>"Associação de Ensino Superior do Piauí",	:code =>"AESPI")
-Institution.create(	:name =>"Centro Federal de Educação Tecnológica C S F",	:code =>"CEFET-RJ")
-Institution.create(	:name =>"Centro Universitário Luterano de Palmas",	:code =>"CEULP")
-Institution.create(	:name =>"Centro Federal de Educação Tecnológica de Campos",	:code =>"CFETC")
-Institution.create(	:name =>"Escola Federal de Engenharia de",	:code =>"EFEI")
-Institution.create(	:name =>"Escola Naval",	:code =>"EM")
-Institution.create(	:name =>"Faculdade Integral Diferencial",	:code =>"FACID")
-Institution.create(	:name =>"Faculdades Integradas de Rondonópolis",	:code =>"FAIR")
-Institution.create(	:name =>"Faculdade Carioca",	:code =>"FC")
-Institution.create(	:name =>"Faculdade da Cidade",	:code =>"FCIDADE")
-Institution.create(	:name =>"Fundação Educacional de Barretos",	:code =>"FEB")
-Institution.create(	:name =>"Fundação Educacional Souza Marques",	:code =>"FESM")
-Institution.create(	:name =>"Federação das Faculdades Celso Lisboa",	:code =>"FFCL")
-Institution.create(	:name =>"Fundação Getúlio Vargas",	:code =>"FGV")
-Institution.create(	:name =>"Faculdades Integradas Anglo-Americano",	:code =>"FIAA")
-Institution.create(	:name =>"Faculdades Integradas de Caratinga",	:code =>"FIC")
-Institution.create(	:name =>"Faculdades Integradas Maria Teresa",	:code =>"FMT")
-Institution.create(	:name =>"Fundação Universidade Federal do Tocantins",	:code =>"FUFTO")
-Institution.create(	:name =>"Instituto de Estudos superiores da Amazônia",	:code =>"IESA")
-Institution.create(	:name =>"Instituto Federal do Piauí",	:code =>"IFPI")
-Institution.create(	:name =>"Instituto Militar de Engenharia",	:code =>"IME")
-Institution.create(	:name =>"Instituto Metodista Granbery",	:code =>"IMG")
-Institution.create(	:name =>"Instituto Nacional de Telecomunicações",	:code =>"INATEL")
-Institution.create(	:name =>"Instituto Superior de Tecnol em Ciência da Comp",	:code =>"ISTCC")
-Institution.create(	:name =>"Instituto Tecnológico da Aeronáutica",	:code =>"ITA")
-Institution.create(	:name =>"Faculdades Reunidas Nuno Lisboa",	:code =>"NUNO")
-Institution.create(	:name =>"Pontifícia Universidade Católica de Minas Gerais",	:code =>"PUC/MG")
-Institution.create(	:name =>"Pontifícia Universid Católica do Rio Grande do Sul",	:code =>"PUC/RS")
-Institution.create(	:name =>"Pontifícia Universidade Católica do Rio de Janeiro",	:code =>"PUC-RJ")
-Institution.create(	:name =>"Sociedade de Ensino Sup. E Assessoria Técnica",	:code =>"SESAT")
-Institution.create(	:name =>"Sociedade dos Amigos dos Militares",	:code =>"SUAM")
-Institution.create(	:name =>"Universidade de Barra Mansa",	:code =>"UBM")
-Institution.create(	:name =>"Universidade Católica Dom Bosco",	:code =>"UCDB")
-Institution.create(	:name =>"Universidade Católica de Goiás",	:code =>"UCG")
-Institution.create(	:name =>"Universidade Cândido Mendes",	:code =>"UCM")
-Institution.create(	:name =>"Universidade Católica de Petrópolis",	:code =>"UCP")
-Institution.create(	:name =>"Universidade Católica de Santa Maria",	:code =>"UCSM")
-Institution.create(	:name =>"Universidade Estadual do Norte-Fluminense",	:code =>"UENF")
-Institution.create(	:name =>"Universidade Estadual do Piauí",	:code =>"UEPI")
-Institution.create(	:name =>"Universidade Estadual do Rio de Janeiro",	:code =>"UERJ")
-Institution.create(	:name =>"Universidade Federal de Alagoas",	:code =>"UFA")
-Institution.create(	:name =>"Universidade Federal da Bahia",	:code =>"UFBA")
-Institution.create(	:name =>"Universidade Federal do Ceará",	:code =>"UFC")
-Institution.create(	:name =>"Univeridade Federal Campina Grande",	:code =>"UFCG")
-Institution.create(	:name =>"Universidade Federal do Espírito Santo",	:code =>"UFES")
-Institution.create(	:name =>"Universidade Federal Fluminense",	:code =>"UFF")
-Institution.create(	:name =>"Universidade Federal de Goiás",	:code =>"UFGo")
-Institution.create(	:name =>"Universidade Federal de Juiz de Fora",	:code =>"UFJF")
-Institution.create(	:name =>"Universidade Federal de Lavras",	:code =>"UFLA")
-Institution.create(	:name =>"Universidade Federal de Minas Gerais",	:code =>"UFMG")
-Institution.create(	:name =>"Universidade Federal de Mato Grosso",	:code =>"UFMT")
-Institution.create(	:name =>"Universidade de Fortaleza",	:code =>"UFO")
-Institution.create(	:name =>"Universidade Federal de Ouro Preto",	:code =>"UFOP")
-Institution.create(	:name =>"Universidade Federal do Pará",	:code =>"UFP")
-Institution.create(	:name =>"Universidade Federal da Paraíba",	:code =>"UFPB")
-Institution.create(	:name =>"Universidade Federal de Pernambuco",	:code =>"UFPE")
-Institution.create(	:name =>"Universidade Federal do Piauí",	:code =>"UFPI")
-Institution.create(	:name =>"Universidade Federal do Paraná",	:code =>"UFPR")
-Institution.create(	:name =>"Universidade Federal do Rio de Janeiro",	:code =>"UFRJ")
-Institution.create(	:name =>"Universidade Federal do Rio Grande do Norte",	:code =>"UFRN")
-Institution.create(	:name =>"Universidade Federal Rural do Rio de Janeiro",	:code =>"UFRRJ")
-Institution.create(	:name =>"Universidade Federal de Santa Catarina",	:code =>"UFSC")
-Institution.create(	:name =>"Universidade Federal Santa Maria",	:code =>"UFSM")
-Institution.create(	:name =>"Universidade Federal do Tocantins",	:code =>"UFT")
-Institution.create(	:name =>"Universidade  Federal de Viçosa",	:code =>"UFV")
-Institution.create(	:name =>"Universidade Gama Filho",	:code =>"UGF")
-Institution.create(	:name =>"Universidade do Grande Rio",	:code =>"UGR")
-Institution.create(	:name =>"Universidade Luterana do Brasil",	:code =>"ULBRA")
-Institution.create(	:name =>"Universidade de Lima (Peru)",	:code =>"ULIMA")
-Institution.create(	:name =>"Universidade da Amazônia",	:code =>"UNAMA")
-Institution.create(	:name =>"Universidad Nacional del Callao",	:code =>"UNC")
-Institution.create(	:name =>"Universidade Estácio de Sá",	:code =>"UNESA")
-Institution.create(	:name =>"Universidade Estadual de Campinas",	:code =>"UNICAMP")
-Institution.create(	:name =>"Universidade Salvador",	:code =>"UNIFACS")
-Institution.create(	:name =>"Universidade Federal de Itajubá",	:code =>"UNIFEI")
-Institution.create(	:name =>"Centro Universitário Serra dos Órgãos",	:code =>"UNIFESO")
-Institution.create(	:name =>"Universidade Presidente Antônio Carlos",	:code =>"UNIPAC")
-Institution.create(	:name =>"Universidade Federal do Estado do Rio de Janeiro",	:code =>"UNIRIO")
-Institution.create(	:name =>"Universidade Vale do Rio Doce",	:code =>"UNIVALE")
-Institution.create(	:name =>"Universidad Nacional de San antonio Abad del Cusco",	:code =>"UNSAAC")
-Institution.create(	:name =>"Universidad Nacional de Trujillo",	:code =>"UNT")
-Institution.create(	:name =>"Universidad Ricardo Palma",	:code =>"URP")
-Institution.create(	:name =>"Universidade de São Paulo",	:code =>"USP")
-Institution.create(	:name =>"Universidade Silva e Souza",	:code =>"USS")
-Institution.create(	:name =>"Universidade Santa Úrsula",	:code =>"USU")
-Institution.create(	:name =>"Universidade Veiga de Almeida",	:code =>"UVA")
+Institution.create( :name =>"Associação de Ensino Superior do Piauí", :code =>"AESPI")
+Institution.create( :name =>"Centro Federal de Educação Tecnológica C S F", :code =>"CEFET-RJ")
+Institution.create( :name =>"Centro Universitário Luterano de Palmas", :code =>"CEULP")
+Institution.create( :name =>"Centro Federal de Educação Tecnológica de Campos", :code =>"CFETC")
+Institution.create( :name =>"Escola Federal de Engenharia de", :code =>"EFEI")
+Institution.create( :name =>"Escola Naval", :code =>"EM")
+Institution.create( :name =>"Faculdade Integral Diferencial", :code =>"FACID")
+Institution.create( :name =>"Faculdades Integradas de Rondonópolis", :code =>"FAIR")
+Institution.create( :name =>"Faculdade Carioca", :code =>"FC")
+Institution.create( :name =>"Faculdade da Cidade", :code =>"FCIDADE")
+Institution.create( :name =>"Fundação Educacional de Barretos", :code =>"FEB")
+Institution.create( :name =>"Fundação Educacional Souza Marques", :code =>"FESM")
+Institution.create( :name =>"Federação das Faculdades Celso Lisboa", :code =>"FFCL")
+Institution.create( :name =>"Fundação Getúlio Vargas", :code =>"FGV")
+Institution.create( :name =>"Faculdades Integradas Anglo-Americano", :code =>"FIAA")
+Institution.create( :name =>"Faculdades Integradas de Caratinga", :code =>"FIC")
+Institution.create( :name =>"Faculdades Integradas Maria Teresa", :code =>"FMT")
+Institution.create( :name =>"Fundação Universidade Federal do Tocantins", :code =>"FUFTO")
+Institution.create( :name =>"Instituto de Estudos superiores da Amazônia", :code =>"IESA")
+Institution.create( :name =>"Instituto Federal do Piauí", :code =>"IFPI")
+Institution.create( :name =>"Instituto Militar de Engenharia", :code =>"IME")
+Institution.create( :name =>"Instituto Metodista Granbery", :code =>"IMG")
+Institution.create( :name =>"Instituto Nacional de Telecomunicações", :code =>"INATEL")
+Institution.create( :name =>"Instituto Superior de Tecnol em Ciência da Comp", :code =>"ISTCC")
+Institution.create( :name =>"Instituto Tecnológico da Aeronáutica", :code =>"ITA")
+Institution.create( :name =>"Faculdades Reunidas Nuno Lisboa", :code =>"NUNO")
+Institution.create( :name =>"Pontifícia Universidade Católica de Minas Gerais", :code =>"PUC/MG")
+Institution.create( :name =>"Pontifícia Universid Católica do Rio Grande do Sul", :code =>"PUC/RS")
+Institution.create( :name =>"Pontifícia Universidade Católica do Rio de Janeiro", :code =>"PUC-RJ")
+Institution.create( :name =>"Sociedade de Ensino Sup. E Assessoria Técnica", :code =>"SESAT")
+Institution.create( :name =>"Sociedade dos Amigos dos Militares", :code =>"SUAM")
+Institution.create( :name =>"Universidade de Barra Mansa", :code =>"UBM")
+Institution.create( :name =>"Universidade Católica Dom Bosco", :code =>"UCDB")
+Institution.create( :name =>"Universidade Católica de Goiás", :code =>"UCG")
+Institution.create( :name =>"Universidade Cândido Mendes", :code =>"UCM")
+Institution.create( :name =>"Universidade Católica de Petrópolis", :code =>"UCP")
+Institution.create( :name =>"Universidade Católica de Santa Maria", :code =>"UCSM")
+Institution.create( :name =>"Universidade Estadual do Norte-Fluminense", :code =>"UENF")
+Institution.create( :name =>"Universidade Estadual do Piauí", :code =>"UEPI")
+Institution.create( :name =>"Universidade Estadual do Rio de Janeiro", :code =>"UERJ")
+Institution.create( :name =>"Universidade Federal de Alagoas", :code =>"UFA")
+Institution.create( :name =>"Universidade Federal da Bahia", :code =>"UFBA")
+Institution.create( :name =>"Universidade Federal do Ceará", :code =>"UFC")
+Institution.create( :name =>"Univeridade Federal Campina Grande", :code =>"UFCG")
+Institution.create( :name =>"Universidade Federal do Espírito Santo", :code =>"UFES")
+Institution.create( :name =>"Universidade Federal Fluminense", :code =>"UFF")
+Institution.create( :name =>"Universidade Federal de Goiás", :code =>"UFGo")
+Institution.create( :name =>"Universidade Federal de Juiz de Fora", :code =>"UFJF")
+Institution.create( :name =>"Universidade Federal de Lavras", :code =>"UFLA")
+Institution.create( :name =>"Universidade Federal de Minas Gerais", :code =>"UFMG")
+Institution.create( :name =>"Universidade Federal de Mato Grosso", :code =>"UFMT")
+Institution.create( :name =>"Universidade de Fortaleza", :code =>"UFO")
+Institution.create( :name =>"Universidade Federal de Ouro Preto", :code =>"UFOP")
+Institution.create( :name =>"Universidade Federal do Pará", :code =>"UFP")
+Institution.create( :name =>"Universidade Federal da Paraíba", :code =>"UFPB")
+Institution.create( :name =>"Universidade Federal de Pernambuco", :code =>"UFPE")
+Institution.create( :name =>"Universidade Federal do Piauí", :code =>"UFPI")
+Institution.create( :name =>"Universidade Federal do Paraná", :code =>"UFPR")
+Institution.create( :name =>"Universidade Federal do Rio de Janeiro", :code =>"UFRJ")
+Institution.create( :name =>"Universidade Federal do Rio Grande do Norte", :code =>"UFRN")
+Institution.create( :name =>"Universidade Federal Rural do Rio de Janeiro", :code =>"UFRRJ")
+Institution.create( :name =>"Universidade Federal de Santa Catarina", :code =>"UFSC")
+Institution.create( :name =>"Universidade Federal Santa Maria", :code =>"UFSM")
+Institution.create( :name =>"Universidade Federal do Tocantins", :code =>"UFT")
+Institution.create( :name =>"Universidade  Federal de Viçosa", :code =>"UFV")
+Institution.create( :name =>"Universidade Gama Filho", :code =>"UGF")
+Institution.create( :name =>"Universidade do Grande Rio", :code =>"UGR")
+Institution.create( :name =>"Universidade Luterana do Brasil", :code =>"ULBRA")
+Institution.create( :name =>"Universidade de Lima (Peru)", :code =>"ULIMA")
+Institution.create( :name =>"Universidade da Amazônia", :code =>"UNAMA")
+Institution.create( :name =>"Universidad Nacional del Callao", :code =>"UNC")
+Institution.create( :name =>"Universidade Estácio de Sá", :code =>"UNESA")
+Institution.create( :name =>"Universidade Estadual de Campinas", :code =>"UNICAMP")
+Institution.create( :name =>"Universidade Salvador", :code =>"UNIFACS")
+Institution.create( :name =>"Universidade Federal de Itajubá", :code =>"UNIFEI")
+Institution.create( :name =>"Centro Universitário Serra dos Órgãos", :code =>"UNIFESO")
+Institution.create( :name =>"Universidade Presidente Antônio Carlos", :code =>"UNIPAC")
+Institution.create( :name =>"Universidade Federal do Estado do Rio de Janeiro", :code =>"UNIRIO")
+Institution.create( :name =>"Universidade Vale do Rio Doce", :code =>"UNIVALE")
+Institution.create( :name =>"Universidad Nacional de San antonio Abad del Cusco", :code =>"UNSAAC")
+Institution.create( :name =>"Universidad Nacional de Trujillo", :code =>"UNT")
+Institution.create( :name =>"Universidad Ricardo Palma", :code =>"URP")
+Institution.create( :name =>"Universidade de São Paulo", :code =>"USP")
+Institution.create( :name =>"Universidade Silva e Souza", :code =>"USS")
+Institution.create( :name =>"Universidade Santa Úrsula", :code =>"USU")
+Institution.create( :name =>"Universidade Veiga de Almeida", :code =>"UVA")
 
 Country.create(:name=>"Afeganistão")
 Country.create(:name=>"África do Sul")
