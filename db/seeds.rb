@@ -12,36 +12,49 @@
 #   cities = City.create([{ :name => 'Chicago', :description =>'Chicago' }, { :name => 'Copenhagen', :description =>'Copenhagen' }])
 #   Mayor.create(:name => 'Daley', :description =>'Daley', :city => cities.first)
 
-['CAPES', 'CNPq', 'FAPERJ'].each do |sponsor|
-  Sponsor.new do |s|
-    s.name = sponsor
-  end.save!
-end
-
 ['Graduação', 'Especialização', 'Mestrado', 'Doutorado'].each do |level|
     Level.new do |l|
-      l.name = level
+        l.name = level
     end.save!
 end
 
-['Avulso', 'Especial', 'Regular'].each do |enrollment|
-      EnrollmentStatus.new do |e|
-        e.name = enrollment
-      end.save!
-end
-
 [
-    {:name => 'Defesa', :description => 'Aluno defendeu'},
-    {:name => 'Rendimento', :description => 'Aluno não cumpriu critérios de rendimento'},
-    {:name => 'Desistência', :description => 'Aluno desistiu'},
-    {:name => 'Prazo', :description => 'Prazo para defesa esgotado'},
-    {:name => 'Especial -> Regular', :description => 'Aluno foi admitido como aluno regular'}
+{:name => 'Defesa', :description => 'Aluno defendeu'},
+{:name => 'Rendimento', :description => 'Aluno não cumpriu critérios de rendimento'},
+{:name => 'Desistência', :description => 'Aluno desistiu'},
+{:name => 'Prazo', :description => 'Prazo para defesa esgotado'},
+{:name => 'Especial -> Regular', :description => 'Aluno foi admitido como aluno regular'}
 ].each do |reason|
     DismissalReason.new do |d|
         d.name = reason[:name]
         d.description = reason[:description]
     end.save!
 end
+
+['Avulso', 'Especial', 'Regular'].each do |enrollment|
+    EnrollmentStatus.new do |e|
+        e.name = enrollment
+    end.save!
+end
+
+['CAPES', 'CNPq', 'FAPERJ'].each do |sponsor|
+  Sponsor.new do |s|
+    s.name = sponsor
+  end.save!
+end
+
+['Nota 10', 'DS', 'REUNI', 'Individual', 'Cota', 'PEC-PG', 'Projeto'].each do |name|
+    ScholarshipType.new do |s|
+        s.name = name
+    end.save!
+end
+
+['Exame de Qualificação', 'Pedido de Banca', 'Prova de Inglês'].each do |name|
+    Phase.new do |p|
+        p.name = name
+    end.save!
+end
+
 
 [
     {:id => 1, :name => 'Desconhecido', :description => 'Desconhecido'},
