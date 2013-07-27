@@ -2,6 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class City < ActiveRecord::Base
+  attr_accessible :name, :state
   belongs_to :state
 
   validates :state, :presence => true
