@@ -10,9 +10,9 @@ gem "devise"
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
-gem 'mysql2'
 
 group :development, :test do
+  gem 'sqlite3'
   gem 'awesome_print'
   gem 'rspec-rails', '~> 2.0'
   gem 'factory_girl_rails', '1.7.0'
@@ -20,6 +20,7 @@ group :development, :test do
 end
 
 group :production, :staging do
+  gem 'mysql2'
   gem 'exception_notification', '2.6.1', :require => 'exception_notifier'
 end
 
