@@ -5,6 +5,7 @@
 class CourseClassesController < ApplicationController
   authorize_resource
   include NumbersHelper
+  helper :class_enrollments
 
   active_scaffold :course_class do |config|
 

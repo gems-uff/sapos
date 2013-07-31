@@ -47,6 +47,10 @@ class ClassEnrollment < ActiveRecord::Base
     super(new_grade)
   end
 
+  def grade_to_view
+    grade.nil? ? nil : (grade/10.0)
+  end
+
   private
   def grade_for_situation
     if course_has_grade
