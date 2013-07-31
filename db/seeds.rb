@@ -75,7 +75,7 @@ user = User.new do |u|
   u.name = 'admin'
   u.email = 'admin@change.me'
   u.password = 'admin'
-  u.role_id = 6
+  u.role = Role.find_by_name('Administrador')
 end
 user.skip_confirmation!
 user.save!
