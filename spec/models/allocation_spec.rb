@@ -40,7 +40,7 @@ describe Allocation do
           allocation.should have_error(:less_than_or_equal_to).with_parameter(:count, 23).on :start_time
         end
       end
-      context "should have error less_than_or_equal_to when" do
+      context "should have error greater_than_or_equal_to when" do
         it "start_time is less than 0" do
           allocation.start_time = -1
           allocation.should have_error(:greater_than_or_equal_to).with_parameter(:count, 0).on :start_time
@@ -86,7 +86,7 @@ describe Allocation do
           allocation.should have_error(:less_than_or_equal_to).with_parameter(:count, 23).on :end_time
         end
       end
-      context "should have error less_than_or_equal_to when" do
+      context "should have error greater_than_or_equal_to when" do
         it "end_time is less than 0" do
           allocation.end_time = -1
           allocation.should have_error(:greater_than_or_equal_to).with_parameter(:count, 0).on :end_time

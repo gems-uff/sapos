@@ -620,9 +620,24 @@ noscript.active-scaffold {
 
 .active-scaffold .empty-message, .active-scaffold .filtered-message {
     background-color: #e8e8e8;
-    padding: 4px;
-    text-align: center;
+    padding: 2px 4px 6px 4px;
+    text-align: right;
     color: #666;
+
+    .reset {
+        position: relative;
+        z-index: 2;
+        right: 0;
+    }
+}
+
+.active-scaffold .empty-message {
+    font-weight: bold;
+    margin-top: -21px;
+    padding-bottom: 10px;
+    position: relative;
+    text-align: left;
+    z-index: 1;
 }
 
 .active-scaffold .message {
@@ -711,7 +726,7 @@ noscript.active-scaffold {
    ============================== */
 
 .active-scaffold .loading-indicator {
-    vertical-align: text-bottom;
+    vertical-align: middle;
     width: 16px;
     margin: 0;
 }
