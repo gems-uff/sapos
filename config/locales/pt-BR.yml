@@ -667,6 +667,9 @@ pt-BR:
          semester: "Semestre"
          enrollments: "Matrículas"
          class_enrollments_count: "Alunos Inscritos"
+      role:
+        name: "Nome"
+        description: "Descrição"
       allocation:
         day: "Dia"
         room: "Sala"
