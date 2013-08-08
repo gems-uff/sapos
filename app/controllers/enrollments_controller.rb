@@ -596,7 +596,7 @@ CONCAT(course_classes.year, course_classes.semester)")
       bold_rows = []
       total_credits = 0
       gpr_by_semester.each do |y, s, gpr|
-        class_enrollments = enrollment.class_enrollments.where("situation <> ?", I18n.translate("activerecord.attributes.class_enrollment.situations.registered")).where("course_classes.year = ? and course_classes.semester = ?", y, s).joins(:course_class)
+        class_enrollments = enrollment.class_enrollments.where("course_classes.year = ? and course_classes.semester = ?", y, s).joins(:course_class)
         ys = "#{s}/#{y}"
         semester_credits = 0
         class_enrollments.each do |class_enrollment|
