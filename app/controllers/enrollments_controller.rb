@@ -71,7 +71,7 @@ class EnrollmentsController < ApplicationController
       date1 = Date.new(year.to_i, month.to_i)
       date2 = Date.new(month.to_i==12 ? year.to_i + 1 : year.to_i, (month.to_i % 12) + 1)
 
-      ["DATE(#{column.search_sql}) >= ? and DATE(#{column.search_sql}) < ?", date1, date2]
+      ["DATE(#{column.search_sql.last}) >= ? and DATE(#{column.search_sql.last}) < ?", date1, date2]
     end
   end
 
