@@ -628,10 +628,12 @@ pt-BR:
       accomplishment:
         phase: "Etapa"
         enrollment: "Matrícula"
+        enrollment_id: "Matrícula"
         conclusion_date: "Data de conclusão"
         obs: "Observação"
       deferral:
         enrollment: "Matrícula"
+        enrollment_id: "Matrícula"
         approval_date: "Data de aprovação"
         obs: "Observação"
         deferral_type: "Tipo de Prorrogação"
