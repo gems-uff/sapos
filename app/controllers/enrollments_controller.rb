@@ -286,7 +286,7 @@ class EnrollmentsController < ApplicationController
         current_x += enrollment_dismissal_date_text.size*font_width + default_margin_x
 
         enrollment_dismissal_reason_text = "#{I18n.t("pdf_content.enrollment.academic_transcript.enrollment_dismissal_reason")}:"
-        enrollment_dismissal_reason_text += enrollment.dismissal ? "#{enrollment.dismissal.dismissal_reason.name}" : "--"
+        enrollment_dismissal_reason_text += enrollment.dismissal ? " #{enrollment.dismissal.dismissal_reason.name}" : "--"
 
         pdf.draw_text(enrollment_dismissal_reason_text, :at => [current_x, pdf.cursor])
       end
@@ -551,7 +551,7 @@ class EnrollmentsController < ApplicationController
         current_x += enrollment_dismissal_date_text.size*font_width + default_margin_x
 
         enrollment_dismissal_reason_text = "#{I18n.t("pdf_content.enrollment.grades_report.enrollment_dismissal_reason")}:"
-        enrollment_dismissal_reason_text += enrollment.dismissal ? "#{enrollment.dismissal.dismissal_reason.name}" : "--"
+        enrollment_dismissal_reason_text += enrollment.dismissal ? " #{enrollment.dismissal.dismissal_reason.name}" : "--"
 
         pdf.draw_text(enrollment_dismissal_reason_text, :at => [current_x, pdf.cursor])
       end
