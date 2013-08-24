@@ -35,6 +35,7 @@ The project was the result of the final paper of the students **Rodrigo Dias** a
 #Links
 
 * [SAPOS](http://sel.ic.uff.br/sapos)
+* [SAPOS Wiki](http://github.com/gems-uff/sapos/wiki)
 * [Issue Tracking](http://github.com/gems-uff/sapos/issues)
 * Term paper
 
