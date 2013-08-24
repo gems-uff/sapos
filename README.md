@@ -1,27 +1,29 @@
-#Sobre:
+#About
 
-O Projeto SAPOS tem como proposta facilitar a gestão de informações referentes à coordenação de Pós-Graduação em Computação da Universidade Federal Fluminense.
-
-<br>
-
-Atualmente o sistema é hospedado no Laboratório de Engenharia de Software, graças à colaboração do professor **Leonardo Gresta Paulino Murta**.
+The SAPOS Project has the purpose to ease the information management concerning the coordination of the Graduate in Computer Science course from the Fluminense Federal University.
 
 <br>
 
-O projeto foi resultado do trabalho de conclusão de curso dos alunos **Rodrigo Dias** e **Tiago Amaro**, ambos do Bacharelado em Ciência da Computação da Universidade Federal Fluminense. O trabalho foi orientado pelos professores **Leonardo Murta** e **Vanessa Braganholo**.
-#Equipe
+Currently the system is hosted in the Software Engineering Lab, thanks to the colaboration of the teacher
+ **Leonardo Gresta Paulino Murta**.
 
-- Orientadores
+<br>
+
+The project was the result of the final paper of the students **Rodrigo Dias** and **Tiago Amaro**, both from the Computer Science Bachelor course of the Fluminense Federal University. The paper was led by the teachers **Leonardo Murta** and **Vanessa Braganholo**.
+
+#Team
+
+- Advisors
 
   * Leonardo Gresta Paulino Murta
   * Vanessa Braganholo 
 
-- Alunos
+- Students
 
   * Rodrigo Dias Ferreira
   * Tiago Manuel Padrela Ferreira Amaro
 
-#Agradecimentos
+#Thanks to
 
   * Celso da Cruz Carneiro Ribeiro
   * Simone de Lima Martins
@@ -34,9 +36,9 @@ O projeto foi resultado do trabalho de conclusão de curso dos alunos **Rodrigo 
 
 * [SAPOS](http://sel.ic.uff.br/sapos)
 * [Issue Tracking](http://github.com/gems-uff/sapos/issues)
-* Monografia
+* Term paper
 
-#Tecnologias
+#Technologies
 
 * [ActiveScaffold](https://github.com/activescaffold/active_scaffold)
 * [Redmine](http://www.redmine.org/)
