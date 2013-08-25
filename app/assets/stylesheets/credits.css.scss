@@ -1,0 +1,117 @@
+/* Credits div*/
+#credits_footer, #authors_footer, #license_footer {
+	float: right;
+	margin-top: 5px;
+	font-size: 13px;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
+#credits, #authors, #license {
+	border-style: solid;
+	border-color: #C8C6C6;
+	border-width: 1px 0 1px 1px;
+}
+
+#credits {
+	font-family: Helvetica, arial, sans-serif;
+	font-size: 15px;
+	line-height: 1.6;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	background-color: white;
+	padding: 30px;
+	padding-top: 0;
+
+	a {
+		color: #4183C4;
+	}
+	a.absent {
+		color: #cc0000;
+	}
+	a.anchor {
+		display: block;
+		padding-left: 30px;
+		margin-left: -30px;
+		cursor: pointer;
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		margin: 20px 0 10px;
+		padding: 0;
+		font-weight: bold;
+		-webkit-font-smoothing: antialiased;
+		cursor: text;
+		position: relative;
+	}
+
+	h1 {
+		font-size: 2em;
+		border-bottom: 1px solid #cccccc;
+		color: #333333;
+	}
+
+	h2 {
+		font-size: 1.8em;
+		border-bottom: 1px solid #cccccc;
+		color: #333333;
+	}
+
+	h3 {
+		font-size: 1.6em;
+	}
+
+	h4 {
+		font-size: 1.4em;
+	}
+
+	h5 {
+		font-size: 1.2em;
+	}
+
+	h6 {
+		color: #777777;
+		font-size: 1em;
+	}
+
+	p, blockquote, ul, ol, dl, li, table, pre {
+		margin: 15px 0;
+	}
+
+	li {
+		margin: 0;
+	}
+
+	hr {
+		border: 0 none;
+		color: #cccccc;
+		height: 4px;
+		padding: 0;
+	}
+
+	h1 p, h2 p, h3 p, h4 p, h5 p, h6 p {
+		margin-top: 0;
+	}
+
+	li p.first {
+		display: inline-block;
+	}
+
+	ul, ol {
+		padding-left: 30px;
+	}
+
+	ul :first-child, ol :first-child {
+		margin-top: 0;
+	}
+
+	ul :last-child, ol :last-child {
+		margin-bottom: 0;
+	}
+}
