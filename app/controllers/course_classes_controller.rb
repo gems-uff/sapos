@@ -127,7 +127,7 @@ class CourseClassesController < ApplicationController
 
     unless course_class.class_enrollments.empty?
       i=0
-      table_data = course_class.class_enrollments.map do |class_enrollment|
+      table_data = course_class.class_enrollments.joins({:enrollment => :student}).order("students.name").map do |class_enrollment|
         [
             i+=1,
             class_enrollment.enrollment.enrollment_number,

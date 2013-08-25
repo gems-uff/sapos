@@ -22,6 +22,8 @@ pt-BR:
       invalid_token: 'Token de autenticação inválido.'
       timeout: 'A sua sessão expirou, por favor faça login novamente para continuar.'
       inactive: 'A sua conta ainda não foi ativada.'
+      user:
+        not_found_in_database: "Conta não encontrada no banco de dados."
     sessions:
       signed_in: 'Login feito com sucesso.'
       signed_out: 'Logout feito com sucesso.'

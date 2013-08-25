@@ -71,7 +71,7 @@ class EnrollmentsController < ApplicationController
       date1 = Date.new(year.to_i, month.to_i)
       date2 = Date.new(month.to_i==12 ? year.to_i + 1 : year.to_i, (month.to_i % 12) + 1)
 
-      ["DATE(#{column.search_sql}) >= ? and DATE(#{column.search_sql}) < ?", date1, date2]
+      ["DATE(#{column.search_sql.last}) >= ? and DATE(#{column.search_sql.last}) < ?", date1, date2]
     end
   end
 
@@ -286,7 +286,7 @@ class EnrollmentsController < ApplicationController
         current_x += enrollment_dismissal_date_text.size*font_width + default_margin_x
 
         enrollment_dismissal_reason_text = "#{I18n.t("pdf_content.enrollment.academic_transcript.enrollment_dismissal_reason")}:"
-        enrollment_dismissal_reason_text += enrollment.dismissal ? "#{enrollment.dismissal.dismissal_reason.name}" : "--"
+        enrollment_dismissal_reason_text += enrollment.dismissal ? " #{enrollment.dismissal.dismissal_reason.name}" : "--"
 
         pdf.draw_text(enrollment_dismissal_reason_text, :at => [current_x, pdf.cursor])
       end
@@ -551,7 +551,7 @@ class EnrollmentsController < ApplicationController
         current_x += enrollment_dismissal_date_text.size*font_width + default_margin_x
 
         enrollment_dismissal_reason_text = "#{I18n.t("pdf_content.enrollment.grades_report.enrollment_dismissal_reason")}:"
-        enrollment_dismissal_reason_text += enrollment.dismissal ? "#{enrollment.dismissal.dismissal_reason.name}" : "--"
+        enrollment_dismissal_reason_text += enrollment.dismissal ? " #{enrollment.dismissal.dismissal_reason.name}" : "--"
 
         pdf.draw_text(enrollment_dismissal_reason_text, :at => [current_x, pdf.cursor])
       end
@@ -580,24 +580,31 @@ class EnrollmentsController < ApplicationController
               }
     )
 
-    gpr_by_semester = ActiveRecord::Base.connection.execute("select course_classes.year, course_classes.semester,
-sum(grade*credits)/sum(credits) as GPR FROM `class_enrollments` INNER JOIN `course_classes` ON
+    available_semesters = ActiveRecord::Base.connection.execute("select course_classes.year, course_classes.semester
+FROM `class_enrollments` INNER JOIN `course_classes` ON
 `course_classes`.`id` = `class_enrollments`.`course_class_id` INNER JOIN `courses` ON `courses`.`id` =
 `course_classes`.`course_id` INNER JOIN `course_types` ON `course_types`.`id` = `courses`.`course_type_id` WHERE
-`class_enrollments`.`enrollment_id` = #{ActiveRecord::Base.sanitize(enrollment.id)} AND (situation <>
-'#{I18n.translate("activerecord.attributes.class_enrollment.situations.registered")}') AND
-(course_types.has_score = true) GROUP BY CONCAT(course_classes.year, course_classes.semester) ORDER BY
+`class_enrollments`.`enrollment_id` = #{ActiveRecord::Base.sanitize(enrollment.id)}
+GROUP BY CONCAT(course_classes.year, course_classes.semester) ORDER BY
 CONCAT(course_classes.year, course_classes.semester)")
 
-
-    if  gpr_by_semester.any?
+    if  available_semesters.any?
       table_data = []
       row_index = 0
       bold_rows = []
       total_credits = 0
-      gpr_by_semester.each do |y, s, gpr|
-        class_enrollments = enrollment.class_enrollments.where("situation <> ?", I18n.translate("activerecord.attributes.class_enrollment.situations.registered")).where("course_classes.year = ? and course_classes.semester = ?", y, s).joins(:course_class)
+      available_semesters.each do |y, s|
+        class_enrollments = enrollment.class_enrollments.where("course_classes.year = ? and course_classes.semester = ?", y, s).joins(:course_class)
+        gpr = ActiveRecord::Base.connection.execute("select sum(grade*credits)/sum(credits) as GPR FROM `class_enrollments` INNER JOIN `course_classes` ON
+`course_classes`.`id` = `class_enrollments`.`course_class_id` INNER JOIN `courses` ON `courses`.`id` =
+`course_classes`.`course_id` INNER JOIN `course_types` ON `course_types`.`id` = `courses`.`course_type_id` WHERE
+`class_enrollments`.`enrollment_id` = #{ActiveRecord::Base.sanitize(enrollment.id)} AND (situation <>
+'#{I18n.translate("activerecord.attributes.class_enrollment.situations.registered")}') AND
+(course_types.has_score = true) AND (course_classes.year = #{y}) and (course_classes.semester = #{s})")
         ys = "#{s}/#{y}"
+
+        puts "gpr.inspect #{gpr.inspect}"
+        puts "gpr.methods #{gpr.methods}"
         semester_credits = 0
         class_enrollments.each do |class_enrollment|
           row_index +=1
@@ -615,7 +622,7 @@ CONCAT(course_classes.year, course_classes.semester)")
 
         end
         bold_rows<< row_index
-        table_data << ["", "", "#{I18n.t("pdf_content.enrollment.grades_report.semester_summary")} ", number_to_grade(gpr, :precision => 1), semester_credits, ""]
+        table_data << ["", "", "#{I18n.t("pdf_content.enrollment.grades_report.semester_summary")} ", number_to_grade(gpr.to_a[0][0], :precision => 1), semester_credits, ""]
         row_index+=1
         total_credits += semester_credits
       end

@@ -6,6 +6,7 @@ class Accomplishment < ActiveRecord::Base
   belongs_to :phase
 
   validates :enrollment, :presence => true
+  validates :enrollment_id, :uniqueness => {:scope => :phase_id}
   validates :phase, :presence => true
 
   def to_label

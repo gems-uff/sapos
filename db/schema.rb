@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130726195041) do
+ActiveRecord::Schema.define(:version => 20130820023423) do
 
   create_table "enrollment_statuses", :force => true do |t|
     t.string   "name"
@@ -247,7 +247,7 @@ ActiveRecord::Schema.define(:version => 20130726195041) do
   create_table "deferral_types", :force => true do |t|
     t.string   "name"
     t.string   "description"
-    t.integer  "duration_semesters"
+    t.integer  "duration_semesters", :default => 0
     t.integer  "phase_id"
     t.datetime "created_at",                        :null => false
     t.datetime "updated_at",                        :null => false
@@ -323,7 +323,7 @@ ActiveRecord::Schema.define(:version => 20130726195041) do
   create_table "phase_durations", :force => true do |t|
     t.integer  "phase_id"
     t.integer  "level_id"
-    t.integer  "deadline_semesters"
+    t.integer  "deadline_semesters", :default => 0
     t.datetime "created_at",                        :null => false
     t.datetime "updated_at",                        :null => false
     t.integer  "deadline_months",    :default => 0

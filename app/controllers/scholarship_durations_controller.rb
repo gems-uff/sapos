@@ -117,7 +117,7 @@ class ScholarshipDurationsController < ApplicationController
       if year != 1
         date = Date.new(year.to_i, month.to_i)
 
-        ["#{column.search_sql} >= ?", date]
+        ["#{column.search_sql.last} >= ?", date]
       end
     end
   end
@@ -130,7 +130,7 @@ class ScholarshipDurationsController < ApplicationController
       if year != 1
         date = Date.new(year.to_i, month.to_i)
 
-        ["#{column.search_sql} >= ?", date]
+        ["#{column.search_sql.last} >= ?", date]
       end
     end
   end
@@ -143,7 +143,7 @@ class ScholarshipDurationsController < ApplicationController
       if year != 1
         date = Date.new(year.to_i, month.to_i)
 
-        ["#{column.search_sql} >= ?", date]
+        ["#{column.search_sql.last} >= ?", date]
       end
     end
   end
