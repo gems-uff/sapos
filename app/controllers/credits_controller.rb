@@ -7,13 +7,7 @@ class CreditsController < ApplicationController
   require 'file_utils'
 
   def show
-    links_content = FileUtils.file_content('LINKS')
-    authors_content = FileUtils.file_content('AUTHORS')
-    license_content = FileUtils.file_content('LICENSE')
-    @header = "SAPOS main goal is to ease the management of information related to graduate programs such as enrollments, courses, advisement, scholarships, requirements, among others."
-    @links = links_content
-    @authors = authors_content
-    @license = license_content
+    @readme = FileUtils.file_content('README.md', 'rt')
   end
 
 end
