@@ -76,10 +76,10 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.string   "telephone1"
     t.string   "telephone2"
     t.string   "email"
-    t.index ["country_id"], :name => "fk__students_country_id"
-    t.index ["birthplace"], :name => "fk__students_birthplace"
-    t.index ["state_id"], :name => "fk__students_state_id"
     t.index ["city_id"], :name => "fk__students_city_id"
+    t.index ["state_id"], :name => "fk__students_state_id"
+    t.index ["birthplace"], :name => "fk__students_birthplace"
+    t.index ["country_id"], :name => "fk__students_country_id"
     t.foreign_key ["birthplace"], "states", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_students_birthplace"
     t.foreign_key ["city_id"], "cities", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_students_city_id"
     t.foreign_key ["country_id"], "countries", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_students_country_id"
@@ -95,9 +95,9 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.text     "obs"
     t.datetime "created_at",           :null => false
     t.datetime "updated_at",           :null => false
-    t.index ["student_id"], :name => "fk__enrollments_student_id"
-    t.index ["level_id"], :name => "fk__enrollments_level_id"
     t.index ["enrollment_status_id"], :name => "fk__enrollments_enrollment_status_id"
+    t.index ["level_id"], :name => "fk__enrollments_level_id"
+    t.index ["student_id"], :name => "fk__enrollments_student_id"
     t.foreign_key ["enrollment_status_id"], "enrollment_statuses", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_enrollments_enrollment_status_id"
     t.foreign_key ["level_id"], "levels", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_enrollments_level_id"
     t.foreign_key ["student_id"], "students", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_enrollments_student_id"
@@ -117,8 +117,8 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.string   "obs"
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false
-    t.index ["enrollment_id"], :name => "fk__accomplishments_enrollment_id"
     t.index ["phase_id"], :name => "fk__accomplishments_phase_id"
+    t.index ["enrollment_id"], :name => "fk__accomplishments_enrollment_id"
     t.foreign_key ["enrollment_id"], "enrollments", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_accomplishments_enrollment_id"
     t.foreign_key ["phase_id"], "phases", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_accomplishments_phase_id"
   end
@@ -143,8 +143,8 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.string   "telephone2"
     t.string   "siape"
     t.string   "enrollment_number"
-    t.index ["state_id"], :name => "fk__professors_state_id"
     t.index ["city_id"], :name => "fk__professors_city_id"
+    t.index ["state_id"], :name => "fk__professors_state_id"
     t.foreign_key ["city_id"], "cities", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_professors_city_id"
     t.foreign_key ["state_id"], "states", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_professors_state_id"
   end
@@ -154,8 +154,8 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.integer  "level_id"
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
-    t.index ["professor_id"], :name => "fk__advisement_authorizations_professor_id"
     t.index ["level_id"], :name => "fk__advisement_authorizations_level_id"
+    t.index ["professor_id"], :name => "fk__advisement_authorizations_professor_id"
     t.foreign_key ["level_id"], "levels", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_advisement_authorizations_level_id"
     t.foreign_key ["professor_id"], "professors", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_advisement_authorizations_professor_id"
   end
@@ -166,10 +166,10 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.boolean  "main_advisor"
     t.datetime "created_at",    :null => false
     t.datetime "updated_at",    :null => false
-    t.index ["professor_id"], :name => "fk__advisements_professor_id"
-    t.index ["enrollment_id"], :name => "fk__advisements_enrollment_id"
-    t.index ["professor_id"], :name => "index_advisements_on_professor_id"
     t.index ["enrollment_id"], :name => "index_advisements_on_enrollment_id"
+    t.index ["professor_id"], :name => "index_advisements_on_professor_id"
+    t.index ["enrollment_id"], :name => "fk__advisements_enrollment_id"
+    t.index ["professor_id"], :name => "fk__advisements_professor_id"
     t.foreign_key ["enrollment_id"], "enrollments", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_advisements_enrollment_id"
     t.foreign_key ["professor_id"], "professors", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_advisements_professor_id"
   end
@@ -197,8 +197,8 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.integer  "course_type_id"
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
-    t.index ["research_area_id"], :name => "fk__courses_research_area_id"
     t.index ["course_type_id"], :name => "fk__courses_course_type_id"
+    t.index ["research_area_id"], :name => "fk__courses_research_area_id"
     t.foreign_key ["course_type_id"], "course_types", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_courses_course_type_id"
     t.foreign_key ["research_area_id"], "research_areas", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_courses_research_area_id"
   end
@@ -211,8 +211,8 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.integer  "semester"
     t.datetime "created_at",   :null => false
     t.datetime "updated_at",   :null => false
-    t.index ["course_id"], :name => "fk__course_classes_course_id"
     t.index ["professor_id"], :name => "fk__course_classes_professor_id"
+    t.index ["course_id"], :name => "fk__course_classes_course_id"
     t.foreign_key ["course_id"], "courses", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_course_classes_course_id"
     t.foreign_key ["professor_id"], "professors", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_course_classes_professor_id"
   end
@@ -238,8 +238,8 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.datetime "created_at",                                :null => false
     t.datetime "updated_at",                                :null => false
     t.boolean  "disapproved_by_absence", :default => false
-    t.index ["course_class_id"], :name => "fk__class_enrollments_course_class_id"
     t.index ["enrollment_id"], :name => "fk__class_enrollments_enrollment_id"
+    t.index ["course_class_id"], :name => "fk__class_enrollments_course_class_id"
     t.foreign_key ["course_class_id"], "course_classes", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_class_enrollments_course_class_id"
     t.foreign_key ["enrollment_id"], "enrollments", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_class_enrollments_enrollment_id"
   end
@@ -253,8 +253,9 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.datetime "updated_at",                        :null => false
     t.integer  "duration_months",    :default => 0
     t.integer  "duration_days",      :default => 0
+    t.index ["phase_id"], :name => "ltered_deferral_types_phase_id"
     t.index ["phase_id"], :name => "fk__deferral_types_phase_id"
-    t.foreign_key ["phase_id"], "phases", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_deferral_types_phase_id"
+    t.foreign_key ["phase_id"], "phases", ["id"], :on_update => :no_action, :on_delete => :no_action, :name => "fk_deferral_types_phase_id"
   end
 
   create_table "deferrals", :force => true do |t|
@@ -264,8 +265,8 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.integer  "deferral_type_id"
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
-    t.index ["enrollment_id"], :name => "fk__deferrals_enrollment_id"
     t.index ["deferral_type_id"], :name => "fk__deferrals_deferral_type_id"
+    t.index ["enrollment_id"], :name => "fk__deferrals_enrollment_id"
     t.foreign_key ["deferral_type_id"], "deferral_types", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_deferrals_deferral_type_id"
     t.foreign_key ["enrollment_id"], "enrollments", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_deferrals_enrollment_id"
   end
@@ -284,8 +285,8 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.text     "obs"
     t.datetime "created_at",          :null => false
     t.datetime "updated_at",          :null => false
-    t.index ["enrollment_id"], :name => "fk__dismissals_enrollment_id"
     t.index ["dismissal_reason_id"], :name => "fk__dismissals_dismissal_reason_id"
+    t.index ["enrollment_id"], :name => "fk__dismissals_enrollment_id"
     t.foreign_key ["dismissal_reason_id"], "dismissal_reasons", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_dismissals_dismissal_reason_id"
     t.foreign_key ["enrollment_id"], "enrollments", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_dismissals_enrollment_id"
   end
@@ -303,8 +304,8 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.integer  "institution_id"
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
-    t.index ["level_id"], :name => "fk__majors_level_id"
     t.index ["institution_id"], :name => "fk__majors_institution_id"
+    t.index ["level_id"], :name => "fk__majors_level_id"
     t.foreign_key ["institution_id"], "institutions", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_majors_institution_id"
     t.foreign_key ["level_id"], "levels", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_majors_level_id"
   end
@@ -312,10 +313,10 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
   create_table "majors_students", :id => false, :force => true do |t|
     t.integer "major_id",   :null => false
     t.integer "student_id", :null => false
-    t.index ["major_id"], :name => "index_majors_students_on_course_id"
-    t.index ["student_id"], :name => "index_majors_students_on_student_id"
-    t.index ["major_id"], :name => "fk__majors_students_course_id"
     t.index ["student_id"], :name => "fk__majors_students_student_id"
+    t.index ["major_id"], :name => "fk__majors_students_course_id"
+    t.index ["student_id"], :name => "index_majors_students_on_student_id"
+    t.index ["major_id"], :name => "index_majors_students_on_course_id"
     t.foreign_key ["major_id"], "majors", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_majors_students_major_id"
     t.foreign_key ["student_id"], "students", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_majors_students_student_id"
   end
@@ -328,10 +329,12 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.datetime "updated_at",                        :null => false
     t.integer  "deadline_months",    :default => 0
     t.integer  "deadline_days",      :default => 0
-    t.index ["phase_id"], :name => "fk__phase_durations_phase_id"
+    t.index ["phase_id"], :name => "ltered_phase_durations_phase_id"
+    t.index ["level_id"], :name => "ltered_phase_durations_level_id"
     t.index ["level_id"], :name => "fk__phase_durations_level_id"
-    t.foreign_key ["level_id"], "levels", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_phase_durations_level_id"
-    t.foreign_key ["phase_id"], "phases", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_phase_durations_phase_id"
+    t.index ["phase_id"], :name => "fk__phase_durations_phase_id"
+    t.foreign_key ["level_id"], "levels", ["id"], :on_update => :no_action, :on_delete => :no_action, :name => "fk_phase_durations_level_id"
+    t.foreign_key ["phase_id"], "phases", ["id"], :on_update => :no_action, :on_delete => :no_action, :name => "fk_phase_durations_phase_id"
   end
 
   create_table "professor_research_areas", :force => true do |t|
@@ -339,8 +342,8 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.integer  "research_area_id"
     t.datetime "created_at",       :null => false
     t.datetime "updated_at",       :null => false
-    t.index ["professor_id"], :name => "fk__professor_research_areas_professor_id"
     t.index ["research_area_id"], :name => "fk__professor_research_areas_research_area_id"
+    t.index ["professor_id"], :name => "fk__professor_research_areas_professor_id"
     t.foreign_key ["professor_id"], "professors", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_professor_research_areas_professor_id"
     t.foreign_key ["research_area_id"], "research_areas", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_professor_research_areas_research_area_id"
   end
@@ -375,10 +378,10 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.datetime "created_at",          :null => false
     t.datetime "updated_at",          :null => false
     t.integer  "professor_id"
-    t.index ["level_id"], :name => "fk__scholarships_level_id"
-    t.index ["sponsor_id"], :name => "fk__scholarships_sponsor_id"
-    t.index ["scholarship_type_id"], :name => "fk__scholarships_scholarship_type_id"
     t.index ["professor_id"], :name => "fk__scholarships_professor_id"
+    t.index ["scholarship_type_id"], :name => "fk__scholarships_scholarship_type_id"
+    t.index ["sponsor_id"], :name => "fk__scholarships_sponsor_id"
+    t.index ["level_id"], :name => "fk__scholarships_level_id"
     t.foreign_key ["level_id"], "levels", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_scholarships_level_id"
     t.foreign_key ["professor_id"], "professors", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_scholarships_professor_id"
     t.foreign_key ["scholarship_type_id"], "scholarship_types", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_scholarships_scholarship_type_id"
@@ -394,10 +397,10 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.datetime "created_at",     :null => false
     t.datetime "updated_at",     :null => false
     t.date     "cancel_date"
-    t.index ["scholarship_id"], :name => "fk__scholarship_durations_scholarship_id"
-    t.index ["enrollment_id"], :name => "fk__scholarship_durations_enrollment_id"
-    t.index ["scholarship_id"], :name => "index_scholarship_durations_on_scholarship_id"
     t.index ["enrollment_id"], :name => "index_scholarship_durations_on_enrollment_id"
+    t.index ["scholarship_id"], :name => "index_scholarship_durations_on_scholarship_id"
+    t.index ["enrollment_id"], :name => "fk__scholarship_durations_enrollment_id"
+    t.index ["scholarship_id"], :name => "fk__scholarship_durations_scholarship_id"
     t.foreign_key ["enrollment_id"], "enrollments", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_scholarship_durations_enrollment_id"
     t.foreign_key ["scholarship_id"], "scholarships", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_scholarship_durations_scholarship_id"
   end
