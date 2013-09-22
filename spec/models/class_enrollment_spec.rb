@@ -178,6 +178,18 @@ describe ClassEnrollment do
     end
   end
   describe "Methods" do
+    describe "grade=" do
+      context "receives a number in String format" do
+        it "converts comma separated numbers" do
+          class_enrollment.grade = "4,5"
+          class_enrollment.grade.should eq 45
+        end
+        it "converts dot separated numbers" do
+          class_enrollment.grade = "6.3"
+          class_enrollment.grade.should eq 63
+        end
+      end
+    end
     describe "grade_filled?" do
       context "should return true" do
         it "when grade is not null" do
@@ -194,3 +206,4 @@ describe ClassEnrollment do
     end
   end
 end
+
