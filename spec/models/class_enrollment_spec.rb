@@ -179,7 +179,7 @@ describe ClassEnrollment do
   end
   describe "Methods" do
     describe "grade=" do
-      context "receives a number in String format" do
+      context "parameter is a String number" do
         it "converts comma separated numbers" do
           class_enrollment.grade = "4,5"
           class_enrollment.grade.should eq 45
