@@ -5,6 +5,8 @@ class Dismissal < ActiveRecord::Base
   belongs_to :dismissal_reason
   belongs_to :enrollment
 
+  has_paper_trail
+
   validates :date, :presence => true
   validates :dismissal_reason, :presence => true
   validates :enrollment, :presence => true

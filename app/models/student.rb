@@ -12,7 +12,9 @@ class Student < ActiveRecord::Base
   belongs_to :city
   
   #delete cascade for enrollment -- when a student is deleted, so are his enrollments
-  has_many :enrollments, :dependent => :destroy  
+  has_many :enrollments, :dependent => :destroy
+
+  has_paper_trail  
    
   validates :name, :presence => true
   validates :cpf, :presence => true, :uniqueness => true

@@ -9,6 +9,8 @@ class Scholarship < ActiveRecord::Base
   has_many :scholarship_durations, :dependent => :destroy
   has_many :enrollments, :through => :scholarship_durations
 
+  has_paper_trail
+
   validates :scholarship_number, :presence => true, :uniqueness => true
   validates :level, :presence => true
   validates :sponsor, :presence => true

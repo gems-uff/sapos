@@ -9,4 +9,6 @@ class Role < ActiveRecord::Base
   ROLE_PROFESSOR = 4
   ROLE_ALUNO = 5
   ROLE_ADMINISTRADOR = 6
+
+  has_paper_trail
 end

@@ -8,6 +8,8 @@ class Professor < ActiveRecord::Base
   has_many :scholarships, :dependent => :destroy
   has_many :advisement_authorizations, :dependent => :destroy
 
+  has_paper_trail
+
   validates :cpf, :presence => true, :uniqueness => true
   validates :name, :presence => true
   validates :enrollment_number, :uniqueness => true, :allow_blank => true

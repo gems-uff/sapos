@@ -7,6 +7,8 @@ class Phase < ActiveRecord::Base
   has_many :enrollments, :through => :accomplishments
   has_many :phase_durations, :dependent => :destroy
   has_many :levels, :through => :phase_durations
+
+  has_paper_trail
   
   validates :name, :presence => true, :uniqueness => true
 end

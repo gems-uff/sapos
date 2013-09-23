@@ -6,6 +6,8 @@ class PhaseDuration < ActiveRecord::Base
   belongs_to :phase
   belongs_to :level
 
+  has_paper_trail
+
   validates :phase, :presence => true
   validates :level, :presence => true
 

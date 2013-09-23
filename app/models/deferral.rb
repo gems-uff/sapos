@@ -5,6 +5,8 @@ class Deferral < ActiveRecord::Base
   belongs_to :enrollment
   belongs_to :deferral_type
 
+  has_paper_trail
+
   validates :enrollment, :presence => true
   validates :enrollment_id, :uniqueness => {:scope => :deferral_type_id}
   validates :deferral_type, :presence => true

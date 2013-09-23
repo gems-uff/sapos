@@ -4,4 +4,6 @@
 class ProfessorResearchArea < ActiveRecord::Base
   belongs_to :professor
   belongs_to :research_area
+
+  has_paper_trail
 end

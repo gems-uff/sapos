@@ -6,6 +6,8 @@ class Major < ActiveRecord::Base
   belongs_to :institution
   has_and_belongs_to_many :students, :join_table => "majors_students"
 
+  has_paper_trail
+
   validates :name, :presence => true
   validates :institution, :presence => true
   validates :level, :presence => true

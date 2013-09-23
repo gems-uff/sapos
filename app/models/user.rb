@@ -6,6 +6,8 @@ class User < ActiveRecord::Base
 
   belongs_to :role
 
+  has_paper_trail
+
   attr_accessible :email, :password, :password_confirmation, :remember_me
 
   devise :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,

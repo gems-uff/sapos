@@ -5,5 +5,7 @@ class Institution < ActiveRecord::Base
   attr_accessible :name, :code
   has_many :majors, :dependent => :destroy
   
+  has_paper_trail
+  
   validates :name, :presence => true, :uniqueness => true
 end
