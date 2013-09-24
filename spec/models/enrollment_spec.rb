@@ -126,5 +126,67 @@ describe Enrollment do
         result.sort.should eql(expected_result.sort)
       end
     end
+
+    describe "available_semesters" do
+      before(:all) do
+        course1 = FactoryGirl.create(:course);
+        course2 = FactoryGirl.create(:course);
+        @class1 = FactoryGirl.create(:course_class, :year => "2012", :semester => "1")
+        @class2 = FactoryGirl.create(:course_class, :year => "2012", :semester => "1")
+        @class3 = FactoryGirl.create(:course_class, :year => "2012", :semester => "2")
+        @class4 = FactoryGirl.create(:course_class, :year => "2013", :semester => "1")
+        @class5 = FactoryGirl.create(:course_class, :year => "2013", :semester => "1", :course => course1)
+        @class6 = FactoryGirl.create(:course_class, :year => "2013", :semester => "2", :course => course1)
+        @class7 = FactoryGirl.create(:course_class, :year => "2013", :semester => "2", :course => course2)
+      end
+      it "shouldn't return any value when the enrollment doesn't have any classes" do
+        admission_date = YearSemester.current.semester_begin
+        enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
+        enrollment.available_semesters.any?.should be_false
+      end
+
+      it "should return [[2013,2]] when it is enrolled to a class of 2013.2" do
+        admission_date = YearSemester.current.semester_begin
+        enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
+        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
+        enrollment.available_semesters.any?.should be_true
+        enrollment.available_semesters.should == [[2013, 2]]
+      end
+
+      it "should return [[2013,2]] when it is enrolled to more than one class of 2013.2" do
+        admission_date = YearSemester.current.semester_begin
+        enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
+        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
+        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class7)
+        enrollment.available_semesters.any?.should be_true
+        enrollment.available_semesters.should == [[2013, 2]]
+      end
+
+      it "should return [[2013, 1], [2013,2]] when it is enrolled a class of 2013.1 and a class of 2013.2" do
+        admission_date = YearSemester.current.semester_begin
+        enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
+        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
+        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class5)
+        enrollment.available_semesters.any?.should be_true
+        enrollment.available_semesters.should == [[2013, 1], [2013, 2]]
+      end
+
+      it "should be ordered: [[2012, 1], [2012, 2], [2013, 1], [2013,2]]" do
+        admission_date = YearSemester.current.semester_begin
+        enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
+        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class3)
+        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class5)
+        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class1)
+        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class7)
+        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class4)
+        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class2)
+        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
+        enrollment.available_semesters.any?.should be_true
+        enrollment.available_semesters.should == [[2012, 1], [2012, 2], [2013, 1], [2013,2]]
+      end
+
+    end
   end
+
+   
 end

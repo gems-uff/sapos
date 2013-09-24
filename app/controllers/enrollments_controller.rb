@@ -580,54 +580,11 @@ class EnrollmentsController < ApplicationController
               }
     )
 
-    available_semesters = ActiveRecord::Base.connection.execute("select course_classes.year, course_classes.semester
-FROM `class_enrollments` INNER JOIN `course_classes` ON
-`course_classes`.`id` = `class_enrollments`.`course_class_id` INNER JOIN `courses` ON `courses`.`id` =
-`course_classes`.`course_id` INNER JOIN `course_types` ON `course_types`.`id` = `courses`.`course_type_id` WHERE
-`class_enrollments`.`enrollment_id` = #{ActiveRecord::Base.sanitize(enrollment.id)}
-GROUP BY CONCAT(course_classes.year, course_classes.semester) ORDER BY
-CONCAT(course_classes.year, course_classes.semester)")
 
-    if  available_semesters.any?
-      table_data = []
-      row_index = 0
-      bold_rows = []
-      total_credits = 0
-      available_semesters.each do |y, s|
-        class_enrollments = enrollment.class_enrollments.where("course_classes.year = ? and course_classes.semester = ?", y, s).joins(:course_class)
-        gpr = ActiveRecord::Base.connection.execute("select sum(grade*credits)/sum(credits) as GPR FROM `class_enrollments` INNER JOIN `course_classes` ON
-`course_classes`.`id` = `class_enrollments`.`course_class_id` INNER JOIN `courses` ON `courses`.`id` =
-`course_classes`.`course_id` INNER JOIN `course_types` ON `course_types`.`id` = `courses`.`course_type_id` WHERE
-`class_enrollments`.`enrollment_id` = #{ActiveRecord::Base.sanitize(enrollment.id)} AND (situation <>
-'#{I18n.translate("activerecord.attributes.class_enrollment.situations.registered")}') AND
-(course_types.has_score = true) AND (course_classes.year = #{y}) and (course_classes.semester = #{s})")
-        ys = "#{s}/#{y}"
+    # refactoring
+    any_available_semesters, table_data, bold_rows, total_credits = enrollment.grades_report_data
 
-        puts "gpr.inspect #{gpr.inspect}"
-        puts "gpr.methods #{gpr.methods}"
-        semester_credits = 0
-        class_enrollments.each do |class_enrollment|
-          row_index +=1
-
-          table_data << [
-              ys,
-              class_enrollment.course_class.course.code,
-              class_enrollment.course_class.course.name,
-              class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : "--",
-              class_enrollment.course_class.course.credits,
-              class_enrollment.situation
-          ]
-
-          semester_credits += class_enrollment.course_class.course.credits if  class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
-
-        end
-        bold_rows<< row_index
-        table_data << ["", "", "#{I18n.t("pdf_content.enrollment.grades_report.semester_summary")} ", number_to_grade(gpr.to_a[0][0], :precision => 1), semester_credits, ""]
-        row_index+=1
-        total_credits += semester_credits
-      end
-
-
+    if any_available_semesters
       pdf.table(table_data, :column_widths => table_width,
                 :row_colors => ["F9F9F9", "F0F0F0"],
                 :cell_style => {:font => "Courier",
@@ -637,12 +594,12 @@ CONCAT(course_classes.year, course_classes.semester)")
                                 :align => :center
                 }
       ) do |table|
-        table.column(2).align = :left
-        bold_rows.each do |i|
+          table.column(2).align = :left
+          bold_rows.each do |i|
           table.column(2).row(i).align = :right
           table.row(i).font_style = :bold
         end
-      end
+    end
 
       total_gpr = ActiveRecord::Base.connection.execute("select sum(grade*credits)/sum(credits) as GPR FROM `class_enrollments` INNER JOIN `course_classes` ON
 `course_classes`.`id` = `class_enrollments`.`course_class_id` INNER JOIN `courses` ON `courses`.`id` =
