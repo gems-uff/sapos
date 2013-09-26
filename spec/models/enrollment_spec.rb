@@ -2,7 +2,6 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 require "spec_helper"
-require "debugger"
 
 describe Enrollment do
   let(:enrollment) { Enrollment.new }
@@ -187,14 +186,15 @@ describe Enrollment do
       end
     end
 
-    describe "gpr_by_semester" do
+    describe "gpr" do
+
       before(:each) do
         with_grade = FactoryGirl.create(:course_type, :has_score => true)
         without_grade = FactoryGirl.create(:course_type, :has_score => nil)
         # create courses by number of credits
         courses = [4, 6, 6, 4, 2, 4].collect { |credits| FactoryGirl.create(:course, :credits => credits, :course_type => with_grade) }
-        courses[3].course_type = without_grade
-        courses[3].save
+        courses[4].course_type = without_grade
+        courses[4].save
 
         admission_date = YearSemester.current.semester_begin
         @enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
@@ -205,8 +205,8 @@ describe Enrollment do
           ["2012", "1", courses[1], 50, "disapproved"], 
           ["2012", "2", courses[2], 90, "aproved"], 
           ["2013", "1", courses[1], 100, "aproved"],
-          ["2013", "1", courses[3], nil, "aproved"],
-          ["2013", "1", courses[4], 97, "aproved"],
+          ["2013", "1", courses[4], nil, "aproved"],
+          ["2013", "1", courses[3], 97, "aproved"],
           ["2013", "1", courses[5], nil, "registered"],
           ["2013", "2", courses[5], nil, "registered"]
         ].each do |year, semester, course, grade, situation|
@@ -218,26 +218,33 @@ describe Enrollment do
         end
       end
 
-      it "should return 90 for 2012.2 (testing 1 grade)" do
-        @enrollment.gpr_by_semester(2012, 2).should == 90
+      describe "gpr_by_semester" do
+        it "should return 90 for 2012.2 (testing 1 grade)" do
+          @enrollment.gpr_by_semester(2012, 2).should == 90
+        end
+
+        it "should return 62 for 2012.1 (testing 2 grades)" do
+          @enrollment.gpr_by_semester(2012, 1).should == 62
+        end
+
+        it "should return 0 for 2013.2 (testing 1 incomplete class)" do
+          @enrollment.gpr_by_semester(2013, 2).should be_nil
+        end
+        
+        it "should return 99 for 2013.1 (testing 2 grades, 1 incomplete class, 1 approved class without grade)" do
+          @enrollment.gpr_by_semester(2013, 1).round(0).should == 99
+        end
+
+        it "should return 0 if it is not enrolled in any classes of the semester" do
+          @enrollment.gpr_by_semester(2011, 2).should be_nil
+        end
       end
 
-      it "should return 62 for 2012.1 (testing 2 grades)" do
-        @enrollment.gpr_by_semester(2012, 1).should == 62
+      describe "total_gpr" do
+        it "should return 83" do
+          @enrollment.total_gpr.round.should == 83
+        end
       end
-
-      it "should return 0 for 2013.2 (testing 1 incomplete class)" do
-        @enrollment.gpr_by_semester(2013, 2).should be_nil
-      end
-      
-      it "should return 99 for 2013.1 (testing 2 grades, 1 incomplete class, 1 approved class without grade)" do
-        @enrollment.gpr_by_semester(2013, 1).should == 99
-      end
-
-      it "should return 0 if it is not enrolled in any classes of the semester" do
-        @enrollment.gpr_by_semester(2011, 2).should be_nil
-      end
-
 
       
     end

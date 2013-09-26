@@ -1,12 +1,6 @@
 # Copyright (c) 2013 Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-def number_to_grade(number, options = {})
-  # Try to use the NumberHelper function
-  options[:precision] ||= 2
-  "#{(number/10.0).round(options[:precision])}" if number
-end
-
 class Enrollment < ActiveRecord::Base
   attr_accessible :enrollment_number
   belongs_to :student
@@ -39,55 +33,26 @@ class Enrollment < ActiveRecord::Base
   end
 
   def gpr_by_semester(year, semester)
-    self.class_enrollments.joins(course_class: {course: :course_type})
+    result = self.class_enrollments.joins(course_class: {course: :course_type})
       .where(
         'course_classes.year' => year, 
         'course_classes.semester' => semester, 
         'course_types.has_score' => true)
       .where(ClassEnrollment.arel_table[:situation].not_eq(I18n.translate("activerecord.attributes.class_enrollment.situations.registered")))
-      .select('sum(credits*grade)/sum(credits) as gpr')[0]['gpr']
+      .select('sum(credits*grade) as grade, sum(credits) as credits')
+    result[0]['grade'].to_f / result[0]['credits'].to_f unless result[0]['credits'].nil? or result[0]['credits'] == 0
     #In Rails 4, replace the second where with
     #where.not('class_enrollments.situation' => I18n.translate("activerecord.attributes.class_enrollment.situations.registered"))
   end
 
-  def grades_report_data
-    table_data = []
-    bold_rows = []
-    total_credits = 0
-
-    avl_semesters = self.available_semesters 
-
-    if avl_semesters.any?
-
-      row_index = 0
-
-      avl_semesters.each do |y, s|
-        class_enrollments = self.class_enrollments.where("course_classes.year = ? and course_classes.semester = ?", y, s).joins(:course_class)
-        ys = "#{s}/#{y}"
-
-        semester_credits = 0
-        class_enrollments.each do |class_enrollment|
-          row_index +=1
-
-          table_data << [
-              ys,
-              class_enrollment.course_class.course.code,
-              class_enrollment.course_class.course.name,
-              class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : "--",
-              class_enrollment.course_class.course.credits,
-              class_enrollment.situation
-          ]
-
-          semester_credits += class_enrollment.course_class.course.credits if class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
-        end
-        bold_rows<< row_index
-        table_data << ["", "", "#{I18n.t("pdf_content.enrollment.grades_report.semester_summary")} ", number_to_grade(self.gpr_by_semester(y, s), :precision => 1), semester_credits, ""]
-        row_index+=1
-        total_credits += semester_credits
-      end
-    end
-
-    [avl_semesters.any?, table_data, bold_rows, total_credits]
+  def total_gpr
+    result = self.class_enrollments.joins(course_class: {course: :course_type})
+      .where('course_types.has_score' => true)
+      .where(ClassEnrollment.arel_table[:situation].not_eq(I18n.translate("activerecord.attributes.class_enrollment.situations.registered")))
+      .select('sum(credits*grade) as grade, sum(credits) as credits')
+    result[0]['grade'].to_f / result[0]['credits'].to_f unless result[0]['credits'].nil? or result[0]['credits'] == 0
+     #In Rails 4, replace the second where with
+    #where.not('class_enrollments.situation' => I18n.translate("activerecord.attributes.class_enrollment.situations.registered"))
   end
 
   def self.with_delayed_phases_on(date, phases)

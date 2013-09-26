@@ -582,9 +582,43 @@ class EnrollmentsController < ApplicationController
 
 
     # refactoring
-    any_available_semesters, table_data, bold_rows, total_credits = enrollment.grades_report_data
+    available_semesters = enrollment.available_semesters
 
-    if any_available_semesters
+    if available_semesters.any?
+      table_data = []
+      bold_rows = []
+      total_credits = 0
+      row_index = 0
+
+      available_semesters.each do |y, s|
+        class_enrollments = enrollment.class_enrollments
+          .where(
+            'course_classes.year' => y,
+            'course_classes.semester' => s)
+          .joins(:course_class)
+        ys = "#{s}/#{y}"
+
+        semester_credits = 0
+        class_enrollments.each do |class_enrollment|
+          row_index +=1
+
+          table_data << [
+              ys,
+              class_enrollment.course_class.course.code,
+              class_enrollment.course_class.course.name,
+              class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : "--",
+              class_enrollment.course_class.course.credits,
+              class_enrollment.situation
+          ]
+
+          semester_credits += class_enrollment.course_class.course.credits if class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
+        end
+        bold_rows<< row_index
+        table_data << ["", "", "#{I18n.t("pdf_content.enrollment.grades_report.semester_summary")} ", number_to_grade(enrollment.gpr_by_semester(y, s), :precision => 1), semester_credits, ""]
+        row_index+=1
+        total_credits += semester_credits
+      end
+
       pdf.table(table_data, :column_widths => table_width,
                 :row_colors => ["F9F9F9", "F0F0F0"],
                 :cell_style => {:font => "Courier",
@@ -601,29 +635,23 @@ class EnrollmentsController < ApplicationController
         end
     end
 
-      total_gpr = ActiveRecord::Base.connection.execute("select sum(grade*credits)/sum(credits) as GPR FROM `class_enrollments` INNER JOIN `course_classes` ON
-`course_classes`.`id` = `class_enrollments`.`course_class_id` INNER JOIN `courses` ON `courses`.`id` =
-`course_classes`.`course_id` INNER JOIN `course_types` ON `course_types`.`id` = `courses`.`course_type_id` WHERE
-`class_enrollments`.`enrollment_id` = #{ActiveRecord::Base.sanitize(enrollment.id)} AND (situation <>
-'#{I18n.translate("activerecord.attributes.class_enrollment.situations.registered")}') AND
-(course_types.has_score = true)")
 
-      footer = [
-          ["", "", "#{I18n.t('pdf_content.enrollment.grades_report.total_credits')} ", "", total_credits, ""],
-          ["", "", "#{I18n.t('pdf_content.enrollment.grades_report.total_gpr')} ", number_to_grade(total_gpr.first.first, :precision => 1), "", ""]
-      ]
-      pdf.table(footer, :column_widths => table_width,
-                :row_colors => ["BFBFBF"],
-                :cell_style => {:font => "Courier",
-                                :size => 8,
-                                :inline_format => true,
-                                :border_width => 0,
-                                :align => :center,
-                                :font_style => :bold
-                }
-      ) do |table|
-        table.column(2).align = :right
-      end
+    footer = [
+        ["", "", "#{I18n.t('pdf_content.enrollment.grades_report.total_credits')} ", "", total_credits, ""],
+        ["", "", "#{I18n.t('pdf_content.enrollment.grades_report.total_gpr')} ", number_to_grade(enrollment.total_gpr, :precision => 1), "", ""]
+    ]
+    pdf.table(footer, :column_widths => table_width,
+              :row_colors => ["BFBFBF"],
+              :cell_style => {:font => "Courier",
+                              :size => 8,
+                              :inline_format => true,
+                              :border_width => 0,
+                              :align => :center,
+                              :font_style => :bold
+              }
+    ) do |table|
+      table.column(2).align = :right
+    end
 
       last_box_height = 50
       last_box_width1 = 150
