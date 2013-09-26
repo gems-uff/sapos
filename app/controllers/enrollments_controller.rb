@@ -313,7 +313,10 @@ class EnrollmentsController < ApplicationController
                               :align => :center
               }
     )
-    class_enrollments = enrollment.class_enrollments.where(:situation => I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")).joins(:course_class).order("CONCAT(course_classes.year, course_classes.semester)")
+    class_enrollments = enrollment.class_enrollments
+      .where(:situation => I18n.translate("activerecord.attributes.class_enrollment.situations.aproved"))
+      .joins(:course_class)
+      .order("course_classes.year", "course_classes.semester")
     unless class_enrollments.empty?
       table_data = class_enrollments.map do |class_enrollment|
         [
@@ -556,7 +559,6 @@ class EnrollmentsController < ApplicationController
         pdf.draw_text(enrollment_dismissal_reason_text, :at => [current_x, pdf.cursor])
       end
     end
-
 
     pdf.move_down 20
 
