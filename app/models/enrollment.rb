@@ -39,12 +39,15 @@ class Enrollment < ActiveRecord::Base
   end
 
   def gpr_by_semester(year, semester)
-    ActiveRecord::Base.connection.execute("select sum(grade*credits)/sum(credits) as GPR FROM `class_enrollments` INNER JOIN `course_classes` ON
-`course_classes`.`id` = `class_enrollments`.`course_class_id` INNER JOIN `courses` ON `courses`.`id` =
-`course_classes`.`course_id` INNER JOIN `course_types` ON `course_types`.`id` = `courses`.`course_type_id` WHERE
-`class_enrollments`.`enrollment_id` = #{ActiveRecord::Base.sanitize(self.id)} AND (situation <>
-'#{I18n.translate("activerecord.attributes.class_enrollment.situations.registered")}') AND
-(course_types.has_score = true) AND (course_classes.year = #{year}) and (course_classes.semester = #{semester})").to_a[0][0]
+    self.class_enrollments.joins(course_class: {course: :course_type})
+      .where(
+        'course_classes.year' => year, 
+        'course_classes.semester' => semester, 
+        'course_types.has_score' => true)
+      .where(ClassEnrollment.arel_table[:situation].not_eq(I18n.translate("activerecord.attributes.class_enrollment.situations.registered")))
+      .select('sum(credits*grade)/sum(credits) as gpr')[0]['gpr']
+    #In Rails 4, replace the second where with
+    #where.not('class_enrollments.situation' => I18n.translate("activerecord.attributes.class_enrollment.situations.registered"))
   end
 
   def grades_report_data
@@ -75,7 +78,7 @@ class Enrollment < ActiveRecord::Base
               class_enrollment.situation
           ]
 
-          semester_credits += class_enrollment.course_class.course.credits if  class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
+          semester_credits += class_enrollment.course_class.course.credits if class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
         end
         bold_rows<< row_index
         table_data << ["", "", "#{I18n.t("pdf_content.enrollment.grades_report.semester_summary")} ", number_to_grade(self.gpr_by_semester(y, s), :precision => 1), semester_credits, ""]
