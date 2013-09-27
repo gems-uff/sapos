@@ -7,7 +7,7 @@ class StudentsController < ApplicationController
 
   active_scaffold :student do |config|
     config.list.sorting = {:name => 'ASC'}
-    config.list.columns = [:name, :cpf, :enrollments]
+    config.list.columns = [:name, :cpf, :enrollments_number]
     config.create.label = :create_student_label
     config.update.label = :update_student_label
 

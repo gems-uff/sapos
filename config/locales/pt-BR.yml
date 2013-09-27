@@ -523,6 +523,7 @@ pt-BR:
         majors: "Cursos"
         cpf: "CPF"
         enrollments: "Matrículas"
+        enrollments_number: "Matrículas"
         address: "Logradouro"        
         birthdate: "Data de Nascimento"
         birthplace: "Naturalidade"

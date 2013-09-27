@@ -16,5 +16,11 @@ class Student < ActiveRecord::Base
    
   validates :name, :presence => true
   validates :cpf, :presence => true, :uniqueness => true
+
+  def enrollments_number
+    self.enrollments.collect { |enrollment| 
+      enrollment.enrollment_number 
+    }.join(', ')
+  end
   
 end
