@@ -338,10 +338,10 @@ pt-BR:
 
       full_messages:
         format: "%{attribute} %{message}"        
-                
+
       advisement:
         already_with_main_advisor: "já possui um orientador principal"     
-        
+
       models:
         scholarship_duration:
           start_date_before_scholarship_end_date: "anterior a Data de Limite de Concessão de outra alocação de bolsa"
@@ -378,6 +378,9 @@ pt-BR:
           blank_duration: "duração deve ser de pelo menos um dia"
         phase_duration:
           blank_deadline: "prazo deve ser de pelo menos um dia"
+        enrollment:
+          main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
+          main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
 
     models:
       advisement:

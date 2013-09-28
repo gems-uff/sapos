@@ -8,7 +8,7 @@ class Enrollment < ActiveRecord::Base
   belongs_to :enrollment_status
   has_one :dismissal, :dependent => :destroy
   has_many :advisements, :dependent => :destroy
-  has_many :professors, :through => :advisements
+  has_many :professors, :through => :advisements, :readonly => false
   has_many :scholarship_durations, :dependent => :destroy
   has_many :scholarships, :through => :scholarship_durations
   has_many :accomplishments, :dependent => :destroy
@@ -20,6 +20,8 @@ class Enrollment < ActiveRecord::Base
   validates :level, :presence => true
   validates :enrollment_status, :presence => true
   validates :student, :presence => true
+
+  validate :enrollment_has_main_advisor
 
   def to_label
     "#{enrollment_number} - #{student.name}"
@@ -108,6 +110,21 @@ class Enrollment < ActiveRecord::Base
       enrollments_with_all_phases_accomplished << enrollment.id if phases_duration.blank?
     end
     enrollments_with_all_phases_accomplished
+  end
+
+  def enrollment_has_main_advisor
+    unless advisements.nil? or advisements.empty?
+      #found = false
+      main_advisors = 0
+      advisements.each do |a|
+        #found ||= a.main_advisor
+        main_advisors += 1 if a.main_advisor
+      end
+      errors.add(:base, I18n.translate("activerecord.errors.models.enrollment.main_advisor_required")) if main_advisors == 0
+      errors.add(:base, I18n.translate("activerecord.errors.models.enrollment.main_advisor_uniqueness")) if main_advisors > 1
+
+      
+    end
   end
 
 end

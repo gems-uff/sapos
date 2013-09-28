@@ -2,6 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 require "spec_helper"
+require "debugger"
 
 describe Enrollment do
   let(:enrollment) { Enrollment.new }
@@ -18,6 +19,24 @@ describe Enrollment do
         it "student is null" do
           enrollment.student = nil
           enrollment.should have_error(:blank).on :student
+        end
+      end
+      context "should have advisment error when it" do
+        it "has just one advisor that is not a main advisor" do
+          enrollment.student = Student.new
+          enrollment.advisements.build
+          enrollment.should_not be_valid
+          enrollment.errors[:base].should include I18n.translate("activerecord.errors.models.enrollment.main_advisor_required")
+        end
+
+        it "has more than one main advisor" do
+          enrollment.student = Student.new
+          advisement1 = enrollment.advisements.build 
+          advisement1.main_advisor = true
+          advisement2 = enrollment.advisements.build 
+          advisement2.main_advisor = true
+          enrollment.should_not be_valid
+          enrollment.errors[:base].should include I18n.translate("activerecord.errors.models.enrollment.main_advisor_uniqueness")
         end
       end
     end

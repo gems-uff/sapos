@@ -48,21 +48,6 @@ describe Advisement do
           advisement.should have(0).errors_on :main_advisor
         end
       end
-      context "should have error blank when" do
-        it "does not have other advisor and main_advisor is false" do
-          advisement.stub!(:enrollment_has_advisors).and_return(false)
-          advisement.main_advisor = false
-          advisement.should have_error(:blank).on :main_advisor
-        end
-      end
-      context "should have uniqueness error when" do
-        it "main_advisor is true and another advisement with main_advisor of same enrollment exists" do
-          advisement.main_advisor = true
-          advisement.enrollment = FactoryGirl.create(:enrollment)
-          FactoryGirl.create(:advisement, :enrollment => advisement.enrollment)
-          advisement.should have_error(:taken).on :main_advisor
-        end
-      end
     end
     describe "professor_id" do
       context "should be valid when" do
