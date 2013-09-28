@@ -588,6 +588,7 @@ pt-BR:
         advisement_points: "Pontos de Orientação"
         advisements_with_points: "Orientandos"
         professor_research_areas: "Áreas de Pesquisa"
+        research_areas: "Áreas de Pesquisa"
       advisement:
         professor: "Orientador"
         enrollment: "Matrícula"
@@ -650,6 +651,7 @@ pt-BR:
         name: "Nome"
         code: "Código"
         professor_research_areas: "Professores"
+        professors: "Professores"
       course:
         name: "Nome"
         code: "Código"

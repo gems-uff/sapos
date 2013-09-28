@@ -14,6 +14,7 @@ class ResearchAreasController < ApplicationController
     config.columns =
         [:name,
          :code]
+    config.show.columns = [:name, :code, :professors]
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 end
