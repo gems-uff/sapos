@@ -510,7 +510,9 @@ pt-BR:
         professor: "Orientador"
         delayed_phase: "Etapa atrasada"
         delayed_phase_date: "em"
+        year_semester_label: "em"
         class_enrollments: "Inscrições"
+        course_class_year_semester: "Disciplina"
       dismissal:
         date: "Data"
         dismissal_reason: "Motivo do Desligamento"

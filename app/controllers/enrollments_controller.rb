@@ -23,9 +23,15 @@ class EnrollmentsController < ApplicationController
 #    config.columns[:level].update_columns = :accomplishments
     config.columns[:accomplishments].allow_add_existing = false;
 
-    config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase
+    config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase, :course_class_year_semester
     config.actions.swap :search, :field_search
-    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :accomplishments, :delayed_phase]
+    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :accomplishments, :delayed_phase, :course_class_year_semester]
+
+    #config.columns[:course_class_year_semester].search_sql = 
+      
+
+    #config.columns[:course_class_year_semester].search_ui = :course
+
 
     config.columns[:enrollment_number].search_sql = "enrollments.enrollment_number"
     config.columns[:enrollment_number].search_ui = :text
@@ -62,6 +68,36 @@ class EnrollmentsController < ApplicationController
     config.show.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal, :class_enrollments]
   end
   record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
+
+  #def self.condition_for_course_type(column, value, like_pattern)
+  #  return [] if value[:year].empty? and value[:semester].empty? and value[:course].empty?
+  #  ['(?, ?, ?) IN (%{search_sql})', value[:course], value[:year], value[:semester]]
+  #end
+
+  def self.condition_for_course_class_year_semester_column(column, value, like_pattern)
+    return [] if value[:year].empty? and value[:semester].empty? and value[:course].empty?
+    columns = { :year => '`course_classes`.`year`', 
+                :semester => '`course_classes`.`semester`', 
+                :course => '`courses`.`id`'}
+    select = []
+    condition = []
+    result = []
+    columns.each do |key, selection|
+      unless value[key].empty?
+        select << selection
+        condition << "?"
+        result << value[key]
+      end
+    end
+
+    search_sql = ClassEnrollment.joins(course_class: {course: :course_type})
+      .where('`class_enrollments`.`enrollment_id` = `enrollments`.`id`')
+      .select(select)
+      .to_sql
+
+
+    ["(#{condition.join(', ')}) IN (#{search_sql})"] + result
+  end
 
   def self.condition_for_admission_date_column(column, value, like_pattern)
     month = value[:month].empty? ? 1 : value[:month]
