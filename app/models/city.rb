@@ -5,6 +5,8 @@ class City < ActiveRecord::Base
   attr_accessible :name, :state
   belongs_to :state
 
+  has_paper_trail
+
   validates :state, :presence => true
 
   validates :name, :presence => true

@@ -473,6 +473,9 @@ pt-BR:
       professor_research_area:
         one: "Área de Pesquisa do Professor"
         other: "Área de Pesquisa dos Professores"
+      version:
+        one: "Versão"
+        other: "Versões"
 
     attributes:
       major:

@@ -4,6 +4,8 @@
 class Country < ActiveRecord::Base
   attr_accessible :name
   has_many :state
+
+  has_paper_trail
   
   validates :name, :presence => true, :uniqueness => true
 end
