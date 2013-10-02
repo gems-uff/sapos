@@ -164,6 +164,10 @@ Sapos::Application.routes.draw do
     as_routes
   end
 
+  resources :configurations do
+    as_routes
+  end
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

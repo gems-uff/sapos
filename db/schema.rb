@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130820023423) do
+ActiveRecord::Schema.define(:version => 20131002122507) do
 
   create_table "enrollment_statuses", :force => true do |t|
     t.string   "name"
@@ -242,6 +242,14 @@ ActiveRecord::Schema.define(:version => 20130820023423) do
     t.index ["enrollment_id"], :name => "fk__class_enrollments_enrollment_id"
     t.foreign_key ["course_class_id"], "course_classes", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_class_enrollments_course_class_id"
     t.foreign_key ["enrollment_id"], "enrollments", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_class_enrollments_enrollment_id"
+  end
+
+  create_table "configurations", :force => true do |t|
+    t.string   "name"
+    t.string   "variable"
+    t.string   "value"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "deferral_types", :force => true do |t|

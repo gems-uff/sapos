@@ -123,10 +123,11 @@ SimpleNavigation::Configuration.run do |navigation|
       locations.item :country, 'Países', countries_path, :if => can_read?(Country)
     end
 
-    configuracoes_models = [User, Role]
+    configuracoes_models = [User, Role, Configuration]
     primary.item :configuration, 'Configurações', get_path_from(configuracoes_models), :if => can_read?(configuracoes_models) do |configuration|
       configuration.item :user, 'Usuários', users_path, :if => can_read?(User)
       configuration.item :roles, 'Papéis', roles_path, :if => can_read?(Role)
+      configuration.item :configuration, 'Configurações', configurations_path, :if => can_read?(Configuration)
     end
 
     primary.item :logout, 'Logout', destroy_user_session_path

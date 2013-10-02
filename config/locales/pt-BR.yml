@@ -473,6 +473,9 @@ pt-BR:
       professor_research_area:
         one: "Área de Pesquisa do Professor"
         other: "Área de Pesquisa dos Professores"
+      configuration:
+        one: "Configuração"
+        other: "Configurações"
 
     attributes:
       major:
@@ -694,6 +697,10 @@ pt-BR:
       professor_research_area:
         professor: "Professor"
         research_area: "Área de Pesquisa"
+      configuration:
+        name: "Nome"
+        variable: "Variável"
+        value: "Valor"
 
   active_scaffold:
     hide: "Ocultar"
@@ -763,6 +770,7 @@ pt-BR:
     create_allocation_label: "Adicionar Alocação"
     create_class_enrollment_label: "Adicionar Inscrição"
     create_professor_research_area_label: "Adicionar Área de Pesquisa do Professor"
+    create_configuration_label: "Adicionar Configuração"
     update_enrollment_label: "Modificar Matrícula"
     update_major_label: "Modificar Curso"
     update_user_label: "Modificar Usuário"
@@ -778,6 +786,7 @@ pt-BR:
     update_allocation_label: "Editar Alocação"
     update_class_enrollment_label: "Editar Inscrição"
     update_professor_research_area_label: "Área de Pesquisa do Professor"
+    update_configuration_label: "Editar Configuração"
     total_label: "Total"
 
     errors:
