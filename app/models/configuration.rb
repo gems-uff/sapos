@@ -1,6 +1,9 @@
 # Copyright (c) 2013 Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 class Configuration < ActiveRecord::Base
   attr_accessible :name, :value, :variable
 
