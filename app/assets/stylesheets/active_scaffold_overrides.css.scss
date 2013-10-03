@@ -1128,3 +1128,14 @@ noscript.active-scaffold {
 .as_touch tr.record td {
     padding: 5px 10px;
 }
+
+.record-select-list a.remove {
+    display: block;
+    width: 0px;
+    height: 16px;
+    padding-left: 16px;
+    background: url("active_scaffold/default/cross.png") 0 0 no-repeat;
+    overflow: hidden;
+    float: left;
+    margin-right: 5px;
+}
