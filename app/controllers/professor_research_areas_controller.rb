@@ -15,6 +15,9 @@ class ProfessorResearchAreasController < ApplicationController
 
     config.columns[:professor].form_ui = :record_select
     config.columns[:research_area].form_ui = :record_select
+
+    config.columns[:professor].includes = [:name]
+    config.columns[:research_area].includes = [:name]
   end
 
   record_select

@@ -323,7 +323,7 @@ pt-BR:
     license: "Arquivo de Licensa"
 
   activerecord:   
-        
+
     errors:
       template:
         header:
@@ -383,6 +383,9 @@ pt-BR:
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
         professor_research_area:
           unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
+        student_major:
+          unique_pair: "não pode estar em dois ou mais cursos repetidos e curso não pode possuir o mesmo aluno duas ou mais vezes"
+
 
     models:
       advisement:
@@ -478,6 +481,9 @@ pt-BR:
       professor_research_area:
         one: "Área de Pesquisa do Professor"
         other: "Área de Pesquisa dos Professores"
+      student_major:
+        one: "Curso do Aluno"
+        other: "Curso dos Alunos"
 
     attributes:
       major:
@@ -485,6 +491,7 @@ pt-BR:
         institution: "Instituição"
         level: "Nível"
         students: "Alunos"
+        student_majors: "Alunos"
       sponsor:
         name: "Nome"
       level: 
@@ -547,7 +554,8 @@ pt-BR:
         state: "Estado"
         telephone1: "1º Telefone"
         telephone2: "2º Telefone"
-        zip_code: "CEP"        
+        zip_code: "CEP"   
+        student_majors: "Cursos"     
       scholarship:
         scholarship_number: "Número da Bolsa"
         level: "Nível"
@@ -700,6 +708,9 @@ pt-BR:
       professor_research_area:
         professor: "Professor"
         research_area: "Área de Pesquisa"
+      student_major:
+        student: "Aluno"
+        major: "Curso"
 
   active_scaffold:
     hide: "Ocultar"
@@ -739,7 +750,7 @@ pt-BR:
     reset: "Resetar"
     click_to_reset: "Clique aqui para remover o filtro criado"
     replace_with_new: ""
-    
+
     create_major_label: "Adicionar Curso"
     create_institution_label: "Adicionar Instituição"
     create_level_label: "Adicionar Nível"
@@ -769,6 +780,7 @@ pt-BR:
     create_allocation_label: "Adicionar Alocação"
     create_class_enrollment_label: "Adicionar Inscrição"
     create_professor_research_area_label: "Adicionar Área de Pesquisa do Professor"
+    create_student_major_label: "Adicionar Curso do Aluno"
     update_enrollment_label: "Modificar Matrícula"
     update_major_label: "Modificar Curso"
     update_user_label: "Modificar Usuário"
@@ -784,6 +796,7 @@ pt-BR:
     update_allocation_label: "Editar Alocação"
     update_class_enrollment_label: "Editar Inscrição"
     update_professor_research_area_label: "Área de Pesquisa do Professor"
+    update_student_major_label: "Editar Curso do Aluno"
     total_label: "Total"
 
     errors:
