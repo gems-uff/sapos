@@ -3,7 +3,8 @@
 
 class Student < ActiveRecord::Base
   attr_accessible :name
-  has_and_belongs_to_many :majors
+  has_many :majors, :through => :student_majors
+  has_many :student_majors, :dependent => :destroy
     
   belongs_to :birthplace, :foreign_key => "state_id", :class_name => "State"
   belongs_to :state

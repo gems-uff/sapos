@@ -9,7 +9,7 @@ class Ability
                 Deferral, DeferralType, Dismissal, DismissalReason, Enrollment,
                 EnrollmentStatus, Institution, Level, Major, Phase, PhaseDuration,
                 Professor, ProfessorResearchArea, ResearchArea, Role, Scholarship,
-                ScholarshipDuration, ScholarshipType, Sponsor, State, Student,
+                ScholarshipDuration, ScholarshipType, Sponsor, State, Student, StudentMajor,
                 User, YearSemester]
 
 
