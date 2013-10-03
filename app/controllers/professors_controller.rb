@@ -25,7 +25,7 @@ class ProfessorsController < ApplicationController
     config.columns[:sex].options = {:options => [['Masculino', 'M'],
                                                  ['Feminino', 'F']]}
     config.columns[:scholarships].form_ui = :record_select
-
+    config.columns[:professor_research_areas].includes = {:research_areas => :professor_research_areas}
     form_columns = [:name,
                    :cpf,
                    :birthdate,

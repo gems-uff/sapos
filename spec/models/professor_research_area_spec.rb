@@ -48,7 +48,7 @@ describe ProfessorResearchArea do
           professor_research_area.professor = FactoryGirl.create(:professor)
           professor_research_area.research_area = FactoryGirl.create(:research_area)
           FactoryGirl.create(:professor_research_area, :professor => professor_research_area.professor, :research_area => professor_research_area.research_area)
-          professor_research_area.should have_error(:taken).on :professor_id
+          professor_research_area.should have_error(:unique_pair).on :professor_id
         end
       end
     end
