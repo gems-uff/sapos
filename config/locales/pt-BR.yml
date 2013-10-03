@@ -381,6 +381,8 @@ pt-BR:
         enrollment:
           main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
+        deferral:
+          enrollment_and_deferral_uniqueness: "já possui esta prorrogação"
         professor_research_area:
           unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
         student_major:
