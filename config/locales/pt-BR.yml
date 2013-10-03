@@ -381,6 +381,8 @@ pt-BR:
         enrollment:
           main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
+        professor_research_area:
+          unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas"
 
     models:
       advisement:

@@ -25,10 +25,6 @@ class ProfessorsController < ApplicationController
     config.columns[:sex].options = {:options => [['Masculino', 'M'],
                                                  ['Feminino', 'F']]}
     config.columns[:scholarships].form_ui = :record_select
-    config.columns[:research_areas].form_ui = :record_select
-    #config.columns[:research_areas].allow_add_existing = true
-    
-    #config.columns[:research_areas].options = {:draggable_lists => true}
 
     form_columns = [:name,
                    :cpf,
@@ -47,7 +43,7 @@ class ProfessorsController < ApplicationController
                    :telephone2,
                    :zip_code,
                    :scholarships,
-                   :research_areas]
+                   :professor_research_areas]
 
     config.create.columns = form_columns
     config.update.columns = form_columns

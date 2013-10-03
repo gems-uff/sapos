@@ -7,6 +7,7 @@ Sapos::Application.routes.draw do
 
   resources :professor_research_areas do
     as_routes
+    record_select_routes
   end
 
   resources :class_enrollments do
