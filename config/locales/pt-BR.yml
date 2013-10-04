@@ -387,7 +387,8 @@ pt-BR:
           unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
         student_major:
           unique_pair: "não pode estar em dois ou mais cursos repetidos e curso não pode possuir o mesmo aluno duas ou mais vezes"
-
+        accomplishment:
+          accomplishment_enrollment_uniqueness: "já realizou esta etapa"
 
     models:
       advisement:
@@ -712,6 +713,7 @@ pt-BR:
         research_area: "Área de Pesquisa"
       student_major:
         student: "Aluno"
+        student_id: "Aluno"
         major: "Curso"
 
   active_scaffold:
