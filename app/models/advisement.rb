@@ -8,7 +8,7 @@ class Advisement < ActiveRecord::Base
   validates :professor, :presence => true
   validates :enrollment, :presence => true
 
-  validates :professor_id, :uniqueness => {:scope => :enrollment_id} #A professor can't be advisor more than once of an enrollment
+  validates :professor_id, :uniqueness => {:scope => :enrollment_id, :message => :advisement_professor_uniqueness} #A professor can't be advisor more than once of an enrollment
 
   def to_label
     "#{enrollment.enrollment_number} - #{professor.name}"

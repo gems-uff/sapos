@@ -389,7 +389,8 @@ pt-BR:
           unique_pair: "não pode estar em dois ou mais cursos repetidos e curso não pode possuir o mesmo aluno duas ou mais vezes"
         accomplishment:
           accomplishment_enrollment_uniqueness: "já realizou esta etapa"
-
+        advisement:
+          advisement_professor_uniqueness: "não pode ser orientador duas vezes da mesma matrícula"
     models:
       advisement:
         one: "Orientação"
