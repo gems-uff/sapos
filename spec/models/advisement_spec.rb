@@ -61,7 +61,7 @@ describe Advisement do
           advisement.professor = FactoryGirl.create(:professor)
           advisement.enrollment = FactoryGirl.create(:enrollment)
           FactoryGirl.create(:advisement, :professor => advisement.professor, :enrollment => advisement.enrollment)
-          advisement.should have_error(:taken).on :professor_id
+          advisement.should have_error(:advisement_professor_uniqueness).on :professor_id
         end
       end
     end
