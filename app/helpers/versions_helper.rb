@@ -4,7 +4,7 @@
 
 module VersionsHelper
 	def whodunnit_column(record, column)
-		name = record.object[/:\s\w+/][2..-1] if not record.object.nil?
-		name#link_to(h(name), :action => :show, :controller => 'users', :id => record.whodunnit)
+		user_id = record.whodunnit.to_i
+		link_to(h(User.find(user_id).name), user_path(User.find(user_id))) if user_id != 0
 	end
 end

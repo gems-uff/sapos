@@ -15,6 +15,6 @@ class VersionsController < ApplicationController
 
     config.actions.exclude :create, :delete, :update
   end
-  record_select :per_page => 1, :order_by => 'created_at', :search_on => [:item_id]
+  record_select :per_page => 10, :order_by => 'created_at', :search_on => [:item_id]
 
  end
