@@ -8,13 +8,13 @@ class VersionsController < ApplicationController
   active_scaffold :version do |config|
     config.columns = [:item_type, :item_id, :event, :whodunnit]
 
-    config.columns[:item_type].label = 'Modelo modificado'
-    config.columns[:item_id].label = 'ID do objeto'
-    config.columns[:whodunnit].label = 'Usuario'
-
+    config.columns[:item_type].label = I18n.t('activerecord.attributes.version.item_type')
+    config.columns[:item_id].label = I18n.t('activerecord.attributes.version.item_id')
+    config.columns[:event].label = I18n.t('activerecord.attributes.version.event')
+    config.columns[:whodunnit].label = I18n.t('activerecord.attributes.version.whodunnit')
 
     config.actions.exclude :create, :delete, :update
   end
+  record_select :per_page => 1, :order_by => 'created_at', :search_on => [:item_id]
 
-  record_select :per_page => 10, :search_on => [:item_id]
-end
+ end

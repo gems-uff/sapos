@@ -695,6 +695,12 @@ pt-BR:
       professor_research_area:
         professor: "Professor"
         research_area: "Área de Pesquisa"
+      version:
+        item_id: "ID do Objeto"
+        item_type: "Modelo do Objeto"
+        event: "Ação"
+        whodunnit: "Usuário"
+        object: "Descrição"
 
   active_scaffold:
     hide: "Ocultar"
