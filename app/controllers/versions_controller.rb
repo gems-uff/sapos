@@ -1,3 +1,4 @@
+# encoding utf-8
 # Copyright (c) 2013 Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
@@ -6,12 +7,14 @@ class VersionsController < ApplicationController
 
   active_scaffold :version do |config|
     config.columns = [:item_type, :item_id, :event, :whodunnit]
+
     config.columns[:item_type].label = 'Modelo modificado'
     config.columns[:item_id].label = 'ID do objeto'
-    config.columns[:whodunnit].label = 'ID do usuario'
+    config.columns[:whodunnit].label = 'Usuario'
+
 
     config.actions.exclude :create, :delete, :update
   end
-  record_select :per_page => 10, :search_on => [:item_id]
 
+  record_select :per_page => 10, :search_on => [:item_id]
 end
