@@ -30,4 +30,19 @@ module VersionsHelper
 		user_id = record.whodunnit.to_i
 		link_to(h(User.find(user_id).name), user_path(User.find(user_id))) if user_id != 0
 	end
+
+	def old_version_show_column(record, column)
+		if not record.object.nil?
+			property_list = ''
+			raw_property_list = record.object.split("\n")
+
+			for property in raw_property_list
+				if not property.end_with? ': ' and not property.include? 'password'
+					property_list += (property + "\n") if property != '---' #a string do objeto inicia com um ---
+				end
+			end
+
+			property_list
+		end
+	end
 end

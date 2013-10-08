@@ -15,6 +15,8 @@ class VersionsController < ApplicationController
     config.columns[:event].label = I18n.t('activerecord.attributes.version.event')
     config.columns[:user].label = I18n.t('activerecord.attributes.version.user')
 
+    config.show.columns = [:item_type, :current_object, :event, :user, :old_version]
+
     config.actions.exclude :create, :delete, :update
   end
 
