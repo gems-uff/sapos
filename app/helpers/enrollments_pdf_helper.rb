@@ -34,7 +34,7 @@ module EnrollmentsPdfHelper
     enrollment ||= options[:enrollment]
     x = 5
     default_margin = 22
-    default_margin_x = 40
+    default_margin_x = 20
     font_width = 5.7
     current_x = x
 
@@ -56,14 +56,19 @@ module EnrollmentsPdfHelper
         pdf.draw_text("#{I18n.t('pdf_content.enrollment.header.student_name')}:", :at => [current_x, pdf.cursor])
         pdf.draw_text(enrollment.student.name, :at => [first_column_text_x, pdf.cursor])
 
+        enrollment_number_text = "#{enrollment.enrollment_number}"
+        student_identity_number_text = "#{rescue_blank_text(enrollment.student.identity_number)}"
+
+        first_column_size = [enrollment_number_text.size, student_identity_number_text.size, 12].max*font_width + default_margin_x
+
         pdf.move_down default_margin
         enrollment_number_label = "#{I18n.t('pdf_content.enrollment.header.enrollment_number')}:"
         pdf.draw_text(enrollment_number_label, :at => [current_x, pdf.cursor])
-        enrollment_number_text = "#{enrollment.enrollment_number}"
+        
         current_x = first_column_text_x
         pdf.draw_text(enrollment_number_text, :at => [current_x, pdf.cursor])
 
-        current_x += enrollment_number_text.size*font_width + default_margin_x
+        current_x += first_column_size
         student_birthplace_text = "#{I18n.t('pdf_content.enrollment.header.student_birthplace')}: #{rescue_blank_text(enrollment.student.birthplace, {:method_call => :name})}"
         pdf.draw_text(student_birthplace_text, :at => [current_x, pdf.cursor])
 
@@ -74,11 +79,10 @@ module EnrollmentsPdfHelper
 
         student_identity_number_label = "#{I18n.t('pdf_content.enrollment.header.student_identity_number')}:"
         pdf.draw_text(student_identity_number_label, :at => [current_x, pdf.cursor])
-        student_identity_number_text = "#{rescue_blank_text(enrollment.student.identity_number)}"
+        
         current_x = first_column_text_x
         pdf.draw_text(student_identity_number_text, :at => [current_x, pdf.cursor])
-
-        current_x += student_identity_number_text.size*font_width + default_margin_x
+        current_x += first_column_size
         identity_issuing_body = "#{I18n.t('pdf_content.enrollment.header.identity_issuing_body')}: #{rescue_blank_text(enrollment.student.identity_issuing_body)}"
         pdf.draw_text(identity_issuing_body, :at => [current_x, pdf.cursor])
         pdf.move_down default_margin
