@@ -257,6 +257,9 @@ module EnrollmentsPdfHelper
         ys = "#{s}/#{y}"
 
         semester_credits = 0
+
+
+
         class_enrollments.each do |class_enrollment|
           row_index +=1
 
@@ -311,6 +314,8 @@ module EnrollmentsPdfHelper
     ) do |table|
       table.column(2).align = :right
     end
+
+    pdf.move_down 20
   end
 
   def advisors_list(pdf, options={})
@@ -324,6 +329,8 @@ module EnrollmentsPdfHelper
         pdf.draw_text("#{I18n.t("pdf_content.enrollment.grades_report.advisors")}: #{(enrollment.professors.map { |professor| professor.name }).join(", ") }", :at => [current_x, pdf.cursor])
       end
     end
+
+    pdf.move_down 10
   end
 
 end

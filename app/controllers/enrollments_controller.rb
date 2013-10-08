@@ -159,9 +159,7 @@ class EnrollmentsController < ApplicationController
 
     @accomplished_phases = @enrollment.accomplishments.order(:conclusion_date)
 
-    pdf = Prawn::Document.new(:left_margin => 20, :right_margin => 20, :top_margin => 30, :bottom_margin => 30)
-
-    x_start_position = 5
+    pdf = Prawn::Document.new(:left_margin => 20, :right_margin => 20, :top_margin => 30, :bottom_margin => 80)
     
     header(pdf)
 
@@ -173,9 +171,9 @@ class EnrollmentsController < ApplicationController
 
     accomplished_table(pdf, accomplished_phases: @accomplished_phases)
     
-    
-
-    page_footer(pdf)
+    pdf.repeat(:all, dynamic: true) do
+      page_footer(pdf)
+    end
 
     send_data(pdf.render, :filename => "#{I18n.t('pdf_content.enrollment.academic_transcript.title')} -  #{@enrollment.student.name}.pdf", :type => 'application/pdf')
   end
@@ -186,13 +184,7 @@ class EnrollmentsController < ApplicationController
 
     @accomplished_phases = @enrollment.accomplishments.order(:conclusion_date)
 
-    pdf = Prawn::Document.new(:left_margin => 20, :right_margin => 20, :top_margin => 30, :bottom_margin => 30)
-
-    x_start_position = 5
-    default_margin = 22
-    default_margin_x = 40
-    current_x = x_start_position
-    font_width = 5.7
+    pdf = Prawn::Document.new(:left_margin => 20, :right_margin => 20, :top_margin => 30, :bottom_margin => 80)
 
     header(pdf)
 
@@ -202,17 +194,13 @@ class EnrollmentsController < ApplicationController
 
     grades_report_table(pdf, enrollment: @enrollment)
 
-    page_footer(pdf)
-
-    pdf.start_new_page
-
-    pdf.move_down 20
-
     accomplished_table(pdf, accomplished_phases: @accomplished_phases)
 
     advisors_list(pdf, enrollment: @enrollment)
-    
-    page_footer(pdf)
+
+    pdf.repeat(:all, dynamic: true) do
+      page_footer(pdf)
+    end
 
     send_data(pdf.render, :filename => "#{I18n.t('pdf_content.enrollment.grades_report.title')} -  #{@enrollment.student.name}.pdf", :type => 'application/pdf')
   end

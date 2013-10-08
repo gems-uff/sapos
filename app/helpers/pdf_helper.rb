@@ -35,7 +35,7 @@ module PdfHelper
     last_box_width1 = 150
     last_box_width2 = 350
 
-    last_box_y = pdf.bounds.bottom + last_box_height# pdf.cursor - 15
+    last_box_y = pdf.bounds.bottom  #pdf.bounds.bottom + last_box_height# pdf.cursor - 15
     pdf.font('Courier', :size => 8) do
       pdf.bounding_box([0, last_box_y], :width => last_box_width1, :height => last_box_height) do
         pdf.stroke_bounds
@@ -73,7 +73,8 @@ module PdfHelper
         pdf.stroke_bounds
         current_x = x
         pdf.move_down last_box_height/2
-        pdf.draw_text("#{I18n.t("pdf_content.enrollment.footer.page")} #{pdf.page_count}", :at => [current_x, pdf.cursor])
+        #pdf.number_pages("#{I18n.t("pdf_content.enrollment.footer.page")} <page>/<total>")
+        pdf.draw_text("#{I18n.t("pdf_content.enrollment.footer.page")} #{pdf.page_number}", :at => [current_x, pdf.cursor])
       end
     end
 
