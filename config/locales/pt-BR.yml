@@ -253,6 +253,8 @@ pt-BR:
         student_name: "Aluno"
         level_name: "Nível"
     enrollment:
+      to_pdf:
+        filename: "Relatório de Matrículas"
       academic_transcript:
         title: "Histórico Escolar"
         link: "Histórico"

@@ -12,7 +12,7 @@ class EnrollmentsController < ApplicationController
 
   active_scaffold :enrollment do |config|
 
-    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
+    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection, :parameters => {:format => :pdf}
     config.action_links.add 'academic_transcript_pdf', :label => I18n.t('pdf_content.enrollment.academic_transcript.link'), :page => true, :type => :member
     config.action_links.add 'grades_report_pdf', :label => I18n.t('pdf_content.enrollment.grades_report.link'), :page => true, :type => :member
 
@@ -127,40 +127,10 @@ class EnrollmentsController < ApplicationController
 
 
   def to_pdf
-    pdf = Prawn::Document.new
-
-    y_position = pdf.cursor
-
-    pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [455, y_position],
-              :vposition => :top,
-              :scale => 0.3
-    )
-
-    pdf.font("Courier", :size => 14) do
-      pdf.text "Universidade Federal Fluminense
-                Instituto de Computação
-                Pós-Graduação"
-    end
-
-    pdf.move_down 30
-
-    header = [["<b>#{I18n.t("activerecord.attributes.enrollment.student")}</b>",
-               "<b>#{I18n.t("activerecord.attributes.enrollment.enrollment_number")}</b>",
-               "<b>#{I18n.t("activerecord.attributes.enrollment.admission_date")}</b>",
-               "<b>#{I18n.t("activerecord.attributes.enrollment.dismissal")}</b>"]]
-    pdf.table(header, :column_widths => [208, 108, 108, 108],
-              :row_colors => ["BFBFBF"],
-              :cell_style => {:font => "Courier",
-                              :size => 10,
-                              :inline_format => true,
-                              :border_width => 0
-              }
-    )
-
     each_record_in_page {}
     enrollments_list = find_page(:sorting => active_scaffold_config.list.user.sorting).items
 
-    enrollments = enrollments_list.map do |enrollment|
+    @enrollments = enrollments_list.map do |enrollment|
       [
           enrollment.student[:name],
           enrollment[:enrollment_number],
@@ -171,16 +141,11 @@ class EnrollmentsController < ApplicationController
       ]
     end
 
-    pdf.table(enrollments, :column_widths => [208, 108, 108, 108],
-              :row_colors => ["FFFFFF", "F0F0F0"],
-              :cell_style => {:font => "Courier",
-                              :size => 8,
-                              :inline_format => true,
-                              :border_width => 0
-              }
-    )
-
-    send_data(pdf.render, :filename => 'relatorio.pdf', :type => 'application/pdf')
+    respond_to do |format|
+      format.pdf do
+        send_data render_to_string, :filename => I18n.t("pdf_content.enrollment.to_pdf.filename"), :type => 'application/pdf'
+      end
+    end
   end
 
   def academic_transcript_pdf

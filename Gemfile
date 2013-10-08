@@ -46,7 +46,7 @@ gem 'jquery-ui-rails'
 
 # Prawn to PDF
 gem 'prawn'
-gem 'prawn-rails'
+gem 'prawn_rails'
 
 # Redcarpet for Readme MarkDown (or README.md)
 gem 'redcarpet', '2.1.0'
