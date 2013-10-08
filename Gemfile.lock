@@ -46,6 +46,13 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.6.2)
+    columnize (0.3.6)
+    debugger (1.6.2)
+      columnize (>= 0.3.1)
+      debugger-linecache (~> 1.2.0)
+      debugger-ruby_core_source (~> 1.2.3)
+    debugger-linecache (1.2.0)
+    debugger-ruby_core_source (1.2.3)
     devise (2.2.4)
       bcrypt-ruby (~> 3.0)
       orm_adapter (~> 0.1)
@@ -191,6 +198,7 @@ DEPENDENCIES
   awesome_print
   cancan
   coffee-rails (~> 3.2.1)
+  debugger
   devise
   exception_notification (= 2.6.1)
   factory_girl_rails (= 1.7.0)
