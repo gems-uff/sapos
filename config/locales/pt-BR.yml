@@ -337,7 +337,6 @@ pt-BR:
           enrollment_and_scholarship_uniqueness: "já possui uma Bolsa alocada nesse período"
           attributes:
             start_date_after_end_date: "posterior a Data de Limite de Concessão"
-          
             cancel_date:
               on_or_before: "posterior a Data Limite de Concessão"
               on_or_after:  "anterior a Data de Início"

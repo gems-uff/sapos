@@ -13,8 +13,8 @@ class EnrollmentsController < ApplicationController
   active_scaffold :enrollment do |config|
 
     config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection, :parameters => {:format => :pdf}
-    config.action_links.add 'academic_transcript_pdf', :label => I18n.t('pdf_content.enrollment.academic_transcript.link'), :page => true, :type => :member
-    config.action_links.add 'grades_report_pdf', :label => I18n.t('pdf_content.enrollment.grades_report.link'), :page => true, :type => :member
+    config.action_links.add 'academic_transcript_pdf', :label => I18n.t('pdf_content.enrollment.academic_transcript.link'), :page => true, :type => :member, :parameters => {:format => :pdf}
+    config.action_links.add 'grades_report_pdf', :label => I18n.t('pdf_content.enrollment.grades_report.link'), :page => true, :type => :member, :parameters => {:format => :pdf}
 
     config.list.columns = [:student, :enrollment_number, :level, :enrollment_status, :admission_date, :dismissal]
     config.list.sorting = {:enrollment_number => 'ASC'}
@@ -149,7 +149,6 @@ class EnrollmentsController < ApplicationController
   end
 
   def academic_transcript_pdf
-
     @enrollment = Enrollment.find(params[:id])
 
     @class_enrollments = @enrollment.class_enrollments
@@ -159,50 +158,23 @@ class EnrollmentsController < ApplicationController
 
     @accomplished_phases = @enrollment.accomplishments.order(:conclusion_date)
 
-    pdf = Prawn::Document.new(:left_margin => 20, :right_margin => 20, :top_margin => 30, :bottom_margin => 80)
-    
-    header(pdf)
-
-    document_title(pdf, I18n.t('pdf_content.enrollment.academic_transcript.title'))
-
-    enrollment_header(pdf, enrollment: @enrollment)
-
-    transcript_table(pdf, class_enrollments: @class_enrollments)
-
-    accomplished_table(pdf, accomplished_phases: @accomplished_phases)
-    
-    pdf.repeat(:all, dynamic: true) do
-      page_footer(pdf)
+    respond_to do |format|
+      format.pdf do
+        send_data render_to_string, :filename => "#{I18n.t('pdf_content.enrollment.academic_transcript.title')} -  #{@enrollment.student.name}.pdf", :type => 'application/pdf'
+      end
     end
-
-    send_data(pdf.render, :filename => "#{I18n.t('pdf_content.enrollment.academic_transcript.title')} -  #{@enrollment.student.name}.pdf", :type => 'application/pdf')
   end
 
   def grades_report_pdf
-
     @enrollment = Enrollment.find(params[:id])
 
     @accomplished_phases = @enrollment.accomplishments.order(:conclusion_date)
 
-    pdf = Prawn::Document.new(:left_margin => 20, :right_margin => 20, :top_margin => 30, :bottom_margin => 80)
-
-    header(pdf)
-
-    document_title(pdf, I18n.t('pdf_content.enrollment.grades_report.title'))
-
-    enrollment_header(pdf, enrollment: @enrollment)
-
-    grades_report_table(pdf, enrollment: @enrollment)
-
-    accomplished_table(pdf, accomplished_phases: @accomplished_phases)
-
-    advisors_list(pdf, enrollment: @enrollment)
-
-    pdf.repeat(:all, dynamic: true) do
-      page_footer(pdf)
+    respond_to do |format|
+      format.pdf do
+        send_data render_to_string, :filename => "#{I18n.t('pdf_content.enrollment.grades_report.title')} -  #{@enrollment.student.name}.pdf", :type => 'application/pdf'
+      end
     end
-
-    send_data(pdf.render, :filename => "#{I18n.t('pdf_content.enrollment.grades_report.title')} -  #{@enrollment.student.name}.pdf", :type => 'application/pdf')
   end
 
 
