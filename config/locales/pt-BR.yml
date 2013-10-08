@@ -696,11 +696,18 @@ pt-BR:
         professor: "Professor"
         research_area: "Área de Pesquisa"
       version:
+        current_object: "Versão Atual"
+        current_object_destroyed: "Objeto Deletado"
+        user: "Usuário"
         item_id: "ID do Objeto"
-        item_type: "Modelo do Objeto"
+        item_type: "Modelo"
         event: "Ação"
+        event_options:
+          create: "Criação"
+          update: "Atualização"
+          destroy: "Remoção"
         whodunnit: "Usuário"
-        object: "Descrição"
+        object: "Objeto Anterior"
 
   active_scaffold:
     hide: "Ocultar"
