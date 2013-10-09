@@ -2,4 +2,6 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 module CourseClassesHelper
+  include PdfHelper
+  include CourseClassesPdfHelper 
 end
