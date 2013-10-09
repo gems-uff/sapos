@@ -4,7 +4,6 @@
 
 module PdfHelper
   
-  include AdvisementsPdfHelper
   def header(pdf)
     y_position = pdf.cursor
     pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [pdf.bounds.right - 65, y_position],
