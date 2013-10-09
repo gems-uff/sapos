@@ -9,7 +9,6 @@ class EnrollmentsController < ApplicationController
   include ApplicationHelper
   helper :class_enrollments
 
-
   active_scaffold :enrollment do |config|
 
     config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection, :parameters => {:format => :pdf}

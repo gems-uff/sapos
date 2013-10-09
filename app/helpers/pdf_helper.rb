@@ -3,7 +3,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 module PdfHelper
-  include EnrollmentsPdfHelper
+  
   include AdvisementsPdfHelper
   def header(pdf)
     y_position = pdf.cursor

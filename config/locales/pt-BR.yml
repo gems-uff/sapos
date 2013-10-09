@@ -294,7 +294,11 @@ pt-BR:
         semester_summary: "Resumo do período (CR e Créditos obtidos)"
         accomplished_phases: "Etapas obrigatórias concluídas"
         advisors: "Orientadores"
-        total_gpr: "CR Acumulado"
+        total_gpr: "CR Acumulado" 
+    scholarships:
+      to_pdf:
+        filename: "Relatório de Bolsas"
+
 
   rescue_blank_text: "Não informado"
 
