@@ -4,8 +4,6 @@
 
 class ScholarshipsController < ApplicationController
   authorize_resource
-  include PdfHelper
-  include ScholarshipsPdfHelper
 
   active_scaffold :scholarship do |config|
     config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection, :parameters => {:format => :pdf}

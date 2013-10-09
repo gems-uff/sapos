@@ -298,6 +298,9 @@ pt-BR:
     scholarships:
       to_pdf:
         filename: "Relatório de Bolsas"
+    scholarship_durations:
+      to_pdf:
+        filename: "Relatório de Alocação de Bolsas"
 
 
   rescue_blank_text: "Não informado"

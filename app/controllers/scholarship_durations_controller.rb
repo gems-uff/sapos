@@ -6,7 +6,7 @@ class ScholarshipDurationsController < ApplicationController
   authorize_resource
 
   active_scaffold :scholarship_duration do |config|
-    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection
+    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection, :parameters => {:format => :pdf}
 
     #Enables advanced search A.K.A FieldSearch
     config.actions.swap :search, :field_search
@@ -151,39 +151,10 @@ class ScholarshipDurationsController < ApplicationController
   def to_pdf
     pdf = Prawn::Document.new
 
-    y_position = pdf.cursor
-
-    pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [455, y_position],
-              :vposition => :top,
-              :scale => 0.3
-    )
-
-    pdf.font("Courier", :size => 14) do
-      pdf.text "Universidade Federal Fluminense
-                Instituto de Computação
-                Pós-Graduação"
-    end
-
-    pdf.move_down 30
-
-    header = [["<b>Número da Bolsa</b>",
-               "<b>Data de Início</b>",
-               "<b>Data de Limite de Concessão</b>",
-               "<b>Data de Encerramento</b>",
-               "<b>Matrícula</b>"]]
-    pdf.table(header, :column_widths => [108, 108, 108, 108, 108],
-              :row_colors => ["BFBFBF"],
-              :cell_style => {:font => "Courier",
-                              :size => 10,
-                              :inline_format => true,
-                              :border_width => 0
-              }
-    )
-
     each_record_in_page {}
     scholarship_durations_list = find_page(:sorting => active_scaffold_config.list.user.sorting).items
 
-    scholarship_durations = scholarship_durations_list.map do |scp|
+    @scholarship_durations = scholarship_durations_list.map do |scp|
       [
           scp.scholarship[:scholarship_number],
           scp[:start_date],
@@ -193,16 +164,11 @@ class ScholarshipDurationsController < ApplicationController
       ]
     end
 
-    pdf.table(scholarship_durations, :column_widths => [108, 108, 108, 108, 108],
-              :row_colors => ["FFFFFF", "F0F0F0"],
-              :cell_style => {:font => "Courier",
-                              :size => 8,
-                              :inline_format => true,
-                              :border_width => 0
-              }
-    )
-
-    send_data(pdf.render, :filename => 'relatorio.pdf', :type => 'application/pdf')
+    respond_to do |format|
+      format.pdf do
+        send_data render_to_string, :filename => I18n.t("pdf_content.scholarship_durations.to_pdf.filename"), :type => 'application/pdf'
+      end
+    end
   end
 
 end 
