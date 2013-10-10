@@ -474,8 +474,8 @@ pt-BR:
         one: "Área de Pesquisa do Professor"
         other: "Área de Pesquisa dos Professores"
       version:
-        one: "Versão"
-        other: "Versões"
+        one: "Log"
+        other: "Log"
 
     attributes:
       major:
@@ -696,8 +696,10 @@ pt-BR:
         professor: "Professor"
         research_area: "Área de Pesquisa"
       version:
+        old_version: "Versão Antiga"
         current_object: "Versão Atual"
         current_object_destroyed: "Objeto Deletado"
+        created_at: "Modificado em"
         user: "Usuário"
         item_id: "ID do Objeto"
         item_type: "Modelo"

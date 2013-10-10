@@ -1,4 +1,4 @@
-# encoding utf-8
+# encoding: utf-8
 # Copyright (c) 2013 Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
@@ -31,6 +31,10 @@ module VersionsHelper
 		link_to(h(User.find(user_id).name), user_path(User.find(user_id))) if user_id != 0
 	end
 
+	def created_at_column(record, column)
+		return record.created_at.strftime('%d/%m/%Y às %H:%M')
+	end
+
 	def old_version_show_column(record, column)
 		if not record.object.nil?
 			property_list = ''
@@ -38,7 +42,7 @@ module VersionsHelper
 
 			for property in raw_property_list
 				if not property.end_with? ': ' and not property.include? 'password'
-					property_list += (property + "\n") if property != '---' #a string do objeto inicia com um ---
+					property_list += (property + " ") if property != '---' #a string do objeto inicia com um ---
 				end
 			end
 

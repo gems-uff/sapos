@@ -127,7 +127,7 @@ SimpleNavigation::Configuration.run do |navigation|
     primary.item :configuration, 'Configurações', get_path_from(configuracoes_models), :if => can_read?(configuracoes_models) do |configuration|
       configuration.item :user, 'Usuários', users_path, :if => can_read?(User)
       configuration.item :roles, 'Papéis', roles_path, :if => can_read?(Role)
-      configuration.item :versions, 'Versões', versions_path, :if => can_read?(Role)
+      configuration.item :versions, 'Log', versions_path, :if => can_read?(Role)
     end
 
     primary.item :logout, 'Logout', destroy_user_session_path
