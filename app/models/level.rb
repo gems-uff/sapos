@@ -4,5 +4,7 @@
 class Level < ActiveRecord::Base
   attr_accessible :name
   has_many :advisement_authorizations, :dependent => :destroy
+  has_many :enrollments
   validates :name, :presence => true, :uniqueness => true
+
 end

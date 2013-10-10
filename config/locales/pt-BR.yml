@@ -228,6 +228,7 @@ pt-BR:
       odd: "deve ser ímpar"
       even: "deve ser par"
 
+
   pdf_content:
     course_class:
       summary:
@@ -794,6 +795,8 @@ pt-BR:
     update_professor_research_area_label: "Área de Pesquisa do Professor"
     update_student_major_label: "Editar Curso do Aluno"
     total_label: "Total"
+
+    cant_destroy_record: "Não é possível excluir %{record}"
 
     errors:
       template:
