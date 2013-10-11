@@ -244,6 +244,14 @@ ActiveRecord::Schema.define(:version => 20131003133948) do
     t.foreign_key ["enrollment_id"], "enrollments", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_class_enrollments_enrollment_id"
   end
 
+  create_table "configurations", :force => true do |t|
+    t.string   "name"
+    t.string   "variable"
+    t.string   "value"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "deferral_types", :force => true do |t|
     t.string   "name"
     t.string   "description"
@@ -254,8 +262,7 @@ ActiveRecord::Schema.define(:version => 20131003133948) do
     t.integer  "duration_months",    :default => 0
     t.integer  "duration_days",      :default => 0
     t.index ["phase_id"], :name => "fk__deferral_types_phase_id"
-    t.index ["phase_id"], :name => "ltered_deferral_types_phase_id"
-    t.foreign_key ["phase_id"], "phases", ["id"], :on_update => :no_action, :on_delete => :no_action, :name => "fk_deferral_types_phase_id"
+    t.foreign_key ["phase_id"], "phases", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_deferral_types_phase_id"
   end
 
   create_table "deferrals", :force => true do |t|
@@ -320,10 +327,8 @@ ActiveRecord::Schema.define(:version => 20131003133948) do
     t.integer  "deadline_days",      :default => 0
     t.index ["phase_id"], :name => "fk__phase_durations_phase_id"
     t.index ["level_id"], :name => "fk__phase_durations_level_id"
-    t.index ["level_id"], :name => "ltered_phase_durations_level_id"
-    t.index ["phase_id"], :name => "ltered_phase_durations_phase_id"
-    t.foreign_key ["level_id"], "levels", ["id"], :on_update => :no_action, :on_delete => :no_action, :name => "fk_phase_durations_level_id"
-    t.foreign_key ["phase_id"], "phases", ["id"], :on_update => :no_action, :on_delete => :no_action, :name => "fk_phase_durations_phase_id"
+    t.foreign_key ["level_id"], "levels", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_phase_durations_level_id"
+    t.foreign_key ["phase_id"], "phases", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_phase_durations_phase_id"
   end
 
   create_table "professor_research_areas", :force => true do |t|
@@ -397,15 +402,12 @@ ActiveRecord::Schema.define(:version => 20131003133948) do
   create_table "student_majors", :force => true do |t|
     t.integer "major_id",   :null => false
     t.integer "student_id", :null => false
-    t.index ["major_id"], :name => "ltered_student_majors_major_id"
-    t.index ["student_id"], :name => "ltered_student_majors_student_id"
-    t.index ["student_id"], :name => "index_student_majors_on_student_id"
     t.index ["major_id"], :name => "index_majors_students_on_course_id"
     t.index ["major_id"], :name => "fk__majors_students_course_id"
+    t.index ["student_id"], :name => "index_student_majors_on_student_id"
     t.index ["student_id"], :name => "fk__student_majors_student_id"
-    t.index ["major_id"], :name => "fk__student_majors_major_id"
-    t.foreign_key ["major_id"], "majors", ["id"], :on_update => :no_action, :on_delete => :no_action, :name => "fk_student_majors_major_id"
-    t.foreign_key ["student_id"], "students", ["id"], :on_update => :no_action, :on_delete => :no_action, :name => "fk_student_majors_student_id"
+    t.foreign_key ["major_id"], "majors", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_student_majors_major_id"
+    t.foreign_key ["student_id"], "students", ["id"], :on_update => :restrict, :on_delete => :restrict, :name => "fk_student_majors_student_id"
   end
 
   create_table "users", :force => true do |t|

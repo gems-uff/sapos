@@ -26,10 +26,10 @@ class EnrollmentsController < ApplicationController
     config.actions.swap :search, :field_search
     config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :accomplishments, :delayed_phase, :course_class_year_semester]
 
-    #config.columns[:course_class_year_semester].search_sql = 
+    config.columns[:course_class_year_semester].search_sql = ""
       
 
-    #config.columns[:course_class_year_semester].search_ui = :course
+    #config.columns[:course_class_year_semester].search_ui = :select
 
 
     config.columns[:enrollment_number].search_sql = "enrollments.enrollment_number"
