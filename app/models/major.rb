@@ -4,7 +4,8 @@
 class Major < ActiveRecord::Base
   belongs_to :level
   belongs_to :institution
-  has_and_belongs_to_many :students, :join_table => "majors_students"
+  has_many :students, :through => :student_majors
+  has_many :student_majors, :dependent => :destroy
 
   has_paper_trail
 

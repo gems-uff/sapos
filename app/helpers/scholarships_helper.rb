@@ -2,6 +2,9 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 module ScholarshipsHelper
+  include PdfHelper
+  include ScholarshipsPdfHelper
+
   @@config = YAML::load_file("#{Rails.root}/config/properties.yml")    
   @@range = @@config["scholarship_year_range"]    
   

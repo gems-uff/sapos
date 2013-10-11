@@ -8,7 +8,7 @@ class Enrollment < ActiveRecord::Base
   belongs_to :enrollment_status
   has_one :dismissal, :dependent => :destroy
   has_many :advisements, :dependent => :destroy
-  has_many :professors, :through => :advisements
+  has_many :professors, :through => :advisements, :readonly => false
   has_many :scholarship_durations, :dependent => :destroy
   has_many :scholarships, :through => :scholarship_durations
   has_many :accomplishments, :dependent => :destroy
@@ -23,8 +23,40 @@ class Enrollment < ActiveRecord::Base
   validates :enrollment_status, :presence => true
   validates :student, :presence => true
 
+  validate :enrollment_has_main_advisor
+
   def to_label
     "#{enrollment_number} - #{student.name}"
+  end
+
+  def available_semesters
+    self.class_enrollments.joins(course_class: :course)
+      .group('course_classes.year', 'course_classes.semester')
+      .order('course_classes.year', 'course_classes.semester')
+      .select(['course_classes.year', 'course_classes.semester']).collect { |y| [y.year, y.semester] }
+  end
+
+  def gpr_by_semester(year, semester)
+    result = self.class_enrollments.joins(course_class: {course: :course_type})
+      .where(
+        'course_classes.year' => year, 
+        'course_classes.semester' => semester, 
+        'course_types.has_score' => true)
+      .where(ClassEnrollment.arel_table[:situation].not_eq(I18n.translate("activerecord.attributes.class_enrollment.situations.registered")))
+      .select('sum(credits*grade) as grade, sum(credits) as credits')
+    result[0]['grade'].to_f / result[0]['credits'].to_f unless result[0]['credits'].nil? or result[0]['credits'] == 0
+    #In Rails 4, replace the second where with
+    #where.not('class_enrollments.situation' => I18n.translate("activerecord.attributes.class_enrollment.situations.registered"))
+  end
+
+  def total_gpr
+    result = self.class_enrollments.joins(course_class: {course: :course_type})
+      .where('course_types.has_score' => true)
+      .where(ClassEnrollment.arel_table[:situation].not_eq(I18n.translate("activerecord.attributes.class_enrollment.situations.registered")))
+      .select('sum(credits*grade) as grade, sum(credits) as credits')
+    result[0]['grade'].to_f / result[0]['credits'].to_f unless result[0]['credits'].nil? or result[0]['credits'] == 0
+     #In Rails 4, replace the second where with
+    #where.not('class_enrollments.situation' => I18n.translate("activerecord.attributes.class_enrollment.situations.registered"))
   end
 
   def self.with_delayed_phases_on(date, phases)
@@ -81,4 +113,20 @@ class Enrollment < ActiveRecord::Base
     end
     enrollments_with_all_phases_accomplished
   end
+
+  def enrollment_has_main_advisor
+    unless advisements.nil? or advisements.empty?
+      #found = false
+      main_advisors = 0
+      advisements.each do |a|
+        #found ||= a.main_advisor
+        main_advisors += 1 if a.main_advisor
+      end
+      errors.add(:base, I18n.translate("activerecord.errors.models.enrollment.main_advisor_required")) if main_advisors == 0
+      errors.add(:base, I18n.translate("activerecord.errors.models.enrollment.main_advisor_uniqueness")) if main_advisors > 1
+
+      
+    end
+  end
+
 end

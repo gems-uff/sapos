@@ -15,3 +15,25 @@
 //= require jquery_ujs
 //= require active_scaffold
 //= require_tree .
+
+
+function areInputsFilled(selector) {
+	var filled = false;
+	$(selector).each(function() {
+	   var element = $(this);
+	   if (element.val() != "") {
+	       filled = true;
+	   }
+	});
+	return filled;
+}
+
+function confirmOnPageExit(){
+	if (areInputsFilled('.as_form.update input[type=text], .as_form.create input[type=text]')) {
+		return 'Existem campos preenchidos! Você pode perder suas alterações!';
+	}
+}
+
+$(document).ready(function(){
+	window.onbeforeunload = confirmOnPageExit;
+});

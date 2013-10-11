@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 module AdvisementsHelper
+  include PdfHelper
+  include AdvisementsPdfHelper 
   def active_search_column(record,options)
     select(record, :active, [["Todas","all"],["Ativas","active"],["Inativas","not_active"]], options, options)
   end

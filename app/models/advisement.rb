@@ -10,10 +10,7 @@ class Advisement < ActiveRecord::Base
   validates :professor, :presence => true
   validates :enrollment, :presence => true
 
-  validates :professor_id, :uniqueness => {:scope => :enrollment_id} #A professor can't be advisor more than once of an enrollment
-  validates :main_advisor, :uniqueness => {:scope => :enrollment_id}, :if => :main_advisor #only check if main_advisor is unique if the user tries to insert another main advisor
-  validates :main_advisor, :presence => true, :unless => :enrollment_has_advisors
-
+  validates :professor_id, :uniqueness => {:scope => :enrollment_id, :message => :advisement_professor_uniqueness} #A professor can't be advisor more than once of an enrollment
 
   def to_label
     "#{enrollment.enrollment_number} - #{professor.name}"
@@ -66,6 +63,11 @@ class Advisement < ActiveRecord::Base
   
   def enrollment_has_advisors
     return false if enrollment.nil?
-    !Advisement.where(:enrollment_id => enrollment.id).empty?
+    enrollment_advisements = Advisement.where(:enrollment_id => enrollment.id)
+    return false if enrollment_advisements.empty?
+    !enrollment_advisements.where(main_advisor: true).empty?
   end
+
+
+
 end

@@ -2,8 +2,6 @@
 # Copyright (c) 2013 Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-# encoding: utf-8
-
 class AdvisementsController < ApplicationController
   authorize_resource
 
@@ -121,7 +119,16 @@ class AdvisementsController < ApplicationController
 
   def to_pdf
     each_record_in_page {}
-    @advisements = find_page(:sorting => active_scaffold_config.list.user.sorting).items
+    
+    @advisements = find_page(:sorting => active_scaffold_config.list.user.sorting).items.map do |adv|
+      [
+          adv.professor[:name],
+          adv.enrollment[:enrollment_number],
+          adv.enrollment.student[:name],
+          adv.enrollment.level[:name]
+      ]
+    end
+
     respond_to do |format|
       format.pdf do
         send_data render_to_string, :filename => "#{I18n.t("pdf_content.advisements.to_pdf.filename")}.pdf", :type => "application/pdf"

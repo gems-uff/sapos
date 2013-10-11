@@ -16,9 +16,12 @@ class MajorsController < ApplicationController
     config.columns[:students].clear_link
     config.columns[:level].form_ui = :select
     config.columns[:institution].form_ui = :record_select
-    config.columns[:students].form_ui = :record_select
-    config.create.columns = [:name, :level, :institution, :students]
-    config.update.columns = [:name, :level, :institution, :students]
+
+    config.columns[:student_majors].includes = [:students, :student_majors]
+
+    config.list.columns = [:name, :level, :institution, :students]
+    config.create.columns = [:name, :level, :institution, :student_majors]
+    config.update.columns = [:name, :level, :institution, :student_majors]
     
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true

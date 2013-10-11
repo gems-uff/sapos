@@ -11,6 +11,7 @@ Sapos::Application.routes.draw do
 
   resources :professor_research_areas do
     as_routes
+    record_select_routes
   end
 
   resources :class_enrollments do
@@ -166,6 +167,11 @@ Sapos::Application.routes.draw do
 
   resources :advisement_authorizations do
     as_routes
+  end
+
+  resources :student_majors do
+    as_routes
+    record_select_routes
   end
 
   # The priority is based upon order of creation:

@@ -8,7 +8,7 @@ class Deferral < ActiveRecord::Base
   has_paper_trail
 
   validates :enrollment, :presence => true
-  validates :enrollment_id, :uniqueness => {:scope => :deferral_type_id}
+  validates :enrollment_id, :uniqueness => {:scope => :deferral_type_id, :message => :enrollment_and_deferral_uniqueness}
   validates :deferral_type, :presence => true
 
   def to_label

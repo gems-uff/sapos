@@ -7,6 +7,8 @@ class Professor < ActiveRecord::Base
   has_many :enrollments, :through => :advisements
   has_many :scholarships, :dependent => :destroy
   has_many :advisement_authorizations, :dependent => :destroy
+  has_many :research_areas, :through => :professor_research_areas
+  has_many :professor_research_areas, :dependent => :destroy
 
   has_paper_trail
 

@@ -8,7 +8,7 @@ class Accomplishment < ActiveRecord::Base
   has_paper_trail
 
   validates :enrollment, :presence => true
-  validates :enrollment_id, :uniqueness => {:scope => :phase_id}
+  validates :enrollment_id, :uniqueness => {:scope => :phase_id, :message => :accomplishment_enrollment_uniqueness}
   validates :phase, :presence => true
 
   def to_label

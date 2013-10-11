@@ -44,4 +44,20 @@ describe Student do
       end
       end
   end
+  describe "Methods" do
+    describe "enrollments_number" do
+      it "should return the enrollment number when the student has one enrollment" do
+        student = FactoryGirl.create(:student)
+        FactoryGirl.create(:enrollment, :enrollment_number => "M123", :student => student)
+        student.enrollments_number.should == "M123"
+      end
+
+      it "should return the enrollments number separated by comma when the student has two enrollments" do
+        student = FactoryGirl.create(:student)
+        FactoryGirl.create(:enrollment, :enrollment_number => "M123", :student => student)
+        FactoryGirl.create(:enrollment, :enrollment_number => "D234", :student => student)
+        student.enrollments_number.should == "M123, D234"
+      end
+    end
+  end
 end
