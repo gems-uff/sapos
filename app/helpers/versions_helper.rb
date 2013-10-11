@@ -45,7 +45,7 @@ module VersionsHelper
 					not property.include? 'password' and 
 					not property.include? '_at' and
 					not property.include? 'sign_in'
-					property_list += (property + "<br>") if property != '---' #a string do objeto inicia com um --- e tem uns Z's randomicos
+					property_list += (property + "<br>") if property != '---' #a string do objeto inicia com um ---
 				end
 			end
 
