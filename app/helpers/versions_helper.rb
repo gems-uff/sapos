@@ -41,12 +41,15 @@ module VersionsHelper
 			raw_property_list = record.object.split("\n")
 
 			for property in raw_property_list
-				if not property.end_with? ': ' and not property.include? 'password'
-					property_list += (property + " ") if property != '---' #a string do objeto inicia com um ---
+				if not property.end_with? ': ' and 
+					not property.include? 'password' and 
+					not property.include? '_at' and
+					not property.include? 'sign_in'
+					property_list += (property + "<br>") if property != '---' #a string do objeto inicia com um --- e tem uns Z's randomicos
 				end
 			end
 
-			property_list
+			property_list.html_safe
 		end
 	end
 end
