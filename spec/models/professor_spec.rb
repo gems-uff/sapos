@@ -68,7 +68,7 @@ describe Professor do
       it "should return 0 if the professor has no advisement_authorizations" do
         professor.advisement_points.should eql("0.0")
       end
-      it "should return the spected number if the professor has advisement_authorizations" do
+      it "should return the spected number if the professor has advisement_authorizations (default)" do
         professor = FactoryGirl.create(:professor)
         other_professor = FactoryGirl.create(:professor)
         enrollment = FactoryGirl.create(:enrollment)
@@ -83,6 +83,30 @@ describe Professor do
         FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => other_enrollment, :main_advisor => false)
 
         professor.advisement_points.should eql("1.5")
+      end
+
+      it "should return the spected number if the professor has advisement_authorizations and the points are changed" do
+        config = Configuration.find_by_variable(:single_advisor_points)
+        config.delete unless config.nil?
+        config = Configuration.find_by_variable(:multiple_advisor_points)
+        config.delete unless config.nil?
+        Configuration.create(:variable=>:single_advisor_points, :value=>"2.0")
+        Configuration.create(:variable=>:multiple_advisor_points, :value=>"1.0")
+
+        professor = FactoryGirl.create(:professor)
+        other_professor = FactoryGirl.create(:professor)
+        enrollment = FactoryGirl.create(:enrollment)
+        other_enrollment = FactoryGirl.create(:enrollment, :level => enrollment.level)
+
+        FactoryGirl.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
+        FactoryGirl.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
+
+        FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
+        FactoryGirl.create(:advisement, :professor => professor, :enrollment => other_enrollment)
+
+        FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => other_enrollment, :main_advisor => false)
+
+        professor.advisement_points.should eql("3.0")
       end
     end
     describe "advisement_point" do
@@ -111,7 +135,7 @@ describe Professor do
           professor.advisement_point(enrollment).should eql(0.0)
         end
       end
-      it "should return 1 when the professor is the only authorized advisor" do
+      it "should return 1 when the professor is the only authorized advisor (default)" do
 
         professor = FactoryGirl.create(:professor)
         other_professor = FactoryGirl.create(:professor)
@@ -124,7 +148,25 @@ describe Professor do
 
         professor.advisement_point(enrollment).should eql(1.0)
       end
-      it "should return 1 when the professor is not the only authorized advisor" do
+
+      it "should return the configured value when the professor is the only authorized advisor" do
+        config = Configuration.find_by_variable(:single_advisor_points)
+        config.delete unless config.nil?
+        Configuration.create(:variable=>:single_advisor_points, :value=>"2.0")
+
+        professor = FactoryGirl.create(:professor)
+        other_professor = FactoryGirl.create(:professor)
+        enrollment = FactoryGirl.create(:enrollment)
+
+        FactoryGirl.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
+
+        FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
+        FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
+
+        professor.advisement_point(enrollment).should eql(2.0)
+      end      
+
+      it "should return 0.5 when the professor is not the only authorized advisor (default)" do
         professor = FactoryGirl.create(:professor)
         other_professor = FactoryGirl.create(:professor)
         enrollment = FactoryGirl.create(:enrollment)
@@ -137,6 +179,26 @@ describe Professor do
 
         professor.advisement_point(enrollment).should eql(0.5)
       end
+
+      it "should return the configured value when the professor is not the only authorized advisor" do
+        config = Configuration.find_by_variable(:multiple_advisor_points)
+        config.delete unless config.nil?
+        Configuration.create(:variable=>:multiple_advisor_points, :value=>"1.0")
+
+        professor = FactoryGirl.create(:professor)
+        other_professor = FactoryGirl.create(:professor)
+        enrollment = FactoryGirl.create(:enrollment)
+
+        FactoryGirl.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
+        FactoryGirl.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
+
+        FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
+        FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
+
+        professor.advisement_point(enrollment).should eql(1.0)
+      end
+
+
     end
   end
 end

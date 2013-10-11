@@ -5,7 +5,7 @@ class Ability
   include CanCan::Ability
 
   ALL_MODELS = [Accomplishment, Advisement, AdvisementAuthorization, Allocation,
-                City, ClassEnrollment, Country, Course, CourseClass, CourseType,
+                City, ClassEnrollment, Configuration, Country, Course, CourseClass, CourseType,
                 Deferral, DeferralType, Dismissal, DismissalReason, Enrollment,
                 EnrollmentStatus, Institution, Level, Major, Phase, PhaseDuration,
                 Professor, ProfessorResearchArea, ResearchArea, Role, Scholarship,
