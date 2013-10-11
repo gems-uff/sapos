@@ -6,6 +6,8 @@ class Course < ActiveRecord::Base
   belongs_to :research_area
   belongs_to :course_type
 
+  has_paper_trail
+
   validates :course_type, :presence => true
   validates :name, :presence => true, :uniqueness => true
   validates :code, :presence => true, :uniqueness => true

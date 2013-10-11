@@ -16,6 +16,8 @@ class Enrollment < ActiveRecord::Base
   has_many :deferrals, :dependent => :destroy
   has_many :class_enrollments, :dependent => :destroy
 
+  has_paper_trail
+
   validates :enrollment_number, :presence => true, :uniqueness => true
   validates :level, :presence => true
   validates :enrollment_status, :presence => true

@@ -5,6 +5,8 @@ class AdvisementAuthorization < ActiveRecord::Base
   belongs_to :professor
   belongs_to :level
 
+  has_paper_trail
+
   validates :professor, :presence => true
   validates :level, :presence => true
 

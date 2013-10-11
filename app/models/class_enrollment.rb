@@ -5,6 +5,8 @@ class ClassEnrollment < ActiveRecord::Base
   belongs_to :course_class
   belongs_to :enrollment
 
+  has_paper_trail
+
   SITUATIONS = [I18n.translate("activerecord.attributes.class_enrollment.situations.registered"), I18n.translate("activerecord.attributes.class_enrollment.situations.aproved"), I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")]
 
   validates :enrollment, :presence => true

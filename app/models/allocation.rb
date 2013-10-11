@@ -4,6 +4,8 @@
 class Allocation < ActiveRecord::Base
   belongs_to :course_class
 
+  has_paper_trail
+
   validates :day, :inclusion => {:in => I18n.translate("date.day_names")}, :presence => true
   validates :course_class, :presence => true
   validates :start_time, :presence => true, :numericality => { :greater_than_or_equal_to => 0, :less_than_or_equal_to => 23 }

@@ -7,6 +7,7 @@ gem "schema_plus"
 
 gem 'cancan'
 gem "devise"
+gem "paper_trail", "~> 2.7.2"
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'

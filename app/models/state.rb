@@ -5,6 +5,8 @@ class State < ActiveRecord::Base
   attr_accessible :name, :code, :country
   belongs_to :country
   has_many :cities
+
+  has_paper_trail
   
   validates :name, :presence => true, :uniqueness => true
   validates :code, :presence => true, :uniqueness => true

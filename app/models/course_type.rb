@@ -4,5 +4,7 @@
 class CourseType < ActiveRecord::Base
   has_many :courses
 
+  has_paper_trail
+
   validates :name, :presence => true, :uniqueness => true
 end

@@ -5,6 +5,8 @@ class ScholarshipDuration < ActiveRecord::Base
   belongs_to :scholarship
   belongs_to :enrollment
 
+  has_paper_trail
+
   validates :scholarship, :presence => true
   validates :enrollment_id, :presence => true, :uniqueness => {:message => I18n.t("activerecord.errors.models.scholarship_duration.enrollment_and_scholarship_uniqueness"), :if => :student_has_other_scholarship_duration}
   validates :enrollment, :presence => true

@@ -5,6 +5,8 @@ class Advisement < ActiveRecord::Base
   belongs_to :professor
   belongs_to :enrollment
 
+  has_paper_trail
+
   validates :professor, :presence => true
   validates :enrollment, :presence => true
 

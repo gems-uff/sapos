@@ -4,5 +4,8 @@
 class Level < ActiveRecord::Base
   attr_accessible :name
   has_many :advisement_authorizations
+
+  has_paper_trail
+
   validates :name, :presence => true, :uniqueness => true
 end

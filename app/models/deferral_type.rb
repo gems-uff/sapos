@@ -6,6 +6,8 @@ class DeferralType < ActiveRecord::Base
   belongs_to :phase
   has_many :deferrals
 
+  has_paper_trail
+
   validates :name, :presence => true
   validates :phase, :presence => true
 
