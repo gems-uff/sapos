@@ -18,4 +18,8 @@ class DeferralType < ActiveRecord::Base
       errors.add(:duration, I18n.t("activerecord.errors.models.deferral_type.blank_duration"))
     end
   end
+
+  def to_label
+    "#{self.name}"
+  end
 end

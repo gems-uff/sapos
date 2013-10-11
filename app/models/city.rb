@@ -10,4 +10,8 @@ class City < ActiveRecord::Base
   validates :state, :presence => true
 
   validates :name, :presence => true
+
+  def to_label
+  	"#{self.name}"
+  end
 end

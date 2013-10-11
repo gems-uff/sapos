@@ -81,4 +81,8 @@ class Professor < ActiveRecord::Base
             </table>"
     resp.html_safe
   end
+
+  def to_label
+    "#{self.name}"
+  end
 end

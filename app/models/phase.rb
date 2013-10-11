@@ -11,4 +11,8 @@ class Phase < ActiveRecord::Base
   has_paper_trail
   
   validates :name, :presence => true, :uniqueness => true
+
+  def to_label
+  	"#{self.name}"
+  end
 end

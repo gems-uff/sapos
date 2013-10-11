@@ -14,4 +14,7 @@ class ProfessorResearchArea < ActiveRecord::Base
 
   validates :professor_id, :uniqueness => {:scope => :research_area_id, :message => :unique_pair} #A professor can't have the same research_area more than once
 
+  def to_label
+  	"#{self.professor.name} - #{self.research_area.name}"
+  end
 end

@@ -44,4 +44,8 @@ class User < ActiveRecord::Base
     errors.add(:base, I18n.t("activerecord.errors.models.user.delete")) if User.count == 1
     errors.blank?
   end
+
+  def to_label
+    "#{self.name}"
+  end
 end

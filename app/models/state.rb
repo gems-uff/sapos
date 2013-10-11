@@ -11,4 +11,8 @@ class State < ActiveRecord::Base
   validates :name, :presence => true, :uniqueness => true
   validates :code, :presence => true, :uniqueness => true
   validates :country, :presence => true
+
+  def to_label
+    "#{self.name}"
+  end
 end

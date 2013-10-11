@@ -13,4 +13,8 @@ class StudentMajor < ActiveRecord::Base
   validates :major, :presence => true
 
   validates :student_id, :uniqueness => {:scope => :major_id, :message => :unique_pair} 
+
+  def to_label
+    "#{self.student.name} - #{self.major.name}"
+  end
 end

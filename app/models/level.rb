@@ -10,4 +10,7 @@ class Level < ActiveRecord::Base
   has_many :enrollments
   validates :name, :presence => true, :uniqueness => true
 
+  def to_label
+  	"#{self.name}"
+  end
 end

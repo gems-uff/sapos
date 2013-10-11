@@ -26,4 +26,7 @@ class Student < ActiveRecord::Base
     }.join(', ')
   end
   
+  def to_label
+    "#{self.name}"
+  end
 end

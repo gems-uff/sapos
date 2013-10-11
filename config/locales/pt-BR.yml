@@ -1,204 +1,33 @@
 # encoding utf-8
-# Sample localization file for English. Add more files in this directory for other locales.
-# See http://github.com/svenfuchs/rails-i18n/tree/master/rails%2Flocale for starting points.
+# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 pt-BR:
-  # formatos de data e hora
-  date:
-    formats:
-      default: "%d-%m-%Y"
-#      default: "%Y-%m-%d"
-      short: "%d de %B"
-      long: "%d de %B de %Y"
-      monthyear: "%B-%Y"
-      monthyear2: "%B/%Y"
-
-    day_names:
-      - Domingo
-      - Segunda
-      - Terça
-      - Quarta
-      - Quinta
-      - Sexta
-      - Sábado
-    abbr_day_names:
-      - Dom
-      - Seg
-      - Ter
-      - Qua
-      - Qui
-      - Sex
-      - Sáb
-
-    month_names:
-      - ~
-      - Janeiro
-      - Fevereiro
-      - Março
-      - Abril
-      - Maio
-      - Junho
-      - Julho
-      - Agosto
-      - Setembro
-      - Outubro
-      - Novembro
-      - Dezembro
-    abbr_month_names:
-      - ~
-      - Jan
-      - Fev
-      - Mar
-      - Abr
-      - Mai
-      - Jun
-      - Jul
-      - Ago
-      - Set
-      - Out
-      - Nov
-      - Dez
-    order:
-      - :day
-      - :month
-      - :year
-
-  time:
-    formats:
-      default: "%A, %d de %B de %Y, %H:%M h"
-      short: "%H:%M h"
-      long: "%A, %d de %B de %Y, %H:%M h"
-    am: ''
-    pm: ''
-
-  # Usado no Array.to_sentence
-  support:
-    array:
-      words_connector: ", "
-      two_words_connector: " e "
-      last_word_connector: " e "
-
-    select:
-      prompt: "Por favor selecione"
-
-  number:
-    format:
-      separator: ','
-      delimiter: '.'
-      precision: 3
-      significant: false
-      strip_insignificant_zeros: false
-
-    currency:
-      format:
-        format: '%u %n'
-        unit: 'R$'
-        separator: ','
-        delimiter: '.'
-        precision: 2
-        significant: false
-        strip_insignificant_zeros: false
-
-    percentage:
-      format:
-        delimiter: '.'
-
-    precision:
-      format:
-        delimiter: '.'
-
-    human:
-      format:
-        delimiter: '.'
-        precision: 2
-        significant: true
-        strip_insignificant_zeros: true
-      storage_units:
-        format: "%n %u"
-        units:
-          byte:
-            one: "Byte"
-            other: "Bytes"
-          kb: "KB"
-          mb: "MB"
-          gb: "GB"
-          tb: "TB"
-      # number_to_human()
-      # new in rails 3: please add to other locales
-      decimal_units:
-        format: "%n %u"
-        units:
-          unit: ""
-          thousand: "mil"
-          million:
-            one: milhão
-            other: milhões
-          billion:
-            one: bilhão
-            other: bilhões
-          trillion:
-            one: trilhão
-            other: trilhões
-          quadrillion:
-            one: quatrilhão
-            other: quatrilhões
-
-  # distancia do tempo em palavras
-  datetime:
-    distance_in_words:
-      half_a_minute: 'meio minuto'
-      less_than_x_seconds:
-        one: 'menos de 1 segundo'
-        other: 'menos de %{count} segundos'
-      x_seconds:
-        one: '1 segundo'
-        other: '%{count} segundos'
-      less_than_x_minutes:
-        one: 'menos de um minuto'
-        other: 'menos de %{count} minutos'
-      x_minutes:
-        one: '1 minuto'
-        other: '%{count} minutos'
-      about_x_hours:
-        one: 'aproximadamente 1 hora'
-        other: 'aproximadamente %{count} horas'
-      x_days:
-        one: '1 dia'
-        other: '%{count} dias'
-      about_x_months:
-        one: 'aproximadamente 1 mês'
-        other: 'aproximadamente %{count} meses'
-      x_months:
-        one: '1 mês'
-        other: '%{count} meses'
-      about_x_years:
-        one: 'aproximadamente 1 ano'
-        other: 'aproximadamente %{count} anos'
-      over_x_years:
-        one: 'mais de 1 ano'
-        other: 'mais de %{count} anos'
-      almost_x_years:
-        one: 'quase 1 ano'
-        other: 'quase %{count} anos'
-    prompts:
-      year:   "Ano"
-      month:  "Mês"
-      day:    "Dia"
-      hour:   "Hora"
-      minute: "Minuto"
-      second: "Segundo"
-
-  helpers:
-    select:
-      prompt: "Por favor selecione"
-
-    submit:
-      create: 'Criar %{model}'
-      update: 'Atualizar %{model}'
-      submit: 'Salvar %{model}'
 
   errors:
     format: "%{attribute} %{message}"
+
+    messages: &errors_messages
+      accepted: "deve ser aceito"
+      blank: "não pode ficar em branco"
+      confirmation: "não está igual"
+      empty: "não pode ficar vazio"
+      equal_to: "deve ser igual a %{count}"
+      even: "deve ser par"
+      exclusion: "não está disponível"
+      greater_than: "deve ser maior que %{count}"
+      greater_than_or_equal_to: "deve ser maior ou igual a %{count}"
+      inclusion: "não está incluído na lista"
+      invalid: "não é válido"
+      less_than: "deve ser menor que %{count}"
+      less_than_or_equal_to: "deve ser menor ou igual a %{count}"
+      not_a_number: "não é um número"
+      not_an_integer: "não é um número inteiro"
+      odd: "deve ser ímpar"
+      taken: "já existe"
+      too_long: "é muito longo (máximo: %{count} caracteres)"
+      too_short: "é muito curto (mínimo: %{count} caracteres)"
+      wrong_length: "não possui o tamanho esperado (%{count} caracteres)"
 
     template:
       header:
@@ -206,95 +35,611 @@ pt-BR:
         other: "Não foi possível gravar %{model}: %{count} erros."
       body: "Por favor, verifique o(s) seguinte(s) campo(s):"
 
-    messages: &errors_messages
-      taken: "já existe"
-      inclusion: "não está incluído na lista"
-      exclusion: "não está disponível"
-      invalid: "não é válido"
-      confirmation: "não está igual"
-      accepted: "deve ser aceito"
-      empty: "não pode ficar vazio"
-      blank: "não pode ficar em branco"
-      too_long: "é muito longo (máximo: %{count} caracteres)"
-      too_short: "é muito curto (mínimo: %{count} caracteres)"
-      wrong_length: "não possui o tamanho esperado (%{count} caracteres)"
-      not_a_number: "não é um número"
-      not_an_integer: "não é um número inteiro"
-      greater_than: "deve ser maior que %{count}"
-      greater_than_or_equal_to: "deve ser maior ou igual a %{count}"
-      equal_to: "deve ser igual a %{count}"
-      less_than: "deve ser menor que %{count}"
-      less_than_or_equal_to: "deve ser menor ou igual a %{count}"
-      odd: "deve ser ímpar"
-      even: "deve ser par"
+  activerecord:   
+    attributes:
+      accomplishment:
+        conclusion_date: "Data de conclusão"
+        enrollment: "Matrícula"
+        enrollment_id: "Matrícula"
+        obs: "Observação"
+        phase: "Etapa"
+      advisement:
+        active: "Orientação ativa?"
+        co_advisor: "Possui coorientador?"
+        co_advisor_list: "Lista de Coorientadores"
+        enrollment: "Matrícula"
+        enrollment_number: "Número de Matrícula"
+        level: "Nível"
+        main_advisor: "Orientador Principal"
+        professor: "Orientador"
+        student_name: "Nome do Aluno"
+      advisement_authorization:
+        level: "Nível"
+        professor: "Orientador"
+      allocation:
+        course_class: "Turma"
+        day: "Dia"
+        end_time: "Hora de fim"
+        room: "Sala"
+        start_time: "Hora de início"
+      city:
+        name: "Nome"
+        state: "Estado"
+      class_enrollment:
+        course_class: "Turma"
+        disapproved_by_absence: "Reprovado por Falta"
+        enrollment: "Matrícula"
+        grade: "Nota"
+        obs: "Observações"
+        situation: "Situação"
+        situations:
+          aproved: "Aprovado"
+          disapproved: "Reprovado"
+          registered: "Incompleto"
+      country:
+        name: "Nome"
+      course:
+        code: "Código"
+        content: "Ementa"
+        course_type: "Tipo de Disciplina"
+        credits: "Créditos"
+        name: "Nome"
+        research_area: "Área de Pesquisa"
+      course_class:
+        allocations: "Alocações"
+        class_enrollments: "Inscrições"
+        class_enrollments_count: "Alunos Inscritos"
+        course: "Disciplina"
+        enrollments: "Matrículas"
+        name: "Nome"
+        professor: "Professor"
+        semester: "Semestre"
+        year: "Ano"
+      course_type:
+        has_score: "Tem nota"
+        name: "Nome"
+      deferral:
+        approval_date: "Data de aprovação"
+        deferral_type: "Tipo de Prorrogação"
+        enrollment: "Matrícula"
+        enrollment_id: "Matrícula"
+        obs: "Observação"
+      deferral_type:
+        description: "Descrição"
+        duration: "Duração"
+        duration_days: "Duração(dias)"
+        duration_months: "Duração(meses)"
+        duration_semesters: "Duração(períodos)"
+        name: "Nome"
+        phase: "Etapa"
+      dismissal:
+        date: "Data"
+        dismissal_reason: "Motivo do Desligamento"
+        enrollment: "Matrícula"
+        obs: "Observação"
+      dismissal_reason:
+        description: "Descrição"
+        name: "Nome"
+      enrollment:
+        accomplishments: "Realização de Etapa"
+        active: "Ativo?"
+        admission_date: "Data de Admissão"
+        advisements: "Orientadores"
+        class_enrollments: "Inscrições"
+        course_class_year_semester: "Disciplina"
+        deferrals: "Prorrogações"
+        delayed_phase: "Etapa atrasada"
+        delayed_phase_date: "em"
+        dismissal: "Desligamento"
+        enrollment_number: "Número de Matrícula"
+        enrollment_status: "Tipo de Matrícula"
+        level: "Nível"
+        phase: "Etapa"
+        professor: "Orientador"
+        scholarship_durations: "Bolsas"
+        scholarship_durations_active: "Possui bolsa?"
+        scholarships: "Números das Bolsas"
+        student: "Nome do Aluno"
+        year_semester_label: "em"
+      enrollment_status:
+        name: "Nome"
+      institution:
+        code: "Sigla"
+        majors: "Cursos"
+        name: "Nome"
+      level: 
+        advisement_authorizations: "Credenciamentos"
+        name: "Nome"
+      major:
+        institution: "Instituição"
+        level: "Nível"
+        name: "Nome"
+        student_majors: "Alunos"
+        students: "Alunos"
+      phase:
+        accomplishments: "Realização de Etapas"
+        description: "Descrição"
+        enrollments: "Matrículas"
+        name: "Nome"
+        phase_durations: "Duração de Etapas"
+      phase_duration:
+        deadline_days: "Prazo Máximo(dias)"
+        deadline_months: "Prazo Máximo(meses)"
+        deadline_semesters: "Prazo Máximo(períodos)"
+        level: "Nível"
+      professor: 
+        address: "Logradouro"
+        advisement_authorizations: "Credenciamentos"
+        advisement_points: "Pontos de Orientação"
+        advisements: "Orientandos"
+        advisements_with_points: "Orientandos"
+        birthdate: "Data de Nascimento"
+        civil_status: "Estado Civil"
+        cpf: "CPF"
+        enrollment_number: "Matrícula"
+        enrollments: "Orientandos"
+        identity_expedition_date: "Data de expedição da Identidade"
+        identity_issuing_body: "Órgão Expeditor"
+        identity_number: "Número da identidade"
+        name: "Nome"
+        neighbourhood: "Bairro"
+        professor_research_areas: "Áreas de Pesquisa"
+        research_areas: "Áreas de Pesquisa"
+        scholarships: "Bolsas"
+        sex: "Sexo"
+        telephone1: "1º Telefone"
+        telephone2: "2º Telefone"
+        zip_code: "CEP"
+      professor_research_area:
+        professor: "Professor"
+        research_area: "Área de Pesquisa"
+      research_area:
+        code: "Código"
+        name: "Nome"
+        professor_research_areas: "Professores"
+        professors: "Professores"
+      role:
+        description: "Descrição"
+        name: "Nome"
+      scholarship:
+        end_date: "Data de Fim"                
+        enrollments: "Matrículas"
+        level: "Nível"
+        scholarship_number: "Número da Bolsa"
+        scholarship_type: "Tipo"
+        sponsor: "Agência"
+        start_date: "Data de Início"
+      scholarship_duration:
+        active: "Ativa?"
+        adviser: "Orientador"
+        cancel_date: "Data de Encerramento"
+        end_date: "Data Limite de Concessão"                
+        enrollment: "Matrícula"
+        enrollment_id: "Matrícula"
+        last_scholarship_duration_end_date: "Bolsa"
+        level: "Nível"
+        scholarship: "Número da Bolsa"
+        scholarship_end_date: "Data de Fim de Bolsa"
+        scholarship_start_date: "Data de Início de Bolsa"
+        scholarship_types: "Tipo de Bolsa"
+        sponsors: "Agência de Fomento"
+        start_date: "Data de Início"
+      scholarship_type:
+        name: "Nome"
+      sponsor:
+        name: "Nome"
+      state:
+        code: "Sigla"
+        country: "País"
+        name: "Nome"
+      student:
+        address: "Logradouro"        
+        birthdate: "Data de Nascimento"
+        birthplace: "Naturalidade"
+        city: "Cidade"
+        civil_status: "Estado Civil"
+        country: "País de origem"
+        cpf: "CPF"
+        employer: "Empresa"
+        enrollments: "Matrículas"
+        enrollments_number: "Matrículas"
+        father_name: "Nome do Pai"
+        identity_expedition_date: "Data de expedição da Identidade"
+        identity_issuing_body: "Órgão Expeditor"
+        identity_number: "Número da identidade"
+        job_position: "Cargo"        
+        majors: "Cursos"
+        mother_name: "Nome da Mãe"
+        name: "Nome"
+        neighbourhood: "Bairro"
+        sex: "Sexo"
+        state: "Estado"
+        student_majors: "Cursos"     
+        telephone1: "1º Telefone"
+        telephone2: "2º Telefone"
+        zip_code: "CEP"   
+      student_major:
+        major: "Curso"
+        student: "Aluno"
+        student_id: "Aluno"
+      user:
+        name: "Nome do usuário"
+        password: "Senha"
+        password_confirmation: "Digite a senha novamente"
+        role: Papel
+      version:
+        created_at: "Modificado em"
+        current_object: "Versão Atual"
+        current_object_destroyed: "Objeto Deletado"
+        event: "Ação"
+        event_options:
+          create: "Criação"
+          destroy: "Remoção"
+          update: "Atualização"
+        item_id: "ID do Objeto"
+        item_type: "Modelo"
+        label: "%{event} de %{type}"
+        object: "Objeto Anterior"
+        old_version: "Versão Antiga"
+        relationship_object: "Objeto de Relacionamento"
+        user: "Usuário"
+        whodunnit: "Usuário"
 
+    errors:
+      advisement:
+        already_with_main_advisor: "já possui um orientador principal"     
+
+      full_messages:
+        format: "%{attribute} %{message}"        
+
+      messages:
+        record_invalid: "A validação falhou: %{errors}"
+        taken: "já existe"
+        <<: *errors_messages
+
+      models:
+        accomplishment:
+          accomplishment_enrollment_uniqueness: "já realizou esta etapa"
+        advisement:
+          advisement_professor_uniqueness: "não pode ser orientador duas vezes da mesma matrícula"
+        allocation:
+          end_time_before_start_time: "menor do que a hora de fim"
+          scheduling_conflict: "este horário já está sendo usado em outra alocação da mesma turma"
+        class_enrollment:
+          disapproved_by_absence_for_situation_aproved: "deve estar desmarcado para situação'Aprovado'"
+          disapproved_by_absence_for_situation_registered: "deve estar desmarcado para situação 'Incompleto'"
+          grade_filled_for_course_without_score: "Esta disciplina não possui nota"
+          grade_for_situation_aproved: "A nota deve ser maior ou igual a 60 para situação 'Aprovado'"
+          grade_for_situation_disapproved: "A nota deve menor que 60 para situação 'Reprovado'"
+          grade_for_situation_registered: "A nota deve estar em branco para situação 'Incompleto'"
+        deferral:
+          enrollment_and_deferral_uniqueness: "já possui esta prorrogação"
+        deferral_type:
+          blank_duration: "duração deve ser de pelo menos um dia"
+        enrollment:
+          main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
+          main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
+        scholarship:
+          attributes:
+            end_date:
+              on_or_after: "anterior a Data de Início"
+        scholarship_duration:
+          end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
+          end_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
+          enrollment_and_scholarship_uniqueness: "já possui uma Bolsa alocada nesse período"
+          scholarship_start_date_after_end_or_cancel_date: "posterior a Data de Início de outra alocação de bolsa"
+          start_date_after_scholarship_end_date: "da alocação de bolsa deve ser posterior a data de limite de concessão de uma alocação que não tem data de encerramento"
+          start_date_before_scholarship_cancel_date: "anterior a Data de Encerramento de outra alocação de bolsa"
+          start_date_before_scholarship_end_date: "anterior a Data de Limite de Concessão de outra alocação de bolsa"
+          start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
+          attributes:
+            start_date_after_end_date: "posterior a Data de Limite de Concessão"
+            cancel_date:
+              on_or_after:  "anterior a Data de Início"
+              on_or_before: "posterior a Data Limite de Concessão"
+        phase_duration:
+          blank_deadline: "prazo deve ser de pelo menos um dia"
+        professor_research_area:
+          unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
+        student_major:
+          unique_pair: "não pode estar em dois ou mais cursos repetidos e curso não pode possuir o mesmo aluno duas ou mais vezes"
+        user:
+          delete: "O sistema precisa ter ao menos um usuário"
+          missing_password: "A senha não foi definida"
+          self_delete: "Você não pode se deletar"
+
+      template:
+        body: "Por favor, verifique o(s) seguinte(s) campo(s):"
+        header:
+          one: "Não foi possível gravar %{model}: 1 erro"
+          other: "Não foi possível gravar %{model}: %{count} erros."
+
+    models:
+      accomplishment:
+        one: "Realização de Etapa"
+        other: "Realização de Etapas"
+      advisement:
+        one: "Orientação"
+        other: "Orientações"
+      advisement_authorization:
+        one: "Credenciamento"
+        other: "Credenciamentos"
+      allocation:
+        one: "Alocação"
+        other: "Alocações"
+      city:
+        one: "Cidade"
+        other: "Cidades"
+      class_enrollment:
+        one: "Inscrição"
+        other: "Inscrições"
+      country:
+        one: "País"
+        other: "Países"
+      course:
+        one: "Disciplina"
+        other: "Disciplinas"
+      course_class:
+        one: "Turma"
+        other: "Turmas"
+      course_type:
+        one: "Tipo de Disciplina"
+        other: "Tipos de Disciplina"
+      deferral:
+        one: "Prorrogação"
+        other: "Prorrogações"
+      deferral_type:
+        one: "Tipo de Prorrogação"
+        other: "Tipos de Prorrogação"
+      dismissal:
+        one: "Desligamento"
+        other: "Desligamentos"
+      dismissal_reason:
+        one: "Razão de Desligamento"
+        other: "Razões de Desligamento"
+      enrollment: 
+        one: "Matrícula"
+        other: "Matrículas"
+      enrollment_status:
+        one: "Tipo de Matrícula"
+        other: "Tipos de Matrícula"
+      institution:
+        one: "Instituição"
+        other: "Instituições"  
+      level: 
+        one: "Nível"
+        other: "Níveis"    
+      major:
+        one: "Curso"
+        other: "Cursos"
+      phase:
+        one: "Etapa"
+        other: "Etapas"
+      phase_duration:
+        one: "Duração de Etapa"
+        other: "Duração de Etapas"
+      professor:
+        one: "Professor"
+        other: "Professores"
+      professor_research_area:
+        one: "Área de Pesquisa do Professor"
+        other: "Área de Pesquisa dos Professores"
+      research_area:
+        one: "Área de Pesquisa"
+        other: "Áreas de Pesquisa"
+      role:
+        one: "Papel"
+        other: "Papéis"
+      scholarship:
+        one: "Bolsa"
+        other: "Bolsas"
+      scholarship_duration:
+        one: "Alocação de Bolsa"
+        other: "Alocação de Bolsas"
+      scholarship_type:
+        one: "Tipo de Bolsa"
+        other: "Tipos de Bolsa"
+      sponsor:
+        one: "Agência de Fomento"
+        other: "Agências de Fomento"
+      state:
+        one: "Estado"
+        other: "Estados"
+      student:
+        one: "Aluno"
+        other: "Alunos"
+      student_major:
+        one: "Curso do Aluno"
+        other: "Curso dos Alunos"
+      user:
+        one: "Usuário"
+        other: "Usuários"
+      version:
+        one: "Log"
+        other: "Log"
+
+  active_scaffold:
+    'false': "Não"
+    'true': "Sim"
+    _select_: "Selecione uma opção"
+    add: "Adicionar"
+    add_existing: "Adicionar Existente"
+    cancel: "Cancelar"
+    cant_destroy_record: "Não é possível excluir %{record}"
+    click_to_reset: "Clique aqui para remover o filtro criado"
+    close: "Fechar"
+    create: "Salvar"
+    create_accomplishment_label: "Criar Realização de Etapas"
+    create_advisement_authorization_label: "Adicionar Credenciamento"
+    create_advisement_label: "Adicionar Orientação"
+    create_allocation_label: "Adicionar Alocação"
+    create_another : "Criar Outro"
+    create_city_label: "Adicionar Cidade"
+    create_class_enrollment_label: "Adicionar Inscrição"
+    create_country_label: "Adicionar País"
+    create_course_class_label: "Adicionar Turma"
+    create_course_label: "Adicionar Disciplina"
+    create_course_type_label: "Adicionar Tipo de Disciplina"
+    create_deferral_label: "Adicionar Prorrogação"
+    create_deferral_type_label: "Adicionar Tipo de Prorrogação"
+    create_dismissal_label: "Adicionar Desligamento"
+    create_dismissal_reason_label: "Adicionar Razão de Desligamento"
+    create_enrollment_label: "Adicionar Matrícula"
+    create_enrollment_status_label: "Adicionar Tipo de Matrícula"
+    create_institution_label: "Adicionar Instituição"
+    create_level_label: "Adicionar Nível"
+    create_link: "Adicionar"
+    create_major_label: "Adicionar Curso"
+    create_new: "Criar Novo"
+    create_phase_label: "Adicionar Fase"
+    create_professor_label: "Adicionar Professor"
+    create_professor_research_area_label: "Adicionar Área de Pesquisa do Professor"
+    create_research_area_label: "Adicionar Área de Pesquisa"
+    create_scholarship_duration_label: "Adicionar Bolsa"
+    create_scholarship_label: "Adicionar Bolsa"
+    create_sponsor_label: "Adicionar Agência de Fomento"
+    create_state_label: "Adicionar Estado"
+    create_student_label: "Adicionar Aluno"
+    create_student_major_label: "Adicionar Curso do Aluno"
+    create_user_label: "Adicionar Usuário"
+    delayed_phases_report: "Relatório"
+    delete_link: "Excluir"
+    delete_message: "Tem certeza que deseja excluir?"
+    filtered: ""
+    found:
+      one: "Registro Encontrado"
+      other: "Registros Encontrados"
+    hide: "Ocultar"
+    live_search: "Buscar"
+    nested_for_model: ""
+    next: "Próximo"
+    no_entries: "Nenhum Dado Cadastrado"    
+    no_options: "Sem Opções"
+    previous: "Anterior"
+    replace_with_new: ""
+    reset: "Resetar"
+    search: "Buscar"
+    search_link: "Buscar"
+    show: "Mostrar"
+    show_link: "Visualizar"
+    show_model: ""
+    to_pdf: "Gerar relatório"
+    total_label: "Total"
+    update: "Atualizar"
+    update_advisement_authorization_label: "Editar Credenciamento"
+    update_allocation_label: "Editar Alocação"
+    update_city_label: "Editar Cidade"
+    update_class_enrollment_label: "Editar Inscrição"
+    update_country_label: "Editar País"
+    update_course_class_label: "Editar Turma"
+    update_course_label: "Editar Disciplina"
+    update_course_type_label: "Editar Tipo de Disciplina"
+    update_enrollment_label: "Modificar Matrícula"
+    update_link: "Editar"
+    update_major_label: "Modificar Curso"
+    update_model: ""
+    update_professor_research_area_label: "Área de Pesquisa do Professor"
+    update_research_area_label: "Editar Área de Pesquisa"
+    update_state_label: "Editar Estado"
+    update_student_label: "Modificar Aluno"
+    update_student_major_label: "Editar Curso do Aluno"
+    update_user_label: "Modificar Usuário"
+
+    errors:
+      full_messages:
+        format: "%{attribute} %{message}"
+
+      messages:
+        record_invalid: "A validação falhou: %{errors}"
+        taken: "já existe"
+        <<: *errors_messages
+
+      template:
+        body: "Por favor, verifique o(s) seguinte(s) campo(s):"
+        header:
+          one: "Não foi possível gravar %{model}: 1 erro"
+          other: "Não foi possível gravar %{model}: %{count} erros."
+
+  doc:
+    authors: "Lista de Autores"
+    credits: "Créditos"
+    license: "Arquivo de Licensa"
+
+  helpers:
+    select:
+      prompt: "Por favor selecione"
+
+    submit:
+      create: 'Criar %{model}'
+      submit: 'Salvar %{model}'
+      update: 'Atualizar %{model}'
 
   pdf_content:
-    course_class:
-      summary:
-        title: "Resumo Semestral"
-        course_name: "Nome da Disciplina"
-        year_semester: "Semestre/Ano"
-        lesson: "Aulas Dadas"
-        sequential_number: "Nº"
-        enrollment_number: "Matrícula"
-        student_name: "Nome do Aluno"
-        final_grade: "Nota Final"
-        situation: "Situação"
-        attendance: "Freq S/I"
-        attendance_true: "S"
-        attendance_false: "I"
-        obs: "Obs.:"
-        link: "Pauta"
     advisements:
       to_pdf:
-        filename: "Relatório de Orientações"
-        professor_name: "Professor"
         enrollment_number: "Número de Matrícula"
-        student_name: "Aluno"
+        filename: "Relatório de Orientações"
         level_name: "Nível"
+        professor_name: "Professor"
+        student_name: "Aluno"
+    course_class:
+      summary:
+        attendance: "Freq S/I"
+        attendance_false: "I"
+        attendance_true: "S"
+        course_name: "Nome da Disciplina"
+        enrollment_number: "Matrícula"
+        final_grade: "Nota Final"
+        lesson: "Aulas Dadas"
+        link: "Pauta"
+        obs: "Obs.:"
+        sequential_number: "Nº"
+        situation: "Situação"
+        student_name: "Nome do Aluno"
+        title: "Resumo Semestral"
+        year_semester: "Semestre/Ano"
     enrollment:
       to_pdf:
         filename: "Relatório de Matrículas"
       header:
-        student_name: "Aluno"
-        enrollment_number: "Matrícula"
-        student_identity_number: "Identidade"
-        student_cpf: "C.P.F."
-        student_birthplace: "Naturalidade"
-        student_birthdate: "Data de Nascimento"
-        identity_issuing_body: "Órgão Expedidor"
         course: "Curso"
         enrollment_admission_date: "Mês/Ano de ingresso no curso"
         enrollment_dismissal_date: "Mês/Ano de desligamento do curso"
         enrollment_dismissal_reason: "Motivo"
+        enrollment_number: "Matrícula"
         graduation: "em Computação"
+        identity_issuing_body: "Órgão Expedidor"
+        student_birthdate: "Data de Nascimento"
+        student_birthplace: "Naturalidade"
+        student_cpf: "C.P.F."
+        student_identity_number: "Identidade"
+        student_name: "Aluno"
       grade_list:
-        course_code: "Código"
-        course_name: "Nome da Disciplina"
-        course_grade: "Nota"
-        course_credits: "Créditos"
-        course_year_semester: "Período"
         course_approved: "AP"
+        course_code: "Código"
+        course_credits: "Créditos"
+        course_grade: "Nota"
+        course_name: "Nome da Disciplina"
+        course_year_semester: "Período"
         situation: "Situação"
       footer:
-        location: "Niterói"
-        warning1: "Este documento só é válido sem rasuras, com selo da UFF e com a assinatura do Coordenador."
         coordinator_signature: "ASSINATURA DO COORDENADOR"
+        location: "Niterói"
         page: "Pág. nº "
+        warning1: "Este documento só é válido sem rasuras, com selo da UFF e com a assinatura do Coordenador."
       academic_transcript:
-        title: "Histórico Escolar"
+        accomplished_phases: "Etapas obrigatórias concluídas"
+        advisors: "Orientadores"
         link: "Histórico"
+        title: "Histórico Escolar"
         total_credits: "Total"
-        accomplished_phases: "Etapas obrigatórias concluídas"
-        advisors: "Orientadores"
       grades_report:
-        title: "Boletim Escolar"
-        link: "Boletim"
-        total_credits: "Créditos Acumulados"
-        semester_summary: "Resumo do período (CR e Créditos obtidos)"
         accomplished_phases: "Etapas obrigatórias concluídas"
         advisors: "Orientadores"
+        link: "Boletim"
+        semester_summary: "Resumo do período (CR e Créditos obtidos)"
+        title: "Boletim Escolar"
+        total_credits: "Créditos Acumulados"
         total_gpr: "CR Acumulado" 
     scholarships:
       to_pdf:
@@ -303,532 +648,5 @@ pt-BR:
       to_pdf:
         filename: "Relatório de Alocação de Bolsas"
 
-
   rescue_blank_text: "Não informado"
 
-
-
-  doc:
-    credits: "Créditos"
-    authors: "Lista de Autores"
-    license: "Arquivo de Licensa"
-
-  activerecord:   
-
-    errors:
-      template:
-        header:
-          one: "Não foi possível gravar %{model}: 1 erro"
-          other: "Não foi possível gravar %{model}: %{count} erros."
-        body: "Por favor, verifique o(s) seguinte(s) campo(s):"
-
-      messages:
-        taken: "já existe"
-        record_invalid: "A validação falhou: %{errors}"
-        <<: *errors_messages
-
-      full_messages:
-        format: "%{attribute} %{message}"        
-
-      advisement:
-        already_with_main_advisor: "já possui um orientador principal"     
-
-      models:
-        scholarship_duration:
-          start_date_before_scholarship_end_date: "anterior a Data de Limite de Concessão de outra alocação de bolsa"
-          start_date_before_scholarship_cancel_date: "anterior a Data de Encerramento de outra alocação de bolsa"
-          scholarship_start_date_after_end_or_cancel_date: "posterior a Data de Início de outra alocação de bolsa"
-          start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
-          start_date_after_scholarship_end_date: "da alocação de bolsa deve ser posterior a data de limite de concessão de uma alocação que não tem data de encerramento"
-          end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
-          end_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
-          enrollment_and_scholarship_uniqueness: "já possui uma Bolsa alocada nesse período"
-          attributes:
-            start_date_after_end_date: "posterior a Data de Limite de Concessão"
-            cancel_date:
-              on_or_before: "posterior a Data Limite de Concessão"
-              on_or_after:  "anterior a Data de Início"
-        scholarship:
-          attributes:
-            end_date:
-              on_or_after: "anterior a Data de Início"
-        user:
-          delete: "O sistema precisa ter ao menos um usuário"
-          self_delete: "Você não pode se deletar"
-          missing_password: "A senha não foi definida"
-        allocation:
-          end_time_before_start_time: "menor do que a hora de fim"
-          scheduling_conflict: "este horário já está sendo usado em outra alocação da mesma turma"
-        class_enrollment:
-          grade_for_situation_registered: "A nota deve estar em branco para situação 'Incompleto'"
-          grade_for_situation_aproved: "A nota deve ser maior ou igual a 60 para situação 'Aprovado'"
-          grade_for_situation_disapproved: "A nota deve menor que 60 para situação 'Reprovado'"
-          grade_filled_for_course_without_score: "Esta disciplina não possui nota"
-          disapproved_by_absence_for_situation_registered: "deve estar desmarcado para situação 'Incompleto'"
-          disapproved_by_absence_for_situation_aproved: "deve estar desmarcado para situação'Aprovado'"
-        deferral_type:
-          blank_duration: "duração deve ser de pelo menos um dia"
-        phase_duration:
-          blank_deadline: "prazo deve ser de pelo menos um dia"
-        enrollment:
-          main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
-          main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
-        deferral:
-          enrollment_and_deferral_uniqueness: "já possui esta prorrogação"
-        professor_research_area:
-          unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
-        student_major:
-          unique_pair: "não pode estar em dois ou mais cursos repetidos e curso não pode possuir o mesmo aluno duas ou mais vezes"
-        accomplishment:
-          accomplishment_enrollment_uniqueness: "já realizou esta etapa"
-        advisement:
-          advisement_professor_uniqueness: "não pode ser orientador duas vezes da mesma matrícula"
-    models:
-      advisement:
-        one: "Orientação"
-        other: "Orientações"
-      advisement_authorization:
-        one: "Credenciamento"
-        other: "Credenciamentos"
-      major:
-        one: "Curso"
-        other: "Cursos"
-      sponsor:
-        one: "Agência de Fomento"
-        other: "Agências de Fomento"
-      level: 
-        one: "Nível"
-        other: "Níveis"
-      institution:
-        one: "Instituição"
-        other: "Instituições"  
-      dismissal_reason:
-        one: "Razão de Desligamento"
-        other: "Razões de Desligamento"
-      dismissal:
-        one: "Desligamento"
-        other: "Desligamentos"
-      enrollment_status:
-        one: "Tipo de Matrícula"
-        other: "Tipos de Matrícula"
-      enrollment: 
-        one: "Matrícula"
-        other: "Matrículas"
-      student:
-        one: "Aluno"
-        other: "Alunos"
-      scholarship:
-        one: "Bolsa"
-        other: "Bolsas"
-      scholarship_type:
-        one: "Tipo de Bolsa"
-        other: "Tipos de Bolsa"
-      scholarship_duration:
-        one: "Alocação de Bolsa"
-        other: "Alocação de Bolsas"
-      professor:
-        one: "Professor"
-        other: "Professores"
-      user:
-        one: "Usuário"
-        other: "Usuários"
-      country:
-        one: "País"
-        other: "Países"
-      state:
-        one: "Estado"
-        other: "Estados"
-      city:
-        one: "Cidade"
-        other: "Cidades"
-      phase:
-        one: "Etapa"
-        other: "Etapas"
-      accomplishment:
-        one: "Realização de Etapa"
-        other: "Realização de Etapas"
-      deferral:
-        one: "Prorrogação"
-        other: "Prorrogações"
-      deferral_type:
-        one: "Tipo de Prorrogação"
-        other: "Tipos de Prorrogação"
-      research_area:
-        one: "Área de Pesquisa"
-        other: "Áreas de Pesquisa"
-      role:
-        one: "Papel"
-        other: "Papéis"
-      course:
-        one: "Disciplina"
-        other: "Disciplinas"
-      course_type:
-        one: "Tipo de Disciplina"
-        other: "Tipos de Disciplina"
-      course_class:
-        one: "Turma"
-        other: "Turmas"
-      allocation:
-        one: "Alocação"
-        other: "Alocações"
-      class_enrollment:
-        one: "Inscrição"
-        other: "Inscrições"
-      professor_research_area:
-        one: "Área de Pesquisa do Professor"
-        other: "Área de Pesquisa dos Professores"
-      version:
-        one: "Log"
-        other: "Log"
-      student_major:
-        one: "Curso do Aluno"
-        other: "Curso dos Alunos"
-
-    attributes:
-      major:
-        name: "Nome"
-        institution: "Instituição"
-        level: "Nível"
-        students: "Alunos"
-        student_majors: "Alunos"
-      sponsor:
-        name: "Nome"
-      level: 
-        name: "Nome"
-        advisement_authorizations: "Credenciamentos"
-      institution:
-        name: "Nome"
-        code: "Sigla"
-        majors: "Cursos"
-      dismissal_reason:
-        name: "Nome"
-        description: "Descrição"
-      enrollment:
-        admission_date: "Data de Admissão"
-        enrollment_number: "Número de Matrícula"
-        dismissal: "Desligamento"
-        active: "Ativo?"
-        enrollment_status: "Tipo de Matrícula"
-        level: "Nível"
-        student: "Nome do Aluno"
-        scholarship_durations: "Bolsas"
-        scholarship_durations_active: "Possui bolsa?"
-        scholarships: "Números das Bolsas"
-        advisements: "Orientadores"
-        deferrals: "Prorrogações"
-        accomplishments: "Realização de Etapa"
-        phase: "Etapa"
-        professor: "Orientador"
-        delayed_phase: "Etapa atrasada"
-        delayed_phase_date: "em"
-        year_semester_label: "em"
-        class_enrollments: "Inscrições"
-        course_class_year_semester: "Disciplina"
-      dismissal:
-        date: "Data"
-        dismissal_reason: "Motivo do Desligamento"
-        enrollment: "Matrícula"
-        obs: "Observação"
-      enrollment_status:
-        name: "Nome"
-      student:
-        name: "Nome"
-        majors: "Cursos"
-        cpf: "CPF"
-        enrollments: "Matrículas"
-        enrollments_number: "Matrículas"
-        address: "Logradouro"        
-        birthdate: "Data de Nascimento"
-        birthplace: "Naturalidade"
-        city: "Cidade"
-        civil_status: "Estado Civil"
-        country: "País de origem"
-        employer: "Empresa"
-        father_name: "Nome do Pai"
-        identity_expedition_date: "Data de expedição da Identidade"
-        identity_issuing_body: "Órgão Expeditor"
-        identity_number: "Número da identidade"
-        job_position: "Cargo"        
-        mother_name: "Nome da Mãe"
-        neighbourhood: "Bairro"
-        sex: "Sexo"
-        state: "Estado"
-        telephone1: "1º Telefone"
-        telephone2: "2º Telefone"
-        zip_code: "CEP"   
-        student_majors: "Cursos"     
-      scholarship:
-        scholarship_number: "Número da Bolsa"
-        level: "Nível"
-        sponsor: "Agência"
-        scholarship_type: "Tipo"
-        start_date: "Data de Início"
-        end_date: "Data de Fim"                
-        enrollments: "Matrículas"
-      scholarship_duration:
-        scholarship: "Número da Bolsa"
-        start_date: "Data de Início"
-        end_date: "Data Limite de Concessão"                
-        enrollment: "Matrícula"
-        enrollment_id: "Matrícula"
-        cancel_date: "Data de Encerramento"
-        scholarship_start_date: "Data de Início de Bolsa"
-        scholarship_end_date: "Data de Fim de Bolsa"
-        last_scholarship_duration_end_date: "Bolsa"
-        adviser: "Orientador"
-        sponsors: "Agência de Fomento"
-        scholarship_types: "Tipo de Bolsa"
-        level: "Nível"
-        active: "Ativa?"
-      professor: 
-        name: "Nome"
-        cpf: "CPF"
-        address: "Logradouro"
-        civil_status: "Estado Civil"
-        birthdate: "Data de Nascimento"
-        identity_expedition_date: "Data de expedição da Identidade"
-        identity_issuing_body: "Órgão Expeditor"
-        identity_number: "Número da identidade"
-        neighbourhood: "Bairro"
-        sex: "Sexo"
-        telephone1: "1º Telefone"
-        telephone2: "2º Telefone"
-        zip_code: "CEP"
-        advisements: "Orientandos"
-        advisement_authorizations: "Credenciamentos"
-        scholarships: "Bolsas"
-        enrollments: "Orientandos"
-        enrollment_number: "Matrícula"
-        advisement_points: "Pontos de Orientação"
-        advisements_with_points: "Orientandos"
-        professor_research_areas: "Áreas de Pesquisa"
-        research_areas: "Áreas de Pesquisa"
-      advisement:
-        professor: "Orientador"
-        enrollment: "Matrícula"
-        main_advisor: "Orientador Principal"
-        enrollment_number: "Número de Matrícula"
-        student_name: "Nome do Aluno"
-        active: "Orientação ativa?"
-        co_advisor: "Possui coorientador?"
-        co_advisor_list: "Lista de Coorientadores"
-        level: "Nível"
-      advisement_authorization:
-        professor: "Orientador"
-        level: "Nível"
-      user:
-        name: "Nome do usuário"
-        role: Papel
-        password: "Senha"
-        password_confirmation: "Digite a senha novamente"
-      country:
-        name: "Nome"
-      state:
-        name: "Nome"
-        code: "Sigla"
-        country: "País"
-      city:
-        name: "Nome"
-        state: "Estado"
-      phase:
-        name: "Nome"
-        description: "Descrição"
-        phase_durations: "Duração de Etapas"
-        accomplishments: "Realização de Etapas"
-        enrollments: "Matrículas"
-      phase_duration:
-        deadline_semesters: "Prazo Máximo(períodos)"
-        deadline_months: "Prazo Máximo(meses)"
-        deadline_days: "Prazo Máximo(dias)"
-        level: "Nível"
-      accomplishment:
-        phase: "Etapa"
-        enrollment: "Matrícula"
-        enrollment_id: "Matrícula"
-        conclusion_date: "Data de conclusão"
-        obs: "Observação"
-      deferral:
-        enrollment: "Matrícula"
-        enrollment_id: "Matrícula"
-        approval_date: "Data de aprovação"
-        obs: "Observação"
-        deferral_type: "Tipo de Prorrogação"
-      deferral_type:
-        name: "Nome"
-        description: "Descrição"
-        duration_semesters: "Duração(períodos)"
-        duration_months: "Duração(meses)"
-        duration_days: "Duração(dias)"
-        duration: "Duração"
-        phase: "Etapa"
-      research_area:
-        name: "Nome"
-        code: "Código"
-        professor_research_areas: "Professores"
-        professors: "Professores"
-      course:
-        name: "Nome"
-        code: "Código"
-        content: "Ementa"
-        credits: "Créditos"
-        research_area: "Área de Pesquisa"
-        course_type: "Tipo de Disciplina"
-      course_type:
-        name: "Nome"
-        has_score: "Tem nota"
-      course_class:
-         name: "Nome"
-         course: "Disciplina"
-         professor: "Professor"
-         class_enrollments: "Inscrições"
-         allocations: "Alocações"
-         year: "Ano"
-         semester: "Semestre"
-         enrollments: "Matrículas"
-         class_enrollments_count: "Alunos Inscritos"
-      role:
-        name: "Nome"
-        description: "Descrição"
-      allocation:
-        day: "Dia"
-        room: "Sala"
-        start_time: "Hora de início"
-        end_time: "Hora de fim"
-        course_class: "Turma"
-      class_enrollment:
-        obs: "Observações"
-        grade: "Nota"
-        disapproved_by_absence: "Reprovado por Falta"
-        situation: "Situação"
-        course_class: "Turma"
-        enrollment: "Matrícula"
-        situations:
-          registered: "Incompleto"
-          aproved: "Aprovado"
-          disapproved: "Reprovado"
-      professor_research_area:
-        professor: "Professor"
-        research_area: "Área de Pesquisa"
-      version:
-        old_version: "Versão Antiga"
-        current_object: "Versão Atual"
-        current_object_destroyed: "Objeto Deletado"
-        created_at: "Modificado em"
-        user: "Usuário"
-        item_id: "ID do Objeto"
-        item_type: "Modelo"
-        event: "Ação"
-        event_options:
-          create: "Criação"
-          update: "Atualização"
-          destroy: "Remoção"
-        whodunnit: "Usuário"
-        object: "Objeto Anterior"
-      student_major:
-        student: "Aluno"
-        student_id: "Aluno"
-        major: "Curso"
-
-  active_scaffold:
-    hide: "Ocultar"
-    show: "Mostrar"
-    close: "Fechar"
-    create: "Salvar"
-    cancel: "Cancelar"
-    create_another : "Criar Outro"
-    no_options: "Sem Opções"
-    create_new: "Criar Novo"
-    to_pdf: "Gerar relatório"
-    update: "Atualizar"
-    add_existing: "Adicionar Existente"
-    add: "Adicionar"
-    update_link: "Editar"
-    create_link: "Adicionar"
-    delete_link: "Excluir"
-    show_link: "Visualizar"
-    search_link: "Buscar"
-    search: "Buscar"
-    live_search: "Buscar"
-    _select_: "Selecione uma opção"
-    'true': "Sim"
-    'false': "Não"
-    delete_message: "Tem certeza que deseja excluir?"
-    nested_for_model: ""
-    show_model: ""
-    update_model: ""
-    delayed_phases_report: "Relatório"
-    found:
-      one: "Registro Encontrado"
-      other: "Registros Encontrados"
-    next: "Próximo"
-    previous: "Anterior"
-    no_entries: "Nenhum Dado Cadastrado"    
-    filtered: ""
-    reset: "Resetar"
-    click_to_reset: "Clique aqui para remover o filtro criado"
-    replace_with_new: ""
-
-    create_major_label: "Adicionar Curso"
-    create_institution_label: "Adicionar Instituição"
-    create_level_label: "Adicionar Nível"
-    create_sponsor_label: "Adicionar Agência de Fomento"
-    create_dismissal_reason_label: "Adicionar Razão de Desligamento"
-    create_dismissal_label: "Adicionar Desligamento"
-    create_accomplishment_label: "Criar Realização de Etapas"
-    create_enrollment_label: "Adicionar Matrícula"
-    create_enrollment_status_label: "Adicionar Tipo de Matrícula"
-    create_student_label: "Adicionar Aluno"
-    create_scholarship_label: "Adicionar Bolsa"
-    create_scholarship_duration_label: "Adicionar Bolsa"
-    create_professor_label: "Adicionar Professor"
-    create_user_label: "Adicionar Usuário"
-    create_advisement_label: "Adicionar Orientação"
-    create_country_label: "Adicionar País"
-    create_state_label: "Adicionar Estado"
-    create_city_label: "Adicionar Cidade"
-    create_deferral_type_label: "Adicionar Tipo de Prorrogação"
-    create_phase_label: "Adicionar Fase"
-    create_deferral_label: "Adicionar Prorrogação"
-    create_advisement_authorization_label: "Adicionar Credenciamento"
-    create_research_area_label: "Adicionar Área de Pesquisa"
-    create_course_label: "Adicionar Disciplina"
-    create_course_type_label: "Adicionar Tipo de Disciplina"
-    create_course_class_label: "Adicionar Turma"
-    create_allocation_label: "Adicionar Alocação"
-    create_class_enrollment_label: "Adicionar Inscrição"
-    create_professor_research_area_label: "Adicionar Área de Pesquisa do Professor"
-    create_student_major_label: "Adicionar Curso do Aluno"
-    update_enrollment_label: "Modificar Matrícula"
-    update_major_label: "Modificar Curso"
-    update_user_label: "Modificar Usuário"
-    update_student_label: "Modificar Aluno"
-    update_country_label: "Editar País"
-    update_state_label: "Editar Estado"
-    update_city_label: "Editar Cidade"
-    update_advisement_authorization_label: "Editar Credenciamento"
-    update_research_area_label: "Editar Área de Pesquisa"
-    update_course_label: "Editar Disciplina"
-    update_course_type_label: "Editar Tipo de Disciplina"
-    update_course_class_label: "Editar Turma"
-    update_allocation_label: "Editar Alocação"
-    update_class_enrollment_label: "Editar Inscrição"
-    update_professor_research_area_label: "Área de Pesquisa do Professor"
-    update_student_major_label: "Editar Curso do Aluno"
-    total_label: "Total"
-
-    cant_destroy_record: "Não é possível excluir %{record}"
-
-    errors:
-      template:
-        header:
-          one: "Não foi possível gravar %{model}: 1 erro"
-          other: "Não foi possível gravar %{model}: %{count} erros."
-        body: "Por favor, verifique o(s) seguinte(s) campo(s):"
-
-      messages:
-        taken: "já existe"
-        record_invalid: "A validação falhou: %{errors}"
-        <<: *errors_messages
-
-      full_messages:
-        format: "%{attribute} %{message}"

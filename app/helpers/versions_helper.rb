@@ -4,7 +4,7 @@
 
 module VersionsHelper
 	def item_type_column(record, column)
-		I18n.t("activerecord.models.#{record.item_type.downcase}.one")
+		I18n.t("activerecord.models.#{record.item_type.underscore}.one")
 	end
 
 	def current_object_column(record, column)
@@ -15,10 +15,14 @@ module VersionsHelper
 		if model.find_by_id(object_id).nil?
 			I18n.t("activerecord.attributes.version.current_object_destroyed")
 		else
-			path = send((model_str.downcase + "_path").to_sym, object_id)
-			route = Rails.application.routes.recognize_path(path)
+			begin
+				path = send((model_str.underscore + "_path").to_sym, object_id)
+				route = Rails.application.routes.recognize_path(path)
 
-			link_to(h(model.find(object_id).to_label), route) if object_id != 0
+				link_to(h(model.find(object_id).to_label), route) if object_id != 0
+			rescue NoMethodError
+				I18n.t("activerecord.attributes.version.relationship_object") if object_id != 0
+			end
 		end
 	end
 
