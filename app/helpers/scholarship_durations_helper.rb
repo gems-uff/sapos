@@ -94,7 +94,7 @@ module ScholarshipDurationsHelper
   end
 
   def active_search_column(record,options)
-    select(record, :active, [["Todas","all"],["Ativas","active"],["Inativas","not_active"]], options, options)
+    select_tag(record[:active], options_for_select([["Todas","all"],["Ativas","active"],["Inativas","not_active"]]), options)
   end
 
   def level_search_column(record,options)
