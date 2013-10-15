@@ -14,13 +14,17 @@ class ScholarshipsController < ApplicationController
     config.list.sorting = {:scholarship_number => 'ASC'}
     config.list.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :start_date, :end_date]
 
-    config.field_search.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :start_date, :end_date]
+    config.columns.add :available
+    config.field_search.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :start_date, :end_date, :available]
 
     config.create.label = :create_scholarship_label
 
     config.columns[:start_date].search_sql = "scholarships.start_date"
     config.columns[:end_date].search_sql = "scholarships.end_date"
     config.columns[:scholarship_number].search_ui = :text
+    config.columns[:available].search_sql = ""
+    #config.columns[:available].search_ui = :text
+
 
     config.columns[:sponsor].form_ui = :select
     config.columns[:scholarship_type].form_ui = :select
@@ -40,6 +44,33 @@ class ScholarshipsController < ApplicationController
   end
   record_select :per_page => 10, :search_on => [:scholarship_number], :order_by => 'scholarship_number', :full_text_search => true
 
+  def self.condition_for_available_column(column, value, like_pattern)
+    if value[:use] == "yes"
+      month = value[:month].empty? ? 1 : value[:month]
+      year = value[:year].empty? ? 1 : value[:year]
+      
+      dt = Date.new(year.to_i, month.to_i)
+      #dt = value
+
+      scholarships = Scholarship.arel_table
+      scholarship_durations = ScholarshipDuration.arel_table
+
+      allocated_with_end_date = Scholarship.joins(:scholarship_durations)
+        .where(scholarship_durations[:end_date].lt(dt)
+          .and(scholarship_durations[:cancel_date].eq(nil))
+          .and(scholarships[:end_date].eq(nil)
+            .or(scholarships[:end_date].gt(Date.today))))
+        .collect{ |scholarship| scholarship.id }
+
+      non_allocated = Scholarship.includes(:scholarship_durations)
+        .where(scholarship_durations[:scholarship_id].eq(nil)
+          .and(scholarships[:end_date].eq(nil)
+            .or(scholarships[:end_date].gt(Date.today))))
+        .collect{ |scholarship| scholarship.id }
+
+      [scholarships[:id].in(allocated_with_end_date + non_allocated)]
+    end
+  end
 
   def self.condition_for_start_date_column(column, value, like_pattern)
     month = value[:month].empty? ? 1 : value[:month]
