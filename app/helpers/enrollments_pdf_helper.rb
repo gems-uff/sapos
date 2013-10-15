@@ -339,7 +339,11 @@ module EnrollmentsPdfHelper
     enrollment ||= options[:enrollment]
 
     pdf.font('Courier', :size => 9) do
-      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 25) do
+      height = 25
+      if pdf.cursor - height < 0
+        pdf.start_new_page
+      end
+      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => height) do
         pdf.stroke_bounds
         current_x = 5
         pdf.move_down 15
