@@ -330,7 +330,24 @@ module EnrollmentsPdfHelper
         pdf.stroke_bounds
         current_x = 5
         pdf.move_down 15
-        pdf.draw_text("#{I18n.t("pdf_content.enrollment.grades_report.advisors")}: #{(enrollment.professors.map { |professor| professor.name }).join(", ") }", :at => [current_x, pdf.cursor])
+
+        label = "#{I18n.t("pdf_content.enrollment.grades_report.advisors")}: "
+        pdf.draw_text(label, :at => [current_x, pdf.cursor])
+        current_x += pdf.width_of(label)
+        enrollment.advisements.each_with_index do |advisement, index|
+          if advisement.main_advisor
+            pdf.draw_text(advisement.professor.name, :at => [current_x, pdf.cursor], :style => :bold)
+            current_x += pdf.width_of(advisement.professor.name, {:style=>:bold})
+          else
+            pdf.draw_text(advisement.professor.name, :at => [current_x, pdf.cursor])
+            current_x += pdf.width_of(advisement.professor.name)
+          end
+          if index != enrollment.advisements.length - 1
+            pdf.draw_text(", ", :at => [current_x, pdf.cursor])
+            current_x += pdf.width_of(", ")
+          
+          end
+        end
       end
     end
 

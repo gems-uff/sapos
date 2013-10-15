@@ -4,6 +4,8 @@
 class DismissalReason < ActiveRecord::Base
    validates :name, :presence => true, :uniqueness => true
 
+   attr_accessible :name, :show_advisor_name
+
    has_paper_trail
 
    def to_label

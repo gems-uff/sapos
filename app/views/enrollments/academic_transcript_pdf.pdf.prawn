@@ -13,6 +13,10 @@ prawn_document(:left_margin => 20, :right_margin => 20, :top_margin => 30, :bott
 
     accomplished_table(pdf, accomplished_phases: @accomplished_phases)
     
+    if not @enrollment.dismissal.nil? and @enrollment.dismissal.dismissal_reason.show_advisor_name
+    	advisors_list(pdf, enrollment: @enrollment)
+    end
+
     pdf.repeat(:all, dynamic: true) do
       page_footer(pdf)
     end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131003133948) do
+ActiveRecord::Schema.define(:version => 20131015022118) do
 
   create_table "enrollment_statuses", :force => true do |t|
     t.string   "name"
@@ -281,8 +281,9 @@ ActiveRecord::Schema.define(:version => 20131003133948) do
   create_table "dismissal_reasons", :force => true do |t|
     t.string   "name"
     t.text     "description"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",                           :null => false
+    t.datetime "updated_at",                           :null => false
+    t.boolean  "show_advisor_name", :default => false
   end
 
   create_table "dismissals", :force => true do |t|
