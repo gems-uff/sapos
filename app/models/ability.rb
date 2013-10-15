@@ -10,7 +10,7 @@ class Ability
                 EnrollmentStatus, Institution, Level, Major, Phase, PhaseDuration,
                 Professor, ProfessorResearchArea, ResearchArea, Role, Scholarship,
                 ScholarshipDuration, ScholarshipType, Sponsor, State, Student, StudentMajor,
-                User, YearSemester]
+                User, YearSemester, Version]
 
 
   def initialize(user)
@@ -29,9 +29,9 @@ class Ability
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, :all
     elsif role_id == Role::ROLE_PROFESSOR
-      can :read, (Ability::ALL_MODELS - [User, Role])
+      can :read, (Ability::ALL_MODELS - [User, Role, Configuration, Version])
     elsif role_id == Role::ROLE_SECRETARIA
-      can :manage, (Ability::ALL_MODELS - [User, Role])
+      can :manage, (Ability::ALL_MODELS - [User, Role, Configuration, Version])
     end
 
     # Define abilities for the passed in user here. For example:
