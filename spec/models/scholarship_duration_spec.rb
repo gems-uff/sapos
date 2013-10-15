@@ -64,7 +64,18 @@ describe ScholarshipDuration do
     end
     describe "if_scholarship_is_not_with_another_student" do
       context "should return the expected error when" do
-        
+        it "has an old scholarship that ends after the new scholarship starts" do
+          enrollment = FactoryGirl.create(:enrollment)
+          scholarship = FactoryGirl.create(:scholarship, :start_date => start_date, :end_date => end_date + 2.days)
+          FactoryGirl.create(:scholarship_duration, :enrollment => enrollment, :scholarship => scholarship,
+                             :start_date => start_date, :end_date => end_date + 2.days)
+          scholarship_duration.scholarship = scholarship
+          scholarship_duration.start_date = end_date
+          scholarship_duration.end_date = end_date + 5.days
+          scholarship_duration.enrollment = enrollment
+          scholarship_duration.should have_error(:start_date_before_scholarship_end_date).on :start_date
+        end
+
         it "has an old scholarship that was canceled after the new scholarship starts" do
           enrollment = FactoryGirl.create(:enrollment)
           scholarship = FactoryGirl.create(:scholarship, :start_date => start_date, :end_date => end_date + 2.days)
@@ -101,18 +112,6 @@ describe ScholarshipDuration do
           scholarship_duration.should have_error(:scholarship_start_date_after_end_or_cancel_date).on :cancel_date
         end
 
-        it "has an unfinished scholarship even if it is after the scholarship ends" do
-          enrollment = FactoryGirl.create(:enrollment)
-          scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => end_date + 5.days)
-          FactoryGirl.create(:scholarship_duration, :enrollment => enrollment, :scholarship => scholarship,
-                             :start_date => end_date, :end_date => end_date + 2.days)
-          scholarship_duration.scholarship = scholarship
-          scholarship_duration.start_date = end_date + 3.days
-          scholarship_duration.end_date = end_date + 5.days
-          #scholarship_duration.cancel_date = end_date + 1.day
-          scholarship_duration.enrollment = enrollment
-          scholarship_duration.should have_error(:unfinished_scholarship).on :scholarship
-        end
       end
     end
 
@@ -173,6 +172,34 @@ describe ScholarshipDuration do
         scholarship_duration.start_date = start_date
         scholarship_duration.end_date = end_date
         scholarship_duration.to_label.should eql("#{I18n.localize(start_date, :format => :monthyear)} - #{I18n.localize(end_date, :format => :monthyear)}")
+      end
+    end
+
+    describe "warning_message" do
+      it "should return nil when everything is alright" do
+        enrollment = FactoryGirl.create(:enrollment)
+        scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => end_date + 5.days)
+        FactoryGirl.create(:scholarship_duration, :enrollment => enrollment, :scholarship => scholarship,
+                           :start_date => end_date, :end_date => end_date + 2.days, :cancel_date => end_date + 2.days)
+        scholarship_duration.scholarship = scholarship
+        scholarship_duration.start_date = end_date + 3.days
+        scholarship_duration.end_date = end_date + 5.days
+        #scholarship_duration.cancel_date = end_date + 1.day
+        scholarship_duration.enrollment = enrollment
+        scholarship_duration.warning_message.should be_nil
+      end
+
+      it "should return unfinished scholarship warning when there is an unfinished scholarship" do
+        enrollment = FactoryGirl.create(:enrollment)
+        scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => end_date + 5.days)
+        FactoryGirl.create(:scholarship_duration, :enrollment => enrollment, :scholarship => scholarship,
+                           :start_date => end_date, :end_date => end_date + 2.days)
+        scholarship_duration.scholarship = scholarship
+        scholarship_duration.start_date = end_date + 3.days
+        scholarship_duration.end_date = end_date + 5.days
+        #scholarship_duration.cancel_date = end_date + 1.day
+        scholarship_duration.enrollment = enrollment
+        scholarship_duration.warning_message.should == I18n.t("activerecord.attributes.scholarship_duration.warnings.unfinished_scholarship")
       end
     end
   end

@@ -148,6 +148,14 @@ class ScholarshipDurationsController < ApplicationController
     end
   end
 
+  def after_create_save(record)
+    flash[:warning] = record.warning_message
+  end
+
+  def after_update_save(record)
+    flash[:warning] = record.warning_message
+  end
+
   def to_pdf
     pdf = Prawn::Document.new
 

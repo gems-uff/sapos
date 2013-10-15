@@ -77,6 +77,23 @@ class ScholarshipDuration < ActiveRecord::Base
     false
   end
 
+  def warning_message
+    if self.id.nil?
+      scholarships_with_student = ScholarshipDuration.all :conditions => ["scholarship_id = ?", scholarship.id]
+    else
+      scholarships_with_student = ScholarshipDuration.all :conditions => ["scholarship_id = ? AND id <> ?", scholarship.id, self.id]
+    end
+
+    message = nil
+    scholarships_with_student.each do |scholarship|
+      if scholarship.start_date <= start_date and scholarship.cancel_date.nil?
+        message = I18n.t("activerecord.attributes.scholarship_duration.warnings.unfinished_scholarship")
+        break
+      end
+    end
+    message
+  end
+
   def if_scholarship_is_not_with_another_student
     if self.id.nil?
       scholarships_with_student = ScholarshipDuration.all :conditions => ["scholarship_id = ?", scholarship.id]
@@ -87,8 +104,10 @@ class ScholarshipDuration < ActiveRecord::Base
     scholarships_with_student.each do |scholarship|
       if scholarship.start_date <= start_date # se a bolsa é antiga
         if scholarship.cancel_date.nil?
-          errors.add(:scholarship, I18n.t("activerecord.errors.models.scholarship_duration.unfinished_scholarship"))
-          break
+          if scholarship.end_date >= start_date
+            errors.add(:start_date, I18n.t("activerecord.errors.models.scholarship_duration.start_date_before_scholarship_end_date"))
+            break
+          end
         else
           if scholarship.cancel_date >= start_date
             errors.add(:start_date, I18n.t("activerecord.errors.models.scholarship_duration.start_date_before_scholarship_cancel_date"))
