@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131015022118) do
+ActiveRecord::Schema.define(:version => 20131015031345) do
 
   create_table "enrollment_statuses", :force => true do |t|
     t.string   "name"
@@ -95,6 +95,7 @@ ActiveRecord::Schema.define(:version => 20131015022118) do
     t.text     "obs"
     t.datetime "created_at",           :null => false
     t.datetime "updated_at",           :null => false
+    t.string   "thesis_title"
     t.index ["student_id"], :name => "fk__enrollments_student_id"
     t.index ["level_id"], :name => "fk__enrollments_level_id"
     t.index ["enrollment_status_id"], :name => "fk__enrollments_enrollment_status_id"

@@ -57,5 +57,22 @@ describe Configuration do
         Configuration.multiple_advisor_points.should == 2.0
       end
     end 
+
+    context "program_level" do
+      it "should return nil when there is no configuration defined" do
+        config = Configuration.find_by_variable(:program_level)
+        config.delete unless config.nil?
+
+        Configuration.program_level.should == nil
+      end
+
+      it "should return 5 when it is defined to 5" do
+        config = Configuration.find_by_variable(:program_level)
+        config.delete unless config.nil?
+        Configuration.create(:variable=>:program_level, :value=>"5")
+
+        Configuration.program_level.should == 5
+      end
+    end 
   end
 end

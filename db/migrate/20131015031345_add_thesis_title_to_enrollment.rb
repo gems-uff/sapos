@@ -1,8 +1,8 @@
 # Copyright (c) 2013 Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class AddShowAdvisorNameToDismissalReason < ActiveRecord::Migration
+class AddThesisTitleToEnrollment < ActiveRecord::Migration
   def change
-    add_column :dismissal_reasons, :show_advisor_name, :boolean, default: false
+    add_column :enrollments, :thesis_title, :string
   end
 end

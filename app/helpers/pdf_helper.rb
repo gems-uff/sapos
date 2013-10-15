@@ -15,6 +15,11 @@ module PdfHelper
       pdf.text "Universidade Federal Fluminense
                 Instituto de Computação
                 Programa de Pós-Graduação em Computação"
+      level = Configuration.program_level
+      unless level.nil?
+        pdf.text "Conceito #{level} pela CAPES"
+        
+      end
     end
 
     pdf.move_down 20

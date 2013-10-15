@@ -2,7 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Enrollment < ActiveRecord::Base
-  attr_accessible :enrollment_number
+  attr_accessible :enrollment_number, :thesis_title
   belongs_to :student
   belongs_to :level
   belongs_to :enrollment_status

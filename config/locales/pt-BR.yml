@@ -145,6 +145,7 @@ pt-BR:
         scholarship_durations_active: "Possui bolsa?"
         scholarships: "Números das Bolsas"
         student: "Nome do Aluno"
+        thesis_title: "Título da Tese"
         year_semester_label: "em"
       enrollment_status:
         name: "Nome"

@@ -95,7 +95,11 @@ module EnrollmentsPdfHelper
         pdf.draw_text(student_cpf_text, :at => [current_x, pdf.cursor])
 
       end
-      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 80) do
+
+      has_thesis = not(enrollment.thesis_title.nil? or enrollment.thesis_title.empty?)
+      height = 80 + (has_thesis ? 20 : 0)
+
+      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => height) do
         pdf.stroke_bounds
         current_x = x
         pdf.move_down default_margin
@@ -115,6 +119,15 @@ module EnrollmentsPdfHelper
         enrollment_dismissal_reason_text += enrollment.dismissal ? " #{enrollment.dismissal.dismissal_reason.name}" : "--"
 
         pdf.draw_text(enrollment_dismissal_reason_text, :at => [current_x, pdf.cursor])
+      
+        if has_thesis
+          pdf.move_down default_margin
+          pdf.stroke_bounds
+          current_x = 5
+
+          label = "#{I18n.t("activerecord.attributes.enrollment.thesis_title")}: #{enrollment.thesis_title}"
+          pdf.draw_text(label, :at => [current_x, pdf.cursor])
+        end 
       end
     end
 

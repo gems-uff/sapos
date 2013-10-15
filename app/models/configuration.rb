@@ -22,4 +22,9 @@ class Configuration < ActiveRecord::Base
   	config.nil? ? 0.5 : config.value.to_f 
   end
 
+  def self.program_level
+    config = Configuration.find_by_variable(:program_level)
+    config.nil? ? nil : config.value.to_i 
+  end
+
 end
