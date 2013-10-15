@@ -87,10 +87,8 @@ class ScholarshipDuration < ActiveRecord::Base
     scholarships_with_student.each do |scholarship|
       if scholarship.start_date <= start_date # se a bolsa é antiga
         if scholarship.cancel_date.nil?
-          if scholarship.end_date >= start_date
-            errors.add(:start_date, I18n.t("activerecord.errors.models.scholarship_duration.start_date_before_scholarship_end_date"))
-            break
-          end
+          errors.add(:scholarship, I18n.t("activerecord.errors.models.scholarship_duration.unfinished_scholarship"))
+          break
         else
           if scholarship.cancel_date >= start_date
             errors.add(:start_date, I18n.t("activerecord.errors.models.scholarship_duration.start_date_before_scholarship_cancel_date"))

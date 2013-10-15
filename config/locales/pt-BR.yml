@@ -340,6 +340,7 @@ pt-BR:
           start_date_before_scholarship_cancel_date: "anterior a Data de Encerramento de outra alocação de bolsa"
           start_date_before_scholarship_end_date: "anterior a Data de Limite de Concessão de outra alocação de bolsa"
           start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
+          unfinished_scholarship: "ainda está alocado. Por favor, feche a alocação antes de criar uma nova"
           attributes:
             start_date_after_end_date: "posterior a Data de Limite de Concessão"
             cancel_date:
