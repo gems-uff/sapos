@@ -48,4 +48,29 @@ module ScholarshipsHelper
          :include_blank => true
     }        
   end
+
+  def available_search_column(record, options)
+
+    local_options = {
+        :include_blank => true
+    }
+
+    day_html_options = {
+        :name => "search[available][day]"
+    }
+    month_html_options = {
+        :name => "search[available][month]"
+    }
+    year_html_options = {
+        :name => "search[available][year]"
+    }
+
+    html = check_box_tag "search[available][use]", "yes", false, :style => "vertical-align: sub;"
+    html += label_tag "search[available][use]", I18n.t("activerecord.attributes.scholarship.available_label"), :style => "margin: 0 15px;"
+    #html = label_tag(:accomplishments_date, I18n.t("activerecord.attributes.enrollment.delayed_phase_date"), :style => "margin: 0px 15px") 
+    #html += select_day(Date.today.day, local_options, day_html_options) 
+    html += select_month(Date.today.month, local_options, month_html_options)
+    html += select_year(Date.today.year, local_options, year_html_options)
+    html
+  end
 end

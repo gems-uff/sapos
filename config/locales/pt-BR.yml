@@ -206,6 +206,8 @@ pt-BR:
         description: "Descrição"
         name: "Nome"
       scholarship:
+        available: "Disponível"
+        available_label: "com concessão até"
         end_date: "Data de Fim"                
         enrollments: "Matrículas"
         level: "Nível"
