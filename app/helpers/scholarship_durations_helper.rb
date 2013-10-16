@@ -104,4 +104,12 @@ module ScholarshipDurationsHelper
 
     select_tag record[:level], options_from_collection_for_select(Level.all(:order => "name"), "id", "name"), options.merge(local_options)
   end
+
+  def scholarship_form_column(record, options)
+    record_select_field :scholarship, record.scholarship || Scholarship.new, options.merge!(class: "text-input")
+  end
+
+  def enrollment_form_column(record, options)
+    record_select_field :enrollment, record.enrollment || Enrollment.new, options.merge!(class: "text-input")
+  end
 end

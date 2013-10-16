@@ -18,4 +18,12 @@ module AdvisementsHelper
     levels += Level.all.map { |level| [level.name,level.id]}
     select(record, :level, levels, options,options)
   end
+
+  def professor_form_column(record, options)
+    record_select_field :professor, record.professor || Professor.new, options.merge!(class: "text-input")
+  end
+
+  def enrollment_form_column(record, options)
+    record_select_field :enrollment, record.enrollment || Enrollment.new, options.merge!(class: "text-input")
+  end
 end

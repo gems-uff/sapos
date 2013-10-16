@@ -12,9 +12,6 @@ class StudentMajorsController < ApplicationController
     config.columns[:student].form_ui = :record_select
     config.columns[:major].form_ui = :record_select
 
-    config.columns[:student].includes = [:name]
-    config.columns[:major].includes = [:name]
-    
   end
 
   record_select

@@ -8,6 +8,8 @@ class EnrollmentsController < ApplicationController
   include NumbersHelper
   include ApplicationHelper
   helper :class_enrollments
+  helper :advisements
+  helper :scholarship_durations
 
   active_scaffold :enrollment do |config|
 

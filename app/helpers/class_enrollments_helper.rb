@@ -43,4 +43,12 @@ module ClassEnrollmentsHelper
   	#select :record, "id", options_for_select(CourseClass.group(:semester).select(:semester).collect{|y| y[:semester]}), {:include_blank => as_('- select -')}, options
   	content_tag :span, html, :class => 'search_course_class'
   end
+
+  def course_class_form_column(record, options)
+    record_select_field :course_class, record.course_class || CourseClass.new, options.merge!(class: "text-input")
+  end
+
+  def enrollment_form_column(record, options)
+    record_select_field :enrollment, record.enrollment || Enrollment.new, options.merge!(class: "text-input")
+  end
 end

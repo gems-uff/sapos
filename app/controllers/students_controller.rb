@@ -5,6 +5,8 @@
 class StudentsController < ApplicationController
   authorize_resource
 
+  helper :student_majors
+  
   active_scaffold :student do |config|
     config.list.sorting = {:name => 'ASC'}
     config.list.columns = [:name, :cpf, :enrollments_number]

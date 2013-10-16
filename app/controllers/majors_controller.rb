@@ -5,6 +5,8 @@
 class MajorsController < ApplicationController
   authorize_resource
 
+  helper :student_majors
+
   active_scaffold :major do |config|
     config.list.sorting = {:name => 'ASC'}
     config.create.label = :create_major_label

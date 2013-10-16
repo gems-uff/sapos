@@ -5,11 +5,11 @@
 class LevelsController < ApplicationController
   authorize_resource
 
+  helper :advisement_authorizations
   active_scaffold :level do |config|
     config.list.sorting = {:name => 'ASC'}
     config.update.columns = [:name, :advisement_authorizations]
     config.create.columns = [:name, :advisement_authorizations]
     #config.create.label = :create_level_label
   end
-
 end 
