@@ -8,6 +8,7 @@ class ProfessorsController < ApplicationController
   include NumbersHelper
   include ApplicationHelper
   helper :class_enrollments
+  helper :professor_research_areas
 
   active_scaffold :professor do |config|
     config.columns.add :advisement_points

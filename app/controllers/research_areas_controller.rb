@@ -4,6 +4,7 @@
 
 class ResearchAreasController < ApplicationController
   authorize_resource
+  helper :professor_research_areas
 
   active_scaffold :research_area do |config|
     config.list.sorting = {:name => 'ASC'}
