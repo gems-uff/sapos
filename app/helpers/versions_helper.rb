@@ -53,7 +53,7 @@ module VersionsHelper
 				end
 			end
 
-			property_list.html_safe
+			html_escape(property_list).gsub("&lt;br&gt;", "<br>").html_safe
 		end
 	end
 end
