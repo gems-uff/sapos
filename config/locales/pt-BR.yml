@@ -147,6 +147,11 @@ pt-BR:
         student: "Nome do Aluno"
         thesis_title: "Título da Tese"
         year_semester_label: "em"
+        listed_advisors: "Orientadores"
+        listed_accomplishments: "Realização de Etapas"
+        listed_deferrals: "Prorrogações"
+        listed_scholarships: "Bolsas"
+        listed_class_enrollments: "Inscrições"
       enrollment_status:
         name: "Nome"
       institution:
@@ -232,8 +237,6 @@ pt-BR:
         scholarship_types: "Tipo de Bolsa"
         sponsors: "Agência de Fomento"
         start_date: "Data de Início"
-        warnings:
-          unfinished_scholarship: "Esta bolsa ainda está alocada a outra matrícula. Por favor, lembre-se de fechar a alocação"
       scholarship_type:
         name: "Nome"
       sponsor:
@@ -342,6 +345,7 @@ pt-BR:
           start_date_before_scholarship_cancel_date: "anterior a Data de Encerramento de outra alocação de bolsa"
           start_date_before_scholarship_end_date: "anterior a Data de Limite de Concessão de outra alocação de bolsa"
           start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
+          unfinished_scholarship: "ainda está alocado. Por favor, feche a alocação antes de criar uma nova"
           attributes:
             start_date_after_end_date: "posterior a Data de Limite de Concessão"
             cancel_date:
