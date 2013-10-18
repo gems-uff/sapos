@@ -34,6 +34,7 @@ module EnrollmentsPdfHelper
     enrollment ||= options[:enrollment]
     x = 5
     default_margin = 22
+    default_margin_indent = 11
     default_margin_x = 20
     font_width = 5.7
     current_x = x
@@ -96,37 +97,38 @@ module EnrollmentsPdfHelper
 
       end
 
-      has_thesis = not(enrollment.thesis_title.nil? or enrollment.thesis_title.empty?)
-      height = 80 + (has_thesis ? 20 : 0)
+      height = 80 
+
+      if not(enrollment.thesis_title.nil? or enrollment.thesis_title.empty?)
+        has_thesis = true
+        thesis_label = "#{I18n.t("activerecord.attributes.enrollment.thesis_title")}: #{enrollment.thesis_title}"
+        height += pdf.height_of_formatted([{ text: thesis_label, :width => pdf.bounds.right - x }]) 
+      end   
 
       pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => height) do
         pdf.stroke_bounds
-        current_x = x
-        pdf.move_down default_margin
 
-        pdf.draw_text("#{I18n.t("pdf_content.enrollment.header.course")}: #{enrollment.level.name} #{I18n.t("pdf_content.enrollment.header.graduation")}", :at => [current_x, pdf.cursor])
-        pdf.move_down default_margin
+        pdf.indent(x) do
+          pdf.move_down default_margin_indent
+          
+          pdf.text("#{I18n.t("pdf_content.enrollment.header.course")}: #{enrollment.level.name} #{I18n.t("pdf_content.enrollment.header.graduation")}")
+          pdf.move_down default_margin_indent
+          
+          pdf.text("#{I18n.t("pdf_content.enrollment.header.enrollment_admission_date")}: #{I18n.localize(enrollment.admission_date, :format => :monthyear2)}")
+          pdf.move_down default_margin_indent
 
-        pdf.draw_text("#{I18n.t("pdf_content.enrollment.header.enrollment_admission_date")}: #{I18n.localize(enrollment.admission_date, :format => :monthyear2)}", :at => [current_x, pdf.cursor])
-        pdf.move_down default_margin
+          enrollment_dismissal_date_text = "#{I18n.t("pdf_content.enrollment.header.enrollment_dismissal_date")}:"
+          enrollment_dismissal_date_text += enrollment.dismissal ? " #{"#{I18n.localize(enrollment.dismissal.date, :format => :monthyear2)}"}" : "--"
+          enrollment_dismissal_reason_text = "#{I18n.t("pdf_content.enrollment.header.enrollment_dismissal_reason")}:"
+          enrollment_dismissal_reason_text += enrollment.dismissal ? " #{enrollment.dismissal.dismissal_reason.name}" : "--"
 
-        enrollment_dismissal_date_text = "#{I18n.t("pdf_content.enrollment.header.enrollment_dismissal_date")}:"
-        enrollment_dismissal_date_text += enrollment.dismissal ? " #{"#{I18n.localize(enrollment.dismissal.date, :format => :monthyear2)}"}" : "--"
-        pdf.draw_text(enrollment_dismissal_date_text, :at => [current_x, pdf.cursor])
-        current_x += enrollment_dismissal_date_text.size*font_width + default_margin_x
+          enrollment_dismissal_text = enrollment_dismissal_date_text + '     ' + enrollment_dismissal_reason_text
+          pdf.text(enrollment_dismissal_text)
 
-        enrollment_dismissal_reason_text = "#{I18n.t("pdf_content.enrollment.header.enrollment_dismissal_reason")}:"
-        enrollment_dismissal_reason_text += enrollment.dismissal ? " #{enrollment.dismissal.dismissal_reason.name}" : "--"
-
-        pdf.draw_text(enrollment_dismissal_reason_text, :at => [current_x, pdf.cursor])
-      
-        if has_thesis
-          pdf.move_down default_margin
-          pdf.stroke_bounds
-          current_x = 5
-
-          label = "#{I18n.t("activerecord.attributes.enrollment.thesis_title")}: #{enrollment.thesis_title}"
-          pdf.draw_text(label, :at => [current_x, pdf.cursor])
+          if has_thesis
+            pdf.move_down default_margin_indent
+            pdf.text thesis_label
+          end 
         end 
       end
     end
