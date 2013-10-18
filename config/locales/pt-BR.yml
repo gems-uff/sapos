@@ -209,7 +209,7 @@ pt-BR:
         name: "Nome"
       scholarship:
         available: "Disponível"
-        available_label: "com concessão até"
+        available_label: "a partir de"
         end_date: "Data de Fim"                
         enrollments: "Matrículas"
         level: "Nível"
