@@ -124,7 +124,7 @@ pt-BR:
       dismissal_reason:
         description: "Descrição"
         name: "Nome"
-        show_advisor_name: "Mostrar nome do orientador"
+        show_advisor_name: "Mostrar Orientador no Histórico"
       enrollment:
         accomplishments: "Realização de Etapa"
         active: "Ativo?"
