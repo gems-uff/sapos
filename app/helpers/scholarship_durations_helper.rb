@@ -106,10 +106,12 @@ module ScholarshipDurationsHelper
   end
 
   def scholarship_form_column(record, options)
+    logger.info "  RecordSelect Helper ScholarshipDurationsHelper\\scholarship_form_column" 
     record_select_field :scholarship, record.scholarship || Scholarship.new, options.merge!(class: "text-input")
   end
 
   def enrollment_form_column(record, options)
+    logger.info "  RecordSelect Helper ScholarshipDurationsHelper\\enrollment_form_column" 
     record_select_field :enrollment, record.enrollment || Enrollment.new, options.merge!(class: "text-input")
   end
 end
