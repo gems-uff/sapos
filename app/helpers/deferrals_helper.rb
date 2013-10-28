@@ -50,6 +50,6 @@ module DeferralsHelper
       valid_date = total_duration_days.days.since(valid_date)
     end
 
-    valid_date
+    valid_date.strftime('%d/%m/%Y')
   end
 end
