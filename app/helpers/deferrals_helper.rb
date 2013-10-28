@@ -14,4 +14,8 @@ module DeferralsHelper
          :default => nil,
     }.merge(options)
   end
+
+  def valid_until_column(record, column)
+    "validade"
+  end
 end
