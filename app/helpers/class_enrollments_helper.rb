@@ -45,10 +45,12 @@ module ClassEnrollmentsHelper
   end
 
   def course_class_form_column(record, options)
+    logger.info "  RecordSelect Helper ClassEnrollmentsHelper\\course_class_form_column" 
     record_select_field :course_class, record.course_class || CourseClass.new, options.merge!(class: "text-input")
   end
 
   def enrollment_form_column(record, options)
+    logger.info "  RecordSelect Helper ClassEnrollmentsHelper\\enrollment_form_column" 
     record_select_field :enrollment, record.enrollment || Enrollment.new, options.merge!(class: "text-input")
   end
 end

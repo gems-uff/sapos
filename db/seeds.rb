@@ -416,7 +416,7 @@ Country.create(:name=>"Zona do Canal do Panamá")
   
 Configuration.create(:name=>"Pontos para orientador único", :variable =>"single_advisor_points", :value => "1.0")
 Configuration.create(:name=>"Pontos para orientador múltiplo", :variable =>"multiple_advisor_points", :value => "0.5")
-Configuration.create(:name=>"Nível do Programa na CAPES", :variable =>"program_level", :value => "7")
+Configuration.create(:name=>"Nível do Programa na CAPES", :variable =>"program_level", :value => "5")
 
 
 State.create(:name =>"Acre",:code =>"AC",:country =>Country.find_by_name("Brasil"))
