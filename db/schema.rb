@@ -253,6 +253,17 @@ ActiveRecord::Schema.define(:version => 20131015031345) do
     t.datetime "updated_at", :null => false
   end
 
+  create_table "courses_students", :id => false, :force => true do |t|
+    t.integer "course_id",  :null => false
+    t.integer "student_id", :null => false
+    t.index ["student_id"], :name => "index_courses_students_on_student_id"
+    t.index ["course_id"], :name => "index_courses_students_on_course_id"
+    t.index ["student_id"], :name => "fk__courses_students_student_id"
+    t.index ["course_id"], :name => "fk__courses_students_course_id"
+    t.foreign_key ["course_id"], "courses", ["id"], :on_update => :no_action, :on_delete => :no_action, :name => "fk_courses_students_course_id"
+    t.foreign_key ["student_id"], "students", ["id"], :on_update => :no_action, :on_delete => :no_action, :name => "fk_courses_students_student_id"
+  end
+
   create_table "deferral_types", :force => true do |t|
     t.string   "name"
     t.string   "description"

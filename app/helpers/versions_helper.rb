@@ -11,15 +11,14 @@ module VersionsHelper
 		object_id = record.item_id.to_i
 		model_str = record.item_type
 		model = model_str.constantize
-
 		if model.find_by_id(object_id).nil?
 			I18n.t("activerecord.attributes.version.current_object_destroyed")
 		else
+
 			begin
 				path = send((model_str.underscore + "_path").to_sym, object_id)
-				route = Rails.application.routes.recognize_path(path)
-
-				link_to(h(model.find(object_id).to_label), route) if object_id != 0
+				#route = Rails.application.routes.recognize_path(path)
+				link_to(h(model.find(object_id).to_label), path) if object_id != 0
 			rescue NoMethodError
 				I18n.t("activerecord.attributes.version.relationship_object") if object_id != 0
 			end
