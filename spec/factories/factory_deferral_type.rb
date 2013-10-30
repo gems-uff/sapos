@@ -9,8 +9,8 @@ FactoryGirl.define do
     sequence :name do |i|
       "DeferralType_#{i}"
     end
-    duration_semesters 1
-    duration_months 1
-    duration_days 1
+    duration_semesters 0
+    duration_months 0
+    duration_days 0
   end
 end

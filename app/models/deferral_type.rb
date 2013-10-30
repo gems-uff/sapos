@@ -22,4 +22,8 @@ class DeferralType < ActiveRecord::Base
   def to_label
     "#{self.name}"
   end
+
+  def duration
+    {:semesters => self.duration_semesters, :months => self.duration_months, :days => self.duration_days}
+  end
 end

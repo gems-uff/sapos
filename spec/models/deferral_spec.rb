@@ -46,87 +46,39 @@ describe Deferral do
     end
     describe "valid_until" do
       it "should return 31th of july 2013" do
-        enrollment = Enrollment.new()
-        level = Level.new
-        phase = Phase.new
-        phase_duration = PhaseDuration.new
-        deferral_type = DeferralType.new
+        phase = FactoryGirl.create(:phase)
+        level = FactoryGirl.create(:level)
+        enrollment = FactoryGirl.create(:enrollment, :level => level, :admission_date => Date.new(2012, 3, 1))
+        FactoryGirl.create(:accomplishment, :phase => phase, :enrollment => enrollment)
+        phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :deadline_semesters => 1, :level => level)
+        deferral_type = FactoryGirl.create(:deferral_type, :phase => phase, :duration_semesters => 2)
+        deferral = FactoryGirl.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
 
-        level.id = 1
-        phase_duration.deadline_semesters = 1
-        phase_duration.level_id = level.id
-
-        enrollment.admission_date = Date.new(2012, 3, 1)
-        enrollment.level = level
-        
-        phase.levels = [level]
-        phase.phase_durations = [phase_duration]
-        phase.enrollments = [enrollment]
-
-        deferral_type.phase = phase
-        deferral_type.duration_semesters = 2
-
-        deferral.enrollment = enrollment
-        deferral.deferral_type = deferral_type
-
-        puts deferral.valid_until
         deferral.valid_until.should eql(Date.new(2013, 7, 31).strftime('%d/%m/%Y'))
       end
 
       it "should return 28th of february 2023" do
-        enrollment = Enrollment.new()
-        level = Level.new
-        phase = Phase.new
-        phase_duration = PhaseDuration.new
-        deferral_type = DeferralType.new
+        phase = FactoryGirl.create(:phase)
+        level = FactoryGirl.create(:level)
+        enrollment = FactoryGirl.create(:enrollment, :level => level, :admission_date => Date.new(2017, 8, 1))
+        FactoryGirl.create(:accomplishment, :phase => phase, :enrollment => enrollment)
+        phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :deadline_semesters => 8, :level => level)
+        deferral_type = FactoryGirl.create(:deferral_type, :phase => phase, :duration_semesters => 3)
+        deferral = FactoryGirl.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
 
-        level.id = 1
-        phase_duration.deadline_semesters = 8
-        phase_duration.level_id = level.id
 
-        enrollment.admission_date = Date.new(2017, 8, 1)
-        enrollment.level = level
-        
-        phase.levels = [level]
-        phase.phase_durations = [phase_duration]
-        phase.enrollments = [enrollment]
-
-        deferral_type.phase = phase
-        deferral_type.duration_semesters = 3
-
-        deferral.enrollment = enrollment
-        deferral.deferral_type = deferral_type
-
-        puts deferral.valid_until
         deferral.valid_until.should eql(Date.new(2023, 2, 28).strftime('%d/%m/%Y'))
       end
 
       it "should return 7th of june 2014" do
-        enrollment = Enrollment.new()
-        level = Level.new
-        phase = Phase.new
-        phase_duration = PhaseDuration.new
-        deferral_type = DeferralType.new
+        phase = FactoryGirl.create(:phase)
+        level = FactoryGirl.create(:level)
+        enrollment = FactoryGirl.create(:enrollment, :level => level, :admission_date => Date.new(2013, 8, 1))
+        FactoryGirl.create(:accomplishment, :phase => phase, :enrollment => enrollment)
+        phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :deadline_semesters => 1, :level => level)
+        deferral_type = FactoryGirl.create(:deferral_type, :phase => phase, :duration_months => 3, :duration_days => 7)
+        deferral = FactoryGirl.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
 
-        level.id = 1
-        phase_duration.deadline_semesters = 1
-        phase_duration.level_id = level.id
-
-        enrollment.admission_date = Date.new(2013, 8, 1)
-        enrollment.level = level
-        
-        phase.levels = [level]
-        phase.phase_durations = [phase_duration]
-        phase.enrollments = [enrollment]
-
-        deferral_type.phase = phase
-        deferral_type.duration_months = 3
-        deferral_type.duration_days = 7
-
-        deferral.enrollment = enrollment
-        deferral.deferral_type = deferral_type
-
-        puts deferral.valid_until
         deferral.valid_until.should eql(Date.new(2014, 6, 7).strftime('%d/%m/%Y'))
       end
     end
