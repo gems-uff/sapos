@@ -14,7 +14,6 @@ class AccomplishmentsController < ApplicationController
     config.search.columns = [:phase]
     config.columns[:phase].form_ui = :select
     config.columns[:enrollment].form_ui = :record_select
-    config.columns[:enrollment].clear_link
     config.columns[:phase].clear_link
     config.create.columns = [:phase, :enrollment, :conclusion_date, :obs]
     config.update.columns = [:phase, :enrollment, :conclusion_date, :obs]

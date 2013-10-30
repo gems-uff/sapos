@@ -28,8 +28,6 @@ class CourseClassesController < ApplicationController
 
     config.action_links.add 'summary_pdf', :label => I18n.t('pdf_content.course_class.summary.link'), :page => true, :type => :member, :parameters => {:format => :pdf}
 
-    config.columns[:course].clear_link
-    config.columns[:professor].clear_link
     config.columns[:course].form_ui = :record_select
     config.columns[:professor].form_ui = :record_select
     config.columns[:year].form_ui = :select

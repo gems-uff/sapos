@@ -11,8 +11,6 @@ class ClassEnrollmentsController < ApplicationController
     config.create.label = :create_class_enrollment_label
     config.update.label = :update_class_enrollment_label
 
-    config.columns[:enrollment].clear_link
-    config.columns[:course_class].clear_link
     config.columns[:enrollment].form_ui = :record_select
     config.columns[:course_class].form_ui = :record_select
     config.columns[:situation].form_ui = :select

@@ -18,7 +18,6 @@ class DismissalsController < ApplicationController
     config.columns[:dismissal_reason].form_ui = :select
     config.columns[:enrollment].form_ui = :record_select
     config.columns[:date].options = {:format => :monthyear}
-    config.columns[:enrollment].clear_link
     config.columns[:dismissal_reason].clear_link
 
     config.update.columns = [:enrollment, :date, :dismissal_reason, :obs]

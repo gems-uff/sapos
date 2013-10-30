@@ -9,7 +9,7 @@ class StudentsController < ApplicationController
   
   active_scaffold :student do |config|
     config.list.sorting = {:name => 'ASC'}
-    config.list.columns = [:name, :cpf, :enrollments_number]
+    config.list.columns = [:name, :cpf, :enrollments]
     config.create.label = :create_student_label
     config.update.label = :update_student_label
 
@@ -24,7 +24,6 @@ class StudentsController < ApplicationController
     config.columns[:sex].options = {:options => [['Masculino', 'M'], ['Feminino', 'F']]}
     config.columns[:birthdate].options = {'date:yearRange' => 'c-100:c'}
     config.columns[:civil_status].options = {:options => ['Solteiro(a)', 'Casado(a)']}
-    config.columns[:enrollments].clear_link
 
     config.columns[:student_majors].includes = [:majors, :student_majors]
 
