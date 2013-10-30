@@ -15,7 +15,6 @@ class MajorsController < ApplicationController
 
     config.columns[:institution].clear_link
     config.columns[:level].clear_link
-    config.columns[:students].clear_link
     config.columns[:level].form_ui = :select
     config.columns[:institution].form_ui = :record_select
 

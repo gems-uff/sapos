@@ -11,8 +11,6 @@ class CoursesController < ApplicationController
     config.create.label = :create_course_label
     config.update.label = :update_course_label
 
-    config.columns[:research_area].clear_link
-    config.columns[:course_type].clear_link
     config.columns[:research_area].form_ui = :record_select
     config.columns[:course_type].form_ui = :select
 

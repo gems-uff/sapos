@@ -10,7 +10,6 @@ class AllocationsController < ApplicationController
     config.create.label = :create_allocation_label
     config.update.label = :update_allocation_label
 
-    config.columns[:course_class].clear_link
     config.columns[:course_class].form_ui = :record_select
     config.columns[:day].form_ui = :select
     config.columns[:day].options = {:options => I18n.translate("date.day_names"), :include_blank => I18n.t("active_scaffold._select_")}

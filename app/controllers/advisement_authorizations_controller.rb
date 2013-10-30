@@ -12,6 +12,7 @@ class AdvisementAuthorizationsController < ApplicationController
     config.columns[:level].search_ui = :select
     config.columns[:professor].form_ui = :record_select
     config.columns[:level].form_ui = :select
+    config.columns[:level].clear_link
 
   end
   record_select :per_page => 10

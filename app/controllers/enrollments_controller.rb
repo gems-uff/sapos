@@ -48,7 +48,6 @@ class EnrollmentsController < ApplicationController
     config.columns[:active].search_sql = ""
     config.columns[:delayed_phase].search_sql = ""
     config.columns[:delayed_phase].search_ui = :select
-    config.columns[:professor].clear_link
     config.columns[:professor].search_sql = "professors.name"
     config.columns[:professor].includes = {:advisements => :professor}
     config.columns[:professor].search_ui = :text
@@ -58,7 +57,6 @@ class EnrollmentsController < ApplicationController
     config.columns[:level].form_ui = :select
     config.columns[:enrollment_status].form_ui = :select
     config.columns[:dismissal].clear_link
-    config.columns[:student].clear_link
     config.columns[:level].clear_link
     config.columns[:enrollment_status].clear_link
     config.columns[:admission_date].options = {:format => :monthyear}
@@ -213,6 +211,4 @@ class EnrollmentsController < ApplicationController
       end
     end
   end
-
-
 end
