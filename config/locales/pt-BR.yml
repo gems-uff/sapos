@@ -108,6 +108,7 @@ pt-BR:
         enrollment: "Matrícula"
         enrollment_id: "Matrícula"
         obs: "Observação"
+        valid_until: "Validade"
       deferral_type:
         description: "Descrição"
         duration: "Duração"

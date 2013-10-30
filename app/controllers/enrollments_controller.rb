@@ -8,6 +8,8 @@ class EnrollmentsController < ApplicationController
   include NumbersHelper
   include ApplicationHelper
   helper :class_enrollments
+  helper :advisements
+  helper :scholarship_durations
 
   active_scaffold :enrollment do |config|
 
@@ -19,14 +21,12 @@ class EnrollmentsController < ApplicationController
     config.list.sorting = {:enrollment_number => 'ASC'}
     config.create.label = :create_enrollment_label
     config.update.label = :update_enrollment_label
-#    config.columns[:level].update_columns = :accomplishments
+    #config.columns[:level].update_columns = :accomplishments
     config.columns[:accomplishments].allow_add_existing = false;
 
     config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase, :course_class_year_semester
-    config.columns.add :listed_advisors, :listed_accomplishments, :listed_deferrals, :listed_scholarships, :listed_class_enrollments
-
     config.actions.swap :search, :field_search
-    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :accomplishments, :delayed_phase, :course_class_year_semester]
+    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :delayed_phase, :course_class_year_semester]
 
     config.columns[:course_class_year_semester].search_sql = ""
       
@@ -64,10 +64,9 @@ class EnrollmentsController < ApplicationController
     config.columns[:admission_date].options = {:format => :monthyear}
 #Student can not be configured as record select because it does not allow the user to create a new one, if needed
     config.columns[:student].form_ui = :record_select
-    config.create.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :thesis_title, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal, :class_enrollments]
+    config.create.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :thesis_title, :advisements, :scholarship_durations, :dismissal, :class_enrollments]
     config.update.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :thesis_title, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal, :class_enrollments]
-    config.show.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :listed_advisors, :listed_accomplishments, :listed_deferrals, :listed_scholarships, :dismissal, :listed_class_enrollments]
-
+    config.show.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal, :class_enrollments]
   end
   record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
 
@@ -214,5 +213,6 @@ class EnrollmentsController < ApplicationController
       end
     end
   end
+
 
 end

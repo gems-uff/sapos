@@ -22,4 +22,8 @@ class PhaseDuration < ActiveRecord::Base
       errors.add(:deadline, I18n.t("activerecord.errors.models.phase_duration.blank_deadline"))
     end
   end
+
+  def duration
+    {:semesters => self.deadline_semesters, :months => self.deadline_months, :days => self.deadline_days}
+  end
 end
