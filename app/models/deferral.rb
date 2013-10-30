@@ -38,22 +38,15 @@ class Deferral < ActiveRecord::Base
     total_time = total_time_with_deferrals
     valid_date = enrollment.admission_date
 
-    if total_time[:semesters] != 0
-      valid_date = (12 * (total_time[:semesters] / 2)).months.since(valid_date)
-      valid_date = valid_date.month == 3 ? 
-        (5 * (total_time[:semesters] % 2)).months.since(valid_date) : 
-        (7 * (total_time[:semesters] % 2)).months.since(valid_date)
-      valid_date = 1.month.ago(valid_date).end_of_month
-    end
+    valid_date = (12 * (total_time[:semesters] / 2)).months.since(valid_date)
+    valid_date = valid_date.month == 3 ? 
+      (5 * (total_time[:semesters] % 2)).months.since(valid_date) : 
+      (7 * (total_time[:semesters] % 2)).months.since(valid_date)
 
-    if total_time[:months] != 0
-      valid_date = total_time[:months].months.since(valid_date).end_of_month
-    end
+    valid_date = 1.month.ago(valid_date).end_of_month if (total_time[:semesters] != 0)
 
-    if total_time[:days] != 0
-      valid_date = total_time[:days].days.since(valid_date)
-    end
+    valid_date = total_time[:months].months.since(valid_date).end_of_month
 
-    valid_date.strftime('%d/%m/%Y')
+    total_time[:days].days.since(valid_date).strftime('%d/%m/%Y')
   end
 end
