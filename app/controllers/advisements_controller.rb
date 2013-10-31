@@ -17,10 +17,8 @@ class AdvisementsController < ApplicationController
 
     config.field_search.columns = [:professor, :enrollment_number, :level, :student_name, :main_advisor, :active, :co_advisor]
 
-    config.columns[:enrollment_number].includes = [:enrollment]
-    config.columns[:student_name].includes = [{:enrollment => :student}]
 
-    config.columns[:professor].clear_link
+    config.columns[:student_name].includes = [{:enrollment => :student}]
     config.columns[:active].search_sql = ""
     config.columns[:active].search_ui = :select
     config.columns[:co_advisor].search_sql = ""
@@ -30,7 +28,7 @@ class AdvisementsController < ApplicationController
     config.columns[:level].search_sql = "enrollments.level_id"
     config.columns[:level].search_ui = :select
 
-    config.list.columns = [:professor, :enrollment_number, :student_name, :main_advisor, :active, :co_advisor]
+    config.list.columns = [:professor, :enrollment, :main_advisor, :active, :co_advisor]
     config.columns[:professor].sort_by :sql => "professors.name"
     config.columns[:enrollment_number].sort_by :sql => "enrollments.enrollment_number"
     config.columns[:active].sort_by :method => "active_order"
