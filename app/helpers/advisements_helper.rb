@@ -16,7 +16,7 @@ module AdvisementsHelper
   def level_search_column(record,options)
     levels = [["Todos",nil]]
     levels += Level.all.map { |level| [level.name,level.id]}
-    select(record, :level, levels, options,options)
+    select_tag("#{options[:name]}", options_for_select(levels))
   end
 
   def professor_form_column(record, options)
