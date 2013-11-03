@@ -83,4 +83,25 @@ module PdfHelper
     end
 
   end
+
+  def text_table(pdf, data_table, default_margin_indent)
+    index = 0
+    rows = data_table.collect { |row| "" }
+    while true do
+      column = data_table.collect { |row| row[index] }
+      break if column.all? { |field| field.nil? }
+      size = column.max_by { |field| field.to_s.size }.size
+      column.each_with_index do |field, i| 
+        rows[i] += field.to_s + (" "*(size - field.to_s.size))
+      end
+      index += 1
+    end
+
+    rows.each do |row|
+      pdf.move_down default_margin_indent
+    
+      pdf.text(row) 
+    end
+  end
+
 end

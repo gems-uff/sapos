@@ -40,60 +40,36 @@ module EnrollmentsPdfHelper
     current_x = x
 
     pdf.font('Courier', :size => 9) do
-      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 100) do
+      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 120) do
         pdf.stroke_bounds
 
-
-        first_colummn_labels_sizes = [
-            I18n.t('pdf_content.enrollment.header.student_name').size,
-            I18n.t('pdf_content.enrollment.header.enrollment_number').size,
-            I18n.t('pdf_content.enrollment.header.student_identity_number').size,
-            I18n.t('pdf_content.enrollment.header.student_cpf').size
+        data_table = [
+          [
+            "#{I18n.t('pdf_content.enrollment.header.student_name')}: ",
+            enrollment.student.name
+          ], [
+            "#{I18n.t('pdf_content.enrollment.header.enrollment_number')}: ",
+            "#{enrollment.enrollment_number}   ",
+            "#{I18n.t('pdf_content.enrollment.header.student_birthdate')}: ",
+            "#{rescue_blank_text(enrollment.student.birthdate)}"
+          ], [
+            "#{I18n.t('pdf_content.enrollment.header.student_birthplace')}: ",
+            "#{rescue_blank_text([enrollment.student.birthplace, enrollment.student.country], {:method_call => :name})}"
+          ], [
+            "#{I18n.t('pdf_content.enrollment.header.student_identity_number')}: ", 
+            "#{rescue_blank_text(enrollment.student.identity_number)}   ",
+            "#{I18n.t('pdf_content.enrollment.header.identity_issuing_body')}: ",
+            "#{rescue_blank_text(enrollment.student.identity_issuing_body)}"
+          ], [
+            "#{I18n.t('pdf_content.enrollment.header.student_cpf')}: ",
+            "#{rescue_blank_text(enrollment.student.cpf)}"
+          ]
         ]
 
-        first_column_text_x = first_colummn_labels_sizes.sort.last*font_width + default_margin_x/3
-
-        pdf.move_down default_margin
-        pdf.draw_text("#{I18n.t('pdf_content.enrollment.header.student_name')}:", :at => [current_x, pdf.cursor])
-        pdf.draw_text(enrollment.student.name, :at => [first_column_text_x, pdf.cursor])
-
-        enrollment_number_text = "#{enrollment.enrollment_number}"
-        student_identity_number_text = "#{rescue_blank_text(enrollment.student.identity_number)}"
-
-        first_column_size = [enrollment_number_text.size, student_identity_number_text.size, 12].max*font_width + default_margin_x
-
-        pdf.move_down default_margin
-        enrollment_number_label = "#{I18n.t('pdf_content.enrollment.header.enrollment_number')}:"
-        pdf.draw_text(enrollment_number_label, :at => [current_x, pdf.cursor])
+        pdf.indent(x) do
+          text_table(pdf, data_table, default_margin_indent)
+        end 
         
-        current_x = first_column_text_x
-        pdf.draw_text(enrollment_number_text, :at => [current_x, pdf.cursor])
-
-        current_x += first_column_size
-        student_birthplace_text = "#{I18n.t('pdf_content.enrollment.header.student_birthplace')}: #{rescue_blank_text(enrollment.student.birthplace, {:method_call => :name})}"
-        pdf.draw_text(student_birthplace_text, :at => [current_x, pdf.cursor])
-
-        current_x += student_birthplace_text.size*font_width + default_margin_x
-        pdf.draw_text("#{I18n.t('pdf_content.enrollment.header.student_birthdate')}: #{rescue_blank_text(enrollment.student.birthdate)}", :at => [current_x, pdf.cursor])
-        pdf.move_down default_margin
-        current_x = x
-
-        student_identity_number_label = "#{I18n.t('pdf_content.enrollment.header.student_identity_number')}:"
-        pdf.draw_text(student_identity_number_label, :at => [current_x, pdf.cursor])
-        
-        current_x = first_column_text_x
-        pdf.draw_text(student_identity_number_text, :at => [current_x, pdf.cursor])
-        current_x += first_column_size
-        identity_issuing_body = "#{I18n.t('pdf_content.enrollment.header.identity_issuing_body')}: #{rescue_blank_text(enrollment.student.identity_issuing_body)}"
-        pdf.draw_text(identity_issuing_body, :at => [current_x, pdf.cursor])
-        pdf.move_down default_margin
-        current_x = x
-
-        student_cpf_label = "#{I18n.t('pdf_content.enrollment.header.student_cpf')}:"
-        pdf.draw_text(student_cpf_label, :at => [current_x, pdf.cursor])
-        student_cpf_text = "#{rescue_blank_text(enrollment.student.cpf)}"
-        current_x = first_column_text_x
-        pdf.draw_text(student_cpf_text, :at => [current_x, pdf.cursor])
 
       end
 
@@ -117,7 +93,7 @@ module EnrollmentsPdfHelper
           pdf.text("#{I18n.t("pdf_content.enrollment.header.enrollment_admission_date")}: #{I18n.localize(enrollment.admission_date, :format => :monthyear2)}")
           pdf.move_down default_margin_indent
 
-          enrollment_dismissal_date_text = "#{I18n.t("pdf_content.enrollment.header.enrollment_dismissal_date")}:"
+          enrollment_dismissal_date_text = "#{I18n.t("pdf_content.enrollment.header.enrollment_dismissal_date")}: "
           enrollment_dismissal_date_text += enrollment.dismissal ? " #{"#{I18n.localize(enrollment.dismissal.date, :format => :monthyear2)}"}" : "--"
           enrollment_dismissal_reason_text = "#{I18n.t("pdf_content.enrollment.header.enrollment_dismissal_reason")}:"
           enrollment_dismissal_reason_text += enrollment.dismissal ? " #{enrollment.dismissal.dismissal_reason.name}" : "--"
