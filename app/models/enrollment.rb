@@ -131,7 +131,7 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-# TODO Alocate all methods to a helper.
+# TODO Alocate all methods bellow to a helper.
   def listed_advisors
     return "-" if self.advisements.empty? 
     
@@ -216,8 +216,8 @@ class Enrollment < ActiveRecord::Base
     body += "<thead>
               <tr>
                 <th>Data de Aprovação</td>
-                <th>Observação</td>
                 <th>Tipo de Prorrogação</td>
+                <th>Observação</td>
               </tr>
             </thead>"
     
@@ -229,8 +229,8 @@ class Enrollment < ActiveRecord::Base
 
       body += "<tr class=\"record #{tr_class}\">
                 <td>#{deferral.approval_date}</td>
-                <td>#{deferral.obs}</td>
                 <td>#{deferral.deferral_type.name}</td>
+                <td>#{deferral.obs}</td>
               </tr>"
     end
 
@@ -266,8 +266,8 @@ class Enrollment < ActiveRecord::Base
       body += "<tr class=\"record #{tr_class}\">
                 <td>#{scholarship.scholarship_number}</td>
                 <td>#{scholarship.start_date}</td>
-                <td>#{scholarship.end_date}</td>
                 <td>#{scholarship.scholarship_durations.where(:cancel_date => nil).empty? ? "-" : scholarship.scholarship_durations.where(:cancel_date => nil).last.end_date}</td>
+                <td>#{scholarship.end_date}</td>
                 <td>#{scholarship.obs}</td>
               </tr>"
     end
@@ -301,10 +301,12 @@ class Enrollment < ActiveRecord::Base
       count += 1
       tr_class = count.even? ? "even-record" : ""
 
+      grade = (class_enrollment.grade / 10.0) rescue 0
+
       body += "<tr class=\"record #{tr_class}\">
-                <td>#{class_enrollment.course_class_id}</td>
+                <td>#{class_enrollment.course_class.name}</td>
                 <td>#{class_enrollment.situation}</td>
-                <td>#{class_enrollment.grade}</td>"
+                <td>#{grade}</td>"
 
       if class_enrollment.attendance_to_label == "N"                                                                                       
         body += "<td>Sim</td>"
