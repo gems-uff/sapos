@@ -586,6 +586,12 @@ pt-BR:
     license: "Arquivo de Licensa"
 
   helpers:
+    city_widget:
+      select_city: "Selecione a cidade"
+      select_country: "Selecione o país"
+      select_state: "Selecione o estado"
+
+
     select:
       prompt: "Por favor selecione"
 

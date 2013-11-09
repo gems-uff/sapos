@@ -74,10 +74,12 @@ Sapos::Application.routes.draw do
 
   resources :states do
     as_routes
+    get 'cities', on: :member
   end
 
   resources :countries do
     as_routes
+    get 'states', on: :member
   end
 
   resources :users do

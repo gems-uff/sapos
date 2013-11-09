@@ -17,6 +17,10 @@
 //= require_tree .
 
 
+var I18nExitConfirmation = 'Existem campos preenchidos! Você pode perder suas alterações!';
+var I18nSelectState = "Selecione o estado";
+var I18nSelectCity = "Selecione a cidade";
+
 function areInputsFilled(selector) {
 	var filled = false;
 	$(selector).each(function() {
@@ -28,12 +32,46 @@ function areInputsFilled(selector) {
 	return filled;
 }
 
-function confirmOnPageExit(){
+function confirmOnPageExit() {
 	if (areInputsFilled('.as_form.update input[type=text], .as_form.create input[type=text]')) {
-		return 'Existem campos preenchidos! Você pode perder suas alterações!';
+		return I18nExitConfirmation;
 	}
+}
+
+
+function replaceList(url, domElement, defaultText, done) {
+	$(domElement).siblings(".loading-indicator").css('visibility', 'visible');
+	$.getJSON(url, function (json) {
+		stateList = "<option value>"+defaultText+"</option>"
+	    $.each(json, function (i, tuple) {
+	        stateList += "<option value=\""+ tuple[1] +"\">" + tuple[0] + "</option>";
+	    });
+	    $(domElement).html(stateList);
+	    done();
+	    $(domElement).siblings(".loading-indicator").css('visibility', 'hidden');
+	});
+}
+
+function cityWidget() {
+	$('#main_content').on('change', '.city_widget_country', function() {
+		countryId = this.value;
+		stateDomId = $(this).data("state-dom-id");
+		cityDomId = $(this).data("city-dom-id");
+		url = $(this).data("access-url").replace("*", countryId);
+		replaceList(url, stateDomId, I18nSelectState, function() {
+			$(cityDomId).html("<option value>"+I18nSelectCity+"</option>");
+		});		
+	});
+
+	$('#main_content').on('change', '.city_widget_state', function() {
+		stateId = this.value;
+		cityDomId = $(this).data("city-dom-id");
+		url = $(this).data("access-url").replace("*", stateId);
+		replaceList(url, cityDomId, I18nSelectCity, function() {});		
+	});
 }
 
 $(document).ready(function(){
 	window.onbeforeunload = confirmOnPageExit;
+	cityWidget();
 });
