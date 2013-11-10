@@ -173,4 +173,195 @@ module EnrollmentsHelper
       super
     end
   end
+
+  def enrollment_advisements_show_column(record, column)
+    return "-" if record.advisements.empty? 
+    
+    body = ""
+    count = 0
+
+    body += "<table class=\"listed-records-table\">"
+    
+    body += "<thead>
+              <tr>
+                <th>Nome do Orientador</td>
+                <th>Matrícula do Orientador</td>
+              </tr>
+            </thead>"
+            
+    body += "<tbody class=\"records\">"
+
+    record.advisements.each do |advisement|
+      count += 1
+      tr_class = count.even? ? "even-record" : ""
+
+      if advisement.main_advisor
+        body += "<tr class=\"record #{tr_class}\">
+                  <td><strong>#{advisement.professor.name}</strong></td>
+                  <td><strong>#{advisement.professor.enrollment_number}</strong></td>
+                </tr>"
+      else
+        body += "<tr class=\"record #{tr_class}\">
+                  <td>#{advisement.professor.name}</td>
+                  <td>#{advisement.professor.enrollment_number}</td>
+                </tr>"
+      end
+    end
+
+    body += "</tbody>"
+    body += "</table>"
+    body.html_safe
+  end
+
+  def enrollment_accomplishments_show_column(record, column)
+    return "-" if record.accomplishments.empty?
+
+    body = ""
+    count = 0
+
+    body += "<table class=\"listed-records-table\">"
+    
+    body += "<thead>
+              <tr>
+                <th>Etapa</td>
+                <th>Data de Conclusão</td>
+                <th>Observação</td>
+              </tr>
+            </thead>"
+            
+    body += "<tbody class=\"records\">"
+
+    record.accomplishments.each do |accomplishment|
+      count += 1
+      tr_class = count.even? ? "even-record" : ""
+
+      body += "<tr class=\"record #{tr_class}\">
+                <td>#{accomplishment.phase.name}</td>
+                <td>#{accomplishment.conclusion_date}</td>
+                <td>#{accomplishment.obs}</td>
+              </tr>"
+    end
+
+    body += "</tbody>"
+    body += "</table>"
+    body.html_safe
+  end
+
+  def enrollment_deferrals_show_column(record, column)
+    return "-" if record.deferrals.empty?
+    
+    body = ""
+    count = 0
+
+    body += "<table class=\"listed-records-table\">"
+    
+    body += "<thead>
+              <tr>
+                <th>Data de Aprovação</td>
+                <th>Tipo de Prorrogação</td>
+                <th>Observação</td>
+              </tr>
+            </thead>"
+    
+    body += "<tbody class=\"records\">"
+
+    record.deferrals.each do |deferral|
+      count += 1
+      tr_class = count.even? ? "even-record" : ""
+
+      body += "<tr class=\"record #{tr_class}\">
+                <td>#{deferral.approval_date}</td>
+                <td>#{deferral.deferral_type.name}</td>
+                <td>#{deferral.obs}</td>
+              </tr>"
+    end
+
+    body += "</tbody>"
+    body += "</table>"
+    body.html_safe
+  end
+
+  def enrollment_scholarship_durations_show_column(record, column)
+        return "-" if record.scholarships.empty?
+    
+    body = ""
+    count = 0
+
+    body += "<table class=\"listed-records-table\">"
+    
+    body += "<thead>
+              <tr>
+                <th>Número da Bolsa</td>
+                <th>Data de início</td>
+                <th>Data limite de concessão</td>
+                <th>Data de encerramento</td>
+                <th>Observação</td>
+              </tr>
+            </thead>"
+
+    body += "<tbody class=\"records\">"
+            
+    record.scholarships.each do |scholarship|
+      count += 1
+      tr_class = count.even? ? "even-record" : ""
+
+      body += "<tr class=\"record #{tr_class}\">
+                <td>#{scholarship.scholarship_number}</td>
+                <td>#{scholarship.start_date}</td>
+                <td>#{scholarship.scholarship_durations.where(:cancel_date => nil).empty? ? "-" : scholarship.scholarship_durations.where(:cancel_date => nil).last.end_date}</td>
+                <td>#{scholarship.end_date}</td>
+                <td>#{scholarship.obs}</td>
+              </tr>"
+    end
+
+    body += "</tbody>"
+    body += "</table>"
+    body.html_safe
+  end
+
+  def enrollment_class_enrollments_show_column(record, column)
+    return "-" if record.class_enrollments.empty?
+    
+    body = ""
+    count = 0
+
+    body += "<table class=\"listed-records-table\">"
+    
+    body += "<thead>
+              <tr>
+                <th>Turma</td>
+                <th>Situação</td>
+                <th>Nota</td>
+                <th>Reprovado por falta</td>
+                <th>Observação</td>
+              </tr>
+            </thead>"
+            
+    body += "<tbody class=\"records\">"
+
+    record.class_enrollments.each do |class_enrollment|
+      count += 1
+      tr_class = count.even? ? "even-record" : ""
+
+      grade = (class_enrollment.grade / 10.0) rescue 0
+
+      body += "<tr class=\"record #{tr_class}\">
+                <td>#{class_enrollment.course_class.name}</td>
+                <td>#{class_enrollment.situation}</td>
+                <td>#{grade}</td>"
+
+      if class_enrollment.attendance_to_label == "N"                                                                                       
+        body += "<td>Sim</td>"
+      else
+        body += "<td>Não</td>"
+      end
+
+      body += "<td>#{class_enrollment.obs}</td>
+             </tr>"
+    end
+
+    body += "</tbody>"
+    body += "</table>"
+    body.html_safe
+  end
 end
