@@ -140,6 +140,18 @@ module EnrollmentsHelper
     select_date record[:admission_date], options.merge(local_options)
   end
 
+  def level_form_column(record, options)
+    puts record.dismissal
+    puts record.accomplishments
+    puts record.deferrals
+    if record.dismissal or record.accomplishments.count > 0 or record.deferrals.count > 0
+      if record.level
+        return record.level.name
+      end
+    end
+    select :record, :level, options_for_select(Level.all.map {|level| [level.name, level.id]})
+  end
+
 #  TODO , quando se edita uma matrícula, esta retorna todas as Realizações de etapa que o nível da matrícula
 #  porém o evento de on change do select de nível não está sendo possível por causa do javascript (pesquisar mais a fundo)
 #  métodos envolvidos "active_scaffold.js" -> render_form_field & replace_html
