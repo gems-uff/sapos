@@ -4,6 +4,9 @@
 require "spec_helper"
 
 describe DeferralType do
+  it { should be_able_to_be_destroyed }
+  it { should restrict_destroy_when_exists :deferral }
+
   let(:deferral_type) { DeferralType.new }
   subject { deferral_type }
   describe "Validations" do

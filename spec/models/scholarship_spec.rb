@@ -4,6 +4,9 @@
 require "spec_helper"
 
 describe Scholarship do
+  it { should be_able_to_be_destroyed }
+  it { should destroy_dependent :scholarship_duration }
+
   let(:scholarship) { Scholarship.new }
   subject { scholarship }
   describe "Validations" do

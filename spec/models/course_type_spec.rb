@@ -4,6 +4,9 @@
 require "spec_helper"
 
 describe CourseType do
+  it { should be_able_to_be_destroyed }
+  it { should restrict_destroy_when_exists :course }
+  
   let(:course_type) { CourseType.new }
   subject { course_type }
   describe "Validations" do

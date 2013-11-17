@@ -5,6 +5,7 @@ class Course < ActiveRecord::Base
   attr_accessible :name
   belongs_to :research_area
   belongs_to :course_type
+  has_many :course_classes, :dependent => :restrict
 
   has_paper_trail
 

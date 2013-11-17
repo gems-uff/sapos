@@ -3,8 +3,7 @@
 
 class Country < ActiveRecord::Base
   attr_accessible :name
-  has_many :state
-
+  has_many :state, :dependent => :restrict
   has_paper_trail
   
   validates :name, :presence => true, :uniqueness => true
@@ -12,4 +11,5 @@ class Country < ActiveRecord::Base
   def to_label
   	"#{self.name}"
   end
+
 end

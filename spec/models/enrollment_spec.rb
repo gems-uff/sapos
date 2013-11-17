@@ -5,6 +5,14 @@ require "spec_helper"
 require "debugger"
 
 describe Enrollment do
+  it { should be_able_to_be_destroyed }
+  it { should destroy_dependent :accomplishment }
+  it { should destroy_dependent :advisement }
+  it { should destroy_dependent :class_enrollment }
+  it { should destroy_dependent :deferral }
+  it { should destroy_dependent :dismissal }
+  it { should destroy_dependent :scholarship_duration }
+
   let(:enrollment) { Enrollment.new }
   subject { enrollment }
   describe "Validations" do

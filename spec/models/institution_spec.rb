@@ -4,6 +4,9 @@
 require "spec_helper"
 
 describe Institution do
+  it { should be_able_to_be_destroyed }
+  it { should destroy_dependent :major }
+
   let(:institution) { Institution.new }
   subject { institution }
   describe "Validations" do

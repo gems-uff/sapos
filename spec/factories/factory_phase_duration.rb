@@ -9,6 +9,6 @@ FactoryGirl.define do
     level
     deadline_semesters 0
     deadline_months 0
-    deadline_days 0
+    deadline_days 1
   end
 end

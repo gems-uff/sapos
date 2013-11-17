@@ -7,7 +7,12 @@ class Level < ActiveRecord::Base
   has_paper_trail
 
   has_many :advisement_authorizations, :dependent => :destroy
-  has_many :enrollments
+  has_many :enrollments, :dependent => :restrict
+  has_many :majors, :dependent => :restrict
+  has_many :phase_durations, :dependent => :restrict
+  has_many :scholarships, :dependent => :restrict
+
+
   validates :name, :presence => true, :uniqueness => true
 
   def to_label

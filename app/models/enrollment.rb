@@ -7,13 +7,15 @@ class Enrollment < ActiveRecord::Base
   belongs_to :student
   belongs_to :level
   belongs_to :enrollment_status
+
+  has_many :professors, :through => :advisements, :readonly => false
+  has_many :scholarships, :through => :scholarship_durations
+  has_many :phases, :through => :accomplishments
+
   has_one :dismissal, :dependent => :destroy
   has_many :advisements, :dependent => :destroy
-  has_many :professors, :through => :advisements, :readonly => false
   has_many :scholarship_durations, :dependent => :destroy
-  has_many :scholarships, :through => :scholarship_durations
   has_many :accomplishments, :dependent => :destroy
-  has_many :phases, :through => :accomplishments
   has_many :deferrals, :dependent => :destroy
   has_many :class_enrollments, :dependent => :destroy
 

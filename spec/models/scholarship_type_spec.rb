@@ -4,6 +4,9 @@
 require "spec_helper"
 
 describe ScholarshipType do
+  it { should be_able_to_be_destroyed }
+  it { should restrict_destroy_when_exists :scholarship }
+
   let(:scholarship_type) { ScholarshipType.new }
   subject { scholarship_type }
   describe "Validations" do

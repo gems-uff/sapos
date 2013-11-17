@@ -4,6 +4,7 @@
 class City < ActiveRecord::Base
   attr_accessible :name, :state
   belongs_to :state
+  has_many :students, :dependent => :restrict
 
   has_paper_trail
 

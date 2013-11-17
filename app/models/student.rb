@@ -3,18 +3,17 @@
 
 class Student < ActiveRecord::Base
   attr_accessible :name
+
   has_many :majors, :through => :student_majors
+
   has_many :student_majors, :dependent => :destroy
+  #delete cascade for enrollment -- when a student is deleted, so are his enrollments
+  has_many :enrollments, :dependent => :destroy
     
-  belongs_to :birthplace, :foreign_key => "state_id", :class_name => "State"
   belongs_to :state
-  
   belongs_to :country
   belongs_to :city
   
-  #delete cascade for enrollment -- when a student is deleted, so are his enrollments
-  has_many :enrollments, :dependent => :destroy
-
   has_paper_trail  
    
   validates :name, :presence => true

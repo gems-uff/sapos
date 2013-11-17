@@ -4,7 +4,8 @@
 class State < ActiveRecord::Base
   attr_accessible :name, :code, :country
   belongs_to :country
-  has_many :cities
+  has_many :cities, :dependent => :restrict
+  has_many :students, :dependent => :restrict
 
   has_paper_trail
   

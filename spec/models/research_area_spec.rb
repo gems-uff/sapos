@@ -4,6 +4,10 @@
 require "spec_helper"
 
 describe ResearchArea do
+  it { should be_able_to_be_destroyed }
+  it { should restrict_destroy_when_exists :course }
+  it { should destroy_dependent :professor_research_area }
+  
   let(:research_area) { ResearchArea.new }
   subject { research_area }
   describe "Validations" do

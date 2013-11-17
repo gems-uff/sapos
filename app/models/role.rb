@@ -3,6 +3,8 @@
 
 class Role < ActiveRecord::Base
 
+  has_many :users, :dependent => :restrict
+
   ROLE_DESCONHECIDO = 1
   ROLE_COORDENACAO = 2
   ROLE_SECRETARIA = 3

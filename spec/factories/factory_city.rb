@@ -4,13 +4,10 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
 FactoryGirl.define do
-  factory :deferral_type do
-    phase
-    sequence :name do |i|
-      "DeferralType_#{i}"
+  factory :city do
+    sequence :name do |name|
+      "City_#{name}"
     end
-    duration_semesters 0
-    duration_months 0
-    duration_days 1
+    state
   end
 end

@@ -54,7 +54,7 @@ module EnrollmentsPdfHelper
             "#{rescue_blank_text(enrollment.student.birthdate)}"
           ], [
             "#{I18n.t('pdf_content.enrollment.header.student_birthplace')}: ",
-            "#{rescue_blank_text([enrollment.student.birthplace, enrollment.student.country], {:method_call => :name})}"
+            "#{rescue_blank_text([enrollment.student.state, enrollment.student.country], {:method_call => :name})}"
           ], [
             "#{I18n.t('pdf_content.enrollment.header.student_identity_number')}: ", 
             "#{rescue_blank_text(enrollment.student.identity_number)}   ",
