@@ -14,8 +14,8 @@ class StudentsController < ApplicationController
     config.update.label = :update_student_label
 
 #    config.columns[:birthdate].form_ui = :calendar_date_select         
-    config.columns[:country].form_ui = :select
-    config.columns[:state].form_ui = :select
+    config.columns[:birth_city].form_ui = :select
+    config.columns[:birth_state].form_ui = :hidden
     config.columns[:city].form_ui = :select
     config.columns[:civil_status].form_ui = :select
     #config.columns[:majors].form_ui = :record_select
@@ -44,8 +44,8 @@ class StudentsController < ApplicationController
          :identity_number,
          :identity_issuing_body,
          :identity_expedition_date,
-         :country,
-         :state,
+         :birth_state,
+         :birth_city,
          :father_name,
          :mother_name,
          :obs,

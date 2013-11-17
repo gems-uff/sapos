@@ -63,5 +63,43 @@ describe Student do
         student.enrollments_number.should == "M123, D234"
       end
     end
+
+    describe "birthplace" do
+      it "should return city, state, country, when birth_city is specified" do
+        city = FactoryGirl.create(:city)
+        student = FactoryGirl.create(:student, :birth_city => city)
+        student.birthplace.should == "#{city.name}, #{city.state.name}, #{city.state.country.name}"
+      end
+      it "should return city, state, country, when birth_city is not specified" do
+        state = FactoryGirl.create(:state)
+        student = FactoryGirl.create(:student, :birth_state => state)
+        student.birthplace.should == "#{state.name}, #{state.country.name}"
+      end
+      it "should return nil when neither birth_city and birth_state are specified" do
+        student = FactoryGirl.create(:student)
+        student.birthplace.should be_nil
+      end
+    end
+  end
+  describe "Before save" do
+    it "should set the birth_state when birth_city is filled" do
+      birth_city = FactoryGirl.create(:city)
+      birth_state = FactoryGirl.create(:state)
+      student = FactoryGirl.build(:student, :birth_state => birth_state, :birth_city => nil)
+      student.birth_city = birth_city
+      student.birth_state.should == birth_state
+
+      student.save
+      student.birth_state.should == birth_city.state
+      student.birth_state.should_not == birth_state
+    end
+
+    it "should not set the birth_state when birth_city is not filled" do
+      birth_state = FactoryGirl.create(:state)
+      student = FactoryGirl.build(:student, :birth_state => birth_state, :birth_city => nil)
+      student.birth_state.should == birth_state
+      student.save
+      student.birth_state.should == birth_state
+    end
   end
 end

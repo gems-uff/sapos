@@ -5,8 +5,8 @@ require "spec_helper"
 
 describe State do
   it { should be_able_to_be_destroyed }
-  it { should restrict_destroy_when_exists :student, with_fk: :state_id }
-  it { should restrict_destroy_when_exists :city, with_fk: :state_id }
+  it { should restrict_destroy_when_exists(:student).with_fk :birth_state_id }
+  it { should restrict_destroy_when_exists(:city).with_fk :state_id }
 
   let(:state) { State.new }
   subject { state }

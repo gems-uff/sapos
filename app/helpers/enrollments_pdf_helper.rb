@@ -45,23 +45,23 @@ module EnrollmentsPdfHelper
 
         data_table = [
           [
-            "#{I18n.t('pdf_content.enrollment.header.student_name')}: ",
+            "#{I18n.t('pdf_content.enrollment.header.student_name')}: " +
             enrollment.student.name
           ], [
-            "#{I18n.t('pdf_content.enrollment.header.enrollment_number')}: ",
+            "#{I18n.t('pdf_content.enrollment.header.enrollment_number')}: " +
             "#{enrollment.enrollment_number}   ",
-            "#{I18n.t('pdf_content.enrollment.header.student_birthdate')}: ",
+            "#{I18n.t('pdf_content.enrollment.header.student_birthdate')}: " +
             "#{rescue_blank_text(enrollment.student.birthdate)}"
           ], [
-            "#{I18n.t('pdf_content.enrollment.header.student_birthplace')}: ",
-            "#{rescue_blank_text([enrollment.student.state, enrollment.student.country], {:method_call => :name})}"
+            "#{I18n.t('pdf_content.enrollment.header.student_birthplace')}: " +
+            "#{rescue_blank_text(enrollment.student.birthplace)}"
           ], [
-            "#{I18n.t('pdf_content.enrollment.header.student_identity_number')}: ", 
-            "#{rescue_blank_text(enrollment.student.identity_number)}   ",
-            "#{I18n.t('pdf_content.enrollment.header.identity_issuing_body')}: ",
+            "#{I18n.t('pdf_content.enrollment.header.student_identity_number')}: " +
+            "#{rescue_blank_text(enrollment.student.identity_number)}  ",
+            "#{I18n.t('pdf_content.enrollment.header.identity_issuing_body')}: " +
             "#{rescue_blank_text(enrollment.student.identity_issuing_body)}"
           ], [
-            "#{I18n.t('pdf_content.enrollment.header.student_cpf')}: ",
+            "#{I18n.t('pdf_content.enrollment.header.student_cpf')}: " +
             "#{rescue_blank_text(enrollment.student.cpf)}"
           ]
         ]

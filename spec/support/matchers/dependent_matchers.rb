@@ -38,7 +38,6 @@ RSpec::Matchers.define :restrict_destroy_when_exists do |dependent_class|
   match do |actual|
     name = actual.class.name.underscore
     @fk = (name + '_id').to_sym if @fk.nil? 
-
     restrict_success = true
 
     obj = FactoryGirl.create(name.to_sym)

@@ -90,9 +90,11 @@ module PdfHelper
     while true do
       column = data_table.collect { |row| row[index] }
       break if column.all? { |field| field.nil? }
-      size = column.max_by { |field| field.to_s.size }.size
+      column_size = data_table.collect { |row| row[index + 1].nil? ? "" : row[index] }
+      size = column_size.max_by { |field| field.to_s.size }.size
       column.each_with_index do |field, i| 
-        rows[i] += field.to_s + (" "*(size - field.to_s.size))
+        spaces = size >= field.to_s.size ? (" "*(size - field.to_s.size)) : ""
+        rows[i] += field.to_s + spaces
       end
       index += 1
     end

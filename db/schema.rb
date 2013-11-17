@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131110185739) do
+ActiveRecord::Schema.define(:version => 20131117194058) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -362,14 +362,12 @@ ActiveRecord::Schema.define(:version => 20131110185739) do
     t.string   "civil_status"
     t.string   "father_name"
     t.string   "mother_name"
-    t.integer  "country_id"
-    t.integer  "birthplace"
     t.string   "identity_number"
     t.string   "identity_issuing_body"
     t.date     "identity_expedition_date"
     t.string   "employer"
     t.string   "job_position"
-    t.integer  "state_id"
+    t.integer  "birth_state_id"
     t.integer  "city_id"
     t.string   "neighbourhood"
     t.string   "zip_code"
@@ -377,11 +375,12 @@ ActiveRecord::Schema.define(:version => 20131110185739) do
     t.string   "telephone1"
     t.string   "telephone2"
     t.string   "email"
+    t.integer  "birth_city_id"
   end
 
+  add_index "students", ["birth_city_id"], :name => "index_students_on_birth_city_id"
+  add_index "students", ["birth_state_id"], :name => "index_students_on_state_id"
   add_index "students", ["city_id"], :name => "index_students_on_city_id"
-  add_index "students", ["country_id"], :name => "index_students_on_country_id"
-  add_index "students", ["state_id"], :name => "index_students_on_state_id"
 
   create_table "users", :force => true do |t|
     t.string   "name"
