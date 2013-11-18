@@ -193,6 +193,7 @@ pt-BR:
         enrollments: "Orientandos"
         identity_expedition_date: "Data de expedição da Identidade"
         identity_issuing_body: "Órgão Expeditor"
+        identity_issuing_place: "Local de Expedição"
         identity_number: "Número da identidade"
         name: "Nome"
         neighborhood: "Bairro"
