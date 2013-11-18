@@ -95,6 +95,7 @@ module ApplicationHelper
         show_text = false if s.name == options[:text]
         [s.name, s.name]
       end
+      show_text = false if options[:text].empty?
 
       html += select_tag(
         "record[#{options[:select_field]}]", 

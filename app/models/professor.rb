@@ -2,7 +2,10 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Professor < ActiveRecord::Base
-  attr_accessible :name
+  attr_accessible :name, :cpf, :birthdate, :sex, :civil_status, :identity_number,
+  :identity_issuing_body, :identity_expedition_date, :identity_issuing_place,
+  :neighborhood, :address, :zip_code, :telephone1, :telephone2, :siape, :enrollment_number
+  
   has_many :advisements, :dependent => :destroy
   has_many :enrollments, :through => :advisements
   has_many :scholarships, :dependent => :destroy
@@ -10,6 +13,8 @@ class Professor < ActiveRecord::Base
   has_many :research_areas, :through => :professor_research_areas
   has_many :professor_research_areas, :dependent => :destroy
   has_many :course_classes, :dependent => :restrict
+
+  belongs_to :city
 
   has_paper_trail
 

@@ -18,8 +18,7 @@
 
 
 var I18nExitConfirmation = 'Existem campos preenchidos! Você pode perder suas alterações!';
-var I18nSelectState = "Selecione o estado";
-var I18nSelectCity = "Selecione a cidade";
+
 
 function areInputsFilled(selector) {
 	var filled = false;

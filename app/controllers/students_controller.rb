@@ -34,7 +34,7 @@ class StudentsController < ApplicationController
          :civil_status,
          :birthdate,
          :city,
-         :neighbourhood,
+         :neighborhood,
          :address,
          :zip_code,
          :telephone1,

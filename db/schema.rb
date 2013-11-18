@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131117214103) do
+ActiveRecord::Schema.define(:version => 20131118002820) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -261,19 +261,18 @@ ActiveRecord::Schema.define(:version => 20131117214103) do
     t.string   "identity_number"
     t.string   "identity_issuing_body"
     t.string   "identity_expedition_date"
-    t.string   "neighbourhood"
+    t.string   "neighborhood"
     t.string   "address"
-    t.integer  "state_id"
     t.integer  "city_id"
     t.string   "zip_code"
     t.string   "telephone1"
     t.string   "telephone2"
     t.string   "siape"
     t.string   "enrollment_number"
+    t.string   "identity_issuing_place"
   end
 
   add_index "professors", ["city_id"], :name => "index_professors_on_city_id"
-  add_index "professors", ["state_id"], :name => "index_professors_on_state_id"
 
   create_table "research_areas", :force => true do |t|
     t.string   "name"
@@ -369,7 +368,7 @@ ActiveRecord::Schema.define(:version => 20131117214103) do
     t.string   "job_position"
     t.integer  "birth_state_id"
     t.integer  "city_id"
-    t.string   "neighbourhood"
+    t.string   "neighborhood"
     t.string   "zip_code"
     t.string   "address"
     t.string   "telephone1"
