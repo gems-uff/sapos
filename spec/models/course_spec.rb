@@ -82,5 +82,45 @@ describe Course do
         end
       end
     end
+    describe "workload" do
+      context "should be valid when" do
+        it "workload is not null" do
+          course.workload = 10
+          course.should have(0).errors_on :workload
+        end
+      end
+      context "should have error blank when" do
+        it "workload is null" do
+          course.workload = nil
+          course.should have_error(:blank).on :workload
+        end
+      end
+    end
+  end
+  describe "Methods" do
+    context "workload_value" do
+      it "should return 0 when there is no workload" do
+        course.workload = nil
+        course.workload_value.should == 0
+      end
+
+      it "should return 5 when workload is 5" do
+        course.workload = 5
+        course.workload_value.should == 5
+      end
+    end
+
+    context "workload_text" do
+      it "should return N/A when there is no workload" do
+        course.workload = nil
+        course.workload_text.should == I18n.translate('activerecord.attributes.course.empty_workload')
+      end
+
+      it "should return 5h when workload is 5" do
+        course.workload = 5
+        course.workload_text.should == I18n.translate('activerecord.attributes.course.workload_time', :time => 5)
+      end
+    end
+
   end
 end

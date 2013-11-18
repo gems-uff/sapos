@@ -106,13 +106,14 @@ module EnrollmentsPdfHelper
 
   def transcript_table(pdf, options={})
     class_enrollments ||= options[:class_enrollments]
-    table_width = [68, 65, 314, 60, 65]
+    table_width = [58, 55, 249, 50, 65, 95]
 
     header = [["<b>#{I18n.t("pdf_content.enrollment.grade_list.course_year_semester")}</b>",
                "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_code")}</b>",
                "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_name")}</b>",
                "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_grade")}</b>",
-               "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_credits")}</b>"
+               "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_credits")}</b>",
+               "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_workload")}</b>"
               ]]
 
     pdf.table(header, :column_widths => table_width,
@@ -132,7 +133,8 @@ module EnrollmentsPdfHelper
             class_enrollment.course_class.course.code,
             class_enrollment.course_class.course.name,
             class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : I18n.t("pdf_content.enrollment.grade_list.course_approved"),
-            class_enrollment.course_class.course.credits
+            class_enrollment.course_class.course.credits,
+            class_enrollment.course_class.course.workload_text
         ]
       end
 
@@ -149,7 +151,14 @@ module EnrollmentsPdfHelper
       end      
     end
 
-    footer = [["", "", "<b>#{I18n.t('pdf_content.enrollment.academic_transcript.total_credits')}</b>", "", class_enrollments.joins({:course_class => :course}).sum(:credits).to_i]]
+    footer = [[
+      "", 
+      "", 
+      "<b>#{I18n.t('pdf_content.enrollment.academic_transcript.total_credits')}</b>", 
+      "", 
+      class_enrollments.joins({:course_class => :course}).sum(:credits).to_i, 
+      I18n.translate('activerecord.attributes.course.workload_time', :time => class_enrollments.joins({:course_class => :course}).sum(:workload).to_i)
+    ]]
     pdf.table(footer, :column_widths => table_width,
               :row_colors => ["BFBFBF"],
               :cell_style => {:font => "Courier",

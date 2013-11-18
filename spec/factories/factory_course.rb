@@ -13,5 +13,6 @@ FactoryGirl.define do
       "#{code}"
     end
     credits 10
+    workload 68
   end
 end

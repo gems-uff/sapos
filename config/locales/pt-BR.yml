@@ -89,6 +89,10 @@ pt-BR:
         credits: "Créditos"
         name: "Nome"
         research_area: "Área de Pesquisa"
+        workload: "Carga Horária"
+        empty_workload: "N/A"
+        workload_time: "%{time}h"
+        workload_text: "Carga Horária"
       course_class:
         allocations: "Alocações"
         class_enrollments: "Inscrições"
@@ -670,6 +674,7 @@ pt-BR:
         course_credits: "Créditos"
         course_grade: "Nota"
         course_name: "Nome da Disciplina"
+        course_workload: "Carga Horária"
         course_year_semester: "Período"
         situation: "Situação"
       footer:
