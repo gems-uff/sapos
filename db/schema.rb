@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131118002820) do
+ActiveRecord::Schema.define(:version => 20131118011141) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -190,6 +190,7 @@ ActiveRecord::Schema.define(:version => 20131118002820) do
     t.datetime "created_at",           :null => false
     t.datetime "updated_at",           :null => false
     t.string   "thesis_title"
+    t.date     "thesis_defense_date"
   end
 
   add_index "enrollments", ["enrollment_status_id"], :name => "index_enrollments_on_enrollment_status_id"

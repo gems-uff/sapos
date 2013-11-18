@@ -147,6 +147,7 @@ pt-BR:
         scholarships: "Números das Bolsas"
         student: "Nome do Aluno"
         thesis_title: "Título da Tese"
+        thesis_defense_date: "Data de Defesa"
         year_semester_label: "em"
         listed_advisors: "Orientadores"
         listed_accomplishments: "Realização de Etapas"
@@ -330,9 +331,12 @@ pt-BR:
           enrollment_and_deferral_uniqueness: "já possui esta prorrogação"
         deferral_type:
           blank_duration: "duração deve ser de pelo menos um dia"
+        dismissal:
+          date_before_enrollment_admission_date: "anterior a Data de Admissão"
         enrollment:
           main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
+          thesis_defense_date_before_admission_date: "anterior a Data de Admissão"
         scholarship:
           attributes:
             end_date:

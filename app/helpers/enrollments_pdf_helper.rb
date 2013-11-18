@@ -79,7 +79,9 @@ module EnrollmentsPdfHelper
 
       if not(enrollment.thesis_title.nil? or enrollment.thesis_title.empty?)
         has_thesis = true
-        thesis_label = "#{I18n.t("activerecord.attributes.enrollment.thesis_title")}: #{enrollment.thesis_title}"
+        thesis_label = 
+          "#{I18n.t("activerecord.attributes.enrollment.thesis_title")}: #{rescue_blank_text(enrollment.thesis_title)}\n\n" +
+          "#{I18n.t("activerecord.attributes.enrollment.thesis_defense_date")}: #{rescue_blank_text(enrollment.thesis_defense_date)}"
         height += pdf.height_of_formatted([{ text: thesis_label, :width => pdf.bounds.right - x }]) 
       end   
 

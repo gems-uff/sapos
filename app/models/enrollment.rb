@@ -3,7 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Enrollment < ActiveRecord::Base
-  attr_accessible :enrollment_number, :thesis_title
+  attr_accessible :enrollment_number, :admission_date, :obs, :thesis_title, 
+    :thesis_defense_date
   belongs_to :student
   belongs_to :level
   belongs_to :enrollment_status
@@ -27,6 +28,8 @@ class Enrollment < ActiveRecord::Base
   validates :student, :presence => true
 
   validate :enrollment_has_main_advisor
+
+  validates_date :thesis_defense_date, :on_or_after => :admission_date, :allow_nil => true, :on_or_after_message => I18n.t("activerecord.errors.models.enrollment.thesis_defense_date_before_admission_date")
 
   def to_label
     "#{enrollment_number} - #{student.name}"

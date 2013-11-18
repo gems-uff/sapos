@@ -38,14 +38,27 @@ describe Dismissal do
     describe "date" do
       context "should be valid when" do
         it "date is not null" do
+          dismissal.enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
+          dismissal.date = Date.today
+          dismissal.should have(0).errors_on :date
+        end
+        it "is after enrollment admission date" do
+          enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
+          dismissal.enrollment = enrollment
           dismissal.date = Date.today
           dismissal.should have(0).errors_on :date
         end
       end
-      context "should have error blank when" do
+      context "should have error when" do
         it "date is null" do
           dismissal.date = nil
           dismissal.should have_error(:blank).on :date
+        end
+        it "is before enrollment admission date" do
+          enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
+          dismissal.enrollment = enrollment
+          dismissal.date = 4.days.ago.to_date
+          dismissal.should have_error(:date_before_enrollment_admission_date).on :date
         end
       end
     end

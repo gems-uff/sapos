@@ -98,6 +98,22 @@ describe Enrollment do
         end
       end
     end
+    describe "thesis_defense_date" do
+      context "should be valid when" do
+        it "is after admission_date" do
+          enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
+          enrollment.thesis_defense_date = 3.days.from_now.to_date
+          enrollment.should have(0).errors_on :thesis_defense_date
+        end
+      end
+      context "should not be valid when" do
+        it "is before admission_date" do
+          enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
+          enrollment.thesis_defense_date = 4.days.ago.to_date
+          enrollment.should have_error(:thesis_defense_date_before_admission_date).on :thesis_defense_date
+        end
+      end
+    end
   end
   describe "Methods" do
     before(:all) do
