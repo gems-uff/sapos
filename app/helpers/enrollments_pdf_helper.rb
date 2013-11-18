@@ -40,70 +40,42 @@ module EnrollmentsPdfHelper
     current_x = x
 
     pdf.font('Courier', :size => 9) do
-      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 100) do
+      pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => 120) do
         pdf.stroke_bounds
 
-
-        first_colummn_labels_sizes = [
-            I18n.t('pdf_content.enrollment.header.student_name').size,
-            I18n.t('pdf_content.enrollment.header.enrollment_number').size,
-            I18n.t('pdf_content.enrollment.header.student_identity_number').size,
-            I18n.t('pdf_content.enrollment.header.student_cpf').size
+        data_table = [
+          [
+            "#{I18n.t('pdf_content.enrollment.header.student_name')}: " +
+            enrollment.student.name
+          ], [
+            "#{I18n.t('pdf_content.enrollment.header.enrollment_number')}: " +
+            "#{enrollment.enrollment_number}   ",
+            "#{I18n.t('pdf_content.enrollment.header.student_birthdate')}: " +
+            "#{rescue_blank_text(enrollment.student.birthdate)}"
+          ], [
+            "#{I18n.t('pdf_content.enrollment.header.student_birthplace')}: " +
+            "#{rescue_blank_text(enrollment.student.birthplace)}"
+          ], [
+            "#{I18n.t('pdf_content.enrollment.header.student_identity_number')}: " +
+            "#{rescue_blank_text(enrollment.student.identity_number)}  ",
+            "#{I18n.t('pdf_content.enrollment.header.identity_issuing_body')}: " +
+            "#{rescue_blank_text(enrollment.student.identity_issuing_body)}  ",
+            "#{I18n.t('pdf_content.enrollment.header.identity_issuing_place')}: " +
+            "#{rescue_blank_text(enrollment.student.identity_issuing_place)}"
+          ], [
+            "#{I18n.t('pdf_content.enrollment.header.student_cpf')}: " +
+            "#{rescue_blank_text(enrollment.student.cpf)}"
+          ]
         ]
 
-        first_column_text_x = first_colummn_labels_sizes.sort.last*font_width + default_margin_x/3
-
-        pdf.move_down default_margin
-        pdf.draw_text("#{I18n.t('pdf_content.enrollment.header.student_name')}:", :at => [current_x, pdf.cursor])
-        pdf.draw_text(enrollment.student.name, :at => [first_column_text_x, pdf.cursor])
-
-        enrollment_number_text = "#{enrollment.enrollment_number}"
-        student_identity_number_text = "#{rescue_blank_text(enrollment.student.identity_number)}"
-
-        first_column_size = [enrollment_number_text.size, student_identity_number_text.size, 12].max*font_width + default_margin_x
-
-        pdf.move_down default_margin
-        enrollment_number_label = "#{I18n.t('pdf_content.enrollment.header.enrollment_number')}:"
-        pdf.draw_text(enrollment_number_label, :at => [current_x, pdf.cursor])
+        pdf.indent(x) do
+          text_table(pdf, data_table, default_margin_indent)
+        end 
         
-        current_x = first_column_text_x
-        pdf.draw_text(enrollment_number_text, :at => [current_x, pdf.cursor])
-
-        current_x += first_column_size
-        student_birthplace_text = "#{I18n.t('pdf_content.enrollment.header.student_birthplace')}: #{rescue_blank_text(enrollment.student.birthplace, {:method_call => :name})}"
-        pdf.draw_text(student_birthplace_text, :at => [current_x, pdf.cursor])
-
-        current_x += student_birthplace_text.size*font_width + default_margin_x
-        pdf.draw_text("#{I18n.t('pdf_content.enrollment.header.student_birthdate')}: #{rescue_blank_text(enrollment.student.birthdate)}", :at => [current_x, pdf.cursor])
-        pdf.move_down default_margin
-        current_x = x
-
-        student_identity_number_label = "#{I18n.t('pdf_content.enrollment.header.student_identity_number')}:"
-        pdf.draw_text(student_identity_number_label, :at => [current_x, pdf.cursor])
-        
-        current_x = first_column_text_x
-        pdf.draw_text(student_identity_number_text, :at => [current_x, pdf.cursor])
-        current_x += first_column_size
-        identity_issuing_body = "#{I18n.t('pdf_content.enrollment.header.identity_issuing_body')}: #{rescue_blank_text(enrollment.student.identity_issuing_body)}"
-        pdf.draw_text(identity_issuing_body, :at => [current_x, pdf.cursor])
-        pdf.move_down default_margin
-        current_x = x
-
-        student_cpf_label = "#{I18n.t('pdf_content.enrollment.header.student_cpf')}:"
-        pdf.draw_text(student_cpf_label, :at => [current_x, pdf.cursor])
-        student_cpf_text = "#{rescue_blank_text(enrollment.student.cpf)}"
-        current_x = first_column_text_x
-        pdf.draw_text(student_cpf_text, :at => [current_x, pdf.cursor])
 
       end
 
       height = 80 
-
-      if not(enrollment.thesis_title.nil? or enrollment.thesis_title.empty?)
-        has_thesis = true
-        thesis_label = "#{I18n.t("activerecord.attributes.enrollment.thesis_title")}: #{enrollment.thesis_title}"
-        height += pdf.height_of_formatted([{ text: thesis_label, :width => pdf.bounds.right - x }]) 
-      end   
 
       pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => height) do
         pdf.stroke_bounds
@@ -117,7 +89,7 @@ module EnrollmentsPdfHelper
           pdf.text("#{I18n.t("pdf_content.enrollment.header.enrollment_admission_date")}: #{I18n.localize(enrollment.admission_date, :format => :monthyear2)}")
           pdf.move_down default_margin_indent
 
-          enrollment_dismissal_date_text = "#{I18n.t("pdf_content.enrollment.header.enrollment_dismissal_date")}:"
+          enrollment_dismissal_date_text = "#{I18n.t("pdf_content.enrollment.header.enrollment_dismissal_date")}: "
           enrollment_dismissal_date_text += enrollment.dismissal ? " #{"#{I18n.localize(enrollment.dismissal.date, :format => :monthyear2)}"}" : "--"
           enrollment_dismissal_reason_text = "#{I18n.t("pdf_content.enrollment.header.enrollment_dismissal_reason")}:"
           enrollment_dismissal_reason_text += enrollment.dismissal ? " #{enrollment.dismissal.dismissal_reason.name}" : "--"
@@ -125,10 +97,6 @@ module EnrollmentsPdfHelper
           enrollment_dismissal_text = enrollment_dismissal_date_text + '     ' + enrollment_dismissal_reason_text
           pdf.text(enrollment_dismissal_text)
 
-          if has_thesis
-            pdf.move_down default_margin_indent
-            pdf.text thesis_label
-          end 
         end 
       end
     end
@@ -138,13 +106,14 @@ module EnrollmentsPdfHelper
 
   def transcript_table(pdf, options={})
     class_enrollments ||= options[:class_enrollments]
-    table_width = [68, 65, 314, 60, 65]
+    table_width = [58, 55, 249, 50, 65, 95]
 
     header = [["<b>#{I18n.t("pdf_content.enrollment.grade_list.course_year_semester")}</b>",
                "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_code")}</b>",
                "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_name")}</b>",
                "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_grade")}</b>",
-               "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_credits")}</b>"
+               "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_credits")}</b>",
+               "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_workload")}</b>"
               ]]
 
     pdf.table(header, :column_widths => table_width,
@@ -164,7 +133,8 @@ module EnrollmentsPdfHelper
             class_enrollment.course_class.course.code,
             class_enrollment.course_class.course.name,
             class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : I18n.t("pdf_content.enrollment.grade_list.course_approved"),
-            class_enrollment.course_class.course.credits
+            class_enrollment.course_class.course.credits,
+            class_enrollment.course_class.course.workload_text
         ]
       end
 
@@ -181,7 +151,14 @@ module EnrollmentsPdfHelper
       end      
     end
 
-    footer = [["", "", "<b>#{I18n.t('pdf_content.enrollment.academic_transcript.total_credits')}</b>", "", class_enrollments.joins({:course_class => :course}).sum(:credits).to_i]]
+    footer = [[
+      "", 
+      "", 
+      "<b>#{I18n.t('pdf_content.enrollment.academic_transcript.total_credits')}</b>", 
+      "", 
+      class_enrollments.joins({:course_class => :course}).sum(:credits).to_i, 
+      I18n.translate('activerecord.attributes.course.workload_time', :time => class_enrollments.joins({:course_class => :course}).sum(:workload).to_i)
+    ]]
     pdf.table(footer, :column_widths => table_width,
               :row_colors => ["BFBFBF"],
               :cell_style => {:font => "Courier",
@@ -351,6 +328,76 @@ module EnrollmentsPdfHelper
         pdf.move_down 15
 
         pdf.draw_text("#{I18n.t("pdf_content.enrollment.grades_report.advisors")}: #{(enrollment.professors.map { |professor| professor.name }).join(", ") }", :at => [current_x, pdf.cursor])
+      end
+    end
+
+    pdf.move_down 10
+  end
+
+  def thesis_table(pdf, options={})
+    thesis_title ||= options[:thesis_title]
+    thesis_defense_date ||= options[:thesis_defense_date]
+    thesis_desense_committee ||= options[:thesis_defense_committee]
+
+    if not(thesis_title.nil? or thesis_title.empty?)
+      thesis_table_width = [pdf.bounds.right]
+
+      thesis_table_header = [["<b>#{I18n.t("pdf_content.enrollment.thesis.header")}</b>"]]
+
+      pdf.table(thesis_table_header, :column_widths => thesis_table_width,
+                :row_colors => ["BFBFBF"],
+                :cell_style => {:font => "Courier",
+                                :size => 10,
+                                :inline_format => true,
+                                :border_width => 0,
+                                :align => :center
+                }
+      )
+      
+      thesis_table_data = [
+        ["<b>#{I18n.t("pdf_content.enrollment.thesis.title")}</b>", thesis_title],
+        
+      ]
+      thesis_table_data << ["<b>#{I18n.t("pdf_content.enrollment.thesis.date")}</b>", I18n.localize(thesis_defense_date, format: :long)] unless thesis_defense_date.nil?
+      table_width = [92, 480]
+      pdf.table(thesis_table_data, :column_widths => table_width,
+                :row_colors => ["F9F9F9", "F0F0F0"],
+                :cell_style => {:font => "Courier",
+                                :size => 8,
+                                :inline_format => true,
+                                :border_width => 0,
+                                :align => :left
+                }
+      )
+
+      unless thesis_desense_committee.empty?
+        thesis_table_data = [
+          [
+            "<b>#{I18n.t("pdf_content.enrollment.thesis.defense_committee.defense_committee")}</b>",
+            "<b>#{I18n.t("pdf_content.enrollment.thesis.defense_committee.name")}</b>",
+            "<b>#{I18n.t("pdf_content.enrollment.thesis.defense_committee.institution")}</b>"
+          ],
+        ] + thesis_desense_committee.map do |professor|
+          [
+              "", professor.name, rescue_blank_text(professor.institution, :method_call => :name)
+          ]
+        end
+
+        table_width = [92, 240, 240]
+
+        pdf.table(thesis_table_data, :column_widths => table_width,
+                  :row_colors => ["F9F9F9", "F0F0F0"],
+                  :cell_style => {:font => "Courier",
+                                  :size => 8,
+                                  :inline_format => true,
+                                  :border_width => 0,
+                                  :align => :left
+                  }
+        ) do |table|
+            table.row(0).column(1).align = :center
+            table.row(0).column(2).align = :center
+        end
+
       end
     end
 

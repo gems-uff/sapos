@@ -89,6 +89,10 @@ pt-BR:
         credits: "Créditos"
         name: "Nome"
         research_area: "Área de Pesquisa"
+        workload: "Carga Horária"
+        empty_workload: "N/A"
+        workload_time: "%{time}h"
+        workload_text: "Carga Horária"
       course_class:
         allocations: "Alocações"
         class_enrollments: "Inscrições"
@@ -147,12 +151,15 @@ pt-BR:
         scholarships: "Números das Bolsas"
         student: "Nome do Aluno"
         thesis_title: "Título da Tese"
+        thesis_defense_date: "Data de Defesa"
         year_semester_label: "em"
         listed_advisors: "Orientadores"
         listed_accomplishments: "Realização de Etapas"
         listed_deferrals: "Prorrogações"
         listed_scholarships: "Bolsas"
         listed_class_enrollments: "Inscrições"
+        thesis_defense_committee_participations: "Banca Avaliadora"
+        thesis_defense_committee_professors: "Banca Avaliadora"
       enrollment_status:
         name: "Nome"
       institution:
@@ -192,9 +199,11 @@ pt-BR:
         enrollments: "Orientandos"
         identity_expedition_date: "Data de expedição da Identidade"
         identity_issuing_body: "Órgão Expeditor"
+        identity_issuing_place: "Local de Expedição"
         identity_number: "Número da identidade"
+        institution: "Instituição"
         name: "Nome"
-        neighbourhood: "Bairro"
+        neighborhood: "Bairro"
         professor_research_areas: "Áreas de Pesquisa"
         research_areas: "Áreas de Pesquisa"
         scholarships: "Bolsas"
@@ -202,6 +211,8 @@ pt-BR:
         telephone1: "1º Telefone"
         telephone2: "2º Telefone"
         zip_code: "CEP"
+        thesis_defense_committee_participations: "Participações em Banca"
+        thesis_defense_committee_enrollments: "Avaliados"
       professor_research_area:
         professor: "Professor"
         research_area: "Área de Pesquisa"
@@ -248,11 +259,11 @@ pt-BR:
         name: "Nome"
       student:
         address: "Logradouro"        
+        birth_city: "Naturalidade"
+        birth_state: "Estado de Origem"
         birthdate: "Data de Nascimento"
-        birthplace: "Naturalidade"
         city: "Cidade"
         civil_status: "Estado Civil"
-        country: "País de origem"
         cpf: "CPF"
         employer: "Empresa"
         enrollments: "Matrículas"
@@ -260,14 +271,14 @@ pt-BR:
         father_name: "Nome do Pai"
         identity_expedition_date: "Data de expedição da Identidade"
         identity_issuing_body: "Órgão Expeditor"
+        identity_issuing_place: "Local de Expedição"
         identity_number: "Número da identidade"
         job_position: "Cargo"        
         majors: "Cursos"
         mother_name: "Nome da Mãe"
         name: "Nome"
-        neighbourhood: "Bairro"
+        neighborhood: "Bairro"
         sex: "Sexo"
-        state: "Estado"
         student_majors: "Cursos"     
         telephone1: "1º Telefone"
         telephone2: "2º Telefone"
@@ -276,6 +287,9 @@ pt-BR:
         major: "Curso"
         student: "Aluno"
         student_id: "Aluno"
+      thesis_defense_committee_participation:
+        enrollment: "Matrícula"
+        professor: "Professor"
       user:
         name: "Nome do usuário"
         password: "Senha"
@@ -330,9 +344,12 @@ pt-BR:
           enrollment_and_deferral_uniqueness: "já possui esta prorrogação"
         deferral_type:
           blank_duration: "duração deve ser de pelo menos um dia"
+        dismissal:
+          date_before_enrollment_admission_date: "anterior a Data de Admissão"
         enrollment:
           main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
+          thesis_defense_date_before_admission_date: "anterior a Data de Admissão"
         scholarship:
           attributes:
             end_date:
@@ -358,6 +375,8 @@ pt-BR:
           unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
         student_major:
           unique_pair: "não pode estar em dois ou mais cursos repetidos e curso não pode possuir o mesmo aluno duas ou mais vezes"
+        thesis_defense_committee_participation:
+          thesis_defense_committee_participation_professor_uniqueness: "não pode participar duas vezes da mesma banca"
         user:
           delete: "O sistema precisa ter ao menos um usuário"
           missing_password: "A senha não foi definida"
@@ -469,6 +488,9 @@ pt-BR:
       student_major:
         one: "Curso do Aluno"
         other: "Curso dos Alunos"
+      thesis_defense_committee_participation:
+        one: "Participação em Banca"
+        other: "Participações em Bancas"
       user:
         one: "Usuário"
         other: "Usuários"
@@ -520,6 +542,7 @@ pt-BR:
     create_state_label: "Adicionar Estado"
     create_student_label: "Adicionar Aluno"
     create_student_major_label: "Adicionar Curso do Aluno"
+    create_thesis_defense_committee_participation_label: "Adicionar Participação em Banca"
     create_user_label: "Adicionar Usuário"
     delayed_phases_report: "Relatório"
     delete_link: "Excluir"
@@ -563,6 +586,7 @@ pt-BR:
     update_state_label: "Editar Estado"
     update_student_label: "Modificar Aluno"
     update_student_major_label: "Editar Curso do Aluno"
+    update_thesis_defense_committee_participation: "Editar Participação em Banca"
     update_user_label: "Modificar Usuário"
 
     errors:
@@ -586,6 +610,15 @@ pt-BR:
     license: "Arquivo de Licensa"
 
   helpers:
+    city_widget:
+      select_city: "Selecione a cidade"
+      select_country: "Selecione o país"
+      select_state: "Selecione o estado"
+
+    identity_issuing_place_widget:
+      show_states: "Mostrar estados do %{country}"
+      show_text: "Mostrar campo de texto"
+
     select:
       prompt: "Por favor selecione"
 
@@ -628,7 +661,8 @@ pt-BR:
         enrollment_dismissal_reason: "Motivo"
         enrollment_number: "Matrícula"
         graduation: "em Computação"
-        identity_issuing_body: "Órgão Expedidor"
+        identity_issuing_body: "Órgão"
+        identity_issuing_place: "Local de Expedição"
         student_birthdate: "Data de Nascimento"
         student_birthplace: "Naturalidade"
         student_cpf: "C.P.F."
@@ -640,6 +674,7 @@ pt-BR:
         course_credits: "Créditos"
         course_grade: "Nota"
         course_name: "Nome da Disciplina"
+        course_workload: "Carga Horária"
         course_year_semester: "Período"
         situation: "Situação"
       footer:
@@ -653,6 +688,14 @@ pt-BR:
         link: "Histórico"
         title: "Histórico Escolar"
         total_credits: "Total"
+      thesis:
+        header: "Defesa de Tese"
+        title: "Título"
+        date: "Data"
+        defense_committee: 
+          defense_committee: "Banca Avaliadora"
+          name: "Professor"
+          institution: "Instituição"
       grades_report:
         accomplished_phases: "Etapas obrigatórias concluídas"
         advisors: "Orientadores"

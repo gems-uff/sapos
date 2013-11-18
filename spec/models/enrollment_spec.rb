@@ -5,6 +5,16 @@ require "spec_helper"
 require "debugger"
 
 describe Enrollment do
+  it { should be_able_to_be_destroyed }
+  it { should restrict_destroy_when_exists :accomplishment }
+  it { should restrict_destroy_when_exists :advisement }
+  it { should restrict_destroy_when_exists :class_enrollment }
+  it { should restrict_destroy_when_exists :deferral }
+  it { should restrict_destroy_when_exists :dismissal }
+  it { should restrict_destroy_when_exists :scholarship_duration }
+  it { should restrict_destroy_when_exists :thesis_defense_committee_participation }
+
+
   let(:enrollment) { Enrollment.new }
   subject { enrollment }
   describe "Validations" do
@@ -87,6 +97,22 @@ describe Enrollment do
           FactoryGirl.create(:enrollment, :enrollment_number => enrollment_number)
           enrollment.enrollment_number = enrollment_number
           enrollment.should have_error(:taken).on :enrollment_number
+        end
+      end
+    end
+    describe "thesis_defense_date" do
+      context "should be valid when" do
+        it "is after admission_date" do
+          enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
+          enrollment.thesis_defense_date = 3.days.from_now.to_date
+          enrollment.should have(0).errors_on :thesis_defense_date
+        end
+      end
+      context "should not be valid when" do
+        it "is before admission_date" do
+          enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
+          enrollment.thesis_defense_date = 4.days.ago.to_date
+          enrollment.should have_error(:thesis_defense_date_before_admission_date).on :thesis_defense_date
         end
       end
     end

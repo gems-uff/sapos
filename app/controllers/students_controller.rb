@@ -14,11 +14,12 @@ class StudentsController < ApplicationController
     config.update.label = :update_student_label
 
 #    config.columns[:birthdate].form_ui = :calendar_date_select         
-    config.columns[:country].form_ui = :select
-    config.columns[:state].form_ui = :select
+    config.columns[:birth_city].form_ui = :select
+    config.columns[:birth_state].form_ui = :hidden
     config.columns[:city].form_ui = :select
     config.columns[:civil_status].form_ui = :select
-    config.columns[:birthplace].form_ui = :select
+    config.columns[:identity_issuing_place].form_ui = ""
+    
     #config.columns[:majors].form_ui = :record_select
     config.columns[:sex].form_ui = :select
     config.columns[:sex].options = {:options => [['Masculino', 'M'], ['Feminino', 'F']]}
@@ -32,9 +33,8 @@ class StudentsController < ApplicationController
          :sex,
          :civil_status,
          :birthdate,
-         :state,
          :city,
-         :neighbourhood,
+         :neighborhood,
          :address,
          :zip_code,
          :telephone1,
@@ -45,9 +45,10 @@ class StudentsController < ApplicationController
          :cpf,
          :identity_number,
          :identity_issuing_body,
+         :identity_issuing_place, 
          :identity_expedition_date,
-         :country,
-         :birthplace,
+         :birth_state,
+         :birth_city,
          :father_name,
          :mother_name,
          :obs,

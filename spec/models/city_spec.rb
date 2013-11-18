@@ -4,6 +4,11 @@
 require "spec_helper"
 
 describe City do
+  it { should be_able_to_be_destroyed }
+  it { should restrict_destroy_when_exists(:student).with_fk :city_id }
+  it { should restrict_destroy_when_exists(:student).with_fk :birth_city_id }
+  it { should restrict_destroy_when_exists(:professor).with_fk :city_id }
+
   let(:city) { City.new }
   subject { city }
   describe "Validations" do

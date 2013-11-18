@@ -4,8 +4,9 @@
 class State < ActiveRecord::Base
   attr_accessible :name, :code, :country
   belongs_to :country
-  has_many :cities
-
+  has_many :cities, :dependent => :restrict
+  has_many :student_birth_states, :class_name => 'Student', :foreign_key => 'birth_state_id', :dependent => :restrict
+  
   has_paper_trail
   
   validates :name, :presence => true, :uniqueness => true

@@ -27,4 +27,9 @@ class Configuration < ActiveRecord::Base
     config.nil? ? nil : config.value.to_i 
   end
 
+  def self.identity_issuing_country
+    config = Configuration.find_by_variable(:identity_issuing_country)
+    Country.find_by_name(config.nil? ? "Brasil": config.value)
+  end
+
 end

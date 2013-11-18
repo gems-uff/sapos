@@ -4,6 +4,11 @@
 require "spec_helper"
 
 describe Phase do
+  it { should be_able_to_be_destroyed }
+  it { should restrict_destroy_when_exists :accomplishment }
+  it { should restrict_destroy_when_exists :deferral_type }
+  it { should restrict_destroy_when_exists :phase_duration }
+
   let(:phase) { Phase.new }
   subject { phase }
   describe "Validations" do

@@ -310,3 +310,15 @@ body a {
     font-size: 12px;
     margin-top: -1px;
 }
+
+.inline-adapter-cell div.actions {
+    display: none;
+}
+
+.inline-adapter-cell .active-scaffold-header {
+    display: none;
+}
+
+.inline-adapter-cell .active-scaffold > table{
+    display: none;
+}

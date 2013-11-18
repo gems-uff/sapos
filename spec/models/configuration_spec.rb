@@ -74,5 +74,45 @@ describe Configuration do
         Configuration.program_level.should == 5
       end
     end 
+
+    context "identity_issuing_country" do
+      it "should return nil when there is no configuration defined and no country named Brasil" do
+        country = Country.find_by_name("Brasil")
+        country.delete unless country.nil?
+
+        config = Configuration.find_by_variable(:identity_issuing_country)
+        config.delete unless config.nil?
+
+        Configuration.identity_issuing_country.should == nil
+      end
+
+      it "should return Brasil when there is no configuration, but there is a country named Brasil" do
+        country = Country.find_by_name("Brasil")
+        country.delete unless country.nil?
+        country = FactoryGirl.create(:country, :name => "Brasil")
+
+        config = Configuration.find_by_variable(:identity_issuing_country)
+        config.delete unless config.nil?
+        
+        Configuration.identity_issuing_country.should == country
+      end
+
+      it "should return England it is defined to England" do
+        brasil = Country.find_by_name("Brasil")
+        brasil.delete unless brasil.nil?
+        FactoryGirl.create(:country, :name => "Brasil")
+
+        england = Country.find_by_name("England")
+        england.delete unless england.nil?
+        england = FactoryGirl.create(:country, :name => "England")
+
+        config = Configuration.find_by_variable(:identity_issuing_country)
+        config.delete unless config.nil?
+
+        Configuration.create(:variable => :identity_issuing_country, :value=>"England")
+
+        Configuration.identity_issuing_country.should == england
+      end
+    end 
   end
 end

@@ -4,6 +4,9 @@
 require "spec_helper"
 
 describe Sponsor do
+  it { should be_able_to_be_destroyed }
+  it { should restrict_destroy_when_exists :scholarship }
+  
   let(:sponsor) { Sponsor.new }
   subject { sponsor }
   describe "Validations" do

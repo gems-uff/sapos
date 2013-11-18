@@ -3,7 +3,7 @@ source 'http://rubygems.org'
 gem 'rails', '3.2.15'
 gem "rails-erd", "~> 1.0.0"
 gem "kaminari"
-gem "schema_plus"
+#gem "schema_plus"
 
 gem 'cancan'
 gem "devise"

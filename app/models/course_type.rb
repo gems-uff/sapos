@@ -2,7 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class CourseType < ActiveRecord::Base
-  has_many :courses
+  has_many :courses, :dependent => :restrict
 
   has_paper_trail
 

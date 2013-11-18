@@ -11,6 +11,6 @@ FactoryGirl.define do
     end
     duration_semesters 0
     duration_months 0
-    duration_days 0
+    duration_days 1
   end
 end

@@ -14,4 +14,15 @@ class CountriesController < ApplicationController
     config.update.columns = [:name]
   end
 
+  def states
+    states = []
+    unless params[:id] == 'states'
+      country = Country.find_by_id(params[:id])
+      states = country.state.collect {|s| [s.name, s.id]} unless country.nil?
+    end
+    respond_to do |format|
+      format.json { render :json =>  states}
+    end
+  end
+
 end 

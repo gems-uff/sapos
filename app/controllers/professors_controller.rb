@@ -22,27 +22,30 @@ class ProfessorsController < ApplicationController
     config.columns[:civil_status].form_ui = :select
     config.columns[:civil_status].options = {:options => [['Solteiro(a)', 'solteiro'],
                                                           ['Casado(a)', 'casado']]}
+    config.columns[:institution].form_ui = :record_select
     config.columns[:sex].form_ui = :select
     config.columns[:sex].options = {:options => [['Masculino', 'M'],
                                                  ['Feminino', 'F']]}
     config.columns[:scholarships].form_ui = :record_select
     config.columns[:professor_research_areas].includes = {:research_areas => :professor_research_areas}
     form_columns = [:name,
-                   :cpf,
-                   :birthdate,
-                   :address,
-                   :birthdate,
-                   :civil_status,
-                   :identity_expedition_date,
-                   :identity_issuing_body,
-                   :identity_number,
-                   :neighbourhood,
                    :sex,
-                   :enrollment_number,
-                   :siape,
+                   :civil_status,
+                   :birthdate,
+                   :city,
+                   :neighborhood,
+                   :address,
+                   :zip_code,
                    :telephone1,
                    :telephone2,
-                   :zip_code,
+                   :cpf,   
+                   :identity_expedition_date,
+                   :identity_issuing_body,
+                   :identity_issuing_place,
+                   :identity_number,
+                   :enrollment_number,
+                   :siape,
+                   :institution,
                    :scholarships,
                    :professor_research_areas]
 
@@ -59,7 +62,7 @@ class ProfessorsController < ApplicationController
                            :identity_expedition_date,
                            :identity_issuing_body,
                            :identity_number,
-                           :neighbourhood,
+                           :neighborhood,
                            :sex,
                            :enrollment_number,
                            :siape,

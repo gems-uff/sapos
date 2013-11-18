@@ -3,20 +3,25 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Enrollment < ActiveRecord::Base
-  attr_accessible :enrollment_number, :thesis_title
+  attr_accessible :enrollment_number, :admission_date, :obs, :thesis_title, 
+    :thesis_defense_date
   belongs_to :student
   belongs_to :level
   belongs_to :enrollment_status
-  has_one :dismissal, :dependent => :destroy
-  has_many :advisements, :dependent => :destroy
-  has_many :professors, :through => :advisements, :readonly => false
-  has_many :scholarship_durations, :dependent => :destroy
-  has_many :scholarships, :through => :scholarship_durations
-  has_many :accomplishments, :dependent => :destroy
-  has_many :phases, :through => :accomplishments
-  has_many :deferrals, :dependent => :destroy
-  has_many :class_enrollments, :dependent => :destroy
 
+  has_many :professors, :through => :advisements, :readonly => false
+  has_many :scholarships, :through => :scholarship_durations
+  has_many :phases, :through => :accomplishments
+
+  has_one :dismissal, :dependent => :restrict
+  has_many :advisements, :dependent => :restrict
+  has_many :scholarship_durations, :dependent => :restrict
+  has_many :accomplishments, :dependent => :restrict
+  has_many :deferrals, :dependent => :restrict
+  has_many :class_enrollments, :dependent => :restrict
+  has_many :thesis_defense_committee_participations, :dependent => :restrict
+  has_many :thesis_defense_committee_professors, :source => :professor, :through => :thesis_defense_committee_participations
+  
   has_paper_trail
 
   validates :enrollment_number, :presence => true, :uniqueness => true
@@ -25,6 +30,8 @@ class Enrollment < ActiveRecord::Base
   validates :student, :presence => true
 
   validate :enrollment_has_main_advisor
+
+  validates_date :thesis_defense_date, :on_or_after => :admission_date, :allow_nil => true, :on_or_after_message => I18n.t("activerecord.errors.models.enrollment.thesis_defense_date_before_admission_date")
 
   def to_label
     "#{enrollment_number} - #{student.name}"

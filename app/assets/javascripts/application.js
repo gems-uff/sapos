@@ -17,6 +17,9 @@
 //= require_tree .
 
 
+var I18nExitConfirmation = 'Existem campos preenchidos! Você pode perder suas alterações!';
+
+
 function areInputsFilled(selector) {
 	var filled = false;
 	$(selector).each(function() {
@@ -28,12 +31,15 @@ function areInputsFilled(selector) {
 	return filled;
 }
 
-function confirmOnPageExit(){
+function confirmOnPageExit() {
 	if (areInputsFilled('.as_form.update input[type=text], .as_form.create input[type=text]')) {
-		return 'Existem campos preenchidos! Você pode perder suas alterações!';
+		return I18nExitConfirmation;
 	}
 }
 
+
 $(document).ready(function(){
 	window.onbeforeunload = confirmOnPageExit;
+	cityWidget();
+	identityIssuingPlaceWidget();
 });

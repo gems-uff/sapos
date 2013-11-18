@@ -4,6 +4,9 @@
 require "spec_helper"
 
 describe EnrollmentStatus do
+  it { should be_able_to_be_destroyed }
+  it { should restrict_destroy_when_exists :enrollment }
+
   let(:enrollment_status) { EnrollmentStatus.new }
   subject { enrollment_status }
   describe "Validations" do

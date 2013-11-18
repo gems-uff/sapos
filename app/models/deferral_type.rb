@@ -4,7 +4,7 @@
 class DeferralType < ActiveRecord::Base
   attr_accessible :name
   belongs_to :phase
-  has_many :deferrals
+  has_many :deferrals, :dependent => :restrict
 
   has_paper_trail
 

@@ -4,6 +4,14 @@
 require "spec_helper"
 
 describe Level do
+  it { should be_able_to_be_destroyed }
+  it { should restrict_destroy_when_exists :enrollment }
+  it { should restrict_destroy_when_exists :advisement_authorization }
+  it { should restrict_destroy_when_exists :major }
+  it { should restrict_destroy_when_exists :phase_duration }
+  it { should restrict_destroy_when_exists :scholarship }
+  
+  
   let(:level) { Level.new }
   subject { level }
   describe "Validations" do

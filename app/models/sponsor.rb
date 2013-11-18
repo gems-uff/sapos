@@ -5,6 +5,8 @@ class Sponsor < ActiveRecord::Base
 
   validates :name, :presence => true, :uniqueness => true
 
+  has_many :scholarships, :dependent => :restrict
+
   has_paper_trail
 
   def to_label
