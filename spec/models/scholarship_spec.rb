@@ -5,7 +5,7 @@ require "spec_helper"
 
 describe Scholarship do
   it { should be_able_to_be_destroyed }
-  it { should destroy_dependent :scholarship_duration }
+  it { should restrict_destroy_when_exists :scholarship_duration }
 
   let(:scholarship) { Scholarship.new }
   subject { scholarship }

@@ -5,11 +5,11 @@ require "spec_helper"
 
 describe Professor do
   it { should be_able_to_be_destroyed }
-  it { should destroy_dependent :advisement_authorization }
-  it { should destroy_dependent :advisement }
+  it { should restrict_destroy_when_exists :advisement_authorization }
+  it { should restrict_destroy_when_exists :advisement }
   it { should restrict_destroy_when_exists :course_class }
-  it { should destroy_dependent :professor_research_area }
-  it { should destroy_dependent :scholarship }
+  it { should restrict_destroy_when_exists :professor_research_area }
+  it { should restrict_destroy_when_exists :scholarship }
 
   let(:professor) { Professor.new }
   subject { professor }

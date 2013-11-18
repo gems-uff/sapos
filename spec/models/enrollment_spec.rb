@@ -6,12 +6,12 @@ require "debugger"
 
 describe Enrollment do
   it { should be_able_to_be_destroyed }
-  it { should destroy_dependent :accomplishment }
-  it { should destroy_dependent :advisement }
-  it { should destroy_dependent :class_enrollment }
-  it { should destroy_dependent :deferral }
-  it { should destroy_dependent :dismissal }
-  it { should destroy_dependent :scholarship_duration }
+  it { should restrict_destroy_when_exists :accomplishment }
+  it { should restrict_destroy_when_exists :advisement }
+  it { should restrict_destroy_when_exists :class_enrollment }
+  it { should restrict_destroy_when_exists :deferral }
+  it { should restrict_destroy_when_exists :dismissal }
+  it { should restrict_destroy_when_exists :scholarship_duration }
 
   let(:enrollment) { Enrollment.new }
   subject { enrollment }

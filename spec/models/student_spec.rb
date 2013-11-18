@@ -5,8 +5,8 @@ require "spec_helper"
 
 describe Student do
   it { should be_able_to_be_destroyed }
-  it { should destroy_dependent :enrollment }
-  it { should destroy_dependent :student_major }
+  it { should restrict_destroy_when_exists :enrollment }
+  it { should restrict_destroy_when_exists :student_major }
 
   let(:student) { Student.new }
   subject { student }

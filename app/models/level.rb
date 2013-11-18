@@ -6,7 +6,7 @@ class Level < ActiveRecord::Base
 
   has_paper_trail
 
-  has_many :advisement_authorizations, :dependent => :destroy
+  has_many :advisement_authorizations, :dependent => :restrict
   has_many :enrollments, :dependent => :restrict
   has_many :majors, :dependent => :restrict
   has_many :phase_durations, :dependent => :restrict

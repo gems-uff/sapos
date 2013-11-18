@@ -6,12 +6,12 @@ class Professor < ActiveRecord::Base
   :identity_issuing_body, :identity_expedition_date, :identity_issuing_place,
   :neighborhood, :address, :zip_code, :telephone1, :telephone2, :siape, :enrollment_number
   
-  has_many :advisements, :dependent => :destroy
+  has_many :advisements, :dependent => :restrict
   has_many :enrollments, :through => :advisements
-  has_many :scholarships, :dependent => :destroy
-  has_many :advisement_authorizations, :dependent => :destroy
+  has_many :scholarships, :dependent => :restrict
+  has_many :advisement_authorizations, :dependent => :restrict
   has_many :research_areas, :through => :professor_research_areas
-  has_many :professor_research_areas, :dependent => :destroy
+  has_many :professor_research_areas, :dependent => :restrict
   has_many :course_classes, :dependent => :restrict
 
   belongs_to :city

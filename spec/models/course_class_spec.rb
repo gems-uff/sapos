@@ -5,8 +5,8 @@ require "spec_helper"
 
 describe CourseClass do
   it { should be_able_to_be_destroyed }
-  it { should destroy_dependent :allocation }
-  it { should destroy_dependent :class_enrollment }
+  it { should restrict_destroy_when_exists :allocation }
+  it { should restrict_destroy_when_exists :class_enrollment }
 
   let(:course_class) { CourseClass.new }
   subject { course_class }
