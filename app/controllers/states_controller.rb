@@ -17,9 +17,11 @@ class StatesController < ApplicationController
   end
 
   def cities
-    state = State.find_by_id(params[:id])
     cities = []
-    cities = state.cities.collect {|c| [c.name, c.id]} unless state.nil?
+    unless params[:id] == 'cities'
+      state = State.find_by_id(params[:id])
+      cities = state.cities.collect {|c| [c.name, c.id]} unless state.nil?
+    end
     respond_to do |format|
       format.json { render :json =>  cities}
     end

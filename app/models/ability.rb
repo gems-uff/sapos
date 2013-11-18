@@ -10,7 +10,7 @@ class Ability
                 EnrollmentStatus, Institution, Level, Major, Phase, PhaseDuration,
                 Professor, ProfessorResearchArea, ResearchArea, Role, Scholarship,
                 ScholarshipDuration, ScholarshipType, Sponsor, State, Student, StudentMajor,
-                User, YearSemester, Version]
+                ThesisDefenseCommitteeParticipation, User, YearSemester, Version]
 
 
   def initialize(user)

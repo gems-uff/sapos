@@ -17,6 +17,14 @@ prawn_document(:left_margin => 20, :right_margin => 20, :top_margin => 30, :bott
     	advisors_list(pdf, enrollment: @enrollment)
     end
 
+    if not(@enrollment.thesis_title.nil? or @enrollment.thesis_title.empty?)
+      thesis_table(pdf, 
+        thesis_title: @enrollment.thesis_title, 
+        thesis_defense_date: @enrollment.thesis_defense_date,
+        thesis_defense_committee: @enrollment.thesis_defense_committee_professors
+      )
+    end
+
     pdf.repeat(:all, dynamic: true) do
       page_footer(pdf)
     end

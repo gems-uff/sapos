@@ -36,8 +36,8 @@ module PdfHelper
   def page_footer(pdf, options={})
     x = 5
     last_box_height = 50
-    last_box_width1 = 150
-    last_box_width2 = 350
+    last_box_width1 = 165
+    last_box_width2 = 335
 
     last_box_y = pdf.bounds.bottom  #pdf.bounds.bottom + last_box_height# pdf.cursor - 15
     pdf.font('Courier', :size => 8) do
@@ -57,7 +57,7 @@ module PdfHelper
 
         pdf.draw_text("#{I18n.t("pdf_content.enrollment.footer.warning1")}", :at => [current_x, pdf.cursor])
 
-        underline_width = 3.8
+        underline_width = 3.7
         pdf.move_down 30
         underline = "__________________________________________________________________________"
         current_x += (last_box_width2 - underline.size*underline_width)/2
@@ -65,7 +65,7 @@ module PdfHelper
         pdf.draw_text(underline, :at => [current_x, pdf.cursor])
 
         pdf.move_down 8
-        font_width = 7.5
+        font_width = 6.7
         coordinator_signature = I18n.t("pdf_content.enrollment.footer.coordinator_signature")
         current_x += (last_box_width2 - coordinator_signature.size*font_width)/2
         pdf.draw_text(coordinator_signature, :at => [current_x, pdf.cursor])

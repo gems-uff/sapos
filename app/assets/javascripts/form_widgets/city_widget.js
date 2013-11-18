@@ -4,7 +4,7 @@ var I18nSelectCity = "Selecione a cidade";
 function replaceList(url, domElement, defaultText, done) {
 	$(domElement).siblings(".loading-indicator").css('visibility', 'visible');
 	$.getJSON(url, function (json) {
-		stateList = "<option value=\"-1\">"+defaultText+"</option>"
+		stateList = "<option value>"+defaultText+"</option>"
 	    $.each(json, function (i, tuple) {
 	        stateList += "<option value=\""+ tuple[1] +"\">" + tuple[0] + "</option>";
 	    });

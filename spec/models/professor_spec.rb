@@ -10,6 +10,7 @@ describe Professor do
   it { should restrict_destroy_when_exists :course_class }
   it { should restrict_destroy_when_exists :professor_research_area }
   it { should restrict_destroy_when_exists :scholarship }
+  it { should restrict_destroy_when_exists :thesis_defense_committee_participation }
 
   let(:professor) { Professor.new }
   subject { professor }

@@ -19,7 +19,9 @@ class Enrollment < ActiveRecord::Base
   has_many :accomplishments, :dependent => :restrict
   has_many :deferrals, :dependent => :restrict
   has_many :class_enrollments, :dependent => :restrict
-
+  has_many :thesis_defense_committee_participations, :dependent => :restrict
+  has_many :thesis_defense_committee_professors, :source => :professor, :through => :thesis_defense_committee_participations
+  
   has_paper_trail
 
   validates :enrollment_number, :presence => true, :uniqueness => true

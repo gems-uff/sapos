@@ -6,6 +6,7 @@ require "spec_helper"
 describe Institution do
   it { should be_able_to_be_destroyed }
   it { should restrict_destroy_when_exists :major }
+  it { should restrict_destroy_when_exists :professor }
 
   let(:institution) { Institution.new }
   subject { institution }

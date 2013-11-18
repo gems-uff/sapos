@@ -154,6 +154,8 @@ pt-BR:
         listed_deferrals: "Prorrogações"
         listed_scholarships: "Bolsas"
         listed_class_enrollments: "Inscrições"
+        thesis_defense_committee_participations: "Banca Avaliadora"
+        thesis_defense_committee_professors: "Banca Avaliadora"
       enrollment_status:
         name: "Nome"
       institution:
@@ -195,6 +197,7 @@ pt-BR:
         identity_issuing_body: "Órgão Expeditor"
         identity_issuing_place: "Local de Expedição"
         identity_number: "Número da identidade"
+        institution: "Instituição"
         name: "Nome"
         neighborhood: "Bairro"
         professor_research_areas: "Áreas de Pesquisa"
@@ -204,6 +207,8 @@ pt-BR:
         telephone1: "1º Telefone"
         telephone2: "2º Telefone"
         zip_code: "CEP"
+        thesis_defense_committee_participations: "Participações em Banca"
+        thesis_defense_committee_enrollments: "Avaliados"
       professor_research_area:
         professor: "Professor"
         research_area: "Área de Pesquisa"
@@ -278,6 +283,9 @@ pt-BR:
         major: "Curso"
         student: "Aluno"
         student_id: "Aluno"
+      thesis_defense_committee_participation:
+        enrollment: "Matrícula"
+        professor: "Professor"
       user:
         name: "Nome do usuário"
         password: "Senha"
@@ -363,6 +371,8 @@ pt-BR:
           unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
         student_major:
           unique_pair: "não pode estar em dois ou mais cursos repetidos e curso não pode possuir o mesmo aluno duas ou mais vezes"
+        thesis_defense_committee_participation:
+          thesis_defense_committee_participation_professor_uniqueness: "não pode participar duas vezes da mesma banca"
         user:
           delete: "O sistema precisa ter ao menos um usuário"
           missing_password: "A senha não foi definida"
@@ -474,6 +484,9 @@ pt-BR:
       student_major:
         one: "Curso do Aluno"
         other: "Curso dos Alunos"
+      thesis_defense_committee_participation:
+        one: "Participação em Banca"
+        other: "Participações em Bancas"
       user:
         one: "Usuário"
         other: "Usuários"
@@ -525,6 +538,7 @@ pt-BR:
     create_state_label: "Adicionar Estado"
     create_student_label: "Adicionar Aluno"
     create_student_major_label: "Adicionar Curso do Aluno"
+    create_thesis_defense_committee_participation_label: "Adicionar Participação em Banca"
     create_user_label: "Adicionar Usuário"
     delayed_phases_report: "Relatório"
     delete_link: "Excluir"
@@ -568,6 +582,7 @@ pt-BR:
     update_state_label: "Editar Estado"
     update_student_label: "Modificar Aluno"
     update_student_major_label: "Editar Curso do Aluno"
+    update_thesis_defense_committee_participation: "Editar Participação em Banca"
     update_user_label: "Modificar Usuário"
 
     errors:
@@ -668,6 +683,14 @@ pt-BR:
         link: "Histórico"
         title: "Histórico Escolar"
         total_credits: "Total"
+      thesis:
+        header: "Defesa de Tese"
+        title: "Título"
+        date: "Data"
+        defense_committee: 
+          defense_committee: "Banca Avaliadora"
+          name: "Professor"
+          institution: "Instituição"
       grades_report:
         accomplished_phases: "Etapas obrigatórias concluídas"
         advisors: "Orientadores"

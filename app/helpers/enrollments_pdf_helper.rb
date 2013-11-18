@@ -77,14 +77,6 @@ module EnrollmentsPdfHelper
 
       height = 80 
 
-      if not(enrollment.thesis_title.nil? or enrollment.thesis_title.empty?)
-        has_thesis = true
-        thesis_label = 
-          "#{I18n.t("activerecord.attributes.enrollment.thesis_title")}: #{rescue_blank_text(enrollment.thesis_title)}\n\n" +
-          "#{I18n.t("activerecord.attributes.enrollment.thesis_defense_date")}: #{rescue_blank_text(enrollment.thesis_defense_date)}"
-        height += pdf.height_of_formatted([{ text: thesis_label, :width => pdf.bounds.right - x }]) 
-      end   
-
       pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.right, :height => height) do
         pdf.stroke_bounds
 
@@ -105,10 +97,6 @@ module EnrollmentsPdfHelper
           enrollment_dismissal_text = enrollment_dismissal_date_text + '     ' + enrollment_dismissal_reason_text
           pdf.text(enrollment_dismissal_text)
 
-          if has_thesis
-            pdf.move_down default_margin_indent
-            pdf.text thesis_label
-          end 
         end 
       end
     end
@@ -331,6 +319,76 @@ module EnrollmentsPdfHelper
         pdf.move_down 15
 
         pdf.draw_text("#{I18n.t("pdf_content.enrollment.grades_report.advisors")}: #{(enrollment.professors.map { |professor| professor.name }).join(", ") }", :at => [current_x, pdf.cursor])
+      end
+    end
+
+    pdf.move_down 10
+  end
+
+  def thesis_table(pdf, options={})
+    thesis_title ||= options[:thesis_title]
+    thesis_defense_date ||= options[:thesis_defense_date]
+    thesis_desense_committee ||= options[:thesis_defense_committee]
+
+    if not(thesis_title.nil? or thesis_title.empty?)
+      thesis_table_width = [pdf.bounds.right]
+
+      thesis_table_header = [["<b>#{I18n.t("pdf_content.enrollment.thesis.header")}</b>"]]
+
+      pdf.table(thesis_table_header, :column_widths => thesis_table_width,
+                :row_colors => ["BFBFBF"],
+                :cell_style => {:font => "Courier",
+                                :size => 10,
+                                :inline_format => true,
+                                :border_width => 0,
+                                :align => :center
+                }
+      )
+      
+      thesis_table_data = [
+        ["<b>#{I18n.t("pdf_content.enrollment.thesis.title")}</b>", thesis_title],
+        
+      ]
+      thesis_table_data << ["<b>#{I18n.t("pdf_content.enrollment.thesis.date")}</b>", I18n.localize(thesis_defense_date, format: :long)] unless thesis_defense_date.nil?
+      table_width = [92, 480]
+      pdf.table(thesis_table_data, :column_widths => table_width,
+                :row_colors => ["F9F9F9", "F0F0F0"],
+                :cell_style => {:font => "Courier",
+                                :size => 8,
+                                :inline_format => true,
+                                :border_width => 0,
+                                :align => :left
+                }
+      )
+
+      unless thesis_desense_committee.empty?
+        thesis_table_data = [
+          [
+            "<b>#{I18n.t("pdf_content.enrollment.thesis.defense_committee.defense_committee")}</b>",
+            "<b>#{I18n.t("pdf_content.enrollment.thesis.defense_committee.name")}</b>",
+            "<b>#{I18n.t("pdf_content.enrollment.thesis.defense_committee.institution")}</b>"
+          ],
+        ] + thesis_desense_committee.map do |professor|
+          [
+              "", professor.name, rescue_blank_text(professor.institution, :method_call => :name)
+          ]
+        end
+
+        table_width = [92, 240, 240]
+
+        pdf.table(thesis_table_data, :column_widths => table_width,
+                  :row_colors => ["F9F9F9", "F0F0F0"],
+                  :cell_style => {:font => "Courier",
+                                  :size => 8,
+                                  :inline_format => true,
+                                  :border_width => 0,
+                                  :align => :left
+                  }
+        ) do |table|
+            table.row(0).column(1).align = :center
+            table.row(0).column(2).align = :center
+        end
+
       end
     end
 

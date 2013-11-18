@@ -22,6 +22,7 @@ class ProfessorsController < ApplicationController
     config.columns[:civil_status].form_ui = :select
     config.columns[:civil_status].options = {:options => [['Solteiro(a)', 'solteiro'],
                                                           ['Casado(a)', 'casado']]}
+    config.columns[:institution].form_ui = :record_select
     config.columns[:sex].form_ui = :select
     config.columns[:sex].options = {:options => [['Masculino', 'M'],
                                                  ['Feminino', 'F']]}
@@ -44,6 +45,7 @@ class ProfessorsController < ApplicationController
                    :identity_number,
                    :enrollment_number,
                    :siape,
+                   :institution,
                    :scholarships,
                    :professor_research_areas]
 

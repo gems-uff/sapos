@@ -180,6 +180,11 @@ Sapos::Application.routes.draw do
     as_routes
   end
 
+  resources :thesis_defense_committee_participations do
+    as_routes
+    record_select_routes
+  end
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

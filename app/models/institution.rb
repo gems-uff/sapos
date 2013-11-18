@@ -4,6 +4,7 @@
 class Institution < ActiveRecord::Base
   attr_accessible :name, :code
   has_many :majors, :dependent => :restrict
+  has_many :professors, :dependent => :restrict
   
   has_paper_trail
   

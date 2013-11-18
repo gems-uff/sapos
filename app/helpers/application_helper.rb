@@ -52,7 +52,7 @@ module ApplicationHelper
     
     html += select_tag(
       "record[#{options[:country]}]", 
-      options_for_select([[I18n.translate("helpers.city_widget.select_country"), -1]] + Country.all.collect{|c| [c.name, c.id]}, country_id), 
+      options_for_select([[I18n.translate("helpers.city_widget.select_country"), nil]] + Country.all.collect{|c| [c.name, c.id]}, country_id), 
       {
         class: "city_widget_country", 
         data: {
@@ -64,7 +64,7 @@ module ApplicationHelper
     )
     html += select_tag(
       "record[#{options[:state]}]", 
-      options_for_select([[I18n.translate("helpers.city_widget.select_state"), -1]] + State.where("country_id" => country_id).collect{|s| [s.name, s.id]}, state_id),
+      options_for_select([[I18n.translate("helpers.city_widget.select_state"), nil]] + State.where("country_id" => country_id).collect{|s| [s.name, s.id]}, state_id),
       class: "city_widget_state", 
       data: {
         :city_dom_id => "#record_#{options[:city]}",
@@ -74,7 +74,7 @@ module ApplicationHelper
 
     html += select_tag(
       "record[#{options[:city]}]", 
-      options_for_select([[I18n.translate("helpers.city_widget.select_city"), -1]] + City.where("state_id" => state_id).collect{|c| [c.name, c.id]}, city_id)
+      options_for_select([[I18n.translate("helpers.city_widget.select_city"), nil]] + City.where("state_id" => state_id).collect{|c| [c.name, c.id]}, city_id)
     )
 
     html += loading_indicator_tag({ })

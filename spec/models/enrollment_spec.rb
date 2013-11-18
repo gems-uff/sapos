@@ -12,6 +12,8 @@ describe Enrollment do
   it { should restrict_destroy_when_exists :deferral }
   it { should restrict_destroy_when_exists :dismissal }
   it { should restrict_destroy_when_exists :scholarship_duration }
+  it { should restrict_destroy_when_exists :thesis_defense_committee_participation }
+
 
   let(:enrollment) { Enrollment.new }
   subject { enrollment }

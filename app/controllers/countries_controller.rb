@@ -15,9 +15,11 @@ class CountriesController < ApplicationController
   end
 
   def states
-    country = Country.find_by_id(params[:id])
     states = []
-    states = country.state.collect {|s| [s.name, s.id]} unless country.nil?
+    unless params[:id] == 'states'
+      country = Country.find_by_id(params[:id])
+      states = country.state.collect {|s| [s.name, s.id]} unless country.nil?
+    end
     respond_to do |format|
       format.json { render :json =>  states}
     end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131118011141) do
+ActiveRecord::Schema.define(:version => 20131118021603) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -271,9 +271,11 @@ ActiveRecord::Schema.define(:version => 20131118011141) do
     t.string   "siape"
     t.string   "enrollment_number"
     t.string   "identity_issuing_place"
+    t.integer  "institution_id"
   end
 
   add_index "professors", ["city_id"], :name => "index_professors_on_city_id"
+  add_index "professors", ["institution_id"], :name => "index_professors_on_institution_id"
 
   create_table "research_areas", :force => true do |t|
     t.string   "name"
@@ -382,6 +384,16 @@ ActiveRecord::Schema.define(:version => 20131118011141) do
   add_index "students", ["birth_city_id"], :name => "index_students_on_birth_city_id"
   add_index "students", ["birth_state_id"], :name => "index_students_on_state_id"
   add_index "students", ["city_id"], :name => "index_students_on_city_id"
+
+  create_table "thesis_defense_committee_participations", :force => true do |t|
+    t.integer  "professor_id"
+    t.integer  "enrollment_id"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+  end
+
+  add_index "thesis_defense_committee_participations", ["enrollment_id"], :name => "index_thesis_defense_committee_participations_on_enrollment_id"
+  add_index "thesis_defense_committee_participations", ["professor_id"], :name => "index_thesis_defense_committee_participations_on_professor_id"
 
   create_table "users", :force => true do |t|
     t.string   "name"

@@ -13,8 +13,11 @@ class Professor < ActiveRecord::Base
   has_many :research_areas, :through => :professor_research_areas
   has_many :professor_research_areas, :dependent => :restrict
   has_many :course_classes, :dependent => :restrict
-
+  has_many :thesis_defense_committee_participations, :dependent => :restrict
+  has_many :thesis_defense_committee_enrollments, :source => :enrollment, :through => :thesis_defense_committee_participations
+  
   belongs_to :city
+  belongs_to :institution
 
   has_paper_trail
 
