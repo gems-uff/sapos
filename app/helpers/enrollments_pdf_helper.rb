@@ -59,7 +59,9 @@ module EnrollmentsPdfHelper
             "#{I18n.t('pdf_content.enrollment.header.student_identity_number')}: " +
             "#{rescue_blank_text(enrollment.student.identity_number)}  ",
             "#{I18n.t('pdf_content.enrollment.header.identity_issuing_body')}: " +
-            "#{rescue_blank_text(enrollment.student.identity_issuing_body)}"
+            "#{rescue_blank_text(enrollment.student.identity_issuing_body)}  ",
+            "#{I18n.t('pdf_content.enrollment.header.identity_issuing_place')}: " +
+            "#{rescue_blank_text(enrollment.student.identity_issuing_place)}"
           ], [
             "#{I18n.t('pdf_content.enrollment.header.student_cpf')}: " +
             "#{rescue_blank_text(enrollment.student.cpf)}"

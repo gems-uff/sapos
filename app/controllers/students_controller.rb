@@ -18,6 +18,8 @@ class StudentsController < ApplicationController
     config.columns[:birth_state].form_ui = :hidden
     config.columns[:city].form_ui = :select
     config.columns[:civil_status].form_ui = :select
+    config.columns[:identity_issuing_place].form_ui = ""
+    
     #config.columns[:majors].form_ui = :record_select
     config.columns[:sex].form_ui = :select
     config.columns[:sex].options = {:options => [['Masculino', 'M'], ['Feminino', 'F']]}
@@ -43,6 +45,7 @@ class StudentsController < ApplicationController
          :cpf,
          :identity_number,
          :identity_issuing_body,
+         :identity_issuing_place, 
          :identity_expedition_date,
          :birth_state,
          :birth_city,

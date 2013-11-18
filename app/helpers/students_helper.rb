@@ -32,4 +32,10 @@ module StudentsHelper
     )
   end
 
+  def identity_issuing_place_form_column(record, options)
+    identity_issuing_place_widget(
+      text: record.identity_issuing_place
+    )
+  end
+
 end

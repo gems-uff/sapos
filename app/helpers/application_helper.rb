@@ -50,12 +50,9 @@ module ApplicationHelper
       city_id = nil if not city.nil? and city.state_id != state_id
     end
     
-    
-
-
     html += select_tag(
       "record[#{options[:country]}]", 
-      options_for_select([[I18n.translate("helpers.city_widget.select_country"), nil]] + Country.all.collect{|c| [c.name, c.id]}, country_id), 
+      options_for_select([[I18n.translate("helpers.city_widget.select_country"), -1]] + Country.all.collect{|c| [c.name, c.id]}, country_id), 
       {
         class: "city_widget_country", 
         data: {
@@ -67,7 +64,7 @@ module ApplicationHelper
     )
     html += select_tag(
       "record[#{options[:state]}]", 
-      options_for_select([[I18n.translate("helpers.city_widget.select_state"), nil]] + State.where("country_id" => country_id).collect{|s| [s.name, s.id]}, state_id),
+      options_for_select([[I18n.translate("helpers.city_widget.select_state"), -1]] + State.where("country_id" => country_id).collect{|s| [s.name, s.id]}, state_id),
       class: "city_widget_state", 
       data: {
         :city_dom_id => "#record_#{options[:city]}",
@@ -77,9 +74,73 @@ module ApplicationHelper
 
     html += select_tag(
       "record[#{options[:city]}]", 
-      options_for_select([[I18n.translate("helpers.city_widget.select_city"), nil]] + City.where("state_id" => state_id).collect{|c| [c.name, c.id]}, city_id)
+      options_for_select([[I18n.translate("helpers.city_widget.select_city"), -1]] + City.where("state_id" => state_id).collect{|c| [c.name, c.id]}, city_id)
     )
 
     html += loading_indicator_tag({ })
+  end
+
+  def identity_issuing_place_widget(options={})
+    options[:text] ||= ""
+    options[:select_field] ||= :identity_issuing_place_select
+    options[:text_field] ||= :identity_issuing_place
+    options[:show_states_link] ||= :identity_issuing_place_widget_show_states
+    options[:show_text_link] ||= :identity_issuing_place_widget_show_text
+
+    country = Configuration.identity_issuing_country
+    html = ""
+    show_text = true
+    unless country.nil?
+      states = country.state.collect do |s| 
+        show_text = false if s.name == options[:text]
+        [s.name, s.name]
+      end
+
+      html += select_tag(
+        "record[#{options[:select_field]}]", 
+        options_for_select([[I18n.translate("helpers.city_widget.select_state"), ""]] + states, options[:text]),
+        class: "identity_issuing_place_widget_select", 
+        data: {
+          :text_field_id => "#record_#{options[:text_field]}"
+        },
+        style: "display: #{show_text ? 'none' : 'inline-block'}"
+      )
+    end
+    html += text_field_tag(
+      "record[#{options[:text_field]}]", 
+      options[:text], 
+      class: "text-input",
+      maxlength: 255,
+      size: 30,
+      style: "display: #{show_text ? 'inline-block' : 'none'}"
+    )
+    unless country.nil?
+      html += link_to(
+        I18n.translate("helpers.identity_issuing_place_widget.show_states", :country=>country.name),
+        "#",
+        id: options[:show_states_link],
+        class: "identity_issuing_place_widget_show_state",
+        data: {
+          :hide => "#record_#{options[:text_field]}",
+          :show1 => "#record_#{options[:select_field]}",
+          :show2 => "##{options[:show_text_link]}",
+        },
+        style: "display: #{show_text ? 'inline-block' : 'none'}"
+      )
+      html += link_to(
+        I18n.translate("helpers.identity_issuing_place_widget.show_text"),
+        "#", 
+        id: options[:show_text_link],
+        class: "identity_issuing_place_widget_show_text",
+        data: {
+          :hide => "#record_#{options[:select_field]}",
+          :show1 => "#record_#{options[:text_field]}",
+          :show2 => "##{options[:show_states_link]}",
+        },
+        style: "display: #{show_text ? 'none' : 'inline-block'}"
+      )
+    end
+    
+    html
   end
 end

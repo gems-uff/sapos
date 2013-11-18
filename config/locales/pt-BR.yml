@@ -260,6 +260,7 @@ pt-BR:
         father_name: "Nome do Pai"
         identity_expedition_date: "Data de expedição da Identidade"
         identity_issuing_body: "Órgão Expeditor"
+        identity_issuing_place: "Local de Expedição"
         identity_number: "Número da identidade"
         job_position: "Cargo"        
         majors: "Cursos"
@@ -590,6 +591,9 @@ pt-BR:
       select_country: "Selecione o país"
       select_state: "Selecione o estado"
 
+    identity_issuing_place_widget:
+      show_states: "Mostrar estados do %{country}"
+      show_text: "Mostrar campo de texto"
 
     select:
       prompt: "Por favor selecione"
@@ -633,7 +637,8 @@ pt-BR:
         enrollment_dismissal_reason: "Motivo"
         enrollment_number: "Matrícula"
         graduation: "em Computação"
-        identity_issuing_body: "Órgão Expedidor"
+        identity_issuing_body: "Órgão"
+        identity_issuing_place: "Local de Expedição"
         student_birthdate: "Data de Nascimento"
         student_birthplace: "Naturalidade"
         student_cpf: "C.P.F."
