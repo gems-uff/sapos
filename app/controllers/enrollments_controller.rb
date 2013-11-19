@@ -127,9 +127,9 @@ class EnrollmentsController < ApplicationController
   def self.condition_for_active_column(column, value, like_pattern)
     query_inactive_enrollment = "select enrollment_id from dismissals where DATE(dismissals.date) <= DATE(?)"
     case value
-      when '0' then
+      when 'not_active' then
         sql = "enrollments.id in (#{query_inactive_enrollment})"
-      when '1' then
+      when 'active' then
         sql = "enrollments.id not in (#{query_inactive_enrollment})"
       else
         sql = ""
