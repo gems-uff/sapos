@@ -71,7 +71,7 @@ module CourseClassesPdfHelper
             class_enrollment.enrollment.student.name,
             number_to_grade(class_enrollment.grade),
             class_enrollment.attendance_to_label,
-            class_enrollment.situation,
+            class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.registered") ? "" : class_enrollment.situation,
             class_enrollment.obs
         ]
       end
