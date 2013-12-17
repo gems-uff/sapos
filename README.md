@@ -25,6 +25,7 @@ This project was initiated by professors **Leonardo Murta** and **Vanessa Bragan
 * Viviane Moura Aceti Alves (usage feedback)
 * Carol Cruz (text revision)
 * Juliana Serra Affonso (design)
+* Pedro Henrique Pegado Ribeiro (logo designer)
 
 #Documentation
 
