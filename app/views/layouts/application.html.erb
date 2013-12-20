@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/html">
 <head>
   <title>Sapos</title>
-  <%= favicon_link_tag 'sapo.gif' %>
+  <%= favicon_link_tag 'logoSapos-circle.png' %>
 
   <%= stylesheet_link_tag "application", :media => "all" %>
 
@@ -23,32 +23,19 @@
 </head>
 <body>
 
-<p class="notice"><%= notice %></p>
-<p class="alert"><%= alert %></p>
-
-<div id="steelmeshdark"></div>
-<div id="menubardiv"></div>
+<span class="notice"><%= notice %></span>
 
 <div id='main_content'>
   <div class='menu'>
     <div class='header'>
-
-      <% if session[:user_id] %>
-          <div id="logout_button">
-            <%= button_to 'Logout', logout_path, :method => :delete %>
-          </div>
-      <% end %>
-
-      <div class='title'>
-        <%= image_tag 'logoSapos.png' %>
+      <div class='logo'>
+        <%= link_to root_path do %>
+          <%= image_tag 'logoSapos.png' %>
+        <% end %>
       </div>
       <div class="sub">
-        <span>
-          <a href="http://www.ic.uff.br" target="_blank">Instituto de Computação /</a>
-          <a href="http://www.uff.br" target="_blank">UFF</a>
-        </span>
         <span id="saposgif">
-          Versão <%= APP_VERSION %> <%= image_tag 'sapo.gif', :width => '20' %>
+          Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %>
         </span>
       </div>
     </div>
@@ -65,12 +52,11 @@
       </div>
     </div>
 
-    <div id="credits_footer">
-      <%= link_to I18n.t("doc.credits"), credits_show_path %>
+    <div id="credits-below-content">
+      <small>SAPOS desenvolvido por <%= link_to 'IC/UFF', 'http://www.ic.uff.br/', :target => '_blank' %></small>
     </div>
-
   </div>
 </div>
 
 </body>
-</html> 
+</html>
