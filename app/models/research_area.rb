@@ -3,6 +3,7 @@
 
 class ResearchArea < ActiveRecord::Base
   has_many :courses, :dependent => :restrict
+  has_many :enrollments, :dependent => :restrict
   has_many :professors, :through => :professor_research_areas
   has_many :professor_research_areas, :dependent => :restrict
 

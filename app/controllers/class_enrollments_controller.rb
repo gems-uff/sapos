@@ -13,8 +13,8 @@ class ClassEnrollmentsController < ApplicationController
 
     config.columns[:enrollment].form_ui = :record_select
     config.columns[:course_class].form_ui = :record_select
-    config.columns[:situation].form_ui = :select
     config.columns[:grade].options =  {:format => :i18n_number, :i18n_options => {:format_as => "grade"}}
+    config.columns[:situation].form_ui = :select
     config.columns[:situation].options = {:options => ClassEnrollment::SITUATIONS, :include_blank => I18n.t("active_scaffold._select_")}
 
     config.columns =

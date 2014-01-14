@@ -2,31 +2,21 @@
 # Copyright (c) 2013 Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-prawn_document(:left_margin => 20, :right_margin => 20, :top_margin => 30, :bottom_margin => 80, :filename => 'transcript.pdf') do |pdf|
-    header(pdf)
+require "prawn/measurement_extensions"
 
-    document_title(pdf, I18n.t('pdf_content.enrollment.academic_transcript.title'))
+new_document('transcript.pdf') do |pdf|
+    
+    header_uff(pdf, I18n.t("pdf_content.enrollment.header.title"))
+
+    enrollment_student_header(pdf, enrollment: @enrollment)
 
     enrollment_header(pdf, enrollment: @enrollment)
 
     transcript_table(pdf, class_enrollments: @class_enrollments)
 
-    accomplished_table(pdf, accomplished_phases: @accomplished_phases)
-    
-    if not @enrollment.dismissal.nil? and @enrollment.dismissal.dismissal_reason.show_advisor_name
-    	advisors_list(pdf, enrollment: @enrollment)
+    no_page_break(pdf) do
+        thesis_table(pdf, enrollment: @enrollment)
     end
-
-    if not(@enrollment.thesis_title.nil? or @enrollment.thesis_title.empty?)
-      thesis_table(pdf, 
-        thesis_title: @enrollment.thesis_title, 
-        thesis_defense_date: @enrollment.thesis_defense_date,
-        thesis_defense_committee: @enrollment.thesis_defense_committee_professors
-      )
-    end
-
-    pdf.repeat(:all, dynamic: true) do
-      page_footer(pdf)
-    end
+ 
 end
 

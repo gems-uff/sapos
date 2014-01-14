@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20131118160144) do
+ActiveRecord::Schema.define(:version => 20140114213849) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -161,6 +161,7 @@ ActiveRecord::Schema.define(:version => 20131118160144) do
     t.datetime "created_at",                           :null => false
     t.datetime "updated_at",                           :null => false
     t.boolean  "show_advisor_name", :default => false
+    t.string   "thesis_judgement"
   end
 
   create_table "dismissals", :force => true do |t|
@@ -192,6 +193,8 @@ ActiveRecord::Schema.define(:version => 20131118160144) do
     t.datetime "updated_at",           :null => false
     t.string   "thesis_title"
     t.date     "thesis_defense_date"
+    t.integer  "research_area_id"
+    t.string   "entrance_exam_result"
   end
 
   add_index "enrollments", ["enrollment_status_id"], :name => "index_enrollments_on_enrollment_status_id"
@@ -238,8 +241,9 @@ ActiveRecord::Schema.define(:version => 20131118160144) do
   create_table "phases", :force => true do |t|
     t.string   "name"
     t.string   "description"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+    t.boolean  "is_language", :default => false
   end
 
   create_table "professor_research_areas", :force => true do |t|

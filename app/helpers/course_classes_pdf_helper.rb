@@ -7,21 +7,12 @@ module CourseClassesPdfHelper
   def summary_header(pdf, options={})
     course_class ||= options[:course_class]
 
+    widths = [576, 100, 130]
+
     top_header = [["<b>#{I18n.t("pdf_content.course_class.summary.course_name").upcase}</b>",
                    "<b>#{I18n.t("pdf_content.course_class.summary.year_semester").upcase}</b>",
                    "<b>#{I18n.t("pdf_content.course_class.summary.lesson").upcase}</b>"
                   ]]
-
-    top_width = [490, 100, 130]
-    pdf.table(top_header, :column_widths => top_width,
-              :row_colors => ["BFBFBF"],
-              :cell_style => {:font => 'Courier',
-                              :size => 10,
-                              :inline_format => true,
-                              :border_width => 0,
-                              :align => :center
-              }
-    )
 
     top_data = [[
                     course_class.course.name + (course_class.name.blank? ? '' : " (#{course_class.name})"),
@@ -29,20 +20,16 @@ module CourseClassesPdfHelper
                     ''
                 ]]
 
-    pdf.table(top_data, :column_widths => top_width,
-              :row_colors => ["FFFFFF"],
-              :cell_style => {:font => 'Courier',
-                              :size => 8,
-                              :inline_format => true,
-                              :border_width => 0
-              }
-    )
+    simple_pdf_table(pdf, widths, top_header, top_data) do |table|
+      table.column(0).align = :left
+      table.column(0).padding = [2, 4]
+    end
   end
 
   def summary_table(pdf, options={})
     course_class ||= options[:course_class]
 
-    table_width = [30, 105, 285, 45, 45, 60, 150]
+    table_width = [30, 105, 285, 45, 45, 60, 236]
 
     header = [["<b>#{I18n.t("pdf_content.course_class.summary.sequential_number")}</b>",
                "<b>#{I18n.t("pdf_content.course_class.summary.enrollment_number")}</b>",
@@ -51,16 +38,6 @@ module CourseClassesPdfHelper
                "<b>#{I18n.t("pdf_content.course_class.summary.attendance")}</b>",
                "<b>#{I18n.t("pdf_content.course_class.summary.situation")}</b>",
                "<b>#{I18n.t("pdf_content.course_class.summary.obs")}</b>"]]
-
-    pdf.table(header, :column_widths => table_width,
-              :row_colors => ["BFBFBF"],
-              :cell_style => {:font => "Courier",
-                              :size => 10,
-                              :inline_format => true,
-                              :border_width => 0,
-                              :align => :left
-              }
-    )
 
     unless course_class.class_enrollments.empty?
       i=0
@@ -75,16 +52,15 @@ module CourseClassesPdfHelper
             class_enrollment.obs
         ]
       end
-
-      pdf.table(table_data, :column_widths => table_width,
-                :row_colors => ["FFFFFF", "F0F0F0"],
-                :cell_style => {:font => "Courier",
-                                :size => 8,
-                                :inline_format => true,
-                                :border_width => 0
-                }
-      )
+    else
+      table_data = []
     end
+
+    simple_pdf_table(pdf, table_width, header, table_data, distance: 0) do |table|
+      table.column(2).align = :left
+      table.column(2).padding = [2, 4]
+    end
+
 
     pdf.move_down 50
   end

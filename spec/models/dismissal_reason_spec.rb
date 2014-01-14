@@ -29,5 +29,25 @@ describe DismissalReason do
         end
       end
     end
+     describe "thesis_judgement" do
+      context "should be valid when" do
+        it "thesis_judgement is in the list" do
+          dismissal_reason.thesis_judgement = DismissalReason::THESIS_JUDGEMENT.first
+          dismissal_reason.should have(0).errors_on :thesis_judgement
+        end
+      end
+      context "should have error blank when" do
+        it "entrance_exam_result is null" do
+          dismissal_reason.thesis_judgement = nil
+          dismissal_reason.should have_error(:blank).on :thesis_judgement
+        end
+      end
+      context "should have error inclusion when" do
+        it "entrance_exam_result is not in the list" do
+          dismissal_reason.thesis_judgement = "ANYTHING NOT IN THE LIST"
+          dismissal_reason.should have_error(:inclusion).on :thesis_judgement
+        end
+      end
+    end
   end
 end

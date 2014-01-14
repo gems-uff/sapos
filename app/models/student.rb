@@ -36,8 +36,8 @@ class Student < ActiveRecord::Base
 
   def birthplace
     return nil if birth_city.nil? and birth_state.nil?
-    return "#{birth_state.name}, #{birth_state.country.name}" if birth_city.nil? 
-    "#{birth_city.name}, #{birth_city.state.name}, #{birth_city.state.country.name}"
+    return "#{birth_state.country.name}" if birth_city.nil? 
+    "#{birth_city.state.country.name}"
   end
 
   protected
