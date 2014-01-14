@@ -149,7 +149,8 @@ module EnrollmentsHelper
         return record.level.name
       end
     end
-    select :record, :level, options_for_select(Level.all.map {|level| [level.name, level.id]})
+    selected = record.level.nil? ? nil : record.level.id 
+    select :record, :level, options_for_select(Level.all.map {|level| [level.name, level.id]}, :selected => selected) 
   end
 
 #  TODO , quando se edita uma matrícula, esta retorna todas as Realizações de etapa que o nível da matrícula
