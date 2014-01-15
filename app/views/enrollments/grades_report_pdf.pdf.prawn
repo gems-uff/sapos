@@ -7,7 +7,7 @@ new_document('grades_report.pdf') do |pdf|
 
     enrollment_student_header(pdf, enrollment: @enrollment)
 
-    enrollment_header(pdf, enrollment: @enrollment, show_dismissal: true)
+    grades_report_header(pdf, enrollment: @enrollment)
 
 
     grades_report_table(pdf, enrollment: @enrollment, class_enrollments: @class_enrollments)
@@ -20,6 +20,10 @@ new_document('grades_report.pdf') do |pdf|
 
     no_page_break(pdf) do
     	accomplished_table(pdf, accomplished_phases: @accomplished_phases)
+    end
+
+    no_page_break(pdf) do
+        deferrals_table(pdf, deferrals: @deferrals)
     end
 
 end

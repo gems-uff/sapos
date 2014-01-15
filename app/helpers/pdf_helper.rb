@@ -7,7 +7,7 @@ require "prawn/measurement_extensions"
 
 module PdfHelper
   
-  def header_uff(pdf, title, &block)
+  def header_uff(pdf, title, options={}, &block)
     puts pdf.bounds.left + pdf.bounds.right
     pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right, :height => 90) do
       pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right - 170, :height => 68) do
@@ -22,6 +22,7 @@ module PdfHelper
 
       pdf.bounding_box([0, pdf.cursor - 3], :width => pdf.bounds.left + pdf.bounds.right - 170, :height => 19) do
           pdf.stroke_bounds
+          
           pdf.fill_color '333399'
           pdf.fill_and_stroke_rectangle(
               [pdf.bounds.left, pdf.cursor],
@@ -37,7 +38,9 @@ module PdfHelper
 
 
       pdf.bounding_box([pdf.bounds.left + pdf.bounds.right - 153, 90], :width => 153, :height => 90) do
-          pdf.stroke_bounds
+          unless options[:hide_logo_stroke_bounds]
+            pdf.stroke_bounds
+          end
           unless block.nil?
             yield
           else
@@ -52,10 +55,10 @@ module PdfHelper
   end
 
   def header_ic(pdf, title)
-    header_uff(pdf, title) do
-      pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [30, 72],
+    header_uff(pdf, title, hide_logo_stroke_bounds: true) do
+      pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [13, 89],
               :vposition => :top,
-              :scale => 0.4)
+              :scale => 0.6)
     end
   end
 

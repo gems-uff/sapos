@@ -216,6 +216,9 @@ class EnrollmentsController < ApplicationController
 
     @accomplished_phases = @enrollment.accomplishments.order(:conclusion_date)
 
+    @deferrals = @enrollment.deferrals.order(:approval_date)
+
+
     respond_to do |format|
       format.pdf do
         send_data render_to_string, :filename => "#{I18n.t('pdf_content.enrollment.grades_report.title')} -  #{@enrollment.student.name}.pdf", :type => 'application/pdf'

@@ -703,6 +703,7 @@ pt-BR:
         page: "Pág. nº "
         warning1: "Este documento só é válido sem rasuras, com selo da UFF e com a assinatura do Coordenador."
       academic_transcript:
+        deferrals: "Prorrogações"
         accomplished_phases: "Etapas obrigatórias concluídas"
         advisors: "Orientadores"
         link: "Histórico"

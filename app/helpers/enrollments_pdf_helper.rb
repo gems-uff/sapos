@@ -43,90 +43,55 @@ module EnrollmentsPdfHelper
     end
   end
 
-  def enrollment_header(pdf, options={})
-    enrollment ||= options[:enrollment]
-    pdf.bounding_box([0, pdf.cursor - 3], :width => 560) do
-      
-      pdf.font('Courier', :size => 8) do
-        data_table = [
-          [
-            "#{I18n.t('pdf_content.enrollment.header.course')} " +
-            "<b>#{rescue_blank_text(enrollment.level.name.nil? ? nil : (enrollment.level.name + I18n.t('pdf_content.enrollment.header.graduation')))}</b>"
-          ], [
-            "#{I18n.t('pdf_content.enrollment.header.field_of_study')} " +
-            "<b>#{rescue_blank_text(enrollment.research_area, method_call: :name)}</b>"
-          ], [
-            "#{I18n.t('pdf_content.enrollment.header.program_level')} " +
-            "<b>#{Configuration.program_level} </b>"
-          ]
+  def common_header_part(pdf, options={}, &block)
+    data_table = yield
+    pdf.indent(5) do
+      text_table(pdf, data_table, 8)
+    end 
+    
+    pdf.move_down 5
+    unless options[:hide_stroke]
+      pdf.horizontal_line 0, 560
+    end
+  end
+
+  def common_header_part1(pdf, enrollment, extra=[])
+    common_header_part(pdf) do
+      [
+        [
+          "#{I18n.t('pdf_content.enrollment.header.course')} " +
+          "<b>#{rescue_blank_text(enrollment.level.name.nil? ? nil : (enrollment.level.name + I18n.t('pdf_content.enrollment.header.graduation')))}</b>"
+        ], [
+          "#{I18n.t('pdf_content.enrollment.header.field_of_study')} " +
+          "<b>#{rescue_blank_text(enrollment.research_area, method_call: :name)}</b>"
         ]
+      ] + extra
+    end
+  end
 
-        pdf.indent(5) do
-          text_table(pdf, data_table, 8)
-        end 
-        pdf.line_width 0.5
-        pdf.move_down 5
-        pdf.horizontal_line 0, 560
-
-        data_table = [
-          [
-            "#{I18n.t('pdf_content.enrollment.header.enrollment_admission_result')} " +
-            "<b>#{I18n.t('pdf_content.enrollment.header.entrance_exam_approved')}</b>"
-          ]
-        ]
-
-        pdf.indent(5) do
-          text_table(pdf, data_table, 8)
-        end 
-
-
-        pdf.move_down 5
-        pdf.horizontal_line 0, 560
-
-        languages = enrollment.accomplishments.joins(:phase).where(phases: {:is_language => true})
-        str = "#{I18n.t('pdf_content.enrollment.header.language_tests')}:"
-        unless languages.empty?
-          data_table = []
-          languages.each do |accomplishment|
-            data_table.push([
-              "#{str} " +
-              "<b>#{I18n.t('pdf_content.enrollment.header.approved')} #{accomplishment.phase.name}</b>" 
-            ])
-            str = "|" + " "*(str.size - 1)
-          end
-        else
-          data_table = [
-            [
-              "#{str} " +
-              "<b>#{I18n.t('pdf_content.enrollment.header.no_test')}</b>"
-            ]
-          ]
-        end
-
-        pdf.indent(5) do
-          text_table(pdf, data_table, 8)
-        end 
-
-        pdf.move_down 5
-        pdf.horizontal_line 0, 560
-
-        data_table = [
+  def common_header_part2(pdf, enrollment, hide_stroke)
+    common_header_part(pdf, {hide_stroke: hide_stroke}) do
+      data_table = [
           [
             "#{I18n.t('pdf_content.enrollment.header.enrollment_admission_date')} " +
             "<b>#{I18n.localize(enrollment.admission_date, :format => :monthyear2)}</b>"
           ]
         ]
+    end  
+  end
 
-        pdf.indent(5) do
-          text_table(pdf, data_table, 8)
-        end 
+  def grades_report_header(pdf, options={}) 
+    enrollment ||= options[:enrollment]
+    pdf.bounding_box([0, pdf.cursor - 3], :width => 560) do
+      pdf.font('Courier', :size => 8) do
+        pdf.line_width 0.5
 
-        pdf.move_down 5
+        common_header_part1(pdf, enrollment)
 
-        if options[:show_dismissal]
-          pdf.horizontal_line 0, 560
+        common_header_part2(pdf, enrollment, false)
 
-          data_table = [
+        common_header_part(pdf, {hide_stroke: true}) do
+          [
             [
               "#{I18n.t('pdf_content.enrollment.header.enrollment_dismissal_date')} " +
               "<b>#{enrollment.dismissal ? " #{"#{I18n.localize(enrollment.dismissal.date, :format => :monthyear2)}"}" : "--"}</b>   ",
@@ -134,13 +99,63 @@ module EnrollmentsPdfHelper
               "<b>#{enrollment.dismissal ? " #{enrollment.dismissal.dismissal_reason.name}" : "--"}</b>"
             ]
           ]
-
-          pdf.indent(5) do
-            text_table(pdf, data_table, 8)
-          end 
-
-          pdf.move_down 5
         end
+
+        pdf.close_and_stroke
+        pdf.line_width 1
+        pdf.stroke_bounds
+      end
+    end
+
+  end
+
+
+  def enrollment_header(pdf, options={})
+    enrollment ||= options[:enrollment]
+    pdf.bounding_box([0, pdf.cursor - 3], :width => 560) do
+      pdf.font('Courier', :size => 8) do
+        pdf.line_width 0.5
+
+        common_header_part1(pdf, enrollment, [
+          "#{I18n.t('pdf_content.enrollment.header.program_level')} " +
+          "<b>#{Configuration.program_level} </b>"
+        ])
+
+        common_header_part(pdf) do
+          [
+            [
+              "#{I18n.t('pdf_content.enrollment.header.enrollment_admission_result')} " +
+              "<b>#{I18n.t('pdf_content.enrollment.header.entrance_exam_approved')}</b>"
+            ]
+          ]
+        end
+
+        common_header_part(pdf) do
+          languages = enrollment.accomplishments.joins(:phase).where(phases: {:is_language => true})
+          str = "#{I18n.t('pdf_content.enrollment.header.language_tests')}:"
+          unless languages.empty?
+            data_table = []
+            languages.each do |accomplishment|
+              data_table.push([
+                "#{str} " +
+                "<b>#{I18n.t('pdf_content.enrollment.header.approved')} #{accomplishment.phase.name}</b>" 
+              ])
+              str = "|" + " "*(str.size - 1)
+            end
+          else
+            data_table = [
+              [
+                "#{str} " +
+                "<b>#{I18n.t('pdf_content.enrollment.header.no_test')}</b>"
+              ]
+            ]
+          end
+          data_table
+        end
+
+
+        common_header_part2(pdf, enrollment, true)
+        
 
         pdf.close_and_stroke
         pdf.line_width 1
@@ -353,6 +368,48 @@ module EnrollmentsPdfHelper
         end
 
         pdf.table(phases_table_data, :column_widths => phases_table_width,
+                  :row_colors => ["F2F2FF", "E5E5FF"],
+                  :cell_style => {:font => "Courier",
+                                  :size => 10,
+                                  :inline_format => true,
+                                  :border_width => 0,
+                                  :align => :left
+                  }
+        )
+
+        pdf.stroke_bounds
+      end
+    end
+  end
+
+  def deferrals_table(pdf, options={})
+    deferrals ||= options[:deferrals]
+
+    unless deferrals.empty?
+      pdf.bounding_box([0, pdf.cursor - 3], :width => 560) do
+
+        deferrals_table_width = [pdf.bounds.right]
+
+
+        deferrals_table_header = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.deferrals")}</b>"]]
+
+        pdf.table(deferrals_table_header, :column_widths => deferrals_table_width,
+                  :row_colors => ["E5E5FF"],
+                  :cell_style => {:font => "Courier",
+                                  :size => 10,
+                                  :inline_format => true,
+                                  :border_width => 1,
+                                  :align => :center
+                  }
+        )
+
+        deferrals_table_data = deferrals.map do |deferral|
+          [
+              "#{I18n.localize(deferral.approval_date, :format => :monthyear2)} #{deferral.deferral_type.name}"
+          ]
+        end
+
+        pdf.table(deferrals_table_data, :column_widths => deferrals_table_width,
                   :row_colors => ["F2F2FF", "E5E5FF"],
                   :cell_style => {:font => "Courier",
                                   :size => 10,
