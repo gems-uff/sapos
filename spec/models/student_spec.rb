@@ -65,15 +65,15 @@ describe Student do
     end
 
     describe "birthplace" do
-      it "should return city, state, country, when birth_city is specified" do
+      it "should return country, when birth_city is specified" do
         city = FactoryGirl.create(:city)
         student = FactoryGirl.create(:student, :birth_city => city)
-        student.birthplace.should == "#{city.name}, #{city.state.name}, #{city.state.country.name}"
+        student.birthplace.should == "#{city.state.country.name}"
       end
-      it "should return city, state, country, when birth_city is not specified" do
+      it "should return country, when birth_city is not specified" do
         state = FactoryGirl.create(:state)
         student = FactoryGirl.create(:student, :birth_state => state)
-        student.birthplace.should == "#{state.name}, #{state.country.name}"
+        student.birthplace.should == "#{state.country.name}"
       end
       it "should return nil when neither birth_city and birth_state are specified" do
         student = FactoryGirl.create(:student)

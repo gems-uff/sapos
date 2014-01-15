@@ -33,18 +33,14 @@ describe Enrollment do
       end
       context "should have advisment error when it" do
         it "has just one advisor that is not a main advisor" do
-          enrollment.student = Student.new
-          enrollment.advisements.build
+          enrollment.advisements << FactoryGirl.create(:advisement, :main_advisor => false)
           enrollment.should_not be_valid
           enrollment.errors[:base].should include I18n.translate("activerecord.errors.models.enrollment.main_advisor_required")
         end
 
         it "has more than one main advisor" do
-          enrollment.student = Student.new
-          advisement1 = enrollment.advisements.build 
-          advisement1.main_advisor = true
-          advisement2 = enrollment.advisements.build 
-          advisement2.main_advisor = true
+          enrollment.advisements << advisement1 = FactoryGirl.create(:advisement, :main_advisor => true)
+          enrollment.advisements << advisement2 = FactoryGirl.create(:advisement, :main_advisor => true)
           enrollment.should_not be_valid
           enrollment.errors[:base].should include I18n.translate("activerecord.errors.models.enrollment.main_advisor_uniqueness")
         end
@@ -100,6 +96,26 @@ describe Enrollment do
         end
       end
     end
+    describe "entrance_exam_result" do
+      context "should be valid when" do
+        it "entrance_exam_result is in the list" do
+          enrollment.entrance_exam_result = Enrollment::ENTRANCE_EXAM_RESULT.first
+          enrollment.should have(0).errors_on :entrance_exam_result
+        end
+      end
+      context "should have error blank when" do
+        it "entrance_exam_result is null" do
+          enrollment.entrance_exam_result = nil
+          enrollment.should have_error(:blank).on :entrance_exam_result
+        end
+      end
+      context "should have error inclusion when" do
+        it "entrance_exam_result is not in the list" do
+          enrollment.entrance_exam_result = "ANYTHING NOT IN THE LIST"
+          enrollment.should have_error(:inclusion).on :entrance_exam_result
+        end
+      end
+    end
     describe "thesis_defense_date" do
       context "should be valid when" do
         it "is after admission_date" do
@@ -113,6 +129,40 @@ describe Enrollment do
           enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
           enrollment.thesis_defense_date = 4.days.ago.to_date
           enrollment.should have_error(:thesis_defense_date_before_admission_date).on :thesis_defense_date
+        end
+      end
+    end
+
+    describe "research_area" do
+      context "should be valid when" do
+        it "is empty" do
+          enrollment = FactoryGirl.create(:enrollment, :research_area => nil)
+          enrollment.should have(0).errors_on :research_area
+        end
+
+        it "is the same research_area as the advisor" do
+          research_area = FactoryGirl.create(:research_area) 
+          enrollment = FactoryGirl.create(:enrollment, :research_area => research_area)
+          professor = FactoryGirl.create(:professor, :research_areas => [research_area])
+          FactoryGirl.create(:advisement, :enrollment => enrollment, :professor => professor)
+          enrollment.should have(0).errors_on :research_area
+        end
+
+        it "there is no advisor" do
+          research_area = FactoryGirl.create(:research_area) 
+          enrollment = FactoryGirl.create(:enrollment, :research_area => research_area)
+          enrollment.should have(0).errors_on :research_area
+        end
+      end
+      context "should not be valid when" do
+        it "is not the same area as the advisor" do
+          research_area1 = FactoryGirl.create(:research_area) 
+          research_area2 = FactoryGirl.create(:research_area) 
+          enrollment = FactoryGirl.create(:enrollment, :research_area => research_area1)
+          professor = FactoryGirl.create(:professor, :research_areas => [research_area2])
+          FactoryGirl.create(:advisement, :enrollment => enrollment, :professor => professor)
+          enrollment.save
+          enrollment.errors[:research_area].should include I18n.translate("activerecord.errors.models.enrollment.research_area_different_from_professors")
         end
       end
     end

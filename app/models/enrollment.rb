@@ -4,10 +4,15 @@
 
 class Enrollment < ActiveRecord::Base
   attr_accessible :enrollment_number, :admission_date, :obs, :thesis_title, 
-    :thesis_defense_date
+    :thesis_defense_date, :entrance_exam_result
+
+  ENTRANCE_EXAM_RESULT = [I18n.translate("activerecord.attributes.enrollment.entrance_exam_results.firstplace"), I18n.translate("activerecord.attributes.enrollment.entrance_exam_results.approved")]
+
+
   belongs_to :student
   belongs_to :level
   belongs_to :enrollment_status
+  belongs_to :research_area
 
   has_many :professors, :through => :advisements, :readonly => false
   has_many :scholarships, :through => :scholarship_durations
@@ -27,11 +32,14 @@ class Enrollment < ActiveRecord::Base
   validates :enrollment_number, :presence => true, :uniqueness => true
   validates :level, :presence => true
   validates :enrollment_status, :presence => true
+  validates :entrance_exam_result, :presence => true, :inclusion => {:in => ENTRANCE_EXAM_RESULT}
   validates :student, :presence => true
 
   validate :enrollment_has_main_advisor
 
   validates_date :thesis_defense_date, :on_or_after => :admission_date, :allow_nil => true, :on_or_after_message => I18n.t("activerecord.errors.models.enrollment.thesis_defense_date_before_admission_date")
+
+  validate :verify_research_area_with_advisors
 
   def to_label
     "#{enrollment_number} - #{student.name}"
@@ -135,6 +143,18 @@ class Enrollment < ActiveRecord::Base
       errors.add(:base, I18n.translate("activerecord.errors.models.enrollment.main_advisor_uniqueness")) if main_advisors > 1
 
       
+    end
+  end
+
+  def verify_research_area_with_advisors
+    unless advisements.nil? or advisements.empty?
+      research_areas = []
+      advisements.each do |advisement|
+        research_areas += advisement.professor.research_areas unless advisement.professor.research_areas.nil?
+      end
+      unless research_areas.include? research_area
+        errors.add(:research_area, I18n.translate("activerecord.errors.models.enrollment.research_area_different_from_professors"))
+      end
     end
   end
 end

@@ -2,13 +2,23 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class DismissalReason < ActiveRecord::Base
-   validates :name, :presence => true, :uniqueness => true
 
-   attr_accessible :name, :show_advisor_name
+  THESIS_JUDGEMENT = [
+    I18n.translate("activerecord.attributes.dismissal_reason.thesis_judgements.approved"), 
+    I18n.translate("activerecord.attributes.dismissal_reason.thesis_judgements.reproved"), 
+    I18n.translate("activerecord.attributes.dismissal_reason.thesis_judgements.invalid")
+  ]
 
-   has_paper_trail
+   
+  attr_accessible :name, :show_advisor_name, :thesis_judgement
 
-   def to_label
-  	"#{self.name}"
+  validates :name, :presence => true, :uniqueness => true
+  validates :thesis_judgement, :presence => true, :inclusion => {:in => THESIS_JUDGEMENT}
+  
+
+  has_paper_trail
+
+  def to_label
+    "#{self.name}"
   end
 end

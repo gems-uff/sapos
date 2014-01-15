@@ -2,21 +2,25 @@
 # Copyright (c) 2013 Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-prawn_document(:left_margin => 20, :right_margin => 20, :top_margin => 30, :bottom_margin => 80, :filename => 'grades_report.pdf') do |pdf|
-    header(pdf)
+new_document('grades_report.pdf') do |pdf|
+    header_ic(pdf, I18n.t('pdf_content.enrollment.grades_report.title'))
 
-    document_title(pdf, I18n.t('pdf_content.enrollment.grades_report.title'))
+    enrollment_student_header(pdf, enrollment: @enrollment)
 
-    enrollment_header(pdf, enrollment: @enrollment)
+    enrollment_header(pdf, enrollment: @enrollment, show_dismissal: true)
 
-    grades_report_table(pdf, enrollment: @enrollment)
 
-    accomplished_table(pdf, accomplished_phases: @accomplished_phases)
+    grades_report_table(pdf, enrollment: @enrollment, class_enrollments: @class_enrollments)
 
-    advisors_list(pdf, enrollment: @enrollment)
 
-    pdf.repeat(:all, dynamic: true) do
-      page_footer(pdf)
+
+    no_page_break(pdf) do
+        thesis_table(pdf, enrollment: @enrollment, show_advisors: true)
     end
+
+    no_page_break(pdf) do
+    	accomplished_table(pdf, accomplished_phases: @accomplished_phases)
+    end
+
 end
 

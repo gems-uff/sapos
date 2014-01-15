@@ -55,8 +55,9 @@ class ScholarshipsController < ApplicationController
       scholarship_durations = ScholarshipDuration.arel_table
 
       allocated_with_end_date = Scholarship.joins(:scholarship_durations)
-        .where(scholarship_durations[:end_date].lt(dt)
-          .and(scholarship_durations[:cancel_date].eq(nil))
+        .where(((scholarship_durations[:end_date].lt(dt)
+            .and(scholarship_durations[:cancel_date].eq(nil)))
+          .or(scholarship_durations[:cancel_date].lt(dt)))
           .and(scholarships[:end_date].eq(nil)
             .or(scholarships[:end_date].gt(Date.today))))
         .collect{ |scholarship| scholarship.id }

@@ -2,7 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Phase < ActiveRecord::Base
-  attr_accessible :name
+  attr_accessible :name, :is_language
   has_many :accomplishments, :dependent => :restrict
   has_many :enrollments, :through => :accomplishments
   has_many :phase_durations, :dependent => :restrict

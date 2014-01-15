@@ -7,28 +7,21 @@ module AdvisementsPdfHelper
   def advisements_table(pdf, options={})
     advisements ||= options[:advisements]
 
+    widths = [140, 140, 140, 140]
+
     header = [["<b>#{I18n.t("pdf_content.advisements.to_pdf.professor_name")}</b>",
                "<b>#{I18n.t("pdf_content.advisements.to_pdf.enrollment_number")}</b>",
                "<b>#{I18n.t("pdf_content.advisements.to_pdf.student_name")}</b>",
                "<b>#{I18n.t("pdf_content.advisements.to_pdf.level_name")}</b>"]]
 
-    pdf.table(header, :column_widths => [135, 135, 135, 135],
-              :row_colors => ["BFBFBF"],
-              :cell_style => {:font => "Courier",
-                              :size => 10,
-                              :inline_format => true,
-                              :border_width => 0
-              }
-    )
-    
-    pdf.table(advisements, :column_widths => [135, 135, 135, 135],
-              :row_colors => ["FFFFFF", "F0F0F0"],
-              :cell_style => {:font => "Courier",
-                              :size => 8,
-                              :inline_format => true,
-                              :border_width => 0
-              }
-    )
+    simple_pdf_table(pdf, widths, header, advisements) do |table|
+      table.column(0).align = :left
+      table.column(0).padding = [2, 4]
+      table.column(2).align = :left
+      table.column(2).padding = [2, 4]
+    end
+
+   
   end
 
 end
