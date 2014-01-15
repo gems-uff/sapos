@@ -71,7 +71,7 @@ module EnrollmentsPdfHelper
         data_table = [
           [
             "#{I18n.t('pdf_content.enrollment.header.enrollment_admission_result')} " +
-            "<b>#{rescue_blank_text(enrollment.entrance_exam_result)}</b>"
+            "<b>#{I18n.t('pdf_content.enrollment.header.entrance_exam_approved')}</b>"
           ]
         ]
 

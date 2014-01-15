@@ -37,13 +37,13 @@ describe DismissalReason do
         end
       end
       context "should have error blank when" do
-        it "entrance_exam_result is null" do
+        it "thesis_judgement is null" do
           dismissal_reason.thesis_judgement = nil
           dismissal_reason.should have_error(:blank).on :thesis_judgement
         end
       end
       context "should have error inclusion when" do
-        it "entrance_exam_result is not in the list" do
+        it "thesis_judgement is not in the list" do
           dismissal_reason.thesis_judgement = "ANYTHING NOT IN THE LIST"
           dismissal_reason.should have_error(:inclusion).on :thesis_judgement
         end

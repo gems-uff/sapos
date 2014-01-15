@@ -65,13 +65,11 @@ class EnrollmentsController < ApplicationController
 #Student can not be configured as record select because it does not allow the user to create a new one, if needed
     config.columns[:student].form_ui = :record_select
     config.columns[:enrollment_status].form_ui = :select
-    config.columns[:entrance_exam_result].form_ui = :select
-    config.columns[:entrance_exam_result].options = {:options => Enrollment::ENTRANCE_EXAM_RESULT, :include_blank => I18n.t("active_scaffold._select_")}
-
+ 
     config.columns[:research_area].form_ui = :record_select
-    config.create.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :entrance_exam_result, :thesis_title, :thesis_defense_date, :research_area, :advisements, :scholarship_durations, :dismissal, :class_enrollments, :thesis_defense_committee_participations]
-    config.update.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :entrance_exam_result, :thesis_title, :thesis_defense_date, :research_area, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal, :class_enrollments, :thesis_defense_committee_participations]
-    config.show.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :entrance_exam_result, :thesis_title, :thesis_defense_date, :research_area, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal, :class_enrollments]
+    config.create.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :thesis_title, :thesis_defense_date, :research_area, :advisements, :scholarship_durations, :dismissal, :class_enrollments, :thesis_defense_committee_participations]
+    config.update.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :thesis_title, :thesis_defense_date, :research_area, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal, :class_enrollments, :thesis_defense_committee_participations]
+    config.show.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :thesis_title, :thesis_defense_date, :research_area, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal, :class_enrollments]
   end
   record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
 

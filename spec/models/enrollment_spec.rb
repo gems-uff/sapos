@@ -96,26 +96,6 @@ describe Enrollment do
         end
       end
     end
-    describe "entrance_exam_result" do
-      context "should be valid when" do
-        it "entrance_exam_result is in the list" do
-          enrollment.entrance_exam_result = Enrollment::ENTRANCE_EXAM_RESULT.first
-          enrollment.should have(0).errors_on :entrance_exam_result
-        end
-      end
-      context "should have error blank when" do
-        it "entrance_exam_result is null" do
-          enrollment.entrance_exam_result = nil
-          enrollment.should have_error(:blank).on :entrance_exam_result
-        end
-      end
-      context "should have error inclusion when" do
-        it "entrance_exam_result is not in the list" do
-          enrollment.entrance_exam_result = "ANYTHING NOT IN THE LIST"
-          enrollment.should have_error(:inclusion).on :entrance_exam_result
-        end
-      end
-    end
     describe "thesis_defense_date" do
       context "should be valid when" do
         it "is after admission_date" do

@@ -148,10 +148,6 @@ pt-BR:
         dismissal: "Desligamento"
         enrollment_number: "Número de Matrícula"
         enrollment_status: "Tipo de Matrícula"
-        entrance_exam_result: "Resultado do Exame de Seleção"
-        entrance_exam_results:
-          firstplace: "1º Lugar"
-          approved: "Aprovado"
         research_area: "Área de Concentração"
         level: "Nível"
         phase: "Etapa"
@@ -688,6 +684,7 @@ pt-BR:
         student_cpf: "C.P.F.:    "
         student_identity_number: "IDENTIDADE:"
         student_name: "ALUNO:     "
+        entrance_exam_approved: "Aprovado"
       grade_list:
         title: "DISCIPLINAS CURSADAS COM APROVEITAMENTO"
         course_approved: "AP"

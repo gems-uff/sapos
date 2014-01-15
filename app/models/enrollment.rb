@@ -4,10 +4,7 @@
 
 class Enrollment < ActiveRecord::Base
   attr_accessible :enrollment_number, :admission_date, :obs, :thesis_title, 
-    :thesis_defense_date, :entrance_exam_result
-
-  ENTRANCE_EXAM_RESULT = [I18n.translate("activerecord.attributes.enrollment.entrance_exam_results.firstplace"), I18n.translate("activerecord.attributes.enrollment.entrance_exam_results.approved")]
-
+    :thesis_defense_date
 
   belongs_to :student
   belongs_to :level
@@ -32,7 +29,6 @@ class Enrollment < ActiveRecord::Base
   validates :enrollment_number, :presence => true, :uniqueness => true
   validates :level, :presence => true
   validates :enrollment_status, :presence => true
-  validates :entrance_exam_result, :presence => true, :inclusion => {:in => ENTRANCE_EXAM_RESULT}
   validates :student, :presence => true
 
   validate :enrollment_has_main_advisor

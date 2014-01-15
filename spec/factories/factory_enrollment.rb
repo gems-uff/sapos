@@ -8,7 +8,6 @@ FactoryGirl.define do
     student
     level
     enrollment_status
-    entrance_exam_result I18n.translate("activerecord.attributes.enrollment.entrance_exam_results.firstplace")
     sequence :enrollment_number do |number|
       number
     end
