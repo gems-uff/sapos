@@ -351,7 +351,7 @@ module EnrollmentsHelper
                 <td>#{class_enrollment.situation}</td>
                 <td>#{grade}</td>"
 
-      if class_enrollment.attendance_to_label == "N"                                                                                       
+      if class_enrollment.attendance_to_label == "I"                                                                                       
         body += "<td>Sim</td>"
       else
         body += "<td>Não</td>"
