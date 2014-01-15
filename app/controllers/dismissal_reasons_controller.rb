@@ -10,7 +10,7 @@ class DismissalReasonsController < ApplicationController
     config.create.label = :create_dismissal_reason_label
   	config.columns[:thesis_judgement].form_ui = :select
     config.columns[:thesis_judgement].options = {:options => DismissalReason::THESIS_JUDGEMENT, :include_blank => I18n.t("active_scaffold._select_")}
-
+    config.columns = [:name, :description, :show_advisor_name, :thesis_judgement]
   end
 
 end 
