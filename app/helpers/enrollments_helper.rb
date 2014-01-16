@@ -365,4 +365,36 @@ module EnrollmentsHelper
     body += "</table>"
     body.html_safe
   end
+
+  def enrollment_thesis_defense_committee_participations_show_column(record, column)
+    return "-" if record.thesis_defense_committee_participations.empty?
+    
+    body = ""
+    count = 0
+
+    body += "<table class=\"listed-records-table\">"
+    
+    body += "<thead>
+              <tr>
+                <th>Nome</td>
+                <th>Instituição</td>
+              </tr>
+            </thead>"
+
+    body += "<tbody class=\"records\">"
+            
+    record.thesis_defense_committee_professors.each do |professor|
+      count += 1
+      tr_class = count.even? ? "even-record" : ""
+
+      body += "<tr class=\"record #{tr_class}\">
+                <td>#{professor.name}</td>
+                <td>#{rescue_blank_text(professor.institution, :method_call => :name)}</td>
+              </tr>"
+    end
+
+    body += "</tbody>"
+    body += "</table>"
+    body.html_safe
+  end
 end

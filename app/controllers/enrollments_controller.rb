@@ -17,59 +17,56 @@ class EnrollmentsController < ApplicationController
     config.action_links.add 'academic_transcript_pdf', :label => I18n.t('pdf_content.enrollment.academic_transcript.link'), :page => true, :type => :member, :parameters => {:format => :pdf}
     config.action_links.add 'grades_report_pdf', :label => I18n.t('pdf_content.enrollment.grades_report.link'), :page => true, :type => :member, :parameters => {:format => :pdf}
 
-    config.list.columns = [:student, :enrollment_number, :level, :enrollment_status, :admission_date, :dismissal]
-    config.list.sorting = {:enrollment_number => 'ASC'}
-    config.create.label = :create_enrollment_label
-    config.update.label = :update_enrollment_label
-    #config.columns[:level].update_columns = :accomplishments
-    config.columns[:accomplishments].allow_add_existing = false;
-
     config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase, :course_class_year_semester
     config.columns.add :listed_advisors, :listed_accomplishments, :listed_deferrals, :listed_scholarships, :listed_class_enrollments
 
+    config.list.columns = [:student, :enrollment_number, :level, :enrollment_status, :admission_date, :dismissal]
+    config.list.sorting = {:enrollment_number => 'ASC'}
+    
+    config.create.label = :create_enrollment_label
+    config.update.label = :update_enrollment_label
     config.actions.swap :search, :field_search
+
     config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :delayed_phase, :course_class_year_semester]
 
-    config.columns[:course_class_year_semester].search_sql = ""
-
-    #config.columns[:course_class_year_semester].search_ui = :select
-
-    config.columns[:enrollment_number].search_sql = "enrollments.enrollment_number"
-    config.columns[:enrollment_number].search_ui = :text
-    config.columns[:student].search_ui = :record_select
-    config.columns[:level].search_sql = "levels.id"
-    config.columns[:level].search_ui = :select
-    config.columns[:enrollment_status].search_sql = "enrollment_statuses.id"
-    config.columns[:enrollment_status].search_ui = :select
-    config.columns[:admission_date].search_sql = "enrollments.admission_date"
-    config.columns[:scholarship_durations_active].search_ui = :select
-    config.columns[:scholarship_durations_active].search_sql = ""
-    config.columns[:active].search_ui = :select
+    
+    config.columns[:accomplishments].allow_add_existing = false;
+    config.columns[:accomplishments].search_sql = ""
     config.columns[:active].search_sql = ""
+    config.columns[:active].search_ui = :select
+    config.columns[:admission_date].options = {:format => :monthyear}
+    config.columns[:admission_date].search_sql = "enrollments.admission_date"
+    config.columns[:course_class_year_semester].search_sql = ""
     config.columns[:delayed_phase].search_sql = ""
     config.columns[:delayed_phase].search_ui = :select
-    config.columns[:professor].search_sql = "professors.name"
-    config.columns[:professor].includes = {:advisements => :professor}
-    config.columns[:professor].search_ui = :text
-    
-
-    config.columns[:accomplishments].search_sql = ""
-
-    config.columns[:dismissal].sort_by :sql => 'dismissals.date'
-    config.columns[:level].form_ui = :select
-    config.columns[:enrollment_status].form_ui = :select
     config.columns[:dismissal].clear_link
-    config.columns[:level].clear_link
+    config.columns[:dismissal].sort_by :sql => 'dismissals.date'
+    config.columns[:enrollment_number].search_sql = "enrollments.enrollment_number"
+    config.columns[:enrollment_number].search_ui = :text
     config.columns[:enrollment_status].clear_link
-    config.columns[:admission_date].options = {:format => :monthyear}
-#Student can not be configured as record select because it does not allow the user to create a new one, if needed
-    config.columns[:student].form_ui = :record_select
     config.columns[:enrollment_status].form_ui = :select
- 
+    config.columns[:enrollment_status].form_ui = :select
+    config.columns[:enrollment_status].search_sql = "enrollment_statuses.id"
+    config.columns[:enrollment_status].search_ui = :select
+    config.columns[:level].clear_link
+    config.columns[:level].form_ui = :select
+    config.columns[:level].search_sql = "levels.id"
+    config.columns[:level].search_ui = :select
+    config.columns[:professor].includes = {:advisements => :professor}
+    config.columns[:professor].search_sql = "professors.name"
+    config.columns[:professor].search_ui = :text
     config.columns[:research_area].form_ui = :record_select
-    config.create.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :thesis_title, :thesis_defense_date, :research_area, :advisements, :scholarship_durations, :dismissal, :class_enrollments, :thesis_defense_committee_participations]
-    config.update.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :thesis_title, :thesis_defense_date, :research_area, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal, :class_enrollments, :thesis_defense_committee_participations]
-    config.show.columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :thesis_title, :thesis_defense_date, :research_area, :advisements, :accomplishments, :deferrals, :scholarship_durations, :dismissal, :class_enrollments]
+    config.columns[:scholarship_durations_active].search_sql = ""
+    config.columns[:scholarship_durations_active].search_ui = :select
+    config.columns[:student].form_ui = :record_select
+    config.columns[:student].search_ui = :record_select
+
+    columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :thesis_title, :thesis_defense_date, :research_area, :advisements, :accomplishments, :deferrals, :scholarship_durations, :thesis_defense_committee_participations, :dismissal, :class_enrollments]
+    create_columns = columns.dup.delete_if { |x| [:accomplishments, :deferrals].include? x }
+
+    config.create.columns = create_columns
+    config.update.columns = columns
+    config.show.columns = columns
   end
   record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
 
