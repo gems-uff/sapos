@@ -20,7 +20,7 @@ class EnrollmentsController < ApplicationController
     config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase, :course_class_year_semester
     config.columns.add :listed_advisors, :listed_accomplishments, :listed_deferrals, :listed_scholarships, :listed_class_enrollments
 
-    config.list.columns = [:student, :enrollment_number, :level, :enrollment_status, :admission_date, :dismissal]
+    config.list.columns = [:enrollment_number, :student, :enrollment_status, :level, :admission_date, :dismissal]
     config.list.sorting = {:enrollment_number => 'ASC'}
     
     config.create.label = :create_enrollment_label
@@ -61,7 +61,25 @@ class EnrollmentsController < ApplicationController
     config.columns[:student].form_ui = :record_select
     config.columns[:student].search_ui = :record_select
 
-    columns = [:enrollment_number, :admission_date, :level, :enrollment_status, :obs, :student, :thesis_title, :thesis_defense_date, :research_area, :advisements, :accomplishments, :deferrals, :scholarship_durations, :thesis_defense_committee_participations, :dismissal, :class_enrollments]
+    columns = [
+      :enrollment_number, 
+      :student,
+      :admission_date, 
+      :enrollment_status,
+      :level,  
+      :research_area,
+      :thesis_title,
+      :thesis_defense_date,
+      :obs, 
+
+      :advisements, 
+      :scholarship_durations,
+      :accomplishments, 
+      :deferrals, 
+      :thesis_defense_committee_participations, 
+      :dismissal, 
+      :class_enrollments
+    ]
     create_columns = columns.dup.delete_if { |x| [:accomplishments, :deferrals].include? x }
 
     config.create.columns = create_columns
