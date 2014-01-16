@@ -55,17 +55,22 @@ class ScholarshipsController < ApplicationController
       scholarship_durations = ScholarshipDuration.arel_table
 
       allocated_with_end_date = Scholarship.joins(:scholarship_durations)
-        .where(((scholarship_durations[:end_date].lt(dt)
-            .and(scholarship_durations[:cancel_date].eq(nil)))
-          .or(scholarship_durations[:cancel_date].lt(dt)))
-          .and(scholarships[:end_date].eq(nil)
-            .or(scholarships[:end_date].gt(Date.today))))
+        .where(
+          ((scholarship_durations[:end_date].lt(dt).and(scholarship_durations[:cancel_date].eq(nil)))
+            .or(scholarship_durations[:cancel_date].lt(dt))
+          ).and(
+            scholarships[:end_date].eq(nil).or(scholarships[:end_date].gt(dt))
+          )
+        )
         .collect{ |scholarship| scholarship.id }
 
       non_allocated = Scholarship.includes(:scholarship_durations)
-        .where(scholarship_durations[:scholarship_id].eq(nil)
-          .and(scholarships[:end_date].eq(nil)
-            .or(scholarships[:end_date].gt(Date.today))))
+        .where(
+          scholarship_durations[:scholarship_id].eq(nil)
+          .and(
+            scholarships[:end_date].eq(nil).or(scholarships[:end_date].gt(dt))
+          )
+        )
         .collect{ |scholarship| scholarship.id }
 
       [scholarships[:id].in(allocated_with_end_date + non_allocated)]
