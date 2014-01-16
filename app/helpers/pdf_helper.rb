@@ -199,25 +199,28 @@ module PdfHelper
     end
 
     #Content
-    pdf.table(values, :column_widths => widths,
-              :row_colors => ["F2F2FF", "E5E5FF"],
-              :cell_style => {:font => "Helvetica",
-                              :size => 9,
-                              :inline_format => true,
-                              :border_width => 1,
-                              :borders => [:left, :right],
-                              :border_color => "000080",
-                              :align => :center,
-                              :padding => 2
-              }
-    ) do |table| 
-      table.row(0).borders = [:top, :left, :right]
-      yield table unless block.nil?
-      
+    unless values.empty?
+      pdf.table(values, :column_widths => widths,
+                :row_colors => ["F2F2FF", "E5E5FF"],
+                :cell_style => {:font => "Helvetica",
+                                :size => 9,
+                                :inline_format => true,
+                                :border_width => 1,
+                                :borders => [:left, :right],
+                                :border_color => "000080",
+                                :align => :center,
+                                :padding => 2
+                }
+      ) do |table| 
+        table.row(0).borders = [:top, :left, :right]
+        yield table unless block.nil?
+        
+      end
+      pdf.stroke do
+        pdf.horizontal_line 0, (pdf.bounds.left + pdf.bounds.right).floor
+      end
     end
-    pdf.stroke do
-      pdf.horizontal_line 0, (pdf.bounds.left + pdf.bounds.right).floor
-    end
+    
   end
 
 end

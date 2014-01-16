@@ -712,4 +712,90 @@ module EnrollmentsPdfHelper
     end
   end
 
+  def search_table(pdf, options={})
+    search ||= options[:search]
+
+    return if search.nil?
+
+    values = []
+
+
+    values.push([
+      I18n.t("activerecord.attributes.enrollment.enrollment_number"),
+      search[:enrollment_number]
+    ]) unless search[:enrollment_number].empty?
+
+    values.push([
+      I18n.t("activerecord.attributes.enrollment.student"),
+      Student.find(search[:student].to_i).name
+    ]) unless search[:student].empty?
+
+    values.push([
+      I18n.t("activerecord.attributes.enrollment.level"),
+      Level.find(search[:level].to_i).name
+    ]) unless search[:level].empty?
+
+    values.push([
+      I18n.t("activerecord.attributes.enrollment.enrollment_status"),
+      EnrollmentStatus.find(search[:enrollment_status].to_i).name
+    ]) unless search[:enrollment_status].empty?
+    
+    unless search[:admission_date][:month].empty? or search[:admission_date][:year].empty?
+      admission_date = Date.new(search[:admission_date][:year].to_i, search[:admission_date][:month].to_i)
+    
+      values.push([
+        "#{I18n.t("activerecord.attributes.enrollment.admission_date")}",
+        I18n.localize(admission_date, :format => :monthyear2)
+      ]) 
+    end
+
+    values.push([
+      I18n.t("activerecord.attributes.enrollment.active"),
+      ["Todas", "Ativas", "Inativas"][search[:active].to_i]
+    ]) unless search[:active].empty?
+
+    values.push([
+      I18n.t("activerecord.attributes.enrollment.scholarship_durations_active"),
+      ["Não", "Sim"][search[:scholarship_durations_active].to_i]
+    ]) unless search[:scholarship_durations_active].empty?
+    
+
+    values.push([
+      I18n.t("activerecord.attributes.enrollment.professor"),
+      search[:professor]
+    ]) unless search[:professor].empty?
+
+
+
+    unless search[:delayed_phase][:phase].empty?
+      phase_date = Date.new(search[:delayed_phase][:year].to_i, search[:delayed_phase][:month].to_i, search[:delayed_phase][:day].to_i)
+
+      phase = search[:delayed_phase][:phase] == 'all' ? 'Alguma' : Phase.find(search[:delayed_phase][:phase].to_i)
+      values.push([
+        "#{I18n.t("activerecord.attributes.enrollment.delayed_phase")}",
+        "#{phase} em #{I18n.localize(phase_date, :format => :long)} "
+      ]) 
+    end
+
+    unless search[:course_class_year_semester][:semester].empty? and search[:course_class_year_semester][:year].empty? and search[:course_class_year_semester][:course].empty?
+      course = search[:course_class_year_semester][:course].empty? ? "" : Course.find(search[:course_class_year_semester][:course].to_i).name
+      values.push([
+        "#{I18n.t("activerecord.attributes.enrollment.course_class_year_semester")}",
+        "#{course} em #{search[:course_class_year_semester][:year]}/#{search[:course_class_year_semester][:semester]}"
+      ]) 
+    end
+
+
+    widths = [280, 280]
+
+    header = [["<b>#{I18n.t("pdf_content.enrollment.search.attribute")}</b>",
+               "<b>#{I18n.t("pdf_content.enrollment.search.value")}</b>"]]
+    
+    simple_pdf_table(pdf, widths, header, values) do |table|
+      table.column(0).align = :left
+      table.column(0).padding = [2, 4]
+    end
+
+  end
+
 end

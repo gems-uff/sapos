@@ -709,6 +709,9 @@ pt-BR:
         link: "Histórico"
         title: "Histórico Escolar"
         total_credits: "Total"
+      search:
+        attribute: "Campo"
+        value: "Valor"
       thesis:
         title: "TESE / DISSERTAÇÃO - TÍTULO:"
         date: "DATA DA DEFESA:"

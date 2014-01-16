@@ -182,9 +182,9 @@ class EnrollmentsController < ApplicationController
 
 
   def to_pdf
+
     each_record_in_page {}
     enrollments_list = find_page(:sorting => active_scaffold_config.list.user.sorting).items
-
     @enrollments = enrollments_list.map do |enrollment|
       [
           enrollment.student[:name],
@@ -195,6 +195,8 @@ class EnrollmentsController < ApplicationController
           end
       ]
     end
+
+    @search = search_params
 
     respond_to do |format|
       format.pdf do
