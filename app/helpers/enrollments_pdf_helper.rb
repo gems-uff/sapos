@@ -9,6 +9,8 @@ module EnrollmentsPdfHelper
     pdf.bounding_box([0, pdf.cursor - 3], :width => 560) do
       
       pdf.font('Courier', :size => 8) do
+        birthdate = enrollment.student.birthdate.nil? ? rescue_blank_text(nil) : I18n.localize(enrollment.student.birthdate, :format => :default)
+          
         data_table = [
           [
             "#{I18n.t('pdf_content.enrollment.header.student_name')} " +
@@ -19,7 +21,7 @@ module EnrollmentsPdfHelper
             "#{I18n.t('pdf_content.enrollment.header.student_birthplace')} " +
             "<b>#{rescue_blank_text(enrollment.student.birthplace)}   </b>",
             "#{I18n.t('pdf_content.enrollment.header.student_birthdate')} " +
-            "<b>#{rescue_blank_text(enrollment.student.birthdate)}</b>"
+            "<b>#{birthdate}</b>"
           ], [
             "#{I18n.t('pdf_content.enrollment.header.student_identity_number')} " +
             "<b>#{rescue_blank_text(enrollment.student.identity_number)}  </b>",
@@ -645,10 +647,12 @@ module EnrollmentsPdfHelper
           pdf.line_width 0.5
           pdf.horizontal_line 0, 560
           
+          thesis_defense_date = thesis_defense_date.nil? ? rescue_blank_text(nil) : I18n.localize(thesis_defense_date, :format => :default)
           data_table = [
             [
               "#{I18n.t('pdf_content.enrollment.thesis.date')} " +
-              "<b>#{rescue_blank_text(thesis_defense_date)}   </b>"
+              "<b>#{thesis_defense_date}   </b>"
+              
             ]
           ]
           if !(enrollment.dismissal.nil?)
