@@ -54,26 +54,23 @@ class ScholarshipsController < ApplicationController
       scholarships = Scholarship.arel_table
       scholarship_durations = ScholarshipDuration.arel_table
 
-      allocated_with_end_date = Scholarship.joins(:scholarship_durations)
+      allocated = ScholarshipDuration
         .where(
-          ((scholarship_durations[:end_date].lt(dt).and(scholarship_durations[:cancel_date].eq(nil)))
-            .or(scholarship_durations[:cancel_date].lt(dt))
-          ).and(
-            scholarships[:end_date].eq(nil).or(scholarships[:end_date].gt(dt))
-          )
-        )
-        .collect{ |scholarship| scholarship.id }
-
-      non_allocated = Scholarship.includes(:scholarship_durations)
-        .where(
-          scholarship_durations[:scholarship_id].eq(nil)
+          scholarship_durations[:start_date].lteq(dt)
           .and(
-            scholarships[:end_date].eq(nil).or(scholarships[:end_date].gt(dt))
+            (scholarship_durations[:end_date].gt(dt).and(scholarship_durations[:cancel_date].eq(nil)))
+            .or(scholarship_durations[:cancel_date].gt(dt))
           )
         )
-        .collect{ |scholarship| scholarship.id }
-
-      [scholarships[:id].in(allocated_with_end_date + non_allocated)]
+        .collect{ |scholarship_duration| scholarship_duration.scholarship_id }
+      
+      condition1 = allocated.empty? ? scholarships[:id].eq(scholarships[:id]) : scholarships[:id].not_in(allocated)
+      #breakpoint
+      [condition1
+        .and(scholarships[:start_date].lteq(dt))
+        .and(scholarships[:end_date].eq(nil)
+          .or(scholarships[:end_date].gt(dt)))
+      ]
     end
   end
 
