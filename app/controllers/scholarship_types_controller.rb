@@ -5,7 +5,12 @@
 class ScholarshipTypesController < ApplicationController
   authorize_resource
 
-  active_scaffold :scholarship_type do |conf|
+  active_scaffold :scholarship_type do |config|
+  	config.list.sorting = {:name => 'ASC'}
+    config.create.label = :create_scholarship_type_label
+  	columns = [:name]
+    config.create.columns = columns
+    config.update.columns = columns
   end
 
 end 

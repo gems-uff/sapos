@@ -5,7 +5,7 @@ require "spec_helper"
 
 describe Major do
   it { should be_able_to_be_destroyed }
-  it { should restrict_destroy_when_exists :student_major }
+  it { should destroy_dependent :student_major }
 
   let(:major) { Major.new }
   subject { major }

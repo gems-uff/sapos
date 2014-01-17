@@ -2,13 +2,16 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class CourseClass < ActiveRecord::Base
+  
+  attr_accessible :year, :semester, :professor, :course
+
   belongs_to :course
   belongs_to :professor
 
   has_paper_trail
 
-  has_many :class_enrollments, :dependent => :restrict
-  has_many :allocations, :dependent => :restrict
+  has_many :class_enrollments, :dependent => :destroy
+  has_many :allocations, :dependent => :destroy
 
   has_many :enrollments, :through => :class_enrollments
 

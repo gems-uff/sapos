@@ -12,6 +12,13 @@
 #   cities = City.create([{ :name => 'Chicago', :description =>'Chicago' }, { :name => 'Copenhagen', :description =>'Copenhagen' }])
 #   Mayor.create(:name => 'Daley', :description =>'Daley', :city => cities.first)
 
+Configuration.create(:name=>"Pontos para orientador único", :variable =>"single_advisor_points", :value => "1.0")
+Configuration.create(:name=>"Pontos para orientador múltiplo", :variable =>"multiple_advisor_points", :value => "0.5")
+Configuration.create(:name=>"Nível do Programa na CAPES", :variable =>"program_level", :value => "5")
+Configuration.create(:name=>"País padrão de emissão da identidade", :variable =>"identity_issuing_country", :value => "Brasil")
+
+
+
 ['Graduação', 'Especialização', 'Mestrado', 'Doutorado'].each do |level|
     Level.new do |l|
         l.name = level
@@ -19,15 +26,18 @@
 end
 
 [
-{:name => 'Defesa', :description => 'Aluno defendeu'},
-{:name => 'Rendimento', :description => 'Aluno não cumpriu critérios de rendimento'},
-{:name => 'Desistência', :description => 'Aluno desistiu'},
-{:name => 'Prazo', :description => 'Prazo para defesa esgotado'},
-{:name => 'Especial -> Regular', :description => 'Aluno foi admitido como aluno regular'}
+{:name => 'Reprovado', :description => 'Aluno reprovado na tese', :show_advisor_name => false, :thesis_judgement => "Reprovado"},
+{:name => 'Titulação', :description => 'Aluno defendeu', :show_advisor_name => true, :thesis_judgement => "Aprovado"},
+{:name => 'Rendimento', :description => 'Aluno não cumpriu critérios de rendimento', :show_advisor_name => false, :thesis_judgement => "--"},
+{:name => 'Desistência', :description => 'Aluno desistiu', :show_advisor_name => false, :thesis_judgement => "--"},
+{:name => 'Prazo', :description => 'Prazo para defesa esgotado', :show_advisor_name => false, :thesis_judgement => "--"},
+{:name => 'Especial/Avulso -> Regular', :description => 'Aluno foi admitido como aluno regular', :show_advisor_name => false, :thesis_judgement => "--"}
 ].each do |reason|
     DismissalReason.new do |d|
         d.name = reason[:name]
         d.description = reason[:description]
+        d.show_advisor_name = reason[:show_advisor_name]
+        d.thesis_judgement = reason[:thesis_judgement]
     end.save!
 end
 
@@ -49,12 +59,65 @@ end
     end.save!
 end
 
-['Exame de Qualificação', 'Pedido de Banca', 'Prova de Inglês'].each do |name|
+['Exame de Qualificação', 'Pedido de Banca', 'Artigo A1/A2/B1'].each do |name|
     Phase.new do |p|
         p.name = name
     end.save!
 end
 
+Phase.new do |p|
+  p.name = 'Prova de Inglês'
+  p.is_language = true
+end.save!
+
+[
+  {:level_name => 'Doutorado', :phase_name => 'Pedido de Banca', :deadline_semesters => 8, :deadline_months => 0, :deadline_days => 0},
+  {:level_name => 'Mestrado', :phase_name => 'Pedido de Banca', :deadline_semesters => 4, :deadline_months => 0, :deadline_days => 0},
+  {:level_name => 'Doutorado', :phase_name => 'Exame de Qualificação', :deadline_semesters => 5, :deadline_months => 0, :deadline_days => 0},
+  {:level_name => 'Doutorado', :phase_name => 'Prova de Inglês', :deadline_semesters => 1, :deadline_months => 0, :deadline_days => 0},
+  {:level_name => 'Mestrado', :phase_name => 'Prova de Inglês', :deadline_semesters => 1, :deadline_months => 0, :deadline_days => 0},
+  {:level_name => 'Doutorado', :phase_name => 'Artigo A1/A2/B1', :deadline_semesters => 8, :deadline_months => 0, :deadline_days => 0}
+].each do |phase_duration|
+  PhaseDuration.new do |pd|
+    pd.level = Level.find_by_name(phase_duration[:level_name])
+    pd.phase = Phase.find_by_name(phase_duration[:phase_name])
+    pd.deadline_semesters = phase_duration[:deadline_semesters]
+    pd.deadline_months = phase_duration[:deadline_months]
+    pd.deadline_days = phase_duration[:deadline_days]
+  end.save!
+end
+
+[
+  {:name => 'Prorrogação de EQ', :duration_semesters => 1, :duration_months => 0, :duration_days => 0, :phase_name => 'Exame de Qualificação'},
+  {:name => 'Prorrogação Regular', :duration_semesters => 1, :duration_months => 0, :duration_days => 0, :phase_name => 'Pedido de Banca'},
+  {:name => 'Prorrogação Final', :duration_semesters => 0, :duration_months => 3, :duration_days => 0, :phase_name => 'Pedido de Banca'},
+  {:name => 'Prorrogação Extraordinária', :duration_semesters => 1, :duration_months => 0, :duration_days => 0, :phase_name => 'Pedido de Banca'},
+  {:name => 'Trancamento de Matrícula', :duration_semesters => 1, :duration_months => 0, :duration_days => 0, :phase_name => 'Pedido de Banca'},
+  {:name => 'Segunda Chamada Prova de Inglês', :duration_semesters => 1, :duration_months => 0, :duration_days => 0, :phase_name => 'Prova de Inglês'}
+].each do |deferral_type|
+  DeferralType.new do |dt|
+    dt.name = deferral_type[:name]
+    dt.duration_semesters = deferral_type[:duration_semesters]
+    dt.duration_months = deferral_type[:duration_months]
+    dt.duration_days = deferral_type[:duration_days]
+    dt.phase = Phase.find_by_name(deferral_type[:phase_name])
+  end.save!
+end
+
+[
+  {:name => 'Dissertação e Tese', :has_score => false},
+  {:name => 'Estágio em Docência', :has_score => true},
+  {:name => 'Estudo Orientado', :has_score => true},
+  {:name => 'Obrigatória da Área', :has_score => true},
+  {:name => 'Optativa', :has_score => true},
+  {:name => 'Seminário', :has_score => false},
+  {:name => 'Tópicos Especiais', :has_score => true},
+].each do |course_type|
+  CourseType.new do |ct|
+    ct.name = course_type[:name]
+    ct.has_score = course_type[:has_score]
+  end.save!
+end
 
 [
     {:id => 1, :name => 'Desconhecido', :description => 'Desconhecido'},
@@ -412,14 +475,6 @@ Country.create(:name=>"Wallis e Futuna, Ilhas")
 Country.create(:name=>"Zâmbia")
 Country.create(:name=>"Zimbábue")
 Country.create(:name=>"Zona do Canal do Panamá")
-
-  
-Configuration.create(:name=>"Pontos para orientador único", :variable =>"single_advisor_points", :value => "1.0")
-Configuration.create(:name=>"Pontos para orientador múltiplo", :variable =>"multiple_advisor_points", :value => "0.5")
-Configuration.create(:name=>"Nível do Programa na CAPES", :variable =>"program_level", :value => "5")
-Configuration.create(:name=>"País padrão de emissão da identidade", :variable =>"identity_issuing_country", :value => "Brasil")
-
-
 
 State.create(:name =>"Acre",:code =>"AC",:country =>Country.find_by_name("Brasil"))
 State.create(:name =>"Alagoas",:code =>"AL",:country =>Country.find_by_name("Brasil"))

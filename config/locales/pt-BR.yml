@@ -547,6 +547,7 @@ pt-BR:
     create_research_area_label: "Adicionar Área de Pesquisa"
     create_scholarship_duration_label: "Adicionar Bolsa"
     create_scholarship_label: "Adicionar Bolsa"
+    create_scholarship_type_label: "Adicionar Tipo de Bolsa"
     create_sponsor_label: "Adicionar Agência de Fomento"
     create_state_label: "Adicionar Estado"
     create_student_label: "Adicionar Aluno"

@@ -16,12 +16,12 @@ class Enrollment < ActiveRecord::Base
   has_many :phases, :through => :accomplishments
 
   has_one :dismissal, :dependent => :restrict
-  has_many :advisements, :dependent => :restrict
-  has_many :scholarship_durations, :dependent => :restrict
-  has_many :accomplishments, :dependent => :restrict
-  has_many :deferrals, :dependent => :restrict
-  has_many :class_enrollments, :dependent => :restrict
-  has_many :thesis_defense_committee_participations, :dependent => :restrict
+  has_many :advisements, :dependent => :destroy
+  has_many :scholarship_durations, :dependent => :destroy
+  has_many :accomplishments, :dependent => :destroy
+  has_many :deferrals, :dependent => :destroy
+  has_many :class_enrollments, :dependent => :destroy
+  has_many :thesis_defense_committee_participations, :dependent => :destroy
   has_many :thesis_defense_committee_professors, :source => :professor, :through => :thesis_defense_committee_participations
   
   has_paper_trail

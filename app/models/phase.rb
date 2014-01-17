@@ -5,7 +5,7 @@ class Phase < ActiveRecord::Base
   attr_accessible :name, :is_language
   has_many :accomplishments, :dependent => :restrict
   has_many :enrollments, :through => :accomplishments
-  has_many :phase_durations, :dependent => :restrict
+  has_many :phase_durations, :dependent => :destroy
   has_many :levels, :through => :phase_durations
   has_many :deferral_type, :dependent => :restrict
 
