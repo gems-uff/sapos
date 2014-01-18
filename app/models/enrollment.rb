@@ -23,6 +23,7 @@ class Enrollment < ActiveRecord::Base
   has_many :class_enrollments, :dependent => :destroy
   has_many :thesis_defense_committee_participations, :dependent => :destroy
   has_many :thesis_defense_committee_professors, :source => :professor, :through => :thesis_defense_committee_participations
+  has_many :phase_completions, :dependent => :destroy
   
   has_paper_trail
 

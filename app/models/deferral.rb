@@ -36,17 +36,6 @@ class Deferral < ActiveRecord::Base
 
   def valid_until
     total_time = total_time_with_deferrals
-    valid_date = enrollment.admission_date
-
-    valid_date = (12 * (total_time[:semesters] / 2)).months.since(valid_date)
-    valid_date = valid_date.month == 3 ? 
-      (5 * (total_time[:semesters] % 2)).months.since(valid_date) : 
-      (7 * (total_time[:semesters] % 2)).months.since(valid_date)
-
-    valid_date = 1.month.ago(valid_date).end_of_month if (total_time[:semesters] != 0)
-
-    valid_date = total_time[:months].months.since(valid_date).end_of_month
-
-    total_time[:days].days.since(valid_date).strftime('%d/%m/%Y')
+    deferral_type.phase.calculate_end_date(enrollment.admission_date, total_time[:semesters], total_time[:months], total_time[:days]).strftime('%d/%m/%Y')
   end
 end

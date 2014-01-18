@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140115224750) do
+ActiveRecord::Schema.define(:version => 20140118184749) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -223,6 +223,15 @@ ActiveRecord::Schema.define(:version => 20140115224750) do
 
   add_index "majors", ["institution_id"], :name => "index_majors_on_institution_id"
   add_index "majors", ["level_id"], :name => "index_majors_on_level_id"
+
+  create_table "phase_completions", :force => true do |t|
+    t.integer  "enrollment_id"
+    t.integer  "phase_id"
+    t.datetime "due_date"
+    t.datetime "completion_date"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+  end
 
   create_table "phase_durations", :force => true do |t|
     t.integer  "phase_id"
