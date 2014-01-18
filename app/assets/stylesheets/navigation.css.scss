@@ -93,13 +93,7 @@ body a {
     border-top: none;
     background-color: #FFFFFF;
 
-    -webkit-border-radius: 10px;
-    -moz-border-radius: 10px;
-    border-radius: 10px;
-
-    -webkit-border-bottom-left-radius: 0;
-    -moz-border-radius-bottomleft: 0;
-    border-bottom-left-radius: 0;
+    border-radius: 10px 10px 0 0;
 }
 
 .menu_content .content {
