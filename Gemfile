@@ -63,6 +63,9 @@ gem 'validates_timeliness', '~> 3.0.2'
 # Menu
 gem 'simple-navigation'
 
+# Notification
+gem 'rufus-scheduler'
+
 # Use unicorn as the web server
 # gem 'unicorn'
 
