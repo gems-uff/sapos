@@ -400,7 +400,7 @@ module EnrollmentsHelper
 
 
   def enrollment_phase_due_dates_show_column(record, column)
-    return "-" if record.accomplishments.empty?
+    return "-" if record.phase_completions.empty?
 
     body = ""
     count = 0
