@@ -40,12 +40,7 @@ class Notifier
   def run_notifications
     result = []
     @notifications.each do |notification|
-      notification_result = notification.call
-      if notification_result.is_a?(Array)
-        result += notification_result
-      else
-        result << notification_result
-      end
+      result += notification.call
     end
     result
   end

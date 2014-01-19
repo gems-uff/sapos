@@ -6,7 +6,7 @@ require './lib/notifier'
 notifier = Notifier.instance
 
 notifier.new_notification do
-  {:to => "sapos@mailinator.com", :body => "bla", :subject => "Primeira Mensagem"}
+  [{:to => "sapos@mailinator.com", :body => "bla", :subject => "Primeira Mensagem"}]
 end
 
 notifier.new_notification do
