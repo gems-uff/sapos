@@ -16,6 +16,9 @@ Configuration.create(:name=>"Pontos para orientador único", :variable =>"single
 Configuration.create(:name=>"Pontos para orientador múltiplo", :variable =>"multiple_advisor_points", :value => "0.5")
 Configuration.create(:name=>"Nível do Programa na CAPES", :variable =>"program_level", :value => "5")
 Configuration.create(:name=>"País padrão de emissão da identidade", :variable =>"identity_issuing_country", :value => "Brasil")
+Configuration.create(:name=>"Frequência de envio de notificações (reiniciar servidor após alteração)", :variable =>"notification_frequency", :value => "1d")
+Configuration.create(:name=>"Horário inicial para o envio de notificações (reiniciar servidor após alteração)", :variable =>"notification_start_at", :value => "12:00")
+
 
 
 

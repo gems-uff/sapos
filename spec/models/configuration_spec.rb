@@ -114,5 +114,40 @@ describe Configuration do
         Configuration.identity_issuing_country.should == england
       end
     end 
+
+    context "notification_frequency" do
+      it "should return 1d when there is no configuration defined" do
+        config = Configuration.find_by_variable(:notification_frequency)
+        config.delete unless config.nil?
+
+        Configuration.notification_frequency.should == "1d"
+      end
+
+      it "should return 5m when it is defined to 5m" do
+        config = Configuration.find_by_variable(:notification_frequency)
+        config.delete unless config.nil?
+        Configuration.create(:variable=>:notification_frequency, :value=>"5m")
+
+        Configuration.notification_frequency.should == "5m"
+      end
+    end 
+
+    context "notification_start_at" do
+      it "should return 12:00 when there is no configuration defined" do
+        config = Configuration.find_by_variable(:notification_start_at)
+        config.delete unless config.nil?
+
+        Configuration.notification_start_at.should == "12:00"
+      end
+
+      it "should return 18:00 when it is defined to 18:00" do
+        config = Configuration.find_by_variable(:notification_start_at)
+        config.delete unless config.nil?
+        Configuration.create(:variable=>:notification_start_at, :value=>"18:00")
+
+        Configuration.notification_start_at.should == "18:00"
+      end
+    end 
   end
+
 end

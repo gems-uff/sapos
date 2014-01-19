@@ -32,4 +32,14 @@ class Configuration < ActiveRecord::Base
     Country.find_by_name(config.nil? ? "Brasil": config.value)
   end
 
+  def self.notification_frequency
+    config = Configuration.find_by_variable(:notification_frequency)
+    config.nil? ? "1d" : config.value.to_s 
+  end
+
+  def self.notification_start_at
+    config = Configuration.find_by_variable(:notification_start_at)
+    config.nil? ? "12:00" : config.value.to_s 
+  end
+
 end
