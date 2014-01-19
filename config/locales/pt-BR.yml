@@ -151,6 +151,8 @@ pt-BR:
         research_area: "Área de Concentração"
         level: "Nível"
         phase: "Etapa"
+        phase_completions: "Realização de Etapas"
+        phase_due_dates: "Conclusão de Etapas"
         professor: "Orientador"
         scholarship_durations: "Bolsas"
         scholarship_durations_active: "Possui bolsa?"
@@ -187,12 +189,20 @@ pt-BR:
         enrollments: "Matrículas"
         name: "Nome"
         phase_durations: "Duração de Etapas"
+        phase_completions: "Realização de Etapas"
         is_language: "Exame de Línguas"
       phase_duration:
         deadline_days: "Prazo Máximo(dias)"
         deadline_months: "Prazo Máximo(meses)"
         deadline_semesters: "Prazo Máximo(períodos)"
         level: "Nível"
+      phase_completion:
+        enrollment: "Matrícula"
+        enrollment_id: "Matrícula"
+        phase: "Etapa"
+        phase_id: "Etapa"
+        due_date: "Validade"
+        completion_date: "Conclusão"
       professor: 
         address: "Logradouro"
         advisement_authorizations: "Credenciamentos"
@@ -464,6 +474,9 @@ pt-BR:
       phase_duration:
         one: "Duração de Etapa"
         other: "Duração de Etapas"
+      phase_completion:
+        one: "Realização de Etapa"
+        other: "Realização de Etapas"
       professor:
         one: "Professor"
         other: "Professores"

@@ -68,6 +68,7 @@ pt-BR:
       default: "%A, %d de %B de %Y, %H:%M h"
       short: "%H:%M h"
       long: "%A, %d de %B de %Y, %H:%M h"
+      defaultdate: "%d-%m-%Y"
     am: ''
     pm: ''
 
