@@ -18,7 +18,7 @@ describe PhaseCompletion do
         end
       end
     end
-    describe "deferral_type" do
+    describe "phase_id" do
       context "should be valid when" do
         it "phase_id is not null" do
           phase_completion.phase_id = 1
@@ -29,6 +29,26 @@ describe PhaseCompletion do
         it "phase_id is null" do
           phase_completion.phase_id = nil
           phase_completion.should have_error(:blank).on :phase_id
+        end
+      end
+    end
+
+    describe "unique (phase_id, enrollment_id)" do
+      context "should be valid when" do
+        it "(phase_id, enrollment_id) is unique" do
+          phase_completion.phase_id = 1
+          phase_completion.enrollment_id = 1
+          phase_completion.should have(0).errors_on :phase_id
+        end
+      end
+      context "should have error blank when" do
+        it "(phase_id, enrollment_id) is not unique" do
+
+          FactoryGirl.create(:phase_completion, :phase_id => 1, :enrollment_id => 1)
+          
+          phase_completion.phase_id = 1
+          phase_completion.enrollment_id = 1
+          phase_completion.should have_error(:taken).on :phase_id
         end
       end
     end
