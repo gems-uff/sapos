@@ -41,7 +41,7 @@ describe PhaseCompletion do
           phase_completion.should have(0).errors_on :phase_id
         end
       end
-      context "should have error blank when" do
+      context "should have error taken when" do
         it "(phase_id, enrollment_id) is not unique" do
 
           FactoryGirl.create(:phase_completion, :phase_id => 1, :enrollment_id => 1)

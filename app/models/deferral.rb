@@ -35,7 +35,7 @@ class Deferral < ActiveRecord::Base
   end
 
   def valid_until
-    total_time = total_time_with_deferrals
+    total_time = deferral_type.phase.calculate_total_deferral_time_for_phase_until_date(enrollment, approval_date)
     deferral_type.phase.calculate_end_date(enrollment.admission_date, total_time[:semesters], total_time[:months], total_time[:days]).strftime('%d/%m/%Y')
   end
 end

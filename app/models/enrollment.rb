@@ -170,13 +170,7 @@ class Enrollment < ActiveRecord::Base
       if phase_deferrals.empty?
         due_date = phase_duration.phase.calculate_end_date(admission_date, phase_duration.deadline_semesters, phase_duration.deadline_months, phase_duration.deadline_days)
       else
-        total_time = phase_duration.duration
-        phase_deferrals.each do |deferral|
-          deferral_duration = deferral.deferral_type.duration
-          (total_time.keys | deferral_duration.keys).each do |key|
-            total_time[key] += deferral_duration[key].to_i
-          end
-        end
+        total_time = phase_duration.phase.calculate_total_deferral_time_for_phase_until_date(self, Date.today)
         due_date = phase_duration.phase.calculate_end_date(admission_date, total_time[:semesters], total_time[:months], total_time[:days])
       end
 

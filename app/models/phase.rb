@@ -18,16 +18,28 @@ class Phase < ActiveRecord::Base
   	"#{self.name}"
   end
 
-  def calculate_end_date(initial_date, total_semesters, total_months, total_days)
-    end_date = initial_date
+  def calculate_total_deferral_time_for_phase_until_date(enrollment, date)
+    total_time = phase_durations.select { |duration| duration.level_id == enrollment.level.id}[0].duration
 
-    if total_semesters != 0
-      months_from_semesters = (12 * (total_semesters / 2)) + ((end_date.month == 3 ? 5 : 7) * (total_semesters % 2)) - 1
-      end_date = months_from_semesters.months.since(end_date).end_of_month
+    deferrals = enrollment.deferrals.select { |deferral| deferral.deferral_type.phase == self}
+    for deferral in deferrals
+      if date >= deferral.approval_date
+        deferral_duration = deferral.deferral_type.duration
+        (total_time.keys | deferral_duration.keys).each do |key|
+          total_time[key] += deferral_duration[key].to_i
+        end
+      end
     end
 
-    end_date = total_months.months.since(end_date).end_of_month
+    total_time
+  end
 
-    end_date = total_days.days.since(end_date)
+  def calculate_end_date(date, total_semesters, total_months, total_days)
+    if total_semesters != 0
+      semester_months = (12 * (total_semesters / 2)) + ((date.month == 3 ? 5 : 7) * (total_semesters % 2)) - 1
+      date = semester_months.months.since(date).end_of_month
+    end
+
+    total_days.days.since(total_months.months.since(date).end_of_month)
   end
 end
