@@ -38,6 +38,8 @@ class Enrollment < ActiveRecord::Base
 
   validate :verify_research_area_with_advisors
 
+  after_save :create_phase_completions
+
   def to_label
     "#{enrollment_number} - #{student.name}"
   end
@@ -152,6 +154,33 @@ class Enrollment < ActiveRecord::Base
       unless research_areas.include? research_area
         errors.add(:research_area, I18n.translate("activerecord.errors.models.enrollment.research_area_different_from_professors"))
       end
+    end
+  end
+
+  def create_phase_completions()
+    PhaseCompletion.where(:enrollment_id => id).destroy_all
+
+    PhaseDuration.where(:level_id => level_id).each do |phase_duration|
+      completion_date = nil
+
+      phase_accomplishment = accomplishments.where(:phase_id => phase_duration.phase_id)[0]
+      completion_date = phase_accomplishment.conclusion_date unless phase_accomplishment.nil?
+
+      phase_deferrals = deferrals.select { |deferral| deferral.deferral_type.phase == phase_duration.phase}
+      if phase_deferrals.empty?
+        due_date = phase_duration.phase.calculate_end_date(admission_date, phase_duration.deadline_semesters, phase_duration.deadline_months, phase_duration.deadline_days)
+      else
+        total_time = phase_duration.duration
+        phase_deferrals.each do |deferral|
+          deferral_duration = deferral.deferral_type.duration
+          (total_time.keys | deferral_duration.keys).each do |key|
+            total_time[key] += deferral_duration[key].to_i
+          end
+        end
+        due_date = phase_duration.phase.calculate_end_date(admission_date, total_time[:semesters], total_time[:months], total_time[:days])
+      end
+
+      PhaseCompletion.create(:enrollment_id=>id, :phase_id=>phase_duration.phase.id, :completion_date=>completion_date, :due_date=>due_date)
     end
   end
 end
