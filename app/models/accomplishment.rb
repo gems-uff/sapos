@@ -19,8 +19,10 @@ class Accomplishment < ActiveRecord::Base
 
   def set_completion_date
   	phase_completion = PhaseCompletion.where(:enrollment_id => enrollment_id, :phase_id => phase_id).first
-  	phase_completion.completion_date = conclusion_date
-  	phase_completion.save
+  	if phase_completion
+	  phase_completion.completion_date = conclusion_date
+	  phase_completion.save
+	end
   end
   
 end

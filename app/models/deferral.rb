@@ -11,7 +11,7 @@ class Deferral < ActiveRecord::Base
   validates :enrollment_id, :uniqueness => {:scope => :deferral_type_id, :message => :enrollment_and_deferral_uniqueness}
   validates :deferral_type, :presence => true
 
-  after_save :recalculate_valid_date_for_phase_completion
+  after_save :recalculate_due_date_for_phase_completion
 
   def to_label
     "#{deferral_type.name}" unless deferral_type.nil?    
@@ -41,9 +41,12 @@ class Deferral < ActiveRecord::Base
     deferral_type.phase.calculate_end_date(enrollment.admission_date, total_time[:semesters], total_time[:months], total_time[:days]).strftime('%d/%m/%Y')
   end
 
-  def recalculate_valid_date_for_phase_completion
+  def recalculate_due_date_for_phase_completion
     phase_completion = PhaseCompletion.where(:enrollment_id => enrollment_id, :phase_id => deferral_type.phase_id).first
-    phase_completion.due_date = valid_until
-    phase_completion.save
+    if phase_completion
+      phase_completion.due_date = valid_until
+      phase_completion.save
+    end
   end
+
 end
