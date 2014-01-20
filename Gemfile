@@ -46,6 +46,9 @@ gem 'jquery-ui-rails'
 # To use ActiveModel has_secure_password
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
+# Iconography
+gem 'font-awesome-sass'
+
 # Prawn to PDF
 gem 'prawn'
 gem 'prawn_rails'

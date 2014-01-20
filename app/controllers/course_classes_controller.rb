@@ -26,7 +26,11 @@ class CourseClassesController < ApplicationController
     config.columns[:name].search_ui = :text
     config.columns[:enrollments].search_ui = :record_select
 
-    config.action_links.add 'summary_pdf', :label => I18n.t('pdf_content.course_class.summary.link'), :page => true, :type => :member, :parameters => {:format => :pdf}
+    config.action_links.add 'summary_pdf', 
+      :label => "<i title='#{I18n.t('pdf_content.course_class.summary.link')}' class='fa fa-list-alt'></i>".html_safe, 
+      :page => true, 
+      :type => :member, 
+      :parameters => {:format => :pdf}
 
     config.columns[:course].form_ui = :record_select
     config.columns[:professor].form_ui = :record_select

@@ -69,6 +69,8 @@ GEM
     factory_girl_rails (1.7.0)
       factory_girl (~> 2.6.0)
       railties (>= 3.0.0)
+    font-awesome-sass (4.0.2)
+      sass-rails (>= 3.1.1)
     hashery (2.1.1)
     hike (1.2.3)
     i18n (0.6.5)
@@ -201,6 +203,7 @@ DEPENDENCIES
   devise
   exception_notification (= 2.6.1)
   factory_girl_rails (= 1.7.0)
+  font-awesome-sass
   jquery-rails (= 2.1.4)
   jquery-ui-rails
   json

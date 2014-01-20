@@ -14,8 +14,16 @@ class EnrollmentsController < ApplicationController
   active_scaffold :enrollment do |config|
 
     config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection, :parameters => {:format => :pdf}
-    config.action_links.add 'academic_transcript_pdf', :label => I18n.t('pdf_content.enrollment.academic_transcript.link'), :page => true, :type => :member, :parameters => {:format => :pdf}
-    config.action_links.add 'grades_report_pdf', :label => I18n.t('pdf_content.enrollment.grades_report.link'), :page => true, :type => :member, :parameters => {:format => :pdf}
+    config.action_links.add 'academic_transcript_pdf', 
+      :label => "<i title='#{I18n.t('pdf_content.enrollment.academic_transcript.link')}' class='fa fa-book'></i>".html_safe, 
+      :page => true, 
+      :type => :member, 
+      :parameters => {:format => :pdf}
+    config.action_links.add 'grades_report_pdf', 
+      :label => "<i title='#{I18n.t('pdf_content.enrollment.grades_report.link')}' class='fa fa-file-text-o'></i>".html_safe,
+      :page => true, 
+      :type => :member, 
+      :parameters => {:format => :pdf}
 
     config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase, :course_class_year_semester
     config.columns.add :listed_advisors, :listed_accomplishments, :listed_deferrals, :listed_scholarships, :listed_class_enrollments
