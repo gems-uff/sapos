@@ -242,6 +242,12 @@ pt-BR:
         scholarship_type: "Tipo"
         sponsor: "Agência"
         start_date: "Data de Início"
+        timeline: "Linha do Tempo"
+        scholarship_caption: "Bolsa"
+        end_date_caption: "Alocação encerrada na data limite"
+        cancel_date_caption: "Alocação encerrada antes da data limite"
+        end_date_tip: "Limite"
+        present: "Presente"
       scholarship_duration:
         active: "Ativa?"
         adviser: "Orientador"

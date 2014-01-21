@@ -37,9 +37,17 @@ function confirmOnPageExit() {
 	}
 }
 
+function prevSemester(date){
+    return new Date(date.getTime() - DAY_IN_MILLISECONDS * 180);
+}
+
+function nextSemester(date){
+    return new Date(date.getTime() + DAY_IN_MILLISECONDS * 180);
+}
 
 $(document).ready(function(){
 	window.onbeforeunload = confirmOnPageExit;
 	cityWidget();
 	identityIssuingPlaceWidget();
 });
+
