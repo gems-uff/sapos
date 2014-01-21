@@ -101,12 +101,12 @@ module ScholarshipsHelper
   end
 
   def scholarship_timeline_show_column(record, column)
-    block = "<div class='timeline' id='scholarship_timeline_#{record.id}'></div>
+    block = "<div class='fulltimeline'><div class='timeline' id='scholarship_timeline_#{record.id}'></div>
       <div class='timecaption'>
         <span class='scholarship_desc caption_desc'> #{I18n.t('activerecord.attributes.scholarship.scholarship_caption')} </span>
         <span class='end_date_desc caption_desc'> #{I18n.t('activerecord.attributes.scholarship.end_date_caption')} </span>
         <span class='cancel_date_desc caption_desc'> #{I18n.t('activerecord.attributes.scholarship.cancel_date_caption')} </span>
-      </div>
+      </div></div>
     "
     block += "<script>
       var events_#{record.id} = ["
@@ -168,5 +168,41 @@ module ScholarshipsHelper
 
     block += "</script>"
     block.html_safe
+  end
+
+  def scholarship_durations_show_column(record, column)
+    return "-" if record.scholarship_durations.empty?
+    
+    body = ""
+    count = 0
+
+    body += "<table width='100%' class=\"showtable listed-records-table\">"
+    
+    body += "<thead>
+              <tr>
+                <th>#{I18n.t('activerecord.attributes.scholarship_duration.enrollment')}</th>
+                <th>#{I18n.t('activerecord.attributes.scholarship_duration.start_date')}</th>
+                <th>#{I18n.t('activerecord.attributes.scholarship_duration.end_date')}</th>
+                <th>#{I18n.t('activerecord.attributes.scholarship_duration.cancel_date')}</th>
+              </tr>
+            </thead>"
+
+    body += "<tbody class=\"records\">"
+            
+    record.scholarship_durations.each do |sd|
+      count += 1
+      tr_class = count.even? ? "even-record" : ""
+      cancel_date = sd.cancel_date.nil? ? '-' : I18n.localize(sd.cancel_date, :format => :monthyear2)
+      body += "<tr class=\"record #{tr_class}\">
+                <td>#{sd.enrollment.to_label}</td>
+                <td>#{I18n.localize(sd.start_date, :format => :monthyear2)}</td>
+                <td>#{I18n.localize(sd.end_date, :format => :monthyear2)}</td>
+                <td>#{cancel_date}</td>
+              </tr>"
+    end
+
+    body += "</tbody>"
+    body += "</table>"
+    body.html_safe
   end
 end

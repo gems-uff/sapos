@@ -1,9 +1,15 @@
+@import 'variables';
+
+$borderradius: 3px;
+
 .chronoline-left-icon {
   left: 3px;
+  border-top-left-radius: $borderradius;
 }
 
 .chronoline-right-icon {
   right: -6px;
+  border-top-right-radius: $borderradius;
 }
 
 .chronoline-left-icon,
@@ -21,7 +27,7 @@
 }
 
 .timeline {
-  width: 630px; 
+  width: ($showwidth - 2px); 
 }
 
 .caption_desc {
@@ -43,4 +49,15 @@
 
 .cancel_date_desc {
   color: #AA0000;
+}
+
+.fulltimeline {
+  border: 1px solid $show_border_color;
+  border-radius: $borderradius;
+  padding: 0 !important;
+}
+
+.timecaption {
+  border-top: 1px solid $show_border_color;
+  padding: 5px !important;
 }

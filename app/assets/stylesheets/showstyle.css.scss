@@ -1,0 +1,18 @@
+@import 'variables';
+
+.scholarship_durations-view {
+	width: $showwidth;
+}
+
+.showtable th {
+	padding: 2px 5px;
+	border-right: 1px solid #C5DBF7;
+}
+
+.showtable tr td:last-child {
+	border-right: 1px solid #C5DBF7;
+}
+
+.showtable tr th:last-child {
+	border-right: 1px solid #427fa4;
+}
