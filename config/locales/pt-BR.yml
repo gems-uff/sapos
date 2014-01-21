@@ -734,6 +734,13 @@ pt-BR:
         title: "BOLETIM ESCOLAR / PÓS-GRADUAÇÃO"
         total_credits: "Créditos Acumulados"
         total_gpr: "CR Acumulado" 
+      scholarships:
+        title: "Bolsas"
+        number: "Número"
+        sponsor: "Agência"
+        start_date: "Data de Início"
+        end_date: "Data Limite"
+        cancel_date: "Encerramento"
     scholarships:
       to_pdf:
         filename: "Relatório de Bolsas"

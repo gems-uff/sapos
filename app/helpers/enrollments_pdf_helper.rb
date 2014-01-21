@@ -426,6 +426,55 @@ module EnrollmentsPdfHelper
     end
   end
 
+  def enrollment_scholarships_table(pdf, options={})
+    enrollment ||= options[:enrollment]
+    scholarship_durations = enrollment.scholarship_durations
+
+    unless scholarship_durations.empty?
+      pdf.move_down 3
+      scholarships_table_title = [[
+        "<b>#{I18n.t("pdf_content.enrollment.scholarships.title")}</b>"
+      ]]
+
+      pdf.table(scholarships_table_title, :column_widths => [560],
+                :row_colors => ["E5E5FF"],
+                :cell_style => {:font => "Courier",
+                                :size => 10,
+                                :inline_format => true,
+                                :border_width => 1,
+                                :align => :center
+                }
+      )
+
+      scholarships_table_width = [200, 90, 90, 90, 90]
+
+      scholarships_table_header = [[
+        "<b>#{I18n.t("pdf_content.enrollment.scholarships.number")}</b>",
+        "<b>#{I18n.t("pdf_content.enrollment.scholarships.sponsor")}</b>",
+        "<b>#{I18n.t("pdf_content.enrollment.scholarships.start_date")}</b>",
+        "<b>#{I18n.t("pdf_content.enrollment.scholarships.end_date")}</b>",
+        "<b>#{I18n.t("pdf_content.enrollment.scholarships.cancel_date")}</b>",
+
+      ]]
+
+      scholarships_table_data = scholarship_durations.map do |sd|
+        start_date = sd.start_date.nil? ? "-" : I18n.localize(sd.start_date, :format => :monthyear2)
+        end_date = sd.end_date.nil? ? "-" : I18n.localize(sd.end_date, :format => :monthyear2)
+        cancel_date = sd.cancel_date.nil? ? "-" : I18n.localize(sd.cancel_date, :format => :monthyear2)
+          
+        [
+          rescue_blank_text(sd.scholarship, :method_call => :scholarship_number),
+          rescue_blank_text(sd.scholarship.sponsor, :method_call => :name),
+          start_date,
+          end_date,
+          cancel_date
+        ]
+      end
+
+      simple_pdf_table(pdf, scholarships_table_width, scholarships_table_header, scholarships_table_data, distance: 0)
+    end
+  end
+
   def grades_report_table(pdf, options={})
     enrollment ||= options[:enrollment]
     total_class_enrollments ||= options[:class_enrollments]
