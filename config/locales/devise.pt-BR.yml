@@ -15,7 +15,7 @@ pt-BR:
   devise:
     failure:
       already_authenticated: 'Você já está logado.'
-      unauthenticated: 'Você precisa registrar-se ou fazer login para continuar.'
+      unauthenticated: ''
       unconfirmed: 'Você precisa confirmar a sua conta para continuar.'
       locked: 'Sua conta está bloqueada.'
       invalid: 'Senha ou e-mail inválidos.'
@@ -23,7 +23,7 @@ pt-BR:
       timeout: 'A sua sessão expirou, por favor faça login novamente para continuar.'
       inactive: 'A sua conta ainda não foi ativada.'
       user:
-        not_found_in_database: "Conta não encontrada no banco de dados."
+        not_found_in_database: "Email ou senha inválida."
     sessions:
       signed_in: 'Login feito com sucesso.'
       signed_out: 'Logout feito com sucesso.'

@@ -1,14 +1,4 @@
 /* Credits div*/
-#credits_footer, #authors_footer, #license_footer {
-	float: right;
-	margin-top: 5px;
-	font-size: 13px;
-
-	&:hover {
-		text-decoration: underline;
-	}
-}
-
 #credits, #authors, #license {
 	border-style: solid;
 	border-color: #C8C6C6;

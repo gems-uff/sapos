@@ -1,5 +1,5 @@
 <div id="login_form_wrapper">
-  <% if flash[:alert] %>
+  <% unless alert.blank? %>
       <div id="error_login"><%= flash[:alert] %></div>
   <% end %>
 
