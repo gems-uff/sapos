@@ -661,6 +661,13 @@ pt-BR:
         student_name: "Nome do Aluno"
         title: "Resumo Semestral"
         year_semester: "Semestre/Ano"
+      class_schedule:
+        title: "QUADRO DE HORÁRIOS"
+        link: "Quadro de Horários"
+        professor: "Professor"
+        course_name: "Disciplina"
+        noschedule: "Horário a combinar"
+        year_semester_error: 'Selecione Ano/Semestre na busca!'
     enrollment:
       to_pdf:
         filename: "Relatório de Matrículas"

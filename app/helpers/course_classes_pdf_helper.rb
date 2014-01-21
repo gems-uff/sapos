@@ -74,4 +74,78 @@ module CourseClassesPdfHelper
     pdf.text "#{course_class.professor.name}", :align => :center
   end
 
+  def class_schedule_table(pdf, options={})
+    course_classes ||= options[:course_classes]
+    star = false
+    first = 1
+    last = 5
+    course_classes.each do |course_class|
+      course_class.allocations.each do |allocation| 
+        index = I18n.translate("date.day_names").index(allocation.day)
+        unless index.nil?
+          first = index if index < first
+          last = index if index > last
+        end
+      end
+    end
+
+    table_width = [286]
+    header = [[
+      "<b>#{I18n.t("pdf_content.course_class.class_schedule.course_name")}</b>"
+    ]]
+
+    count = last - first + 1
+    day_width = (320 / count).floor
+    (first..last).each do |index|
+      table_width << day_width
+      header[0] << "<b>#{I18n.translate("date.day_names")[index]}</b>"
+    end
+    table_width << (520 - day_width * count)
+    header[0] << "<b>#{I18n.t("pdf_content.course_class.class_schedule.professor")}</b>"
+
+    table_data = []
+
+    course_classes.each do |course_class|
+      course = header[0].map {|x| ""}
+      course_name = rescue_blank_text(course_class.course, :method_call => :name)
+
+      if course_class.name.nil? or course_class.name.empty?
+        course[0] = course_name
+      else
+        course[0] = "#{course_class.name} (#{course_name})"
+      end
+
+      course_class.allocations.each do |allocation| 
+        index = I18n.translate("date.day_names").index(allocation.day)
+        course[index + 1 - first] = "#{allocation.start_time}-#{allocation.end_time}"
+      end
+
+      if course_class.allocations.empty?
+        (first..last).each do |index|
+          table_width << day_width
+          course[index + 1 - first] = "*"
+        end
+        star = true
+      end
+
+      course[-1] = rescue_blank_text(course_class.professor, :method_call => :name)
+      table_data << course
+    end
+
+    table_data.sort_by! { |e| e[0] }
+    
+    simple_pdf_table(pdf, table_width, header, table_data) do |table|
+      table.column(0).align = :left
+      table.column(0).padding = [2, 4]
+      table.column(-1).align = :left
+      table.column(-1).padding = [2, 4]    
+    end
+
+    if star
+      pdf.move_down 10
+      pdf.text "<b>* #{I18n.t("pdf_content.course_class.class_schedule.noschedule")}</b>", :inline_format => true
+    end
+
+  end
+
 end

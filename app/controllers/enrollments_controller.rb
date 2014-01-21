@@ -13,7 +13,11 @@ class EnrollmentsController < ApplicationController
 
   active_scaffold :enrollment do |config|
 
-    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection, :parameters => {:format => :pdf}
+    config.action_links.add 'to_pdf', 
+      :label => I18n.t('active_scaffold.to_pdf'), 
+      :page => true, 
+      :type => :collection, 
+      :parameters => {:format => :pdf}
     config.action_links.add 'academic_transcript_pdf', 
       :label => "<i title='#{I18n.t('pdf_content.enrollment.academic_transcript.link')}' class='fa fa-book'></i>".html_safe, 
       :page => true, 

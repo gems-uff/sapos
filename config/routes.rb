@@ -29,6 +29,9 @@ Sapos::Application.routes.draw do
     member do
       get 'summary_pdf'
     end
+    collection do
+      get 'class_schedule_pdf'
+    end
   end
 
   resources :course_types do
