@@ -8,7 +8,33 @@ module ScholarshipsHelper
   @@config = YAML::load_file("#{Rails.root}/config/properties.yml")    
   @@range = @@config["scholarship_year_range"]    
   
-  def start_date_form_column(record,options)                
+  def scholarship_duration_cancel_date_form_column(record,options)     
+    date_select :record, :cancel_date, {
+         :discard_day => true,
+         :start_year => Time.now.year - @@range,
+         :end_year => Time.now.year + @@range,
+         :include_blank => true,
+         :default => nil
+    }.merge(options)
+  end
+
+  def scholarship_duration_start_date_form_column(record,options)                
+    date_select :record, :start_date, {
+         :discard_day => true,
+         :start_year => Time.now.year - @@range,
+         :end_year => Time.now.year + @@range
+    }.merge(options)
+  end
+
+  def scholarship_duration_end_date_form_column(record,options)    
+    date_select :record, :end_date, {
+         :discard_day => true,
+         :start_year => Time.now.year - @@range,
+         :end_year => Time.now.year + @@range
+    }.merge(options)
+  end  
+
+  def scholarship_start_date_form_column(record,options)                
     date_select :record, :start_date, {
          :discard_day => true,
          :start_year => Time.now.year - @@range,
@@ -40,7 +66,7 @@ module ScholarshipsHelper
     select_date record[:end_date], options.merge(local_options)
   end    
   
-  def end_date_form_column(record,options)    
+  def scholarship_end_date_form_column(record,options)    
     date_select :record, :end_date, {
          :discard_day => true,
          :start_year => Time.now.year - @@range,

@@ -248,6 +248,7 @@ pt-BR:
         cancel_date_caption: "Alocação encerrada antes da data limite"
         end_date_tip: "Limite"
         present: "Presente"
+        scholarship_durations: "Alocação de Bolsas"
       scholarship_duration:
         active: "Ativa?"
         adviser: "Orientador"
