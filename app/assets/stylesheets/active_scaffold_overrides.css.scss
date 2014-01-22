@@ -169,6 +169,7 @@ noscript.active-scaffold {
 .active-scaffold-header div.actions a.new_existing,
 .active-scaffold-header div.actions a.show_search,
 .active-scaffold-header div.actions a.to_pdf,
+.active-scaffold-header div.actions a.class_schedule_pdf,
 .active-scaffold-header div.actions a.show_config_list,
 .active-scaffold-header div.actions div.action_group div {
     margin: 0;
@@ -219,7 +220,8 @@ noscript.active-scaffold {
     background-image: url("active_scaffold/magnifier.png");
 }
 
-.active-scaffold-header div.actions a.to_pdf {
+.active-scaffold-header div.actions a.to_pdf,
+.active-scaffold-header div.actions a.class_schedule_pdf {
     background-image: url("pdfIcon.gif");
 }
 
@@ -634,7 +636,6 @@ noscript.active-scaffold {
 .active-scaffold .empty-message {
     font-weight: bold;
     margin-top: -21px;
-    padding-bottom: 10px;
     position: relative;
     text-align: left;
     z-index: 1;
@@ -1156,4 +1157,5 @@ noscript.active-scaffold {
 .listed-records-table thead tr th {
   padding-right: 15px;
 }
+
 

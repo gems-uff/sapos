@@ -2,7 +2,7 @@
 
 SAPOS main goal is to ease the management of information related to graduate programs such as enrollments, courses, advisement, scholarships, requirements, among others.
 
-This project was initiated by professors **Leonardo Murta** and **Vanessa Braganholo** and followed by three term projects from the Computer Science undergraduate course at Universidade Federal Fluminense. 
+This project was initiated by professors Leonardo Murta and Vanessa Braganholo and followed by three term projects from the Computer Science undergraduate course at Universidade Federal Fluminense. 
 
 #Team
 

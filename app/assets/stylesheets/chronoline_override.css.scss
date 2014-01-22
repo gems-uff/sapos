@@ -1,0 +1,63 @@
+@import 'variables';
+
+$borderradius: 3px;
+
+.chronoline-left-icon {
+  left: 3px;
+  border-top-left-radius: $borderradius;
+}
+
+.chronoline-right-icon {
+  right: -6px;
+  border-top-right-radius: $borderradius;
+}
+
+.chronoline-left-icon,
+.chronoline-right-icon {
+    position: relative;
+    background: url("chronoline/chronosprites.png") no-repeat scroll 0px 0 transparent;
+    height: 15px;
+    width: 10px;
+    cursor: pointer;
+    margin: 0 auto;
+}
+
+.chronoline-right-icon {
+    background-position: -10px 0;
+}
+
+.timeline {
+  width: ($showwidth - 2px); 
+}
+
+.caption_desc {
+  font-size: 11px;
+  margin-right: 20px;
+}
+
+.caption_desc:before {
+  content: "• ";
+}
+
+.scholarship_desc {
+  color: #0055e1;
+}
+
+.end_date_desc {
+  color: #00AA00;
+}
+
+.cancel_date_desc {
+  color: #AA0000;
+}
+
+.fulltimeline {
+  border: 1px solid $show_border_color;
+  border-radius: $borderradius;
+  padding: 0 !important;
+}
+
+.timecaption {
+  border-top: 1px solid $show_border_color;
+  padding: 5px !important;
+}

@@ -26,7 +26,17 @@ class CourseClassesController < ApplicationController
     config.columns[:name].search_ui = :text
     config.columns[:enrollments].search_ui = :record_select
 
-    config.action_links.add 'summary_pdf', :label => I18n.t('pdf_content.course_class.summary.link'), :page => true, :type => :member, :parameters => {:format => :pdf}
+    config.action_links.add 'class_schedule_pdf', 
+      :label => I18n.t('pdf_content.course_class.class_schedule.link'),
+      :page => true, 
+      :type => :collection, 
+      :parameters => {:format => :pdf}
+    
+    config.action_links.add 'summary_pdf', 
+      :label => "<i title='#{I18n.t('pdf_content.course_class.summary.link')}' class='fa fa-list-alt'></i>".html_safe, 
+      :page => true, 
+      :type => :member, 
+      :parameters => {:format => :pdf}
 
     config.columns[:course].form_ui = :record_select
     config.columns[:professor].form_ui = :record_select
@@ -53,6 +63,28 @@ class CourseClassesController < ApplicationController
         send_data render_to_string, :filename => "#{I18n.t('pdf_content.course_class.summary.title')} -  #{course_class.name || course_class.course.name}.pdf", :type => 'application/pdf'
       end
     end
+  end
+
+  def class_schedule_pdf
+
+    each_record_in_page {}
+    @course_classes = find_page
+    @search = search_params
+
+    if search_params.nil? or search_params[:year].empty? or search_params[:semester].empty?
+      flash[:error] = I18n.t("pdf_content.course_class.class_schedule.year_semester_error")
+      redirect_to action: :index
+    else
+      @year = search_params[:year]
+      @semester = search_params[:semester]
+
+      respond_to do |format|
+        format.pdf do
+          send_data render_to_string, :filename => "#{I18n.t("pdf_content.course_class.class_schedule.link")} (#{@year}/#{@semester})", :type => 'application/pdf'
+        end
+      end
+    end
+    
   end
 
 

@@ -6,7 +6,7 @@ class Scholarship < ActiveRecord::Base
   belongs_to :sponsor
   belongs_to :scholarship_type
   belongs_to :professor
-  has_many :scholarship_durations, :dependent => :restrict
+  has_many :scholarship_durations, :dependent => :destroy
   has_many :enrollments, :through => :scholarship_durations
 
   has_paper_trail

@@ -14,7 +14,7 @@ class ScholarshipsController < ApplicationController
     config.list.sorting = {:scholarship_number => 'ASC'}
     config.list.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :start_date, :end_date]
 
-    config.columns.add :available
+    config.columns.add :available, :timeline
     config.field_search.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :start_date, :end_date, :available]
 
     config.create.label = :create_scholarship_label
@@ -39,8 +39,8 @@ class ScholarshipsController < ApplicationController
 
 
     config.create.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs]
-    config.update.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs]
-    config.show.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs, :enrollments]
+    config.update.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs, :scholarship_durations]
+    config.show.columns = [:scholarship_number, :level, :sponsor, :scholarship_type, :professor, :start_date, :end_date, :obs, :timeline, :scholarship_durations]
   end
   record_select :per_page => 10, :search_on => [:scholarship_number], :order_by => 'scholarship_number', :full_text_search => true
 

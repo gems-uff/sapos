@@ -26,5 +26,9 @@ new_document('grades_report.pdf') do |pdf|
         deferrals_table(pdf, deferrals: @deferrals)
     end
 
+    no_page_break(pdf) do
+        enrollment_scholarships_table(pdf, enrollment: @enrollment)
+    end
+
 end
 

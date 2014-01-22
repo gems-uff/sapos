@@ -252,6 +252,13 @@ pt-BR:
         scholarship_type: "Tipo"
         sponsor: "Agência"
         start_date: "Data de Início"
+        timeline: "Linha do Tempo"
+        scholarship_caption: "Bolsa"
+        end_date_caption: "Alocação encerrada na data limite"
+        cancel_date_caption: "Alocação encerrada antes da data limite"
+        end_date_tip: "Limite"
+        present: "Presente"
+        scholarship_durations: "Alocação de Bolsas"
       scholarship_duration:
         active: "Ativa?"
         adviser: "Orientador"
@@ -674,6 +681,13 @@ pt-BR:
         student_name: "Nome do Aluno"
         title: "Resumo Semestral"
         year_semester: "Semestre/Ano"
+      class_schedule:
+        title: "QUADRO DE HORÁRIOS"
+        link: "Quadro de Horários"
+        professor: "Professor"
+        course_name: "Disciplina"
+        noschedule: "Horário a combinar"
+        year_semester_error: 'Selecione Ano/Semestre na busca!'
     enrollment:
       to_pdf:
         filename: "Relatório de Matrículas"
@@ -740,6 +754,13 @@ pt-BR:
         title: "BOLETIM ESCOLAR / PÓS-GRADUAÇÃO"
         total_credits: "Créditos Acumulados"
         total_gpr: "CR Acumulado" 
+      scholarships:
+        title: "Bolsas"
+        number: "Número"
+        sponsor: "Agência"
+        start_date: "Data de Início"
+        end_date: "Data Limite"
+        cancel_date: "Encerramento"
     scholarships:
       to_pdf:
         filename: "Relatório de Bolsas"

@@ -18,9 +18,11 @@ class ApplicationController < ActionController::Base
   ActiveScaffold.set_defaults do |config|
     config.ignore_columns.add [:created_at, :updated_at, :lock_version, :versions]
     config.create.link.label = :create_link
-    config.delete.link.label = :delete_link
-    config.show.link.label = :show_link
-    config.update.link.label = :update_link
+    config.delete.link.label = "<i title='#{I18n.t('active_scaffold.delete_link')}' class='fa fa-trash-o'></i>".html_safe
+    config.show.link.label = "<i title='#{I18n.t('active_scaffold.show_link')}' class='fa fa-eye'></i>".html_safe
+    config.update.link.label = "<i title='#{I18n.t('active_scaffold.update_link')}' class='fa fa-pencil'></i>".html_safe
+   #config.update.link.html_options[:link] = '<i class="fa fa-pencil"></i>'
+    
     config.search.link.label = :search_link
     config.delete.link.confirm = :delete_message
     #Faz com que a busca seja enviada ao servidor enquanto o usuário digita
