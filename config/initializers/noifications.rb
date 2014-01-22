@@ -16,7 +16,7 @@ notifier.new_notification do
 	    	:subject => "Test", 
 	    	:body => "Test"
 	    }
-	end
+	  end
     notifications << notification
   end
   notifications
