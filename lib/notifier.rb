@@ -9,7 +9,9 @@ class Notifier
   def initialize
     @notifications = []
     @options = {}
-    return if $rails_rake_task
+
+    return unless Rails.const_defined? 'Server'
+
     if Rails.env.development? or Rails.env.test? 
       @options = {:to => 'sapos@mailinator.com'}
       first_at = Time.now + 1.second

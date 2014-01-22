@@ -7,17 +7,24 @@ require './lib/notifier'
 
 notifier = Notifier.instance
 
+#Notifies every student that hasn't completed one of the necessary phases that has only 30 days left until the due date
 notifier.new_notification do
-  phase_completions = PhaseCompletion.where("due_date < ? AND phase_id = ?", 30.days.since(Date.today), 1)
   notifications = []
+  Phase.all.each do |phase|
+    phase_completions = PhaseCompletion.where(
+      "phase_id = ? AND due_date < ? AND completion_date IS NULL", 
+      phase.id, 
+      365.days.since(Date.today)
+    )
 
-  phase_completions.each do |phase_completion|
-    notification = {
-      :to => phase_completion.enrollment.student.email, 
-      :subject => "Test", 
-      :body => "Test"
-  }
-    notifications << notification
+    phase_completions.each do |phase_completion|
+      notification = {
+        :to => phase_completion.enrollment.student.email, 
+        :subject => "O prazo da etapa #{phase.name} acaba em 30 dias", 
+        :body => "Você tem 30 dias para realizar a etapa #{phase.name} ou pedir uma prorrogação" 
+      }
+      notifications << notification
+    end
   end
   notifications
 end
@@ -57,7 +64,7 @@ notifier.new_notification do
   #Step 3: define template
   template = {
     :to => "<%= result['email'] %>",
-    :subject => "A validade da etapa <%= result['phase_name'] %> acaba em 7 dias",
+    :subject => "O prazo da etapa <%= result['phase_name'] %> acaba em 7 dias",
     :body => "Você tem 7 dias para realizar a etapa <%= result['phase_name'] %> ou pedir uma prorrogação"  
   }
 
