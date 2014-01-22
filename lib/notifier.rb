@@ -45,8 +45,11 @@ class Notifier
   def send_emails
     run_notifications.each do |message|
       m = message.merge(@options)
-      ActionMailer::Base.mail(m).deliver!
-      display_notification_info(m)
+      unless m[:to].nil? or m[:to].empty?
+        
+        ActionMailer::Base.mail(m).deliver!
+        display_notification_info(m)
+      end
     end
   end
 
