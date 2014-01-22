@@ -9,7 +9,7 @@ class Notifier
   def initialize
     @notifications = []
     @options = {}
-
+    return if $rails_rake_task
     if Rails.env.development? or Rails.env.test? 
       @options = {:to => 'sapos@mailinator.com'}
       first_at = Time.now + 1.second
@@ -50,6 +50,7 @@ class Notifier
     end
   end
 
+  #ToDo: Use rails logger
   def display_notification_info(notification)
     puts "\n#{Time.now.strftime('%Y/%m/%d %H:%M:%S')}"
     puts "########## Notification ##########"
@@ -59,4 +60,3 @@ class Notifier
     puts "##################################"
   end
 end
-
