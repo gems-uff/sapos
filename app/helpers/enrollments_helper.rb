@@ -140,29 +140,27 @@ module EnrollmentsHelper
     select_date record[:admission_date], options.merge(local_options)
   end
 
+
   def level_form_column(record, options)
-    puts record.dismissal
-    puts record.accomplishments
-    puts record.deferrals
     if record.dismissal or record.accomplishments.count > 0 or record.deferrals.count > 0
       if record.level
         return record.level.name
       end
     end
     selected = record.level.nil? ? nil : record.level.id 
-    select :record, :level, options_for_select(Level.all.map {|level| [level.name, level.id]}, :selected => selected) 
+    scope ||= nil 
+    column = active_scaffold_config.columns[:level]
+    active_scaffold_input_select column, options
+    #select :record, :level, options_for_select(Level.all.map {|level| [level.name, level.id]}, :selected => selected) 
   end
 
-#  TODO , quando se edita uma matrícula, esta retorna todas as Realizações de etapa que o nível da matrícula
-#  porém o evento de on change do select de nível não está sendo possível por causa do javascript (pesquisar mais a fundo)
-#  métodos envolvidos "active_scaffold.js" -> render_form_field & replace_html
+  #TODO: remove current accomplishments if level was changed
   def options_for_association_conditions(association)
     if association.name == :phase
       enrollment_id = params[:id]
       enrollment = Enrollment.find_by_id(enrollment_id)
-
-      level_id = enrollment.nil? ? params[:value] : enrollment.level_id #recupera level_id vindo do parâmetro de atualização
-
+      #level_id = enrollment.nil? ? params[:value] : enrollment.level_id #recupera level_id vindo do parâmetro de atualização
+      level_id = @record.enrollment.nil? ? params[:value] : @record.enrollment.level_id
       ["phases.id IN (
        SELECT phases.id
        FROM phases
@@ -181,12 +179,12 @@ module EnrollmentsHelper
     body = ""
     count = 0
 
-    body += "<table class=\"listed-records-table\">"
+    body += "<table class=\"showtable listed-records-table\">"
     
     body += "<thead>
               <tr>
-                <th>Nome do Orientador</td>
-                <th>Matrícula do Orientador</td>
+                <th>#{I18n.t('activerecord.attributes.advisement.professor')}</th>
+                <th>#{I18n.t('activerecord.attributes.advisement.professor_enrollment_number')}</th>
               </tr>
             </thead>"
             
@@ -198,7 +196,7 @@ module EnrollmentsHelper
 
       if advisement.main_advisor
         body += "<tr class=\"record #{tr_class}\">
-                  <td><strong>#{advisement.professor.name}</strong></td>
+                  <td title='#{I18n.t('activerecord.attributes.advisement.main_advisor')}'><strong>#{advisement.professor.name}*</strong></td>
                   <td><strong>#{advisement.professor.enrollment_number}</strong></td>
                 </tr>"
       else
@@ -220,13 +218,13 @@ module EnrollmentsHelper
     body = ""
     count = 0
 
-    body += "<table class=\"listed-records-table\">"
+    body += "<table class=\"showtable listed-records-table\">"
     
     body += "<thead>
               <tr>
-                <th>Etapa</td>
-                <th>Data de Conclusão</td>
-                <th>Observação</td>
+                <th>#{I18n.t('activerecord.attributes.accomplishment.phase')}</th>
+                <th>#{I18n.t('activerecord.attributes.accomplishment.conclusion_date')}</th>
+                <th>#{I18n.t('activerecord.attributes.accomplishment.obs')}</th>
               </tr>
             </thead>"
             
@@ -238,7 +236,7 @@ module EnrollmentsHelper
 
       body += "<tr class=\"record #{tr_class}\">
                 <td>#{accomplishment.phase.name}</td>
-                <td>#{accomplishment.conclusion_date}</td>
+                <td>#{I18n.localize(accomplishment.conclusion_date, :format=>:monthyear2)}</td>
                 <td>#{accomplishment.obs}</td>
               </tr>"
     end
@@ -254,13 +252,13 @@ module EnrollmentsHelper
     body = ""
     count = 0
 
-    body += "<table class=\"listed-records-table\">"
+    body += "<table class=\"showtable listed-records-table\">"
     
     body += "<thead>
               <tr>
-                <th>Data de Aprovação</td>
-                <th>Tipo de Prorrogação</td>
-                <th>Observação</td>
+                <th>#{I18n.t('activerecord.attributes.deferral.approval_date')}</th>
+                <th>#{I18n.t('activerecord.attributes.deferral.deferral_type')}</th>
+                <th>#{I18n.t('activerecord.attributes.deferral.obs')}</th>
               </tr>
             </thead>"
     
@@ -271,7 +269,7 @@ module EnrollmentsHelper
       tr_class = count.even? ? "even-record" : ""
 
       body += "<tr class=\"record #{tr_class}\">
-                <td>#{deferral.approval_date}</td>
+                <td>#{I18n.localize(deferral.approval_date, :format => :monthyear2)}</td>
                 <td>#{deferral.deferral_type.name}</td>
                 <td>#{deferral.obs}</td>
               </tr>"
@@ -283,35 +281,37 @@ module EnrollmentsHelper
   end
 
   def enrollment_scholarship_durations_show_column(record, column)
-        return "-" if record.scholarships.empty?
+    return "-" if record.scholarships.empty?
     
     body = ""
     count = 0
 
-    body += "<table class=\"listed-records-table\">"
+    body += "<table class=\"showtable listed-records-table\">"
     
     body += "<thead>
               <tr>
-                <th>Número da Bolsa</td>
-                <th>Data de início</td>
-                <th>Data limite de concessão</td>
-                <th>Data de encerramento</td>
-                <th>Observação</td>
+                <th>#{I18n.t('activerecord.attributes.scholarship.scholarship_number')}</th>
+                <th>#{I18n.t('activerecord.attributes.scholarship_duration.start_date')}</th>
+                <th>#{I18n.t('activerecord.attributes.scholarship_duration.end_date')}</th>
+                <th>#{I18n.t('activerecord.attributes.scholarship_duration.cancel_date')}</th>
+                <th>#{I18n.t('activerecord.attributes.scholarship_duration.obs')}</th>
               </tr>
             </thead>"
 
     body += "<tbody class=\"records\">"
-            
-    record.scholarships.each do |scholarship|
+    nilvalue = '-'
+    record.scholarship_durations.each do |sd|
       count += 1
       tr_class = count.even? ? "even-record" : ""
-
+      end_date = sd.end_date.nil? ? nilvalue : I18n.localize(sd.end_date, :format => :monthyear2)
+      cancel_date = sd.cancel_date.nil? ? nilvalue : I18n.localize(sd.cancel_date, :format => :monthyear2)
+      
       body += "<tr class=\"record #{tr_class}\">
-                <td>#{scholarship.scholarship_number}</td>
-                <td>#{scholarship.start_date}</td>
-                <td>#{scholarship.scholarship_durations.where(:cancel_date => nil).empty? ? "-" : scholarship.scholarship_durations.where(:cancel_date => nil).last.end_date}</td>
-                <td>#{scholarship.end_date}</td>
-                <td>#{scholarship.obs}</td>
+                <td title='#{sd.scholarship.sponsor.name}'>#{sd.scholarship.scholarship_number}</td>
+                <td>#{I18n.localize(sd.start_date, :format => :monthyear2)}</td>
+                <td>#{end_date}</td>
+                <td>#{cancel_date}</td>
+                <td>#{sd.obs}</td>
               </tr>"
     end
 
@@ -326,15 +326,15 @@ module EnrollmentsHelper
     body = ""
     count = 0
 
-    body += "<table class=\"listed-records-table\">"
+    body += "<table class=\"showtable listed-records-table\">"
     
     body += "<thead>
               <tr>
-                <th>Turma</td>
-                <th>Situação</td>
-                <th>Nota</td>
-                <th>Reprovado por falta</td>
-                <th>Observação</td>
+                <th>#{I18n.t('activerecord.models.course.one')}</th>
+                <th>#{I18n.t('activerecord.attributes.class_enrollment.situation')}</th>
+                <th>#{I18n.t('activerecord.attributes.class_enrollment.grade')}</th>
+                <th>#{I18n.t('activerecord.attributes.class_enrollment.disapproved_by_absence')}</th>
+                <th>#{I18n.t('activerecord.attributes.class_enrollment.obs')}</th>
               </tr>
             </thead>"
             
@@ -345,9 +345,8 @@ module EnrollmentsHelper
       tr_class = count.even? ? "even-record" : ""
 
       grade = (class_enrollment.grade / 10.0) rescue 0
-
       body += "<tr class=\"record #{tr_class}\">
-                <td>#{class_enrollment.course_class.name}</td>
+                <td>#{class_enrollment.course_class.course.name}</td>
                 <td>#{class_enrollment.situation}</td>
                 <td>#{grade}</td>"
 
@@ -372,12 +371,12 @@ module EnrollmentsHelper
     body = ""
     count = 0
 
-    body += "<table class=\"listed-records-table\">"
+    body += "<table class=\"showtable listed-records-table\">"
     
     body += "<thead>
               <tr>
-                <th>Nome</td>
-                <th>Instituição</td>
+                <th>#{I18n.t('activerecord.attributes.professor.name')}</th>
+                <th>#{I18n.t('activerecord.attributes.professor.institution')}</th>
               </tr>
             </thead>"
 
