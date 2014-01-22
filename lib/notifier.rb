@@ -9,21 +9,18 @@ class Notifier
   def initialize
     @notifications = []
     @options = {}
+
     if Rails.env.development? or Rails.env.test? 
       @options = {:to => 'sapos@mailinator.com'}
-    end 
-
-    scheduler = Rufus::Scheduler.new
-    first_at = Configuration.notification_start_at
-    if first_at == 'now'
       first_at = Time.now + 1.second
     else
-      first_at = Time.parse(first_at)
+      first_at = Time.parse(Configuration.notification_start_at)
       if first_at < Time.now
         first_at += 1.day
       end
     end
 
+    scheduler = Rufus::Scheduler.new
     scheduler.every Configuration.notification_frequency, :first_at => first_at do
       send_emails
     end
@@ -49,7 +46,17 @@ class Notifier
     run_notifications.each do |message|
       m = message.merge(@options)
       ActionMailer::Base.mail(m).deliver!
+      display_notification_info(m)
     end
+  end
+
+  def display_notification_info(notification)
+    puts "\n#{Time.now.strftime('%Y/%m/%d %H:%M:%S')}"
+    puts "########## Notification ##########"
+    puts "Notifying #{notification[:to]}"
+    puts "Subject: #{notification[:subject]}"
+    puts "body: #{notification[:body]}"
+    puts "##################################"
   end
 end
 

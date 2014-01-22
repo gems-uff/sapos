@@ -6,10 +6,12 @@ require './lib/notifier'
 notifier = Notifier.instance
 
 notifier.new_notification do
-  [{:to => "sapos@mailinator.com", :body => "bla", :subject => "Primeira Mensagem"}]
-end
+  phase_completions = PhaseCompletion.where("due_date < ? AND phase_id = ?", 730.days.since(Date.today), 1)
+  notifications = []
 
-notifier.new_notification do
-  [{:to => "sapos@mailinator.com", :body => "1", :subject => "Segunda Mensagem"},
-    {:to => "joaofelipenp@gmail.com", :body => "2", :subject => "Terceira Mensagem"}]
+  phase_completions.each do |phase_completion|
+    notification = {:to => phase_completion.enrollment.student.email, :subject => "Test", :body => "Test"}
+    notifications << notification
+  end
+  notifications
 end
