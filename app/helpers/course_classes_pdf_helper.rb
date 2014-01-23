@@ -74,6 +74,38 @@ module CourseClassesPdfHelper
     pdf.text "#{course_class.professor.name}", :align => :center
   end
 
+  def summary_emails_table(pdf, options={})
+    course_class ||= options[:course_class]
+
+    table_width = [30, 105, 285, 386]
+
+    header = [["<b>#{I18n.t("pdf_content.course_class.summary.sequential_number")}</b>",
+               "<b>#{I18n.t("pdf_content.course_class.summary.enrollment_number")}</b>",
+               "<b>#{I18n.t("pdf_content.course_class.summary.student_name")}</b>",
+               "<b>#{I18n.t("pdf_content.course_class.summary.student_email")}</b>"]]
+
+    unless course_class.class_enrollments.empty?
+      i=0
+      table_data = course_class.class_enrollments.joins({:enrollment => :student}).order("students.name").map do |class_enrollment|
+        [
+            i+=1,
+            class_enrollment.enrollment.enrollment_number,
+            class_enrollment.enrollment.student.name,
+            class_enrollment.enrollment.student.email
+        ]
+      end
+    else
+      table_data = []
+    end
+
+    simple_pdf_table(pdf, table_width, header, table_data, distance: 0) do |table|
+      table.column(2).align = :left
+      table.column(2).padding = [2, 4]
+      table.column(3).align = :left
+      table.column(3).padding = [2, 4]
+    end
+  end
+
   def class_schedule_table(pdf, options={})
     course_classes ||= options[:course_classes]
     star = false

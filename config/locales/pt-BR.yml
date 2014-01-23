@@ -663,6 +663,7 @@ pt-BR:
         attendance_true: "S"
         course_name: "Nome da Disciplina"
         enrollment_number: "Matrícula"
+        email_title: "Lista de E-mails"
         final_grade: "Nota Final"
         lesson: "Aulas Dadas"
         link: "Pauta"
@@ -670,6 +671,7 @@ pt-BR:
         sequential_number: "Nº"
         situation: "Situação"
         student_name: "Nome do Aluno"
+        student_email: "E-mail do Aluno"
         title: "Resumo Semestral"
         year_semester: "Semestre/Ano"
       class_schedule:
