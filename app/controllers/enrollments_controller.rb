@@ -65,6 +65,8 @@ class EnrollmentsController < ApplicationController
     config.columns[:level].form_ui = :select
     config.columns[:level].search_sql = "levels.id"
     config.columns[:level].search_ui = :select
+    config.columns[:level].send_form_on_update_column = true
+    config.columns[:level].update_columns = [:accomplishments, :phase]
     config.columns[:professor].includes = {:advisements => :professor}
     config.columns[:professor].search_sql = "professors.name"
     config.columns[:professor].search_ui = :text

@@ -53,6 +53,7 @@ pt-BR:
         main_advisor: "Orientador Principal"
         professor: "Orientador"
         student_name: "Nome do Aluno"
+        professor_enrollment_number: "Matrícula do Orientador"
       advisement_authorization:
         level: "Nível"
         professor: "Orientador"
@@ -70,7 +71,7 @@ pt-BR:
         disapproved_by_absence: "Reprovado por Falta"
         enrollment: "Matrícula"
         grade: "Nota"
-        obs: "Observações"
+        obs: "Observação"
         situation: "Situação"
         situations:
           aproved: "Aprovado"
@@ -274,6 +275,7 @@ pt-BR:
         scholarship_types: "Tipo de Bolsa"
         sponsors: "Agência de Fomento"
         start_date: "Data de Início"
+        obs: "Observação"
       scholarship_type:
         name: "Nome"
       sponsor:

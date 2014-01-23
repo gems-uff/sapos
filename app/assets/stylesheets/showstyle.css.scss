@@ -1,6 +1,13 @@
 @import 'variables';
 
-.scholarship_durations-view {
+#as_professors-content .advisements_with_points-view,
+#as_enrollments-content .advisements-view,
+#as_enrollments-content .accomplishments-view,
+#as_enrollments-content .deferrals-view, 
+#as_enrollments-content .scholarship_durations-view,
+#as_enrollments-content .class_enrollments-view,
+#as_enrollments-content .thesis_defense_committee_participations-view,
+#as_scholarships-content .scholarship_durations-view {
 	width: $showwidth;
 }
 

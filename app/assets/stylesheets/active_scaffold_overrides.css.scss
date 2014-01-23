@@ -37,7 +37,20 @@ a {
 
 .active-scaffold table {
     width: 100%;
-    border-collapse: separate;
+    border-collapse: collapse;
+}
+
+.active-scaffold table  th {
+/*     padding: 2px 5px; */
+    border-right: 1px solid #C5DBF7;
+}
+
+.active-scaffold table tr td:last-child {
+    border-right: 1px solid #C5DBF7;
+}
+
+.active-scaffold table tr th:last-child {
+    border-right: 1px solid #427fa4;
 }
 
 .active-scaffold a,
@@ -1158,4 +1171,6 @@ noscript.active-scaffold {
   padding-right: 15px;
 }
 
-
+.active-scaffold-footer {
+    padding-bottom: 10px !important;
+}
