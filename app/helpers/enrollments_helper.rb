@@ -404,13 +404,13 @@ module EnrollmentsHelper
     body = ""
     count = 0
 
-    body += "<table class=\"listed-records-table\">"
+    body += "<table class=\"showtable listed-records-table\">"
     
     body += "<thead>
               <tr>
-                <th>Etapa</td>
-                <th>Data Limite</td>
-                <th>Data de Conclusão</td>
+                <th>#{I18n.t('activerecord.models.phase.one')}</th>
+                <th>#{I18n.t('activerecord.attributes.phase_completion.due_date')}</th>
+                <th>#{I18n.t('activerecord.attributes.phase_completion.completion_date')}</th>
               </tr>
             </thead>"
             
