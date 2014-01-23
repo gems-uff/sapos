@@ -5,7 +5,7 @@ body {
     padding: 0;
     margin: 0 auto;
     background-color: #f0f0f0;
-    background-image: url("steel-mesh-pattern.png");
+    /* background-image: url("steel-mesh-pattern.png"); */
     height: 100%;
 }
 
@@ -109,9 +109,9 @@ body a {
     float: none;
     width: auto;
     overflow: hidden;
-/*     min-height: 100px; 
-    padding-bottom: 10px;*/
-    border-left: 1px dotted #9f9f9f;
+   min-height: 234px; 
+ /*     padding-bottom: 10px;*/
+    border-left: 1px solid #9f9f9f;
    
 }
 
@@ -124,6 +124,7 @@ body a {
     float: left;
     width: 100%;
     background-color: #e8e8e8;
+    border-top: 1px solid #c8c6c6;
 }
 
 .menu_content #top_navigation ul {
@@ -177,7 +178,7 @@ body a {
 
 /*hack to overwrite default ul property*/
 .menu_content #sub_navigation ul{
-    margin-top: -1px;
+    margin-top: 0;
 }
 
 .menu_content #sub_navigation li {
@@ -202,6 +203,7 @@ body a {
 
 .menu_content #sub_navigation li a:hover {
     background-color: #e1faff;
+
 }
 
 .menu_content #sub_navigation li a.selected {
