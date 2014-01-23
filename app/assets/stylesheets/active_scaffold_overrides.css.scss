@@ -40,17 +40,9 @@ a {
     border-collapse: collapse;
 }
 
-.active-scaffold table  th {
+.as_content > table:first-child > thead th {
 /*     padding: 2px 5px; */
     border-right: 1px solid #C5DBF7;
-}
-
-.active-scaffold table tr td:last-child {
-    border-right: 1px solid #C5DBF7;
-}
-
-.active-scaffold table tr th:last-child {
-    border-right: 1px solid #427fa4;
 }
 
 .active-scaffold a,
