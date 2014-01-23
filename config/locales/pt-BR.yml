@@ -275,6 +275,7 @@ pt-BR:
         obs: "Observação"
       scholarship_type:
         name: "Nome"
+        scholarships: "Bolsas"
       sponsor:
         name: "Nome"
         scholarships: "Bolsas"
