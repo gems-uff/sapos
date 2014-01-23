@@ -171,6 +171,7 @@ pt-BR:
         thesis_defense_committee_professors: "Banca Avaliadora"
       enrollment_status:
         name: "Nome"
+        enrollments: "Matrículas"
       institution:
         code: "Sigla"
         majors: "Cursos"
