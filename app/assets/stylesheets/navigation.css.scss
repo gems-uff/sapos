@@ -1,3 +1,4 @@
+
 body {
     font-family: Verdana, Helvetica, sans-serif;
     font-size: 11pt;
@@ -62,7 +63,6 @@ body a {
     height: 129px;
     width: 100%;
     z-index: -100;
-    background: url("steel-mesh-pattern.png");
 }
 
 #saposgif{
@@ -96,19 +96,34 @@ body a {
     border-radius: 10px 10px 0 0;
 }
 
-.menu_content .content {
-    float: left;
-    min-height: 100px;
-    margin-bottom: 10px;
-    width: 879px;
+/* Fluids */
+
+.menu_content .content_wrapper {
+    height: auto;
+    overflow: hidden;
+    min-height: 100%;
 }
 
-/*Top Navigation*/
+/* Right Fluid */
+.content_wrapper > .content {
+    float: none;
+    width: auto;
+    overflow: hidden;
+/*     min-height: 100px; 
+    padding-bottom: 10px;*/
+    border-left: 1px dotted #9f9f9f;
+   
+}
+
+#sub_navigation:empty + .content {
+    border-left: none;
+}
+    
+/*Right Fluid - Top Navigation*/
 .menu_content #top_navigation {
     float: left;
     width: 100%;
-    margin-left: 149px;
-    background-color: transparent;
+    background-color: #e8e8e8;
 }
 
 .menu_content #top_navigation ul {
@@ -122,10 +137,6 @@ body a {
     list-style-type: none;
     margin: 0;
     padding: 0;
-
-    &:last-child a {
-        border-right: none;
-    }
 }
 
 .menu_content #top_navigation ul li a {
@@ -149,19 +160,19 @@ body a {
     }
 }
 
-/*sub navigation*/
-.menu_content .content_wrapper{
-    min-height: 100%;
-}
-
+/*Left Fluid - Sub navigation*/
 .menu_content #sub_navigation {
     float: left;
     background-color: #FFFFFF;
     width: 150px;
-    margin-top: -30px;
-    margin-right: -1px;
+    height: 100%;
     border-top: 1px solid #c8c6c6;
     border-bottom: none;
+
+}
+
+.menu_content #sub_navigation:empty {
+    display: none;
 }
 
 /*hack to overwrite default ul property*/
@@ -182,7 +193,7 @@ body a {
     padding: 10px 10px;
     background-size: 10px 10px;
     border-bottom: 1px dotted #9f9f9f;
-    border-right: 1px dotted #9f9f9f;
+  /*   border-right: 1px dotted #9f9f9f; */
     color: #656464;
     text-decoration: none;
     width: 130px;
@@ -273,3 +284,7 @@ body a {
 .inline-adapter-cell .active-scaffold > table{
     display: none;
 }
+
+
+
+
