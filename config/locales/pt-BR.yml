@@ -178,6 +178,10 @@ pt-BR:
       level: 
         advisement_authorizations: "Credenciamentos"
         name: "Nome"
+        enrollments: "Matrículas"
+        majors: "Cursos"
+        phase_durations: "Duração de Etapas"
+        scholarships: "Bolsas"
       major:
         institution: "Instituição"
         level: "Nível"
