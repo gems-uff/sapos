@@ -106,13 +106,15 @@ module CourseClassesPdfHelper
     table_data = []
 
     course_classes.each do |course_class|
+      next unless course_class.course.course_type.schedulable
+        
       course = header[0].map {|x| ""}
       course_name = rescue_blank_text(course_class.course, :method_call => :name)
 
-      if course_class.name.nil? or course_class.name.empty?
+      if course_class.name.nil? or course_class.name.empty? or not course_class.course.course_type.show_class_name
         course[0] = course_name
       else
-        course[0] = "#{course_class.name} (#{course_name})"
+        course[0] = "#{course_name} (#{course_class.name})"
       end
 
       course_class.allocations.each do |allocation| 
@@ -141,9 +143,17 @@ module CourseClassesPdfHelper
       table.column(-1).padding = [2, 4]    
     end
 
+    star_text = ""
     if star
       pdf.move_down 10
-      pdf.text "<b>* #{I18n.t("pdf_content.course_class.class_schedule.noschedule")}</b>", :inline_format => true
+      pdf.text "<b>#{star_text}* #{I18n.t("pdf_content.course_class.class_schedule.noschedule")}</b>", :inline_format => true
+      star_text += "*"
+    end
+
+    unless Configuration.class_schedule_text.nil? or Configuration.class_schedule_text.empty? 
+      pdf.move_down 5
+      pdf.text "<b>#{star_text}* #{Configuration.class_schedule_text}</b>", :inline_format => true
+      star_text += "*"
     end
 
   end

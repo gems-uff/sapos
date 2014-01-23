@@ -3,7 +3,7 @@
 
 class CourseType < ActiveRecord::Base
 
-  attr_accessible :has_score, :name
+  attr_accessible :has_score, :name, :schedulable, :show_class_name
 
   has_many :courses, :dependent => :restrict
 

@@ -107,6 +107,8 @@ pt-BR:
       course_type:
         has_score: "Tem nota"
         name: "Nome"
+        schedulable: "Aparecer no QH"
+        show_class_name: "Mostrar nome da turma no QH"
       deferral:
         approval_date: "Data de aprovação"
         deferral_type: "Tipo de Prorrogação"

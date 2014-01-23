@@ -32,4 +32,9 @@ class Configuration < ActiveRecord::Base
     Country.find_by_name(config.nil? ? "Brasil": config.value)
   end
 
+  def self.class_schedule_text
+    config = Configuration.find_by_variable(:class_schedule_text)
+    config.nil? ? "" : config.value
+  end
+
 end
