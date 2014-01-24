@@ -200,7 +200,7 @@ describe ScholarshipDuration do
         scholarship_duration.end_date = end_date + 5.days
         #scholarship_duration.cancel_date = end_date + 1.day
         scholarship_duration.enrollment = enrollment
-        scholarship_duration.warning_message.should == I18n.t("activerecord.attributes.scholarship_duration.warnings.unfinished_scholarship")
+        scholarship_duration.warning_message.should == I18n.t("activerecord.errors.models.scholarship_duration.unfinished_scholarship")
       end
     end
 
