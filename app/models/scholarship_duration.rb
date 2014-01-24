@@ -140,4 +140,15 @@ class ScholarshipDuration < ActiveRecord::Base
     finder_scholarship.start_date unless scholarship.nil?
   end
 
+  def last_date
+    return self.cancel_date unless self.cancel_date.nil?
+    self.end_date
+  end
+
+  def was_cancelled?
+    return false if self.cancel_date.nil?
+    self.end_date != self.cancel_date
+  end
+
+
 end
