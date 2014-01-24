@@ -85,5 +85,19 @@ describe Scholarship do
         scholarship.to_label.should eql("#{scholarship_number}")
       end
     end
+
+    describe 'last_date' do
+      let(:end_date) { 3.days.from_now.to_date }
+
+      it 'should return end_date.end_of_month if there is end_date' do
+        scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => end_date + 2.months)
+        scholarship.last_date.should == (end_date + 2.months).end_of_month
+      end
+
+      it 'should be greater or equal to 100 years if there is no end_date' do
+        scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => nil)
+        scholarship.last_date.should >= Date.today + 100.years - 1.day
+      end
+    end
   end
 end

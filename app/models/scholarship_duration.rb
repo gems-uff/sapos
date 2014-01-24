@@ -141,8 +141,8 @@ class ScholarshipDuration < ActiveRecord::Base
   end
 
   def last_date
-    return self.cancel_date unless self.cancel_date.nil?
-    self.end_date
+    return self.cancel_date.end_of_month unless self.cancel_date.nil?
+    self.end_date.end_of_month
   end
 
   def was_cancelled?

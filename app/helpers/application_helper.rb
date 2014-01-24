@@ -25,6 +25,11 @@ module ApplicationHelper
     result.join(options[:separator])
   end
 
+  def monthyear2(date, options = {})
+    options[:blank_text] ||= I18n.t('rescue_blank_text')
+    return options[:blank_text] if date.nil?
+    I18n.localize(date, :format => :monthyear2)
+  end
 
   def read_attribute(attribute_name)
     return nil if params[:record].nil? or params[:record][attribute_name].nil?
@@ -144,4 +149,7 @@ module ApplicationHelper
     
     html
   end
+
+  
+
 end

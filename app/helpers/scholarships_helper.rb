@@ -108,66 +108,38 @@ module ScholarshipsHelper
         <span class='cancel_date_desc caption_desc'> #{I18n.t('activerecord.attributes.scholarship.cancel_date_caption')} </span>
       </div></div>
     "
-    block += "<script>
-      var events_#{record.id} = ["
+    timeline = TimelineHelper::TimelineWidget.new
+      
     record.scholarship_durations.each do |sd|
-      last_date = sd.last_date.end_of_month
-      color = sd.was_cancelled? ? '#AA0000' : '#00AA00'
-      extra_text = " | #{I18n.t('activerecord.attributes.scholarship.end_date_tip')}: #{I18n.localize(sd.end_date, :format => :monthyear2)}}" if sd.was_cancelled?
-      block += "{
-        dates: [
-          new Date(#{sd.start_date.year}, #{sd.start_date.month - 1}, #{sd.start_date.day}),
-          new Date(#{last_date.year}, #{last_date.month - 1}, #{last_date.day})
-        ],
-        title: '#{sd.enrollment.to_label}: #{I18n.localize(sd.start_date, :format => :monthyear2)} - #{I18n.localize(last_date, :format => :monthyear2)}#{extra_text}',
-        attrs: {
-          fill: '#{color}',
-          stroke: '#{color}'
-        }
-      },"
+      extra_text = " | #{I18n.t('activerecord.attributes.scholarship.end_date_tip')}: #{monthyear2(sd.end_date)}}" if sd.was_cancelled?
+    
+      timeline.add_event(
+        sd.start_date,
+        sd.last_date,
+        "#{sd.enrollment.to_label}: #{monthyear2(sd.start_date)} - #{monthyear2(sd.last_date)}#{extra_text}",
+        TimelineHelper::TimelineWidget.color_attrs(sd.was_cancelled? ? '#AA0000' : '#00AA00')
+      )
     end
 
-    if record.end_date.nil? 
-      last_date = (Date.today + 100.years)
-      last_date_text = I18n.t('activerecord.attributes.scholarship.present')
-    else
-      last_date = record.end_date
-      last_date_text = I18n.localize(record.end_date, :format => :monthyear2)
-    end
-    last_date = last_date.end_of_month
-    block += "{
-      dates: [
-        new Date(#{record.start_date.year}, #{record.start_date.month - 1}, #{record.start_date.day}),
-        new Date(#{last_date.year}, #{last_date.month - 1}, #{last_date.day})
-      ],
-      title: '#{record.scholarship_number}: #{I18n.localize(record.start_date, :format => :monthyear2)} - #{last_date_text}'
-    }];
-    "
-
-    last_date += 1.month
+    timeline.add_event(
+      record.start_date, 
+      record.last_date,
+      "#{record.scholarship_number}: #{monthyear2(record.start_date)} - #{monthyear2(record.end_date, :blank_text=>I18n.t('activerecord.attributes.scholarship.present'))}"
+    )
+    
+    last_date = record.last_date + 1.month
     start_date = record.start_date - 1.month
 
     days = [700, (last_date - start_date).to_i].min
 
-    block += "
-        var timeline = new Chronoline(document.getElementById('scholarship_timeline_#{record.id}'), events_#{record.id},
-          {animated: true, 
-          draggable: true,
-          visibleSpan:  DAY_IN_MILLISECONDS * #{days},
-          fitVisibleSpan: false, 
-          labelFormat: '',
-          markToday: false,
-          eventHeigh: 3,
-          topMargin: 0,
-          startDate: new Date(#{start_date.year}, #{start_date.month - 1}, #{start_date.day}),
-          endDate: new Date(#{last_date.year}, #{last_date.month - 1}, #{last_date.day}),
-          floatingSubLabels: false,
-          scrollLeft: prevSemester,
-          scrollRight: nextSemester
-        });
-      "
 
-    block += "</script>"
+    block += timeline.script(
+      "scholarship_timeline_#{record.id}",
+      "events_#{record.id}",
+      days,
+      start_date,
+      last_date
+    )
     block.html_safe
   end
 

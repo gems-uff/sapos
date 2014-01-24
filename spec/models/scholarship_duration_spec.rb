@@ -3,6 +3,7 @@
 
 require "spec_helper"
 
+
 describe ScholarshipDuration do
   let(:scholarship_duration) { ScholarshipDuration.new }
   let(:start_date) { 3.days.ago.to_date }
@@ -209,14 +210,14 @@ describe ScholarshipDuration do
       end
 
 
-      it 'should return end_date if there is no cancel_date' do
+      it 'should return end_date.end_of_month if there is no cancel_date' do
         scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => nil, :scholarship => @scholarship)
-        scholarship_duration.last_date.should == end_date + 2.months
+        scholarship_duration.last_date.should == (end_date + 2.months).end_of_month
       end
 
-      it 'should return cancel_date if there is a cancel_date' do
+      it 'should return cancel_date.end_of_month if there is a cancel_date' do
         scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 1.months, :scholarship => @scholarship)
-        scholarship_duration.last_date.should == end_date + 1.months
+        scholarship_duration.last_date.should == (end_date + 1.months).end_of_month
       end
     end
 
