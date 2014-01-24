@@ -152,12 +152,13 @@ module CourseClassesPdfHelper
       course_class.allocations.each do |allocation| 
         index = I18n.translate("date.day_names").index(allocation.day)
         course[index + 1 - first] = "#{allocation.start_time}-#{allocation.end_time}"
+        course[index + 1 - first] += "\n#{allocation.room || ' '}"
       end
 
       if course_class.allocations.empty?
         (first..last).each do |index|
           table_width << day_width
-          course[index + 1 - first] = "*"
+          course[index + 1 - first] = "*\n "
         end
         star = true
       end
@@ -170,9 +171,12 @@ module CourseClassesPdfHelper
     
     simple_pdf_table(pdf, table_width, header, table_data) do |table|
       table.column(0).align = :left
-      table.column(0).padding = [2, 4]
+      table.column(0).valign = :center
+      table.column(0).padding = [-2, 4, 2, 4]
+      
       table.column(-1).align = :left
-      table.column(-1).padding = [2, 4]    
+      table.column(-1).valign = :center
+      table.column(-1).padding = [-2, 4, 2, 4]    
     end
 
     star_text = ""
