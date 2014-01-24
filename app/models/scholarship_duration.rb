@@ -15,6 +15,7 @@ class ScholarshipDuration < ActiveRecord::Base
   #validates if scholarship isn't with another student
   validate :if_scholarship_is_not_with_another_student
 
+
 #  #validates if a scholarship duration start date isn't before it's end date
   validates_date :start_date, :on_or_before => :end_date, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_after_end_date")
 #
@@ -44,7 +45,7 @@ class ScholarshipDuration < ActiveRecord::Base
   #if start date of a new scholarship duration is earlier than an existing scholarship duration then 
   def student_has_other_scholarship_duration
     return false if enrollment.nil?
-
+    return false if scholarship.nil?
     #Se a bolsa é mais antiga que a atual    scholarship.start_date < start_date
     # -> scholarship.cancel_date não é nulo -> scholarhsip.cancel < start_date
     # -> scholarship.cancel_date é nulo -> schoarslhip.end_date < start_date
@@ -87,7 +88,7 @@ class ScholarshipDuration < ActiveRecord::Base
     message = nil
     scholarships_with_student.each do |scholarship|
       if scholarship.start_date <= start_date and scholarship.cancel_date.nil?
-        message = I18n.t("activerecord.attributes.scholarship_duration.warnings.unfinished_scholarship")
+        message = I18n.t("activerecord.errors.models.scholarship_duration.unfinished_scholarship")
         break
       end
     end
@@ -95,6 +96,7 @@ class ScholarshipDuration < ActiveRecord::Base
   end
 
   def if_scholarship_is_not_with_another_student
+    return if scholarship.nil?
     if self.id.nil?
       scholarships_with_student = ScholarshipDuration.all :conditions => ["scholarship_id = ?", scholarship.id]
     else
