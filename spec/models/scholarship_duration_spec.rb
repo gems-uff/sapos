@@ -202,5 +202,43 @@ describe ScholarshipDuration do
         scholarship_duration.warning_message.should == I18n.t("activerecord.attributes.scholarship_duration.warnings.unfinished_scholarship")
       end
     end
+
+    describe 'last_date' do
+      before(:all) do
+        @scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => end_date + 5.months)
+      end
+
+
+      it 'should return end_date if there is no cancel_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => nil, :scholarship => @scholarship)
+        scholarship_duration.last_date.should == end_date + 2.months
+      end
+
+      it 'should return cancel_date if there is a cancel_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 1.months, :scholarship => @scholarship)
+        scholarship_duration.last_date.should == end_date + 1.months
+      end
+    end
+
+    describe 'was_cancelled?' do
+      before(:all) do
+        @scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => end_date + 5.months)
+      end
+
+      it 'should return false if there is no cancel_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => nil, :scholarship => @scholarship)
+        scholarship_duration.was_cancelled?.should == false
+      end
+
+      it 'should return false if cancel_date == end_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 2.months, :scholarship => @scholarship)
+        scholarship_duration.was_cancelled?.should == false
+      end
+
+      it 'should return true if cancel_date != end_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 1.months, :scholarship => @scholarship)
+        scholarship_duration.was_cancelled?.should == true
+      end      
+    end
   end
 end
