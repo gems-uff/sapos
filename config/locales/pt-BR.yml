@@ -183,7 +183,7 @@ pt-BR:
         level: "Nível"
         name: "Nome"
         student_majors: "Alunos"
-        students: "Alunos
+        students: "Alunos"
       notification:
         body_template: "Template do corpo"
         frequency: "Frequência"
