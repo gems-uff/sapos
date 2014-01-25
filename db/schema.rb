@@ -111,8 +111,10 @@ ActiveRecord::Schema.define(:version => 20140125190500) do
   create_table "course_types", :force => true do |t|
     t.string   "name"
     t.boolean  "has_score"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+    t.boolean  "schedulable"
+    t.boolean  "show_class_name"
   end
 
   create_table "courses", :force => true do |t|
