@@ -7,10 +7,10 @@ class Ability
   ALL_MODELS = [Accomplishment, Advisement, AdvisementAuthorization, Allocation,
                 City, ClassEnrollment, Configuration, Country, Course, CourseClass, CourseType,
                 Deferral, DeferralType, Dismissal, DismissalReason, Enrollment,
-                EnrollmentStatus, Institution, Level, Major, Phase, PhaseCompletion, PhaseDuration,
-                Professor, ProfessorResearchArea, ResearchArea, Role, Scholarship,
-                ScholarshipDuration, ScholarshipType, Sponsor, State, Student, StudentMajor,
-                ThesisDefenseCommitteeParticipation, User, YearSemester, Version]
+                EnrollmentStatus, Institution, Level, Major, Notification, NotificationLog,
+                Phase, PhaseCompletion, PhaseDuration, Professor, ProfessorResearchArea, ResearchArea, 
+                Role, Scholarship, ScholarshipDuration, ScholarshipType, Sponsor, State, Student, 
+                StudentMajor, ThesisDefenseCommitteeParticipation, User, YearSemester, Version]
 
 
   def initialize(user)

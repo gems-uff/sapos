@@ -52,7 +52,7 @@ notifier.new_notification do
   params = [Date.parse('2013-07-31'), Date.parse('2013-08-01')]
   params = params.map { |p| conn.quote(p)}
   result = conn.select_all "
-    SELECT students.email AS email, phases.name AS phase_name
+    SELECT (SELECT email FROM users) as emails, students.email AS email, phases.name AS phase_name
     FROM phase_completions 
     INNER JOIN enrollments ON enrollments.id == phase_completions.enrollment_id 
     INNER JOIN students ON students.id == enrollments.student_id
@@ -63,7 +63,7 @@ notifier.new_notification do
 
   #Step 3: define template
   template = {
-    :to => "<%= result['email'] %>",
+    :to => "<%= result['emails'].join(';') %>",
     :subject => "O prazo da etapa <%= result['phase_name'] %> acaba em 7 dias",
     :body => "Você tem 7 dias para realizar a etapa <%= result['phase_name'] %> ou pedir uma prorrogação"  
   }
