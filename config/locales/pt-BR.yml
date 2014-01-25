@@ -187,6 +187,12 @@ pt-BR:
       notification:
         body_template: "Template do corpo"
         frequency: "Frequência"
+        frequencies:
+          annual: "Anual"
+          semiannual: "Semestral"
+          monthly: "Mensal"
+          weekly: "Semanal"
+          daily: "Diária"
         last_execution: "Última Execução"
         notification_offset: "Offset da notificação"
         query_offset: "Offset da consulta"
