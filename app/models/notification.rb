@@ -1,5 +1,5 @@
 class Notification < ActiveRecord::Base
-  attr_accessible :body_template, :frequency, :last_execution, :notification_offset, :query_offset, :sql_query, :subject_template, :title, :to_template
+  attr_accessible :body_template, :frequency, :next_execution, :notification_offset, :query_offset, :sql_query, :subject_template, :title, :to_template
 
   has_many :notification_logs
 
@@ -45,7 +45,7 @@ class Notification < ActiveRecord::Base
     date + self.notification_offset.days
   end
 
-  def should_send?
+  def should_execute?
     return true if self.last_execution.nil?
     notification_date = self.notification_date
     (self.last_execution <= notification_date) and (Time.now >= notification_date)
