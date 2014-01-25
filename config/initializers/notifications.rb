@@ -9,14 +9,54 @@ notifier = Notifier.instance
 
 
 notifier.new_notification do
-	notifications_to_send = []
-
+	notifications_to_execute = []
 	Notification.all.each do |notification|
-	  notifications_to_send << notification if notification.should_send?
+	  notifications_to_execute << notification if notification.should_execute?
 	end
 
+	notifications = []
+	notifications_to_execute.each do |notification|
+		#Create connection to the Database
+		db_connection = ActiveRecord::Base.connection
 
+		#Generate query using the parameters specified by the notification
+		params = {
+			:frequency => conn.quote(notification.frequency), 
+			:query_offset => conn.quote(notification.query_offset), 
+			:notification_offset => conn.quote(notification.notification_offset)
+		}
+		query = notification.sql_query % params
+
+		#Query the Database
+		query_result = db_connection.select_all(query)
+
+		#Build the notifications with the results from the query
+		query_result.each do |raw_result|
+			result = {}
+			raw_result.each do |key , value|
+				result[key.to_symbol] = value
+			end
+
+	    notifications << {
+				:to => notification.to_template % result,
+				:subject => notification.subject_template % result,
+				:body => notification.body_template % result
+			}
+	  end
+	  notification.last_executed = Time.now
+	  notification.save
+	end
+	notifications
 end
+
+
+
+
+
+
+
+
+
 
 #Notifies every student that hasn't completed one of the necessary phases that has only 30 days left until the due date
 notifier.new_notification do

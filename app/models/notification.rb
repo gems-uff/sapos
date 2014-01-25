@@ -50,7 +50,7 @@ class Notification < ActiveRecord::Base
     self.frequency_date + self.query_offset
   end
 
-  def should_send?
+  def should_execute?
     return true if self.last_execution.nil?
     notification_date = self.notification_date
     (self.last_execution <= notification_date) and (Time.now >= notification_date)
