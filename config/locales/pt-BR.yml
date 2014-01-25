@@ -490,6 +490,9 @@ pt-BR:
       notification:
         one: "Notificação"
         other: "Notificações"
+      notification_log:
+        one: "Envio de Notificação"
+        other: "Envios de Notificações"
       phase:
         one: "Etapa"
         other: "Etapas"
