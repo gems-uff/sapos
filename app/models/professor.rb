@@ -52,45 +52,6 @@ class Professor < ActiveRecord::Base
     (authorized_advisors.to_i == 1) ? Configuration.single_advisor_points : Configuration.multiple_advisor_points
   end
 
-  def advisements_with_points
-    #TODO Find out how to move this code to a helper
-    return "-" if self.advisements.empty?
-
-    body = ""
-    count = 0
-    total_point = 0.0
-    self.advisements.joins([:enrollment, "LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id"]).where("dismissals.id IS NULL").each do |advisement|
-      count +=1;
-      tr_class = count.even? ? "even-record" : ""
-      point = advisement_point(advisement.enrollment)
-      total_point += point
-      body += "<tr class=\"record #{tr_class}\">
-                <td>#{advisement.enrollment.student.name}</td>
-                <td>#{advisement.enrollment.enrollment_number}</td>
-                <td>#{point}</td>
-              </tr>"
-    end
-    body += "<tr class=\"record total_points\">
-                <td colspan=2>#{I18n.t("active_scaffold.total_label")}</td>
-                <td>#{total_point}</td>
-              </tr>"
-
-
-    resp = "<table style=\"border-collapse: collapse\">
-              <thead style=\"color: white; font-size: 12px\">
-                <tr>
-                  <th style=\"padding-right: 15px\">#{I18n.t("activerecord.attributes.advisement.student_name")}</th>
-                  <th style=\"padding-right: 15px\">#{I18n.t("activerecord.attributes.enrollment.enrollment_number")}</th>
-                  <th style=\"padding-right: 15px\">#{I18n.t("activerecord.attributes.professor.advisement_points")}</th>
-                </tr>
-              </thead>
-              <tboby class=\"records\">
-              #{body}
-              </tbody>
-            </table>"
-    resp.html_safe
-  end
-
   def to_label
     "#{self.name}"
   end

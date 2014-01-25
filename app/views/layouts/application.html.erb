@@ -41,12 +41,16 @@
     </div>
 
     <div class='menu_content' <%= transparent_if_logged_out %>>
-      <div id='top_navigation' <%= display_none_if_logged_out %>><%= render_navigation :level => 1 %></div>
+      
       <div class='clear_float'></div>
       <div class='content_wrapper'>
         <div id='sub_navigation' <%= display_none_if_logged_out %>><%= render_navigation :level => 2 %></div>
         <div class='content'>
-          <%= yield %>
+          <div id='top_navigation' <%= display_none_if_logged_out %>><%= render_navigation :level => 1 %></div>
+          <div class='clear_float'></div>
+          <div>
+            <%= yield %>
+          </div>
         </div>
         <div class='clear_float'></div>
       </div>

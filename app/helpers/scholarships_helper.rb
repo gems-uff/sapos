@@ -112,6 +112,7 @@ module ScholarshipsHelper
       var events_#{record.id} = ["
     record.scholarship_durations.each do |sd|
       last_date = sd.cancel_date.nil? ? sd.end_date : sd.cancel_date
+      last_date = last_date.end_of_month
       color = sd.cancel_date.nil? ? '#00AA00' : '#AA0000'
       extra_text = " | #{I18n.t('activerecord.attributes.scholarship.end_date_tip')}: #{I18n.localize(sd.end_date, :format => :monthyear2)}}" unless sd.cancel_date.nil?
       block += "{
@@ -134,6 +135,7 @@ module ScholarshipsHelper
       last_date = record.end_date
       last_date_text = I18n.localize(record.end_date, :format => :monthyear2)
     end
+    last_date = last_date.end_of_month
     block += "{
       dates: [
         new Date(#{record.start_date.year}, #{record.start_date.month - 1}, #{record.start_date.day}),
