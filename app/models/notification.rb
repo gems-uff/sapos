@@ -23,31 +23,26 @@ class Notification < ActiveRecord::Base
   validates :to_template, :presence => true
 
 
-  def frequency_date
+  def calculate_next_notification_date(options={})
+    time = options[:time]
+    time ||= Time.now
     if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
       first_semester = Time.parse("03/01")
       second_semester = Time.parse("08/01")
       dates = [second_semester - 1.year, first_semester, second_semester, first_semester + 1.year]
-      if self.last_execution.nil?
-        date = dates[0] 
-      else
-        date = dates.find { |date| (date + self.notification_offset) >= self.last_execution }
-      end
     else
-      date = Time.parse("01/01") if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.annual")
-      date = Time.now.beginning_of_month if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.monthly")
-      date = Time.now.beginning_of_week(:monday) if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.weekly")
-      date = Time.now.midnight if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.daily")    
+      dates = [Time.parse("01/01") - 1.year,             Time.parse("01/01"),             Time.parse("01/01") + 1.year]             if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.annual")
+      dates = [time.beginning_of_month - 1.month,        time.beginning_of_month,         time.beginning_of_month + 1.month]        if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.monthly")
+      dates = [time.beginning_of_week(:monday) - 1.week, time.beginning_of_week(:monday), time.beginning_of_week(:monday) + 1.week] if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.weekly")
+      dates = [time.midnight - 1.day,                    time.midnight,                   time.midnight + 1.day]                    if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.daily")    
     end
-    date
-  end
 
-  def notification_date
-    self.frequency_date + self.notification_offset
-  end
-
-  def query_date
-    self.frequency_date + self.query_offset
+    #if self.next_execution.nil?
+    #  date = dates[0] 
+    #else
+    date = dates.find { |date| (date + self.notification_offset.days) > time }
+    #end
+    date + self.notification_offset.days
   end
 
   def should_send?
@@ -55,5 +50,5 @@ class Notification < ActiveRecord::Base
     notification_date = self.notification_date
     (self.last_execution <= notification_date) and (Time.now >= notification_date)
   end
- 
+
 end

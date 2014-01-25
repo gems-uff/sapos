@@ -6,8 +6,10 @@ FactoryGirl.define do
     subject_template "test"
     body_template "test"
     sql_query "SELECT *"
-    notification_offset 10
-    query_offset 10
-    frequency "daily"
+    notification_offset 0
+    query_offset 0
+    frequency I18n.translate("activerecord.attributes.notification.frequencies.daily")
+    title "test"
+    
   end
 end
