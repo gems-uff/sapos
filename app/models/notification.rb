@@ -15,4 +15,9 @@ class Notification < ActiveRecord::Base
   validates :sql_query, :presence => true
   validates :subject_template, :presence => true
   validates :to_template, :presence => true
+
+
+  def should_send?
+    true
+  end
 end
