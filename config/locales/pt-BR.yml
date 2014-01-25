@@ -183,7 +183,7 @@ pt-BR:
         level: "Nível"
         name: "Nome"
         student_majors: "Alunos"
-        students: "Alunos
+        students: "Alunos"
       notification:
         body_template: "Template do corpo"
         frequency: "Frequência"
@@ -192,6 +192,7 @@ pt-BR:
         query_offset: "Offset da consulta"
         sql_query: "Consulta"
         subject_template: "Template do título"
+        title: "Título"
         to_template: "Template do recipiente"
       phase:
         accomplishments: "Realização de Etapas"
@@ -486,6 +487,9 @@ pt-BR:
       major:
         one: "Curso"
         other: "Cursos"
+      notification:
+        one: "Notificação"
+        other: "Notificações"
       phase:
         one: "Etapa"
         other: "Etapas"
@@ -572,6 +576,7 @@ pt-BR:
     create_link: "Adicionar"
     create_major_label: "Adicionar Curso"
     create_new: "Criar Novo"
+    create_notification_label: "Adicionar Notificação"
     create_phase_label: "Adicionar Fase"
     create_professor_label: "Adicionar Professor"
     create_professor_research_area_label: "Adicionar Área de Pesquisa do Professor"
@@ -622,6 +627,7 @@ pt-BR:
     update_link: "Editar"
     update_major_label: "Modificar Curso"
     update_model: ""
+    update_notification_label: "Modificar Notificação"
     update_professor_research_area_label: "Área de Pesquisa do Professor"
     update_research_area_label: "Editar Área de Pesquisa"
     update_state_label: "Editar Estado"
