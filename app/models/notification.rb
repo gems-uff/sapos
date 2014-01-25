@@ -1,5 +1,5 @@
 class Notification < ActiveRecord::Base
-  attr_accessible :body_template, :frequency, :last_execution, :notification_offset, :query_offset, :sql_query, :subject_template, :title, :to_template
+  attr_accessible :body_template, :frequency, :next_execution, :notification_offset, :query_offset, :sql_query, :subject_template, :title, :to_template
 
   has_many :notification_logs
 
