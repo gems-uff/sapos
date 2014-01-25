@@ -183,7 +183,16 @@ pt-BR:
         level: "Nível"
         name: "Nome"
         student_majors: "Alunos"
-        students: "Alunos"
+        students: "Alunos
+      notification:
+        body_template: "Template do corpo"
+        frequency: "Frequência"
+        last_execution: "Última Execução"
+        notification_offset: "Offset da notificação"
+        query_offset: "Offset da consulta"
+        sql_query: "Consulta"
+        subject_template: "Template do título"
+        to_template: "Template do recipiente"
       phase:
         accomplishments: "Realização de Etapas"
         description: "Descrição"
