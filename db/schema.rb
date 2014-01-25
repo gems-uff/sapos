@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140119003811) do
+ActiveRecord::Schema.define(:version => 20140125181343) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -111,8 +111,10 @@ ActiveRecord::Schema.define(:version => 20140119003811) do
   create_table "course_types", :force => true do |t|
     t.string   "name"
     t.boolean  "has_score"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+    t.boolean  "schedulable"
+    t.boolean  "show_class_name"
   end
 
   create_table "courses", :force => true do |t|
@@ -223,6 +225,26 @@ ActiveRecord::Schema.define(:version => 20140119003811) do
 
   add_index "majors", ["institution_id"], :name => "index_majors_on_institution_id"
   add_index "majors", ["level_id"], :name => "index_majors_on_level_id"
+
+  create_table "notification_logs", :force => true do |t|
+    t.integer  "notification_id"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+  end
+
+  add_index "notification_logs", ["notification_id"], :name => "index_notification_logs_on_notification_id"
+
+  create_table "notifications", :force => true do |t|
+    t.string   "to_template"
+    t.string   "subject_template"
+    t.string   "body_template"
+    t.text     "sql_query"
+    t.integer  "notification_offset"
+    t.integer  "query_offset"
+    t.string   "frequency"
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
+  end
 
   create_table "phase_completions", :force => true do |t|
     t.integer  "enrollment_id"
