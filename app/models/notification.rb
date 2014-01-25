@@ -5,8 +5,11 @@ class Notification < ActiveRecord::Base
 
   has_paper_trail
 
+  FREQUENCIES = [I18n.translate("activerecord.attributes.notification.frequencies.annual"), I18n.translate("activerecord.attributes.notification.frequencies.semiannual"), I18n.translate("activerecord.attributes.notification.frequencies.monthly"), I18n.translate("activerecord.attributes.notification.frequencies.weekly"), I18n.translate("activerecord.attributes.notification.frequencies.daily")]
+    
+
   validates :body_template, :presence => true
-  validates :frequency, :presence => true, :inclusion => {:in => I18n.translate("activerecord.attributes.notification.frequencies")}
+  validates :frequency, :presence => true, :inclusion => {:in => FREQUENCIES}
   validates :notification_offset, :presence => true
   validates :query_offset, :presence => true
   validates :sql_query, :presence => true
