@@ -185,7 +185,7 @@ pt-BR:
         student_majors: "Alunos"
         students: "Alunos"
       notification:
-        body_template: "Template do corpo"
+        body_template: "Template do Corpo"
         frequency: "Frequência"
         frequencies:
           annual: "Anual"
@@ -194,12 +194,18 @@ pt-BR:
           weekly: "Semanal"
           daily: "Diária"
         last_execution: "Última Execução"
-        notification_offset: "Offset da notificação"
-        query_offset: "Offset da consulta"
+        notification_offset: "Offset da Notificação"
+        query_offset: "Offset da Consulta"
         sql_query: "Consulta"
-        subject_template: "Template do título"
+        subject_template: "Template do Assunto"
         title: "Título"
-        to_template: "Template do recipiente"
+        to_template: "Template do Recipiente"
+      notification_log:
+        body: "Corpo"
+        to: "Para"
+        subject: "Assunto"
+        created_at: "Data de Execução"
+        notification: "Notificação"
       phase:
         accomplishments: "Realização de Etapas"
         description: "Descrição"
@@ -497,8 +503,8 @@ pt-BR:
         one: "Notificação"
         other: "Notificações"
       notification_log:
-        one: "Envio de Notificação"
-        other: "Envios de Notificações"
+        one: "Notificação Enviada"
+        other: "Notificações Enviadas"
       phase:
         one: "Etapa"
         other: "Etapas"
