@@ -3,6 +3,8 @@
 
 Sapos::Application.routes.draw do
 
+  resources :notifications do as_routes end
+
   devise_for :users, :controllers => {:registrations => "users" }
 
   resources :versions do
