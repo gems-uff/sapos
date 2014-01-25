@@ -23,7 +23,7 @@ class Notification < ActiveRecord::Base
   validates :to_template, :presence => true
 
 
-  def calculate_next_notification_date(options={})
+  def calculate_next_notification_date(options)
     time = options[:time]
     time ||= Time.now
     if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
@@ -31,15 +31,16 @@ class Notification < ActiveRecord::Base
       second_semester = Time.parse("08/01")
       dates = [second_semester - 1.year, first_semester, second_semester, first_semester + 1.year]
     else
-      dates = [Time.parse("01/01") - 1.year,             Time.parse("01/01"),             Time.parse("01/01") + 1.year]             if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.annual")
-      dates = [time.beginning_of_month - 1.month,        time.beginning_of_month,         time.beginning_of_month + 1.month]        if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.monthly")
-      dates = [time.beginning_of_week(:monday) - 1.week, time.beginning_of_week(:monday), time.beginning_of_week(:monday) + 1.week] if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.weekly")
-      dates = [time.midnight - 1.day,                    time.midnight,                   time.midnight + 1.day]                    if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.daily")    
+      dates = (-2..2).map { |n| Time.parse("01/01") + n.year } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.annual")
+      dates = (-2..2).map { |n| time.beginning_of_month + n.month } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.monthly")
+      dates = (-2..2).map { |n| time.beginning_of_week(:monday) + n.week } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.weekly")
+      dates = (-2..2).map { |n| time.midnight + n.day } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.daily")    
     end
 
     #if self.next_execution.nil?
     #  date = dates[0] 
     #else
+
     date = dates.find { |date| (date + self.notification_offset.days) > time }
     #end
     date + self.notification_offset.days

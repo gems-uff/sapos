@@ -140,6 +140,11 @@ describe Notification do
           notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.weekly"), :notification_offset => -2)
           notification.calculate_next_notification_date(:time => Time.parse("2014/01/14")).should == Time.parse("2014/01/18")
         end
+
+         it "should be 2014/02/01(saturday) if today is 2014/01/25(saturday) and offset is -2" do
+          notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.weekly"), :notification_offset => -2)
+          notification.calculate_next_notification_date(:time => Time.parse("2014/01/25")).should == Time.parse("2014/02/01")
+        end
       end
 
       describe "for monthly frequency" do
