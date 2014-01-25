@@ -228,6 +228,9 @@ ActiveRecord::Schema.define(:version => 20140125185989) do
     t.integer  "notification_id"
     t.datetime "created_at",      :null => false
     t.datetime "updated_at",      :null => false
+    t.string   "to"
+    t.string   "subject"
+    t.text     "body"
   end
 
   add_index "notification_logs", ["notification_id"], :name => "index_notification_logs_on_notification_id"
