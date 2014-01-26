@@ -5,6 +5,8 @@
 class ScholarshipsController < ApplicationController
   authorize_resource
 
+  include TimelineHelper
+  helper :timeline
   active_scaffold :scholarship do |config|
     config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection, :parameters => {:format => :pdf}
 
@@ -54,22 +56,23 @@ class ScholarshipsController < ApplicationController
       scholarships = Scholarship.arel_table
       scholarship_durations = ScholarshipDuration.arel_table
 
+      end_of_previous_month = (dt - 1.month).end_of_month 
       allocated = ScholarshipDuration
         .where(
           scholarship_durations[:start_date].lteq(dt)
           .and(
-            (scholarship_durations[:end_date].gt(dt).and(scholarship_durations[:cancel_date].eq(nil)))
-            .or(scholarship_durations[:cancel_date].gt(dt))
+            (scholarship_durations[:end_date].gt(end_of_previous_month).and(scholarship_durations[:cancel_date].eq(nil)))
+            .or(scholarship_durations[:cancel_date].gt(end_of_previous_month))
           )
         )
         .collect{ |scholarship_duration| scholarship_duration.scholarship_id }
       
       condition1 = allocated.empty? ? scholarships[:id].eq(scholarships[:id]) : scholarships[:id].not_in(allocated)
-      #breakpoint
+
       [condition1
         .and(scholarships[:start_date].lteq(dt))
         .and(scholarships[:end_date].eq(nil)
-          .or(scholarships[:end_date].gt(dt)))
+          .or(scholarships[:end_date].gt(end_of_previous_month)))
       ]
     end
   end

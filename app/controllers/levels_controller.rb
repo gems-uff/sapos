@@ -8,8 +8,7 @@ class LevelsController < ApplicationController
   helper :advisement_authorizations
   active_scaffold :level do |config|
     config.list.sorting = {:name => 'ASC'}
-    config.update.columns = [:name, :advisement_authorizations]
-    config.create.columns = [:name, :advisement_authorizations]
-    #config.create.label = :create_level_label
+    config.create.label = :create_level_label
+    config.columns = [:name, :advisement_authorizations]
   end
 end 

@@ -21,5 +21,11 @@ class Scholarship < ActiveRecord::Base
   def to_label
     "#{scholarship_number}"
   end
+
+  def last_date
+    return (Date.today + 100.years).end_of_month if self.end_date.nil?
+     self.end_date.end_of_month
+  end
+
   
 end

@@ -8,10 +8,7 @@ class EnrollmentStatusesController < ApplicationController
   active_scaffold :enrollment_status do |config|
     config.list.sorting = {:name => 'ASC'}
     config.create.label = :create_enrollment_status_label
-    columns = [:name]
-    config.create.columns = columns
-    config.update.columns = columns
-    config.show.columns = columns
+    config.columns = [:name]
   end
 
 end

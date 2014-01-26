@@ -3,6 +3,7 @@
 
 require "spec_helper"
 
+
 describe ScholarshipDuration do
   let(:scholarship_duration) { ScholarshipDuration.new }
   let(:start_date) { 3.days.ago.to_date }
@@ -199,8 +200,46 @@ describe ScholarshipDuration do
         scholarship_duration.end_date = end_date + 5.days
         #scholarship_duration.cancel_date = end_date + 1.day
         scholarship_duration.enrollment = enrollment
-        scholarship_duration.warning_message.should == I18n.t("activerecord.attributes.scholarship_duration.warnings.unfinished_scholarship")
+        scholarship_duration.warning_message.should == I18n.t("activerecord.errors.models.scholarship_duration.unfinished_scholarship")
       end
+    end
+
+    describe 'last_date' do
+      before(:all) do
+        @scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => end_date + 5.months)
+      end
+
+
+      it 'should return end_date.end_of_month if there is no cancel_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => nil, :scholarship => @scholarship)
+        scholarship_duration.last_date.should == (end_date + 2.months).end_of_month
+      end
+
+      it 'should return cancel_date.end_of_month if there is a cancel_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 1.months, :scholarship => @scholarship)
+        scholarship_duration.last_date.should == (end_date + 1.months).end_of_month
+      end
+    end
+
+    describe 'was_cancelled?' do
+      before(:all) do
+        @scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => end_date + 5.months)
+      end
+
+      it 'should return false if there is no cancel_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => nil, :scholarship => @scholarship)
+        scholarship_duration.was_cancelled?.should == false
+      end
+
+      it 'should return false if cancel_date == end_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 2.months, :scholarship => @scholarship)
+        scholarship_duration.was_cancelled?.should == false
+      end
+
+      it 'should return true if cancel_date != end_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 1.months, :scholarship => @scholarship)
+        scholarship_duration.was_cancelled?.should == true
+      end      
     end
   end
 end

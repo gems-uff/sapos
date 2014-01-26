@@ -3,7 +3,7 @@
 
 class Allocation < ActiveRecord::Base
 
-  attr_accessible :day, :course_class, :start_time, :end_time
+  attr_accessible :day, :course_class, :start_time, :end_time, :room
 
   belongs_to :course_class
 

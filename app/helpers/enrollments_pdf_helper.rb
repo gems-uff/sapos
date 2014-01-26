@@ -826,7 +826,7 @@ module EnrollmentsPdfHelper
       phase = search[:delayed_phase][:phase] == 'all' ? 'Alguma' : Phase.find(search[:delayed_phase][:phase].to_i)
       values.push([
         "#{I18n.t("activerecord.attributes.enrollment.delayed_phase")}",
-        "#{phase} em #{I18n.localize(phase_date, :format => :long)} "
+        "#{phase.name} em #{I18n.localize(phase_date, :format => :long)} "
       ]) 
     end
 

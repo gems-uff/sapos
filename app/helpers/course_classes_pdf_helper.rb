@@ -74,6 +74,38 @@ module CourseClassesPdfHelper
     pdf.text "#{course_class.professor.name}", :align => :center
   end
 
+  def summary_emails_table(pdf, options={})
+    course_class ||= options[:course_class]
+
+    table_width = [30, 105, 285, 386]
+
+    header = [["<b>#{I18n.t("pdf_content.course_class.summary.sequential_number")}</b>",
+               "<b>#{I18n.t("pdf_content.course_class.summary.enrollment_number")}</b>",
+               "<b>#{I18n.t("pdf_content.course_class.summary.student_name")}</b>",
+               "<b>#{I18n.t("pdf_content.course_class.summary.student_email")}</b>"]]
+
+    unless course_class.class_enrollments.empty?
+      i=0
+      table_data = course_class.class_enrollments.joins({:enrollment => :student}).order("students.name").map do |class_enrollment|
+        [
+            i+=1,
+            class_enrollment.enrollment.enrollment_number,
+            class_enrollment.enrollment.student.name,
+            class_enrollment.enrollment.student.email
+        ]
+      end
+    else
+      table_data = []
+    end
+
+    simple_pdf_table(pdf, table_width, header, table_data, distance: 0) do |table|
+      table.column(2).align = :left
+      table.column(2).padding = [2, 4]
+      table.column(3).align = :left
+      table.column(3).padding = [2, 4]
+    end
+  end
+
   def class_schedule_table(pdf, options={})
     course_classes ||= options[:course_classes]
     star = false
@@ -106,24 +138,27 @@ module CourseClassesPdfHelper
     table_data = []
 
     course_classes.each do |course_class|
+      next unless course_class.course.course_type.schedulable
+        
       course = header[0].map {|x| ""}
       course_name = rescue_blank_text(course_class.course, :method_call => :name)
 
-      if course_class.name.nil? or course_class.name.empty?
+      if course_class.name.nil? or course_class.name.empty? or not course_class.course.course_type.show_class_name
         course[0] = course_name
       else
-        course[0] = "#{course_class.name} (#{course_name})"
+        course[0] = "#{course_name} (#{course_class.name})"
       end
 
       course_class.allocations.each do |allocation| 
         index = I18n.translate("date.day_names").index(allocation.day)
         course[index + 1 - first] = "#{allocation.start_time}-#{allocation.end_time}"
+        course[index + 1 - first] += "\n#{allocation.room || ' '}"
       end
 
       if course_class.allocations.empty?
         (first..last).each do |index|
           table_width << day_width
-          course[index + 1 - first] = "*"
+          course[index + 1 - first] = "*\n "
         end
         star = true
       end
@@ -136,14 +171,25 @@ module CourseClassesPdfHelper
     
     simple_pdf_table(pdf, table_width, header, table_data) do |table|
       table.column(0).align = :left
-      table.column(0).padding = [2, 4]
+      table.column(0).valign = :center
+      table.column(0).padding = [-2, 4, 2, 4]
+      
       table.column(-1).align = :left
-      table.column(-1).padding = [2, 4]    
+      table.column(-1).valign = :center
+      table.column(-1).padding = [-2, 4, 2, 4]    
     end
 
+    star_text = ""
     if star
       pdf.move_down 10
-      pdf.text "<b>* #{I18n.t("pdf_content.course_class.class_schedule.noschedule")}</b>", :inline_format => true
+      pdf.text "<b>#{star_text}* #{I18n.t("pdf_content.course_class.class_schedule.noschedule")}</b>", :inline_format => true
+      star_text += "*"
+    end
+
+    unless Configuration.class_schedule_text.nil? or Configuration.class_schedule_text.empty? 
+      pdf.move_down 5
+      pdf.text "<b>#{star_text}* #{Configuration.class_schedule_text}</b>", :inline_format => true
+      star_text += "*"
     end
 
   end

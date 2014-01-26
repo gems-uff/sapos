@@ -42,4 +42,9 @@ class Configuration < ActiveRecord::Base
     config.nil? ? "12:00" : config.value.to_s 
   end
 
+  def self.class_schedule_text
+    config = Configuration.find_by_variable(:class_schedule_text)
+    config.nil? ? "" : config.value
+  end
+
 end

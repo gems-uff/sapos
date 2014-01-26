@@ -107,6 +107,8 @@ pt-BR:
       course_type:
         has_score: "Tem nota"
         name: "Nome"
+        schedulable: "Aparecer no QH"
+        show_class_name: "Mostrar nome da turma no QH"
       deferral:
         approval_date: "Data de aprovação"
         deferral_type: "Tipo de Prorrogação"
@@ -171,6 +173,7 @@ pt-BR:
         thesis_defense_committee_professors: "Banca Avaliadora"
       enrollment_status:
         name: "Nome"
+        enrollments: "Matrículas"
       institution:
         code: "Sigla"
         majors: "Cursos"
@@ -178,6 +181,10 @@ pt-BR:
       level: 
         advisement_authorizations: "Credenciamentos"
         name: "Nome"
+        enrollments: "Matrículas"
+        majors: "Cursos"
+        phase_durations: "Duração de Etapas"
+        scholarships: "Bolsas"
       major:
         institution: "Instituição"
         level: "Nível"
@@ -300,8 +307,10 @@ pt-BR:
         obs: "Observação"
       scholarship_type:
         name: "Nome"
+        scholarships: "Bolsas"
       sponsor:
         name: "Nome"
+        scholarships: "Bolsas"
       state:
         code: "Sigla"
         country: "País"
@@ -413,7 +422,7 @@ pt-BR:
           start_date_before_scholarship_cancel_date: "anterior a Data de Encerramento de outra alocação de bolsa"
           start_date_before_scholarship_end_date: "anterior a Data de Limite de Concessão de outra alocação de bolsa"
           start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
-          unfinished_scholarship: "ainda está alocado. Por favor, feche a alocação antes de criar uma nova"
+          unfinished_scholarship: "A bolsa ainda está alocada. Por favor, feche a alocação antes de criar uma nova"
           attributes:
             start_date_after_end_date: "posterior a Data de Limite de Concessão"
             cancel_date:
@@ -707,6 +716,7 @@ pt-BR:
         attendance_true: "S"
         course_name: "Nome da Disciplina"
         enrollment_number: "Matrícula"
+        email_title: "Lista de E-mails"
         final_grade: "Nota Final"
         lesson: "Aulas Dadas"
         link: "Pauta"
@@ -714,6 +724,7 @@ pt-BR:
         sequential_number: "Nº"
         situation: "Situação"
         student_name: "Nome do Aluno"
+        student_email: "E-mail do Aluno"
         title: "Resumo Semestral"
         year_semester: "Semestre/Ano"
       class_schedule:

@@ -147,6 +147,23 @@ describe Configuration do
 
         Configuration.notification_start_at.should == "18:00"
       end
+    end
+
+    context "class_schedule_text" do
+      it "should return '' when there is no configuration defined" do
+        config = Configuration.find_by_variable(:class_schedule_text)
+        config.delete unless config.nil?
+
+        Configuration.class_schedule_text.should == ''
+      end
+
+      it "should return 'bla' when it is defined to 5" do
+        config = Configuration.find_by_variable(:class_schedule_text)
+        config.delete unless config.nil?
+        Configuration.create(:variable=>:class_schedule_text, :value=>"bla")
+
+        Configuration.class_schedule_text.should == 'bla'
+      end
     end 
   end
 
