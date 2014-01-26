@@ -650,6 +650,9 @@ pt-BR:
     update_student_major_label: "Editar Curso do Aluno"
     update_thesis_defense_committee_participation: "Editar Participação em Banca"
     update_user_label: "Modificar Usuário"
+    notification:
+      sql_query_default: "SELECT * FROM "
+      body_template_default: "Olá %{name},"
 
     errors:
       full_messages:

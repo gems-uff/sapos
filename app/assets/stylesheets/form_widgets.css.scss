@@ -1,3 +1,5 @@
+@import 'variables';
+
 .identity_issuing_place_widget_show_state {
 	margin-left: 10px;
 }
@@ -10,3 +12,17 @@
 	width: 228px;
 }
 
+.form .CodeMirror {
+	width: $showwidth;
+	border: 1px solid #a4c7d0;
+	margin-left: 2px !important;
+	margin-top: 3px !important;
+	margin-bottom: 5px !important;
+}
+
+.form .CodeMirror-scroll {
+	margin-bottom: -30px !important;
+	margin-right: -30px !important;
+	padding-bottom: 30px !important;
+	padding-right: 30px !important;
+}

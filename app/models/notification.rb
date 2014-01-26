@@ -21,7 +21,9 @@ class Notification < ActiveRecord::Base
   validates :subject_template, :presence => true
   validates :to_template, :presence => true
 
-  after_create :update_next_execution
+  validate :execution
+
+  after_create :update_next_execution!
 
 
   def calculate_next_notification_date(options={})
@@ -47,7 +49,9 @@ class Notification < ActiveRecord::Base
   end
 
   def query_date
-    self.next_execution + (self.query_offset - self.notification_offset).days
+    next_date = self.next_execution
+    next_date = calculate_next_notification_date if next_date.nil?
+    next_date + (self.query_offset - self.notification_offset).days
   end
 
   def execute(options={})
@@ -81,6 +85,16 @@ class Notification < ActiveRecord::Base
     end
     self.update_next_execution! unless options[:skip_update]
     notifications
+  end
+
+  def execution
+    begin
+
+      self.execute(:skip_update => true)
+    rescue => e
+      errors.add(:base, e.to_s)
+      
+    end
   end
 
 end

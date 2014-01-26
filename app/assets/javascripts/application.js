@@ -16,6 +16,7 @@
 //= require active_scaffold
 //= require codemirror
 //= require codemirror/modes/sql
+//= require codemirror/modes/xml
 //= require_tree .
 
 
