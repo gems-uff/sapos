@@ -12,7 +12,7 @@
 	width: 228px;
 }
 
-.form .CodeMirror {
+.CodeMirror {
 	width: $showwidth;
 	border: 1px solid #a4c7d0;
 	margin-left: 2px !important;
@@ -20,9 +20,13 @@
 	margin-bottom: 5px !important;
 }
 
-.form .CodeMirror-scroll {
+.CodeMirror-scroll {
 	margin-bottom: -30px !important;
 	margin-right: -30px !important;
 	padding-bottom: 30px !important;
 	padding-right: 30px !important;
+}
+
+.CodeMirror-lines {
+	padding-top: 3px !important;
 }

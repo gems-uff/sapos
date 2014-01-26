@@ -15,6 +15,23 @@ module NotificationsHelper
     </script>".html_safe
   end
 
+  def code_mirrot_view(id, type, value)
+    "<div id='#{id}'></div>
+    <script>
+    CodeMirror(document.getElementById('#{id}'),
+     {mode: '#{type}',
+      value: '#{escape_javascript(value)}',
+      indentWithTabs: true,
+      smartIndent: true,
+      lineNumbers: true,
+      matchBrackets : true,
+      autofocus: true,
+      readOnly: true
+     }
+    );
+    </script>".html_safe
+  end
+
   def sql_query_form_column(record, options)
     code_mirror_text_area(:sql_query, "record_sql_query_#{record.id}", "text/x-mysql", options.merge(:value => record.sql_query || I18n.t('active_scaffold.notification.sql_query_default')))
   end
@@ -28,21 +45,10 @@ module NotificationsHelper
   end
 
   def sql_query_show_column(record, column)
-    type = "text/x-mysql"
-    value = record.sql_query
-    id = "sql_query-view-#{record.id}"
-    "<div id='sql_query-view-#{record.id}'></div>
-    <script>
-    CodeMirror(document.getElementById('#{id}'),
-     {mode: '#{type}',
-      value: '#{value}',
-      indentWithTabs: true,
-      smartIndent: true,
-      lineNumbers: true,
-      matchBrackets : true,
-      autofocus: true
-     }
-    );
-    </script>".html_safe
+    code_mirrot_view("sql_query-view-#{record.id}", "text/x-mysql", record.sql_query)
+  end
+
+  def body_template_show_column(record, column)
+    code_mirrot_view("body_template-view-#{record.id}", "text/html", record.body_template)
   end
 end
