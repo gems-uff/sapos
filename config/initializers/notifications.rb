@@ -22,6 +22,7 @@ notifier.new_notification do
 		#Generate query using the parameters specified by the notification
 		params = {
 			#Temos que definir todos os possíveis parametros que as buscas podem querer usar
+			:query_date => db_connection.quote(notification.query_date)
 		}
 		query = (notification.sql_query % params).gsub("\r\n", " ")
 
