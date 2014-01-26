@@ -196,6 +196,9 @@ Sapos::Application.routes.draw do
 
   resources :notifications do 
     as_routes 
+    member do
+      get 'execute_now'
+    end
   end
 
   # The priority is based upon order of creation:

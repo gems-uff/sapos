@@ -7,9 +7,10 @@ class Notifier
   include Singleton
 
   def initialize
-    @notifications = []
+    @async_notifications = []
     @options = {}
-
+    @logger = Rails.logger
+    
     return unless Rails.const_defined? 'Server'
 
     if Rails.env.development? or Rails.env.test? 
@@ -24,31 +25,30 @@ class Notifier
 
     scheduler = Rufus::Scheduler.new
     scheduler.every Configuration.notification_frequency, :first_at => first_at do
-      send_emails
+      asynchronous_emails
     end
   end
 
   def new_notification(&block)
-    @notifications << lambda { yield }
+    @async_notifications << lambda { yield }
   end
 
   def notifications
-    @notifications
+    @async_notifications
   end
 
   def run_notifications
-    result = []
-    @notifications.each do |notification|
-      result += notification.call
-    end
-    result
+    @async_notifications.map{ |n| n.call }.flatten
   end
 
-  def send_emails
-    run_notifications.each do |message|
+  def asynchronous_emails
+    send_emails(run_notifications)
+  end
+
+  def send_emails(messages)
+    messages.each do |message|
       m = message.merge(@options)
       unless m[:to].nil? or m[:to].empty?
-        
         ActionMailer::Base.mail(m).deliver!
         display_notification_info(m)
       end
@@ -57,11 +57,11 @@ class Notifier
 
   #ToDo: Use rails logger
   def display_notification_info(notification)
-    puts "\n#{Time.now.strftime('%Y/%m/%d %H:%M:%S')}"
-    puts "########## Notification ##########"
-    puts "Notifying #{notification[:to]}"
-    puts "Subject: #{notification[:subject]}"
-    puts "body: #{notification[:body]}"
-    puts "##################################"
+    @logger.info "\n#{Time.now.strftime('%Y/%m/%d %H:%M:%S')}"
+    @logger.info "########## Notification ##########"
+    @logger.info "Notifying #{notification[:to]}"
+    @logger.info "Subject: #{notification[:subject]}"
+    @logger.info "body: #{notification[:body]}"
+    @logger.info "##################################"
   end
 end

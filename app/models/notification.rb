@@ -24,7 +24,12 @@ class Notification < ActiveRecord::Base
   validate :execution
 
   after_create :update_next_execution!
+  after_initialize :init
 
+  def init
+    self.query_offset ||= 0
+    self.notification_offset ||= 0
+  end
 
   def calculate_next_notification_date(options={})
     time = options[:time]
