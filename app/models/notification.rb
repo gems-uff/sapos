@@ -45,4 +45,8 @@ class Notification < ActiveRecord::Base
     Time.now >= next_execution
   end
 
+  def query_date
+    self.next_execution + (self.query_offset - self.notification_offset).days
+  end
+
 end
