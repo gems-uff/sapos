@@ -193,7 +193,7 @@ pt-BR:
           monthly: "Mensal"
           weekly: "Semanal"
           daily: "Diária"
-        last_execution: "Última Execução"
+        next_execution: "Próxima Execução"
         notification_offset: "Offset da Notificação"
         query_offset: "Offset da Consulta"
         sql_query: "Consulta"
