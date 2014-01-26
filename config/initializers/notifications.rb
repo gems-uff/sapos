@@ -12,7 +12,7 @@ notifier.new_notification do
 	notifications = []
 
 	Notification.all.each do |notification|
-	  notifications_to_execute << notification if notification.should_execute?
+	  notifications_to_execute << notification if notification.should_run?
 	end
 
 	#Create connection to the Database
@@ -41,7 +41,6 @@ notifier.new_notification do
 				:body => notification.body_template % result
 			}
 	  end
-	  notification.last_execution = Date.today
 	  notification.save
 	end
 	notifications

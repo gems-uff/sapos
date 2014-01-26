@@ -13,7 +13,6 @@ class Notification < ActiveRecord::Base
     I18n.translate("activerecord.attributes.notification.frequencies.daily")
   ]
     
-
   validates :body_template, :presence => true
   validates :frequency, :presence => true, :inclusion => {:in => FREQUENCIES}
   validates :notification_offset, :presence => true
@@ -22,8 +21,10 @@ class Notification < ActiveRecord::Base
   validates :subject_template, :presence => true
   validates :to_template, :presence => true
 
+  before_save :calculate_next_notification_date
 
-  def calculate_next_notification_date(options)
+
+  def calculate_next_notification_date(options={})
     time = options[:time]
     time ||= Time.now
     if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
@@ -37,19 +38,11 @@ class Notification < ActiveRecord::Base
       dates = (-2..2).map { |n| time.midnight + n.day } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.daily")    
     end
 
-    #if self.next_execution.nil?
-    #  date = dates[0] 
-    #else
-
-    date = dates.find { |date| (date + self.notification_offset.days) > time }
-    #end
-    date + self.notification_offset.days
+    self.next_execution = dates.find { |date| (date + self.notification_offset.days) > time } + self.notification_offset.days
   end
 
-  def should_execute?
-    return true if self.last_execution.nil?
-    notification_date = self.notification_date
-    (self.last_execution <= notification_date) and (Time.now >= notification_date)
+  def should_run?
+    Time.now >= next_execution
   end
 
 end
