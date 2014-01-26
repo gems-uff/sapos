@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140125190500) do
+ActiveRecord::Schema.define(:version => 20140125183352) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -111,10 +111,8 @@ ActiveRecord::Schema.define(:version => 20140125190500) do
   create_table "course_types", :force => true do |t|
     t.string   "name"
     t.boolean  "has_score"
-    t.datetime "created_at",      :null => false
-    t.datetime "updated_at",      :null => false
-    t.boolean  "schedulable"
-    t.boolean  "show_class_name"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   create_table "courses", :force => true do |t|
@@ -238,6 +236,7 @@ ActiveRecord::Schema.define(:version => 20140125190500) do
   add_index "notification_logs", ["notification_id"], :name => "index_notification_logs_on_notification_id"
 
   create_table "notifications", :force => true do |t|
+    t.string   "title"
     t.string   "to_template"
     t.string   "subject_template"
     t.text     "body_template"
@@ -245,10 +244,9 @@ ActiveRecord::Schema.define(:version => 20140125190500) do
     t.integer  "notification_offset"
     t.integer  "query_offset"
     t.string   "frequency"
+    t.datetime "next_execution"
     t.datetime "created_at",          :null => false
     t.datetime "updated_at",          :null => false
-    t.datetime "last_execution"
-    t.string   "title"
   end
 
   create_table "phase_completions", :force => true do |t|
