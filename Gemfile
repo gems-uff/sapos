@@ -68,6 +68,7 @@ gem 'simple-navigation'
 
 # Notification
 gem 'rufus-scheduler'
+gem 'codemirror-rails'
 
 # Use unicorn as the web server
 # gem 'unicorn'

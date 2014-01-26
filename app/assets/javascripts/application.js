@@ -14,6 +14,8 @@
 //= require jquery.ui.all
 //= require jquery_ujs
 //= require active_scaffold
+//= require codemirror
+//= require codemirror/modes/sql
 //= require_tree .
 
 

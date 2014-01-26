@@ -39,6 +39,8 @@ GEM
     builder (3.0.4)
     cancan (1.6.9)
     choice (0.1.6)
+    codemirror-rails (3.16)
+      railties (>= 3.0, < 5)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
       railties (~> 3.2.0)
@@ -200,6 +202,7 @@ DEPENDENCIES
   active_scaffold (~> 3.3.3)
   awesome_print
   cancan
+  codemirror-rails
   coffee-rails (~> 3.2.1)
   debugger
   devise
