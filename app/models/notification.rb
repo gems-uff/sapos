@@ -21,7 +21,7 @@ class Notification < ActiveRecord::Base
   validates :subject_template, :presence => true
   validates :to_template, :presence => true
 
-  before_save :calculate_next_notification_date
+  after_create :update_next_execution
 
 
   def calculate_next_notification_date(options={})
@@ -38,15 +38,49 @@ class Notification < ActiveRecord::Base
       dates = (-2..2).map { |n| time.midnight + n.day } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.daily")    
     end
 
-    self.next_execution = dates.find { |date| (date + self.notification_offset.days) > time } + self.notification_offset.days
+    dates.find { |date| (date + self.notification_offset.days) > time } + self.notification_offset.days
   end
 
-  def should_run?
-    Time.now >= next_execution
+  def update_next_execution!
+    self.next_execution = self.calculate_next_notification_date
+    self.save!
   end
 
   def query_date
     self.next_execution + (self.query_offset - self.notification_offset).days
+  end
+
+  def execute(options={})
+    notifications = []
+    
+    #Create connection to the Database
+    db_connection = ActiveRecord::Base.connection
+    
+    #Generate query using the parameters specified by the notification
+    params = {
+      #Temos que definir todos os possíveis parametros que as buscas podem querer usar
+      :query_date => db_connection.quote(self.query_date)
+    }
+    query = (self.sql_query % params).gsub("\r\n", " ")
+
+    #Query the Database
+    query_result = db_connection.select_all(query)
+
+    #Build the notifications with the results from the query
+    query_result.each do |raw_result|
+      result = {}
+      raw_result.each do |key , value|
+        result[key.to_sym] = value
+      end
+
+      notifications << {
+        :to => self.to_template % result,
+        :subject => self.subject_template % result,
+        :body => self.body_template % result
+      }
+    end
+    self.update_next_execution! unless options[:skip_update]
+    notifications
   end
 
 end
