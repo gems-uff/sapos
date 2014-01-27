@@ -148,11 +148,14 @@ user.save!
 
 [
   {
-    :title => "Vencimento de etapas em 30 dias", 
+    :title => "Vencimento de etapas em 1 mês", 
     :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), 
     :notification_offset => 0, 
-    :query_offset => 30, 
-    :sql_query => "SELECT students.email AS email, students.name AS name, phases.name AS phase_name
+    :query_offset => 32, 
+    :sql_query => "SELECT 
+  students.email AS email, 
+  students.name AS name, 
+  phases.name AS phase_name
 FROM phase_completions 
 INNER JOIN enrollments ON enrollments.id == phase_completions.enrollment_id 
 INNER JOIN students ON students.id == enrollments.student_id
@@ -162,8 +165,34 @@ AND completion_date IS NULL",
     :individual => true,
     :to_template => "<%= email %>", 
     :subject_template => "Prazo para realização da etapa <%= phase_name %>", 
-    :body_template => "Olá <%= name %>,\nFaltam menos de 30 dias para o vencimento da etapa <%= phase_name %>"
-  }
+    :body_template => "Olá <%= name %>,\nFalta menos de 1 mês para o vencimento da etapa <%= phase_name %>"
+  }, 
+  {
+    :title => "Notificar Prazo de Pedido de Banca a Coordenadores", 
+    :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), 
+    :notification_offset => 0, 
+    :query_offset => 32, 
+    :sql_query => 'SELECT 
+  students.email AS email, 
+  students.name AS name, 
+  due_date AS due_date
+FROM phase_completions 
+INNER JOIN enrollments ON enrollments.id = phase_completions.enrollment_id 
+INNER JOIN students ON students.id = enrollments.student_id
+INNER JOIN phases ON phases.id = phase_completions.phase_id 
+WHERE due_date<%{query_date} 
+AND completion_date IS NULL
+AND phases.name == "Pedido de Banca"', 
+    :individual => false,
+    :to_template => "<%= User.where(:role_id => 2).map(&:email).join(';') %>", 
+    :subject_template => "Alunos precisam realizar Pedido de Banca em um mês", 
+    :body_template => "Coordenador,
+
+Os seguintes alunos precisam pedir banca em 1 mês:
+<% records.each do |record| %>
+- <%= record['name'] %> (<%= record['email'] %>) - <%= localize(record['due_date'], :monthyear2) %>
+<% end %>"
+  }, 
 ].each do |notification|
   Notification.new do |n|
     n.title = notification[:title]

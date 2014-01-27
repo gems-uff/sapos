@@ -5,6 +5,10 @@ class ERBFormatter
     end 
   end
 
+  def localize(date, format)
+    I18n.localize(Time.parse(date), :format => format)
+  end
+
   def format(code)
     ERB.new(code, 0).result(binding)
   end

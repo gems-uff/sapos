@@ -104,14 +104,16 @@ class Notification < ActiveRecord::Base
         }
       end
     else
-      bindings = {:records => records}.merge(params)
-      formatter = ERBFormatter.new(bindings)
-      notifications << {
-        :notification_id => self.id,
-        :to => formatter.format(self.to_template),
-        :subject => formatter.format(self.subject_template),
-        :body => formatter.format(self.body_template)
-      }
+      unless records.empty?
+        bindings = {:records => records}.merge(params)
+        formatter = ERBFormatter.new(bindings)
+        notifications << {
+          :notification_id => self.id,
+          :to => formatter.format(self.to_template),
+          :subject => formatter.format(self.subject_template),
+          :body => formatter.format(self.body_template)
+        }
+      end
     end
     self.update_next_execution! unless options[:skip_update]
     notifications

@@ -71,6 +71,8 @@ pt-BR:
       defaultdate: "%d-%m-%Y"
       picker: "%a, %d %b %Y %H:%M:%S"
       day: "%A, %d de %B de %Y"
+      monthyear: "%B-%Y"
+      monthyear2: "%B/%Y"
     am: ''
     pm: ''
 
