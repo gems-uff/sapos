@@ -198,6 +198,7 @@ Sapos::Application.routes.draw do
     as_routes 
     member do
       get 'execute_now'
+      get 'simulate'
     end
   end
 

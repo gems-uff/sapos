@@ -26,6 +26,10 @@ class Notification < ActiveRecord::Base
   after_create :update_next_execution!
   after_initialize :init
 
+  def to_label
+    self.title || I18n.t('activerecord.attributes.notification.no_name')
+  end
+
   def init
     self.query_offset ||= 0
     self.notification_offset ||= 0

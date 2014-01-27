@@ -8,6 +8,13 @@ class NotificationsController < ApplicationController
       :page => true, 
       :type => :member
 
+    config.action_links.add 'simulate', 
+      :label => "<i title='#{I18n.t('active_scaffold.notification.simulate')}' class='fa fa-table'></i>".html_safe,
+      :page => true, 
+      :inline => true,
+      :type => :member
+
+
     config.columns[:frequency].form_ui = :select
     config.columns[:frequency].options = {:options => Notification::FREQUENCIES}
     config.columns[:frequency].description = I18n.t('active_scaffold.notification.frequency_description')
@@ -30,5 +37,12 @@ class NotificationsController < ApplicationController
     notification = Notification.find(params[:id])
     Notifier.instance.send_emails notification.execute
     redirect_to Notification
+  end
+
+  def simulate
+    @notification = Notification.find(params[:id])
+    @query_date = @notification.query_date 
+    @messages = @notification.execute(:skip_update => true)
+    render :action => 'simulate'
   end
 end

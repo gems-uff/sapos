@@ -1,0 +1,28 @@
+<h4> <%= @notification.to_label %> </h4>
+
+<p class="simulate_query_date"> <%= I18n.t('active_scaffold.notification.query_date')%>: <%= I18n.localize(@query_date, :format => :day) %> </p>
+
+<table class="showtable listed-records-table">
+	<thead>
+		<tr>
+			<th><%= I18n.t('activerecord.attributes.notification_log.to')%></th>
+			<th><%= I18n.t('activerecord.attributes.notification_log.subject')%></th>
+			<th><%= I18n.t('activerecord.attributes.notification_log.body')%></th>
+		</tr>
+	</thead>
+	<tbody class="records">
+		<% @messages.each_with_index do |message, index| %>
+			<% tr_class = index.odd? ? "even-record" : "" %>
+			<tr class="record <%= tr_class %>">
+				<td><%= message[:to] %></td>
+				<td><%= message[:subject] %></td>
+				<td><%= message[:body].html_safe %></td>
+			</tr>
+		<% end %>
+	</tbody>
+</table>
+
+<p class="form-footer">
+  <%= link_to as_(:close), main_path_to_return, :class => 'as_cancel', :remote => request.xhr? %>
+  <%= loading_indicator_tag(:action => :create, :id => params[:id]) %>
+</p>
