@@ -53,8 +53,8 @@ class NotificationsController < ApplicationController
   def simulate
     @query_date = Date.strptime(params[:query_date], "%d-%m-%Y") unless params[:query_date].nil? 
     @notification = Notification.find(params[:id])
-    @messages = @notification.execute(:skip_update => true, :query_date => @query_date.to_time)
     @query_date ||= @notification.query_date.to_date
+    @messages = @notification.execute(:skip_update => true, :query_date => @query_date.to_time)
     render :action => 'simulate'
   end
 
