@@ -157,12 +157,29 @@ describe Configuration do
         Configuration.class_schedule_text.should == ''
       end
 
-      it "should return 'bla' when it is defined to 5" do
+      it "should return 'bla' when it is defined to bla" do
         config = Configuration.find_by_variable(:class_schedule_text)
         config.delete unless config.nil?
         Configuration.create(:variable=>:class_schedule_text, :value=>"bla")
 
         Configuration.class_schedule_text.should == 'bla'
+      end
+    end 
+
+     context "redirect_email" do
+      it "should return 'sapos@mailinator.com' when there is no configuration defined" do
+        config = Configuration.find_by_variable(:redirect_email)
+        config.delete unless config.nil?
+
+        Configuration.redirect_email.should == 'sapos@mailinator.com'
+      end
+
+      it "should return 'bla' when it is defined to bla" do
+        config = Configuration.find_by_variable(:redirect_email)
+        config.delete unless config.nil?
+        Configuration.create(:variable=>:redirect_email, :value=>"bla")
+
+        Configuration.redirect_email.should == 'bla'
       end
     end 
   end

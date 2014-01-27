@@ -13,10 +13,11 @@ class Notifier
     
     return unless Rails.const_defined? 'Server'
 
-    if Rails.env.development? or Rails.env.test? or Rails.env.staging? 
-      @options = {:to => 'sapos@mailinator.com'}
+    if Rails.env.development? or Rails.env.test? 
+      @options = {:to => Configuration.redirect_email}
       first_at = Time.now + 1.second
     else
+      @options = {:to => Configuration.redirect_email} if Rails.env.staging?
       first_at = Time.parse(Configuration.notification_start_at)
       if first_at < Time.now
         first_at += 1.day

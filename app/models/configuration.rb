@@ -47,4 +47,9 @@ class Configuration < ActiveRecord::Base
     config.nil? ? "" : config.value
   end
 
+  def self.redirect_email
+    config = Configuration.find_by_variable(:redirect_email)
+    config.nil? ? "sapos@mailinator.com" : config.value
+  end
+
 end
