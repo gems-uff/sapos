@@ -23,13 +23,17 @@ class ScholarshipDuration < ActiveRecord::Base
   validates_date :start_date, :on_or_after => :scholarship_start_date, :on_or_after_message => I18n.t("activerecord.errors.models.scholarship_duration.start_date_before_scholarship_start_date")
   validates_date :start_date, :on_or_before => :scholarship_end_date, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.start_date_after_scholarship_end_date")
   validates_date :end_date, :on_or_after => :scholarship_start_date, :on_or_after_message => I18n.t("activerecord.errors.models.scholarship_duration.end_date_before_scholarship_start_date")
-  validates_date :end_date, :on_or_before => :scholarship_end_date, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.end_date_after_scholarship_end_date")
+  validates_date :end_date, :on_or_before => :scholarship_end_date, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.end_date_after_scholarship_end_date"), :if => :doesnt_have_cancel_date?
 #
 #  #validates if a cancel date of an scholarship duration is valid
   validates_date :cancel_date, :on_or_before => :end_date, :allow_nil => true
   validates_date :cancel_date, :on_or_after => :start_date, :allow_nil => true
 
   before_save :update_end_and_cancel_dates
+
+  def doesnt_have_cancel_date?
+    self.cancel_date.nil?
+  end
 
   def to_label
     label = ""
