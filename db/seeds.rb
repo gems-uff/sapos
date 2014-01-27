@@ -159,9 +159,10 @@ INNER JOIN students ON students.id == enrollments.student_id
 INNER JOIN phases ON phases.id == phase_completions.phase_id 
 WHERE due_date<%{query_date} 
 AND completion_date IS NULL", 
-    :to_template => "%{email}", 
-    :subject_template => "Prazo para realização da etapa %{phase_name}", 
-    :body_template => "Olá %{name},\nFaltam menos de 30 dias para o vencimento da etapa %{phase_name}"
+    :individual => true,
+    :to_template => "<%= email %>", 
+    :subject_template => "Prazo para realização da etapa <%= phase_name %>", 
+    :body_template => "Olá <%= name %>,\nFaltam menos de 30 dias para o vencimento da etapa <%= phase_name %>"
   }
 ].each do |notification|
   Notification.new do |n|
@@ -170,6 +171,7 @@ AND completion_date IS NULL",
     n.notification_offset = notification[:notification_offset]
     n.query_offset = notification[:query_offset]
     n.sql_query = notification[:sql_query]
+    n.Individual = notification[:individual]
     n.to_template = notification[:to_template]
     n.subject_template = notification[:subject_template]
     n.body_template = notification[:body_template]

@@ -13,7 +13,7 @@ class Notifier
     
     return unless Rails.const_defined? 'Server'
 
-    if Rails.env.development? or Rails.env.test? 
+    if Rails.env.development? or Rails.env.test? or Rails.env.staging? 
       @options = {:to => 'sapos@mailinator.com'}
       first_at = Time.now + 1.second
     else

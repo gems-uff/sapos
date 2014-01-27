@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140125183352) do
+ActiveRecord::Schema.define(:version => 20140127152054) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -247,8 +247,9 @@ ActiveRecord::Schema.define(:version => 20140125183352) do
     t.integer  "query_offset"
     t.string   "frequency"
     t.datetime "next_execution"
-    t.datetime "created_at",          :null => false
-    t.datetime "updated_at",          :null => false
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
+    t.boolean  "individual",          :default => true
   end
 
   create_table "phase_completions", :force => true do |t|

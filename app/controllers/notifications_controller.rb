@@ -11,8 +11,9 @@ class NotificationsController < ApplicationController
     config.columns[:frequency].form_ui = :select
     config.columns[:frequency].options = {:options => Notification::FREQUENCIES}
     config.columns[:frequency].description = I18n.t('active_scaffold.notification.frequency_description')
+    config.columns[:individual].description = I18n.t('active_scaffold.notification.individual_description')
 
-    form_columns = [:title, :frequency, :notification_offset, :query_offset, :sql_query, :to_template, :subject_template, :body_template]
+    form_columns = [:title, :frequency, :notification_offset, :query_offset, :sql_query, :individual, :to_template, :subject_template, :body_template]
     config.update.columns = form_columns
     config.create.columns = form_columns
     config.show.columns = form_columns + [:next_execution]

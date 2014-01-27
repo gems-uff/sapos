@@ -207,6 +207,7 @@ pt-BR:
         subject_template: "Template do Assunto"
         title: "Título"
         to_template: "Template do Recipiente"
+        individual: "Individual"
       notification_log:
         body: "Corpo"
         to: "Para"
@@ -664,6 +665,7 @@ pt-BR:
       body_template_default: "Olá %{name},"
       frequency_description: "Diária: todo dia; Semanal: toda segunda; Mensal: dia 01 de cada mês; Semestral: 01/03 e 01/08; Anual: 01/01"
       execute_now: "Enviar agora"
+      individual_description: "Um e-mail para cada resultado"
 
     errors:
       full_messages:

@@ -1,5 +1,5 @@
 class Notification < ActiveRecord::Base
-  attr_accessible :body_template, :frequency, :next_execution, :notification_offset, :query_offset, :sql_query, :subject_template, :title, :to_template
+  attr_accessible :body_template, :frequency, :next_execution, :notification_offset, :query_offset, :sql_query, :subject_template, :title, :to_template, :individual
 
   has_many :notification_logs
 
@@ -82,20 +82,35 @@ class Notification < ActiveRecord::Base
     query = (self.sql_query % params).gsub("\r\n", " ")
 
     #Query the Database
-    query_result = db_connection.select_all(query)
+    records = db_connection.select_all(query)
 
     #Build the notifications with the results from the query
-    query_result.each do |raw_result|
-      result = {}
-      raw_result.each do |key , value|
-        result[key.to_sym] = value
-      end
+    if self.individual
+      records.each do |raw_result|
+        bindings = {
+          :records => records,
+          :record => raw_result
+        }.merge(params)
+        raw_result.each do |key , value|
+          bindings[key.to_sym] = value
+        end
+        formatter = ERBFormatter.new(bindings)
 
+        notifications << {
+          :notification_id => self.id,
+          :to => formatter.format(self.to_template),
+          :subject => formatter.format(self.subject_template),
+          :body => formatter.format(self.body_template)
+        }
+      end
+    else
+      bindings = {:records => records}.merge(params)
+      formatter = ERBFormatter.new(bindings)
       notifications << {
         :notification_id => self.id,
-        :to => self.to_template % result,
-        :subject => self.subject_template % result,
-        :body => self.body_template % result
+        :to => formatter.format(self.to_template),
+        :subject => formatter.format(self.subject_template),
+        :body => formatter.format(self.body_template)
       }
     end
     self.update_next_execution! unless options[:skip_update]
@@ -111,3 +126,5 @@ class Notification < ActiveRecord::Base
   end
 
 end
+
+
