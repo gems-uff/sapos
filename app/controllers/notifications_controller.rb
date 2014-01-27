@@ -3,6 +3,14 @@ class NotificationsController < ApplicationController
 
   active_scaffold :"notification" do |config|
   	
+
+    config.action_links.add 'set_query_date', 
+      :label => "<i title='#{I18n.t('active_scaffold.notification.set_query_date')}' class='fa fa-clock-o'></i>".html_safe,
+      :page => true, 
+      :inline => true,
+      :position => :after,
+      :type => :member
+
     config.action_links.add 'execute_now', 
       :label => "<i title='#{I18n.t('active_scaffold.notification.execute_now')}' class='fa fa-mail-forward'></i>".html_safe,
       :page => true, 
@@ -12,7 +20,9 @@ class NotificationsController < ApplicationController
       :label => "<i title='#{I18n.t('active_scaffold.notification.simulate')}' class='fa fa-table'></i>".html_safe,
       :page => true, 
       :inline => true,
+      :position => :after,
       :type => :member
+
 
 
     config.columns[:frequency].form_ui = :select
@@ -34,15 +44,24 @@ class NotificationsController < ApplicationController
   end
 
   def execute_now
+    query_date = Date.strptime(params[:query_date], "%d-%m-%Y") unless params[:query_date].nil?
     notification = Notification.find(params[:id])
-    Notifier.instance.send_emails notification.execute
+    Notifier.instance.send_emails(notification.execute(:query_date => query_date.to_time))
     redirect_to Notification
   end
 
   def simulate
+    @query_date = Date.strptime(params[:query_date], "%d-%m-%Y") unless params[:query_date].nil? 
     @notification = Notification.find(params[:id])
-    @query_date = @notification.query_date 
-    @messages = @notification.execute(:skip_update => true)
+    @messages = @notification.execute(:skip_update => true, :query_date => @query_date.to_time)
+    @query_date ||= @notification.query_date.to_date
     render :action => 'simulate'
+  end
+
+  def set_query_date
+    @query_date = Date.strptime(params[:query_date], "%d-%m-%Y") unless params[:query_date].nil?
+    @notification = Notification.find(params[:id])
+    @query_date ||= @notification.query_date.to_date
+    render :action => 'set_query_date'
   end
 end

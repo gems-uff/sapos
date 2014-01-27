@@ -669,6 +669,7 @@ pt-BR:
       simulate: "Simular"
       individual_description: "Um e-mail para cada resultado"
       query_date: "Data de Consulta"
+      set_query_date: "Escolher Data de Consulta"
 
     errors:
       full_messages:
