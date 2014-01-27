@@ -83,6 +83,7 @@ class Notification < ActiveRecord::Base
       end
 
       notifications << {
+        :notification_id => self.id,
         :to => self.to_template % result,
         :subject => self.subject_template % result,
         :body => self.body_template % result
@@ -94,11 +95,9 @@ class Notification < ActiveRecord::Base
 
   def execution
     begin
-
       self.execute(:skip_update => true)
     rescue => e
       errors.add(:base, e.to_s)
-      
     end
   end
 

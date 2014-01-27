@@ -50,6 +50,12 @@ class Notifier
       m = message.merge(@options)
       unless m[:to].nil? or m[:to].empty?
         ActionMailer::Base.mail(m).deliver!
+        NotificationLog.new(
+          :notification_id => m[:notification_id], 
+          :to => m[:to], 
+          :subject => m[:subject],
+          :body => m[:body]
+        ).save
         display_notification_info(m)
       end
     end
