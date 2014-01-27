@@ -206,7 +206,7 @@ describe ScholarshipDuration do
 
     describe 'last_date' do
       before(:all) do
-        @scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => end_date + 5.months)
+        @scholarship = FactoryGirl.create(:scholarship, :start_date => 3.days.from_now.to_date, :end_date => 3.days.from_now.to_date + 5.months)
       end
 
 
@@ -223,7 +223,7 @@ describe ScholarshipDuration do
 
     describe 'was_cancelled?' do
       before(:all) do
-        @scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => end_date + 5.months)
+        @scholarship = FactoryGirl.create(:scholarship, :start_date => 3.days.from_now.to_date, :end_date => 3.days.from_now.to_date + 5.months)
       end
 
       it 'should return false if there is no cancel_date' do
