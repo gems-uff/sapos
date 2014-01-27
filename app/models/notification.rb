@@ -61,14 +61,23 @@ class Notification < ActiveRecord::Base
 
   def execute(options={})
     notifications = []
+    qdate = options[:query_date]
+    qdate ||= self.query_date
     
     #Create connection to the Database
     db_connection = ActiveRecord::Base.connection
     
+    this_semester = YearSemester.on_date qdate
+    last_semester = this_semester - 1
     #Generate query using the parameters specified by the notification
     params = {
       #Temos que definir todos os possíveis parametros que as buscas podem querer usar
-      :query_date => db_connection.quote(self.query_date)
+      :query_date => db_connection.quote(qdate),
+      :this_semester_year => this_semester.year,
+      :this_semester_number => this_semester.semester,
+      :last_semester_year => last_semester.year,
+      :last_semester_number => last_semester.semester,
+       
     }
     query = (self.sql_query % params).gsub("\r\n", " ")
 
