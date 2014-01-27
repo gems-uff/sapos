@@ -145,6 +145,38 @@ end
 user.skip_confirmation!
 user.save!
 
+
+[
+  {
+    :title => "Vencimento de etapas em 30 dias", 
+    :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), 
+    :notification_offset => 0, 
+    :query_offset => 30, 
+    :sql_query => "SELECT students.email AS email, students.name AS name, phases.name AS phase_name
+                  FROM phase_completions 
+                  INNER JOIN enrollments ON enrollments.id == phase_completions.enrollment_id 
+                  INNER JOIN students ON students.id == enrollments.student_id
+                  INNER JOIN phases ON phases.id == phase_completions.phase_id 
+                  WHERE due_date<%{query_date} 
+                  AND completion_date IS NULL", 
+    :to_template => "%{email}", 
+    :subject_template => "Prazo para realização da etapa %{phase_name}", 
+    :body_template => "Olá %{name},\nFaltam menos de 30 dias para o vencimento da etapa %{phase_name}"
+  }
+].each do |notification|
+  Notification.new do |n|
+    n.title = notification[:title]
+    n.frequency = notification[:frequency]
+    n.notification_offset = notification[:notification_offset]
+    n.query_offset = notification[:query_offset]
+    n.sql_query = notification[:sql_query]
+    n.to_template = notification[:to_template]
+    n.subject_template = notification[:subject_template]
+    n.body_template = notification[:body_template]
+  end.save!
+end    
+
+
 Institution.create( :name =>"Associação de Ensino Superior do Piauí", :code =>"AESPI")
 Institution.create( :name =>"Centro Federal de Educação Tecnológica C S F", :code =>"CEFET-RJ")
 Institution.create( :name =>"Centro Universitário Luterano de Palmas", :code =>"CEULP")

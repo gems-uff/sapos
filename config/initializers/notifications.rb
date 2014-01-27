@@ -10,7 +10,7 @@ notifier = Notifier.instance
 notifier.new_notification do
   notifications = []
 
-  #Get the next execution time table
+  #Get the next execution time arel table
   next_execution = Notification.arel_table[:next_execution]
 
   #Find notifications that should run

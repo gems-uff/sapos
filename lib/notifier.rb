@@ -61,7 +61,6 @@ class Notifier
     end
   end
 
-  #ToDo: Use rails logger
   def display_notification_info(notification)
     @logger.info "\n#{Time.now.strftime('%Y/%m/%d %H:%M:%S')}"
     @logger.info "########## Notification ##########"
