@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140123012013) do
+ActiveRecord::Schema.define(:version => 20140127184740) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -225,6 +225,32 @@ ActiveRecord::Schema.define(:version => 20140123012013) do
 
   add_index "majors", ["institution_id"], :name => "index_majors_on_institution_id"
   add_index "majors", ["level_id"], :name => "index_majors_on_level_id"
+
+  create_table "notification_logs", :force => true do |t|
+    t.integer  "notification_id"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+    t.string   "to"
+    t.string   "subject"
+    t.text     "body"
+  end
+
+  add_index "notification_logs", ["notification_id"], :name => "index_notification_logs_on_notification_id"
+
+  create_table "notifications", :force => true do |t|
+    t.string   "title"
+    t.string   "to_template"
+    t.string   "subject_template"
+    t.text     "body_template"
+    t.text     "sql_query"
+    t.integer  "notification_offset"
+    t.integer  "query_offset"
+    t.string   "frequency"
+    t.datetime "next_execution"
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
+    t.boolean  "individual",          :default => true
+  end
 
   create_table "phase_completions", :force => true do |t|
     t.integer  "enrollment_id"
