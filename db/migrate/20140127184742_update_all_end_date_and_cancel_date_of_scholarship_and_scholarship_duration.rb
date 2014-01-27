@@ -1,10 +1,12 @@
 class UpdateAllEndDateAndCancelDateOfScholarshipAndScholarshipDuration < ActiveRecord::Migration
   def up
   	Scholarship.all.each do |scholarship|
-  	  scholarship.save!
+  	  puts "Scholarship #{scholarship.id}"
+      scholarship.save!
   	end
   	ScholarshipDuration.all.each do |scholarship_duration|
-  	  scholarship_duration.save!
+  	  puts "ScholarshipDuration #{scholarship_duration.id}"
+      scholarship_duration.save!
   	end
   end
 
