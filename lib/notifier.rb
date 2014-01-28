@@ -9,15 +9,15 @@ class Notifier
   def initialize
     @async_notifications = []
     @options = {}
+    @options = {:to => Configuration.redirect_email} unless  Configuration.redirect_email.empty?
+    puts @options
     @logger = Rails.logger
     
     return unless Rails.const_defined? 'Server'
 
     if Rails.env.development? or Rails.env.test? 
-      @options = {:to => Configuration.redirect_email}
       first_at = Time.now + 1.second
     else
-      @options = {:to => Configuration.redirect_email} unless  Configuration.redirect_email.nil?
       first_at = Time.parse(Configuration.notification_start_at)
       if first_at < Time.now
         first_at += 1.day
