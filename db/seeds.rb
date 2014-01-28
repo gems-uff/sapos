@@ -16,7 +16,7 @@ Configuration.create(:name=>"Pontos para orientador único", :variable =>"single
 Configuration.create(:name=>"Pontos para orientador múltiplo", :variable =>"multiple_advisor_points", :value => "0.5")
 Configuration.create(:name=>"Nível do Programa na CAPES", :variable =>"program_level", :value => "5")
 Configuration.create(:name=>"País padrão de emissão da identidade", :variable =>"identity_issuing_country", :value => "Brasil")
-Configuration.create(:name=>"Texto no final do quadro de horários", :variable =>"class_schedule_text", :value => "Alunos interessados em cursar disciplinas de Tópicos Avançados devem consultar os respectivos professores antes da matrícula")
+Configuration.create(:name=>"Texto no final do quadro de horários", :variable =>"class_schedule_text", :value => "Alunos interessados em cursar disciplinas de Tópicos Avançados devem consultar os respectivos professores antes da matrícula.")
 
 
 
