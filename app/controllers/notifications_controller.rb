@@ -46,6 +46,7 @@ class NotificationsController < ApplicationController
   def execute_now
     query_date = Date.strptime(params[:query_date], "%d-%m-%Y") unless params[:query_date].nil?
     notification = Notification.find(params[:id])
+    query_date ||= @notification.query_date.to_date
     Notifier.instance.send_emails(notification.execute(:query_date => query_date.to_time))
     redirect_to Notification
   end
