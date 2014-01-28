@@ -15,7 +15,7 @@ module NotificationsHelper
     </script>".html_safe
   end
 
-  def code_mirrot_view(id, type, value)
+  def code_mirror_view(id, type, value)
     "<div id='#{id}'></div>
     <script>
     CodeMirror(document.getElementById('#{id}'),
@@ -45,10 +45,10 @@ module NotificationsHelper
   end
 
   def sql_query_show_column(record, column)
-    code_mirrot_view("sql_query-view-#{record.id}", "text/x-mysql", record.sql_query)
+    code_mirror_view("sql_query-view-#{record.id}", "text/x-mysql", record.sql_query)
   end
 
   def body_template_show_column(record, column)
-    code_mirrot_view("body_template-view-#{record.id}", "text/html", record.body_template)
+    code_mirror_view("body_template-view-#{record.id}", "text/html", record.body_template)
   end
 end
