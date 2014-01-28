@@ -146,7 +146,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def verify_research_area_with_advisors
-    unless advisements.nil? or advisements.empty?
+    unless advisements.nil? or advisements.empty? or research_area.nil?
       research_areas = []
       advisements.each do |advisement|
         research_areas += advisement.professor.research_areas unless advisement.professor.research_areas.nil?
