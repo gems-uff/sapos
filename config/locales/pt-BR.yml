@@ -368,6 +368,7 @@ pt-BR:
           grade_for_situation_registered: "A nota deve estar em branco para situação 'Incompleto'"
         deferral:
           enrollment_and_deferral_uniqueness: "já possui esta prorrogação"
+          enrollment_level: "não possui o mesmo nível que a prorrogação"
         deferral_type:
           blank_duration: "duração deve ser de pelo menos um dia"
         dismissal:
@@ -396,8 +397,11 @@ pt-BR:
             cancel_date:
               on_or_after:  "anterior a Data de Início"
               on_or_before: "posterior a Data Limite de Concessão"
+        phase:
+          phase_duration_has_deferral: "Não foi possível remover duração de etapa para %{level}, pois já existe prorrogação para este nível"
         phase_duration:
           blank_deadline: "prazo deve ser de pelo menos um dia"
+          has_deferral: "Já existe prorrogação para esta duração de etapa"
         professor_research_area:
           unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
         student_major:

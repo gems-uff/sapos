@@ -10,6 +10,10 @@ class Deferral < ActiveRecord::Base
   validates :enrollment, :presence => true
   validates :enrollment_id, :uniqueness => {:scope => :deferral_type_id, :message => :enrollment_and_deferral_uniqueness}
   validates :deferral_type, :presence => true
+  validates :approval_date, :presence => true
+
+
+  validate :enrollment_level
 
   def to_label
     "#{deferral_type.name}" unless deferral_type.nil?    
@@ -48,5 +52,14 @@ class Deferral < ActiveRecord::Base
     valid_date = total_time[:months].months.since(valid_date).end_of_month
 
     total_time[:days].days.since(valid_date).strftime('%d/%m/%Y')
+  end
+
+  def enrollment_level
+    return if enrollment.nil?
+    return if deferral_type.nil?
+
+    unless deferral_type.phase.levels.include? enrollment.level
+      errors.add(:enrollment, I18n.translate("activerecord.errors.models.deferral.enrollment_level")) 
+    end
   end
 end

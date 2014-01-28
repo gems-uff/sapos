@@ -16,4 +16,5 @@ class Phase < ActiveRecord::Base
   def to_label
   	"#{self.name}"
   end
+
 end

@@ -13,11 +13,32 @@ describe Deferral do
           deferral.enrollment = Enrollment.new
           deferral.should have(0).errors_on :enrollment
         end
+
+        it "deferral_type phase has the enrollment level" do
+          level = FactoryGirl.create(:level)
+          phase = FactoryGirl.create(:phase)
+          deferral.enrollment = FactoryGirl.create(:enrollment, :level => level)
+          deferral.deferral_type = FactoryGirl.create(:deferral_type, :phase => phase)
+          phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :level => level)
+          
+          deferral.should have(0).errors_on :enrollment
+        end
       end
       context "should have error blank when" do
         it "enrollment is null" do
           deferral.enrollment = nil
           deferral.should have_error(:blank).on :enrollment
+        end
+      end
+
+      context "should have error enrollment_level when" do
+        it "deferral_type phase doesn't have the enrollment level" do
+          level = FactoryGirl.create(:level)
+          phase = FactoryGirl.create(:phase)
+          deferral.enrollment = FactoryGirl.create(:enrollment, :level => level)
+          deferral.deferral_type = FactoryGirl.create(:deferral_type, :phase => phase)
+          
+          deferral.should have_error(:enrollment_level).on :enrollment
         end
       end
     end
@@ -32,6 +53,20 @@ describe Deferral do
         it "deferral_type is null" do
           deferral.deferral_type = nil
           deferral.should have_error(:blank).on :deferral_type
+        end
+      end
+    end
+    describe "approval_date" do
+      context "should be valid when" do
+        it "approval_date is not null" do
+          deferral.approval_date = Date.parse("2014/01/01")
+          deferral.should have(0).errors_on :approval_date
+        end
+      end
+      context "should have error blank when" do
+        it "approval_date is null" do
+          deferral.approval_date = nil
+          deferral.should have_error(:blank).on :approval_date
         end
       end
     end

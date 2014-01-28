@@ -29,7 +29,7 @@ class EnrollmentsController < ApplicationController
       :type => :member, 
       :parameters => {:format => :pdf}
 
-    config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase, :course_class_year_semester
+    config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase, :course_class_year_semester, :deferral_type
     config.columns.add :listed_advisors, :listed_accomplishments, :listed_deferrals, :listed_scholarships, :listed_class_enrollments
 
     config.list.columns = [:enrollment_number, :student, :enrollment_status, :level, :admission_date, :dismissal]
@@ -65,7 +65,7 @@ class EnrollmentsController < ApplicationController
     config.columns[:level].search_sql = "levels.id"
     config.columns[:level].search_ui = :select
     config.columns[:level].send_form_on_update_column = true
-    config.columns[:level].update_columns = [:accomplishments, :phase]
+    config.columns[:level].update_columns = [:accomplishments, :phase, :deferrals, :deferral_type]
     config.columns[:professor].includes = {:advisements => :professor}
     config.columns[:professor].search_sql = "professors.name"
     config.columns[:professor].search_ui = :text

@@ -15,6 +15,8 @@ class PhaseDuration < ActiveRecord::Base
 
   validate :deadline_validation
 
+  before_destroy :validate_destroy
+
   def to_label
     "#{deadline_semesters} períodos, #{deadline_months} meses e #{deadline_days} dias"
   end
@@ -27,5 +29,19 @@ class PhaseDuration < ActiveRecord::Base
 
   def duration
     {:semesters => self.deadline_semesters, :months => self.deadline_months, :days => self.deadline_days}
+  end
+
+  def validate_destroy
+    return true if phase.nil? or level.nil?
+    has_deferral = phase.deferral_type.any? do |deferral_type|
+      deferral_type.deferrals.any? do |deferral|
+        deferral.enrollment.level == level
+      end
+    end
+    if has_deferral
+      errors.add(:base, I18n.t("activerecord.errors.models.phase_duration.has_deferral"))
+      phase.errors.add(:base, I18n.t("activerecord.errors.models.phase.phase_duration_has_deferral", :level => level.to_label))
+    end
+    !has_deferral
   end
 end
