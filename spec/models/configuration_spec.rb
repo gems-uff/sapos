@@ -167,11 +167,11 @@ describe Configuration do
     end 
 
      context "redirect_email" do
-      it "should return 'sapos@mailinator.com' when there is no configuration defined" do
+      it "should return '' when there is no configuration defined" do
         config = Configuration.find_by_variable(:redirect_email)
         config.delete unless config.nil?
 
-        Configuration.redirect_email.should == 'sapos@mailinator.com'
+        Configuration.redirect_email.should == ''
       end
 
       it "should return 'bla' when it is defined to bla" do
