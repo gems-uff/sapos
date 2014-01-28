@@ -194,7 +194,7 @@ AND phases.name == "Pedido de Banca"',
     :title => "Notificar Alunos com Pedido de Banca não Desligados a Coordenadores", 
     :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), 
     :notification_offset => 14, 
-    :query_offset => -59, 
+    :query_offset => -30, 
     :sql_query => 'SELECT 
   students.email AS email, 
   students.name AS name, 
