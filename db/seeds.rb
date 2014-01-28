@@ -158,16 +158,17 @@ user.save!
   students.name AS name, 
   phases.name AS phase_name
 FROM phase_completions 
-INNER JOIN enrollments ON enrollments.id == phase_completions.enrollment_id 
-INNER JOIN students ON students.id == enrollments.student_id
-INNER JOIN phases ON phases.id == phase_completions.phase_id 
+INNER JOIN enrollments ON enrollments.id = phase_completions.enrollment_id 
+INNER JOIN students ON students.id = enrollments.student_id
+INNER JOIN phases ON phases.id = phase_completions.phase_id 
 WHERE due_date<=%{query_date} 
 AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
 AND completion_date IS NULL", 
     :individual => true,
     :to_template => "<%= email %>", 
     :subject_template => "Prazo para realização da etapa <%= phase_name %>", 
-    :body_template => "Prezado <%= name %>,<br><br>Falta menos de 1 mês para o vencimento da etapa <%= phase_name %>"
+    :body_template => "Prezado <%= name %>,
+    Falta menos de 1 mês para o vencimento da etapa <%= phase_name %>"
   }, 
   {
     :title => "Notificar Prazo de Pedido de Banca a Coordenadores", 
@@ -185,17 +186,21 @@ INNER JOIN phases ON phases.id = phase_completions.phase_id
 WHERE due_date<=%{query_date} 
 AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
 AND completion_date IS NULL
-AND phases.name == "Pedido de Banca"', 
+AND phases.name = "Pedido de Banca"', 
     :individual => false,
     :to_template => "<%= User.where(:role_id => 2).map(&:email).join(';') %>", 
     :subject_template => "Alunos precisam realizar Pedido de Banca em um mês", 
-    :body_template => "Coordenador,<br><br>Os seguintes alunos precisam pedir banca em 1 mês:<br><% records.each do |record| %>- <%= record['name'] %> (<%= record['email'] %>) - <%= localize(record['due_date'], :monthyear2) %><br><% end %>"
+    :body_template => "Coordenador, 
+    Os seguintes alunos precisam pedir banca em 1 mês:
+
+    <% records.each do |record| %>- <%= record['name'] %> (<%= record['email'] %>) - <%= localize(record['due_date'], :monthyear2) %>
+    <% end %>"
   }, 
   {
     :title => "Notificar Alunos com Pedido de Banca não Desligados a Coordenadores", 
     :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), 
     :notification_offset => 14, 
-    :query_offset => -31, 
+    :query_offset => -32, 
     :sql_query => 'SELECT 
   students.email AS email, 
   students.name AS name, 
@@ -207,11 +212,15 @@ INNER JOIN students ON students.id = enrollments.student_id
 INNER JOIN phases ON phases.id = phase_completions.phase_id 
 WHERE completion_date<=%{query_date}
 AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
-AND phases.name == "Pedido de Banca"', 
+AND phases.name = "Pedido de Banca"', 
     :individual => false,
     :to_template => "<%= User.where(:role_id => 2).map(&:email).join(';') %>", 
     :subject_template => "Alunos ainda não desligados", 
-    :body_template => "Coordenador,<br><br>Os seguintes alunos pediram banca há mais de 45 dias, mas ainda não foram desligados:<br><% records.each do |record| %>- <%= record['name'] %> (<%= record['email'] %>)<br><% end %>"
+    :body_template => "Coordenador, 
+    Os seguintes alunos pediram banca há mais de 45 dias, mas ainda não foram desligados:
+
+    <% records.each do |record| %>- <%= record['name'] %> (<%= record['email'] %>)
+    <% end %>"
   },
 ].each do |notification|
   Notification.new do |n|
