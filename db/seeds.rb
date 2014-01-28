@@ -19,6 +19,7 @@ Configuration.create(:name=>"País padrão de emissão da identidade", :variable
 Configuration.create(:name=>"Frequência de envio de notificações (reiniciar servidor após alteração)", :variable =>"notification_frequency", :value => "1d")
 Configuration.create(:name=>"Horário inicial para o envio de notificações (reiniciar servidor após alteração)", :variable =>"notification_start_at", :value => "12:00")
 Configuration.create(:name=>"Texto no final do quadro de horários", :variable =>"class_schedule_text", :value => "Alunos interessados em cursar disciplinas de Tópicos Avançados devem consultar os respectivos professores antes da matrícula")
+Configuration.create(:name=>"E-mail de redirecionamento para as notificações", :variable =>"redirect_email", :value => "")
 
 
 ['Graduação', 'Especialização', 'Mestrado', 'Doutorado'].each do |level|
@@ -151,7 +152,7 @@ user.save!
     :title => "Vencimento de etapas em 1 mês", 
     :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), 
     :notification_offset => 0, 
-    :query_offset => 32, 
+    :query_offset => 31, 
     :sql_query => "SELECT 
   students.email AS email, 
   students.name AS name, 
@@ -160,19 +161,19 @@ FROM phase_completions
 INNER JOIN enrollments ON enrollments.id == phase_completions.enrollment_id 
 INNER JOIN students ON students.id == enrollments.student_id
 INNER JOIN phases ON phases.id == phase_completions.phase_id 
-WHERE due_date<%{query_date} 
+WHERE due_date<=%{query_date} 
 AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
 AND completion_date IS NULL", 
     :individual => true,
     :to_template => "<%= email %>", 
     :subject_template => "Prazo para realização da etapa <%= phase_name %>", 
-    :body_template => "Olá <%= name %>,<br><br>Falta menos de 1 mês para o vencimento da etapa <%= phase_name %>"
+    :body_template => "Prezado <%= name %>,<br><br>Falta menos de 1 mês para o vencimento da etapa <%= phase_name %>"
   }, 
   {
     :title => "Notificar Prazo de Pedido de Banca a Coordenadores", 
     :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), 
     :notification_offset => 0, 
-    :query_offset => 32, 
+    :query_offset => 31, 
     :sql_query => 'SELECT 
   students.email AS email, 
   students.name AS name, 
@@ -181,7 +182,7 @@ FROM phase_completions
 INNER JOIN enrollments ON enrollments.id = phase_completions.enrollment_id 
 INNER JOIN students ON students.id = enrollments.student_id
 INNER JOIN phases ON phases.id = phase_completions.phase_id 
-WHERE due_date<%{query_date} 
+WHERE due_date<=%{query_date} 
 AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
 AND completion_date IS NULL
 AND phases.name == "Pedido de Banca"', 
@@ -194,7 +195,7 @@ AND phases.name == "Pedido de Banca"',
     :title => "Notificar Alunos com Pedido de Banca não Desligados a Coordenadores", 
     :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), 
     :notification_offset => 14, 
-    :query_offset => -30, 
+    :query_offset => -31, 
     :sql_query => 'SELECT 
   students.email AS email, 
   students.name AS name, 
@@ -204,7 +205,7 @@ FROM phase_completions
 INNER JOIN enrollments ON enrollments.id = phase_completions.enrollment_id 
 INNER JOIN students ON students.id = enrollments.student_id
 INNER JOIN phases ON phases.id = phase_completions.phase_id 
-WHERE completion_date<%{query_date}
+WHERE completion_date<=%{query_date}
 AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
 AND phases.name == "Pedido de Banca"', 
     :individual => false,
