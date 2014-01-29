@@ -31,8 +31,8 @@ class Notification < ActiveRecord::Base
   end
 
   def init
-    self.query_offset ||= 0
-    self.notification_offset ||= 0
+    self.query_offset ||= "0"
+    self.notification_offset ||= "0"
   end
 
   def calculate_next_notification_date(options={})
@@ -49,7 +49,7 @@ class Notification < ActiveRecord::Base
       dates = (-2..2).map { |n| time.midnight + n.day } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.daily")    
     end
 
-    dates.find { |date| (date + self.notification_offset.days) > time } + self.notification_offset.days
+    dates.find { |date| (date + StringTimeDelta::parse(self.notification_offset)) > time } + StringTimeDelta::parse(self.notification_offset)
   end
 
   def update_next_execution!
@@ -60,7 +60,7 @@ class Notification < ActiveRecord::Base
   def query_date
     next_date = self.next_execution
     next_date = calculate_next_notification_date if next_date.nil?
-    next_date + (self.query_offset - self.notification_offset).days
+    next_date + StringTimeDelta::parse(self.query_offset) - StringTimeDelta::parse(self.notification_offset)
   end
 
   def execute(options={})

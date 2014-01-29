@@ -43,7 +43,7 @@ describe Notification do
     describe "notification_offset" do
       context "should be valid when" do
         it "notification_offset is not null" do
-          notification.notification_offset = 5
+          notification.notification_offset = "5"
           notification.should have(0).errors_on :notification_offset
         end
       end
@@ -58,7 +58,7 @@ describe Notification do
     describe "query_offset" do
       context "should be valid when" do
         it "query_offset is not null" do
-          notification.query_offset = 5
+          notification.query_offset = "5"
           notification.should have(0).errors_on :query_offset
         end
       end
@@ -132,17 +132,17 @@ describe Notification do
         end
 
         it "should be 2014/01/16(thursday) if today is 2014/01/14(tuesday) and offset is 3" do
-          notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.weekly"), :notification_offset => 3)
+          notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.weekly"), :notification_offset => "3")
           notification.calculate_next_notification_date(:time => Time.parse("2014/01/14")).should == Time.parse("2014/01/16")
         end
 
         it "should be 2014/01/18(saturday) if today is 2014/01/14(tuesday) and offset is -2" do
-          notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.weekly"), :notification_offset => -2)
+          notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.weekly"), :notification_offset => "-2")
           notification.calculate_next_notification_date(:time => Time.parse("2014/01/14")).should == Time.parse("2014/01/18")
         end
 
          it "should be 2014/02/01(saturday) if today is 2014/01/25(saturday) and offset is -2" do
-          notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.weekly"), :notification_offset => -2)
+          notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.weekly"), :notification_offset => "-2")
           notification.calculate_next_notification_date(:time => Time.parse("2014/01/25")).should == Time.parse("2014/02/01")
         end
       end
@@ -154,8 +154,13 @@ describe Notification do
         end
 
         it "should be 02/15 if today is 01/17 and offset is 14" do
-          notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), :notification_offset => 14)
+          notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), :notification_offset => "14")
           notification.calculate_next_notification_date(:time => Time.parse("01/17")).should == Time.parse("02/15")
+        end
+
+        it "should be 02/08 if today is 01/17 and offset is 1w" do
+          notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), :notification_offset => "1w")
+          notification.calculate_next_notification_date(:time => Time.parse("01/17")).should == Time.parse("02/08")
         end
       end
 
@@ -181,7 +186,7 @@ describe Notification do
         end
 
         it "should be 07/01 if today is 02/15 and offset is -31" do
-          notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.semiannual"), :notification_offset => -31)
+          notification = FactoryGirl.create(:notification, :frequency => I18n.translate("activerecord.attributes.notification.frequencies.semiannual"), :notification_offset => "-31")
           notification.calculate_next_notification_date(:time => Time.parse("02/15")).should == Time.parse("07/01")
         end
 

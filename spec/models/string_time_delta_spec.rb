@@ -55,7 +55,11 @@ describe StringTimeDelta do
     it ("should return 1 year and 6 months if it is parsing 1y6M") do
       StringTimeDelta::parse("1y6M").should == (1.year + 6.months)
     end
- 
+
+    it ("should return 15 days if it is parsing 15") do
+      StringTimeDelta::parse("15").should == 15.days
+    end
+
   end
 
 end
