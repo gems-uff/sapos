@@ -7,7 +7,6 @@ class DeferralsController < ApplicationController
 
   active_scaffold :deferral do |config|
     config.list.sorting = {:enrollment => 'ASC'}
-    config.search.columns = [:enrollment]
 
     config.columns[:enrollment].search_sql = 'enrollments.enrollment_number'
     config.columns[:enrollment].form_ui = :record_select
@@ -20,6 +19,7 @@ class DeferralsController < ApplicationController
     config.update.columns = [:enrollment, :approval_date, :obs, :deferral_type]
     config.show.columns = [:enrollment, :approval_date, :obs, :deferral_type]
     config.list.columns = [:enrollment, :approval_date, :deferral_type, :valid_until]
+    config.search.columns = [:enrollment]
     
     config.create.label = :create_deferral_label
    

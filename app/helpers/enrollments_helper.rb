@@ -157,31 +157,9 @@ module EnrollmentsHelper
   #TODO: remove current accomplishments and current deferral_type if level was changed
   def options_for_association_conditions(association)
     if association.name == :phase
-      enrollment_id = params[:id]
-      enrollment = Enrollment.find_by_id(enrollment_id)
-      #level_id = enrollment.nil? ? params[:value] : enrollment.level_id #recupera level_id vindo do parâmetro de atualização
-      level_id = @record.enrollment.nil? ? params[:value] : @record.enrollment.level_id
-      ["phases.id IN (
-       SELECT phases.id
-       FROM phases
-       LEFT OUTER JOIN phase_durations
-       ON phase_durations.phase_id = phases.id
-       WHERE phase_durations.level_id = ?
-       )", level_id]
+      Phase::find_all_for_enrollment(@record.enrollment)
     elsif association.name == :deferral_type
-      enrollment_id = params[:id]
-      enrollment = Enrollment.find_by_id(enrollment_id)
-      #level_id = enrollment.nil? ? params[:value] : enrollment.level_id #recupera level_id vindo do parâmetro de atualização
-      level_id = @record.enrollment.nil? ? params[:value] : @record.enrollment.level_id
-      
-      ["deferral_types.id IN (
-        SELECT deferral_types.id
-        FROM deferral_types
-        INNER JOIN phases ON deferral_types.phase_id = phases.id 
-        LEFT OUTER JOIN phase_durations ON phase_durations.phase_id = phases.id
-        WHERE phase_durations.level_id = ?
-      )", level_id]
-
+      DeferralType::find_all_for_enrollment(@record.enrollment)
     else
       super
     end
