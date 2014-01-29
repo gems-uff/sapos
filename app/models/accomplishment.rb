@@ -11,8 +11,19 @@ class Accomplishment < ActiveRecord::Base
   validates :enrollment_id, :uniqueness => {:scope => :phase_id, :message => :accomplishment_enrollment_uniqueness}
   validates :phase, :presence => true
 
+  validate :enrollment_level
+
   def to_label
     "#{phase.name}"    
   end
   
+
+  def enrollment_level
+    return if enrollment.nil?
+    return if phase.nil?
+
+    unless phase.levels.include? enrollment.level
+      errors.add(:enrollment, I18n.translate("activerecord.errors.models.accomplishment.enrollment_level")) 
+    end
+  end
 end

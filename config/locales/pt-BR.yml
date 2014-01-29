@@ -354,6 +354,7 @@ pt-BR:
       models:
         accomplishment:
           accomplishment_enrollment_uniqueness: "já realizou esta etapa"
+          enrollment_level: "não possui o mesmo nível que a etapa"
         advisement:
           advisement_professor_uniqueness: "não pode ser orientador duas vezes da mesma matrícula"
         allocation:
