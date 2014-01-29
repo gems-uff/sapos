@@ -140,6 +140,7 @@ pt-BR:
           invalid: "--"
       enrollment:
         accomplishments: "Realização de Etapa"
+        accomplishment_date: "até"
         active: "Ativo?"
         admission_date: "Data de Admissão"
         advisements: "Orientadores"

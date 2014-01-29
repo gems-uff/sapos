@@ -825,7 +825,7 @@ module EnrollmentsPdfHelper
       phase_name = search[:accomplishments][:phase] == 'all' ? 'Todas' : Phase.find(search[:accomplishments][:phase].to_i).name
       values.push([
         "#{I18n.t("activerecord.attributes.enrollment.accomplishments")}",
-        "#{phase_name} em #{I18n.localize(phase_date, :format => :long)} "
+        "#{phase_name} #{I18n.t("activerecord.attributes.enrollment.accomplishment_date")} #{I18n.localize(phase_date, :format => :long)} "
       ]) 
     end
 
@@ -835,7 +835,7 @@ module EnrollmentsPdfHelper
       phase_name = search[:delayed_phase][:phase] == 'all' ? 'Alguma' : Phase.find(search[:delayed_phase][:phase].to_i).name
       values.push([
         "#{I18n.t("activerecord.attributes.enrollment.delayed_phase")}",
-        "#{phase_name} em #{I18n.localize(phase_date, :format => :long)} "
+        "#{phase_name} #{I18n.t("activerecord.attributes.enrollment.delayed_phase_date")} #{I18n.localize(phase_date, :format => :long)} "
       ]) 
     end
 
@@ -843,7 +843,7 @@ module EnrollmentsPdfHelper
       course = search[:course_class_year_semester][:course].empty? ? "" : Course.find(search[:course_class_year_semester][:course].to_i).name
       values.push([
         "#{I18n.t("activerecord.attributes.enrollment.course_class_year_semester")}",
-        "#{course} em #{search[:course_class_year_semester][:year]}/#{search[:course_class_year_semester][:semester]}"
+        "#{course} #{I18n.t("activerecord.attributes.enrollment.year_semester_label")} #{search[:course_class_year_semester][:year]}/#{search[:course_class_year_semester][:semester]}"
       ]) 
     end
 
