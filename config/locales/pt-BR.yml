@@ -215,6 +215,8 @@ pt-BR:
         subject: "Assunto"
         created_at: "Data de Execução"
         notification: "Notificação"
+        notification_name: "Notificação"
+        notification_removed: "Notificação Removida"
       phase:
         accomplishments: "Realização de Etapas"
         description: "Descrição"
