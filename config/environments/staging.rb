@@ -56,7 +56,7 @@ Sapos::Application.configure do
   # config.action_mailer.raise_delivery_errors = false
   config.action_mailer.delivery_method = :sendmail
   config.action_mailer.default_url_options = {:host => 'sel.ic.uff.br/sapos-homologacao'}
-  config.action_mailer.sendmail_settings = {:arguments => '-i -f sapos@sel.ic.uff.br', :location => '/usr/sbin/sendmail'}
+  config.action_mailer.sendmail_settings = {:arguments => '-i -f "SAPOS <sapos@sel.ic.uff.br>"', :location => '/usr/sbin/sendmail'}
 
   # Enable threaded mode
   # config.threadsafe!

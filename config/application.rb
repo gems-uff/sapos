@@ -65,5 +65,5 @@ module Sapos
     config.assets.version = '1.0'
   end
 
-  ActionMailer::Base.default :from => 'sapos@sel.ic.uff.br'
+  ActionMailer::Base.default :from => 'SAPOS <sapos@sel.ic.uff.br>'
 end
