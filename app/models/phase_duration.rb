@@ -38,10 +38,19 @@ class PhaseDuration < ActiveRecord::Base
         deferral.enrollment.level == level
       end
     end
+    has_level = level.enrollments.any? do |enrollment| 
+      enrollment.accomplishments.any? do |accomplishment|
+        accomplishment.phase == phase
+      end
+    end
     if has_deferral
       errors.add(:base, I18n.t("activerecord.errors.models.phase_duration.has_deferral"))
       phase.errors.add(:base, I18n.t("activerecord.errors.models.phase.phase_duration_has_deferral", :level => level.to_label))
     end
-    !has_deferral
+    if has_level
+      errors.add(:base, I18n.t("activerecord.errors.models.phase_duration.has_level"))
+      phase.errors.add(:base, I18n.t("activerecord.errors.models.phase.phase_duration_has_level", :level => level.to_label))
+    end
+    !has_deferral and !has_level
   end
 end

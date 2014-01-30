@@ -401,9 +401,11 @@ pt-BR:
               on_or_before: "posterior a Data Limite de Concessão"
         phase:
           phase_duration_has_deferral: "Não foi possível remover duração de etapa para %{level}, pois já existe prorrogação para este nível"
+          phase_duration_has_level: "Não foi possível remover duração de etapa para %{level}, pois já existe matrícula com esta etapa concluída"
         phase_duration:
           blank_deadline: "prazo deve ser de pelo menos um dia"
           has_deferral: "Já existe prorrogação para esta duração de etapa"
+          has_level: "Já existe conclusão de etapa para a duração de etapa deste nível"
         professor_research_area:
           unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
         student_major:

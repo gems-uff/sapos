@@ -56,7 +56,7 @@ describe PhaseDuration do
     end
     describe "validate_destroy" do
       context "should be valid when" do
-        it "there is no deferral with the same level as the phase_duration" do
+        it "there is no deferral with the same level and no accomplishment with the same phase and level as the phase_duration" do
           phase_duration = FactoryGirl.create(:phase_duration)
           phase_duration.validate_destroy.should == true
           phase_duration.phase.should have(0).errors_on :base
@@ -78,6 +78,20 @@ describe PhaseDuration do
           phase_duration.errors.full_messages.should include(I18n.t('activerecord.errors.models.phase_duration.has_deferral'))
         end
       end
+      context "should have error has_level when" do
+        it "there is a deferral with the same level as the phase_duration" do
+          level = FactoryGirl.create(:level)
+          phase = FactoryGirl.create(:phase)
+          enrollment = FactoryGirl.create(:enrollment, :level => level)
+          phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :level => level)
+          accomplishment = FactoryGirl.create(:accomplishment, :enrollment => enrollment, :phase => phase)
+
+          phase_duration.validate_destroy.should == false
+          phase_duration.phase.errors.full_messages.should include(I18n.t('activerecord.errors.models.phase.phase_duration_has_level', :level => level.to_label))
+          phase_duration.errors.full_messages.should include(I18n.t('activerecord.errors.models.phase_duration.has_level'))
+        end
+      end
+
     end
   end
   describe "Methods" do
