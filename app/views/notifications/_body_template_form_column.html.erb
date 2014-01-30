@@ -1,0 +1,25 @@
+<% column_options = active_scaffold_input_options(column, scope, :object => record) %>
+<dl>
+	<dt>
+		<%= label_tag label_for(column, column_options), column.label %>
+		<br>
+		<span class="description">
+			<span class="desc-title">Os campos de template utilizam linguagem ERB. <a href="http://stackoverflow.com/questions/7996695/rails-erb-syntax"> Ver detalhes </a> </span>
+			<span class="desc-title">Variáveis: </span>
+			<ul>
+				<li><strong>&lt;% records %&gt;</strong> <br> Lista com todos os resultados </li>
+				<li><strong>&lt;% record %&gt;</strong> <br> Mapa dos atributos de cada resultado. <strong>Disponível apenas para notificações individuais.</strong> <br> Ex: &lt;%= record['email'] %&gt;<br> * O mesmo valor pode ser obtido por &lt;%= email %&gt; </li>
+			</ul>
+			<span class="desc-title">Funções: </span>
+			<ul>
+				<li><strong>&lt;%= localize(var, formato) %&gt;</strong> <br> Imprime tempo com formato melhor. Opções de formato: <br> <span title="%A, %d de %B de %Y, %H:%M h">:default</span>, <span title="%d-%m-%Y">:defaultdate</span>, <span title="%H:%M h">:short</span>, <span title="%d de %B">:shortdate</span>, <span title="%A, %d de %B de %Y, %H:%M h">:long</span>, <span title="%d de %B de %Y">:longdate</span>, <span title="%a, %d %b %Y %H:%M:%S">:picker</span>, <span title="%A, %d de %B de %Y">:day</span>, <span title="%B-%Y">:monthyear</span>, <span title="%B/%Y">:monthyear2</span> </li>
+				
+			</ul>
+
+		</span>
+	</dt>
+	<dd>
+		<%= body_template_form_column record, column_options %>
+	</dd>
+</dl>
+

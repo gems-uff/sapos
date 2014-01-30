@@ -42,4 +42,18 @@
 
 .description li {
 	padding: 2px 0 !important;
+	text-align: justify;
 }
+
+.to_template-input,
+.subject_template-input {
+	width: ($showwidth - 4px);
+	margin-left: 2px !important;
+}
+
+.notification_offset-input,
+.query_offset-input {
+	width: 100px;
+	margin-left: 2px !important;
+}
+

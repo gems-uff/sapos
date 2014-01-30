@@ -662,12 +662,14 @@ pt-BR:
     update_thesis_defense_committee_participation: "Editar Participação em Banca"
     update_user_label: "Modificar Usuário"
     notification:
-      sql_query_default: "SELECT * FROM "
-      body_template_default: "Olá %{name},"
+      sql_query_default: "SELECT students.name as name FROM students\nWHERE students.created_at<%{query_date}"
+      body_template_default: "Prezado <%= name %>"
       frequency_description: "Diária: todo dia; Semanal: toda segunda; Mensal: dia 01 de cada mês; Semestral: 01/03 e 01/08; Anual: 01/01"
       execute_now: "Enviar agora"
       simulate: "Simular"
       individual_description: "Um e-mail para cada resultado"
+      notification_offset_description: "Data de execução. Frequência Mensal com offset 3d executará todo dia 04 do mês"
+      query_offset_description: "Data de consulta. Frequência Semestral com offset -1M terá variavel para dias 01/02 ou 01/07"
       query_date: "Data de Consulta"
       set_query_date: "Escolher Data de Consulta"
 
