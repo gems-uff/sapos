@@ -20,6 +20,10 @@ Configuration.create(:name=>"Frequência de envio de notificações (reiniciar s
 Configuration.create(:name=>"Horário inicial para o envio de notificações (reiniciar servidor após alteração)", :variable =>"notification_start_at", :value => "12:00")
 Configuration.create(:name=>"Texto no final do quadro de horários", :variable =>"class_schedule_text", :value => "Alunos interessados em cursar disciplinas de Tópicos Avançados devem consultar os respectivos professores antes da matrícula")
 Configuration.create(:name=>"E-mail de redirecionamento para as notificações", :variable =>"redirect_email", :value => "")
+Configuration.create(:name=>"Texto de rodapé da notificação", :variable =>"notification_footer", :value => "Pós-Graduação em Computação - IC/UFF
+Este e-mail foi enviado automaticamente pelo SAPOS. Por favor, não responda. 
+Em caso de dúvida, procure a secretaria."
+)
 
 
 ['Graduação', 'Especialização', 'Mestrado', 'Doutorado'].each do |level|

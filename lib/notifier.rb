@@ -49,6 +49,9 @@ class Notifier
   def send_emails(messages)
     messages.each do |message|
       m = message.merge(@options)
+      unless Configuration.notification_footer.empty?
+        m[:body] += "\n\n\n" + Configuration.notification_footer
+      end
       unless m[:to].nil? or m[:to].empty?
         ActionMailer::Base.mail(m).deliver!
         NotificationLog.new(

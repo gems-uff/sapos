@@ -52,4 +52,9 @@ class Configuration < ActiveRecord::Base
     config.nil? ? "" : config.value
   end
 
+  def self.notification_footer
+    config = Configuration.find_by_variable(:notification_footer)
+    config.nil? ? "" : config.value
+  end
+
 end
