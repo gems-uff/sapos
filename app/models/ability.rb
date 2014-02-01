@@ -25,7 +25,8 @@ class Ability
 
 
     if role_id == Role::ROLE_ADMINISTRADOR
-      can :manage, :all
+      can :manage, (Ability::ALL_MODELS - [Role])
+      can :read, Role
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [Role, Notification])
     elsif role_id == Role::ROLE_PROFESSOR

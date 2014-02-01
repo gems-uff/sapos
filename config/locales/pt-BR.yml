@@ -452,7 +452,9 @@ pt-BR:
           delete: "O sistema precisa ter ao menos um usuário"
           missing_password: "A senha não foi definida"
           self_delete: "Você não pode se deletar"
-
+          invalid_role_was: "era maior do que seu papel"
+          invalid_role: "não pode ser maior do que seu papel"
+          invalid_role_full: "O papel do usuário não pode ser maior do que o seu papel"
       template:
         body: "Por favor, verifique o(s) seguinte(s) campo(s):"
         header:

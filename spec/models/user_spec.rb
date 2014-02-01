@@ -10,7 +10,21 @@ describe User do
   let(:user) { User.new }
   subject { user }
   describe "Validations" do
-    describe "enrollment" do
+    describe "email" do
+      context "should be valid when" do
+        it "email is not null" do
+          user.email = "Username"
+          user.should have(0).errors_on :email
+        end
+      end
+      context "should have error blank when" do
+        it "email is null" do
+          user.email = nil
+          user.should have_error(:blank).on :email
+        end
+      end
+    end
+    describe "name" do
       context "should be valid when" do
         it "name is not null and is unique" do
           user.name = "Username"
@@ -29,6 +43,20 @@ describe User do
           FactoryGirl.create(:user, :name => name)
           user.name = name
           user.should have_error(:taken).on :name
+        end
+      end
+    end
+    describe "role" do
+      context "should be valid when" do
+        it "role is not null" do
+          user.role = FactoryGirl.create(:role)
+          user.should have(0).errors_on :role
+        end
+      end
+      context "should have error blank when" do
+        it "role is null" do
+          user.role = nil
+          user.should have_error(:blank).on :role
         end
       end
     end
