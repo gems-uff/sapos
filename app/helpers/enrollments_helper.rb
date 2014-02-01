@@ -388,4 +388,39 @@ module EnrollmentsHelper
     body += "</table>"
     body.html_safe
   end
+
+
+  def enrollment_phase_due_dates_show_column(record, column)
+    return "-" if record.phase_completions.empty?
+
+    body = ""
+    count = 0
+
+    body += "<table class=\"showtable listed-records-table\">"
+    
+    body += "<thead>
+              <tr>
+                <th>#{I18n.t('activerecord.models.phase.one')}</th>
+                <th>#{I18n.t('activerecord.attributes.phase_completion.due_date')}</th>
+                <th>#{I18n.t('activerecord.attributes.phase_completion.completion_date')}</th>
+              </tr>
+            </thead>"
+            
+    body += "<tbody class=\"records\">"
+
+    record.phase_completions.each do |phase_completion|
+      count += 1
+      tr_class = count.even? ? "even-record" : ""
+      completion_date = phase_completion.completion_date.nil? ? '-' : I18n.localize(phase_completion.completion_date, :format => :defaultdate)
+      body += "<tr class=\"record #{tr_class}\">
+                <td>#{phase_completion.phase.name}</td>
+                <td>#{I18n.localize(phase_completion.due_date, :format => :defaultdate)}</td>
+                <td>#{completion_date}</td>
+              </tr>"
+    end
+
+    body += "</tbody>"
+    body += "</table>"
+    body.html_safe
+  end
 end

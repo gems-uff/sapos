@@ -31,6 +31,7 @@ class EnrollmentsController < ApplicationController
 
     config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase, :course_class_year_semester, :deferral_type
     config.columns.add :listed_advisors, :listed_accomplishments, :listed_deferrals, :listed_scholarships, :listed_class_enrollments
+    config.columns.add :phase_due_dates
 
     config.list.columns = [:enrollment_number, :student, :enrollment_status, :level, :admission_date, :dismissal]
     config.list.sorting = {:enrollment_number => 'ASC'}
@@ -98,7 +99,7 @@ class EnrollmentsController < ApplicationController
 
     config.create.columns = create_columns
     config.update.columns = columns
-    config.show.columns = columns
+    config.show.columns = columns + [:phase_due_dates]
   end
   record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
 
@@ -256,4 +257,5 @@ class EnrollmentsController < ApplicationController
       end
     end
   end
+
 end

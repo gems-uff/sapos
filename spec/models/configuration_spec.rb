@@ -115,6 +115,40 @@ describe Configuration do
       end
     end 
 
+    context "notification_frequency" do
+      it "should return 1d when there is no configuration defined" do
+        config = Configuration.find_by_variable(:notification_frequency)
+        config.delete unless config.nil?
+
+        Configuration.notification_frequency.should == "1d"
+      end
+
+      it "should return 5m when it is defined to 5m" do
+        config = Configuration.find_by_variable(:notification_frequency)
+        config.delete unless config.nil?
+        Configuration.create(:variable=>:notification_frequency, :value=>"5m")
+
+        Configuration.notification_frequency.should == "5m"
+      end
+    end 
+
+    context "notification_start_at" do
+      it "should return 12:00 when there is no configuration defined" do
+        config = Configuration.find_by_variable(:notification_start_at)
+        config.delete unless config.nil?
+
+        Configuration.notification_start_at.should == "12:00"
+      end
+
+      it "should return 18:00 when it is defined to 18:00" do
+        config = Configuration.find_by_variable(:notification_start_at)
+        config.delete unless config.nil?
+        Configuration.create(:variable=>:notification_start_at, :value=>"18:00")
+
+        Configuration.notification_start_at.should == "18:00"
+      end
+    end
+
     context "class_schedule_text" do
       it "should return '' when there is no configuration defined" do
         config = Configuration.find_by_variable(:class_schedule_text)
@@ -123,7 +157,7 @@ describe Configuration do
         Configuration.class_schedule_text.should == ''
       end
 
-      it "should return 'bla' when it is defined to 5" do
+      it "should return 'bla' when it is defined to bla" do
         config = Configuration.find_by_variable(:class_schedule_text)
         config.delete unless config.nil?
         Configuration.create(:variable=>:class_schedule_text, :value=>"bla")
@@ -131,5 +165,23 @@ describe Configuration do
         Configuration.class_schedule_text.should == 'bla'
       end
     end 
+
+     context "redirect_email" do
+      it "should return '' when there is no configuration defined" do
+        config = Configuration.find_by_variable(:redirect_email)
+        config.delete unless config.nil?
+
+        Configuration.redirect_email.should == ''
+      end
+
+      it "should return 'bla' when it is defined to bla" do
+        config = Configuration.find_by_variable(:redirect_email)
+        config.delete unless config.nil?
+        Configuration.create(:variable=>:redirect_email, :value=>"bla")
+
+        Configuration.redirect_email.should == 'bla'
+      end
+    end 
   end
+
 end

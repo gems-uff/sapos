@@ -7,6 +7,7 @@
 #as_enrollments-content .scholarship_durations-view,
 #as_enrollments-content .class_enrollments-view,
 #as_enrollments-content .thesis_defense_committee_participations-view,
+#as_enrollments-content .phase_due_dates-view,
 #as_scholarships-content .scholarship_durations-view {
 	width: $showwidth;
 }
@@ -22,4 +23,12 @@
 
 .showtable tr th:last-child {
 	border-right: 1px solid #427fa4;
+}
+
+.show-view .CodeMirror {
+	font-weight: normal;
+}
+
+.simulate_query_date {
+	margin: 7px 0 !important;
 }

@@ -23,6 +23,7 @@ class Enrollment < ActiveRecord::Base
   has_many :class_enrollments, :dependent => :destroy
   has_many :thesis_defense_committee_participations, :dependent => :destroy
   has_many :thesis_defense_committee_professors, :source => :professor, :through => :thesis_defense_committee_participations
+  has_many :phase_completions, :dependent => :destroy
   
   has_paper_trail
 
@@ -36,6 +37,8 @@ class Enrollment < ActiveRecord::Base
   validates_date :thesis_defense_date, :on_or_after => :admission_date, :allow_nil => true, :on_or_after_message => I18n.t("activerecord.errors.models.enrollment.thesis_defense_date_before_admission_date")
 
   validate :verify_research_area_with_advisors
+
+  after_save :create_phase_completions
 
   def to_label
     "#{enrollment_number} - #{student.name}"
@@ -143,7 +146,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def verify_research_area_with_advisors
-    unless advisements.nil? or advisements.empty?
+    unless advisements.nil? or advisements.empty? or research_area.nil?
       research_areas = []
       advisements.each do |advisement|
         research_areas += advisement.professor.research_areas unless advisement.professor.research_areas.nil?
@@ -151,6 +154,27 @@ class Enrollment < ActiveRecord::Base
       unless research_areas.include? research_area
         errors.add(:research_area, I18n.translate("activerecord.errors.models.enrollment.research_area_different_from_professors"))
       end
+    end
+  end
+
+  def create_phase_completions()
+    PhaseCompletion.where(:enrollment_id => id).destroy_all
+
+    PhaseDuration.where(:level_id => level_id).each do |phase_duration|
+      completion_date = nil
+
+      phase_accomplishment = accomplishments.where(:phase_id => phase_duration.phase_id)[0]
+      completion_date = phase_accomplishment.conclusion_date unless phase_accomplishment.nil?
+
+      phase_deferrals = deferrals.select { |deferral| deferral.deferral_type.phase == phase_duration.phase}
+      if phase_deferrals.empty?
+        due_date = phase_duration.phase.calculate_end_date(admission_date, phase_duration.deadline_semesters, phase_duration.deadline_months, phase_duration.deadline_days)
+      else
+        total_time = phase_duration.phase.calculate_total_deferral_time_for_phase_until_date(self, Date.today)
+        due_date = phase_duration.phase.calculate_end_date(admission_date, total_time[:semesters], total_time[:months], total_time[:days])
+      end
+
+      PhaseCompletion.create(:enrollment_id=>id, :phase_id=>phase_duration.phase.id, :completion_date=>completion_date, :due_date=>due_date)
     end
   end
 end

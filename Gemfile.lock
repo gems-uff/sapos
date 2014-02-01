@@ -39,6 +39,8 @@ GEM
     builder (3.0.4)
     cancan (1.6.9)
     choice (0.1.6)
+    codemirror-rails (3.16)
+      railties (>= 3.0, < 5)
     coffee-rails (3.2.2)
       coffee-script (>= 2.2.0)
       railties (~> 3.2.0)
@@ -157,6 +159,8 @@ GEM
       rspec-mocks (~> 2.13.0)
     ruby-graphviz (1.0.8)
     ruby-rc4 (0.1.5)
+    rufus-scheduler (3.0.3)
+      tzinfo
     sass (3.2.9)
     sass-rails (3.2.6)
       railties (~> 3.2.0)
@@ -198,6 +202,7 @@ DEPENDENCIES
   active_scaffold (~> 3.3.3)
   awesome_print
   cancan
+  codemirror-rails
   coffee-rails (~> 3.2.1)
   debugger
   devise
@@ -217,6 +222,7 @@ DEPENDENCIES
   recordselect (= 3.3.0)
   redcarpet (= 2.1.0)
   rspec-rails (~> 2.0)
+  rufus-scheduler
   sass-rails (~> 3.2.3)
   simple-navigation
   sqlite3

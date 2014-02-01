@@ -1,0 +1,22 @@
+<% column_options = active_scaffold_input_options(column, scope, :object => record) %>
+<dl>
+	<dt>
+		<%= label_tag label_for(column, column_options), column.label %>
+		<br>
+		<span class="description">
+			<span class="desc-title">Variáveis: </span>
+			<ul>
+				<li><strong>%{query_date}</strong> <br> Data de consulta. <br> Ex: <strong>15/01/2014</strong>, para frequencia anual e offset de consulta 14d</li>
+				<li><strong>%{this_semester_year}</strong> <br> Ano do semestre da data de consulta. Ex: <strong>2013</strong>, para data de consulta 15/01/2014</li>
+				<li><strong>%{this_semester_number}</strong> <br> Número do semestre da data de consulta. Ex: <strong>2</strong>, para data de consulta 15/01/2014</li>
+				<li><strong>%{last_semester_year}</strong> <br> Ano do semestre anterior à data de consulta. Ex: <strong>2013</strong>, para data de consulta 15/01/2014</li>
+				<li><strong>%{last_semester_number}</strong> <br> Número do semestre anterior à data de consulta. Ex: <strong>1</strong>, para data de consulta 15/01/2014</li>
+			</ul>
+
+		</span>
+	</dt>
+	<dd>
+		<%= sql_query_form_column record, column_options %>
+	</dd>
+</dl>
+

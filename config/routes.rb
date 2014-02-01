@@ -3,6 +3,8 @@
 
 Sapos::Application.routes.draw do
 
+
+
   devise_for :users, :controllers => {:registrations => "users" }
 
   resources :versions do
@@ -186,6 +188,19 @@ Sapos::Application.routes.draw do
   resources :thesis_defense_committee_participations do
     as_routes
     record_select_routes
+  end
+
+  resources :notification_logs do 
+    as_routes 
+  end
+
+  resources :notifications do 
+    as_routes 
+    member do
+      get 'execute_now'
+      get 'simulate'
+      get 'set_query_date'
+    end
   end
 
   # The priority is based upon order of creation:

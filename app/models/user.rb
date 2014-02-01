@@ -13,6 +13,8 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,
          :lockable
 
+  validate :role_valid?
+
   def valid_password?(password)
     if self.hashed_password.present?
       if User.encrypt_password(password, self.salt) == self.hashed_password
@@ -27,6 +29,11 @@ class User < ActiveRecord::Base
     else
       super
     end
+  end
+
+  def role_valid?
+  #  errors.add(:role, I18n.translate("activerecord.errors.models.user.invalid_role")) 
+
   end
 
   def User.encrypt_password(password, salt)

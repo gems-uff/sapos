@@ -155,6 +155,8 @@ pt-BR:
         research_area: "Área de Concentração"
         level: "Nível"
         phase: "Etapa"
+        phase_completions: "Realização de Etapas"
+        phase_due_dates: "Conclusão de Etapas"
         professor: "Orientador"
         scholarship_durations: "Bolsas"
         scholarship_durations_active: "Possui bolsa?"
@@ -190,18 +192,52 @@ pt-BR:
         name: "Nome"
         student_majors: "Alunos"
         students: "Alunos"
+      notification:
+        body_template: "Template do Corpo"
+        frequency: "Frequência"
+        frequencies:
+          annual: "Anual"
+          semiannual: "Semestral"
+          monthly: "Mensal"
+          weekly: "Semanal"
+          daily: "Diária"
+        next_execution: "Próxima Execução"
+        notification_offset: "Offset da Notificação"
+        query_offset: "Offset da Consulta"
+        sql_query: "Consulta"
+        subject_template: "Template do Assunto"
+        title: "Título"
+        to_template: "Template do Recipiente"
+        individual: "Individual"
+        no_name: "Sem nome"
+      notification_log:
+        body: "Corpo"
+        to: "Para"
+        subject: "Assunto"
+        created_at: "Data de Execução"
+        notification: "Notificação"
+        notification_name: "Notificação"
+        notification_removed: "Notificação Removida"
       phase:
         accomplishments: "Realização de Etapas"
         description: "Descrição"
         enrollments: "Matrículas"
         name: "Nome"
         phase_durations: "Duração de Etapas"
+        phase_completions: "Realização de Etapas"
         is_language: "Exame de Línguas"
       phase_duration:
         deadline_days: "Prazo Máximo(dias)"
         deadline_months: "Prazo Máximo(meses)"
         deadline_semesters: "Prazo Máximo(períodos)"
         level: "Nível"
+      phase_completion:
+        enrollment: "Matrícula"
+        enrollment_id: "Matrícula"
+        phase: "Etapa"
+        phase_id: "Etapa"
+        due_date: "Validade"
+        completion_date: "Conclusão"
       professor: 
         address: "Logradouro"
         advisement_authorizations: "Credenciamentos"
@@ -484,12 +520,21 @@ pt-BR:
       major:
         one: "Curso"
         other: "Cursos"
+      notification:
+        one: "Notificação"
+        other: "Notificações"
+      notification_log:
+        one: "Notificação Enviada"
+        other: "Notificações Enviadas"
       phase:
         one: "Etapa"
         other: "Etapas"
       phase_duration:
         one: "Duração de Etapa"
         other: "Duração de Etapas"
+      phase_completion:
+        one: "Realização de Etapa"
+        other: "Realização de Etapas"
       professor:
         one: "Professor"
         other: "Professores"
@@ -567,6 +612,7 @@ pt-BR:
     create_link: "Adicionar"
     create_major_label: "Adicionar Curso"
     create_new: "Criar Novo"
+    create_notification_label: "Adicionar Notificação"
     create_phase_label: "Adicionar Fase"
     create_professor_label: "Adicionar Professor"
     create_professor_research_area_label: "Adicionar Área de Pesquisa do Professor"
@@ -617,6 +663,7 @@ pt-BR:
     update_link: "Editar"
     update_major_label: "Modificar Curso"
     update_model: ""
+    update_notification_label: "Modificar Notificação"
     update_professor_research_area_label: "Área de Pesquisa do Professor"
     update_research_area_label: "Editar Área de Pesquisa"
     update_state_label: "Editar Estado"
@@ -624,6 +671,17 @@ pt-BR:
     update_student_major_label: "Editar Curso do Aluno"
     update_thesis_defense_committee_participation: "Editar Participação em Banca"
     update_user_label: "Modificar Usuário"
+    notification:
+      sql_query_default: "SELECT students.name as name FROM students\nWHERE students.created_at<%{query_date}"
+      body_template_default: "Prezado <%= name %>"
+      frequency_description: "Diária: todo dia; Semanal: toda segunda; Mensal: dia 01 de cada mês; Semestral: 01/03 e 01/08; Anual: 01/01"
+      execute_now: "Enviar agora"
+      simulate: "Simular"
+      individual_description: "Um e-mail para cada resultado"
+      notification_offset_description: "Data de execução. Frequência Mensal com offset 3d executará todo dia 04 do mês"
+      query_offset_description: "Data de consulta. Frequência Semestral com offset -1M terá variavel para dias 01/02 ou 01/07"
+      query_date: "Data de Consulta"
+      set_query_date: "Escolher Data de Consulta"
 
     errors:
       full_messages:

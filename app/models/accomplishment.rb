@@ -13,8 +13,18 @@ class Accomplishment < ActiveRecord::Base
 
   validate :enrollment_level
 
+  after_save :set_completion_date
+
   def to_label
     "#{phase.name}"    
+  end
+
+  def set_completion_date
+  	phase_completion = PhaseCompletion.where(:enrollment_id => enrollment_id, :phase_id => phase_id).first
+  	if phase_completion
+  	  phase_completion.completion_date = conclusion_date
+  	  phase_completion.save
+  	end
   end
   
 

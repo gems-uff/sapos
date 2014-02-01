@@ -15,7 +15,9 @@ class PhaseDuration < ActiveRecord::Base
 
   validate :deadline_validation
 
+
   before_destroy :validate_destroy
+  after_save :create_phase_completion
 
   def to_label
     "#{deadline_semesters} períodos, #{deadline_months} meses e #{deadline_days} dias"
@@ -30,6 +32,7 @@ class PhaseDuration < ActiveRecord::Base
   def duration
     {:semesters => self.deadline_semesters, :months => self.deadline_months, :days => self.deadline_days}
   end
+
 
   def validate_destroy
     return true if phase.nil? or level.nil?
@@ -52,5 +55,32 @@ class PhaseDuration < ActiveRecord::Base
       phase.errors.add(:base, I18n.t("activerecord.errors.models.phase.phase_duration_has_level", :level => level.to_label))
     end
     !has_deferral and !has_level
+  end
+
+  def create_phase_completion()
+    PhaseCompletion.joins(:enrollment).where(:phase_id => phase.id, :enrollments => {:level_id => level.id}).destroy_all
+    
+    Enrollment.where(:level_id => level_id).each do |enrollment|
+      completion_date = nil
+
+      phase_accomplishment = enrollment.accomplishments.where(:phase_id => phase.id)[0]
+      completion_date = phase_accomplishment.conclusion_date unless phase_accomplishment.nil?
+
+      phase_deferrals = enrollment.deferrals.select { |deferral| deferral.deferral_type.phase == phase}
+      if phase_deferrals.empty?
+        due_date = phase.calculate_end_date(enrollment.admission_date, deadline_semesters, deadline_months, deadline_days)
+      else
+        total_time = duration
+        phase_deferrals.each do |deferral|
+          deferral_duration = deferral.deferral_type.duration
+          (total_time.keys | deferral_duration.keys).each do |key|
+            total_time[key] += deferral_duration[key].to_i
+          end
+        end
+        due_date = phase.calculate_end_date(enrollment.admission_date, total_time[:semesters], total_time[:months], total_time[:days])
+      end
+
+      PhaseCompletion.create(:enrollment_id=>enrollment.id, :phase_id=>phase.id, :completion_date=>completion_date, :due_date=>due_date)
+    end
   end
 end

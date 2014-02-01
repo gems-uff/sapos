@@ -1,3 +1,5 @@
+@import 'variables';
+
 .identity_issuing_place_widget_show_state {
 	margin-left: 10px;
 }
@@ -8,5 +10,50 @@
 
 .identity_issuing_place_widget_select {
 	width: 228px;
+}
+
+.CodeMirror {
+	width: $showwidth;
+	border: 1px solid #a4c7d0;
+	margin-left: 2px !important;
+	margin-top: 3px !important;
+	margin-bottom: 5px !important;
+}
+
+.CodeMirror-scroll {
+	margin-bottom: -30px !important;
+	margin-right: -30px !important;
+	padding-bottom: 30px !important;
+	padding-right: 30px !important;
+}
+
+.CodeMirror-lines {
+	padding-top: 3px !important;
+}
+
+.description .desc-title {
+	margin-top: 10px !important;
+	display: block;
+}
+
+.description ul {
+	padding-left: 14px;
+}
+
+.description li {
+	padding: 2px 0 !important;
+	text-align: justify;
+}
+
+.to_template-input,
+.subject_template-input {
+	width: ($showwidth - 4px);
+	margin-left: 2px !important;
+}
+
+.notification_offset-input,
+.query_offset-input {
+	width: 100px;
+	margin-left: 2px !important;
 }
 

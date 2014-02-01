@@ -7,15 +7,15 @@ class Ability
   ALL_MODELS = [Accomplishment, Advisement, AdvisementAuthorization, Allocation,
                 City, ClassEnrollment, Configuration, Country, Course, CourseClass, CourseType,
                 Deferral, DeferralType, Dismissal, DismissalReason, Enrollment,
-                EnrollmentStatus, Institution, Level, Major, Phase, PhaseDuration,
-                Professor, ProfessorResearchArea, ResearchArea, Role, Scholarship,
-                ScholarshipDuration, ScholarshipType, Sponsor, State, Student, StudentMajor,
-                ThesisDefenseCommitteeParticipation, User, YearSemester, Version]
+                EnrollmentStatus, Institution, Level, Major, Notification, NotificationLog,
+                Phase, PhaseCompletion, PhaseDuration, Professor, ProfessorResearchArea, ResearchArea, 
+                Role, Scholarship, ScholarshipDuration, ScholarshipType, Sponsor, State, Student, 
+                StudentMajor, ThesisDefenseCommitteeParticipation, User, YearSemester, Version]
 
 
   def initialize(user)
     alias_action :list, :row, :show_search, :render_field, :to_pdf, :summary_pdf, :academic_transcript_pdf, :grades_report_pdf, :browse, :to => :read
-    alias_action :update_column, :edit_associated, :new_existing, :add_existing, :to => :update
+    alias_action :update_column, :edit_associated, :new_existing, :add_existing, :execute_now, :to => :update
     alias_action :delete, :destroy_existing, :to => :destroy
     #as_action_aliases
 
@@ -27,11 +27,11 @@ class Ability
     if role_id == Role::ROLE_ADMINISTRADOR
       can :manage, :all
     elsif role_id == Role::ROLE_COORDENACAO
-      can :manage, :all
+      can :manage, (Ability::ALL_MODELS - [Role, Notification])
     elsif role_id == Role::ROLE_PROFESSOR
-      can :read, (Ability::ALL_MODELS - [User, Role, Configuration, Version])
+      can :read, (Ability::ALL_MODELS - [User, Role, Configuration, Version, Notification])
     elsif role_id == Role::ROLE_SECRETARIA
-      can :manage, (Ability::ALL_MODELS - [User, Role, Configuration, Version])
+      can :manage, (Ability::ALL_MODELS - [User, Role, Configuration, Version, Notification])
     end
 
     # Define abilities for the passed in user here. For example:

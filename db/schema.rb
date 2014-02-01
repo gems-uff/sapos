@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140127184743) do
+ActiveRecord::Schema.define(:version => 20140129213915) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -243,8 +243,8 @@ ActiveRecord::Schema.define(:version => 20140127184743) do
     t.string   "subject_template"
     t.text     "body_template"
     t.text     "sql_query"
-    t.integer  "notification_offset"
-    t.integer  "query_offset"
+    t.string   "notification_offset"
+    t.string   "query_offset"
     t.string   "frequency"
     t.datetime "next_execution"
     t.datetime "created_at",                            :null => false
