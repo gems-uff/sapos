@@ -168,6 +168,7 @@ INNER JOIN students ON students.id = enrollments.student_id
 INNER JOIN phases ON phases.id = phase_completions.phase_id 
 WHERE due_date<=%{query_date} 
 AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
+AND enrollments.enrollment_status_id = 2
 AND completion_date IS NULL", 
     :individual => true,
     :to_template => "<%= email %>", 
