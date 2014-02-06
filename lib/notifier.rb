@@ -8,12 +8,9 @@ class Notifier
 
   def initialize
     @async_notifications = []
-    @options = {}
     @logger = Rails.logger
     
     return unless Rails.const_defined? 'Server'
-    @options = {:to => Configuration.redirect_email} unless Configuration.redirect_email.empty?
-    
 
     if Rails.env.development? or Rails.env.test? 
       first_at = Time.now + 1.second
@@ -48,9 +45,14 @@ class Notifier
 
   def send_emails(messages)
     messages.each do |message|
-      m = message.merge(@options)
+      options = {}
+      m = message.merge(options)
       unless Configuration.notification_footer.empty?
         m[:body] += "\n\n\n" + Configuration.notification_footer
+      end
+      unless Configuration.redirect_email.empty?
+        m[:body] = "Originalmente para #{m[:to]}\n\n" + m[:body]
+        m[:to] = Configuration.redirect_email
       end
       unless m[:to].nil? or m[:to].empty?
         ActionMailer::Base.mail(m).deliver!
