@@ -5,8 +5,8 @@ class Ability
   include CanCan::Ability
 
   ALL_MODELS = [Accomplishment, Advisement, AdvisementAuthorization, Allocation,
-                City, ClassEnrollment, Configuration, Country, Course, CourseClass, CourseType,
-                Deferral, DeferralType, Dismissal, DismissalReason, Enrollment,
+                City, ClassEnrollment, Country, Course, CourseClass, CourseType,
+                CustomVariable, Deferral, DeferralType, Dismissal, DismissalReason, Enrollment,
                 EnrollmentStatus, Institution, Level, Major, Notification, NotificationLog,
                 Phase, PhaseCompletion, PhaseDuration, Professor, ProfessorResearchArea, ResearchArea, 
                 Role, Scholarship, ScholarshipDuration, ScholarshipType, Sponsor, State, Student, 
@@ -25,14 +25,14 @@ class Ability
 
 
     if role_id == Role::ROLE_ADMINISTRADOR
-      can :manage, (Ability::ALL_MODELS - [Role])
-      can :read, Role
+      can :manage, :all
+      cannot [:destroy, :update], Role
     elsif role_id == Role::ROLE_COORDENACAO
-      can :manage, (Ability::ALL_MODELS - [Role, Notification])
+      can :manage, (Ability::ALL_MODELS - [Role, Notification, CustomVariable])
     elsif role_id == Role::ROLE_PROFESSOR
-      can :read, (Ability::ALL_MODELS - [User, Role, Configuration, Version, Notification])
+      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification])
     elsif role_id == Role::ROLE_SECRETARIA
-      can :manage, (Ability::ALL_MODELS - [User, Role, Configuration, Version, Notification])
+      can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification])
     end
 
     # Define abilities for the passed in user here. For example:

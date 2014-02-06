@@ -15,14 +15,14 @@ class Notifier
     if Rails.env.development? or Rails.env.test? 
       first_at = Time.now + 1.second
     else
-      first_at = Time.parse(Configuration.notification_start_at)
+      first_at = Time.parse(CustomVariable.notification_start_at)
       if first_at < Time.now
         first_at += 1.day
       end
     end
 
     scheduler = Rufus::Scheduler.new
-    scheduler.every Configuration.notification_frequency, :first_at => first_at do
+    scheduler.every CustomVariable.notification_frequency, :first_at => first_at do
       asynchronous_emails
     end
   end
@@ -47,12 +47,12 @@ class Notifier
     messages.each do |message|
       options = {}
       m = message.merge(options)
-      unless Configuration.notification_footer.empty?
-        m[:body] += "\n\n\n" + Configuration.notification_footer
+      unless CustomVariable.notification_footer.empty?
+        m[:body] += "\n\n\n" + CustomVariable.notification_footer
       end
-      unless Configuration.redirect_email.empty?
+      unless CustomVariable.redirect_email.empty?
         m[:body] = "Originalmente para #{m[:to]}\n\n" + m[:body]
-        m[:to] = Configuration.redirect_email
+        m[:to] = CustomVariable.redirect_email
       end
       unless m[:to].nil? or m[:to].empty?
         ActionMailer::Base.mail(m).deliver!

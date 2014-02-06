@@ -94,12 +94,12 @@ describe Professor do
       end
 
       it "should return the spected number if the professor has advisement_authorizations and the points are changed" do
-        config = Configuration.find_by_variable(:single_advisor_points)
+        config = CustomVariable.find_by_variable(:single_advisor_points)
         config.delete unless config.nil?
-        config = Configuration.find_by_variable(:multiple_advisor_points)
+        config = CustomVariable.find_by_variable(:multiple_advisor_points)
         config.delete unless config.nil?
-        Configuration.create(:variable=>:single_advisor_points, :value=>"2.0")
-        Configuration.create(:variable=>:multiple_advisor_points, :value=>"1.0")
+        CustomVariable.create(:variable=>:single_advisor_points, :value=>"2.0")
+        CustomVariable.create(:variable=>:multiple_advisor_points, :value=>"1.0")
 
         professor = FactoryGirl.create(:professor)
         other_professor = FactoryGirl.create(:professor)
@@ -158,9 +158,9 @@ describe Professor do
       end
 
       it "should return the configured value when the professor is the only authorized advisor" do
-        config = Configuration.find_by_variable(:single_advisor_points)
+        config = CustomVariable.find_by_variable(:single_advisor_points)
         config.delete unless config.nil?
-        Configuration.create(:variable=>:single_advisor_points, :value=>"2.0")
+        CustomVariable.create(:variable=>:single_advisor_points, :value=>"2.0")
 
         professor = FactoryGirl.create(:professor)
         other_professor = FactoryGirl.create(:professor)
@@ -189,9 +189,9 @@ describe Professor do
       end
 
       it "should return the configured value when the professor is not the only authorized advisor" do
-        config = Configuration.find_by_variable(:multiple_advisor_points)
+        config = CustomVariable.find_by_variable(:multiple_advisor_points)
         config.delete unless config.nil?
-        Configuration.create(:variable=>:multiple_advisor_points, :value=>"1.0")
+        CustomVariable.create(:variable=>:multiple_advisor_points, :value=>"1.0")
 
         professor = FactoryGirl.create(:professor)
         other_professor = FactoryGirl.create(:professor)

@@ -120,7 +120,7 @@ module EnrollmentsPdfHelper
 
         common_header_part1(pdf, enrollment, [
           "#{I18n.t('pdf_content.enrollment.header.program_level')} " +
-          "<b>#{Configuration.program_level} </b>"
+          "<b>#{CustomVariable.program_level} </b>"
         ])
 
         common_header_part(pdf) do

@@ -2,7 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 FactoryGirl.define do
-  factory :configuration do
+  factory :custom_variable do
     name ""
     value ""
     variable ""

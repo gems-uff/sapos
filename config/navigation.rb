@@ -123,14 +123,15 @@ SimpleNavigation::Configuration.run do |navigation|
       locations.item :country, 'Países', countries_path, :if => can_read?(Country)
     end
 
-    configuracoes_models = [User, Role, Configuration, Version, Notification, NotificationLog]
+    configuracoes_models = [User, Role, CustomVariable, Version, Notification, NotificationLog]
     primary.item :configuration, 'Configurações', get_path_from(configuracoes_models), :if => can_read?(configuracoes_models) do |configuration|
       configuration.item :user, 'Usuários', users_path, :if => can_read?(User)
       configuration.item :roles, 'Papéis', roles_path, :if => can_read?(Role)
       configuration.item :versions, 'Log', versions_path, :if => can_read?(Version)
       configuration.item :notifications, 'Notificações', notifications_path, :if => can_read?(Notification)
       configuration.item :notification_logs, 'Notificações Enviadas', notification_logs_path, :if => can_read?(NotificationLog)
-      configuration.item :configuration, 'Configurações', configurations_path, :if => can_read?(Configuration)
+      configuration.item :custom_variables, 'Variáveis', custom_variables_path, :if => can_read?(CustomVariable)
+      
     end
 
     primary.item :logout, 'Logout', destroy_user_session_path

@@ -37,7 +37,7 @@ class Professor < ActiveRecord::Base
     enrollments_with_multiple_advisors = enrollments.where("1 < (SELECT COUNT(*) FROM advisements WHERE advisements.enrollment_id = enrollments.id AND advisements.professor_id in (SELECT advisement_authorizations.professor_id from advisement_authorizations))")
 
     points = 0.0
-    points += Configuration.multiple_advisor_points*enrollments_with_multiple_advisors.count + Configuration.single_advisor_points*enrollments_with_single_advisor.count
+    points += CustomVariable.multiple_advisor_points*enrollments_with_multiple_advisors.count + CustomVariable.single_advisor_points*enrollments_with_single_advisor.count
 
     "#{points.to_f}"
   end
@@ -49,7 +49,7 @@ class Professor < ActiveRecord::Base
   def advisement_point(enrollment)
     return 0.0 if self.advisement_authorizations.empty? || enrollment.advisements.where(:professor_id => self.id).empty? || enrollment.dismissal
     authorized_advisors = enrollment.advisements.joins(:professor).where("professors.id in (SELECT advisement_authorizations.professor_id from advisement_authorizations)").count
-    (authorized_advisors.to_i == 1) ? Configuration.single_advisor_points : Configuration.multiple_advisor_points
+    (authorized_advisors.to_i == 1) ? CustomVariable.single_advisor_points : CustomVariable.multiple_advisor_points
   end
 
   def to_label

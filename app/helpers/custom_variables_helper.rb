@@ -1,0 +1,2 @@
+module CustomVariablesHelper
+end

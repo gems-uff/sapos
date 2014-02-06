@@ -77,7 +77,7 @@ pt-BR:
           aproved: "Aprovado"
           disapproved: "Reprovado"
           registered: "Incompleto"
-      configuration:
+      custom_variable:
         name: "Nome"
         value: "Valor"
         variable: "Variável"
@@ -480,9 +480,9 @@ pt-BR:
       class_enrollment:
         one: "Inscrição"
         other: "Inscrições"
-      configuration:
-        one: "Configuração"
-        other: "Configurações"
+      custom_variable:
+        one: "Variável"
+        other: "Variáveis"
       country:
         one: "País"
         other: "Países"
@@ -598,7 +598,7 @@ pt-BR:
     create_another : "Criar Outro"
     create_city_label: "Adicionar Cidade"
     create_class_enrollment_label: "Adicionar Inscrição"
-    create_configuration_label: "Adicionar Configuração"
+    create_custom_variable_label: "Adicionar Variável"
     create_country_label: "Adicionar País"
     create_course_class_label: "Adicionar Turma"
     create_course_label: "Adicionar Disciplina"
@@ -656,7 +656,7 @@ pt-BR:
     update_allocation_label: "Editar Alocação"
     update_city_label: "Editar Cidade"
     update_class_enrollment_label: "Editar Inscrição"
-    update_configuration_label: "Editar Configuração"
+    update_custom_variable_label: "Editar Variável"
     update_country_label: "Editar País"
     update_course_class_label: "Editar Turma"
     update_course_label: "Editar Disciplina"

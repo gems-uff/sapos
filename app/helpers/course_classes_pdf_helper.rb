@@ -186,9 +186,9 @@ module CourseClassesPdfHelper
       star_text += "*"
     end
 
-    unless Configuration.class_schedule_text.nil? or Configuration.class_schedule_text.empty? 
+    unless CustomVariable.class_schedule_text.nil? or CustomVariable.class_schedule_text.empty? 
       pdf.move_down 5
-      pdf.text "<b>#{star_text}* #{Configuration.class_schedule_text}</b>", :inline_format => true
+      pdf.text "<b>#{star_text}* #{CustomVariable.class_schedule_text}</b>", :inline_format => true
       star_text += "*"
     end
 

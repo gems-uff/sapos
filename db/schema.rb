@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140129213915) do
+ActiveRecord::Schema.define(:version => 20140206184506) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -81,14 +81,6 @@ ActiveRecord::Schema.define(:version => 20140129213915) do
   add_index "class_enrollments", ["course_class_id"], :name => "index_class_enrollments_on_course_class_id"
   add_index "class_enrollments", ["enrollment_id"], :name => "index_class_enrollments_on_enrollment_id"
 
-  create_table "configurations", :force => true do |t|
-    t.string   "name"
-    t.string   "variable"
-    t.string   "value"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
   create_table "countries", :force => true do |t|
     t.string   "name"
     t.datetime "created_at", :null => false
@@ -131,6 +123,14 @@ ActiveRecord::Schema.define(:version => 20140129213915) do
 
   add_index "courses", ["course_type_id"], :name => "index_courses_on_course_type_id"
   add_index "courses", ["research_area_id"], :name => "index_courses_on_research_area_id"
+
+  create_table "custom_variables", :force => true do |t|
+    t.string   "name"
+    t.string   "variable"
+    t.string   "value"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "deferral_types", :force => true do |t|
     t.string   "name"
