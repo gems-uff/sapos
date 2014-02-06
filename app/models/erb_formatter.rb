@@ -6,7 +6,8 @@ class ERBFormatter
   end
 
   def localize(date, format)
-    I18n.localize(Time.parse(date), :format => format)
+    time = ((date.class == String) ? Time.parse(date) : date.to_time) 
+    I18n.localize(time, :format => format)
   end
 
   def format(code)
