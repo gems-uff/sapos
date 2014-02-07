@@ -55,6 +55,7 @@ class ProfessorsController < ApplicationController
 
 
     config.show.columns = [:name,
+                           :email,
                            :cpf,
                            :birthdate,
                            :address,
