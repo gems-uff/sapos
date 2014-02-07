@@ -87,5 +87,36 @@ class CourseClassesController < ApplicationController
     
   end
 
+  protected
+
+  def before_update_save(record)
+    return unless (record.valid? and record.class_enrollments.all? {|class_enrollment| class_enrollment.valid?})
+    changed = record.class_enrollments.any? {|class_enrollment| (class_enrollment.grade_changed? or class_enrollment.situation_changed? or class_enrollment.disapproved_by_absence_changed?)}
+    return unless changed
+    info = {
+      :class => record.label_with_course,
+      :professor => record.professor.name,
+      :values => record.class_enrollments.map do |class_enrollment| 
+        enrollment = class_enrollment.enrollment.to_label
+        situation = "#{class_enrollment.situation}#{class_enrollment.situation_changed? ? '*' : ''}"
+        grade = "#{class_enrollment.grade_to_view}#{class_enrollment.grade_changed? ? '*' : ''}"
+        absence_changed = class_enrollment.disapproved_by_absence_changed? ? '*' : ''
+        if class_enrollment.attendance_to_label == "I"
+          absence = "#{I18n.t('activerecord.attributes.class_enrollment.disapproved_by_absence')}#{absence_changed}"
+        else
+          absence = "#{I18n.t('active_scaffold.false')} #{I18n.t('activerecord.attributes.class_enrollment.disapproved_by_absence')}#{absence_changed}"
+        end
+        "-#{enrollment}: #{situation} - #{grade} (#{absence})"
+      end.join("\n")
+    }
+    message_to_professor = {
+      :to => record.professor.email,
+      :subject => I18n.t('notifications.course_class.email_to_professor.subject', info),
+      :body => I18n.t('notifications.course_class.email_to_professor.body', info)
+    }
+    emails = [message_to_professor]
+    Notifier.instance.send_emails(emails)
+  end
+
 
 end 

@@ -88,7 +88,7 @@ class ClassEnrollment < ActiveRecord::Base
       :name => enrollment.student.name,
       :course => course_class.course.name,
       :situation => situation,
-      :grade => grade,
+      :grade => grade_to_view,
       :absence => ((attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false')) 
     }
     message_to_student = {

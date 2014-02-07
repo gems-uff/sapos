@@ -732,6 +732,10 @@ pt-BR:
       email_to_advisor:
         subject: "A inscrição em %{course} do seu(ua) orientando(a) %{name} foi atualizada"
         body: "Prezado(a) %{advisor_name},\n\nA inscrição em %{course} do seu(ua) orientando(a) %{name} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
+    course_class:
+      email_to_professor:
+        subject: "As notas da sua turma %{class} foram lançadas ou alteradas"
+        body: "Prezado(a) %{professor},\n\nAs notas da sua turma %{class} foram lançadas ou alteradas:\n%{values}\n\n* Valores alterados"
   pdf_content:
     advisements:
       to_pdf:

@@ -26,6 +26,10 @@ class CourseClass < ActiveRecord::Base
     "#{name || course.name} - #{year}/#{semester}"
   end
 
+  def label_with_course
+    self.course.name + (self.name.blank? ? '' : " (#{self.name})")
+  end
+
   def class_enrollments_count
     self.class_enrollments.count
   end
