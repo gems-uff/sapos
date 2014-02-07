@@ -17,6 +17,8 @@ class ClassEnrollment < ActiveRecord::Base
   validate :grade_for_situation
   validate :disapproved_by_absence_for_situation
 
+  after_save :notify_student_and_advisor
+
   def to_label
     "#{self.enrollment.student.name} - #{self.course_class.name || self.course_class.course.name}"
   end
@@ -78,6 +80,32 @@ class ClassEnrollment < ActiveRecord::Base
         self.errors.add(:disapproved_by_absence, I18n.translate("activerecord.errors.models.class_enrollment.disapproved_by_absence_for_situation_aproved")) if self.disapproved_by_absence
     end
     self.errors.blank?
+  end
+
+  def notify_student_and_advisor
+    return if grade.nil? or !(grade_changed? or situation_changed? or disapproved_by_absence_changed?)
+    info = {
+      :name => enrollment.student.name,
+      :course => course_class.course.name,
+      :situation => situation,
+      :grade => grade,
+      :absence => ((attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false')) 
+    }
+    message_to_student = {
+      :to => enrollment.student.email,
+      :subject => I18n.t('notifications.class_enrollment.email_to_student.subject', info),
+      :body => I18n.t('notifications.class_enrollment.email_to_student.body', info)
+    }
+    emails = [message_to_student]
+    #enrollment.advisements.each do |advisement|
+    #  professor_info = info.merge(:advisor_name => advisement.professor.name)
+    #  emails << message_to_advisor = {
+    #    :to => advisement.professor.email,
+    #    :subject => I18n.t('notifications.class_enrollment.email_to_advisor.subject', professor_info),
+    #    :body => I18n.t('notifications.class_enrollment.email_to_advisor.body', professor_info)
+    #  }
+    #end
+    Notifier.instance.send_emails(emails)
   end
 
 end

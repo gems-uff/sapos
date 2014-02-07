@@ -44,6 +44,7 @@ class Notifier
   end
 
   def send_emails(messages)
+    return unless Rails.const_defined? 'Server'
     messages.each do |message|
       options = {}
       m = message.merge(options)
@@ -61,7 +62,7 @@ class Notifier
           :to => m[:to], 
           :subject => m[:subject],
           :body => m[:body]
-        ).save
+        ).save unless m[:notification_id].nil?
         display_notification_info(m)
       end
     end
