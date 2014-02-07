@@ -97,14 +97,14 @@ class ClassEnrollment < ActiveRecord::Base
       :body => I18n.t('notifications.class_enrollment.email_to_student.body', info)
     }
     emails = [message_to_student]
-    #enrollment.advisements.each do |advisement|
-    #  professor_info = info.merge(:advisor_name => advisement.professor.name)
-    #  emails << message_to_advisor = {
-    #    :to => advisement.professor.email,
-    #    :subject => I18n.t('notifications.class_enrollment.email_to_advisor.subject', professor_info),
-    #    :body => I18n.t('notifications.class_enrollment.email_to_advisor.body', professor_info)
-    #  }
-    #end
+    enrollment.advisements.each do |advisement|
+      professor_info = info.merge(:advisor_name => advisement.professor.name)
+      emails << message_to_advisor = {
+        :to => advisement.professor.email,
+        :subject => I18n.t('notifications.class_enrollment.email_to_advisor.subject', professor_info),
+        :body => I18n.t('notifications.class_enrollment.email_to_advisor.body', professor_info)
+      }
+    end
     Notifier.instance.send_emails(emails)
   end
 
