@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140206184506) do
+ActiveRecord::Schema.define(:version => 20140207004711) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -313,6 +313,7 @@ ActiveRecord::Schema.define(:version => 20140206184506) do
     t.string   "enrollment_number"
     t.string   "identity_issuing_place"
     t.integer  "institution_id"
+    t.string   "email"
   end
 
   add_index "professors", ["city_id"], :name => "index_professors_on_city_id"

@@ -13,14 +13,17 @@ class User < ActiveRecord::Base
   devise :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,
          :lockable
 
-  validates :email, :presence => true
+  validates :email, :presence => true, :uniqueness => true
   validates :name, :presence => true, :uniqueness => true
   validate :role_valid?
   validates :role, :presence => true
   
-
-
   before_destroy :validate_destroy
+  after_save :update_email
+
+  def to_label
+    "#{self.name}"
+  end
 
   def valid_password?(password)
     if self.hashed_password.present?
@@ -68,7 +71,17 @@ class User < ActiveRecord::Base
     errors.blank?
   end
 
-  def to_label
-    "#{self.name}"
+  
+  def professor
+    Professor.where(:email => email).first
+  end
+
+  def update_email
+    return if email.nil? or email_was.nil?
+    professor = Professor.where(:email => email_was).first
+    unless professor.nil?
+      professor.email = email
+      professor.save 
+    end
   end
 end

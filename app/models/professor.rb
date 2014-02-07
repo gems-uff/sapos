@@ -2,7 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Professor < ActiveRecord::Base
-  attr_accessible :name, :cpf, :birthdate, :sex, :civil_status, :identity_number,
+  attr_accessible :name, :cpf, :birthdate, :email, :sex, :civil_status, :identity_number,
   :identity_issuing_body, :identity_expedition_date, :identity_issuing_place,
   :neighborhood, :address, :zip_code, :telephone1, :telephone2, :siape, :enrollment_number
   
@@ -23,7 +23,10 @@ class Professor < ActiveRecord::Base
 
   validates :cpf, :presence => true, :uniqueness => true
   validates :name, :presence => true
+  validates :email, :uniqueness => true, :allow_nil => true, :allow_blank => true
   validates :enrollment_number, :uniqueness => true, :allow_blank => true
+
+  after_save :update_email
 
 #  It was considered that active advisements were enrollments without dismissals reasons
   def advisement_points
@@ -54,5 +57,19 @@ class Professor < ActiveRecord::Base
 
   def to_label
     "#{self.name}"
+  end
+
+  def user
+    return nil if email.nil?
+    User.where(:email => email).first
+  end
+
+  def update_email
+    return if email.nil? or email_was.nil?
+    user = User.where(:email => email_was).first
+    unless user.nil?
+      user.email = email
+      user.save 
+    end
   end
 end

@@ -29,6 +29,7 @@ class ProfessorsController < ApplicationController
     config.columns[:scholarships].form_ui = :record_select
     config.columns[:professor_research_areas].includes = {:research_areas => :professor_research_areas}
     form_columns = [:name,
+                    :email,
                    :sex,
                    :civil_status,
                    :birthdate,
