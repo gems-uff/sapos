@@ -730,8 +730,11 @@ pt-BR:
         subject: "Sua inscrição em %{course} foi atualizada"
         body: "Prezado(a) %{name},\n\nSua inscrição em %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
       email_to_advisor:
-        subject: "A inscrição em %{course} do seu(ua) orientando(a) %{name} foi atualizada"
-        body: "Prezado(a) %{advisor_name},\n\nA inscrição em %{course} do seu(ua) orientando(a) %{name} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
+        subject: "A inscrição em %{course} do(a) seu(ua) orientando(a) %{name} foi atualizada"
+        body: "Prezado(a) %{advisor_name},\n\nA inscrição em %{course} do(a) seu(ua) orientando(a) %{name} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
+      email_to_professor:
+        subject: "A inscrição do(a) aluno(a) %{name} na sua turma %{course} foi atualizada"
+        body: "Prezado(a) %{professor},\n\nA inscrição do(a) aluno(a) %{name} na sua turma %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}\n\n* Valores alterados"
     course_class:
       email_to_professor:
         subject: "As notas da sua turma %{class} foram lançadas ou alteradas"

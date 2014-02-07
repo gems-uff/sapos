@@ -86,7 +86,7 @@ class ClassEnrollment < ActiveRecord::Base
     return if grade.nil? or !(grade_changed? or situation_changed? or disapproved_by_absence_changed?)
     info = {
       :name => enrollment.student.name,
-      :course => course_class.course.name,
+      :course => course_class.label_with_course,
       :situation => situation,
       :grade => grade_to_view,
       :absence => ((attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false')) 
