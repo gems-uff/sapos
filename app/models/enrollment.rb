@@ -41,6 +41,7 @@ class Enrollment < ActiveRecord::Base
   after_save :create_phase_completions
 
   def to_label
+    return enrollment_number if student.nil?
     "#{enrollment_number} - #{student.name}"
   end
 
