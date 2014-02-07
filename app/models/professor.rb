@@ -26,8 +26,6 @@ class Professor < ActiveRecord::Base
   validates :email, :uniqueness => true, :allow_nil => true, :allow_blank => true
   validates :enrollment_number, :uniqueness => true, :allow_blank => true
 
-  after_save :update_email
-
 #  It was considered that active advisements were enrollments without dismissals reasons
   def advisement_points
     return "#{0.0}" if self.advisement_authorizations.empty?
@@ -57,19 +55,5 @@ class Professor < ActiveRecord::Base
 
   def to_label
     "#{self.name}"
-  end
-
-  def user
-    return nil if email.nil?
-    User.where(:email => email).first
-  end
-
-  def update_email
-    return if email.nil? or email_was.nil?
-    user = User.where(:email => email_was).first
-    unless user.nil?
-      user.email = email
-      user.save 
-    end
   end
 end

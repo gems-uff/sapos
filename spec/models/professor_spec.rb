@@ -225,31 +225,5 @@ describe Professor do
         professor.advisement_point(enrollment).should eql(1.0)
       end
     end
-    describe "user" do
-      it "should return nil if there is no user with the same email" do
-        professor = FactoryGirl.create(:professor, :email => "nouseremail@sapos.com")
-        professor.user.should == nil
-      end
-      it "should return an user if there is a user with the same email" do
-        Role.where(:id => Role::ROLE_ADMINISTRADOR).first or FactoryGirl.create(:role_administrador)
-        user = FactoryGirl.create(:user, :email => 'oldemail@sapos.com')
-        professor = FactoryGirl.create(:professor, :email => user.email)
-        professor.user.should == user
-      end
-    end
-  end
-  describe "Callbacks" do
-    describe "after_save" do
-      describe "update_email" do
-        it "should update user email, if there is a user with the old email" do
-          Role.where(:id => Role::ROLE_ADMINISTRADOR).first or FactoryGirl.create(:role_administrador)
-          user = FactoryGirl.create(:user, :email => 'oldemail@sapos.com')
-          professor = FactoryGirl.create(:professor, :email => user.email)
-          professor.email = 'newemail@sapos.com'
-          professor.save 
-          User.find(user.id).email.should == 'newemail@sapos.com'
-        end
-      end
-    end
   end
 end

@@ -19,7 +19,6 @@ class User < ActiveRecord::Base
   validates :role, :presence => true
   
   before_destroy :validate_destroy
-  after_save :update_email
 
   def to_label
     "#{self.name}"
@@ -71,17 +70,4 @@ class User < ActiveRecord::Base
     errors.blank?
   end
 
-  
-  def professor
-    Professor.where(:email => email).first
-  end
-
-  def update_email
-    return if email.nil? or email_was.nil?
-    professor = Professor.where(:email => email_was).first
-    unless professor.nil?
-      professor.email = email
-      professor.save 
-    end
-  end
 end
