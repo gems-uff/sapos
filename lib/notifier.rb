@@ -45,6 +45,8 @@ class Notifier
 
   def send_emails(messages)
     return unless Rails.const_defined? 'Server'
+    return if CustomVariable.redirect_email == 'null'
+    
     messages.each do |message|
       options = {}
       m = message.merge(options)
