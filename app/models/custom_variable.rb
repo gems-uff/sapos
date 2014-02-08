@@ -9,8 +9,38 @@ class CustomVariable < ActiveRecord::Base
 
   has_paper_trail
 
+  VARIABLES = ["single_advisor_points", "multiple_advisor_points", "program_level",
+    "identity_issuing_country", "notification_frequency", "notification_start_at",
+    "class_schedule_text", "redirect_email", "notification_footer", "logo"
+  ]
+
   validates :variable, :presence => true
 
+  def value_url
+    return "custom_variables/#{value.split('|')[0]}" if variable == "logo"
+    nil
+  end
+
+  def value_filename
+    return (value || '').split('|')[0] if variable == "logo"
+    nil
+  end
+
+  def value_scale
+    return (value || '').split('|')[1] if variable == "logo"
+    nil
+  end
+
+  def value_x
+    return (value || '').split('|')[2] if variable == "logo"
+    nil
+  end
+
+  def value_y
+    return (value || '').split('|')[3] if variable == "logo"
+    nil
+  end
+  
 
   def self.single_advisor_points
   	config = CustomVariable.find_by_variable(:single_advisor_points)
@@ -39,7 +69,7 @@ class CustomVariable < ActiveRecord::Base
 
   def self.notification_start_at
     config = CustomVariable.find_by_variable(:notification_start_at)
-    config.nil? ? "12:00" : config.value.to_s 
+    config.nil? ? "4:00" : config.value.to_s 
   end
 
   def self.class_schedule_text
@@ -55,6 +85,11 @@ class CustomVariable < ActiveRecord::Base
   def self.notification_footer
     config = CustomVariable.find_by_variable(:notification_footer)
     config.nil? ? "" : config.value
+  end
+
+  def self.logo
+    config = CustomVariable.find_by_variable(:logo)
+    config.nil? ? "logoUFF.jpg" : config.value
   end
 
 end
