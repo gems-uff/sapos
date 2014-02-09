@@ -16,6 +16,7 @@ class Deferral < ActiveRecord::Base
   validate :enrollment_level
 
   after_save :recalculate_due_date_for_phase_completion
+  after_create :notify_student_and_advisor
 
   def to_label
     "#{deferral_type.name}" unless deferral_type.nil?    
@@ -60,5 +61,28 @@ class Deferral < ActiveRecord::Base
     unless deferral_type.phase.levels.include? enrollment.level
       errors.add(:enrollment, I18n.translate("activerecord.errors.models.deferral.enrollment_level")) 
     end
+  end
+
+  def notify_student_and_advisor
+    info = {
+      :name => enrollment.student.name,
+      :phase => deferral_type.phase.name,
+      :deferral => deferral_type.name,
+    }
+    message_to_student = {
+      :to => enrollment.student.email,
+      :subject => I18n.t('notifications.deferral.email_to_student.subject', info),
+      :body => I18n.t('notifications.deferral.email_to_student.body', info)
+    }
+    emails = [message_to_student]
+    enrollment.advisements.each do |advisement|
+      advisor_info = info.merge(:advisor_name => advisement.professor.name)
+      emails << message_to_advisor = {
+        :to => advisement.professor.email,
+        :subject => I18n.t('notifications.deferral.email_to_advisor.subject', advisor_info),
+        :body => I18n.t('notifications.deferral.email_to_advisor.body', advisor_info)
+      }
+    end
+    Notifier.instance.send_emails(emails)
   end
 end
