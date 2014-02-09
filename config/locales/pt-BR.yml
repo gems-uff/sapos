@@ -725,6 +725,17 @@ pt-BR:
       update: 'Atualizar %{model}'
 
   notifications:
+    accomplishment:
+      email_to_student:
+        subject: "Você completou a etapa %{phase}"
+        body: "Prezado(a) %{name},\n\nVocê completou a etapa %{phase}."
+      email_to_advisor:
+        subject: "O(A) seu(a) orientando(a) %{name} completou a etapa %{phase}"
+        body: "Prezado(a) %{advisor_name},\n\nO(A) seu(ua) orientando(a) %{name} completou a etapa %{phase}."
+    advisement:
+      email_to_advisor:
+        subject: "O(A) aluno(a) %{name} agora é seu(ua) orientando(a)"
+        body: "Prezado(a) %{advisor_name},\n\nO(A) aluno(a) %{name} agora é seu(ua) orientando(a)."
     class_enrollment:
       email_to_student:
         subject: "Sua inscrição em %{course} foi atualizada"
@@ -746,13 +757,6 @@ pt-BR:
       email_to_advisor:
         subject: "O pedido de prorrogação do(a) seu(a) orientando(a) %{name} foi deferido"
         body: "Prezado(a) %{advisor_name},\n\nO pedido de prorrogação para %{phase} do(a) seu(ua) orientando(a) %{name} foi deferido, através da %{deferral}"
-    accomplishment:
-      email_to_student:
-        subject: "Você completou a etapa %{phase}"
-        body: "Prezado(a) %{name},\n\nVocê completou a etapa %{phase}."
-      email_to_advisor:
-        subject: "O(A) seu(a) orientando(a) %{name} completou a etapa %{phase}"
-        body: "Prezado(a) %{advisor_name},\n\nO(A) seu(ua) orientando(a) %{name} completou a etapa %{phase}."
   pdf_content:
     advisements:
       to_pdf:
