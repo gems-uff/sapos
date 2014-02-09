@@ -77,7 +77,7 @@ pt-BR:
           aproved: "Aprovado"
           disapproved: "Reprovado"
           registered: "Incompleto"
-      configuration:
+      custom_variable:
         name: "Nome"
         value: "Valor"
         variable: "Variável"
@@ -140,6 +140,7 @@ pt-BR:
           invalid: "--"
       enrollment:
         accomplishments: "Realização de Etapa"
+        accomplishment_date: "até"
         active: "Ativo?"
         admission_date: "Data de Admissão"
         advisements: "Orientadores"
@@ -247,6 +248,7 @@ pt-BR:
         civil_status: "Estado Civil"
         city: "Residência"
         cpf: "CPF"
+        email: "E-mail"
         enrollment_number: "Matrícula"
         enrollments: "Orientandos"
         identity_expedition_date: "Data de expedição da Identidade"
@@ -390,6 +392,7 @@ pt-BR:
       models:
         accomplishment:
           accomplishment_enrollment_uniqueness: "já realizou esta etapa"
+          enrollment_level: "não possui o mesmo nível que a etapa"
         advisement:
           advisement_professor_uniqueness: "não pode ser orientador duas vezes da mesma matrícula"
         allocation:
@@ -404,6 +407,7 @@ pt-BR:
           grade_for_situation_registered: "A nota deve estar em branco para situação 'Incompleto'"
         deferral:
           enrollment_and_deferral_uniqueness: "já possui esta prorrogação"
+          enrollment_level: "não possui o mesmo nível que a prorrogação"
         deferral_type:
           blank_duration: "duração deve ser de pelo menos um dia"
         dismissal:
@@ -432,8 +436,13 @@ pt-BR:
             cancel_date:
               on_or_after:  "anterior a Data de Início"
               on_or_before: "posterior a Data Limite de Concessão"
+        phase:
+          phase_duration_has_deferral: "Não foi possível remover duração de etapa para %{level}, pois já existe prorrogação para este nível"
+          phase_duration_has_level: "Não foi possível remover duração de etapa para %{level}, pois já existe matrícula com esta etapa concluída"
         phase_duration:
           blank_deadline: "prazo deve ser de pelo menos um dia"
+          has_deferral: "Já existe prorrogação para esta duração de etapa"
+          has_level: "Já existe conclusão de etapa para a duração de etapa deste nível"
         professor_research_area:
           unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
         student_major:
@@ -444,7 +453,9 @@ pt-BR:
           delete: "O sistema precisa ter ao menos um usuário"
           missing_password: "A senha não foi definida"
           self_delete: "Você não pode se deletar"
-
+          invalid_role_was: "era maior do que seu papel"
+          invalid_role: "não pode ser maior do que seu papel"
+          invalid_role_full: "O papel do usuário não pode ser maior do que o seu papel"
       template:
         body: "Por favor, verifique o(s) seguinte(s) campo(s):"
         header:
@@ -470,9 +481,9 @@ pt-BR:
       class_enrollment:
         one: "Inscrição"
         other: "Inscrições"
-      configuration:
-        one: "Configuração"
-        other: "Configurações"
+      custom_variable:
+        one: "Variável"
+        other: "Variáveis"
       country:
         one: "País"
         other: "Países"
@@ -588,7 +599,7 @@ pt-BR:
     create_another : "Criar Outro"
     create_city_label: "Adicionar Cidade"
     create_class_enrollment_label: "Adicionar Inscrição"
-    create_configuration_label: "Adicionar Configuração"
+    create_custom_variable_label: "Adicionar Variável"
     create_country_label: "Adicionar País"
     create_course_class_label: "Adicionar Turma"
     create_course_label: "Adicionar Disciplina"
@@ -646,7 +657,7 @@ pt-BR:
     update_allocation_label: "Editar Alocação"
     update_city_label: "Editar Cidade"
     update_class_enrollment_label: "Editar Inscrição"
-    update_configuration_label: "Editar Configuração"
+    update_custom_variable_label: "Editar Variável"
     update_country_label: "Editar País"
     update_course_class_label: "Editar Turma"
     update_course_label: "Editar Disciplina"
@@ -665,7 +676,7 @@ pt-BR:
     update_user_label: "Modificar Usuário"
     notification:
       sql_query_default: "SELECT students.name as name FROM students\nWHERE students.created_at<%{query_date}"
-      body_template_default: "Prezado <%= name %>"
+      body_template_default: "Prezado(a) <%= name %>"
       frequency_description: "Diária: todo dia; Semanal: toda segunda; Mensal: dia 01 de cada mês; Semestral: 01/03 e 01/08; Anual: 01/01"
       execute_now: "Enviar agora"
       simulate: "Simular"
@@ -713,6 +724,21 @@ pt-BR:
       submit: 'Salvar %{model}'
       update: 'Atualizar %{model}'
 
+  notifications:
+    class_enrollment:
+      email_to_student:
+        subject: "Sua inscrição em %{course} foi atualizada"
+        body: "Prezado(a) %{name},\n\nSua inscrição em %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
+      email_to_advisor:
+        subject: "A inscrição em %{course} do(a) seu(ua) orientando(a) %{name} foi atualizada"
+        body: "Prezado(a) %{advisor_name},\n\nA inscrição em %{course} do(a) seu(ua) orientando(a) %{name} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
+      email_to_professor:
+        subject: "A inscrição do(a) aluno(a) %{name} na sua turma %{course} foi atualizada"
+        body: "Prezado(a) %{professor},\n\nA inscrição do(a) aluno(a) %{name} na sua turma %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}\n\n* Valores alterados"
+    course_class:
+      email_to_professor:
+        subject: "As notas da sua turma %{class} foram lançadas ou alteradas"
+        body: "Prezado(a) %{professor},\n\nAs notas da sua turma %{class} foram lançadas ou alteradas:\n%{values}\n\n* Valores alterados"
   pdf_content:
     advisements:
       to_pdf:

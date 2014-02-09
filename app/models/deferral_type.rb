@@ -26,4 +26,15 @@ class DeferralType < ActiveRecord::Base
   def duration
     {:semesters => self.duration_semesters, :months => self.duration_months, :days => self.duration_days}
   end
+
+  def self.find_all_for_enrollment(enrollment)
+    return [] if enrollment.nil?
+    ["deferral_types.id IN (
+      SELECT deferral_types.id
+      FROM deferral_types
+      INNER JOIN phases ON deferral_types.phase_id = phases.id 
+      LEFT OUTER JOIN phase_durations ON phase_durations.phase_id = phases.id
+      WHERE phase_durations.level_id = ?
+    )", enrollment.level_id]
+  end
 end

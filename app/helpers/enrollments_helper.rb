@@ -60,7 +60,7 @@ module EnrollmentsHelper
         :name => "search[accomplishments][year]"
     }
 
-    select(:record, :phases, options_for_select([["Todas", "all"]] + Phase.all.map {|phase| [phase.name, phase.id]}), {:include_blank => as_(:_select_)}, select_html_options) + label_tag(:accomplishments_date, I18n.t("activerecord.attributes.enrollment.delayed_phase_date"), :style => "margin: 0px 15px") +  select_day(Date.today.day, local_options, day_html_options) +  select_month(Date.today.month, local_options, month_html_options) + select_year(Date.today.year, local_options, year_html_options)
+    select(:record, :phases, options_for_select([["Todas", "all"]] + Phase.all.map {|phase| [phase.name, phase.id]}), {:include_blank => as_(:_select_)}, select_html_options) + label_tag(:accomplishments_date, I18n.t("activerecord.attributes.enrollment.accomplishment_date"), :style => "margin: 0px 15px") +  select_day(Date.today.day, local_options, day_html_options) +  select_month(Date.today.month, local_options, month_html_options) + select_year(Date.today.year, local_options, year_html_options)
   end
 
   def approval_date_form_column(record, options)
@@ -154,20 +154,12 @@ module EnrollmentsHelper
     #select :record, :level, options_for_select(Level.all.map {|level| [level.name, level.id]}, :selected => selected) 
   end
 
-  #TODO: remove current accomplishments if level was changed
+  #TODO: remove current accomplishments and current deferral_type if level was changed
   def options_for_association_conditions(association)
     if association.name == :phase
-      enrollment_id = params[:id]
-      enrollment = Enrollment.find_by_id(enrollment_id)
-      #level_id = enrollment.nil? ? params[:value] : enrollment.level_id #recupera level_id vindo do parâmetro de atualização
-      level_id = @record.enrollment.nil? ? params[:value] : @record.enrollment.level_id
-      ["phases.id IN (
-       SELECT phases.id
-       FROM phases
-       LEFT OUTER JOIN phase_durations
-       ON phase_durations.phase_id = phases.id
-       WHERE phase_durations.level_id = ?
-       )", level_id]
+      Phase::find_all_for_enrollment(@record.enrollment)
+    elsif association.name == :deferral_type
+      DeferralType::find_all_for_enrollment(@record.enrollment)
     else
       super
     end

@@ -181,7 +181,7 @@ Sapos::Application.routes.draw do
     record_select_routes
   end
 
-  resources :configurations do
+  resources :custom_variables do
     as_routes
   end
 

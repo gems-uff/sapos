@@ -13,11 +13,31 @@ describe Accomplishment do
           accomplishment.enrollment = Enrollment.new
           accomplishment.should have(0).errors_on :enrollment
         end
+
+        it "phase has the enrollment level" do
+          level = FactoryGirl.create(:level)
+          phase = FactoryGirl.create(:phase)
+          accomplishment.enrollment = FactoryGirl.create(:enrollment, :level => level)
+          accomplishment.phase = phase
+          phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :level => level)
+          
+          accomplishment.should have(0).errors_on :enrollment
+        end
       end
       context "should have error blank when" do
         it "enrollment is null" do
           accomplishment.enrollment = nil
           accomplishment.should have_error(:blank).on :enrollment
+        end
+      end
+      context "should have error enrollment_level when" do
+        it "phase phase doesn't have the enrollment level" do
+          level = FactoryGirl.create(:level)
+          phase = FactoryGirl.create(:phase)
+          accomplishment.enrollment = FactoryGirl.create(:enrollment, :level => level)
+          accomplishment.phase = phase
+          
+          accomplishment.should have_error(:enrollment_level).on :enrollment
         end
       end
     end

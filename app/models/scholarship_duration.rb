@@ -29,6 +29,8 @@ class ScholarshipDuration < ActiveRecord::Base
   validates_date :cancel_date, :on_or_before => :end_date, :allow_nil => true
   validates_date :cancel_date, :on_or_after => :start_date, :allow_nil => true
 
+  before_save :update_end_and_cancel_dates
+
   def to_label
     label = ""
 
@@ -152,5 +154,9 @@ class ScholarshipDuration < ActiveRecord::Base
     self.end_date != self.cancel_date
   end
 
+  def update_end_and_cancel_dates
+    self.end_date = self.end_date.end_of_month unless self.end_date.nil?
+    self.cancel_date = self.cancel_date.end_of_month unless self.cancel_date.nil?
+  end
 
 end

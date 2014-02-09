@@ -18,6 +18,17 @@ class Phase < ActiveRecord::Base
   	"#{self.name}"
   end
 
+  def self.find_all_for_enrollment(enrollment)
+    return [] if enrollment.nil?
+    ["phases.id IN (
+      SELECT phases.id
+      FROM phases
+      LEFT OUTER JOIN phase_durations
+      ON phase_durations.phase_id = phases.id
+      WHERE phase_durations.level_id = ?
+    )", enrollment.level_id]
+  end
+
   def calculate_total_deferral_time_for_phase_until_date(enrollment, date)
     total_time = phase_durations.select { |duration| duration.level_id == enrollment.level.id}[0].duration
 

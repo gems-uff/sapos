@@ -18,6 +18,8 @@ class Scholarship < ActiveRecord::Base
   #validates date
   validates_date :end_date, :on_or_after => :start_date, :allow_nil => true
   
+  before_save :update_end_date
+
   def to_label
     "#{scholarship_number}"
   end
@@ -27,5 +29,8 @@ class Scholarship < ActiveRecord::Base
      self.end_date.end_of_month
   end
 
-  
+  def update_end_date
+    self.end_date = self.end_date.end_of_month unless self.end_date.nil?
+  end
+
 end

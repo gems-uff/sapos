@@ -12,5 +12,14 @@ class Role < ActiveRecord::Base
   ROLE_ALUNO = 5
   ROLE_ADMINISTRADOR = 6
 
+  ORDER = [
+  	ROLE_DESCONHECIDO, 
+  	ROLE_ALUNO, 
+  	ROLE_PROFESSOR,
+  	ROLE_SECRETARIA,
+  	ROLE_COORDENACAO,
+  	ROLE_ADMINISTRADOR
+  ]
+
   has_paper_trail
 end

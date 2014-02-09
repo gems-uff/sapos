@@ -8,24 +8,21 @@ class Notifier
 
   def initialize
     @async_notifications = []
-    @options = {}
     @logger = Rails.logger
     
     return unless Rails.const_defined? 'Server'
-    @options = {:to => Configuration.redirect_email} unless Configuration.redirect_email.empty?
-    
 
     if Rails.env.development? or Rails.env.test? 
       first_at = Time.now + 1.second
     else
-      first_at = Time.parse(Configuration.notification_start_at)
+      first_at = Time.parse(CustomVariable.notification_start_at)
       if first_at < Time.now
         first_at += 1.day
       end
     end
 
     scheduler = Rufus::Scheduler.new
-    scheduler.every Configuration.notification_frequency, :first_at => first_at do
+    scheduler.every CustomVariable.notification_frequency, :first_at => first_at do
       asynchronous_emails
     end
   end
@@ -47,10 +44,18 @@ class Notifier
   end
 
   def send_emails(messages)
+    return unless Rails.const_defined? 'Server'
+    return if CustomVariable.redirect_email == 'null'
+    
     messages.each do |message|
-      m = message.merge(@options)
-      unless Configuration.notification_footer.empty?
-        m[:body] += "\n\n\n" + Configuration.notification_footer
+      options = {}
+      m = message.merge(options)
+      unless CustomVariable.notification_footer.empty?
+        m[:body] += "\n\n\n" + CustomVariable.notification_footer
+      end
+      unless CustomVariable.redirect_email.empty?
+        m[:body] = "Originalmente para #{m[:to]}\n\n" + m[:body]
+        m[:to] = CustomVariable.redirect_email
       end
       unless m[:to].nil? or m[:to].empty?
         ActionMailer::Base.mail(m).deliver!
@@ -59,7 +64,7 @@ class Notifier
           :to => m[:to], 
           :subject => m[:subject],
           :body => m[:body]
-        ).save
+        ).save unless m[:notification_id].nil?
         display_notification_info(m)
       end
     end

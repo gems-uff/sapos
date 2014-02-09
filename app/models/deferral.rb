@@ -10,6 +10,10 @@ class Deferral < ActiveRecord::Base
   validates :enrollment, :presence => true
   validates :enrollment_id, :uniqueness => {:scope => :deferral_type_id, :message => :enrollment_and_deferral_uniqueness}
   validates :deferral_type, :presence => true
+  validates :approval_date, :presence => true
+
+
+  validate :enrollment_level
 
   after_save :recalculate_due_date_for_phase_completion
 
@@ -49,4 +53,12 @@ class Deferral < ActiveRecord::Base
     end
   end
 
+  def enrollment_level
+    return if enrollment.nil?
+    return if deferral_type.nil?
+
+    unless deferral_type.phase.levels.include? enrollment.level
+      errors.add(:enrollment, I18n.translate("activerecord.errors.models.deferral.enrollment_level")) 
+    end
+  end
 end

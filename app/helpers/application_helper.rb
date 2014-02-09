@@ -92,7 +92,7 @@ module ApplicationHelper
     options[:show_states_link] ||= :identity_issuing_place_widget_show_states
     options[:show_text_link] ||= :identity_issuing_place_widget_show_text
 
-    country = Configuration.identity_issuing_country
+    country = CustomVariable.identity_issuing_country
     html = ""
     show_text = true
     unless country.nil?

@@ -120,7 +120,7 @@ module EnrollmentsPdfHelper
 
         common_header_part1(pdf, enrollment, [
           "#{I18n.t('pdf_content.enrollment.header.program_level')} " +
-          "<b>#{Configuration.program_level} </b>"
+          "<b>#{CustomVariable.program_level} </b>"
         ])
 
         common_header_part(pdf) do
@@ -819,14 +819,23 @@ module EnrollmentsPdfHelper
     ]) unless search[:professor].empty?
 
 
+    unless search[:accomplishments][:phase].empty?
+      phase_date = Date.new(search[:accomplishments][:year].to_i, search[:accomplishments][:month].to_i, search[:accomplishments][:day].to_i)
+
+      phase_name = search[:accomplishments][:phase] == 'all' ? 'Todas' : Phase.find(search[:accomplishments][:phase].to_i).name
+      values.push([
+        "#{I18n.t("activerecord.attributes.enrollment.accomplishments")}",
+        "#{phase_name} #{I18n.t("activerecord.attributes.enrollment.accomplishment_date")} #{I18n.localize(phase_date, :format => :long)} "
+      ]) 
+    end
 
     unless search[:delayed_phase][:phase].empty?
       phase_date = Date.new(search[:delayed_phase][:year].to_i, search[:delayed_phase][:month].to_i, search[:delayed_phase][:day].to_i)
 
-      phase = search[:delayed_phase][:phase] == 'all' ? 'Alguma' : Phase.find(search[:delayed_phase][:phase].to_i)
+      phase_name = search[:delayed_phase][:phase] == 'all' ? 'Alguma' : Phase.find(search[:delayed_phase][:phase].to_i).name
       values.push([
         "#{I18n.t("activerecord.attributes.enrollment.delayed_phase")}",
-        "#{phase.name} em #{I18n.localize(phase_date, :format => :long)} "
+        "#{phase_name} #{I18n.t("activerecord.attributes.enrollment.delayed_phase_date")} #{I18n.localize(phase_date, :format => :long)} "
       ]) 
     end
 
@@ -834,7 +843,7 @@ module EnrollmentsPdfHelper
       course = search[:course_class_year_semester][:course].empty? ? "" : Course.find(search[:course_class_year_semester][:course].to_i).name
       values.push([
         "#{I18n.t("activerecord.attributes.enrollment.course_class_year_semester")}",
-        "#{course} em #{search[:course_class_year_semester][:year]}/#{search[:course_class_year_semester][:semester]}"
+        "#{course} #{I18n.t("activerecord.attributes.enrollment.year_semester_label")} #{search[:course_class_year_semester][:year]}/#{search[:course_class_year_semester][:semester]}"
       ]) 
     end
 

@@ -57,4 +57,41 @@ describe DeferralType do
       end
     end
   end
+
+  describe "Class methods" do
+    describe "find_all_for_enrollment" do
+      it "should return all deferral_types if enrollment is nil" do
+        FactoryGirl.create(:deferral_type)
+        FactoryGirl.create(:deferral_type)
+        FactoryGirl.create(:deferral_type)
+        
+        deferral_types = DeferralType.where(DeferralType::find_all_for_enrollment(nil))
+        deferral_types.count.should == DeferralType.count
+      end
+
+      it "should return deferral_types that have the same level as the enrollment" do
+        Deferral.destroy_all
+        DeferralType.destroy_all
+        level1 = FactoryGirl.create(:level)
+        level2 = FactoryGirl.create(:level)
+        
+        phase1 = FactoryGirl.create(:phase)
+        FactoryGirl.create(:phase_duration, :phase => phase1, :level => level1)
+        FactoryGirl.create(:deferral_type, :phase => phase1)
+
+        phase2 = FactoryGirl.create(:phase)
+        FactoryGirl.create(:phase_duration, :phase => phase2, :level => level1)
+        FactoryGirl.create(:deferral_type, :phase => phase2)
+          
+        phase3 = FactoryGirl.create(:phase)
+        FactoryGirl.create(:phase_duration, :phase => phase3, :level => level2)
+        FactoryGirl.create(:deferral_type, :phase => phase3)
+
+        enrollment = FactoryGirl.create(:enrollment, :level => level1) 
+        
+        deferral_types = DeferralType.where(DeferralType::find_all_for_enrollment(enrollment))
+        deferral_types.count.should == 2
+      end
+    end
+  end
 end

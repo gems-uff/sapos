@@ -11,6 +11,8 @@ class Accomplishment < ActiveRecord::Base
   validates :enrollment_id, :uniqueness => {:scope => :phase_id, :message => :accomplishment_enrollment_uniqueness}
   validates :phase, :presence => true
 
+  validate :enrollment_level
+
   after_save :set_completion_date
 
   def to_label
@@ -20,9 +22,18 @@ class Accomplishment < ActiveRecord::Base
   def set_completion_date
   	phase_completion = PhaseCompletion.where(:enrollment_id => enrollment_id, :phase_id => phase_id).first
   	if phase_completion
-	  phase_completion.completion_date = conclusion_date
-	  phase_completion.save
-	end
+  	  phase_completion.completion_date = conclusion_date
+  	  phase_completion.save
+  	end
   end
   
+
+  def enrollment_level
+    return if enrollment.nil?
+    return if phase.nil?
+
+    unless phase.levels.include? enrollment.level
+      errors.add(:enrollment, I18n.translate("activerecord.errors.models.accomplishment.enrollment_level")) 
+    end
+  end
 end

@@ -51,6 +51,25 @@ describe Professor do
         end
       end
     end
+    describe "email" do
+      context "should be valid when" do
+        it "email is null" do
+          professor.email = nil
+          professor.should have(0).errors_on :email
+        end
+        it "email is not null and not taken" do
+          professor.email = "professor@sapos.com"
+          professor.should have(0).errors_on :email
+        end
+      end
+      context "should have error taken when" do
+        it "email is already in use" do
+          other_professor = FactoryGirl.create(:professor, :email => "professor@sapos.com")
+          professor.email = other_professor.email
+          professor.should have_error(:taken).on :email
+        end
+      end
+    end
     describe "enrollment_number" do
       context "should be valid when" do
         it "enrollment_number is null" do
@@ -94,12 +113,12 @@ describe Professor do
       end
 
       it "should return the spected number if the professor has advisement_authorizations and the points are changed" do
-        config = Configuration.find_by_variable(:single_advisor_points)
+        config = CustomVariable.find_by_variable(:single_advisor_points)
         config.delete unless config.nil?
-        config = Configuration.find_by_variable(:multiple_advisor_points)
+        config = CustomVariable.find_by_variable(:multiple_advisor_points)
         config.delete unless config.nil?
-        Configuration.create(:variable=>:single_advisor_points, :value=>"2.0")
-        Configuration.create(:variable=>:multiple_advisor_points, :value=>"1.0")
+        CustomVariable.create(:variable=>:single_advisor_points, :value=>"2.0")
+        CustomVariable.create(:variable=>:multiple_advisor_points, :value=>"1.0")
 
         professor = FactoryGirl.create(:professor)
         other_professor = FactoryGirl.create(:professor)
@@ -158,9 +177,9 @@ describe Professor do
       end
 
       it "should return the configured value when the professor is the only authorized advisor" do
-        config = Configuration.find_by_variable(:single_advisor_points)
+        config = CustomVariable.find_by_variable(:single_advisor_points)
         config.delete unless config.nil?
-        Configuration.create(:variable=>:single_advisor_points, :value=>"2.0")
+        CustomVariable.create(:variable=>:single_advisor_points, :value=>"2.0")
 
         professor = FactoryGirl.create(:professor)
         other_professor = FactoryGirl.create(:professor)
@@ -189,9 +208,9 @@ describe Professor do
       end
 
       it "should return the configured value when the professor is not the only authorized advisor" do
-        config = Configuration.find_by_variable(:multiple_advisor_points)
+        config = CustomVariable.find_by_variable(:multiple_advisor_points)
         config.delete unless config.nil?
-        Configuration.create(:variable=>:multiple_advisor_points, :value=>"1.0")
+        CustomVariable.create(:variable=>:multiple_advisor_points, :value=>"1.0")
 
         professor = FactoryGirl.create(:professor)
         other_professor = FactoryGirl.create(:professor)
@@ -205,8 +224,6 @@ describe Professor do
 
         professor.advisement_point(enrollment).should eql(1.0)
       end
-
-
     end
   end
 end

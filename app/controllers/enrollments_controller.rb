@@ -29,7 +29,7 @@ class EnrollmentsController < ApplicationController
       :type => :member, 
       :parameters => {:format => :pdf}
 
-    config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase, :course_class_year_semester
+    config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase, :course_class_year_semester, :deferral_type
     config.columns.add :listed_advisors, :listed_accomplishments, :listed_deferrals, :listed_scholarships, :listed_class_enrollments
     config.columns.add :phase_due_dates
 
@@ -40,7 +40,7 @@ class EnrollmentsController < ApplicationController
     config.update.label = :update_enrollment_label
     config.actions.swap :search, :field_search
 
-    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :delayed_phase, :course_class_year_semester]
+    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :accomplishments, :delayed_phase, :course_class_year_semester]
 
     
     config.columns[:accomplishments].allow_add_existing = false;
@@ -66,7 +66,7 @@ class EnrollmentsController < ApplicationController
     config.columns[:level].search_sql = "levels.id"
     config.columns[:level].search_ui = :select
     config.columns[:level].send_form_on_update_column = true
-    config.columns[:level].update_columns = [:accomplishments, :phase]
+    config.columns[:level].update_columns = [:accomplishments, :phase, :deferrals, :deferral_type]
     config.columns[:professor].includes = {:advisements => :professor}
     config.columns[:professor].search_sql = "professors.name"
     config.columns[:professor].search_ui = :text

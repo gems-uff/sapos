@@ -15,6 +15,8 @@ class PhaseDuration < ActiveRecord::Base
 
   validate :deadline_validation
 
+
+  before_destroy :validate_destroy
   after_save :create_phase_completion
 
   def to_label
@@ -29,6 +31,30 @@ class PhaseDuration < ActiveRecord::Base
 
   def duration
     {:semesters => self.deadline_semesters, :months => self.deadline_months, :days => self.deadline_days}
+  end
+
+
+  def validate_destroy
+    return true if phase.nil? or level.nil?
+    has_deferral = phase.deferral_type.any? do |deferral_type|
+      deferral_type.deferrals.any? do |deferral|
+        deferral.enrollment.level == level
+      end
+    end
+    has_level = level.enrollments.any? do |enrollment| 
+      enrollment.accomplishments.any? do |accomplishment|
+        accomplishment.phase == phase
+      end
+    end
+    if has_deferral
+      errors.add(:base, I18n.t("activerecord.errors.models.phase_duration.has_deferral"))
+      phase.errors.add(:base, I18n.t("activerecord.errors.models.phase.phase_duration_has_deferral", :level => level.to_label))
+    end
+    if has_level
+      errors.add(:base, I18n.t("activerecord.errors.models.phase_duration.has_level"))
+      phase.errors.add(:base, I18n.t("activerecord.errors.models.phase.phase_duration_has_level", :level => level.to_label))
+    end
+    !has_deferral and !has_level
   end
 
   def create_phase_completion()
@@ -57,5 +83,4 @@ class PhaseDuration < ActiveRecord::Base
       PhaseCompletion.create(:enrollment_id=>enrollment.id, :phase_id=>phase.id, :completion_date=>completion_date, :due_date=>due_date)
     end
   end
-
 end

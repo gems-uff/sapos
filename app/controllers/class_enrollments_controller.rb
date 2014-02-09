@@ -22,4 +22,28 @@ class ClassEnrollmentsController < ApplicationController
 
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
+
+
+  protected
+
+  def before_update_save(record)
+    return if record.grade.nil? or !record.valid? or !(record.grade_changed? or record.situation_changed? or record.disapproved_by_absence_changed?)
+    absence_changed = record.disapproved_by_absence_changed? ? '*' : ''
+    info = {
+      :name => record.enrollment.to_label,
+      :professor => record.course_class.professor.name,
+      :course => record.course_class.label_with_course,
+      :situation => "#{record.situation}#{record.situation_changed? ? '*' : ''}",
+      :grade => "#{record.grade_to_view}#{record.grade_changed? ? '*' : ''}",
+      :absence => ((record.attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false')) + absence_changed
+    }
+    message_to_professor = {
+      :to => record.course_class.professor.email,
+      :subject => I18n.t('notifications.class_enrollment.email_to_professor.subject', info),
+      :body => I18n.t('notifications.class_enrollment.email_to_professor.body', info)
+    }
+    emails = [message_to_professor]
+    Notifier.instance.send_emails(emails)
+  end
+
 end 

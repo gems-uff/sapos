@@ -14,4 +14,13 @@ module DeferralsHelper
          :default => nil,
     }.merge(options)
   end
+
+  #TODO: remove current deferraltype if enrollment was changed
+  def options_for_association_conditions(association)
+    if association.name == :deferral_type
+      DeferralType::find_all_for_enrollment(@record.enrollment)
+    else
+      super
+    end
+  end
 end
