@@ -12,6 +12,8 @@ class Advisement < ActiveRecord::Base
 
   validates :professor_id, :uniqueness => {:scope => :enrollment_id, :message => :advisement_professor_uniqueness} #A professor can't be advisor more than once of an enrollment
 
+  after_create :notify_advisor
+
   def to_label
     "#{enrollment.enrollment_number} - #{professor.name}"
   end
@@ -68,6 +70,17 @@ class Advisement < ActiveRecord::Base
     !enrollment_advisements.where(main_advisor: true).empty?
   end
 
-
+  def notify_advisor
+    advisor_info = {
+      :name => enrollment.student.name,
+      :advisor_name => professor.name
+    }
+    emails = [{
+      :to => professor.email,
+      :subject => I18n.t('notifications.advisement.email_to_advisor.subject', advisor_info),
+      :body => I18n.t('notifications.advisement.email_to_advisor.body', advisor_info)
+    }]
+    Notifier.instance.send_emails(emails)
+  end
 
 end
