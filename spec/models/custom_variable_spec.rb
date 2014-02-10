@@ -166,10 +166,18 @@ describe CustomVariable do
       end
     end 
 
-     context "redirect_email" do
-      it "should return '' when there is no variable defined" do
+    context "redirect_email" do
+      it "should return nil when there is no variable defined" do
         config = CustomVariable.find_by_variable(:redirect_email)
         config.delete unless config.nil?
+
+        CustomVariable.redirect_email.should == nil
+      end
+
+      it "should return '' when the value is nil" do
+        config = CustomVariable.find_by_variable(:redirect_email)
+        config.delete unless config.nil?
+        CustomVariable.create(:variable=>:redirect_email, :value=>nil)
 
         CustomVariable.redirect_email.should == ''
       end
@@ -180,6 +188,23 @@ describe CustomVariable do
         CustomVariable.create(:variable=>:redirect_email, :value=>"bla")
 
         CustomVariable.redirect_email.should == 'bla'
+      end
+    end
+
+    context "notification_footer" do
+      it "should return '' when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:notification_footer)
+        config.delete unless config.nil?
+
+        CustomVariable.notification_footer.should == ''
+      end
+
+      it "should return 'bla' when it is defined to bla" do
+        config = CustomVariable.find_by_variable(:notification_footer)
+        config.delete unless config.nil?
+        CustomVariable.create(:variable=>:notification_footer, :value=>"bla")
+
+        CustomVariable.notification_footer.should == 'bla'
       end
     end 
   end

@@ -49,7 +49,7 @@ class CustomVariable < ActiveRecord::Base
 
   def self.redirect_email
     config = CustomVariable.find_by_variable(:redirect_email)
-    config.nil? ? "" : config.value
+    config.nil? ? nil : (config.value || '')
   end
 
   def self.notification_footer

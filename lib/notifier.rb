@@ -45,7 +45,7 @@ class Notifier
 
   def send_emails(messages)
     return unless Rails.const_defined? 'Server'
-    return if CustomVariable.redirect_email == 'null'
+    return if CustomVariable.redirect_email == ''
     
     messages.each do |message|
       options = {}
@@ -53,7 +53,7 @@ class Notifier
       unless CustomVariable.notification_footer.empty?
         m[:body] += "\n\n\n" + CustomVariable.notification_footer
       end
-      unless CustomVariable.redirect_email.empty?
+      unless CustomVariable.redirect_email.nil?
         m[:body] = "Originalmente para #{m[:to]}\n\n" + m[:body]
         m[:to] = CustomVariable.redirect_email
       end
