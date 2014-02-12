@@ -44,7 +44,12 @@ class Notifier
   end
 
   def send_emails(messages)
-    return unless Rails.const_defined? 'Server'
+    @logger.info "Starting send_emails function"
+    unless Rails.const_defined? 'Server'
+      @logger.info "Execution method is not 'Server' stoping process"
+      return
+    end
+
     return if CustomVariable.redirect_email == 'null'
     
     messages.each do |message|
