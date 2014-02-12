@@ -44,13 +44,15 @@ class Notifier
   end
 
   def send_emails(messages)
-    @logger.info "Starting send_emails function"
+    @logger.info "Starting send_emails function."
     unless Rails.const_defined? 'Server'
-      @logger.info "Execution method is not 'Server' stoping process"
+      @logger.info "Execution method is not 'Server'. Stoping process."
       return
     end
 
-    return if CustomVariable.redirect_email == 'null'
+    if CustomVariable.redirect_email == ''
+      @logger.info "Custom Variable 'redirect_email' is empty. Stoping process."
+    end
     
     messages.each do |message|
       options = {}
@@ -58,7 +60,8 @@ class Notifier
       unless CustomVariable.notification_footer.empty?
         m[:body] += "\n\n\n" + CustomVariable.notification_footer
       end
-      unless CustomVariable.redirect_email.empty?
+      unless CustomVariable.redirect_email.nil?
+        @logger.info "Custom Variable 'redirect_email' is set. Redirecting the emails"
         m[:body] = "Originalmente para #{m[:to]}\n\n" + m[:body]
         m[:to] = CustomVariable.redirect_email
       end
