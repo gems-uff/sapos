@@ -10,7 +10,7 @@ class Notifier
     @async_notifications = []
     @logger = Rails.logger
     
-    return unless Rails.const_defined? 'Server'
+    return unless should_run?
 
     if Rails.env.development? or Rails.env.test? 
       first_at = Time.now + 1.second
@@ -25,6 +25,10 @@ class Notifier
     scheduler.every CustomVariable.notification_frequency, :first_at => first_at do
       asynchronous_emails
     end
+  end
+
+  def should_run?
+    (Rails.const_defined?('Server') || defined?(::PhusionPassenger))
   end
 
   def new_notification(&block)
@@ -45,13 +49,14 @@ class Notifier
 
   def send_emails(messages)
     @logger.info "Starting send_emails function."
-    unless Rails.const_defined? 'Server'
+    unless should_run?
       @logger.info "Execution method is not 'Server'. Stoping process."
       return
     end
 
     if CustomVariable.redirect_email == ''
       @logger.info "Custom Variable 'redirect_email' is empty. Stoping process."
+      return
     end
     
     messages.each do |message|
