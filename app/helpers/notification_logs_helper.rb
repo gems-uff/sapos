@@ -11,4 +11,8 @@ module NotificationLogsHelper
 			I18n.t('activerecord.attributes.notification_log.notification_removed')
 		end
 	end
+
+	def to_column(record, column)
+		record.to.gsub(/[;,]/,'; ')
+	end
 end
