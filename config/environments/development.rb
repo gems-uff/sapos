@@ -2,6 +2,9 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 Sapos::Application.configure do
+  # Allow the notifier to send emails
+  config.should_send_emails = Rails.const_defined?('Server') 
+
   # Settings specified here will take precedence over those in config/application.rb
 
   # In the development environment your application's code is reloaded on

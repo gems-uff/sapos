@@ -28,7 +28,7 @@ class Notifier
   end
 
   def should_run?
-    (Rails.const_defined?('Server') || defined?(::PhusionPassenger))
+    Rails.application.config.should_send_emails
   end
 
   def new_notification(&block)

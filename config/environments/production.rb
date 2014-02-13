@@ -3,6 +3,9 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 Sapos::Application.configure do
+  # Allow the notifier to send emails
+  config.should_send_emails = true
+  
   # Settings specified here will take precedence over those in config/application.rb
 
   # Code is not reloaded between requests
