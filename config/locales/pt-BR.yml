@@ -727,15 +727,15 @@ pt-BR:
   notifications:
     accomplishment:
       email_to_student:
-        subject: "Você completou a etapa %{phase}"
+        subject: "Etapa %{phase} completa"
         body: "Prezado(a) %{name},\n\nVocê completou a etapa %{phase}."
       email_to_advisor:
-        subject: "O(A) seu(a) orientando(a) %{name} completou a etapa %{phase}"
-        body: "Prezado(a) %{advisor_name},\n\nO(A) seu(ua) orientando(a) %{name} completou a etapa %{phase}."
+        subject: "Seu orientando %{name} completou uma etapa"
+        body: "Prezado(a) %{advisor_name},\n\nSeu(ua) orientando(a) %{name} completou a etapa %{phase}."
     advisement:
       email_to_advisor:
-        subject: "O(A) aluno(a) %{name} agora é seu(ua) orientando(a)"
-        body: "Prezado(a) %{advisor_name},\n\nO(A) aluno(a) %{name} agora é seu(ua) orientando(a)."
+        subject: "Nova orientação"
+        body: "Prezado(a) %{advisor_name},\n\nO(A) aluno(a) %{name} foi cadastrado como seu(ua) orientando(a)."
     class_enrollment:
       email_to_student:
         subject: "Sua inscrição em %{course} foi atualizada"
@@ -744,7 +744,7 @@ pt-BR:
         subject: "A inscrição em %{course} do(a) seu(ua) orientando(a) %{name} foi atualizada"
         body: "Prezado(a) %{advisor_name},\n\nA inscrição em %{course} do(a) seu(ua) orientando(a) %{name} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
       email_to_professor:
-        subject: "A inscrição do(a) aluno(a) %{name} na sua turma %{course} foi atualizada"
+        subject: "Alteração de nota de seu orientando"
         body: "Prezado(a) %{professor},\n\nA inscrição do(a) aluno(a) %{name} na sua turma %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}\n\n* Valores alterados"
     course_class:
       email_to_professor:
@@ -752,11 +752,11 @@ pt-BR:
         body: "Prezado(a) %{professor},\n\nAs notas da sua turma %{class} foram lançadas ou alteradas:\n%{values}\n\n* Valores alterados"
     deferral:
       email_to_student:
-        subject: "Seu pedido de prorrogação para %{phase} foi deferido"
-        body: "Prezado(a) %{name},\n\nSeu pedido de prorrogação para %{phase} foi deferido, através da %{deferral}."
+        subject: "Pedido de prorrogação deferido"
+        body: "Prezado(a) %{name},\n\nSeu pedido de %{deferral} para %{phase} foi deferido."
       email_to_advisor:
-        subject: "O pedido de prorrogação do(a) seu(a) orientando(a) %{name} foi deferido"
-        body: "Prezado(a) %{advisor_name},\n\nO pedido de prorrogação para %{phase} do(a) seu(ua) orientando(a) %{name} foi deferido, através da %{deferral}"
+        subject: "Pedido de prorrogação de orientando deferido"
+        body: "Prezado(a) %{advisor_name},\n\nO pedido de %{deferral} para %{phase} do(a) seu(ua) orientando(a) %{name} foi deferido"
   pdf_content:
     advisements:
       to_pdf:
