@@ -17,8 +17,8 @@ CustomVariable.create(:name=>"Pontos para orientador múltiplo", :variable =>"mu
 CustomVariable.create(:name=>"Nível do Programa na CAPES", :variable =>"program_level", :value => "5")
 CustomVariable.create(:name=>"País padrão de emissão da identidade", :variable =>"identity_issuing_country", :value => "Brasil")
 CustomVariable.create(:name=>"Texto no final do quadro de horários", :variable =>"class_schedule_text", :value => "Alunos interessados em cursar disciplinas de Tópicos Avançados devem consultar os respectivos professores antes da matrícula.")
-CustomVariable.create(:name=>"Frequência de envio de notificações (reiniciar servidor após alteração)", :variable =>"notification_frequency", :value => "1d")
-CustomVariable.create(:name=>"Horário inicial para o envio de notificações (reiniciar servidor após alteração)", :variable =>"notification_start_at", :value => "4:00")
+CustomVariable.create(:name=>"Frequência de envio de notificações", :variable =>"notification_frequency", :value => "1d")
+CustomVariable.create(:name=>"Horário inicial para o envio de notificações", :variable =>"notification_start_at", :value => "4:00")
 CustomVariable.create(:name=>"E-mail de redirecionamento para as notificações", :variable =>"redirect_email", :value => "")
 CustomVariable.create(:name=>"Texto de rodapé da notificação", :variable =>"notification_footer", :value => "Pós-Graduação em Computação - IC/UFF
 Este e-mail foi enviado automaticamente pelo SAPOS. Por favor, não responda. 
