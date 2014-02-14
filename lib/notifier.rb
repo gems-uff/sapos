@@ -9,10 +9,18 @@ class Notifier
   def initialize
     @async_notifications = []
     @logger = Rails.logger
+    @job = nil
     
     return unless should_run?
 
-    if Rails.env.development? or Rails.env.test? 
+    @scheduler = Rufus::Scheduler.new
+    start_job(Rails.env.development? || Rails.env.test?)    
+  end
+
+  def start_job(development)
+    @job.unschedule unless @job.nil?
+    
+    if development
       first_at = Time.now + 1.second
     else
       first_at = Time.parse(CustomVariable.notification_start_at)
@@ -21,8 +29,7 @@ class Notifier
       end
     end
 
-    scheduler = Rufus::Scheduler.new
-    scheduler.every CustomVariable.notification_frequency, :first_at => first_at do
+    @job = @scheduler.schedule_every CustomVariable.notification_frequency, :first_at => first_at do
       asynchronous_emails
     end
   end

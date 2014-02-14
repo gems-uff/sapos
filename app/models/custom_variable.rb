@@ -11,6 +11,13 @@ class CustomVariable < ActiveRecord::Base
 
   validates :variable, :presence => true
 
+  after_save :reschedule_notifier
+
+  def reschedule_notifier
+    return unless (variable_changed? || value_changed?)
+    return unless ['notification_frequency', 'notification_start_at'].include? variable 
+    Notifier.instance.start_job(false)
+  end
 
   def self.single_advisor_points
   	config = CustomVariable.find_by_variable(:single_advisor_points)
