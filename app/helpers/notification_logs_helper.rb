@@ -15,4 +15,8 @@ module NotificationLogsHelper
 	def to_column(record, column)
 		record.to.gsub(/[;,]/,'; ')
 	end
+
+	def created_at_column(record, column)
+		I18n.l(record.created_at.in_time_zone)
+	end
 end
