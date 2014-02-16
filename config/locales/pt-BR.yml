@@ -689,7 +689,7 @@ pt-BR:
       asynchronous:
         title: "Notificações assíncronas"
         simulation: "Simulação"
-        
+        notyet: "Ainda não executado"
         nojob: "Não há job agendado"
         preview: "Informações"
         last_time: "Última execução"

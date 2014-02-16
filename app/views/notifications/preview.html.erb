@@ -4,9 +4,9 @@
 
 <% unless @job.nil? %>
 
-	<p class="simulate_query_date"> <%= I18n.t('active_scaffold.notification.asynchronous.last_time')%>: <%= I18n.localize(@job.last_time, :format => :default) %> </p>
+	<p class="simulate_query_date"> <%= I18n.t('active_scaffold.notification.asynchronous.last_time')%>: <%= (@job.last_time.nil? ? I18n.t('active_scaffold.notification.asynchronous.notyet') : I18n.localize(@job.last_time, :format => :default)) %> </p>
 
-	<p class="simulate_query_date"> <%= I18n.t('active_scaffold.notification.asynchronous.next_time')%>: <%= I18n.localize(@job.next_time, :format => :default) %> </p>
+	<p class="simulate_query_date"> <%= I18n.t('active_scaffold.notification.asynchronous.next_time')%>: <%= (@job.next_time.nil? ? I18n.t('active_scaffold.false') : I18n.localize(@job.next_time, :format => :default)) %> </p>
 
 	<p class="simulate_query_date"> <%= I18n.t('active_scaffold.notification.asynchronous.frequency')%>: <%= @frequency %> </p>
 
