@@ -3,6 +3,11 @@ class NotificationsController < ApplicationController
 
   active_scaffold :"notification" do |config|
   	
+    config.action_links.add 'preview', 
+      :label => I18n.t('active_scaffold.notification.asynchronous.preview'), 
+      :page => true, 
+      :inline => true,
+      :type => :collection
 
     config.action_links.add 'set_query_date', 
       :label => "<i title='#{I18n.t('active_scaffold.notification.set_query_date')}' class='fa fa-clock-o'></i>".html_safe,
@@ -68,5 +73,12 @@ class NotificationsController < ApplicationController
     @notification = Notification.find(params[:id])
     @query_date ||= @notification.query_date.to_date
     render :action => 'set_query_date'
+  end
+
+  def preview
+    notifier = Notifier.instance
+    @job = notifier.job
+    @should_run = notifier.should_run?
+    @frequency = CustomVariable.notification_frequency
   end
 end

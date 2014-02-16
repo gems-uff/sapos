@@ -685,6 +685,16 @@ pt-BR:
       query_offset_description: "Data de consulta. Frequência Semestral com offset -1M terá variavel para dias 01/02 ou 01/07"
       query_date: "Data de Consulta"
       set_query_date: "Escolher Data de Consulta"
+      should_send_emails: "Enviar e-mails" 
+      asynchronous:
+        title: "Notificações assíncronas"
+        simulation: "Simulação"
+        
+        nojob: "Não há job agendado"
+        preview: "Informações"
+        last_time: "Última execução"
+        next_time: "Próxima execução"
+        frequency: "Frequência"
 
     errors:
       full_messages:

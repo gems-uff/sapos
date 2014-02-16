@@ -201,6 +201,10 @@ Sapos::Application.routes.draw do
       get 'simulate'
       get 'set_query_date'
     end
+
+    collection do
+      get 'preview'
+    end
   end
 
   # The priority is based upon order of creation:

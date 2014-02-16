@@ -8,6 +8,7 @@ require './lib/notifier'
 notifier = Notifier.instance
 
 notifier.new_notification do
+  Rails.logger.info "[Notifications] #{Time.now} - Notifications from DB"
   notifications = []
 
   #Get the next execution time arel table

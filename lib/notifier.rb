@@ -28,14 +28,19 @@ class Notifier
         first_at += 1.day
       end
     end
-
+    @logger.info "[Notifications] #{Time.now} - Scheduling next execution to #{first_at}"
     @job = @scheduler.schedule_every CustomVariable.notification_frequency, :first_at => first_at do
+      @logger.info "[Notifications] #{Time.now} - Running notifications"
       asynchronous_emails
     end
   end
 
   def should_run?
     Rails.application.config.should_send_emails
+  end
+
+  def job
+    @job
   end
 
   def new_notification(&block)
