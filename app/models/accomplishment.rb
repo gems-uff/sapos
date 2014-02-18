@@ -56,6 +56,6 @@ class Accomplishment < ActiveRecord::Base
         :body => I18n.t('notifications.accomplishment.email_to_advisor.body', advisor_info)
       }
     end
-    Notifier.instance.send_emails(emails)
+    Notifier.send_emails(emails)
   end
 end

@@ -52,7 +52,7 @@ class NotificationsController < ApplicationController
     query_date = Date.strptime(params[:query_date], "%d-%m-%Y") unless params[:query_date].nil?
     notification = Notification.find(params[:id])
     query_date ||= notification.query_date.to_date
-    Notifier.instance.send_emails(notification.execute(:query_date => query_date.to_time))
+    Notifier.send_emails(notification.execute(:query_date => query_date.to_time))
     redirect_to Notification
   end
 
@@ -72,7 +72,7 @@ class NotificationsController < ApplicationController
   end
 
   def notify
-    Notifier.instance.asynchronous_emails
+    Notifier.asynchronous_emails
     render :inline => 'Ok'
   end
 

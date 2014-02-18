@@ -3,44 +3,44 @@
 
 require 'singleton'
 
-class Notifier
-  include Singleton
+module Notifier
 
-  def initialize
-    @async_notifications = [] 
-    @logger = Rails.logger
+  def self.logger
+    Rails.logger
   end
-
-  def should_run?
+  
+  def self.should_run?
     Rails.application.config.should_send_emails
   end
 
-  def new_notification(&block)
-    @async_notifications << lambda { yield }
+  def self.run_notifications
+    Notifier.logger.info "[Notifications] #{Time.now} - Notifications from DB"
+    notifications = []
+
+    #Get the next execution time arel table
+    next_execution = Notification.arel_table[:next_execution]
+
+    #Find notifications that should run
+    Notification.where(next_execution.lt(Time.now)).each do |notification|
+      notifications += notification.execute
+    end
+    notifications
   end
 
-  def notifications
-    @async_notifications
+  def self.asynchronous_emails
+    Notifier.logger.info "Sending Registered Notifications"
+    Notifier.send_emails(Notifier.run_notifications)
   end
 
-  def run_notifications
-    @async_notifications.map{ |n| n.call }.flatten
-  end
-
-  def asynchronous_emails
-    @logger.info "Sending Registered Notifications"
-    send_emails(run_notifications)
-  end
-
-  def send_emails(messages)
-    @logger.info "Starting send_emails function."
-    unless should_run?
-      @logger.info "Execution method is not 'Server'. Stoping process."
+  def self.send_emails(messages)
+    Notifier.logger.info "Starting send_emails function."
+    unless Notifier.should_run?
+      Notifier.logger.info "Execution method is not 'Server'. Stoping process."
       return
     end
 
     if CustomVariable.redirect_email == ''
-      @logger.info "Custom Variable 'redirect_email' is empty. Stoping process."
+      Notifier.logger.info "Custom Variable 'redirect_email' is empty. Stoping process."
       return
     end
     
@@ -51,7 +51,7 @@ class Notifier
         m[:body] += "\n\n\n" + CustomVariable.notification_footer
       end
       unless CustomVariable.redirect_email.nil?
-        @logger.info "Custom Variable 'redirect_email' is set. Redirecting the emails"
+        Notifier.logger.info "Custom Variable 'redirect_email' is set. Redirecting the emails"
         m[:body] = "Originalmente para #{m[:to]}\n\n" + m[:body]
         m[:to] = CustomVariable.redirect_email
       end
@@ -63,17 +63,17 @@ class Notifier
           :subject => m[:subject],
           :body => m[:body]
         ).save unless m[:notification_id].nil?
-        display_notification_info(m)
+        Notifier.display_notification_info(m)
       end
     end
   end
 
-  def display_notification_info(notification)
-    @logger.info "\n#{Time.now.strftime('%Y/%m/%d %H:%M:%S')}"
-    @logger.info "########## Notification ##########"
-    @logger.info "Notifying #{notification[:to]}"
-    @logger.info "Subject: #{notification[:subject]}"
-    @logger.info "body: #{notification[:body]}"
-    @logger.info "##################################"
+  def self.display_notification_info(notification)
+    Notifier.logger.info "\n#{Time.now.strftime('%Y/%m/%d %H:%M:%S')}"
+    Notifier.logger.info "########## Notification ##########"
+    Notifier.logger.info "Notifying #{notification[:to]}"
+    Notifier.logger.info "Subject: #{notification[:subject]}"
+    Notifier.logger.info "body: #{notification[:body]}"
+    Notifier.logger.info "##################################"
   end
 end

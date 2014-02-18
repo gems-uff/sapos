@@ -105,7 +105,7 @@ class ClassEnrollment < ActiveRecord::Base
         :body => I18n.t('notifications.class_enrollment.email_to_advisor.body', professor_info)
       }
     end
-    Notifier.instance.send_emails(emails)
+    Notifier.send_emails(emails)
   end
 
 end
