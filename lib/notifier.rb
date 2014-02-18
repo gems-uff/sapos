@@ -7,40 +7,12 @@ class Notifier
   include Singleton
 
   def initialize
-    @async_notifications = []
+    @async_notifications = [] 
     @logger = Rails.logger
-    @job = nil
-    
-    return unless should_run?
-
-    @scheduler = Rufus::Scheduler.new
-    start_job(Rails.env.development? || Rails.env.test?)    
-  end
-
-  def start_job(development)
-    @job.unschedule unless @job.nil?
-    
-    if development
-      first_at = Time.now + 1.second
-    else
-      first_at = Time.parse(CustomVariable.notification_start_at)
-      if first_at < Time.now
-        first_at += 1.day
-      end
-    end
-    @logger.info "[Notifications] #{Time.now} - Scheduling next execution to #{first_at}"
-    @job = @scheduler.schedule_every CustomVariable.notification_frequency, :first_at => first_at do
-      @logger.info "[Notifications] #{Time.now} - Running notifications"
-      asynchronous_emails
-    end
   end
 
   def should_run?
     Rails.application.config.should_send_emails
-  end
-
-  def job
-    @job
   end
 
   def new_notification(&block)
@@ -56,6 +28,7 @@ class Notifier
   end
 
   def asynchronous_emails
+    @logger.info "Sending Registered Notifications"
     send_emails(run_notifications)
   end
 

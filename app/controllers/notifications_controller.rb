@@ -1,14 +1,10 @@
 class NotificationsController < ApplicationController
   authorize_resource
+  skip_authorization_check :only => [:notify]
+  skip_before_filter :authenticate_user!, :only => :notify
 
   active_scaffold :"notification" do |config|
   	
-    config.action_links.add 'preview', 
-      :label => I18n.t('active_scaffold.notification.asynchronous.preview'), 
-      :page => true, 
-      :inline => true,
-      :type => :collection
-
     config.action_links.add 'set_query_date', 
       :label => "<i title='#{I18n.t('active_scaffold.notification.set_query_date')}' class='fa fa-clock-o'></i>".html_safe,
       :page => true, 
@@ -75,10 +71,9 @@ class NotificationsController < ApplicationController
     render :action => 'set_query_date'
   end
 
-  def preview
-    notifier = Notifier.instance
-    @job = notifier.job
-    @should_run = notifier.should_run?
-    @frequency = CustomVariable.notification_frequency
+  def notify
+    Notifier.instance.asynchronous_emails
+    render :inline => 'Ok'
   end
+
 end

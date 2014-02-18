@@ -203,7 +203,7 @@ Sapos::Application.routes.draw do
     end
 
     collection do
-      get 'preview'
+      get 'notify'
     end
   end
 

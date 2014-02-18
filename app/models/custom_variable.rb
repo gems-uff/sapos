@@ -11,14 +11,6 @@ class CustomVariable < ActiveRecord::Base
 
   validates :variable, :presence => true
 
-  after_save :reschedule_notifier
-
-  def reschedule_notifier
-    return unless (variable_changed? || value_changed?)
-    return unless ['notification_frequency', 'notification_start_at'].include? variable 
-    Notifier.instance.start_job(false)
-  end
-
   def self.single_advisor_points
   	config = CustomVariable.find_by_variable(:single_advisor_points)
   	config.nil? ? 1.0 : config.value.to_f 
@@ -37,16 +29,6 @@ class CustomVariable < ActiveRecord::Base
   def self.identity_issuing_country
     config = CustomVariable.find_by_variable(:identity_issuing_country)
     Country.find_by_name(config.nil? ? "Brasil": config.value)
-  end
-
-  def self.notification_frequency
-    config = CustomVariable.find_by_variable(:notification_frequency)
-    config.nil? ? "1d" : config.value.to_s 
-  end
-
-  def self.notification_start_at
-    config = CustomVariable.find_by_variable(:notification_start_at)
-    config.nil? ? "12:00" : config.value.to_s 
   end
 
   def self.class_schedule_text

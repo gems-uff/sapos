@@ -34,6 +34,7 @@ class Ability
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification])
     end
+    can :notify, Notification
 
     # Define abilities for the passed in user here. For example:
     #
