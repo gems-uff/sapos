@@ -745,28 +745,28 @@ pt-BR:
     advisement:
       email_to_advisor:
         subject: "Nova orientação"
-        body: "Prezado(a) %{advisor_name},\n\nO(A) aluno(a) %{name} foi cadastrado como seu(ua) orientando(a)."
+        body: "%{advisor_name},\n\nInformamos que %{name} foi cadastrado como seu orientando."
     class_enrollment:
       email_to_student:
         subject: "Sua inscrição em %{course} foi atualizada"
-        body: "Prezado(a) %{name},\n\nSua inscrição em %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
+        body: "%{name},\n\nInformamos que sua inscrição em %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
       email_to_advisor:
-        subject: "A inscrição em %{course} do(a) seu(ua) orientando(a) %{name} foi atualizada"
-        body: "Prezado(a) %{advisor_name},\n\nA inscrição em %{course} do(a) seu(ua) orientando(a) %{name} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
+        subject: "Inscrição em %{course} de %{name} foi atualizada"
+        body: "%{advisor_name},\n\nInformamos que a inscrição em %{course} de seu orientando %{name} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
       email_to_professor:
         subject: "Alteração de nota de seu orientando"
-        body: "Prezado(a) %{professor},\n\nA inscrição do(a) aluno(a) %{name} na sua turma %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}\n\n* Valores alterados"
+        body: "%{professor},\n\nInformamos que a inscrição de %{name} na turma %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}\n\n* Valores alterados"
     course_class:
       email_to_professor:
-        subject: "As notas da sua turma %{class} foram lançadas ou alteradas"
-        body: "Prezado(a) %{professor},\n\nAs notas da sua turma %{class} foram lançadas ou alteradas:\n%{values}\n\n* Valores alterados"
+        subject: "Alteração de notas da turma %{class}"
+        body: "%{professor},\n\nInformamos que as notas da sua turma %{class} foram lançadas ou alteradas:\n%{values}\n\n* Valores alterados"
     deferral:
       email_to_student:
         subject: "Pedido de prorrogação deferido"
-        body: "Prezado(a) %{name},\n\nSeu pedido de %{deferral} para %{phase} foi deferido."
+        body: "%{name},\n\nInformamos que seu pedido de %{deferral} para %{phase} foi deferido."
       email_to_advisor:
         subject: "Pedido de prorrogação de orientando deferido"
-        body: "Prezado(a) %{advisor_name},\n\nO pedido de %{deferral} para %{phase} do(a) seu(ua) orientando(a) %{name} foi deferido"
+        body: "%{advisor_name},\n\nInformamos que o pedido de %{deferral} para %{phase} de seu orientando %{name} foi deferido."
   pdf_content:
     advisements:
       to_pdf:
