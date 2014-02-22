@@ -676,7 +676,7 @@ pt-BR:
     update_user_label: "Modificar Usuário"
     notification:
       sql_query_default: "SELECT students.name as name FROM students\nWHERE students.created_at<%{query_date}"
-      body_template_default: "Prezado(a) <%= name %>"
+      body_template_default: "<%= name %>"
       frequency_description: "Diária: todo dia; Semanal: toda segunda; Mensal: dia 01 de cada mês; Semestral: 01/03 e 01/08; Anual: 01/01"
       execute_now: "Enviar agora"
       simulate: "Simular"
@@ -738,10 +738,10 @@ pt-BR:
     accomplishment:
       email_to_student:
         subject: "Etapa %{phase} completa"
-        body: "Prezado(a) %{name},\n\nVocê completou a etapa %{phase}."
+        body: "%{name},\n\nInformamos que você completou a etapa %{phase}."
       email_to_advisor:
-        subject: "Seu orientando %{name} completou uma etapa"
-        body: "Prezado(a) %{advisor_name},\n\nSeu(ua) orientando(a) %{name} completou a etapa %{phase}."
+        subject: "%{name} completou uma etapa"
+        body: "%{advisor_name},\n\nInformamos que seu orientando %{name} completou a etapa %{phase}."
     advisement:
       email_to_advisor:
         subject: "Nova orientação"
