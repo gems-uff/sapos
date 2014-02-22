@@ -115,40 +115,6 @@ describe CustomVariable do
       end
     end 
 
-    context "notification_frequency" do
-      it "should return 1d when there is no variable defined" do
-        config = CustomVariable.find_by_variable(:notification_frequency)
-        config.delete unless config.nil?
-
-        CustomVariable.notification_frequency.should == "1d"
-      end
-
-      it "should return 5m when it is defined to 5m" do
-        config = CustomVariable.find_by_variable(:notification_frequency)
-        config.delete unless config.nil?
-        CustomVariable.create(:variable=>:notification_frequency, :value=>"5m")
-
-        CustomVariable.notification_frequency.should == "5m"
-      end
-    end 
-
-    context "notification_start_at" do
-      it "should return 12:00 when there is no variable defined" do
-        config = CustomVariable.find_by_variable(:notification_start_at)
-        config.delete unless config.nil?
-
-        CustomVariable.notification_start_at.should == "12:00"
-      end
-
-      it "should return 18:00 when it is defined to 18:00" do
-        config = CustomVariable.find_by_variable(:notification_start_at)
-        config.delete unless config.nil?
-        CustomVariable.create(:variable=>:notification_start_at, :value=>"18:00")
-
-        CustomVariable.notification_start_at.should == "18:00"
-      end
-    end
-
     context "class_schedule_text" do
       it "should return '' when there is no variable defined" do
         config = CustomVariable.find_by_variable(:class_schedule_text)
