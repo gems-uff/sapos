@@ -737,8 +737,8 @@ pt-BR:
   notifications:
     accomplishment:
       email_to_student:
-        subject: "Etapa %{phase} completa"
-        body: "%{name},\n\nInformamos que você completou a etapa %{phase}."
+        subject: "%{phase}"
+        body: "%{name},\n\nInformamos que você realizou %{phase}."
       email_to_advisor:
         subject: "%{name} completou uma etapa"
         body: "%{advisor_name},\n\nInformamos que seu orientando %{name} completou a etapa %{phase}."
