@@ -168,8 +168,34 @@ module CourseClassesPdfHelper
     end
 
     table_data.sort_by! { |e| e[0] }
+
+    temp_data = []
+    total = 0
+    count = 0
+
+    table_data.each do |data| 
+      total += 1
+      count += 1
+      temp_data << data
+
+      if count == 15
+        class_schedule_print_table(pdf, table_width, header, temp_data, star)
+        if total != table_data.size
+          pdf.start_new_page
+        end
+        temp_data = []
+        count = 0
+      end
+    end
+
+    unless temp_data.empty?
+      class_schedule_print_table(pdf, table_width, header, temp_data, star)
+    end
     
-    simple_pdf_table(pdf, table_width, header, table_data) do |table|
+  end
+
+  def class_schedule_print_table(pdf, table_width, header, data, star)
+    simple_pdf_table(pdf, table_width, header, data) do |table|
       table.column(0).align = :left
       table.column(0).valign = :center
       table.column(0).padding = [-2, 4, 2, 4]
@@ -191,7 +217,6 @@ module CourseClassesPdfHelper
       pdf.text "<b>#{star_text}* #{CustomVariable.class_schedule_text}</b>", :inline_format => true
       star_text += "*"
     end
-
   end
 
 end
