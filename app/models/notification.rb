@@ -1,3 +1,6 @@
+# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 class Notification < ActiveRecord::Base
   attr_accessible :body_template, :frequency, :next_execution, :notification_offset, :query_offset, :sql_query, :subject_template, :title, :to_template, :individual
 
