@@ -99,24 +99,31 @@ class Notification < ActiveRecord::Base
           bindings[key.to_sym] = value
         end
         formatter = ERBFormatter.new(bindings)
-
-        notifications << {
-          :notification_id => self.id,
-          :to => formatter.format(self.to_template),
-          :subject => formatter.format(self.subject_template),
-          :body => formatter.format(self.body_template)
-        }
+        begin
+          notifications << {
+            :notification_id => self.id,
+            :to => formatter.format(self.to_template),
+            :subject => formatter.format(self.subject_template),
+            :body => formatter.format(self.body_template)
+          }
+        rescue SyntaxError
+          raise 'Template Syntax Error'
+        end
       end
     else
       unless records.empty?
         bindings = {:records => records}.merge(params)
         formatter = ERBFormatter.new(bindings)
-        notifications << {
-          :notification_id => self.id,
-          :to => formatter.format(self.to_template),
-          :subject => formatter.format(self.subject_template),
-          :body => formatter.format(self.body_template)
-        }
+        begin
+          notifications << {
+            :notification_id => self.id,
+            :to => formatter.format(self.to_template),
+            :subject => formatter.format(self.subject_template),
+            :body => formatter.format(self.body_template)
+          }
+        rescue SyntaxError
+          raise 'Template Syntax Error'
+        end
       end
     end
     self.update_next_execution! unless options[:skip_update]
