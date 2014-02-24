@@ -412,6 +412,7 @@ pt-BR:
           blank_duration: "duração deve ser de pelo menos um dia"
         dismissal:
           date_before_enrollment_admission_date: "anterior a Data de Admissão"
+          enrollment_has_scholarship: "possui uma bolsa ativa na data de desligamento"
         enrollment:
           main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"

@@ -154,6 +154,13 @@ class ScholarshipDuration < ActiveRecord::Base
     self.end_date != self.cancel_date
   end
 
+  def active?(options={})
+    date = options[:date].nil? ? Date.today : options[:date].to_date
+    return false if date < self.start_date
+    return self.end_date.end_of_month >= date if self.cancel_date.nil?
+    (self.cancel_date.end_of_month - 1.month) >= date
+  end
+
   def update_end_and_cancel_dates
     self.end_date = self.end_date.end_of_month unless self.end_date.nil?
     self.cancel_date = self.cancel_date.end_of_month unless self.cancel_date.nil?
