@@ -74,5 +74,5 @@ Sapos::Application.configure do
   config.middleware.use ExceptionNotifier,
                         :email_prefix => "[SAPOS: Erro em Staging] ",
                         :sender_address => %{"Exception Notifier Sapos Staging" <erro-sapos@sel.ic.uff.br>},
-                        :exception_recipients => %w{everton.moreth@gmail.com bschettino@id.uff.br joaofelipenp@gmail.com lvieira@lvieira.com leomurta+sapos@gmail.com}
+                        :exception_recipients => %w{everton.moreth@gmail.com bschettino@id.uff.br joaofelipenp@gmail.com lvieira@lvieira.com leomurta+sapos@gmail.com vanessa.braganholo+sapos@gmail.com}
 end
