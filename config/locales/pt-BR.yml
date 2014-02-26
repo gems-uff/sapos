@@ -207,7 +207,7 @@ pt-BR:
         sql_query: "Consulta"
         subject_template: "Template do Assunto"
         title: "Título"
-        to_template: "Template do Recipiente"
+        to_template: "Template do Destinatário"
         individual: "Individual"
         no_name: "Sem nome"
       notification_log:
