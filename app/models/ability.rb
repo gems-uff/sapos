@@ -35,7 +35,7 @@ class Ability
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [Role, Notification, CustomVariable])
     elsif role_id == Role::ROLE_PROFESSOR
-      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification])
+      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification, NotificationLog])
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification])
     end
