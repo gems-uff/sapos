@@ -62,7 +62,7 @@ module Notifier
           :to => m[:to], 
           :subject => m[:subject],
           :body => m[:body]
-        ).save unless m[:notification_id].nil?
+        ).save
         Notifier.display_notification_info(m)
       end
     end

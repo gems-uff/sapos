@@ -217,7 +217,7 @@ pt-BR:
         created_at: "Data de Execução"
         notification: "Notificação"
         notification_name: "Notificação"
-        notification_removed: "Notificação Removida"
+        notification_removed_or_sync: "Notificação Síncrona ou Assíncrona Removida"
       phase:
         accomplishments: "Realização de Etapas"
         description: "Descrição"

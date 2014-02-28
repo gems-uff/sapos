@@ -8,7 +8,7 @@ module NotificationLogsHelper
 		unless notification.nil?
 			link_to(h(notification.title), notification_path(notification))
 		else
-			I18n.t('activerecord.attributes.notification_log.notification_removed')
+			I18n.t('activerecord.attributes.notification_log.notification_removed_or_sync')
 		end
 	end
 
