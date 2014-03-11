@@ -171,6 +171,20 @@ module PdfHelper
           page_footer(pdf)
         end
       end
+      if options[:watermark]
+        pdf.create_stamp("watermark") do
+          pdf.rotate(60, :origin => [0, 0]) do
+           pdf.fill_color "993333"
+           pdf.font('Courier', :size => 22) do
+             pdf.draw_text I18n.t('pdf_content.professor_watermark'), :at => [0, 0]
+           end
+           pdf.fill_color "000000"
+          end
+        end
+        pdf.repeat(:all, dynamic: true) do
+          pdf.stamp_at "watermark", [80, 0] 
+        end
+      end
     end
   end
 

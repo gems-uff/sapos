@@ -769,6 +769,7 @@ pt-BR:
         subject: "Pedido de prorrogação de orientando deferido"
         body: "%{advisor_name},\n\nInformamos que o pedido de %{deferral} para %{phase} de seu orientando %{name} foi deferido."
   pdf_content:
+    professor_watermark: "DOCUMENTO VÁLIDO APENAS PARA USO INTERNO E PESSOAL DO PROFESSOR"
     advisements:
       to_pdf:
         enrollment_number: "Número de Matrícula"
