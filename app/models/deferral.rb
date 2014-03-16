@@ -15,7 +15,7 @@ class Deferral < ActiveRecord::Base
 
   validate :enrollment_level
 
-  after_save :recalculate_due_date_for_phase_completion
+  after_commit :recalculate_due_date_for_phase_completion
   after_create :notify_student_and_advisor
 
   def to_label
@@ -30,26 +30,27 @@ class Deferral < ActiveRecord::Base
 
     deferrals = enrollment.deferrals.select { |deferral| deferral.deferral_type.phase == deferral_type.phase}
     for deferral in deferrals
-      if approval_date >= deferral.approval_date
-        deferral_duration = deferral.deferral_type.duration
-        (total_time.keys | deferral_duration.keys).each do |key|
-          total_time[key] += deferral_duration[key].to_i
-        end
+      deferral_duration = deferral.deferral_type.duration
+      (total_time.keys | deferral_duration.keys).each do |key|
+        total_time[key] += deferral_duration[key].to_i
       end
     end
 
     total_time
   end
 
-  def valid_until
-    total_time = deferral_type.phase.calculate_total_deferral_time_for_phase_until_date(enrollment, approval_date)
+  def calculate_end_date(total_time)
     deferral_type.phase.calculate_end_date(enrollment.admission_date, total_time[:semesters], total_time[:months], total_time[:days]).strftime('%d/%m/%Y')
+  end
+
+  def valid_until
+    calculate_end_date(deferral_type.phase.calculate_total_deferral_time_for_phase_until_date(enrollment, approval_date))
   end
 
   def recalculate_due_date_for_phase_completion
     phase_completion = PhaseCompletion.where(:enrollment_id => enrollment_id, :phase_id => deferral_type.phase_id).first
     if phase_completion
-      phase_completion.due_date = valid_until
+      phase_completion.due_date = calculate_end_date(total_time_with_deferrals())
       phase_completion.save
     end
   end
