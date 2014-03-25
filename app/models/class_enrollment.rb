@@ -20,7 +20,7 @@ class ClassEnrollment < ActiveRecord::Base
   after_save :notify_student_and_advisor
 
   def to_label
-    "#{self.enrollment.student.name} - #{self.course_class.name || self.course_class.course.name}"
+    "#{self.enrollment.student.name} - #{self.course_class.name_with_class}"
   end
 
   def attendance_to_label
