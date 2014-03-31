@@ -16,8 +16,25 @@ class ClassEnrollment < ActiveRecord::Base
   validates :grade, :numericality => {:greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}, :if => :grade_filled?
   validate :grade_for_situation
   validate :disapproved_by_absence_for_situation
+  validate :check_multiple_class_enrollment_allowed
 
   after_save :notify_student_and_advisor
+
+  def check_multiple_class_enrollment_allowed
+      other_enrollments = ClassEnrollment.
+          joins(:course_class => {:course => :course_type}).
+          includes(:course_class => {:course => :course_type}).
+          where(CourseType.arel_table[:allow_multiple_classes].eq(false)).
+          where(:enrollment_id => self.enrollment_id).
+          where(Course.arel_table[:id].eq( self.course_class.course_id)).
+          group(:enrollment_id).
+          having("count(course_id) > 1")
+
+
+      unless other_enrollments.empty?
+        self.errors.add(:course_class, :multiple_class_enrollments_not_allowed)
+      end
+    end
 
   def to_label
     "#{self.enrollment.student.name} - #{self.course_class.name || self.course_class.course.name}"
@@ -85,27 +102,28 @@ class ClassEnrollment < ActiveRecord::Base
   def notify_student_and_advisor
     return if grade.nil? or !(grade_changed? or situation_changed? or disapproved_by_absence_changed?)
     info = {
-      :name => enrollment.student.name,
-      :course => course_class.label_with_course,
-      :situation => situation,
-      :grade => grade_to_view,
-      :absence => ((attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false')) 
+        :name => enrollment.student.name,
+        :course => course_class.label_with_course,
+        :situation => situation,
+        :grade => grade_to_view,
+        :absence => ((attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false'))
     }
     message_to_student = {
-      :to => enrollment.student.email,
-      :subject => I18n.t('notifications.class_enrollment.email_to_student.subject', info),
-      :body => I18n.t('notifications.class_enrollment.email_to_student.body', info)
+        :to => enrollment.student.email,
+        :subject => I18n.t('notifications.class_enrollment.email_to_student.subject', info),
+        :body => I18n.t('notifications.class_enrollment.email_to_student.body', info)
     }
     emails = [message_to_student]
     enrollment.advisements.each do |advisement|
       professor_info = info.merge(:advisor_name => advisement.professor.name)
       emails << message_to_advisor = {
-        :to => advisement.professor.email,
-        :subject => I18n.t('notifications.class_enrollment.email_to_advisor.subject', professor_info),
-        :body => I18n.t('notifications.class_enrollment.email_to_advisor.body', professor_info)
+          :to => advisement.professor.email,
+          :subject => I18n.t('notifications.class_enrollment.email_to_advisor.subject', professor_info),
+          :body => I18n.t('notifications.class_enrollment.email_to_advisor.body', professor_info)
       }
     end
     Notifier.send_emails(emails)
   end
+
 
 end
