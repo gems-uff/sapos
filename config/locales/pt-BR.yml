@@ -109,6 +109,7 @@ pt-BR:
         name: "Nome"
         schedulable: "Aparecer no QH"
         show_class_name: "Mostrar nome da turma no QH e Histórico"
+        allow_multiple_classes: "Permitir mais de uma inscrição"
       deferral:
         approval_date: "Data de aprovação"
         deferral_type: "Tipo de Prorrogação"
@@ -399,6 +400,9 @@ pt-BR:
           end_time_before_start_time: "menor do que a hora de fim"
           scheduling_conflict: "este horário já está sendo usado em outra alocação da mesma turma"
         class_enrollment:
+          attributes:
+            course_class:
+              multiple_class_enrollments_not_allowed: Não é permitido fazer mais de uma inscrição nesta turma.
           disapproved_by_absence_for_situation_aproved: "deve estar desmarcado para situação'Aprovado'"
           disapproved_by_absence_for_situation_registered: "deve estar desmarcado para situação 'Incompleto'"
           grade_filled_for_course_without_score: "Esta disciplina não possui nota"
