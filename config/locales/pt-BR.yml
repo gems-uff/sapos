@@ -271,6 +271,10 @@ pt-BR:
       professor_research_area:
         professor: "Professor"
         research_area: "Área de Pesquisa"
+      query:
+        name: Nome
+        sql: Consulta
+        notifications: Notificações
       research_area:
         code: "Código"
         name: "Nome"
@@ -549,6 +553,9 @@ pt-BR:
       professor_research_area:
         one: "Área de Pesquisa do Professor"
         other: "Área de Pesquisa dos Professores"
+      query:
+        one: Contulta
+        other: Consultas
       research_area:
         one: "Área de Pesquisa"
         other: "Áreas de Pesquisa"

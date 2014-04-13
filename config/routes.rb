@@ -4,8 +4,7 @@
 Sapos::Application.routes.draw do
 
 
-
-  devise_for :users, :controllers => {:registrations => "users" }
+  devise_for :users, :controllers => {:registrations => "users"}
 
   resources :versions do
     as_routes
@@ -91,7 +90,9 @@ Sapos::Application.routes.draw do
     as_routes
   end
 
-  resources :roles do as_routes end
+  resources :roles do
+    as_routes
+  end
 
   resources :scholarship_durations do
     as_routes
@@ -190,12 +191,12 @@ Sapos::Application.routes.draw do
     record_select_routes
   end
 
-  resources :notification_logs do 
-    as_routes 
+  resources :notification_logs do
+    as_routes
   end
 
-  resources :notifications do 
-    as_routes 
+  resources :notifications do
+    as_routes
     member do
       get 'execute_now'
       get 'simulate'
@@ -205,6 +206,10 @@ Sapos::Application.routes.draw do
     collection do
       get 'notify'
     end
+  end
+
+  resources :queries do
+    as_routes
   end
 
   # The priority is based upon order of creation:
