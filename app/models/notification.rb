@@ -10,13 +10,13 @@ class Notification < ActiveRecord::Base
   has_paper_trail
 
   FREQUENCIES = [
-    I18n.translate("activerecord.attributes.notification.frequencies.annual"), 
-    I18n.translate("activerecord.attributes.notification.frequencies.semiannual"),
-    I18n.translate("activerecord.attributes.notification.frequencies.monthly"), 
-    I18n.translate("activerecord.attributes.notification.frequencies.weekly"), 
-    I18n.translate("activerecord.attributes.notification.frequencies.daily")
+      I18n.translate("activerecord.attributes.notification.frequencies.annual"),
+      I18n.translate("activerecord.attributes.notification.frequencies.semiannual"),
+      I18n.translate("activerecord.attributes.notification.frequencies.monthly"),
+      I18n.translate("activerecord.attributes.notification.frequencies.weekly"),
+      I18n.translate("activerecord.attributes.notification.frequencies.daily")
   ]
-    
+
   validates :body_template, :presence => true
   validates :frequency, :presence => true, :inclusion => {:in => FREQUENCIES}
   validates :notification_offset, :presence => true
@@ -30,8 +30,22 @@ class Notification < ActiveRecord::Base
   after_create :update_next_execution!
   after_initialize :init
 
+  before_save do
+    if self.query.changed?
+      self.query.save
+    end
+  end
+
   def to_label
     self.title || I18n.t('activerecord.attributes.notification.no_name')
+  end
+
+  def sql_query
+    self.query.sql
+  end
+
+  def sql_query=(val)
+    self.query.sql= val
   end
 
   def init
@@ -50,7 +64,7 @@ class Notification < ActiveRecord::Base
       dates = (-2..2).map { |n| Time.parse("01/01") + n.year } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.annual")
       dates = (-2..2).map { |n| time.beginning_of_month + n.month } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.monthly")
       dates = (-2..2).map { |n| time.beginning_of_week(:monday) + n.week } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.weekly")
-      dates = (-2..2).map { |n| time.midnight + n.day } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.daily")    
+      dates = (-2..2).map { |n| time.midnight + n.day } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.daily")
     end
 
     dates.find { |date| (date + StringTimeDelta::parse(self.notification_offset)) > time } + StringTimeDelta::parse(self.notification_offset)
@@ -79,21 +93,21 @@ class Notification < ActiveRecord::Base
     notifications = []
     qdate = options[:query_date]
     qdate ||= self.query_date
-    
+
     #Create connection to the Database
     db_connection = ActiveRecord::Base.connection
-    
+
     this_semester = YearSemester.on_date qdate
     last_semester = this_semester - 1
     #Generate query using the parameters specified by the notification
     params = {
-      #Temos que definir todos os possíveis parametros que as buscas podem querer usar
-      :query_date => db_connection.quote(qdate),
-      :this_semester_year => this_semester.year,
-      :this_semester_number => this_semester.semester,
-      :last_semester_year => last_semester.year,
-      :last_semester_number => last_semester.semester,
-       
+        #Temos que definir todos os possíveis parametros que as buscas podem querer usar
+        :query_date => db_connection.quote(qdate),
+        :this_semester_year => this_semester.year,
+        :this_semester_number => this_semester.semester,
+        :last_semester_year => last_semester.year,
+        :last_semester_number => last_semester.semester,
+
     }
 
     records = try_field :sql_query do
@@ -107,18 +121,24 @@ class Notification < ActiveRecord::Base
     if self.individual
       records.each do |raw_result|
         bindings = {
-          :records => records,
-          :record => raw_result
+            :records => records,
+            :record => raw_result
         }.merge(params)
-        raw_result.each do |key , value|
+        raw_result.each do |key, value|
           bindings[key.to_sym] = value
         end
         formatter = ERBFormatter.new(bindings)
         notifications << {
-          :notification_id => self.id,
-          :to => (try_field :to_template do formatter.format(self.to_template) end),
-          :subject => (try_field :subject_template do formatter.format(self.subject_template) end),
-          :body => (try_field :body_template do formatter.format(self.body_template) end)
+            :notification_id => self.id,
+            :to => (try_field :to_template do
+              formatter.format(self.to_template)
+            end),
+            :subject => (try_field :subject_template do
+              formatter.format(self.subject_template)
+            end),
+            :body => (try_field :body_template do
+              formatter.format(self.body_template)
+            end)
         }
       end
     else
@@ -126,10 +146,16 @@ class Notification < ActiveRecord::Base
         bindings = {:records => records}.merge(params)
         formatter = ERBFormatter.new(bindings)
         notifications << {
-          :notification_id => self.id,
-          :to => (try_field :to_template do formatter.format(self.to_template) end),
-          :subject => (try_field :subject_template do formatter.format(self.subject_template) end),
-          :body => (try_field :body_template do formatter.format(self.body_template) end)
+            :notification_id => self.id,
+            :to => (try_field :to_template do
+              formatter.format(self.to_template)
+            end),
+            :subject => (try_field :subject_template do
+              formatter.format(self.subject_template)
+            end),
+            :body => (try_field :body_template do
+              formatter.format(self.body_template)
+            end)
         }
       end
     end
@@ -149,7 +175,7 @@ class Notification < ActiveRecord::Base
       else
         errors.add(:base, e.to_s)
       end
-      
+
     end
   end
 
