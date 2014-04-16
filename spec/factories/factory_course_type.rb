@@ -8,5 +8,6 @@ FactoryGirl.define do
     sequence :name do |name|
       "CourseType_#{name}"
     end
+    allow_multiple_classes true
   end
 end
