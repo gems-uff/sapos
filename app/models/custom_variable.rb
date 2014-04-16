@@ -14,7 +14,7 @@ class CustomVariable < ActiveRecord::Base
     "class_schedule_text" => :text,
     "redirect_email" => :text,
     "notification_footer" => :text,
-    "logo" => :pdfimage
+    "pdf_header" => :pdfimage
   }
 
   validates :variable, :presence => true
@@ -55,17 +55,17 @@ class CustomVariable < ActiveRecord::Base
     config.nil? ? "" : config.value
   end
 
-  def self.logo
-    config = CustomVariable.find_by_variable(:logo)
-    ImageVariable.new(config.nil? ? "logoUFF.jpg|0.4|13|77" : config.value)
+  def self.pdf_header
+    config = CustomVariable.find_by_variable(:pdf_header)
+    HeaderVariable.new(value: config.nil? ? nil : config.value)
   end
 
   def image
-    return ImageVariable.new("|1.0|0|0") if VARIABLES[variable] == :text
+    return HeaderVariable.new if VARIABLES[variable] == :text
     begin
       CustomVariable.send(variable)
     rescue 
-      value
+      HeaderVariable.new(value: value)
     end
   end
 

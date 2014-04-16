@@ -183,8 +183,9 @@ Sapos::Application.routes.draw do
 
   resources :custom_variables do
     as_routes
-    member do
+    collection do
       put 'preview'
+      post 'preview'
     end
   end
 

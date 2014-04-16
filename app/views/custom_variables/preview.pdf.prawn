@@ -3,6 +3,6 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 new_document('preview.pdf', :hide_footer => true) do |pdf|
-  header(pdf, I18n.t("pdf_content.custom_variables.logo.preview"), logo: @logo)
+  header_uff(pdf, I18n.t("pdf_content.custom_variables.pdf_header.preview"), pdf_header: @pdf_header)
 end
 

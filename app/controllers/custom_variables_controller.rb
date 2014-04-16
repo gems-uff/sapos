@@ -17,52 +17,57 @@ class CustomVariablesController < ApplicationController
     config.update.label = :update_custom_variable_label
   end
 
-  def save_image(record)
+  def save_image(record, options={})
     return if CustomVariable::VARIABLES[record.variable] != :pdfimage
+    puts params
     uploaded_io = params[:record][:file_value]
-    scale = params[:record][:value_scale] || 0.4
-    x = params[:record][:value_x] || 13
-    y = params[:record][:value_y] || 77
-    record.value = "#{record.image.filename}|#{scale}|#{x}|#{y}"
-    return if uploaded_io.nil?
-    record.value = "#{uploaded_io.original_filename}|#{scale}|#{x}|#{y}"
-    File.open(Rails.root.join('app', 'assets', 'images', 'custom_variables', uploaded_io.original_filename), 'wb') do |file|
-      file.write(uploaded_io.read)
+
+    scale = params[:record][:value_scale]
+    x = params[:record][:value_x]
+    y = params[:record][:value_y]
+    text = params[:record][:value_text]
+    filename = record.image.filename
+
+    if not uploaded_io.nil?
+      if options[:name].nil? or options[:name].empty?
+        filename = uploaded_io.original_filename
+      else
+        extension = ".#{uploaded_io.original_filename.split('.')[-1]}"
+        filename = "#{options[:name]}#{extension}"
+      end
+
+      File.open(Rails.root.join('app', 'assets', 'images', 'custom_variables', filename), 'wb') do |file|
+        file.write(uploaded_io.read)
+      end
     end
-    
+
+    HeaderVariable.new(
+      :filename => filename,
+      :scale => scale,
+      :x => x,
+      :y => y,
+      :text => text
+    )
   end
 
   def before_update_save(record)
-    save_image(record)
+    record.value = save_image(record).to_s
   end
 
   def before_create_save(record)
-    save_image(record)
+    record.value = save_image(record).to_s
   end
 
   def preview
-    puts "================="
-    puts params
-    puts "================="
-    record = CustomVariable.find_by_variable(params[:record][:variable])
-    uploaded_io = params[:record][:file_value]
-    
-    scale = params[:record][:value_scale] || 0.4
-    x = params[:record][:value_x] || 13
-    y = params[:record][:value_y] || 77
-    filename = record.image.filename
-    unless uploaded_io.nil?
-        extension = ".#{uploaded_io.original_filename.split('.')[-1]}"
-        filename = "temp#{extension}"
-        File.open(Rails.root.join('app', 'assets', 'images', 'custom_variables', "temp#{extension}"), 'wb') do |file|
-          file.write(uploaded_io.read)
-        end
+    if params[:record]
+      record = CustomVariable.find_by_variable(params[:record][:variable])
+      @pdf_header = save_image(record, name: "temp")
+    else
+      @pdf_header = CustomVariable.pdf_header
     end
-    text = "#{filename}|#{scale}|#{x}|#{y}"
-    @logo = ImageVariable.new(text)
     respond_to do |format|
       format.pdf do
-        send_data render_to_string, :filename => I18n.t("pdf_content.custom_variables.logo.preview"), :type => 'application/pdf'
+        send_data render_to_string, :filename => I18n.t("pdf_content.custom_variables.pdf_header.preview"), :type => 'application/pdf'
       end
     end
   end

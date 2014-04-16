@@ -8,15 +8,13 @@ require "prawn/measurement_extensions"
 module PdfHelper
   
   def header_uff(pdf, title, options={}, &block)
-    puts pdf.bounds.left + pdf.bounds.right
-    pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right, :height => 90) do
+    pdf_header = options[:pdf_header] || CustomVariable.pdf_header
+    pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right, :height => HeaderVariable::HEIGHT) do
       pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right - 170, :height => 68) do
           
           pdf.stroke_bounds
           pdf.pad(15) do
-            pdf.text "<b>UNIVERSIDADE FEDERAL FLUMINENSE
-                    INSTITUTO DE COMPUTAÇÃO
-                    PROGRAMA DE PÓS-GRADUAÇÃO EM COMPUTAÇÃO</b>", :align => :center, font_size: 9, :inline_format => true
+            pdf.text "<b>#{pdf_header.text}</b>", :align => :center, font_size: 9, :inline_format => true
           end
       end
 
@@ -37,31 +35,29 @@ module PdfHelper
       end
 
 
-      pdf.bounding_box([pdf.bounds.left + pdf.bounds.right - 153, 90], :width => 153, :height => 90) do
+      pdf.bounding_box([pdf.bounds.left + pdf.bounds.right - 153, HeaderVariable::HEIGHT], :width => 153, :height => HeaderVariable::HEIGHT) do
           unless options[:hide_logo_stroke_bounds]
             pdf.stroke_bounds
           end
           unless block.nil?
             yield
           else
-            pdf.image("#{Rails.root}/config/images/logoUFF.jpg", :at => [13, 77],
-              :vposition => :top,
-              :scale => 0.4
-            )
+            if not (pdf_header.filename.nil? or pdf_header.filename.empty?)
+              pdf.image("#{Rails.root}/app/assets/images/custom_variables/#{pdf_header.filename}", 
+                :at => [pdf_header.image_x, pdf_header.image_y],
+                :vposition => :top,
+                :scale => pdf_header.scale)
+            else
+              pdf.image("#{Rails.root}/config/images/logoUFF.jpg", :at => [13, 77],
+                :vposition => :top,
+                :scale => 0.4
+              )
+            end
+            
           end
       end
     end
 
-  end
-
-  def header(pdf, title, options={}) 
-    puts options[:logo]
-    logo = options[:logo] || CustomVariable.logo
-    header_uff(pdf, title) do
-      pdf.image("#{Rails.root}/app/assets/images/custom_variables/#{logo.filename}", :at => [logo.x, logo.y],
-              :vposition => :top,
-              :scale => logo.scale)
-    end
   end
 
   def header_ic(pdf, title)
