@@ -1,9 +1,13 @@
+# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 class NotificationsController < ApplicationController
   authorize_resource
+  skip_authorization_check :only => [:notify]
+  skip_before_filter :authenticate_user!, :only => :notify
 
   active_scaffold :"notification" do |config|
   	
-
     config.action_links.add 'set_query_date', 
       :label => "<i title='#{I18n.t('active_scaffold.notification.set_query_date')}' class='fa fa-clock-o'></i>".html_safe,
       :page => true, 
@@ -51,7 +55,7 @@ class NotificationsController < ApplicationController
     query_date = Date.strptime(params[:query_date], "%d-%m-%Y") unless params[:query_date].nil?
     notification = Notification.find(params[:id])
     query_date ||= notification.query_date.to_date
-    Notifier.instance.send_emails(notification.execute(:query_date => query_date.to_time))
+    Notifier.send_emails(notification.execute(:query_date => query_date.to_time))
     redirect_to Notification
   end
 
@@ -69,4 +73,10 @@ class NotificationsController < ApplicationController
     @query_date ||= @notification.query_date.to_date
     render :action => 'set_query_date'
   end
+
+  def notify
+    Notifier.asynchronous_emails
+    render :inline => 'Ok'
+  end
+
 end

@@ -54,6 +54,16 @@ module PdfHelper
 
   end
 
+  def header(pdf, title, options={}) 
+    puts options[:logo]
+    logo = options[:logo] || CustomVariable.logo
+    header_uff(pdf, title) do
+      pdf.image("#{Rails.root}/app/assets/images/custom_variables/#{logo.filename}", :at => [logo.x, logo.y],
+              :vposition => :top,
+              :scale => logo.scale)
+    end
+  end
+
   def header_ic(pdf, title)
     header_uff(pdf, title, hide_logo_stroke_bounds: true) do
       pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [13, 89],
@@ -169,6 +179,20 @@ module PdfHelper
       unless options[:hide_footer]
         pdf.repeat(:all, dynamic: true) do
           page_footer(pdf)
+        end
+      end
+      if options[:watermark]
+        pdf.create_stamp("watermark") do
+          pdf.rotate(60, :origin => [0, 0]) do
+           pdf.fill_color "993333"
+           pdf.font('Courier', :size => 22) do
+             pdf.draw_text I18n.t('pdf_content.professor_watermark'), :at => [0, 0]
+           end
+           pdf.fill_color "000000"
+          end
+        end
+        pdf.repeat(:all, dynamic: true) do
+          pdf.stamp_at "watermark", [80, 0] 
         end
       end
     end

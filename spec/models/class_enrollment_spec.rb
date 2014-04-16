@@ -4,7 +4,7 @@
 require "spec_helper"
 
 describe ClassEnrollment do
-  let(:class_enrollment) { ClassEnrollment.new }
+  let(:class_enrollment) { FactoryGirl.build(:class_enrollment) }
   subject { class_enrollment }
   describe "Validations" do
     describe "enrollment" do

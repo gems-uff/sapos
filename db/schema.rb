@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140208010854) do
+ActiveRecord::Schema.define(:version => 20140331200646) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -103,10 +103,11 @@ ActiveRecord::Schema.define(:version => 20140208010854) do
   create_table "course_types", :force => true do |t|
     t.string   "name"
     t.boolean  "has_score"
-    t.datetime "created_at",      :null => false
-    t.datetime "updated_at",      :null => false
+    t.datetime "created_at",                                :null => false
+    t.datetime "updated_at",                                :null => false
     t.boolean  "schedulable"
     t.boolean  "show_class_name"
+    t.boolean  "allow_multiple_classes", :default => false, :null => false
   end
 
   create_table "courses", :force => true do |t|

@@ -108,7 +108,8 @@ pt-BR:
         has_score: "Tem nota"
         name: "Nome"
         schedulable: "Aparecer no QH"
-        show_class_name: "Mostrar nome da turma no QH"
+        show_class_name: "Mostrar nome da turma no QH e Histórico"
+        allow_multiple_classes: "Permitir mais de uma inscrição"
       deferral:
         approval_date: "Data de aprovação"
         deferral_type: "Tipo de Prorrogação"
@@ -207,7 +208,7 @@ pt-BR:
         sql_query: "Consulta"
         subject_template: "Template do Assunto"
         title: "Título"
-        to_template: "Template do Recipiente"
+        to_template: "Template do Destinatário"
         individual: "Individual"
         no_name: "Sem nome"
       notification_log:
@@ -217,7 +218,7 @@ pt-BR:
         created_at: "Data de Execução"
         notification: "Notificação"
         notification_name: "Notificação"
-        notification_removed: "Notificação Removida"
+        notification_removed_or_sync: "Notificação Síncrona ou Assíncrona Removida"
       phase:
         accomplishments: "Realização de Etapas"
         description: "Descrição"
@@ -399,6 +400,9 @@ pt-BR:
           end_time_before_start_time: "menor do que a hora de fim"
           scheduling_conflict: "este horário já está sendo usado em outra alocação da mesma turma"
         class_enrollment:
+          attributes:
+            course_class:
+              multiple_class_enrollments_not_allowed: "de inscrição única. Não é permitido fazer mais de uma inscrição nesta disciplina."
           disapproved_by_absence_for_situation_aproved: "deve estar desmarcado para situação'Aprovado'"
           disapproved_by_absence_for_situation_registered: "deve estar desmarcado para situação 'Incompleto'"
           grade_filled_for_course_without_score: "Esta disciplina não possui nota"
@@ -412,6 +416,7 @@ pt-BR:
           blank_duration: "duração deve ser de pelo menos um dia"
         dismissal:
           date_before_enrollment_admission_date: "anterior a Data de Admissão"
+          enrollment_has_scholarship: "possui uma bolsa ativa na data de desligamento"
         enrollment:
           main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
@@ -676,7 +681,7 @@ pt-BR:
     update_user_label: "Modificar Usuário"
     notification:
       sql_query_default: "SELECT students.name as name FROM students\nWHERE students.created_at<%{query_date}"
-      body_template_default: "Prezado(a) <%= name %>"
+      body_template_default: "<%= name %>"
       frequency_description: "Diária: todo dia; Semanal: toda segunda; Mensal: dia 01 de cada mês; Semestral: 01/03 e 01/08; Anual: 01/01"
       execute_now: "Enviar agora"
       simulate: "Simular"
@@ -685,6 +690,16 @@ pt-BR:
       query_offset_description: "Data de consulta. Frequência Semestral com offset -1M terá variavel para dias 01/02 ou 01/07"
       query_date: "Data de Consulta"
       set_query_date: "Escolher Data de Consulta"
+      should_send_emails: "Enviar e-mails" 
+      asynchronous:
+        title: "Notificações assíncronas"
+        simulation: "Simulação"
+        notyet: "Ainda não executado"
+        nojob: "Não há job agendado"
+        preview: "Informações"
+        last_time: "Última execução"
+        next_time: "Próxima execução"
+        frequency: "Frequência"
 
     errors:
       full_messages:
@@ -725,21 +740,40 @@ pt-BR:
       update: 'Atualizar %{model}'
 
   notifications:
+    accomplishment:
+      email_to_student:
+        subject: "%{phase}"
+        body: "%{name},\n\nInformamos que você realizou %{phase}."
+      email_to_advisor:
+        subject: "%{name} completou uma etapa"
+        body: "%{advisor_name},\n\nInformamos que seu orientando %{name} completou a etapa %{phase}."
+    advisement:
+      email_to_advisor:
+        subject: "Nova orientação"
+        body: "%{advisor_name},\n\nInformamos que %{name} foi cadastrado como seu orientando."
     class_enrollment:
       email_to_student:
         subject: "Sua inscrição em %{course} foi atualizada"
-        body: "Prezado(a) %{name},\n\nSua inscrição em %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
+        body: "%{name},\n\nInformamos que sua inscrição em %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
       email_to_advisor:
-        subject: "A inscrição em %{course} do(a) seu(ua) orientando(a) %{name} foi atualizada"
-        body: "Prezado(a) %{advisor_name},\n\nA inscrição em %{course} do(a) seu(ua) orientando(a) %{name} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
+        subject: "Inscrição em %{course} de %{name} foi atualizada"
+        body: "%{advisor_name},\n\nInformamos que a inscrição em %{course} de seu orientando %{name} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
       email_to_professor:
-        subject: "A inscrição do(a) aluno(a) %{name} na sua turma %{course} foi atualizada"
-        body: "Prezado(a) %{professor},\n\nA inscrição do(a) aluno(a) %{name} na sua turma %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}\n\n* Valores alterados"
+        subject: "Alteração de nota de seu orientando"
+        body: "%{professor},\n\nInformamos que a inscrição de %{name} na turma %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}\n\n* Valores alterados"
     course_class:
       email_to_professor:
-        subject: "As notas da sua turma %{class} foram lançadas ou alteradas"
-        body: "Prezado(a) %{professor},\n\nAs notas da sua turma %{class} foram lançadas ou alteradas:\n%{values}\n\n* Valores alterados"
+        subject: "Alteração de notas da turma %{class}"
+        body: "%{professor},\n\nInformamos que as notas da sua turma %{class} foram lançadas ou alteradas:\n%{values}\n\n* Valores alterados"
+    deferral:
+      email_to_student:
+        subject: "Pedido de prorrogação deferido"
+        body: "%{name},\n\nInformamos que seu pedido de %{deferral} para %{phase} foi deferido."
+      email_to_advisor:
+        subject: "Pedido de prorrogação de orientando deferido"
+        body: "%{advisor_name},\n\nInformamos que o pedido de %{deferral} para %{phase} de seu orientando %{name} foi deferido."
   pdf_content:
+    professor_watermark: "DOCUMENTO VÁLIDO APENAS PARA USO INTERNO E PESSOAL DO PROFESSOR"
     advisements:
       to_pdf:
         enrollment_number: "Número de Matrícula"
@@ -772,6 +806,9 @@ pt-BR:
         course_name: "Disciplina"
         noschedule: "Horário a combinar"
         year_semester_error: 'Selecione Ano/Semestre na busca!'
+    custom_variables:
+      logo:
+        preview: "Visualizar"
     enrollment:
       to_pdf:
         filename: "Relatório de Matrículas"

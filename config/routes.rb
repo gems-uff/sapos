@@ -183,6 +183,9 @@ Sapos::Application.routes.draw do
 
   resources :custom_variables do
     as_routes
+    member do
+      put 'preview'
+    end
   end
 
   resources :thesis_defense_committee_participations do
@@ -200,6 +203,10 @@ Sapos::Application.routes.draw do
       get 'execute_now'
       get 'simulate'
       get 'set_query_date'
+    end
+
+    collection do
+      get 'notify'
     end
   end
 

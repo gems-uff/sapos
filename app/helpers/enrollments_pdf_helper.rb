@@ -250,7 +250,7 @@ module EnrollmentsPdfHelper
       next_table_data = class_enrollments.map do |class_enrollment|
         [
             class_enrollment.course_class.course.code,
-            class_enrollment.course_class.course.name,
+            class_enrollment.course_class.name_with_class,
             class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : I18n.t("pdf_content.enrollment.grade_list.course_approved"),
             class_enrollment.course_class.course.credits,
             class_enrollment.course_class.course.workload_text,
@@ -561,7 +561,7 @@ module EnrollmentsPdfHelper
 
           table_data << [ 
               class_enrollment.course_class.course.code,
-              class_enrollment.course_class.course.name,
+              class_enrollment.course_class.name_with_class,
               class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : "--",
               class_enrollment.course_class.course.credits,
               class_enrollment.course_class.course.workload_text,

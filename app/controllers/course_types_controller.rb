@@ -7,12 +7,12 @@ class CourseTypesController < ApplicationController
 
   active_scaffold :course_type do |config|
     config.list.sorting = {:name => 'ASC'}
-    config.list.columns = [:name, :has_score, :schedulable, :show_class_name]
+    config.list.columns = [:name, :has_score, :schedulable, :show_class_name, :allow_multiple_classes]
     config.create.label = :create_course_type_label
     config.update.label = :update_course_type_label
 
     config.columns =
-        [:name, :has_score, :schedulable, :show_class_name]
+        [:name, :has_score, :schedulable, :show_class_name, :allow_multiple_classes]
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 

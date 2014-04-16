@@ -8,7 +8,15 @@ module NotificationLogsHelper
 		unless notification.nil?
 			link_to(h(notification.title), notification_path(notification))
 		else
-			I18n.t('activerecord.attributes.notification_log.notification_removed')
+			I18n.t('activerecord.attributes.notification_log.notification_removed_or_sync')
 		end
+	end
+
+	def to_column(record, column)
+		record.to.gsub(/[;,]/,'; ')
+	end
+
+	def created_at_column(record, column)
+		I18n.l(record.created_at.in_time_zone)
 	end
 end

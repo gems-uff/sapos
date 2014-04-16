@@ -3,6 +3,9 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 Sapos::Application.configure do
+  # Allow the notifier to send emails
+  config.should_send_emails = true
+  
   # Settings specified here will take precedence over those in config/application.rb
 
   # Code is not reloaded between requests
@@ -71,5 +74,5 @@ Sapos::Application.configure do
   config.middleware.use ExceptionNotifier,
                         :email_prefix => "[SAPOS: Erro em Staging] ",
                         :sender_address => %{"Exception Notifier Sapos Staging" <erro-sapos@sel.ic.uff.br>},
-                        :exception_recipients => %w{everton.moreth@gmail.com bschettino@id.uff.br joaofelipenp@gmail.com lvieira@lvieira.com leomurta+sapos@gmail.com}
+                        :exception_recipients => %w{everton.moreth@gmail.com bschettino@id.uff.br joaofelipenp@gmail.com lvieira@lvieira.com leomurta+sapos@gmail.com vanessa.braganholo+sapos@gmail.com}
 end

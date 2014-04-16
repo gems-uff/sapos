@@ -3,49 +3,46 @@
 
 require 'singleton'
 
-class Notifier
-  include Singleton
+module Notifier
 
-  def initialize
-    @async_notifications = []
-    @logger = Rails.logger
-    
-    return unless Rails.const_defined? 'Server'
+  def self.logger
+    Rails.logger
+  end
+  
+  def self.should_run?
+    Rails.application.config.should_send_emails
+  end
 
-    if Rails.env.development? or Rails.env.test? 
-      first_at = Time.now + 1.second
-    else
-      first_at = Time.parse(CustomVariable.notification_start_at)
-      if first_at < Time.now
-        first_at += 1.day
-      end
+  def self.run_notifications
+    Notifier.logger.info "[Notifications] #{Time.now} - Notifications from DB"
+    notifications = []
+
+    #Get the next execution time arel table
+    next_execution = Notification.arel_table[:next_execution]
+
+    #Find notifications that should run
+    Notification.where(next_execution.lt(Time.now)).each do |notification|
+      notifications += notification.execute
+    end
+    notifications
+  end
+
+  def self.asynchronous_emails
+    Notifier.logger.info "Sending Registered Notifications"
+    Notifier.send_emails(Notifier.run_notifications)
+  end
+
+  def self.send_emails(messages)
+    Notifier.logger.info "Starting send_emails function."
+    unless Notifier.should_run?
+      Notifier.logger.info "Execution method is not 'Server'. Stoping process."
+      return
     end
 
-    scheduler = Rufus::Scheduler.new
-    scheduler.every CustomVariable.notification_frequency, :first_at => first_at do
-      asynchronous_emails
+    if CustomVariable.redirect_email == ''
+      Notifier.logger.info "Custom Variable 'redirect_email' is empty. Stoping process."
+      return
     end
-  end
-
-  def new_notification(&block)
-    @async_notifications << lambda { yield }
-  end
-
-  def notifications
-    @async_notifications
-  end
-
-  def run_notifications
-    @async_notifications.map{ |n| n.call }.flatten
-  end
-
-  def asynchronous_emails
-    send_emails(run_notifications)
-  end
-
-  def send_emails(messages)
-    return unless Rails.const_defined? 'Server'
-    return if CustomVariable.redirect_email == 'null'
     
     messages.each do |message|
       options = {}
@@ -53,7 +50,8 @@ class Notifier
       unless CustomVariable.notification_footer.empty?
         m[:body] += "\n\n\n" + CustomVariable.notification_footer
       end
-      unless CustomVariable.redirect_email.empty?
+      unless CustomVariable.redirect_email.nil?
+        Notifier.logger.info "Custom Variable 'redirect_email' is set. Redirecting the emails"
         m[:body] = "Originalmente para #{m[:to]}\n\n" + m[:body]
         m[:to] = CustomVariable.redirect_email
       end
@@ -64,18 +62,18 @@ class Notifier
           :to => m[:to], 
           :subject => m[:subject],
           :body => m[:body]
-        ).save unless m[:notification_id].nil?
-        display_notification_info(m)
+        ).save
+        Notifier.display_notification_info(m)
       end
     end
   end
 
-  def display_notification_info(notification)
-    @logger.info "\n#{Time.now.strftime('%Y/%m/%d %H:%M:%S')}"
-    @logger.info "########## Notification ##########"
-    @logger.info "Notifying #{notification[:to]}"
-    @logger.info "Subject: #{notification[:subject]}"
-    @logger.info "body: #{notification[:body]}"
-    @logger.info "##################################"
+  def self.display_notification_info(notification)
+    Notifier.logger.info "\n#{Time.now.strftime('%Y/%m/%d %H:%M:%S')}"
+    Notifier.logger.info "########## Notification ##########"
+    Notifier.logger.info "Notifying #{notification[:to]}"
+    Notifier.logger.info "Subject: #{notification[:subject]}"
+    Notifier.logger.info "body: #{notification[:body]}"
+    Notifier.logger.info "##################################"
   end
 end

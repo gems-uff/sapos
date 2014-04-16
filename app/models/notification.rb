@@ -1,3 +1,6 @@
+# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 class Notification < ActiveRecord::Base
   attr_accessible :body_template, :frequency, :next_execution, :notification_offset, :query_offset, :sql_query, :subject_template, :title, :to_template, :individual
 
@@ -63,6 +66,14 @@ class Notification < ActiveRecord::Base
     next_date + StringTimeDelta::parse(self.query_offset) - StringTimeDelta::parse(self.notification_offset)
   end
 
+  def try_field(field, &block)
+    begin
+      return yield
+    rescue Exception => e
+      raise [field, e.to_s].join(' -:- ')
+    end
+  end
+
   def execute(options={})
     notifications = []
     qdate = options[:query_date]
@@ -83,10 +94,13 @@ class Notification < ActiveRecord::Base
       :last_semester_number => last_semester.semester,
        
     }
-    query = (self.sql_query % params).gsub("\r\n", " ")
 
-    #Query the Database
-    records = db_connection.select_all(query)
+    records = try_field :sql_query do
+      query = (self.sql_query % params).gsub("\r\n", " ")
+
+      #Query the Database
+      db_connection.select_all(query)
+    end
 
     #Build the notifications with the results from the query
     if self.individual
@@ -99,12 +113,11 @@ class Notification < ActiveRecord::Base
           bindings[key.to_sym] = value
         end
         formatter = ERBFormatter.new(bindings)
-
         notifications << {
           :notification_id => self.id,
-          :to => formatter.format(self.to_template),
-          :subject => formatter.format(self.subject_template),
-          :body => formatter.format(self.body_template)
+          :to => (try_field :to_template do formatter.format(self.to_template) end),
+          :subject => (try_field :subject_template do formatter.format(self.subject_template) end),
+          :body => (try_field :body_template do formatter.format(self.body_template) end)
         }
       end
     else
@@ -113,9 +126,9 @@ class Notification < ActiveRecord::Base
         formatter = ERBFormatter.new(bindings)
         notifications << {
           :notification_id => self.id,
-          :to => formatter.format(self.to_template),
-          :subject => formatter.format(self.subject_template),
-          :body => formatter.format(self.body_template)
+          :to => (try_field :to_template do formatter.format(self.to_template) end),
+          :subject => (try_field :subject_template do formatter.format(self.subject_template) end),
+          :body => (try_field :body_template do formatter.format(self.body_template) end)
         }
       end
     end
@@ -127,7 +140,15 @@ class Notification < ActiveRecord::Base
     begin
       self.execute(:skip_update => true)
     rescue => e
-      errors.add(:base, e.to_s)
+      splitted = e.to_s.split(' -:- ')
+      if splitted.size > 1
+        field = splitted[0].to_sym
+        message = splitted[1..-1].join(' -:- ')
+        errors.add(field, ': ' + message)
+      else
+        errors.add(:base, e.to_s)
+      end
+      
     end
   end
 

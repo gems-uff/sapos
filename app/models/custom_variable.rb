@@ -1,46 +1,24 @@
 # Copyright (c) 2013 Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
-# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
-
 class CustomVariable < ActiveRecord::Base
   attr_accessible :name, :value, :variable
 
   has_paper_trail
 
-  VARIABLES = ["single_advisor_points", "multiple_advisor_points", "program_level",
-    "identity_issuing_country", "notification_frequency", "notification_start_at",
-    "class_schedule_text", "redirect_email", "notification_footer", "logo"
-  ]
+  VARIABLES = {
+    "single_advisor_points" => :text,
+    "multiple_advisor_points" => :text,
+    "program_level" => :text,
+    "identity_issuing_country" => :text,
+    "class_schedule_text" => :text,
+    "redirect_email" => :text,
+    "notification_footer" => :text,
+    "logo" => :pdfimage
+  }
 
   validates :variable, :presence => true
 
-  def value_url
-    return "custom_variables/#{value.split('|')[0]}" if variable == "logo"
-    nil
-  end
-
-  def value_filename
-    return (value || '').split('|')[0] if variable == "logo"
-    nil
-  end
-
-  def value_scale
-    return (value || '').split('|')[1] if variable == "logo"
-    nil
-  end
-
-  def value_x
-    return (value || '').split('|')[2] if variable == "logo"
-    nil
-  end
-
-  def value_y
-    return (value || '').split('|')[3] if variable == "logo"
-    nil
-  end
-  
 
   def self.single_advisor_points
   	config = CustomVariable.find_by_variable(:single_advisor_points)
@@ -62,16 +40,6 @@ class CustomVariable < ActiveRecord::Base
     Country.find_by_name(config.nil? ? "Brasil": config.value)
   end
 
-  def self.notification_frequency
-    config = CustomVariable.find_by_variable(:notification_frequency)
-    config.nil? ? "1d" : config.value.to_s 
-  end
-
-  def self.notification_start_at
-    config = CustomVariable.find_by_variable(:notification_start_at)
-    config.nil? ? "4:00" : config.value.to_s 
-  end
-
   def self.class_schedule_text
     config = CustomVariable.find_by_variable(:class_schedule_text)
     config.nil? ? "" : config.value
@@ -79,7 +47,7 @@ class CustomVariable < ActiveRecord::Base
 
   def self.redirect_email
     config = CustomVariable.find_by_variable(:redirect_email)
-    config.nil? ? "" : config.value
+    config.nil? ? nil : (config.value || '')
   end
 
   def self.notification_footer
@@ -89,7 +57,16 @@ class CustomVariable < ActiveRecord::Base
 
   def self.logo
     config = CustomVariable.find_by_variable(:logo)
-    config.nil? ? "logoUFF.jpg" : config.value
+    ImageVariable.new(config.nil? ? "logoUFF.jpg|0.4|13|77" : config.value)
+  end
+
+  def image
+    return ImageVariable.new("|1.0|0|0") if VARIABLES[variable] == :text
+    begin
+      CustomVariable.send(variable)
+    rescue 
+      value
+    end
   end
 
 end

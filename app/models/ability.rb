@@ -6,16 +6,21 @@ class Ability
 
   ALL_MODELS = [Accomplishment, Advisement, AdvisementAuthorization, Allocation,
                 City, ClassEnrollment, Country, Course, CourseClass, CourseType,
-                CustomVariable, Deferral, DeferralType, Dismissal, DismissalReason, Enrollment,
-                EnrollmentStatus, Institution, Level, Major, Notification, NotificationLog,
-                Phase, PhaseCompletion, PhaseDuration, Professor, ProfessorResearchArea, ResearchArea, 
-                Role, Scholarship, ScholarshipDuration, ScholarshipType, Sponsor, State, Student, 
-                StudentMajor, ThesisDefenseCommitteeParticipation, User, YearSemester, Version]
+                CustomVariable, Deferral, DeferralType, Dismissal, 
+                DismissalReason, Enrollment, EnrollmentStatus, Institution,
+                Level, Major, Notification, NotificationLog, Phase, 
+                PhaseCompletion, PhaseDuration, Professor, ProfessorResearchArea,
+                ResearchArea, Role, Scholarship, ScholarshipDuration, 
+                ScholarshipType, Sponsor, State, Student, StudentMajor, 
+                ThesisDefenseCommitteeParticipation, User, Version, YearSemester] 
 
 
   def initialize(user)
-    alias_action :list, :row, :show_search, :render_field, :to_pdf, :summary_pdf, :academic_transcript_pdf, :grades_report_pdf, :browse, :to => :read
-    alias_action :update_column, :edit_associated, :new_existing, :add_existing, :execute_now, :to => :update
+    alias_action :list, :row, :show_search, :render_field, :class_schedule_pdf,
+        :to_pdf, :summary_pdf, :academic_transcript_pdf, :grades_report_pdf, 
+        :browse, :simulate, :set_query_date, :cities, :states, :preview, :to => :read
+    alias_action :update_column, :edit_associated, :new_existing, :add_existing, 
+        :execute_now, :execute_now, :notify, :to => :update
     alias_action :delete, :destroy_existing, :to => :destroy
     #as_action_aliases
 
@@ -30,10 +35,11 @@ class Ability
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [Role, Notification, CustomVariable])
     elsif role_id == Role::ROLE_PROFESSOR
-      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification])
+      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification, NotificationLog])
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification])
     end
+    can :notify, Notification
 
     # Define abilities for the passed in user here. For example:
     #

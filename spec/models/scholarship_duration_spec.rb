@@ -241,5 +241,31 @@ describe ScholarshipDuration do
         scholarship_duration.was_cancelled?.should == true
       end      
     end
+    describe 'active?' do
+      before(:all) do
+        @scholarship = FactoryGirl.create(:scholarship, :start_date => 3.days.from_now.to_date, :end_date => 3.days.from_now.to_date + 5.months)
+      end
+
+      it 'should return false if date is after end_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => nil, :scholarship => @scholarship)
+        scholarship_duration.active?(:date => end_date + 4.months).should == false
+      end
+
+      it 'should return false if date is in the month of cancel_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 2.months, :scholarship => @scholarship)
+        scholarship_duration.active?(:date => scholarship_duration.cancel_date - 1.day).should == false
+      end
+
+      it 'should return false if date < start_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 2.months, :scholarship => @scholarship)
+        scholarship_duration.active?(:date => end_date - 1.month).should == false
+      end
+
+
+      it 'should return true if date < cancel_date' do
+        scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 1.months, :scholarship => @scholarship)
+        scholarship_duration.active?(:date => end_date + 1.day).should == true
+      end      
+    end
   end
 end

@@ -1,7 +1,7 @@
 <% column_options = active_scaffold_input_options(column, scope, :object => record) %>
 
 
-	<dl class="textarea_value <%='visible_variable' if record.variable != 'logo'%>">
+	<dl class="textarea_value variable_value variable_text">
 		<dt>
 			<%= label_tag label_for(column, column_options), column.label %>
 		</dt>
@@ -9,50 +9,103 @@
 			<%= text_area(:record, :value, column_options) %>
 		</dd>
 	</dl>
-	<dl class="image_value <%='visible_variable' if record.variable == 'logo'%>">
+	<dl class="image_value variable_value variable_pdfimage">
 		<dt>
 			<%= label_tag label_for(column, column_options), column.label %>
 		</dt>
 		<dd>
-			<%= image_tag(record.value_url) + '<br>'.html_safe if record.value? %>
-			<%= file_field(:record, :file_value, :value => record.value_filename) %>
+			<div class="pdfimage">
+				<%= image_tag(record.image.url) + '<br>'.html_safe if record.image.instance_of?(ImageVariable) %>
+			</div>
+			<div class="filefield">
+				<%= file_field(:record, :file_value, :value => record.image.filename, :class => 'record_file_value') %>
+			</div>
 		</dd>
 	</dl>
 </li>
 <li class="form-element">
-	<dl class="image_value <%='visible_variable' if record.variable == 'logo'%>">
+	<dl class="image_value variable_value variable_pdfimage">
 		<dt>
 			<%= label_tag "record_value_scale_#{record.id}", "Escala" %>
 		</dt>
 		<dd>
-			<%= text_field(:record, :value_scale, :value => record.value_scale, :class => 'text-input') %>
+			<%= text_field(:record, :value_scale, :value => record.image.scale, :class => 'text-input') %>
 		</dd>
 	</dl>
 </li>
 <li class="form-element">
-	<dl class="image_value <%='visible_variable' if record.variable == 'logo'%>">
+	<dl class="image_value variable_value variable_pdfimage">
 		<dt>
 			<%= label_tag "record_value_x_#{record.id}", "X" %>
 		</dt>
 		<dd>
-			<%= text_field(:record, :value_x, :value => record.value_x, :class => 'text-input') %>
+			<%= text_field(:record, :value_x, :value => record.image.x, :class => 'text-input') %>
 		</dd>
 	</dl>
 </li>
 <li class="form-element">
-	<dl class="image_value <%='visible_variable' if record.variable == 'logo'%>">
+	<dl class="image_value variable_value variable_pdfimage">
 		<dt>
 			<%= label_tag "record_value_y_#{record.id}", "Y" %>
 		</dt>
 		<dd>
-			<%= text_field(:record, :value_y, :value => record.value_y, :class => 'text-input') %>
+			<%= text_field(:record, :value_y, :value => record.image.y, :class => 'text-input') %>
 		</dd>
 	</dl>
-
+</li>
+<li class="form-element">
+	<dl class="image_value variable_value variable_pdfimage">
+		<dt>
+		</dt>
+		<dd>
+			<%= link_to(I18n.t("pdf_content.custom_variables.logo.preview"), {:action => "preview", :id=>record.id, :format=>'pdf'}, :class=>'pdf_preview') %>
+		</dd>
+	</dl>
 <script>
+	var variables = <%= CustomVariable::VARIABLES.to_json.html_safe %>;
+	function select(value){
+		var is_logo = (value == 'logo');
+		$('.variable_value').hide();
+		$('.variable_'+variables[value]).show();
+	}
 	$('#record_variable_<%=record.id%>').change(function(){
-		var is_logo = (this.value == 'logo');
-		$('.textarea_value').toggle(!is_logo);
-		$('.image_value').toggle(is_logo);
+		select(this.value);
 	})
+	$('.record_file_value').change(function(ev){
+		var f = (ev.target.files[0]);
+		if (window.File && window.FileReader && window.FileList && window.Blob) {
+			var reader = new FileReader();
+
+		    reader.onload = (function(theFile) {
+		        return function(e) {
+		         	$('.pdfimage').html(['<img class="thumb" src="', e.target.result,
+		                            '" title="', escape(theFile.name), '"/>'].join(''));
+		        };
+		    })(f);
+
+		    reader.readAsDataURL(f);
+		} else {
+			$('.pdfimage').html('...');
+		}
+	})
+	$('.pdf_preview').click(function(ev){
+		ev.preventDefault();
+		var original = $('form');
+		var clone = original.clone();
+		clone.attr('id', '');
+		clone.attr('target', '');
+		clone.attr('method', 'post');
+		clone.attr('action', $('.pdf_preview').attr('href'));
+		clone.find('.record_file_value').remove();
+		var filevalue = $('#record_file_value');
+		filevalue.appendTo(clone);
+		console.log(original.find('.filefield'));
+		original.find('.filefield').empty();
+		clone.appendTo("body").submit();
+		clone.find('.record_file_value').appendTo(original.find('.filefield'));
+		clone.remove();
+    	
+	});
+
+	$('#record_variable_<%=record.id%>').change();
 </script>

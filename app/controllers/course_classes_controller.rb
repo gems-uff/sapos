@@ -60,7 +60,7 @@ class CourseClassesController < ApplicationController
 
     respond_to do |format|
       format.pdf do
-        send_data render_to_string, :filename => "#{I18n.t('pdf_content.course_class.summary.title')} -  #{course_class.name || course_class.course.name}.pdf", :type => 'application/pdf'
+        send_data render_to_string, :filename => "#{I18n.t('pdf_content.course_class.summary.title')} -  #{course_class.name_with_class}.pdf", :type => 'application/pdf'
       end
     end
   end
@@ -115,7 +115,7 @@ class CourseClassesController < ApplicationController
       :body => I18n.t('notifications.course_class.email_to_professor.body', info)
     }
     emails = [message_to_professor]
-    Notifier.instance.send_emails(emails)
+    Notifier.send_emails(emails)
   end
 
 
