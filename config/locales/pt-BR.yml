@@ -108,7 +108,7 @@ pt-BR:
         has_score: "Tem nota"
         name: "Nome"
         schedulable: "Aparecer no QH"
-        show_class_name: "Mostrar nome da turma no QH"
+        show_class_name: "Mostrar nome da turma no QH e Histórico"
         allow_multiple_classes: "Permitir mais de uma inscrição"
       deferral:
         approval_date: "Data de aprovação"

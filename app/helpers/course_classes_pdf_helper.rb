@@ -15,7 +15,7 @@ module CourseClassesPdfHelper
                   ]]
 
     top_data = [[
-                    course_class.course.name + (course_class.name.blank? ? '' : " (#{course_class.name})"),
+                    course_class.name_with_class,
                     "#{course_class.semester}º/#{course_class.year}",
                     ''
                 ]]
@@ -143,11 +143,7 @@ module CourseClassesPdfHelper
       course = header[0].map {|x| ""}
       course_name = rescue_blank_text(course_class.course, :method_call => :name)
 
-      if course_class.name.nil? or course_class.name.empty? or not course_class.course.course_type.show_class_name
-        course[0] = course_name
-      else
-        course[0] = "#{course_name} (#{course_class.name})"
-      end
+      course[0] = course_class.name_with_class
 
       course_class.allocations.each do |allocation| 
         index = I18n.translate("date.day_names").index(allocation.day)
