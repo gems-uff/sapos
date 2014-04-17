@@ -62,7 +62,7 @@ module EnrollmentsPdfHelper
       [
         [
           "#{I18n.t('pdf_content.enrollment.header.course')} " +
-          "<b>#{rescue_blank_text(enrollment.level.name.nil? ? nil : (enrollment.level.name + I18n.t('pdf_content.enrollment.header.graduation')))}</b>"
+          "<b>#{rescue_blank_text(enrollment.level.name.nil? ? nil : (enrollment.level.full_name))}</b>"
         ], [
           "#{I18n.t('pdf_content.enrollment.header.field_of_study')} " +
           "<b>#{rescue_blank_text(enrollment.research_area, method_call: :name)}</b>"

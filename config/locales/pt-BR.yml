@@ -183,6 +183,7 @@ pt-BR:
       level: 
         advisement_authorizations: "Credenciamentos"
         name: "Nome"
+        course_name: "Nome completo do curso"
         enrollments: "Matrículas"
         majors: "Cursos"
         phase_durations: "Duração de Etapas"
@@ -830,7 +831,6 @@ pt-BR:
         enrollment_dismissal_reason: "MOTIVO:"   
         enrollment_number: "MATRÍCULA: "
         field_of_study: "ÁREA DE CONCENTRAÇÃO:"
-        graduation: " em Computação"
         identity_issuing_body: "ÓRGÃO EXPEDIDOR:"
         identity_issuing_place: "ESTADO EXPEDIDOR:"
         language_tests: "EXAME(S) DE LÍNGUA(S)"
