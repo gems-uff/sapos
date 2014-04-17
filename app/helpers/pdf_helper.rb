@@ -7,7 +7,7 @@ require "prawn/measurement_extensions"
 
 module PdfHelper
   
-  def header_uff(pdf, title, options={}, &block)
+  def header(pdf, title, options={}, &block)
     pdf_header = options[:pdf_header] || CustomVariable.pdf_header
     pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right, :height => HeaderVariable::HEIGHT) do
       pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right - 170, :height => 68) do
@@ -43,7 +43,7 @@ module PdfHelper
             yield
           else
             if not (pdf_header.filename.nil? or pdf_header.filename.empty?)
-              pdf.image("#{Rails.root}/app/assets/images/custom_variables/#{pdf_header.filename}", 
+              pdf.image(pdf_header.path, 
                 :at => [pdf_header.image_x, pdf_header.image_y],
                 :vposition => :top,
                 :scale => pdf_header.scale)
@@ -59,15 +59,6 @@ module PdfHelper
     end
 
   end
-
-  def header_ic(pdf, title)
-    header_uff(pdf, title, hide_logo_stroke_bounds: true) do
-      pdf.image("#{Rails.root}/config/images/logoIC.jpg", :at => [13, 89],
-              :vposition => :top,
-              :scale => 0.6)
-    end
-  end
-
 
   def page_footer(pdf, options={})
     x = 5

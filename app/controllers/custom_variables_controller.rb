@@ -36,7 +36,7 @@ class CustomVariablesController < ApplicationController
         filename = "#{options[:name]}#{extension}"
       end
 
-      File.open(Rails.root.join('app', 'assets', 'images', 'custom_variables', filename), 'wb') do |file|
+      File.open(HeaderVariable.file_path(filename), 'wb') do |file|
         file.write(uploaded_io.read)
       end
     end

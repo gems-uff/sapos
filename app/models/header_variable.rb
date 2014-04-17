@@ -25,7 +25,13 @@ class HeaderVariable
 INSTITUTO DE COMPUTAÇÃO
 PROGRAMA DE PÓS-GRADUAÇÃO EM COMPUTAÇÃO")
     end
-    @url = "custom_variables/#{@filename}"
+    #@url = "custom_variables/#{@filename}"
+    @url = "../uploads/pdf_header/#{@filename}"
+  end
+
+  def self.file_path(file)
+    #Rails.root.join('app', 'assets', 'images', 'custom_variables', file)
+    Rails.root.join('public', 'uploads', 'pdf_header', file)
   end
 
   def url
@@ -56,9 +62,12 @@ PROGRAMA DE PÓS-GRADUAÇÃO EM COMPUTAÇÃO")
     HEIGHT - @y
   end
   
-  
   def text
     @text
+  end
+
+  def path
+    HeaderVariable.file_path(@filename)
   end
 
   def to_s

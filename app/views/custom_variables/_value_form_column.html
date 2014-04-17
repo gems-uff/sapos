@@ -33,7 +33,7 @@
 <li class="form-element">
     <dl class="image_value variable_value variable_pdfimage">
         <dt>
-            <%= label_tag label_for(column, column_options), I18n.t('active_scaffold.custom_variables.pdf_header.scale') %>
+            <%= label_tag label_for(column, column_options), I18n.t('active_scaffold.custom_variables.pdf_header.logo') %>
         </dt>
         <dd>
             <div class="pdfimage">
@@ -48,7 +48,7 @@
 <li class="form-element">
     <dl class="image_value variable_value variable_pdfimage">
         <dt>
-            <%= label_tag "record_value_scale_#{record.id}", I18n.t('active_scaffold.custom_variables.pdf_header.logo') %>
+            <%= label_tag "record_value_scale_#{record.id}", I18n.t('active_scaffold.custom_variables.pdf_header.scale') %>
         </dt>
         <dd>
             <%= text_field(:record, :value_scale, :value => record.image.scale, :class => 'text-input') %>
