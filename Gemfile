@@ -6,7 +6,7 @@ gem "kaminari"
 #gem "schema_plus"
 
 gem 'cancan'
-gem "devise"
+gem "devise", "~> 2.2.8"
 gem "paper_trail", "~> 2.7.2"
 
 # Bundle edge Rails instead:
@@ -22,7 +22,7 @@ group :development, :test do
 end
 
 group :production, :staging do
-  gem 'mysql2'
+  gem 'mysql2', '0.3.15'
   gem 'exception_notification', '2.6.1', :require => 'exception_notifier'
 end
 
