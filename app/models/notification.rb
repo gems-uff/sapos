@@ -27,9 +27,6 @@ class Notification < ActiveRecord::Base
 
   validate :execution
 
-  alias_method :query_viewer, :query
-  alias_method :query_viewer=, :query=
-
   after_create :update_next_execution!
   after_initialize :init
 
