@@ -10,7 +10,12 @@
            end
 %>
 <%= content_tag :dl, attributes do %>
-    <dt><%= label_tag label_for(column, column_options), column.label %></dt>
+    <dt>
+      <%= label_tag label_for(column, column_options), column.label %>
+        <div>
+          <span class="description"><%= record.query.try :description %></span>
+        </div>
+    </dt>
     <dd>
       <%= field %>
       <%= link_to 'SQL', 'javascript:void(0)', :onclick => "$('##{column_options[:id] + 'container'}').toggle();" %>

@@ -273,6 +273,7 @@ pt-BR:
         research_area: "Área de Pesquisa"
       query:
         name: Nome
+        description: Descrição
         sql: Consulta
         notifications: Notificações
       research_area:
