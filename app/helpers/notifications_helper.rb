@@ -3,7 +3,10 @@
 
 module NotificationsHelper
 
-  def code_mirror_text_area(column, id, type, options)
+  def code_mirror_text_area(column, id, type, options, read_only = false, set_size = false)
+    options.merge!(:id => id, :name => column)
+
+    set_size_str = set_size ? ".setSize(null, '#{options[:value].count("\n") + 2}em')" :  '';
     block = text_area(:record, :sql_query, options)
     block += "<script>
     CodeMirror.fromTextArea(document.getElementById('#{id}'),
@@ -12,9 +15,10 @@ module NotificationsHelper
       smartIndent: true,
       lineNumbers: true,
       matchBrackets : true,
-      autofocus: true
+      autofocus: true,
+      readOnly: #{read_only}
      }
-    );
+    )#{set_size_str};
     </script>".html_safe
   end
 
@@ -36,7 +40,7 @@ module NotificationsHelper
   end
 
   def sql_query_form_column(record, options)
-    code_mirror_text_area(:sql_query, "record_sql_query_#{record.id}", "text/x-mysql", options.merge(:value => record.sql_query || I18n.t('active_scaffold.notification.sql_query_default')))
+    code_mirror_text_area(:sql_query_view, "record_query_view_#{record.id}", "text/x-mysql", options.merge(:value => record.sql_query || I18n.t('active_scaffold.notification.sql_query_default')), true, true)
   end
 
   def body_template_form_column(record, options)

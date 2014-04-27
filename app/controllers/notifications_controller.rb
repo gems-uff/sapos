@@ -28,6 +28,13 @@ class NotificationsController < ApplicationController
       :type => :member
 
 
+    form_columns = [:title, :frequency, :notification_offset, :query_offset, :query, :individual, :to_template, :subject_template, :body_template]
+    config.columns = form_columns
+    config.update.columns = form_columns
+    config.create.columns = form_columns
+    config.show.columns = form_columns + [:next_execution]
+    config.list.columns = [:title, :frequency, :notification_offset, :query_offset, :next_execution]
+
 
     config.columns[:query].form_ui = :select
     config.columns[:frequency].form_ui = :select
@@ -36,14 +43,8 @@ class NotificationsController < ApplicationController
     config.columns[:individual].description = I18n.t('active_scaffold.notification.individual_description')
     config.columns[:notification_offset].description = I18n.t('active_scaffold.notification.notification_offset_description')
     config.columns[:query_offset].description = I18n.t('active_scaffold.notification.query_offset_description')
+    config.columns[:query].update_columns = [:query]
 
-
-
-    form_columns = [:title, :frequency, :notification_offset, :query_offset, :query, :individual, :to_template, :subject_template, :body_template]
-    config.update.columns = form_columns
-    config.create.columns = form_columns
-    config.show.columns = form_columns + [:next_execution]
-    config.list.columns = [:title, :frequency, :notification_offset, :query_offset, :next_execution]
     
     config.create.label = :create_notification_label
   end
