@@ -1,23 +1,23 @@
 <h4> <%= @query.to_label %> </h4>
 
 <table class="showtable listed-records-table">
-	<thead>
-		<tr>
-			<th><%= I18n.t('activerecord.attributes.notification_log.to')%></th>
-			<th><%= I18n.t('activerecord.attributes.notification_log.subject')%></th>
-			<th><%= I18n.t('activerecord.attributes.notification_log.body')%></th>
-		</tr>
-	</thead>
-	<tbody class="records">
-		<% @messages.each_with_index do |message, index| %>
-			<% tr_class = index.odd? ? "even-record" : "" %>
-			<tr class="record <%= tr_class %>">
-				<td><%= message[:to] %></td>
-				<td><%= message[:subject] %></td>
-				<td><%= message[:body].html_safe %></td>
-			</tr>
-		<% end %>
-	</tbody>
+  <thead>
+  <tr>
+    <% @query_result[:columns].each do |column_name| %>
+        <td><%= column_name %></td>
+    <% end %>
+  </tr>
+  </thead>
+  <tbody class="records">
+  <% @query_result[:rows].each_with_index do |row, index| %>
+      <% tr_class = index.odd? ? "even-record" : "" %>
+      <tr class="record <%= tr_class %>">
+        <% row.each do |value| %>
+            <td><%= value %></td>
+        <% end %>
+      </tr>
+  <% end %>
+  </tbody>
 </table>
 
 <p class="form-footer">

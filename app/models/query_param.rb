@@ -3,7 +3,7 @@ class QueryParam < ActiveRecord::Base
   attr_accessible :name, :default_value, :value_type
 
 
-  VALUE_TYPES = %w{String Number List Literal}
+  VALUE_TYPES = %w{String Number List Date Literal}
 
   validates :value_type, presence: true, inclusion: VALUE_TYPES
   validates :name, presence: true, :format => /^([a-z_][a-zA-Z_0-9]+)?$/
