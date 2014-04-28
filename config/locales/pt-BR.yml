@@ -276,6 +276,11 @@ pt-BR:
         description: Descrição
         sql: Consulta
         notifications: Notificações
+        params: Parâmetros
+      query_param:
+        name: Name
+        value_type: Tipo
+        default_value: Valor padrão
       research_area:
         code: "Código"
         name: "Nome"

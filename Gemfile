@@ -9,6 +9,8 @@ gem 'cancan'
 gem "devise", "~> 2.2.8"
 gem "paper_trail", "~> 2.7.2"
 
+gem 'sql-parser'
+
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 

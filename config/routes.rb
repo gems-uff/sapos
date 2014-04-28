@@ -210,6 +210,13 @@ Sapos::Application.routes.draw do
 
   resources :queries do
     as_routes
+    member do
+      get 'simulate'
+    end
+  end
+
+  resources :query_params do
+    as_routes
   end
 
   # The priority is based upon order of creation:

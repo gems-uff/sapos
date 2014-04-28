@@ -100,6 +100,7 @@ GEM
     prawn_rails (0.0.11)
       prawn (>= 0.11.1)
       railties (>= 3.0.0)
+    racc (1.4.11)
     rack (1.4.5)
     rack-cache (1.2)
       rack (>= 0.4)
@@ -161,6 +162,8 @@ GEM
       multi_json (~> 1.0)
       rack (~> 1.0)
       tilt (~> 1.1, != 1.3.0)
+    sql-parser (0.0.2)
+      racc
     sqlite3 (1.3.7)
     sqlite3 (1.3.7-x86-mingw32)
     therubyracer (0.11.4)
@@ -212,6 +215,7 @@ DEPENDENCIES
   rufus-scheduler
   sass-rails (~> 3.2.3)
   simple-navigation
+  sql-parser
   sqlite3
   therubyracer
   uglifier (>= 1.0.3)
