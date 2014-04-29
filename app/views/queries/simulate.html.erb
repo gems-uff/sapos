@@ -1,26 +1,54 @@
-<h4> <%= @query.to_label %> </h4>
+<h4><%= @query.to_label %></h4>
+<a href="javascript:void(0)">
+  <small id="toggle_sql" class="toggle_sql">SQL</small>
+</a>
+<pre id="generated_sql" style="display: none">
+  <%= @query_result[:query] %>
+</pre>
 
-<table class="showtable listed-records-table">
-  <thead>
-  <tr>
-    <% @query_result[:columns].each do |column_name| %>
-        <td><%= column_name %></td>
-    <% end %>
-  </tr>
-  </thead>
-  <tbody class="records">
-  <% @query_result[:rows].each_with_index do |row, index| %>
-      <% tr_class = index.odd? ? "even-record" : "" %>
-      <tr class="record <%= tr_class %>">
-        <% row.each do |value| %>
-            <td><%= value %></td>
-        <% end %>
-      </tr>
+<div class="actions" style="display: block">
+  <a id="as_queries-simulate-<%= @query.id %>-link" class="simulate as_action again" href="javascript:void(0)"><i class="fa fa-table" title="Simular"></i></a>
+</div>
+
+<div>
+  <% @query.params.each do |param| %>
+      <div>
+        <%= param.name %>
+        <input type="text" id="<%= "query_#{@query.id}_#{param.name}" %>" name="<%= "query_#{@query.id}_#{param.name}" %>" value="<%= param.default_value %>"/>
+      </div>
   <% end %>
-  </tbody>
-</table>
-
+</div>
+<div style="width: 865px; overflow-x: auto;" class="as_content">
+  <table class="showtable listed-records-table">
+    <thead>
+    <tr>
+      <% @query_result[:columns].each do |column_name| %>
+          <th><%= column_name %></th>
+      <% end %>
+    </tr>
+    </thead>
+    <tbody class="records">
+    <% @query_result[:rows].each_with_index do |row, index| %>
+        <% tr_class = index.odd? ? "even-record" : "" %>
+        <tr class="record <%= tr_class %>">
+          <% row.each do |value| %>
+              <td><%= value %></td>
+          <% end %>
+        </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
 <p class="form-footer">
   <%= link_to as_(:close), main_path_to_return, :class => 'as_cancel', :remote => request.xhr? %>
   <%= loading_indicator_tag(:action => :create, :id => params[:id]) %>
 </p>
+<script type="text/javascript">
+    $("#toggle_sql").click(function () {
+        $('#generated_sql').toggle()
+    });
+    $(".simulate.as_action.again").click(function () {
+        $("#as_queries-nested-<%= @query.id %>-row").find('.as_cancel').click();
+        $("#as_queries-simulate-<%= @query.id %>-link").removeClass('disabled').click();
+    })
+</script>
