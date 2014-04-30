@@ -78,7 +78,7 @@ pt-BR:
           disapproved: "Reprovado"
           registered: "Incompleto"
       custom_variable:
-        name: "Nome"
+        name: "Descrição"
         value: "Valor"
         variable: "Variável"
       country:

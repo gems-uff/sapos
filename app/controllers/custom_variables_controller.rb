@@ -12,7 +12,7 @@ class CustomVariablesController < ApplicationController
     config.create.multipart = true
     config.update.multipart = true
     
-    config.columns = [:name, :variable, :value]
+    config.columns = [:variable, :value, :name]
     config.create.label = :create_custom_variable_label
     config.update.label = :update_custom_variable_label
   end
