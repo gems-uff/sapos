@@ -69,7 +69,8 @@
         $('#generated_sql').toggle()
     });
     $(".simulate.as_action.again").click(function () {
-        $("#as_queries-nested-<%= @query.id %>-row").find('.as_cancel').click();
-        $("#as_queries-simulate-<%= @query.id %>-link").removeClass('disabled').click();
+
+        ActiveScaffold.find_action_link($("#as_queries-simulate-<%= @query.id %>-link")).reload();
+
     })
 </script>
