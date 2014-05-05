@@ -27,8 +27,14 @@ class QueriesController < ApplicationController
 
   def simulate
     @query = Query.find(params[:id])
-    @query_result = @query.execute()
+    @query_result = @query.execute(simulation_params: get_simulation_params)
     render :action => 'simulate'
+  end
+
+
+  private
+  def get_simulation_params
+    params[:query_params] || {}
   end
 
 end

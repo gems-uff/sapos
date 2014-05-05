@@ -12,23 +12,12 @@ class Query < ActiveRecord::Base
 
   validate :ensure_valid_params
 
-  def map_params
+  def map_params(simulation_params = {})
     current_params = {}
     self.params.each do |param|
-      case param.value_type
-        when 'Date'
-          current_params[param.name.to_sym] = Date.parse(param.default_value)
-        when 'DateTime'
-          current_params[param.name.to_sym] = DateTime.parse(param.default_value)
-        when 'List'
-          current_params[param.name.to_sym] = param.default_value.split(',')
-        when 'Number'
-          current_params[param.name.to_sym] = param.default_value.to_f
-        when 'Literal'
-          current_params[param.name.to_sym] = param.default_value
-        else
-          current_params[param.name.to_sym] = param.default_value
-      end
+      param_name = param.name.to_sym
+      param.simulation_value = simulation_params[param_name]
+      current_params[param_name] = param.parsed_value
     end
     current_params
   end
@@ -37,12 +26,13 @@ class Query < ActiveRecord::Base
     self.send(:sanitize_sql, [sql, params])
   end
 
-  def execute(options={})
+
+  def execute(options={:simulation_params => {} })
     #Create connection to the Database
     db_connection = ActiveRecord::Base.connection
 
     #Generate query using the parameters specified by the notification
-    current_params = map_params
+    current_params = map_params(options[:simulation_params].symbolize_keys)
 
     generated_query = ::Query.parse_sql_and_params(sql, current_params)
 

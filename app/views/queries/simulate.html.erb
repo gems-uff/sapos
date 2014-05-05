@@ -5,19 +5,20 @@
 <pre id="generated_sql" style="display: none">
   <%= @query_result[:query] %>
 </pre>
-
-<div class="actions" style="display: block">
-  <a id="as_queries-simulate-<%= @query.id %>-link" class="simulate as_action again" href="javascript:void(0)"><i class="fa fa-table" title="Simular"></i></a>
-</div>
-
 <div>
   <% @query.params.each do |param| %>
       <div>
         <%= param.name %>
-        <input type="text" id="<%= "query_#{@query.id}_#{param.name}" %>" name="<%= "query_#{@query.id}_#{param.name}" %>" value="<%= param.default_value %>"/>
+        <small>(<%= param.value_type %>)</small>
+        <%= text_field_tag "query_#{@query.id}_#{param.name}", param.parsed_value, data: {name: "query_params[#{param.name}]"}, id: "query_#{@query.id}_#{param.name}", class: "_onchange_param_field _param_field _param_type_#{param.value_type.downcase}" %>
+        <small class="_default_value" data-default_value="<%= param.default_value %>">(Default: <%= param.default_value %>)</small>
       </div>
   <% end %>
 </div>
+<div class="actions" style="display: block">
+  <a id="as_queries-simulate-<%= @query.id %>-link" class="simulate as_action again" href="javascript:void(0)"><i class="fa fa-table" title="Simular"></i> Simular</a>
+</div>
+
 <div style="width: 865px; overflow-x: auto;" class="as_content">
   <table class="showtable listed-records-table">
     <thead>
@@ -43,7 +44,38 @@
   <%= link_to as_(:close), main_path_to_return, :class => 'as_cancel', :remote => request.xhr? %>
   <%= loading_indicator_tag(:action => :create, :id => params[:id]) %>
 </p>
+
 <script type="text/javascript">
+  $('._default_value').click(function(){
+      var _this = $(this);
+      _this.parent().find('._param_field').val(_this.data('default_value')).trigger('change');
+  })
+    $('._onchange_param_field').change(function () {
+        var link = $("#as_queries-simulate-<%= @query.id %>-link");
+        var p = link.prop('search');
+        var params = {},
+                seg = p.replace(/^\?/, '').split('&'),
+                len = seg.length, i = 0, s;
+        for (; i < len; i++) {
+            if (!seg[i]) {
+                continue;
+            }
+            s = seg[i].split('=');
+            params[s[0]] = s[1];
+        }
+
+        var params_elements = $('._onchange_param_field');
+        for (i = 0, len = params_elements.length; i < len; i++) {
+            var current_param = $(params_elements[i]);
+            params[current_param.data('name')] = current_param.val()
+        }
+
+        link.prop('search', $.param(params));
+
+    })
+
+
+    $("._param_type_date").datepicker();
     $("#toggle_sql").click(function () {
         $('#generated_sql').toggle()
     });
