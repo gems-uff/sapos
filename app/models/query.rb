@@ -27,12 +27,12 @@ class Query < ActiveRecord::Base
   end
 
 
-  def execute(options={:simulation_params => {} })
+  def execute(options={:override_params => {} })
     #Create connection to the Database
     db_connection = ActiveRecord::Base.connection
 
-    #Generate query using the parameters specified by the notification
-    current_params = map_params(options[:simulation_params].symbolize_keys)
+    #Generate query using the parameters specified by the simulation
+    current_params = map_params(options[:override_params].symbolize_keys)
 
     generated_query = ::Query.parse_sql_and_params(sql, current_params)
 

@@ -41,7 +41,7 @@ class Notification < ActiveRecord::Base
   end
 
   def sql_query
-    self.query.sql
+    self.query.try(:sql) || ''
   end
 
   def sql_query=(val)
@@ -81,14 +81,6 @@ class Notification < ActiveRecord::Base
     next_date + StringTimeDelta::parse(self.query_offset) - StringTimeDelta::parse(self.notification_offset)
   end
 
-  def try_field(field, &block)
-    begin
-      return yield
-    rescue Exception => e
-      raise [field, e.to_s].join(' -:- ')
-    end
-  end
-
   def execute(options={})
     notifications = []
     qdate = options[:query_date]
@@ -110,52 +102,31 @@ class Notification < ActiveRecord::Base
 
     }
 
-    records = try_field :sql_query do
-      query = (self.sql_query % params).gsub("\r\n", " ")
-
-      #Query the Database
-      db_connection.select_all(query)
-    end
+    result = self.query.execute(:override_params => params)
 
     #Build the notifications with the results from the query
     if self.individual
-      records.each do |raw_result|
-        bindings = {
-            :records => records,
-            :record => raw_result
-        }.merge(params)
-        raw_result.each do |key, value|
-          bindings[key.to_sym] = value
-        end
+      result[:rows].each do |raw_result|
+        bindings = {}.merge(params)
+        bindings.merge!(Hash[result[:columns].zip(raw_result)])
+
         formatter = ERBFormatter.new(bindings)
         notifications << {
             :notification_id => self.id,
-            :to => (try_field :to_template do
-              formatter.format(self.to_template)
-            end),
-            :subject => (try_field :subject_template do
-              formatter.format(self.subject_template)
-            end),
-            :body => (try_field :body_template do
-              formatter.format(self.body_template)
-            end)
+            :to => formatter.format(self.to_template),
+            :subject => formatter.format(self.subject_template),
+            :body => formatter.format(self.body_template)
         }
       end
     else
-      unless records.empty?
-        bindings = {:records => records}.merge(params)
+      unless result[:rows].empty?
+        bindings = {:rows => result[:rows], :columns => result[:columns]}.merge(params)
         formatter = ERBFormatter.new(bindings)
         notifications << {
             :notification_id => self.id,
-            :to => (try_field :to_template do
-              formatter.format(self.to_template)
-            end),
-            :subject => (try_field :subject_template do
-              formatter.format(self.subject_template)
-            end),
-            :body => (try_field :body_template do
-              formatter.format(self.body_template)
-            end)
+            :to => formatter.format(self.to_template),
+            :subject => formatter.format(self.subject_template),
+            :body => formatter.format(self.body_template)
         }
       end
     end

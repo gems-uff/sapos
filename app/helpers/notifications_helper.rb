@@ -3,9 +3,7 @@
 
 module NotificationsHelper
 
-  def code_mirror_text_area(column, id, type, options, read_only = false, set_size = false)
-    options.merge!(:id => id, :name => column)
-
+  def code_mirror_text_area(column, id, type, options, set_size = false)
     set_size_str = set_size ? ".setSize(null, '#{options[:value].count("\n") + 2}em')" :  '';
     block = text_area(:record, :sql_query, options)
     block += "<script>
@@ -15,14 +13,14 @@ module NotificationsHelper
       smartIndent: true,
       lineNumbers: true,
       matchBrackets : true,
-      autofocus: true,
-      readOnly: #{read_only}
+      autofocus: true
      }
     )#{set_size_str};
     </script>".html_safe
   end
 
-  def code_mirror_view(id, type, value)
+  def code_mirror_view(id, type, value, set_size = false)
+    set_size_str = set_size ? ".setSize(null, '#{value.count("\n") + 2}em')" :  '';
     "<div id='#{id}'></div>
     <script>
     CodeMirror(document.getElementById('#{id}'),
@@ -35,12 +33,13 @@ module NotificationsHelper
       autofocus: true,
       readOnly: true
      }
-    );
+    )#{set_size_str};
     </script>".html_safe
   end
 
   def sql_query_form_column(record, options)
-    code_mirror_text_area(:sql_query_view, "record_query_view_#{record.id}", "text/x-mysql", options.merge(:value => record.sql_query || I18n.t('active_scaffold.notification.sql_query_default')), true, true)
+    # code_mirror_text_area(:sql_query_view, "record_query_view_#{record.id}", "text/x-mysql", options.merge(:value => record.sql_query || I18n.t('active_scaffold.notification.sql_query_default')), true, true)
+    code_mirror_view("sql_query-view-#{record.id}", "text/x-mysql", record.sql_query, true)
   end
 
   def body_template_form_column(record, options)
