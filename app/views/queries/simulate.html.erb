@@ -50,28 +50,17 @@
       var _this = $(this);
       _this.parent().find('._param_field').val(_this.data('default_value')).trigger('change');
   })
+
     $('._onchange_param_field').change(function () {
         var link = $("#as_queries-simulate-<%= @query.id %>-link");
-        var p = link.prop('search');
-        var params = {},
-                seg = p.replace(/^\?/, '').split('&'),
-                len = seg.length, i = 0, s;
-        for (; i < len; i++) {
-            if (!seg[i]) {
-                continue;
-            }
-            s = seg[i].split('=');
-            params[s[0]] = s[1];
-        }
-
+        var p = link.prop('search').replace(/^\?/, '');
+        var params = queryStringToHash(p);
         var params_elements = $('._onchange_param_field');
-        for (i = 0, len = params_elements.length; i < len; i++) {
+        for (var i = 0, len = params_elements.length; i < len; i++) {
             var current_param = $(params_elements[i]);
             params[current_param.data('name')] = current_param.val()
         }
-
         link.prop('search', $.param(params));
-
     })
 
 
