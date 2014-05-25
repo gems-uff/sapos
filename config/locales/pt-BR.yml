@@ -66,6 +66,9 @@ pt-BR:
       city:
         name: "Nome"
         state: "Estado"
+        professors: "Residência de Professores"
+        students: "Residência de Alunos"
+        student_birth_cities: "Naturalidade de Alunos"
       class_enrollment:
         course_class: "Turma"
         disapproved_by_absence: "Reprovado por Falta"
@@ -83,6 +86,7 @@ pt-BR:
         variable: "Variável"
       country:
         name: "Nome"
+        state: "Estados"
       course:
         code: "Código"
         content: "Ementa"
@@ -333,6 +337,8 @@ pt-BR:
         code: "Sigla"
         country: "País"
         name: "Nome"
+        cities: "Cidades"
+        student_birth_states: "Naturalidade de Alunos"
       student:
         address: "Logradouro"        
         birth_city: "Naturalidade"
