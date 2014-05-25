@@ -4,7 +4,8 @@
 class Professor < ActiveRecord::Base
   attr_accessible :name, :cpf, :birthdate, :email, :sex, :civil_status, :identity_number,
   :identity_issuing_body, :identity_expedition_date, :identity_issuing_place,
-  :neighborhood, :address, :zip_code, :telephone1, :telephone2, :siape, :enrollment_number
+  :neighborhood, :address, :zip_code, :telephone1, :telephone2, :siape, :enrollment_number,
+  :academic_title_country, :academic_title_institution, :academic_title_level, :academic_title_date, :obs
   
   has_many :advisements, :dependent => :restrict
   has_many :enrollments, :through => :advisements
@@ -18,6 +19,11 @@ class Professor < ActiveRecord::Base
   
   belongs_to :city
   belongs_to :institution
+  belongs_to :academic_title_country, :class_name => 'Country', :foreign_key => 'academic_title_country_id' 
+  belongs_to :academic_title_institution, :class_name => 'Institution', :foreign_key => 'academic_title_institution_id'
+  belongs_to :academic_title_level, :class_name => 'Level', :foreign_key => 'academic_title_level_id'
+   
+    
 
   has_paper_trail
 

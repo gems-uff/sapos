@@ -273,6 +273,11 @@ pt-BR:
         zip_code: "CEP"
         thesis_defense_committee_participations: "Participações em Banca"
         thesis_defense_committee_enrollments: "Avaliados"
+        academic_title_level: "Nível de Titulação"
+        academic_title_institution: "Instituição de Titulação"
+        academic_title_country: "País de Titulação"
+        academic_title_date: "Data de Titulação"
+        obs: "Observações"
       professor_research_area:
         professor: "Professor"
         research_area: "Área de Pesquisa"

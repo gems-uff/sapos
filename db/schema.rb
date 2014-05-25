@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140505035623) do
+ActiveRecord::Schema.define(:version => 20140525171701) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -298,8 +298,8 @@ ActiveRecord::Schema.define(:version => 20140505035623) do
     t.string   "name"
     t.string   "cpf"
     t.date     "birthdate"
-    t.datetime "created_at",               :null => false
-    t.datetime "updated_at",               :null => false
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
     t.string   "sex"
     t.string   "civil_status"
     t.string   "identity_number"
@@ -316,8 +316,16 @@ ActiveRecord::Schema.define(:version => 20140505035623) do
     t.string   "identity_issuing_place"
     t.integer  "institution_id"
     t.string   "email"
+    t.date     "academic_title_date"
+    t.integer  "academic_title_country_id"
+    t.integer  "academic_title_institution_id"
+    t.integer  "academic_title_level_id"
+    t.text     "obs"
   end
 
+  add_index "professors", ["academic_title_country_id"], :name => "index_professors_on_academic_title_country_id"
+  add_index "professors", ["academic_title_institution_id"], :name => "index_professors_on_academic_title_institution_id"
+  add_index "professors", ["academic_title_level_id"], :name => "index_professors_on_academic_title_level_id"
   add_index "professors", ["city_id"], :name => "index_professors_on_city_id"
   add_index "professors", ["email"], :name => "index_professors_on_email"
   add_index "professors", ["institution_id"], :name => "index_professors_on_institution_id"

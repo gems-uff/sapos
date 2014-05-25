@@ -28,27 +28,38 @@ class ProfessorsController < ApplicationController
                                                  ['Feminino', 'F']]}
     config.columns[:scholarships].form_ui = :record_select
     config.columns[:professor_research_areas].includes = {:research_areas => :professor_research_areas}
+    
+    config.columns[:academic_title_institution].form_ui = :record_select
+    config.columns[:academic_title_country].form_ui = :select
+    config.columns[:academic_title_level].form_ui = :select
+    
     form_columns = [:name,
-                    :email,
-                   :sex,
-                   :civil_status,
-                   :birthdate,
-                   :city,
-                   :neighborhood,
-                   :address,
-                   :zip_code,
-                   :telephone1,
-                   :telephone2,
-                   :cpf,   
-                   :identity_expedition_date,
-                   :identity_issuing_body,
-                   :identity_issuing_place,
-                   :identity_number,
-                   :enrollment_number,
-                   :siape,
-                   :institution,
-                   :scholarships,
-                   :professor_research_areas]
+                :email,
+               :sex,
+               :civil_status,
+               :birthdate,
+               :city,
+               :neighborhood,
+               :address,
+               :zip_code,
+               :telephone1,
+               :telephone2,
+               :cpf,   
+               :identity_expedition_date,
+               :identity_issuing_body,
+               :identity_issuing_place,
+               :identity_number,
+               :enrollment_number,
+               :siape,
+               :institution,
+               :scholarships,
+               :academic_title_level,
+               :academic_title_institution,
+               :academic_title_country,
+               :academic_title_date,
+               :obs,
+               :professor_research_areas,
+             ]
 
     config.create.columns = form_columns
     config.update.columns = form_columns
@@ -74,7 +85,13 @@ class ProfessorsController < ApplicationController
                            :scholarships,
                            :advisement_authorizations,
                            :advisements_with_points,
-                           :research_areas]
+                           :academic_title_level,
+                           :academic_title_institution,
+                           :academic_title_country,
+                           :academic_title_date,
+                           :obs,
+                           :research_areas,
+                         ]
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 
