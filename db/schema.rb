@@ -244,7 +244,6 @@ ActiveRecord::Schema.define(:version => 20140417024756) do
     t.string   "to_template"
     t.string   "subject_template"
     t.text     "body_template"
-    t.text     "sql_query"
     t.string   "notification_offset"
     t.string   "query_offset"
     t.string   "frequency"
@@ -252,6 +251,7 @@ ActiveRecord::Schema.define(:version => 20140417024756) do
     t.datetime "created_at",                            :null => false
     t.datetime "updated_at",                            :null => false
     t.boolean  "individual",          :default => true
+    t.integer  "query_id",                              :null => false
   end
 
   create_table "phase_completions", :force => true do |t|
@@ -321,6 +321,13 @@ ActiveRecord::Schema.define(:version => 20140417024756) do
   add_index "professors", ["city_id"], :name => "index_professors_on_city_id"
   add_index "professors", ["email"], :name => "index_professors_on_email"
   add_index "professors", ["institution_id"], :name => "index_professors_on_institution_id"
+
+  create_table "queries", :force => true do |t|
+    t.string   "name"
+    t.text     "sql"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "research_areas", :force => true do |t|
     t.string   "name"

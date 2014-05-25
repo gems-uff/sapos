@@ -5,6 +5,7 @@ class Notification < ActiveRecord::Base
   attr_accessible :body_template, :frequency, :next_execution, :notification_offset, :query_offset, :sql_query, :subject_template, :title, :to_template, :individual
 
   has_many :notification_logs
+  belongs_to :query, :inverse_of => :notifications
 
   has_paper_trail
 
