@@ -1,15 +1,24 @@
 # Copyright (c) 2013 Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
-# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
-
 class CustomVariable < ActiveRecord::Base
   attr_accessible :name, :value, :variable
 
   has_paper_trail
 
+  VARIABLES = {
+    "single_advisor_points" => :text,
+    "multiple_advisor_points" => :text,
+    "program_level" => :text,
+    "identity_issuing_country" => :text,
+    "class_schedule_text" => :text,
+    "redirect_email" => :text,
+    "notification_footer" => :text,
+    "pdf_header" => :pdfimage
+  }
+
   validates :variable, :presence => true
+
 
   def self.single_advisor_points
   	config = CustomVariable.find_by_variable(:single_advisor_points)
@@ -44,6 +53,20 @@ class CustomVariable < ActiveRecord::Base
   def self.notification_footer
     config = CustomVariable.find_by_variable(:notification_footer)
     config.nil? ? "" : config.value
+  end
+
+  def self.pdf_header
+    config = CustomVariable.find_by_variable(:pdf_header)
+    HeaderVariable.new(value: config.nil? ? nil : config.value)
+  end
+
+  def image
+    return HeaderVariable.new if VARIABLES[variable] == :text
+    begin
+      CustomVariable.send(variable)
+    rescue 
+      HeaderVariable.new(value: value)
+    end
   end
 
 end

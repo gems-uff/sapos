@@ -8,11 +8,10 @@ FactoryGirl.define do
     to_template "sapos@mailinator.com"
     subject_template "test"
     body_template "test"
-    sql_query "SELECT * FROM USERS"
     notification_offset 0
     query_offset 0
     frequency I18n.translate("activerecord.attributes.notification.frequencies.daily")
     title "test"
-    
+    query
   end
 end

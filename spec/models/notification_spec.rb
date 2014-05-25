@@ -4,7 +4,12 @@
 require 'spec_helper'
 
 describe Notification do
-  let(:notification) { Notification.new }
+  let(:notification) do 
+    query = Query.new
+    notification = Notification.new 
+    notification.query = query
+    notification
+  end
   subject { notification }
   describe "Validations" do
     describe "body_template" do

@@ -2,7 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Level < ActiveRecord::Base
-  attr_accessible :name
+  attr_accessible :name, :course_name
 
   has_paper_trail
 
@@ -17,5 +17,10 @@ class Level < ActiveRecord::Base
 
   def to_label
   	"#{self.name}"
+  end
+
+  def full_name
+    return self.name if self.course_name.nil? or self.course_name.empty?
+    self.course_name
   end
 end

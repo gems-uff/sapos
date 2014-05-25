@@ -3,6 +3,6 @@
 FactoryGirl.define do
   factory :query do
     name "MyString"
-    sql "MyText"
+    sql "SELECT * FROM USERS"
   end
 end

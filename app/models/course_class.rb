@@ -23,7 +23,7 @@ class CourseClass < ActiveRecord::Base
   validates :semester, :presence => true, :inclusion => {:in => SEMESTERS}
 
   def to_label
-    "#{name || course.name} - #{year}/#{semester}"
+    "#{name_with_class} - #{year}/#{semester}"
   end
 
   def label_with_course
@@ -32,5 +32,10 @@ class CourseClass < ActiveRecord::Base
 
   def class_enrollments_count
     self.class_enrollments.count
+  end
+
+  def name_with_class
+    return course.name if name.nil? or name.empty? or course.course_type.nil? or not course.course_type.show_class_name
+    "#{course.name} (#{name})"
   end
 end

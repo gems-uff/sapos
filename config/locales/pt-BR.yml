@@ -78,7 +78,7 @@ pt-BR:
           disapproved: "Reprovado"
           registered: "Incompleto"
       custom_variable:
-        name: "Nome"
+        name: "Descrição"
         value: "Valor"
         variable: "Variável"
       country:
@@ -108,7 +108,7 @@ pt-BR:
         has_score: "Tem nota"
         name: "Nome"
         schedulable: "Aparecer no QH"
-        show_class_name: "Mostrar nome da turma no QH"
+        show_class_name: "Mostrar nome da turma no QH e Histórico"
         allow_multiple_classes: "Permitir mais de uma inscrição"
       deferral:
         approval_date: "Data de aprovação"
@@ -183,6 +183,7 @@ pt-BR:
       level: 
         advisement_authorizations: "Credenciamentos"
         name: "Nome"
+        course_name: "Nome completo do curso"
         enrollments: "Matrículas"
         majors: "Cursos"
         phase_durations: "Duração de Etapas"
@@ -647,6 +648,13 @@ pt-BR:
     create_student_major_label: "Adicionar Curso do Aluno"
     create_thesis_defense_committee_participation_label: "Adicionar Participação em Banca"
     create_user_label: "Adicionar Usuário"
+    custom_variables:
+      pdf_header:
+        scale: "Escala"
+        logo: "Logo"
+        x: "X"
+        y: "Y"
+        preview: "Visualizar"
     delayed_phases_report: "Relatório"
     delete_link: "Excluir"
     delete_message: "Tem certeza que deseja excluir?"
@@ -819,6 +827,9 @@ pt-BR:
         course_name: "Disciplina"
         noschedule: "Horário a combinar"
         year_semester_error: 'Selecione Ano/Semestre na busca!'
+    custom_variables:
+      pdf_header:
+        preview: "Visualizar"
     enrollment:
       to_pdf:
         filename: "Relatório de Matrículas"
@@ -833,7 +844,6 @@ pt-BR:
         enrollment_dismissal_reason: "MOTIVO:"   
         enrollment_number: "MATRÍCULA: "
         field_of_study: "ÁREA DE CONCENTRAÇÃO:"
-        graduation: " em Computação"
         identity_issuing_body: "ÓRGÃO EXPEDIDOR:"
         identity_issuing_place: "ESTADO EXPEDIDOR:"
         language_tests: "EXAME(S) DE LÍNGUA(S)"

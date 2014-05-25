@@ -77,19 +77,32 @@ describe CourseClass do
   describe "Methods" do
     describe "to_label" do
       context "should return the expected string when" do
-        it "name is not null" do
+        it "name is not null and course type shows class name" do
           name = "name"
+          other_name = "Other name"
           course_class.name = name
           course_class.year = 2013
           course_class.semester = CourseClass::SEMESTERS.first
-          course_class.course = Course.new(:name => "Other name")
-          course_class.to_label.should eql("#{name} - #{course_class.year}/#{course_class.semester}")
+          course_class.course = Course.new(:name => other_name)
+          course_class.course.course_type = FactoryGirl.create(:course_type, :show_class_name => true)
+          course_class.to_label.should eql("#{other_name} (#{name}) - #{course_class.year}/#{course_class.semester}")
+        end
+        it "name is not null and course type doesnt show class name" do
+          name = "name"
+          other_name = "Other name"
+          course_class.name = name
+          course_class.year = 2013
+          course_class.semester = CourseClass::SEMESTERS.first
+          course_class.course = Course.new(:name => other_name)
+          course_class.course.course_type = FactoryGirl.create(:course_type, :show_class_name => false)
+          course_class.to_label.should eql("#{other_name} - #{course_class.year}/#{course_class.semester}")
         end
         it "name is null" do
           course_name = "course_name"
           course_class.year = 2013
           course_class.semester = CourseClass::SEMESTERS.first
           course_class.course = Course.new(:name => course_name)
+          course_class.course.course_type = FactoryGirl.create(:course_type, :show_class_name => true)
           course_class.to_label.should eql("#{course_name} - #{course_class.year}/#{course_class.semester}")
         end
       end

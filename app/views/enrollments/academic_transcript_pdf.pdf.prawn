@@ -6,7 +6,7 @@ require "prawn/measurement_extensions"
 
 new_document('transcript.pdf', :watermark => (current_user.role_id == Role::ROLE_PROFESSOR)) do |pdf|
     
-    header_uff(pdf, I18n.t("pdf_content.enrollment.header.title"))
+    header(pdf, I18n.t("pdf_content.enrollment.header.title"))
 
     enrollment_student_header(pdf, enrollment: @enrollment)
 

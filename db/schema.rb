@@ -212,8 +212,9 @@ ActiveRecord::Schema.define(:version => 20140505035623) do
 
   create_table "levels", :force => true do |t|
     t.string   "name"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+    t.string   "course_name"
   end
 
   create_table "majors", :force => true do |t|
