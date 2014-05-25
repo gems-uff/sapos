@@ -10,7 +10,7 @@ class Ability
                 DismissalReason, Enrollment, EnrollmentStatus, Institution,
                 Level, Major, Notification, NotificationLog, Phase, 
                 PhaseCompletion, PhaseDuration, Professor, ProfessorResearchArea,
-                ResearchArea, Role, Scholarship, ScholarshipDuration, 
+                ReportConfiguration, ResearchArea, Role, Scholarship, ScholarshipDuration, 
                 ScholarshipType, Sponsor, State, Student, StudentMajor, 
                 ThesisDefenseCommitteeParticipation, User, Version, YearSemester] 
 
@@ -33,11 +33,11 @@ class Ability
       can :manage, :all
       cannot [:destroy, :update], Role
     elsif role_id == Role::ROLE_COORDENACAO
-      can :manage, (Ability::ALL_MODELS - [Role, Notification, CustomVariable])
+      can :manage, (Ability::ALL_MODELS - [Role, Notification, CustomVariable, ReportConfiguration])
     elsif role_id == Role::ROLE_PROFESSOR
-      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification, NotificationLog])
+      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification, NotificationLog, ReportConfiguration])
     elsif role_id == Role::ROLE_SECRETARIA
-      can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification])
+      can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification, ReportConfiguration])
     end
     can :notify, Notification
 

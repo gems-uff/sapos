@@ -72,6 +72,9 @@ gem 'simple-navigation'
 gem 'rufus-scheduler'
 gem 'codemirror-rails'
 
+# Image
+gem 'carrierwave'
+
 # Use unicorn as the web server
 # gem 'unicorn'
 
