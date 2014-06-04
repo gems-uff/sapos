@@ -1,30 +1,75 @@
 <h4> <%= @notification.to_label %> </h4>
 
+<%= render 'queries/params_form', :resource => @notification, :target => 'simulate', :show_derivations => true %>
+
+<div class="actions" style="display: block; margin: 10px 0 0 0;">
+  <a id="as_notifications-simulate-<%= @notification.id %>-link" class="simulate as_action again" href="javascript:void(0)">
+    <i class="fa fa-table" title="Simular"></i>Simular
+  </a>
+  &nbsp;&nbsp;
+  <%= render 'queries/show_sql', sql_query: @query_sql %>
 
 
-<p class="simulate_query_date"> <%= I18n.t('active_scaffold.notification.query_date')%>: <%= I18n.localize(@query_date, :format => :default) %> </p>
+</div>
 
-<table class="showtable listed-records-table">
-	<thead>
-		<tr>
-			<th><%= I18n.t('activerecord.attributes.notification_log.to')%></th>
-			<th><%= I18n.t('activerecord.attributes.notification_log.subject')%></th>
-			<th><%= I18n.t('activerecord.attributes.notification_log.body')%></th>
-		</tr>
-	</thead>
-	<tbody class="records">
-		<% @messages.each_with_index do |message, index| %>
-			<% tr_class = index.odd? ? "even-record" : "" %>
-			<tr class="record <%= tr_class %>">
-				<td><%= message[:to] %></td>
-				<td><%= message[:subject] %></td>
-				<td><%= message[:body].html_safe %></td>
-			</tr>
-		<% end %>
-	</tbody>
-</table>
+
+
+<% if @messages.size.zero? && params[:notification_params].try(:[], :data_consulta).nil? %>
+    <div style="margin: 10px 0">Faça uma simulação</div>
+
+<% elsif @messages.size.zero? && params[:notification_params].try(:[], :data_consulta) %>
+    <div style="margin: 10px 0">Esta consulta não retornou nenhum resultado</div>
+<% else %>
+
+
+    <div class="actions" style="display: block">
+      <% if params[:notification_params][:data_consulta] %>
+          <p class="simulate_query_date">
+            <span>
+              <%= I18n.t('active_scaffold.notification.query_date') %>:
+              <%= params[:notification_params][:data_consulta] %>
+            </span>
+            &nbsp;&nbsp;&nbsp;
+            <a id="as_notifications-execute_now-<%= @notification.id %>-link" class="simulate as_action again" href="<%= execute_now_notification_path(@notification, :data_consulta => params[:notification_params][:data_consulta]) %>">
+              <i class="fa fa-mail-forward" title="Notificar agora"></i>Notificar agora
+            </a>
+          </p>
+
+      <% end %>
+    </div>
+
+
+    <table class="showtable listed-records-table">
+      <thead>
+      <tr>
+        <th><%= I18n.t('activerecord.attributes.notification_log.to') %></th>
+        <th><%= I18n.t('activerecord.attributes.notification_log.subject') %></th>
+        <th><%= I18n.t('activerecord.attributes.notification_log.body') %></th>
+      </tr>
+      </thead>
+      <tbody class="records">
+      <% @messages.each_with_index do |message, index| %>
+          <% tr_class = index.odd? ? "even-record" : "" %>
+          <tr class="record <%= tr_class %>">
+            <td><%= message[:to] %></td>
+            <td><%= message[:subject] %></td>
+            <td><%= message[:body].html_safe %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+
+<% end %>
 
 <p class="form-footer">
   <%= link_to as_(:close), main_path_to_return, :class => 'as_cancel', :remote => request.xhr? %>
   <%= loading_indicator_tag(:action => :create, :id => params[:id]) %>
 </p>
+
+<script type="text/javascript">
+    $(function () {
+        $(".simulate.as_action.again").click(function () {
+            ActiveScaffold.find_action_link($("#as_notifications-simulate-<%= @notification.id %>-link")).reload();
+        })
+    });
+</script>

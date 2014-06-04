@@ -413,6 +413,17 @@ pt-BR:
         <<: *errors_messages
 
       models:
+        query_param:
+          attributes:
+            name:
+              restricted_name: não pode ser usado pois é uma palavra reservada do sistema.
+            default_value:
+              invalid_integer: não é um número inteiro válido
+              invalid_float: não é um número float válido
+              invalid_date: não é uma data válida
+              invalid_date_time: não é uma data/hora válida
+              invalid_time: não é uma hora válida
+
         accomplishment:
           accomplishment_enrollment_uniqueness: "já realizou esta etapa"
           enrollment_level: "não possui o mesmo nível que a etapa"
@@ -711,8 +722,10 @@ pt-BR:
     update_student_major_label: "Editar Curso do Aluno"
     update_thesis_defense_committee_participation: "Editar Participação em Banca"
     update_user_label: "Modificar Usuário"
+    query:
+      execute: 'Executar'
     notification:
-      sql_query_default: "SELECT students.name as name FROM students\nWHERE students.created_at<%{query_date}"
+      sql_query_default: "SELECT students.name as name FROM students\nWHERE students.created_at < :data_consulta"
       body_template_default: "<%= name %>"
       frequency_description: "Diária: todo dia; Semanal: toda segunda; Mensal: dia 01 de cada mês; Semestral: 01/03 e 01/08; Anual: 01/01"
       execute_now: "Enviar agora"

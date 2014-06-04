@@ -9,6 +9,8 @@ class Notification < ActiveRecord::Base
 
   has_paper_trail
 
+  RESERVED_PARAMS = %w{numero_ultimo_semestre ano_ultimo_semestre numero_semestre_atual ano_semestre_atual}
+
   FREQUENCIES = [
       I18n.translate("activerecord.attributes.notification.frequencies.annual"),
       I18n.translate("activerecord.attributes.notification.frequencies.semiannual"),
@@ -83,26 +85,10 @@ class Notification < ActiveRecord::Base
 
   def execute(options={})
     notifications = []
-    qdate = options[:query_date]
-    qdate ||= self.query_date
 
-    #Create connection to the Database
-    db_connection = ActiveRecord::Base.connection
+    params = prepare_params_and_derivations(options[:override_params])
 
-    this_semester = YearSemester.on_date qdate
-    last_semester = this_semester - 1
-    #Generate query using the parameters specified by the notification
-    params = {
-        #Temos que definir todos os possíveis parametros que as buscas podem querer usar
-        :query_date => db_connection.quote(qdate),
-        :this_semester_year => this_semester.year,
-        :this_semester_number => this_semester.semester,
-        :last_semester_year => last_semester.year,
-        :last_semester_number => last_semester.semester,
-
-    }
-
-    result = self.query.execute(:override_params => params)
+    result = self.query.execute(params)
 
     #Build the notifications with the results from the query
     if self.individual
@@ -131,7 +117,34 @@ class Notification < ActiveRecord::Base
       end
     end
     self.update_next_execution! unless options[:skip_update]
-    notifications
+
+    {:notifications => notifications, :query => result[:query]}
+  end
+
+  def set_params_for_exhibition(override_params)
+    params = self.prepare_params_and_derivations(override_params)
+    self.query.map_params(params)
+    true
+  end
+
+  def prepare_params_and_derivations(override_params)
+    qdate = override_params[:data_consulta] || self.query_date
+    params = get_query_date_derivations(qdate)
+    override_params.merge(params)
+  end
+
+  def get_query_date_derivations(qdate)
+    qdate = Date.strptime(qdate, "%Y-%m-%d") if qdate.is_a? String
+    this_semester = YearSemester.on_date qdate
+    last_semester = this_semester - 1
+    #Generate query using the parameters specified by the notification
+    params = {
+        #Temos que definir todos os possíveis parametros que as buscas podem querer usar
+        :ano_semestre_atual => this_semester.year,
+        :numero_semestre_atual => this_semester.semester,
+        :ano_ultimo_semestre => last_semester.year,
+        :numero_ultimo_semestre => last_semester.semester,
+    }
   end
 
   def execution
@@ -148,6 +161,16 @@ class Notification < ActiveRecord::Base
       end
 
     end
+  end
+
+
+  def get_simulation_query_date
+    self.params.find { |p| p.name == 'data_consulta'}.simulation_value
+  end
+
+
+  def params
+    self.query.params
   end
 
 end

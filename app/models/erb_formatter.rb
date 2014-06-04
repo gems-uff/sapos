@@ -11,15 +11,15 @@ class ERBFormatter
   end
 
 
-  def _(val)
+  def var(val)
     @attributes[val]
   end
 
   def records
     unless @records
       @records = []
-      keys = _(:columns)
-      _(:rows).each do |row|
+      keys = var(:columns)
+      var(:rows).each do |row|
         @records << Hash[keys.zip(row)]
       end
     end
@@ -30,6 +30,7 @@ class ERBFormatter
     time = ((date.class == String) ? Time.parse(date) : date.to_time)
     I18n.localize(time, :format => format)
   end
+
   alias_method :l, :localize
 
   def format(code)
