@@ -6,8 +6,8 @@ class QueriesController < ApplicationController
 
   active_scaffold :query do |config|
 
-    config.action_links.add 'simulate',
-      :label => "<i title='#{I18n.t('active_scaffold.notification.simulate')}' class='fa fa-table'></i>".html_safe,
+    config.action_links.add 'execute',
+      :label => "<i title='#{I18n.t('active_scaffold.query.execute')}' class='fa fa-table'></i>".html_safe,
       :page => true,
       :inline => true,
       :position => :after,
@@ -18,17 +18,17 @@ class QueriesController < ApplicationController
     config.columns[:description].options = {:cols => 124, :rows => 3}
     config.columns[:params].allow_add_existing = false
     config.columns[:params].clear_link
-    # config.create.columns = form_columns
+    config.create.columns = [:name, :description, :params, :sql]
     # config.show.columns = form_columns + [:next_execution]
     # config.list.columns = [:title, :frequency, :notification_offset, :query_offset, :next_execution]
 
   end
 
 
-  def simulate
+  def execute
     @query = Query.find(params[:id])
-    @query_result = @query.execute(override_params: get_simulation_params)
-    render :action => 'simulate'
+    @query_result = @query.execute(get_simulation_params)
+    render :action => 'execute'
   end
 
 

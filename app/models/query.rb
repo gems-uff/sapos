@@ -10,14 +10,18 @@ class Query < ActiveRecord::Base
 
   accepts_nested_attributes_for :params, reject_if: :all_blank
 
-  validate :ensure_valid_params
+  before_save :ensure_valid_params
+  validates_associated :params
 
   def map_params(simulation_params = {})
+    simulation_params = simulation_params.symbolize_keys
     current_params = {}
     self.params.each do |param|
       param_name = param.name.to_sym
       param.simulation_value = simulation_params[param_name]
-      current_params[param_name] = param.parsed_value
+      param.validate_value(param.simulation_value)
+
+      current_params[param_name] = (param.errors.empty? ? param.parsed_value : '')
     end
     current_params
   end
@@ -27,20 +31,26 @@ class Query < ActiveRecord::Base
   end
 
 
-  def execute(options={:override_params => {} })
+  def execute(override_params = {})
     #Create connection to the Database
     db_connection = ActiveRecord::Base.connection
 
     #Generate query using the parameters specified by the simulation
-    current_params = map_params(options[:override_params].symbolize_keys)
+    current_params = map_params(override_params)
 
-    generated_query = ::Query.parse_sql_and_params(sql, current_params)
+    valid_params = self.params.find { |p| p.errors.size.nonzero? }.nil?
 
-    #Query the Database
-    db_resource = db_connection.exec_query(generated_query)
+    if valid_params
+      generated_query = ::Query.parse_sql_and_params(sql, current_params)
 
-    #Build the notifications with the results from the query
-    {:columns => db_resource.columns, :rows => db_resource.rows, :query => generated_query}
+      #Query the Database
+      db_resource = db_connection.exec_query(generated_query)
+
+      #Build the notifications with the results from the query
+      {:columns => db_resource.columns, :rows => db_resource.rows, :query => generated_query, :errors => self.errors}
+    else
+      {:columns => [], :rows => [], :query => '', :errors => self.params}
+    end
   end
 
 

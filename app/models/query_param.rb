@@ -21,6 +21,56 @@ class QueryParam < ActiveRecord::Base
   validates :value_type, presence: true, inclusion: VALUE_TYPES
   validates :name, presence: true, :format => /^([a-z_][a-zA-Z_0-9]+)?$/
 
+  validate do
+    validate_value(default_value)
+  end
+
+
+  def validate_value(val)
+    unless val.to_s.empty?
+      case value_type
+        when VALUE_DATE
+          begin
+            Date.parse(val)
+            unless val =~ /[0-9]{4}-[0-9]{2}-[0-9]{2}/
+              raise ArgumentError
+            end
+          rescue ArgumentError
+            self.errors.add :default_value, :invalid_date
+          end
+          val
+        when VALUE_DATETIME
+          begin
+            DateTime.parse(val)
+            unless val =~ /[0-9]{4}-[0-9]{2}-[0-9]{2} [09]{2}:[09]{2}:[09]{2}/
+              raise ArgumentError
+            end
+          rescue ArgumentError
+            self.errors.add :default_value, :invalid_date_time
+          end
+          val
+        when VALUE_TIME
+          begin
+            Time.parse(val)
+            unless val =~ /[09]{2}:[09]{2}:[09]{2}/
+              raise ArgumentError
+            end
+          rescue ArgumentError
+            self.errors.add :default_value, :invalid_time
+          end
+
+        when VALUE_INTEGER
+          if val.to_i.to_s != val.to_s
+            self.errors.add :default_value, :invalid_integer
+          end
+        when VALUE_FLOAT
+          if val.to_f.to_s != val.to_s
+            self.errors.add :default_value, :invalid_float
+          end
+      end
+    end
+  end
+
 
   def type
     @type ||= ActiveSupport::StringInquirer.new(self.value_type.downcase)
@@ -39,7 +89,16 @@ class QueryParam < ActiveRecord::Base
       when VALUE_TIME
         Time.parse(value)
       when VALUE_LIST
-        value.split(',')
+        list_value = value.split(',')
+        if list_value.find { |i| i =~ /[^0-9.]/ }
+          list_value
+        else
+          if list_value.find { |i| i =~ /[^0-9]/ }
+            list_value.collect &:to_i
+          else
+            list_value.collect &:to_f
+          end
+        end
       when VALUE_INTEGER
         value.to_i
       when VALUE_FLOAT

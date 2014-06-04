@@ -214,7 +214,7 @@ Sapos::Application.routes.draw do
   resources :queries do
     as_routes
     member do
-      get 'simulate'
+      get 'execute'
     end
   end
 

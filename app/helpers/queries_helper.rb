@@ -38,10 +38,10 @@ module QueriesHelper
   def sql_form_column(record, options)
     code_mirror_text_area(:sql_query, "record_sql_#{record.id}", "text/x-mysql", options.merge(:value => record.sql || I18n.t('active_scaffold.notification.sql_query_default')))
   end
-
-  def sql_show_column(record, column)
-    code_mirror_view("sql-view-#{record.id}", "text/x-mysql", record.sql_query)
-  end
+  #
+  # def sql_show_column(record, column)
+  #   code_mirror_view("sql-view-#{record.id}", "text/x-mysql", record.sql_query)
+  # end
 
   def body_template_form_column(record, options)
     code_mirror_text_area(:body_template, "record_body_template_#{record.id}", "text/html", options.merge(:value => record.body_template || I18n.t('active_scaffold.notification.body_template_default')))
