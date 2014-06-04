@@ -204,7 +204,6 @@ Sapos::Application.routes.draw do
     member do
       get 'execute_now'
       get 'simulate'
-      get 'set_query_date'
     end
 
     collection do
