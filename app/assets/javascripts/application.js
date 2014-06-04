@@ -22,7 +22,6 @@
 
 var I18nExitConfirmation = 'Existem campos preenchidos! Você pode perder suas alterações!';
 
-
 function areInputsFilled(selector) {
   var filled = false;
   $(selector).each(function () {
@@ -96,6 +95,9 @@ function queryStringToHash(query) {
 };
 
 $(document).ready(function () {
+  $.datepicker.regional['pt-BR'].dateFormat = 'yy-mm-dd';
+  $.datepicker.setDefaults($.datepicker.regional['pt-BR'] );
+
   window.onbeforeunload = confirmOnPageExit;
   cityWidget();
   identityIssuingPlaceWidget();
