@@ -81,32 +81,36 @@ class QueryParam < ActiveRecord::Base
   end
 
   def parsed_value
-    case value_type
-      when VALUE_DATE
-        Date.parse(value)
-      when VALUE_DATETIME
-        DateTime.parse(value)
-      when VALUE_TIME
-        Time.parse(value)
-      when VALUE_LIST
-        list_value = value.split(',')
-        if list_value.find { |i| i =~ /[^0-9.]/ }
-          list_value
-        else
-          if list_value.find { |i| i =~ /[^0-9]/ }
-            list_value.collect &:to_i
+    if value.to_s.empty?
+      value
+    else
+      case value_type
+        when VALUE_DATE
+          Date.parse(value)
+        when VALUE_DATETIME
+          DateTime.parse(value)
+        when VALUE_TIME
+          Time.parse(value)
+        when VALUE_LIST
+          list_value = value.split(',')
+          if list_value.find { |i| i =~ /[^0-9.]/ }
+            list_value
           else
-            list_value.collect &:to_f
+            if list_value.find { |i| i =~ /[^0-9]/ }
+              list_value.collect &:to_i
+            else
+              list_value.collect &:to_f
+            end
           end
-        end
-      when VALUE_INTEGER
-        value.to_i
-      when VALUE_FLOAT
-        value.to_f
-      when VALUE_LITERAL
-        value
-      else
-        value
+        when VALUE_INTEGER
+          value.to_i
+        when VALUE_FLOAT
+          value.to_f
+        when VALUE_LITERAL
+          value
+        else
+          value
+      end
     end
   end
 end
