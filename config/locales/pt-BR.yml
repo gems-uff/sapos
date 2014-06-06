@@ -70,6 +70,7 @@ pt-BR:
         students: "Residência de Alunos"
         student_birth_cities: "Naturalidade de Alunos"
       class_enrollment:
+        course_class_id: "Turma"
         course_class: "Turma"
         disapproved_by_absence: "Reprovado por Falta"
         enrollment: "Matrícula"
@@ -409,6 +410,7 @@ pt-BR:
 
       messages:
         record_invalid: "A validação falhou: %{errors}"
+
         taken: "já existe"
         <<: *errors_messages
 
@@ -722,6 +724,7 @@ pt-BR:
     update_student_major_label: "Editar Curso do Aluno"
     update_thesis_defense_committee_participation: "Editar Participação em Banca"
     update_user_label: "Modificar Usuário"
+    record_not_saved: "A validação falhou!"
     query:
       execute: 'Executar'
     notification:

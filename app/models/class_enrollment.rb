@@ -7,7 +7,10 @@ class ClassEnrollment < ActiveRecord::Base
 
   has_paper_trail
 
-  SITUATIONS = [I18n.translate("activerecord.attributes.class_enrollment.situations.registered"), I18n.translate("activerecord.attributes.class_enrollment.situations.aproved"), I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")]
+  REGISTERED = I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
+  APPROVED = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
+  DISAPPROVED = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
+  SITUATIONS = [REGISTERED, APPROVED, DISAPPROVED]
 
   validates :enrollment, :presence => true
   validates :course_class, :presence => true
@@ -27,6 +30,7 @@ class ClassEnrollment < ActiveRecord::Base
           includes(:course_class => {:course => :course_type}).
           where(CourseType.arel_table[:allow_multiple_classes].eq(false)).
           where(:enrollment_id => self.enrollment_id).
+          where(ClassEnrollment.arel_table[:situation].not_eq(DISAPPROVED)).
           where(Course.arel_table[:id].eq( self.course_class.course_id)).
           group(:enrollment_id).
           having("count(course_id) > 1")
