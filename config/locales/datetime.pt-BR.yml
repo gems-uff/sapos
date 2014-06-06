@@ -6,8 +6,8 @@ pt-BR:
   # formatos de data e hora
   date:
     formats:
-      default: "%d-%m-%Y"
-#      default: "%Y-%m-%d"
+#      default: "%d-%m-%Y"
+      default: "%Y-%m-%d"
       short: "%d de %B"
       long: "%d de %B de %Y"
       monthyear: "%B-%Y"
