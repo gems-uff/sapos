@@ -86,7 +86,7 @@ class Notification < ActiveRecord::Base
   def execute(options={})
     notifications = []
 
-    params = prepare_params_and_derivations(options[:override_params])
+    params = prepare_params_and_derivations(options[:override_params] || {})
 
     result = self.query.execute(params)
 
@@ -134,7 +134,10 @@ class Notification < ActiveRecord::Base
   end
 
   def get_query_date_derivations(qdate)
-    qdate = Date.strptime(qdate, "%Y-%m-%d") if qdate.is_a? String
+    if qdate.is_a? String
+      return {} if qdate.blank?
+      qdate = Date.strptime(qdate, "%Y-%m-%d")
+    end
     this_semester = YearSemester.on_date qdate
     last_semester = this_semester - 1
     #Generate query using the parameters specified by the notification
@@ -165,7 +168,7 @@ class Notification < ActiveRecord::Base
 
 
   def get_simulation_query_date
-    self.params.find { |p| p.name == 'data_consulta'}.simulation_value
+    self.params.find { |p| p.name == 'data_consulta' }.simulation_value
   end
 
 

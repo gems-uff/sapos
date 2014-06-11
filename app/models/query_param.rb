@@ -25,6 +25,10 @@ class QueryParam < ActiveRecord::Base
     validate_value(default_value)
   end
 
+  def simulation_value=(val)
+    @simulation_value = val
+  end
+
 
   def validate_value(val)
     unless val.to_s.empty?
@@ -36,6 +40,7 @@ class QueryParam < ActiveRecord::Base
               raise ArgumentError
             end
           rescue ArgumentError
+            self.errors.add :default_value, :invalid_date
             self.errors.add :default_value, :invalid_date
           end
           val

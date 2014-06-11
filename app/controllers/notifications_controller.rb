@@ -59,7 +59,7 @@ class NotificationsController < ApplicationController
       @messages = result[:notifications]
       @query_sql = result[:query]
     else
-      @notification.set_params_for_exhibition(:data_consulta => @notification.query_date.to_s)
+      # @notification.set_params_for_exhibition(:data_consulta => @notification.query_date.to_s)
       @messages = []
     end
     render :action => 'simulate'
