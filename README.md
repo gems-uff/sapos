@@ -4,8 +4,6 @@ SAPOS main goal is to ease the management of information related to graduate pro
 
 This project was initiated by professors Leonardo Murta and Vanessa Braganholo and followed by three term projects from the Computer Science undergraduate course at Universidade Federal Fluminense. 
 
-We would like to thank JetBrains for providing us a license of RedMine that was used in the development of SAPOS. 
-
 #Team
 
 * Leonardo Gresta Paulino Murta (joined in July 2011)
@@ -47,6 +45,10 @@ We would like to thank JetBrains for providing us a license of RedMine that was 
 * [ActiveScaffold](https://github.com/activescaffold/active_scaffold)
 * [Prawn](https://github.com/prawnpdf/prawn)
 * [MySQL](http://www.mysql.com/)
+
+#Acknowledgements
+
+We would like to thank JetBrains for providing us a license of RedMine that was used in the development of SAPOS. 
 
 #License
 
