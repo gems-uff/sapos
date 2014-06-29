@@ -292,6 +292,9 @@ pt-BR:
         name: Name
         value_type: Tipo
         default_value: Valor padrão
+      notification_param:
+        value: Valor
+        query_param: Parâmetro
       research_area:
         code: "Código"
         name: "Nome"
@@ -566,6 +569,9 @@ pt-BR:
       notification:
         one: "Notificação"
         other: "Notificações"
+      notification_param:
+        one: Parâmetro
+        other: Parâmetros
       notification_log:
         one: "Notificação Enviada"
         other: "Notificações Enviadas"
