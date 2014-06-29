@@ -3,6 +3,8 @@
 
 class QueryParam < ActiveRecord::Base
   belongs_to :query
+  has_many :notification_params
+
   attr_accessible :name, :default_value, :value_type
 
   attr_accessor :simulation_value
