@@ -32,7 +32,7 @@ module Notifier
     Notifier.send_emails(Notifier.run_notifications)
   end
 
-  def self.send_emails(messages)
+  def self.send_emails(notifications)
     Notifier.logger.info "Starting send_emails function."
     unless Notifier.should_run?
       Notifier.logger.info "Execution method is not 'Server'. Stoping process."
@@ -43,7 +43,9 @@ module Notifier
       Notifier.logger.info "Custom Variable 'redirect_email' is empty. Stoping process."
       return
     end
-    
+
+    messages = notifications[:notifications]
+
     messages.each do |message|
       options = {}
       m = message.merge(options)
