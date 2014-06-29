@@ -32,6 +32,7 @@ class Ability
     if role_id == Role::ROLE_ADMINISTRADOR
       can :manage, :all
       cannot [:destroy, :update], Role
+      cannot [:destroy, :create], NotificationParam
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [Role, Notification, CustomVariable])
     elsif role_id == Role::ROLE_PROFESSOR
