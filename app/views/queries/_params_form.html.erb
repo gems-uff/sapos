@@ -1,5 +1,4 @@
 <% resource_name = resource.class.to_s.downcase %>
-<% show_derivations ||= false %>
 <h5>Parâmetros de consulta</h5>
 <div>
   <table class="showtable listed-records-table">
@@ -18,43 +17,25 @@
               <td colspan="3"><%= error %></td>
             </tr>
         <% end %>
+        <tr class="record">
+          <td>
+            <%= param.name %>
+            <small>(<%= param.value_type %>)</small>
+          </td>
+          <td>
+            <% if param.type.list? or param.default_value.nil? %>
+                <%= text_field_tag "#{resource_name}_#{resource.id}_#{param.name}", param.value, data: {name: "#{resource_name}_params[#{param.name}]", 'link-target' => "#as_#{resource_name.pluralize}-execute-#{resource.id}-link"}, id: "#{resource_name}_#{resource.id}_#{param.name}", class: "_onchange_param_field _param_field _param_type_#{param.value_type.downcase}" %>
+            <% else %>
+                <%= text_field_tag "#{resource_name}_#{resource.id}_#{param.name}", param.parsed_value, data: {name: "#{resource_name}_params[#{param.name}]", 'link-target' => "#as_#{resource_name.pluralize}-execute-#{resource.id}-link"}, id: "#{resource_name}_#{resource.id}_#{param.name}", class: "_onchange_param_field _param_field _param_type_#{param.value_type.downcase}" %>
+            <% end %>
+          </td>
+          <td>
+            <small class="_default_value" data-default_value="<%= param.default_value %>">
+              <a href="javascript:void(o)">(Default: <%= param.default_value %>)</a>
+            </small>
+          </td>
+        </tr>
 
-
-        <% if show_derivations && Notification::RESERVED_PARAMS.include?(param.name) %>
-            <tr class="record">
-              <td>
-                <%= param.name %>
-                <small>(<%= param.value_type %>)</small>
-              </td>
-              <td>
-                <span><%= param.value %></span>
-              </td>
-              <td>
-                <small>(derivado de <b>data_consulta</b>)</small>
-              </td>
-            </tr>
-        <% else %>
-            <tr class="record">
-              <td>
-                <%= param.name %>
-                <small>(<%= param.value_type %>)</small>
-              </td>
-              <td>
-
-                <% if param.type.list? or param.default_value.nil? %>
-                    <%= text_field_tag "#{resource_name}_#{resource.id}_#{param.name}", param.value, data: {name: "#{resource_name}_params[#{param.name}]", 'link-target' => "#as_#{resource_name.pluralize}-#{target}-#{resource.id}-link"}, id: "#{resource_name}_#{resource.id}_#{param.name}", class: "_onchange_param_field _param_field _param_type_#{param.value_type.downcase}" %>
-                <% else %>
-                    <%= text_field_tag "#{resource_name}_#{resource.id}_#{param.name}", param.parsed_value, data: {name: "#{resource_name}_params[#{param.name}]", 'link-target' => "#as_#{resource_name.pluralize}-#{target}-#{resource.id}-link"}, id: "#{resource_name}_#{resource.id}_#{param.name}", class: "_onchange_param_field _param_field _param_type_#{param.value_type.downcase}" %>
-                <% end %>
-
-              </td>
-              <td>
-                <small class="_default_value" data-default_value="<%= param.default_value %>">
-                  (Default: <%= param.default_value %>)
-                </small>
-              </td>
-            </tr>
-        <% end %>
     <% end %>
     </tbody>
   </table>
