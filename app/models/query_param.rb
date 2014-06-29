@@ -43,7 +43,6 @@ class QueryParam < ActiveRecord::Base
             end
           rescue ArgumentError
             self.errors.add :default_value, :invalid_date
-            self.errors.add :default_value, :invalid_date
           end
           val
         when VALUE_DATETIME
