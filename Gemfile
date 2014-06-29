@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.17'
+gem 'rails', '3.2.18'
 gem "rails-erd", "~> 1.0.0"
 gem "kaminari"
 #gem "schema_plus"
@@ -11,15 +11,14 @@ gem "paper_trail", "~> 2.7.2"
 
 gem 'sql-parser'
 
-# Bundle edge Rails instead:
-# gem 'rails', :git => 'git://github.com/rails/rails.git'
-
 group :development, :test do
   gem 'sqlite3'
   gem 'awesome_print'
   gem 'rspec-rails', '~> 2.0'
   gem 'factory_girl_rails', '1.7.0'
-  gem 'debugger'
+  gem 'quiet_assets'
+  gem 'webrick',  '1.3.1'
+  # gem 'debugger'
   #gem 'rcov_rails'
 end
 
@@ -59,7 +58,7 @@ gem 'prawn_rails'
 gem 'redcarpet', '2.1.0'
 
 # Active scaffold support for Rails 3
-gem 'active_scaffold', "~> 3.3.3"
+gem 'active_scaffold', "3.3.3"
 gem 'recordselect', "3.3.0"
 
 #Date Validation Plugin
