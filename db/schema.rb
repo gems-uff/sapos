@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140525171701) do
+ActiveRecord::Schema.define(:version => 20140629202358) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -238,6 +238,18 @@ ActiveRecord::Schema.define(:version => 20140525171701) do
   end
 
   add_index "notification_logs", ["notification_id"], :name => "index_notification_logs_on_notification_id"
+
+  create_table "notification_params", :force => true do |t|
+    t.integer  "notification_id"
+    t.integer  "query_param_id"
+    t.string   "value"
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
+    t.boolean  "active",          :default => false, :null => false
+  end
+
+  add_index "notification_params", ["notification_id"], :name => "index_notification_params_on_notification_id"
+  add_index "notification_params", ["query_param_id"], :name => "index_notification_params_on_query_param_id"
 
   create_table "notifications", :force => true do |t|
     t.string   "title"
