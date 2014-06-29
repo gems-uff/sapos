@@ -1,6 +1,6 @@
 <h4><%= @query.to_label %></h4>
 
-<%= render 'params_form', :resource => @query, :target => 'execute' %>
+<%= render 'params_form', :resource => @query %>
 
 <div class="actions" style="display: block; margin: 10px 0">
   <a id="as_queries-execute-<%= @query.id %>-link" class="execute as_action again" href="javascript:void(0)"><i class="fa fa-table" title="Executar"></i>
