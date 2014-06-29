@@ -22,7 +22,7 @@
       <%= loading_indicator_tag(:action => :render_field, :id => params[:id]) if column.update_columns %>
       <%= content_tag :span, column.description, :class => 'description' if column.description.present? %>
       <div id="<%= column_options[:id] + 'container' %>">
-        <%= sql_query_form_column record, column_options %>
+        <%= query_sql_form_column(record, column_options) %>
       </div>
     </dd>
 <% end %>

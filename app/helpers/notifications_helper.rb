@@ -4,7 +4,7 @@
 module NotificationsHelper
 
   def code_mirror_text_area(column, id, type, options, set_size = false)
-    set_size_str = set_size ? ".setSize(null, '#{options[:value].count("\n") + 2}em')" :  '';
+    set_size_str = set_size ? ".setSize(null, '#{options[:value].count("\n") + 2}em')" : '';
     block = text_area(:record, :sql_query, options)
     block += "<script>
     CodeMirror.fromTextArea(document.getElementById('#{id}'),
@@ -20,7 +20,7 @@ module NotificationsHelper
   end
 
   def code_mirror_view(id, type, value, set_size = false)
-    set_size_str = set_size ? ".setSize(null, '#{value.count("\n") + 2}em')" :  '';
+    set_size_str = set_size ? ".setSize(null, '#{value.count("\n") + 2}em')" : '';
     "<div id='#{id}'></div>
     <script>
     CodeMirror(document.getElementById('#{id}'),
@@ -37,9 +37,9 @@ module NotificationsHelper
     </script>".html_safe
   end
 
-  def sql_query_form_column(record, options)
+  def query_sql_form_column(record, options)
     # code_mirror_text_area(:sql_query_view, "record_query_view_#{record.id}", "text/x-mysql", options.merge(:value => record.sql_query || I18n.t('active_scaffold.notification.sql_query_default')), true, true)
-    code_mirror_view("sql_query-view-#{record.id}", "text/x-mysql", record.sql_query, true)
+    code_mirror_view("sql_query-view-#{record.id}", "text/x-mysql", (record.query.try(:sql) || ''), true)
   end
 
   def body_template_form_column(record, options)
@@ -51,10 +51,16 @@ module NotificationsHelper
   end
 
   def sql_query_show_column(record, column)
-    code_mirror_view("sql_query-view-#{record.id}", "text/x-mysql", record.sql_query)
+    code_mirror_view("sql_query-view-#{record.id}", "text/x-mysql", (record.query.try(:sql) || ''))
   end
 
   def body_template_show_column(record, column)
     code_mirror_view("body_template-view-#{record.id}", "text/html", record.body_template)
   end
+
+  def notification_param_query_param_form_column(record, options)
+    options[:value] = record.query_param_id
+    label(:record_value_1_params, record.id, ("(#{record.value_type}) ") + record.name) + hidden_field(:record, :query_param, options)
+  end
+
 end

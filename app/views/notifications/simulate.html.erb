@@ -1,6 +1,6 @@
 <h4> <%= @notification.to_label %> </h4>
 
-<%= render 'queries/params_form', :resource => @notification, :target => 'simulate', :show_derivations => true %>
+<%= render 'notifications/params_form', :resource => @notification%>
 
 <div class="actions" style="display: block; margin: 10px 0 0 0;">
   <a id="as_notifications-simulate-<%= @notification.id %>-link" class="simulate as_action again" href="javascript:void(0)">

@@ -5,6 +5,8 @@ class Notification < ActiveRecord::Base
   attr_accessible :body_template, :frequency, :next_execution, :notification_offset, :query_offset, :sql_query, :subject_template, :title, :to_template, :individual
 
   has_many :notification_logs
+  has_many :notification_params, class_name: 'NotificationParam', dependent: :destroy
+  has_many :params, class_name: 'NotificationParam', dependent: :destroy, conditions: {active: true}
   belongs_to :query, :inverse_of => :notifications
 
   has_paper_trail
@@ -23,19 +25,42 @@ class Notification < ActiveRecord::Base
   validates :frequency, :presence => true, :inclusion => {:in => FREQUENCIES}
   validates :notification_offset, :presence => true
   validates :query_offset, :presence => true
-  validates :sql_query, :presence => true
   validates :subject_template, :presence => true
   validates :to_template, :presence => true
 
   validate :execution
 
   after_create :update_next_execution!
-  after_initialize :init
+
+  def query_params_ids
+    (self.query.try(:params) || []).collect &:id
+  end
+
+  after_initialize do
+    self.query_offset ||= "0"
+    self.notification_offset ||= "0"
+  end
+
+
+  def query_id=(val)
+    super
+    notification_params_ids = (self.notification_params || []).collect &:query_param_id
+
+    new_params = query_params_ids - notification_params_ids
+
+    new_params.each do |query_param_id|
+      self.notification_params.create(:query_param_id => query_param_id, :notification_id => self.id, :active => true)
+    end
+  end
 
   before_save do
-    if self.query.changed?
-      self.query.save
+    if self.query_id_changed?
+      cached_query_params_ids = self.query_params_ids
+      self.notification_params.each do |np|
+        np.update_attribute(:active, cached_query_params_ids.include?(np.query_param_id))
+      end
     end
+    true
   end
 
   def to_label
@@ -48,11 +73,6 @@ class Notification < ActiveRecord::Base
 
   def sql_query=(val)
     self.query.sql= val
-  end
-
-  def init
-    self.query_offset ||= "0"
-    self.notification_offset ||= "0"
   end
 
   def calculate_next_notification_date(options={})
@@ -83,10 +103,19 @@ class Notification < ActiveRecord::Base
     next_date + StringTimeDelta::parse(self.query_offset) - StringTimeDelta::parse(self.notification_offset)
   end
 
+  def set_notification_params_values(params)
+    params.each do |key, value|
+      current_param = self.params.find { |p| p.query_param.name.to_s == key.to_s }
+      current_param.value = value if current_param
+    end
+  end
+
   def execute(options={})
     notifications = []
 
     params = prepare_params_and_derivations(options[:override_params] || {})
+
+    set_notification_params_values(params)
 
     result = self.query.execute(params)
 
@@ -170,12 +199,6 @@ class Notification < ActiveRecord::Base
   def get_simulation_query_date
     self.params.find { |p| p.name == 'data_consulta' }.simulation_value
   end
-
-
-  def params
-    self.query.params
-  end
-
 end
 
 
