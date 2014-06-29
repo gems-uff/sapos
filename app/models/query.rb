@@ -10,7 +10,7 @@ class Query < ActiveRecord::Base
 
   accepts_nested_attributes_for :params, reject_if: :all_blank
 
-  before_save :ensure_valid_params
+  validate :ensure_valid_params
   validates_associated :params
 
   def map_params(simulation_params = {})
