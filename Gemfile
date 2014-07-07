@@ -52,7 +52,7 @@ gem 'jquery-ui-rails'
 gem 'font-awesome-sass'
 
 # Prawn to PDF
-gem 'prawn'
+gem 'prawn', '0.15.0'
 gem 'prawn_rails'
 
 # Redcarpet for Readme MarkDown (or README.md)
@@ -60,6 +60,7 @@ gem 'redcarpet', '2.1.0'
 
 # Active scaffold support for Rails 3
 gem 'active_scaffold', "~> 3.3.3"
+gem 'active_scaffold_duplicate', '~> 1.0.2'
 gem 'recordselect', "3.3.0"
 
 #Date Validation Plugin

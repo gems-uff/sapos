@@ -14,6 +14,13 @@ class ReportConfiguration < ActiveRecord::Base
   validates :scale, :presence => true
 
   mount_uploader :image, ImageUploader
+  skip_callback :commit, :after, :remove_image!
+
+  def initialize_dup(other)
+    super
+    attrib = other.attributes.except("id", "created_at", "updated_at")
+    self.assign_attributes(attrib)
+  end
 
 
 end

@@ -3,7 +3,7 @@
 	</dt>
 	<dd>
 		<input type="hidden" name="record_id" value="<%=record.id.nil? ? -1 : record.id%>">
-		<%= link_to(I18n.t('active_scaffold.custom_variables.pdf_header.preview'), {:action => "preview", :format=>'pdf'}, :class=>'pdf_preview') %>
+		<%= link_to(I18n.t('active_scaffold.report_configurations.preview'), {:action => "preview", :format=>'pdf'}, :class=>'pdf_preview') %>
 	</dd>
 </dl>
 <script>

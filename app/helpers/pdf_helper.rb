@@ -7,11 +7,16 @@ require "prawn/measurement_extensions"
 
 module PdfHelper
   
-  def header(pdf, title, options={}, &block)
-    type = options[:pdf_type] || :report; #report, transcript, grades_report, schedule
-    pdf_type = :"#{use_at_}#{type}"
-    pdf_config = options[:pdf_config] || ReportConfiguration.where(pdf_type => true).find(:first, :order => '`order` desc')
-    pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right, :height => HeaderVariable::HEIGHT) do
+  HEIGHT = 90
+
+  def header(pdf, title, pdf_config, options={}, &block)
+    if pdf_config.nil?
+      type = options[:pdf_type] || :report; #report, transcript, grades_report, schedule
+      pdf_type = :"use_at_#{type}"
+      pdf_config = options[:pdf_config] || ReportConfiguration.where(pdf_type => true).find(:first, :order => '`order` desc')
+    end      
+
+    pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right, :height => HEIGHT) do
       pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right - 170, :height => 68) do
           
           pdf.stroke_bounds
@@ -37,7 +42,7 @@ module PdfHelper
       end
 
 
-      pdf.bounding_box([pdf.bounds.left + pdf.bounds.right - 153, HeaderVariable::HEIGHT], :width => 153, :height => HeaderVariable::HEIGHT) do
+      pdf.bounding_box([pdf.bounds.left + pdf.bounds.right - 153, HEIGHT], :width => 153, :height => HEIGHT) do
           unless options[:hide_logo_stroke_bounds]
             pdf.stroke_bounds
           end
@@ -46,7 +51,7 @@ module PdfHelper
           else
             if not (pdf_config.image.nil? or pdf_config.image.path.empty?)
               pdf.image(pdf_config.image.path, 
-                :at => [pdf_config.x, 90 - pdf_config.y],
+                :at => [pdf_config.x, HEIGHT - pdf_config.y],
                 :vposition => :top,
                 :scale => pdf_config.scale)
             else
@@ -152,19 +157,24 @@ module PdfHelper
     end
   end
 
-  def new_document(name, options = {}, &block)
+  def new_document(name, title, options = {}, &block)
+    type = options[:pdf_type] || :report; #report, transcript, grades_report, schedule
+    pdf_type = :"use_at_#{type}"
+    pdf_config = options[:pdf_config] || ReportConfiguration.where(pdf_type => true).find(:first, :order => '`order` desc')
+    
     prawn_document({
       :page_size => "A4", 
       :left_margin => 0.6.cm, 
       :right_margin => (0.6.cm + ((options[:page_layout] == :landscape) ? 1.87 : 1.25)), 
       :top_margin => 0.8.cm, 
-      :bottom_margin => (options[:hide_footer] ? 1.cm : 80), 
+      :bottom_margin => (pdf_config.show_sapos ? 1.cm : 80), 
       :filename => name
     }.merge(options)) do |pdf|
       pdf.fill_color "000080" 
       pdf.stroke_color '000080'
+      header(pdf, title, pdf_config)
       yield pdf
-      unless options[:hide_footer]
+      if pdf_config.show_sapos
         pdf.repeat(:all, dynamic: true) do
           page_footer(pdf)
         end

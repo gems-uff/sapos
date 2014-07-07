@@ -9,7 +9,8 @@ class ReportConfigurationsController < ApplicationController
     config.list.sorting = {:name => 'ASC'}
     config.create.label = :create_report_configuration_label
     config.update.label = :update_report_configuration_label    
-
+    config.actions << :duplicate
+    config.duplicate.link.label = "<i title='#{I18n.t('active_scaffold.duplicate')}' class='fa fa-copy'></i>".html_safe
     config.list.columns = [
         :name, 
         :order, 
@@ -58,7 +59,7 @@ class ReportConfigurationsController < ApplicationController
     @pdf_config = record
     respond_to do |format|
       format.pdf do
-        send_data render_to_string, :filename => I18n.t("pdf_content.custom_variables.pdf_header.preview"), :type => 'application/pdf'
+        send_data render_to_string, :filename => I18n.t("pdf_content.report_configurations.preview"), :type => 'application/pdf'
       end
     end
   end

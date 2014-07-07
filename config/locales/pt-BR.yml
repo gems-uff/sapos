@@ -676,16 +676,12 @@ pt-BR:
     create_student_major_label: "Adicionar Curso do Aluno"
     create_thesis_defense_committee_participation_label: "Adicionar Participação em Banca"
     create_user_label: "Adicionar Usuário"
-    custom_variables:
-      pdf_header:
-        scale: "Escala"
-        logo: "Logo"
-        x: "X"
-        y: "Y"
-        preview: "Visualizar"
+    report_configurations:
+      preview: "Visualizar"
     delayed_phases_report: "Relatório"
     delete_link: "Excluir"
     delete_message: "Tem certeza que deseja excluir?"
+    duplicate: "Duplicar"
     filtered: ""
     found:
       one: "Registro Encontrado"
@@ -856,9 +852,8 @@ pt-BR:
         course_name: "Disciplina"
         noschedule: "Horário a combinar"
         year_semester_error: 'Selecione Ano/Semestre na busca!'
-    custom_variables:
-      pdf_header:
-        preview: "Visualizar"
+    report_configurations:
+      preview: "Visualizar"
     enrollment:
       to_pdf:
         filename: "Relatório de Matrículas"
