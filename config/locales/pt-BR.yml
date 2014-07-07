@@ -294,7 +294,7 @@ pt-BR:
       report_configuration:
         name: "Nome"
         image: "Logo"
-        show_sapos: "Rodapé"
+        signature_footer: "Rodapé com assinatura"
         text: "Header"
         use_at_grades_report: "Usar no boletim"
         use_at_report: "Usar em relatórios"

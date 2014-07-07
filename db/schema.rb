@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140525190034) do
+ActiveRecord::Schema.define(:version => 20140707232935) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -357,7 +357,7 @@ ActiveRecord::Schema.define(:version => 20140525190034) do
     t.boolean  "use_at_schedule"
     t.text     "text"
     t.string   "image"
-    t.boolean  "show_sapos"
+    t.boolean  "signature_footer"
     t.integer  "order",                :default => 2
     t.decimal  "scale"
     t.integer  "x"

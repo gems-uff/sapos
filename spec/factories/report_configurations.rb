@@ -9,6 +9,6 @@ FactoryGirl.define do
     use_at_schedule false
     text "MyText"
     image "MyString"
-    show_sapos false
+    signature_footer false
   end
 end

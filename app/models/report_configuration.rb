@@ -2,7 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class ReportConfiguration < ActiveRecord::Base
-  attr_accessible :image, :name, :show_sapos, :text, :use_at_grades_report, 
+  attr_accessible :image, :name, :signature_footer, :text, :use_at_grades_report, 
   				  :use_at_report, :use_at_schedule, :use_at_transcript, :order,
   				  :x, :y, :scale
   has_paper_trail

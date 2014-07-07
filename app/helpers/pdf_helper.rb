@@ -66,7 +66,7 @@ module PdfHelper
 
   end
 
-  def page_footer(pdf, options={})
+  def signature_footer(pdf, options={})
     x = 5
     
     diff_width = options[:diff_width]
@@ -120,6 +120,26 @@ module PdfHelper
     end
   end
 
+  def datetime_footer(pdf, options={})
+    x = 5
+    
+    diff_width = options[:diff_width]
+    diff_width ||= 0
+
+    last_box_height = 30
+    last_box_width1 = 165
+    last_box_width2 = 335
+
+    last_box_y = pdf.bounds.bottom  #pdf.bounds.bottom + last_box_height# pdf.cursor - 15
+    pdf.font('Courier', :size => 8) do
+      pdf.bounding_box([0, last_box_y], :width => last_box_width1, :height => last_box_height) do
+        current_x = x
+        pdf.move_down last_box_height/2
+        pdf.draw_text("SAPOS - #{I18n.localize(Time.zone.now, :format => :long)}", :at => [current_x, pdf.cursor])
+      end
+    end
+  end
+
   def text_table(pdf, data_table, default_margin_indent)
     index = 0
     rows = data_table.collect { |row| "" }
@@ -167,16 +187,19 @@ module PdfHelper
       :left_margin => 0.6.cm, 
       :right_margin => (0.6.cm + ((options[:page_layout] == :landscape) ? 1.87 : 1.25)), 
       :top_margin => 0.8.cm, 
-      :bottom_margin => (pdf_config.show_sapos ? 1.cm : 80), 
+      :bottom_margin => (pdf_config.signature_footer ? 80 : 1.cm), 
       :filename => name
     }.merge(options)) do |pdf|
       pdf.fill_color "000080" 
       pdf.stroke_color '000080'
       header(pdf, title, pdf_config)
       yield pdf
-      if pdf_config.show_sapos
-        pdf.repeat(:all, dynamic: true) do
-          page_footer(pdf)
+      
+      pdf.repeat(:all, dynamic: true) do
+        if pdf_config.signature_footer
+          signature_footer(pdf)
+        else
+          datetime_footer(pdf)
         end
       end
       if options[:watermark]
