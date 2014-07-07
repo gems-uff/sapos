@@ -4,42 +4,62 @@
 
 class ReportConfigurationsController < ApplicationController
   authorize_resource
-
+  include ApplicationHelper
   active_scaffold :report_configuration do |config|
     config.list.sorting = {:name => 'ASC'}
     config.create.label = :create_report_configuration_label
-    config.update.label = :update_report_configuration_label
-  
-    columns = [
-		:name, 
-		:image,
-		:scale,
-		:x,
-		:y,
-		:order, 
-		:text, 
-		:show_sapos, 
-		:use_at_report, 
-		:use_at_transcript,
-		:use_at_grades_report,
-		:use_at_schedule
-	]
-	
+    config.update.label = :update_report_configuration_label    
 
     config.list.columns = [
-		:name, 
-		:order, 
-		:text, 
-		:show_sapos, 
-		:use_at_report, 
-		:use_at_transcript,
-		:use_at_grades_report,
-		:use_at_schedule
-	]
+        :name, 
+        :order, 
+        :text, 
+        :show_sapos, 
+        :use_at_report, 
+        :use_at_transcript,
+        :use_at_grades_report,
+        :use_at_schedule
+    ]
 
-	config.columns = columns
-	config.create.columns = columns + [:preview]
-	config.update.columns = columns + [:preview]
+    columns = [
+        :name, 
+        :image,
+        :scale,
+        :x,
+        :y,
+        :order, 
+        :text, 
+        :preview,
+        :show_sapos, 
+        :use_at_report, 
+        :use_at_transcript,
+        :use_at_grades_report,
+        :use_at_schedule,
+    ]
 
+    config.create.columns = columns
+    config.update.columns = columns
+    columns.delete(:preview)
+    config.columns = columns
+    
+  end
+
+  def preview
+    id = params[:record_id].to_i
+    if id != -1
+      record = ReportConfiguration.find(id)
+    else
+      record = ReportConfiguration.new
+    end
+
+    record.assign_attributes(params[:record].except(:image_cache, :remove_image))
+    # up = ImageUploader.new record, :image
+    # up.store(File.open(params[:record][:image]))
+    @pdf_config = record
+    respond_to do |format|
+      format.pdf do
+        send_data render_to_string, :filename => I18n.t("pdf_content.custom_variables.pdf_header.preview"), :type => 'application/pdf'
+      end
+    end
   end
 end

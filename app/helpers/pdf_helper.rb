@@ -8,13 +8,15 @@ require "prawn/measurement_extensions"
 module PdfHelper
   
   def header(pdf, title, options={}, &block)
-    pdf_header = options[:pdf_header] || CustomVariable.pdf_header
+    type = options[:pdf_type] || :report; #report, transcript, grades_report, schedule
+    pdf_type = :"#{use_at_}#{type}"
+    pdf_config = options[:pdf_config] || ReportConfiguration.where(pdf_type => true).find(:first, :order => '`order` desc')
     pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right, :height => HeaderVariable::HEIGHT) do
       pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right - 170, :height => 68) do
           
           pdf.stroke_bounds
           pdf.pad(15) do
-            pdf.text "<b>#{pdf_header.text}</b>", :align => :center, font_size: 9, :inline_format => true
+            pdf.text "<b>#{pdf_config.text}</b>", :align => :center, font_size: 9, :inline_format => true
           end
       end
 
@@ -42,18 +44,17 @@ module PdfHelper
           unless block.nil?
             yield
           else
-            if not (pdf_header.filename.nil? or pdf_header.filename.empty?)
-              pdf.image(pdf_header.path, 
-                :at => [pdf_header.image_x, pdf_header.image_y],
+            if not (pdf_config.image.nil? or pdf_config.image.path.empty?)
+              pdf.image(pdf_config.image.path, 
+                :at => [pdf_config.x, 90 - pdf_config.y],
                 :vposition => :top,
-                :scale => pdf_header.scale)
+                :scale => pdf_config.scale)
             else
               pdf.image("#{Rails.root}/config/images/logoUFF.jpg", :at => [13, 77],
                 :vposition => :top,
                 :scale => 0.4
               )
             end
-            
           end
       end
     end

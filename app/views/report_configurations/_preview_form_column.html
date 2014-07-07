@@ -1,9 +1,69 @@
-
-<%= submit_tag "teste", :class => "submit"%>
+<dl>
+	<dt>
+	</dt>
+	<dd>
+		<input type="hidden" name="record_id" value="<%=record.id.nil? ? -1 : record.id%>">
+		<%= link_to(I18n.t('active_scaffold.custom_variables.pdf_header.preview'), {:action => "preview", :format=>'pdf'}, :class=>'pdf_preview') %>
+	</dd>
+</dl>
 <script>
+	var as_container = '#<%="as_#{record.class.name.tableize}-#{record.new_record? ? "create-" : "update-#{record.id}"}-form"%>';
+	var image_input = as_container + ' .image-input';
+	var header_input = as_container + ' #record_text_<%=record.id%>';
+
+	// Surround
+	$(image_input).wrap('<div class="filefield"></div>')
+	$(header_input).wrap('<div class="header_text_field"></div>')
+
+	// Image preview
+	carrierwave_preview(as_container);
+
+	// Pdf preview
+	function getiframeDocument(iframe) {
+        var iframeDoc = iframe[0].contentWindow || iframe[0].contentDocument;
+        if (iframeDoc.document) {
+            iframeDoc = iframeDoc.document;
+        }
+        return iframeDoc;
+    }
+
+    function submit_clone_form(link_selector, original, move) {
+        var iframe = $("<iframe style='display: none' src='about:blank'></iframe>").appendTo("body");
+        var iframedoc = getiframeDocument(iframe);
+        iframedoc.write("<html><head></head><body></body></html>");            
+        var clone = original.clone();
+        clone.attr('id', '');
+        clone.attr('target', '');
+        clone.attr('method', 'post');
+      
+        clone.attr('action', $(link_selector).attr('href'));
+        for (descriptor in move) {
+            clone.find(descriptor).remove();
+            var element = $(descriptor);
+            element.appendTo(clone);
+            var parent = move[descriptor];
+            original.find(parent).empty();
+        }
+        clone.appendTo($(iframedoc).find('body')).submit();
+        for (descriptor in move) {
+            var parent = move[descriptor];
+            clone.find(descriptor).appendTo(original.find(parent));
+        }
+        clone.remove();
+    }
+
+    link_selector = as_container + ' .pdf_preview';
+    $(link_selector).click(function(ev){
+        ev.preventDefault();
+        var original = $(as_container);
+        submit_clone_form(link_selector, original, {
+            '.image-input': '.filefield',
+            '#record_text_<%=record.id%>': '.header_text_field'
+        });
+        
+    });
 
 
-$('#as_report_configurations-update-<%=record.id%>-form .form_footer')
 
 
 </script>
