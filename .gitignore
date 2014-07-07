@@ -6,6 +6,8 @@
 /public/assets
 /public/images/active_scaffold
 /public/uploads/pdf_header
+/public/uploads/tmp
+/public/uploads/report_configuration
 /public/javascripts/active_scaffold
 /public/stylesheets/active_scaffold
 .idea/

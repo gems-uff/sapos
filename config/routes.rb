@@ -184,10 +184,6 @@ Sapos::Application.routes.draw do
 
   resources :custom_variables do
     as_routes
-    collection do
-      put 'preview'
-      post 'preview'
-    end
   end
 
   resources :thesis_defense_committee_participations do
@@ -224,6 +220,14 @@ Sapos::Application.routes.draw do
 
   resources :notification_params do
     as_routes
+  end
+
+  resources :report_configurations do
+    as_routes
+    collection do
+      put 'preview'
+      post 'preview'
+    end
   end
 
   # The priority is based upon order of creation:

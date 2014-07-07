@@ -11,7 +11,8 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140629202358) do
+
+ActiveRecord::Schema.define(:version => 20140707232936) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -360,6 +361,23 @@ ActiveRecord::Schema.define(:version => 20140629202358) do
   end
 
   add_index "query_params", ["query_id"], :name => "index_query_params_on_query_id"
+
+  create_table "report_configurations", :force => true do |t|
+    t.string   "name"
+    t.boolean  "use_at_report"
+    t.boolean  "use_at_transcript"
+    t.boolean  "use_at_grades_report"
+    t.boolean  "use_at_schedule"
+    t.text     "text"
+    t.string   "image"
+    t.boolean  "signature_footer"
+    t.integer  "order",                :default => 2
+    t.decimal  "scale"
+    t.integer  "x"
+    t.integer  "y"
+    t.datetime "created_at",                          :null => false
+    t.datetime "updated_at",                          :null => false
+  end
 
   create_table "research_areas", :force => true do |t|
     t.string   "name"
