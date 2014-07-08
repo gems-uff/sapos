@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140708043853) do
+ActiveRecord::Schema.define(:version => 20140708190809) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -371,12 +371,12 @@ ActiveRecord::Schema.define(:version => 20140708043853) do
     t.text     "text"
     t.string   "image"
     t.boolean  "signature_footer"
-    t.integer  "order",                :default => 2
-    t.decimal  "scale"
+    t.integer  "order",                                               :default => 2
+    t.decimal  "scale",                :precision => 10, :scale => 8
     t.integer  "x"
     t.integer  "y"
-    t.datetime "created_at",                          :null => false
-    t.datetime "updated_at",                          :null => false
+    t.datetime "created_at",                                                         :null => false
+    t.datetime "updated_at",                                                         :null => false
   end
 
   create_table "research_areas", :force => true do |t|
