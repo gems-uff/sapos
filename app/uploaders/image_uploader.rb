@@ -13,7 +13,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
   def url
-    "#{Rails.application.config.config_url_root}#{super}"
+    "#{Rails.application.config.config_url_root}#{super[4..-1]}"
   end
 
   def store_dir
