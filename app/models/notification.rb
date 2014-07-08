@@ -21,15 +21,20 @@ class Notification < ActiveRecord::Base
       I18n.translate("activerecord.attributes.notification.frequencies.daily")
   ]
 
-  validates :body_template, :presence => true
-  validates :frequency, :presence => true, :inclusion => {:in => FREQUENCIES}
-  validates :notification_offset, :presence => true
-  validates :query_offset, :presence => true
-  validates :subject_template, :presence => true
-  validates :to_template, :presence => true
+  validates :body_template, :presence => true, on: :update
+  validates :frequency, :presence => true, :inclusion => {:in => FREQUENCIES}, on: :update
+  validates :notification_offset, :presence => true, on: :update
+  validates :query_offset, :presence => true, on: :update
+  validates :subject_template, :presence => true, on: :update
+  validates :to_template, :presence => true, on: :update
 
-  validate :execution
+  validate do
+    execution unless self.new_record?
+  end
 
+  before_create do
+    self.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
+  end
   after_create :update_next_execution!
 
   def query_params_ids
@@ -39,11 +44,17 @@ class Notification < ActiveRecord::Base
   after_initialize do
     self.query_offset ||= "0"
     self.notification_offset ||= "0"
+    hammer_current_params!
   end
 
+  def build_params_for_creation
+    self.query_params_ids.each do |query_param_id|
+      self.params.build(:query_param_id => query_param_id, :active => true)
+    end
+  end
 
-  def query_id=(val)
-    super
+  def hammer_current_params!
+
     notification_params_ids = (self.notification_params || []).collect &:query_param_id
 
     new_params = query_params_ids - notification_params_ids
@@ -51,15 +62,22 @@ class Notification < ActiveRecord::Base
     new_params.each do |query_param_id|
       self.notification_params.create(:query_param_id => query_param_id, :notification_id => self.id, :active => true)
     end
-  end
 
-  before_save do
     if self.query_id_changed?
       cached_query_params_ids = self.query_params_ids
       self.notification_params.each do |np|
         np.update_attribute(:active, cached_query_params_ids.include?(np.query_param_id))
       end
     end
+  end
+
+  def query_id=(val)
+    super
+    hammer_current_params!
+  end
+
+  before_save do
+    hammer_current_params! if self.persisted?
     true
   end
 
@@ -119,34 +137,35 @@ class Notification < ActiveRecord::Base
 
     result = self.query.execute(params)
 
-    #Build the notifications with the results from the query
-    if self.individual
-      result[:rows].each do |raw_result|
-        bindings = {}.merge(params)
-        bindings.merge!(Hash[result[:columns].zip(raw_result)])
+    unless options[:only_validate]
+      #Build the notifications with the results from the query
+      if self.individual
+        result[:rows].each do |raw_result|
+          bindings = {}.merge(params)
+          bindings.merge!(Hash[result[:columns].zip(raw_result)])
 
-        formatter = ERBFormatter.new(bindings)
-        notifications << {
-            :notification_id => self.id,
-            :to => formatter.format(self.to_template),
-            :subject => formatter.format(self.subject_template),
-            :body => formatter.format(self.body_template)
-        }
+          formatter = ERBFormatter.new(bindings)
+          notifications << {
+              :notification_id => self.id,
+              :to => formatter.format(self.to_template),
+              :subject => formatter.format(self.subject_template),
+              :body => formatter.format(self.body_template)
+          }
+        end
+      else
+        unless result[:rows].empty?
+          bindings = {:rows => result[:rows], :columns => result[:columns]}.merge(params)
+          formatter = ERBFormatter.new(bindings)
+          notifications << {
+              :notification_id => self.id,
+              :to => formatter.format(self.to_template),
+              :subject => formatter.format(self.subject_template),
+              :body => formatter.format(self.body_template)
+          }
+        end
       end
-    else
-      unless result[:rows].empty?
-        bindings = {:rows => result[:rows], :columns => result[:columns]}.merge(params)
-        formatter = ERBFormatter.new(bindings)
-        notifications << {
-            :notification_id => self.id,
-            :to => formatter.format(self.to_template),
-            :subject => formatter.format(self.subject_template),
-            :body => formatter.format(self.body_template)
-        }
-      end
+      self.update_next_execution! unless options[:skip_update]
     end
-    self.update_next_execution! unless options[:skip_update]
-
     {:notifications => notifications, :query => result[:query]}
   end
 
@@ -181,7 +200,7 @@ class Notification < ActiveRecord::Base
 
   def execution
     begin
-      self.execute(:skip_update => true)
+      self.execute(:skip_update => true, :only_validate => true)
     rescue => e
       splitted = e.to_s.split(' -:- ')
       if splitted.size > 1

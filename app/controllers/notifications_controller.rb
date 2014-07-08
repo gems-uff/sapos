@@ -19,7 +19,7 @@ class NotificationsController < ApplicationController
     form_columns = [:title, :frequency, :notification_offset, :query_offset, :query, :params, :individual, :to_template, :subject_template, :body_template]
     config.columns = form_columns
     config.update.columns = form_columns
-    config.create.columns = form_columns
+    config.create.columns = [:title, :frequency, :notification_offset, :query_offset, :query, :individual, :to_template, :subject_template, :body_template]
     config.show.columns = form_columns + [:next_execution]
     config.list.columns = [:title, :frequency, :notification_offset, :query_offset, :next_execution]
 
@@ -36,6 +36,20 @@ class NotificationsController < ApplicationController
 
 
     config.create.label = :create_notification_label
+  end
+
+  def after_render_field(record, column)
+    if column.name == :query
+      if params[:id]
+        notification = Notification.find(params[:id])
+        notification.query_id = record.query_id
+        notification.save
+      else
+        record.save
+        record.build_params_for_creation
+      end
+
+    end
   end
 
   def after_update_save(record)
