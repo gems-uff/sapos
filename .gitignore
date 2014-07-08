@@ -3,6 +3,7 @@
 /log/*.log
 /tmp/
 /nbproject/private/
+/app/images/report_configuration
 /public/assets
 /public/images/active_scaffold
 /public/uploads/pdf_header
