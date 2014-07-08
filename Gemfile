@@ -63,7 +63,7 @@ gem 'redcarpet', '2.1.0'
 # Active scaffold support for Rails 3
 gem 'active_scaffold' #, "3.3.3"
 gem 'active_scaffold_duplicate', '~> 1.0.2'
-gem 'recordselect', "3.3.0"
+gem 'recordselect', "~> 3.3.6"
 
 #Date Validation Plugin
 gem 'validates_timeliness', '~> 3.0.2'
