@@ -21,16 +21,18 @@ module ScholarshipDurationsHelper
     date_select :record, :start_date, {
          :discard_day => true,
          :start_year => Time.now.year - @@range,
-         :end_year => Time.now.year + @@range
+         :end_year => Time.now.year + @@range,
     }.merge(options)
   end
   
-  def end_date_form_column(record,options)    
+  def end_date_form_column(record, options)
     date_select :record, :end_date, {
          :discard_day => true,
          :start_year => Time.now.year - @@range,
-         :end_year => Time.now.year + @@range
-    }.merge(options)
+         :end_year => Time.now.year + @@range,
+         :include_blank => true,
+         :default => nil,
+    }.merge(options), {:class => "end_date-input"}
   end  
   
   def start_date_search_column(record,options)                
@@ -105,13 +107,4 @@ module ScholarshipDurationsHelper
     select_tag record[:level], options_from_collection_for_select(Level.all(:order => "name"), "id", "name"), options.merge(local_options)
   end
 
-  def scholarship_form_column(record, options)
-    logger.info "  RecordSelect Helper ScholarshipDurationsHelper\\scholarship_form_column" 
-    record_select_field :scholarship, record.scholarship || Scholarship.new, options.merge!(class: "text-input")
-  end
-
-  def enrollment_form_column(record, options)
-    logger.info "  RecordSelect Helper ScholarshipDurationsHelper\\enrollment_form_column" 
-    record_select_field :enrollment, record.enrollment || Enrollment.new, options.merge!(class: "text-input")
-  end
 end

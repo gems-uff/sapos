@@ -2,7 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Level < ActiveRecord::Base
-  attr_accessible :name, :course_name
+  attr_accessible :name, :course_name, :default_duration
 
   has_paper_trail
 
@@ -14,6 +14,8 @@ class Level < ActiveRecord::Base
 
 
   validates :name, :presence => true, :uniqueness => true
+  validates :default_duration, :presence => true
+
 
   def to_label
   	"#{self.name}"

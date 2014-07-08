@@ -37,5 +37,19 @@ describe Level do
         end
       end
     end
+    describe "default_duration" do
+      context "should be valid when" do
+        it "default_duration is not null" do
+          level.default_duration = 48
+          level.should have(0).errors_on :default_duration
+        end
+      end
+      context "should have error blank when" do
+        it "default_duration is null" do
+          level.default_duration = nil
+          level.should have_error(:blank).on :default_duration
+        end
+      end
+    end
   end
 end

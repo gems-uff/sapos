@@ -34,7 +34,12 @@ class ScholarshipDurationsController < ApplicationController
     config.columns[:scholarship].search_sql = 'scholarships.scholarship_number'
     config.columns[:scholarship].sort_by :sql => 'scholarships.scholarship_number'
     config.columns[:scholarship].form_ui = :record_select
+    config.columns[:scholarship].update_columns = [:end_date]
+    config.columns[:scholarship].send_form_on_update_column = true
     config.columns[:enrollment].form_ui = :record_select
+    config.columns[:enrollment].update_columns = [:end_date]
+    config.columns[:enrollment].send_form_on_update_column = true
+    config.columns[:end_date].send_form_on_update_column = true
     config.columns[:start_date].options = {:format => :monthyear}
     config.columns[:end_date].options = {:format => :monthyear}
     config.columns[:cancel_date].options = {:format => :monthyear}
@@ -152,6 +157,19 @@ class ScholarshipDurationsController < ApplicationController
 
   def after_update_save(record)
     flash[:warning] = record.warning_message
+  end
+
+  def after_render_field(record, column)
+    if column.name == :enrollment or column.name == :scholarship
+      dates = []
+      unless record.enrollment.nil?
+        dates << (record.enrollment.admission_date + (record.enrollment.level.default_duration - 1).months).end_of_month
+      end
+      unless record.scholarship.nil?
+        dates << record.scholarship.end_date
+      end
+      record.end_date = dates.min
+    end
   end
 
   def to_pdf

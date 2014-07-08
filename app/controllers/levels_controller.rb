@@ -10,6 +10,6 @@ class LevelsController < ApplicationController
     config.list.sorting = {:name => 'ASC'}
     config.create.label = :create_level_label
 
-    config.columns = [:name, :course_name, :advisement_authorizations]
+    config.columns = [:name, :course_name, :default_duration, :advisement_authorizations]
   end
 end 
