@@ -84,6 +84,6 @@ class Deferral < ActiveRecord::Base
         :body => I18n.t('notifications.deferral.email_to_advisor.body', advisor_info)
       }
     end
-    Notifier.send_emails(emails)
+    Notifier.send_emails(notifications: emails)
   end
 end

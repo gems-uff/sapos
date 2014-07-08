@@ -3,7 +3,7 @@
 
 FactoryGirl.define do
   factory :custom_variable do
-    name ""
+    description ""
     value ""
     variable ""
   end

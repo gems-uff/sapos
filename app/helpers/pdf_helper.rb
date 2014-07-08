@@ -7,14 +7,21 @@ require "prawn/measurement_extensions"
 
 module PdfHelper
   
-  def header(pdf, title, options={}, &block)
-    pdf_header = options[:pdf_header] || CustomVariable.pdf_header
-    pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right, :height => HeaderVariable::HEIGHT) do
+  HEIGHT = 90
+
+  def header(pdf, title, pdf_config, options={}, &block)
+    if pdf_config.nil?
+      type = options[:pdf_type] || :report; #report, transcript, grades_report, schedule
+      pdf_type = :"use_at_#{type}"
+      pdf_config = options[:pdf_config] || ReportConfiguration.where(pdf_type => true).find(:first, :order => '`order` desc')
+    end      
+
+    pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right, :height => HEIGHT) do
       pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right - 170, :height => 68) do
           
           pdf.stroke_bounds
           pdf.pad(15) do
-            pdf.text "<b>#{pdf_header.text}</b>", :align => :center, font_size: 9, :inline_format => true
+            pdf.text "<b>#{pdf_config.text}</b>", :align => :center, font_size: 9, :inline_format => true
           end
       end
 
@@ -35,32 +42,31 @@ module PdfHelper
       end
 
 
-      pdf.bounding_box([pdf.bounds.left + pdf.bounds.right - 153, HeaderVariable::HEIGHT], :width => 153, :height => HeaderVariable::HEIGHT) do
+      pdf.bounding_box([pdf.bounds.left + pdf.bounds.right - 153, HEIGHT], :width => 153, :height => HEIGHT) do
           unless options[:hide_logo_stroke_bounds]
             pdf.stroke_bounds
           end
           unless block.nil?
             yield
           else
-            if not (pdf_header.filename.nil? or pdf_header.filename.empty?)
-              pdf.image(pdf_header.path, 
-                :at => [pdf_header.image_x, pdf_header.image_y],
+            if not (pdf_config.image.nil? or pdf_config.image.path.empty?)
+              pdf.image(pdf_config.image.path, 
+                :at => [pdf_config.x, HEIGHT - pdf_config.y],
                 :vposition => :top,
-                :scale => pdf_header.scale)
+                :scale => pdf_config.scale)
             else
               pdf.image("#{Rails.root}/config/images/logoUFF.jpg", :at => [13, 77],
                 :vposition => :top,
                 :scale => 0.4
               )
             end
-            
           end
       end
     end
 
   end
 
-  def page_footer(pdf, options={})
+  def signature_footer(pdf, options={})
     x = 5
     
     diff_width = options[:diff_width]
@@ -114,6 +120,26 @@ module PdfHelper
     end
   end
 
+  def datetime_footer(pdf, options={})
+    x = 5
+    
+    diff_width = options[:diff_width]
+    diff_width ||= 0
+
+    last_box_height = 30
+    last_box_width1 = 165
+    last_box_width2 = 335
+
+    last_box_y = pdf.bounds.bottom  #pdf.bounds.bottom + last_box_height# pdf.cursor - 15
+    pdf.font('Courier', :size => 8) do
+      pdf.bounding_box([0, last_box_y], :width => last_box_width1, :height => last_box_height) do
+        current_x = x
+        pdf.move_down last_box_height/2
+        pdf.draw_text("SAPOS - #{I18n.localize(Time.zone.now, :format => :long)}", :at => [current_x, pdf.cursor])
+      end
+    end
+  end
+
   def text_table(pdf, data_table, default_margin_indent)
     index = 0
     rows = data_table.collect { |row| "" }
@@ -151,21 +177,29 @@ module PdfHelper
     end
   end
 
-  def new_document(name, options = {}, &block)
+  def new_document(name, title, options = {}, &block)
+    type = options[:pdf_type] || :report; #report, transcript, grades_report, schedule
+    pdf_type = :"use_at_#{type}"
+    pdf_config = options[:pdf_config] || ReportConfiguration.where(pdf_type => true).find(:first, :order => '`order` desc')
+    
     prawn_document({
       :page_size => "A4", 
       :left_margin => 0.6.cm, 
       :right_margin => (0.6.cm + ((options[:page_layout] == :landscape) ? 1.87 : 1.25)), 
       :top_margin => 0.8.cm, 
-      :bottom_margin => (options[:hide_footer] ? 1.cm : 80), 
+      :bottom_margin => (pdf_config.signature_footer ? 80 : 1.cm), 
       :filename => name
     }.merge(options)) do |pdf|
       pdf.fill_color "000080" 
       pdf.stroke_color '000080'
+      header(pdf, title, pdf_config)
       yield pdf
-      unless options[:hide_footer]
-        pdf.repeat(:all, dynamic: true) do
-          page_footer(pdf)
+      
+      pdf.repeat(:all, dynamic: true) do
+        if pdf_config.signature_footer
+          signature_footer(pdf)
+        else
+          datetime_footer(pdf)
         end
       end
       if options[:watermark]

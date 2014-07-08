@@ -847,6 +847,12 @@ module EnrollmentsPdfHelper
       ]) 
     end
 
+    values.push([
+      I18n.t("activerecord.attributes.enrollment.research_area"),
+      ResearchArea.find(search[:research_area].to_i).to_label
+    ]) unless search[:research_area].nil?
+
+
 
     widths = [280, 280]
 

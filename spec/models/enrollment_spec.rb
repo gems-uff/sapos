@@ -2,7 +2,6 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 require "spec_helper"
-require "debugger"
 
 describe Enrollment do
   it { should be_able_to_be_destroyed }

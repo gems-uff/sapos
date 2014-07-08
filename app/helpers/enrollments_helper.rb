@@ -165,6 +165,11 @@ module EnrollmentsHelper
     end
   end
 
+  def enrollment_dismissal_show_column(record, column)
+    return "-" if record.dismissal.nil?
+    return "#{record.dismissal.dismissal_reason.name} - #{I18n.localize(record.dismissal.date, format: :monthyear)}"
+  end
+
   def enrollment_advisements_show_column(record, column)
     return "-" if record.advisements.empty? 
     

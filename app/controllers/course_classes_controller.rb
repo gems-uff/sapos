@@ -115,7 +115,7 @@ class CourseClassesController < ApplicationController
       :body => I18n.t('notifications.course_class.email_to_professor.body', info)
     }
     emails = [message_to_professor]
-    Notifier.send_emails(emails)
+    Notifier.send_emails(notifications: emails)
   end
 
 

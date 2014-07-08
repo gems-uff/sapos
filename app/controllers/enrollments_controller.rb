@@ -40,7 +40,20 @@ class EnrollmentsController < ApplicationController
     config.update.label = :update_enrollment_label
     config.actions.swap :search, :field_search
 
-    config.field_search.columns = [:enrollment_number, :student, :level, :enrollment_status, :admission_date, :active, :scholarship_durations_active, :professor, :accomplishments, :delayed_phase, :course_class_year_semester]
+    config.field_search.columns = [
+      :enrollment_number, 
+      :student, 
+      :level, 
+      :enrollment_status, 
+      :admission_date, 
+      :active, 
+      :scholarship_durations_active, 
+      :professor,
+      :accomplishments, 
+      :delayed_phase, 
+      :course_class_year_semester,
+      :research_area
+    ]
 
     
     config.columns[:accomplishments].allow_add_existing = false;

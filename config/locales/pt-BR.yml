@@ -82,7 +82,7 @@ pt-BR:
           disapproved: "Reprovado"
           registered: "Incompleto"
       custom_variable:
-        name: "Descrição"
+        description: "Descrição"
         value: "Valor"
         variable: "Variável"
       country:
@@ -189,6 +189,7 @@ pt-BR:
         advisement_authorizations: "Credenciamentos"
         name: "Nome"
         course_name: "Nome completo do curso"
+        default_duration: "Duração padrão (meses)"
         enrollments: "Matrículas"
         majors: "Cursos"
         phase_durations: "Duração de Etapas"
@@ -295,6 +296,19 @@ pt-BR:
       notification_param:
         value: Valor
         query_param: Parâmetro
+      report_configuration:
+        name: "Nome"
+        image: "Logo"
+        signature_footer: "Rodapé com assinatura"
+        text: "Header"
+        use_at_grades_report: "Usar no boletim"
+        use_at_report: "Usar em relatórios"
+        use_at_schedule: "Usar no quadro de horários"
+        use_at_transcript: "Usar no histórico"
+        order: "Prioridade"
+        scale: "Escala"
+        x: "X"
+        y: "Y"
       research_area:
         code: "Código"
         name: "Nome"
@@ -593,6 +607,9 @@ pt-BR:
       query:
         one: Contulta
         other: Consultas
+      report_configuration:
+        one: "Configuração de relatório"
+        other: "Configurações de relatório"
       research_area:
         one: "Área de Pesquisa"
         other: "Áreas de Pesquisa"
@@ -668,6 +685,7 @@ pt-BR:
     create_phase_label: "Adicionar Fase"
     create_professor_label: "Adicionar Professor"
     create_professor_research_area_label: "Adicionar Área de Pesquisa do Professor"
+    create_report_configuration_label: "Adicionar Configuração de Relatório"
     create_research_area_label: "Adicionar Área de Pesquisa"
     create_scholarship_duration_label: "Adicionar Bolsa"
     create_scholarship_label: "Adicionar Bolsa"
@@ -678,16 +696,12 @@ pt-BR:
     create_student_major_label: "Adicionar Curso do Aluno"
     create_thesis_defense_committee_participation_label: "Adicionar Participação em Banca"
     create_user_label: "Adicionar Usuário"
-    custom_variables:
-      pdf_header:
-        scale: "Escala"
-        logo: "Logo"
-        x: "X"
-        y: "Y"
-        preview: "Visualizar"
+    report_configurations:
+      preview: "Visualizar"
     delayed_phases_report: "Relatório"
     delete_link: "Excluir"
     delete_message: "Tem certeza que deseja excluir?"
+    duplicate: "Duplicar"
     filtered: ""
     found:
       one: "Registro Encontrado"
@@ -724,6 +738,7 @@ pt-BR:
     update_model: ""
     update_notification_label: "Modificar Notificação"
     update_professor_research_area_label: "Área de Pesquisa do Professor"
+    update_report_configuration_label: "Modificar Configuração de Relatório"
     update_research_area_label: "Editar Área de Pesquisa"
     update_state_label: "Editar Estado"
     update_student_label: "Modificar Aluno"
@@ -860,9 +875,8 @@ pt-BR:
         course_name: "Disciplina"
         noschedule: "Horário a combinar"
         year_semester_error: 'Selecione Ano/Semestre na busca!'
-    custom_variables:
-      pdf_header:
-        preview: "Visualizar"
+    report_configurations:
+      preview: "Visualizar"
     enrollment:
       to_pdf:
         filename: "Relatório de Matrículas"
