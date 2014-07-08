@@ -18,6 +18,9 @@ group :development, :test do
   gem 'factory_girl_rails', '1.7.0'
   gem 'quiet_assets'
   gem 'webrick',  '1.3.1'
+  gem 'binding_of_caller'
+  gem 'better_errors'
+  gem 'spring'
   # gem 'debugger'
   #gem 'rcov_rails'
 end
