@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140708002735) do
+ActiveRecord::Schema.define(:version => 20140708043853) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -126,11 +126,11 @@ ActiveRecord::Schema.define(:version => 20140708002735) do
   add_index "courses", ["research_area_id"], :name => "index_courses_on_research_area_id"
 
   create_table "custom_variables", :force => true do |t|
-    t.string   "name"
+    t.string   "description"
     t.string   "variable"
-    t.text     "value",      :limit => 255
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
+    t.text     "value",       :limit => 255
+    t.datetime "created_at",                 :null => false
+    t.datetime "updated_at",                 :null => false
   end
 
   create_table "deferral_types", :force => true do |t|
