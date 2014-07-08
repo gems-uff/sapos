@@ -4,7 +4,7 @@
 Sapos::Application.configure do
   # Allow the notifier to send emails
   config.should_send_emails = Rails.const_defined?('Server') 
-  config.config_url_root = '/'
+  config.config_url_root = ''
 
   # Settings specified here will take precedence over those in config/application.rb
   # In the development environment your application's code is reloaded on
@@ -37,7 +37,7 @@ Sapos::Application.configure do
 
   # Do not compress assets
   config.assets.compress = false
-  config.serve_static_assets = false
+  config.serve_static_assets = true
 
   # Expands the lines which load the assets
   config.assets.debug = true

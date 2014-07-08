@@ -4,7 +4,7 @@
 Sapos::Application.configure do
   # Allow the notifier to send emails
   config.should_send_emails = false
-  config.config_url_root = '/'
+  config.config_url_root = ''
 
   # Settings specified here will take precedence over those in config/application.rb
 
