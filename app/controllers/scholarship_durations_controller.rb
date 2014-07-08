@@ -166,7 +166,7 @@ class ScholarshipDurationsController < ApplicationController
         dates << (record.enrollment.admission_date + (record.enrollment.level.default_duration - 1).months).end_of_month
       end
       unless record.scholarship.nil?
-        dates << record.scholarship.end_date
+        dates << record.scholarship.end_date unless record.scholarship.end_date.nil?
       end
       record.end_date = dates.min
     end
