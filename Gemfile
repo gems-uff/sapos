@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.18'
+gem 'rails', '~> 3.2.18'
 gem "rails-erd", "~> 1.0.0"
 gem "kaminari"
 #gem "schema_plus"
@@ -58,7 +58,7 @@ gem 'prawn_rails'
 gem 'redcarpet', '2.1.0'
 
 # Active scaffold support for Rails 3
-gem 'active_scaffold', "3.3.3"
+gem 'active_scaffold' #, "3.3.3"
 gem 'recordselect', "3.3.0"
 
 #Date Validation Plugin
