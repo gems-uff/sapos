@@ -9,8 +9,8 @@ class ReportConfigurationsController < ApplicationController
     config.list.sorting = {:name => 'ASC'}
     config.create.label = :create_report_configuration_label
     config.update.label = :update_report_configuration_label    
-    config.actions << :duplicate
-    config.duplicate.link.label = "<i title='#{I18n.t('active_scaffold.duplicate')}' class='fa fa-copy'></i>".html_safe
+    #config.actions << :duplicate
+    #config.duplicate.link.label = "<i title='#{I18n.t('active_scaffold.duplicate')}' class='fa fa-copy'></i>".html_safe
     config.list.columns = [
         :name, 
         :order, 
