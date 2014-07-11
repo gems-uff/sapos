@@ -91,7 +91,7 @@ class CourseClassesController < ApplicationController
 
   def before_update_save(record)
     return unless (record.valid? and record.class_enrollments.all? {|class_enrollment| class_enrollment.valid?})
-    changed = record.class_enrollments.any? {|class_enrollment| (class_enrollment.grade_changed? or class_enrollment.situation_changed? or class_enrollment.disapproved_by_absence_changed?)}
+    changed = record.class_enrollments.any? { |class_enrollment| class_enrollment.should_send_email_to_professor? }
     return unless changed
     info = {
       :class => record.label_with_course,

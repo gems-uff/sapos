@@ -828,7 +828,7 @@ pt-BR:
         subject: "Inscrição em %{course} de %{name} foi atualizada"
         body: "%{advisor_name},\n\nInformamos que a inscrição em %{course} de seu orientando %{name} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
       email_to_professor:
-        subject: "Alteração de nota de seu orientando"
+        subject: "Alteração da nota de %{name} na turma %{course}"
         body: "%{professor},\n\nInformamos que a inscrição de %{name} na turma %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}\n\n* Valores alterados"
     course_class:
       email_to_professor:
