@@ -12,13 +12,13 @@
 #   cities = City.create([{ :name => 'Chicago', :description =>'Chicago' }, { :name => 'Copenhagen', :description =>'Copenhagen' }])
 #   Mayor.create(:name => 'Daley', :description =>'Daley', :city => cities.first)
 
-CustomVariable.create(:name=>"Pontos para orientador único", :variable =>"single_advisor_points", :value => "1.0")
-CustomVariable.create(:name=>"Pontos para orientador múltiplo", :variable =>"multiple_advisor_points", :value => "0.5")
-CustomVariable.create(:name=>"Nível do Programa na CAPES", :variable =>"program_level", :value => "5")
-CustomVariable.create(:name=>"País padrão de emissão da identidade", :variable =>"identity_issuing_country", :value => "Brasil")
-CustomVariable.create(:name=>"Texto no final do quadro de horários", :variable =>"class_schedule_text", :value => "Alunos interessados em cursar disciplinas de Tópicos Avançados devem consultar os respectivos professores antes da matrícula.")
-CustomVariable.create(:name=>"E-mail de redirecionamento para as notificações", :variable =>"redirect_email", :value => "")
-CustomVariable.create(:name=>"Texto de rodapé da notificação", :variable =>"notification_footer", :value => "Pós-Graduação em Computação - IC/UFF
+CustomVariable.create(:description=>"Pontos para orientador único", :variable =>"single_advisor_points", :value => "1.0")
+CustomVariable.create(:description=>"Pontos para orientador múltiplo", :variable =>"multiple_advisor_points", :value => "0.5")
+CustomVariable.create(:description=>"Nível do Programa na CAPES", :variable =>"program_level", :value => "5")
+CustomVariable.create(:description=>"País padrão de emissão da identidade", :variable =>"identity_issuing_country", :value => "Brasil")
+CustomVariable.create(:description=>"Texto no final do quadro de horários", :variable =>"class_schedule_text", :value => "Alunos interessados em cursar disciplinas de Tópicos Avançados devem consultar os respectivos professores antes da matrícula.")
+CustomVariable.create(:description=>"E-mail de redirecionamento para as notificações", :variable =>"redirect_email", :value => "")
+CustomVariable.create(:description=>"Texto de rodapé da notificação", :variable =>"notification_footer", :value => "Pós-Graduação em Computação - IC/UFF
 Este e-mail foi enviado automaticamente pelo SAPOS. Por favor, não responda. 
 Em caso de dúvida, procure a secretaria."
 )
@@ -147,97 +147,6 @@ user = User.new do |u|
 end
 user.skip_confirmation!
 user.save!
-
-
-[
-  {
-    :title => "Vencimento de etapas em 1 mês", 
-    :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), 
-    :notification_offset => 0, 
-    :query_offset => 31, 
-    :sql_query => "SELECT 
-  students.email AS email, 
-  students.name AS name, 
-  phases.name AS phase_name
-FROM phase_completions 
-INNER JOIN enrollments ON enrollments.id = phase_completions.enrollment_id 
-INNER JOIN students ON students.id = enrollments.student_id
-INNER JOIN phases ON phases.id = phase_completions.phase_id 
-WHERE due_date<=%{query_date} 
-AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
-AND enrollments.enrollment_status_id = 2
-AND completion_date IS NULL", 
-    :individual => true,
-    :to_template => "<%= email %>", 
-    :subject_template => "Prazo para realização da etapa <%= phase_name %>", 
-    :body_template => "Prezado <%= name %>,
-    Falta menos de 1 mês para o vencimento da etapa <%= phase_name %>"
-  }, 
-  {
-    :title => "Notificar Prazo de Pedido de Banca a Coordenadores", 
-    :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), 
-    :notification_offset => 0, 
-    :query_offset => 31, 
-    :sql_query => 'SELECT 
-  students.email AS email, 
-  students.name AS name, 
-  due_date AS due_date
-FROM phase_completions 
-INNER JOIN enrollments ON enrollments.id = phase_completions.enrollment_id 
-INNER JOIN students ON students.id = enrollments.student_id
-INNER JOIN phases ON phases.id = phase_completions.phase_id 
-WHERE due_date<=%{query_date} 
-AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
-AND completion_date IS NULL
-AND phases.name = "Pedido de Banca"', 
-    :individual => false,
-    :to_template => "<%= User.where(:role_id => 2).map(&:email).join(';') %>", 
-    :subject_template => "Alunos precisam realizar Pedido de Banca em um mês", 
-    :body_template => "Coordenador, 
-    Os seguintes alunos precisam pedir banca em 1 mês:
-
-    <% records.each do |record| %>- <%= record['name'] %> (<%= record['email'] %>) - <%= localize(record['due_date'], :monthyear2) %>
-    <% end %>"
-  }, 
-  {
-    :title => "Notificar Alunos com Pedido de Banca não Desligados a Coordenadores", 
-    :frequency => I18n.translate("activerecord.attributes.notification.frequencies.monthly"), 
-    :notification_offset => 14, 
-    :query_offset => -32, 
-    :sql_query => 'SELECT 
-  students.email AS email, 
-  students.name AS name, 
-  phases.name AS phase_name,
-  due_date AS due_date
-FROM phase_completions 
-INNER JOIN enrollments ON enrollments.id = phase_completions.enrollment_id 
-INNER JOIN students ON students.id = enrollments.student_id
-INNER JOIN phases ON phases.id = phase_completions.phase_id 
-WHERE completion_date<=%{query_date}
-AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
-AND phases.name = "Pedido de Banca"', 
-    :individual => false,
-    :to_template => "<%= User.where(:role_id => 2).map(&:email).join(';') %>", 
-    :subject_template => "Alunos ainda não desligados", 
-    :body_template => "Coordenador, 
-    Os seguintes alunos pediram banca há mais de 45 dias, mas ainda não foram desligados:
-
-    <% records.each do |record| %>- <%= record['name'] %> (<%= record['email'] %>)
-    <% end %>"
-  },
-].each do |notification|
-  Notification.new do |n|
-    n.title = notification[:title]
-    n.frequency = notification[:frequency]
-    n.notification_offset = notification[:notification_offset]
-    n.query_offset = notification[:query_offset]
-    n.sql_query = notification[:sql_query]
-    n.individual = notification[:individual]
-    n.to_template = notification[:to_template]
-    n.subject_template = notification[:subject_template]
-    n.body_template = notification[:body_template]
-  end.save!
-end    
 
 
 Institution.create( :name =>"Associação de Ensino Superior do Piauí", :code =>"AESPI")
