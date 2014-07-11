@@ -100,7 +100,7 @@ class CourseClassesController < ApplicationController
           class_enrollment.disapproved_by_absence_changed?
         )
       )
-    }
+    end
     return unless changed
     info = {
       :class => record.label_with_course,
