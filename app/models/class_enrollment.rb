@@ -16,7 +16,6 @@ class ClassEnrollment < ActiveRecord::Base
   validates :course_class, :presence => true
   validates :course_class_id, :uniqueness => {:scope => :enrollment_id}
   validates :situation, :presence => true, :inclusion => {:in => SITUATIONS}
-  validates :grade, :numericality => {:greater_than_or_equal_to => 0, :less_than_or_equal_to => 100}, :if => :grade_filled?
   validate :grade_for_situation
   validate :disapproved_by_absence_for_situation
   validate :check_multiple_class_enrollment_allowed
@@ -89,6 +88,10 @@ class ClassEnrollment < ActiveRecord::Base
   private
   def grade_for_situation
     if course_has_grade
+      unless self.grade.blank?
+        self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_gt_100")) if self.grade > 100
+        self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_lt_0")) if self.grade < 0
+      end
       case self.situation
         when I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
           self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_registered")) unless self.grade.blank?
