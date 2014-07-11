@@ -34,6 +34,18 @@ class ScholarshipDuration < ActiveRecord::Base
 
   def init
     self.start_date = Date.today.beginning_of_month + 1.month if self.start_date.nil?
+    self.update_end_date
+  end
+
+  def update_end_date
+    dates = []
+    unless self.enrollment.nil?
+      dates << (self.enrollment.admission_date + (self.enrollment.level.default_duration - 1).months).end_of_month
+    end
+    unless self.scholarship.nil?
+      dates << self.scholarship.end_date unless self.scholarship.end_date.nil?
+    end
+    self.end_date = dates.min
   end
 
   def to_label

@@ -161,14 +161,7 @@ class ScholarshipDurationsController < ApplicationController
 
   def after_render_field(record, column)
     if column.name == :enrollment or column.name == :scholarship
-      dates = []
-      unless record.enrollment.nil?
-        dates << (record.enrollment.admission_date + (record.enrollment.level.default_duration - 1).months).end_of_month
-      end
-      unless record.scholarship.nil?
-        dates << record.scholarship.end_date unless record.scholarship.end_date.nil?
-      end
-      record.end_date = dates.min
+      record.update_end_date
     end
   end
 
