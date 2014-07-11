@@ -1,4 +1,5 @@
-function carrierwave_preview(as_container) {
+function carrierwave_preview(as_container, input) {
+	
 	// Show previously loaded image
 	var a = $(as_container + ' .carrierwave_controls a')[0];
 	if (a){
@@ -9,7 +10,6 @@ function carrierwave_preview(as_container) {
 	}
 
 	// Load image preview
-	input = $(as_container + ' .image-input')
 	input.after("<div class='previewimage'></div>")
 	input.change(function(ev){
 	    var f = (ev.target.files[0]);

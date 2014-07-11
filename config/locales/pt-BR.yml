@@ -383,6 +383,7 @@ pt-BR:
         mother_name: "Nome da Mãe"
         name: "Nome"
         neighborhood: "Bairro"
+        photo: "Foto"
         sex: "Sexo"
         student_majors: "Cursos"     
         telephone1: "1º Telefone"

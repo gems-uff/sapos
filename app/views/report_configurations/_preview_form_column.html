@@ -16,7 +16,7 @@
 	$(header_input).wrap('<div class="header_text_field"></div>')
 
 	// Image preview
-	carrierwave_preview(as_container);
+	carrierwave_preview(as_container, $(as_container + ' .image-input'));
 
 	// Pdf preview
 	function getiframeDocument(iframe) {

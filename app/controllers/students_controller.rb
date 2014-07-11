@@ -30,6 +30,7 @@ class StudentsController < ApplicationController
 
     config.columns =
         [:name,
+         :photo,
          :sex,
          :civil_status,
          :birthdate,
