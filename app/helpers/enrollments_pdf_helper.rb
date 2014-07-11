@@ -769,7 +769,6 @@ module EnrollmentsPdfHelper
     search ||= options[:search]
 
     return if search.nil? or search.empty?
-
     values = []
 
 
@@ -801,10 +800,14 @@ module EnrollmentsPdfHelper
         I18n.localize(admission_date, :format => :monthyear2)
       ]) 
     end
-
+    
     values.push([
       I18n.t("activerecord.attributes.enrollment.active"),
-      ["Todas", "Ativas", "Inativas"][search[:active].to_i]
+      {
+        "all" => "Todas", 
+        "active" => "Ativas", 
+        "not_active" => "Inativas"
+      }[search[:active]]
     ]) unless search[:active].empty?
 
     values.push([
@@ -850,7 +853,7 @@ module EnrollmentsPdfHelper
     values.push([
       I18n.t("activerecord.attributes.enrollment.research_area"),
       ResearchArea.find(search[:research_area].to_i).to_label
-    ]) unless search[:research_area].nil?
+    ]) unless search[:research_area].nil? or search[:research_area].empty?
 
 
 
