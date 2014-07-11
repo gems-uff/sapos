@@ -768,7 +768,7 @@ module EnrollmentsPdfHelper
   def search_table(pdf, options={})
     search ||= options[:search]
 
-    return if search.nil?
+    return if search.nil? or search.empty?
 
     values = []
 
