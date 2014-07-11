@@ -27,7 +27,7 @@ class ClassEnrollmentsController < ApplicationController
   protected
 
   def before_update_save(record)
-    return if record.grade.nil? or !record.valid? or !(record.grade_changed? or record.situation_changed? or record.disapproved_by_absence_changed?)
+    return if record.grade.nil? or !record.valid? or !record.should_send_email_to_professor?
     absence_changed = record.disapproved_by_absence_changed? ? '*' : ''
     info = {
       :name => record.enrollment.to_label,

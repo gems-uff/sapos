@@ -77,6 +77,15 @@ class ClassEnrollment < ActiveRecord::Base
     grade.nil? ? nil : (grade/10.0)
   end
 
+  def should_send_email_to_professor?
+    (!self.id.nil?) and 
+    (
+      self.grade_changed? or 
+      self.situation_changed? or 
+      self.disapproved_by_absence_changed?
+    )
+  end
+
   private
   def grade_for_situation
     if course_has_grade
