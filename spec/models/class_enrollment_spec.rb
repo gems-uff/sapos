@@ -137,6 +137,24 @@ describe ClassEnrollment do
           class_enrollment.should have_error(:grade_filled_for_course_without_score).on :grade
         end
       end
+
+      context "should have error grade_gt_100 when" do
+        it "grade if greater than 100" do
+          class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
+          class_enrollment.grade = 101
+          class_enrollment.stub!(:course_has_grade).and_return(true)
+          class_enrollment.should have_error(:grade_gt_100).on :grade
+        end
+      end
+
+      context "should have error grade_lt_0 when" do
+        it "grade if lower than 0" do
+          class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
+          class_enrollment.grade = -1
+          class_enrollment.stub!(:course_has_grade).and_return(true)
+          class_enrollment.should have_error(:grade_lt_0).on :grade
+        end
+      end
     end
     describe "disapproved_by_absence for situation" do
       context "should be valid when" do
