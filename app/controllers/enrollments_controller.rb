@@ -297,7 +297,7 @@ class EnrollmentsController < ApplicationController
     end
     return if emails.empty?
     
-    Notifier.send_emails(emails)
+    Notifier.send_emails(notifications: emails)
   end
 
 end
