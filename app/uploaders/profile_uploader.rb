@@ -22,7 +22,27 @@ class ProfileUploader < CarrierWave::Uploader::Base
   
 
   configure do |config|
+    config.remove_previously_stored_files_after_update = false
     config.root = Rails.root
+  end
+
+  class FilelessIO < StringIO
+    attr_accessor :original_filename
+    attr_accessor :content_type
+  end
+
+  # Param must be a hash with to 'base64_contents' and 'filename'.
+  def cache!(file)
+
+    if file.respond_to?(:has_key?) && file.has_key?(:base64_contents) && file.has_key?(:filename)
+      local_file = FilelessIO.new(Base64.decode64(file[:base64_contents]))
+      local_file.original_filename = file[:filename]
+      extension = File.extname(file[:filename])[1..-1]
+      local_file.content_type = Mime::Type.lookup_by_extension(extension).to_s
+      super(local_file)
+    else
+      super(file)
+    end
   end
 
   # Provide a default URL as a default if there hasn't been a file uploaded:

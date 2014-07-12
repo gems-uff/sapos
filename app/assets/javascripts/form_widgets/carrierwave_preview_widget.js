@@ -10,7 +10,7 @@ function carrierwave_preview(as_container, input) {
 	}
 
 	// Load image preview
-	input.after("<div class='previewimage'></div>")
+	input.after("<div class='previewimage' style='margin-left: 2px;'></div>")
 	input.change(function(ev){
 	    var f = (ev.target.files[0]);
         if (window.File && window.FileReader && window.FileList && window.Blob) {
@@ -18,7 +18,7 @@ function carrierwave_preview(as_container, input) {
 
             reader.onload = (function(theFile) {
                 return function(e) {
-                    $(as_container + ' .previewimage').html(['<img class="thumb" src="', e.target.result,
+                    $(as_container + ' .previewimage').html(['<p>Visualização:</p><img class="thumb" src="', e.target.result,
                                     '" title="', escape(theFile.name), '"/>'].join(''));
                 };
             })(f);
