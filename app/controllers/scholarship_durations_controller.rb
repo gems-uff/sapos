@@ -161,6 +161,19 @@ class ScholarshipDurationsController < ApplicationController
 
   def after_render_field(record, column)
     if column.name == :enrollment or column.name == :scholarship
+      if record.enrollment.nil? and params[:parent_controller] == "enrollments"
+        if params[:parent_id].nil? or params[:parent_id].empty?
+          record.enrollment = Enrollment.new
+        else
+          record.enrollment = Enrollment.find(params[:parent_id])
+        end
+        hash = params[:record].slice("admission_date(3i)", "admission_date(2i)", "admission_date(1i)")
+
+        record.enrollment.attributes = hash
+        unless params[:record]["level"].nil? or params[:record]["level"].empty? 
+           record.enrollment.level = Level.find(params[:record]["level"])
+        end 
+      end
       record.update_end_date
     end
   end

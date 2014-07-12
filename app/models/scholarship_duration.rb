@@ -39,7 +39,7 @@ class ScholarshipDuration < ActiveRecord::Base
 
   def update_end_date
     dates = []
-    unless self.enrollment.nil?
+    unless self.enrollment.nil? or self.enrollment.level.nil?
       dates << (self.enrollment.admission_date + (self.enrollment.level.default_duration - 1).months).end_of_month
     end
     unless self.scholarship.nil?
