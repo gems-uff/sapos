@@ -428,4 +428,21 @@ module EnrollmentsHelper
     body += "</table>"
     body.html_safe
   end
+
+  def display_action_links(action_links, record, options, &block)
+    search = search_params
+    if record.nil? or search.nil? or search.empty?
+      return super
+    end
+    if search[:delayed_phase][:phase] == "all"
+
+      columns ||= list_columns
+      phase_date = Date.new(search[:delayed_phase][:year].to_i, search[:delayed_phase][:month].to_i, search[:delayed_phase][:day].to_i)
+      pcs = record.phase_completions.where(PhaseCompletion.arel_table[:due_date].lt(phase_date)).where(:completion_date => nil)
+      phases = pcs.collect{|pc| pc.phase.name}.join(', ')
+      return (super + "</tr></table></td><tr class='record tr_search_result'><td style='text-align: right;'>Etapas atrasadas</td><td colspan='#{columns.size}'>#{phases}<table><tr>".html_safe).html_safe
+    end
+
+    return super
+  end
 end
