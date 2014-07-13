@@ -30,7 +30,7 @@ class ScholarshipDurationsController < ApplicationController
     config.list.sorting = {:scholarship => 'ASC'}
     config.list.columns = [:scholarship, :start_date, :end_date, :cancel_date, :enrollment]
     config.create.label = :create_scholarship_duration_label
-    config.columns = [:scholarship, :enrollment, :start_date, :cancel_date, :end_date, :obs]
+    config.columns = [:scholarship, :enrollment, :start_date, :cancel_date, :end_date, :obs, :scholarship_suspensions]
     config.columns[:scholarship].search_sql = 'scholarships.scholarship_number'
     config.columns[:scholarship].sort_by :sql => 'scholarships.scholarship_number'
     config.columns[:scholarship].form_ui = :record_select
@@ -44,7 +44,12 @@ class ScholarshipDurationsController < ApplicationController
     config.columns[:end_date].options = {:format => :monthyear}
     config.columns[:cancel_date].options = {:format => :monthyear}
     config.create.columns = [:scholarship, :enrollment, :start_date, :end_date, :cancel_date, :obs]
-    config.update.columns = [:scholarship, :enrollment, :start_date, :end_date, :cancel_date, :obs]
+    config.update.columns = [:scholarship, :enrollment, :start_date, :end_date, :cancel_date, :obs, :scholarship_suspensions]
+  end
+  record_select :per_page => 10, :full_text_search => true
+
+  def record_select_includes
+    [:enrollment, :scholarship]
   end
 
   def self.condition_for_adviser_column(column, value, like_pattern)

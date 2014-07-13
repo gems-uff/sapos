@@ -4,6 +4,7 @@
 class ScholarshipDuration < ActiveRecord::Base
   belongs_to :scholarship
   belongs_to :enrollment
+  has_many :scholarship_suspensions
 
   has_paper_trail
 

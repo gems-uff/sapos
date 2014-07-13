@@ -11,7 +11,7 @@ class Ability
                 Level, Major, Notification, NotificationLog, Phase, 
                 PhaseCompletion, PhaseDuration, Professor, ProfessorResearchArea,
                 ReportConfiguration, ResearchArea, Role, Scholarship, ScholarshipDuration, 
-                ScholarshipType, Sponsor, State, Student, StudentMajor, 
+                ScholarshipSuspension, ScholarshipType, Sponsor, State, Student, StudentMajor, 
                 ThesisDefenseCommitteeParticipation, User, Version, YearSemester] 
 
 

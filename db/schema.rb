@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140711233114) do
+ActiveRecord::Schema.define(:version => 20140713001157) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -406,6 +406,17 @@ ActiveRecord::Schema.define(:version => 20140711233114) do
 
   add_index "scholarship_durations", ["enrollment_id"], :name => "index_scholarship_durations_on_enrollment_id"
   add_index "scholarship_durations", ["scholarship_id"], :name => "index_scholarship_durations_on_scholarship_id"
+
+  create_table "scholarship_suspensions", :force => true do |t|
+    t.date     "start_date"
+    t.date     "end_date"
+    t.boolean  "active",                  :default => true
+    t.integer  "scholarship_duration_id"
+    t.datetime "created_at",                                :null => false
+    t.datetime "updated_at",                                :null => false
+  end
+
+  add_index "scholarship_suspensions", ["scholarship_duration_id"], :name => "index_scholarship_suspensions_on_scholarship_duration_id"
 
   create_table "scholarship_types", :force => true do |t|
     t.string   "name"

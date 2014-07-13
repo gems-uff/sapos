@@ -4,6 +4,8 @@
 Sapos::Application.routes.draw do
 
 
+  resources :scholarship_suspensions do as_routes end
+
   devise_for :users, :controllers => {:registrations => "users"}
 
   resources :versions do
@@ -96,6 +98,7 @@ Sapos::Application.routes.draw do
 
   resources :scholarship_durations do
     as_routes
+    record_select_routes
     collection do
       get 'to_pdf'
     end

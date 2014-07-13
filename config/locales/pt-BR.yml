@@ -346,10 +346,19 @@ pt-BR:
         scholarship: "Número da Bolsa"
         scholarship_end_date: "Data de Fim de Bolsa"
         scholarship_start_date: "Data de Início de Bolsa"
+        scholarship_suspensions: "Suspensões"
         scholarship_types: "Tipo de Bolsa"
         sponsors: "Agência de Fomento"
         start_date: "Data de Início"
         obs: "Observação"
+      scholarship_suspension:
+        active: "Suspensão ativa?"
+        start_date: "Data de Início"
+        end_date: "Data de Fim"
+        scholarship_duration: "Alocação"
+        active_options:
+          active: "Ativa"
+          inactive: "Inativa"
       scholarship_type:
         name: "Nome"
         scholarships: "Bolsas"
@@ -496,6 +505,17 @@ pt-BR:
             cancel_date:
               on_or_after:  "anterior a Data de Início"
               on_or_before: "posterior a Data Limite de Concessão"
+        scholarship_suspension:
+          suspension_start_date_after_end_date: "posterior a Data de Fim"
+          suspension_start_date_before_scholarship_start_date: "anterior a Data de Início da Alocação"
+          suspension_start_date_after_scholarship_end_date: "posterior a Data de Fim da Alocação"
+          suspension_end_date_after_scholarship_end_date: "posterior a Data de Fim da Alocação"
+          active_suspension: "Existe uma outra suspensão ativa no mesmo intervalo de tempo"
+          attributes:
+            start_date:
+              invalid_date: inválida
+            end_date:
+              invalid_date: inválida
         phase:
           phase_duration_has_deferral: "Não foi possível remover duração de etapa para %{level}, pois já existe prorrogação para este nível"
           phase_duration_has_level: "Não foi possível remover duração de etapa para %{level}, pois já existe matrícula com esta etapa concluída"

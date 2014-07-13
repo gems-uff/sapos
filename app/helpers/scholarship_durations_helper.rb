@@ -17,7 +17,7 @@ module ScholarshipDurationsHelper
     }.merge(options)
   end
   
-  def start_date_form_column(record,options)                
+  def scholarship_duration_start_date_form_column(record,options)                
     date_select :record, :start_date, {
          :discard_day => true,
          :start_year => Time.now.year - @@range,
@@ -25,7 +25,7 @@ module ScholarshipDurationsHelper
     }.merge(options)
   end
   
-  def end_date_form_column(record, options)
+  def scholarship_duration_end_date_form_column(record, options)
     date_select :record, :end_date, {
          :discard_day => true,
          :start_year => Time.now.year - @@range,
@@ -33,7 +33,30 @@ module ScholarshipDurationsHelper
          :include_blank => true,
          :default => nil,
     }.merge(options), {:class => "end_date-input"}
+  end 
+
+  def scholarship_suspension_start_date_form_column(record,options)                
+    date_select(:record, :start_date, {
+         :discard_day => true,
+         :start_year => Time.now.year - @@range,
+         :end_year => Time.now.year + @@range,
+         :include_blank => true,
+         :default => nil,
+    }.merge(options), {:class => "replace-date-input"}) +
+    hidden_field(:record, :start_date, options)
+  end
+  
+  def scholarship_suspension_end_date_form_column(record, options)
+    date_select(:record, :end_date, {
+         :discard_day => true,
+         :start_year => Time.now.year - @@range,
+         :end_year => Time.now.year + @@range,
+         :include_blank => true,
+         :default => nil,
+    }.merge(options), {:class => "replace-date-input"}) +
+    hidden_field(:record, :end_date, options)
   end  
+   
   
   def start_date_search_column(record,options)                
     local_options = {
