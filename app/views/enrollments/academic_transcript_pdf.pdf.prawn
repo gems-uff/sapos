@@ -15,6 +15,10 @@ new_document('transcript.pdf', I18n.t("pdf_content.enrollment.header.title"), :w
     no_page_break(pdf) do
         thesis_table(pdf, enrollment: @enrollment)
     end
+
+    no_page_break(pdf) do
+        enrollment_holds_table(pdf, enrollment: @enrollment)
+    end
  
 end
 

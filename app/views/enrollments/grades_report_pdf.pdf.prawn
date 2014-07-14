@@ -29,5 +29,9 @@ new_document('grades_report.pdf', I18n.t('pdf_content.enrollment.grades_report.t
         enrollment_scholarships_table(pdf, enrollment: @enrollment)
     end
 
+    no_page_break(pdf) do
+        enrollment_holds_table(pdf, enrollment: @enrollment)
+    end
+
 end
 

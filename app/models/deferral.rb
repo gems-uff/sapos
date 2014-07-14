@@ -22,35 +22,17 @@ class Deferral < ActiveRecord::Base
     "#{deferral_type.name}" unless deferral_type.nil?    
   end
 
-  def total_time_with_deferrals
-    durations = deferral_type.phase.phase_durations
-    phase_duration = durations.select { |duration| duration.level_id == enrollment.level.id}[0]
-
-    total_time = phase_duration.duration
-
-    deferrals = enrollment.deferrals.select { |deferral| deferral.deferral_type.phase == deferral_type.phase}
-    for deferral in deferrals
-      deferral_duration = deferral.deferral_type.duration
-      (total_time.keys | deferral_duration.keys).each do |key|
-        total_time[key] += deferral_duration[key].to_i
-      end
-    end
-
-    total_time
-  end
-
-  def calculate_end_date(total_time)
-    deferral_type.phase.calculate_end_date(enrollment.admission_date, total_time[:semesters], total_time[:months], total_time[:days]).strftime('%d/%m/%Y')
-  end
-
   def valid_until
-    calculate_end_date(deferral_type.phase.calculate_total_deferral_time_for_phase_until_date(enrollment, approval_date))
+    DateUtils.add_hash_to_date(
+      enrollment.admission_date, 
+      deferral_type.phase.total_duration(enrollment, until_date: approval_date)
+    ).strftime('%d/%m/%Y')
   end
 
   def recalculate_due_date_for_phase_completion
     phase_completion = PhaseCompletion.where(:enrollment_id => enrollment_id, :phase_id => deferral_type.phase_id).first
     if phase_completion
-      phase_completion.due_date = calculate_end_date(total_time_with_deferrals())
+      phase_completion.calculate_due_date
       phase_completion.save
     end
   end

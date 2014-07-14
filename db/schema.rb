@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140713001157) do
+ActiveRecord::Schema.define(:version => 20140714040947) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -179,6 +179,18 @@ ActiveRecord::Schema.define(:version => 20140713001157) do
   add_index "dismissals", ["dismissal_reason_id"], :name => "index_dismissals_on_dismissal_reason_id"
   add_index "dismissals", ["enrollment_id"], :name => "index_dismissals_on_enrollment_id"
 
+  create_table "enrollment_holds", :force => true do |t|
+    t.integer  "enrollment_id"
+    t.integer  "year"
+    t.integer  "semester"
+    t.integer  "number_of_semesters", :default => 1
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
+    t.boolean  "active",              :default => true
+  end
+
+  add_index "enrollment_holds", ["enrollment_id"], :name => "index_enrollment_holds_on_enrollment_id"
+
   create_table "enrollment_statuses", :force => true do |t|
     t.string   "name"
     t.datetime "created_at", :null => false
@@ -292,9 +304,10 @@ ActiveRecord::Schema.define(:version => 20140713001157) do
   create_table "phases", :force => true do |t|
     t.string   "name"
     t.string   "description"
-    t.datetime "created_at",                     :null => false
-    t.datetime "updated_at",                     :null => false
-    t.boolean  "is_language", :default => false
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
+    t.boolean  "is_language",    :default => false
+    t.boolean  "extend_on_hold", :default => false
   end
 
   create_table "professor_research_areas", :force => true do |t|

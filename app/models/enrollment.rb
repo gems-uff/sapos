@@ -20,6 +20,7 @@ class Enrollment < ActiveRecord::Base
   has_many :scholarship_durations, :dependent => :destroy
   has_many :accomplishments, :dependent => :destroy
   has_many :deferrals, :dependent => :destroy
+  has_many :enrollment_holds, :dependent => :destroy
   has_many :class_enrollments, :dependent => :destroy
   has_many :thesis_defense_committee_participations, :dependent => :destroy
   has_many :thesis_defense_committee_professors, :source => :professor, :through => :thesis_defense_committee_participations
@@ -158,24 +159,14 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def create_phase_completions()
+  def create_phase_completions
     PhaseCompletion.where(:enrollment_id => id).destroy_all
 
     PhaseDuration.where(:level_id => level_id).each do |phase_duration|
-      completion_date = nil
-
-      phase_accomplishment = accomplishments.where(:phase_id => phase_duration.phase_id)[0]
-      completion_date = phase_accomplishment.conclusion_date unless phase_accomplishment.nil?
-
-      phase_deferrals = deferrals.select { |deferral| deferral.deferral_type.phase == phase_duration.phase}
-      if phase_deferrals.empty?
-        due_date = phase_duration.phase.calculate_end_date(admission_date, phase_duration.deadline_semesters, phase_duration.deadline_months, phase_duration.deadline_days)
-      else
-        total_time = phase_duration.phase.calculate_total_deferral_time_for_phase_until_date(self, Date.today)
-        due_date = phase_duration.phase.calculate_end_date(admission_date, total_time[:semesters], total_time[:months], total_time[:days])
-      end
-
-      PhaseCompletion.create(:enrollment_id=>id, :phase_id=>phase_duration.phase.id, :completion_date=>completion_date, :due_date=>due_date)
+      PhaseCompletion.new(
+        :enrollment=>self, 
+        :phase=>phase_duration.phase
+      ).save
     end
   end
 end

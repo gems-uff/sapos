@@ -866,7 +866,45 @@ module EnrollmentsPdfHelper
       table.column(0).align = :left
       table.column(0).padding = [2, 4]
     end
+  end
 
+  def enrollment_holds_table(pdf, options={})
+    enrollment ||= options[:enrollment]
+    enrollment_holds = enrollment.enrollment_holds
+
+    unless enrollment_holds.empty?
+      pdf.move_down 3
+      holds_table_title = [[
+        "<b>#{I18n.t("pdf_content.enrollment.enrollment_holds.title")}</b>"
+      ]]
+
+      pdf.table(holds_table_title, :column_widths => [560],
+                :row_colors => ["E5E5FF"],
+                :cell_style => {:font => "Courier",
+                                :size => 10,
+                                :inline_format => true,
+                                :border_width => 1,
+                                :align => :center
+                }
+      )
+
+      holds_table_width = [380, 180]
+
+      holds_table_header = [[
+        "<b>#{I18n.t("pdf_content.enrollment.enrollment_holds.semester")}</b>",
+        "<b>#{I18n.t("pdf_content.enrollment.enrollment_holds.number_of_semesters")}</b>",
+
+      ]]
+
+      holds_table_data = enrollment_holds.map do |eh|
+        [
+          eh.date_label,
+          eh.number_label
+        ]
+      end
+
+      simple_pdf_table(pdf, holds_table_width, holds_table_header, holds_table_data, distance: 0)
+    end
   end
 
 end

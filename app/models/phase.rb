@@ -2,7 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Phase < ActiveRecord::Base
-  attr_accessible :name, :is_language
+  attr_accessible :name, :is_language, :extend_on_hold
   has_many :accomplishments, :dependent => :restrict
   has_many :enrollments, :through => :accomplishments
   has_many :phase_durations, :dependent => :destroy
@@ -13,6 +13,8 @@ class Phase < ActiveRecord::Base
   has_paper_trail
   
   validates :name, :presence => true, :uniqueness => true
+
+  after_save :create_phase_completions
 
   def to_label
   	"#{self.name}"
@@ -29,15 +31,23 @@ class Phase < ActiveRecord::Base
     )", enrollment.level_id]
   end
 
-  def calculate_total_deferral_time_for_phase_until_date(enrollment, date)
-    total_time = phase_durations.select { |duration| duration.level_id == enrollment.level.id}[0].duration
+  def total_duration(enrollment, options={})
+    date ||= options[:until_date]
 
+    total_time = phase_durations.select { |duration| duration.level_id == enrollment.level.id}[0].duration
     deferrals = enrollment.deferrals.select { |deferral| deferral.deferral_type.phase == self}
-    for deferral in deferrals
-      if date >= deferral.approval_date
+    deferrals.each do |deferral|
+      if date.nil? or date >= deferral.approval_date
         deferral_duration = deferral.deferral_type.duration
         (total_time.keys | deferral_duration.keys).each do |key|
           total_time[key] += deferral_duration[key].to_i
+        end
+      end
+    end
+    if self.extend_on_hold
+      enrollment.enrollment_holds.each do |hold|
+        if date.nil? or date >= hold.start_date
+          total_time[:semesters] += hold.number_of_semesters
         end
       end
     end
@@ -45,12 +55,9 @@ class Phase < ActiveRecord::Base
     total_time
   end
 
-  def calculate_end_date(date, total_semesters, total_months, total_days)
-    if total_semesters != 0
-      semester_months = (12 * (total_semesters / 2)) + ((date.month == 3 ? 5 : 7) * (total_semesters % 2)) - 1
-      date = semester_months.months.since(date).end_of_month
+  def create_phase_completions
+    PhaseDuration.where(:phase_id => id).each do |phase_duration|
+      phase_duration.create_phase_completions
     end
-
-    total_days.days.since(total_months.months.since(date).end_of_month)
   end
 end

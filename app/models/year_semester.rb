@@ -38,6 +38,12 @@ class YearSemester
     year_semester
   end
 
+  def initialize(options={})
+    self.year ||= options[:year]
+    self.semester ||= options[:semester]
+    
+  end
+
   def semester_end
     self.next_semester_start - 1.day
   end

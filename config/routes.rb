@@ -4,6 +4,8 @@
 Sapos::Application.routes.draw do
 
 
+  resources :enrollment_holds do as_routes end
+
   resources :scholarship_suspensions do as_routes end
 
   devise_for :users, :controllers => {:registrations => "users"}

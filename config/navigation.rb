@@ -67,12 +67,13 @@ SimpleNavigation::Configuration.run do |navigation|
       can_read
     end
 
-    alunos_models = [Student, Dismissal, Enrollment, Level, DismissalReason, EnrollmentStatus]
+    alunos_models = [Student, Dismissal, Enrollment, EnrollmentHold, Level, DismissalReason, EnrollmentStatus]
 
     primary.item :stud, 'Alunos', get_path_from(alunos_models), :if => can_read?(alunos_models) do |stud|
       stud.item :student, 'Alunos', students_path, :if => can_read?(Student)
       stud.item :dismissal, 'Desligamentos', dismissals_path, :if => can_read?(Dismissal)
       stud.item :enrollment, 'Matrículas', enrollments_path, :if => can_read?(Enrollment)
+      stud.item :enrollment_hold, 'Trancamentos', enrollment_holds_path, :if => can_read?(EnrollmentHold)
       stud.item :level, 'Níveis', levels_path, :if => can_read?(Level)
       stud.item :dismissal_reason, 'Razões de Desligamento', dismissal_reasons_path, :if => can_read?(DismissalReason)
       stud.item :enrollment_status, 'Tipos de Matrícula', enrollment_statuses_path, :if => can_read?(EnrollmentStatus)

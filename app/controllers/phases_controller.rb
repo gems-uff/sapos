@@ -7,13 +7,14 @@ class PhasesController < ApplicationController
 
   active_scaffold :phase do |config|
     config.list.sorting = {:name => 'ASC'}
-    config.list.columns = [:name, :description]
+    config.list.columns = [:name, :description, :is_language, :extend_on_hold]
     config.create.label = :create_phase_label
     config.columns[:enrollments].form_ui = :record_select
 #    config.columns[:levels].form_ui = :select
-    config.create.columns = [:name, :description, :is_language, :phase_durations]
-    config.update.columns = [:name, :description, :is_language, :phase_durations]
-    config.show.columns = [:name, :description, :is_language, :phase_durations, :enrollments]
+    form_columns = [:name, :description, :is_language, :extend_on_hold, :phase_durations]
+    config.create.columns = form_columns
+    config.update.columns = form_columns
+    config.show.columns = form_columns + [:enrollments]
   end
 #  record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 

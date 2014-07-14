@@ -156,6 +156,7 @@ pt-BR:
         delayed_phase: "Etapa atrasada"
         delayed_phase_date: "em"
         dismissal: "Desligamento"
+        enrollment_holds: "Trancamentos"
         enrollment_number: "Número de Matrícula"
         enrollment_status: "Tipo de Matrícula"
         research_area: "Área de Concentração"
@@ -178,6 +179,13 @@ pt-BR:
         listed_class_enrollments: "Inscrições"
         thesis_defense_committee_participations: "Banca Avaliadora"
         thesis_defense_committee_professors: "Banca Avaliadora"
+      enrollment_hold:
+        active: "Trancado?"
+        enrollment: "Matrícula"
+        year: "Ano"
+        semester: "Semestre"
+        number_of_semesters: "Número de Semestres"
+        number_label: "semestre"
       enrollment_status:
         name: "Nome"
         enrollments: "Matrículas"
@@ -230,6 +238,7 @@ pt-BR:
         accomplishments: "Realização de Etapas"
         description: "Descrição"
         enrollments: "Matrículas"
+        extend_on_hold: "Prorrogar com Trancamentos"
         name: "Nome"
         phase_durations: "Duração de Etapas"
         phase_completions: "Realização de Etapas"
@@ -486,6 +495,9 @@ pt-BR:
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
           thesis_defense_date_before_admission_date: "anterior a Data de Admissão"
           research_area_different_from_professors: "diferente de áreas de pesquisa do(s) orientador(es)"
+        enrollment_hold:
+          before_admission_date: "anterior a Data de Admissão"
+          after_dismissal_date: "posterior a Data de Desligamento"
         scholarship:
           attributes:
             end_date:
@@ -591,6 +603,9 @@ pt-BR:
       enrollment: 
         one: "Matrícula"
         other: "Matrículas"
+      enrollment_hold:
+        one: "Trancamento"
+        other: "Trancamentos"
       enrollment_status:
         one: "Tipo de Matrícula"
         other: "Tipos de Matrícula"
@@ -645,6 +660,9 @@ pt-BR:
       scholarship_duration:
         one: "Alocação de Bolsa"
         other: "Alocação de Bolsas"
+      scholarship_suspension:
+        one: "Suspensão de Bolsa"
+        other: "Suspensões de Bolsas"
       scholarship_type:
         one: "Tipo de Bolsa"
         other: "Tipos de Bolsa"
@@ -924,18 +942,6 @@ pt-BR:
         student_identity_number: "IDENTIDADE:"
         student_name: "ALUNO:     "
         entrance_exam_approved: "Aprovado"
-      grade_list:
-        title: "DISCIPLINAS CURSADAS COM APROVEITAMENTO"
-        course_approved: "AP"
-        course_code: "CÓDIGO"
-        course_credits: "NÚMERO DE CRÉDITOS"
-        course_grade: "NOTA / CONCEITO"
-        course_name: "DENOMINAÇÃO"
-        course_workload: "CARGA HORÁRIA"
-        course_year_semester: "PERÍODO"
-        total: "TOTAL"
-        situation: "SITUAÇÃO"
-        semester_summary: "RESUMO DO PERÍODO"
       footer:
         coordinator_signature: "ASSINATURA DO COORDENADOR"
         location: "Niterói"
@@ -948,16 +954,22 @@ pt-BR:
         link: "Histórico"
         title: "Histórico Escolar"
         total_credits: "Total"
-      search:
-        attribute: "Campo"
-        value: "Valor"
-      thesis:
-        title: "TESE / DISSERTAÇÃO - TÍTULO:"
-        date: "DATA DA DEFESA:"
-        judgement: "JULGAMENTO:"
-        approved: "Aprovado"
-        advisors: "ORIENTADOR(ES):"
-        defense_committee: "MEMBROS DA BANCA EXAMINADORA / INSTITUIÇÃO DE ORIGEM:"
+      enrollment_holds:
+        title: "Trancamentos"
+        semester: "Semestre"
+        number_of_semesters: "Duração"
+      grade_list:
+        title: "DISCIPLINAS CURSADAS COM APROVEITAMENTO"
+        course_approved: "AP"
+        course_code: "CÓDIGO"
+        course_credits: "NÚMERO DE CRÉDITOS"
+        course_grade: "NOTA / CONCEITO"
+        course_name: "DENOMINAÇÃO"
+        course_workload: "CARGA HORÁRIA"
+        course_year_semester: "PERÍODO"
+        total: "TOTAL"
+        situation: "SITUAÇÃO"
+        semester_summary: "RESUMO DO PERÍODO"
       grades_report:
         accomplished_phases: "Etapas obrigatórias concluídas"
         advisors: "Orientadores"
@@ -972,6 +984,16 @@ pt-BR:
         start_date: "Data de Início"
         end_date: "Data Limite"
         cancel_date: "Encerramento"
+      search:
+        attribute: "Campo"
+        value: "Valor"
+      thesis:
+        title: "TESE / DISSERTAÇÃO - TÍTULO:"
+        date: "DATA DA DEFESA:"
+        judgement: "JULGAMENTO:"
+        approved: "Aprovado"
+        advisors: "ORIENTADOR(ES):"
+        defense_committee: "MEMBROS DA BANCA EXAMINADORA / INSTITUIÇÃO DE ORIGEM:"
     scholarships:
       to_pdf:
         filename: "Relatório de Bolsas"
