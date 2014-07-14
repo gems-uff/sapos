@@ -168,7 +168,7 @@ describe Enrollment do
       one_semester_deferral_type = FactoryGirl.create(:deferral_type, :phase => one_month_phase, :duration_days => 0, :duration_months => 0, :duration_semesters => 1)
       FactoryGirl.create(:deferral, :enrollment => enrollment_active_deferral, :deferral_type => one_semester_deferral_type)
 
-      @enrollment_expired_deferral = FactoryGirl.create(:enrollment, :level => level, :admission_date => (admission_date - 2.months))
+      @enrollment_expired_deferral = FactoryGirl.create(:enrollment, :level => level, :admission_date => (admission_date - 8.months))
       FactoryGirl.create(:deferral, :enrollment => @enrollment_expired_deferral, :deferral_type => one_semester_deferral_type)
 
     end
@@ -184,7 +184,7 @@ describe Enrollment do
     end
     describe "self.with_delayed_phases_on" do
       it "should return the expected enrollments" do
-        result = Enrollment.with_delayed_phases_on(1.month.from_now.to_date, nil)
+        result = Enrollment.with_delayed_phases_on(1.months.from_now.to_date, nil)
 
         expected_result = [@delayed_enrollment.id, @enrollment_expired_deferral.id].sort
         result.sort.should eql(expected_result.sort)

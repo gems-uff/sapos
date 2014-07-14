@@ -79,44 +79,27 @@ class Enrollment < ActiveRecord::Base
   def self.with_delayed_phases_on(date, phases)
     date = Date.today if date.nil?
     phases = Phase.all if phases.nil?
+    phases_ids = phases.map(&:id)
 
-    active_enrollments = Enrollment.where("enrollments.id not in (select enrollment_id from dismissals where DATE(dismissals.date) <= DATE(?))", date)
+    Enrollment.joins(:phase_completions).includes(:dismissal)
+      .where(:phase_completions => {
+        :completion_date => nil,
+        :phase_id => phases_ids
 
-    delayed_enrollments = []
+      })
+      .where(PhaseCompletion.arel_table[:due_date].lt(date))
+      .where(
+        Dismissal.arel_table[:date].gt(date)
+        .or(Dismissal.arel_table[:enrollment_id].eq(nil))
+      ).map(&:id).uniq
+  end
 
-    active_enrollments.each do |enrollment|
-
-      accomplished_phases = Accomplishment.where(:enrollment_id => enrollment, :phase_id => phases).map { |ac| ac.phase }
-      phases_duration = PhaseDuration.where("level_id = :level_id and phase_id in (:phases)", :level_id => enrollment.level_id, :phases => (phases - accomplished_phases))
-
-      begin_ys = YearSemester.on_date(enrollment.admission_date)
-
-      phases_duration.each do |phase_duration|
-
-        phase_duration_deadline_ys = begin_ys + phase_duration.deadline_semesters
-        phases_duration_deadline_months = phase_duration.deadline_months
-        phases_duration_deadline_days = phase_duration.deadline_days
-
-        deferral_types = DeferralType.joins(:deferrals).where("deferrals.enrollment_id = :enrollment_id and phase_id = :phase_id", :enrollment_id => enrollment.id, :phase_id => phase_duration.phase_id)
-
-        final_ys = phase_duration_deadline_ys
-        final_months = phases_duration_deadline_months
-        final_days = phases_duration_deadline_days
-
-        deferral_types.each do |deferral_type|
-          final_ys.increase_semesters(deferral_type.duration_semesters)
-          final_months += deferral_type.duration_months
-          final_days += deferral_type.duration_days
-        end
-
-        deadline_date = final_ys.semester_begin + final_months.months + final_days.days
-        if deadline_date <= date
-          delayed_enrollments << enrollment.id
-          break
-        end
-      end
-    end
-    delayed_enrollments
+  def delayed_phases(options={})
+    date ||= options[:date]
+    date ||= Date.today
+    self.phase_completions
+      .where(PhaseCompletion.arel_table[:due_date].lt(date))
+      .where(:completion_date => nil).collect{|pc| pc.phase}
   end
 
   def self.with_all_phases_accomplished_on(date)
