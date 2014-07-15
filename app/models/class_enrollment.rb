@@ -22,6 +22,8 @@ class ClassEnrollment < ActiveRecord::Base
 
   after_save :notify_student_and_advisor
 
+  default_scope {joins(:enrollment => :student).order('"students"."name"').readonly(false)}
+
   def check_multiple_class_enrollment_allowed
     return if not self.course_class
       other_enrollments = ClassEnrollment.
