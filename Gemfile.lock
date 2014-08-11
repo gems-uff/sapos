@@ -229,7 +229,7 @@ DEPENDENCIES
   prawn (= 0.15.0)
   prawn_rails
   quiet_assets
-  rails (~> 3.2.18)
+  rails (~> 3.2.19)
   rails-erd (~> 1.0.0)
   recordselect (~> 3.3.6)
   redcarpet (= 2.1.0)
