@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.2.17'
+gem 'rails', '3.2.19'
 gem "rails-erd", "~> 1.0.0"
 gem "kaminari"
 #gem "schema_plus"
@@ -17,7 +17,7 @@ group :development, :test do
   gem 'awesome_print'
   gem 'rspec-rails', '~> 2.0'
   gem 'factory_girl_rails', '1.7.0'
-  gem 'debugger'
+  #gem 'debugger'
   #gem 'rcov_rails'
 end
 
