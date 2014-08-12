@@ -850,6 +850,13 @@ module EnrollmentsPdfHelper
       ]) 
     end
 
+    unless search[:enrollment_hold][:hold].to_i == 0 
+      values.push([
+        "#{I18n.t("activerecord.attributes.enrollment.enrollment_hold")}",
+        I18n.t("active_scaffold.true")
+      ]) 
+    end
+
     values.push([
       I18n.t("activerecord.attributes.enrollment.research_area"),
       ResearchArea.find(search[:research_area].to_i).to_label

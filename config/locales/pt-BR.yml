@@ -156,6 +156,7 @@ pt-BR:
         delayed_phase: "Etapa atrasada"
         delayed_phase_date: "em"
         dismissal: "Desligamento"
+        enrollment_hold: "Trancado?"
         enrollment_holds: "Trancamentos"
         enrollment_number: "Número de Matrícula"
         enrollment_status: "Tipo de Matrícula"

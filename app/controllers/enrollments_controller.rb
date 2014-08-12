@@ -31,7 +31,7 @@ class EnrollmentsController < ApplicationController
 
     config.columns.add :scholarship_durations_active, :active, :professor, :phase, :delayed_phase, :course_class_year_semester, :deferral_type
     config.columns.add :listed_advisors, :listed_accomplishments, :listed_deferrals, :listed_scholarships, :listed_class_enrollments
-    config.columns.add :phase_due_dates
+    config.columns.add :phase_due_dates, :enrollment_hold
 
     config.list.columns = [:enrollment_number, :student, :enrollment_status, :level, :admission_date, :dismissal]
     config.list.sorting = {:enrollment_number => 'ASC'}
@@ -52,9 +52,11 @@ class EnrollmentsController < ApplicationController
       :accomplishments, 
       :delayed_phase, 
       :course_class_year_semester,
-      :research_area
+      :research_area,
+      :enrollment_hold
     ]
 
+    config.columns[:enrollment_hold].search_sql = ""
     
     config.columns[:accomplishments].allow_add_existing = false;
     config.columns[:accomplishments].search_sql = ""
@@ -117,10 +119,44 @@ class EnrollmentsController < ApplicationController
   end
   record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
 
-  #def self.condition_for_course_type(column, value, like_pattern)
-  #  return [] if value[:year].empty? and value[:semester].empty? and value[:course].empty?
-  #  ['(?, ?, ?) IN (%{search_sql})', value[:course], value[:year], value[:semester]]
-  #end
+  def self.condition_for_accomplishments_column(column, value, like_pattern)
+    return "" if value[:phase].blank?
+    date = value.nil? ? value : Date.parse("#{value[:year]}/#{value[:month]}/#{value[:day]}")
+    phase = value[:phase] == "all" ? nil : value[:phase]
+    if (value[:phase] == "all")
+      enrollments_ids = Enrollment.with_all_phases_accomplished_on(date)
+      query = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{enrollments_ids.join(',')})"
+    else
+      query = "enrollments.id in (select enrollment_id from accomplishments where DATE(conclusion_date) <= DATE('#{date}') and phase_id = #{phase})"
+    end
+    query
+  end
+
+  def self.condition_for_active_column(column, value, like_pattern)
+    query_inactive_enrollment = "select enrollment_id from dismissals where DATE(dismissals.date) <= DATE(?)"
+    case value
+      when 'not_active' then
+        sql = "enrollments.id in (#{query_inactive_enrollment})"
+      when 'active' then
+        sql = "enrollments.id not in (#{query_inactive_enrollment})"
+      else
+        sql = ""
+    end
+
+    [sql, Time.now]
+  end
+
+  def self.condition_for_admission_date_column(column, value, like_pattern)
+    month = value[:month].empty? ? 1 : value[:month]
+    year = value[:year].empty? ? 1 : value[:year]
+
+    if year != 1
+      date1 = Date.new(year.to_i, month.to_i)
+      date2 = Date.new(month.to_i==12 ? year.to_i + 1 : year.to_i, (month.to_i % 12) + 1)
+
+      ["DATE(#{column.search_sql.last}) >= ? and DATE(#{column.search_sql.last}) < ?", date1, date2]
+    end
+  end
 
   def self.condition_for_course_class_year_semester_column(column, value, like_pattern)
     return [] if value[:year].empty? and value[:semester].empty? and value[:course].empty?
@@ -147,16 +183,22 @@ class EnrollmentsController < ApplicationController
     ["(#{condition.join(', ')}) IN (#{search_sql})"] + result
   end
 
-  def self.condition_for_admission_date_column(column, value, like_pattern)
-    month = value[:month].empty? ? 1 : value[:month]
-    year = value[:year].empty? ? 1 : value[:year]
+  def self.condition_for_delayed_phase_column(column, value, like_pattern)
+    return "" if value[:phase].blank?
+    date = value.nil? ? value : Date.parse("#{value[:year]}/#{value[:month]}/#{value[:day]}")
+    phase = value[:phase] == "all" ? Phase.all : [Phase.find(value[:phase])]
+    enrollments_ids = Enrollment.with_delayed_phases_on(date, phase)
+    query_delayed_phase = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{enrollments_ids.join(',')})"
+    query_delayed_phase
+  end
 
-    if year != 1
-      date1 = Date.new(year.to_i, month.to_i)
-      date2 = Date.new(month.to_i==12 ? year.to_i + 1 : year.to_i, (month.to_i % 12) + 1)
-
-      ["DATE(#{column.search_sql.last}) >= ? and DATE(#{column.search_sql.last}) < ?", date1, date2]
-    end
+  def self.condition_for_enrollment_hold_column(column, value, like_pattern)
+    return "" if value[:hold].blank? or value[:hold].to_i == 0
+    eh = EnrollmentHold.arel_table
+    enrollments_ids = Enrollment.joins(:enrollment_holds)
+      .where(eh[:active].eq(true)).pluck(:id)
+    query_enrollment_hold = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{enrollments_ids.join(',')})"
+    query_enrollment_hold
   end
 
   def self.condition_for_scholarship_durations_active_column(column, value, like_pattern)
@@ -172,43 +214,6 @@ class EnrollmentsController < ApplicationController
 
     [sql, Time.now, Time.now]
   end
-
-  def self.condition_for_active_column(column, value, like_pattern)
-    query_inactive_enrollment = "select enrollment_id from dismissals where DATE(dismissals.date) <= DATE(?)"
-    case value
-      when 'not_active' then
-        sql = "enrollments.id in (#{query_inactive_enrollment})"
-      when 'active' then
-        sql = "enrollments.id not in (#{query_inactive_enrollment})"
-      else
-        sql = ""
-    end
-
-    [sql, Time.now]
-  end
-
-  def self.condition_for_delayed_phase_column(column, value, like_pattern)
-    return "" if value[:phase].blank?
-    date = value.nil? ? value : Date.parse("#{value[:year]}/#{value[:month]}/#{value[:day]}")
-    phase = value[:phase] == "all" ? Phase.all : [Phase.find(value[:phase])]
-    enrollments_ids = Enrollment.with_delayed_phases_on(date, phase)
-    query_delayed_phase = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{enrollments_ids.join(',')})"
-    query_delayed_phase
-  end
-
-  def self.condition_for_accomplishments_column(column, value, like_pattern)
-    return "" if value[:phase].blank?
-    date = value.nil? ? value : Date.parse("#{value[:year]}/#{value[:month]}/#{value[:day]}")
-    phase = value[:phase] == "all" ? nil : value[:phase]
-    if (value[:phase] == "all")
-      enrollments_ids = Enrollment.with_all_phases_accomplished_on(date)
-      query = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{enrollments_ids.join(',')})"
-    else
-      query = "enrollments.id in (select enrollment_id from accomplishments where DATE(conclusion_date) <= DATE('#{date}') and phase_id = #{phase})"
-    end
-    query
-  end
-
 
   def to_pdf
 

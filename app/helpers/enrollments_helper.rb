@@ -63,6 +63,14 @@ module EnrollmentsHelper
     select(:record, :phases, options_for_select([["Todas", "all"]] + Phase.all.map {|phase| [phase.name, phase.id]}), {:include_blank => as_(:_select_)}, select_html_options) + label_tag(:accomplishments_date, I18n.t("activerecord.attributes.enrollment.accomplishment_date"), :style => "margin: 0px 15px") +  select_day(Date.today.day, local_options, day_html_options) +  select_month(Date.today.month, local_options, month_html_options) + select_year(Date.today.year, local_options, year_html_options)
   end
 
+  def enrollment_hold_search_column(record, input_name)
+    select_html_options = {
+        :name => "search[enrollment_hold][hold]",
+        :style => "float:left; margin: 5px 2px;" 
+    }
+    check_box(record, :enrollment_hold, select_html_options) 
+  end
+
   def approval_date_form_column(record, options)
     date_select :record, :approval_date, {
         :discard_day => true,
@@ -431,17 +439,21 @@ module EnrollmentsHelper
 
   def display_action_links(action_links, record, options, &block)
     search = search_params
+    result = super
     if record.nil? or search.nil? or search.empty?
-      return super
+      return result
     end
+    columns ||= list_columns
     if search[:delayed_phase][:phase] == "all"
-
-      columns ||= list_columns
       phase_date = Date.new(search[:delayed_phase][:year].to_i, search[:delayed_phase][:month].to_i, search[:delayed_phase][:day].to_i)
       phases = record.delayed_phases(date: phase_date).collect{|p| p.name}.join(', ')
-      return (super + "</tr></table></td><tr class='record tr_search_result'><td style='text-align: right;'>Etapas atrasadas</td><td colspan='#{columns.size}'>#{phases}<table><tr>".html_safe).html_safe
+      result += ("</tr></table></td><tr class='record tr_search_result'><td style='text-align: right;'>Etapas atrasadas</td><td colspan='#{columns.size}'>#{phases}<table><tr>".html_safe).html_safe
+    end
+    if search[:enrollment_hold][:hold].to_i != 0
+      holds = record.enrollment_holds.where(:active => true).collect(&:to_label).join(', ')
+      result += ("</tr></table></td><tr class='record tr_search_result'><td style='text-align: right;'>Trancamento</td><td colspan='#{columns.size}'>#{holds}<table><tr>".html_safe).html_safe
     end
 
-    return super
+    result
   end
 end
