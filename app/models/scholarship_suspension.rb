@@ -42,12 +42,16 @@ class ScholarshipSuspension < ActiveRecord::Base
   def to_label
     label = I18n.localize(start_date, :format => :monthyear)
     label += " - #{I18n.localize(end_date, :format => :monthyear)}: "
-    if active
-      label += I18n.t("activerecord.attributes.scholarship_suspension.active_options.active")
-    else
-      label += I18n.t("activerecord.attributes.scholarship_suspension.active_options.inactive")
-    end
+    label += active_label
     label
+  end
+
+  def active_label
+    if active
+      I18n.t("activerecord.attributes.scholarship_suspension.active_options.active")
+    else
+      I18n.t("activerecord.attributes.scholarship_suspension.active_options.inactive")
+    end
   end
 
   def scholarship_duration_start_date

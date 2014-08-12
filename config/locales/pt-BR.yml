@@ -367,8 +367,8 @@ pt-BR:
         end_date: "Data de Fim"
         scholarship_duration: "Alocação"
         active_options:
-          active: "Ativa"
-          inactive: "Inativa"
+          active: "Bolsa Suspensa"
+          inactive: "Bolsa Ativa"
       scholarship_type:
         name: "Nome"
         scholarships: "Bolsas"

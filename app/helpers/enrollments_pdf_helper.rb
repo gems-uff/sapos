@@ -108,9 +108,7 @@ module EnrollmentsPdfHelper
         pdf.stroke_bounds
       end
     end
-
   end
-
 
   def enrollment_header(pdf, options={})
     enrollment ||= options[:enrollment]
@@ -456,22 +454,44 @@ module EnrollmentsPdfHelper
         "<b>#{I18n.t("pdf_content.enrollment.scholarships.cancel_date")}</b>",
 
       ]]
-
-      scholarships_table_data = scholarship_durations.map do |sd|
+      i = 0
+      scholarships_table_data = []
+      suspensions_ids = []
+      scholarship_durations.each do |sd|
         start_date = sd.start_date.nil? ? "-" : I18n.localize(sd.start_date, :format => :monthyear2)
         end_date = sd.end_date.nil? ? "-" : I18n.localize(sd.end_date, :format => :monthyear2)
         cancel_date = sd.cancel_date.nil? ? "-" : I18n.localize(sd.cancel_date, :format => :monthyear2)
-          
-        [
+        scholarships_table_data << [
           rescue_blank_text(sd.scholarship, :method_call => :scholarship_number),
           rescue_blank_text(sd.scholarship.sponsor, :method_call => :name),
           start_date,
           end_date,
           cancel_date
         ]
+        i += 1
+        suspensions = sd.scholarship_suspensions
+        unless suspensions.empty?
+          suspensions.each do |s| 
+            scholarships_table_data << [
+              "Suspensão #{s.active ? 'ativa' : 'inativa'}",
+              "",
+              I18n.localize(s.start_date, :format => :monthyear),
+              I18n.localize(s.end_date, :format => :monthyear),
+              "-"
+            ]
+            suspensions_ids << i
+            i += 1
+          end
+        end
       end
 
-      simple_pdf_table(pdf, scholarships_table_width, scholarships_table_header, scholarships_table_data, distance: 0)
+      simple_pdf_table(pdf, scholarships_table_width, scholarships_table_header, scholarships_table_data, distance: 0) do |table| 
+        suspensions_ids.each do |i|
+          table.cells[i, 0].font_style = :bold
+          table.cells[i, 0].style :align => :right
+          table.cells[i, 0].style :padding_right => 10
+        end
+      end
     end
   end
 
