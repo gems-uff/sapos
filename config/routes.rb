@@ -203,7 +203,7 @@ Sapos::Application.routes.draw do
   resources :notifications do
     as_routes
     member do
-      get 'execute_now'
+      post 'execute_now'
       get 'simulate'
     end
 

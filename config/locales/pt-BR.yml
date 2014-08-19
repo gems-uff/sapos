@@ -799,6 +799,7 @@ pt-BR:
       individual_description: "Um e-mail para cada resultado"
       notification_offset_description: "Data de execução. Frequência Mensal com offset 3d executará todo dia 04 do mês"
       query_offset_description: "Data de consulta. Frequência Semestral com offset -1M terá variavel para dias 01/02 ou 01/07"
+      execute_now_success: 'Notificação disparda com sucesso'
       query_date: "Data de Consulta"
       set_query_date: "Escolher Data de Consulta"
       should_send_emails: "Enviar e-mails" 

@@ -57,11 +57,15 @@ class NotificationsController < ApplicationController
   end
 
   def execute_now
-    query_date = Date.strptime(params[:data_consulta], "%Y-%m-%d") unless params[:data_consulta].nil?
-    notification = Notification.find(params[:id])
-    query_date ||= notification.query_date.to_date
-    Notifier.send_emails(notification.execute(:data_consulta => query_date.to_time))
-    redirect_to Notification
+    process_action_link_action do |notification|
+
+      query_date = Date.strptime(params[:data_consulta], "%Y-%m-%d") unless params[:data_consulta].nil?
+      query_date ||= notification.query_date.to_date
+      Notifier.send_emails(notification.execute(:data_consulta => query_date.to_time))
+      self.successful = true
+
+      flash[:info] = I18n.t('active_scaffold.notification.execute_now_success')
+    end
   end
 
   def simulate
