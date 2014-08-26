@@ -24,7 +24,7 @@ module Notifier
     Notification.where(next_execution.lt(Time.now)).each do |notification|
       notifications << notification.execute
     end
-    {:notifications => notifications }
+    notifications
   end
 
   def self.asynchronous_emails
