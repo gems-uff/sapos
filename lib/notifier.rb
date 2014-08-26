@@ -22,7 +22,7 @@ module Notifier
 
     #Find notifications that should run
     Notification.where(next_execution.lt(Time.now)).each do |notification|
-      notifications += notification.execute
+      notifications << notification.execute
     end
     {:notifications => notifications }
   end
