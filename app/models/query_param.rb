@@ -37,9 +37,11 @@ class QueryParam < ActiveRecord::Base
       case value_type
         when VALUE_DATE
           begin
-            Date.parse(val)
-            unless val =~ /[0-9]{4}-[0-9]{2}-[0-9]{2}/
-              raise ArgumentError
+            unless val.is_a?(ActiveSupport::TimeWithZone)
+              Date.parse(val)
+              unless val =~ /[0-9]{4}-[0-9]{2}-[0-9]{2}/
+                raise ArgumentError
+              end
             end
           rescue ArgumentError
             self.errors.add :default_value, :invalid_date
@@ -92,9 +94,17 @@ class QueryParam < ActiveRecord::Base
     else
       case value_type
         when VALUE_DATE
-          Date.parse(value)
+          if value.is_a?(ActiveSupport::TimeWithZone)
+            value.to_date
+          else
+            Date.parse(value)
+          end
         when VALUE_DATETIME
-          DateTime.parse(value)
+          if value.is_a?(ActiveSupport::TimeWithZone)
+            value.to_datetime
+          else
+            DateTime.parse(value)
+          end
         when VALUE_TIME
           Time.parse(value)
         when VALUE_LIST
