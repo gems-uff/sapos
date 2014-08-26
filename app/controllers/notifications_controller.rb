@@ -59,9 +59,10 @@ class NotificationsController < ApplicationController
   def execute_now
     process_action_link_action do |notification|
 
+      notification_params = params[:notification_params]
       query_date = Date.strptime(params[:data_consulta], "%Y-%m-%d") unless params[:data_consulta].nil?
       query_date ||= notification.query_date.to_date
-      Notifier.send_emails(notification.execute(:data_consulta => query_date.to_time))
+      Notifier.send_emails(notification.execute(override_params: notification_params))
       self.successful = true
 
       flash[:info] = I18n.t('active_scaffold.notification.execute_now_success')
@@ -70,6 +71,7 @@ class NotificationsController < ApplicationController
 
   def simulate
     @notification = Notification.find(params[:id])
+
 
     notification_params = params[:notification_params]
     if notification_params

@@ -30,7 +30,7 @@
               <%= params[:notification_params][:data_consulta] %>
             </span>
             &nbsp;&nbsp;&nbsp;
-            <a id="as_notifications-execute_now-<%= @notification.id %>-link" data-remote="true" data-method="post" class="execute_now as_action" href="<%= execute_now_notification_path(@notification, :data_consulta => params[:notification_params][:data_consulta]) %>">
+            <a id="as_notifications-execute_now-<%= @notification.id %>-link" data-remote="true" data-method="post" class="execute_now as_action" href="<%= execute_now_notification_path(@notification, :notification_params => params[:notification_params]) %>">
               <i class="fa fa-mail-forward" title="Notificar agora"></i>Notificar agora
             </a>
             <%= loading_indicator_tag(:action => :execute_now, :id => @notification.id) %>
@@ -71,6 +71,6 @@
     $(function () {
         $(".simulate.as_action.again").click(function () {
             ActiveScaffold.find_action_link($("#as_notifications-simulate-<%= @notification.id %>-link")).reload();
-        })
+        });
     });
 </script>
