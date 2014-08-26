@@ -22,9 +22,9 @@ module Notifier
 
     #Find notifications that should run
     Notification.where(next_execution.lt(Time.now)).each do |notification|
-      notifications << notification.execute
+      notifications << notification.execute[:notifications]
     end
-    notifications
+    {:notifications => notifications.flatten }
   end
 
   def self.asynchronous_emails
