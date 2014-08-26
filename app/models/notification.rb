@@ -176,7 +176,8 @@ class Notification < ActiveRecord::Base
   end
 
   def prepare_params_and_derivations(override_params)
-    qdate = override_params[:data_consulta] || self.query_date
+    override_params[:data_consulta] ||= self.query_date
+    qdate = override_params[:data_consulta]
     params = get_query_date_derivations(qdate)
     override_params.merge(params)
   end
