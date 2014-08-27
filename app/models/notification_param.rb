@@ -20,9 +20,11 @@ class NotificationParam < ActiveRecord::Base
       case value_type
         when QueryParam::VALUE_DATE
           begin
-            Date.parse(value)
-            unless value =~ /[0-9]{4}-[0-9]{2}-[0-9]{2}/
-              raise ArgumentError
+            unless val.is_a?(ActiveSupport::TimeWithZone)
+              Date.parse(value)
+              unless value =~ /[0-9]{4}-[0-9]{2}-[0-9]{2}/
+                raise ArgumentError
+              end
             end
           rescue ArgumentError
             self.errors.add :default_value, :invalid_date
