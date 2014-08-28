@@ -12,6 +12,7 @@
 /public/uploads/report_configuration
 /public/javascripts/active_scaffold
 /public/stylesheets/active_scaffold
+/uploads
 .idea/
 .rvmrc
 /vendor/bundle

@@ -1,3 +1,12 @@
+GIT
+  remote: git://github.com/vladimeeer/carrierwave-activerecord.git
+  revision: bfdbb7dcbf425230c2991cf893b671411deebdbf
+  ref: bfdbb7dcbf4
+  specs:
+    carrierwave-activerecord (0.1.0rc15)
+      activerecord (~> 3.2.13)
+      carrierwave (>= 0.10.0)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -47,10 +56,11 @@ GEM
       debug_inspector (>= 0.0.1)
     builder (3.0.4)
     cancan (1.6.10)
-    carrierwave (0.9.0)
+    carrierwave (0.10.0)
       activemodel (>= 3.2.0)
       activesupport (>= 3.2.0)
       json (>= 1.7)
+      mime-types (>= 1.16)
     choice (0.1.6)
     codemirror-rails (3.16)
       railties (>= 3.0, < 5)
@@ -214,6 +224,7 @@ DEPENDENCIES
   binding_of_caller
   cancan
   carrierwave
+  carrierwave-activerecord!
   codemirror-rails
   coffee-rails (~> 3.2.1)
   devise (~> 2.2.8)

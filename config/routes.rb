@@ -158,6 +158,9 @@ Sapos::Application.routes.draw do
   resources :students do
     as_routes
     record_select_routes
+    member do
+      get 'photo'
+    end
   end
 
   resources :majors do
@@ -232,6 +235,9 @@ Sapos::Application.routes.draw do
     collection do
       put 'preview'
       post 'preview'
+    end
+    member do
+      get 'logo'
     end
   end
 

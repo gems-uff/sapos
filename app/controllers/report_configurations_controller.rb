@@ -63,4 +63,9 @@ class ReportConfigurationsController < ApplicationController
       end
     end
   end
+
+  def logo
+    record = ReportConfiguration.find params[:id]
+    send_data(record.image.read, filename: record.image_identifier)
+  end
 end

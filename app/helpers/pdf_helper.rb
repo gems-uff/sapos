@@ -49,8 +49,8 @@ module PdfHelper
           unless block.nil?
             yield
           else
-            if not (pdf_config.image.nil? or pdf_config.image.path.empty?)
-              pdf.image(pdf_config.image.path, 
+            if not (pdf_config.image.nil? or pdf_config.image_identifier.nil?)
+              pdf.image(StringIO.new(pdf_config.image.read), 
                 :at => [pdf_config.x, HEIGHT - pdf_config.y],
                 :vposition => :top,
                 :scale => pdf_config.scale)

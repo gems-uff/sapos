@@ -58,4 +58,9 @@ class StudentsController < ApplicationController
 
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 
+  def photo
+    student = Student.find params[:id]
+    send_data(student.photo.read, filename: student.photo_identifier)
+  end
+
 end 

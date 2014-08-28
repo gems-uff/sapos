@@ -17,6 +17,8 @@
 
 	// Image preview
 	carrierwave_preview(as_container, $(as_container + ' .image-input'));
+    $(image_input).wrap('<div class="filefieldwrap"></div>')
+    
 
 	// Pdf preview
 	function getiframeDocument(iframe) {
@@ -57,7 +59,7 @@
         ev.preventDefault();
         var original = $(as_container);
         submit_clone_form(link_selector, original, {
-            '.image-input': '.filefield',
+            '.image-input': '.filefieldwrap',
             '#record_text_<%=record.id%>': '.header_text_field'
         });
         

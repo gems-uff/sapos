@@ -7,19 +7,15 @@ class ImageUploader < CarrierWave::Uploader::Base
   # include CarrierWave::MiniMagick
 
   # Choose what kind of storage to use for this uploader:
-  storage :file
+  storage :active_record
   # storage :fog
 
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
-  def url
-    "#{Rails.application.config.config_url_root}/assets#{super[18..-1]}"
-  end
-
-  def store_dir
-    "app/assets/images/#{model.class.to_s.underscore}/#{mounted_as}"
-  end
   
+  def url
+    "report_configurations/#{model.id}/logo"
+  end
 
   configure do |config|
     config.remove_previously_stored_files_after_update = false

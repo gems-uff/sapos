@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140812175236) do
+ActiveRecord::Schema.define(:version => 20140828023932) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -57,6 +57,13 @@ ActiveRecord::Schema.define(:version => 20140812175236) do
   end
 
   add_index "allocations", ["course_class_id"], :name => "index_allocations_on_course_class_id"
+
+  create_table "carrier_wave_files", :force => true do |t|
+    t.string   "medium_hash"
+    t.binary   "binary"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
 
   create_table "cities", :force => true do |t|
     t.string   "name"
