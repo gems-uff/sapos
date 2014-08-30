@@ -1,5 +1,5 @@
 GIT
-  remote: git://github.com/vladimeeer/carrierwave-activerecord.git
+  remote: https://github.com/vladimeeer/carrierwave-activerecord.git
   revision: bfdbb7dcbf425230c2991cf893b671411deebdbf
   ref: bfdbb7dcbf4
   specs:
@@ -202,7 +202,7 @@ GEM
       polyglot
       polyglot (>= 0.3.1)
     ttfunk (1.1.1)
-    tzinfo (0.3.40)
+    tzinfo (0.3.41)
     uglifier (2.1.1)
       execjs (>= 0.3.0)
       multi_json (~> 1.0, >= 1.0.2)

@@ -77,7 +77,7 @@ gem 'codemirror-rails'
 
 # Image
 gem 'carrierwave'
-gem 'carrierwave-activerecord', :git => 'git://github.com/vladimeeer/carrierwave-activerecord.git', :ref => 'bfdbb7dcbf4'
+gem 'carrierwave-activerecord', :git => 'https://github.com/vladimeeer/carrierwave-activerecord.git', :ref => 'bfdbb7dcbf4'
 # Use unicorn as the web server
 # gem 'unicorn'
 
