@@ -23,7 +23,7 @@ GEM
       rack-cache (~> 1.2)
       rack-test (~> 0.6.1)
       sprockets (~> 2.2.1)
-    active_scaffold (3.4.1)
+    active_scaffold (3.4.3)
       rails (>= 3.2.18, < 5)
     active_scaffold_duplicate (1.0.2)
       active_scaffold (>= 3.3.0.rc)

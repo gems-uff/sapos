@@ -31,7 +31,6 @@ class ScholarshipDuration < ActiveRecord::Base
   validates_date :cancel_date, :on_or_after => :start_date, :allow_nil => true
 
   before_save :update_end_and_cancel_dates
-  after_initialize :init
 
   def init
     self.start_date = Date.today.beginning_of_month + 1.month if self.start_date.nil?

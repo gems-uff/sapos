@@ -25,7 +25,7 @@ module EnrollmentsHelper
 
   def delayed_phase_search_column(record, input_name)
     local_options = {
-        :include_blank => true
+        :include_blank => false
     }
     select_html_options = {
         :name => "search[delayed_phase][phase]"
@@ -45,7 +45,7 @@ module EnrollmentsHelper
 
   def accomplishments_search_column(record, input_name)
     local_options = {
-        :include_blank => true
+        :include_blank => false
     }
     select_html_options = {
         :name => "search[accomplishments][phase]"
@@ -449,7 +449,7 @@ module EnrollmentsHelper
       phases = record.delayed_phases(date: phase_date).collect{|p| p.name}.join(', ')
       result += ("</tr></table></td><tr class='record tr_search_result'><td style='text-align: right;'>Etapas atrasadas</td><td colspan='#{columns.size}'>#{phases}<table><tr>".html_safe).html_safe
     end
-    if search[:enrollment_hold][:hold].to_i != 0
+    if !search[:enrollment_hold].nil? and search[:enrollment_hold][:hold].to_i != 0
       holds = record.enrollment_holds.where(:active => true).collect(&:to_label).join(', ')
       result += ("</tr></table></td><tr class='record tr_search_result'><td style='text-align: right;'>Trancamento</td><td colspan='#{columns.size}'>#{holds}<table><tr>".html_safe).html_safe
     end
