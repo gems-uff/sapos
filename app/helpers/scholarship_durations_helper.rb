@@ -64,6 +64,7 @@ module ScholarshipDurationsHelper
          :start_year => Time.now.year - @@range,
          :end_year => Time.now.year + @@range,
          :include_blank => true,
+         :default => nil,
          :prefix => options[:name]
     }
     
@@ -76,6 +77,7 @@ module ScholarshipDurationsHelper
          :start_year => Time.now.year - @@range,
          :end_year => Time.now.year + @@range,
          :include_blank => true,
+         :default => nil,
          :prefix => options[:name]
     }
     
@@ -88,6 +90,7 @@ module ScholarshipDurationsHelper
          :start_year => Time.now.year - @@range,
          :end_year => Time.now.year + @@range,
          :include_blank => true,
+         :default => nil,
          :prefix => options[:name]
     }
     

@@ -206,4 +206,10 @@ class ScholarshipDurationsController < ApplicationController
     end
   end
 
+  protected
+  def do_new
+    super
+    @record.init
+  end 
+
 end 

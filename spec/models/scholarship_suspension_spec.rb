@@ -130,7 +130,7 @@ describe ScholarshipSuspension do
         scholarship_suspension.start_date = start_date
         scholarship_suspension.end_date = end_date
         scholarship_suspension.active = true
-        scholarship_suspension.to_label.should eql("#{I18n.localize(start_date, :format => :monthyear)} - #{I18n.localize(end_date, :format => :monthyear)}: Ativa")
+        scholarship_suspension.to_label.should eql("#{I18n.localize(start_date, :format => :monthyear)} - #{I18n.localize(end_date, :format => :monthyear)}: Bolsa Suspensa")
       end
       
     end

@@ -184,7 +184,7 @@ describe Enrollment do
     end
     describe "self.with_delayed_phases_on" do
       it "should return the expected enrollments" do
-        result = Enrollment.with_delayed_phases_on(1.months.from_now.to_date, nil)
+        result = Enrollment.with_delayed_phases_on(2.months.from_now.to_date, nil)
 
         expected_result = [@delayed_enrollment.id, @enrollment_expired_deferral.id].sort
         result.sort.should eql(expected_result.sort)
