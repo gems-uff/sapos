@@ -26,6 +26,7 @@ group :development, :test do
 end
 
 group :production, :staging do
+  gem 'turnout'
   gem 'mysql2', '0.3.15'
   gem 'exception_notification', '2.6.1', :require => 'exception_notifier'
 end
