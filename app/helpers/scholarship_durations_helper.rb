@@ -99,10 +99,11 @@ module ScholarshipDurationsHelper
 
   def adviser_search_column(record,options)
     local_options = {
-        :include_blank => true
+        :include_blank => true,
+        :class => "text-input"
+        
     }
-
-    select_tag record[:adviser], options_from_collection_for_select(Professor.all(:order => "name"), "id","name"), options.merge(local_options)
+    record_select_field :adviser, Professor.new, options.merge(local_options)
   end
 
   def sponsors_search_column(record,options)
