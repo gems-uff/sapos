@@ -54,15 +54,16 @@ class ScholarshipDurationsController < ApplicationController
 
   def self.condition_for_adviser_column(column, value, like_pattern)
     unless value.blank?
-      sql = "enrollments.id IN (
-             SELECT adv.enrollment_id
-             FROM advisements AS adv
-             INNER JOIN professors
-             ON professors.id = adv.professor_id
-             WHERE professors.id = ?
-	         )"
+      professor_id = Advisement.arel_table[:professor_id]
+      scholarship_durations_id = ScholarshipDuration.arel_table[:id]
+      query = Enrollment.joins(:scholarship_durations).joins(:advisements)
+        .where(professor_id.eq(value))
+        .select(scholarship_durations_id)
+        .to_sql
 
-      [sql, value]
+      sql = "id IN (#{query})"
+
+      [sql]
     end
   end
 
