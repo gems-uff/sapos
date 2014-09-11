@@ -39,6 +39,7 @@ module StudentsHelper
   end
   
   def photo_show_column(record, column)
+    return '-' if record.photo.blank?
     image_tag photo_student_path(record)
   end
 
