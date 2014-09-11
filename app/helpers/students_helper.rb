@@ -37,5 +37,9 @@ module StudentsHelper
       text: record.identity_issuing_place
     )
   end
+  
+  def photo_show_column(record, column)
+    image_tag photo_student_path(record)
+  end
 
 end
