@@ -31,25 +31,36 @@ class Query < ActiveRecord::Base
   end
 
 
+  def within_read_only_connection(&block)
+    begin
+      ActiveRecord::Base.establish_connection("#{Rails.env}_read_only") if ActiveRecord::Base.configurations["#{Rails.env}_read_only"]
+      yield block
+    ensure
+      ActiveRecord::Base.establish_connection(Rails.env)
+    end
+  end
+
   def execute(override_params = {})
-    #Create connection to the Database
-    db_connection = ActiveRecord::Base.connection
+    within_read_only_connection do
+      #Create connection to the Database
+      db_connection = ActiveRecord::Base.connection
 
-    #Generate query using the parameters specified by the simulation
-    current_params = map_params(override_params)
+      #Generate query using the parameters specified by the simulation
+      current_params = map_params(override_params)
 
-    valid_params = self.params.find { |p| p.errors.size.nonzero? }.nil?
+      valid_params = self.params.find { |p| p.errors.size.nonzero? }.nil?
 
-    if valid_params
-      generated_query = ::Query.parse_sql_and_params(sql, current_params)
+      if valid_params
+        generated_query = ::Query.parse_sql_and_params(sql, current_params)
 
-      #Query the Database
-      db_resource = db_connection.exec_query(generated_query)
+        #Query the Database
+        db_resource = db_connection.exec_query(generated_query)
 
-      #Build the notifications with the results from the query
-      {:columns => db_resource.columns, :rows => db_resource.rows, :query => generated_query, :errors => self.errors}
-    else
-      {:columns => [], :rows => [], :query => '', :errors => self.params}
+        #Build the notifications with the results from the query
+        {:columns => db_resource.columns, :rows => db_resource.rows, :query => generated_query, :errors => self.errors}
+      else
+        {:columns => [], :rows => [], :query => '', :errors => self.params}
+      end
     end
   end
 
