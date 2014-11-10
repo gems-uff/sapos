@@ -31,6 +31,7 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 
 * [Term paper about the first version](https://github.com/gems-uff/sapos/raw/master/doc/TCC%20Rodrigo%20e%20Tiago.pdf)
 * [Term paper about the second version](https://github.com/gems-uff/sapos/raw/master/doc/TCC%20Bruno%20Schettino.pdf)
+* [Term paper about the third version](https://github.com/gems-uff/sapos/raw/master/doc/TCC%20Joao%20e%20Luis.pdf)
 * [Wiki](https://github.com/gems-uff/sapos/wiki)
 
 #Development
