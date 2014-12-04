@@ -32,6 +32,17 @@ class Notification < ActiveRecord::Base
     execution unless self.new_record?
   end
 
+  after_initialize do
+    self.query_offset ||= "0"
+    self.notification_offset ||= "0"
+    hammer_current_params!
+  end
+
+  before_save do
+    hammer_current_params! if self.persisted?
+    true
+  end
+
   before_create do
     self.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
   end
@@ -39,12 +50,6 @@ class Notification < ActiveRecord::Base
 
   def query_params_ids
     (self.query.try(:params) || []).collect &:id
-  end
-
-  after_initialize do
-    self.query_offset ||= "0"
-    self.notification_offset ||= "0"
-    hammer_current_params!
   end
 
   def build_params_for_creation
@@ -76,11 +81,6 @@ class Notification < ActiveRecord::Base
     hammer_current_params!
   end
 
-  before_save do
-    hammer_current_params! if self.persisted?
-    true
-  end
-
   def to_label
     self.title || I18n.t('activerecord.attributes.notification.no_name')
   end
@@ -99,7 +99,7 @@ class Notification < ActiveRecord::Base
     if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
       first_semester = Time.parse("03/01")
       second_semester = Time.parse("08/01")
-      dates = [second_semester - 1.year, first_semester, second_semester, first_semester + 1.year]
+      dates = [second_semester - 1.year, first_semester, second_semester, first_semester + 1.year, second_semester + 1.year]
     else
       dates = (-2..2).map { |n| Time.parse("01/01") + n.year } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.annual")
       dates = (-2..2).map { |n| time.beginning_of_month + n.month } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.monthly")
