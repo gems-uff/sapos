@@ -32,6 +32,9 @@ class Query < ActiveRecord::Base
 
 
   def within_read_only_connection(&block)
+    if ActiveRecord::Base.connection.adapter_name == "SQLite"
+      return yield block
+    end
     begin
       ActiveRecord::Base.establish_connection("#{Rails.env}_read_only") if ActiveRecord::Base.configurations["#{Rails.env}_read_only"]
       yield block
