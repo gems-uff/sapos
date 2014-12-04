@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140828023932) do
+ActiveRecord::Schema.define(:version => 20141130000705) do
 
   create_table "accomplishments", :force => true do |t|
     t.integer  "enrollment_id"
@@ -124,9 +124,10 @@ ActiveRecord::Schema.define(:version => 20140828023932) do
     t.integer  "credits"
     t.integer  "research_area_id"
     t.integer  "course_type_id"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
     t.integer  "workload"
+    t.boolean  "available",        :default => true
   end
 
   add_index "courses", ["course_type_id"], :name => "index_courses_on_course_type_id"

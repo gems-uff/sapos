@@ -89,6 +89,7 @@ pt-BR:
         name: "Nome"
         state: "Estados"
       course:
+        available: "Disponível"
         code: "Código"
         content: "Ementa"
         course_type: "Tipo de Disciplina"

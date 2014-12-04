@@ -39,6 +39,7 @@ class CourseClassesController < ApplicationController
       :parameters => {:format => :pdf}
 
     config.columns[:course].form_ui = :record_select
+    config.columns[:course].options[:params] = {available: true}
     config.columns[:professor].form_ui = :record_select
     config.columns[:year].form_ui = :select
     config.columns[:semester].form_ui = :select
