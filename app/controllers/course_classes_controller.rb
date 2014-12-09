@@ -44,7 +44,7 @@ class CourseClassesController < ApplicationController
     config.columns[:year].form_ui = :select
     config.columns[:semester].form_ui = :select
     config.columns[:semester].options = {:options => ['1', '2']}
-    config.columns[:year].options = {:options => ((Date.today.year-5)..Date.today.year).map { |y| y }.reverse}
+    config.columns[:year].options = {:options => ((Date.today.year-5)..Date.today.year+1).map { |y| y }.reverse, :selected => Date.today.year}
 
     config.create.columns =
         [:name, :course, :professor, :year, :semester, :allocations]
