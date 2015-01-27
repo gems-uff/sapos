@@ -500,6 +500,8 @@ pt-BR:
         enrollment_hold:
           before_admission_date: "anterior a Data de Admissão"
           after_dismissal_date: "posterior a Data de Desligamento"
+        notification:
+          offset_invalid_value: "está com o valor inválido. Tente um número, seguido por y, M, W, d, h, m ou s"
         scholarship:
           attributes:
             end_date:
