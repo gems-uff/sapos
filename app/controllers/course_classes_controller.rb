@@ -46,7 +46,7 @@ class CourseClassesController < ApplicationController
     config.columns[:semester].options = {
       :options => ['1', '2'],
       :include_blank => true,
-      :default => nil)
+      :default => nil
     }
     config.columns[:year].options = {
       :options => ((Date.today.year-5)..Date.today.year+1).map { |y| y }.reverse,
