@@ -5,8 +5,6 @@ class QueryParam < ActiveRecord::Base
   belongs_to :query
   has_many :notification_params
 
-  attr_accessible :name, :default_value, :value_type
-
   attr_accessor :simulation_value
 
   VALUE_STRING = 'String'
@@ -21,7 +19,7 @@ class QueryParam < ActiveRecord::Base
   VALUE_TYPES = [VALUE_STRING, VALUE_INTEGER, VALUE_FLOAT, VALUE_LIST, VALUE_LITERAL, VALUE_DATE, VALUE_DATETIME, VALUE_TIME, VALUE_LITERAL]
 
   validates :value_type, presence: true, inclusion: VALUE_TYPES
-  validates :name, presence: true, :format => /^([a-z_][a-zA-Z_0-9]+)?$/
+  validates :name, presence: true, :format => /\A([a-z_][a-zA-Z_0-9]+)?\z/
 
   validate do
     validate_value(default_value)

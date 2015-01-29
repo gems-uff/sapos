@@ -3,8 +3,6 @@
 
 class CourseClass < ActiveRecord::Base
   
-  attr_accessible :year, :semester, :professor, :course
-
   belongs_to :course
   belongs_to :professor
 

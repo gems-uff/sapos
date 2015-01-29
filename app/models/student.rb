@@ -2,10 +2,6 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Student < ActiveRecord::Base
-  attr_accessible :name, :cpf, :obs, :birthdate, :sex, :civil_status, :father_name,
-    :mother_name, :identity_number, :identity_issuing_body, :identity_expedition_date,
-    :identity_issuing_place, :employer, :job_position, :neighborhood, :zip_code, 
-    :address, :telephone1, :telephone2, :email, :photo
 
   mount_uploader :photo, ProfileUploader
 

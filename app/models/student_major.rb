@@ -2,8 +2,6 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class StudentMajor < ActiveRecord::Base
-  attr_accessible :student, :major
-
   has_paper_trail
   
   belongs_to :student

@@ -1,10 +1,22 @@
 # SQLite version 3.x
 #   gem install sqlite3
 development:
-  adapter: sqlite3
-  database: db/development.sqlite3
+  adapter: mysql2
+  database: sapos_development
   pool: 5
+  username: root
+  password: 123456
   timeout: 5000
+  host: localhost
+
+#development_read_only:
+#  adapter: mysql2
+#  database: sapos_development
+#  pool: 5
+#  username: teste_no_access
+#  password: 123456
+#  pool: 5
+#  timeout: 5000
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
