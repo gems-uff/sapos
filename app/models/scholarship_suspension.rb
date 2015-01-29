@@ -1,6 +1,5 @@
 class ScholarshipSuspension < ActiveRecord::Base
   belongs_to :scholarship_duration
-  attr_accessible :active, :end_date, :start_date
 
   has_paper_trail
 

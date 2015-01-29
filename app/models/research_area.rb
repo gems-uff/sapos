@@ -12,7 +12,6 @@ class ResearchArea < ActiveRecord::Base
   validates :name, :presence => true, :uniqueness => true
   validates :code, :presence => true, :uniqueness => true
 
-  attr_accessible :name, :code
 
   def to_label
     "#{code} - #{name}"

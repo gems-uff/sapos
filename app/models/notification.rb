@@ -2,7 +2,6 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Notification < ActiveRecord::Base
-  attr_accessible :body_template, :frequency, :next_execution, :notification_offset, :query_offset, :sql_query, :subject_template, :title, :to_template, :individual
 
   has_many :notification_logs
   has_many :notification_params, class_name: 'NotificationParam', dependent: :destroy

@@ -3,7 +3,6 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class PhaseCompletion < ActiveRecord::Base
-  attr_accessible :completion_date, :due_date, :enrollment, :phase
 
   belongs_to :enrollment
   belongs_to :phase
