@@ -14,7 +14,16 @@ class CoursesController < ApplicationController
     config.list.columns = [:name, :code, :research_area, :credits, :workload_text, :course_type, :available]
     config.create.label = :create_course_label
     config.update.label = :update_course_label
+    config.actions.swap :search, :field_search
 
+    config.field_search.columns = [
+      :name, 
+      :course_type, 
+      :research_area, 
+      :available
+    ]
+
+    config.columns[:name].search_ui = :text
 
     config.columns[:research_area].form_ui = :record_select
     config.columns[:course_type].form_ui = :select
