@@ -9,13 +9,13 @@ class Course < ActiveRecord::Base
   has_paper_trail
 
   validates :course_type, :presence => true
-  validates :name, :presence => true, :uniqueness => true
+  validates :name, :presence => true, :uniqueness => {:scope => :available, :message => "e #{I18n.t('activerecord.attributes.course.available')} #{I18n.t('errors.messages.taken')}"}
   validates :code, :presence => true, :uniqueness => true
   validates :credits, :presence => true
   validates :workload, :presence => true
 
   def to_label
-  	"#{self.name}"
+       "#{self.name}"
   end
 
   def workload_value
