@@ -7,7 +7,7 @@ class Query < ActiveRecord::Base
   has_many :params, class_name: 'QueryParam'
 
 
-  accepts_nested_attributes_for :params, reject_if: :all_blank
+  accepts_nested_attributes_for :params, reject_if: :all_blank, allow_destroy: true
 
   validate :ensure_valid_params
   validates_associated :params
@@ -43,26 +43,33 @@ class Query < ActiveRecord::Base
   end
 
   def execute(override_params = {})
-    within_read_only_connection do
-      #Create connection to the Database
-      db_connection = ActiveRecord::Base.connection
+    #Generate query using the parameters specified by the simulation
+    current_params = map_params(override_params)
 
-      #Generate query using the parameters specified by the simulation
-      current_params = map_params(override_params)
+    valid_params = self.params.find { |p| p.errors.size.nonzero? }.nil?
 
-      valid_params = self.params.find { |p| p.errors.size.nonzero? }.nil?
+    if not valid_params
+      {:columns => [], :rows => [], :query => '', :errors => self.params}
+    else
 
-      if valid_params
-        generated_query = ::Query.parse_sql_and_params(sql, current_params)
+      generated_query = ::Query.parse_sql_and_params(sql, current_params)
+      ActiveRecord::Base.connection.commit_db_transaction
 
+      columns = []
+      rows = []
+
+      # TODO: Connections and transactions are messed up, need to upgrade to Rails 4 to use connection pool.
+      within_read_only_connection do
+        #Create connection to the Database
+        db_connection = ActiveRecord::Base.connection
         #Query the Database
         db_resource = db_connection.exec_query(generated_query)
 
-        #Build the notifications with the results from the query
-        {:columns => db_resource.columns, :rows => db_resource.rows, :query => generated_query, :errors => self.errors}
-      else
-        {:columns => [], :rows => [], :query => '', :errors => self.params}
+        columns = db_resource.columns
+        rows = db_resource.rows
       end
+      #Build the notifications with the results from the query
+      {:columns => columns, :rows => rows, :query => generated_query, :errors => self.errors}
     end
   end
 

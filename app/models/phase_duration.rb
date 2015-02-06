@@ -16,7 +16,7 @@ class PhaseDuration < ActiveRecord::Base
 
 
   before_destroy :validate_destroy
-  after_commit :create_phase_completions
+  after_commit :create_phase_completions, :on => [:create, :update]
 
   def to_label
     "#{deadline_semesters} períodos, #{deadline_months} meses e #{deadline_days} dias"

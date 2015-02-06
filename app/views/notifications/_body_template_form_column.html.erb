@@ -4,11 +4,18 @@
 		<%= label_tag label_for(column, column_options), column.label %>
 		<br>
 		<span class="description">
-			<span class="desc-title">Os campos de template utilizam linguagem ERB. <a href="http://stackoverflow.com/questions/7996695/rails-erb-syntax"> Ver detalhes </a> </span>
+			<span class="desc-title">Os campos de template utilizam linguagem ERB. <a href="http://stackoverflow.com/questions/7996695/rails-erb-syntax"> Ver detalhes </a>.</span>
 			<span class="desc-title">Variáveis: </span>
+
 			<ul>
-				<li><strong>&lt;% records %&gt;</strong> <br> Lista com todos os resultados </li>
-				<li><strong>&lt;% record %&gt;</strong> <br> Mapa dos atributos de cada resultado. <strong>Disponível apenas para notificações individuais.</strong> <br> Ex: &lt;%= record['email'] %&gt;<br> * O mesmo valor pode ser obtido por &lt;%= email %&gt; </li>
+				<li><strong>&lt;%= var('VARIAVEL') %&gt;</strong> <br> Escreve uma variável no corpo do email </li>
+				<li><strong>&lt;% var('Nome da Variavel') %&gt;</strong> <br> Variáveis com espaços podem ser utilizadas (usando aliases de colunas da consulta) </li>
+				<li>
+                  <strong>&lt;% records %&gt;</strong> <br> Lista com todos os resultados
+                  <pre>&lt;% records.each do |record|  %&gt;
+  &lt;%= record['name'] %&gt;
+&lt;% end %&gt;</pre>
+                </li>
 			</ul>
 			<span class="desc-title">Funções: </span>
 			<ul>

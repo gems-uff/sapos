@@ -60,4 +60,9 @@ class NotificationParam < ActiveRecord::Base
       end
     end
   end
+
+
+  def parsed_value
+    self.query_param.parsed_value
+  end
 end
