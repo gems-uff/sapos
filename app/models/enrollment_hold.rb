@@ -1,5 +1,6 @@
 class EnrollmentHold < ActiveRecord::Base
   belongs_to :enrollment
+  attr_accessible :number_of_semesters, :semester, :year
 
   has_paper_trail
 

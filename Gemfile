@@ -1,40 +1,54 @@
-source 'https://rubygems.org'
+source 'http://rubygems.org'
 
-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.0.13'
-
-# Use sqlite3 as the database for Active Record
-# gem 'sqlite3'
-
-# Use SCSS for stylesheets
-gem 'sass-rails', '~> 4.0.2'
-
-# Use Uglifier as compressor for JavaScript assets
-gem 'uglifier', '>= 1.3.0'
-
-# Use CoffeeScript for .js.coffee assets and views
-gem 'coffee-rails', '~> 4.0.0'
-
-# See https://github.com/sstephenson/execjs#readme for more supported runtimes
-# gem 'therubyracer', platforms: :ruby
-
-# Use jquery as the JavaScript library
-gem 'jquery-rails'
-gem 'jquery-ui-rails'
-
-# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
-# gem 'turbolinks'
-
-
+gem 'rails', '~> 3.2.19'
 gem "rails-erd", "~> 1.0.0"
 gem "kaminari"
 #gem "schema_plus"
 
 gem 'cancan'
-gem "devise"#, "~> 2.2.8"
-gem "paper_trail", '3.0.2'
+gem "devise", "~> 2.2.8"
+gem "paper_trail", "~> 2.7.2"
 
 gem 'sql-parser'
+
+group :development, :test do
+  gem 'sqlite3'
+  gem 'awesome_print'
+  gem 'rspec-rails', '~> 2.0'
+  gem 'factory_girl_rails', '1.7.0'
+  gem 'quiet_assets'
+  gem 'webrick',  '1.3.1'
+  gem 'binding_of_caller'
+  gem 'better_errors'
+  gem 'spring'
+  # gem 'debugger'
+  #gem 'rcov_rails'
+end
+
+group :production, :staging do
+  gem 'mysql2', '0.3.15'
+  gem 'exception_notification', '2.6.1', :require => 'exception_notifier'
+end
+
+gem 'json'
+
+# Gems used only for assets and not required
+# in production environments by default.
+group :assets do
+  gem 'sass-rails',   '~> 3.2.3'
+  gem 'coffee-rails', '~> 3.2.1'
+
+  # See https://github.com/sstephenson/execjs#readme for more supported runtimes
+  gem 'therubyracer', :platforms => :ruby
+
+  gem 'uglifier', '>= 1.0.3'
+end
+
+gem 'jquery-rails', '2.1.4'
+gem 'jquery-ui-rails'
+
+# To use ActiveModel has_secure_password
+# gem 'bcrypt', '~> 3.0.0'
 
 # Iconography
 gem 'font-awesome-sass'
@@ -63,46 +77,12 @@ gem 'codemirror-rails'
 
 # Image
 gem 'carrierwave'
-gem 'carrierwave-activerecord', :git => 'https://github.com/emoreth/carrierwave-activerecord.git'
-
-
-group :development, :test do
-  gem 'sqlite3'
-  gem 'awesome_print'
-  gem 'rspec-rails', '~> 2.0'
-  gem 'factory_girl_rails', '1.7.0'
-  gem 'quiet_assets'
-  gem 'webrick',  '1.3.1'
-  gem 'binding_of_caller'
-  gem 'better_errors'
-  gem 'spring'
-  # gem 'debugger'
-  #gem 'rcov_rails'
-end
-
-group :production, :staging do
-  gem 'mysql2', '0.3.15'
-  gem 'exception_notification', '2.6.1', :require => 'exception_notifier'
-end
-
-gem 'json'
-
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 1.2'
-
-group :doc do
-  # bundle exec rake doc:rails generates the API under doc/api.
-  gem 'sdoc', require: false
-end
-
-# Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
-
-# Use unicorn as the app server
+gem 'carrierwave-activerecord', :git => 'https://github.com/vladimeeer/carrierwave-activerecord.git', :ref => 'bfdbb7dcbf4'
+# Use unicorn as the web server
 # gem 'unicorn'
 
-# Use Capistrano for deployment
-# gem 'capistrano', group: :development
+# Deploy with Capistrano
+# gem 'capistrano'
 
-# Use debugger
-# gem 'debugger', group: [:development, :test]
+# To use debugger
+# gem 'ruby-debug'

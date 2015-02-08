@@ -3,9 +3,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class ApplicationController < ActionController::Base
-  # Prevent CSRF attacks by raising an exception.
-  # For APIs, you may want to use :null_session instead.
-  protect_from_forgery with: :exception
+  protect_from_forgery
 
   check_authorization :unless => :devise_controller?
 

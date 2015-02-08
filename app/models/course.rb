@@ -2,6 +2,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Course < ActiveRecord::Base
+  attr_accessible :name, :code, :content, :credits, :workload, :available
+
   belongs_to :research_area
   belongs_to :course_type
   has_many :course_classes, :dependent => :restrict

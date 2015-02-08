@@ -10,6 +10,8 @@ class DismissalReason < ActiveRecord::Base
   ]
 
    
+  attr_accessible :name, :description, :show_advisor_name, :thesis_judgement
+
   validates :name, :presence => true, :uniqueness => true
   validates :thesis_judgement, :presence => true, :inclusion => {:in => THESIS_JUDGEMENT}
   

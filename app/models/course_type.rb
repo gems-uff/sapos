@@ -3,6 +3,8 @@
 
 class CourseType < ActiveRecord::Base
 
+  attr_accessible :has_score, :name, :schedulable, :show_class_name
+
   has_many :courses, :dependent => :restrict
 
   has_paper_trail

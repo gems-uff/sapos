@@ -8,6 +8,8 @@ class User < ActiveRecord::Base
 
   has_paper_trail
 
+  attr_accessible :email, :password, :password_confirmation, :remember_me
+
   devise :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,
          :lockable
 

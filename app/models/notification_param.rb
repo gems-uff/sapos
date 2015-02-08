@@ -5,6 +5,7 @@ class NotificationParam < ActiveRecord::Base
   belongs_to :notification, :inverse_of => :params, :touch => true
   belongs_to :query_param
 
+  attr_accessible :value, :query_param_id, :notification_id, :active
 
   delegate :name, :value_type, :type, :default_value, to: :query_param
 
