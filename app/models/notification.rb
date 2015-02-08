@@ -28,6 +28,9 @@ class Notification < ActiveRecord::Base
   validates :subject_template, :presence => true, on: :update
   validates :to_template, :presence => true, on: :update
 
+  validates_format_of :notification_offset, :with => /\A(\-?\d+[yMwdhms]?)+\z/, :message => :offset_invalid_value
+  validates_format_of :query_offset, :with => /\A(\-?\d+[yMwdhms]?)+\z/, :message => :offset_invalid_value
+
   validate do
     execution unless self.new_record?
   end
@@ -107,7 +110,7 @@ class Notification < ActiveRecord::Base
       dates = (-2..2).map { |n| time.midnight + n.day } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.daily")
     end
 
-    dates.find { |date| (date + StringTimeDelta::parse(self.notification_offset)) > time } + StringTimeDelta::parse(self.notification_offset)
+    dates.find { |date| (date + StringTimeDelta::parse(self.notification_offset)) > time } + StringTimeDelta::parse(self.notification_offset)    
   end
 
   def update_next_execution!
@@ -117,7 +120,7 @@ class Notification < ActiveRecord::Base
 
   def query_date
     next_date = self.next_execution
-    next_date = calculate_next_notification_date if next_date.nil?
+    next_date = calculate_next_notification_date if next_date.nil?  
     next_date + StringTimeDelta::parse(self.query_offset) - StringTimeDelta::parse(self.notification_offset)
   end
 
@@ -203,15 +206,20 @@ class Notification < ActiveRecord::Base
     begin
       self.execute(:skip_update => true, :only_validate => true)
     rescue => e
-      splitted = e.to_s.split(' -:- ')
-      if splitted.size > 1
-        field = splitted[0].to_sym
-        message = splitted[1..-1].join(' -:- ')
-        errors.add(field, ': ' + message)
-      else
-        errors.add(:base, e.to_s)
-      end
-
+#///////////////////////////////////////////////////
+# A mensagem de erro correta já está sendo exibida
+#  O bloco apenas serve para capturar a exceção
+#///////////////////////////////////////////////////
+#      splitted = e.to_s.split(' -:- ')
+#      if splitted.size > 1
+#        field = splitted[0].to_sym
+#        message = splitted[1..-1].join(' -:- ')
+#        errors.add(field, ': ' + message)
+#      else
+#        errors.add(:base, e.to_s)
+#      end
+#
+      false
     end
   end
 

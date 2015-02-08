@@ -174,6 +174,11 @@ module EnrollmentsPdfHelper
                "<b>#{I18n.t("activerecord.attributes.enrollment.admission_date")}</b>",
                "<b>#{I18n.t("activerecord.attributes.enrollment.dismissal")}</b>"]]
     
+    enrollments.each{ |e|
+      e[2] = I18n.localize(e[2], :format => :default) unless e[2].nil?
+      e[3] = I18n.localize(e[3], :format => :default) unless e[3].nil?
+    }
+
     simple_pdf_table(pdf, widths, header, enrollments) do |table|
       table.column(0).align = :left
       table.column(0).padding = [2, 4]

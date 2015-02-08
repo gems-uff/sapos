@@ -500,6 +500,8 @@ pt-BR:
         enrollment_hold:
           before_admission_date: "anterior a Data de Admissão"
           after_dismissal_date: "posterior a Data de Desligamento"
+        notification:
+          offset_invalid_value: "está com o valor inválido. Tente um número, seguido por y, M, W, d, h, m ou s"
         scholarship:
           attributes:
             end_date:
@@ -793,7 +795,7 @@ pt-BR:
       execute: 'Executar'
     notification:
       sql_query_default: "SELECT students.name as name FROM students\nWHERE students.created_at < :data_consulta"
-      body_template_default: "<%= name %>"
+      body_template_default: "<%= var('name') %>"
       frequency_description: "Diária: todo dia; Semanal: toda segunda; Mensal: dia 01 de cada mês; Semestral: 01/03 e 01/08; Anual: 01/01"
       execute_now: "Enviar agora"
       simulate: "Simular"

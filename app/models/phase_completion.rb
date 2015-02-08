@@ -27,9 +27,9 @@ class PhaseCompletion < ActiveRecord::Base
   # => after_save     create_phase_completions [due_date, completion_date]
   # phase_duration:
   # => after_save     create_phase_completions [due_date, completion_date]
-  
+
   def init
-    return if enrollment.nil? or phase.nil?
+    return if enrollment.nil? or phase.nil? or !phase.phase_durations.any?
 
     self.calculate_due_date
     self.calculate_completion_date
@@ -37,7 +37,7 @@ class PhaseCompletion < ActiveRecord::Base
 
   def calculate_due_date
     self.due_date = DateUtils.add_hash_to_date(
-      enrollment.admission_date, 
+      enrollment.admission_date,
       phase.total_duration(enrollment)
     )
   end
