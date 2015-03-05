@@ -85,6 +85,7 @@ SimpleNavigation::Configuration.run do |navigation|
       prof.item :professor, 'Professores', professors_path, :if => can_read?(Professor)
       prof.item :advisement, 'Orientações', advisements_path, :if => can_read?(Advisement)
       prof.item :advisement_authorizations, 'Credenciamentos', advisement_authorizations_path, :if => can_read?(AdvisementAuthorization)
+      prof.item :thesis_defense_committee_participations, 'Bancas', thesis_defense_committee_participations_path, :if => can_read?(ThesisDefenseCommitteeParticipation)
     end
 
     bolsas_models = [Scholarship, ScholarshipType, ScholarshipDuration]
