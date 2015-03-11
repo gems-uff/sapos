@@ -4,7 +4,9 @@
 class Course < ActiveRecord::Base
   attr_accessible :name, :code, :content, :credits, :workload, :available
 
-  belongs_to :research_area
+  has_many :research_areas, :through => :course_research_areas
+  has_many :course_research_areas, :dependent => :destroy
+
   belongs_to :course_type
   has_many :course_classes, :dependent => :restrict
 

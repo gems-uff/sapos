@@ -4,6 +4,7 @@
 
 class CoursesController < ApplicationController
   authorize_resource
+  helper :course_research_areas
 
   active_scaffold :course do |config|
 
@@ -11,25 +12,28 @@ class CoursesController < ApplicationController
     config.list.sorting = {:name => 'ASC'}
 
     config.columns.add :workload_text
-    config.list.columns = [:name, :code, :research_area, :credits, :workload_text, :course_type, :available]
+
+    config.columns[:course_research_areas].includes = {:research_areas => :course_research_areas}
+
+    config.list.columns = [:name, :code, :course_research_areas, :credits, :workload_text, :course_type, :available]
     config.create.label = :create_course_label
     config.update.label = :update_course_label
+
     config.actions.swap :search, :field_search
 
     config.field_search.columns = [
       :name, 
       :course_type, 
-      :research_area, 
+      :course_research_areas, 
       :available
     ]
 
     config.columns[:name].search_ui = :text
 
-    config.columns[:research_area].form_ui = :record_select
     config.columns[:course_type].form_ui = :select
 
     config.columns =
-        [:name, :code, :credits, :workload, :research_area, :content, :course_type, :available]
+        [:name, :code, :credits, :workload, :course_research_areas, :content, :course_type, :available]
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 

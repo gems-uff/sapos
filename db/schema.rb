@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150206160050) do
+ActiveRecord::Schema.define(version: 20150212185557) do
 
   create_table "accomplishments", force: true do |t|
     t.integer  "enrollment_id"
@@ -107,6 +107,13 @@ ActiveRecord::Schema.define(version: 20150206160050) do
   add_index "course_classes", ["course_id"], name: "index_course_classes_on_course_id"
   add_index "course_classes", ["professor_id"], name: "index_course_classes_on_professor_id"
 
+  create_table "course_research_areas", force: true do |t|
+    t.integer  "course_id"
+    t.integer  "research_area_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
   create_table "course_types", force: true do |t|
     t.string   "name"
     t.boolean  "has_score"
@@ -132,6 +139,16 @@ ActiveRecord::Schema.define(version: 20150206160050) do
 
   add_index "courses", ["course_type_id"], name: "index_courses_on_course_type_id"
   add_index "courses", ["research_area_id"], name: "index_courses_on_research_area_id"
+
+  create_table "course_research_areas", force: true do |t|
+    t.integer "course_id"
+    t.integer "research_area_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "course_research_areas", ["course_id"], name: "index_course_research_areas_on_course_id"
+  add_index "course_research_areas", ["research_area_id"], name: "index_course_research_areas_on_research_area_id"
 
   create_table "custom_variables", force: true do |t|
     t.string   "description"

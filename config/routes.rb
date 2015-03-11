@@ -241,6 +241,10 @@ Sapos::Application.routes.draw do
     end
   end
 
+  resources :course_research_areas do
+    as_routes
+  end
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
