@@ -3,8 +3,8 @@
 
 class State < ActiveRecord::Base
   belongs_to :country
-  has_many :cities, :dependent => :restrict
-  has_many :student_birth_states, :class_name => 'Student', :foreign_key => 'birth_state_id', :dependent => :restrict
+  has_many :cities, :dependent => :restrict_with_exception
+  has_many :student_birth_states, :class_name => 'Student', :foreign_key => 'birth_state_id', :dependent => :restrict_with_exception
   
   has_paper_trail
   

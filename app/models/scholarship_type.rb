@@ -4,7 +4,7 @@
 class ScholarshipType < ActiveRecord::Base
    validates :name, :presence => true, :uniqueness => true
 
-   has_many :scholarships, :dependent => :restrict
+   has_many :scholarships, :dependent => :restrict_with_exception
 
    has_paper_trail
 

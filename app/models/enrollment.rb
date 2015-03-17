@@ -9,11 +9,12 @@ class Enrollment < ActiveRecord::Base
   belongs_to :enrollment_status
   belongs_to :research_area
 
-  has_many :professors, :through => :advisements, :readonly => false
+  has_many :professors, :through => :advisements
+  attr_readonly :professors
   has_many :scholarships, :through => :scholarship_durations
   has_many :phases, :through => :accomplishments
 
-  has_one :dismissal, :dependent => :restrict
+  has_one :dismissal, :dependent => :restrict_with_exception
   has_many :advisements, :dependent => :destroy
   has_many :scholarship_durations, :dependent => :destroy
   has_many :accomplishments, :dependent => :destroy

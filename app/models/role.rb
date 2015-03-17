@@ -3,7 +3,7 @@
 
 class Role < ActiveRecord::Base
 
-  has_many :users, :dependent => :restrict
+  has_many :users, :dependent => :restrict_with_exception
 
   ROLE_DESCONHECIDO = 1
   ROLE_COORDENACAO = 2

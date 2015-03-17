@@ -3,7 +3,7 @@
 
 class CourseType < ActiveRecord::Base
 
-  has_many :courses, :dependent => :restrict
+  has_many :courses, :dependent => :restrict_with_exception
 
   has_paper_trail
 

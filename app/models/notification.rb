@@ -5,7 +5,7 @@ class Notification < ActiveRecord::Base
 
   has_many :notification_logs
   has_many :notification_params, class_name: 'NotificationParam', dependent: :destroy
-  has_many :params, class_name: 'NotificationParam', dependent: :destroy, conditions: {active: true}
+  has_many :params, -> { where(active: true) }, class_name: 'NotificationParam', dependent: :destroy
   belongs_to :query, :inverse_of => :notifications
 
   has_paper_trail

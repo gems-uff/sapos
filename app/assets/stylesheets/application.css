@@ -13,7 +13,7 @@
  *= require active_scaffold_images
  *= require active_scaffold_extensions
  *= require active_scaffold_colors
- *= require jquery.ui.all
+ *= require jquery-ui
  *= require codemirror
  *= require_tree .
  *= require active_scaffold_overrides

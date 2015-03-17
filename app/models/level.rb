@@ -6,10 +6,10 @@ class Level < ActiveRecord::Base
   has_paper_trail
 
   has_many :advisement_authorizations, :dependent => :destroy
-  has_many :enrollments, :dependent => :restrict
-  has_many :majors, :dependent => :restrict
-  has_many :phase_durations, :dependent => :restrict
-  has_many :scholarships, :dependent => :restrict
+  has_many :enrollments, :dependent => :restrict_with_exception
+  has_many :majors, :dependent => :restrict_with_exception
+  has_many :phase_durations, :dependent => :restrict_with_exception
+  has_many :scholarships, :dependent => :restrict_with_exception
 
 
   validates :name, :presence => true, :uniqueness => true

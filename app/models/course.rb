@@ -4,7 +4,7 @@
 class Course < ActiveRecord::Base
   belongs_to :research_area
   belongs_to :course_type
-  has_many :course_classes, :dependent => :restrict
+  has_many :course_classes, :dependent => :restrict_with_exception
 
   has_paper_trail
 

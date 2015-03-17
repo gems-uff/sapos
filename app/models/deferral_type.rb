@@ -3,7 +3,7 @@
 
 class DeferralType < ActiveRecord::Base
   belongs_to :phase
-  has_many :deferrals, :dependent => :restrict
+  has_many :deferrals, :dependent => :restrict_with_exception
 
   has_paper_trail
 

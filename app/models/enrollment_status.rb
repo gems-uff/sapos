@@ -3,7 +3,7 @@
 
 class EnrollmentStatus < ActiveRecord::Base
    validates :name, :presence => true, :uniqueness => true
-   has_many :enrollments, :dependent => :restrict
+   has_many :enrollments, :dependent => :restrict_with_exception
    has_paper_trail
 
    def to_label
