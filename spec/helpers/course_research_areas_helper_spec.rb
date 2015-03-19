@@ -1,3 +1,7 @@
+# encoding utf-8
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 require 'spec_helper'
 
 # Specs in this file have access to a helper object that includes
