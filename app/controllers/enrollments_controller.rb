@@ -106,10 +106,10 @@ class EnrollmentsController < ApplicationController
       :scholarship_durations,
       :accomplishments, 
       :deferrals, 
+      :enrollment_holds, 
+      :class_enrollments, 
       :thesis_defense_committee_participations, 
-      :dismissal, 
-      :class_enrollments,
-      :enrollment_holds
+      :dismissal
     ]
     create_columns = columns.dup.delete_if { |x| [:accomplishments, :deferrals].include? x }
 

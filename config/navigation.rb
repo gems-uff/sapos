@@ -61,6 +61,8 @@ SimpleNavigation::Configuration.run do |navigation|
       can_read = false
       models = models.is_a?(Array) ? models : [models]
       models.each do |model|
+        puts ">>>>#{model}:\t#{can?(:read, model)}" unless can?(:read, model)
+        
         can_read ||= can?(:read, model)
       end
       return can_read ? Proc.new { true } : Proc.new { false } if proc
@@ -104,18 +106,19 @@ SimpleNavigation::Configuration.run do |navigation|
       phases.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path, :if => can_read?(DeferralType)
     end
 
-    primary.item :courses, 'Disciplinas', courses_path do |courses|
-      courses.item :research_area, 'Áreas de Pesquisa', research_areas_path
-      courses.item :course, 'Disciplinas', courses_path
-      courses.item :course_type, 'Tipos de Disciplinas', course_types_path
-      courses.item :course_class, 'Turmas', course_classes_path
-      courses.item :class_enrollment, 'Inscrições', class_enrollments_path
-      courses.item :allocation, 'Alocações', allocations_path
+    primary.item :courses, 'Disciplinas', courses_path, :if => can_read?(Course) do |courses|
+      courses.item :research_area, 'Áreas de Pesquisa', research_areas_path, :if => can_read?(ResearchArea)
+      courses.item :course, 'Disciplinas', courses_path, :if => can_read?(Course)
+      courses.item :course_type, 'Tipos de Disciplinas', course_types_path, :if => can_read?(CourseType)
+      courses.item :course_class, 'Turmas', course_classes_path, :if => can_read?(CourseClass)
+      courses.item :class_enrollment, 'Inscrições', class_enrollments_path, :if => can_read?(ClassEnrollment)
+      courses.item :allocation, 'Alocações', allocations_path, :if => can_read?(Allocation)
     end
 
-    primary.item :grade, 'Formação', majors_path do |grade|
-      grade.item :major, 'Cursos', majors_path
-      grade.item :institution, 'Instituições', institutions_path
+    grade_models = [Major, Institution]
+    primary.item :grade, 'Formação', majors_path, :if => can_read?(grade_models) do |grade|
+      grade.item :major, 'Cursos', majors_path, :if => can_read?(Major)
+      grade.item :institution, 'Instituições', institutions_path, :if => can_read?(Institution)
     end
 
     localidades_models = [City, State, Country]
