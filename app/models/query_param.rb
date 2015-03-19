@@ -16,7 +16,8 @@ class QueryParam < ActiveRecord::Base
   VALUE_TIME = 'Time'
   VALUE_LITERAL = 'Literal'
 
-  VALUE_TYPES = [VALUE_STRING, VALUE_INTEGER, VALUE_FLOAT, VALUE_LIST, VALUE_LITERAL, VALUE_DATE, VALUE_DATETIME, VALUE_TIME, VALUE_LITERAL]
+  VALUE_TYPES = [VALUE_STRING, VALUE_INTEGER, VALUE_FLOAT, VALUE_LIST, VALUE_LITERAL,
+                 VALUE_DATE, VALUE_DATETIME, VALUE_TIME, VALUE_LITERAL]
 
   validates :value_type, presence: true, inclusion: VALUE_TYPES
   validates :name, presence: true, :format => /\A([a-z_][a-zA-Z_0-9]+)?\z/
@@ -37,9 +38,6 @@ class QueryParam < ActiveRecord::Base
           begin
             unless val.is_a?(ActiveSupport::TimeWithZone)
               Date.parse(val)
-              unless val =~ /[0-9]{4}-[0-9]{2}-[0-9]{2}/
-                raise ArgumentError
-              end
             end
           rescue ArgumentError
             self.errors.add :default_value, :invalid_date
@@ -48,9 +46,6 @@ class QueryParam < ActiveRecord::Base
         when VALUE_DATETIME
           begin
             DateTime.parse(val)
-            unless val =~ /[0-9]{4}-[0-9]{2}-[0-9]{2} [09]{2}:[09]{2}:[09]{2}/
-              raise ArgumentError
-            end
           rescue ArgumentError
             self.errors.add :default_value, :invalid_date_time
           end
@@ -58,9 +53,6 @@ class QueryParam < ActiveRecord::Base
         when VALUE_TIME
           begin
             Time.parse(val)
-            unless val =~ /[09]{2}:[09]{2}:[09]{2}/
-              raise ArgumentError
-            end
           rescue ArgumentError
             self.errors.add :default_value, :invalid_time
           end

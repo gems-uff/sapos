@@ -7,7 +7,6 @@ pt-BR:
   date:
     formats:
       default: "%d/%m/%Y"
-#      default: "%Y-%m-%d"
       short: "%d de %B"
       long: "%d de %B de %Y"
       monthyear: "%B-%Y"
