@@ -40,7 +40,7 @@ gem "paper_trail"
 gem 'sql-parser'
 
 # Iconography
-gem 'font-awesome-sass'
+gem 'font-awesome-rails'
 
 # Prawn to PDF
 gem 'prawn'
