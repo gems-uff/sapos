@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150206160050) do
+ActiveRecord::Schema.define(version: 20150212185557) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer  "enrollment_id",   limit: 4
@@ -59,10 +59,11 @@ ActiveRecord::Schema.define(version: 20150206160050) do
   add_index "allocations", ["course_class_id"], name: "index_allocations_on_course_class_id", using: :btree
 
   create_table "carrier_wave_files", force: :cascade do |t|
+    t.string   "identifier",  limit: 255
     t.string   "medium_hash", limit: 255
     t.binary   "binary",      limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "cities", force: :cascade do |t|
@@ -90,8 +91,8 @@ ActiveRecord::Schema.define(version: 20150206160050) do
 
   create_table "countries", force: :cascade do |t|
     t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "course_classes", force: :cascade do |t|
@@ -107,38 +108,43 @@ ActiveRecord::Schema.define(version: 20150206160050) do
   add_index "course_classes", ["course_id"], name: "index_course_classes_on_course_id", using: :btree
   add_index "course_classes", ["professor_id"], name: "index_course_classes_on_professor_id", using: :btree
 
+  create_table "course_research_areas", force: :cascade do |t|
+    t.integer  "course_id",        limit: 4
+    t.integer  "research_area_id", limit: 4
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "course_types", force: :cascade do |t|
     t.string   "name",                   limit: 255
     t.boolean  "has_score",              limit: 1
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
+    t.boolean  "allow_multiple_classes", limit: 1,   default: false, null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "schedulable",            limit: 1
     t.boolean  "show_class_name",        limit: 1
-    t.boolean  "allow_multiple_classes", limit: 1,   default: false, null: false
   end
 
   create_table "courses", force: :cascade do |t|
-    t.string   "name",             limit: 255
-    t.string   "code",             limit: 255
-    t.text     "content",          limit: 65535
-    t.integer  "credits",          limit: 4
-    t.integer  "research_area_id", limit: 4
-    t.integer  "course_type_id",   limit: 4
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
-    t.integer  "workload",         limit: 4
-    t.boolean  "available",        limit: 1,     default: true
+    t.string   "name",           limit: 255
+    t.string   "code",           limit: 255
+    t.text     "content",        limit: 65535
+    t.integer  "credits",        limit: 4
+    t.integer  "course_type_id", limit: 4
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.integer  "workload",       limit: 4
+    t.boolean  "available",      limit: 1,     default: true
   end
 
   add_index "courses", ["course_type_id"], name: "index_courses_on_course_type_id", using: :btree
-  add_index "courses", ["research_area_id"], name: "index_courses_on_research_area_id", using: :btree
 
   create_table "custom_variables", force: :cascade do |t|
     t.string   "description", limit: 255
     t.string   "variable",    limit: 255
-    t.text     "value",       limit: 255
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.text     "value",       limit: 65535
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "deferral_types", force: :cascade do |t|
@@ -169,8 +175,8 @@ ActiveRecord::Schema.define(version: 20150206160050) do
   create_table "dismissal_reasons", force: :cascade do |t|
     t.string   "name",              limit: 255
     t.text     "description",       limit: 65535
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "show_advisor_name", limit: 1,     default: false
     t.string   "thesis_judgement",  limit: 255
   end
@@ -192,8 +198,8 @@ ActiveRecord::Schema.define(version: 20150206160050) do
     t.integer  "year",                limit: 4
     t.integer  "semester",            limit: 4
     t.integer  "number_of_semesters", limit: 4, default: 1
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "active",              limit: 1, default: true
   end
 
@@ -201,8 +207,8 @@ ActiveRecord::Schema.define(version: 20150206160050) do
 
   create_table "enrollment_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "enrollments", force: :cascade do |t|
@@ -225,15 +231,15 @@ ActiveRecord::Schema.define(version: 20150206160050) do
 
   create_table "institutions", force: :cascade do |t|
     t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "code",       limit: 255
   end
 
   create_table "levels", force: :cascade do |t|
     t.string   "name",             limit: 255
-    t.datetime "created_at",                               null: false
-    t.datetime "updated_at",                               null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "course_name",      limit: 255
     t.integer  "default_duration", limit: 4,   default: 0
   end
@@ -251,8 +257,8 @@ ActiveRecord::Schema.define(version: 20150206160050) do
 
   create_table "notification_logs", force: :cascade do |t|
     t.integer  "notification_id", limit: 4
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.string   "to",              limit: 255
     t.string   "subject",         limit: 255
     t.text     "body",            limit: 65535
@@ -261,18 +267,19 @@ ActiveRecord::Schema.define(version: 20150206160050) do
   add_index "notification_logs", ["notification_id"], name: "index_notification_logs_on_notification_id", using: :btree
 
   create_table "notification_params", force: :cascade do |t|
+    t.boolean  "active",          limit: 1,   default: false, null: false
     t.integer  "notification_id", limit: 4
     t.integer  "query_param_id",  limit: 4
     t.string   "value",           limit: 255
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
-    t.boolean  "active",          limit: 1,   default: false, null: false
   end
 
   add_index "notification_params", ["notification_id"], name: "index_notification_params_on_notification_id", using: :btree
   add_index "notification_params", ["query_param_id"], name: "index_notification_params_on_query_param_id", using: :btree
 
   create_table "notifications", force: :cascade do |t|
+    t.integer  "query_id",            limit: 4,                    null: false
     t.string   "title",               limit: 255
     t.string   "to_template",         limit: 255
     t.string   "subject_template",    limit: 255
@@ -281,10 +288,9 @@ ActiveRecord::Schema.define(version: 20150206160050) do
     t.string   "query_offset",        limit: 255
     t.string   "frequency",           limit: 255
     t.datetime "next_execution"
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "individual",          limit: 1,     default: true
-    t.integer  "query_id",            limit: 4,                    null: false
   end
 
   create_table "phase_completions", force: :cascade do |t|
@@ -292,8 +298,8 @@ ActiveRecord::Schema.define(version: 20150206160050) do
     t.integer  "phase_id",        limit: 4
     t.datetime "due_date"
     t.datetime "completion_date"
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "phase_durations", force: :cascade do |t|
@@ -312,8 +318,8 @@ ActiveRecord::Schema.define(version: 20150206160050) do
   create_table "phases", force: :cascade do |t|
     t.string   "name",           limit: 255
     t.string   "description",    limit: 255
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.boolean  "is_language",    limit: 1,   default: false
     t.boolean  "extend_on_hold", limit: 1,   default: false
   end
@@ -367,9 +373,9 @@ ActiveRecord::Schema.define(version: 20150206160050) do
   create_table "queries", force: :cascade do |t|
     t.string   "name",        limit: 255
     t.text     "sql",         limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
     t.string   "description", limit: 255
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "query_params", force: :cascade do |t|
@@ -377,8 +383,8 @@ ActiveRecord::Schema.define(version: 20150206160050) do
     t.string   "name",          limit: 255
     t.string   "default_value", limit: 255
     t.string   "value_type",    limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "query_params", ["query_id"], name: "index_query_params_on_query_id", using: :btree
@@ -396,22 +402,22 @@ ActiveRecord::Schema.define(version: 20150206160050) do
     t.decimal  "scale",                              precision: 10, scale: 8
     t.integer  "x",                    limit: 4
     t.integer  "y",                    limit: 4
-    t.datetime "created_at",                                                              null: false
-    t.datetime "updated_at",                                                              null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "research_areas", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.string   "code",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "roles", force: :cascade do |t|
     t.string   "name",        limit: 50,  null: false
     t.string   "description", limit: 255, null: false
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "scholarship_durations", force: :cascade do |t|
@@ -433,16 +439,16 @@ ActiveRecord::Schema.define(version: 20150206160050) do
     t.date     "end_date"
     t.boolean  "active",                  limit: 1, default: true
     t.integer  "scholarship_duration_id", limit: 4
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "scholarship_suspensions", ["scholarship_duration_id"], name: "index_scholarship_suspensions_on_scholarship_duration_id", using: :btree
 
   create_table "scholarship_types", force: :cascade do |t|
     t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "scholarships", force: :cascade do |t|
@@ -465,8 +471,8 @@ ActiveRecord::Schema.define(version: 20150206160050) do
 
   create_table "sponsors", force: :cascade do |t|
     t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "states", force: :cascade do |t|
@@ -517,14 +523,14 @@ ActiveRecord::Schema.define(version: 20150206160050) do
   end
 
   add_index "students", ["birth_city_id"], name: "index_students_on_birth_city_id", using: :btree
-  add_index "students", ["birth_state_id"], name: "index_students_on_state_id", using: :btree
+  add_index "students", ["birth_state_id"], name: "index_students_on_birth_state_id", using: :btree
   add_index "students", ["city_id"], name: "index_students_on_city_id", using: :btree
 
   create_table "thesis_defense_committee_participations", force: :cascade do |t|
     t.integer  "professor_id",  limit: 4
     t.integer  "enrollment_id", limit: 4
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "thesis_defense_committee_participations", ["enrollment_id"], name: "index_thesis_defense_committee_participations_on_enrollment_id", using: :btree

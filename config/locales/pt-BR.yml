@@ -95,7 +95,7 @@ pt-BR:
         course_type: "Tipo de Disciplina"
         credits: "Créditos"
         name: "Nome"
-        research_area: "Área de Pesquisa"
+        course_research_areas: "Áreas de Pesquisa"
         workload: "Carga Horária"
         empty_workload: "N/A"
         workload_time: "%{time}h"
@@ -110,6 +110,9 @@ pt-BR:
         professor: "Professor"
         semester: "Semestre"
         year: "Ano"
+      course_research_area:
+        course: "Curso"
+        research_area: "Área de Pesquisa"
       course_type:
         has_score: "Tem nota"
         name: "Nome"
@@ -589,6 +592,9 @@ pt-BR:
       course_class:
         one: "Turma"
         other: "Turmas"
+      course_research_area:
+        one: "Área de Pesquisa do Curso"
+        other: "Áreas de Pesquisa do Curso"
       course_type:
         one: "Tipo de Disciplina"
         other: "Tipos de Disciplina"

@@ -2,7 +2,10 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class ResearchArea < ActiveRecord::Base
-  has_many :courses, :dependent => :restrict_with_exception
+
+  has_many :courses, :through => :course_research_areas
+  has_many :course_research_areas, :dependent => :destroy
+
   has_many :enrollments, :dependent => :restrict_with_exception
   has_many :professors, :through => :professor_research_areas
   has_many :professor_research_areas, :dependent => :destroy

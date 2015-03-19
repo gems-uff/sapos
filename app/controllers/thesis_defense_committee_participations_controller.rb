@@ -12,6 +12,11 @@ class ThesisDefenseCommitteeParticipationsController < ApplicationController
     config.create.columns = columns
     config.update.columns = columns
     config.show.columns = columns
+    config.actions.swap :search, :field_search
+
+    config.field_search.columns = [
+      :professor
+    ]
 
     config.columns[:enrollment].form_ui = :record_select
     config.columns[:professor].form_ui = :record_select
