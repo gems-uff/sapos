@@ -28,5 +28,6 @@
 .idea/
 .rvmrc
 nbproject/
+coverage/
 /vendor/bundle
 .DS_Store
