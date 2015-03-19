@@ -27,5 +27,6 @@
 /uploads
 .idea/
 .rvmrc
+nbproject/
 /vendor/bundle
 .DS_Store
