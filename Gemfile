@@ -70,7 +70,7 @@ gem 'carrierwave-activerecord', :git => 'https://github.com/emoreth/carrierwave-
 
 
 group :development, :test do
-  # gem 'sqlite3'
+  gem 'sqlite3'
   gem 'awesome_print'
   gem 'rspec-rails'
   gem 'factory_girl_rails'
