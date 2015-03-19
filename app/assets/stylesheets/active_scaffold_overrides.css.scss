@@ -861,10 +861,10 @@ noscript.active-scaffold {
     color: #999;
     font-size: 10px;
     margin-left: 5px;
-    width: 165px;
+    width: 185px;
 
     ul {
-      width: 145px
+      width: 180px
     }
 }
 
@@ -1183,4 +1183,12 @@ noscript.active-scaffold {
 
 small._default_value {
   cursor: pointer;
+}
+
+#main_content .menu {
+  width: 1075px;
+}
+
+.active-scaffold li.form-element dt {
+  width: 15em;
 }
