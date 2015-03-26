@@ -11,8 +11,10 @@
 /db/*.sqlite3
 /db/*.sqlite3-journal
 
-# Ignore database file
-config/database.yml
+#Ignoring rvm
+.rvmrc
+.ruby-version
+
 
 # Ignore all logfiles and tempfiles.
 /log/*.log
@@ -29,7 +31,6 @@ config/database.yml
 /public/stylesheets/active_scaffold
 /uploads
 .idea/
-.rvmrc
 nbproject/
 coverage/
 /vendor/bundle
