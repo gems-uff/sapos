@@ -61,8 +61,6 @@ SimpleNavigation::Configuration.run do |navigation|
       can_read = false
       models = models.is_a?(Array) ? models : [models]
       models.each do |model|
-        puts ">>>>#{model}:\t#{can?(:read, model)}" unless can?(:read, model)
-        
         can_read ||= can?(:read, model)
       end
       return can_read ? Proc.new { true } : Proc.new { false } if proc
