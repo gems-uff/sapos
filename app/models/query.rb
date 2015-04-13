@@ -30,15 +30,18 @@ class Query < ActiveRecord::Base
   end
 
 
-  def within_read_only_connection(&block)
+  def run_read_only_query(query)
     if ActiveRecord::Base.connection.adapter_name == "SQLite"
-      return yield block
-    end
-    begin
-      ActiveRecord::Base.establish_connection("#{Rails.env}_read_only") if ActiveRecord::Base.configurations["#{Rails.env}_read_only"]
-      yield block
-    ensure
-      ActiveRecord::Base.establish_connection(Rails.env)
+
+      db_resource = ActiveRecord::Base.connection.exec_query(query)
+
+      {columns: db_resource.columns, rows: db_resource.rows}
+    elsif ActiveRecord::Base.connection.adapter_name == 'Mysql2'
+      client = Mysql2::Client.new(ActiveRecord::Base.configurations["#{Rails.env}_read_only"])
+      results = client.query(query)
+      client.close
+
+      {columns: results.fields, rows: results.entries.collect(&:values)}
     end
   end
 
@@ -53,23 +56,12 @@ class Query < ActiveRecord::Base
     else
 
       generated_query = ::Query.parse_sql_and_params(sql, current_params)
-      ActiveRecord::Base.connection.commit_db_transaction
 
-      columns = []
-      rows = []
+      #Query the Database safely
+      db_resource = run_read_only_query(generated_query)
 
-      # TODO: Connections and transactions are messed up, need to upgrade to Rails 4 to use connection pool.
-      within_read_only_connection do
-        #Create connection to the Database
-        db_connection = ActiveRecord::Base.connection
-        #Query the Database
-        db_resource = db_connection.exec_query(generated_query)
-
-        columns = db_resource.columns
-        rows = db_resource.rows
-      end
       #Build the notifications with the results from the query
-      {:columns => columns, :rows => rows, :query => generated_query, :errors => self.errors}
+      db_resource.merge(:query => generated_query, :errors => self.errors)
     end
   end
 
@@ -83,4 +75,5 @@ class Query < ActiveRecord::Base
       self.errors.add(:base, "O parametro #{variable_name} foi usado na query mas nao foi definido.")
     end
   end
+
 end
