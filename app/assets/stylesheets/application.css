@@ -9,6 +9,7 @@
  * compiled file, but it's generally better to create a new file per style scope.
  *
  *= require_self
+ *= require variables
  *= require active_scaffold_layout
  *= require active_scaffold_images
  *= require active_scaffold_extensions
