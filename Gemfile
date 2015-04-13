@@ -45,6 +45,8 @@ gem 'font-awesome-rails'
 # Prawn to PDF
 gem 'prawn'
 gem 'prawn_rails'
+gem 'odf-report'
+gem 'clamsy', :git => 'https://github.com/emoreth/clamsy.git'
 
 # Redcarpet for Readme MarkDown (or README.md)
 gem 'redcarpet'
