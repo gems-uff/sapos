@@ -1,5 +1,5 @@
 GIT
-  remote: https://github.com/emoreth/carrierwave-activerecord.git
+  remote: https://github.com/gems-uff/carrierwave-activerecord.git
   revision: 6544a4d491e3c767e82d8e31ad0b2824146a0a11
   specs:
     carrierwave-activerecord (0.1.0rc15)
@@ -7,7 +7,7 @@ GIT
       carrierwave (>= 0.10.0)
 
 GIT
-  remote: https://github.com/emoreth/clamsy.git
+  remote: https://github.com/gems-uff/clamsy.git
   revision: b3579f3fbf79cdab8bd95757f457681a78f720d0
   specs:
     clamsy (0.0.5)

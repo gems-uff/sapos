@@ -46,7 +46,7 @@ gem 'font-awesome-rails'
 gem 'prawn'
 gem 'prawn_rails'
 gem 'odf-report'
-gem 'clamsy', :git => 'https://github.com/emoreth/clamsy.git'
+gem 'clamsy', :git => 'https://github.com/gems-uff/clamsy.git'
 
 # Redcarpet for Readme MarkDown (or README.md)
 gem 'redcarpet'
@@ -68,7 +68,7 @@ gem 'codemirror-rails'
 
 # Image
 gem 'carrierwave'
-gem 'carrierwave-activerecord', :git => 'https://github.com/emoreth/carrierwave-activerecord.git'
+gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave-activerecord.git'
 
 
 group :development, :test do
