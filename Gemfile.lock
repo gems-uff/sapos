@@ -8,7 +8,7 @@ GIT
 
 GIT
   remote: https://github.com/emoreth/clamsy.git
-  revision: 6a2901ac2b945a7d1501d7fcacefeb2a63890847
+  revision: b3579f3fbf79cdab8bd95757f457681a78f720d0
   specs:
     clamsy (0.0.5)
       ftools (>= 0.0.0)
