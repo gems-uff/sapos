@@ -19,11 +19,16 @@ class AdvisementsController < ApplicationController
 
 
     config.columns[:student_name].includes = [{:enrollment => :student}]
+    config.columns[:enrollment_number].includes = [:enrollment]
+    config.columns[:level].includes = [:enrollment => :level]
+    config.columns[:professor].includes = [:professor]
+
     config.columns[:active].search_sql = ""
     config.columns[:active].search_ui = :select
     config.columns[:co_advisor].search_sql = ""
     config.columns[:co_advisor].search_ui = :select
     config.columns[:enrollment_number].search_sql = "enrollments.enrollment_number"
+    
     config.columns[:student_name].search_sql = "students.name"
     config.columns[:level].search_sql = "enrollments.level_id"
     config.columns[:level].search_ui = :select
@@ -44,26 +49,38 @@ class AdvisementsController < ApplicationController
   end
 
   def self.condition_for_active_column(column, value, like_pattern)
-    sql_actives = "enrollments.id IN(
-      SELECT enrollments.id
-      FROM enrollments
-      LEFT OUTER JOIN dismissals
-      ON dismissals.enrollment_id = enrollments.id
-      WHERE dismissals.id IS NULL
-    )"
-    sql_not_actives = "enrollments.id IN(
-      SELECT enrollments.id
-      FROM enrollments
-      LEFT OUTER JOIN dismissals
-      ON dismissals.enrollment_id = enrollments.id
-      WHERE dismissals.id IS NOT NULL
-    )"
-    sql_all = "enrollments.id IN(
-      SELECT enrollments.id
-      FROM enrollments
-      LEFT OUTER JOIN dismissals
-      ON dismissals.enrollment_id = enrollments.id   
-    )"
+    advisementArelTable = Advisement.arel_table
+    enrollmentArelTable = Enrollment.arel_table
+    dismissalArelTable = Dismissal.arel_table
+
+    sql_actives = advisementArelTable[:id].in(
+     advisementArelTable
+     .project(advisementArelTable[:id])
+     .join(enrollmentArelTable, Arel::Nodes::OuterJoin)
+     .on(enrollmentArelTable[:id].eq(advisementArelTable[:enrollment_id]))
+     .join(dismissalArelTable, Arel::Nodes::OuterJoin)
+     .on(dismissalArelTable[:enrollment_id].eq(enrollmentArelTable[:id]))
+     .where(dismissalArelTable[:id].eq(nil))
+    ).to_sql
+
+    sql_not_actives = advisementArelTable[:id].in(
+     advisementArelTable
+     .project(advisementArelTable[:id])
+     .join(enrollmentArelTable, Arel::Nodes::OuterJoin)
+     .on(enrollmentArelTable[:id].eq(advisementArelTable[:enrollment_id]))
+     .join(dismissalArelTable, Arel::Nodes::OuterJoin)
+     .on(dismissalArelTable[:enrollment_id].eq(enrollmentArelTable[:id]))
+     .where(dismissalArelTable[:id].not_eq(nil))
+    ).to_sql
+
+    sql_all = advisementArelTable[:id].in(
+     advisementArelTable
+     .project(advisementArelTable[:id])
+     .join(enrollmentArelTable, Arel::Nodes::OuterJoin)
+     .on(enrollmentArelTable[:id].eq(advisementArelTable[:enrollment_id]))
+     .join(dismissalArelTable, Arel::Nodes::OuterJoin)
+     .on(dismissalArelTable[:enrollment_id].eq(enrollmentArelTable[:id]))
+    ).to_sql
 
     case value
       when "active" then
@@ -80,26 +97,46 @@ class AdvisementsController < ApplicationController
   end
 
   def self.condition_for_co_advisor_column(column, value, like_pattern)
-    sql_sim = "enrollments.id IN(
-                SELECT enrollments.id
-                FROM enrollments
-                LEFT OUTER JOIN advisements
-                ON enrollments.id = advisements.enrollment_id
-                WHERE advisements.main_advisor = FALSE
-              )"
-    sql_nao = "enrollments.id NOT IN(
-                SELECT enrollments.id
-                FROM enrollments
-                LEFT OUTER JOIN advisements
-                ON enrollments.id = advisements.enrollment_id
-                WHERE advisements.main_advisor = FALSE
-              )"
-    sql_all = "professors.id IN(
-                SELECT professors.id
-                FROM professors
-                LEFT OUTER JOIN advisements
-                ON professors.id = advisements.professor_id
-              )"
+    advisementArelTable = Advisement.arel_table
+    enrollmentArelTable = Enrollment.arel_table
+    professorArelTable = Professor.arel_table
+
+    sql_sim = advisementArelTable[:id].in(
+     advisementArelTable
+     .project(advisementArelTable[:id])
+     .join(enrollmentArelTable, Arel::Nodes::OuterJoin)
+     .on(advisementArelTable[:enrollment_id].eq(enrollmentArelTable[:id]))
+     .where(enrollmentArelTable[:id].in(
+      enrollmentArelTable
+      .project(enrollmentArelTable[:id])
+      .join(advisementArelTable, Arel::Nodes::OuterJoin)
+      .on(enrollmentArelTable[:id].eq(advisementArelTable[:enrollment_id]))
+      .where(advisementArelTable[:main_advisor].eq(false))
+      )
+     )
+    ).to_sql
+
+    sql_nao = advisementArelTable[:id].not_in(
+     advisementArelTable
+     .project(advisementArelTable[:id])
+     .join(enrollmentArelTable, Arel::Nodes::OuterJoin)
+     .on(advisementArelTable[:enrollment_id].eq(enrollmentArelTable[:id]))
+     .where(enrollmentArelTable[:id].in(
+      enrollmentArelTable
+      .project(enrollmentArelTable[:id])
+      .join(advisementArelTable, Arel::Nodes::OuterJoin)
+      .on(enrollmentArelTable[:id].eq(advisementArelTable[:enrollment_id]))
+      .where(advisementArelTable[:main_advisor].eq(false))
+      )
+     )
+    )
+
+    sql_all = advisementArelTable[:id].in(
+     advisementArelTable
+     .project(advisementArelTable[:id])
+     .join(professorArelTable, Arel::Nodes::OuterJoin)
+     .on(advisementArelTable[:professor_id].eq(professorArelTable[:id]))
+    ).to_sql
 
     case value
       when "all" then
