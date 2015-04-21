@@ -1,9 +1,7 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Allocation < ActiveRecord::Base
-
-  attr_accessible :day, :course_class, :start_time, :end_time, :room
 
   belongs_to :course_class
 

@@ -1,5 +1,5 @@
 # encoding utf-8
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 pt-BR:
@@ -310,6 +310,13 @@ pt-BR:
       notification_param:
         value: Valor
         query_param: Parâmetro
+      report:
+        name: Nome
+        description: Descrição
+        has_table: Modo tabela?
+        table_name: Nome da tabela
+        query_id: Consulta
+        query: Consulta
       report_configuration:
         name: "Nome"
         image: "Logo"
@@ -655,6 +662,9 @@ pt-BR:
       query:
         one: Contulta
         other: Consultas
+      report:
+        one: Relatório
+        other: Relatórios
       report_configuration:
         one: "Configuração de relatório"
         other: "Configurações de relatório"
@@ -752,6 +762,7 @@ pt-BR:
     delayed_phases_report: "Relatório"
     delete_link: "Excluir"
     delete_message: "Tem certeza que deseja excluir?"
+    deleted_records: 'Registros Removidos'
     duplicate: "Duplicar"
     filtered: ""
     found:

@@ -1,11 +1,7 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Student < ActiveRecord::Base
-  attr_accessible :name, :cpf, :obs, :birthdate, :sex, :civil_status, :father_name,
-    :mother_name, :identity_number, :identity_issuing_body, :identity_expedition_date,
-    :identity_issuing_place, :employer, :job_position, :neighborhood, :zip_code, 
-    :address, :telephone1, :telephone2, :email, :photo
 
   mount_uploader :photo, ProfileUploader
 
@@ -13,7 +9,7 @@ class Student < ActiveRecord::Base
 
   has_many :student_majors, :dependent => :destroy
   #delete cascade for enrollment -- when a student is deleted, so are his enrollments
-  has_many :enrollments, :dependent => :restrict
+  has_many :enrollments, :dependent => :restrict_with_exception
     
   belongs_to :city
   belongs_to :birth_city, :class_name => 'City', :foreign_key => 'birth_city_id'

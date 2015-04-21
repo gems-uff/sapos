@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class DismissalReason < ActiveRecord::Base
@@ -10,8 +10,6 @@ class DismissalReason < ActiveRecord::Base
   ]
 
    
-  attr_accessible :name, :description, :show_advisor_name, :thesis_judgement
-
   validates :name, :presence => true, :uniqueness => true
   validates :thesis_judgement, :presence => true, :inclusion => {:in => THESIS_JUDGEMENT}
   

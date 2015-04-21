@@ -1,9 +1,8 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class ProfessorResearchArea < ActiveRecord::Base
-  attr_accessible :professor, :research_area
-  
+
   belongs_to :professor
   belongs_to :research_area
 

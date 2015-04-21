@@ -1,9 +1,8 @@
 #encoding: utf-8
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class PhaseDuration < ActiveRecord::Base
-  attr_accessible :deadline_semesters, :deadline_months, :deadline_days
 
   belongs_to :phase
   belongs_to :level

@@ -1,12 +1,11 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Notification < ActiveRecord::Base
-  attr_accessible :body_template, :frequency, :next_execution, :notification_offset, :query_offset, :sql_query, :subject_template, :title, :to_template, :individual
 
   has_many :notification_logs
   has_many :notification_params, class_name: 'NotificationParam', dependent: :destroy
-  has_many :params, class_name: 'NotificationParam', dependent: :destroy, conditions: {active: true}
+  has_many :params, -> { where(active: true) }, class_name: 'NotificationParam', dependent: :destroy
   belongs_to :query, :inverse_of => :notifications
 
   has_paper_trail
@@ -188,7 +187,7 @@ class Notification < ActiveRecord::Base
   def get_query_date_derivations(qdate)
     if qdate.is_a? String
       return {} if qdate.blank?
-      qdate = Date.strptime(qdate, "%Y-%m-%d")
+      qdate = Date.strptime(qdate, "%d/%m/%Y")
     end
     this_semester = YearSemester.on_date qdate
     last_semester = this_semester - 1

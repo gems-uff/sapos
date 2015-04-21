@@ -1,3 +1,7 @@
+# encoding utf-8
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 module ScholarshipSuspensionsHelper
   @@config = YAML::load_file("#{Rails.root}/config/properties.yml")    
   @@range = @@config["scholarship_year_range"]    

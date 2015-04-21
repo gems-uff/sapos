@@ -1,9 +1,7 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class CustomVariable < ActiveRecord::Base
-  attr_accessible :description, :value, :variable
-
   has_paper_trail
 
   VARIABLES = {

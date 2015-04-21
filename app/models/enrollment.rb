@@ -1,21 +1,20 @@
 # encoding: utf-8
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Enrollment < ActiveRecord::Base
-  attr_accessible :enrollment_number, :admission_date, :obs, :thesis_title, 
-    :thesis_defense_date
 
   belongs_to :student
   belongs_to :level
   belongs_to :enrollment_status
   belongs_to :research_area
 
-  has_many :professors, :through => :advisements, :readonly => false
+  has_many :professors, :through => :advisements
+  attr_readonly :professors
   has_many :scholarships, :through => :scholarship_durations
   has_many :phases, :through => :accomplishments
 
-  has_one :dismissal, :dependent => :restrict
+  has_one :dismissal, :dependent => :restrict_with_exception
   has_many :advisements, :dependent => :destroy
   has_many :scholarship_durations, :dependent => :destroy
   has_many :accomplishments, :dependent => :destroy

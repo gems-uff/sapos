@@ -1,21 +1,81 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
-gem 'rails', '~> 3.2.19'
-gem "rails-erd", "~> 1.0.0"
+
+ruby '2.2.0'
+
+# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
+gem 'rails'
+
+# Use sqlite3 as the database for Active Record
+# gem 'sqlite3'
+
+# Use SCSS for stylesheets
+gem 'sass-rails'
+
+# Use Uglifier as compressor for JavaScript assets
+gem 'uglifier'
+
+# Use CoffeeScript for .js.coffee assets and views
+gem 'coffee-rails'
+
+# See https://github.com/sstephenson/execjs#readme for more supported runtimes
+# gem 'therubyracer', platforms: :ruby
+
+# Use jquery as the JavaScript library
+gem 'jquery-rails'
+gem 'jquery-ui-rails'
+
+# Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
+# gem 'turbolinks'
+
+
+gem "rails-erd"
 gem "kaminari"
 #gem "schema_plus"
 
 gem 'cancan'
-gem "devise", "~> 2.2.8"
-gem "paper_trail", "~> 2.7.2"
+gem "devise"
+gem "paper_trail"
 
 gem 'sql-parser'
+
+# Iconography
+gem 'font-awesome-rails'
+
+# Prawn to PDF
+gem 'prawn'
+gem 'prawn_rails'
+gem 'odf-report'
+gem 'clamsy', :git => 'https://github.com/gems-uff/clamsy.git'
+
+# Redcarpet for Readme MarkDown (or README.md)
+gem 'redcarpet'
+
+# Active scaffold support for Rails 3
+gem 'active_scaffold'
+gem 'active_scaffold_duplicate'
+gem 'recordselect'
+
+#Date Validation Plugin
+gem 'validates_timeliness', '~> 3.0.2'
+
+# Menu
+gem 'simple-navigation'
+
+# Notification
+gem 'rufus-scheduler'
+gem 'codemirror-rails'
+
+# Image
+gem 'carrierwave'
+gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave-activerecord.git'
+
 
 group :development, :test do
   gem 'sqlite3'
   gem 'awesome_print'
-  gem 'rspec-rails', '~> 2.0'
-  gem 'factory_girl_rails', '1.7.0'
+  gem 'rspec-rails'
+  gem 'factory_girl_rails'
   gem 'quiet_assets'
   gem 'webrick',  '1.3.1'
   gem 'binding_of_caller'
@@ -32,57 +92,22 @@ end
 
 gem 'json'
 
-# Gems used only for assets and not required
-# in production environments by default.
-group :assets do
-  gem 'sass-rails',   '~> 3.2.3'
-  gem 'coffee-rails', '~> 3.2.1'
+# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+gem 'jbuilder', '~> 1.2'
 
-  # See https://github.com/sstephenson/execjs#readme for more supported runtimes
-  gem 'therubyracer', :platforms => :ruby
-
-  gem 'uglifier', '>= 1.0.3'
+group :doc do
+  # bundle exec rake doc:rails generates the API under doc/api.
+  gem 'sdoc', require: false
 end
 
-gem 'jquery-rails', '2.1.4'
-gem 'jquery-ui-rails'
+# Use ActiveModel has_secure_password
+# gem 'bcrypt', '~> 3.1.7'
 
-# To use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.0.0'
-
-# Iconography
-gem 'font-awesome-sass'
-
-# Prawn to PDF
-gem 'prawn', '0.15.0'
-gem 'prawn_rails'
-
-# Redcarpet for Readme MarkDown (or README.md)
-gem 'redcarpet', '2.1.0'
-
-# Active scaffold support for Rails 3
-gem 'active_scaffold' #, "3.3.3"
-gem 'active_scaffold_duplicate', '~> 1.0.2'
-gem 'recordselect', "~> 3.3.6"
-
-#Date Validation Plugin
-gem 'validates_timeliness', '~> 3.0.2'
-
-# Menu
-gem 'simple-navigation'
-
-# Notification
-gem 'rufus-scheduler'
-gem 'codemirror-rails'
-
-# Image
-gem 'carrierwave'
-gem 'carrierwave-activerecord', :git => 'https://github.com/vladimeeer/carrierwave-activerecord.git', :ref => 'bfdbb7dcbf4'
-# Use unicorn as the web server
+# Use unicorn as the app server
 # gem 'unicorn'
 
-# Deploy with Capistrano
-# gem 'capistrano'
+# Use Capistrano for deployment
+# gem 'capistrano', group: :development
 
-# To use debugger
-# gem 'ruby-debug'
+# Use debugger
+# gem 'debugger', group: [:development, :test]

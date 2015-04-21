@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class User < ActiveRecord::Base
@@ -7,8 +7,6 @@ class User < ActiveRecord::Base
   belongs_to :role
 
   has_paper_trail
-
-  attr_accessible :email, :password, :password_confirmation, :remember_me
 
   devise :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,
          :lockable

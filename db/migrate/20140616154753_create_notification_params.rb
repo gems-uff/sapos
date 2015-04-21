@@ -1,3 +1,7 @@
+# encoding utf-8
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 class CreateNotificationParams < ActiveRecord::Migration
   def up
     create_table :notification_params, :force => true do |t|

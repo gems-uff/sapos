@@ -1,20 +1,16 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Professor < ActiveRecord::Base
-  attr_accessible :name, :cpf, :birthdate, :email, :sex, :civil_status, :identity_number,
-  :identity_issuing_body, :identity_expedition_date, :identity_issuing_place,
-  :neighborhood, :address, :zip_code, :telephone1, :telephone2, :siape, :enrollment_number,
-  :academic_title_country, :academic_title_institution, :academic_title_level, :academic_title_date, :obs
-  
-  has_many :advisements, :dependent => :restrict
+
+  has_many :advisements, :dependent => :restrict_with_exception
   has_many :enrollments, :through => :advisements
-  has_many :scholarships, :dependent => :restrict
-  has_many :advisement_authorizations, :dependent => :restrict
+  has_many :scholarships, :dependent => :restrict_with_exception
+  has_many :advisement_authorizations, :dependent => :restrict_with_exception
   has_many :research_areas, :through => :professor_research_areas
   has_many :professor_research_areas, :dependent => :destroy
-  has_many :course_classes, :dependent => :restrict
-  has_many :thesis_defense_committee_participations, :dependent => :restrict
+  has_many :course_classes, :dependent => :restrict_with_exception
+  has_many :thesis_defense_committee_participations, :dependent => :restrict_with_exception
   has_many :thesis_defense_committee_enrollments, :source => :enrollment, :through => :thesis_defense_committee_participations
   
   belongs_to :city

@@ -1,11 +1,10 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class NotificationParam < ActiveRecord::Base
   belongs_to :notification, :inverse_of => :params, :touch => true
   belongs_to :query_param
 
-  attr_accessible :value, :query_param_id, :notification_id, :active
 
   delegate :name, :value_type, :type, :default_value, to: :query_param
 
@@ -22,9 +21,6 @@ class NotificationParam < ActiveRecord::Base
           begin
             unless value.is_a?(ActiveSupport::TimeWithZone)
               Date.parse(value)
-              unless value =~ /[0-9]{4}-[0-9]{2}-[0-9]{2}/
-                raise ArgumentError
-              end
             end
           rescue ArgumentError
             self.errors.add :default_value, :invalid_date
@@ -33,9 +29,6 @@ class NotificationParam < ActiveRecord::Base
         when QueryParam::VALUE_DATETIME
           begin
             DateTime.parse(value)
-            unless value =~ /[0-9]{4}-[0-9]{2}-[0-9]{2} [09]{2}:[09]{2}:[09]{2}/
-              raise ArgumentError
-            end
           rescue ArgumentError
             self.errors.add :default_value, :invalid_date_time
           end
@@ -43,9 +36,6 @@ class NotificationParam < ActiveRecord::Base
         when QueryParam::VALUE_TIME
           begin
             Time.parse(value)
-            unless value =~ /[09]{2}:[09]{2}:[09]{2}/
-              raise ArgumentError
-            end
           rescue ArgumentError
             self.errors.add :default_value, :invalid_time
           end

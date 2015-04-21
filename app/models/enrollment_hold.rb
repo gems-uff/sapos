@@ -1,6 +1,9 @@
+# encoding utf-8
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 class EnrollmentHold < ActiveRecord::Base
   belongs_to :enrollment
-  attr_accessible :number_of_semesters, :semester, :year
 
   has_paper_trail
 

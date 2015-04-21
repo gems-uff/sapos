@@ -1,5 +1,7 @@
+# encoding utf-8
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 # Additional translations at http://github.com/plataformatec/devise/wiki/I18n
-# Este arquivo deve ser colocado em config/locales/devise.pt-BR.yml
 
 pt-BR:
   errors:

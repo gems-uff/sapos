@@ -1,16 +1,15 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Level < ActiveRecord::Base
-  attr_accessible :name, :course_name, :default_duration
 
   has_paper_trail
 
   has_many :advisement_authorizations, :dependent => :destroy
-  has_many :enrollments, :dependent => :restrict
-  has_many :majors, :dependent => :restrict
-  has_many :phase_durations, :dependent => :restrict
-  has_many :scholarships, :dependent => :restrict
+  has_many :enrollments, :dependent => :restrict_with_exception
+  has_many :majors, :dependent => :restrict_with_exception
+  has_many :phase_durations, :dependent => :restrict_with_exception
+  has_many :scholarships, :dependent => :restrict_with_exception
 
 
   validates :name, :presence => true, :uniqueness => true

@@ -1,9 +1,9 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Role < ActiveRecord::Base
 
-  has_many :users, :dependent => :restrict
+  has_many :users, :dependent => :restrict_with_exception
 
   ROLE_DESCONHECIDO = 1
   ROLE_COORDENACAO = 2

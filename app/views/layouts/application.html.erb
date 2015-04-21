@@ -4,7 +4,7 @@
   <title>Sapos</title>
   <%= favicon_link_tag 'logoSapos-circle.png' %>
 
-  <%= stylesheet_link_tag "application", :media => "all" %>
+  <%= stylesheet_link_tag "application", :media => "all", debug: false %>
 
 
   <%#= stylesheet_link_tag :all %>
@@ -19,7 +19,7 @@
   <%#= stylesheet_link_tag 'active_scaffold_overrides' %>
 
   <%= javascript_include_tag 'application' %>
-  <%= csrf_meta_tag %>
+  <%= csrf_meta_tags %>
 </head>
 <body>
 

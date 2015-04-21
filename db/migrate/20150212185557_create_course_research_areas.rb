@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class CreateCourseResearchAreas < ActiveRecord::Migration
@@ -14,12 +14,12 @@ class CreateCourseResearchAreas < ActiveRecord::Migration
       CourseResearchArea.create(course_id: t.id,research_area_id: t.research_area_id)
     end
 
-    remove_column :courses, :research_areas
+    remove_column :courses, :research_area_id
 
   end
 
   def self.down
-    add_column :courses, :research_areas, :integer
+    add_column :courses, :research_area_id, :integer
 
     
     CourseResearchArea.all.each do |t| 

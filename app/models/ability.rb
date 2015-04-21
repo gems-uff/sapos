@@ -1,4 +1,4 @@
-# Copyright (c) 2013 Universidade Federal Fluminense (UFF).
+# Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class Ability
@@ -28,7 +28,6 @@ class Ability
 
     role_id = user.role_id
 
-
     if role_id == Role::ROLE_ADMINISTRADOR
       can :manage, :all
       cannot [:destroy, :update], Role
@@ -39,6 +38,10 @@ class Ability
       can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification, NotificationLog, ReportConfiguration])
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification, ReportConfiguration])
+    elsif role_id == Role::ROLE_ALUNO
+      can :manage, []
+    elsif role_id == Role::ROLE_DESCONHECIDO
+      can :manage, []
     end
     can :notify, Notification
 
