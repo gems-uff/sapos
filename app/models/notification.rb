@@ -187,7 +187,7 @@ class Notification < ActiveRecord::Base
   def get_query_date_derivations(qdate)
     if qdate.is_a? String
       return {} if qdate.blank?
-      qdate = Date.strptime(qdate, "%Y-%m-%d")
+      qdate = Date.strptime(qdate, "%d/%m/%Y")
     end
     this_semester = YearSemester.on_date qdate
     last_semester = this_semester - 1
