@@ -180,7 +180,7 @@ module PdfHelper
   def new_document(name, title, options = {}, &block)
     type = options[:pdf_type] || :report; #report, transcript, grades_report, schedule
     pdf_type = :"use_at_#{type}"
-    pdf_config = options[:pdf_config] || ReportConfiguration.where(pdf_type => true).find(:first, :order => '`order` desc')
+    pdf_config = options[:pdf_config] || ReportConfiguration.where(pdf_type => true).order(order: :desc).first
     
     prawn_document({
       :page_size => "A4", 
