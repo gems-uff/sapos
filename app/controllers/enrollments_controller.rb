@@ -104,14 +104,15 @@ class EnrollmentsController < ApplicationController
 
       :advisements, 
       :scholarship_durations,
-      :accomplishments, 
+      :accomplishments,
+      :phase_due_dates,
       :deferrals, 
       :enrollment_holds, 
       :class_enrollments, 
       :thesis_defense_committee_participations, 
       :dismissal
     ]
-    create_columns = columns.dup.delete_if { |x| [:accomplishments, :deferrals].include? x }
+    create_columns = columns - [:accomplishments, :deferrals, :phase_due_dates]
 
     config.create.columns = create_columns
     config.update.columns = columns
