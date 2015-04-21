@@ -21,9 +21,6 @@ class NotificationParam < ActiveRecord::Base
           begin
             unless value.is_a?(ActiveSupport::TimeWithZone)
               Date.parse(value)
-              unless value =~ /[0-9]{4}-[0-9]{2}-[0-9]{2}/
-                raise ArgumentError
-              end
             end
           rescue ArgumentError
             self.errors.add :default_value, :invalid_date
@@ -32,9 +29,6 @@ class NotificationParam < ActiveRecord::Base
         when QueryParam::VALUE_DATETIME
           begin
             DateTime.parse(value)
-            unless value =~ /[0-9]{4}-[0-9]{2}-[0-9]{2} [09]{2}:[09]{2}:[09]{2}/
-              raise ArgumentError
-            end
           rescue ArgumentError
             self.errors.add :default_value, :invalid_date_time
           end
@@ -42,9 +36,6 @@ class NotificationParam < ActiveRecord::Base
         when QueryParam::VALUE_TIME
           begin
             Time.parse(value)
-            unless value =~ /[09]{2}:[09]{2}:[09]{2}/
-              raise ArgumentError
-            end
           rescue ArgumentError
             self.errors.add :default_value, :invalid_time
           end
