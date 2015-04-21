@@ -17,7 +17,7 @@ Sapos::Application.routes.draw do
   # Example resource route (maps HTTP verbs to controller actions automatically):
 
 
-  root 'enrollments#index'
+  root :to => "application#root"
 
   resources :enrollment_holds do as_routes end
 
