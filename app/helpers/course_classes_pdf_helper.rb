@@ -169,13 +169,15 @@ module CourseClassesPdfHelper
     total = 0
     count = 0
 
+    footer = true
+
     table_data.each do |data| 
       total += 1
       count += 1
       temp_data << data
 
       if count == 15
-        class_schedule_print_table(pdf, table_width, header, temp_data, star)
+        class_schedule_print_table(pdf, table_width, header, temp_data, star, footer)
         if total != table_data.size
           pdf.start_new_page
         end
@@ -185,12 +187,14 @@ module CourseClassesPdfHelper
     end
 
     unless temp_data.empty?
-      class_schedule_print_table(pdf, table_width, header, temp_data, star)
+      class_schedule_print_table(pdf, table_width, header, temp_data, star, footer)
+
+      class_schedule_text_print(pdf, star) if footer
     end
     
   end
 
-  def class_schedule_print_table(pdf, table_width, header, data, star)
+  def class_schedule_print_table(pdf, table_width, header, data, star, footer)
     simple_pdf_table(pdf, table_width, header, data) do |table|
       table.column(0).align = :left
       table.column(0).valign = :center
@@ -201,6 +205,11 @@ module CourseClassesPdfHelper
       table.column(-1).padding = [-2, 4, 2, 4]    
     end
 
+    class_schedule_text_print(pdf, star) unless footer
+
+  end
+
+  def class_schedule_text_print(pdf, star)
     star_text = ""
     if star
       pdf.move_down 10
