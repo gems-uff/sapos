@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150212185557) do
+ActiveRecord::Schema.define(version: 20150428212151) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer  "enrollment_id",   limit: 4
@@ -121,8 +121,8 @@ ActiveRecord::Schema.define(version: 20150212185557) do
     t.boolean  "allow_multiple_classes", limit: 1,   default: false, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "schedulable",            limit: 1
-    t.boolean  "show_class_name",        limit: 1
+    t.boolean  "schedulable",            limit: 1,   default: true
+    t.boolean  "show_class_name",        limit: 1,   default: true
   end
 
   create_table "courses", force: :cascade do |t|
