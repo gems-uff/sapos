@@ -163,18 +163,21 @@ module PdfHelper
   end
 
   def no_page_break(pdf, &block)
-    current_page = pdf.page_count
-
-    roll = pdf.transaction do
-      yield
-
-      pdf.rollback if pdf.page_count > current_page
-    end
-
-    unless roll
-      pdf.start_new_page
+    pdf.group do
       yield
     end
+    # current_page = pdf.page_count
+    #
+    # roll = pdf.transaction do
+    #   yield
+    #
+    #   pdf.rollback if pdf.page_count > current_page
+    # end
+    #
+    # unless roll
+    #   pdf.start_new_page
+    #   yield
+    # end
   end
 
   def new_document(name, title, options = {}, &block)
