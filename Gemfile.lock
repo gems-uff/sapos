@@ -150,6 +150,7 @@ GEM
     prawn (2.0.1)
       pdf-core (~> 0.5.1)
       ttfunk (~> 1.4.0)
+    prawn-table (0.2.1)
     prawn_rails (0.0.11)
       prawn (>= 0.11.1)
       railties (>= 3.0.0)
@@ -287,6 +288,7 @@ DEPENDENCIES
   odf-report
   paper_trail
   prawn
+  prawn-table
   prawn_rails
   quiet_assets
   rails
