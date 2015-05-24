@@ -37,7 +37,8 @@ class Query < ActiveRecord::Base
 
       {columns: db_resource.columns, rows: db_resource.rows}
     elsif ActiveRecord::Base.connection.adapter_name == 'Mysql2'
-      client = Mysql2::Client.new(ActiveRecord::Base.configurations["#{Rails.env}_read_only"])
+      conf = ActiveRecord::Base.configurations
+      client = Mysql2::Client.new(conf["#{Rails.env}_read_only"] ? conf["#{Rails.env}_read_only"] : conf[Rails.env])
       results = client.query(query)
       client.close
 
