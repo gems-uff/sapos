@@ -12,13 +12,9 @@ new_document('transcript.pdf', I18n.t("pdf_content.enrollment.header.title"), :w
 
     transcript_table(pdf, class_enrollments: @class_enrollments)
 
-    no_page_break(pdf) do
-        thesis_table(pdf, enrollment: @enrollment)
-    end
+    thesis_table(pdf, enrollment: @enrollment)
 
-    no_page_break(pdf) do
-        enrollment_holds_table(pdf, enrollment: @enrollment)
-    end
- 
+    enrollment_holds_table(pdf, enrollment: @enrollment)
+
 end
 

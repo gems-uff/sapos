@@ -6,6 +6,7 @@ require "prawn/measurement_extensions"
 
 
 module PdfHelper
+  include ApplicationHelper
   
   HEIGHT = 90
 
@@ -162,23 +163,6 @@ module PdfHelper
     end
   end
 
-  def no_page_break(pdf, &block)
-    pdf.group do
-      yield
-    end
-    # current_page = pdf.page_count
-    #
-    # roll = pdf.transaction do
-    #   yield
-    #
-    #   pdf.rollback if pdf.page_count > current_page
-    # end
-    #
-    # unless roll
-    #   pdf.start_new_page
-    #   yield
-    # end
-  end
 
   def new_document(name, title, options = {}, &block)
     type = options[:pdf_type] || :report; #report, transcript, grades_report, schedule
@@ -272,3 +256,5 @@ module PdfHelper
   end
 
 end
+
+Prawn::Document.extensions << PdfHelper

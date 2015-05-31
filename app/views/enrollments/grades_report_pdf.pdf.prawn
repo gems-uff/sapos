@@ -11,27 +11,15 @@ new_document('grades_report.pdf', I18n.t('pdf_content.enrollment.grades_report.t
 
     grades_report_table(pdf, enrollment: @enrollment, class_enrollments: @class_enrollments)
 
+    thesis_table(pdf, enrollment: @enrollment, show_advisors: true)
 
+    accomplished_table(pdf, accomplished_phases: @accomplished_phases)
 
-    no_page_break(pdf) do
-        thesis_table(pdf, enrollment: @enrollment, show_advisors: true)
-    end
+    deferrals_table(pdf, deferrals: @deferrals)
 
-    no_page_break(pdf) do
-    	accomplished_table(pdf, accomplished_phases: @accomplished_phases)
-    end
+    enrollment_scholarships_table(pdf, enrollment: @enrollment)
 
-    no_page_break(pdf) do
-        deferrals_table(pdf, deferrals: @deferrals)
-    end
-
-    no_page_break(pdf) do
-        enrollment_scholarships_table(pdf, enrollment: @enrollment)
-    end
-
-    no_page_break(pdf) do
-        enrollment_holds_table(pdf, enrollment: @enrollment)
-    end
+    enrollment_holds_table(pdf, enrollment: @enrollment)
 
 end
 
