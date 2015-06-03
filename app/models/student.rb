@@ -38,6 +38,11 @@ class Student < ActiveRecord::Base
     "#{birth_city.state.country.name}"
   end
 
+  def identity_issuing_place_to_label
+    return "#{I18n.t('pdf_content.enrollment.header.identity_issuing_state')}" unless State.where("name LIKE ?", self.identity_issuing_place).empty?
+    return "#{I18n.t('pdf_content.enrollment.header.identity_issuing_country')}"
+  end
+
   protected
 
   def set_birth_state_by_birth_city
