@@ -214,6 +214,7 @@ module PdfHelper
     pdf.bounding_box([0, pdf.cursor - distance], :width => (pdf.bounds.left + pdf.bounds.right).floor) do
     
       pdf.table(header, :column_widths => widths,
+                :width => 560,
                 :row_colors => ["E5E5FF"],
                 :cell_style => {:font => "Helvetica",
                                 :size => 9,
@@ -233,6 +234,7 @@ module PdfHelper
     #Content
     unless values.empty?
       pdf.table(values, :column_widths => widths,
+                :width => 560,
                 :row_colors => ["F2F2FF", "E5E5FF"],
                 :cell_style => {:font => "Helvetica",
                                 :size => 9,
