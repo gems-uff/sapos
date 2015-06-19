@@ -103,7 +103,7 @@ class ScholarshipsController < ApplicationController
     each_record_in_page {}
     scholarships_from_page = find_page(:sorting => active_scaffold_config.list.user.sorting).items
 
-    @scholarships = scholarships_from_page.map! do |s|
+    @scholarships = scholarships_from_page.map do |s|
       [ 
           s[:scholarship_number],
           s.level.nil? ? nil : s.level[:name],
