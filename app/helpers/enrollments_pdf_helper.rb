@@ -444,6 +444,7 @@ module EnrollmentsPdfHelper
                                     ]]
 
         pdf.table(scholarships_table_title, :column_widths => [560],
+                  :width => 560,
                   :row_colors => ["E5E5FF"],
                   :cell_style => {:font => "Courier",
                                   :size => 10,
@@ -511,59 +512,40 @@ module EnrollmentsPdfHelper
 
     table_width = [66, 215, 57, 57, 50, 50, 65]
 
+    pdf.move_down 3
     #Header
-    pdf.bounding_box([0, pdf.cursor - 3], :width => 560) do
+    header = [[{
+                  :colspan => 7,
+                  :content => "<b>#{I18n.t("pdf_content.enrollment.grade_list.title")}</b>"
+              }],
+              [
+                  "<b>#{I18n.t('pdf_content.enrollment.grade_list.course_code')}</b>",
+                  "<b>#{I18n.t('pdf_content.enrollment.grade_list.course_name')}</b>",
+                  "<b>#{I18n.t('pdf_content.enrollment.grade_list.course_grade')}</b>",
+                  "<b>#{I18n.t('pdf_content.enrollment.grade_list.course_credits')}</b>",
+                  "<b>#{I18n.t('pdf_content.enrollment.grade_list.course_workload')}</b>",
+                  "<b>#{I18n.t('pdf_content.enrollment.grade_list.course_year_semester')}</b>",
+                  "<b>#{I18n.t('pdf_content.enrollment.grade_list.situation')}</b>"
+              ]]
 
-      header = [[
-                    "<b>#{I18n.t("pdf_content.enrollment.grade_list.title")}</b>"
-                ]]
-
-      pdf.table(header, :column_widths => [560],
-                :row_colors => ["E5E5FF"],
-                :cell_style => {:font => "Helvetica",
-                                :size => 9,
-                                :inline_format => true,
-                                :border_width => 1,
-                                :borders => [:left, :right],
-                                :border_color => "000080",
-                                :align => :left,
-                                :padding => [2, 4]
-                }
-      )
-
-      pdf.stroke_bounds
-    end
-
-    pdf.bounding_box([0, pdf.cursor], :width => 560) do
-
-      header = [[
-                    "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_code")}</b>",
-                    "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_name")}</b>",
-                    "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_grade")}</b>",
-                    "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_credits")}</b>",
-                    "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_workload")}</b>",
-                    "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_year_semester")}</b>",
-                    "<b>#{I18n.t("pdf_content.enrollment.grade_list.situation")}</b>"
-                ]]
-
-      pdf.table(header, :column_widths => table_width,
-                :row_colors => ["E5E5FF"],
-                :cell_style => {:font => "Helvetica",
-                                :size => 9,
-                                :inline_format => true,
-                                :border_width => 1,
-                                :borders => [:left, :right],
-                                :border_color => "000080",
-                                :align => :center,
-                                :padding => [12, 2]
-                }
-      ) do |table|
-        table.column(2).padding = [7, 2]
-        table.column(3).padding = [2, 2]
-        table.column(4).padding = [7, 2]
-      end
-
-      pdf.stroke_bounds
+    pdf.table(header, :column_widths => table_width,
+              :width => 560,
+              :row_colors => ["E5E5FF"],
+              :cell_style => {:font => "Helvetica",
+                              :size => 9,
+                              :inline_format => true,
+                              :border_width => 1,
+                              :borders => [:left, :right, :top, :bottom],
+                              :border_color => "000080",
+                              :align => :center,
+                              :padding => [12, 2]
+              }
+    )do |table|
+      table.column(0).row(0).align  = :left
+      table.column(0).row(0).padding  = [2, 4]
+      table.column(2).row(1).padding = [7, 2]
+      table.column(3).row(1).padding = [2, 2]
+      table.column(4).row(1).padding = [7, 2]
     end
 
     available_semesters = enrollment.available_semesters
@@ -574,6 +556,7 @@ module EnrollmentsPdfHelper
       total_credits = 0
       row_index = 0
 
+      # Coleta e calculo de informacao
       available_semesters.each do |y, s|
         class_enrollments = enrollment.class_enrollments
                                 .where(
@@ -610,69 +593,36 @@ module EnrollmentsPdfHelper
         total_credits += semester_credits
       end
 
-      next_table_data = table_data
-      new_page = true
-      page_size = (pdf.cursor / 15.5).floor
-      current_i = 0
-      next_i = page_size
+      table_data.push([" ", "", "", "", "", "", ""]) if table_data.size % 2 == 0
+      pdf.fill_color "000000"
 
-      while new_page do
-        new_page = false;
-        table_data = next_table_data
-
-        pdf.bounding_box([0, pdf.cursor], :width => 560) do
-
-          pdf.fill_color "000000"
-
-
-          if (table_data.size >= page_size)
-            new_page = true
-            next_table_data = table_data.slice(page_size..-1)
-            table_data = table_data.slice(0..page_size)
-            page_size = 50
-          end
-
-          if (table_data.size % 2 == 0)
-            table_data.push([
-                                " ", "", "", "", "", "", ""
-                            ])
-          end
-
-
-          pdf.table(table_data, :column_widths => table_width,
-                    :row_colors => ["F2F2FF", "E5E5FF"],
-                    :cell_style => {:font => "Helvetica",
-                                    :size => 9,
-                                    :inline_format => true,
-                                    :border_width => 1,
-                                    :borders => [:left, :right],
-                                    :border_color => "000080",
-                                    :align => :center,
-                                    :padding => 2
-                    }
-          ) do |table|
-            table.column(1).align = :left
-            table.column(1).font = "Helvetica"
-            table.column(1).padding = [2, 4]
-            bold_rows.each do |i|
-              table.column(1).row(i - current_i).align = :right
-              table.row(i - current_i).font_style = :bold
-            end
-          end
-          pdf.fill_color "000080"
-
-          pdf.stroke_bounds
-        end
-        if new_page
-          pdf.start_new_page
-          current_i = next_i
-          next_i += page_size
+      pdf.table(table_data, :column_widths => table_width,
+                :row_colors => ["F2F2FF", "E5E5FF"],
+                :cell_style => {:font => "Helvetica",
+                                :size => 9,
+                                :inline_format => true,
+                                :border_width => 1,
+                                :borders => [:left, :right],
+                                :border_color => "000080",
+                                :align => :center,
+                                :padding => 2
+                }
+      ) do |table|
+        table.row(0).borders = [:left, :right, :top]
+        table.row(0).border_top_width = 1
+        table.column(1).align = :left
+        table.column(1).font = "Helvetica"
+        table.column(1).padding = [2, 4]
+        bold_rows.each do |i|
+          table.column(1).row(i).align = :right
+          table.row(i).font_style = :bold
         end
       end
+      pdf.fill_color "000080"
+
     end
 
     #Footer
-    pdf.bounding_box([0, pdf.cursor], :width => 560) do
       footer = [
           ["", "#{I18n.t('pdf_content.enrollment.grade_list.total')} ", number_to_grade(enrollment.total_gpr, :precision => 1), total_credits, I18n.translate('activerecord.attributes.course.workload_time', :time => total_class_enrollments.joins({:course_class => :course}).sum(:workload).to_i), "", ""],
       ]
@@ -682,7 +632,7 @@ module EnrollmentsPdfHelper
                                 :size => 9,
                                 :inline_format => true,
                                 :border_width => 1,
-                                :borders => [:left, :right],
+                                :borders => [:left, :right, :bottom, :top],
                                 :border_color => "000080",
                                 :align => :center,
                                 :padding => 2,
@@ -695,8 +645,7 @@ module EnrollmentsPdfHelper
         table.column(3).text_color = "000000"
         table.column(4).text_color = "000000"
       end
-      pdf.stroke_bounds
-    end
+      pdf.move_down 3
   end
 
   def thesis_table(curr_pdf, options={})
@@ -708,90 +657,92 @@ module EnrollmentsPdfHelper
       thesis_defense_date = enrollment.thesis_defense_date
       thesis_desense_committee = enrollment.thesis_defense_committee_professors
 
-      pdf.bounding_box([0, pdf.cursor], :width => 560) do
+      if enrollment.thesis_defense_committee_professors.any?
+        pdf.bounding_box([0, pdf.cursor], :width => 560) do
 
-        pdf.font('Courier', :size => 9) do
-          if not (thesis_title.nil? or thesis_title.empty?)
-            data_table = [
-                [
-                    "#{I18n.t('pdf_content.enrollment.thesis.title')} " +
-                        "<b>#{rescue_blank_text(thesis_title)}</b>"
-                ]
-            ]
+          pdf.font('Courier', :size => 9) do
+            if not (thesis_title.nil? or thesis_title.empty?)
+              data_table = [
+                  [
+                      "#{I18n.t('pdf_content.enrollment.thesis.title')} " +
+                          "<b>#{rescue_blank_text(thesis_title)}</b>"
+                  ]
+              ]
 
-            pdf.indent(5) do
-              text_table(pdf, data_table, 8)
+              pdf.indent(5) do
+                text_table(pdf, data_table, 8)
+              end
+
+              pdf.move_down 5
+              pdf.line_width 0.5
+              pdf.horizontal_line 0, 560
+
+              thesis_defense_date = thesis_defense_date.nil? ? rescue_blank_text(nil) : I18n.localize(thesis_defense_date, :format => :default)
+              data_table = [
+                  [
+                      "#{I18n.t('pdf_content.enrollment.thesis.date')} " +
+                          "<b>#{thesis_defense_date}   </b>"
+
+                  ]
+              ]
+              if !(enrollment.dismissal.nil?)
+                data_table[0].push(
+                    "#{I18n.t('pdf_content.enrollment.thesis.judgement')} " +
+                        "<b>#{rescue_blank_text(enrollment.dismissal.dismissal_reason, :method_call => :thesis_judgement)}</b>"
+                )
+              else
+                data_table[0].push(
+                    "#{I18n.t('pdf_content.enrollment.thesis.judgement')} " +
+                        "<b>#{I18n.t("activerecord.attributes.dismissal_reason.thesis_judgements.invalid")}</b>"
+                )
+              end
+
+              pdf.indent(5) do
+                text_table(pdf, data_table, 8)
+              end
+
+              pdf.move_down 5
+              pdf.horizontal_line 0, 560
             end
 
-            pdf.move_down 5
-            pdf.line_width 0.5
-            pdf.horizontal_line 0, 560
+            has_advisors = !(enrollment.professors.nil? || enrollment.professors.empty?)
+            show_advisors = !(enrollment.dismissal.nil?) && enrollment.dismissal.dismissal_reason.show_advisor_name
+            show_advisors = true if options[:show_advisors]
+            if has_advisors and show_advisors
+              data_table = [
+                  [
+                      "#{I18n.t('pdf_content.enrollment.thesis.advisors')} " +
+                          "<b>#{rescue_blank_text(enrollment.professors.collect { |a| a.name }.join(', '))}</b>"
+                  ]
+              ]
+              pdf.indent(5) do
+                text_table(pdf, data_table, 8)
+              end
 
-            thesis_defense_date = thesis_defense_date.nil? ? rescue_blank_text(nil) : I18n.localize(thesis_defense_date, :format => :default)
-            data_table = [
-                [
-                    "#{I18n.t('pdf_content.enrollment.thesis.date')} " +
-                        "<b>#{thesis_defense_date}   </b>"
-
-                ]
-            ]
-            if !(enrollment.dismissal.nil?)
-              data_table[0].push(
-                  "#{I18n.t('pdf_content.enrollment.thesis.judgement')} " +
-                      "<b>#{rescue_blank_text(enrollment.dismissal.dismissal_reason, :method_call => :thesis_judgement)}</b>"
-              )
-            else
-              data_table[0].push(
-                  "#{I18n.t('pdf_content.enrollment.thesis.judgement')} " +
-                      "<b>#{I18n.t("activerecord.attributes.dismissal_reason.thesis_judgements.invalid")}</b>"
-              )
+              pdf.move_down 5
+              pdf.horizontal_line 0, 560
             end
 
-            pdf.indent(5) do
-              text_table(pdf, data_table, 8)
-            end
+            if not (thesis_desense_committee.nil? or thesis_desense_committee.empty?)
+              pdf.indent(5) do
+                pdf.move_down 8
+                pdf.text "#{I18n.t('pdf_content.enrollment.thesis.defense_committee')} ", :inline_format => true
+                pdf.move_down 5
 
-            pdf.move_down 5
-            pdf.horizontal_line 0, 560
-          end
-
-          has_advisors = !(enrollment.professors.nil? || enrollment.professors.empty?)
-          show_advisors = !(enrollment.dismissal.nil?) && enrollment.dismissal.dismissal_reason.show_advisor_name
-          show_advisors = true if options[:show_advisors]
-          if has_advisors and show_advisors
-            data_table = [
-                [
-                    "#{I18n.t('pdf_content.enrollment.thesis.advisors')} " +
-                        "<b>#{rescue_blank_text(enrollment.professors.collect { |a| a.name }.join(', '))}</b>"
-                ]
-            ]
-            pdf.indent(5) do
-              text_table(pdf, data_table, 8)
-            end
-
-            pdf.move_down 5
-            pdf.horizontal_line 0, 560
-          end
-
-          if not (thesis_desense_committee.nil? or thesis_desense_committee.empty?)
-            pdf.indent(5) do
-              pdf.move_down 8
-              pdf.text "#{I18n.t('pdf_content.enrollment.thesis.defense_committee')} ", :inline_format => true
+                thesis_desense_committee.each do |professor|
+                  pdf.text "<b>#{professor.name} / #{rescue_blank_text(professor.institution, :method_call => :name)}</b>", :inline_format => true
+                  pdf.move_down 1
+                end
+              end
               pdf.move_down 5
 
-              thesis_desense_committee.each do |professor|
-                pdf.text "<b>#{professor.name} / #{rescue_blank_text(professor.institution, :method_call => :name)}</b>", :inline_format => true
-                pdf.move_down 1
-              end
+
             end
-            pdf.move_down 5
-
-
           end
+          pdf.close_and_stroke
+          pdf.line_width 1
+          pdf.stroke_bounds
         end
-        pdf.close_and_stroke
-        pdf.line_width 1
-        pdf.stroke_bounds
       end
     end
   end

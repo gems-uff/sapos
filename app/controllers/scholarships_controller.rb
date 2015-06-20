@@ -103,7 +103,7 @@ class ScholarshipsController < ApplicationController
     each_record_in_page {}
     scholarships_from_page = find_page(:sorting => active_scaffold_config.list.user.sorting).items
 
-    @scholarships = scholarships_from_page.map! do |s|
+    @scholarships = scholarships_from_page.map do |s|
       [ 
           s[:scholarship_number],
           s.level.nil? ? nil : s.level[:name],
@@ -116,7 +116,7 @@ class ScholarshipsController < ApplicationController
 
     respond_to do |format|
       format.pdf do
-        send_data render_to_string, :filename => I18n.t("pdf_content.scholarships.to_pdf.filename"), :type => 'application/pdf'
+        send_data render_to_string, :filename => "#{I18n.t('pdf_content.scholarships.to_pdf.filename')}.pdf", :type => 'application/pdf'
       end
     end
   end

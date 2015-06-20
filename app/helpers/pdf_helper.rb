@@ -14,7 +14,7 @@ module PdfHelper
     if pdf_config.nil?
       type = options[:pdf_type] || :report; #report, transcript, grades_report, schedule
       pdf_type = :"use_at_#{type}"
-      pdf_config = options[:pdf_config] || ReportConfiguration.where(pdf_type => true).find(:first, :order => '`order` desc')
+      pdf_config = options[:pdf_config] || ReportConfiguration.where(pdf_type => true).order('`order` desc').first
     end      
 
     pdf.bounding_box([0, pdf.cursor], :width => pdf.bounds.left + pdf.bounds.right, :height => HEIGHT) do
@@ -214,6 +214,7 @@ module PdfHelper
     pdf.bounding_box([0, pdf.cursor - distance], :width => (pdf.bounds.left + pdf.bounds.right).floor) do
     
       pdf.table(header, :column_widths => widths,
+                # :width => widths.sum,
                 :row_colors => ["E5E5FF"],
                 :cell_style => {:font => "Helvetica",
                                 :size => 9,
@@ -233,6 +234,7 @@ module PdfHelper
     #Content
     unless values.empty?
       pdf.table(values, :column_widths => widths,
+                # :width => widths.sum,
                 :row_colors => ["F2F2FF", "E5E5FF"],
                 :cell_style => {:font => "Helvetica",
                                 :size => 9,

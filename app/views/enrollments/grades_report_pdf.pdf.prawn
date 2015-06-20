@@ -8,7 +8,6 @@ new_document('grades_report.pdf', I18n.t('pdf_content.enrollment.grades_report.t
 
     grades_report_header(pdf, enrollment: @enrollment)
 
-
     grades_report_table(pdf, enrollment: @enrollment, class_enrollments: @class_enrollments)
 
     thesis_table(pdf, enrollment: @enrollment, show_advisors: true)
