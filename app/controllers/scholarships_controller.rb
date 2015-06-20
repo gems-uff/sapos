@@ -116,7 +116,7 @@ class ScholarshipsController < ApplicationController
 
     respond_to do |format|
       format.pdf do
-        send_data render_to_string, :filename => I18n.t("pdf_content.scholarships.to_pdf.filename"), :type => 'application/pdf'
+        send_data render_to_string, :filename => "#{I18n.t('pdf_content.scholarships.to_pdf.filename')}.pdf", :type => 'application/pdf'
       end
     end
   end
