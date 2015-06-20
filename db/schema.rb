@@ -93,6 +93,7 @@ ActiveRecord::Schema.define(version: 20150428212151) do
     t.string   "name",       limit: 255
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "nationality", default: "-"
   end
 
   create_table "course_classes", force: :cascade do |t|
