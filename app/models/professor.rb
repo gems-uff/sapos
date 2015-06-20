@@ -33,7 +33,7 @@ class Professor < ActiveRecord::Base
     return "#{0.0}" if self.advisement_authorizations.empty?
 
     enrollments = Enrollment.joins(["LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id", :advisements]).
-        where("advisements.professor_id = :professor_id AND dismissals.id IS NULL", :professor_id => self.id).scoped
+        where("advisements.professor_id = :professor_id AND dismissals.id IS NULL", :professor_id => self.id)
 
     enrollments_with_single_advisor = enrollments.where("1 = (SELECT COUNT(*) FROM advisements WHERE advisements.enrollment_id = enrollments.id AND advisements.professor_id in (SELECT advisement_authorizations.professor_id from advisement_authorizations))")
 
