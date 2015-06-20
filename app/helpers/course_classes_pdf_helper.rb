@@ -141,7 +141,6 @@ module CourseClassesPdfHelper
       next unless course_class.course.course_type.schedulable
         
       course = header[0].map {|x| ""}
-      course_name = rescue_blank_text(course_class.course, :method_call => :name)
 
       course[0] = course_class.name_with_class
 
@@ -165,33 +164,16 @@ module CourseClassesPdfHelper
 
     table_data.sort_by! { |e| e[0] }
 
-    temp_data = []
-    total = 0
     count = 0
+    rows_per_page = 15
+    num_pages = (table_data.size.to_f / rows_per_page).ceil
 
-    footer = true
-
-    table_data.each do |data| 
-      total += 1
+    table_data.each_slice(rows_per_page) do |data_slice|
       count += 1
-      temp_data << data
-
-      if count == 15
-        class_schedule_print_table(pdf, table_width, header, temp_data, star, footer)
-        if total != table_data.size
-          pdf.start_new_page
-        end
-        temp_data = []
-        count = 0
-      end
+      last_page = (num_pages ==  count)
+      class_schedule_print_table(pdf, table_width, header, data_slice, star, last_page)
+      pdf.start_new_page unless last_page
     end
-
-    unless temp_data.empty?
-      class_schedule_print_table(pdf, table_width, header, temp_data, star, footer)
-
-      class_schedule_text_print(pdf, star) if footer
-    end
-    
   end
 
   def class_schedule_print_table(pdf, table_width, header, data, star, footer)
@@ -205,7 +187,7 @@ module CourseClassesPdfHelper
       table.column(-1).padding = [-2, 4, 2, 4]    
     end
 
-    class_schedule_text_print(pdf, star) unless footer
+    class_schedule_text_print(pdf, star) if footer
 
   end
 
