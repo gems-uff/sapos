@@ -112,11 +112,10 @@ class EnrollmentsController < ApplicationController
       :thesis_defense_committee_participations, 
       :dismissal
     ]
-    create_columns = columns - [:accomplishments, :deferrals, :phase_due_dates]
 
-    config.create.columns = create_columns
-    config.update.columns = create_columns
-    config.show.columns = columns + [:phase_due_dates]
+    config.create.columns = columns - [:accomplishments, :deferrals, :phase_due_dates]
+    config.update.columns = columns - [:phase_due_dates]
+    config.show.columns = columns
   end
   record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
 
