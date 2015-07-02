@@ -73,9 +73,9 @@ class ScholarshipDuration < ActiveRecord::Base
     # -> scholarship.cancel_date é nulo -> schoarslhip.start_date > end_date
 
     if self.id.nil?
-      scholarships_with_student = ScholarshipDuration.all :conditions => ["enrollment_id = ?", enrollment.id]
+      scholarships_with_student = ScholarshipDuration.where(enrollment_id: enrollment.id).all
     else
-      scholarships_with_student = ScholarshipDuration.all :conditions => ["enrollment_id = ? AND id <> ?", enrollment.id, self.id]
+      scholarships_with_student = ScholarshipDuration.where(enrollment_id: enrollment.id).where.not(id: self.id).all
     end
 
     scholarships_with_student.each do |scholarship|
@@ -99,9 +99,9 @@ class ScholarshipDuration < ActiveRecord::Base
 
   def warning_message
     if self.id.nil?
-      scholarships_with_student = ScholarshipDuration.all :conditions => ["scholarship_id = ?", scholarship.id]
+      scholarships_with_student = ScholarshipDuration.where(scholarship_id: scholarship.id).all
     else
-      scholarships_with_student = ScholarshipDuration.all :conditions => ["scholarship_id = ? AND id <> ?", scholarship.id, self.id]
+      scholarships_with_student = ScholarshipDuration.where(scholarship_id: scholarship.id).where.not(id: self.id).all
     end
 
     message = nil
@@ -117,9 +117,9 @@ class ScholarshipDuration < ActiveRecord::Base
   def if_scholarship_is_not_with_another_student
     return if scholarship.nil?
     if self.id.nil?
-      scholarships_with_student = ScholarshipDuration.all :conditions => ["scholarship_id = ?", scholarship.id]
+      scholarships_with_student = ScholarshipDuration.where(scholarship_id: scholarship.id).all
     else
-      scholarships_with_student = ScholarshipDuration.all :conditions => ["scholarship_id = ? AND id <> ?", scholarship.id, self.id]
+      scholarships_with_student = ScholarshipDuration.where(scholarship_id: scholarship.id).where.not(id: self.id).all
     end
 
     scholarships_with_student.each do |scholarship|
