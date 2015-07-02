@@ -9,9 +9,9 @@ class CountriesController < ApplicationController
     config.list.sorting = {:name => 'ASC'}
     config.list.columns = [:name]
     config.create.label = :create_country_label
-    config.create.columns = [:name]
+    config.create.columns = [:name, :nationality]
     config.update.label = :update_country_label
-    config.update.columns = [:name]
+    config.update.columns = [:name, :nationality]
   end
 
   def states
