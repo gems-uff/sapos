@@ -152,7 +152,6 @@ module CourseClassesPdfHelper
 
       if course_class.allocations.empty?
         (first..last).each do |index|
-          table_width << day_width
           course[index + 1 - first] = "*\n "
         end
         star = true
