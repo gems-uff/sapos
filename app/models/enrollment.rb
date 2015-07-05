@@ -90,7 +90,7 @@ class Enrollment < ActiveRecord::Base
       .where(
         Dismissal.arel_table[:date].gt(date)
         .or(Dismissal.arel_table[:enrollment_id].eq(nil))
-      ).map(&:id).uniq
+      ).references(:dismissals).map(&:id).uniq
   end
 
   def delayed_phases(options={})
