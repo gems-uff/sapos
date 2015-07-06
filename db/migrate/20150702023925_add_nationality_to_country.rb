@@ -1,7 +1,5 @@
 class AddNationalityToCountry < ActiveRecord::Migration
   def change
-  	add_column :countries, :nationality, :string, :default => "-"
-
   	Country.where(:name=>"Afeganistão").first.update(:nationality=>"afegã(o)")
 		Country.where(:name=>"África do Sul").first.update(:nationality=>"sul-africano(a)")
 		Country.where(:name=>"Albânia, República da").first.update(:nationality=>"albanês(esa)")

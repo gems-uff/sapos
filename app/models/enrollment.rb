@@ -80,20 +80,6 @@ class Enrollment < ActiveRecord::Base
     phases = Phase.all if phases.nil?
     phases_ids = phases.map(&:id)
 
-#    dismissalArelTable = Dismissal.arel_table
-#    enrollmentArelTable = Enrollment.arel_table
-#    phaseCompletionArelTable = PhaseCompletion.arel_table
-#
-#    enrollmentArelTable
-#    .join(phaseCompletionArelTable)
-#    .on(enrollmentArelTable[:id].eq(pahseCompletionArelTable[:enrollment_id]))
-#    .join(DismissalArelTable)
-#    .on(enrollmentArelTable[:id].eq(dismissalArelTable[:enrollment_id]))
-#    .where(phaseCompletionArelTable[:completion_date].not_eq(nil))
-#    .where(phaseCompletionArelTable[:due_date].lt(date))
-#    .where(dismissal)
-
-
     Enrollment.joins(:phase_completions).includes(:dismissal)
       .where(:phase_completions => {
         :completion_date => nil,
