@@ -82,7 +82,7 @@ group :development, :test do
   gem 'binding_of_caller'
   gem 'better_errors'
   gem 'spring'
-  # gem 'debugger'
+  gem 'byebug'
   #gem 'rcov_rails'
 end
 

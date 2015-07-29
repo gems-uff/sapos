@@ -502,6 +502,9 @@ pt-BR:
         dismissal:
           date_before_enrollment_admission_date: "anterior a Data de Admissão"
           enrollment_has_scholarship: "possui uma bolsa ativa na data de desligamento"
+          attributes:
+            date:
+              invalid_date: não é uma data válida
         enrollment:
           main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
