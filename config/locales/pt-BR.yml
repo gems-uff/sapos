@@ -88,6 +88,7 @@ pt-BR:
       country:
         name: "Nome"
         state: "Estados"
+        nationality: "Nacionalidade"
       course:
         available: "Disciplina do currículo vigente"
         code: "Código"
