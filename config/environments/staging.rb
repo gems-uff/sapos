@@ -5,7 +5,6 @@
 Sapos::Application.configure do
   # Allow the notifier to send emails
   config.should_send_emails = true
-  config.config_url_root = '/sapos-homologacao'
   
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -73,7 +72,7 @@ Sapos::Application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
   config.action_mailer.delivery_method = :sendmail
-  config.action_mailer.default_url_options = {:host => 'sel.ic.uff.br/sapos-homologacao'}
+  config.action_mailer.default_url_options = {:host => 'sel.ic.uff.br'}
   config.action_mailer.sendmail_settings = {:arguments => '-i -f "SAPOS <sapos@sel.ic.uff.br>"', :location => '/usr/sbin/sendmail'}
 
   # Enable threaded mode

@@ -89,9 +89,8 @@ Sapos::Application.configure do
 
   # Allow the notifier to send emails
   config.should_send_emails = true
-  config.config_url_root = '/sapos'
   config.action_mailer.delivery_method = :sendmail
-  config.action_mailer.default_url_options = { :host => 'sel.ic.uff.br/sapos' }
+  config.action_mailer.default_url_options = { :host => 'sel.ic.uff.br' }
   config.action_mailer.sendmail_settings = { :arguments => '-i -f "SAPOS <sapos@sel.ic.uff.br>"', :location => '/usr/sbin/sendmail' }
 
 

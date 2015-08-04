@@ -45,6 +45,5 @@ Sapos::Application.configure do
 
   # Allow the notifier to send emails
   config.should_send_emails = false
-  config.config_url_root = ''
 
 end

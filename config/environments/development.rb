@@ -37,7 +37,6 @@ Sapos::Application.configure do
 
   # Allow the notifier to send emails
   config.should_send_emails = Rails.const_defined?('Server') 
-  config.config_url_root = ''
 
   # Only use best-standards-support built into browsers
   config.action_dispatch.best_standards_support = :builtin
