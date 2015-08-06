@@ -37,7 +37,7 @@ pt-BR:
     confirmations:
       send_instructions: 'Dentro de minutos você receberá um e-mail com instruções para confirmar a sua conta.'
       send_paranoid_instructions: 'Caso seu e-mail exista em nossa base, dentro de minugos você receberá um e-mail com instruções para confirmar a sua conta.'
-      confirmed: 'Sua conta foi confirmada com sucesso. Você está logado.'
+      confirmed: 'Sua conta foi confirmada com sucesso.'
     registrations:
       signed_up: 'Bem-vindo! Você registrou-se com sucesso.'
       inactive_signed_up: 'Você registrou-se com sucesso. No entanto, não pudemos realizar seu login porque sua conta está %{reason}.'
