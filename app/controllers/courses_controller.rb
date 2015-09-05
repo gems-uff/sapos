@@ -34,6 +34,8 @@ class CoursesController < ApplicationController
 
     config.columns =
         [:name, :code, :credits, :workload, :course_research_areas, :content, :course_type, :available]
+
+    config.actions.exclude :deleted_records
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 

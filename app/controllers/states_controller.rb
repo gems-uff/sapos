@@ -14,6 +14,8 @@ class StatesController < ApplicationController
     config.create.columns = [:country, :name, :code]
     config.update.label = :update_state_label
     config.update.columns = [:country, :name, :code]
+
+    config.actions.exclude :deleted_records
   end
 
   def cities

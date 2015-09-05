@@ -10,6 +10,8 @@ class RolesController < ApplicationController
     config.columns = [:name, :description]
     config.columns[:description].form_ui = :textarea
     config.show.link = false
+
+    config.actions.exclude :deleted_records
   end
 
 end

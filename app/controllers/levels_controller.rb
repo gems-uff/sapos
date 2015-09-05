@@ -11,5 +11,7 @@ class LevelsController < ApplicationController
     config.create.label = :create_level_label
 
     config.columns = [:name, :course_name, :default_duration, :advisement_authorizations]
+
+    config.actions.exclude :deleted_records
   end
 end 

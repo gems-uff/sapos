@@ -7,5 +7,7 @@ class ScholarshipSuspensionsController < ApplicationController
   active_scaffold :"scholarship_suspension" do |config|
   	config.columns[:scholarship_duration].form_ui = :record_select
   	config.columns = [:scholarship_duration, :start_date, :end_date, :active]
+
+    config.actions.exclude :deleted_records
   end
 end

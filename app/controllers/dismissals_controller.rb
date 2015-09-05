@@ -22,6 +22,8 @@ class DismissalsController < ApplicationController
 
     config.update.columns = [:enrollment, :date, :dismissal_reason, :obs]
     config.create.columns = [:enrollment, :date, :dismissal_reason, :obs]
+
+    config.actions.exclude :deleted_records
   end
 
 end

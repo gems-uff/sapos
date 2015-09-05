@@ -14,6 +14,8 @@ class DeferralTypesController < ApplicationController
     config.create.columns = [:name, :description, :duration_semesters, :duration_months, :duration_days, :phase]
     config.update.columns = [:name, :description, :duration_semesters, :duration_months, :duration_days, :phase]
     config.show.columns = [:name, :description, :duration_semesters, :duration_months, :duration_days, :phase]
+
+    config.actions.exclude :deleted_records
   end
 
 end

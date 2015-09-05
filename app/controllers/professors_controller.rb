@@ -92,6 +92,8 @@ class ProfessorsController < ApplicationController
                            :obs,
                            :research_areas,
                          ]
+
+    config.actions.exclude :deleted_records
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 

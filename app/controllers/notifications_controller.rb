@@ -36,6 +36,8 @@ class NotificationsController < ApplicationController
 
 
     config.create.label = :create_notification_label
+
+    config.actions.exclude :deleted_records
   end
 
   def after_render_field(record, column)

@@ -12,6 +12,8 @@ class CountriesController < ApplicationController
     config.create.columns = [:name, :nationality]
     config.update.label = :update_country_label
     config.update.columns = [:name, :nationality]
+
+    config.actions.exclude :deleted_records
   end
 
   def states

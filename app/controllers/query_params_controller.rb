@@ -11,5 +11,7 @@ class QueryParamsController < ApplicationController
     config.columns[:value_type].form_ui = :select
     config.columns[:value_type].options = { options:  QueryParam::VALUE_TYPES, :include_blank => 'Escolha'}
     # config.columns[:value_type].update_columns = [:default_value]
+
+    config.actions.exclude :deleted_records
   end
 end

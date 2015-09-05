@@ -61,6 +61,8 @@ class CourseClassesController < ApplicationController
 
     config.update.columns =
         [:name, :course, :professor, :year, :semester, :class_enrollments, :allocations]
+
+    config.actions.exclude :deleted_records
   end
   record_select :per_page => 10, :order_by => 'name', :full_text_search => true
 

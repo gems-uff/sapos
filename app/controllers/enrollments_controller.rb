@@ -116,6 +116,8 @@ class EnrollmentsController < ApplicationController
     config.create.columns = columns - [:accomplishments, :deferrals, :phase_due_dates]
     config.update.columns = columns - [:phase_due_dates]
     config.show.columns = columns
+
+    config.actions.exclude :deleted_records
   end
   record_select :per_page => 10, :search_on => [:enrollment_number], :order_by => 'enrollment_number', :full_text_search => true
 

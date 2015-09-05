@@ -13,6 +13,8 @@ class CourseTypesController < ApplicationController
 
     config.columns =
         [:name, :has_score, :schedulable, :show_class_name, :allow_multiple_classes]
+
+    config.actions.exclude :deleted_records
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 

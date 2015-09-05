@@ -20,6 +20,8 @@ class ThesisDefenseCommitteeParticipationsController < ApplicationController
 
     config.columns[:enrollment].form_ui = :record_select
     config.columns[:professor].form_ui = :record_select
+
+    config.actions.exclude :deleted_records
   end
   record_select
 end

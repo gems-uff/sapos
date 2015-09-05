@@ -46,6 +46,8 @@ class ScholarshipDurationsController < ApplicationController
     config.columns[:cancel_date].options = {:format => :monthyear}
     config.create.columns = [:scholarship, :enrollment, :start_date, :end_date, :cancel_date, :obs]
     config.update.columns = [:scholarship, :enrollment, :start_date, :end_date, :cancel_date, :obs, :scholarship_suspensions]
+
+    config.actions.exclude :deleted_records
   end
   record_select :per_page => 10, :full_text_search => true
 

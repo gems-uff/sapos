@@ -14,5 +14,7 @@ class UsersController < ApplicationController
     config.columns[:role].form_ui = :select
     config.columns[:password].form_ui = :password
     config.columns[:password_confirmation].form_ui = :password
+
+    config.actions.exclude :deleted_records
   end
 end

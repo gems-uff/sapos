@@ -46,6 +46,8 @@ class AdvisementsController < ApplicationController
     config.create.columns = [:professor, :enrollment, :main_advisor]
     config.update.columns = [:professor, :enrollment, :main_advisor]
     config.show.columns = [:professor, :enrollment, :main_advisor, :co_advisor_list]
+
+    config.actions.exclude :deleted_records
   end
 
   def self.condition_for_active_column(column, value, like_pattern)

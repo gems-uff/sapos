@@ -15,6 +15,8 @@ class ResearchAreasController < ApplicationController
    
     config.columns = [:name, :code, :professor_research_areas]
     config.list.columns = [:name, :code]
+
+    config.actions.exclude :deleted_records
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 end

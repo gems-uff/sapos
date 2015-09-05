@@ -13,6 +13,7 @@ class InstitutionsController < ApplicationController
     config.columns[:majors].associated_limit = nil
     config.columns[:majors].form_ui = :record_select
 
+    config.actions.exclude :deleted_records
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 

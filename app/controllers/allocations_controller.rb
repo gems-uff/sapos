@@ -17,6 +17,7 @@ class AllocationsController < ApplicationController
     config.columns =
         [:course_class, :day, :room, :start_time, :end_time]
 
+    config.actions.exclude :deleted_records
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 end

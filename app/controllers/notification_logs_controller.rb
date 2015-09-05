@@ -11,7 +11,5 @@ class NotificationLogsController < ApplicationController
   	config.columns[:notification_name].label = I18n.t('activerecord.attributes.notification_log.notification_name')
   	config.list.sorting = {:created_at => 'DESC'}
   	config.actions.exclude :create, :delete, :update
-
-  	
   end
 end

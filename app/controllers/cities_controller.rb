@@ -14,6 +14,8 @@ class CitiesController < ApplicationController
     config.create.columns = [:state, :name]
     config.update.label = :update_city_label
     config.update.columns = [:state, :name]
+
+    config.actions.exclude :deleted_records
   end
 
 end 

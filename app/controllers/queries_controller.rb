@@ -23,6 +23,7 @@ class QueriesController < ApplicationController
     # config.show.columns = form_columns + [:next_execution]
     # config.list.columns = [:title, :frequency, :notification_offset, :query_offset, :next_execution]
 
+    config.actions.exclude :deleted_records
   end
 
 

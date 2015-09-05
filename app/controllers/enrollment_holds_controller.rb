@@ -24,5 +24,7 @@ class EnrollmentHoldsController < ApplicationController
     	:include_blank => true,
         :default => nil,
     }
+
+    config.actions.exclude :deleted_records
   end
 end

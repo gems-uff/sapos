@@ -42,7 +42,8 @@ class ReportConfigurationsController < ApplicationController
     config.update.columns = columns
     columns.delete(:preview)
     config.columns = columns
-    
+
+    config.actions.exclude :deleted_records
   end
 
   def preview

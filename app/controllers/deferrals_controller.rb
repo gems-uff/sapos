@@ -22,7 +22,8 @@ class DeferralsController < ApplicationController
     config.search.columns = [:enrollment]
     
     config.create.label = :create_deferral_label
-   
+
+    config.actions.exclude :deleted_records
   end
 
 end 

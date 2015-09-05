@@ -22,6 +22,8 @@ class AccomplishmentsController < ApplicationController
     config.search.columns = [:enrollment]
     
     config.create.label = :create_accomplishment_label
+
+    config.actions.exclude :deleted_records
   end
 
 end

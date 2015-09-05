@@ -5,7 +5,9 @@
 class PhaseDurationsController < ApplicationController
   authorize_resource
 
-  active_scaffold :phase_duration do |conf|
+  active_scaffold :phase_duration do |config|
+
+    config.actions.exclude :deleted_records
   end
 
 end 

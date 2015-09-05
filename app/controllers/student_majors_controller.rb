@@ -15,6 +15,7 @@ class StudentMajorsController < ApplicationController
     config.columns[:student].form_ui = :record_select
     config.columns[:major].form_ui = :record_select
 
+    config.actions.exclude :deleted_records
   end
 
   record_select

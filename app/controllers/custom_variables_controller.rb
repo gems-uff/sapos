@@ -15,6 +15,8 @@ class CustomVariablesController < ApplicationController
     config.columns = [:variable, :value, :description]
     config.create.label = :create_custom_variable_label
     config.update.label = :update_custom_variable_label
+
+    config.actions.exclude :deleted_records
   end
 
 end

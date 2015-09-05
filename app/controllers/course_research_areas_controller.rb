@@ -16,6 +16,7 @@ class CourseResearchAreasController < ApplicationController
     config.columns[:course].form_ui = :record_select
     config.columns[:research_area].form_ui = :record_select
 
+    config.actions.exclude :deleted_records
   end
 
   record_select

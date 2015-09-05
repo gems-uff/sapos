@@ -9,6 +9,8 @@ class SponsorsController < ApplicationController
     config.list.sorting = {:name => 'ASC'}
     config.create.label = :create_sponsor_label
     config.columns = [:name]
+
+    config.actions.exclude :deleted_records
   end
 
 end 

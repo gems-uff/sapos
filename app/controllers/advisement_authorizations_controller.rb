@@ -14,6 +14,7 @@ class AdvisementAuthorizationsController < ApplicationController
     config.columns[:level].form_ui = :select
     config.columns[:level].clear_link
 
+    config.actions.exclude :deleted_records
   end
   record_select :per_page => 10
 end
