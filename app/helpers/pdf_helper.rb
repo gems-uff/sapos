@@ -206,34 +206,76 @@ module PdfHelper
     end
   end
 
-  def simple_pdf_table(pdf, widths, header, values, options={}, &block)
-    distance = 3
-    distance = options[:distance] if options.has_key? :distance
+  def pdf_list_with_title(pdf, title, data, options={}, &block)
+    width = (pdf.bounds.left + pdf.bounds.right).floor
+    width = options[:width] if options.has_key? :width
 
-    #Header
-    pdf.bounding_box([0, pdf.cursor - distance], :width => (pdf.bounds.left + pdf.bounds.right).floor) do
-    
-      pdf.table(header, :column_widths => widths,
-                :width => widths.sum,
+    pdf_table_with_title(pdf, [width], title, [], data, options) do |table|
+      table.column(0).align = :left
+      table.column(0).font = "Courier"
+      #table.column(0).size = 10
+      table.column(0).padding = [2, 5]
+      yield table unless block.nil?
+    end
+  end
+
+  def pdf_table_with_title(pdf, widths, title, header, data, options={}, &block)
+    width = (pdf.bounds.left + pdf.bounds.right).floor
+    width = options[:width] if options.has_key? :width
+
+    title_distance = 3
+    title_distance = options[:title_distance] if options.has_key? :title_distance
+    options[:distance] = 0 unless options.has_key? :distance
+
+    # Table
+    pdf.bounding_box([0, pdf.cursor - title_distance], :width => width) do
+      #pdf.move_down title_distance
+      pdf.table(title, :column_widths => [widths.sum],
                 :row_colors => ["E5E5FF"],
                 :cell_style => {:font => "Helvetica",
                                 :size => 9,
                                 :inline_format => true,
                                 :border_width => 1,
-                                :borders => [:left, :right],
                                 :border_color => "000080",
-                                :align => :center,
-                                :padding => [2, 2]
-              }
+                                :align => :left,
+                                :padding => [2, 4]
+                }
       )
+    end
+    simple_pdf_table(pdf, widths, header, data, options, &block)
+  end
 
-      pdf.stroke_bounds
+  def simple_pdf_table(pdf, widths, header, data, options={}, &block)
+    distance = 3
+    distance = options[:distance] if options.has_key? :distance
 
+    #Header
+    unless header.empty?
+      pdf.bounding_box([0, pdf.cursor - distance], :width => (pdf.bounds.left + pdf.bounds.right).floor) do
+
+        pdf.table(header, :column_widths => widths,
+                  :width => widths.sum,
+                  :row_colors => ["E5E5FF"],
+                  :cell_style => {:font => "Helvetica",
+                                  :size => 9,
+                                  :inline_format => true,
+                                  :border_width => 1,
+                                  :borders => [:left, :right],
+                                  :border_color => "000080",
+                                  :align => :center,
+                                  :padding => [2, 2]
+                }
+        )
+
+        pdf.stroke_bounds
+
+      end
     end
 
     #Content
-    unless values.empty?
-      pdf.table(values, :column_widths => widths,
+    unless data.empty?
+      pdf.fill_color "000000"
+      pdf.table(data, :column_widths => widths,
                 :width => widths.sum,
                 :row_colors => ["F2F2FF", "E5E5FF"],
                 :cell_style => {:font => "Helvetica",
@@ -245,16 +287,15 @@ module PdfHelper
                                 :align => :center,
                                 :padding => 2
                 }
-      ) do |table| 
+      ) do |table|
         table.row(0).borders = [:top, :left, :right]
         yield table unless block.nil?
-        
       end
+      pdf.fill_color "000080"
       pdf.stroke do
         pdf.horizontal_line 0, (pdf.bounds.left + pdf.bounds.right).floor
       end
     end
-    
   end
 
 end

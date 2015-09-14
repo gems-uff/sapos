@@ -16,9 +16,10 @@ new_document('grades_report.pdf', I18n.t('pdf_content.enrollment.grades_report.t
 
     deferrals_table(pdf, deferrals: @deferrals)
 
+    enrollment_holds_table(pdf, enrollment: @enrollment)
+
     enrollment_scholarships_table(pdf, enrollment: @enrollment)
 
-    enrollment_holds_table(pdf, enrollment: @enrollment)
 
 end
 

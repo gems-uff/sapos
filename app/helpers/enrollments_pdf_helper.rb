@@ -344,168 +344,6 @@ module EnrollmentsPdfHelper
     end
   end
 
-  def accomplished_table(curr_pdf, options={})
-    curr_pdf.group do |pdf|
-      accomplished_phases ||= options[:accomplished_phases]
-
-      unless accomplished_phases.empty?
-        pdf.bounding_box([0, pdf.cursor - 3], :width => 560) do
-
-          phases_table_width = [pdf.bounds.right]
-
-
-          phases_table_header = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.accomplished_phases")}</b>"]]
-
-          pdf.table(phases_table_header, :column_widths => phases_table_width,
-                    :row_colors => ["E5E5FF"],
-                    :cell_style => {:font => "Courier",
-                                    :size => 10,
-                                    :inline_format => true,
-                                    :border_width => 1,
-                                    :align => :center
-                    }
-          )
-
-          phases_table_data = accomplished_phases.map do |accomplishment|
-            [
-                "#{I18n.localize(accomplishment.conclusion_date, :format => :monthyear2)} #{accomplishment.phase.name}"
-            ]
-          end
-
-          pdf.table(phases_table_data, :column_widths => phases_table_width,
-                    :row_colors => ["F2F2FF", "E5E5FF"],
-                    :cell_style => {:font => "Courier",
-                                    :size => 10,
-                                    :inline_format => true,
-                                    :border_width => 0,
-                                    :align => :left
-                    }
-          )
-
-          pdf.stroke_bounds
-        end
-      end
-    end
-  end
-
-  def deferrals_table(curr_pdf, options={})
-    curr_pdf.group do |pdf|
-      deferrals ||= options[:deferrals]
-
-      unless deferrals.empty?
-        pdf.bounding_box([0, pdf.cursor - 3], :width => 560) do
-
-          deferrals_table_width = [pdf.bounds.right]
-
-
-          deferrals_table_header = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.deferrals")}</b>"]]
-
-          pdf.table(deferrals_table_header, :column_widths => deferrals_table_width,
-                    :row_colors => ["E5E5FF"],
-                    :cell_style => {:font => "Courier",
-                                    :size => 10,
-                                    :inline_format => true,
-                                    :border_width => 1,
-                                    :align => :center
-                    }
-          )
-
-          deferrals_table_data = deferrals.map do |deferral|
-            [
-                "#{I18n.localize(deferral.approval_date, :format => :monthyear2)} #{deferral.deferral_type.name}"
-            ]
-          end
-
-          pdf.table(deferrals_table_data, :column_widths => deferrals_table_width,
-                    :row_colors => ["F2F2FF", "E5E5FF"],
-                    :cell_style => {:font => "Courier",
-                                    :size => 10,
-                                    :inline_format => true,
-                                    :border_width => 0,
-                                    :align => :left
-                    }
-          )
-
-          pdf.stroke_bounds
-        end
-      end
-    end
-  end
-
-  def enrollment_scholarships_table(curr_pdf, options={})
-    curr_pdf.group do |pdf|
-      enrollment ||= options[:enrollment]
-      scholarship_durations = enrollment.scholarship_durations
-
-      unless scholarship_durations.empty?
-        pdf.move_down 3
-        scholarships_table_title = [[
-                                        "<b>#{I18n.t("pdf_content.enrollment.scholarships.title")}</b>"
-                                    ]]
-
-        pdf.table(scholarships_table_title, :column_widths => [560],
-                  :width => 560,
-                  :row_colors => ["E5E5FF"],
-                  :cell_style => {:font => "Courier",
-                                  :size => 10,
-                                  :inline_format => true,
-                                  :border_width => 1,
-                                  :align => :center
-                  }
-        )
-
-        scholarships_table_width = [200, 90, 90, 90, 90]
-
-        scholarships_table_header = [[
-                                         "<b>#{I18n.t("pdf_content.enrollment.scholarships.number")}</b>",
-                                         "<b>#{I18n.t("pdf_content.enrollment.scholarships.sponsor")}</b>",
-                                         "<b>#{I18n.t("pdf_content.enrollment.scholarships.start_date")}</b>",
-                                         "<b>#{I18n.t("pdf_content.enrollment.scholarships.end_date")}</b>",
-                                         "<b>#{I18n.t("pdf_content.enrollment.scholarships.cancel_date")}</b>",
-
-                                     ]]
-        i = 0
-        scholarships_table_data = []
-        suspensions_ids = []
-        scholarship_durations.each do |sd|
-          start_date = sd.start_date.nil? ? "-" : I18n.localize(sd.start_date, :format => :monthyear2)
-          end_date = sd.end_date.nil? ? "-" : I18n.localize(sd.end_date, :format => :monthyear2)
-          cancel_date = sd.cancel_date.nil? ? "-" : I18n.localize(sd.cancel_date, :format => :monthyear2)
-          scholarships_table_data << [
-              rescue_blank_text(sd.scholarship, :method_call => :scholarship_number),
-              rescue_blank_text(sd.scholarship.sponsor, :method_call => :name),
-              start_date,
-              end_date,
-              cancel_date
-          ]
-          i += 1
-          suspensions = sd.scholarship_suspensions
-          unless suspensions.empty?
-            suspensions.each do |s|
-              scholarships_table_data << [
-                  "Suspensão #{s.active ? 'ativa' : 'inativa'}",
-                  "",
-                  I18n.localize(s.start_date, :format => :monthyear),
-                  I18n.localize(s.end_date, :format => :monthyear),
-                  "-"
-              ]
-              suspensions_ids << i
-              i += 1
-            end
-          end
-        end
-
-        simple_pdf_table(pdf, scholarships_table_width, scholarships_table_header, scholarships_table_data, distance: 0) do |table|
-          suspensions_ids.each do |i|
-            table.cells[i, 0].font_style = :bold
-            table.cells[i, 0].style :align => :right
-            table.cells[i, 0].style :padding_right => 10
-          end
-        end
-      end
-    end
-  end
-
   def grades_report_table(pdf, options={})
     enrollment ||= options[:enrollment]
     total_class_enrollments ||= options[:class_enrollments]
@@ -660,7 +498,7 @@ module EnrollmentsPdfHelper
       if enrollment.thesis_defense_committee_professors.any?
         pdf.bounding_box([0, pdf.cursor], :width => 560) do
 
-          pdf.font('Courier', :size => 9) do
+          pdf.font('Courier', :size => 8) do
             if not (thesis_title.nil? or thesis_title.empty?)
               data_table = [
                   [
@@ -743,6 +581,104 @@ module EnrollmentsPdfHelper
           pdf.line_width 1
           pdf.stroke_bounds
         end
+      end
+    end
+  end
+
+  def accomplished_table(curr_pdf, options={})
+    curr_pdf.group do |pdf|
+      accomplished_phases ||= options[:accomplished_phases]
+
+      unless accomplished_phases.empty?
+        title = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.accomplished_phases")}</b>"]]
+        data = accomplished_phases.map do |accomplishment|
+          ["#{I18n.localize(accomplishment.conclusion_date, :format => :monthyear2)} #{accomplishment.phase.name}"]
+        end
+        pdf_list_with_title(pdf, title, data)
+      end
+    end
+  end
+
+  def deferrals_table(curr_pdf, options={})
+    curr_pdf.group do |pdf|
+      deferrals ||= options[:deferrals]
+
+      unless deferrals.empty?
+        title = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.deferrals")}</b>"]]
+        data = deferrals.map do |deferral|
+          ["#{I18n.localize(deferral.approval_date, :format => :monthyear2)} #{deferral.deferral_type.name}"]
+        end
+        pdf_list_with_title(pdf, title, data)
+      end
+    end
+  end
+
+  def enrollment_scholarships_table(curr_pdf, options={})
+    curr_pdf.group do |pdf|
+      enrollment ||= options[:enrollment]
+      scholarship_durations = enrollment.scholarship_durations
+
+      unless scholarship_durations.empty?
+        title = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.scholarships")}</b>"]]
+        header = [["<b>#{I18n.t("pdf_content.enrollment.scholarships.number")}</b>",
+                   "<b>#{I18n.t("pdf_content.enrollment.scholarships.sponsor")}</b>",
+                   "<b>#{I18n.t("pdf_content.enrollment.scholarships.start_date")}</b>",
+                   "<b>#{I18n.t("pdf_content.enrollment.scholarships.end_date")}</b>",
+                   "<b>#{I18n.t("pdf_content.enrollment.scholarships.cancel_date")}</b>"]]
+
+        i = 0
+        data = []
+        suspensions_ids = []
+        scholarship_durations.each do |sd|
+          start_date = sd.start_date.nil? ? "-" : I18n.localize(sd.start_date, :format => :monthyear2)
+          end_date = sd.end_date.nil? ? "-" : I18n.localize(sd.end_date, :format => :monthyear2)
+          cancel_date = sd.cancel_date.nil? ? "-" : I18n.localize(sd.cancel_date, :format => :monthyear2)
+          data << [
+              rescue_blank_text(sd.scholarship, :method_call => :scholarship_number),
+              rescue_blank_text(sd.scholarship.sponsor, :method_call => :name),
+              start_date,
+              end_date,
+              cancel_date
+          ]
+          i += 1
+          suspensions = sd.scholarship_suspensions
+          unless suspensions.empty?
+            suspensions.each do |s|
+              data << [
+                  "Suspensão #{s.active ? 'ativa' : 'inativa'}",
+                  "",
+                  I18n.localize(s.start_date, :format => :monthyear),
+                  I18n.localize(s.end_date, :format => :monthyear),
+                  "-"
+              ]
+              suspensions_ids << i
+              i += 1
+            end
+          end
+        end
+        widths = [200, 90, 90, 90, 90]
+        pdf_table_with_title(pdf, widths, title, header, data, width: 560) do |table|
+          suspensions_ids.each do |i|
+            table.cells[i, 0].font_style = :bold
+            table.cells[i, 0].style :align => :right
+            table.cells[i, 0].style :padding_right => 10
+          end
+        end
+      end
+    end
+  end
+
+  def enrollment_holds_table(curr_pdf, options={})
+    curr_pdf.group do |pdf|
+      enrollment ||= options[:enrollment]
+      enrollment_holds = enrollment.enrollment_holds
+
+      unless enrollment_holds.empty?
+        title = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.enrollment_holds")}</b>"]]
+        data = enrollment_holds.map do |eh|
+          ["#{eh.date_label} #{eh.number_label}"]
+        end
+        pdf_list_with_title(pdf, title, data)
       end
     end
   end
@@ -853,49 +789,6 @@ module EnrollmentsPdfHelper
     simple_pdf_table(pdf, widths, header, values) do |table|
       table.column(0).align = :left
       table.column(0).padding = [2, 4]
-    end
-  end
-
-  def enrollment_holds_table(curr_pdf, options={})
-    curr_pdf.group do |pdf|
-      enrollment ||= options[:enrollment]
-      enrollment_holds = enrollment.enrollment_holds
-
-      unless enrollment_holds.empty?
-        pdf.bounding_box([0, pdf.cursor - 3], :width => 560) do
-          pdf.move_down 3
-          holds_table_title = [[
-                                   "<b>#{I18n.t("pdf_content.enrollment.enrollment_holds.title")}</b>"
-                               ]]
-
-          pdf.table(holds_table_title, :column_widths => [560],
-                    :row_colors => ["E5E5FF"],
-                    :cell_style => {:font => "Courier",
-                                    :size => 10,
-                                    :inline_format => true,
-                                    :border_width => 1,
-                                    :align => :center
-                    }
-          )
-
-          holds_table_width = [380, 180]
-
-          holds_table_header = [[
-                                    "<b>#{I18n.t("pdf_content.enrollment.enrollment_holds.semester")}</b>",
-                                    "<b>#{I18n.t("pdf_content.enrollment.enrollment_holds.number_of_semesters")}</b>",
-
-                                ]]
-
-          holds_table_data = enrollment_holds.map do |eh|
-            [
-                eh.date_label,
-                eh.number_label
-            ]
-          end
-
-          simple_pdf_table(pdf, holds_table_width, holds_table_header, holds_table_data, distance: 0)
-        end
-      end
     end
   end
 
