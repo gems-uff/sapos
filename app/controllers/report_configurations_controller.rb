@@ -53,14 +53,13 @@ class ReportConfigurationsController < ApplicationController
     else
       record = ReportConfiguration.new
     end
-
-    record.assign_attributes(params[:record].except(:image_cache, :remove_image))
+    record.assign_attributes(record_params.except(:image_cache, :remove_image))
     # up = ImageUploader.new record, :image
     # up.store(File.open(params[:record][:image]))
     @pdf_config = record
     respond_to do |format|
       format.pdf do
-        send_data render_to_string, :filename => I18n.t("pdf_content.report_configurations.preview"), :type => 'application/pdf'
+        send_data render_to_string, :filename => "#{I18n.t('pdf_content.report_configurations.preview')}.pdf", :type => 'application/pdf'
       end
     end
   end
@@ -68,5 +67,11 @@ class ReportConfigurationsController < ApplicationController
   def logo
     record = ReportConfiguration.find params[:id]
     send_data(record.image.read, filename: record.image_identifier)
+  end
+
+  private
+  def record_params
+    params.required(:record).permit(:name, :use_at_report, :use_at_transcript, :use_at_grades_report, :use_at_schedule,
+                                    :text, :image, :signature_footer, :order, :scale, :x,:y)
   end
 end
