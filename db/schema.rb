@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150728234140) do
+ActiveRecord::Schema.define(version: 20160621020313) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer  "enrollment_id"
@@ -57,6 +57,23 @@ ActiveRecord::Schema.define(version: 20150728234140) do
   end
 
   add_index "allocations", ["course_class_id"], name: "index_allocations_on_course_class_id"
+
+  create_table "application_processes", force: :cascade do |t|
+    t.string   "name"
+    t.integer  "semester"
+    t.integer  "year"
+    t.date     "start_date"
+    t.date     "end_date"
+    t.integer  "form_template_id"
+    t.integer  "letter_template_id"
+    t.integer  "min_letters"
+    t.integer  "max_letter"
+    t.datetime "created_at",         null: false
+    t.datetime "updated_at",         null: false
+  end
+
+  add_index "application_processes", ["form_template_id"], name: "index_application_processes_on_form_template_id"
+  add_index "application_processes", ["letter_template_id"], name: "index_application_processes_on_letter_template_id"
 
   create_table "carrier_wave_files", force: :cascade do |t|
     t.string   "medium_hash", limit: 255
@@ -229,12 +246,120 @@ ActiveRecord::Schema.define(version: 20150728234140) do
   add_index "enrollments", ["level_id"], name: "index_enrollments_on_level_id"
   add_index "enrollments", ["student_id"], name: "index_enrollments_on_student_id"
 
+  create_table "form_field_inputs", force: :cascade do |t|
+    t.integer  "student_application_id"
+    t.integer  "form_field_id"
+    t.string   "input"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "form_field_inputs", ["form_field_id"], name: "index_form_field_inputs_on_form_field_id"
+  add_index "form_field_inputs", ["student_application_id"], name: "index_form_field_inputs_on_student_application_id"
+
+  create_table "form_field_values", force: :cascade do |t|
+    t.integer  "form_field_id"
+    t.string   "value"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "form_field_values", ["form_field_id"], name: "index_form_field_values_on_form_field_id"
+
+  create_table "form_fields", force: :cascade do |t|
+    t.string   "field_type"
+    t.string   "name"
+    t.string   "description"
+    t.boolean  "is_mandatory"
+    t.integer  "form_template_id"
+    t.datetime "created_at",       null: false
+    t.datetime "updated_at",       null: false
+  end
+
+  add_index "form_fields", ["form_template_id"], name: "index_form_fields_on_form_template_id"
+
+  create_table "form_file_uploads", force: :cascade do |t|
+    t.integer  "student_application_id"
+    t.integer  "form_field_id"
+    t.string   "file"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "form_file_uploads", ["form_field_id"], name: "index_form_file_uploads_on_form_field_id"
+  add_index "form_file_uploads", ["student_application_id"], name: "index_form_file_uploads_on_student_application_id"
+
+  create_table "form_templates", force: :cascade do |t|
+    t.string   "name"
+    t.string   "description"
+    t.boolean  "is_letter"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  create_table "form_text_inputs", force: :cascade do |t|
+    t.integer  "student_application_id"
+    t.integer  "form_field_id"
+    t.text     "input"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "form_text_inputs", ["form_field_id"], name: "index_form_text_inputs_on_form_field_id"
+  add_index "form_text_inputs", ["student_application_id"], name: "index_form_text_inputs_on_student_application_id"
+
   create_table "institutions", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
     t.string   "code",       limit: 255
   end
+
+  create_table "letter_field_inputs", force: :cascade do |t|
+    t.integer  "letter_request_id"
+    t.integer  "form_field_id"
+    t.string   "input"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+  end
+
+  add_index "letter_field_inputs", ["form_field_id"], name: "index_letter_field_inputs_on_form_field_id"
+  add_index "letter_field_inputs", ["letter_request_id"], name: "index_letter_field_inputs_on_letter_request_id"
+
+  create_table "letter_file_uploads", force: :cascade do |t|
+    t.integer  "letter_request_id"
+    t.integer  "form_field_id"
+    t.string   "file"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+  end
+
+  add_index "letter_file_uploads", ["form_field_id"], name: "index_letter_file_uploads_on_form_field_id"
+  add_index "letter_file_uploads", ["letter_request_id"], name: "index_letter_file_uploads_on_letter_request_id"
+
+  create_table "letter_requests", force: :cascade do |t|
+    t.integer  "student_application_id"
+    t.string   "professor_name"
+    t.string   "professor_email"
+    t.string   "professor_telephone"
+    t.string   "access_token"
+    t.boolean  "is_filled"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "letter_requests", ["student_application_id"], name: "index_letter_requests_on_student_application_id"
+
+  create_table "letter_text_inputs", force: :cascade do |t|
+    t.integer  "letter_request_id"
+    t.integer  "form_field_id"
+    t.text     "input"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+  end
+
+  add_index "letter_text_inputs", ["form_field_id"], name: "index_letter_text_inputs_on_form_field_id"
+  add_index "letter_text_inputs", ["letter_request_id"], name: "index_letter_text_inputs_on_letter_request_id"
 
   create_table "levels", force: :cascade do |t|
     t.string   "name",             limit: 255
@@ -484,6 +609,16 @@ ActiveRecord::Schema.define(version: 20150728234140) do
   end
 
   add_index "states", ["country_id"], name: "index_states_on_country_id"
+
+  create_table "student_applications", force: :cascade do |t|
+    t.integer  "student_id"
+    t.integer  "application_process_id"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "student_applications", ["application_process_id"], name: "index_student_applications_on_application_process_id"
+  add_index "student_applications", ["student_id"], name: "index_student_applications_on_student_id"
 
   create_table "student_majors", force: :cascade do |t|
     t.integer "major_id",   null: false
