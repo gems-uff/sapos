@@ -70,6 +70,10 @@ gem 'codemirror-rails'
 gem 'carrierwave'
 gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave-activerecord.git'
 
+# Nested Forms / ApplicationProcess and FormTemplates functionalities.
+gem 'cocoon', '~> 1.2', '>= 1.2.9'
+gem 'simple_form', '~> 3.2', '>= 3.2.1'
+gem 'haml', '~> 4.0', '>= 4.0.7'
 
 group :development, :test do
   gem 'sqlite3'
