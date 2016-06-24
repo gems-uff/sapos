@@ -10,6 +10,8 @@ class Student < ActiveRecord::Base
   has_many :student_majors, :dependent => :destroy
   #delete cascade for enrollment -- when a student is deleted, so are his enrollments
   has_many :enrollments, :dependent => :restrict_with_exception
+
+  has_many :student_applications, :dependent => :restrict_with_exception
     
   belongs_to :city
   belongs_to :birth_city, :class_name => 'City', :foreign_key => 'birth_city_id'

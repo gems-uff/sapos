@@ -17,6 +17,7 @@
 //= require codemirror
 //= require codemirror/modes/sql
 //= require codemirror/modes/xml
+//= require cocoon
 //= require_tree .
 
 
