@@ -9,4 +9,12 @@ class FormTemplate < ActiveRecord::Base
 
   validates :name, presence: true
 
+  def get_form_type
+    if self.is_letter
+      'Carta de Recomendação'
+    else
+      'Formulário'
+    end
+  end
+
 end

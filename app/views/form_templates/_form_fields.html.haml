@@ -1,0 +1,19 @@
+.nested-fields
+  = f.input :name
+  = f.input :description
+  = f.input :field_type, as: :hidden, input_html: { value: type }
+  - if f.object.accept_mandatory? type
+    = f.input :is_mandatory, checked_value: true, unchecked_value: false
+  - else
+    = f.input :is_mandatory, as: :hidden, input_html: { value: false }
+  = link_to_remove_association 'Remover', f
+
+  - if f.object.allow_form_values? type
+    .links
+      = link_to_add_association 'Adicionar Valor do Campo', f, :form_field_values, partial: 'field_values',
+                                'data-association-insertion-method' => 'append'
+
+      = f.simple_fields_for :form_field_values do |field_values|
+        = render 'field_values', f:field_values
+
+  %hr

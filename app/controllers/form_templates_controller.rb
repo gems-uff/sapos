@@ -2,7 +2,15 @@ class FormTemplatesController < ApplicationController
   authorize_resource
 
   def index
-    FormTemplate.all
+    @form_templates = FormTemplate.all
+  end
+
+  def new
+    @form_template = FormTemplate.new
+  end
+
+  def show
+
   end
 =begin
   active_scaffold :form_template do |config|

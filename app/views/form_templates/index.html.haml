@@ -1,1 +1,28 @@
-%h2 Modelos de Formulário
+%p#notice
+  =notice
+
+#as_form_templates-active-scaffold.active-scaffold.active-scaffold-as_form_templates.form_templates-view.default-theme
+  .active-scaffold-header
+    .actions
+      = link_to :create_form_template_label, new_form_template_path
+
+
+%h1
+  = :form_template
+
+%table
+  %thead
+    %tr
+      %th
+        Name
+      %th
+        Description
+      %th
+        Type
+  %tbody
+    - @form_templates.each do |ft|
+      %tr
+        %td
+          = ft.name
+          = ft.description
+          = ft.get_form_type
