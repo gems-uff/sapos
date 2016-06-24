@@ -585,6 +585,9 @@ pt-BR:
       allocation:
         one: "Alocação"
         other: "Alocações"
+      application_process:
+        one: "Edital de Seleção"
+        other: "Editais de Seleção"
       city:
         one: "Cidade"
         other: "Cidades"
@@ -630,6 +633,9 @@ pt-BR:
       enrollment_status:
         one: "Tipo de Matrícula"
         other: "Tipos de Matrícula"
+      form_template:
+        one: "Modelos de Formulário"
+        other: "Modelos de Formulário"
       institution:
         one: "Instituição"
         other: "Instituições"  
@@ -699,6 +705,9 @@ pt-BR:
       student:
         one: "Aluno"
         other: "Alunos"
+      student_application:
+        one: "Inscrição"
+        other: "Inscrições"
       student_major:
         one: "Curso do Aluno"
         other: "Curso dos Alunos"
@@ -761,6 +770,8 @@ pt-BR:
     create_student_major_label: "Adicionar Curso do Aluno"
     create_thesis_defense_committee_participation_label: "Adicionar Participação em Banca"
     create_user_label: "Adicionar Usuário"
+    create_form_template_label: "Criar Modelo de Formulário"
+    create_application_process_label: "Criar Edital de Seleção"
     report_configurations:
       preview: "Visualizar"
     delayed_phases_report: "Relatório"
@@ -811,6 +822,7 @@ pt-BR:
     update_student_major_label: "Editar Curso do Aluno"
     update_thesis_defense_committee_participation: "Editar Participação em Banca"
     update_user_label: "Modificar Usuário"
+    update_application_process_label: "Modificar Edital"
     record_not_saved: "A validação falhou!"
     query:
       execute: 'Executar'

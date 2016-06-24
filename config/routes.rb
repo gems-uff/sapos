@@ -261,6 +261,22 @@ Sapos::Application.routes.draw do
     as_routes
   end
 
+  resources :student_applications do
+    as_routes
+  end
+
+  resources :form_templates do
+    as_routes
+  end
+
+  resources :application_processes do
+    as_routes
+  end
+
+  resources :form_fields do
+    as_routes
+  end
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

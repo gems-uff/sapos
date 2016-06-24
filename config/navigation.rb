@@ -126,6 +126,13 @@ SimpleNavigation::Configuration.run do |navigation|
       locations.item :country, 'Países', countries_path, :if => can_read?(Country)
     end
 
+    application_processes_models = [FormTemplate, ApplicationProcess, StudentApplication]
+    primary.item :application_processes, 'Seleção', get_path_from(application_processes_models), :if => can_read?(application_processes_models) do |application_processes|
+      application_processes.item :form_template, 'Formulários', form_templates_path, :if => can_read?(FormTemplate)
+      application_processes.item :application_process, 'Editais', application_processes_path, :if => can_read?(ApplicationProcess)
+      application_processes.item :student_application, 'Inscrições', student_applications_path, :if => can_read?(StudentApplication)
+    end
+
     configuracoes_models = [User, Role, CustomVariable, Version, Notification, NotificationLog, ReportConfiguration]
     primary.item :configuration, 'Configurações', get_path_from(configuracoes_models), :if => can_read?(configuracoes_models) do |configuration|
       configuration.item :user, 'Usuários', users_path, :if => can_read?(User)
