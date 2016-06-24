@@ -12,6 +12,26 @@ class FormTemplatesController < ApplicationController
   def show
 
   end
+
+  def create
+    @form_template = FormTemplate.new(form_template_params)
+
+    if @form_template.save
+      redirect_to form_templates_path, notice: 'Form template was successfully created.'
+    else
+      render :new
+    end
+
+  end
+
+  private
+
+  def form_template_params
+    params.require(:form_template).permit(:name, :description, :is_letter,
+                                          form_fields_attributes: [:id, :field_type, :name, :is_mandatory, :default, :_destroy,
+                                                                   form_field_values_attributes: [:id, :is_default, :value, :_destroy]],
+                                          application_processes_attributes:[:name, :semester, :year, :start_date, :end_date, :total_letters])
+  end
 =begin
   active_scaffold :form_template do |config|
     config.list.sorting = {:name => 'ASC'}
@@ -26,5 +46,6 @@ class FormTemplatesController < ApplicationController
     config.actions.exclude :deleted_records
   end
 =end
+
 
 end
