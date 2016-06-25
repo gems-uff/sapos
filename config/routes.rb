@@ -277,6 +277,11 @@ Sapos::Application.routes.draw do
     as_routes
   end
 
+  get 'apply'  => 'apply#index'
+  post 'apply'  => 'apply#create'
+  get 'apply/:application_process_id/new'  => 'apply#new', as: :apply_to
+  get 'letter_requests/fill/:access_code'  => 'letter_requests#fill', as: :fill_letter
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
