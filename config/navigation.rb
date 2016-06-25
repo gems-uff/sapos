@@ -125,7 +125,7 @@ SimpleNavigation::Configuration.run do |navigation|
       locations.item :state, 'Estados', states_path, :if => can_read?(State)
       locations.item :country, 'Países', countries_path, :if => can_read?(Country)
     end
-    #get_path_from(application_processes_models)
+
     application_processes_models = [FormTemplate, ApplicationProcess, StudentApplication]
     primary.item :application_processes, 'Seleção', form_templates_path, :if => can_read?(application_processes_models) do |application_processes|
       application_processes.item :form_template, 'Formulários', form_templates_path, :if => can_read?(FormTemplate), :highlights_on => %r(/form_templates)

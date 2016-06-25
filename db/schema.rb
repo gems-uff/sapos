@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160621020313) do
+ActiveRecord::Schema.define(version: 20160625010907) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer  "enrollment_id"
@@ -67,7 +67,7 @@ ActiveRecord::Schema.define(version: 20160621020313) do
     t.integer  "form_template_id"
     t.integer  "letter_template_id"
     t.integer  "min_letters"
-    t.integer  "max_letter"
+    t.integer  "max_letters"
     t.datetime "created_at",         null: false
     t.datetime "updated_at",         null: false
   end

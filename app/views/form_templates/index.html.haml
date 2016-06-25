@@ -4,21 +4,20 @@
 #as_form_templates-active-scaffold.active-scaffold.active-scaffold-as_form_templates.form_templates-view.default-theme
   .active-scaffold-header
     .actions
-      = link_to :create_form_template_label, new_form_template_path
-
+      = link_to I18n.t 'active_scaffold.add', new_form_template_path
 
 %h1
-  = :form_template
+  = I18n.t 'activerecord.models.form_template.other'
 
 %table
   %thead
     %tr
       %th
-        Name
+        = I18n.t 'activerecord.attributes.form_template.name'
       %th
-        Description
+        = I18n.t 'activerecord.attributes.form_template.description'
       %th
-        Type
+        = I18n.t 'activerecord.attributes.form_template.type'
   %tbody
     - @form_templates.each do |ft|
       %tr

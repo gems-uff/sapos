@@ -63,6 +63,16 @@ pt-BR:
         end_time: "Hora de fim"
         room: "Sala"
         start_time: "Hora de início"
+      application_process:
+        name: "Nome"
+        semester: "Semestre"
+        year: "Ano"
+        start_date: "Data de início"
+        end_date: "Data de encerramento"
+        min_letters: "Mínimo de Cartas"
+        max_letters: "Máximo de Cartas"
+        form_template: "Modelo de Formulário"
+        letter_template: "Modelo de Carta de Recomendação"
       city:
         name: "Nome"
         state: "Estado"
@@ -195,6 +205,11 @@ pt-BR:
       enrollment_status:
         name: "Nome"
         enrollments: "Matrículas"
+      form_template:
+        name: "Nome"
+        description: "Descrição"
+        is_letter: "Carta de Recomendação"
+        type: "Tipo"
       institution:
         code: "Sigla"
         majors: "Cursos"
@@ -420,6 +435,9 @@ pt-BR:
         telephone1: "1º Telefone"
         telephone2: "2º Telefone"
         zip_code: "CEP"   
+      student_application:
+        student: "Aluno"
+        application_process: "Edital de Seleção"
       student_major:
         major: "Curso"
         student: "Aluno"
@@ -483,6 +501,9 @@ pt-BR:
         allocation:
           end_time_before_start_time: "menor do que a hora de fim"
           scheduling_conflict: "este horário já está sendo usado em outra alocação da mesma turma"
+        application_process:
+          end_greater_than_start_date: "Data de encerramento deve ser após data de início"
+          max_greater_than_min_letters: "Máximo de cartas não pode ser menor que mínimo"
         class_enrollment:
           attributes:
             course_class:
@@ -634,7 +655,7 @@ pt-BR:
         one: "Tipo de Matrícula"
         other: "Tipos de Matrícula"
       form_template:
-        one: "Modelos de Formulário"
+        one: "Modelo de Formulário"
         other: "Modelos de Formulário"
       institution:
         one: "Instituição"
@@ -823,6 +844,7 @@ pt-BR:
     update_thesis_defense_committee_participation: "Editar Participação em Banca"
     update_user_label: "Modificar Usuário"
     update_application_process_label: "Modificar Edital"
+
     record_not_saved: "A validação falhou!"
     query:
       execute: 'Executar'
@@ -1038,4 +1060,5 @@ pt-BR:
         filename: "Relatório de Alocação de Bolsas"
 
   rescue_blank_text: "Não informado"
+
 
