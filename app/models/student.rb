@@ -16,7 +16,10 @@ class Student < ActiveRecord::Base
     
   belongs_to :city
   belongs_to :birth_city, :class_name => 'City', :foreign_key => 'birth_city_id'
-  belongs_to :birth_state, :class_name => 'State', :foreign_key => 'birth_state_id' 
+  belongs_to :birth_state, :class_name => 'State', :foreign_key => 'birth_state_id'
+
+  accepts_nested_attributes_for :student_applications,
+                                allow_destroy: true
   
   has_paper_trail  
    

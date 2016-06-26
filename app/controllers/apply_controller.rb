@@ -13,7 +13,17 @@ class ApplyController < ApplicationController
     @application_fields = FormField.where(form_template_id: @application_form.id).where.not(field_type: ['text', 'file'])
     @application_texts = FormField.where(form_template_id: @application_form.id, field_type: 'text')
     @application_files = FormField.where(form_template_id: @application_form.id, field_type: 'file')
-    @apply = StudentApplication.new
+    if @student_token.student_id
+      #render text: @student_token.student_id.inspect
+      #@apply = StudentApplication.new(application_process_id: @application_process.id, student_id: @student_token.student_id)
+      @student = Student.find(@student_token.student_id)
+    else
+      #render text: 'No ID'
+      #@apply = StudentApplication.new(application_process_id: @application_process.id)
+      #@apply.students.new(email: @student_token.email, cpf: @student_token.cpf)
+      @student = Student.new(email: @student_token.email, cpf: @student_token.cpf)
+    end
+    @apply = @student.student_applications.new(application_process_id: @application_process.id)
 
     @application_fields.each do |field|
       @apply.form_field_inputs.new(form_field_id: field.id)
@@ -53,7 +63,8 @@ class ApplyController < ApplicationController
     if params[:application_process_id]
       @application_process = ApplicationProcess.find(params[:application_process_id])
     else
-      @application_process = ApplicationProcess.find(StudentToken.find_by_token(params[:token]).application_process_id)
+      @student_token = StudentToken.find_by_token(params[:token])
+      @application_process = ApplicationProcess.find(@student_token.application_process_id)
     end
     unless @application_process.is_open?
       redirect_to :apply
