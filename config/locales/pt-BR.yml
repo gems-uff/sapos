@@ -1061,4 +1061,9 @@ pt-BR:
 
   rescue_blank_text: "Não informado"
 
+  apply:
+    apply_label: "Processos seletivos"
+    student_getid_label: "Identicação do candidato"
+    student_token_mail_subject: "E-mail de confirmação - Sapos"
+
 

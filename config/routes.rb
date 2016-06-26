@@ -256,7 +256,6 @@ Sapos::Application.routes.draw do
     end
   end
 
-
   resources :course_research_areas do
     as_routes
   end
@@ -279,8 +278,10 @@ Sapos::Application.routes.draw do
 
   get 'apply'  => 'apply#index'
   post 'apply'  => 'apply#create'
-  get 'apply/:application_process_id/new'  => 'apply#new', as: :apply_to
+  get 'apply/:application_process_id/student_getid'  => 'apply#student_getid', as: :apply_to
+  post 'apply/:application_process_id/student_getid'  => 'apply#student_find'
   get 'letter_requests/fill/:access_code'  => 'letter_requests#fill', as: :fill_letter
+  get 'apply/fill_form/:token' => 'apply#fill_form', as: :fill_form
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

@@ -1,0 +1,5 @@
+%h2= I18n.t 'apply.student_getid_label'
+= simple_form_for :student do |form|
+  = form.input :cpf
+  = form.input :email
+  = form.submit :value => I18n.t('active_scaffold.search')

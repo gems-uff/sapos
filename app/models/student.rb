@@ -12,6 +12,7 @@ class Student < ActiveRecord::Base
   has_many :enrollments, :dependent => :restrict_with_exception
 
   has_many :student_applications, :dependent => :restrict_with_exception
+  has_many :student_tokens
     
   belongs_to :city
   belongs_to :birth_city, :class_name => 'City', :foreign_key => 'birth_city_id'

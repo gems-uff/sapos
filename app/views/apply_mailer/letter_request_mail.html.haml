@@ -1,0 +1,5 @@
+!!! 5
+%body
+  %h2 A recommendation letter has been requested by #{@request.student_application.student_name}
+  %p Follow the link below to fill it:
+  %a{:href => fill_letter_url(@request.access_code)} #{fill_letter_url(@request.access_code)}

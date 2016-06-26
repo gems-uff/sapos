@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160625010907) do
+ActiveRecord::Schema.define(version: 20160626010408) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer  "enrollment_id"
@@ -627,6 +627,20 @@ ActiveRecord::Schema.define(version: 20160625010907) do
 
   add_index "student_majors", ["major_id"], name: "index_student_majors_on_major_id"
   add_index "student_majors", ["student_id"], name: "index_student_majors_on_student_id"
+
+  create_table "student_tokens", force: :cascade do |t|
+    t.integer  "application_process_id"
+    t.integer  "student_id"
+    t.string   "token"
+    t.boolean  "is_used"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "cpf"
+    t.string   "email"
+  end
+
+  add_index "student_tokens", ["application_process_id"], name: "index_student_tokens_on_application_process_id"
+  add_index "student_tokens", ["student_id"], name: "index_student_tokens_on_student_id"
 
   create_table "students", force: :cascade do |t|
     t.string   "name",                     limit: 255
