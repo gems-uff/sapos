@@ -2,4 +2,4 @@
 %body
   %h2 E-mail de confirmação para: #{@student_token.email}
   %p Follow the link below to continue with the process:
-  %a{:href => fill_form_url(@student_token.token)} #{fill_form_url(@student_token.token)}
+  %a{:href => student_confirm_url(@student_token.token)} #{student_confirm_url(@student_token.token)}

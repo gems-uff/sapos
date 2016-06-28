@@ -1,0 +1,18 @@
+= simple_form_for @student, :url => apply_path  do |stform|
+  = stform.input :token, as: :hidden, input_html: { value: @student_token.token }
+  = stform.input :cpf, :readonly => true
+  = stform.input :email, :readonly => true
+  = stform.input :name
+  = stform.input :address
+  = stform.input :neighborhood
+  = stform.input :birthdate
+  = stform.input :father_name
+  = stform.input :mother_name
+  = stform.input :identity_expedition_date
+  = stform.input :identity_issuing_body
+  = stform.input :identity_number
+  = stform.input :telephone1
+  = stform.input :telephone2
+  = stform.input :zip_code
+  %br
+  = stform.submit

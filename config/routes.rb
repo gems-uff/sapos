@@ -282,6 +282,8 @@ Sapos::Application.routes.draw do
   post 'apply/:application_process_id/student_getid'  => 'apply#student_find'
   get 'letter_requests/fill/:access_code'  => 'letter_requests#fill', as: :fill_letter
   get 'apply/fill_form/:token' => 'apply#fill_form', as: :fill_form
+  get 'apply/student_confirm/:token' => 'apply#student_confirm', as: :student_confirm
+
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

@@ -3,7 +3,7 @@ class ApplyMailer < ApplicationMailer
 
   def letter_request_mail (request)
     @request = request
-    mail(to: @request.professor_email, subject: "Recommendation Letter Requested for: #{@request.student_application.student_name}")
+    mail(to: @request.professor_email, subject: "Recommendation Letter Requested for: #{@request.student_application.student.name}")
   end
 
   def student_token_mail (student_token)
