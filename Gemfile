@@ -75,6 +75,10 @@ gem 'cocoon', '~> 1.2', '>= 1.2.9'
 gem 'simple_form', '~> 3.2', '>= 3.2.1'
 gem 'haml', '~> 4.0', '>= 4.0.7'
 
+# ReCaptcha Helpers
+gem 'dotenv-rails', :require => 'dotenv/rails-now'
+gem "recaptcha", require: "recaptcha/rails"
+
 group :development, :test do
   gem 'sqlite3'
   gem 'awesome_print'
