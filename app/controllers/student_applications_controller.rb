@@ -15,6 +15,7 @@ class StudentApplicationsController < ApplicationController
   # end
   skip_authorization_check
   skip_before_filter :authenticate_user!
+  before_action :check_token, only: [:create]
 
   def create
     @student_application = StudentApplication.new(student_application_params)
@@ -23,13 +24,22 @@ class StudentApplicationsController < ApplicationController
       @student_application.letter_requests.each do |lr|
         ApplyMailer.letter_request_mail(lr).deliver_later
       end
-      render text: 'Finished'
+      @student_token.is_used = true
+      @student_token.save
+      render text: 'Finished' and return
     else
-      render text: 'NOK - StudentApplication'
+      render text: 'ERRO - StudentApplication' and return
     end
   end
 
   private
+
+  def check_token
+    @student_token = StudentToken.find_by_token(params[:student_application][:token])
+    unless (@student_token.is_valid? and @student_token.application_process.is_open?)
+      render text: 'ERRO - Student Application - Token inválido' and return
+    end
+  end
 
   def student_application_params
     params.require(:student_application).permit(:student_id, :application_process_id,

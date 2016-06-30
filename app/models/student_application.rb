@@ -16,4 +16,6 @@ class StudentApplication < ActiveRecord::Base
   accepts_nested_attributes_for :form_file_uploads,
                                 allow_destroy: true
 
+  validates :student_id, uniqueness: {scope: :application_process_id}
+
 end

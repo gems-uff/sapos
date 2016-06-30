@@ -2,4 +2,5 @@
 = simple_form_for :student do |form|
   = form.input :cpf
   = form.input :email
+  = recaptcha_tags
   = form.submit :value => I18n.t('active_scaffold.search')

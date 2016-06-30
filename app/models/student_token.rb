@@ -19,4 +19,19 @@ class StudentToken < ActiveRecord::Base
       self.token = generate_token
     end
   end
+
+  def is_valid?
+    if (DateTime.now.to_f - self.created_at.to_f) > (24*3600) or self.is_used?
+      false
+    else
+      true
+    end
+  end
+
+  def unique_cpf_application_id
+    if StudentToken.where(application_process_id: application_process_id, cpf: cpf).first.created_at < created_at
+      errors.add_to_base('Já existe')
+    end
+  end
+
 end
