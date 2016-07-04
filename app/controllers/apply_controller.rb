@@ -2,6 +2,7 @@ class ApplyController < ApplicationController
   skip_authorization_check
   skip_before_filter :authenticate_user!
   before_action :set_application_process, only: [:new, :student_getid, :student_find, :fill_form, :student_confirm, :create, :update]
+  before_action :check_token, only: [:create_student_application]
 
   def index
     @application_process = ApplicationProcess.is_open
@@ -84,6 +85,21 @@ class ApplyController < ApplicationController
     end
   end
 
+  def create_student_application
+    @student_application = StudentApplication.new(student_application_params)
+
+    if @student_application.save
+      @student_application.letter_requests.each do |lr|
+        ApplyMailer.letter_request_mail(lr).deliver_later
+      end
+      @student_token.is_used = true
+      @student_token.save
+      render text: 'Finished' and return
+    else
+      render text: 'ERRO - StudentApplication' and return
+    end
+  end
+
   private
 
   def set_application_process
@@ -117,6 +133,25 @@ class ApplyController < ApplicationController
     else
       return true
     end
+  end
+
+  def check_token
+    @student_token = StudentToken.find_by_token(params[:student_application][:token])
+    unless (@student_token.is_valid? and @student_token.application_process.is_open?)
+      render text: 'ERRO - Student Application - Token inválido' and return
+    end
+    if StudentApplication.where(student_id: @student_token.student_id, application_process_id: @student_token.application_process_id).exists?
+      render text: 'ERRO - Student Application - Candidato já inscrito' and return
+    end
+  end
+
+  def student_application_params
+    params.require(:student_application).permit(:student_id, :application_process_id,
+                                                form_field_inputs_attributes:[:id, :form_field_id, :input, :_destroy],
+                                                form_text_inputs_attributes:[:id, :form_field_id, :input, :_destroy],
+                                                form_file_uploads_attributes:[:id, :student_application_id, :form_field_id, :file, :_destroy],
+                                                letter_requests_attributes:[:id, :professor_email, :student_application_id, :access_token, :is_filled, :_destroy]
+    )
   end
 
   def student_params

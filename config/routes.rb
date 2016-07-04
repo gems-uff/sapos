@@ -287,6 +287,8 @@ Sapos::Application.routes.draw do
   get 'letter_requests/fill/:access_token'  => 'letter_requests#fill', as: :fill_letter
   patch 'letter_requests/:id' => 'letter_requests#update', as: :letter_request
   put 'letter_requests/:id' => 'letter_requests#update'
+
+  post 'apply/student_application' => 'apply#create_student_application', as: :apply_student_application
   # resources :letter_requests
   # post 'letter_requests'  => 'letter_requests#create'
   # patch 'letter_requests'  => 'letter_requests#update'

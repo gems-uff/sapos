@@ -1,4 +1,4 @@
-= simple_form_for @apply, :html => {:multipart => true} do |form|
+= simple_form_for @apply, :html => {:multipart => true}, :url => apply_student_application_path  do |form|
   = form.input :application_process_id, as: :hidden
   = form.input :student_id, as: :hidden
   = form.input :max_letters, as: :hidden, input_html: { value: @application_process.max_letters }

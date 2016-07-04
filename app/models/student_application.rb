@@ -18,4 +18,8 @@ class StudentApplication < ActiveRecord::Base
 
   validates :student_id, uniqueness: {scope: :application_process_id}
 
+  def to_label
+    "#{self.student.name} - #{self.student.cpf}"
+  end
+
 end

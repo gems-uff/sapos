@@ -2,6 +2,8 @@ class ApplicationProcess < ActiveRecord::Base
   has_many :student_applications, :dependent => :restrict_with_exception
   has_many :student_tokens
 
+  has_many :students, :through => :student_applications
+
   belongs_to :form_template, :class_name => 'FormTemplate', :foreign_key => 'form_template_id'
   belongs_to :letter_template, :class_name => 'FormTemplate',:foreign_key => 'letter_template_id'
 
@@ -29,6 +31,10 @@ class ApplicationProcess < ActiveRecord::Base
     else
       false
     end
+  end
+
+  def student_applications_count
+    self.student_applications.count
   end
 
 end
