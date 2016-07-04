@@ -16,7 +16,7 @@ class ApplyController < ApplicationController
       render text: 'ERRO - ReCaptcha' and return
     end
     @student = Student.find_by_cpf(params[:student][:cpf])
-    if @student and check_new_student_application
+    if @student and check_new_student_application(@student.id, @application_process.id)
       unless @student.email == params[:student][:email]
         render text: 'ERRO - Student_find - Email inválido' and return
       end
@@ -32,7 +32,7 @@ class ApplyController < ApplicationController
   end
 
   def student_confirm
-    if @student_token.student_id and check_new_student_application
+    if @student_token.student_id and check_new_student_application(@student_token.student_id, @application_process.id)
       @student = Student.find(@student_token.student_id)
     else
       @student = Student.new(email: @student_token.email, cpf: @student_token.cpf)
@@ -52,6 +52,7 @@ class ApplyController < ApplicationController
   end
 
   def update
+    @student = Student.find(@student_token.student_id)
     unless @student.update(student_params)
       render text: 'ERRO - Student Update' and return
     end
@@ -59,7 +60,7 @@ class ApplyController < ApplicationController
   end
 
   def fill_form
-    check_new_student_application
+    check_new_student_application(@student_token.student_id, @student_token.student_id)
 
     @application_form = FormTemplate.find(@application_process.form_template_id)
     @application_letter = FormTemplate.find(@application_process.letter_template_id)
@@ -110,8 +111,8 @@ class ApplyController < ApplicationController
     redirect_to fill_form_url(token)
   end
 
-  def check_new_student_application
-    if StudentApplication.where(student_id: @student.id, application_process_id: @application_process.id ).exists?
+  def check_new_student_application (student_id, application_id)
+    if StudentApplication.where(student_id: student_id, application_process_id: application_id ).exists?
       render text: 'ERRO - Já Inscrito' and return false
     else
       return true

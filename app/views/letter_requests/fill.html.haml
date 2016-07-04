@@ -1,0 +1,32 @@
+%h1 Recommendation letter for: #{@letter_request.student_application.student.name}
+%h2 Requested to: #{@letter_request.professor_email}
+
+= simple_form_for @letter_request do |f|
+  = f.input :is_filled, as: :hidden, input_html: { value: true }
+  = f.input :access_token, as: :hidden, input_html: { value: @letter_request.access_token }
+  .nested-fields
+    = f.simple_fields_for :letter_field_inputs do |ff|
+      = ff.input :form_field_id, as: :hidden, input_html: { value: ff.object.form_field.id }
+      - if ff.object.form_field.field_type == 'select'
+        = ff.input :input, label: ff.object.form_field.name, :as => :collection_select, collection: FormFieldValue.where(form_field_id: ff.object.form_field.id ),
+                    :label_method => :value, :value_method => :value, include_blank: !ff.object.form_field.is_mandatory?
+      - elsif ff.object.form_field.field_type == 'radio'
+        = ff.input :input, label: ff.object.form_field.name, as: :radio_buttons, collection: FormFieldValue.where(form_field_id: ff.object.form_field.id ),
+                    :label_method => :value, :value_method => :value, required: ff.object.form_field.is_mandatory?
+      - elsif ff.object.form_field.field_type == 'single_checkbox'
+        = ff.input :input, label: ff.object.form_field.name, as: :boolean, checked_value: true, unchecked_value: false
+      - elsif ff.object.form_field.field_type == 'collection_checkbox'
+        = ff.input :input, label: ff.object.form_field.name, as: :check_boxes, collection: FormFieldValue.where(form_field_id: ff.object.form_field.id ),
+                    :label_method => :value, :value_method => :value
+      - else
+        = ff.input :input, label: ff.object.form_field.name, as: :string, required: ff.object.form_field.is_mandatory?
+
+    = f.simple_fields_for :letter_text_inputs do |ff|
+      = ff.input :form_field_id, as: :hidden, input_html: { value: ff.object.form_field.id }
+      = ff.input :input, label: ff.object.form_field.name, as: :text, required: ff.object.form_field.is_mandatory?
+
+    = f.simple_fields_for :letter_file_uploads do |ff|
+      = ff.input :form_field_id, as: :hidden, input_html: { value: ff.object.form_field.id }
+      = ff.input :file, label: ff.object.form_field.name, as: :file
+
+  = f.submit

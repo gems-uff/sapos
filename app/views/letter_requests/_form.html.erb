@@ -1,0 +1,33 @@
+<%= form_for(@letter_request) do |f| %>
+  <% if @letter_request.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@letter_request.errors.count, "error") %> prohibited this letter_request from being saved:</h2>
+
+      <ul>
+      <% @letter_request.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :professor_email %><br>
+    <%= f.text_field :professor_email %>
+  </div>
+  <div class="field">
+    <%= f.label :student_application_id %><br>
+    <%= f.number_field :student_application_id %>
+  </div>
+  <div class="field">
+    <%= f.label :access_code %><br>
+    <%= f.text_field :access_code %>
+  </div>
+  <div class="field">
+    <%= f.label :is_filled %><br>
+    <%= f.check_box :is_filled %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

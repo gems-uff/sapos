@@ -39,6 +39,9 @@ class StudentApplicationsController < ApplicationController
     unless (@student_token.is_valid? and @student_token.application_process.is_open?)
       render text: 'ERRO - Student Application - Token inválido' and return
     end
+    if StudentApplication.where(student_id: @student_token.student_id, application_process_id: @student_token.application_process_id).exists?
+      render text: 'ERRO - Student Application - Candidato já inscrito' and return
+    end
   end
 
   def student_application_params

@@ -278,11 +278,18 @@ Sapos::Application.routes.draw do
 
   get 'apply'  => 'apply#index'
   post 'apply'  => 'apply#create'
+  patch 'apply'  => 'apply#update'
   get 'apply/:application_process_id/student_getid'  => 'apply#student_getid', as: :apply_to
   post 'apply/:application_process_id/student_getid'  => 'apply#student_find'
-  get 'letter_requests/fill/:access_code'  => 'letter_requests#fill', as: :fill_letter
   get 'apply/fill_form/:token' => 'apply#fill_form', as: :fill_form
   get 'apply/student_confirm/:token' => 'apply#student_confirm', as: :student_confirm
+
+  get 'letter_requests/fill/:access_token'  => 'letter_requests#fill', as: :fill_letter
+  patch 'letter_requests/:id' => 'letter_requests#update', as: :letter_request
+  put 'letter_requests/:id' => 'letter_requests#update'
+  # resources :letter_requests
+  # post 'letter_requests'  => 'letter_requests#create'
+  # patch 'letter_requests'  => 'letter_requests#update'
 
 
   # The priority is based upon order of creation:
