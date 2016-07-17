@@ -1096,7 +1096,7 @@ pt-BR:
         student_cpf: 'CPF'
         requested_letters: "Cartas solicitadas"
         filled_letters: "Cartas Preenchidas"
-        requested_filled_letters: "Cartas solicitadas/preenchidas"
+        requested_filled_letters: "Cartas preenchidas / solicitadas"
         start_date: 'Início'
         end_date: 'Encerramento'
 

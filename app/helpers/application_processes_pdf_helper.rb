@@ -42,16 +42,19 @@ module ApplicationProcessesPdfHelper
         ]
         #simple_pdf_table(pdf, [560], '', title, width: 560)
         pdf_table_with_title(pdf, [560], title, '', [], width: 560)
-        widths = [140, 140, 280]
+        #widths = [50, 160, 350]
+        widths = [160, 400]
         student_applications.joins(:student).order('students.name').each do |applied|
-          data = [
-              [{:content => "<b>#{I18n.t('pdf_content.application_processes.to_pdf.student_name')}</b>"}, {:content => applied.student.name, :colspan => 2}],
-              ["<b>#{I18n.t('pdf_content.application_processes.to_pdf.student_cpf')}</b>", {:content => applied.student.cpf, :colspan => 2}],
-              ["<b>#{I18n.t('pdf_content.application_processes.to_pdf.requested_filled_letters')}</b>", {:content => "#{applied.requested_letters} / #{applied.filled_letters}", :colspan => 2}]
+          title = [
+              ["<b>#{I18n.t('pdf_content.application_processes.to_pdf.student_name')}: #{applied.student.name}</b>"],
+              ["<b>#{I18n.t('pdf_content.application_processes.to_pdf.student_cpf')}: #{applied.student.cpf}</b>"],
+              ["<b>#{I18n.t('pdf_content.application_processes.to_pdf.requested_filled_letters')}: #{applied.filled_letters} / #{applied.requested_letters}</b>"]
           ]
-          field_count = applied.form_field_inputs.count + applied.form_text_inputs.count
-          data += [
-              [{:content => "<b>#{I18n.t('activerecord.attributes.student_application.form_fields')}</b>", :rowspan => field_count+1},"<b>#{I18n.t('activerecord.attributes.form_field.name')}</b>", "<b>#{I18n.t('activerecord.attributes.form_field_input.input')}</b>"]
+          # data = [[]]
+          # field_count = applied.form_field_inputs.count + applied.form_text_inputs.count
+          data = [
+              [{:content => "<b>#{I18n.t('activerecord.attributes.student_application.form_fields')}</b>", :colspan => 2}],
+              ["<b>#{I18n.t('activerecord.attributes.form_field.name')}</b>", "<b>#{I18n.t('activerecord.attributes.form_field_input.input')}</b>"]
           ]
           applied.form_field_inputs.each do |input|
             data += [
@@ -63,15 +66,12 @@ module ApplicationProcessesPdfHelper
                 [text.form_field.name, text.input]
             ]
           end
-          # letter_count = applied.letter_requests.count
-          # data += [
-          #     [{:content => "<b>#{I18n.t('activerecord.attributes.student_application.letter_requests')}</b>", :rowspan => 1+3*letter_count},{:content => "<b>#{}</b>", :colspan => 2}]
-          # ]
-          # applied.letter_requests.each do |lr|
-          #
-          # end
-          pdf.move_down 1
-          simple_pdf_table(pdf, widths, '', data, width: 560)
+          ldata = [
+              [{:content => "<b>#{I18n.t('activerecord.attributes.student_application.letter_requests')}</b>", :colspan => 2}]
+          ]
+          pdf.move_down 3
+          pdf_table_with_title(pdf, widths, title, '', data, width: 560)
+          #simple_pdf_table(pdf, widths, '', ldata, width: 560)
         end
       end
     end
