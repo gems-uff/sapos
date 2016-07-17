@@ -205,6 +205,14 @@ pt-BR:
       enrollment_status:
         name: "Nome"
         enrollments: "Matrículas"
+      form_field:
+        name: "Campo"
+        description: "Descrição"
+        field_type: "Tipo"
+        is_mandatory: "Obrigatório"
+      form_field_input:
+        input: "Entrada do Candidato"
+        letter_input: "Entrada do Indicado"
       form_template:
         name: "Nome"
         description: "Descrição"
@@ -214,7 +222,12 @@ pt-BR:
         code: "Sigla"
         majors: "Cursos"
         name: "Nome"
-      level: 
+      letter_request:
+        professor_name: "Nome do Indicado"
+        professor_email: "Email do Indicado"
+        professor_telephone: "Telefone do Indicado"
+        is_filled: "Preenchida"
+      level:
         advisement_authorizations: "Credenciamentos"
         name: "Nome"
         course_name: "Nome completo do curso"
@@ -438,6 +451,11 @@ pt-BR:
       student_application:
         student: "Aluno"
         application_process: "Edital de Seleção"
+        student_cpf: "CPF"
+        requested_letters: "Recomendações solicitadas"
+        filled_letters: "Recomendações preenchidas"
+        form_fields: "Dados"
+        letter_requests: "Recomendações"
       student_major:
         major: "Curso"
         student: "Aluno"
@@ -654,13 +672,19 @@ pt-BR:
       enrollment_status:
         one: "Tipo de Matrícula"
         other: "Tipos de Matrícula"
+      form_field:
+        one: "Campo"
+        other: "Campos"
       form_template:
         one: "Modelo de Formulário"
         other: "Modelos de Formulário"
       institution:
         one: "Instituição"
         other: "Instituições"  
-      level: 
+      letter_request:
+        one: "Solicitação de Recomendação"
+        other: "Solicitações de Recomendação"
+      level:
         one: "Nível"
         other: "Níveis"    
       major:
@@ -908,6 +932,9 @@ pt-BR:
       create: 'Criar %{model}'
       submit: 'Salvar %{model}'
       update: 'Atualizar %{model}'
+
+    student_application:
+      letter_requested_to: "Recomendação Solicitada para"
 
   notifications:
     accomplishment:
