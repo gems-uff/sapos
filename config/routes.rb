@@ -266,10 +266,13 @@ Sapos::Application.routes.draw do
 
   resources :form_templates do
     as_routes
+    put :disable, on: :member
   end
 
   resources :application_processes do
     as_routes
+    put :disable, on: :member
+    get :application_process_pdf, on: :member
   end
 
   resources :form_fields do
@@ -289,6 +292,14 @@ Sapos::Application.routes.draw do
   put 'letter_requests/:id' => 'letter_requests#update'
 
   post 'apply/student_application' => 'apply#create_student_application', as: :apply_student_application
+
+  #get "/uploads/:id/:basename.:extension", :controller => "form_file_uploads", :action => "download", :conditions => { :method => :get }, as: :form_file_download
+  #match "/uploads/:id/:basename.:extension", :controller => "form_file_uploads", :action => "download", via: :get, as: :form_file_download
+  match "/form_uploads/:id", :controller => "form_file_uploads", :action => "download", via: :get, as: :form_file_download
+  match "/letter_uploads/:id", :controller => "letter_file_uploads", :action => "download", via: :get, as: :letter_file_download
+
+  #get 'form_file_uploads/download/:file_id' => 'form_file_uploads#download', as: :form_file_download
+  #get 'letter_file_uploads/download/:file_id' => 'letter_file_uploads#download', as: :letter_file_download
   # resources :letter_requests
   # post 'letter_requests'  => 'letter_requests#create'
   # patch 'letter_requests'  => 'letter_requests#update'

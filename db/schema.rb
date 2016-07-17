@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160626010408) do
+ActiveRecord::Schema.define(version: 20160716174514) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer  "enrollment_id"
@@ -68,8 +68,9 @@ ActiveRecord::Schema.define(version: 20160626010408) do
     t.integer  "letter_template_id"
     t.integer  "min_letters"
     t.integer  "max_letters"
-    t.datetime "created_at",         null: false
-    t.datetime "updated_at",         null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+    t.boolean  "is_enabled",         default: true
   end
 
   add_index "application_processes", ["form_template_id"], name: "index_application_processes_on_form_template_id"
@@ -293,8 +294,9 @@ ActiveRecord::Schema.define(version: 20160626010408) do
     t.string   "name"
     t.string   "description"
     t.boolean  "is_letter"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.boolean  "is_enabled",  default: true
   end
 
   create_table "form_text_inputs", force: :cascade do |t|

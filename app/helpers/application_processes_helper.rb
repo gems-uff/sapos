@@ -1,4 +1,7 @@
 module ApplicationProcessesHelper
+  include PdfHelper
+  include ApplicationProcessesPdfHelper
+
   def association_klass_scoped(association, klass, record)
     if association.name == :letter_template
       super.letter
@@ -8,4 +11,5 @@ module ApplicationProcessesHelper
       super
     end
   end
+
 end

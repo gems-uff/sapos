@@ -1,16 +1,38 @@
 class FormTemplatesController < ApplicationController
   authorize_resource
 
-  def index
-    @form_templates = FormTemplate.all
+  # def index
+  #   @form_templates = FormTemplate.all
+  # end
+  #
+  # def new
+  #   @form_template = FormTemplate.new
+  # end
+  #
+  # def show
+  #
+  # end
+  #
+
+  #
+
+  active_scaffold :form_template do |config|
+    config.columns.add :get_form_type
+    config.list.sorting = {:name => 'ASC'}
+    config.list.columns = [:name, :description, :get_form_type]
+    config.create.label = :create_form_template_label
+    #config.columns[:state].form_ui = :select
+    #config.columns[:state].clear_link
+    config.create.columns = [:name, :description, :get_form_type]
+    config.nested.add_link(:form_fields)
+    config.action_links.add :disable, :type => :member, :crud_type => :update, :method => :put, :position => false, :label => "<i title='#{I18n.t('active_scaffold.delete_link')}' class='fa fa-trash-o'></i>".html_safe
+    #config.update.label = :update_city_label
+    #config.update.columns = [:state, :name]
+    config.actions.exclude :deleted_records, :update, :delete, :show
   end
 
-  def new
-    @form_template = FormTemplate.new
-  end
-
-  def show
-
+  def beginning_of_chain
+    super.enabled
   end
 
   def create
@@ -24,6 +46,16 @@ class FormTemplatesController < ApplicationController
 
   end
 
+  def disable
+    process_action_link_action do |record|
+      if (record.update(:is_enabled => false))
+        flash[:info] = "Formulário #{record.name} - #{record.get_form_type} removido com sucesso"
+      else
+        flash[:error] = "Não foi possível remover #{record.name} - #{record.get_form_type}"
+      end
+    end
+  end
+
   private
 
   def form_template_params
@@ -32,20 +64,5 @@ class FormTemplatesController < ApplicationController
                                                                    form_field_values_attributes: [:id, :is_default, :value, :_destroy]],
                                           application_processes_attributes:[:name, :semester, :year, :start_date, :end_date, :total_letters])
   end
-=begin
-  active_scaffold :form_template do |config|
-    config.list.sorting = {:name => 'ASC'}
-    config.list.columns = [:name, :is_letter]
-    config.create.label = :create_form_template_label
-    #config.columns[:state].form_ui = :select
-    #config.columns[:state].clear_link
-    config.create.columns = [:name, :description, :is_letter]
-    config.nested.add_link(:form_fields)
-    #config.update.label = :update_city_label
-    #config.update.columns = [:state, :name]
-    config.actions.exclude :deleted_records
-  end
-=end
-
 
 end

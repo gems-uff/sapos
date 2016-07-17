@@ -22,4 +22,20 @@ class StudentApplication < ActiveRecord::Base
     "#{self.student.name} - #{self.student.cpf}"
   end
 
+  def student_cpf
+    "#{self.student.cpf}"
+  end
+
+  def requested_letters
+    "#{self.letter_requests.count}"
+  end
+
+  def filled_letters
+    "#{self.letter_requests.where(is_filled: true).count}"
+  end
+
+  def application_form_template
+    self.application_process.form_template_id
+  end
+
 end

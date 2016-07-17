@@ -8,6 +8,7 @@ class ApplicationProcess < ActiveRecord::Base
   belongs_to :letter_template, :class_name => 'FormTemplate',:foreign_key => 'letter_template_id'
 
   scope :is_open, -> { where("start_date <= :start_date AND end_date >= :end_date", {start_date: DateTime.now, end_date: DateTime.now} ) }
+  scope :enabled, -> { where(is_enabled: true) }
 
   validates :min_letters, numericality: { only_integer: true, greater_than: -1, less_than: 100 }
   validates :max_letters, numericality: { only_integer: true, greater_than: -1, less_than: 100 }
@@ -35,6 +36,10 @@ class ApplicationProcess < ActiveRecord::Base
 
   def student_applications_count
     self.student_applications.count
+  end
+
+  def year_semester
+    "#{self.year}.#{self.semester}"
   end
 
 end

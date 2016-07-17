@@ -1,0 +1,3 @@
+module ApplicationProcessesPdfHelper
+
+end

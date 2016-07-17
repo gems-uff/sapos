@@ -5,6 +5,7 @@ class FormTemplate < ActiveRecord::Base
 
   scope :letter, -> { where(is_letter: true) }
   scope :not_letter, -> { where(is_letter: false) }
+  scope :enabled, -> { where(is_enabled: true) }
 
   accepts_nested_attributes_for :form_fields,
                                 reject_if: :all_blank,
