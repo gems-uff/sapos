@@ -1,4 +1,6 @@
 module StudentApplicationsHelper
+  include ApplicationHelper
+  include PdfHelper
   def student_application_form_fields_show_column(record, column)
     return "-" if record.form_field_inputs.empty? and record.form_text_inputs.empty? and record.form_file_uploads.empty?
 
@@ -42,7 +44,7 @@ module StudentApplicationsHelper
 
       body += "<tr class=\"record #{tr_class}\">
                 <td>#{field.form_field.name}</td>
-                <td>#{link_to field.file.file.basename, form_file_download_url(field.id )}</td>
+                <td>#{link_to field.file.file.extension, form_file_download_url(field.id )}</td>
               </tr>"
     end
 
@@ -97,7 +99,7 @@ module StudentApplicationsHelper
 
           body += "<tr class=\"record #{tr_class}\">
                 <td>#{field.form_field.name}</td>
-                <td>#{link_to field.file.file.basename, letter_file_download_url(field.id )}</td>
+                <td>#{link_to field.file.file.extension, letter_file_download_url(field.id )}</td>
               </tr>"
         end
         body += "</tbody>"

@@ -3,6 +3,8 @@ class ApplicationProcessesController < ApplicationController
   include ApplicationHelper
   include PdfHelper
 
+  before_action :get_application_process_pdf, only: [:application_process_complete_pdf, :application_process_short_pdf]
+
   active_scaffold :application_process do |config|
     config.columns.add :student_applications_count
     config.columns.add :year_semester
@@ -29,11 +31,16 @@ class ApplicationProcessesController < ApplicationController
 
     config.nested.add_link(:student_applications)
 
-    # config.action_links.add 'application_process_pdf',
-    #                         :label => "<i title='Relatório' class='fa fa-file-text-o'></i>".html_safe,
-    #                         :page => true,
-    #                         :type => :member,
-    #                         :parameters => {:format => :pdf}
+    config.action_links.add 'application_process_short_pdf',
+                            :label => "<i title='Resumo' class='fa fa-file-text-o'></i>".html_safe,
+                            :page => true,
+                            :type => :member,
+                            :parameters => {:format => :pdf}
+    config.action_links.add 'application_process_complete_pdf',
+                            :label => "<i title='Relatório Completo' class='fa fa-book'></i>".html_safe,
+                            :page => true,
+                            :type => :member,
+                            :parameters => {:format => :pdf}
 
     config.action_links.add :disable, :type => :member, :crud_type => :update, :method => :put, :position => false, :label => "<i title='#{I18n.t('active_scaffold.delete_link')}' class='fa fa-trash-o'></i>".html_safe
 
@@ -57,7 +64,7 @@ class ApplicationProcessesController < ApplicationController
 
   def disable
     process_action_link_action do |record|
-      if (record.update(:is_enabled => false))
+      if record.update(:is_enabled => false)
         flash[:info] = "Edital #{record.name} - #{record.semester}.#{record.year} removido com sucesso"
       else
         flash[:error] = "Não foi possível remover Edital #{record.name} - #{record.semester}.#{record.year}"
@@ -65,11 +72,20 @@ class ApplicationProcessesController < ApplicationController
     end
   end
 
-  def application_process_pdf
+  def application_process_short_pdf
+
+  end
+  def application_process_complete_pdf
+
+  end
+
+  private
+
+  def get_application_process_pdf
     @application_process = ApplicationProcess.find(params[:id])
     respond_to do |format|
       format.pdf do
-        send_data render_to_string, :filename => "Inscrições - #{@application_process.name}_#{@application_process.year_semester}.pdf", :type => 'application/pdf'
+        send_data render_to_string, :filename => "#{I18n.t('pdf_content.application_processes.to_pdf.filename')} - #{@application_process.name}_#{@application_process.year_semester}.pdf", :type => 'application/pdf'
       end
     end
   end

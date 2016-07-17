@@ -272,7 +272,8 @@ Sapos::Application.routes.draw do
   resources :application_processes do
     as_routes
     put :disable, on: :member
-    get :application_process_pdf, on: :member
+    get :application_process_short_pdf, on: :member
+    get :application_process_complete_pdf, on: :member
   end
 
   resources :form_fields do

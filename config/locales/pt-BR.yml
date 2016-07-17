@@ -67,12 +67,14 @@ pt-BR:
         name: "Nome"
         semester: "Semestre"
         year: "Ano"
+        year_semester: "Semestre"
         start_date: "Data de início"
         end_date: "Data de encerramento"
         min_letters: "Mínimo de Cartas"
         max_letters: "Máximo de Cartas"
         form_template: "Modelo de Formulário"
         letter_template: "Modelo de Carta de Recomendação"
+        student_applications_count: 'Inscritos'
       city:
         name: "Nome"
         state: "Estado"
@@ -1085,6 +1087,18 @@ pt-BR:
     scholarship_durations:
       to_pdf:
         filename: "Relatório de Alocação de Bolsas"
+    application_processes:
+      to_pdf:
+        filename: "Relatório de Inscrições"
+        student_applications: 'Inscrições para'
+        student_applications_count: 'Total de Inscritos'
+        student_name: 'Nome do Candidato'
+        student_cpf: 'CPF'
+        requested_letters: "Cartas solicitadas"
+        filled_letters: "Cartas Preenchidas"
+        requested_filled_letters: "Cartas solicitadas/preenchidas"
+        start_date: 'Início'
+        end_date: 'Encerramento'
 
   rescue_blank_text: "Não informado"
 
