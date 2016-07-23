@@ -215,8 +215,8 @@ pt-BR:
       form_field_value:
         value: 'Valor'
       form_field_input:
-        input: "Entrada do Candidato"
-        letter_input: "Entrada do Indicado"
+        input: "Resposta do Candidato"
+
       form_template:
         name: "Nome"
         description: "Descrição"
@@ -232,6 +232,9 @@ pt-BR:
         professor_email: "Email do Indicado"
         professor_telephone: "Telefone do Indicado"
         is_filled: "Preenchida"
+        not_filled: "Não Preenchida"
+      letter_field_input:
+        input: "Resposta do Indicado"
       level:
         advisement_authorizations: "Credenciamentos"
         name: "Nome"

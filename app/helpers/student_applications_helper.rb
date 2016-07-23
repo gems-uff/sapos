@@ -105,7 +105,7 @@ module StudentApplicationsHelper
         body += "</tbody>"
         body += "</table>"
       else
-        body += "Ainda não foi preenchida"
+        body += I18n.t('activerecord.attributes.letter_request.not_filled')
       end
 
     end

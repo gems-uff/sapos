@@ -66,12 +66,40 @@ module ApplicationProcessesPdfHelper
                 [text.form_field.name, text.input]
             ]
           end
-          ldata = [
+          data += [
               [{:content => "<b>#{I18n.t('activerecord.attributes.student_application.letter_requests')}</b>", :colspan => 2}]
           ]
-          pdf.move_down 3
+          pdf.move_down 5
           pdf_table_with_title(pdf, widths, title, '', data, width: 560)
-          #simple_pdf_table(pdf, widths, '', ldata, width: 560)
+          applied.letter_requests.each do |lrequest|
+            ldata = [
+                ["<b>#{I18n.t('activerecord.attributes.letter_request.professor_name')}</b>", "<b>#{lrequest.professor_name}</b>"],
+                ["<b>#{I18n.t('activerecord.attributes.letter_request.professor_email')}</b>", "<b>#{lrequest.professor_email}</b>"],
+                ["<b>#{I18n.t('activerecord.attributes.letter_request.professor_telephone')}</b>", "<b>#{lrequest.professor_telephone}</b>"]
+            ]
+            if lrequest.is_filled?
+              ldata += [
+                  [{:content => "<b>#{I18n.t('activerecord.attributes.student_application.form_fields')}</b>", :colspan => 2}],
+                  ["<b>#{I18n.t('activerecord.attributes.form_field.name')}</b>", "<b>#{I18n.t('activerecord.attributes.letter_field_input.input')}</b>"]
+              ]
+              lrequest.letter_field_inputs.each do |linput|
+                ldata += [
+                    [linput.form_field.name, linput.input]
+                ]
+              end
+              lrequest.letter_text_inputs.each do |ltext|
+                ldata += [
+                    [ltext.form_field.name, ltext.input]
+                ]
+              end
+            else
+              ldata += [
+                  [{:content => "<b>#{I18n.t('activerecord.attributes.letter_request.not_filled')}</b>", :colspan => 2}]
+              ]
+            end
+            simple_pdf_table(pdf, widths, '', ldata, width: 560)
+            #pdf_table_with_title(pdf, widths, ltitle, '', ldata, width: 560)
+          end
         end
       end
     end
