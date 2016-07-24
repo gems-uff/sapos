@@ -63,13 +63,13 @@ module StudentApplicationsHelper
     record.letter_requests.each do |letter|
       body += "<h1>#{letter.professor_name rescue "-"} - #{letter.professor_email}</h1>"
 
-      if (letter.is_filled?)
+      if letter.is_filled?
         body += "<table class=\"showtable listed-records-table\">"
 
         body += "<thead>
                   <tr>
                     <th>#{I18n.t('activerecord.attributes.form_field.name')}</th>
-                    <th>#{I18n.t('activerecord.attributes.form_field_input.letter_input')}</th>
+                    <th>#{I18n.t('activerecord.attributes.letter_field_input.input')}</th>
                   </tr>
                 </thead>"
 

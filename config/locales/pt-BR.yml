@@ -216,13 +216,24 @@ pt-BR:
         value: 'Valor'
       form_field_input:
         input: "Resposta do Candidato"
-
       form_template:
         name: "Nome"
         description: "Descrição"
         is_letter: "Carta de Recomendação"
         type: "Tipo"
         get_form_type: 'Tipo'
+        form_fields: 'Campos do formulário'
+        remove_field: 'Remover campo'
+        remove_value: 'Remover opção'
+        add_field: 'Adicionar campo'
+        add_value: 'Adicionar opção'
+        add_string_field: 'Adicionar campo de texto curto'
+        add_checkbox_field: 'Adicionar caixa de seleção única'
+        add_checkboxes_field: 'Adicionar múltiplas caixas de seleção'
+        add_radio_field: 'Adicionar seletor único'
+        add_select_field: 'Adicionar menu de seleção'
+        add_text_field: 'Adicionar campo de texto longo'
+        add_file_upload: 'Adicionar upload de arquivo'
       institution:
         code: "Sigla"
         majors: "Cursos"
@@ -233,6 +244,7 @@ pt-BR:
         professor_telephone: "Telefone do Indicado"
         is_filled: "Preenchida"
         not_filled: "Não Preenchida"
+
       letter_field_input:
         input: "Resposta do Indicado"
       level:
@@ -764,6 +776,8 @@ pt-BR:
       student_major:
         one: "Curso do Aluno"
         other: "Curso dos Alunos"
+      student_token:
+        one: "Chave de Validação"
       thesis_defense_committee_participation:
         one: "Participação em Banca"
         other: "Participações em Bancas"
@@ -1111,6 +1125,18 @@ pt-BR:
   apply:
     apply_label: "Processos seletivos"
     student_getid_label: "Identicação do candidato"
-    student_token_mail_subject: "E-mail de confirmação - Sapos"
+    letter_requested_by: "Preencher carta de recomendação para: %{student}"
+    letter_requested_to: "Carta solicitada a: %{professor}"
+    application_finished: 'Sua inscrição foi realizada com sucesso'
+    application_finished_get_mail: 'Em instantes você receberá um email de confirmação.'
+    validation_mail_sent: 'Foi enviado um email de confirmação para %{email} com instruções de como prosseguir.'
+    application_error: 'Erro no processo de inscrição, favor tentar novamente.'
+    student_token_mail_subject: "E-mail de validaçao - Sapos"
+    student_token_mail_body: 'E-mail de validação para: %{student}.'
+    letter_request_mail_subject: "Carta de recomendaçao solicitada para %{student}"
+    letter_request_mail_body: "Uma carta de recomendação foi solicitada por %{student}, para o edital de seleção %{application_process}"
+    follow_link: "Clique no link abaixo para prosseguir"
+    application_finished_mail_subject: "Inscriçao finalizada - %{application_process}"
+
 
 

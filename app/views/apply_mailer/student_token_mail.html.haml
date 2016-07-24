@@ -1,5 +1,10 @@
 !!! 5
 %body
-  %h2 E-mail de confirmação para: #{@student_token.email}
-  %p Follow the link below to continue with the process:
+  %h1
+    - unless CustomVariable.application_process_mail_header.empty?
+      = CustomVariable.application_process_mail_header
+  %h2 #{I18n.t 'apply.student_token_mail_body', student: @student_token.email}
+  %p #{I18n.t 'apply.follow_link'}
   %a{:href => student_confirm_url(@student_token.token)} #{student_confirm_url(@student_token.token)}
+  - unless CustomVariable.notification_footer.empty?
+    = CustomVariable.notification_footer

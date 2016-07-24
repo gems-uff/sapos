@@ -1,5 +1,5 @@
-%h1 Recommendation letter for: #{@letter_request.student_application.student.name}
-%h2 Requested to: #{@letter_request.professor_email}
+%h1 #{I18n.t 'apply.letter_requested_by', @letter_request.student_application.student.name}
+%h2 #{I18n.t 'apply.letter_requested_to', @letter_request.professor_email}
 
 = simple_form_for @letter_request do |f|
   = f.input :is_filled, as: :hidden, input_html: { value: true }

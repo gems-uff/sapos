@@ -1,5 +1,10 @@
 !!! 5
 %body
-  %h2 A recommendation letter has been requested by #{@request.student_application.student.name}
-  %p Follow the link below to fill it:
+  %h1
+    - unless CustomVariable.application_process_mail_header.empty?
+      = CustomVariable.application_process_mail_header
+  %h2 #{I18n.t 'apply.letter_request_mail_body', student: @request.student_application.student.name, application_process: @request.student_application.application_process.name}
+  %p #{I18n.t 'apply.follow_link'}
   %a{:href => fill_letter_url(@request.access_token)} #{fill_letter_url(@request.access_token)}
+  - unless CustomVariable.notification_footer.empty?
+    = CustomVariable.notification_footer

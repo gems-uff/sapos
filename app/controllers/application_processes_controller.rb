@@ -25,8 +25,7 @@ class ApplicationProcessesController < ApplicationController
         :max_letters,
         :form_template,
         :letter_template,
-        :student_applications_count,
-        :student_applications
+        :student_applications_count
     ]
 
     config.nested.add_link(:student_applications)

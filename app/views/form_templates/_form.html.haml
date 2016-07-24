@@ -3,40 +3,40 @@
   = f.input :description
   = f.input :is_letter
 
-  %h3 Campos do Formulário:
+  %h3 #{I18n.t 'activerecord.attributes.form_template.form_fields'}
   #form-container
     .links
-      = link_to_add_association 'Adicionar campo texto curto', f, :form_fields, partial: 'form_fields',
+      = link_to_add_association I18n.t('activerecord.attributes.form_template.add_string_field'), f, :form_fields, partial: 'form_fields',
                                   render_options: {locals: { type: 'string' }},
                                   'data-association-insertion-method' => 'append',
                                   'data-association-insertion-node' => '#fields'
     .links
-      = link_to_add_association 'Adicionar menu de seleção', f, :form_fields, partial: 'form_fields',
+      = link_to_add_association I18n.t('activerecord.attributes.form_template.add_select_field'), f, :form_fields, partial: 'form_fields',
                                   render_options: {locals: { type: 'select' }},
                                   'data-association-insertion-method' => 'append',
                                   'data-association-insertion-node' => '#fields'
     .links
-      = link_to_add_association 'Adicionar seletor radio', f, :form_fields, partial: 'form_fields',
+      = link_to_add_association I18n.t('activerecord.attributes.form_template.add_radio_field'), f, :form_fields, partial: 'form_fields',
                                   render_options: {locals: { type: 'radio' }},
                                   'data-association-insertion-method' => 'append',
                                   'data-association-insertion-node' => '#fields'
     .links
-      = link_to_add_association 'Adicionar Múltiplas Opções', f, :form_fields, partial: 'form_fields',
+      = link_to_add_association I18n.t('activerecord.attributes.form_template.add_checkboxes_field'), f, :form_fields, partial: 'form_fields',
                                   render_options: {locals: { type: 'collection_checkbox' }},
                                   'data-association-insertion-method' => 'append',
                                   'data-association-insertion-node' => '#fields'
     .links
-      = link_to_add_association 'Adicionar Opção Única', f, :form_fields, partial: 'form_fields',
+      = link_to_add_association I18n.t('activerecord.attributes.form_template.add_checkbox_field'), f, :form_fields, partial: 'form_fields',
                                   render_options: {locals: { type: 'single_checkbox' }},
                                   'data-association-insertion-method' => 'append',
                                   'data-association-insertion-node' => '#fields'
     .links
-      = link_to_add_association 'Adicionar upload de arquivo', f, :form_fields, partial: 'form_fields',
+      = link_to_add_association I18n.t('activerecord.attributes.form_template.add_file_upload'), f, :form_fields, partial: 'form_fields',
                                   render_options: {locals: { type: 'file' }},
                                   'data-association-insertion-method' => 'append',
                                   'data-association-insertion-node' => '#fields'
     .links
-      = link_to_add_association 'Adicionar campo texto longo', f, :form_fields, partial: 'form_fields',
+      = link_to_add_association I18n.t('activerecord.attributes.form_template.add_text_field'), f, :form_fields, partial: 'form_fields',
                                   render_options: {locals: { type: 'text' }},
                                   'data-association-insertion-method' => 'after',
                                   'data-association-insertion-node' => '#fields'
