@@ -1137,6 +1137,18 @@ pt-BR:
     letter_request_mail_body: "Uma carta de recomendação foi solicitada por %{student}, para o edital de seleção %{application_process}"
     follow_link: "Clique no link abaixo para prosseguir"
     application_finished_mail_subject: "Inscriçao finalizada - %{application_process}"
+    errors:
+      student_already_applied: 'Candidato já se inscreveu para este edital'
+      invalid_token: 'Chave de validação inválida. Retorne ao início do processo de inscrição e tente novamente'
+      token_expired: 'Chave de validação expirada. Retorne ao início do processo de inscrição e tente novamente'
+      application_process_closed: 'Inscrições para este edital estão encerradas'
+      create_student_application: 'Erro ao salvar inscrição. Retorne ao início do processo de inscrição e tente novamente'
+      create_student: 'Erro ao salvar dados do candidato. Retorne ao início do processo de inscrição e tente novamente'
+      update_student: 'Erro ao atualizar dados do candidato. Retorne ao início do processo de inscrição e tente novamente'
+      invalid_recaptcha: 'Validação ReCaptcha inválida, tente novamente'
+      invalid_email: 'E-mail informado não confere com o registrado para este CPF.'
+      update_token: 'Erro ao salvar inscrição. Retorne ao início do processo de inscrição e tente novamente'
+
 
 
 

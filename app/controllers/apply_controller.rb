@@ -119,21 +119,6 @@ class ApplyController < ApplicationController
 
   def finish
 
-=begin
-    STUDENT_ALREADY_APPLIED
-    INVALID_TOKEN
-    TOKEN_EXPIRED
-    APPLICATION_PROCESS_CLOSED
-    CREATE_STUDENT_APPLICATION
-    CREATE_STUDENT
-    UPDATE_STUDENT
-    INVALID_RECAPTCHA
-    INVALID_EMAIL
-    UPDATE_TOKEN
-
-    OK
-=end
-
   end
 
   private

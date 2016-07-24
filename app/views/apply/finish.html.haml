@@ -3,5 +3,9 @@
   %h3 #{I18n.t 'apply.application_finished_get_mail'}
 - else
   %h2 #{I18n.t 'apply.application_error'}
-  %p #{params[:error]}
+  %p #{I18n.t "apply.errors.#{params[:error].to_s.downcase}"}
+  %br
   = link_to I18n.t('activerecord.models.application_process.other'), apply_url
+  %br
+  %h6
+    %small #{params[:error]}
