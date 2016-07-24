@@ -3,6 +3,7 @@ class StudentToken < ActiveRecord::Base
   
   belongs_to :student
   belongs_to :application_process
+  belongs_to :student_application
 
   #validates :token, presence: true, uniqueness: true
 

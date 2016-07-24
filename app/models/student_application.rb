@@ -1,6 +1,7 @@
 class StudentApplication < ActiveRecord::Base
   belongs_to :application_process
   belongs_to :student
+  has_one :student_token
 
   has_many :form_field_inputs, :dependent => :delete_all
   has_many :form_text_inputs, :dependent => :delete_all

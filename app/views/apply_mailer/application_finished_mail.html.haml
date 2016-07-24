@@ -1,0 +1,11 @@
+!!! 5
+%body
+  %h2 Sua Inscrição foi realizada com sucesso
+  %p #{I18n.t('activerecord.attributes.student_application.application_process')}: #{@student_token.application_process.name} - #{@student_token.application_process.year_semester}
+  %p Candidato: #{@student_token.student.name}
+  %p #{I18n.t('activerecord.attributes.student.cpf')}: #{@student_token.student.cpf}
+  %br
+  %p Chave de validaçao: #{@student_token.token}
+  %br
+  - unless CustomVariable.notification_footer.empty?
+    = CustomVariable.notification_footer

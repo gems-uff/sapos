@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160716174514) do
+ActiveRecord::Schema.define(version: 20160723200815) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer  "enrollment_id"
@@ -639,9 +639,11 @@ ActiveRecord::Schema.define(version: 20160716174514) do
     t.datetime "updated_at",             null: false
     t.string   "cpf"
     t.string   "email"
+    t.integer  "student_application_id"
   end
 
   add_index "student_tokens", ["application_process_id"], name: "index_student_tokens_on_application_process_id"
+  add_index "student_tokens", ["student_application_id"], name: "index_student_tokens_on_student_application_id"
   add_index "student_tokens", ["student_id"], name: "index_student_tokens_on_student_id"
 
   create_table "students", force: :cascade do |t|
