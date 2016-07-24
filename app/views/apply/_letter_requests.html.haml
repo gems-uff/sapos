@@ -1,5 +1,7 @@
 .nested-fields
+  %hr
   = f.input :professor_email
+  = f.input :professor_name
+  = f.input :professor_telephone
   - if removable
     = link_to_remove_association 'Remover', f
-  %hr

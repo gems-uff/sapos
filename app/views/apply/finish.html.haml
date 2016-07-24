@@ -1,0 +1,7 @@
+- if params[:error]=='OK'
+  %h1 Inscrição realizada com sucesso.
+  %h3 Em instantes você receberá um email de confirmação.
+- else
+  %h2 Erro no processo de inscrição, favor tentar novamente.
+  %p #{params[:error]}
+  = link_to I18n.t('activerecord.models.application_process.other'), apply_url

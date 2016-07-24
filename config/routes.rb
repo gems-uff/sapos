@@ -287,6 +287,7 @@ Sapos::Application.routes.draw do
   post 'apply/:application_process_id/student_getid'  => 'apply#student_find'
   get 'apply/fill_form/:token' => 'apply#fill_form', as: :fill_form
   get 'apply/student_confirm/:token' => 'apply#student_confirm', as: :student_confirm
+  get 'apply/finish/:error' => 'apply#finish', as: :apply_finish
 
   get 'letter_requests/fill/:access_token'  => 'letter_requests#fill', as: :fill_letter
   patch 'letter_requests/:id' => 'letter_requests#update', as: :letter_request

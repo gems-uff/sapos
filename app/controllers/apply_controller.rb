@@ -14,12 +14,18 @@ class ApplyController < ApplicationController
 
   def student_find
     unless verify_recaptcha(model: @student_token)
-      render text: 'ERRO - ReCaptcha' and return
+      return redirect_to apply_finish_url(:error => 'INVALID_RECAPTCHA')
+      #render text: 'ERRO - ReCaptcha' and return
     end
+
     @student = Student.find_by_cpf(params[:student][:cpf])
-    if @student and check_new_student_application(@student.id, @application_process.id)
+    if @student
+      if check_student_application_exists(@application_process.id, :student_id => @student.id)
+        return redirect_to apply_finish_url(:error => 'STUDENT_ALREADY_APPLIED')
+      end
       unless @student.email == params[:student][:email]
-        render text: 'ERRO - Student_find - Email inválido' and return
+        return redirect_to apply_finish_url(:error => 'INVALID_EMAIL')
+        #render text: 'ERRO - Student_find - Email inválido' and return
       end
       @student_token = StudentToken.new(:cpf => params[:student][:cpf], :email => @student.email, :student_id => @student.id, :application_process_id => @application_process.id )
     else
@@ -28,13 +34,17 @@ class ApplyController < ApplicationController
     if @student_token.save
       ApplyMailer.student_token_mail(@student_token).deliver_later
     else
-      render text: 'ERRO - Student_find - Token Save' and return
+      return redirect_to apply_finish_url(:error => 'UPDATE_TOKEN')
+      #render text: 'ERRO - Student_find - Token Save' and return
     end
   end
 
   def student_confirm
-    if @student_token.student_id and check_new_student_application(@student_token.student_id, @application_process.id)
+    if @student_token.student_id
       @student = Student.find(@student_token.student_id)
+      if check_student_application_exists(@application_process.id, :student_id => @student.id)
+        return redirect_to apply_finish_url(:error => 'STUDENT_ALREADY_APPLIED')
+      end
     else
       @student = Student.new(email: @student_token.email, cpf: @student_token.cpf)
     end
@@ -43,26 +53,29 @@ class ApplyController < ApplicationController
   def create
     @student = Student.new(student_params)
     unless @student.save
-      render text: 'ERRO - Student Create' and return
+      return redirect_to apply_finish_url(:error => 'CREATE_STUDENT')
+      #render text: 'ERRO - Student Create' and return
     end
     @student_token.student_id = @student.id
     unless @student_token.save
-      render text: 'ERRO - Student Create - Token' and return
+      return redirect_to apply_finish_url(:error => 'UPDATE_TOKEN')
+      #render text: 'ERRO - Student Create - Token' and return
     end
     redirect_fill_form(@student_token.token)
   end
 
   def update
     @student = Student.find(@student_token.student_id)
+    check_student_application_exists(@application_process.id, :student_id => @student.id)
     unless @student.update(student_params)
-      render text: 'ERRO - Student Update' and return
+      return redirect_to apply_finish_url(:error => 'UPDATE_STUDENT')
+      #render text: 'ERRO - Student Update' and return
     end
     redirect_fill_form(@student_token.token)
   end
 
   def fill_form
-    check_new_student_application(@student_token.student_id, @student_token.student_id)
-
+    check_student_application_exists(@application_process.id, :student_id => @student_token.student_id)
     @application_form = FormTemplate.find(@application_process.form_template_id)
     @application_letter = FormTemplate.find(@application_process.letter_template_id)
     @application_fields = FormField.where(form_template_id: @application_form.id).where.not(field_type: ['text', 'file'])
@@ -93,11 +106,34 @@ class ApplyController < ApplicationController
         ApplyMailer.letter_request_mail(lr).deliver_later
       end
       @student_token.is_used = true
+      @student_token.student_application_id = @student_application.id
       @student_token.save
-      render text: 'Finished' and return
+      ApplyMailer.application_finished_mail(@student_token).deliver_later
+      redirect_to apply_finish_url(:error => 'OK')
+      #render text: 'Finished' and return
     else
-      render text: 'ERRO - StudentApplication' and return
+      return redirect_to apply_finish_url(:error => 'CREATE_STUDENT_APPLICATION')
+      #render text: 'ERRO - StudentApplication' and return
     end
+  end
+
+  def finish
+
+=begin
+    STUDENT_ALREADY_APPLIED
+    INVALID_TOKEN
+    TOKEN_EXPIRED
+    APPLICATION_PROCESS_CLOSED
+    CREATE_STUDENT_APPLICATION
+    CREATE_STUDENT
+    UPDATE_STUDENT
+    INVALID_RECAPTCHA
+    INVALID_EMAIL
+    UPDATE_TOKEN
+
+    OK
+=end
+
   end
 
   private
@@ -116,10 +152,12 @@ class ApplyController < ApplicationController
       @application_process = ApplicationProcess.find(@student_token.application_process_id)
     end
     unless @application_process.is_open?
-      render text: 'ERRO - Inscrições Encerradas' and return
+      return redirect_to apply_finish_url('APPLICATION_PROCESS_CLOSED')
+      #render text: 'ERRO - Inscrições Encerradas' and return
     end
     if @student_token and !@student_token.is_valid?
-      render text: 'ERRO - Token expirado' and return
+      return redirect_to apply_finish_url('TOKEN_EXPIRED')
+      #render text: 'ERRO - Token expirado' and return
     end
   end
 
@@ -127,27 +165,33 @@ class ApplyController < ApplicationController
     redirect_to fill_form_url(token)
   end
 
-  def check_new_student_application (student_id, application_id)
-    if StudentApplication.where(student_id: student_id, application_process_id: application_id ).exists?
-      render text: 'ERRO - Já Inscrito' and return false
-    else
+  def check_student_application_exists (application_id, student_cpf: 0, student_id: 0)
+    id = student_id
+    if id == 0
+      id = Student.find_by_cpf(student_cpf).id rescue 0
+    end
+
+    if id != 0 and StudentApplication.where(student_id: id, application_process_id: application_id ).exists?
       return true
     end
+    false
   end
 
   def check_token
     @student_token = StudentToken.find_by_token(params[:student_application][:token])
     unless (@student_token.is_valid? and @student_token.application_process.is_open?)
-      render text: 'ERRO - Student Application - Token inválido' and return
+      return redirect_to apply_finish_url(:error => 'INVALID_TOKEN')
+      #render text: 'ERRO - Student Application - Token inválido' and return
     end
     if StudentApplication.where(student_id: @student_token.student_id, application_process_id: @student_token.application_process_id).exists?
-      render text: 'ERRO - Student Application - Candidato já inscrito' and return
+      redirect_to apply_finish_url(:error => 'STUDENT_ALREADY_APPLIED')
+      #render text: 'ERRO - Student Application - Candidato já inscrito' and return
     end
   end
 
   def student_application_params
     params.require(:student_application).permit(:student_id, :application_process_id,
-                                                form_field_inputs_attributes:[:id, :form_field_id, :input, :_destroy],
+                                                 form_field_inputs_attributes:[:id, :form_field_id, :input, :_destroy],
                                                 form_text_inputs_attributes:[:id, :form_field_id, :input, :_destroy],
                                                 form_file_uploads_attributes:[:id, :student_application_id, :form_field_id, :file, :_destroy],
                                                 letter_requests_attributes:[:id, :professor_email, :student_application_id, :access_token, :is_filled, :_destroy]
