@@ -12,7 +12,11 @@ class Ability
                 PhaseCompletion, PhaseDuration, Professor, ProfessorResearchArea,
                 ReportConfiguration, ResearchArea, Role, Scholarship, ScholarshipDuration, 
                 ScholarshipSuspension, ScholarshipType, Sponsor, State, Student, StudentMajor, 
-                ThesisDefenseCommitteeParticipation, User, Version, YearSemester] 
+                ThesisDefenseCommitteeParticipation, User, Version, YearSemester,
+                StudentApplication, ApplicationProcess, FormTemplate, FormField, FormFieldValue,
+                FormFieldInput, FormTextInput, FormFileUpload, LetterRequest, LetterFieldInput,
+                LetterFileUpload, LetterTextInput
+  ]
 
 
   def initialize(user)
