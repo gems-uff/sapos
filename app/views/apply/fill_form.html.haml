@@ -18,7 +18,7 @@
         = ff.input :input, label: ff.object.form_field.name, as: :boolean, checked_value: true, unchecked_value: false
       - elsif ff.object.form_field.field_type == 'collection_checkbox'
         = ff.input :input, label: ff.object.form_field.name, as: :check_boxes, collection: FormFieldValue.where(form_field_id: ff.object.form_field.id ),
-                      :label_method => :value, :value_method => :value
+                      :label_method => :value, :value_method => :value, include_blank: false
       - else
         = ff.input :input, label: ff.object.form_field.name, as: :string, required: ff.object.form_field.is_mandatory?
 
