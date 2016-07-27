@@ -1,0 +1,24 @@
+wb = xlsx_package.workbook
+wb.add_worksheet(name: "Edital") do |sheet|
+  header = [
+                    I18n.t('pdf_content.application_processes.to_pdf.student_name'),
+                    I18n.t('pdf_content.application_processes.to_pdf.student_cpf'),
+                    I18n.t('pdf_content.application_processes.to_pdf.requested_filled_letters')
+                ]
+  @application_process.form_template.form_fields.order(:id).each do |form_field|
+    header += [form_field.name]
+  end
+  sheet.add_row header
+  @application_process.student_applications.each do |student|
+    row = [
+        student.student.name,
+        student.student.cpf,
+        "#{student.filled_letters}/#{student.requested_letters}"
+    ]
+
+    student.form_field_inputs.order(:form_field_id).each do |input|
+      row += [input.input]
+    end
+    sheet.add_row row
+  end
+end

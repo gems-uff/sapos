@@ -40,6 +40,11 @@ class ApplicationProcessesController < ApplicationController
                             :page => true,
                             :type => :member,
                             :parameters => {:format => :pdf}
+    config.action_links.add 'application_process_complete_xls',
+                            :label => "<i title='Relatório Completo em .xls' class='fa fa-book'></i>".html_safe,
+                            :page => true,
+                            :type => :member,
+                            :parameters => {:format => :xlsx}
 
     config.action_links.add :disable, :type => :member, :crud_type => :update, :method => :put, :position => false, :label => "<i title='#{I18n.t('active_scaffold.delete_link')}' class='fa fa-trash-o'></i>".html_safe
 
@@ -76,6 +81,15 @@ class ApplicationProcessesController < ApplicationController
   end
   def application_process_complete_pdf
 
+  end
+  def application_process_complete_xls
+    @application_process = ApplicationProcess.find(params[:id])
+    respond_to do |format|
+      format.xlsx
+      # format.xlsx do
+      #   send_data render_to_string, :filename => "#{I18n.t('pdf_content.application_processes.to_pdf.filename')} - #{@application_process.name}_#{@application_process.year_semester}.xlsx", :type => 'application/xlsx'
+      # end
+    end
   end
 
   private
