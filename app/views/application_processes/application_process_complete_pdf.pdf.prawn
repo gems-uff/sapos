@@ -9,7 +9,7 @@ new_document('to_pdf.pdf', I18n.t('pdf_content.application_processes.to_pdf.file
                 :width => 100,
                 :align => :right
     }
-    pdf.number_pages "#{I18n.t("pdf_content.enrollment.footer.page")}<page>/<total>", options
+    #pdf.number_pages "#{I18n.t("pdf_content.enrollment.footer.page")}<page>/<total>", options
   end
 
 end

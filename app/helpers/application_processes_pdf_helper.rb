@@ -69,7 +69,8 @@ module ApplicationProcessesPdfHelper
           data += [
               [{:content => "<b>#{I18n.t('activerecord.attributes.student_application.letter_requests')}</b>", :colspan => 2}]
           ]
-          pdf.move_down 5
+          #pdf.move_down 5
+          pdf.start_new_page
           pdf_table_with_title(pdf, widths, title, '', data, width: 560)
           applied.letter_requests.each do |lrequest|
             ldata = [

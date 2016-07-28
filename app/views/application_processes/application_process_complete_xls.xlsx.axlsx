@@ -5,7 +5,10 @@ wb.add_worksheet(name: "Edital") do |sheet|
                     I18n.t('pdf_content.application_processes.to_pdf.student_cpf'),
                     I18n.t('pdf_content.application_processes.to_pdf.requested_filled_letters')
                 ]
-  @application_process.form_template.form_fields.order(:id).each do |form_field|
+  @application_process.form_template.form_fields.where.not(field_type: ['text', 'file']).order(:id).each do |form_field|
+    header += [form_field.name]
+  end
+  @application_process.form_template.form_fields.where(field_type: 'text').order(:id).each do |form_field|
     header += [form_field.name]
   end
   sheet.add_row header
@@ -18,6 +21,9 @@ wb.add_worksheet(name: "Edital") do |sheet|
 
     student.form_field_inputs.order(:form_field_id).each do |input|
       row += [input.input]
+    end
+    student.form_text_inputs.order(:form_field_id).each do |text|
+      row += [text.input]
     end
     sheet.add_row row
   end
