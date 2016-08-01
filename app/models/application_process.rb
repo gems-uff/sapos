@@ -7,7 +7,7 @@ class ApplicationProcess < ActiveRecord::Base
   belongs_to :form_template, :class_name => 'FormTemplate', :foreign_key => 'form_template_id'
   belongs_to :letter_template, :class_name => 'FormTemplate',:foreign_key => 'letter_template_id'
 
-  scope :is_open, -> { where("start_date <= :start_date AND end_date >= :end_date", {start_date: DateTime.now, end_date: DateTime.now} ) }
+  scope :open, -> { where("start_date <= :start_date AND end_date >= :end_date", {start_date: Date.today, end_date: Date.today} ) }
   scope :enabled, -> { where(is_enabled: true) }
 
   validates :min_letters, numericality: { only_integer: true, greater_than: -1, less_than: 100 }
@@ -27,7 +27,7 @@ class ApplicationProcess < ActiveRecord::Base
   end
 
   def is_open?
-    if self.start_date <= DateTime.now and self.end_date >= DateTime.now
+    if self.start_date <= Date.today and self.end_date >= Date.today
       true
     else
       false

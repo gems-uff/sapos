@@ -5,7 +5,7 @@ class ApplyController < ApplicationController
   before_action :check_token, only: [:create_student_application]
 
   def index
-    @application_process = ApplicationProcess.is_open
+    @application_process = ApplicationProcess.open
   end
 
   def student_getid
