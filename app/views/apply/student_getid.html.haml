@@ -1,6 +1,21 @@
-%h2= I18n.t 'apply.student_getid_label'
-= simple_form_for :student do |form|
-  = form.input :cpf
-  = form.input :email
-  = recaptcha_tags
-  = form.submit :value => I18n.t('active_scaffold.search')
+.new-view.view
+  %h1 #{@application_process.name} - #{@application_process.year_semester}
+  %hr
+  %h2= I18n.t 'apply.student_getid_label'
+  .nested-form.default-theme
+    %ol.form.active-scaffold{:style => 'list-style-type: none'}
+      = simple_form_for :student do |form|
+        %li.form-element
+          = form.label :cpf
+          = form.input_field :cpf
+        %br
+        %li.form-element
+          = form.label :email
+          = form.input_field :email
+        %br
+        %li.form-element
+          = recaptcha_tags
+        %br
+        %li.form-element
+          = form.submit :value => I18n.t('active_scaffold.search')
+

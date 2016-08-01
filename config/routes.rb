@@ -267,6 +267,7 @@ Sapos::Application.routes.draw do
   resources :form_templates do
     as_routes
     put :disable, on: :member
+    put :edit_form, on: :member
   end
 
   resources :application_processes do

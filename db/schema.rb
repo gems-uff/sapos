@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160723200815) do
+ActiveRecord::Schema.define(version: 20160729002508) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer  "enrollment_id"
@@ -294,9 +294,9 @@ ActiveRecord::Schema.define(version: 20160723200815) do
     t.string   "name"
     t.string   "description"
     t.boolean  "is_letter"
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
-    t.boolean  "is_enabled",  default: true
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.string   "status"
   end
 
   create_table "form_text_inputs", force: :cascade do |t|

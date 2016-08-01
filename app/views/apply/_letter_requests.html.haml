@@ -1,7 +1,25 @@
+
 .nested-fields
-  %hr
-  = f.input :professor_email
-  = f.input :professor_name
-  = f.input :professor_telephone
+  %li.form-element
+    %dl
+      %dt
+        = f.label :professor_email
+      %dd
+        = f.input_field :professor_email
+  %li.form-element
+    %dl
+      %dt
+        = f.label :professor_name
+      %dd
+        = f.input_field :professor_name
+  %li.form-element
+    %dl
+      %dt
+        = f.label :professor_telephone
+      %dd
+        = f.input_field :professor_telephone
+  %li.form-element
+    %br
+
   - if removable
     = link_to_remove_association 'Remover', f

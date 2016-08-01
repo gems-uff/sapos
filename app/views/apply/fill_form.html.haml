@@ -1,44 +1,65 @@
-= simple_form_for @apply, :html => {:multipart => true}, :url => apply_student_application_path  do |form|
-  = form.input :application_process_id, as: :hidden
-  = form.input :student_id, as: :hidden
-  = form.input :max_letters, as: :hidden, input_html: { value: @application_process.max_letters }
-  = form.input :token, as: :hidden, input_html: { value: @student_token.token }
-  %hr
+.new-view.view
+  %h1 #{@application_process.name} - #{@application_process.year_semester}
+  = simple_form_for @apply, :html => {:multipart => true}, :url => apply_student_application_path  do |form|
+    = form.input :application_process_id, as: :hidden
+    = form.input :student_id, as: :hidden
+    = form.input :max_letters, as: :hidden, input_html: { value: @application_process.max_letters }
+    = form.input :token, as: :hidden, input_html: { value: @student_token.token }
+    %hr
 
-  .nested-form
-    = form.simple_fields_for :form_field_inputs do |ff|
-      = ff.input :form_field_id, as: :hidden, input_html: { value: ff.object.form_field.id }
-      - if ff.object.form_field.field_type == 'select'
-        = ff.input :input, label: ff.object.form_field.name, :as => :collection_select, collection: FormFieldValue.where(form_field_id: ff.object.form_field.id ),
-                      :label_method => :value, :value_method => :value, include_blank: !ff.object.form_field.is_mandatory?
-      - elsif ff.object.form_field.field_type == 'radio'
-        = ff.input :input, label: ff.object.form_field.name, as: :radio_buttons, collection: FormFieldValue.where(form_field_id: ff.object.form_field.id ),
-                      :label_method => :value, :value_method => :value, required: ff.object.form_field.is_mandatory?
-      - elsif ff.object.form_field.field_type == 'single_checkbox'
-        = ff.input :input, label: ff.object.form_field.name, as: :boolean, checked_value: true, unchecked_value: false
-      - elsif ff.object.form_field.field_type == 'collection_checkbox'
-        = ff.input :input, label: ff.object.form_field.name, as: :check_boxes, collection: FormFieldValue.where(form_field_id: ff.object.form_field.id ),
-                      :label_method => :value, :value_method => :value, include_blank: false
-      - else
-        = ff.input :input, label: ff.object.form_field.name, as: :string, required: ff.object.form_field.is_mandatory?
+    .nested-form.default-theme
+      %ol.form.active-scaffold{:style => 'list-style-type: none'}
+        = form.simple_fields_for :form_field_inputs do |ff|
+          %li.form-element
+            = ff.input :form_field_id, as: :hidden, input_html: { value: ff.object.form_field.id }
+            %dl
+              %dt
+                = ff.label ff.object.form_field.name
+              %dd
+                - if ff.object.form_field.field_type == 'select'
+                  = ff.input_field :input, :as => :collection_select, collection: FormFieldValue.where(form_field_id: ff.object.form_field.id ),
+                                  :label_method => :value, :value_method => :value, include_blank: !ff.object.form_field.is_mandatory?, wrapper_html: { class: 'sex-input' }
+                - elsif ff.object.form_field.field_type == 'radio'
+                  = ff.input_field :input, as: :radio_buttons, collection: FormFieldValue.where(form_field_id: ff.object.form_field.id ),
+                                :label_method => :value, :value_method => :value, required: ff.object.form_field.is_mandatory?
+                - elsif ff.object.form_field.field_type == 'single_checkbox'
+                  = ff.input_field :input, as: :boolean, checked_value: true, unchecked_value: false
+                - elsif ff.object.form_field.field_type == 'collection_checkbox'
+                  = ff.input_field :input, as: :check_boxes, collection: FormFieldValue.where(form_field_id: ff.object.form_field.id ),
+                                :label_method => :value, :value_method => :value, include_blank: false
+                - else
+                  = ff.input_field :input, as: :string, required: ff.object.form_field.is_mandatory?
 
-    = form.simple_fields_for :form_text_inputs do |ft|
-      = ft.input :form_field_id, as: :hidden, input_html: { value: ft.object.form_field.id }
-      = ft.input :input, label: ft.object.form_field.name, as: :text, required: ft.object.form_field.is_mandatory?
+        = form.simple_fields_for :form_text_inputs do |ft|
+          %li.form-element
+            = ft.input :form_field_id, as: :hidden, input_html: { value: ft.object.form_field.id }
+            %dl
+              %dt
+                = ft.label ft.object.form_field.name
+              %dd
+                = ft.input_field :input, as: :text, required: ft.object.form_field.is_mandatory?
 
-    = form.simple_fields_for :form_file_uploads do |ffu|
-      = ffu.input :form_field_id, as: :hidden, input_html: { value: ffu.object.form_field.id }
-      = ffu.input :file, label: ffu.object.form_field.name, as: :file
+        = form.simple_fields_for :form_file_uploads do |ffu|
+          %li.form-element
+            = ffu.input :form_field_id, as: :hidden, input_html: { value: ffu.object.form_field.id }
+            %dl
+              %dt
+                = ffu.label ffu.object.form_field.name
+              %dd
+                = ffu.input_field :file, as: :file, required: ffu.object.form_field.is_mandatory?
 
-    #letters
-      = form.simple_fields_for :letter_requests do |letter|
-        = render 'letter_requests', f:letter, removable: false
-      .links
-        = link_to_add_association 'Adicionar carta', form, :letter_requests, partial: 'letter_requests',
-            render_options: {locals: { removable: true }},
-            'data-association-insertion-method' => 'append',
-            'data-association-insertion-node' => '#letters',
-            class: 'add-letter'
+        %br
+        %li.form-element
+          %h3 Cartas de Recomendação:
+        #letters
+          = form.simple_fields_for :letter_requests do |letter|
+            = render 'letter_requests', f:letter, removable: false
+          .links
+            = link_to_add_association 'Adicionar carta', form, :letter_requests, partial: 'letter_requests',
+                render_options: {locals: { removable: true }},
+                'data-association-insertion-method' => 'append',
+                'data-association-insertion-node' => '#letters',
+                class: 'add-letter'
 
-  %br
-  = form.submit
+    %br
+    = form.submit value: 'Finalizar'

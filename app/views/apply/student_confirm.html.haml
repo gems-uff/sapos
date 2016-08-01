@@ -1,18 +1,96 @@
-= simple_form_for @student, :url => apply_path  do |stform|
-  = stform.input :token, as: :hidden, input_html: { value: @student_token.token }
-  = stform.input :cpf, :readonly => true
-  = stform.input :email, :readonly => true
-  = stform.input :name
-  = stform.input :address
-  = stform.input :neighborhood
-  = stform.input :birthdate
-  = stform.input :father_name
-  = stform.input :mother_name
-  = stform.input :identity_expedition_date
-  = stform.input :identity_issuing_body
-  = stform.input :identity_number
-  = stform.input :telephone1
-  = stform.input :telephone2
-  = stform.input :zip_code
+.new-view.view
+  %h1 #{@application_process.name} - #{@application_process.year_semester}
   %br
-  = stform.submit
+  .nested-form.default-theme
+    %ol.form.active-scaffold{:style => 'list-style-type: none'}
+      = simple_form_for @student, :url => apply_path  do |stform|
+        %li.form-element
+          = stform.input :token, as: :hidden, input_html: { value: @student_token.token }
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :cpf
+            %dd
+              = stform.input_field :cpf, :readonly => true
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :email
+            %dd
+              = stform.input_field :email, :readonly => true
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :name
+            %dd
+              = stform.input_field :name
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :address
+            %dd
+              = stform.input_field :address
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :neighborhood
+            %dd
+              = stform.input_field :neighborhood
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :birthdate
+            %dd
+              = stform.input_field :birthdate, start_year: Date.today.year - 100, end_year: Date.today.year
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :father_name
+            %dd
+              = stform.input_field :father_name
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :mother_name
+            %dd
+              = stform.input_field :mother_name
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :identity_expedition_date
+            %dd
+              = stform.input_field :identity_expedition_date, start_year: Date.today.year - 100, end_year: Date.today.year
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :identity_issuing_body
+            %dd
+              = stform.input_field :identity_issuing_body
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :identity_number
+            %dd
+              = stform.input_field :identity_number
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :telephone1
+            %dd
+              = stform.input_field :telephone1
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :telephone2
+            %dd
+              = stform.input_field :telephone2
+        %li.form-element
+          %dl
+            %dt
+              = stform.label :zip_code
+            %dd
+              = stform.input_field :zip_code
+
+        %br
+        %li.form-element
+          = stform.submit value: 'Salvar e continuar'
