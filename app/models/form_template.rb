@@ -1,5 +1,5 @@
 class FormTemplate < ActiveRecord::Base
-  before_create :make_draft
+  #before_create :make_draft
   has_many :form_fields
   has_many :application_process_forms, :class_name =>ApplicationProcess, :foreign_key => :form_template_id
   has_many :application_process_letters, :class_name => ApplicationProcess, :foreign_key => :letter_template_id

@@ -38,16 +38,16 @@ class FormTemplatesController < ApplicationController
     super.enabled
   end
 
-  # def create
-  #   @form_template = FormTemplate.new(form_template_params)
-  #
-  #   if @form_template.save
-  #     redirect_to form_templates_path, notice: 'Form template was successfully created.'
-  #   else
-  #     render :new
-  #   end
-  #
-  # end
+  def create
+    @form_template = FormTemplate.new(form_template_params)
+
+    if @form_template.save
+      redirect_to form_templates_path, notice: 'Form template was successfully created.'
+    else
+      render :new
+    end
+
+  end
 
   def disable
     process_action_link_action do |record|

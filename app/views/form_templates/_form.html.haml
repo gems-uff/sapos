@@ -2,6 +2,7 @@
   = f.input :name
   = f.input :description
   = f.input :is_letter
+  = f.input :status, as: :hidden, input_html: { value: 'PUBLISHED' }
 
   %h3 #{I18n.t 'activerecord.attributes.form_template.form_fields'}
   #form-container
