@@ -62,5 +62,5 @@ module Sapos
 
   end
 
-  ActionMailer::Base.default :from => 'SAPOS <sapos@sel.ic.uff.br>'
+  ActionMailer::Base.default :from => 'SAPOS <sapos@sapos.ic.uff.br>'
 end

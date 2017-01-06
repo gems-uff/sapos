@@ -62,7 +62,7 @@ Sapos::Application.configure do
   # config.cache_store = :mem_cache_store
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
-  # config.action_controller.asset_host = "https://sel.ic.uff.br"
+  # config.action_controller.asset_host = "https://sapos.ic.uff.br"
 
   # Precompile additional assets.
   # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
@@ -72,8 +72,8 @@ Sapos::Application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
   config.action_mailer.delivery_method = :sendmail
-  config.action_mailer.default_url_options = {:host => 'sel.ic.uff.br'}
-  config.action_mailer.sendmail_settings = {:arguments => '-i -f "SAPOS <sapos@sel.ic.uff.br>"', :location => '/usr/sbin/sendmail'}
+  config.action_mailer.default_url_options = {:host => 'sapos.ic.uff.br'}
+  config.action_mailer.sendmail_settings = {:arguments => '-i -f "SAPOS <sapos@sapos.ic.uff.br>"', :location => '/usr/sbin/sendmail'}
 
   # Enable threaded mode
   # config.threadsafe!
@@ -87,6 +87,6 @@ Sapos::Application.configure do
 
   config.middleware.use ExceptionNotifier,
                         :email_prefix => "[SAPOS: Erro em Staging] ",
-                        :sender_address => %{"Exception Notifier Sapos Staging" <erro-sapos@sel.ic.uff.br>},
+                        :sender_address => %{"Exception Notifier Sapos Staging" <erro-sapos@sapos.ic.uff.br>},
                         :exception_recipients => %w{everton.moreth@gmail.com bschettino@id.uff.br joaofelipenp+sapos@gmail.com leomurta+sapos@gmail.com vanessa.braganholo+sapos@gmail.com danielprett+sapos@gmail.com}
 end
