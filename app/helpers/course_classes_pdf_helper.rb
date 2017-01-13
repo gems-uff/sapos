@@ -29,28 +29,50 @@ module CourseClassesPdfHelper
   def summary_table(pdf, options={})
     course_class ||= options[:course_class]
 
-    table_width = [30, 105, 285, 45, 45, 60, 236]
-
-    header = [["<b>#{I18n.t("pdf_content.course_class.summary.sequential_number")}</b>",
-               "<b>#{I18n.t("pdf_content.course_class.summary.enrollment_number")}</b>",
-               "<b>#{I18n.t("pdf_content.course_class.summary.student_name")}</b>",
-               "<b>#{I18n.t("pdf_content.course_class.summary.final_grade")}</b>",
-               "<b>#{I18n.t("pdf_content.course_class.summary.attendance")}</b>",
-               "<b>#{I18n.t("pdf_content.course_class.summary.situation")}</b>",
-               "<b>#{I18n.t("pdf_content.course_class.summary.obs")}</b>"]]
+    if course_class.course.course_type.has_score
+      table_width = [30, 105, 285, 45, 45, 60, 236]
+      header = [["<b>#{I18n.t("pdf_content.course_class.summary.sequential_number")}</b>",
+                 "<b>#{I18n.t("pdf_content.course_class.summary.enrollment_number")}</b>",
+                 "<b>#{I18n.t("pdf_content.course_class.summary.student_name")}</b>",
+                 "<b>#{I18n.t("pdf_content.course_class.summary.final_grade")}</b>",
+                 "<b>#{I18n.t("pdf_content.course_class.summary.attendance")}</b>",
+                 "<b>#{I18n.t("pdf_content.course_class.summary.situation")}</b>",
+                 "<b>#{I18n.t("pdf_content.course_class.summary.obs")}</b>"]]
+    else	   
+      table_width = [30, 105, 330, 45, 60, 236]
+      header = [["<b>#{I18n.t("pdf_content.course_class.summary.sequential_number")}</b>",
+                 "<b>#{I18n.t("pdf_content.course_class.summary.enrollment_number")}</b>",
+                 "<b>#{I18n.t("pdf_content.course_class.summary.student_name")}</b>",
+                 "<b>#{I18n.t("pdf_content.course_class.summary.attendance")}</b>",
+                 "<b>#{I18n.t("pdf_content.course_class.summary.situation")}</b>",
+                 "<b>#{I18n.t("pdf_content.course_class.summary.obs")}</b>"]]
+    end
 
     unless course_class.class_enrollments.empty?
       i=0
       table_data = course_class.class_enrollments.joins({:enrollment => :student}).order("students.name").map do |class_enrollment|
-        [
-            i+=1,
-            class_enrollment.enrollment.enrollment_number,
-            class_enrollment.enrollment.student.name,
-            number_to_grade(class_enrollment.grade),
-            class_enrollment.attendance_to_label,
-            class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.registered") ? "" : class_enrollment.situation,
-            class_enrollment.obs
-        ]
+
+        if course_class.course.course_type.has_score    
+	  [
+	    i+=1,
+	    class_enrollment.enrollment.enrollment_number,
+	    class_enrollment.enrollment.student.name,
+	    number_to_grade(class_enrollment.grade),
+	    class_enrollment.attendance_to_label,
+	    class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.registered") ? "" : class_enrollment.situation,
+	    class_enrollment.obs
+	  ]
+	else
+	  [
+	    i+=1,
+	    class_enrollment.enrollment.enrollment_number,
+	    class_enrollment.enrollment.student.name,
+	    class_enrollment.attendance_to_label,
+	    class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.registered") ? "" : class_enrollment.situation,
+	    class_enrollment.obs
+	  ]
+	end	 
+
       end
     else
       table_data = []
