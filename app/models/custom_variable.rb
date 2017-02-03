@@ -12,6 +12,8 @@ class CustomVariable < ActiveRecord::Base
     "class_schedule_text" => :text,
     "redirect_email" => :text,
     "notification_footer" => :text,
+    "minimum_grade_for_approval" => :text,
+    "grade_of_disapproval_for_absence" => :text
   }
 
   validates :variable, :presence => true
@@ -50,6 +52,16 @@ class CustomVariable < ActiveRecord::Base
   def self.notification_footer
     config = CustomVariable.find_by_variable(:notification_footer)
     config.nil? ? "" : config.value
+  end
+
+  def self.minimum_grade_for_approval
+    config = CustomVariable.find_by_variable(:minimum_grade_for_approval)
+    config.nil? ? 60 : ((config.value.to_f)*10.0).to_i 
+  end
+
+  def self.grade_of_disapproval_for_absence
+    config = CustomVariable.find_by_variable(:grade_of_disapproval_for_absence)
+    config.nil? ? nil : ((config.value.to_f)*10.0).to_i 
   end
 
 end
