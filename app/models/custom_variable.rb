@@ -56,12 +56,16 @@ class CustomVariable < ActiveRecord::Base
 
   def self.minimum_grade_for_approval
     config = CustomVariable.find_by_variable(:minimum_grade_for_approval)
-    config.nil? ? 60 : ((config.value.to_f)*10.0).to_i 
+    config.nil? ? 60 : ((config.value.tr(',', '.').to_f)*10.0).to_i 
   end
 
   def self.grade_of_disapproval_for_absence
     config = CustomVariable.find_by_variable(:grade_of_disapproval_for_absence)
-    config.nil? ? nil : ((config.value.to_f)*10.0).to_i 
+    if config.nil? or config.value.nil? or (config.value.gsub(/\s+/, "").length == 0)
+      return nil
+    else      
+      return ((config.value.tr(',', '.').to_f)*10.0).to_i
+    end
   end
 
 end

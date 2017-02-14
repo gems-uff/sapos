@@ -78,6 +78,10 @@ class ClassEnrollment < ActiveRecord::Base
     grade.nil? ? nil : (grade/10.0)
   end
 
+  def disapproved_by_absence_to_view
+    self.disapproved_by_absence.nil? ? false : self.disapproved_by_absence 
+  end
+
   def should_send_email_to_professor?
     (!self.id.nil?) and 
     (
@@ -114,6 +118,8 @@ class ClassEnrollment < ActiveRecord::Base
         self.errors.add(:disapproved_by_absence, I18n.translate("activerecord.errors.models.class_enrollment.disapproved_by_absence_for_situation_registered")) if self.disapproved_by_absence
       when I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
         self.errors.add(:disapproved_by_absence, I18n.translate("activerecord.errors.models.class_enrollment.disapproved_by_absence_for_situation_aproved")) if self.disapproved_by_absence
+      when I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
+	      self.errors.add(:disapproved_by_absence, I18n.translate("activerecord.errors.models.class_enrollment.disapproved_by_absence_for_situation_disapproved", :grade_of_disapproval_for_absence=>(CustomVariable.grade_of_disapproval_for_absence.to_f/10.0).to_s.tr('.',','))) if self.disapproved_by_absence and (not CustomVariable.grade_of_disapproval_for_absence.nil?) and ( (self.grade.blank?) or ( self.grade > CustomVariable.grade_of_disapproval_for_absence )  ) 
     end
     self.errors.blank?
   end
