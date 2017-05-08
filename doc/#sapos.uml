@@ -1,0 +1,511 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>RailsDependency</ID>
+  <OriginalElement>#sapos</OriginalElement>
+  <nodes>
+    <node x="1898.5" y="170.10249999999996">EnrollmentHold</node>
+    <node x="3341.0" y="1655.554375997934">AdvisementAuthorization</node>
+    <node x="1011.5" y="0.0">ScholarshipType</node>
+    <node x="5206.0" y="3196.629630881939">Country</node>
+    <node x="0.0" y="4290.944873321123">Query</node>
+    <node x="1810.5" y="640.3525">Phase</node>
+    <node x="4929.0" y="3127.129630881939">State</node>
+    <node x="2677.0" y="3876.444873321123">ScholarshipSuspension</node>
+    <node x="2694.0" y="4104.944873321123">StringTimeDelta</node>
+    <node x="2045.0" y="4104.944873321123">ReportConfiguration</node>
+    <node x="780.0" y="1194.319873321123">Enrollment</node>
+    <node x="4552.0" y="3084.629630881939">City</node>
+    <node x="0.0" y="1307.069873321123">Sponsor</node>
+    <node x="2740.5" y="314.85249999999996">Accomplishment</node>
+    <node x="4006.5" y="1732.054375997934">CourseResearchArea</node>
+    <node x="956.0" y="4527.944873321123">NotificationLog</node>
+    <node x="956.0" y="4344.944873321123">NotificationParam</node>
+    <node x="2601.0" y="1046.479630881939">Level</node>
+    <node x="1266.0" y="4334.444873321123">Role</node>
+    <node x="313.0" y="1199.069873321123">Scholarship</node>
+    <node x="2740.5" y="497.85249999999996">PhaseCompletion</node>
+    <node x="1925.0" y="1525.979630881939">EnrollmentStatus</node>
+    <node x="2635.5" y="1898.2451282051281">ResearchArea</node>
+    <node x="3338.0" y="2895.944873321123">ProfessorResearchArea</node>
+    <node x="3292.0" y="373.03033753639534">Deferral</node>
+    <node x="3337.5" y="1030.1617948717949">PhaseDuration</node>
+    <node x="2728.5" y="1493.479630881939">ThesisDefenseCommitteeParticipation</node>
+    <node x="3926.0" y="2183.6796308819394">CourseClass</node>
+    <node x="2724.5" y="680.8525">DeferralType</node>
+    <node x="3739.0" y="3004.944873321123">Student</node>
+    <node x="1878.5" y="3835.944873321123">ScholarshipDuration</node>
+    <node x="1509.0" y="4104.944873321123">User</node>
+    <node x="4525.0" y="67.28999999999996">ClassEnrollment</node>
+    <node x="372.0" y="4314.944873321123">Notification</node>
+    <node x="4611.5" y="3767.444873321123">StudentMajor</node>
+    <node x="2750.5" y="1337.479630881939">Advisement</node>
+    <node x="2762.5" y="1655.479630881939">DismissalReason</node>
+    <node x="3220.0" y="1897.8201282051282">Course</node>
+    <node x="3487.0" y="4104.944873321123">Ability</node>
+    <node x="1556.0" y="2250.8201282051286">Professor</node>
+    <node x="1869.5" y="1654.979630881939">Dismissal</node>
+    <node x="3221.0" y="4104.944873321123">DateUtils</node>
+    <node x="2443.0" y="4104.944873321123">CustomVariable</node>
+    <node x="2879.0" y="4104.944873321123">YearSemester</node>
+    <node x="3050.0" y="4104.944873321123">ERBFormatter</node>
+    <node x="3965.0" y="1860.054375997934">CourseType</node>
+    <node x="431.5" y="4104.944873321123">QueryParam</node>
+    <node x="4535.0" y="2266.0129642152724">Allocation</node>
+    <node x="2771.5" y="2727.778206654456">Institution</node>
+    <node x="3305.0" y="2685.944873321123">Major</node>
+    <node x="3361.0" y="4104.944873321123">Version</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="Student" target="Enrollment">
+      <point x="-353.0" y="-272.66666666666697" />
+      <point x="3659.0" y="2240.320128205128" />
+      <point x="1556.0" y="2240.320128205128" />
+      <point x="348.0" y="176.12000000000035" />
+    </edge>
+    <edge source="Phase" target="Enrollment">
+      <point x="-228.0" y="-76.25" />
+      <point x="1556.0" y="716.6025" />
+      <point x="348.0" y="-150.96000000000004" />
+    </edge>
+    <edge source="Notification" target="NotificationLog">
+      <point x="252.0" y="128.66666666666697" />
+      <point x="-132.5" y="-0.0" />
+    </edge>
+    <edge source="ScholarshipDuration" target="ScholarshipSuspension">
+      <point x="160.0" y="-0.0" />
+      <point x="-193.5" y="-0.0" />
+    </edge>
+    <edge source="Professor" target="ThesisDefenseCommitteeParticipation">
+      <point x="482.5" y="-309.8461538461538" />
+      <point x="2601.0" y="1559.479630881939" />
+      <point x="-142.0" y="22.0" />
+    </edge>
+    <edge source="Enrollment" target="Deferral">
+      <point x="348.0" y="-276.76" />
+      <point x="1556.0" y="127.53999999999996" />
+      <point x="3140.0" y="127.53999999999996" />
+      <point x="3220.0" y="390.90533753639534" />
+      <point x="-147.5" y="-53.625" />
+    </edge>
+    <edge source="Major" target="Student">
+      <point x="134.5" y="-0.0" />
+      <point x="3659.0" y="2770.944873321123" />
+      <point x="-353.0" y="272.6666666666665" />
+    </edge>
+    <edge source="Level" target="Scholarship">
+      <point x="-269.5" y="-94.125" />
+      <point x="2521.0" y="99.5" />
+      <point x="780.0" y="99.5" />
+      <point x="193.5" y="-43.57142857142844" />
+    </edge>
+    <edge source="Enrollment" target="ClassEnrollment">
+      <point x="348.0" y="-301.9200000000001" />
+      <point x="1556.0" y="116.53999999999996" />
+      <point x="-162.0" y="-49.25" />
+    </edge>
+    <edge source="Institution" target="Professor">
+      <point x="-99.0" y="-47.666666666666515" />
+      <point x="2601.0" y="2751.61153998779" />
+      <point x="482.5" y="77.46153846153857" />
+    </edge>
+    <edge source="Enrollment" target="Professor">
+      <point x="348.0" y="276.7600000000002" />
+      <point x="-482.5" y="201.4000000000001" />
+    </edge>
+    <edge source="CourseClass" target="ClassEnrollment">
+      <point x="166.0" y="-83.66666666666652" />
+      <point x="4445.0" y="2225.5129642152724" />
+      <point x="-162.0" y="49.25" />
+    </edge>
+    <edge source="Enrollment" target="ThesisDefenseCommitteeParticipation">
+      <point x="348.0" y="-0.0" />
+      <point x="1556.0" y="1515.479630881939" />
+      <point x="-142.0" y="-22.0" />
+    </edge>
+    <edge source="Enrollment" target="Accomplishment">
+      <point x="348.0" y="-201.27999999999997" />
+      <point x="1556.0" y="350.60249999999996" />
+      <point x="-130.0" y="-35.75" />
+    </edge>
+    <edge source="EnrollmentStatus" target="Enrollment">
+      <point x="-113.5" y="-22.25" />
+      <point x="1556.0" y="1548.229630881939" />
+      <point x="348.0" y="25.160000000000082" />
+    </edge>
+    <edge source="Deferral" target="DeferralType">
+      <point x="-147.5" y="17.875" />
+      <point x="3220.0" y="462.40533753639534" />
+      <point x="3140.0" y="736.8525" />
+      <point x="146.0" y="-56.0" />
+    </edge>
+    <edge source="City" target="Professor">
+      <point x="-135.0" y="-63.75" />
+      <point x="4525.0" y="3105.879630881939" />
+      <point x="4445.0" y="2994.444873321123" />
+      <point x="2601.0" y="2994.444873321123" />
+      <point x="482.5" y="387.3076923076924" />
+    </edge>
+    <edge source="Professor" target="ResearchArea">
+      <point x="482.5" y="-77.46153846153857" />
+      <point x="2601.0" y="2094.245128205128" />
+      <point x="-235.0" y="84.0" />
+    </edge>
+    <edge source="Course" target="CourseClass">
+      <point x="219.5" y="124.5" />
+      <point x="3739.0" y="2309.1796308819394" />
+      <point x="-166.0" y="-0.0" />
+    </edge>
+    <edge source="Dismissal" target="Enrollment">
+      <point x="-169.0" y="-35.75" />
+      <point x="1556.0" y="1690.729630881939" />
+      <point x="348.0" y="75.48000000000002" />
+    </edge>
+    <edge source="Professor" target="CourseClass">
+      <point x="482.5" y="-0.0" />
+      <point x="2601.0" y="2675.444873321123" />
+      <point x="3659.0" y="2675.444873321123" />
+      <point x="3739.0" y="2392.8462975486054" />
+      <point x="-166.0" y="83.66666666666652" />
+    </edge>
+    <edge source="Dismissal" target="DismissalReason">
+      <point x="169.0" y="-0.0" />
+      <point x="-108.0" y="-0.0" />
+    </edge>
+    <edge source="Course" target="ResearchArea">
+      <point x="-219.5" y="-0.0" />
+      <point x="3140.0" y="2010.2451282051281" />
+      <point x="235.0" y="-0.0" />
+    </edge>
+    <edge source="Student" target="City">
+      <point x="353.0" y="-0.0" />
+      <point x="4525.0" y="3233.379630881939" />
+      <point x="-135.0" y="63.75" />
+    </edge>
+    <edge source="Enrollment" target="EnrollmentStatus">
+      <point x="348.0" y="50.320000000000164" />
+      <point x="1556.0" y="1592.729630881939" />
+      <point x="-113.5" y="22.25" />
+    </edge>
+    <edge source="Major" target="Institution">
+      <point x="-134.5" y="-0.0" />
+      <point x="3220.0" y="2770.944873321123" />
+      <point x="3140.0" y="2763.528206654456" />
+      <point x="99.0" y="-35.75" />
+    </edge>
+    <edge source="Phase" target="Level">
+      <point x="228.0" y="122.0" />
+      <point x="2521.0" y="914.8525" />
+      <point x="-269.5" y="-31.375" />
+    </edge>
+    <edge source="Course" target="CourseType">
+      <point x="219.5" y="41.5" />
+      <point x="3739.0" y="2007.804375997934" />
+      <point x="-127.0" y="49.25" />
+    </edge>
+    <edge source="Enrollment" target="PhaseCompletion">
+      <point x="348.0" y="-176.1199999999999" />
+      <point x="1556.0" y="533.6025" />
+      <point x="-130.0" y="-35.75" />
+    </edge>
+    <edge source="State" target="Student">
+      <point x="-98.5" y="56.666666666666515" />
+      <point x="4849.0" y="3265.129630881939" />
+      <point x="4525.0" y="3265.129630881939" />
+      <point x="353.0" y="163.60000000000036" />
+    </edge>
+    <edge source="Professor" target="ProfessorResearchArea">
+      <point x="482.5" y="309.8461538461538" />
+      <point x="2601.0" y="2961.944873321123" />
+      <point x="-101.5" y="22.0" />
+    </edge>
+    <edge source="Advisement" target="Enrollment">
+      <point x="-120.0" y="-0.0" />
+      <point x="1556.0" y="1395.479630881939" />
+      <point x="348.0" y="-25.159999999999854" />
+    </edge>
+    <edge source="State" target="Country">
+      <point x="98.5" y="42.5" />
+      <point x="-84.0" y="-0.0" />
+    </edge>
+    <edge source="CourseClass" target="Enrollment">
+      <point x="-166.0" y="-83.66666666666652" />
+      <point x="3739.0" y="2225.5129642152724" />
+      <point x="3659.0" y="955.8525" />
+      <point x="1556.0" y="955.8525" />
+      <point x="348.0" y="-100.63999999999987" />
+    </edge>
+    <edge source="Deferral" target="Enrollment">
+      <point x="-147.5" y="-17.875" />
+      <point x="3220.0" y="426.65533753639534" />
+      <point x="3140.0" y="159.60249999999996" />
+      <point x="1556.0" y="159.60249999999996" />
+      <point x="348.0" y="-251.5999999999999" />
+    </edge>
+    <edge source="Enrollment" target="Dismissal">
+      <point x="348.0" y="100.6400000000001" />
+      <point x="1556.0" y="1762.229630881939" />
+      <point x="-169.0" y="35.75" />
+    </edge>
+    <edge source="ResearchArea" target="CourseResearchArea">
+      <point x="235.0" y="-89.59999999999991" />
+      <point x="3140.0" y="1920.6451282051282" />
+      <point x="3220.0" y="1754.054375997934" />
+      <point x="-85.5" y="-22.0" />
+    </edge>
+    <edge source="Enrollment" target="Phase">
+      <point x="348.0" y="-125.79999999999995" />
+      <point x="1556.0" y="869.1025" />
+      <point x="-228.0" y="76.25" />
+    </edge>
+    <edge source="ResearchArea" target="Course">
+      <point x="235.0" y="44.80000000000018" />
+      <point x="3140.0" y="2055.045128205128" />
+      <point x="-219.5" y="110.66666666666652" />
+    </edge>
+    <edge source="Enrollment" target="ScholarshipDuration">
+      <point x="348.0" y="301.9200000000001" />
+      <point x="1556.0" y="3891.944873321123" />
+      <point x="-160.0" y="-56.0" />
+    </edge>
+    <edge source="Level" target="AdvisementAuthorization">
+      <point x="269.5" y="-0.0" />
+      <point x="3220.0" y="1677.554375997934" />
+      <point x="-98.5" y="-22.0" />
+    </edge>
+    <edge source="Notification" target="NotificationParam">
+      <point x="252.0" y="-0.0" />
+      <point x="-132.5" y="47.66666666666697" />
+    </edge>
+    <edge source="Professor" target="Advisement">
+      <point x="482.5" y="-387.3076923076924" />
+      <point x="2601.0" y="1434.1462975486056" />
+      <point x="-120.0" y="38.66666666666674" />
+    </edge>
+    <edge source="ScholarshipType" target="Scholarship">
+      <point x="-116.5" y="-22.25" />
+      <point x="780.0" y="22.25" />
+      <point x="193.5" y="-130.71428571428578" />
+    </edge>
+    <edge source="Institution" target="Major">
+      <point x="99.0" y="35.75" />
+      <point x="3140.0" y="2835.028206654456" />
+      <point x="3220.0" y="2827.61153998779" />
+      <point x="-134.5" y="56.666666666666515" />
+    </edge>
+    <edge source="Sponsor" target="Scholarship">
+      <point x="116.5" y="-0.0" />
+      <point x="-193.5" y="-0.0" />
+    </edge>
+    <edge source="CourseType" target="Course">
+      <point x="-127.0" y="-49.25" />
+      <point x="3739.0" y="1909.304375997934" />
+      <point x="219.5" y="-41.5" />
+    </edge>
+    <edge source="ResearchArea" target="Enrollment">
+      <point x="-235.0" y="-28.0" />
+      <point x="2601.0" y="1982.2451282051281" />
+      <point x="2521.0" y="1959.7451282051281" />
+      <point x="1556.0" y="1959.7451282051281" />
+      <point x="348.0" y="150.96000000000026" />
+    </edge>
+    <edge source="Enrollment" target="Advisement">
+      <point x="348.0" y="-50.319999999999936" />
+      <point x="1556.0" y="1299.417130881939" />
+      <point x="2521.0" y="1299.417130881939" />
+      <point x="2601.0" y="1356.8129642152721" />
+      <point x="-120.0" y="-38.66666666666674" />
+    </edge>
+    <edge source="Student" target="Major">
+      <point x="-353.0" y="-0.0" />
+      <point x="3659.0" y="2714.278206654457" />
+      <point x="134.5" y="-56.666666666666515" />
+    </edge>
+    <edge source="Role" target="User">
+      <point x="81.5" y="-0.0" />
+      <point x="-245.5" y="-0.0" />
+    </edge>
+    <edge source="Country" target="State">
+      <point x="-84.0" y="-38.666666666666515" />
+      <point x="98.5" y="-42.5" />
+    </edge>
+    <edge source="ResearchArea" target="ProfessorResearchArea">
+      <point x="235.0" y="89.59999999999991" />
+      <point x="3140.0" y="2099.8451282051283" />
+      <point x="3220.0" y="2917.944873321123" />
+      <point x="-101.5" y="-22.0" />
+    </edge>
+    <edge source="Phase" target="PhaseCompletion">
+      <point x="228.0" y="-61.0" />
+      <point x="2521.0" y="731.8525" />
+      <point x="2601.0" y="605.1025" />
+      <point x="-130.0" y="35.75" />
+    </edge>
+    <edge source="Enrollment" target="EnrollmentHold">
+      <point x="348.0" y="-226.44000000000005" />
+      <point x="1556.0" y="255.10249999999996" />
+      <point x="-140.0" y="-0.0" />
+    </edge>
+    <edge source="DeferralType" target="Deferral">
+      <point x="146.0" y="56.0" />
+      <point x="3140.0" y="848.8525" />
+      <point x="3220.0" y="498.15533753639534" />
+      <point x="-147.5" y="53.625" />
+    </edge>
+    <edge source="Course" target="CourseResearchArea">
+      <point x="219.5" y="-124.5" />
+      <point x="3739.0" y="1798.054375997934" />
+      <point x="-85.5" y="22.0" />
+    </edge>
+    <edge source="Level" target="Major">
+      <point x="269.5" y="83.66666666666674" />
+      <point x="3220.0" y="2714.278206654457" />
+      <point x="-134.5" y="-56.666666666666515" />
+    </edge>
+    <edge source="Enrollment" target="Scholarship">
+      <point x="-348.0" y="-157.25" />
+      <point x="193.5" y="-0.0" />
+    </edge>
+    <edge source="CourseClass" target="Allocation">
+      <point x="166.0" y="83.66666666666652" />
+      <point x="-152.0" y="42.5" />
+    </edge>
+    <edge source="Query" target="QueryParam">
+      <point x="146.0" y="-42.5" />
+      <point x="372.0" y="4189.944873321123" />
+      <point x="-192.5" y="-0.0" />
+    </edge>
+    <edge source="Phase" target="Accomplishment">
+      <point x="228.0" y="-122.0" />
+      <point x="2521.0" y="670.8525" />
+      <point x="2601.0" y="422.10249999999996" />
+      <point x="-130.0" y="35.75" />
+    </edge>
+    <edge source="QueryParam" target="NotificationParam">
+      <point x="192.5" y="-0.0" />
+      <point x="876.0" y="4189.944873321123" />
+      <point x="-132.5" y="-47.66666666666697" />
+    </edge>
+    <edge source="Phase" target="PhaseDuration">
+      <point x="228.0" y="61.0" />
+      <point x="2521.0" y="853.8525" />
+      <point x="2601.0" y="930.1025" />
+      <point x="3140.0" y="930.1025" />
+      <point x="3220.0" y="1072.6617948717949" />
+      <point x="-102.0" y="-42.5" />
+    </edge>
+    <edge source="Professor" target="Enrollment">
+      <point x="-482.5" y="-402.7999999999997" />
+      <point x="348.0" y="201.2800000000002" />
+    </edge>
+    <edge source="Professor" target="Scholarship">
+      <point x="-482.5" y="402.8000000000002" />
+      <point x="1476.0" y="3078.244873321123" />
+      <point x="780.0" y="3078.244873321123" />
+      <point x="193.5" y="87.14285714285711" />
+    </edge>
+    <edge source="Scholarship" target="ScholarshipDuration">
+      <point x="193.5" y="130.71428571428578" />
+      <point x="780.0" y="4003.944873321123" />
+      <point x="-160.0" y="56.0" />
+    </edge>
+    <edge source="Allocation" target="CourseClass">
+      <point x="-152.0" y="-42.5" />
+      <point x="166.0" y="-0.0" />
+    </edge>
+    <edge source="City" target="Student">
+      <point x="-135.0" y="-21.25" />
+      <point x="4525.0" y="3148.379630881939" />
+      <point x="353.0" y="-327.1999999999998" />
+    </edge>
+    <edge source="State" target="City">
+      <point x="-98.5" y="-56.666666666666515" />
+      <point x="4849.0" y="3127.129630881939" />
+      <point x="135.0" y="-42.5" />
+    </edge>
+    <edge source="Professor" target="AdvisementAuthorization">
+      <point x="482.5" y="-232.38461538461524" />
+      <point x="2601.0" y="1807.979630881939" />
+      <point x="3140.0" y="1807.979630881939" />
+      <point x="3220.0" y="1721.554375997934" />
+      <point x="-98.5" y="22.0" />
+    </edge>
+    <edge source="Professor" target="Institution">
+      <point x="482.5" y="232.38461538461524" />
+      <point x="2601.0" y="2846.944873321123" />
+      <point x="-99.0" y="47.666666666666515" />
+    </edge>
+    <edge source="Phase" target="DeferralType">
+      <point x="228.0" y="-0.0" />
+      <point x="-146.0" y="-0.0" />
+    </edge>
+    <edge source="Enrollment" target="ResearchArea">
+      <point x="348.0" y="125.80000000000018" />
+      <point x="1556.0" y="1923.444873321123" />
+      <point x="2521.0" y="1923.444873321123" />
+      <point x="-235.0" y="-84.0" />
+    </edge>
+    <edge source="City" target="State">
+      <point x="135.0" y="42.5" />
+      <point x="-98.5" y="-0.0" />
+    </edge>
+    <edge source="Scholarship" target="ScholarshipType">
+      <point x="193.5" y="-87.14285714285711" />
+      <point x="780.0" y="66.75" />
+      <point x="-116.5" y="22.25" />
+    </edge>
+    <edge source="Scholarship" target="Enrollment">
+      <point x="193.5" y="43.57142857142867" />
+      <point x="-348.0" y="157.25" />
+    </edge>
+    <edge source="Major" target="StudentMajor">
+      <point x="134.5" y="56.666666666666515" />
+      <point x="3659.0" y="2827.61153998779" />
+      <point x="3739.0" y="3833.444873321123" />
+      <point x="-75.5" y="22.0" />
+    </edge>
+    <edge source="Student" target="StudentMajor">
+      <point x="353.0" y="327.2000000000003" />
+      <point x="4525.0" y="3789.444873321123" />
+      <point x="-75.5" y="-22.0" />
+    </edge>
+    <edge source="Level" target="PhaseDuration">
+      <point x="269.5" y="-83.66666666666674" />
+      <point x="3220.0" y="1157.6617948717949" />
+      <point x="-102.0" y="42.5" />
+    </edge>
+    <edge source="Level" target="Enrollment">
+      <point x="-269.5" y="31.375" />
+      <point x="1556.0" y="1203.354630881939" />
+      <point x="348.0" y="-75.48000000000002" />
+    </edge>
+    <edge source="ResearchArea" target="Professor">
+      <point x="-235.0" y="28.0" />
+      <point x="2601.0" y="2038.2451282051281" />
+      <point x="482.5" y="-154.92307692307713" />
+    </edge>
+    <edge source="Professor" target="Level">
+      <point x="482.5" y="-464.76923076923094" />
+      <point x="-269.5" y="94.125" />
+    </edge>
+    <edge source="Professor" target="Country">
+      <point x="482.5" y="464.7692307692305" />
+      <point x="2601.0" y="3865.944873321123" />
+      <point x="5126.0" y="3865.944873321123" />
+      <point x="-84.0" y="38.666666666666515" />
+    </edge>
+    <edge source="Query" target="Notification">
+      <point x="146.0" y="42.5" />
+      <point x="-252.0" y="-0.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.11946621478500317" x="2687.0" y="2350.5" />
+  <SelectedNodes>
+    <node>Major</node>
+  </SelectedNodes>
+  <Categories>
+    <Category>Association fields</Category>
+    <Category>Migration fields</Category>
+  </Categories>
+</Diagram>
+

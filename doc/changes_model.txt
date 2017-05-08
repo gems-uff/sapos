@@ -1,0 +1,82 @@
+rails generate model FormTemplate name:string description:string is_letter:boolean
+rails generate model FormField field_type:string name:string description:string is_mandatory:boolean form_template_id:integer:index
+rails generate model FormFieldValue form_field_id:integer:index value:string
+rails generate model ApplicationProcess name:string semester:integer year:integer start_date:date end_date:date form_template_id:integer:index letter_template_id:integer:index min_letters:integer max_letter:integer
+rails generate model StudentApplication student_id:integer:index application_process_id:integer:index
+rails generate model FormFieldInput student_application_id:integer:index form_field_id:integer:index input:string
+rails generate model FormTextInput student_application_id:integer:index form_field_id:integer:index input:text
+rails generate model FormFileUpload student_application_id:integer:index form_field_id:integer:index file:string
+rails generate model LetterRequest student_application_id:integer:index professor_name:string professor_email:string professor_telephone:string access_token:string is_filled:boolean
+rails generate model LetterFieldInput letter_request_id:integer:index form_field_id:integer:index input:string
+rails generate model LetterTextInput letter_request_id:integer:index form_field_id:integer:index input:text
+rails generate model LetterFileUpload letter_request_id:integer:index form_field_id:integer:index file:string
+
+-----------------------------------------------------------
+    FormTemplate
+        name:string
+        description:string
+        is_letter:boolean
+
+    FormField
+        field_type:string
+        name:string
+        description:string
+        is_mandatory:boolean
+        form_template_id:integer:index
+
+    FormFieldValue
+        form_field_id:integer:index
+        value:string
+
+    ApplicationProcess
+        name:string
+        semester:integer
+        year:integer
+        start_date:date
+        end_date:date
+        form_template_id:integer:index
+        letter_template_id:integer:index
+        min_letters:integer
+        max_letter:integer
+
+    StudentApplication
+        student_id:integer:index
+        application_process_id:integer:index
+
+    FormFieldInput
+        student_application_id:integer:index
+        form_field_id:integer:index
+        input:string
+
+    FormTextInput
+        student_application_id:integer:index
+        form_field_id:integer:index
+        input:text
+
+    FormFileUpload
+        student_application_id:integer:index
+        form_field_id:integer:index
+        file:string
+
+    LetterRequest
+        student_application_id:integer:index
+        professor_name:string
+        professor_email:string
+        professor_telephone:string
+        access_token:string
+        is_filled:boolean
+
+    LetterFieldInput
+        letter_request_id:integer:index
+        form_field_id:integer:index
+        input:string
+
+    LetterTextInput
+        letter_request_id:integer:index
+        form_field_id:integer:index
+        input:text
+
+    LetterFileUpload
+        letter_request_id:integer:index
+        form_field_id:integer:index
+        file:string

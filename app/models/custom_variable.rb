@@ -12,6 +12,8 @@ class CustomVariable < ActiveRecord::Base
     "class_schedule_text" => :text,
     "redirect_email" => :text,
     "notification_footer" => :text,
+    "application_process_mail_header" => :text,
+
   }
 
   validates :variable, :presence => true
@@ -49,6 +51,11 @@ class CustomVariable < ActiveRecord::Base
 
   def self.notification_footer
     config = CustomVariable.find_by_variable(:notification_footer)
+    config.nil? ? "" : config.value
+  end
+
+  def self.application_process_mail_header
+    config = CustomVariable.find_by_variable(:application_process_mail_header)
     config.nil? ? "" : config.value
   end
 

@@ -256,10 +256,58 @@ Sapos::Application.routes.draw do
     end
   end
 
-
   resources :course_research_areas do
     as_routes
   end
+
+  resources :student_applications do
+    as_routes
+  end
+
+  resources :form_templates do
+    as_routes
+    put :disable, on: :member
+    put :edit_form, on: :member
+  end
+
+  resources :application_processes do
+    as_routes
+    put :disable, on: :member
+    get :application_process_short_pdf, on: :member
+    get :application_process_complete_pdf, on: :member
+    get :application_process_complete_xls, on: :member
+  end
+
+  resources :form_fields do
+    as_routes
+  end
+
+  get 'apply'  => 'apply#index'
+  post 'apply'  => 'apply#create'
+  patch 'apply'  => 'apply#update'
+  get 'apply/:application_process_id/student_getid'  => 'apply#student_getid', as: :apply_to
+  post 'apply/:application_process_id/student_getid'  => 'apply#student_find'
+  get 'apply/fill_form/:token' => 'apply#fill_form', as: :fill_form
+  get 'apply/student_confirm/:token' => 'apply#student_confirm', as: :student_confirm
+  get 'apply/finish/:error' => 'apply#finish', as: :apply_finish
+
+  get 'letter_requests/fill/:access_token'  => 'letter_requests#fill', as: :fill_letter
+  patch 'letter_requests/:id' => 'letter_requests#update', as: :letter_request
+  put 'letter_requests/:id' => 'letter_requests#update'
+
+  post 'apply/student_application' => 'apply#create_student_application', as: :apply_student_application
+
+  #get "/uploads/:id/:basename.:extension", :controller => "form_file_uploads", :action => "download", :conditions => { :method => :get }, as: :form_file_download
+  #match "/uploads/:id/:basename.:extension", :controller => "form_file_uploads", :action => "download", via: :get, as: :form_file_download
+  match "/form_uploads/:id", :controller => "form_file_uploads", :action => "download", via: :get, as: :form_file_download
+  match "/letter_uploads/:id", :controller => "letter_file_uploads", :action => "download", via: :get, as: :letter_file_download
+
+  #get 'form_file_uploads/download/:file_id' => 'form_file_uploads#download', as: :form_file_download
+  #get 'letter_file_uploads/download/:file_id' => 'letter_file_uploads#download', as: :letter_file_download
+  # resources :letter_requests
+  # post 'letter_requests'  => 'letter_requests#create'
+  # patch 'letter_requests'  => 'letter_requests#update'
+
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

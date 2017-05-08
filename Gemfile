@@ -70,6 +70,20 @@ gem 'codemirror-rails'
 gem 'carrierwave'
 gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave-activerecord.git'
 
+# Nested Forms / ApplicationProcess and FormTemplates functionalities.
+gem 'cocoon', '~> 1.2', '>= 1.2.9'
+gem 'simple_form', '~> 3.2', '>= 3.2.1'
+gem 'haml', '~> 4.0', '>= 4.0.7'
+
+# ReCaptcha Helpers
+gem 'dotenv-rails', :require => 'dotenv/rails-now'
+gem 'recaptcha', require: 'recaptcha/rails'
+
+# xlsx Spreadsheets
+gem 'rubyzip', '~> 1.1.0'
+gem 'axlsx', '2.1.0.pre'
+gem 'axlsx_rails'
+gem 'acts_as_xlsx'
 
 group :development, :test do
   gem 'sqlite3'

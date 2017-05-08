@@ -12,7 +12,7 @@ Bundler.require(*Rails.groups)
 module Sapos
   class Application < Rails::Application
     # Allow the notifier to send emails
-    config.should_send_emails = false
+    config.should_send_emails = true
 
 
     # Settings in config/environments/* take precedence over those specified here.
@@ -62,5 +62,5 @@ module Sapos
 
   end
 
-  ActionMailer::Base.default :from => 'SAPOS <sapos@sel.ic.uff.br>'
+  ActionMailer::Base.default :from => 'SAPOS <sapos@brunodess.com.br>'
 end

@@ -1,0 +1,3 @@
+%h2= I18n.t 'apply.apply_label'
+- @application_process.each do |apply|
+  %h3= link_to apply.name, apply_to_url(apply.id), method: :get

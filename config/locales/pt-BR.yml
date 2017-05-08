@@ -63,6 +63,18 @@ pt-BR:
         end_time: "Hora de fim"
         room: "Sala"
         start_time: "Hora de início"
+      application_process:
+        name: "Nome"
+        semester: "Semestre"
+        year: "Ano"
+        year_semester: "Semestre"
+        start_date: "Data de início"
+        end_date: "Data de encerramento"
+        min_letters: "Mínimo de Cartas"
+        max_letters: "Máximo de Cartas"
+        form_template: "Modelo de Formulário"
+        letter_template: "Modelo de Carta de Recomendação"
+        student_applications_count: 'Inscritos'
       city:
         name: "Nome"
         state: "Estado"
@@ -195,11 +207,47 @@ pt-BR:
       enrollment_status:
         name: "Nome"
         enrollments: "Matrículas"
+      form_field:
+        name: "Campo"
+        description: "Descrição"
+        field_type: "Tipo"
+        is_mandatory: "Obrigatório"
+      form_field_value:
+        value: 'Valor'
+      form_field_input:
+        input: "Resposta do Candidato"
+      form_template:
+        name: "Nome"
+        description: "Descrição"
+        is_letter: "Carta de Recomendação"
+        type: "Tipo"
+        get_form_type: 'Tipo'
+        form_fields: 'Campos do formulário'
+        remove_field: 'Remover campo'
+        remove_value: 'Remover opção'
+        add_field: 'Adicionar campo'
+        add_value: 'Adicionar opção'
+        add_string_field: 'Adicionar campo de texto curto'
+        add_checkbox_field: 'Adicionar caixa de seleção única'
+        add_checkboxes_field: 'Adicionar múltiplas caixas de seleção'
+        add_radio_field: 'Adicionar seletor único'
+        add_select_field: 'Adicionar menu de seleção'
+        add_text_field: 'Adicionar campo de texto longo'
+        add_file_upload: 'Adicionar upload de arquivo'
       institution:
         code: "Sigla"
         majors: "Cursos"
         name: "Nome"
-      level: 
+      letter_request:
+        professor_name: "Nome do Indicado"
+        professor_email: "Email do Indicado"
+        professor_telephone: "Telefone do Indicado"
+        is_filled: "Preenchida"
+        not_filled: "Não Preenchida"
+
+      letter_field_input:
+        input: "Resposta do Indicado"
+      level:
         advisement_authorizations: "Credenciamentos"
         name: "Nome"
         course_name: "Nome completo do curso"
@@ -420,6 +468,14 @@ pt-BR:
         telephone1: "1º Telefone"
         telephone2: "2º Telefone"
         zip_code: "CEP"   
+      student_application:
+        student: "Aluno"
+        application_process: "Edital de Seleção"
+        student_cpf: "CPF"
+        requested_letters: "Recomendações solicitadas"
+        filled_letters: "Recomendações preenchidas"
+        form_fields: "Dados"
+        letter_requests: "Recomendações"
       student_major:
         major: "Curso"
         student: "Aluno"
@@ -483,6 +539,9 @@ pt-BR:
         allocation:
           end_time_before_start_time: "menor do que a hora de fim"
           scheduling_conflict: "este horário já está sendo usado em outra alocação da mesma turma"
+        application_process:
+          end_greater_than_start_date: "Data de encerramento deve ser após data de início"
+          max_greater_than_min_letters: "Máximo de cartas não pode ser menor que mínimo"
         class_enrollment:
           attributes:
             course_class:
@@ -585,6 +644,9 @@ pt-BR:
       allocation:
         one: "Alocação"
         other: "Alocações"
+      application_process:
+        one: "Edital de Seleção"
+        other: "Editais de Seleção"
       city:
         one: "Cidade"
         other: "Cidades"
@@ -630,10 +692,19 @@ pt-BR:
       enrollment_status:
         one: "Tipo de Matrícula"
         other: "Tipos de Matrícula"
+      form_field:
+        one: "Campo"
+        other: "Campos"
+      form_template:
+        one: "Modelo de Formulário"
+        other: "Modelos de Formulário"
       institution:
         one: "Instituição"
         other: "Instituições"  
-      level: 
+      letter_request:
+        one: "Solicitação de Recomendação"
+        other: "Solicitações de Recomendação"
+      level:
         one: "Nível"
         other: "Níveis"    
       major:
@@ -699,9 +770,14 @@ pt-BR:
       student:
         one: "Aluno"
         other: "Alunos"
+      student_application:
+        one: "Inscrição"
+        other: "Inscrições"
       student_major:
         one: "Curso do Aluno"
         other: "Curso dos Alunos"
+      student_token:
+        one: "Chave de Validação"
       thesis_defense_committee_participation:
         one: "Participação em Banca"
         other: "Participações em Bancas"
@@ -761,6 +837,8 @@ pt-BR:
     create_student_major_label: "Adicionar Curso do Aluno"
     create_thesis_defense_committee_participation_label: "Adicionar Participação em Banca"
     create_user_label: "Adicionar Usuário"
+    create_form_template_label: "Criar Modelo de Formulário"
+    create_application_process_label: "Criar Edital de Seleção"
     report_configurations:
       preview: "Visualizar"
     delayed_phases_report: "Relatório"
@@ -811,6 +889,8 @@ pt-BR:
     update_student_major_label: "Editar Curso do Aluno"
     update_thesis_defense_committee_participation: "Editar Participação em Banca"
     update_user_label: "Modificar Usuário"
+    update_application_process_label: "Modificar Edital"
+
     record_not_saved: "A validação falhou!"
     query:
       execute: 'Executar'
@@ -874,6 +954,9 @@ pt-BR:
       create: 'Criar %{model}'
       submit: 'Salvar %{model}'
       update: 'Atualizar %{model}'
+
+    student_application:
+      letter_requested_to: "Recomendação Solicitada para"
 
   notifications:
     accomplishment:
@@ -1024,6 +1107,48 @@ pt-BR:
     scholarship_durations:
       to_pdf:
         filename: "Relatório de Alocação de Bolsas"
+    application_processes:
+      to_pdf:
+        filename: "Relatório de Inscrições"
+        student_applications: 'Inscrições para'
+        student_applications_count: 'Total de Inscritos'
+        student_name: 'Nome do Candidato'
+        student_cpf: 'CPF'
+        requested_letters: "Cartas solicitadas"
+        filled_letters: "Cartas Preenchidas"
+        requested_filled_letters: "Cartas preenchidas / solicitadas"
+        start_date: 'Início'
+        end_date: 'Encerramento'
 
   rescue_blank_text: "Não informado"
+
+  apply:
+    apply_label: "Processos seletivos"
+    student_getid_label: "Identicação do candidato"
+    letter_requested_by: "Preencher carta de recomendação para: %{student}"
+    letter_requested_to: "Carta solicitada a: %{professor}"
+    application_finished: 'Sua inscrição foi realizada com sucesso'
+    application_finished_get_mail: 'Em instantes você receberá um email de confirmação.'
+    validation_mail_sent: 'Foi enviado um email de confirmação para %{email} com instruções de como prosseguir.'
+    application_error: 'Erro no processo de inscrição, favor tentar novamente.'
+    student_token_mail_subject: "E-mail de validaçao - Sapos"
+    student_token_mail_body: 'E-mail de validação para: %{student}.'
+    letter_request_mail_subject: "Carta de recomendaçao solicitada para %{student}"
+    letter_request_mail_body: "Uma carta de recomendação foi solicitada por %{student}, para o edital de seleção %{application_process}"
+    follow_link: "Clique no link abaixo para prosseguir"
+    application_finished_mail_subject: "Inscriçao finalizada - %{application_process}"
+    errors:
+      student_already_applied: 'Candidato já se inscreveu para este edital'
+      invalid_token: 'Chave de validação inválida. Retorne ao início do processo de inscrição e tente novamente'
+      token_expired: 'Chave de validação expirada. Retorne ao início do processo de inscrição e tente novamente'
+      application_process_closed: 'Inscrições para este edital estão encerradas'
+      create_student_application: 'Erro ao salvar inscrição. Retorne ao início do processo de inscrição e tente novamente'
+      create_student: 'Erro ao salvar dados do candidato. Retorne ao início do processo de inscrição e tente novamente'
+      update_student: 'Erro ao atualizar dados do candidato. Retorne ao início do processo de inscrição e tente novamente'
+      invalid_recaptcha: 'Validação ReCaptcha inválida, tente novamente'
+      invalid_email: 'E-mail informado não confere com o registrado para este CPF.'
+      update_token: 'Erro ao salvar inscrição. Retorne ao início do processo de inscrição e tente novamente'
+
+
+
 
