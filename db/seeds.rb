@@ -22,7 +22,8 @@ CustomVariable.create(:description=>"Texto de rodapé da notificação", :variab
 Este e-mail foi enviado automaticamente pelo SAPOS. Por favor, não responda. 
 Em caso de dúvida, procure a secretaria."
 )
-
+CustomVariable.create(:description=>"Nota mínima para aprovação", :variable =>"minimum_grade_for_approval", :value => "6.0")
+CustomVariable.create(:description=>"Nota de reprovação por falta", :variable =>"grade_of_disapproval_for_absence", :value => "0.0")
 
 ['Graduação', 'Especialização', 'Mestrado', 'Doutorado'].each do |level|
     Level.new do |l|
