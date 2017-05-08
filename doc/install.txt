@@ -1,4 +1,0 @@
-Please refer to our Wiki: 
-
-https://github.com/gems-uff/sapos/wiki/Explained-Quick-install-for-development
-https://github.com/gems-uff/sapos/wiki/Explained-Quick-install-for-production 
