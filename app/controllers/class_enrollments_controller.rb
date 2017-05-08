@@ -17,8 +17,10 @@ class ClassEnrollmentsController < ApplicationController
     config.columns[:situation].form_ui = :select
     config.columns[:situation].options = {:options => ClassEnrollment::SITUATIONS, :include_blank => I18n.t("active_scaffold._select_")}
 
+    #config.columns =
+    #    [:enrollment, :course_class, :situation, :grade, :disapproved_by_absence, :obs]
     config.columns =
-        [:enrollment, :course_class, :situation, :grade, :disapproved_by_absence, :obs]
+	[:enrollment, :course_class, :situation, :disapproved_by_absence, :grade, :obs]     
 
     config.actions.exclude :deleted_records
   end

@@ -495,11 +495,15 @@ module EnrollmentsPdfHelper
       thesis_defense_date = enrollment.thesis_defense_date
       thesis_desense_committee = enrollment.thesis_defense_committee_professors
 
-      if enrollment.thesis_defense_committee_professors.any?
+      has_advisors = !(enrollment.professors.nil? || enrollment.professors.empty?)
+      show_advisors = !(enrollment.dismissal.nil?) && enrollment.dismissal.dismissal_reason.show_advisor_name
+      show_advisors = true if options[:show_advisors]
+
+      if enrollment.thesis_defense_committee_professors.any? or (has_advisors and show_advisors)
         pdf.bounding_box([0, pdf.cursor], :width => 560) do
 
           pdf.font('Courier', :size => 8) do
-            if not (thesis_title.nil? or thesis_title.empty?)
+            if ( not (thesis_title.nil? or thesis_title.empty?) ) and enrollment.thesis_defense_committee_professors.any?		    
               data_table = [
                   [
                       "#{I18n.t('pdf_content.enrollment.thesis.title')} " +
@@ -542,10 +546,7 @@ module EnrollmentsPdfHelper
               pdf.move_down 5
               pdf.horizontal_line 0, 560
             end
-
-            has_advisors = !(enrollment.professors.nil? || enrollment.professors.empty?)
-            show_advisors = !(enrollment.dismissal.nil?) && enrollment.dismissal.dismissal_reason.show_advisor_name
-            show_advisors = true if options[:show_advisors]
+            
             if has_advisors and show_advisors
               data_table = [
                   [

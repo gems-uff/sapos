@@ -53,4 +53,10 @@ module ClassEnrollmentsHelper
     logger.info "  RecordSelect Helper ClassEnrollmentsHelper\\enrollment_form_column" 
     record_select_field :enrollment, record.enrollment || Enrollment.new, options.merge!(class: "text-input")
   end
+
+  def disapproved_by_absence_form_column(record, options)
+	  options = options.merge({:class_enrollments_id => "#{record.id}", :grade_of_disapproval_for_absence => "#{CustomVariable.grade_of_disapproval_for_absence.nil? ? nil : CustomVariable.grade_of_disapproval_for_absence.to_f/10.0}"})
+    check_box :record, :disapproved_by_absence_to_view, options
+  end
+
 end

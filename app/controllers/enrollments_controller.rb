@@ -123,7 +123,7 @@ class EnrollmentsController < ApplicationController
 
   def self.condition_for_accomplishments_column(column, value, like_pattern)
     return "" if value[:phase].blank?
-    date = value.nil? ? value : Date.parse("#{value[:year]}/#{value[:month]}/#{value[:day]}")
+    date = value.nil? ? value : "#{value[:year]}-#{value[:month]}-#{value[:day]}"
     phase = value[:phase] == "all" ? nil : value[:phase]
     if (value[:phase] == "all")
       enrollments_ids = Enrollment.with_all_phases_accomplished_on(date)
@@ -162,27 +162,35 @@ class EnrollmentsController < ApplicationController
 
   def self.condition_for_course_class_year_semester_column(column, value, like_pattern)
     return [] if value[:year].empty? and value[:semester].empty? and value[:course].empty?
-    columns = { :year => '`course_classes`.`year`', 
-                :semester => '`course_classes`.`semester`', 
-                :course => '`courses`.`id`'}
-    select = []
-    condition = []
+
     result = []
-    columns.each do |key, selection|
-      unless value[key].empty?
-        select << selection
-        condition << "?"
-        result << value[key]
-      end
+
+    search_sql = " enrollments.id in ( select 
+                                         class_enrollments.enrollment_id 
+ 				       from
+      				         class_enrollments, course_classes
+ 				       where
+       				         course_classes.id = class_enrollments.course_class_id " 
+
+    if not value[:course].empty?
+      search_sql += " and course_classes.course_id = ? " 
+      result << value[:course]
+    end
+															     
+    if not value[:year].empty?
+      search_sql += " and course_classes.year = ? "
+      result << value[:year]
     end
 
-    search_sql = ClassEnrollment.joins(course_class: {course: :course_type})
-      .where('`class_enrollments`.`enrollment_id` = `enrollments`.`id`')
-      .select(select)
-      .to_sql
+    if not value[:semester].empty?
+      search_sql += " and course_classes.semester = ? "
+      result << value[:semester]
+    end
 
+    search_sql += " ) "
 
-    ["(#{condition.join(', ')}) IN (#{search_sql})"] + result
+    return [ search_sql ] + result 
+    
   end
 
   def self.condition_for_delayed_phase_column(column, value, like_pattern)
