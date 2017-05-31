@@ -16,6 +16,7 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 * João Felipe Nicolaci Pimentel (joined in August 2013)
 * Luis Antônio Vieira Junior (joined in August 2013)
 * Daniel Prett (joined in August 2014)
+* Carlos Eduardo Cabral da Cunha (joined in August 2016)
 
 # Additional contributors
 
