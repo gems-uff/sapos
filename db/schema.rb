@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170203163454) do
+ActiveRecord::Schema.define(version: 20170608190213) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer  "enrollment_id"
@@ -520,9 +520,11 @@ ActiveRecord::Schema.define(version: 20170203163454) do
     t.integer  "birth_city_id"
     t.string   "identity_issuing_place",   limit: 255
     t.string   "photo",                    limit: 255
+    t.integer  "birth_country_id"
   end
 
   add_index "students", ["birth_city_id"], name: "index_students_on_birth_city_id"
+  add_index "students", ["birth_country_id"], name: "index_students_on_birth_country_id"
   add_index "students", ["birth_state_id"], name: "index_students_on_state_id"
   add_index "students", ["city_id"], name: "index_students_on_city_id"
 

@@ -22,7 +22,7 @@ module StudentsHelper
   def birth_city_form_column(record, options)
     city = record.birth_city || City.new
     state = city.state || record.birth_state || State.new
-    country = state.country || Country.new
+    country = state.country || record.birth_country || Country.new
 
     city_widget(
       country: :birth_country, state: :birth_state, city: :birth_city,

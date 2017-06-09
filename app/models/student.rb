@@ -14,7 +14,8 @@ class Student < ActiveRecord::Base
   belongs_to :city
   belongs_to :birth_city, :class_name => 'City', :foreign_key => 'birth_city_id'
   belongs_to :birth_state, :class_name => 'State', :foreign_key => 'birth_state_id' 
-  
+  belongs_to :birth_country, :class_name => 'Country', :foreign_key => 'birth_country_id'
+
   has_paper_trail  
    
   validates :name, :presence => true
@@ -36,6 +37,11 @@ class Student < ActiveRecord::Base
     return nil if birth_city.nil? and birth_state.nil?
     return "#{birth_state.country.name}" if birth_city.nil? 
     "#{birth_city.state.country.name}"
+  end
+
+  def nationality
+    return nil if birth_country.nil?
+    "#{birth_country.nationality}"
   end
 
   def identity_issuing_place_to_label

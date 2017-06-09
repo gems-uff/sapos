@@ -16,6 +16,7 @@ class StudentsController < ApplicationController
 #    config.columns[:birthdate].form_ui = :calendar_date_select         
     config.columns[:birth_city].form_ui = :select
     config.columns[:birth_state].form_ui = :hidden
+    config.columns[:birth_country].form_ui = :hidden
     config.columns[:city].form_ui = :select
     config.columns[:civil_status].form_ui = :select
     config.columns[:identity_issuing_place].form_ui = ""
@@ -39,7 +40,7 @@ class StudentsController < ApplicationController
          :address,
          :zip_code,
          :telephone1,
-         :telephone2,
+ 	 :telephone2,
          :email,
          :employer,
          :job_position,
@@ -48,9 +49,10 @@ class StudentsController < ApplicationController
          :identity_issuing_body,
          :identity_issuing_place, 
          :identity_expedition_date,
-         :birth_state,
+         :birth_country,
+	 :birth_state,
          :birth_city,
-         :father_name,
+	 :father_name,
          :mother_name,
          :obs,
          :student_majors]
