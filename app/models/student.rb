@@ -40,8 +40,14 @@ class Student < ActiveRecord::Base
   end
 
   def nationality
-    return nil if birth_country.nil?
-    "#{birth_country.nationality}"
+    if not birth_country.nil?
+      return "#{birth_country.nationality}"
+    elsif not birth_state.nil?
+      return "#{birth_state.country.nationality}"
+    elsif not birth_city.nil?
+      return "#{birth_city.state.country.nationality}"
+    end
+    nil    
   end
 
   def identity_issuing_place_to_label
