@@ -19,7 +19,7 @@ module EnrollmentsPdfHelper
                 "#{I18n.t('pdf_content.enrollment.header.enrollment_number')} " +
                     "<b>#{enrollment.enrollment_number}   </b>",
                 "#{I18n.t('pdf_content.enrollment.header.student_birthplace')} " +
-                    "<b>#{rescue_blank_text(enrollment.student.birthplace)}   </b>",
+                    "<b>#{rescue_blank_text(enrollment.student.nationality)}   </b>",
                 "#{I18n.t('pdf_content.enrollment.header.student_birthdate')} " +
                     "<b>#{birthdate}</b>"
             ], [
