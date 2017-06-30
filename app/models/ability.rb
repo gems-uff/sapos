@@ -10,7 +10,7 @@ class Ability
                 DismissalReason, Enrollment, EnrollmentHold, EnrollmentStatus, 
                 Institution, Level, Major, Notification, NotificationLog, Phase, 
                 PhaseCompletion, PhaseDuration, Professor, ProfessorResearchArea,
-                ReportConfiguration, ResearchArea, Role, Scholarship, ScholarshipDuration, 
+                Query, ReportConfiguration, ResearchArea, Role, Scholarship, ScholarshipDuration, 
                 ScholarshipSuspension, ScholarshipType, Sponsor, State, Student, StudentMajor, 
                 ThesisDefenseCommitteeParticipation, User, Version, YearSemester] 
 
@@ -33,11 +33,12 @@ class Ability
       cannot [:destroy, :update], Role
       cannot [:destroy, :create], NotificationParam
     elsif role_id == Role::ROLE_COORDENACAO
-      can :manage, (Ability::ALL_MODELS - [Role, Notification, CustomVariable, ReportConfiguration])
+      can :manage, (Ability::ALL_MODELS - [Role, CustomVariable, ReportConfiguration])
     elsif role_id == Role::ROLE_PROFESSOR
-      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification, NotificationLog, ReportConfiguration])
+      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration])
     elsif role_id == Role::ROLE_SECRETARIA
-      can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Version, Notification, ReportConfiguration])
+      can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, ReportConfiguration])
+      can :read, (Query)
     elsif role_id == Role::ROLE_ALUNO
       can :manage, []
     elsif role_id == Role::ROLE_DESCONHECIDO
