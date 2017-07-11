@@ -132,6 +132,8 @@ end
     {:id => 4, :name => 'Professor', :description => 'Professor'},
     {:id => 5, :name => 'Aluno', :description => 'Aluno'},
     {:id => 6, :name => 'Administrador', :description => 'Administrador'}
+    {:id => 7, :name => 'Suporte', :description => 'Suporte (inserir fotos de alunos)'}
+ 
 ].each do |role|
     Role.new do |r|
       r.id = role[:id]
