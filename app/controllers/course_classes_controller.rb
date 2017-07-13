@@ -7,6 +7,8 @@ class CourseClassesController < ApplicationController
   include NumbersHelper
   helper :class_enrollments
 
+  before_action :remove_constraint_to_show_enrollment_column, only: [:edit]
+
   active_scaffold :course_class do |config|
 
     config.columns.add :class_enrollments_count
@@ -131,5 +133,12 @@ class CourseClassesController < ApplicationController
     Notifier.send_emails(notifications: emails)
   end
 
+  private
+  def remove_constraint_to_show_enrollment_column
+    begin
+      Thread.current[:constraint_columns]["class_enrollment-subform"].delete(:enrollment)
+    rescue
+    end
+  end
 
 end 
