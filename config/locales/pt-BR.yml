@@ -397,6 +397,7 @@ pt-BR:
         address: "Logradouro"        
         birth_city: "Naturalidade"
         birth_state: "Estado de Origem"
+        birth_country: "País de Origem"
         birthdate: "Data de Nascimento"
         city: "Residência"
         civil_status: "Estado Civil"
