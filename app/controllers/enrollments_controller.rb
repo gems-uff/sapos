@@ -11,7 +11,7 @@ class EnrollmentsController < ApplicationController
   helper :advisements
   helper :scholarship_durations
 
-  before_action :remove_constraint_to_show_enrollment_column, only: [:new, :edit, :show]
+  before_action :remove_constraint_to_show_enrollment_column, only: [:edit]
 
   active_scaffold :enrollment do |config|
 
