@@ -11,6 +11,8 @@ class EnrollmentsController < ApplicationController
   helper :advisements
   helper :scholarship_durations
 
+  before_action :remove_constraint_to_show_enrollment_column, only: [:new, :edit, :show]
+
   active_scaffold :enrollment do |config|
 
     config.action_links.add 'to_pdf', 
@@ -314,6 +316,14 @@ class EnrollmentsController < ApplicationController
     return if emails.empty?
     
     Notifier.send_emails(notifications: emails)
+  end
+
+  private
+  def remove_constraint_to_show_enrollment_column
+    begin
+      Thread.current[:constraint_columns] = nil
+    rescue
+    end
   end
 
 end
