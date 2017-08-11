@@ -9,6 +9,7 @@ module PdfHelper
   include ApplicationHelper
 
   HEIGHT = 90
+  FOOTER_TOP_MARGIN = 2 
 
   def header(pdf, title, pdf_config, options={}, &block)
     if pdf_config.nil?
@@ -77,7 +78,7 @@ module PdfHelper
     last_box_width1 = 165
     last_box_width2 = 335
 
-    last_box_y = pdf.bounds.bottom  #pdf.bounds.bottom + last_box_height# pdf.cursor - 15
+    last_box_y = pdf.bounds.bottom - FOOTER_TOP_MARGIN  
     pdf.font('Courier', :size => 8) do
       pdf.bounding_box([0, last_box_y], :width => last_box_width1, :height => last_box_height) do
         pdf.stroke_bounds
@@ -173,7 +174,7 @@ module PdfHelper
       :left_margin => 0.6.cm,
       :right_margin => (0.6.cm + ((options[:page_layout] == :landscape) ? 1.87 : 1.25)),
       :top_margin => 0.8.cm,
-      :bottom_margin => (pdf_config.signature_footer ? 96 : 1.cm),
+      :bottom_margin => (pdf_config.signature_footer ? 96 + FOOTER_TOP_MARGIN : 1.cm),
       :filename => name
     }.merge(options)) do |pdf|
       pdf.fill_color "000080"
@@ -227,20 +228,20 @@ module PdfHelper
     options[:distance] = 0 unless options.has_key? :distance
 
     # Table
-    pdf.bounding_box([0, pdf.cursor - title_distance], :width => width) do
-      #pdf.move_down title_distance
-      pdf.table(title, :column_widths => [widths.sum],
-                :row_colors => ["E5E5FF"],
-                :cell_style => {:font => "Helvetica",
-                                :size => 9,
-                                :inline_format => true,
-                                :border_width => 1,
-                                :border_color => "000080",
-                                :align => :left,
-                                :padding => [2, 4]
-                }
-      )
-    end
+    pdf.move_down title_distance 
+    pdf.table(title, :column_widths => [widths.sum],
+              :width => widths.sum,
+              :row_colors => ["E5E5FF"],
+              :cell_style => {:font => "Helvetica",
+                              :size => 9,
+                              :inline_format => true,
+                              :border_width => 1,
+                              :border_color => "000080",
+                              :align => :left,
+                              :padding => [2, 4]
+              }
+    )
+    
     simple_pdf_table(pdf, widths, header, data, options, &block)
   end
 
@@ -250,25 +251,21 @@ module PdfHelper
 
     #Header
     unless header.empty?
-      pdf.bounding_box([0, pdf.cursor - distance], :width => (pdf.bounds.left + pdf.bounds.right).floor) do
-
-        pdf.table(header, :column_widths => widths,
-                  :width => widths.sum,
-                  :row_colors => ["E5E5FF"],
-                  :cell_style => {:font => "Helvetica",
-                                  :size => 9,
-                                  :inline_format => true,
-                                  :border_width => 1,
-                                  :borders => [:left, :right],
-                                  :border_color => "000080",
-                                  :align => :center,
-                                  :padding => [2, 2]
-                }
-        )
-
-        pdf.stroke_bounds
-
-      end
+      
+      pdf.table(header, :column_widths => widths,
+                :width => widths.sum,
+                :row_colors => ["E5E5FF"],
+                :cell_style => {:font => "Helvetica",
+                                :size => 9,
+                                :inline_format => true,
+                                :border_width => 1,
+                                :borders => [:top, :left, :right, :bottom],
+                                :border_color => "000080",
+                                :align => :center,
+                                :padding => [2, 2]
+              }
+      )
+     
     end
 
     #Content
