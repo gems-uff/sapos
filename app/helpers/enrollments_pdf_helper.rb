@@ -487,7 +487,9 @@ module EnrollmentsPdfHelper
   end
 
   def thesis_table(curr_pdf, options={})
-
+    data_table_rows = nil
+    data_table_rows_defense_committee = nil
+	  
     curr_pdf.group do |pdf|
       enrollment ||= options[:enrollment]
 
@@ -500,90 +502,83 @@ module EnrollmentsPdfHelper
       show_advisors = true if options[:show_advisors]
 
       if enrollment.thesis_defense_committee_professors.any? or (has_advisors and show_advisors)
-        pdf.bounding_box([0, pdf.cursor], :width => 560) do
+	data_table_rows = []
+	data_table_rows_defense_committee = []
+        
+        if ( not (thesis_title.nil? or thesis_title.empty?) ) and enrollment.thesis_defense_committee_professors.any?		    
 
-          pdf.font('Courier', :size => 8) do
-            if ( not (thesis_title.nil? or thesis_title.empty?) ) and enrollment.thesis_defense_committee_professors.any?		    
-              data_table = [
-                  [
-                      "#{I18n.t('pdf_content.enrollment.thesis.title')} " +
-                          "<b>#{rescue_blank_text(thesis_title)}</b>"
-                  ]
-              ]
+	  data_table_rows += [
+	    [
+	      "#{I18n.t('pdf_content.enrollment.thesis.title')} " +
+	      "<b>#{rescue_blank_text(thesis_title)}</b>"
+	    ]
+	  ]
 
-              pdf.indent(5) do
-                text_table(pdf, data_table, 8)
-              end
+          thesis_defense_date = thesis_defense_date.nil? ? rescue_blank_text(nil) : I18n.localize(thesis_defense_date, :format => :default)
 
-              pdf.move_down 5
-              pdf.line_width 0.5
-              pdf.horizontal_line 0, 560
-
-              thesis_defense_date = thesis_defense_date.nil? ? rescue_blank_text(nil) : I18n.localize(thesis_defense_date, :format => :default)
-              data_table = [
-                  [
-                      "#{I18n.t('pdf_content.enrollment.thesis.date')} " +
-                          "<b>#{thesis_defense_date}   </b>"
-
-                  ]
-              ]
-              if !(enrollment.dismissal.nil?)
-                data_table[0].push(
-                    "#{I18n.t('pdf_content.enrollment.thesis.judgement')} " +
-                        "<b>#{rescue_blank_text(enrollment.dismissal.dismissal_reason, :method_call => :thesis_judgement)}</b>"
-                )
-              else
-                data_table[0].push(
-                    "#{I18n.t('pdf_content.enrollment.thesis.judgement')} " +
-                        "<b>#{I18n.t("activerecord.attributes.dismissal_reason.thesis_judgements.invalid")}</b>"
-                )
-              end
-
-              pdf.indent(5) do
-                text_table(pdf, data_table, 8)
-              end
-
-              pdf.move_down 5
-              pdf.horizontal_line 0, 560
-            end
-            
-            if has_advisors and show_advisors
-              data_table = [
-                  [
-                      "#{I18n.t('pdf_content.enrollment.thesis.advisors')} " +
-                          "<b>#{rescue_blank_text(enrollment.professors.collect { |a| a.name }.join(', '))}</b>"
-                  ]
-              ]
-              pdf.indent(5) do
-                text_table(pdf, data_table, 8)
-              end
-
-              pdf.move_down 5
-              pdf.horizontal_line 0, 560
-            end
-
-            if not (thesis_desense_committee.nil? or thesis_desense_committee.empty?)
-              pdf.indent(5) do
-                pdf.move_down 8
-                pdf.text "#{I18n.t('pdf_content.enrollment.thesis.defense_committee')} ", :inline_format => true
-                pdf.move_down 5
-
-                thesis_desense_committee.each do |professor|
-                  pdf.text "<b>#{professor.name} / #{rescue_blank_text(professor.institution, :method_call => :name)}</b>", :inline_format => true
-                  pdf.move_down 1
-                end
-              end
-              pdf.move_down 5
-
-
-            end
+          data_table_rows += [
+	    [
+	      "#{I18n.t('pdf_content.enrollment.thesis.date')} " +
+	      "<b>#{thesis_defense_date}   </b>"
+	    ]
+	  ]
+              
+          if !(enrollment.dismissal.nil?)
+	    data_table_rows[-1][0] += "#{I18n.t('pdf_content.enrollment.thesis.judgement')} " +
+	    "<b>#{rescue_blank_text(enrollment.dismissal.dismissal_reason, :method_call => :thesis_judgement)}</b>"
+          else
+	    data_table_rows[-1][0] += "#{I18n.t('pdf_content.enrollment.thesis.judgement')} " +
+	    "<b>#{I18n.t("activerecord.attributes.dismissal_reason.thesis_judgements.invalid")}</b>"	
           end
-          pdf.close_and_stroke
-          pdf.line_width 1
-          pdf.stroke_bounds
+
+        end
+            
+        if has_advisors and show_advisors
+          data_table_rows += [
+	    [
+	      "#{I18n.t('pdf_content.enrollment.thesis.advisors')} " +
+	      "<b>#{rescue_blank_text(enrollment.professors.collect { |a| a.name }.join(', '))}</b>"
+	    ]
+	  ]		 
+        end
+
+        if not (thesis_desense_committee.nil? or thesis_desense_committee.empty?)
+	  data_table_rows_defense_committee += [["#{I18n.t('pdf_content.enrollment.thesis.defense_committee')} "]]
+          thesis_desense_committee.each do |professor|
+            data_table_rows_defense_committee += [["<b>#{professor.name} / #{rescue_blank_text(professor.institution, :method_call => :name)}</b>"]]
+          end
         end
       end
     end
+
+    if not data_table_rows.nil? 
+      table = curr_pdf.make_table(data_table_rows, :cell_style => {:borders => [:left, :right, :bottom, :top], :border_bottom_width => 0.5, :border_top_width => 0.5, :width => 560, :padding_top => 5.5, :padding_bottom => 7.5, :inline_format => true, :font => "Courier", :size => 8, :border_color => "000080" })
+      table.row(0).border_top_width = 1.0
+
+      if data_table_rows_defense_committee.length == 0
+        table.row(data_table_rows.length - 1).border_bottom_width = 1.0
+      end  
+
+      table.draw 
+    end
+    
+    if (not data_table_rows_defense_committee.nil?) && (data_table_rows_defense_committee.length > 0)
+
+      #title row	 
+	    table_committee = curr_pdf.make_table(data_table_rows_defense_committee[0,1], :cell_style => {:borders => [:top, :left, :right], :border_top_width => 0.5, :width => 560, :padding_top => 5.5, :padding_bottom => 4.9, :inline_format => true, :font => "Courier", :size => 8, :border_color => "000080" })
+      table_committee.draw
+			  	  	  
+      #middle rows (if any)
+      if data_table_rows_defense_committee.length > 2  
+	table_committee = curr_pdf.make_table(data_table_rows_defense_committee[1,data_table_rows_defense_committee.length - 2], :cell_style => {:borders => [:left, :right], :width => 560, :padding_top => 0.0, :padding_bottom => 1.0, :inline_format => true, :font => "Courier", :size => 8, :border_color => "000080" })
+	table_committee.draw
+      end
+
+      #last row 
+      table_committee = curr_pdf.make_table(data_table_rows_defense_committee[data_table_rows_defense_committee.length - 1,data_table_rows_defense_committee.length], :cell_style => {:borders => [:left, :right, :bottom], :border_bottom_width => 1.0 , :width => 560, :padding_top => 0.0, :padding_bottom => 8.5, :inline_format => true, :font => "Courier", :size => 8, :border_color => "000080" })
+      table_committee.draw
+    end
+
   end
 
   def accomplished_table(curr_pdf, options={})
