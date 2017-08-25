@@ -35,7 +35,7 @@ class ApplicationController < ActionController::Base
   # Defines which controller and action should be shown when the base
   # URL is acessed (root route in routes.rb).
   def root
-    [Enrollment, Professor, ScholarshipDuration, Phase, Course, City, User].each do |model|
+    [Enrollment, Professor, ScholarshipDuration, Phase, Course, City, User, Student].each do |model|
       if can? :read, model
         redirect_to(:controller => model.name.underscore.pluralize.downcase, :action => 'index') and return
       end
