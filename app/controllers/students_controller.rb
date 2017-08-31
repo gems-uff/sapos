@@ -6,7 +6,9 @@ class StudentsController < ApplicationController
   authorize_resource
 
   helper :student_majors
-  
+
+  before_action :check_current_user
+
   active_scaffold :student do |config|
     config.list.sorting = {:name => 'ASC'}
     config.list.columns = [:name, :cpf, :enrollments]
@@ -65,6 +67,14 @@ class StudentsController < ApplicationController
   def photo
     student = Student.find params[:id]
     send_data(student.photo.read, filename: student.photo_identifier)
+  end
+
+  private
+  def check_current_user
+    if current_user.role_id == Role::ROLE_SUPORTE
+      active_scaffold_config.update.columns = [:photo, :email]
+      active_scaffold_config.show.columns = [:photo, :email]
+    end
   end
 
 end 
