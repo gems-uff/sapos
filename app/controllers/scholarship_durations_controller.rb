@@ -87,7 +87,11 @@ class ScholarshipDurationsController < ApplicationController
 
   def self.condition_for_scholarship_types_column(column, value, like_pattern)
     unless value.blank?
-      sql = "scholarships.scholarship_type_id = ?"
+	    sql = "scholarship_durations.scholarship_id IN (
+		     SELECT scholarships.id
+		     FROM   scholarships
+		     WHERE  scholarships.scholarship_type_id = ?
+		   )"
 
       [sql, value]
     end
