@@ -113,7 +113,7 @@ class ScholarshipDurationsController < ApplicationController
 
   def self.condition_for_level_column(column, value, like_pattern)
     unless value.blank?
-      ["scholarships.id IN (
+      ["scholarship_durations.scholarship_id IN (
       SELECT scholarships.id
       FROM   scholarships
       WHERE  scholarships.level_id = ?
