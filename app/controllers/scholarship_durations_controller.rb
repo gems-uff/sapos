@@ -64,7 +64,7 @@ class ScholarshipDurationsController < ApplicationController
         .select(scholarship_durations_id)
         .to_sql
 
-      sql = "id IN (#{query})"
+      sql = "scholarship_durations.id IN (#{query})"
 
       [sql]
     end
