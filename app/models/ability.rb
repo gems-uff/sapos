@@ -40,8 +40,8 @@ class Ability
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, ReportConfiguration])
       can :read, (Query)
-    elsif role_id = Role::ROLE_SUPORTE
-      can :manage, (Student)
+    elsif role_id == Role::ROLE_SUPORTE
+      can [:read, :update, :photo], (Student)
     elsif role_id == Role::ROLE_ALUNO
       can :manage, []
     elsif role_id == Role::ROLE_DESCONHECIDO

@@ -64,7 +64,7 @@ class ScholarshipDurationsController < ApplicationController
         .select(scholarship_durations_id)
         .to_sql
 
-      sql = "id IN (#{query})"
+      sql = "scholarship_durations.id IN (#{query})"
 
       [sql]
     end
@@ -87,7 +87,11 @@ class ScholarshipDurationsController < ApplicationController
 
   def self.condition_for_scholarship_types_column(column, value, like_pattern)
     unless value.blank?
-      sql = "scholarships.scholarship_type_id = ?"
+	    sql = "scholarship_durations.scholarship_id IN (
+		     SELECT scholarships.id
+		     FROM   scholarships
+		     WHERE  scholarships.scholarship_type_id = ?
+		   )"
 
       [sql, value]
     end
@@ -113,7 +117,7 @@ class ScholarshipDurationsController < ApplicationController
 
   def self.condition_for_level_column(column, value, like_pattern)
     unless value.blank?
-      ["scholarships.id IN (
+      ["scholarship_durations.scholarship_id IN (
       SELECT scholarships.id
       FROM   scholarships
       WHERE  scholarships.level_id = ?
