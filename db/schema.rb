@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170719151616) do
+ActiveRecord::Schema.define(version: 20170915190341) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer  "enrollment_id"
@@ -567,11 +567,11 @@ ActiveRecord::Schema.define(version: 20170719151616) do
   add_index "users", ["role_id"], name: "index_users_on_role_id"
 
   create_table "versions", force: :cascade do |t|
-    t.string   "item_type",  limit: 255, null: false
-    t.integer  "item_id",                null: false
-    t.string   "event",      limit: 255, null: false
+    t.string   "item_type",  limit: 255,      null: false
+    t.integer  "item_id",                     null: false
+    t.string   "event",      limit: 255,      null: false
     t.string   "whodunnit",  limit: 255
-    t.text     "object"
+    t.text     "object",     limit: 16777215
     t.datetime "created_at"
   end
 
