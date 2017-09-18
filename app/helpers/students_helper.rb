@@ -40,7 +40,7 @@ module StudentsHelper
   
   def photo_show_column(record, column)
     return '-' if record.photo.blank?
-    image_tag photo_student_path(record)
+    image_tag photo_student_path(record) + "?hash=#{record.photo_before_type_cast}"
   end
 
 end

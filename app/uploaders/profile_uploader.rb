@@ -15,7 +15,7 @@ class ProfileUploader < CarrierWave::Uploader::Base
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
   def url
-    "students/#{model.id}/photo"
+    "students/#{model.id}/photo?hash=#{model.photo_before_type_cast}"
   end
   
   configure do |config|
