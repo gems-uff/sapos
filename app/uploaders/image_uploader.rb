@@ -16,7 +16,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   # This is a sensible default for uploaders that are meant to be mounted:
   
   def url
-    "report_configurations/#{model.id}/logo"
+    "report_configurations/#{model.id}/logo?hash=#{model.image_before_type_cast}"
   end
 
   configure do |config|
