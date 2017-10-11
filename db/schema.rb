@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170915225335) do
+ActiveRecord::Schema.define(version: 20170922204709) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer  "enrollment_id"
@@ -59,10 +59,11 @@ ActiveRecord::Schema.define(version: 20170915225335) do
   add_index "allocations", ["course_class_id"], name: "index_allocations_on_course_class_id"
 
   create_table "carrier_wave_files", force: :cascade do |t|
-    t.string   "medium_hash", limit: 255
+    t.string   "medium_hash",       limit: 255
     t.binary   "binary"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+    t.integer  "reference_counter",             default: 0
   end
 
   create_table "cities", force: :cascade do |t|
