@@ -7,6 +7,7 @@ class ProfileUploader < CarrierWave::Uploader::Base
   # Include RMagick or MiniMagick support:
   # include CarrierWave::RMagick
   # include CarrierWave::MiniMagick
+  include UploaderReferenceCounter	 
 
   # Choose what kind of storage to use for this uploader:
   storage :active_record
@@ -30,6 +31,11 @@ class ProfileUploader < CarrierWave::Uploader::Base
 
   # Param must be a hash with to 'base64_contents' and 'filename'.
   def cache!(file)
+
+    #avoid the carrier_wave to create duplicate database entry of same file due file termination case 	  
+    if (defined? file.original_filename) && (file.original_filename.is_a? String)
+      file.original_filename.downcase!
+    end  
 
     if file.respond_to?(:has_key?) && file.has_key?(:base64_contents) && file.has_key?(:filename)
       local_file = FilelessIO.new(Base64.decode64(file[:base64_contents]))

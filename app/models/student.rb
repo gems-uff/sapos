@@ -55,6 +55,10 @@ class Student < ActiveRecord::Base
     return "#{I18n.t('pdf_content.enrollment.header.identity_issuing_country')}"
   end
 
+  def mount_uploader_name
+    :photo
+  end
+
   protected
 
   def set_birth_state_by_birth_city

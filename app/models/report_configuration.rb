@@ -12,7 +12,6 @@ class ReportConfiguration < ActiveRecord::Base
   validates :scale, :presence => true
 
   mount_uploader :image, ImageUploader
-  skip_callback :commit, :after, :remove_image!
 
   def initialize_dup(other)
     super
@@ -20,5 +19,8 @@ class ReportConfiguration < ActiveRecord::Base
     self.assign_attributes(attrib)
   end
 
+  def mount_uploader_name
+    :image
+  end
 
 end

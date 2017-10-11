@@ -7,6 +7,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   # Include RMagick or MiniMagick support:
   # include CarrierWave::RMagick
   # include CarrierWave::MiniMagick
+  include UploaderReferenceCounter
 
   # Choose what kind of storage to use for this uploader:
   storage :active_record
@@ -22,6 +23,14 @@ class ImageUploader < CarrierWave::Uploader::Base
   configure do |config|
     config.remove_previously_stored_files_after_update = false
     config.root = Rails.root
+  end
+
+  def cache!(file)
+    #avoid the carrier_wave to create duplicate database entry of same file due file termination case 	  
+    if (defined? file.original_filename) && (file.original_filename.is_a? String)
+      file.original_filename.downcase!
+    end	  
+    super(file)
   end
 
   # Provide a default URL as a default if there hasn't been a file uploaded:
