@@ -1008,7 +1008,8 @@ pt-BR:
         link: "Boletim"
         title: "BOLETIM ESCOLAR / PÓS-GRADUAÇÃO"
         total_credits: "Créditos Acumulados"
-        total_gpr: "CR Acumulado" 
+        total_gpr: "CR Acumulado"
+        accomplishment_conclusion_date_not_given: "---------/----" 
       scholarships:
         number: "NÚMERO"
         sponsor: "AGÊNCIA"

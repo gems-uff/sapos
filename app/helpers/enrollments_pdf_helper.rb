@@ -588,7 +588,7 @@ module EnrollmentsPdfHelper
       unless accomplished_phases.empty?
         title = [["<b>#{I18n.t("pdf_content.enrollment.academic_transcript.accomplished_phases")}</b>"]]
         data = accomplished_phases.map do |accomplishment|
-          ["#{I18n.localize(accomplishment.conclusion_date, :format => :monthyear2)} #{accomplishment.phase.name}"]
+		["#{accomplishment.conclusion_date.nil? ? I18n.t('pdf_content.enrollment.grades_report.accomplishment_conclusion_date_not_given') : I18n.localize(accomplishment.conclusion_date, :format => :monthyear2)} #{accomplishment.phase.name}"]
         end
         pdf_list_with_title(pdf, title, data)
       end
