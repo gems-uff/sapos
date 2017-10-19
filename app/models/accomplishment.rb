@@ -13,6 +13,8 @@ class Accomplishment < ActiveRecord::Base
 
   validate :enrollment_level
 
+  validates :conclusion_date, :presence => true
+
   after_commit :update_completion_date
 
   after_create :notify_student_and_advisor
