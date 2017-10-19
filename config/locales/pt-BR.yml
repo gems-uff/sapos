@@ -185,6 +185,7 @@ pt-BR:
         listed_class_enrollments: "Inscrições"
         thesis_defense_committee_participations: "Banca Avaliadora"
         thesis_defense_committee_professors: "Banca Avaliadora"
+        accomplishment_conclusion_date_not_given: "---------/----"
       enrollment_hold:
         active: "Trancado?"
         enrollment: "Matrícula"

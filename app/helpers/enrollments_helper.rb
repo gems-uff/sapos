@@ -241,7 +241,7 @@ module EnrollmentsHelper
 
       body += "<tr class=\"record #{tr_class}\">
                 <td>#{accomplishment.phase.name}</td>
-                <td>#{I18n.localize(accomplishment.conclusion_date, :format=>:monthyear2)}</td>
+		<td>#{accomplishment.conclusion_date.nil? ? I18n.t('activerecord.attributes.enrollment.accomplishment_conclusion_date_not_given') : I18n.localize(accomplishment.conclusion_date, :format => :monthyear2)}</td>
                 <td>#{accomplishment.obs}</td>
               </tr>"
     end
