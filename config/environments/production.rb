@@ -98,5 +98,5 @@ Sapos::Application.configure do
   config.middleware.use ExceptionNotifier,
                         :email_prefix => "[SAPOS: Erro em Produção] ",
                         :sender_address => %{"Exception Notifier Sapos Produção" <erro-sapos@sapos.ic.uff.br>},
-                        :exception_recipients => %w{everton.moreth@gmail.com bschettino@id.uff.br joaofelipenp+sapos@gmail.com leomurta+sapos@gmail.com vanessa.braganholo+sapos@gmail.com danielprett+sapos@gmail.com}
+                        :exception_recipients => %w{leomurta+sapos@gmail.com vanessa.braganholo+sapos@gmail.com eduardosolrac286+sapos@gmail.com}
 end
