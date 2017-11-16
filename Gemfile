@@ -7,27 +7,6 @@ ruby '~> 2.4.0'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.8'
 
-#-------------------------------------------------------------------------------------------
-# This maintains the versions of some packages (those not required to be updated in order to
-# install and run SAPOS) used before the upgrade of gem rails from version 4.2.3 to 4.2.8
-gem 'rake', '10.4.2'
-gem 'minitest', '5.7.0'
-gem 'thread_safe', '0.3.5'
-gem 'builder', '3.2.2'
-gem 'rack', '1.6.4'
-gem 'thor', '0.19.1'
-gem 'i18n', '0.7.0'
-gem 'tzinfo', '1.2.2'
-gem 'nokogiri', '1.6.6.2'
-gem 'sprockets', '3.2.0'
-gem 'mime-types', '2.6.1'
-gem 'loofah', '2.0.2'
-gem 'mail', '2.6.3'
-gem 'globalid', '0.3.5'
-gem 'rails-dom-testing', '1.0.6'
-gem 'sprockets-rails', '2.3.2'
-#-------------------------------------------------------------------------------------------
-
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
 
@@ -112,8 +91,8 @@ group :production, :staging do
   gem 'exception_notification', '2.6.1', :require => 'exception_notifier'
 end
 
-gem 'json', '1.8.5'
-gem 'rdoc', '4.3.0'
+gem 'json'
+gem 'rdoc'
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 gem 'jbuilder', '~> 1.2'
