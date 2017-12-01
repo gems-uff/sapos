@@ -26,18 +26,18 @@ class ClassEnrollment < ActiveRecord::Base
 
   def check_multiple_class_enrollment_allowed
     return if not self.course_class
-      other_enrollments = ClassEnrollment.
+      other_class_enrollments = ClassEnrollment.
           joins(:course_class => {:course => :course_type}).
           includes(:course_class => {:course => :course_type}).
           where(CourseType.arel_table[:allow_multiple_classes].eq(false)).
           where(:enrollment_id => self.enrollment_id).
           where(ClassEnrollment.arel_table[:situation].not_eq(DISAPPROVED)).
           where(Course.arel_table[:id].eq( self.course_class.course_id)).
+          where.not(:id => self.id).
           group(:enrollment_id).
-          having("count(course_id) > 1")
+          having("count(course_id) > 0")
 
-
-      unless other_enrollments.empty?
+      unless other_class_enrollments.empty?
         self.errors.add(:course_class, :multiple_class_enrollments_not_allowed)
       end
     end
