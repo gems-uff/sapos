@@ -55,7 +55,7 @@ module ClassEnrollmentsHelper
   end
 
   def disapproved_by_absence_form_column(record, options)
-	  options = options.merge({:class_enrollments_id => "#{record.id}", :grade_of_disapproval_for_absence => "#{CustomVariable.grade_of_disapproval_for_absence.nil? ? nil : CustomVariable.grade_of_disapproval_for_absence.to_f/10.0}"})
+	  options = options.merge({:class_enrollments_id => "#{record.id}", :grade_of_disapproval_for_absence => "#{CustomVariable.grade_of_disapproval_for_absence.nil? ? nil : CustomVariable.grade_of_disapproval_for_absence.to_f/10.0}", :course_has_grade => "#{record.course_has_grade}"})
     check_box :record, :disapproved_by_absence_to_view, options
   end
 
