@@ -34,6 +34,7 @@ class ClassEnrollment < ActiveRecord::Base
           where(ClassEnrollment.arel_table[:situation].not_eq(DISAPPROVED)).
           where(Course.arel_table[:id].eq( self.course_class.course_id)).
           where.not(:id => self.id).
+	  where.not((self.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved"))? "1" : "0").
           group(:enrollment_id).
           having("count(course_id) > 0")
 
