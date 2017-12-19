@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class DeferralType < ActiveRecord::Base
+class DeferralType < ApplicationRecord
   belongs_to :phase
   has_many :deferrals, :dependent => :restrict_with_exception
 

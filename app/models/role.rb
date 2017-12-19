@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class Role < ActiveRecord::Base
+class Role < ApplicationRecord
 
   has_many :users, :dependent => :restrict_with_exception
 

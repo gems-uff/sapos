@@ -2,7 +2,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class Enrollment < ActiveRecord::Base
+class Enrollment < ApplicationRecord
 
   belongs_to :student
   belongs_to :level

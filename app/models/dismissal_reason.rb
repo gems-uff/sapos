@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class DismissalReason < ActiveRecord::Base
+class DismissalReason < ApplicationRecord
 
   THESIS_JUDGEMENT = [
     I18n.translate("activerecord.attributes.dismissal_reason.thesis_judgements.approved"), 

@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class Major < ActiveRecord::Base
+class Major < ApplicationRecord
   belongs_to :level
   belongs_to :institution
   has_many :students, :through => :student_majors

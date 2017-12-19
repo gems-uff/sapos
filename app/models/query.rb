@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class Query < ActiveRecord::Base
+class Query < ApplicationRecord
 
   has_many :notifications, inverse_of: :query
   has_many :params, class_name: 'QueryParam', dependent: :destroy
@@ -31,13 +31,13 @@ class Query < ActiveRecord::Base
 
 
   def run_read_only_query(query)
-    if ActiveRecord::Base.connection.adapter_name == "SQLite"
+    if ApplicationRecord.connection.adapter_name == "SQLite"
 
-      db_resource = ActiveRecord::Base.connection.exec_query(query)
+      db_resource = ApplicationRecord.connection.exec_query(query)
 
       {columns: db_resource.columns, rows: db_resource.rows}
-    elsif ActiveRecord::Base.connection.adapter_name == 'Mysql2'
-      conf = ActiveRecord::Base.configurations
+    elsif ApplicationRecord.connection.adapter_name == 'Mysql2'
+      conf = ApplicationRecord.configurations
       client = Mysql2::Client.new(conf["#{Rails.env}_read_only"] ? conf["#{Rails.env}_read_only"] : conf[Rails.env])
       results = client.query(query)
       client.close

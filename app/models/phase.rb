@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class Phase < ActiveRecord::Base
+class Phase < ApplicationRecord
   has_many :accomplishments, :dependent => :restrict_with_exception
   has_many :enrollments, :through => :accomplishments
   has_many :phase_durations, :dependent => :destroy

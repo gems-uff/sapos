@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class ThesisDefenseCommitteeParticipation < ActiveRecord::Base
+class ThesisDefenseCommitteeParticipation < ApplicationRecord
   belongs_to :professor
   belongs_to :enrollment
 

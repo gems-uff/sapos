@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class Institution < ActiveRecord::Base
+class Institution < ApplicationRecord
   has_many :majors, :dependent => :restrict_with_exception
   has_many :professors, :dependent => :restrict_with_exception
   

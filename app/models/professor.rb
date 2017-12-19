@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class Professor < ActiveRecord::Base
+class Professor < ApplicationRecord
 
   has_many :advisements, :dependent => :restrict_with_exception
   has_many :enrollments, :through => :advisements

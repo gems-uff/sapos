@@ -2,7 +2,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class ScholarshipSuspension < ActiveRecord::Base
+class ScholarshipSuspension < ApplicationRecord
   belongs_to :scholarship_duration
 
   has_paper_trail

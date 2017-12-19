@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CourseResearchArea < ActiveRecord::Base
+class CourseResearchArea < ApplicationRecord
   # attr_accessible :course, :research_area, :course_id, :research_area_id
   
   belongs_to :course

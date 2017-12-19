@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class Notification < ActiveRecord::Base
+class Notification < ApplicationRecord
 
   has_many :notification_logs
   has_many :notification_params, class_name: 'NotificationParam', dependent: :destroy

@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class ScholarshipType < ActiveRecord::Base
+class ScholarshipType < ApplicationRecord
    validates :name, :presence => true, :uniqueness => true
 
    has_many :scholarships, :dependent => :restrict_with_exception

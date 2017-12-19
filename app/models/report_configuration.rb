@@ -2,7 +2,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class ReportConfiguration < ActiveRecord::Base
+class ReportConfiguration < ApplicationRecord
   has_paper_trail
 
   validates :text, :presence => true

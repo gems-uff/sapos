@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
 
   
   belongs_to :role

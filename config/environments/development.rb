@@ -43,7 +43,7 @@ Sapos::Application.configure do
 
   # Do not compress assets
   config.assets.compress = false
-  config.serve_static_files = false
+  config.public_file_server.enabled = false
 
   # Configure ActionMailer
   config.action_mailer.default_url_options = { :host => 'localhost:3000' }
@@ -64,4 +64,7 @@ Sapos::Application.configure do
   #     :enable_starttls_auto => true
   # }
 
+  #this line was added to replace the quiet_assets gem functionality
+  config.assets.quiet = true
+  
 end

@@ -163,7 +163,7 @@ module EnrollmentsHelper
   end
 
   #TODO: remove current accomplishments and current deferral_type if level was changed
-  def options_for_association_conditions(association)
+  def options_for_association_conditions(association, record)
     if association.name == :phase
       Phase::find_all_for_enrollment(@record.enrollment)
     elsif association.name == :deferral_type
