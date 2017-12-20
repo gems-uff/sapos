@@ -250,6 +250,7 @@ Sapos::Application.routes.draw do
     collection do
       put 'preview'
       post 'preview'
+      patch 'preview'
     end
     member do
       get 'logo'
