@@ -81,7 +81,7 @@ group :development, :test do
   gem 'rspec-rails', '3.7.1'
   gem 'factory_girl_rails', '4.5.0'
   #gem 'quiet_assets', '1.1.0'
-  gem 'webrick', '1.3.1'
+  gem 'webrick', '1.4.2'
   gem 'binding_of_caller', '0.7.2'
   gem 'better_errors', '2.1.1'
   gem 'spring', '1.3.4'
