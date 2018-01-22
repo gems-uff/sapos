@@ -9,15 +9,15 @@ class Enrollment < ApplicationRecord
   belongs_to :enrollment_status
   belongs_to :research_area
 
-  has_many :professors, :through => :advisements
   attr_readonly :professors
-  has_many :scholarships, :through => :scholarship_durations
-  has_many :phases, :through => :accomplishments
-
+  
   has_one :dismissal, :dependent => :restrict_with_exception
   has_many :advisements, :dependent => :destroy
+  has_many :professors, :through => :advisements
   has_many :scholarship_durations, :dependent => :destroy
+  has_many :scholarships, :through => :scholarship_durations
   has_many :accomplishments, :dependent => :destroy
+  has_many :phases, :through => :accomplishments
   has_many :deferrals, :dependent => :destroy
   has_many :enrollment_holds, :dependent => :destroy
   has_many :class_enrollments, :dependent => :destroy

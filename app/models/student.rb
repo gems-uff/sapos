@@ -5,9 +5,9 @@ class Student < ApplicationRecord
 
   mount_uploader :photo, ProfileUploader
 
+  has_many :student_majors, :dependent => :destroy
   has_many :majors, :through => :student_majors
 
-  has_many :student_majors, :dependent => :destroy
   #delete cascade for enrollment -- when a student is deleted, so are his enrollments
   has_many :enrollments, :dependent => :restrict_with_exception
     

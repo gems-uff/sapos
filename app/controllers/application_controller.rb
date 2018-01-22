@@ -11,8 +11,8 @@ class ApplicationController < ActionController::Base
 
   skip_authorization_check :only => [:root]
 
-  before_filter :authenticate_user!
-  before_filter :parse_date
+  before_action :authenticate_user!
+  before_action :parse_date
 
   clear_helpers
 

@@ -4,8 +4,8 @@
 class Major < ApplicationRecord
   belongs_to :level
   belongs_to :institution
-  has_many :students, :through => :student_majors
   has_many :student_majors, :dependent => :destroy
+  has_many :students, :through => :student_majors
 
   has_paper_trail
 

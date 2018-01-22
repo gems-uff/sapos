@@ -4,7 +4,7 @@
 class NotificationsController < ApplicationController
   authorize_resource
   skip_authorization_check :only => [:notify]
-  skip_before_filter :authenticate_user!, :only => :notify
+  skip_before_action :authenticate_user!, :only => :notify
 
   active_scaffold :"notification" do |config|
 
