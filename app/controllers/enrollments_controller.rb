@@ -144,7 +144,7 @@ class EnrollmentsController < ApplicationController
       when 'active' then
         sql = "enrollments.id not in (#{query_inactive_enrollment})"
       else
-        sql = ""
+        return ""
     end
 
     [sql, Time.now]
@@ -221,7 +221,7 @@ class EnrollmentsController < ApplicationController
       when '1' then
         sql = "enrollments.id in (#{query_active_scholarships})"
       else
-        sql = ""
+        return ""
     end
 
     [sql, Time.now, Time.now]
