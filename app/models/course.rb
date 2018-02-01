@@ -30,5 +30,18 @@ class Course < ApplicationRecord
   def workload_text
     return I18n.translate('activerecord.attributes.course.empty_workload') if workload.nil?
     I18n.translate('activerecord.attributes.course.workload_time', :time => workload)
-  end  
+  end
+
+  def self.ids_de_disciplinas_com_nome_parecido(id_disciplina_selecionada)
+    ids = []
+    nome_disciplina_selecionada = I18n.transliterate(Course.find(id_disciplina_selecionada).name.squish.downcase)
+    disciplinas = Course.all.collect{|c| [c.name, c.id]}
+    disciplinas.each do |disciplina|
+      if nome_disciplina_selecionada == I18n.transliterate(disciplina[0].squish.downcase)  
+        ids.push(disciplina[1])
+      end
+    end
+    return ids
+  end
+
 end

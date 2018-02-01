@@ -175,8 +175,8 @@ class EnrollmentsController < ApplicationController
        				         course_classes.id = class_enrollments.course_class_id " 
 
     if not value[:course].empty?
-      search_sql += " and course_classes.course_id = ? " 
-      result << value[:course]
+      search_sql += " and course_classes.course_id in (?) " 
+      result << Course.ids_de_disciplinas_com_nome_parecido(value[:course])
     end
 															     
     if not value[:year].empty?

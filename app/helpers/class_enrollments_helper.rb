@@ -9,10 +9,21 @@ module ClassEnrollmentsHelper
 
   def course_class_year_semester_search_column(record, options)
 
+  	disciplinas_filtro = Course.all.collect{|c| [I18n.transliterate(c.name.squish.downcase), c.name, c.id]}
+  	disciplinas_filtro.sort_by!{ |elemento| elemento[0] }
+
+  	disciplinas_sem_nome_repetido = []
+  	ultimo_copiado = ""
+  	disciplinas_filtro.each do |elemento|
+  	  if elemento[0] != ultimo_copiado
+  	    disciplinas_sem_nome_repetido.push(elemento[1..2])
+  	    ultimo_copiado = elemento[0] 
+  	  end 
+  	end
 
   	html = select_tag(
   		"#{options[:name]}[course]", 
-  		options_for_select(Course.all.collect{|c| [c.name, c.id]}),
+  		options_for_select(disciplinas_sem_nome_repetido),
   		:prompt => as_(:_select_),
   		:id => "#{options[:id]}_course",
   		:class => "as_search_search_course_class_option"
