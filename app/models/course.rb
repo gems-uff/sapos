@@ -34,11 +34,14 @@ class Course < ApplicationRecord
 
   def self.ids_de_disciplinas_com_nome_parecido(id_disciplina_selecionada)
     ids = []
-    nome_disciplina_selecionada = I18n.transliterate(Course.find(id_disciplina_selecionada).name.squish.downcase)
-    disciplinas = Course.all.collect{|c| [c.name, c.id]}
-    disciplinas.each do |disciplina|
-      if nome_disciplina_selecionada == I18n.transliterate(disciplina[0].squish.downcase)  
-        ids.push(disciplina[1])
+    disciplina_selecionada = Course.find_by(id: id_disciplina_selecionada) 
+    unless disciplina_selecionada.nil?
+      nome_disciplina_selecionada = I18n.transliterate(disciplina_selecionada.name.squish.downcase)
+      disciplinas = Course.all.collect{|c| [c.name, c.id]}
+      disciplinas.each do |disciplina|
+        if nome_disciplina_selecionada == I18n.transliterate(disciplina[0].squish.downcase)  
+          ids.push(disciplina[1])
+        end
       end
     end
     return ids
