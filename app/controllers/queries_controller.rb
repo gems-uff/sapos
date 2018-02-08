@@ -36,6 +36,7 @@ class QueriesController < ApplicationController
 
   private
   def get_simulation_params
+    return params[:query_params].to_unsafe_h if params[:query_params].is_a?(ActionController::Parameters)
     params[:query_params] || {}
   end
 

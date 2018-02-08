@@ -5,6 +5,11 @@ class NotificationsController < ApplicationController
   authorize_resource
   skip_authorization_check :only => [:notify]
   skip_before_action :authenticate_user!, :only => :notify
+  before_action :permit_notification_params
+
+  def permit_notification_params
+    params[:notification_params].permit! unless params[:notification_params].nil?
+  end
 
   active_scaffold :"notification" do |config|
 
@@ -62,6 +67,7 @@ class NotificationsController < ApplicationController
     process_action_link_action do |notification|
 
       notification_params = params[:notification_params]
+      notification_params = notification_params.to_unsafe_h if notification_params.is_a?(ActionController::Parameters)
       query_date = Date.strptime(params[:data_consulta], "%Y-%m-%d") unless params[:data_consulta].nil?
       query_date ||= notification.query_date.to_date
       Notifier.send_emails(notification.execute(override_params: notification_params))
@@ -76,6 +82,7 @@ class NotificationsController < ApplicationController
 
 
     notification_params = params[:notification_params]
+    notification_params = notification_params.to_unsafe_h if notification_params.is_a?(ActionController::Parameters)
     if notification_params
 
       result = @notification.execute(skip_update: true, override_params: notification_params)

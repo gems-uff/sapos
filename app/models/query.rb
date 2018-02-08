@@ -13,7 +13,6 @@ class Query < ApplicationRecord
   validates_associated :params
 
   def map_params(simulation_params = {})
-    simulation_params = simulation_params.to_unsafe_h unless simulation_params.is_a?(Hash)
     simulation_params = simulation_params.symbolize_keys
     current_params = {}
     self.params.each do |param|
