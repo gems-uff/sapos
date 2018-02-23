@@ -43,4 +43,8 @@ module StudentsHelper
     image_tag photo_student_path(record) + "?hash=#{record.photo_before_type_cast}"
   end
 
+  def permit_rs_browse_params
+    [:page, :update, :utf8]
+  end
+
 end

@@ -60,4 +60,8 @@ module ProfessorsHelper
     resp.html_safe
   end
 
+  def permit_rs_browse_params
+    [:page, :update, :utf8]
+  end
+
 end
