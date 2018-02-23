@@ -4,6 +4,6 @@
 
 require 'spec_helper'
 
-describe CourseResearchAreas do
+describe CourseResearchArea do
   pending "add some examples to (or delete) #{__FILE__}"
 end
