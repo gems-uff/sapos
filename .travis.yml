@@ -1,0 +1,5 @@
+language: ruby
+sudo: false
+rvm: 2.4
+install: bundle install --without staging production
+before_script: bundle exec rake db:reset
