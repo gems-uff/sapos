@@ -13,7 +13,7 @@ class CourseClassesController < ApplicationController
 
     config.columns.add :class_enrollments_count
 
-    config.list.sorting = {:name => 'ASC'}
+    config.list.sorting = {:name => 'ASC', :id => 'DESC'}
     config.list.columns = [:name, :course, :professor, :year, :semester, :class_enrollments_count]
     config.create.label = :create_course_class_label
     config.update.label = :update_course_class_label
@@ -66,7 +66,7 @@ class CourseClassesController < ApplicationController
 
     config.actions.exclude :deleted_records
   end
-  record_select :per_page => 10, :order_by => 'name', :full_text_search => true
+  record_select :per_page => 10, :label => :record_select_output, :order_by => 'name, year DESC, semester DESC, id DESC', :full_text_search => true
 
 
   def summary_pdf
