@@ -8,6 +8,7 @@ ruby '~> 2.4.0'
 gem 'rails', '5.1.4'
 
 gem 'rubyzip', '>=1.2.1'
+gem 'loofah', '~> 2.2.1'
 
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
