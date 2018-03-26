@@ -66,7 +66,7 @@ class CourseClassesController < ApplicationController
 
     config.actions.exclude :deleted_records
   end
-  record_select :per_page => 10, :label => :record_select_output, :order_by => 'name, year DESC, semester DESC, id DESC', :full_text_search => true
+  record_select :per_page => 10, :label => :record_select_output, :order_by => 'year DESC, semester DESC, name, id DESC', :full_text_search => true
 
 
   def summary_pdf
