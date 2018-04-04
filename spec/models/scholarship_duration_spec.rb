@@ -129,7 +129,7 @@ describe ScholarshipDuration do
           scholarship_duration.start_date = end_date
           scholarship_duration.end_date = end_date + 5.days
           scholarship_duration.enrollment = enrollment
-          scholarship_duration.student_has_other_scholarship_duration.should be_true
+          scholarship_duration.student_has_other_scholarship_duration.should be_truthy
         end
         it "has an old scholarship that was canceled after the new scholarship starts" do
           enrollment = FactoryGirl.create(:enrollment)
@@ -140,7 +140,7 @@ describe ScholarshipDuration do
           scholarship_duration.start_date = end_date
           scholarship_duration.end_date = end_date + 5.days
           scholarship_duration.enrollment = enrollment
-          scholarship_duration.student_has_other_scholarship_duration.should be_true
+          scholarship_duration.student_has_other_scholarship_duration.should be_truthy
         end
         it "has an new scholarship that starts before the scholarship ends" do
           enrollment = FactoryGirl.create(:enrollment)
@@ -151,7 +151,7 @@ describe ScholarshipDuration do
           scholarship_duration.start_date = start_date
           scholarship_duration.end_date = end_date + 1.day
           scholarship_duration.enrollment = enrollment
-          scholarship_duration.student_has_other_scholarship_duration.should be_true
+          scholarship_duration.student_has_other_scholarship_duration.should be_truthy
         end
 
         it "has an new scholarship that is canceled before the scholarship ends" do
@@ -164,7 +164,7 @@ describe ScholarshipDuration do
           scholarship_duration.end_date = end_date + 2.days
           scholarship_duration.cancel_date = end_date + 1.day
           scholarship_duration.enrollment = enrollment
-          scholarship_duration.student_has_other_scholarship_duration.should be_true
+          scholarship_duration.student_has_other_scholarship_duration.should be_truthy
         end
       end
     end

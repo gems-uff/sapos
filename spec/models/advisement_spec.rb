@@ -92,14 +92,14 @@ describe Advisement do
       context "should return true when " do
         it "the enrollment does not have a dismissal" do
           advisement = FactoryGirl.create(:advisement)
-          advisement.active.should be_true
+          advisement.active.should be_truthy
         end
       end
       context "should return false when " do
         it "the enrollment have a dismissal" do
           advisement = FactoryGirl.create(:advisement)
           FactoryGirl.create(:dismissal, :enrollment => advisement.enrollment)
-          advisement.active.should be_false
+          advisement.active.should be_falsey
         end
       end
     end
@@ -108,13 +108,13 @@ describe Advisement do
         it "the enrollment have another advisement" do
           other_advisement = FactoryGirl.create(:advisement)
           FactoryGirl.create(:advisement, :enrollment => other_advisement.enrollment, :main_advisor => false)
-          other_advisement.co_advisor.should be_true
+          other_advisement.co_advisor.should be_truthy
         end
       end
       context "should return false when " do
         it "the enrollment does not have another advisement" do
           advisement = FactoryGirl.create(:advisement)
-          advisement.co_advisor.should be_false
+          advisement.co_advisor.should be_falsey
         end
       end
     end
@@ -122,13 +122,13 @@ describe Advisement do
       context "should return true when " do
         it "the enrollment have one advisement" do
           advisement = FactoryGirl.create(:advisement)
-          advisement.enrollment_has_advisors.should be_true
+          advisement.enrollment_has_advisors.should be_truthy
         end
       end
       context "should return false when " do
         it "the enrollment does not have any advisements" do
           advisement.enrollment = FactoryGirl.create(:enrollment)
-          advisement.enrollment_has_advisors.should be_false
+          advisement.enrollment_has_advisors.should be_falsey
         end
       end
     end

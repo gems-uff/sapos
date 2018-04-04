@@ -110,7 +110,7 @@ describe ScholarshipSuspension do
           scholarship_suspension.start_date = ss.start_date
           scholarship_suspension.end_date = ss.end_date
           scholarship_suspension.active = false
-          scholarship_suspension.valid?.should be_true
+          scholarship_suspension.valid?.should be_truthy
           scholarship_suspension.errors.full_messages.should_not include(I18n.t("activerecord.errors.models.scholarship_suspension.active_suspension"))
         end
       end
@@ -122,7 +122,7 @@ describe ScholarshipSuspension do
           scholarship_suspension.scholarship_duration = ss.scholarship_duration 
           scholarship_suspension.start_date = ss.start_date
           scholarship_suspension.end_date = ss.end_date
-          scholarship_suspension.valid?.should be_false
+          scholarship_suspension.valid?.should be_falsey
           scholarship_suspension.errors.full_messages.should include(I18n.t("activerecord.errors.models.scholarship_suspension.active_suspension"))
         end
       end

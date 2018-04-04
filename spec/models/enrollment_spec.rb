@@ -216,14 +216,14 @@ describe Enrollment do
       it "shouldn't return any value when the enrollment doesn't have any classes" do
         admission_date = YearSemester.current.semester_begin
         enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
-        enrollment.available_semesters.any?.should be_false
+        enrollment.available_semesters.any?.should be_falsey
       end
 
       it "should return [[2013,2]] when it is enrolled to a class of 2013.2" do
         admission_date = YearSemester.current.semester_begin
         enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
-        enrollment.available_semesters.any?.should be_true
+        enrollment.available_semesters.any?.should be_truthy
         enrollment.available_semesters.should == [[2013, 2]]
       end
 
@@ -232,7 +232,7 @@ describe Enrollment do
         enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class7)
-        enrollment.available_semesters.any?.should be_true
+        enrollment.available_semesters.any?.should be_truthy
         enrollment.available_semesters.should == [[2013, 2]]
       end
 
@@ -241,7 +241,7 @@ describe Enrollment do
         enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class5)
-        enrollment.available_semesters.any?.should be_true
+        enrollment.available_semesters.any?.should be_truthy
         enrollment.available_semesters.should == [[2013, 1], [2013, 2]]
       end
 
@@ -255,7 +255,7 @@ describe Enrollment do
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class4)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class2)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
-        enrollment.available_semesters.any?.should be_true
+        enrollment.available_semesters.any?.should be_truthy
         enrollment.available_semesters.should == [[2012, 1], [2012, 2], [2013, 1], [2013,2]]
       end
     end

@@ -212,13 +212,13 @@ describe ClassEnrollment do
       context "should return true" do
         it "when grade is not null" do
           class_enrollment.grade = 10
-          class_enrollment.grade_filled?.should be_true
+          class_enrollment.grade_filled?.should be_truthy
         end
       end
       context "should return false" do
         it "when grade is null" do
           class_enrollment.grade = nil
-          class_enrollment.grade_filled?.should be_false
+          class_enrollment.grade_filled?.should be_falsey
         end
       end
     end
