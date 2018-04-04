@@ -235,6 +235,8 @@ GEM
       actionpack (>= 4.2.0, < 5.3)
       railties (>= 4.2.0, < 5.3)
     rghost (0.9.6)
+    rspec-collection_matchers (1.1.3)
+      rspec-expectations (>= 2.99.0.beta1)
     rspec-core (3.7.0)
       rspec-support (~> 3.7.0)
     rspec-expectations (3.7.0)
@@ -343,6 +345,7 @@ DEPENDENCIES
   rdoc
   recordselect
   redcarpet
+  rspec-collection_matchers
   rspec-rails
   rubyzip (>= 1.2.1)
   rufus-scheduler

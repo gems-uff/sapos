@@ -10,6 +10,8 @@ gem 'rails', '5.1.4'
 gem 'rubyzip', '>=1.2.1'
 gem 'loofah', '~> 2.2.1'
 
+gem 'rspec-collection_matchers'
+
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
 
