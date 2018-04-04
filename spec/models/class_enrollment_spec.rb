@@ -71,25 +71,25 @@ describe ClassEnrollment do
         it "situation is registered and grade is nil" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
           class_enrollment.grade = nil
-          class_enrollment.stub!(:course_has_grade).and_return(true)
+          class_enrollment.stub(:course_has_grade).and_return(true)
           class_enrollment.should have(0).errors_on :grade
         end
         it "situation is aproved and grade is greater than 59" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = 60
-          class_enrollment.stub!(:course_has_grade).and_return(true)
+          class_enrollment.stub(:course_has_grade).and_return(true)
           class_enrollment.should have(0).errors_on :grade
         end
         it "situation is disapproved and grade is less than 60" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
           class_enrollment.grade = 59
-          class_enrollment.stub!(:course_has_grade).and_return(true)
+          class_enrollment.stub(:course_has_grade).and_return(true)
           class_enrollment.should have(0).errors_on :grade
         end
         it "course does not have grade and grade is null" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = nil
-          class_enrollment.stub!(:course_has_grade).and_return(false)
+          class_enrollment.stub(:course_has_grade).and_return(false)
           class_enrollment.should have(0).errors_on :grade
         end
       end
@@ -97,7 +97,7 @@ describe ClassEnrollment do
         it "situation is registered and grade is not null" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
           class_enrollment.grade = 100
-          class_enrollment.stub!(:course_has_grade).and_return(true)
+          class_enrollment.stub(:course_has_grade).and_return(true)
           class_enrollment.should have_error(:grade_for_situation_registered).on :grade
         end
       end
@@ -105,13 +105,13 @@ describe ClassEnrollment do
         it "situation is aproved and grade is null" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = nil
-          class_enrollment.stub!(:course_has_grade).and_return(true)
+          class_enrollment.stub(:course_has_grade).and_return(true)
           class_enrollment.should have_error(:grade_for_situation_aproved).on :grade
         end
         it "situation is aproved and grade is less than 60" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = 59
-          class_enrollment.stub!(:course_has_grade).and_return(true)
+          class_enrollment.stub(:course_has_grade).and_return(true)
           class_enrollment.should have_error(:grade_for_situation_aproved).on :grade
         end
       end
@@ -119,13 +119,13 @@ describe ClassEnrollment do
         it "situation is disapproved and grade is null" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
           class_enrollment.grade = nil
-          class_enrollment.stub!(:course_has_grade).and_return(true)
+          class_enrollment.stub(:course_has_grade).and_return(true)
           class_enrollment.should have_error(:grade_for_situation_disapproved).on :grade
         end
         it "situation is disapproved and grade is greater than 59" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
           class_enrollment.grade = 60
-          class_enrollment.stub!(:course_has_grade).and_return(true)
+          class_enrollment.stub(:course_has_grade).and_return(true)
           class_enrollment.should have_error(:grade_for_situation_disapproved).on :grade
         end
       end
@@ -133,7 +133,7 @@ describe ClassEnrollment do
         it "course does not have grade and grade is filled" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
           class_enrollment.grade = 59
-          class_enrollment.stub!(:course_has_grade).and_return(false)
+          class_enrollment.stub(:course_has_grade).and_return(false)
           class_enrollment.should have_error(:grade_filled_for_course_without_score).on :grade
         end
       end
@@ -142,7 +142,7 @@ describe ClassEnrollment do
         it "grade if greater than 100" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = 101
-          class_enrollment.stub!(:course_has_grade).and_return(true)
+          class_enrollment.stub(:course_has_grade).and_return(true)
           class_enrollment.should have_error(:grade_gt_100).on :grade
         end
       end
@@ -151,7 +151,7 @@ describe ClassEnrollment do
         it "grade if lower than 0" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = -1
-          class_enrollment.stub!(:course_has_grade).and_return(true)
+          class_enrollment.stub(:course_has_grade).and_return(true)
           class_enrollment.should have_error(:grade_lt_0).on :grade
         end
       end
