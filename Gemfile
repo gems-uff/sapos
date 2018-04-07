@@ -89,7 +89,7 @@ group :development, :test do
   gem 'byebug'
 end
 
-group :production, :staging do
+group :production do
   gem 'mysql2'
   gem 'exception_notification', '2.6.1', :require => 'exception_notifier'
 end

@@ -92,10 +92,8 @@ Sapos::Application.configure do
   config.action_mailer.default_url_options = { :host => 'sapos.ic.uff.br' }
   config.action_mailer.sendmail_settings = { :arguments => '-i -f "SAPOS <sapos@sapos.ic.uff.br>"', :location => '/usr/sbin/sendmail' }
 
-
-
   config.middleware.use ExceptionNotifier,
-                        :email_prefix => "[SAPOS: Erro em Produção] ",
-                        :sender_address => %{"Exception Notifier Sapos Produção" <erro-sapos@sapos.ic.uff.br>},
+                        :email_prefix => "[SAPOS: Error] ",
+                        :sender_address => %{"SAPOS Exception Notifier" <erro-sapos@sapos.ic.uff.br>},
                         :exception_recipients => %w{leomurta+sapos@gmail.com vanessa.braganholo+sapos@gmail.com eduardosolrac286+sapos@gmail.com}
 end
