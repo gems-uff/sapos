@@ -53,7 +53,7 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 
 We would like to thank JetBrains for providing us a license of RubyMine, used in the development of SAPOS. 
 
-[![RubyMine Logo](https://www.jetbrains.com/ruby/docs/logo_rubymine.png)](http://www.jetbrains.com/ruby)
+[![RubyMine Logo](https://raw.githubusercontent.com/gems-uff/sapos/master/doc/rubymine.png)](http://www.jetbrains.com/ruby)
 
 # License
 
