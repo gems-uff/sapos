@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class ChangingStudentBirthPlace < ActiveRecord::Migration
+class ChangingStudentBirthPlace < ActiveRecord::Migration[5.1]
   def change
   	remove_column :students, :birthplace
   	remove_column :students, :country_id

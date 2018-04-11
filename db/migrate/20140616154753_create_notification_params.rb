@@ -2,7 +2,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreateNotificationParams < ActiveRecord::Migration
+class CreateNotificationParams < ActiveRecord::Migration[5.1]
   def up
     create_table :notification_params, :force => true do |t|
       t.integer :notification_id

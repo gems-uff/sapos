@@ -2,7 +2,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class RenameCustomVariablesNameToDescription < ActiveRecord::Migration
+class RenameCustomVariablesNameToDescription < ActiveRecord::Migration[5.1]
   def change
   	rename_column :custom_variables, :name, :description
   end

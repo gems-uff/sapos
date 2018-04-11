@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreateCoursesStudents < ActiveRecord::Migration
+class CreateCoursesStudents < ActiveRecord::Migration[5.1]
   def self.up
     create_table :courses_students, :id => false do |t|
       t.references :course, :null => false

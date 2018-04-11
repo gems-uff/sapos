@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class ChangeAllocationTimeColumnsToInteger < ActiveRecord::Migration
+class ChangeAllocationTimeColumnsToInteger < ActiveRecord::Migration[5.1]
   def self.up
     Allocation.transaction do
       allocations = Allocation.all.map{|allocation| {:id => allocation.id, :start_time => allocation.start_time.hour, :end_time => allocation.end_time.hour} }

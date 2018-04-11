@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreateAdvisementAuthorizations < ActiveRecord::Migration
+class CreateAdvisementAuthorizations < ActiveRecord::Migration[5.1]
   def self.up
     create_table :advisement_authorizations do |t|
       t.integer :professor_id, :references => :professors

@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class PopulateProfessorEmail < ActiveRecord::Migration
+class PopulateProfessorEmail < ActiveRecord::Migration[5.1]
   def up
     add_index :users, :email
     add_index :professors, :email

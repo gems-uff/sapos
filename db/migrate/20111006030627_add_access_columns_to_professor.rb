@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class AddAccessColumnsToProfessor < ActiveRecord::Migration
+class AddAccessColumnsToProfessor < ActiveRecord::Migration[5.1]
   def self.up
     add_column :professors, :sex, :string
     add_column :professors, :civil_status, :string

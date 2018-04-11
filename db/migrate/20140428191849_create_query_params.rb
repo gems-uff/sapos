@@ -2,7 +2,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreateQueryParams < ActiveRecord::Migration
+class CreateQueryParams < ActiveRecord::Migration[5.1]
   def change
     create_table :query_params do |t|
       t.references :query

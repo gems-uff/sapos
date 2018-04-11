@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreateForeignKeys < ActiveRecord::Migration
+class CreateForeignKeys < ActiveRecord::Migration[5.1]
   def self.up
     add_foreign_key "accomplishments", ["enrollment_id"], "enrollments", ["id"]
     add_foreign_key "accomplishments", ["phase_id"], "phases", ["id"]

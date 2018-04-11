@@ -1,4 +1,4 @@
-class AddNationalityDataToCountry < ActiveRecord::Migration
+class AddNationalityDataToCountry < ActiveRecord::Migration[5.1]
   def change
     Country.where(:name=>"Afeganistão").update_all(:nationality=>"afegã(o)")
     Country.where(:name=>"África do Sul").update_all(:nationality=>"sul-africano(a)")

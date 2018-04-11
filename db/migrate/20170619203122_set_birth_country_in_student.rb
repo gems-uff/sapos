@@ -1,4 +1,4 @@
-class SetBirthCountryInStudent < ActiveRecord::Migration
+class SetBirthCountryInStudent < ActiveRecord::Migration[5.1]
   def change
 
     students = Student.where(" (birth_country_id IS NULL) and ( (birth_state_id IS NOT NULL) or (birth_city_id IS NOT NULL) ) ")

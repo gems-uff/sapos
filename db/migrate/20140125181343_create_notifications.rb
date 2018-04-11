@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreateNotifications < ActiveRecord::Migration
+class CreateNotifications < ActiveRecord::Migration[5.1]
   def change
     create_table :notifications do |t|
       t.string :title

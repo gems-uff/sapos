@@ -1,4 +1,4 @@
-class AddReferenceCounterToCarrierWaveFile < ActiveRecord::Migration
+class AddReferenceCounterToCarrierWaveFile < ActiveRecord::Migration[5.1]
   def change
     add_column :carrier_wave_files, :reference_counter, :integer, :default => 0
     execute "update

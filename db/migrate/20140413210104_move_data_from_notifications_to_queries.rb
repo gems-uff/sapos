@@ -2,7 +2,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class MoveDataFromNotificationsToQueries < ActiveRecord::Migration
+class MoveDataFromNotificationsToQueries < ActiveRecord::Migration[5.1]
   def up
     add_column :notifications, :query_id, :integer, :after => :id
 

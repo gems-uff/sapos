@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class AddObsToStudent < ActiveRecord::Migration
+class AddObsToStudent < ActiveRecord::Migration[5.1]
   def self.up
     add_column :students, :obs, :text
   end

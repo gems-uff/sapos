@@ -2,7 +2,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class UpdateRoles < ActiveRecord::Migration
+class UpdateRoles < ActiveRecord::Migration[5.1]
   def self.up
     Role.transaction do
       User.where(:role_id => 6).update_all(:role_id => 4)

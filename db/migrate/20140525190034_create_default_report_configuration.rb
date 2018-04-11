@@ -2,7 +2,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreateDefaultReportConfiguration < ActiveRecord::Migration
+class CreateDefaultReportConfiguration < ActiveRecord::Migration[5.1]
   def up
 
     if ActiveRecord::Base.connection.table_exists? CarrierWave::Storage::ActiveRecord::ActiveRecordFile.table_name

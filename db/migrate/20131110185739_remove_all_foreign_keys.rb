@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class RemoveAllForeignKeys < ActiveRecord::Migration
+class RemoveAllForeignKeys < ActiveRecord::Migration[5.1]
   def up
     create_table "states_temp", :force => true do |t|
       t.string   "name"

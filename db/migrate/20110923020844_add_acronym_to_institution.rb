@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class AddAcronymToInstitution < ActiveRecord::Migration
+class AddAcronymToInstitution < ActiveRecord::Migration[5.1]
   def self.up
     add_column :institutions, :code, :string
   end

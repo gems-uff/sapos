@@ -2,7 +2,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreateEnrollmentHolds < ActiveRecord::Migration
+class CreateEnrollmentHolds < ActiveRecord::Migration[5.1]
   def change
     create_table :enrollment_holds do |t|
       t.references :enrollment

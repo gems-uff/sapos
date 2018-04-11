@@ -1,4 +1,4 @@
-class AddDefaultValueToSchedulableAndShowClassName < ActiveRecord::Migration
+class AddDefaultValueToSchedulableAndShowClassName < ActiveRecord::Migration[5.1]
   def self.up
   	change_column_default :course_types, :schedulable, true
   	change_column_default :course_types, :show_class_name, true

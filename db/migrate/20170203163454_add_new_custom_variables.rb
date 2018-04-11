@@ -1,4 +1,4 @@
-class AddNewCustomVariables < ActiveRecord::Migration
+class AddNewCustomVariables < ActiveRecord::Migration[5.1]
   def change
 
     CustomVariable.where(:variable => "minimum_grade_for_approval").first or CustomVariable.create(:description=>"Nota mínima para aprovação", :variable =>"minimum_grade_for_approval", :value => "6.0")

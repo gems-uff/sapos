@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class AddDefaultValueToSemesters < ActiveRecord::Migration
+class AddDefaultValueToSemesters < ActiveRecord::Migration[5.1]
   def self.up
     DeferralType.transaction do
       DeferralType.where(:duration_semesters => nil).update_all(:duration_semesters => 0)

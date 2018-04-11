@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class UpdateAllEndDateAndCancelDateOfScholarshipAndScholarshipDuration < ActiveRecord::Migration
+class UpdateAllEndDateAndCancelDateOfScholarshipAndScholarshipDuration < ActiveRecord::Migration[5.1]
   def up
   	Scholarship.all.each do |scholarship|
   	  scholarship.save!

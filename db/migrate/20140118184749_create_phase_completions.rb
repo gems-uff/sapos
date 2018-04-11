@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreatePhaseCompletions < ActiveRecord::Migration
+class CreatePhaseCompletions < ActiveRecord::Migration[5.1]
   def change
     create_table :phase_completions do |t|
       t.integer :enrollment_id

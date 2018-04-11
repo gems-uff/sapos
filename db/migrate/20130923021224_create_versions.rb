@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreateVersions < ActiveRecord::Migration
+class CreateVersions < ActiveRecord::Migration[5.1]
   def self.up
     create_table :versions do |t|
       t.string   :item_type, :null => false

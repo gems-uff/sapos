@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class RenameTableCoursesToMajors < ActiveRecord::Migration
+class RenameTableCoursesToMajors < ActiveRecord::Migration[5.1]
   def self.up
     rename_table :courses, :majors
     remove_foreign_key :courses_students, "courses_students_course_id_fkey"

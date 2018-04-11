@@ -2,7 +2,7 @@
 
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
-class CreateCustomVariables < ActiveRecord::Migration
+class CreateCustomVariables < ActiveRecord::Migration[5.1]
   def up
     CustomVariable.where(:variable => "single_advisor_points").first or CustomVariable.create(:name=>"Pontos para orientador único", :variable =>"single_advisor_points", :value => "1.0")
     CustomVariable.where(:variable => "multiple_advisor_points").first or CustomVariable.create(:name=>"Pontos para orientador múltiplo", :variable =>"multiple_advisor_points", :value => "0.5")

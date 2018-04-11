@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreateDismissals < ActiveRecord::Migration
+class CreateDismissals < ActiveRecord::Migration[5.1]
   def self.up
     create_table :dismissals do |t|
       t.date :date

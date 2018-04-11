@@ -2,7 +2,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreateReportConfigurations < ActiveRecord::Migration
+class CreateReportConfigurations < ActiveRecord::Migration[5.1]
   def change
     create_table :report_configurations do |t|
       t.string :name

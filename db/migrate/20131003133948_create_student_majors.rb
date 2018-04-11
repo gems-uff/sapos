@@ -1,7 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class CreateStudentMajors < ActiveRecord::Migration
+class CreateStudentMajors < ActiveRecord::Migration[5.1]
   
   def self.up
   	rename_table :majors_students, :student_majors
