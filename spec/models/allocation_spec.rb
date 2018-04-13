@@ -112,7 +112,7 @@ describe Allocation do
     describe "scheduling_conflict_validation" do
       context "should be valid when" do
         it "does not exists a scheduling conflict" do
-          other_allocation = Factory.create(:allocation, :start_time => (Time.now.at_beginning_of_day + 10.hours).hour, :end_time => (Time.now.at_beginning_of_day + 12.hours).hour)
+          other_allocation = FactoryGirl.create(:allocation, :start_time => (Time.now.at_beginning_of_day + 10.hours).hour, :end_time => (Time.now.at_beginning_of_day + 12.hours).hour)
           allocation.start_time = (Time.now.at_beginning_of_day + 7.hours).hour
           allocation.end_time = (Time.now.at_beginning_of_day + 9.hours).hour
           allocation.course_class = other_allocation.course_class
@@ -123,7 +123,7 @@ describe Allocation do
       end
       context "should have error scheduling_conflict when" do
         it "start_time between another allocation's start_time and end_time" do
-          other_allocation = Factory.create(:allocation, :start_time => (Time.now.at_beginning_of_day + 10.hours).hour, :end_time => (Time.now.at_beginning_of_day + 12.hours).hour)
+          other_allocation = FactoryGirl.create(:allocation, :start_time => (Time.now.at_beginning_of_day + 10.hours).hour, :end_time => (Time.now.at_beginning_of_day + 12.hours).hour)
           allocation.start_time = (Time.now.at_beginning_of_day + 11.hours).hour
           allocation.end_time = (Time.now.at_beginning_of_day + 13.hours).hour
           allocation.course_class = other_allocation.course_class
@@ -132,7 +132,7 @@ describe Allocation do
           allocation.should have(0).errors_on :end_time
         end
         it "end_time between another allocation's start_time and end_time" do
-          other_allocation = Factory.create(:allocation, :start_time => (Time.now.at_beginning_of_day + 10.hours).hour, :end_time => (Time.now.at_beginning_of_day + 12.hours).hour)
+          other_allocation = FactoryGirl.create(:allocation, :start_time => (Time.now.at_beginning_of_day + 10.hours).hour, :end_time => (Time.now.at_beginning_of_day + 12.hours).hour)
           allocation.start_time = (Time.now.at_beginning_of_day + 9.hours).hour
           allocation.end_time = (Time.now.at_beginning_of_day + 11.hours).hour
           allocation.course_class = other_allocation.course_class
