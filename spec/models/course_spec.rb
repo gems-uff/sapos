@@ -24,12 +24,12 @@ describe Course do
         end
       end
       context "should have error taken when" do
-        it "name is already in use" do
+	it "name of available course is already in use" do
           name = "Course"
-          FactoryGirl.create(:course, :name => name)
-          course.name = name
-          course.should have_error(:taken).on :name
-        end
+	  FactoryGirl.create(:course, :name => name, :available => true)
+	  course.name = name
+	  course.should have_error(:check_unique_name_for_available_courses).on :name
+	end
       end
     end
     describe "course_type" do

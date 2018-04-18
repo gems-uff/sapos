@@ -498,6 +498,8 @@ pt-BR:
           grade_for_situation_registered: "deve estar em branco para situação 'Incompleto'"
           grade_gt_100: "deve ser menor ou igual a 10.0"
           grade_lt_0: "deve ser maior ou igual a 0.0"
+        course:
+          check_unique_name_for_available_courses: "de disciplina já existe no currículo vigente"      
         custom_variable:
           minimum_grade_for_approval_not_gt_grade_of_disapproval_for_absence: "da nota mínima para aprovação %{minimum_grade_for_approval} precisa ser maior que o valor da nota de reprovação por falta %{grade_of_disapproval_for_absence}"
           grade_of_disapproval_for_absence_not_lt_minimum_grade_for_approval: "da nota de reprovação por falta %{grade_of_disapproval_for_absence} precisa ser menor que o valor da nota mínima para aprovação %{minimum_grade_for_approval}"
