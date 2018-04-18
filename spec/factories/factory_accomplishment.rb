@@ -7,7 +7,7 @@ FactoryGirl.define do
   factory :accomplishment do
     phase
     enrollment
-    after_build do |obj|
+    after(:build) do |obj|
       if obj.phase.levels.empty?
         level = FactoryGirl.create(:level)
         phase_duration = FactoryGirl.create(:phase_duration, :level => level, :phase => obj.phase)

@@ -8,7 +8,7 @@ FactoryGirl.define do
     deferral_type
     approval_date Date.parse("2014/01/01")
     enrollment
-    after_build do |obj|
+    after(:build) do |obj|
       if obj.deferral_type.phase.levels.empty?
         level = FactoryGirl.create(:level)
         phase_duration = FactoryGirl.create(:phase_duration, :level => level, :phase => obj.deferral_type.phase)
