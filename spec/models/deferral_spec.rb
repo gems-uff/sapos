@@ -85,7 +85,6 @@ describe Deferral do
         level = FactoryGirl.create(:level)
         enrollment = FactoryGirl.create(:enrollment, :level => level, :admission_date => Date.new(2012, 3, 1))
         phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :deadline_semesters => 1, :level => level, :deadline_days => 0)
-        FactoryGirl.create(:accomplishment, :phase => phase, :enrollment => enrollment)
         deferral_type = FactoryGirl.create(:deferral_type, :phase => phase, :duration_semesters => 2, :duration_days => 0)
         deferral = FactoryGirl.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
 
@@ -97,7 +96,6 @@ describe Deferral do
         level = FactoryGirl.create(:level)
         enrollment = FactoryGirl.create(:enrollment, :level => level, :admission_date => Date.new(2017, 8, 1))
         phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :deadline_semesters => 8, :level => level, :deadline_days => 0)
-        FactoryGirl.create(:accomplishment, :phase => phase, :enrollment => enrollment)
         deferral_type = FactoryGirl.create(:deferral_type, :phase => phase, :duration_semesters => 3, :duration_days => 0)
         deferral = FactoryGirl.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
 
@@ -110,7 +108,6 @@ describe Deferral do
         level = FactoryGirl.create(:level)
         enrollment = FactoryGirl.create(:enrollment, :level => level, :admission_date => Date.new(2013, 8, 1))
         phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :deadline_semesters => 1, :level => level, :deadline_days => 0)
-        FactoryGirl.create(:accomplishment, :phase => phase, :enrollment => enrollment)
         deferral_type = FactoryGirl.create(:deferral_type, :phase => phase, :duration_months => 3, :duration_days => 7)
         deferral = FactoryGirl.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
 
