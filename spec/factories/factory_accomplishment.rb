@@ -8,6 +8,9 @@ FactoryGirl.define do
     phase
     enrollment
     after(:build) do |obj|
+      if obj.conclusion_date.nil?
+        obj.conclusion_date = Date.today
+      end
       if obj.phase.levels.empty?
         level = FactoryGirl.create(:level)
         phase_duration = FactoryGirl.create(:phase_duration, :level => level, :phase => obj.phase)
