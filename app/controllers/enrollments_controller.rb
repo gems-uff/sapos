@@ -125,7 +125,7 @@ class EnrollmentsController < ApplicationController
 
   def self.condition_for_accomplishments_column(column, value, like_pattern)
     return "" if value[:phase].blank?
-    date = value.nil? ? value : "#{value[:year]}-#{value[:month]}-#{value[:day]}"
+    date = value.nil? ? value : "#{value[:year]}-#{(value[:month].size == 1)? '0' + value[:month] : value[:month]}-#{(value[:day].size == 1)? '0' + value[:day] : value[:day]}"
     phase = value[:phase] == "all" ? nil : value[:phase]
     if (value[:phase] == "all")
       enrollments_ids = Enrollment.with_all_phases_accomplished_on(date)
