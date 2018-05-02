@@ -103,7 +103,7 @@ GEM
     coffee-script-source (1.9.1)
     columnize (0.9.0)
     concurrent-ruby (1.0.5)
-    crass (1.0.3)
+    crass (1.0.4)
     debug_inspector (0.0.2)
     devise (4.3.0)
       bcrypt (~> 3.0)
@@ -214,8 +214,8 @@ GEM
       activesupport (>= 3.2)
       choice (~> 0.2.0)
       ruby-graphviz (~> 1.2)
-    rails-html-sanitizer (1.0.3)
-      loofah (~> 2.0)
+    rails-html-sanitizer (1.0.4)
+      loofah (~> 2.2, >= 2.2.2)
     railties (5.1.4)
       actionpack (= 5.1.4)
       activesupport (= 5.1.4)
@@ -342,6 +342,7 @@ DEPENDENCIES
   prawn_rails
   rails (= 5.1.4)
   rails-erd
+  rails-html-sanitizer (~> 1.0.4)
   rdoc
   recordselect
   redcarpet
