@@ -152,13 +152,17 @@ class ScholarshipDuration < ApplicationRecord
   end
 
   def scholarship_end_date
-    finder_scholarship = Scholarship.find :last, :conditions => ["id = ?", scholarship]
-    finder_scholarship.end_date unless scholarship.nil?
+    if defined?(scholarship.id)
+      finder_scholarship = Scholarship.find_by_id(scholarship.id)
+      finder_scholarship.end_date unless finder_scholarship.nil? 
+    end
   end
 
   def scholarship_start_date
-    finder_scholarship = Scholarship.find :last, :conditions => ["id = ?", scholarship]
-    finder_scholarship.start_date unless scholarship.nil?
+    if defined?(scholarship.id)
+      finder_scholarship = Scholarship.find_by_id(scholarship.id)
+      finder_scholarship.start_date unless finder_scholarship.nil? 
+    end
   end
 
   def last_date
