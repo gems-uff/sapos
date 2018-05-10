@@ -16,6 +16,7 @@ class ScholarshipDuration < ApplicationRecord
   #validates if scholarship isn't with another student
   validate :if_scholarship_is_not_with_another_student
 
+  validate :scholarship_level_equals_enrollment_level  
 
 #  #validates if a scholarship duration start date isn't before it's end date
   validates_date :start_date, :on_or_before => :end_date, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_after_end_date")
@@ -185,6 +186,12 @@ class ScholarshipDuration < ApplicationRecord
   def update_end_and_cancel_dates
     self.end_date = self.end_date.end_of_month unless self.end_date.nil?
     self.cancel_date = self.cancel_date.end_of_month unless self.cancel_date.nil?
+  end
+
+  def scholarship_level_equals_enrollment_level
+    if defined?(scholarship.level_id) && defined?(enrollment.level_id) && (scholarship.level_id != enrollment.level_id)
+      errors.add(:scholarship, I18n.t("activerecord.errors.models.scholarship_duration.the_levels_of_scholarship_and_enrollment_are_different"))
+    end	    
   end
 
 end

@@ -531,6 +531,7 @@ pt-BR:
             end_date:
               on_or_after: "anterior a Data de Início"
         scholarship_duration:
+          the_levels_of_scholarship_and_enrollment_are_different: "não pode ser alocado a esta Matrícula porque eles são de níveis diferentes"
           end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
           end_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
           enrollment_and_scholarship_uniqueness: "já possui uma Bolsa alocada nesse período"
