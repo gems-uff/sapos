@@ -8,5 +8,8 @@ FactoryGirl.define do
     scholarship
     start_date 2.days.ago
     end_date 2.days.from_now
+    before(:create) do |scholarship_duration|
+      scholarship_duration.scholarship.level = scholarship_duration.enrollment.level
+    end
   end
 end
