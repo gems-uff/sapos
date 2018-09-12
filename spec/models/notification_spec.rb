@@ -129,7 +129,7 @@ describe Notification do
       describe "for daily frequency" do
         it "should be 01/04 if today is 01/03" do
           notification = FactoryGirl.create(:notification)
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.daily")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.daily")
           notification.calculate_next_notification_date(:time => Time.parse("01/03")).should == Time.parse("01/04")
         end
       end
@@ -137,25 +137,25 @@ describe Notification do
       describe "for weekly frequency" do
         it "should be 2014/01/20(monday) if today is 2014/01/14(tuesday)" do
           notification = FactoryGirl.create(:notification)
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.weekly")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.weekly")
           notification.calculate_next_notification_date(:time => Time.parse("2014/01/14")).should == Time.parse("2014/01/20")
         end
 
         it "should be 2014/01/16(thursday) if today is 2014/01/14(tuesday) and offset is 3" do
           notification = FactoryGirl.create(:notification, :notification_offset => "3")
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.weekly")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.weekly")
           notification.calculate_next_notification_date(:time => Time.parse("2014/01/14")).should == Time.parse("2014/01/16")
         end
 
         it "should be 2014/01/18(saturday) if today is 2014/01/14(tuesday) and offset is -2" do
           notification = FactoryGirl.create(:notification, :notification_offset => "-2")
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.weekly")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.weekly")
           notification.calculate_next_notification_date(:time => Time.parse("2014/01/14")).should == Time.parse("2014/01/18")
         end
 
          it "should be 2014/02/01(saturday) if today is 2014/01/25(saturday) and offset is -2" do
           notification = FactoryGirl.create(:notification, :notification_offset => "-2")
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.weekly")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.weekly")
           notification.calculate_next_notification_date(:time => Time.parse("2014/01/25")).should == Time.parse("2014/02/01")
         end
       end
@@ -163,19 +163,19 @@ describe Notification do
       describe "for monthly frequency" do
         it "should be 02/01 if today is 01/17" do
           notification = FactoryGirl.create(:notification)
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.monthly")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.monthly")
           notification.calculate_next_notification_date(:time => Time.parse("01/17")).should == Time.parse("02/01")
         end
 
         it "should be 02/15 if today is 01/17 and offset is 14" do
           notification = FactoryGirl.create(:notification, :notification_offset => "14")
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.monthly")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.monthly")
           notification.calculate_next_notification_date(:time => Time.parse("01/17")).should == Time.parse("02/15")
         end
 
         it "should be 02/08 if today is 01/17 and offset is 1w" do
           notification = FactoryGirl.create(:notification, :notification_offset => "1w")
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.monthly")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.monthly")
           notification.calculate_next_notification_date(:time => Time.parse("01/17")).should == Time.parse("02/08")
         end
       end
@@ -183,31 +183,31 @@ describe Notification do
       describe "for semiannual frequency" do
         it "should be 03/01 of this year if today is 09/01 of last year" do
           notification = FactoryGirl.create(:notification)
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
           notification.calculate_next_notification_date(:time => Time.parse("09/01") - 1.year).should == Time.parse("03/01")
         end
 
         it "should be 03/01 of this year if today is 02/01" do
           notification = FactoryGirl.create(:notification)
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
           notification.calculate_next_notification_date(:time => Time.parse("02/01")).should == Time.parse("03/01")
         end
 
         it "should be 08/01 if today is 04/01" do
           notification = FactoryGirl.create(:notification)
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
           notification.calculate_next_notification_date(:time => Time.parse("04/01")).should == Time.parse("08/01")
         end
 
         it "should be 03/01 of next year if today is 09/01" do
           notification = FactoryGirl.create(:notification)
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
           notification.calculate_next_notification_date(:time => Time.parse("09/01")).should == (Time.parse("03/01") + 1.year)
         end
 
         it "should be 07/01 if today is 02/15 and offset is -31" do
           notification = FactoryGirl.create(:notification, :notification_offset => "-31")
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
           notification.calculate_next_notification_date(:time => Time.parse("02/15")).should == Time.parse("07/01")
         end
 
@@ -216,7 +216,7 @@ describe Notification do
       describe "for annual frequency" do
         it "should be 2015/01/01 if today is 2014/06/27" do
           notification = FactoryGirl.create(:notification)
-	  notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.annual")
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.annual")
           notification.calculate_next_notification_date(:time => Time.parse("2014/06/27")).should == Time.parse("2015/01/01")
         end
       end
