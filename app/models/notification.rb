@@ -26,6 +26,7 @@ class Notification < ApplicationRecord
   validates :query_offset, :presence => true, on: :update
   validates :subject_template, :presence => true, on: :update
   validates :to_template, :presence => true, on: :update
+  validates :query, :presence => true, on: :update
 
   validates_format_of :notification_offset, :with => /\A(\-?\d+[yMwdhms]?)+\z/, :message => :offset_invalid_value
   validates_format_of :query_offset, :with => /\A(\-?\d+[yMwdhms]?)+\z/, :message => :offset_invalid_value

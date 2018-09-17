@@ -5,9 +5,8 @@ require 'spec_helper'
 
 describe Notification do
   let(:notification) do 
-    query = Query.new
-    notification = Notification.new 
-    notification.query = query
+    query = FactoryGirl.create(:query)
+    notification = FactoryGirl.create(:notification, :query => query)
     notification
   end
   subject { notification }
@@ -78,17 +77,17 @@ describe Notification do
       end
     end
 
-    describe "sql_query" do
+    describe "query" do
       context "should be valid when" do
-        it "sql_query is not null" do
+        it "query is not null" do
           notification.sql_query = "SELECT * FROM USERS"
-          notification.should have(0).errors_on :sql_query
+          notification.should have(0).errors_on :query
         end
       end
       context "should have error blank when" do
-        it "sql_query is null" do
-          notification.sql_query = nil
-          notification.should have_error(:blank).on :sql_query
+        it "query is null" do
+          notification.query = nil
+          notification.should have_error(:blank).on :query
         end
       end
     end
