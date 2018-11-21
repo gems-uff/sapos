@@ -10,6 +10,7 @@ gem 'rails', '5.1.4'
 gem 'rubyzip', '>=1.2.1'
 gem 'loofah', '~> 2.2.3'
 gem 'rails-html-sanitizer', '~> 1.0.4'
+gem 'rack', '>= 2.0.6'
 
 gem 'rspec-collection_matchers'
 
