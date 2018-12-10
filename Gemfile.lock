@@ -122,8 +122,8 @@ GEM
     factory_girl_rails (4.5.0)
       factory_girl (~> 4.5.0)
       railties (>= 3.0.0)
-    ffi (1.9.18)
-    ffi (1.9.18-x86-mingw32)
+    ffi (1.9.25)
+    ffi (1.9.25-x86-mingw32)
     font-awesome-rails (4.7.0.2)
       railties (>= 3.2, < 5.2)
     ftools (0.0.0)
@@ -327,6 +327,7 @@ DEPENDENCIES
   devise
   exception_notification (= 2.6.1)
   factory_girl_rails
+  ffi (>= 1.9.24)
   font-awesome-rails
   jbuilder
   jquery-rails (>= 4.0.4)
