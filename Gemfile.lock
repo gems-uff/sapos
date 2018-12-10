@@ -255,7 +255,7 @@ GEM
       rspec-support (~> 3.7.0)
     rspec-support (3.7.0)
     ruby-graphviz (1.2.3)
-    rubyzip (1.2.1)
+    rubyzip (1.2.2)
     rufus-scheduler (3.0.9)
       tzinfo
     sass (3.5.3)
@@ -349,7 +349,7 @@ DEPENDENCIES
   redcarpet
   rspec-collection_matchers
   rspec-rails
-  rubyzip (>= 1.2.1)
+  rubyzip (>= 1.2.2)
   rufus-scheduler
   sass-rails
   sdoc
