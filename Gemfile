@@ -7,10 +7,11 @@ ruby '~> 2.4.0'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '5.1.6.1'
 
-gem 'rubyzip', '>=1.2.1'
+gem 'rubyzip', '>=1.2.2'
 gem 'loofah', '~> 2.2.3'
 gem 'rails-html-sanitizer', '~> 1.0.4'
 gem 'rack', '>= 2.0.6'
+gem 'ffi', '>= 1.9.24'
 
 gem 'rspec-collection_matchers'
 
