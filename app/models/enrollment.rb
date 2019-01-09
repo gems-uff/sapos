@@ -31,7 +31,7 @@ class Enrollment < ApplicationRecord
   validates :level, :presence => true
   validates :enrollment_status, :presence => true
   validates :student, :presence => true
-
+  validates_associated :dismissal
   validate :enrollment_has_main_advisor
 
   validates_date :thesis_defense_date, :on_or_after => :admission_date, :allow_nil => true, :on_or_after_message => I18n.t("activerecord.errors.models.enrollment.thesis_defense_date_before_admission_date")

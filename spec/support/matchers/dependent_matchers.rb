@@ -42,6 +42,7 @@ RSpec::Matchers.define :restrict_destroy_when_exists do |dependent_class|
 
     obj = FactoryGirl.create(name.to_sym)
     FactoryGirl.create(dependent_class, @fk=> obj.id)
+    obj.reload
     begin
       obj.destroy
       restrict_success = false if obj.destroyed?
