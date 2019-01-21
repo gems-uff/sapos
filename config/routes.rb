@@ -16,35 +16,37 @@ Sapos::Application.routes.draw do
 
   # Example resource route (maps HTTP verbs to controller actions automatically):
 
+  concern :active_scaffold, ActiveScaffold::Routing::Basic.new(association: true)
+  concern :active_scaffold_association, ActiveScaffold::Routing::Association.new
 
   root :to => "application#root"
 
-  resources :enrollment_holds do as_routes end
+  resources :enrollment_holds do concerns :active_scaffold end
 
-  resources :scholarship_suspensions do as_routes end
+  resources :scholarship_suspensions do concerns :active_scaffold end
 
   devise_for :users, :controllers => {:registrations => "users"}
 
   resources :versions do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :professor_research_areas do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
   end
 
   resources :class_enrollments do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
   end
 
   resources :allocations do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :course_classes do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
     member do
       get 'summary_pdf'
@@ -55,16 +57,16 @@ Sapos::Application.routes.draw do
   end
 
   resources :course_types do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :courses do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
   end
 
   resources :research_areas do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
   end
 
@@ -72,49 +74,49 @@ Sapos::Application.routes.draw do
   get "credits/show"
 
   resources :phase_durations do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :deferrals do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :deferral_types do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :accomplishments do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :phases do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :cities do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :states do
-    as_routes
+    concerns :active_scaffold
     get 'cities', on: :member
   end
 
   resources :countries do
-    as_routes
+    concerns :active_scaffold
     get 'states', on: :member
   end
 
   resources :users do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :roles do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :scholarship_durations do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
     collection do
       get 'to_pdf'
@@ -122,7 +124,7 @@ Sapos::Application.routes.draw do
   end
 
   resources :scholarships do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
     collection do
       get 'to_pdf'
@@ -130,7 +132,7 @@ Sapos::Application.routes.draw do
   end
 
   resources :advisements do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
     collection do
       get 'to_pdf'
@@ -138,24 +140,24 @@ Sapos::Application.routes.draw do
   end
 
   resources :professors do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
   end
 
   resources :scholarship_types do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :dismissals do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :dismissal_reasons do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :enrollments do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
     collection do
       get 'to_pdf'
@@ -167,11 +169,11 @@ Sapos::Application.routes.draw do
   end
 
   resources :enrollment_statuses do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :students do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
     member do
       get 'photo'
@@ -179,47 +181,47 @@ Sapos::Application.routes.draw do
   end
 
   resources :majors do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
   end
 
   resources :levels do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :institutions do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
   end
 
   resources :sponsors do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :advisement_authorizations do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :student_majors do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
   end
 
   resources :custom_variables do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :thesis_defense_committee_participations do
-    as_routes
+    concerns :active_scaffold
     record_select_routes
   end
 
   resources :notification_logs do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :notifications do
-    as_routes
+    concerns :active_scaffold
     member do
       post 'execute_now'
       get 'simulate'
@@ -231,22 +233,22 @@ Sapos::Application.routes.draw do
   end
 
   resources :queries do
-    as_routes
+    concerns :active_scaffold
     member do
       get 'execute'
     end
   end
 
   resources :query_params do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :notification_params do
-    as_routes
+    concerns :active_scaffold
   end
 
   resources :report_configurations do
-    as_routes
+    concerns :active_scaffold
     collection do
       put 'preview'
       post 'preview'
@@ -259,7 +261,7 @@ Sapos::Application.routes.draw do
 
 
   resources :course_research_areas do
-    as_routes
+    concerns :active_scaffold
   end
 
   # The priority is based upon order of creation:
