@@ -336,6 +336,7 @@ DEPENDENCIES
   kaminari
   loofah (~> 2.2.3)
   mysql2
+  nokogiri (>= 1.8.5)
   odf-report
   paper_trail
   prawn
