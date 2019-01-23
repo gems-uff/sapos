@@ -86,9 +86,9 @@ class ClassEnrollment < ApplicationRecord
   def should_send_email_to_professor?
     (!self.id.nil?) and 
     (
-      self.grade_changed? or 
-      self.situation_changed? or 
-      self.disapproved_by_absence_changed?
+      self.saved_change_to_grade? or 
+      self.saved_change_to_situation? or 
+      self.saved_change_to_disapproved_by_absence?
     )
   end
 
@@ -126,7 +126,7 @@ class ClassEnrollment < ApplicationRecord
   end
 
   def notify_student_and_advisor
-    return if grade.nil? or !(grade_changed? or situation_changed? or disapproved_by_absence_changed?)
+    return if grade.nil? or !(saved_change_to_grade? or saved_change_to_situation? or saved_change_to_disapproved_by_absence?)
     info = {
         :name => enrollment.student.name,
         :course => course_class.label_with_course,

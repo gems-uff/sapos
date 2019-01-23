@@ -71,7 +71,7 @@ class Notification < ApplicationRecord
       self.notification_params.create(:query_param_id => query_param_id, :notification_id => self.id, :active => true)
     end
 
-    if self.query_id_changed?
+    if self.saved_change_to_query_id?
       cached_query_params_ids = self.query_params_ids
       self.notification_params.each do |np|
         np.update_attribute(:active, cached_query_params_ids.include?(np.query_param_id))
