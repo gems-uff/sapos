@@ -20,7 +20,7 @@ RSpec::Matchers.define :be_able_to_be_destroyed do
     "It should be possible to delete a #{actual.class.name} record"
   end
 
-  failure_message_for_should_not do |actual|
+  failure_message_when_negated do |actual|
     "It should not be possible to delete a #{actual.class.name} record"
   end
 
@@ -55,7 +55,7 @@ RSpec::Matchers.define :restrict_destroy_when_exists do |dependent_class|
     "destroy should be restricted when there is a #{dependent_class}"
   end
 
-  failure_message_for_should_not do |record|
+  failure_message_when_negated do |record|
     "destroy should not be restricted when there is a #{dependent_class}"
   end
 
@@ -93,7 +93,7 @@ RSpec::Matchers.define :destroy_dependent do |dependent_class|
     "destroy should be propagated to #{dependent_class}"
   end
 
-  failure_message_for_should_not do |record|
+  failure_message_when_negated do |record|
     "destroy should be propagated to #{dependent_class}"
   end
 

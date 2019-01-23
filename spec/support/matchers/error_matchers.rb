@@ -42,7 +42,7 @@ RSpec::Matchers.define :have_error do |erro|
     end
   end
 
-  failure_message_for_should_not do |record|
+  failure_message_when_negated do |record|
     if @atributo
       %{Esperava que [#{record.errors[@atributo].join(', ')}] não incluísse "#{error_message(record, @atributo, erro.to_s)}"}
     end
