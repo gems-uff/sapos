@@ -38,12 +38,12 @@ describe Advisement do
     describe "main_advisor" do
       context "should be valid when" do
         it "have other advisor" do
-          advisement.stub(:enrollment_has_advisors).and_return(true)
+          allow(advisement).to receive(:enrollment_has_advisors).and_return(true)
           advisement.main_advisor = nil
           advisement.should have(0).errors_on :main_advisor
         end
         it "does not have other advisor and main_advisor is true" do
-          advisement.stub(:enrollment_has_advisors).and_return(false)
+          allow(advisement).to receive(:enrollment_has_advisors).and_return(false)
           advisement.main_advisor = true
           advisement.should have(0).errors_on :main_advisor
         end
