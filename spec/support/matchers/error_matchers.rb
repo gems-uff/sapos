@@ -36,7 +36,7 @@ RSpec::Matchers.define :have_error do |erro|
     record.errors[@atributo].to_a.detect { |e| e == mensagem }
   end
 
-  failure_message_for_should do |record|
+  failure_message do |record|
     if @atributo
       %{Esperava que [#{record.errors[@atributo].join(', ')}] incluísse "#{error_message(record, @atributo, erro.to_s)}"}
     end
