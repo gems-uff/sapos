@@ -264,7 +264,7 @@ describe ScholarshipDuration do
 
       it 'should return true if date < cancel_date' do
         scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 1.months, :scholarship => @scholarship)
-        scholarship_duration.active?(:date => end_date + 1.day).should == true
+        scholarship_duration.active?(:date => end_date.end_of_month).should == true
       end      
     end
   end

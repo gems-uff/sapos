@@ -180,7 +180,7 @@ class ScholarshipDuration < ApplicationRecord
     date = options[:date].nil? ? Date.today : options[:date].to_date
     return false if date < self.start_date
     return self.end_date.end_of_month >= date if self.cancel_date.nil?
-    (self.cancel_date.end_of_month - 1.month) >= date
+    (self.cancel_date - 1.month).end_of_month >= date
   end
 
   def update_end_and_cancel_dates
