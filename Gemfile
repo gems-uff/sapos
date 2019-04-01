@@ -44,7 +44,7 @@ gem "kaminari"
 #gem "schema_plus"
 
 gem 'cancancan'
-gem "devise", ">= 4.6.0"
+gem "devise", ">= 4.6.2"
 gem "paper_trail"
 
 gem 'sql-parser'
