@@ -1,3 +1,8 @@
+![Sapos Logo](https://github.com/gems-uff/sapos/raw/master/app/assets/images/logoSapos.png)
+
+![Release](https://img.shields.io/github/release/gems-uff/sapos.svg)
+![MIT License](https://img.shields.io/github/license/gems-uff/sapos.svg)
+
 # About
 
 SAPOS main goal is to ease the management of information related to graduate programs such as enrollments, courses, advisement, scholarships, requirements, among others.
