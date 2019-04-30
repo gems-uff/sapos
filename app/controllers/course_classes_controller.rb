@@ -13,7 +13,7 @@ class CourseClassesController < ApplicationController
 
     config.columns.add :class_enrollments_count
 
-    config.list.sorting = {:name => 'ASC', :id => 'DESC'}
+    config.list.sorting = {:name => 'ASC'}
     config.list.columns = [:name, :course, :professor, :year, :semester, :class_enrollments_count]
     config.create.label = :create_course_class_label
     config.update.label = :update_course_class_label
@@ -66,7 +66,7 @@ class CourseClassesController < ApplicationController
 
     config.actions.exclude :deleted_records
   end
-  record_select :per_page => 10, :label => :record_select_output, :order_by => 'year DESC, semester DESC, name, id DESC', :full_text_search => true
+  record_select :per_page => 10, :order_by => 'name', :full_text_search => true
 
 
   def summary_pdf
@@ -113,9 +113,9 @@ class CourseClassesController < ApplicationController
       :professor => record.professor.name,
       :values => record.class_enrollments.map do |class_enrollment| 
         enrollment = class_enrollment.enrollment.to_label
-        situation = "#{class_enrollment.situation}#{class_enrollment.saved_change_to_situation? ? '*' : ''}"
-        grade = "#{class_enrollment.grade_to_view}#{class_enrollment.saved_change_to_grade? ? '*' : ''}"
-        absence_changed = class_enrollment.saved_change_to_disapproved_by_absence? ? '*' : ''
+        situation = "#{class_enrollment.situation}#{class_enrollment.situation_changed? ? '*' : ''}"
+        grade = "#{class_enrollment.grade_to_view}#{class_enrollment.grade_changed? ? '*' : ''}"
+        absence_changed = class_enrollment.disapproved_by_absence_changed? ? '*' : ''
         if class_enrollment.attendance_to_label == "I"
           absence = "#{I18n.t('activerecord.attributes.class_enrollment.disapproved_by_absence')}#{absence_changed}"
         else

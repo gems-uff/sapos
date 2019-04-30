@@ -1,0 +1,39 @@
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+<div id="content">
+
+</div>
+<script type="text/javascript">
+
+
+
+function keepHtml(unsafe) {
+    return unsafe
+         .replace(/&amp;/g, "&")
+         .replace(/&lt;/g, "<")
+         .replace(/&gt;/g, ">")
+         .replace(/&quot;/g, '"')
+         .replace(/&#039;/g, "'");
+ }
+
+var data = new Object;
+
+var rawColumns = '<%= @query_result[:rows] %>';
+var columns = rawColumns;
+if (columns[0] == '[' && columns[1] == '[')
+	columns = columns.substr(1,columns.length - 2);
+columns = columns.replace(/nil/g, 'null');
+var parsedColumns = JSON.parse(keepHtml(columns));
+
+<% @query_result[:columns].each_with_index do |column_name, index| %>
+data["<%= column_name %>"] = parsedColumns[<%= index %>];
+<% end %>
+
+
+var template = Handlebars.compile("<%= @template %>");
+var content = template(data);
+
+$('#content').html(keepHtml(content));
+
+console.log(content);
+
+</script>

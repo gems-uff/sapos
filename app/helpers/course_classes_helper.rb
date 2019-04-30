@@ -3,10 +3,5 @@
 
 module CourseClassesHelper
   include PdfHelper
-  include CourseClassesPdfHelper
-
-  def permit_rs_browse_params
-    [:page, :update, :utf8]
-  end
- 
+  include CourseClassesPdfHelper 
 end

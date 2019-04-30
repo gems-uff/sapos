@@ -1,0 +1,72 @@
+<% resource_name = form.class.to_s.downcase %>
+<h5>Parâmetros de consulta</h5>
+<div>
+  <table class="showtable listed-records-table">
+    <thead>
+    <tr>
+      <th>Variável</th>
+      <th>Valor</th>
+      <th>Default</th>
+    </tr>
+    </thead>
+    <tbody class="records">
+    <% resource.params.each do |param| %>
+        <% error = active_scaffold_error_messages_for(param, :object_name => param.class.model_name.human.downcase) %>
+        <% unless error.empty? %>
+            <tr class="record">
+              <td colspan="3"><%= error %></td>
+            </tr>
+        <% end %>
+        <tr class="record">
+          <td>
+            <%= param.name %>
+            <small>(<%= param.value_type %>)</small>
+          </td>
+          <td>
+            <% if param.type.list? or param.default_value.nil? %>
+                <%= text_field_tag "#{resource_name}_#{form.id}_#{param.name}", param.value, data: {name: "query_params[#{param.name}]", 'link-target' => "#as_forms-consult-#{form.id}-link"}, id: "#{resource_name}_#{form.id}_#{param.name}", class: "_onchange_param_field _param_field _param_type_#{param.value_type.downcase}" %>
+            <% else %>
+                <%= text_field_tag "#{resource_name}_#{form.id}_#{param.name}", param.parsed_value, data: {name: "query_params[#{param.name}]", 'link-target' => "#as_forms-consult-#{form.id}-link"}, id: "#{resource_name}_#{form.id}_#{param.name}", class: "_onchange_param_field _param_field _param_type_#{param.value_type.downcase}" %>
+            <% end %>
+          </td>
+          <td>
+            <small class="_default_value" data-default_value="<%= param.default_value %>">
+              <a href="javascript:void(o)">(Default: <%= param.default_value %>)</a>
+            </small>
+          </td>
+        </tr>
+
+    <% end %>
+    </tbody>
+  </table>
+
+  <script type="text/javascript">
+
+      $('._default_value').click(function () {
+          var _this = $(this);
+          _this.parents('tr').first().find('._param_field').val(_this.data('default_value')).trigger('change');
+      });
+
+
+$('._onchange_param_field').change(function () {
+	  
+          var link = $($(this).data('link-target'));
+          var p = link.prop('search').replace(/^\?/, '');
+          var params = queryStringToHash(p);
+          var params_elements = $('._onchange_param_field');
+          for (var i = 0, len = params_elements.length; i < len; i++) {
+              var current_param = $(params_elements[i]);
+              params[current_param.data('name')] = current_param.val()
+          }
+          link.prop('search', $.param(params));
+
+          params['query_id'] = <%=resource.id %>;
+          var generate = $('.as_forms_<%=@form.id %>-generate');
+          generate.prop('search', $.param(params));
+      }).first().trigger('change');
+
+
+      $("._param_type_date").datepicker();
+
+  </script>
+</div>

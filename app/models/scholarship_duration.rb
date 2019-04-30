@@ -16,7 +16,6 @@ class ScholarshipDuration < ApplicationRecord
   #validates if scholarship isn't with another student
   validate :if_scholarship_is_not_with_another_student
 
-  validate :scholarship_level_equals_enrollment_level  
 
 #  #validates if a scholarship duration start date isn't before it's end date
   validates_date :start_date, :on_or_before => :end_date, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_after_end_date")
@@ -153,17 +152,13 @@ class ScholarshipDuration < ApplicationRecord
   end
 
   def scholarship_end_date
-    if defined?(scholarship.id)
-      finder_scholarship = Scholarship.find_by_id(scholarship.id)
-      finder_scholarship.end_date unless finder_scholarship.nil? 
-    end
+    finder_scholarship = Scholarship.find :last, :conditions => ["id = ?", scholarship]
+    finder_scholarship.end_date unless scholarship.nil?
   end
 
   def scholarship_start_date
-    if defined?(scholarship.id)
-      finder_scholarship = Scholarship.find_by_id(scholarship.id)
-      finder_scholarship.start_date unless finder_scholarship.nil? 
-    end
+    finder_scholarship = Scholarship.find :last, :conditions => ["id = ?", scholarship]
+    finder_scholarship.start_date unless scholarship.nil?
   end
 
   def last_date
@@ -180,18 +175,12 @@ class ScholarshipDuration < ApplicationRecord
     date = options[:date].nil? ? Date.today : options[:date].to_date
     return false if date < self.start_date
     return self.end_date.end_of_month >= date if self.cancel_date.nil?
-    (self.cancel_date - 1.month).end_of_month >= date
+    (self.cancel_date.end_of_month - 1.month) >= date
   end
 
   def update_end_and_cancel_dates
     self.end_date = self.end_date.end_of_month unless self.end_date.nil?
     self.cancel_date = self.cancel_date.end_of_month unless self.cancel_date.nil?
-  end
-
-  def scholarship_level_equals_enrollment_level
-    if defined?(scholarship.level_id) && defined?(enrollment.level_id) && (scholarship.level_id != enrollment.level_id)
-      errors.add(:scholarship, I18n.t("activerecord.errors.models.scholarship_duration.the_levels_of_scholarship_and_enrollment_are_different"))
-    end	    
   end
 
 end

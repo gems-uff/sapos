@@ -456,9 +456,4 @@ module EnrollmentsHelper
 
     result
   end
-
-  def permit_rs_browse_params
-    [:page, :update, :utf8]
-  end
-
 end

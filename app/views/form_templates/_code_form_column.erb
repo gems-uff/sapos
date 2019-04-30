@@ -1,0 +1,25 @@
+<% column_options = active_scaffold_input_options(column, scope, :object => record) %>
+<dl>
+
+  <dd>
+    <%= html_form_column record, column_options %>
+  </dd>
+  <dt>
+    <b><%= label_tag label_for(column, column_options), column.label %></b>
+    <br>
+    <span class="description">
+  			<span class="desc-title">Template: </span>
+            <ul>
+              <li>O template usa o <b>Handlebars</b> para gerar o HTML. Detalhes <a href="https://handlebarsjs.com/">aqui</a> </li>
+            </ul>
+  			<span class="desc-title">Resultado da consulta: </span>
+  			<ul>
+              <li>O resultado da consulta será retornado em uma variável chamada <b>data</b>, onde cada linha retornada representa uma posição no vetor</li>
+              <li>Por exemplo, caso sua consulta retorne 5 linhas com as colunas Nome e Idade, data será um vetor de 5 posições, cada uma com a variável Nome e Idade</li>
+              <li>É permitida a inserção de código ou estilo como em qualquer página HTML(tags <b>script</b> e <b>style</b>).</li>
+              <li>Além do HandleBars, o template já contém os frameworks Jquery e Bootstrap</li>
+            </ul>
+  		</span>
+  </dt>
+</dl>
+

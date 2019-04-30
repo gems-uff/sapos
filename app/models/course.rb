@@ -14,8 +14,7 @@ class Course < ApplicationRecord
   has_paper_trail
 
   validates :course_type, :presence => true
-  validates :name, :presence => true
-  validate  :check_unique_name_for_available_courses
+  validates :name, :presence => true, :uniqueness => {:scope => :available, :message => "e #{I18n.t('activerecord.attributes.course.available')} #{I18n.t('errors.messages.taken')}"}
   validates :code, :presence => true, :uniqueness => true
   validates :credits, :presence => true
   validates :workload, :presence => true
@@ -46,20 +45,6 @@ class Course < ApplicationRecord
       end
     end
     return ids
-  end
-
-  private
-
-  def check_unique_name_for_available_courses
-    if available && (not name.nil?)
-      nome_da_disciplina = I18n.transliterate(name.squish.downcase)
-      nomes_das_outras_disciplinas = Course.where(:available => true).where.not(:id => id).collect{|c| [c.name]}
-      nomes_das_outras_disciplinas.each do |nome_da_outra_disciplina|
-        if nome_da_disciplina == I18n.transliterate(nome_da_outra_disciplina[0].squish.downcase)
-          errors.add(:name, "#{I18n.t('activerecord.errors.models.course.check_unique_name_for_available_courses')}")
-	end
-      end
-    end
   end
 
 end

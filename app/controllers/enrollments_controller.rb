@@ -125,7 +125,7 @@ class EnrollmentsController < ApplicationController
 
   def self.condition_for_accomplishments_column(column, value, like_pattern)
     return "" if value[:phase].blank?
-    date = value.nil? ? value : "#{value[:year]}-#{(value[:month].size == 1)? '0' + value[:month] : value[:month]}-#{(value[:day].size == 1)? '0' + value[:day] : value[:day]}"
+    date = value.nil? ? value : "#{value[:year]}-#{value[:month]}-#{value[:day]}"
     phase = value[:phase] == "all" ? nil : value[:phase]
     if (value[:phase] == "all")
       enrollments_ids = Enrollment.with_all_phases_accomplished_on(date)
@@ -296,13 +296,13 @@ class EnrollmentsController < ApplicationController
     emails = []
     record.class_enrollments.each do |class_enrollment| 
       if class_enrollment.should_send_email_to_professor?
-        absence_changed = class_enrollment.saved_change_to_disapproved_by_absence? ? '*' : ''
+        absence_changed = class_enrollment.disapproved_by_absence_changed? ? '*' : ''
         info = {
           :name => record.to_label,
           :professor => class_enrollment.course_class.professor.name,
           :course => class_enrollment.course_class.label_with_course,
-          :situation => "#{class_enrollment.situation}#{class_enrollment.saved_change_to_situation? ? '*' : ''}",
-          :grade => "#{class_enrollment.grade_to_view}#{class_enrollment.saved_change_to_grade? ? '*' : ''}",
+          :situation => "#{class_enrollment.situation}#{class_enrollment.situation_changed? ? '*' : ''}",
+          :grade => "#{class_enrollment.grade_to_view}#{class_enrollment.grade_changed? ? '*' : ''}",
           :absence => ((class_enrollment.attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false')) + absence_changed
         }
         message_to_professor = {

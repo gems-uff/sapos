@@ -14,7 +14,7 @@
     <thead>
     <tr>
       <% @query_result[:columns].each do |column_name| %>
-          <th><%= column_name %></th>
+          <th class="queryColumn"><%= column_name %></th>
       <% end %>
     </tr>
     </thead>
@@ -23,7 +23,7 @@
         <% tr_class = index.odd? ? "even-record" : "" %>
         <tr class="record <%= tr_class %>">
           <% row.each do |value| %>
-              <td><%= value %></td>
+              <td class="tableValue"><%= value %></td>
           <% end %>
         </tr>
     <% end %>
@@ -38,5 +38,19 @@
 <script type="text/javascript">
     $(".execute.as_action.again").click(function () {
         ActiveScaffold.find_action_link($("#as_queries-execute-<%= @query.id %>-link")).reload();
+    })
+
+	var returnQuery = function(){
+		var query = [];
+        	$('.queryColumn').each(
+	            function(index){
+        	        query[$(this).html()] = $('.tableValue').get(index).innerHTML
+        	    });	
+		return query;
+	}
+
+    $(document).ready(function(){
+
+        
     })
 </script>

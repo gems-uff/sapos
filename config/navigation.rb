@@ -126,6 +126,12 @@ SimpleNavigation::Configuration.run do |navigation|
       locations.item :country, 'Países', countries_path, :if => can_read?(Country)
     end
 
+    primary.item :forms, 'Relatórios', forms_path, :if => can_read?(Form) do |forms|
+      forms.item :forms, 'Relatórios', forms_path, :if => can_read?(Form)
+      forms.item :form_images, 'Imagens de Formulários', form_images_path, :if => can_read?(Form)
+      forms.item :form_templates, 'Templates para Relatório', form_templates_path, :if => can_read?(FormTemplate)
+    end
+
     configuracoes_models = [User, Role, CustomVariable, Version, Notification, NotificationLog, ReportConfiguration]
     primary.item :configuration, 'Configurações', get_path_from(configuracoes_models), :if => can_read?(configuracoes_models) do |configuration|
       configuration.item :user, 'Usuários', users_path, :if => can_read?(User)

@@ -14,9 +14,6 @@ module Sapos
     # Allow the notifier to send emails
     config.should_send_emails = false
 
-    #config.action_controller.permit_all_parameters = true
-    #config.action_controller.action_on_unpermitted_parameters = :raise
-
     config.eager_load_paths << Rails.root.join('lib')
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers

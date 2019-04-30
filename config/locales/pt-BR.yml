@@ -196,6 +196,17 @@ pt-BR:
       enrollment_status:
         name: "Nome"
         enrollments: "Matrículas"
+      form:
+        name: "Nome"
+        query: "Consulta"
+        descricao: "Descrição"
+        template: "Template"
+        group_query: "Agrupar Resultado"
+      form_image:
+        name: "Nome"
+        text: "Descrição"
+        image: "Imagem"
+        form: "Relatório"
       institution:
         code: "Sigla"
         majors: "Cursos"
@@ -426,6 +437,11 @@ pt-BR:
         major: "Curso"
         student: "Aluno"
         student_id: "Aluno"
+      form_template:
+        name: "Título"
+        description: "Descrição"
+        code: "Código"
+        form_image: "Imagens"
       thesis_defense_committee_participation:
         enrollment: "Matrícula"
         professor: "Professor"
@@ -498,8 +514,6 @@ pt-BR:
           grade_for_situation_registered: "deve estar em branco para situação 'Incompleto'"
           grade_gt_100: "deve ser menor ou igual a 10.0"
           grade_lt_0: "deve ser maior ou igual a 0.0"
-        course:
-          check_unique_name_for_available_courses: "de disciplina já existe no currículo vigente"      
         custom_variable:
           minimum_grade_for_approval_not_gt_grade_of_disapproval_for_absence: "da nota mínima para aprovação %{minimum_grade_for_approval} precisa ser maior que o valor da nota de reprovação por falta %{grade_of_disapproval_for_absence}"
           grade_of_disapproval_for_absence_not_lt_minimum_grade_for_approval: "da nota de reprovação por falta %{grade_of_disapproval_for_absence} precisa ser menor que o valor da nota mínima para aprovação %{minimum_grade_for_approval}"
@@ -531,7 +545,6 @@ pt-BR:
             end_date:
               on_or_after: "anterior a Data de Início"
         scholarship_duration:
-          the_levels_of_scholarship_and_enrollment_are_different: "não pode ser alocado a esta Matrícula porque eles são de níveis diferentes"
           end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
           end_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
           enrollment_and_scholarship_uniqueness: "já possui uma Bolsa alocada nesse período"
@@ -641,6 +654,12 @@ pt-BR:
       enrollment_status:
         one: "Tipo de Matrícula"
         other: "Tipos de Matrícula"
+      form:
+        one: "Relatório"
+        other: "Relatórios"
+      form_image:
+        one: "Imagem para Relatórios"
+        other: "Imagens para Relatórios"
       institution:
         one: "Instituição"
         other: "Instituições"  
@@ -713,6 +732,9 @@ pt-BR:
       student_major:
         one: "Curso do Aluno"
         other: "Curso dos Alunos"
+      form_template:
+        one: "Template de Relatórios"
+        other: "Templates de Relatórios"
       thesis_defense_committee_participation:
         one: "Participação em Banca"
         other: "Participações em Bancas"
@@ -752,6 +774,8 @@ pt-BR:
     create_dismissal_reason_label: "Adicionar Razão de Desligamento"
     create_enrollment_label: "Adicionar Matrícula"
     create_enrollment_status_label: "Adicionar Tipo de Matrícula"
+    create_form_label: "Adicionar Relatório"
+    create_form_image_label: "Adicionar Imagem"
     create_institution_label: "Adicionar Instituição"
     create_level_label: "Adicionar Nível"
     create_link: "Adicionar"
@@ -770,6 +794,7 @@ pt-BR:
     create_state_label: "Adicionar Estado"
     create_student_label: "Adicionar Aluno"
     create_student_major_label: "Adicionar Curso do Aluno"
+    create_form_template_label: "Adicionar Template"
     create_thesis_defense_committee_participation_label: "Adicionar Participação em Banca"
     create_user_label: "Adicionar Usuário"
     report_configurations:
@@ -809,6 +834,8 @@ pt-BR:
     update_course_class_label: "Editar Turma"
     update_course_label: "Editar Disciplina"
     update_course_type_label: "Editar Tipo de Disciplina"
+    update_form_label: "Modificar Relatório"
+    update_form_image_label: "Modificar Imagem"
     update_enrollment_label: "Modificar Matrícula"
     update_link: "Editar"
     update_major_label: "Modificar Curso"
@@ -820,6 +847,7 @@ pt-BR:
     update_state_label: "Editar Estado"
     update_student_label: "Modificar Aluno"
     update_student_major_label: "Editar Curso do Aluno"
+    update_form_template_label: "Editar Template"
     update_thesis_defense_committee_participation: "Editar Participação em Banca"
     update_user_label: "Modificar Usuário"
     record_not_saved: "A validação falhou!"

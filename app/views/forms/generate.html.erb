@@ -1,0 +1,133 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <title><%= @consulta["relatorio"].nome %></title>
+    <div id="content">
+    Carregando...
+    </div>
+    <script id="entry-template" type="text/x-handlebars-template">
+      <%= @consulta["template"] %>
+    </script>
+    <script>
+        // Script para aumentar o tamanho da variavel em 1
+        Handlebars.registerHelper("inc", function(value, options)
+        {
+            return parseInt(value) + 1;
+        });
+
+
+        // Script para contar qual o tamanho de cada coluna para o Bootstrap Grid
+        Handlebars.registerHelper("block", function(number){
+            var num = 12 / number >> 0;
+            return (typeof(num) == "number" && num >= 1)? num : 1
+        });
+
+        function mesNome(mes){
+
+            switch (mes){
+                case 1: return 'janeiro';
+                case 2: return 'fevereiro';
+                case 3: return 'março';
+                case 4: return 'abril';
+                case 5: return 'maio';
+                case 6: return 'junho';
+                case 7: return 'julho';
+                case 8: return 'agosto';
+                case 9: return 'setembro';
+                case 10: return 'outubro';
+                case 11: return 'novembro';
+                case 12: return 'dezembro';
+            }
+        }
+        function mostraData(){
+
+            var date = new Date();
+            console.log(date);
+            if (date == "Invalid Date")
+                return "--/--/----";
+            var diaInteiro = 	[date.getDate(), mesNome(date.getMonth() + 1), date.getFullYear()];
+            var horaInteira = 	[date.getHours(), date.getMinutes()];
+            var doms = document.getElementsByClassName("diaHora");
+            for (var i=0; i < doms.length; i++)
+                document.getElementsByClassName("diaHora")[i].innerHTML = diaInteiro.join(' de ') + " " + horaInteira.join(':');
+
+        }
+    </script>
+
+    <script type="text/javascript">
+    // Dados
+
+
+    function keepHtml(unsafe) {
+        return unsafe
+             .replace(/&amp;/g, "&")
+             .replace(/&lt;/g, "<")
+             .replace(/&gt;/g, ">")
+             .replace(/&quot;/g, '"')
+             .replace(/&#039;/g, "'");
+     }
+
+    var data = [];
+
+    var rawColumns = '<%= @consulta["resultado"][:rows] %>';
+    var columns = rawColumns;
+    columns = columns.replace(/nil/g, 'null');
+    var parsedColumns = JSON.parse(keepHtml(columns));
+    var row;
+    <% @consulta["resultado"][:rows].each_with_index do |column_name, rowNumber| %>
+    row = new Object;
+      <% @consulta["resultado"][:columns].each_with_index do |column_name, columnNumber| %>
+      row["<%= column_name %>"] = parsedColumns[<%= rowNumber %>][<%= columnNumber %>];
+      <% end %>
+    data.push(row);
+    <% end %>
+
+    var result = new Object;
+    result.nomeRelatorio = "<%= @consulta['relatorio'].nome %>";
+    result.nomeConsulta = "<%= @consulta["nome"] %>";
+    result.colunas = JSON.parse(keepHtml("<%= @consulta["resultado"][:columns] %>"));
+    if (<%= @consulta['relatorio'].group_query %>){
+        var column = result.colunas[0];
+        var groups = [];
+        data.forEach(function(d)  {;
+            var g = groups.filter(function(v) {return v[0][column] == d[column]});
+            if (g.length == 0)
+                groups.push([d]);
+            else
+                g[0].push(d);
+        });
+        data = groups;
+    }
+    result.data = data;
+    result.diaHora = "<%= @consulta['hora'] %>";
+    var code = $("#entry-template").html();
+    var template = Handlebars.compile(code);
+    var content = template(result);
+
+    document.getElementById('content').innerHTML = keepHtml(content);
+    mostraData("<%= @consulta['hora'] %>");
+
+
+    // Imagens
+
+    var imagens = [];
+    <% @consulta["imagens"].each do |imagem| %>
+
+    imagens["<%= imagem[:nome] %>"] = "<%= imagem[:base64] %>"
+    <% end %>
+      $('img.sapos').each(function(){
+
+            $(this).attr('src', 'data:image/png;base64, ' + imagens[$(this).attr('id')])
+
+      });
+    </script>
+    <script>
+      window.status = 'ready';
+    </script>
+  </body>
+</html>
