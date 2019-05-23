@@ -2,7 +2,8 @@ source 'https://rubygems.org'
 
 # The following line is necessary to allow RVM choosing the correct ruby version. RVM 2.0 will probably be able to interpret the "~>" symbol and we will be able to safely remove the "#ruby=2.4" line.
 #ruby=2.4
-ruby '~> 2.4.0'
+ruby '~>2.6.3'
+gem 'irb', require: false #necessario a partir do ruby 2.6.0, para que o rake funcione com o irb 
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '5.1.6.2'
