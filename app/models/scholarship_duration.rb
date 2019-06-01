@@ -34,8 +34,6 @@ class ScholarshipDuration < ApplicationRecord
   end
 
   def check_date_boundaries_of_scholarship
-    #return if start_date.nil? || end_date.nil? || scholarship.start_date.nil? || scholarship.end_date.nil?
-    
     if (not start_date.nil?) && (not scholarship.start_date.nil?) 
       if day_of(start_date) < day_of(scholarship.start_date)
         errors.add(:start_date, I18n.t("activerecord.errors.models.scholarship_duration.start_date_before_scholarship_start_date"))
