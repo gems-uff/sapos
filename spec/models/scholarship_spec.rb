@@ -38,7 +38,40 @@ describe Scholarship do
         end
       end
     end
+    describe "start_date" do
+      context "is after scholarship_duration.start_date" do
+        scholarship_duration = ScholarshipDuration.new
+        it "should return an error message" do
+          scholarship.start_date = Date.today
+          scholarship_duration.scholarship = scholarship
+          scholarship_duration.start_date  = scholarship.start_date - 1.day
+          scholarship.validate
+          expect(scholarship_duration).to have_error(:start_date_before_scholarship_start_date).on :start_date
+        end
+      end
+    end
     describe "end_date" do
+      context "is before scholarship_duration.end_date and scholarship.cancel_date is nil" do
+        scholarship_duration = ScholarshipDuration.new
+        it "should return an error message" do
+          scholarship.end_date = Date.today
+          scholarship_duration.scholarship = scholarship
+          scholarship_duration.end_date  = scholarship.end_date + 1.day
+          scholarship_duration.cancel_date = nil
+          scholarship.validate
+          expect(scholarship_duration).to have_error(:end_date_after_scholarship_end_date).on :end_date
+        end
+      end
+      context "is before scholarship_duration.cancel_date" do
+        scholarship_duration = ScholarshipDuration.new
+        it "should return an error message" do
+          scholarship.end_date = Date.today
+          scholarship_duration.scholarship = scholarship
+          scholarship_duration.cancel_date  = scholarship.end_date + 1.day
+          scholarship.validate
+          expect(scholarship_duration).to have_error(:cancel_date_after_scholarship_end_date).on :cancel_date
+        end
+      end
       context "should be valid when" do
         it "end_date is greater than start_date" do
           scholarship.end_date = Date.today
