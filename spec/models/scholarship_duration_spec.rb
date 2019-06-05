@@ -63,6 +63,20 @@ describe ScholarshipDuration do
         end
       end
     end
+    describe "end_date" do
+      context "is valid and greater than scholarship.end_date" do
+        it "there must be a cancel_date less than or equal scholarship.end_date" do
+          enrollment = FactoryGirl.create(:enrollment)
+          scholarship = FactoryGirl.create(:scholarship, :start_date => start_date, :end_date => end_date)
+          scholarship_duration.enrollment = enrollment
+          scholarship_duration.scholarship = scholarship
+          scholarship_duration.start_date = scholarship.start_date
+          scholarship_duration.end_date = scholarship.end_date + 1.day
+          scholarship_duration.cancel_date = scholarship.end_date
+          scholarship_duration.should have(0).errors_on :end_date
+        end
+      end
+    end
     describe "if_scholarship_is_not_with_another_student" do
       context "should return the expected error when" do
         it "has an old scholarship that ends after the new scholarship starts" do

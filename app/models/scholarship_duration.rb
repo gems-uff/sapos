@@ -21,17 +21,35 @@ class ScholarshipDuration < ApplicationRecord
 #  #validates if a scholarship duration start date isn't before it's end date
   validates_date :start_date, :on_or_before => :end_date, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.attributes.start_date_after_end_date")
 #
-#  #validates if a scholarship duration isn't invalid according to the selected scholarship
-  validates_date :start_date, :on_or_after => :scholarship_start_date, :on_or_after_message => I18n.t("activerecord.errors.models.scholarship_duration.start_date_before_scholarship_start_date")
-  validates_date :start_date, :on_or_before => :scholarship_end_date, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.start_date_after_scholarship_end_date")
-  validates_date :end_date, :on_or_after => :scholarship_start_date, :on_or_after_message => I18n.t("activerecord.errors.models.scholarship_duration.end_date_before_scholarship_start_date")
-  validates_date :end_date, :on_or_before => :scholarship_end_date, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.end_date_after_scholarship_end_date")
-#
 #  #validates if a cancel date of an scholarship duration is valid
-  validates_date :cancel_date, :on_or_before => :end_date, :allow_nil => true
+  validates_date :cancel_date, :on_or_before => :end_date, :allow_nil => true, :on_or_before_message => I18n.t("activerecord.errors.models.scholarship_duration.cancel_date_after_end_date")
   validates_date :cancel_date, :on_or_after => :start_date, :allow_nil => true
 
+  validate :check_date_boundaries_of_scholarship
+
   before_save :update_end_and_cancel_dates
+
+  def day_of(date)
+    date.strftime("%Y%m%d").to_i
+  end
+
+  def check_date_boundaries_of_scholarship
+    if (not start_date.nil?) && (not scholarship.start_date.nil?) 
+      if day_of(start_date) < day_of(scholarship.start_date)
+        errors.add(:start_date, I18n.t("activerecord.errors.models.scholarship_duration.start_date_before_scholarship_start_date"))
+      end
+    end
+
+    if not scholarship.end_date.nil?   
+      if not cancel_date.nil?
+        if day_of(cancel_date) > day_of(scholarship.end_date)  
+          errors.add(:cancel_date, I18n.t("activerecord.errors.models.scholarship_duration.cancel_date_after_scholarship_end_date")) 
+        end   
+      elsif (not end_date.nil?) && (day_of(end_date) > day_of(scholarship.end_date))
+        errors.add(:end_date, I18n.t("activerecord.errors.models.scholarship_duration.end_date_after_scholarship_end_date"))
+      end
+    end   
+  end
 
   def init
     self.start_date = Date.today.beginning_of_month + 1.month if self.start_date.nil?
