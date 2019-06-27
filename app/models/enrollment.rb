@@ -31,7 +31,7 @@ class Enrollment < ApplicationRecord
   validates :level, :presence => true
   validates :enrollment_status, :presence => true
   validates :student, :presence => true
-  validates_associated :dismissal
+
   validate :enrollment_has_main_advisor
 
   validates_date :thesis_defense_date, :on_or_after => :admission_date, :allow_nil => true, :on_or_after_message => I18n.t("activerecord.errors.models.enrollment.thesis_defense_date_before_admission_date")
@@ -106,7 +106,7 @@ class Enrollment < ApplicationRecord
     enrollments_with_all_phases_accomplished = []
     enrollments.each do |enrollment|
       accomplished_phases = Accomplishment.where("enrollment_id = :enrollment_id and DATE(conclusion_date) <= DATE(:conclusion_date)", :enrollment_id => enrollment.id, :conclusion_date => date).map { |ac| ac.phase }
-      phases_duration = PhaseDuration.where("level_id = :level_id", :level_id => enrollment.level_id)
+      phases_duration = PhaseDuration.where("level_id = :level_id", :level_id => enrollment.level_id).scoped
       phases_duration = phases_duration.where("phase_id not in (:accomplished_phases)", :accomplished_phases => accomplished_phases) unless accomplished_phases.blank?
       enrollments_with_all_phases_accomplished << enrollment.id if phases_duration.blank?
     end

@@ -1,0 +1,11 @@
+// Place all the styles related to the FormTemplates controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.to_pdf, .to_pdf:hover{
+  background-image: url(pdfIcon.gif) !important;
+  float: left !important;
+  min-width: 16px;
+  min-height: 17px;
+
+}

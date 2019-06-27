@@ -1,0 +1,69 @@
+<h4>Consulta: <%= @query.to_label %></h4>
+
+<%= render 'params_form', :resource => @query , :form => @form %>
+
+<div class="actions" style="display: block; margin: 10px 0">
+  <a id="as_queries-execute-<%= @query.id %>-link" class="execute as_action again" href="javascript:void(0)"><i class="fa fa-table" title="Executar"></i>
+    Executar</a>
+</div>
+
+<h5>Resultado da Consulta</h5>
+
+<div style="width: 865px; overflow-x: auto;" class="as_content">
+  <table class="showtable listed-records-table">
+    <thead>
+	    <tr>
+	      <% @query_result[:columns].each do |column_name| %>
+		  <th class="queryColumn"><%= column_name %></th>
+	      <% end %>
+	    </tr>
+    </thead>
+    <tbody class="records">
+    <% @query_result[:rows].each_with_index do |row, index| %>
+        <% tr_class = index.odd? ? "even-record" : "" %>
+        <tr class="record <%= tr_class %>">
+          <% row.each do |value| %>
+              <td class="tableValue"><%= value %></td>
+          <% end %>
+        </tr>
+    <% end %>
+    </tbody>
+  </table>
+</div>
+
+ &nbsp;&nbsp;
+<div class="actions" style="display: block; margin: 10px 0">
+	<a id="as_forms_<%=@form.id %>-generate" class="as_forms_<%=@form.id %>-generate  execute as_action" target="_blank" href="/forms/<%=@form.id %>/generate.pdf" >
+    <i class="to_pdf" title="Gerar Formulario"/>
+    Gerar Formulario
+  </a>
+	&nbsp;&nbsp;
+  <a id="as_forms_<%=@form.id %>-generate" class="as_forms_<%=@form.id %>-generate  execute as_action" target="_blank" href="/forms/<%=@form.id %>/generate">
+    <i class="fa fa-code" title="Gerar Formulario"></i>
+    Gerar Página HTML
+  </a>
+</div>
+<form id="form" action="/forms/4/pdf" method="post" style="display: none">
+  <input id="formulario" name="html"/>
+</form>
+
+<p class="form-footer">
+  <%= link_to as_(:close), main_path_to_return, :class => 'as_cancel', :remote => request.xhr? %>
+  <%= loading_indicator_tag(:action => :create, :id => params[:id]) %>
+</p>
+
+<script type="text/javascript">
+    $(".execute.as_action.again").click(function () {
+        ActiveScaffold.find_action_link($("#as_forms-consult-<%= @form.id %>-link")).reload()
+    });
+
+
+    var getQuery = function(){
+           var query = new Object();
+           $('.queryColumn').each(
+               function(index){
+                   query[$(this).html()] = $('.tableValue').get(index).innerHTML
+               });
+           return query;
+       }
+</script>

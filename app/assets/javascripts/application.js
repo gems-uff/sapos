@@ -17,6 +17,10 @@
 //= require codemirror
 //= require codemirror/modes/sql
 //= require codemirror/modes/xml
+//= require codemirror/addons/mode/simple
+//= require codemirror/addons/mode/multiplex
+//= require codemirror/modes/handlebars
+
 //= require_tree .
 
 

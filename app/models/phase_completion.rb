@@ -35,7 +35,6 @@ class PhaseCompletion < ApplicationRecord
   end
 
   def calculate_due_date
-    return unless phase.phase_durations.where(:level_id => enrollment.level_id).any?
     self.due_date = DateUtils.add_hash_to_date(
       enrollment.admission_date,
       phase.total_duration(enrollment)

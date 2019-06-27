@@ -26,7 +26,6 @@ class Notification < ApplicationRecord
   validates :query_offset, :presence => true, on: :update
   validates :subject_template, :presence => true, on: :update
   validates :to_template, :presence => true, on: :update
-  validates :query, :presence => true, on: :update
 
   validates_format_of :notification_offset, :with => /\A(\-?\d+[yMwdhms]?)+\z/, :message => :offset_invalid_value
   validates_format_of :query_offset, :with => /\A(\-?\d+[yMwdhms]?)+\z/, :message => :offset_invalid_value
@@ -71,7 +70,7 @@ class Notification < ApplicationRecord
       self.notification_params.create(:query_param_id => query_param_id, :notification_id => self.id, :active => true)
     end
 
-    if self.saved_change_to_query_id?
+    if self.query_id_changed?
       cached_query_params_ids = self.query_params_ids
       self.notification_params.each do |np|
         np.update_attribute(:active, cached_query_params_ids.include?(np.query_param_id))
@@ -100,11 +99,11 @@ class Notification < ApplicationRecord
     time = options[:time]
     time ||= Time.now
     if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
-      first_semester = Time.parse("03/01", time)
-      second_semester = Time.parse("08/01", time)
+      first_semester = Time.parse("03/01")
+      second_semester = Time.parse("08/01")
       dates = [second_semester - 1.year, first_semester, second_semester, first_semester + 1.year, second_semester + 1.year]
     else
-      dates = (-2..2).map { |n| Time.parse("01/01", time) + n.year } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.annual")
+      dates = (-2..2).map { |n| Time.parse("01/01") + n.year } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.annual")
       dates = (-2..2).map { |n| time.beginning_of_month + n.month } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.monthly")
       dates = (-2..2).map { |n| time.beginning_of_week(:monday) + n.week } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.weekly")
       dates = (-2..2).map { |n| time.midnight + n.day } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.daily")

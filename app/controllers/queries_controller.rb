@@ -25,7 +25,7 @@ class QueriesController < ApplicationController
 
     config.actions.exclude :deleted_records
   end
-
+  record_select :per_page => 10,:search_on => [:name], :order_by => 'name', :full_text_search => true
 
   def execute
     @query = Query.find(params[:id])

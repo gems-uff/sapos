@@ -1,0 +1,20 @@
+<% column_options = active_scaffold_input_options(column, scope, :object => record) %>
+<dl>
+
+  <dt >
+    <%= label_tag label_for(column, column_options), column.label %>
+  </dt>
+  <dd style="width: 78%">
+
+    <%= form_column record, column_options %>
+    <span class="description"  style="float: right">
+  			<span class="desc-title" ><b>Imagens:</b> </span>
+            <ul>
+              <li>Para usar uma imagem no relatorio, basta adicionar uma tag img no Template</li>
+              <li>A imagem deve conter a classe sapos, e seu id deve ser igual ao nome da respectiva imagem</li>
+              <li>Por exemplo, se a imagem criada tiver nome "teste", ela sera identificada no Template por <br/><b>"&lt;img id="teste" class="sapos"/&gt;</b></li>
+            </ul>
+  		</span>
+  </dd>
+</dl>
+
