@@ -5,6 +5,7 @@ class AdvisementAuthorizationsController < ApplicationController
   authorize_resource
 
   active_scaffold :advisement_authorization do |config|
+    config.create.label = :create_advisement_authorization_label	  
     config.columns = [:professor, :level]
     config.actions.swap :search, :field_search
     config.field_search.columns = [:professor, :level]

@@ -7,7 +7,7 @@ class ThesisDefenseCommitteeParticipationsController < ApplicationController
 
   active_scaffold :"thesis_defense_committee_participation" do |config|
   	columns = [:enrollment, :professor]
-
+    config.create.label = :create_thesis_defense_committee_participation_label
     config.list.columns = columns
     config.create.columns = columns
     config.update.columns = columns
