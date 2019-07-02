@@ -6,4 +6,22 @@ require 'spec_helper'
 
 describe Query do
 
+  let(:query) {Query.new}
+  subject { query }
+  context "creating or updating" do
+
+    context "name is blank" do
+      it "show an blank error on name" do
+	query.name = nil     
+        query.should have_error(:blank).on :name
+      end
+    end
+    context "sql is blank" do
+      it "show an blank error on sql" do
+        query.sql = ""      
+        query.should have_error(:blank).on :sql
+      end
+    end
+  end
+
 end

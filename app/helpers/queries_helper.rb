@@ -4,6 +4,7 @@
 module QueriesHelper
 
   def code_mirror_text_area(column, id, type, options)
+    options[:required] = false
     block = text_area(:record, :sql_query, options)
     block += "<script>
     CodeMirror.fromTextArea(document.getElementById('#{id}'),

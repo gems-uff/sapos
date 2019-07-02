@@ -9,6 +9,8 @@ class Query < ApplicationRecord
 
   accepts_nested_attributes_for :params, reject_if: :all_blank, allow_destroy: true
 
+  validates :name, :presence => true
+  validates :sql, :presence => true
   validate :ensure_valid_params
   validates_associated :params
 
@@ -68,6 +70,7 @@ class Query < ApplicationRecord
 
 
   def ensure_valid_params
+    return if (sql.nil? || sql.strip.empty?)	  
     begin
       self.execute
     rescue ActiveRecord::PreparedStatementInvalid => e
