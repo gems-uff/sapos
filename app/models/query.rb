@@ -4,7 +4,7 @@
 class Query < ApplicationRecord
 
   has_many :notifications, inverse_of: :query
-  has_many :params, class_name: 'QueryParam', dependent: :destroy
+  has_many :params, class_name: 'QueryParam', dependent: :destroy, validate: false
 
 
   accepts_nested_attributes_for :params, reject_if: :all_blank, allow_destroy: true

@@ -306,7 +306,7 @@ pt-BR:
         notifications: Notificações
         params: Parâmetros
       query_param:
-        name: Name
+        name: Nome
         value_type: Tipo
         default_value: Valor padrão
       notification_param:
@@ -470,6 +470,7 @@ pt-BR:
           attributes:
             name:
               restricted_name: não pode ser usado pois é uma palavra reservada do sistema.
+              invalid_name: "não é válido. Ele deve iniciar com letra minúscula ou underscore '_', seguido de um ou mais: letra minúscula, maiúscula, dígito ou underscore"
             default_value:
               invalid_integer: não é um número inteiro válido
               invalid_float: não é um número float válido
@@ -676,8 +677,11 @@ pt-BR:
         one: "Área de Pesquisa do Professor"
         other: "Área de Pesquisa dos Professores"
       query:
-        one: Contulta
+        one: Consulta
         other: Consultas
+      query_param:
+        one: "Parâmetro"
+        other: "Parâmetros"      
       report:
         one: Relatório
         other: Relatórios
