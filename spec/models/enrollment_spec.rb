@@ -21,27 +21,27 @@ describe Enrollment do
       context "should be valid when" do
         it "student is not null" do
           enrollment.student = Student.new
-          enrollment.should have(0).errors_on :student
+          expect(enrollment).to have(0).errors_on :student
         end
       end
       context "should have error blank when" do
         it "student is null" do
           enrollment.student = nil
-          enrollment.should have_error(:blank).on :student
+          expect(enrollment).to have_error(:blank).on :student
         end
       end
       context "should have advisment error when it" do
         it "has just one advisor that is not a main advisor" do
           enrollment.advisements << FactoryGirl.create(:advisement, :main_advisor => false)
-          enrollment.should_not be_valid
-          enrollment.errors[:base].should include I18n.translate("activerecord.errors.models.enrollment.main_advisor_required")
+          expect(enrollment).not_to be_valid
+          expect(enrollment.errors[:base]).to include I18n.translate("activerecord.errors.models.enrollment.main_advisor_required")
         end
 
         it "has more than one main advisor" do
           enrollment.advisements << advisement1 = FactoryGirl.create(:advisement, :main_advisor => true)
           enrollment.advisements << advisement2 = FactoryGirl.create(:advisement, :main_advisor => true)
-          enrollment.should_not be_valid
-          enrollment.errors[:base].should include I18n.translate("activerecord.errors.models.enrollment.main_advisor_uniqueness")
+          expect(enrollment).not_to be_valid
+          expect(enrollment.errors[:base]).to include I18n.translate("activerecord.errors.models.enrollment.main_advisor_uniqueness")
         end
       end
     end
@@ -49,13 +49,13 @@ describe Enrollment do
       context "should be valid when" do
         it "enrollment_status is not null" do
           enrollment.enrollment_status = EnrollmentStatus.new
-          enrollment.should have(0).errors_on :enrollment_status
+          expect(enrollment).to have(0).errors_on :enrollment_status
         end
       end
       context "should have error blank when" do
         it "enrollment_status is null" do
           enrollment.enrollment_status = nil
-          enrollment.should have_error(:blank).on :enrollment_status
+          expect(enrollment).to have_error(:blank).on :enrollment_status
         end
       end
     end
@@ -63,13 +63,13 @@ describe Enrollment do
       context "should be valid when" do
         it "level is not null" do
           enrollment.level = Level.new
-          enrollment.should have(0).errors_on :level
+          expect(enrollment).to have(0).errors_on :level
         end
       end
       context "should have error blank when" do
         it "level is null" do
           enrollment.level = nil
-          enrollment.should have_error(:blank).on :level
+          expect(enrollment).to have_error(:blank).on :level
         end
       end
     end
@@ -77,13 +77,13 @@ describe Enrollment do
       context "should be valid when" do
         it "enrollment_number is not null and is not taken" do
           enrollment.enrollment_number = "M123"
-          enrollment.should have(0).errors_on :enrollment_number
+          expect(enrollment).to have(0).errors_on :enrollment_number
         end
       end
       context "should have error blank when" do
         it "enrollment_number is null" do
           enrollment.enrollment_number = nil
-          enrollment.should have_error(:blank).on :enrollment_number
+          expect(enrollment).to have_error(:blank).on :enrollment_number
         end
       end
       context "should have error taken when" do
@@ -91,7 +91,7 @@ describe Enrollment do
           enrollment_number = "D123"
           FactoryGirl.create(:enrollment, :enrollment_number => enrollment_number)
           enrollment.enrollment_number = enrollment_number
-          enrollment.should have_error(:taken).on :enrollment_number
+          expect(enrollment).to have_error(:taken).on :enrollment_number
         end
       end
     end
@@ -100,14 +100,14 @@ describe Enrollment do
         it "is after admission_date" do
           enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
           enrollment.thesis_defense_date = 3.days.from_now.to_date
-          enrollment.should have(0).errors_on :thesis_defense_date
+          expect(enrollment).to have(0).errors_on :thesis_defense_date
         end
       end
       context "should not be valid when" do
         it "is before admission_date" do
           enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
           enrollment.thesis_defense_date = 4.days.ago.to_date
-          enrollment.should have_error(:thesis_defense_date_before_admission_date).on :thesis_defense_date
+          expect(enrollment).to have_error(:thesis_defense_date_before_admission_date).on :thesis_defense_date
         end
       end
     end
@@ -116,7 +116,7 @@ describe Enrollment do
       context "should be valid when" do
         it "is empty" do
           enrollment = FactoryGirl.create(:enrollment, :research_area => nil)
-          enrollment.should have(0).errors_on :research_area
+          expect(enrollment).to have(0).errors_on :research_area
         end
 
         it "is the same research_area as the advisor" do
@@ -124,13 +124,13 @@ describe Enrollment do
           enrollment = FactoryGirl.create(:enrollment, :research_area => research_area)
           professor = FactoryGirl.create(:professor, :research_areas => [research_area])
           FactoryGirl.create(:advisement, :enrollment => enrollment, :professor => professor)
-          enrollment.should have(0).errors_on :research_area
+          expect(enrollment).to have(0).errors_on :research_area
         end
 
         it "there is no advisor" do
           research_area = FactoryGirl.create(:research_area) 
           enrollment = FactoryGirl.create(:enrollment, :research_area => research_area)
-          enrollment.should have(0).errors_on :research_area
+          expect(enrollment).to have(0).errors_on :research_area
         end
       end
       context "should not be valid when" do
@@ -141,7 +141,7 @@ describe Enrollment do
           professor = FactoryGirl.create(:professor, :research_areas => [research_area2])
           FactoryGirl.create(:advisement, :enrollment => enrollment, :professor => professor)
           enrollment.save
-          enrollment.errors[:research_area].should include I18n.translate("activerecord.errors.models.enrollment.research_area_different_from_professors")
+          expect(enrollment.errors[:research_area]).to include I18n.translate("activerecord.errors.models.enrollment.research_area_different_from_professors")
         end
       end
     end
@@ -179,7 +179,7 @@ describe Enrollment do
         enrollment.enrollment_number = enrollment_number
         student_name = "Student"
         enrollment.student = Student.new(:name => student_name)
-        enrollment.to_label.should eql("#{enrollment_number} - #{student_name}")
+        expect(enrollment.to_label).to eql("#{enrollment_number} - #{student_name}")
       end
     end
     describe "self.with_delayed_phases_on" do
@@ -187,7 +187,7 @@ describe Enrollment do
         result = Enrollment.with_delayed_phases_on(2.months.from_now.to_date, nil)
 
         expected_result = [@delayed_enrollment.id, @enrollment_expired_deferral.id].sort
-        result.sort.should eql(expected_result.sort)
+        expect(result.sort).to eql(expected_result.sort)
       end
     end
     describe "self.with_all_phases_accomplished_on" do
@@ -197,7 +197,7 @@ describe Enrollment do
         result = Enrollment.with_all_phases_accomplished_on(Date.today)
 
         expected_result = [@enrollment_accomplished.id].sort
-        result.sort.should eql(expected_result.sort)
+        expect(result.sort).to eql(expected_result.sort)
       end
     end
 
@@ -216,15 +216,15 @@ describe Enrollment do
       it "shouldn't return any value when the enrollment doesn't have any classes" do
         admission_date = YearSemester.current.semester_begin
         enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
-        enrollment.available_semesters.any?.should be_falsey
+        expect(enrollment.available_semesters.any?).to be_falsey
       end
 
       it "should return [[2013,2]] when it is enrolled to a class of 2013.2" do
         admission_date = YearSemester.current.semester_begin
         enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
-        enrollment.available_semesters.any?.should be_truthy
-        enrollment.available_semesters.should == [[2013, 2]]
+        expect(enrollment.available_semesters.any?).to be_truthy
+        expect(enrollment.available_semesters).to eq([[2013, 2]])
       end
 
       it "should return [[2013,2]] when it is enrolled to more than one class of 2013.2" do
@@ -232,8 +232,8 @@ describe Enrollment do
         enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class7)
-        enrollment.available_semesters.any?.should be_truthy
-        enrollment.available_semesters.should == [[2013, 2]]
+        expect(enrollment.available_semesters.any?).to be_truthy
+        expect(enrollment.available_semesters).to eq([[2013, 2]])
       end
 
       it "should return [[2013, 1], [2013,2]] when it is enrolled a class of 2013.1 and a class of 2013.2" do
@@ -241,8 +241,8 @@ describe Enrollment do
         enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class5)
-        enrollment.available_semesters.any?.should be_truthy
-        enrollment.available_semesters.should == [[2013, 1], [2013, 2]]
+        expect(enrollment.available_semesters.any?).to be_truthy
+        expect(enrollment.available_semesters).to eq([[2013, 1], [2013, 2]])
       end
 
       it "should be ordered: [[2012, 1], [2012, 2], [2013, 1], [2013,2]]" do
@@ -255,8 +255,8 @@ describe Enrollment do
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class4)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class2)
         FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
-        enrollment.available_semesters.any?.should be_truthy
-        enrollment.available_semesters.should == [[2012, 1], [2012, 2], [2013, 1], [2013,2]]
+        expect(enrollment.available_semesters.any?).to be_truthy
+        expect(enrollment.available_semesters).to eq([[2012, 1], [2012, 2], [2013, 1], [2013,2]])
       end
     end
 
@@ -294,29 +294,29 @@ describe Enrollment do
 
       describe "gpr_by_semester" do
         it "should return 90 for 2012.2 (testing 1 grade)" do
-          @enrollment.gpr_by_semester(2012, 2).should == 90
+          expect(@enrollment.gpr_by_semester(2012, 2)).to eq(90)
         end
 
         it "should return 62 for 2012.1 (testing 2 grades)" do
-          @enrollment.gpr_by_semester(2012, 1).should == 62
+          expect(@enrollment.gpr_by_semester(2012, 1)).to eq(62)
         end
 
         it "should return 0 for 2013.2 (testing 1 incomplete class)" do
-          @enrollment.gpr_by_semester(2013, 2).should be_nil
+          expect(@enrollment.gpr_by_semester(2013, 2)).to be_nil
         end
         
         it "should return 99 for 2013.1 (testing 2 grades, 1 incomplete class, 1 approved class without grade)" do
-          @enrollment.gpr_by_semester(2013, 1).round(0).should == 99
+          expect(@enrollment.gpr_by_semester(2013, 1).round(0)).to eq(99)
         end
 
         it "should return 0 if it is not enrolled in any classes of the semester" do
-          @enrollment.gpr_by_semester(2011, 2).should be_nil
+          expect(@enrollment.gpr_by_semester(2011, 2)).to be_nil
         end
       end
 
       describe "total_gpr" do
         it "should return 83" do
-          @enrollment.total_gpr.round.should == 83
+          expect(@enrollment.total_gpr.round).to eq(83)
         end
       end
 

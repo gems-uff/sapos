@@ -11,7 +11,7 @@ describe Deferral do
       context "should be valid when" do
         it "enrollment is not null" do
           deferral.enrollment = Enrollment.new
-          deferral.should have(0).errors_on :enrollment
+          expect(deferral).to have(0).errors_on :enrollment
         end
 
         it "deferral_type phase has the enrollment level" do
@@ -21,13 +21,13 @@ describe Deferral do
           deferral.deferral_type = FactoryGirl.create(:deferral_type, :phase => phase)
           phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :level => level)
           
-          deferral.should have(0).errors_on :enrollment
+          expect(deferral).to have(0).errors_on :enrollment
         end
       end
       context "should have error blank when" do
         it "enrollment is null" do
           deferral.enrollment = nil
-          deferral.should have_error(:blank).on :enrollment
+          expect(deferral).to have_error(:blank).on :enrollment
         end
       end
 
@@ -38,7 +38,7 @@ describe Deferral do
           deferral.enrollment = FactoryGirl.create(:enrollment, :level => level)
           deferral.deferral_type = FactoryGirl.create(:deferral_type, :phase => phase)
           
-          deferral.should have_error(:enrollment_level).on :enrollment
+          expect(deferral).to have_error(:enrollment_level).on :enrollment
         end
       end
     end
@@ -46,13 +46,13 @@ describe Deferral do
       context "should be valid when" do
         it "deferral_type is not null" do
           deferral.deferral_type = DeferralType.new
-          deferral.should have(0).errors_on :deferral_type
+          expect(deferral).to have(0).errors_on :deferral_type
         end
       end
       context "should have error blank when" do
         it "deferral_type is null" do
           deferral.deferral_type = nil
-          deferral.should have_error(:blank).on :deferral_type
+          expect(deferral).to have_error(:blank).on :deferral_type
         end
       end
     end
@@ -60,13 +60,13 @@ describe Deferral do
       context "should be valid when" do
         it "approval_date is not null" do
           deferral.approval_date = Date.parse("2014/01/01")
-          deferral.should have(0).errors_on :approval_date
+          expect(deferral).to have(0).errors_on :approval_date
         end
       end
       context "should have error blank when" do
         it "approval_date is null" do
           deferral.approval_date = nil
-          deferral.should have_error(:blank).on :approval_date
+          expect(deferral).to have_error(:blank).on :approval_date
         end
       end
     end
@@ -76,7 +76,7 @@ describe Deferral do
       it "should return the expected string" do
         deferral_type_name = "DeferralType"
         deferral.deferral_type = DeferralType.new(:name => deferral_type_name)
-        deferral.to_label.should eql(deferral_type_name)
+        expect(deferral.to_label).to eql(deferral_type_name)
       end
     end
     describe "valid_until" do
@@ -88,7 +88,7 @@ describe Deferral do
         deferral_type = FactoryGirl.create(:deferral_type, :phase => phase, :duration_semesters => 2, :duration_days => 0)
         deferral = FactoryGirl.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
 
-        deferral.valid_until.should eql(Date.new(2013, 7, 31).strftime('%d/%m/%Y'))
+        expect(deferral.valid_until).to eql(Date.new(2013, 7, 31).strftime('%d/%m/%Y'))
       end
 
       it "should return 28th of february 2023" do
@@ -100,7 +100,7 @@ describe Deferral do
         deferral = FactoryGirl.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
 
 
-        deferral.valid_until.should eql(Date.new(2023, 2, 28).strftime('%d/%m/%Y'))
+        expect(deferral.valid_until).to eql(Date.new(2023, 2, 28).strftime('%d/%m/%Y'))
       end
 
       it "should return 7th of june 2014" do
@@ -111,7 +111,7 @@ describe Deferral do
         deferral_type = FactoryGirl.create(:deferral_type, :phase => phase, :duration_months => 3, :duration_days => 7)
         deferral = FactoryGirl.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
 
-        deferral.valid_until.should eql(Date.new(2014, 6, 7).strftime('%d/%m/%Y'))
+        expect(deferral.valid_until).to eql(Date.new(2014, 6, 7).strftime('%d/%m/%Y'))
       end
     end
   end

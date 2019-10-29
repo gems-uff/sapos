@@ -11,13 +11,13 @@ describe ClassEnrollment do
       context "should be valid when" do
         it "enrollment is not null" do
           class_enrollment.enrollment = Enrollment.new
-          class_enrollment.should have(0).errors_on :enrollment
+          expect(class_enrollment).to have(0).errors_on :enrollment 
         end
       end
       context "should have error blank when" do
         it "enrollment is null" do
           class_enrollment.enrollment = nil
-          class_enrollment.should have_error(:blank).on :enrollment
+          expect(class_enrollment).to have_error(:blank).on :enrollment
         end
       end
     end
@@ -25,13 +25,13 @@ describe ClassEnrollment do
       context "should be valid when" do
         it "course_class is not null and is unique for the enrollment" do
           class_enrollment.course_class = CourseClass.new
-          class_enrollment.should have(0).errors_on :course_class
+          expect(class_enrollment).to have(0).errors_on :course_class
         end
       end
       context "should have error blank when" do
         it "course_class is null" do
           class_enrollment.course_class = nil
-          class_enrollment.should have_error(:blank).on :course_class
+          expect(class_enrollment).to have_error(:blank).on :course_class
         end
       end
       context "should have error taken when" do
@@ -42,7 +42,7 @@ describe ClassEnrollment do
 
           class_enrollment.course_class = course_class
           class_enrollment.enrollment = enrollment
-          class_enrollment.should have_error(:taken).on :course_class_id
+          expect(class_enrollment).to have_error(:taken).on :course_class_id
         end
       end
     end
@@ -50,19 +50,19 @@ describe ClassEnrollment do
       context "should be valid when" do
         it "situation is in the list" do
           class_enrollment.situation = ClassEnrollment::SITUATIONS.first
-          class_enrollment.should have(0).errors_on :situation
+          expect(class_enrollment).to have(0).errors_on :situation
         end
       end
       context "should have error blank when" do
         it "situation is null" do
           class_enrollment.situation = nil
-          class_enrollment.should have_error(:blank).on :situation
+          expect(class_enrollment).to have_error(:blank).on :situation
         end
       end
       context "should have error inclusion when" do
         it "situation is not in the list" do
           class_enrollment.situation = "ANYTHING NOT IN THE LIST"
-          class_enrollment.should have_error(:inclusion).on :situation
+          expect(class_enrollment).to have_error(:inclusion).on :situation
         end
       end
     end
@@ -72,25 +72,25 @@ describe ClassEnrollment do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
           class_enrollment.grade = nil
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          class_enrollment.should have(0).errors_on :grade
+          expect(class_enrollment).to have(0).errors_on :grade
         end
         it "situation is aproved and grade is greater than 59" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = 60
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          class_enrollment.should have(0).errors_on :grade
+          expect(class_enrollment).to have(0).errors_on :grade
         end
         it "situation is disapproved and grade is less than 60" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
           class_enrollment.grade = 59
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          class_enrollment.should have(0).errors_on :grade
+          expect(class_enrollment).to have(0).errors_on :grade
         end
         it "course does not have grade and grade is null" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = nil
           allow(class_enrollment).to receive(:course_has_grade).and_return(false)
-          class_enrollment.should have(0).errors_on :grade
+          expect(class_enrollment).to have(0).errors_on :grade
         end
       end
       context "should have error grade_for_situation_registered when" do
@@ -98,7 +98,7 @@ describe ClassEnrollment do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
           class_enrollment.grade = 100
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          class_enrollment.should have_error(:grade_for_situation_registered).on :grade
+          expect(class_enrollment).to have_error(:grade_for_situation_registered).on :grade
         end
       end
       context "should have error grade_for_situation_aproved when" do
@@ -106,13 +106,13 @@ describe ClassEnrollment do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = nil
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          class_enrollment.should have_error(:grade_for_situation_aproved).with_parameter(:minimum_grade_for_approval, (CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',',')).on :grade
+          expect(class_enrollment).to have_error(:grade_for_situation_aproved).with_parameter(:minimum_grade_for_approval, (CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',',')).on :grade
         end
         it "situation is aproved and grade is less than 60" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = 59
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          class_enrollment.should have_error(:grade_for_situation_aproved).with_parameter(:minimum_grade_for_approval, (CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',',')).on :grade
+          expect(class_enrollment).to have_error(:grade_for_situation_aproved).with_parameter(:minimum_grade_for_approval, (CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',',')).on :grade
         end
       end
       context "should have error grade_for_situation_disapproved when" do
@@ -120,13 +120,13 @@ describe ClassEnrollment do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
           class_enrollment.grade = nil
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          class_enrollment.should have_error(:grade_for_situation_disapproved).with_parameter(:minimum_grade_for_approval, (CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',',')).on :grade
+          expect(class_enrollment).to have_error(:grade_for_situation_disapproved).with_parameter(:minimum_grade_for_approval, (CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',',')).on :grade
         end
         it "situation is disapproved and grade is greater than 59" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
           class_enrollment.grade = 60
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          class_enrollment.should have_error(:grade_for_situation_disapproved).with_parameter(:minimum_grade_for_approval, (CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',',')).on :grade
+          expect(class_enrollment).to have_error(:grade_for_situation_disapproved).with_parameter(:minimum_grade_for_approval, (CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',',')).on :grade
         end
       end
       context "should have error grade_filled_for_course_without_score when" do
@@ -134,7 +134,7 @@ describe ClassEnrollment do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
           class_enrollment.grade = 59
           allow(class_enrollment).to receive(:course_has_grade).and_return(false)
-          class_enrollment.should have_error(:grade_filled_for_course_without_score).on :grade
+          expect(class_enrollment).to have_error(:grade_filled_for_course_without_score).on :grade
         end
       end
 
@@ -143,7 +143,7 @@ describe ClassEnrollment do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = 101
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          class_enrollment.should have_error(:grade_gt_100).on :grade
+          expect(class_enrollment).to have_error(:grade_gt_100).on :grade
         end
       end
 
@@ -152,7 +152,7 @@ describe ClassEnrollment do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = -1
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          class_enrollment.should have_error(:grade_lt_0).on :grade
+          expect(class_enrollment).to have_error(:grade_lt_0).on :grade
         end
       end
     end
@@ -161,36 +161,36 @@ describe ClassEnrollment do
         it "situation is registered and disapproved_by_absence is false" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
           class_enrollment.disapproved_by_absence = false
-          class_enrollment.should have(0).errors_on :disapproved_by_absence
+          expect(class_enrollment).to have(0).errors_on :disapproved_by_absence
         end
         it "situation is aproved and disapproved_by_absence is false" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.disapproved_by_absence = false
-          class_enrollment.should have(0).errors_on :disapproved_by_absence
+          expect(class_enrollment).to have(0).errors_on :disapproved_by_absence
         end
         it "situation is disapproved and disapproved_by_absence is false" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
           class_enrollment.disapproved_by_absence = false
-          class_enrollment.should have(0).errors_on :disapproved_by_absence
+          expect(class_enrollment).to have(0).errors_on :disapproved_by_absence
         end
         it "situation is disapproved and disapproved_by_absence is true" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
           class_enrollment.disapproved_by_absence = true
-          class_enrollment.should have(0).errors_on :disapproved_by_absence
+          expect(class_enrollment).to have(0).errors_on :disapproved_by_absence
         end
       end
       context "should have error disapproved_by_absence_for_situation_registered when" do
         it "situation is registered and disapproved_by_absence is true" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
           class_enrollment.disapproved_by_absence = true
-          class_enrollment.should have_error(:disapproved_by_absence_for_situation_registered).on :disapproved_by_absence
+          expect(class_enrollment).to have_error(:disapproved_by_absence_for_situation_registered).on :disapproved_by_absence
         end
       end
       context "should have error disapproved_by_absence_for_situation_aproved when" do
         it "situation is aproved and grade is null" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.disapproved_by_absence = true
-          class_enrollment.should have_error(:disapproved_by_absence_for_situation_aproved).on :disapproved_by_absence
+          expect(class_enrollment).to have_error(:disapproved_by_absence_for_situation_aproved).on :disapproved_by_absence
         end
       end
     end
@@ -200,11 +200,11 @@ describe ClassEnrollment do
       context "parameter is a String number" do
         it "converts comma separated numbers" do
           class_enrollment.grade = "4,5"
-          class_enrollment.grade.should eq 45
+          expect(class_enrollment.grade).to eq 45
         end
         it "converts dot separated numbers" do
           class_enrollment.grade = "6.3"
-          class_enrollment.grade.should eq 63
+          expect(class_enrollment.grade).to eq 63
         end
       end
     end
@@ -212,13 +212,13 @@ describe ClassEnrollment do
       context "should return true" do
         it "when grade is not null" do
           class_enrollment.grade = 10
-          class_enrollment.grade_filled?.should be_truthy
+          expect(class_enrollment.grade_filled?).to be_truthy
         end
       end
       context "should return false" do
         it "when grade is null" do
           class_enrollment.grade = nil
-          class_enrollment.grade_filled?.should be_falsey
+          expect(class_enrollment.grade_filled?).to be_falsey
         end
       end
     end

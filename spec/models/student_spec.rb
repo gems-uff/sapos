@@ -15,13 +15,13 @@ describe Student do
       context "should be valid when" do
         it "cpf is not null and is not taken" do
           student.cpf = "Student cpf"
-          student.should have(0).errors_on :cpf
+          expect(student).to have(0).errors_on :cpf
         end
       end
       context "should have error blank when" do
         it "cpf is null" do
           student.cpf = nil
-          student.should have_error(:blank).on :cpf
+          expect(student).to have_error(:blank).on :cpf
         end
       end
       context "should have error taken when" do
@@ -29,7 +29,7 @@ describe Student do
           cpf = "Student cpf"
           FactoryGirl.create(:student, :cpf => cpf)
           student.cpf = cpf
-          student.should have_error(:taken).on :cpf
+          expect(student).to have_error(:taken).on :cpf
         end
       end
     end
@@ -37,13 +37,13 @@ describe Student do
       context "should be valid when" do
         it "name is not null and is not taken" do
           student.name = "Student name"
-          student.should have(0).errors_on :name
+          expect(student).to have(0).errors_on :name
         end
       end
       context "should have error blank when" do
         it "name is null" do
           student.name = nil
-          student.should have_error(:blank).on :name
+          expect(student).to have_error(:blank).on :name
         end
       end
       end
@@ -53,14 +53,14 @@ describe Student do
       it "should return the enrollment number when the student has one enrollment" do
         student = FactoryGirl.create(:student)
         FactoryGirl.create(:enrollment, :enrollment_number => "M123", :student => student)
-        student.enrollments_number.should == "M123"
+        expect(student.enrollments_number).to eq("M123")
       end
 
       it "should return the enrollments number separated by comma when the student has two enrollments" do
         student = FactoryGirl.create(:student)
         FactoryGirl.create(:enrollment, :enrollment_number => "M123", :student => student)
         FactoryGirl.create(:enrollment, :enrollment_number => "D234", :student => student)
-        student.enrollments_number.should == "M123, D234"
+        expect(student.enrollments_number).to eq("M123, D234")
       end
     end
 
@@ -68,16 +68,16 @@ describe Student do
       it "should return country, when birth_city is specified" do
         city = FactoryGirl.create(:city)
         student = FactoryGirl.create(:student, :birth_city => city)
-        student.birthplace.should == "#{city.state.country.name}"
+        expect(student.birthplace).to eq("#{city.state.country.name}")
       end
       it "should return country, when birth_city is not specified" do
         state = FactoryGirl.create(:state)
         student = FactoryGirl.create(:student, :birth_state => state)
-        student.birthplace.should == "#{state.country.name}"
+        expect(student.birthplace).to eq("#{state.country.name}")
       end
       it "should return nil when neither birth_city and birth_state are specified" do
         student = FactoryGirl.create(:student)
-        student.birthplace.should be_nil
+        expect(student.birthplace).to be_nil
       end
     end
   end
@@ -87,19 +87,19 @@ describe Student do
       birth_state = FactoryGirl.create(:state)
       student = FactoryGirl.build(:student, :birth_state => birth_state, :birth_city => nil)
       student.birth_city = birth_city
-      student.birth_state.should == birth_state
+      expect(student.birth_state).to eq(birth_state)
 
       student.save
-      student.birth_state.should == birth_city.state
-      student.birth_state.should_not == birth_state
+      expect(student.birth_state).to eq(birth_city.state)
+      expect(student.birth_state).not_to eq(birth_state)
     end
 
     it "should not set the birth_state when birth_city is not filled" do
       birth_state = FactoryGirl.create(:state)
       student = FactoryGirl.build(:student, :birth_state => birth_state, :birth_city => nil)
-      student.birth_state.should == birth_state
+      expect(student.birth_state).to eq(birth_state)
       student.save
-      student.birth_state.should == birth_state
+      expect(student.birth_state).to eq(birth_state)
     end
   end
 end

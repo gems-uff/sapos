@@ -15,13 +15,13 @@ describe ResearchArea do
       context "should be valid when" do
         it "name is not null and is not taken" do
           research_area.name = "ResearchArea name"
-          research_area.should have(0).errors_on :name
+          expect(research_area).to have(0).errors_on :name
         end
       end
       context "should have error blank when" do
         it "name is null" do
           research_area.name = nil
-          research_area.should have_error(:blank).on :name
+          expect(research_area).to have_error(:blank).on :name
         end
       end
       context "should have error taken when" do
@@ -29,7 +29,7 @@ describe ResearchArea do
           name = "ResearchArea name"
           FactoryGirl.create(:research_area, :name => name)
           research_area.name = name
-          research_area.should have_error(:taken).on :name
+          expect(research_area).to have_error(:taken).on :name
         end
       end
     end
@@ -37,13 +37,13 @@ describe ResearchArea do
       context "should be valid when" do
         it "code is not null and is not taken" do
           research_area.code = "ResearchArea code"
-          research_area.should have(0).errors_on :code
+          expect(research_area).to have(0).errors_on :code
         end
       end
       context "should have error blank when" do
         it "code is null" do
           research_area.code = nil
-          research_area.should have_error(:blank).on :code
+          expect(research_area).to have_error(:blank).on :code
         end
       end
       context "should have error taken when" do
@@ -51,7 +51,7 @@ describe ResearchArea do
           code = "ResearchArea code"
           FactoryGirl.create(:research_area, :code => code)
           research_area.code = code
-          research_area.should have_error(:taken).on :code
+          expect(research_area).to have_error(:taken).on :code
         end
       end
     end
@@ -64,7 +64,7 @@ describe ResearchArea do
         research_area.code = research_area_code
         research_area.name = research_area_name
         expected = "#{research_area_code} - #{research_area_name}"
-        research_area.to_label.should eql(expected)
+        expect(research_area.to_label).to eql(expected)
       end
     end
   end

@@ -11,13 +11,13 @@ describe AdvisementAuthorization do
       context "should be valid when" do
         it "professor is not null" do
           advisement_authorization.professor = Professor.new
-          advisement_authorization.should have(0).errors_on :professor
+          expect(advisement_authorization).to have(0).errors_on :professor
         end
       end
       context "should have error blank when" do
         it "professor is null" do
           advisement_authorization.professor = nil
-          advisement_authorization.should have_error(:blank).on :professor
+          expect(advisement_authorization).to have_error(:blank).on :professor
         end
       end
     end
@@ -25,13 +25,13 @@ describe AdvisementAuthorization do
       context "should be valid when" do
         it "level is not null" do
           advisement_authorization.level = Level.new
-          advisement_authorization.should have(0).errors_on :level
+          expect(advisement_authorization).to have(0).errors_on :level
         end
       end
       context "should have error blank when" do
         it "level is null" do
           advisement_authorization.level = nil
-          advisement_authorization.should have_error(:blank).on :level
+          expect(advisement_authorization).to have_error(:blank).on :level
         end
       end
     end
@@ -41,7 +41,7 @@ describe AdvisementAuthorization do
       it "should return the expected string" do
         level_name = "AuthorizedLevel"
         advisement_authorization.level = Level.new(:name => level_name)
-        advisement_authorization.to_label.should eql(level_name)
+        expect(advisement_authorization.to_label).to eql(level_name)
       end
     end
   end

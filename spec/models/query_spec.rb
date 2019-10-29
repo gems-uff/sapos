@@ -13,13 +13,13 @@ describe Query do
     context "name is blank" do
       it "show an blank error on name" do
 	query.name = nil     
-        query.should have_error(:blank).on :name
+        expect(query).to have_error(:blank).on :name
       end
     end
     context "sql is blank" do
       it "show an blank error on sql" do
         query.sql = ""      
-        query.should have_error(:blank).on :sql
+        expect(query).to have_error(:blank).on :sql
       end
     end
   end

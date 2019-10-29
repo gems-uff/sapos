@@ -14,13 +14,13 @@ describe Course do
       context "should be valid when" do
         it "name is not null and is not taken" do
           course.name = "Course"
-          course.should have(0).errors_on :name
+          expect(course).to have(0).errors_on :name
         end
       end
       context "should have error blank when" do
         it "name is null" do
           course.name = nil
-          course.should have_error(:blank).on :name
+          expect(course).to have_error(:blank).on :name
         end
       end
       context "should have error taken when" do
@@ -28,7 +28,7 @@ describe Course do
           name = "Course"
 	  FactoryGirl.create(:course, :name => name, :available => true)
 	  course.name = name
-	  course.should have_error(:check_unique_name_for_available_courses).on :name
+	  expect(course).to have_error(:check_unique_name_for_available_courses).on :name
 	end
       end
     end
@@ -36,13 +36,13 @@ describe Course do
       context "should be valid when" do
         it "course_type is not null" do
           course.course_type = CourseType.new
-          course.should have(0).errors_on :course_type
+          expect(course).to have(0).errors_on :course_type
         end
       end
       context "should have error blank when" do
         it "course_type is null" do
           course.course_type = nil
-          course.should have_error(:blank).on :course_type
+          expect(course).to have_error(:blank).on :course_type
         end
       end
     end
@@ -50,13 +50,13 @@ describe Course do
       context "should be valid when" do
         it "code is not null and is not taken" do
           course.code = "Code"
-          course.should have(0).errors_on :code
+          expect(course).to have(0).errors_on :code
         end
       end
       context "should have error blank when" do
         it "code is null" do
           course.code = nil
-          course.should have_error(:blank).on :code
+          expect(course).to have_error(:blank).on :code
         end
       end
       context "should have error taken when" do
@@ -64,7 +64,7 @@ describe Course do
           code = "Code"
           FactoryGirl.create(:course, :code => code)
           course.code = code
-          course.should have_error(:taken).on :code
+          expect(course).to have_error(:taken).on :code
         end
       end
     end
@@ -72,13 +72,13 @@ describe Course do
       context "should be valid when" do
         it "credits is not null" do
           course.credits = 10
-          course.should have(0).errors_on :credits
+          expect(course).to have(0).errors_on :credits
         end
       end
       context "should have error blank when" do
         it "credits is null" do
           course.credits = nil
-          course.should have_error(:blank).on :credits
+          expect(course).to have_error(:blank).on :credits
         end
       end
     end
@@ -86,13 +86,13 @@ describe Course do
       context "should be valid when" do
         it "workload is not null" do
           course.workload = 10
-          course.should have(0).errors_on :workload
+          expect(course).to have(0).errors_on :workload
         end
       end
       context "should have error blank when" do
         it "workload is null" do
           course.workload = nil
-          course.should have_error(:blank).on :workload
+          expect(course).to have_error(:blank).on :workload
         end
       end
     end
@@ -101,24 +101,24 @@ describe Course do
     context "workload_value" do
       it "should return 0 when there is no workload" do
         course.workload = nil
-        course.workload_value.should == 0
+        expect(course.workload_value).to eq(0)
       end
 
       it "should return 5 when workload is 5" do
         course.workload = 5
-        course.workload_value.should == 5
+        expect(course.workload_value).to eq(5)
       end
     end
 
     context "workload_text" do
       it "should return N/A when there is no workload" do
         course.workload = nil
-        course.workload_text.should == I18n.translate('activerecord.attributes.course.empty_workload')
+        expect(course.workload_text).to eq(I18n.translate('activerecord.attributes.course.empty_workload'))
       end
 
       it "should return 5h when workload is 5" do
         course.workload = 5
-        course.workload_text.should == I18n.translate('activerecord.attributes.course.workload_time', :time => 5)
+        expect(course.workload_text).to eq(I18n.translate('activerecord.attributes.course.workload_time', :time => 5))
       end
     end
 

@@ -14,13 +14,13 @@ describe EnrollmentStatus do
       context "should be valid when" do
         it "name is not null and is not taken" do
           enrollment_status.name = "EnrollmentStatus name"
-          enrollment_status.should have(0).errors_on :name
+          expect(enrollment_status).to have(0).errors_on :name
         end
       end
       context "should have error blank when" do
         it "name is null" do
           enrollment_status.name = nil
-          enrollment_status.should have_error(:blank).on :name
+          expect(enrollment_status).to have_error(:blank).on :name
         end
       end
       context "should have error taken when" do
@@ -28,7 +28,7 @@ describe EnrollmentStatus do
           name = "EnrollmentStatus name"
           FactoryGirl.create(:enrollment_status, :name => name)
           enrollment_status.name = name
-          enrollment_status.should have_error(:taken).on :name
+          expect(enrollment_status).to have_error(:taken).on :name
         end
       end
     end

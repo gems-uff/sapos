@@ -12,13 +12,13 @@ describe PhaseDuration do
       context "should be valid when" do
         it "phase is not null" do
           phase_duration.phase = Phase.new
-          phase_duration.should have(0).errors_on :phase
+          expect(phase_duration).to have(0).errors_on :phase
         end
       end
       context "should have error blank when" do
         it "phase is null" do
           phase_duration.phase = nil
-          phase_duration.should have_error(:blank).on :phase
+          expect(phase_duration).to have_error(:blank).on :phase
         end
       end
     end
@@ -26,13 +26,13 @@ describe PhaseDuration do
       context "should be valid when" do
         it "level is not null" do
           phase_duration.level = Level.new
-          phase_duration.should have(0).errors_on :level
+          expect(phase_duration).to have(0).errors_on :level
         end
       end
       context "should have error blank when" do
         it "level is null" do
           phase_duration.level = nil
-          phase_duration.should have_error(:blank).on :level
+          expect(phase_duration).to have_error(:blank).on :level
         end
       end
     end
@@ -42,7 +42,7 @@ describe PhaseDuration do
           phase_duration.deadline_months = 0
           phase_duration.deadline_semesters = 0
           phase_duration.deadline_days = 1
-          phase_duration.should have(0).errors_on :deadline
+          expect(phase_duration).to have(0).errors_on :deadline
         end
       end
       context "should have error blank_duration when" do
@@ -50,7 +50,7 @@ describe PhaseDuration do
           phase_duration.deadline_days = 0
           phase_duration.deadline_months = 0
           phase_duration.deadline_semesters = nil
-          phase_duration.should have_error(:blank_deadline).on :deadline
+          expect(phase_duration).to have_error(:blank_deadline).on :deadline
         end
       end
     end
@@ -58,9 +58,9 @@ describe PhaseDuration do
       context "should be valid when" do
         it "there is no deferral with the same level and no accomplishment with the same phase and level as the phase_duration" do
           phase_duration = FactoryGirl.create(:phase_duration)
-          phase_duration.validate_destroy.should == true
-          phase_duration.phase.should have(0).errors_on :base
-          phase_duration.should have(0).errors_on :deadline
+          expect(phase_duration.validate_destroy).to eq(true)
+          expect(phase_duration.phase).to have(0).errors_on :base
+          expect(phase_duration).to have(0).errors_on :deadline
         end
       end
       context "should have error has_deferral when" do
@@ -73,9 +73,9 @@ describe PhaseDuration do
 
           phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :level => level)
        
-          phase_duration.validate_destroy.should == false
-          phase_duration.phase.errors.full_messages.should include(I18n.t('activerecord.errors.models.phase.phase_duration_has_deferral', :level => level.to_label))
-          phase_duration.errors.full_messages.should include(I18n.t('activerecord.errors.models.phase_duration.has_deferral'))
+          expect(phase_duration.validate_destroy).to eq(false)
+          expect(phase_duration.phase.errors.full_messages).to include(I18n.t('activerecord.errors.models.phase.phase_duration_has_deferral', :level => level.to_label))
+          expect(phase_duration.errors.full_messages).to include(I18n.t('activerecord.errors.models.phase_duration.has_deferral'))
         end
       end
       context "should have error has_level when" do
@@ -86,9 +86,9 @@ describe PhaseDuration do
           phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :level => level)
           accomplishment = FactoryGirl.create(:accomplishment, :enrollment => enrollment, :phase => phase)
 
-          phase_duration.validate_destroy.should == false
-          phase_duration.phase.errors.full_messages.should include(I18n.t('activerecord.errors.models.phase.phase_duration_has_level', :level => level.to_label))
-          phase_duration.errors.full_messages.should include(I18n.t('activerecord.errors.models.phase_duration.has_level'))
+          expect(phase_duration.validate_destroy).to eq(false)
+          expect(phase_duration.phase.errors.full_messages).to include(I18n.t('activerecord.errors.models.phase.phase_duration_has_level', :level => level.to_label))
+          expect(phase_duration.errors.full_messages).to include(I18n.t('activerecord.errors.models.phase_duration.has_level'))
         end
       end
 
@@ -104,7 +104,7 @@ describe PhaseDuration do
         phase_duration.deadline_months = deadline_months
         phase_duration.deadline_days = deadline_days
         expected = "#{deadline_semesters} períodos, #{deadline_months} meses e #{deadline_days} dias"
-        phase_duration.to_label.should eql(expected)
+        expect(phase_duration.to_label).to eql(expected)
       end
     end
   end

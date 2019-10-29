@@ -16,13 +16,13 @@ describe City do
       context "should be valid when" do
         it "state is not null" do
           city.state = State.new
-          city.should have(0).errors_on :state
+          expect(city).to have(0).errors_on :state
         end
       end
       context "should have error blank when" do
         it "state is null" do
           city.state = nil
-          city.should have_error(:blank).on :state
+          expect(city).to have_error(:blank).on :state
         end
       end
     end
@@ -30,13 +30,13 @@ describe City do
       context "should be valid when" do
         it "name is not null" do
           city.name = "City name"
-          city.should have(0).errors_on :name
+          expect(city).to have(0).errors_on :name
         end
       end
       context "should have error blank when" do
         it "name is null" do
           city.name = nil
-          city.should have_error(:blank).on :name
+          expect(city).to have_error(:blank).on :name
         end
       end
     end
