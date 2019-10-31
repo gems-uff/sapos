@@ -568,6 +568,9 @@ pt-BR:
           has_level: "Já existe conclusão de etapa para a duração de etapa deste nível"
         professor_research_area:
           unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
+        query:
+          sql_has_an_undefined_parameter: "tem um parâmetro chamado '%{parametro}' que não foi definido."
+          sql_execution_generated_an_error: "gerou o seguinte erro ao ser executada: '%{erro}'"        
         student_major:
           unique_pair: "não pode estar em dois ou mais cursos repetidos e curso não pode possuir o mesmo aluno duas ou mais vezes"
         thesis_defense_committee_participation:
