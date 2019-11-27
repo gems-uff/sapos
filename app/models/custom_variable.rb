@@ -13,7 +13,8 @@ class CustomVariable < ApplicationRecord
     "redirect_email" => :text,
     "notification_footer" => :text,
     "minimum_grade_for_approval" => :text,
-    "grade_of_disapproval_for_absence" => :text
+    "grade_of_disapproval_for_absence" => :text,
+    "professor_login_can_post_grades" => :text
   }
 
   validates :variable, :presence => true

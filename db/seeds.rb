@@ -24,6 +24,7 @@ Em caso de dúvida, procure a secretaria."
 )
 CustomVariable.create(:description=>"Nota mínima para aprovação", :variable =>"minimum_grade_for_approval", :value => "6.0")
 CustomVariable.create(:description=>"Nota de reprovação por falta", :variable =>"grade_of_disapproval_for_absence", :value => "0.0")
+CustomVariable.create(:description=>"Professor logado no sistema pode lançar notas", :variable =>"professor_login_can_post_grades", :value => "no")
 
 ['Graduação', 'Especialização', 'Mestrado', 'Doutorado'].each do |level|
     Level.new do |l|
