@@ -296,13 +296,13 @@ class EnrollmentsController < ApplicationController
     emails = []
     record.class_enrollments.each do |class_enrollment| 
       if class_enrollment.should_send_email_to_professor?
-        absence_changed = class_enrollment.saved_change_to_disapproved_by_absence? ? '*' : ''
+        absence_changed = class_enrollment.will_save_change_to_disapproved_by_absence? ? '*' : ''
         info = {
           :name => record.to_label,
           :professor => class_enrollment.course_class.professor.name,
           :course => class_enrollment.course_class.label_with_course,
-          :situation => "#{class_enrollment.situation}#{class_enrollment.saved_change_to_situation? ? '*' : ''}",
-          :grade => "#{class_enrollment.grade_to_view}#{class_enrollment.saved_change_to_grade? ? '*' : ''}",
+          :situation => "#{class_enrollment.situation}#{class_enrollment.will_save_change_to_situation? ? '*' : ''}",
+          :grade => "#{class_enrollment.grade_to_view}#{class_enrollment.will_save_change_to_grade? ? '*' : ''}",
           :absence => ((class_enrollment.attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false')) + absence_changed
         }
         message_to_professor = {
