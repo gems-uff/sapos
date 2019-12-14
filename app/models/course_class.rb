@@ -19,6 +19,14 @@ class CourseClass < ApplicationRecord
   validates :professor, :presence => true
   validates :year, :presence => true
   validates :semester, :presence => true, :inclusion => {:in => SEMESTERS}
+  validate :professor_changed_only_valid_fields, if: -> {current_user.role_id == Role::ROLE_PROFESSOR}
+
+  attr_reader :changed_from_course_class
+  before_save :set_changed_from_course_class
+
+  def set_changed_from_course_class
+    @changed_from_course_class = true	  
+  end
 
   def to_label
     "#{name_with_class} - #{year}/#{semester}"
@@ -36,4 +44,22 @@ class CourseClass < ApplicationRecord
     return course.name if name.nil? or name.empty? or course.course_type.nil? or not course.course_type.show_class_name
     "#{course.name} (#{name})"
   end
+
+  def self.selectable_years
+    ((Date.today.year-5)..Date.today.year+1).map { |y| y }.reverse
+  end
+
+  private
+
+  def professor_changed_only_valid_fields
+    campos_modificaveis = []
+    campos_modificados  = self.changed
+
+    campos_modificados.each do |campo_modificado|
+      if !campos_modificaveis.include?(campo_modificado)
+        errors.add(:course_class, I18n.t("activerecord.errors.models.course_class.changes_to_disallowed_fields"))
+      end
+    end
+  end
+
 end

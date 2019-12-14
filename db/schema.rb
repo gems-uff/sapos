@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190809144853) do
+ActiveRecord::Schema.define(version: 20190819200814) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -343,12 +343,14 @@ ActiveRecord::Schema.define(version: 20190809144853) do
     t.integer "academic_title_institution_id"
     t.integer "academic_title_level_id"
     t.text "obs"
+    t.integer "user_id"
     t.index ["academic_title_country_id"], name: "index_professors_on_academic_title_country_id"
     t.index ["academic_title_institution_id"], name: "index_professors_on_academic_title_institution_id"
     t.index ["academic_title_level_id"], name: "index_professors_on_academic_title_level_id"
     t.index ["city_id"], name: "index_professors_on_city_id"
     t.index ["email"], name: "index_professors_on_email"
     t.index ["institution_id"], name: "index_professors_on_institution_id"
+    t.index ["user_id"], name: "index_professors_on_user_id"
   end
 
   create_table "queries", force: :cascade do |t|

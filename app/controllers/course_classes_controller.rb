@@ -46,12 +46,12 @@ class CourseClassesController < ApplicationController
     config.columns[:year].form_ui = :select
     config.columns[:semester].form_ui = :select
     config.columns[:semester].options = {
-      :options => ['1', '2'],
+      :options => CourseClass::SEMESTERS,
       :include_blank => true,
       :default => nil
     }
     config.columns[:year].options = {
-      :options => ((Date.today.year-5)..Date.today.year+1).map { |y| y }.reverse,
+      :options => CourseClass.selectable_years,
       :include_blank => true,
       :default => nil
     }
@@ -113,9 +113,9 @@ class CourseClassesController < ApplicationController
       :professor => record.professor.name,
       :values => record.class_enrollments.map do |class_enrollment| 
         enrollment = class_enrollment.enrollment.to_label
-        situation = "#{class_enrollment.situation}#{class_enrollment.saved_change_to_situation? ? '*' : ''}"
-        grade = "#{class_enrollment.grade_to_view}#{class_enrollment.saved_change_to_grade? ? '*' : ''}"
-        absence_changed = class_enrollment.saved_change_to_disapproved_by_absence? ? '*' : ''
+        situation = "#{class_enrollment.situation}#{class_enrollment.will_save_change_to_situation? ? '*' : ''}"
+        grade = "#{class_enrollment.grade_to_view}#{class_enrollment.will_save_change_to_grade? ? '*' : ''}"
+        absence_changed = class_enrollment.will_save_change_to_disapproved_by_absence? ? '*' : ''
         if class_enrollment.attendance_to_label == "I"
           absence = "#{I18n.t('activerecord.attributes.class_enrollment.disapproved_by_absence')}#{absence_changed}"
         else

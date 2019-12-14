@@ -37,6 +37,10 @@ class Ability
       can :read, (Role)
     elsif role_id == Role::ROLE_PROFESSOR
       can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration])
+      if user.professor && CustomVariable.professor_login_can_post_grades
+        can :update, ClassEnrollment, course_class: { professor: user.professor, year: YearSemester.current.year, semester: YearSemester.current.semester }
+	can :update, CourseClass, professor: user.professor, year: YearSemester.current.year, semester: YearSemester.current.semester
+      end
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, ReportConfiguration])
       can :read, (Query)

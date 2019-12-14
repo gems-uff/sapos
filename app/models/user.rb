@@ -3,7 +3,7 @@
 
 class User < ApplicationRecord
 
-  
+  has_one :professor  
   belongs_to :role
 
   has_paper_trail
@@ -15,7 +15,9 @@ class User < ApplicationRecord
   validates :name, :presence => true, :uniqueness => true
   validate :role_valid?
   validates :role, :presence => true
-  
+  validate :role_is_professor_if_the_professor_field_is_filled
+  validate :selected_professor_is_already_linked_to_another_user
+    
   before_destroy :validate_destroy
 
   def to_label
@@ -66,6 +68,18 @@ class User < ApplicationRecord
       errors.add(:base, I18n.t("activerecord.errors.models.user.self_delete")) if current_user.id == self.id
     end
     errors.blank?
+  end
+
+  def role_is_professor_if_the_professor_field_is_filled
+    if professor && (role.name != "Professor")
+      errors.add(:professor, I18n.t("activerecord.errors.models.user.selected_role_was_not_professor"))
+    end
+  end
+
+  def selected_professor_is_already_linked_to_another_user
+    if professor && (professor.errors.messages[:professor] == ["selected_professor_is_already_linked_to_another_user"])
+      errors.add(:professor, I18n.t("activerecord.errors.models.user.selected_professor_is_already_linked_to_another_user", :nome_usuario => User.find(professor.user_id_was).name))
+    end
   end
 
 end

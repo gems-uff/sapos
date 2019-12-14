@@ -56,17 +56,23 @@ module ClassEnrollmentsHelper
   end
 
   def course_class_form_column(record, options)
-    logger.info "  RecordSelect Helper ClassEnrollmentsHelper\\course_class_form_column" 
+    logger.info "  RecordSelect Helper ClassEnrollmentsHelper\\course_class_form_column"
+    options.merge!(disabled: true) if current_user.role_id == Role::ROLE_PROFESSOR 
     record_select_field :course_class, record.course_class || CourseClass.new, options.merge!(class: "text-input")
   end
 
   def enrollment_form_column(record, options)
-    logger.info "  RecordSelect Helper ClassEnrollmentsHelper\\enrollment_form_column" 
+    logger.info "  RecordSelect Helper ClassEnrollmentsHelper\\enrollment_form_column"
+    options.merge!(disabled: true) if current_user.role_id == Role::ROLE_PROFESSOR 
     record_select_field :enrollment, record.enrollment || Enrollment.new, options.merge!(class: "text-input")
   end
 
   def disapproved_by_absence_form_column(record, options)
 	  options = options.merge({:class_enrollments_id => "#{record.id}", :grade_of_disapproval_for_absence => "#{CustomVariable.grade_of_disapproval_for_absence.nil? ? nil : CustomVariable.grade_of_disapproval_for_absence.to_f/10.0}", :course_has_grade => "#{record.course_has_grade}"})
+    if record.course_has_grade
+      grade_of_disapproval_for_absence = ((!CustomVariable.grade_of_disapproval_for_absence)||(CustomVariable.grade_of_disapproval_for_absence.nil?)) ? nil : CustomVariable.grade_of_disapproval_for_absence.to_f/10.0
+      options = options.merge(onchange: "if( (this.checked) && (document.getElementById('record_grade_#{record.course_class_id}_class_enrollments_#{record.id}').value.trim() == '')){document.getElementById('record_grade_#{record.course_class_id}_class_enrollments_#{record.id}').value = '#{grade_of_disapproval_for_absence}';}")
+    end
     check_box :record, :disapproved_by_absence_to_view, options
   end
 

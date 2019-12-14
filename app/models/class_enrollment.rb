@@ -19,6 +19,7 @@ class ClassEnrollment < ApplicationRecord
   validate :grade_for_situation
   validate :disapproved_by_absence_for_situation
   validate :check_multiple_class_enrollment_allowed
+  validate :professor_changed_only_valid_fields, if: -> {current_user.role_id == Role::ROLE_PROFESSOR}
 
   after_save :notify_student_and_advisor
 
@@ -86,9 +87,9 @@ class ClassEnrollment < ApplicationRecord
   def should_send_email_to_professor?
     (!self.id.nil?) and 
     (
-      self.saved_change_to_grade? or 
-      self.saved_change_to_situation? or 
-      self.saved_change_to_disapproved_by_absence?
+      self.will_save_change_to_grade? or
+      self.will_save_change_to_situation? or
+      self.will_save_change_to_disapproved_by_absence?
     )
   end
 
@@ -151,5 +152,15 @@ class ClassEnrollment < ApplicationRecord
     Notifier.send_emails(notifications: emails)
   end
 
+  def professor_changed_only_valid_fields
+    campos_modificaveis = ['grade', 'situation', 'disapproved_by_absence', 'obs']
+    campos_modificados  = self.changed
+
+    campos_modificados.each do |campo_modificado|
+      if !campos_modificaveis.include?(campo_modificado)
+	errors.add(:class_enrollment, I18n.t("activerecord.errors.models.class_enrollment.changes_to_disallowed_fields"))
+      end
+    end
+  end
 
 end
