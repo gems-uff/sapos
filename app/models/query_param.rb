@@ -20,7 +20,8 @@ class QueryParam < ApplicationRecord
                  VALUE_DATE, VALUE_DATETIME, VALUE_TIME, VALUE_LITERAL]
 
   validates :value_type, presence: true, inclusion: VALUE_TYPES
-  validates :name, presence: true, :format => /\A([a-z_][a-zA-Z_0-9]+)?\z/
+  #validates :name, presence: true, :format => /\A([a-z_][a-zA-Z_0-9]+)?\z/
+  validates :name, presence: true, format: { with: /\A([a-z_][a-zA-Z_0-9]+)?\z/, message: :invalid_name }
 
   validate do
     validate_value(default_value)
@@ -58,11 +59,15 @@ class QueryParam < ApplicationRecord
           end
 
         when VALUE_INTEGER
-          if val.to_i.to_s != val.to_s
+	  begin
+	    Integer(val)	  
+	  rescue
             self.errors.add :default_value, :invalid_integer
           end
         when VALUE_FLOAT
-          if val.to_f.to_s != val.to_s
+	  begin
+	    Float(val)	  
+	  rescue
             self.errors.add :default_value, :invalid_float
           end
       end

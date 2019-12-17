@@ -13,24 +13,24 @@ describe YearSemester do
         it "date is between first semester begin and second semester begin" do
           date = Date.parse("#{current_year}/#{YearSemester::FIRST_SEMESTER_BEGIN_MONTH}/#{YearSemester::FIRST_SEMESTER_BEGIN_DAY + 1}")
           year_semester = YearSemester.on_date(date)
-          year_semester.semester.should eql(YearSemester::FIRST_SEMESTER)
-          year_semester.year.should eql(Date.today.year)
+          expect(year_semester.semester).to eql(YearSemester::FIRST_SEMESTER)
+          expect(year_semester.year).to eql(Date.today.year)
         end
       end
       context "should return the second semester of the current year when" do
         it "date is after second semester begin" do
           date = Date.parse("#{current_year}/#{YearSemester::SECOND_SEMESTER_BEGIN_MONTH}/#{YearSemester::SECOND_SEMESTER_BEGIN_DAY + 1}")
           year_semester = YearSemester.on_date(date)
-          year_semester.semester.should eql(YearSemester::SECOND_SEMESTER)
-          year_semester.year.should eql(current_year)
+          expect(year_semester.semester).to eql(YearSemester::SECOND_SEMESTER)
+          expect(year_semester.year).to eql(current_year)
         end
       end
       context "should return the second semester of the last year when" do
         it "date is before first semester begin" do
           date = Date.parse("#{current_year}/#{YearSemester::FIRST_SEMESTER_BEGIN_MONTH}/#{YearSemester::FIRST_SEMESTER_BEGIN_DAY}") - 1.day
           year_semester = YearSemester.on_date(date)
-          year_semester.semester.should eql(YearSemester::SECOND_SEMESTER)
-          year_semester.year.should eql(current_year - 1)
+          expect(year_semester.semester).to eql(YearSemester::SECOND_SEMESTER)
+          expect(year_semester.year).to eql(current_year - 1)
         end
       end
     end
@@ -40,7 +40,7 @@ describe YearSemester do
           year_semester.year = current_year
           year_semester.semester = YearSemester::FIRST_SEMESTER
           date = Date.parse("#{current_year}/#{YearSemester::FIRST_SEMESTER_BEGIN_MONTH}/#{YearSemester::FIRST_SEMESTER_BEGIN_DAY}")
-          year_semester.semester_begin.should eql(date)
+          expect(year_semester.semester_begin).to eql(date)
         end
       end
       context "should return date of the second semester begin when" do
@@ -48,7 +48,7 @@ describe YearSemester do
           year_semester.year = current_year
           year_semester.semester = YearSemester::SECOND_SEMESTER
           date = Date.parse("#{current_year}/#{YearSemester::SECOND_SEMESTER_BEGIN_MONTH}/#{YearSemester::SECOND_SEMESTER_BEGIN_DAY}")
-          year_semester.semester_begin.should eql(date)
+          expect(year_semester.semester_begin).to eql(date)
         end
       end
     end
@@ -57,7 +57,7 @@ describe YearSemester do
         year_semester.year = current_year
         year_semester.semester = YearSemester::FIRST_SEMESTER
         date = Date.parse("#{current_year}/#{YearSemester::SECOND_SEMESTER_BEGIN_MONTH}/#{YearSemester::SECOND_SEMESTER_BEGIN_DAY}") - 1.day
-        year_semester.semester_end.should eql(date)
+        expect(year_semester.semester_end).to eql(date)
       end
     end
     describe "next_semester_start" do
@@ -66,13 +66,13 @@ describe YearSemester do
           year_semester.year = current_year
           year_semester.semester = YearSemester::FIRST_SEMESTER
           date = Date.parse("#{current_year}/#{YearSemester::SECOND_SEMESTER_BEGIN_MONTH}/#{YearSemester::SECOND_SEMESTER_BEGIN_DAY}")
-          year_semester.next_semester_start.should eql(date)
+          expect(year_semester.next_semester_start).to eql(date)
         end
         it "semester is set to second semester" do
           year_semester.year = current_year
           year_semester.semester = YearSemester::SECOND_SEMESTER
           date = Date.parse("#{current_year + 1}/#{YearSemester::FIRST_SEMESTER_BEGIN_MONTH}/#{YearSemester::FIRST_SEMESTER_BEGIN_DAY}")
-          year_semester.next_semester_start.should eql(date)
+          expect(year_semester.next_semester_start).to eql(date)
         end
       end
     end
@@ -80,25 +80,25 @@ describe YearSemester do
       it "should return the year semester on today's date" do
         year_semester = YearSemester.on_date(Date.today)
         current_year_semester = YearSemester.current
-        year_semester.semester.should eql(current_year_semester.semester)
-        year_semester.year.should eql(current_year_semester.year)
+        expect(year_semester.semester).to eql(current_year_semester.semester)
+        expect(year_semester.year).to eql(current_year_semester.year)
       end
     end
     describe "opposite_semester" do
       it "should return first semester when semester is set to second" do
         year_semester.semester = YearSemester::SECOND_SEMESTER
-        year_semester.opposite_semester.should eql(YearSemester::FIRST_SEMESTER)
+        expect(year_semester.opposite_semester).to eql(YearSemester::FIRST_SEMESTER)
       end
       it "should return second semester when semester is set to first" do
         year_semester.semester = YearSemester::FIRST_SEMESTER
-        year_semester.opposite_semester.should eql(YearSemester::SECOND_SEMESTER)
+        expect(year_semester.opposite_semester).to eql(YearSemester::SECOND_SEMESTER)
       end
     end
     describe "toggle_semester" do
       it "should switch to first semester when semester is set to second" do
         year_semester.semester = YearSemester::SECOND_SEMESTER
         year_semester.toggle_semester
-        year_semester.semester.should eql(YearSemester::FIRST_SEMESTER)
+        expect(year_semester.semester).to eql(YearSemester::FIRST_SEMESTER)
       end
     end
     describe "decrease_semesters" do
@@ -107,37 +107,37 @@ describe YearSemester do
           year_semester.year = current_year
           year_semester.semester = YearSemester::FIRST_SEMESTER
           year_semester.decrease_semesters(2)
-          year_semester.semester.should eql(YearSemester::FIRST_SEMESTER)
-          year_semester.year.should eql(current_year - 1)
+          expect(year_semester.semester).to eql(YearSemester::FIRST_SEMESTER)
+          expect(year_semester.year).to eql(current_year - 1)
         end
         it "semester is set to first and the parameter is odd" do
           year_semester.year = current_year
           year_semester.semester = YearSemester::FIRST_SEMESTER
           year_semester.decrease_semesters(3)
-          year_semester.semester.should eql(YearSemester::SECOND_SEMESTER)
-          year_semester.year.should eql(current_year - 2)
+          expect(year_semester.semester).to eql(YearSemester::SECOND_SEMESTER)
+          expect(year_semester.year).to eql(current_year - 2)
         end
         it "semester is set to second and the parameter is even" do
           year_semester.year = current_year
           year_semester.semester = YearSemester::SECOND_SEMESTER
           year_semester.decrease_semesters(2)
-          year_semester.semester.should eql(YearSemester::SECOND_SEMESTER)
-          year_semester.year.should eql(current_year - 1)
+          expect(year_semester.semester).to eql(YearSemester::SECOND_SEMESTER)
+          expect(year_semester.year).to eql(current_year - 1)
         end
         it "semester is set to second and the parameter is odd" do
           year_semester.year = current_year
           year_semester.semester = YearSemester::SECOND_SEMESTER
           year_semester.decrease_semesters(3)
-          year_semester.semester.should eql(YearSemester::FIRST_SEMESTER)
-          year_semester.year.should eql(current_year - 1)
+          expect(year_semester.semester).to eql(YearSemester::FIRST_SEMESTER)
+          expect(year_semester.year).to eql(current_year - 1)
         end
         it "the parameter is negative" do
           year_semester.year = current_year
           year_semester.semester = YearSemester::SECOND_SEMESTER
           expected = year_semester + 3
           year_semester.decrease_semesters(-3)
-          year_semester.semester.should eql(expected.semester)
-          year_semester.year.should eql(expected.year)
+          expect(year_semester.semester).to eql(expected.semester)
+          expect(year_semester.year).to eql(expected.year)
         end
       end
     end
@@ -147,37 +147,37 @@ describe YearSemester do
           year_semester.year = current_year
           year_semester.semester = YearSemester::FIRST_SEMESTER
           year_semester.increase_semesters(2)
-          year_semester.semester.should eql(YearSemester::FIRST_SEMESTER)
-          year_semester.year.should eql(current_year + 1)
+          expect(year_semester.semester).to eql(YearSemester::FIRST_SEMESTER)
+          expect(year_semester.year).to eql(current_year + 1)
         end
         it "semester is set to first and the parameter is odd" do
           year_semester.year = current_year
           year_semester.semester = YearSemester::FIRST_SEMESTER
           year_semester.increase_semesters(3)
-          year_semester.semester.should eql(YearSemester::SECOND_SEMESTER)
-          year_semester.year.should eql(current_year + 1)
+          expect(year_semester.semester).to eql(YearSemester::SECOND_SEMESTER)
+          expect(year_semester.year).to eql(current_year + 1)
         end
         it "semester is set to second and the parameter is even" do
           year_semester.year = current_year
           year_semester.semester = YearSemester::SECOND_SEMESTER
           year_semester.increase_semesters(2)
-          year_semester.semester.should eql(YearSemester::SECOND_SEMESTER)
-          year_semester.year.should eql(current_year + 1)
+          expect(year_semester.semester).to eql(YearSemester::SECOND_SEMESTER)
+          expect(year_semester.year).to eql(current_year + 1)
         end
         it "semester is set to second and the parameter is odd" do
           year_semester.year = current_year
           year_semester.semester = YearSemester::SECOND_SEMESTER
           year_semester.increase_semesters(3)
-          year_semester.semester.should eql(YearSemester::FIRST_SEMESTER)
-          year_semester.year.should eql(current_year + 2)
+          expect(year_semester.semester).to eql(YearSemester::FIRST_SEMESTER)
+          expect(year_semester.year).to eql(current_year + 2)
         end
         it "the parameter is negative" do
           year_semester.year = current_year
           year_semester.semester = YearSemester::SECOND_SEMESTER
           expected = year_semester - 3
           year_semester.increase_semesters(-3)
-          year_semester.semester.should eql(expected.semester)
-          year_semester.year.should eql(expected.year)
+          expect(year_semester.semester).to eql(expected.semester)
+          expect(year_semester.year).to eql(expected.year)
         end
       end
     end

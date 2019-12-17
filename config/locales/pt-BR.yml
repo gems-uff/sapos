@@ -306,7 +306,7 @@ pt-BR:
         notifications: Notificações
         params: Parâmetros
       query_param:
-        name: Name
+        name: Nome
         value_type: Tipo
         default_value: Valor padrão
       notification_param:
@@ -470,6 +470,7 @@ pt-BR:
           attributes:
             name:
               restricted_name: não pode ser usado pois é uma palavra reservada do sistema.
+              invalid_name: "não é válido. Ele deve iniciar com letra minúscula ou underscore '_', seguido de um ou mais: letra minúscula, maiúscula, dígito ou underscore"
             default_value:
               invalid_integer: não é um número inteiro válido
               invalid_float: não é um número float válido
@@ -570,6 +571,9 @@ pt-BR:
           has_level: "Já existe conclusão de etapa para a duração de etapa deste nível"
         professor_research_area:
           unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
+        query:
+          sql_has_an_undefined_parameter: "tem um parâmetro chamado '%{parametro}' que não foi definido."
+          sql_execution_generated_an_error: "gerou o seguinte erro ao ser executada: '%{erro}'"        
         student_major:
           unique_pair: "não pode estar em dois ou mais cursos repetidos e curso não pode possuir o mesmo aluno duas ou mais vezes"
         thesis_defense_committee_participation:
@@ -681,8 +685,11 @@ pt-BR:
         one: "Área de Pesquisa do Professor"
         other: "Área de Pesquisa dos Professores"
       query:
-        one: Contulta
+        one: Consulta
         other: Consultas
+      query_param:
+        one: "Parâmetro"
+        other: "Parâmetros"      
       report:
         one: Relatório
         other: Relatórios
@@ -756,6 +763,7 @@ pt-BR:
     create_deferral_type_label: "Adicionar Tipo de Prorrogação"
     create_dismissal_label: "Adicionar Desligamento"
     create_dismissal_reason_label: "Adicionar Razão de Desligamento"
+    create_enrollment_hold_label: "Adicionar Trancamento"
     create_enrollment_label: "Adicionar Matrícula"
     create_enrollment_status_label: "Adicionar Tipo de Matrícula"
     create_institution_label: "Adicionar Instituição"
@@ -767,8 +775,10 @@ pt-BR:
     create_phase_label: "Adicionar Fase"
     create_professor_label: "Adicionar Professor"
     create_professor_research_area_label: "Adicionar Área de Pesquisa do Professor"
+    create_query_label: "Adicionar Consulta"
     create_report_configuration_label: "Adicionar Configuração de Relatório"
     create_research_area_label: "Adicionar Área de Pesquisa"
+    create_role_label: "Adicionar Papel"
     create_scholarship_duration_label: "Adicionar Bolsa"
     create_scholarship_label: "Adicionar Bolsa"
     create_scholarship_type_label: "Adicionar Tipo de Bolsa"

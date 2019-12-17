@@ -11,13 +11,13 @@ describe CustomVariable do
       context "should be valid when" do
         it "variable is not null" do
           custom_variable.variable = "variable"
-          custom_variable.should have(0).errors_on :variable
+          expect(custom_variable).to have(0).errors_on :variable
         end
       end
       context "should have error blank when" do
         it "variable is null" do
           custom_variable.variable = nil
-          custom_variable.should have_error(:blank).on :variable
+          expect(custom_variable).to have_error(:blank).on :variable
         end
       end
     end
@@ -29,7 +29,7 @@ describe CustomVariable do
         config = CustomVariable.find_by_variable(:single_advisor_points)
         config.delete unless config.nil?
 
-        CustomVariable.single_advisor_points.should == 1.0
+        expect(CustomVariable.single_advisor_points).to eq(1.0)
       end
 
       it "should return 2.0 when it is defined to 2.0" do
@@ -37,7 +37,7 @@ describe CustomVariable do
         config.delete unless config.nil?
         CustomVariable.create(:variable=>:single_advisor_points, :value=>"2.0")
 
-        CustomVariable.single_advisor_points.should == 2.0
+        expect(CustomVariable.single_advisor_points).to eq(2.0)
       end
     end
 
@@ -46,7 +46,7 @@ describe CustomVariable do
         config = CustomVariable.find_by_variable(:multiple_advisor_points)
         config.delete unless config.nil?
 
-        CustomVariable.multiple_advisor_points.should == 0.5
+        expect(CustomVariable.multiple_advisor_points).to eq(0.5)
       end
 
       it "should return 2.0 when it is defined to 2.0" do
@@ -54,7 +54,7 @@ describe CustomVariable do
         config.delete unless config.nil?
         CustomVariable.create(:variable=>:multiple_advisor_points, :value=>"2.0")
 
-        CustomVariable.multiple_advisor_points.should == 2.0
+        expect(CustomVariable.multiple_advisor_points).to eq(2.0)
       end
     end 
 
@@ -63,7 +63,7 @@ describe CustomVariable do
         config = CustomVariable.find_by_variable(:program_level)
         config.delete unless config.nil?
 
-        CustomVariable.program_level.should == nil
+        expect(CustomVariable.program_level).to eq(nil)
       end
 
       it "should return 5 when it is defined to 5" do
@@ -71,7 +71,7 @@ describe CustomVariable do
         config.delete unless config.nil?
         CustomVariable.create(:variable=>:program_level, :value=>"5")
 
-        CustomVariable.program_level.should == 5
+        expect(CustomVariable.program_level).to eq(5)
       end
     end 
 
@@ -83,7 +83,7 @@ describe CustomVariable do
         config = CustomVariable.find_by_variable(:identity_issuing_country)
         config.delete unless config.nil?
 
-        CustomVariable.identity_issuing_country.should == nil
+        expect(CustomVariable.identity_issuing_country).to eq(nil)
       end
 
       it "should return Brasil when there is no variable, but there is a country named Brasil" do
@@ -94,7 +94,7 @@ describe CustomVariable do
         config = CustomVariable.find_by_variable(:identity_issuing_country)
         config.delete unless config.nil?
         
-        CustomVariable.identity_issuing_country.should == country
+        expect(CustomVariable.identity_issuing_country).to eq(country)
       end
 
       it "should return England it is defined to England" do
@@ -111,7 +111,7 @@ describe CustomVariable do
 
         CustomVariable.create(:variable => :identity_issuing_country, :value=>"England")
 
-        CustomVariable.identity_issuing_country.should == england
+        expect(CustomVariable.identity_issuing_country).to eq(england)
       end
     end 
 
@@ -120,7 +120,7 @@ describe CustomVariable do
         config = CustomVariable.find_by_variable(:class_schedule_text)
         config.delete unless config.nil?
 
-        CustomVariable.class_schedule_text.should == ''
+        expect(CustomVariable.class_schedule_text).to eq('')
       end
 
       it "should return 'bla' when it is defined to bla" do
@@ -128,7 +128,7 @@ describe CustomVariable do
         config.delete unless config.nil?
         CustomVariable.create(:variable=>:class_schedule_text, :value=>"bla")
 
-        CustomVariable.class_schedule_text.should == 'bla'
+        expect(CustomVariable.class_schedule_text).to eq('bla')
       end
     end 
 
@@ -137,7 +137,7 @@ describe CustomVariable do
         config = CustomVariable.find_by_variable(:redirect_email)
         config.delete unless config.nil?
 
-        CustomVariable.redirect_email.should == nil
+        expect(CustomVariable.redirect_email).to eq(nil)
       end
 
       it "should return '' when the value is nil" do
@@ -145,7 +145,7 @@ describe CustomVariable do
         config.delete unless config.nil?
         CustomVariable.create(:variable=>:redirect_email, :value=>nil)
 
-        CustomVariable.redirect_email.should == ''
+        expect(CustomVariable.redirect_email).to eq('')
       end
 
       it "should return 'bla' when it is defined to bla" do
@@ -153,7 +153,7 @@ describe CustomVariable do
         config.delete unless config.nil?
         CustomVariable.create(:variable=>:redirect_email, :value=>"bla")
 
-        CustomVariable.redirect_email.should == 'bla'
+        expect(CustomVariable.redirect_email).to eq('bla')
       end
     end
 
@@ -162,7 +162,7 @@ describe CustomVariable do
         config = CustomVariable.find_by_variable(:notification_footer)
         config.delete unless config.nil?
 
-        CustomVariable.notification_footer.should == ''
+        expect(CustomVariable.notification_footer).to eq('')
       end
 
       it "should return 'bla' when it is defined to bla" do
@@ -170,7 +170,7 @@ describe CustomVariable do
         config.delete unless config.nil?
         CustomVariable.create(:variable=>:notification_footer, :value=>"bla")
 
-        CustomVariable.notification_footer.should == 'bla'
+        expect(CustomVariable.notification_footer).to eq('bla')
       end
     end 
   end

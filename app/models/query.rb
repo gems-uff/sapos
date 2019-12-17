@@ -4,11 +4,13 @@
 class Query < ApplicationRecord
 
   has_many :notifications, inverse_of: :query
-  has_many :params, class_name: 'QueryParam', dependent: :destroy
+  has_many :params, class_name: 'QueryParam', dependent: :destroy, validate: false
 
 
   accepts_nested_attributes_for :params, reject_if: :all_blank, allow_destroy: true
 
+  validates :name, :presence => true
+  validates :sql, :presence => true
   validate :ensure_valid_params
   validates_associated :params
 
@@ -68,12 +70,15 @@ class Query < ApplicationRecord
 
 
   def ensure_valid_params
+    return if (sql.nil? || sql.strip.empty?)	  
     begin
       self.execute
     rescue ActiveRecord::PreparedStatementInvalid => e
       variable_name = e.message.match(/missing value for :([a-zA-Z0-9_]+)/)[1]
 
-      self.errors.add(:base, "O parametro #{variable_name} foi usado na query mas nao foi definido.")
+      self.errors.add(:sql, I18n.translate("activerecord.errors.models.query.sql_has_an_undefined_parameter", :parametro => variable_name))
+    rescue Exception => e
+      self.errors.add(:sql, I18n.translate("activerecord.errors.models.query.sql_execution_generated_an_error", :erro => e.message))
     end
   end
 

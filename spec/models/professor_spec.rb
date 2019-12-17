@@ -19,13 +19,13 @@ describe Professor do
       context "should be valid when" do
         it "cpf is not null and is not taken" do
           professor.cpf = "Professor cpf"
-          professor.should have(0).errors_on :cpf
+          expect(professor).to have(0).errors_on :cpf
         end
       end
       context "should have error blank when" do
         it "cpf is null" do
           professor.cpf = nil
-          professor.should have_error(:blank).on :cpf
+          expect(professor).to have_error(:blank).on :cpf
         end
       end
       context "should have error taken when" do
@@ -33,7 +33,7 @@ describe Professor do
           cpf = "Professor cpf"
           FactoryGirl.create(:professor, :cpf => cpf)
           professor.cpf = cpf
-          professor.should have_error(:taken).on :cpf
+          expect(professor).to have_error(:taken).on :cpf
         end
       end
     end
@@ -41,13 +41,13 @@ describe Professor do
       context "should be valid when" do
         it "name is not null and is not taken" do
           professor.name = "Professor name"
-          professor.should have(0).errors_on :name
+          expect(professor).to have(0).errors_on :name
         end
       end
       context "should have error blank when" do
         it "name is null" do
           professor.name = nil
-          professor.should have_error(:blank).on :name
+          expect(professor).to have_error(:blank).on :name
         end
       end
     end
@@ -55,18 +55,18 @@ describe Professor do
       context "should be valid when" do
         it "email is null" do
           professor.email = nil
-          professor.should have(0).errors_on :email
+          expect(professor).to have(0).errors_on :email
         end
         it "email is not null and not taken" do
           professor.email = "professor@sapos.com"
-          professor.should have(0).errors_on :email
+          expect(professor).to have(0).errors_on :email
         end
       end
       context "should have error taken when" do
         it "email is already in use" do
           other_professor = FactoryGirl.create(:professor, :email => "professor@sapos.com")
           professor.email = other_professor.email
-          professor.should have_error(:taken).on :email
+          expect(professor).to have_error(:taken).on :email
         end
       end
     end
@@ -74,18 +74,18 @@ describe Professor do
       context "should be valid when" do
         it "enrollment_number is null" do
           professor.enrollment_number = nil
-          professor.should have(0).errors_on :enrollment_number
+          expect(professor).to have(0).errors_on :enrollment_number
         end
         it "enrollment_number is not null and not taken" do
           professor.enrollment_number = "Professor Enrollment Number"
-          professor.should have(0).errors_on :enrollment_number
+          expect(professor).to have(0).errors_on :enrollment_number
         end
       end
       context "should have error taken when" do
         it "enrollment_number is already in use" do
           other_professor = FactoryGirl.create(:professor, :enrollment_number => "Enrollment number")
           professor.enrollment_number = other_professor.enrollment_number
-          professor.should have_error(:taken).on :enrollment_number
+          expect(professor).to have_error(:taken).on :enrollment_number
         end
       end
     end
@@ -93,7 +93,7 @@ describe Professor do
   describe "Methods" do
     describe "advisement_points" do
       it "should return 0 if the professor has no advisement_authorizations" do
-        professor.advisement_points.should eql("0.0")
+        expect(professor.advisement_points).to eql("0.0")
       end
       it "should return the spected number if the professor has advisement_authorizations (default)" do
         professor = FactoryGirl.create(:professor)
@@ -109,7 +109,7 @@ describe Professor do
 
         FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => other_enrollment, :main_advisor => false)
 
-        professor.advisement_points.should eql("1.5")
+        expect(professor.advisement_points).to eql("1.5")
       end
 
       it "should return the spected number if the professor has advisement_authorizations and the points are changed" do
@@ -133,14 +133,14 @@ describe Professor do
 
         FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => other_enrollment, :main_advisor => false)
 
-        professor.advisement_points.should eql("3.0")
+        expect(professor.advisement_points).to eql("3.0")
       end
     end
     describe "advisement_point" do
       context "should return 0 when" do
         it "the professor has no advisement_authorizations" do
           enrollment = FactoryGirl.create(:enrollment)
-          professor.advisement_point(enrollment).should eql(0.0)
+          expect(professor.advisement_point(enrollment)).to eql(0.0)
         end
         it "the enrollment is not advised by the professor" do
           professor = FactoryGirl.create(:professor)
@@ -150,7 +150,7 @@ describe Professor do
           FactoryGirl.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
           FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => enrollment)
 
-          professor.advisement_point(enrollment).should eql(0.0)
+          expect(professor.advisement_point(enrollment)).to eql(0.0)
         end
         it "the enrollment have a dismissal" do
           professor = FactoryGirl.create(:professor)
@@ -159,7 +159,7 @@ describe Professor do
           FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
           FactoryGirl.create(:dismissal, :enrollment => enrollment)
 
-          professor.advisement_point(enrollment).should eql(0.0)
+          expect(professor.advisement_point(enrollment)).to eql(0.0)
         end
       end
       it "should return 1 when the professor is the only authorized advisor (default)" do
@@ -173,7 +173,7 @@ describe Professor do
         FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
         FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
 
-        professor.advisement_point(enrollment).should eql(1.0)
+        expect(professor.advisement_point(enrollment)).to eql(1.0)
       end
 
       it "should return the configured value when the professor is the only authorized advisor" do
@@ -190,7 +190,7 @@ describe Professor do
         FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
         FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
 
-        professor.advisement_point(enrollment).should eql(2.0)
+        expect(professor.advisement_point(enrollment)).to eql(2.0)
       end      
 
       it "should return 0.5 when the professor is not the only authorized advisor (default)" do
@@ -204,7 +204,7 @@ describe Professor do
         FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
         FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
 
-        professor.advisement_point(enrollment).should eql(0.5)
+        expect(professor.advisement_point(enrollment)).to eql(0.5)
       end
 
       it "should return the configured value when the professor is not the only authorized advisor" do
@@ -222,7 +222,7 @@ describe Professor do
         FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
         FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
 
-        professor.advisement_point(enrollment).should eql(1.0)
+        expect(professor.advisement_point(enrollment)).to eql(1.0)
       end
     end
   end

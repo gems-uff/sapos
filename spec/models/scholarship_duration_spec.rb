@@ -14,7 +14,7 @@ describe ScholarshipDuration do
       context "should be valid when" do
         it "scholarship is not null" do
           scholarship_duration.scholarship = Scholarship.new
-          scholarship_duration.should have(0).errors_on :scholarship
+          expect(scholarship_duration).to have(0).errors_on :scholarship
         end
       end
     end
@@ -23,7 +23,7 @@ describe ScholarshipDuration do
         it "enrollment is not null and scholarship is not with another student" do
           scholarship_duration.scholarship = FactoryGirl.create(:scholarship)
           scholarship_duration.enrollment = Enrollment.new
-          scholarship_duration.should have(0).errors_on :enrollment
+          expect(scholarship_duration).to have(0).errors_on :enrollment
         end
       end
       context "should have error taken when" do
@@ -37,7 +37,7 @@ describe ScholarshipDuration do
           scholarship_duration.start_date = start_date
           scholarship_duration.end_date = end_date
 
-          scholarship_duration.should have_error(:enrollment_and_scholarship_uniqueness).on :enrollment_id
+          expect(scholarship_duration).to have_error(:enrollment_and_scholarship_uniqueness).on :enrollment_id
         end
       end
     end
@@ -50,7 +50,7 @@ describe ScholarshipDuration do
           scholarship_duration.scholarship = scholarship
           scholarship_duration.start_date = start_date + 1.day
           scholarship_duration.end_date = end_date
-          scholarship_duration.should have(0).errors_on :start_date
+          expect(scholarship_duration).to have(0).errors_on :start_date
         end
         it "is before scholarship end date" do
           enrollment = FactoryGirl.create(:enrollment)
@@ -59,7 +59,7 @@ describe ScholarshipDuration do
           scholarship_duration.scholarship = scholarship
           scholarship_duration.start_date = end_date - 2.day
           scholarship_duration.end_date = end_date - 1.day
-          scholarship_duration.should have(0).errors_on :start_date
+          expect(scholarship_duration).to have(0).errors_on :start_date
         end
       end
     end
@@ -73,7 +73,7 @@ describe ScholarshipDuration do
           scholarship_duration.start_date = scholarship.start_date
           scholarship_duration.end_date = scholarship.end_date + 1.day
           scholarship_duration.cancel_date = scholarship.end_date
-          scholarship_duration.should have(0).errors_on :end_date
+          expect(scholarship_duration).to have(0).errors_on :end_date
         end
       end
     end
@@ -88,7 +88,7 @@ describe ScholarshipDuration do
           scholarship_duration.start_date = end_date
           scholarship_duration.end_date = end_date + 5.days
           scholarship_duration.enrollment = enrollment
-          scholarship_duration.should have_error(:start_date_before_scholarship_end_date).on :start_date
+          expect(scholarship_duration).to have_error(:start_date_before_scholarship_end_date).on :start_date
         end
 
         it "has an old scholarship that was canceled after the new scholarship starts" do
@@ -100,7 +100,7 @@ describe ScholarshipDuration do
           scholarship_duration.start_date = end_date
           scholarship_duration.end_date = end_date + 5.days
           scholarship_duration.enrollment = enrollment
-          scholarship_duration.should have_error(:start_date_before_scholarship_cancel_date).on :start_date
+          expect(scholarship_duration).to have_error(:start_date_before_scholarship_cancel_date).on :start_date
         end
         it "has an new scholarship that starts before the scholarship ends" do
           enrollment = FactoryGirl.create(:enrollment)
@@ -111,7 +111,7 @@ describe ScholarshipDuration do
           scholarship_duration.start_date = start_date
           scholarship_duration.end_date = end_date + 1.day
           scholarship_duration.enrollment = enrollment
-          scholarship_duration.should have_error(:scholarship_start_date_after_end_or_cancel_date).on :end_date
+          expect(scholarship_duration).to have_error(:scholarship_start_date_after_end_or_cancel_date).on :end_date
         end
 
         it "has an new scholarship that is canceled before the scholarship ends" do
@@ -124,7 +124,7 @@ describe ScholarshipDuration do
           scholarship_duration.end_date = end_date + 2.days
           scholarship_duration.cancel_date = end_date + 1.day
           scholarship_duration.enrollment = enrollment
-          scholarship_duration.should have_error(:scholarship_start_date_after_end_or_cancel_date).on :cancel_date
+          expect(scholarship_duration).to have_error(:scholarship_start_date_after_end_or_cancel_date).on :cancel_date
         end
 
       end
@@ -143,7 +143,7 @@ describe ScholarshipDuration do
           scholarship_duration.start_date = end_date
           scholarship_duration.end_date = end_date + 5.days
           scholarship_duration.enrollment = enrollment
-          scholarship_duration.student_has_other_scholarship_duration.should be_truthy
+          expect(scholarship_duration.student_has_other_scholarship_duration).to be_truthy
         end
         it "has an old scholarship that was canceled after the new scholarship starts" do
           enrollment = FactoryGirl.create(:enrollment)
@@ -154,7 +154,7 @@ describe ScholarshipDuration do
           scholarship_duration.start_date = end_date
           scholarship_duration.end_date = end_date + 5.days
           scholarship_duration.enrollment = enrollment
-          scholarship_duration.student_has_other_scholarship_duration.should be_truthy
+          expect(scholarship_duration.student_has_other_scholarship_duration).to be_truthy
         end
         it "has an new scholarship that starts before the scholarship ends" do
           enrollment = FactoryGirl.create(:enrollment)
@@ -165,7 +165,7 @@ describe ScholarshipDuration do
           scholarship_duration.start_date = start_date
           scholarship_duration.end_date = end_date + 1.day
           scholarship_duration.enrollment = enrollment
-          scholarship_duration.student_has_other_scholarship_duration.should be_truthy
+          expect(scholarship_duration.student_has_other_scholarship_duration).to be_truthy
         end
 
         it "has an new scholarship that is canceled before the scholarship ends" do
@@ -178,7 +178,7 @@ describe ScholarshipDuration do
           scholarship_duration.end_date = end_date + 2.days
           scholarship_duration.cancel_date = end_date + 1.day
           scholarship_duration.enrollment = enrollment
-          scholarship_duration.student_has_other_scholarship_duration.should be_truthy
+          expect(scholarship_duration.student_has_other_scholarship_duration).to be_truthy
         end
       end
     end
@@ -186,7 +186,7 @@ describe ScholarshipDuration do
       it "should return the expected string" do
         scholarship_duration.start_date = start_date
         scholarship_duration.end_date = end_date
-        scholarship_duration.to_label.should eql("#{I18n.localize(start_date, :format => :monthyear)} - #{I18n.localize(end_date, :format => :monthyear)}")
+        expect(scholarship_duration.to_label).to eql("#{I18n.localize(start_date, :format => :monthyear)} - #{I18n.localize(end_date, :format => :monthyear)}")
       end
     end
 
@@ -201,7 +201,7 @@ describe ScholarshipDuration do
         scholarship_duration.end_date = end_date + 5.days
         #scholarship_duration.cancel_date = end_date + 1.day
         scholarship_duration.enrollment = enrollment
-        scholarship_duration.warning_message.should be_nil
+        expect(scholarship_duration.warning_message).to be_nil
       end
 
       it "should return unfinished scholarship warning when there is an unfinished scholarship" do
@@ -214,7 +214,7 @@ describe ScholarshipDuration do
         scholarship_duration.end_date = end_date + 5.days
         #scholarship_duration.cancel_date = end_date + 1.day
         scholarship_duration.enrollment = enrollment
-        scholarship_duration.warning_message.should == I18n.t("activerecord.errors.models.scholarship_duration.unfinished_scholarship")
+        expect(scholarship_duration.warning_message).to  eq(I18n.t("activerecord.errors.models.scholarship_duration.unfinished_scholarship"))
       end
     end
 
@@ -226,12 +226,12 @@ describe ScholarshipDuration do
 
       it 'should return end_date.end_of_month if there is no cancel_date' do
         scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => nil, :scholarship => @scholarship)
-        scholarship_duration.last_date.should == (end_date + 2.months).end_of_month
+        expect(scholarship_duration.last_date).to eq((end_date + 2.months).end_of_month)
       end
 
       it 'should return cancel_date.end_of_month if there is a cancel_date' do
         scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 1.months, :scholarship => @scholarship)
-        scholarship_duration.last_date.should == (end_date + 1.months).end_of_month
+        expect(scholarship_duration.last_date).to eq((end_date + 1.months).end_of_month)
       end
     end
 
@@ -242,17 +242,17 @@ describe ScholarshipDuration do
 
       it 'should return false if there is no cancel_date' do
         scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => nil, :scholarship => @scholarship)
-        scholarship_duration.was_cancelled?.should == false
+        expect(scholarship_duration.was_cancelled?).to eq(false)
       end
 
       it 'should return false if cancel_date == end_date' do
         scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 2.months, :scholarship => @scholarship)
-        scholarship_duration.was_cancelled?.should == false
+        expect(scholarship_duration.was_cancelled?).to eq(false)
       end
 
       it 'should return true if cancel_date != end_date' do
         scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 1.months, :scholarship => @scholarship)
-        scholarship_duration.was_cancelled?.should == true
+        expect(scholarship_duration.was_cancelled?).to eq(true)
       end      
     end
     describe 'active?' do
@@ -262,23 +262,23 @@ describe ScholarshipDuration do
 
       it 'should return false if date is after end_date' do
         scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => nil, :scholarship => @scholarship)
-        scholarship_duration.active?(:date => end_date + 4.months).should == false
+        expect(scholarship_duration.active?(:date => end_date + 4.months)).to eq(false)
       end
 
       it 'should return false if date is in the month of cancel_date' do
         scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 2.months, :scholarship => @scholarship)
-        scholarship_duration.active?(:date => scholarship_duration.cancel_date - 1.day).should == false
+        expect(scholarship_duration.active?(:date => scholarship_duration.cancel_date - 1.day)).to eq(false)
       end
 
       it 'should return false if date < start_date' do
         scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 2.months, :scholarship => @scholarship)
-        scholarship_duration.active?(:date => end_date - 1.month).should == false
+        expect(scholarship_duration.active?(:date => end_date - 1.month)).to eq(false)
       end
 
 
       it 'should return true if date < cancel_date' do
         scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => end_date, :end_date => end_date + 2.months, :cancel_date => end_date + 1.months, :scholarship => @scholarship)
-        scholarship_duration.active?(:date => end_date.end_of_month).should == true
+        expect(scholarship_duration.active?(:date => end_date.end_of_month)).to eq(true)
       end      
     end
   end

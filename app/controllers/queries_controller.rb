@@ -5,7 +5,7 @@ class QueriesController < ApplicationController
   authorize_resource
 
   active_scaffold :query do |config|
-
+    config.create.label = :create_query_label
     config.action_links.add 'execute',
       :label => "<i title='#{I18n.t('active_scaffold.query.execute')}' class='fa fa-table'></i>".html_safe,
       :page => true,

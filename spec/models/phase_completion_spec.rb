@@ -11,13 +11,13 @@ describe PhaseCompletion do
       context "should be valid when" do
         it "enrollment_id is not null" do
           phase_completion.enrollment_id = 1
-          phase_completion.should have(0).errors_on :enrollment_id
+          expect(phase_completion).to have(0).errors_on :enrollment_id
         end
       end
       context "should have error blank when" do
         it "enrollment_id is null" do
           phase_completion.enrollment_id = nil
-          phase_completion.should have_error(:blank).on :enrollment_id
+          expect(phase_completion).to have_error(:blank).on :enrollment_id
         end
       end
     end
@@ -26,13 +26,13 @@ describe PhaseCompletion do
         it "phase_id is not null" do
           PhaseCompletion.destroy_all
           phase_completion.phase_id = 1
-          phase_completion.should have(0).errors_on :phase_id
+          expect(phase_completion).to have(0).errors_on :phase_id
         end
       end
       context "should have error blank when" do
         it "phase_id is null" do
           phase_completion.phase_id = nil
-          phase_completion.should have_error(:blank).on :phase_id
+          expect(phase_completion).to have_error(:blank).on :phase_id
         end
       end
     end
@@ -43,7 +43,7 @@ describe PhaseCompletion do
           PhaseCompletion.destroy_all
           phase_completion.phase_id = 1
           phase_completion.enrollment_id = 1
-          phase_completion.should have(0).errors_on :phase_id
+          expect(phase_completion).to have(0).errors_on :phase_id
         end
       end
       context "should have error taken when" do
@@ -53,7 +53,7 @@ describe PhaseCompletion do
           
           phase_completion.phase_id = 1
           phase_completion.enrollment_id = 1
-          phase_completion.should have_error(:taken).on :phase_id
+          expect(phase_completion).to have_error(:taken).on :phase_id
         end
       end
     end

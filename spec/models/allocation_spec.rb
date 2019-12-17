@@ -11,13 +11,13 @@ describe Allocation do
       context "should be valid when" do
         it "course_class is not null" do
           allocation.course_class = CourseClass.new
-          allocation.should have(0).errors_on :course_class
+          expect(allocation).to have(0).errors_on :course_class
         end
       end
       context "should have error blank when" do
         it "course_class is null" do
           allocation.course_class = nil
-          allocation.should have_error(:blank).on :course_class
+          expect(allocation).to have_error(:blank).on :course_class
         end
       end
     end
@@ -25,25 +25,25 @@ describe Allocation do
       context "should be valid when" do
         it "start_time is not null" do
           allocation.start_time = Time.now.hour
-          allocation.should have(0).errors_on :start_time
+          expect(allocation).to have(0).errors_on :start_time
         end
       end
       context "should have error blank when" do
         it "start_time is null" do
           allocation.start_time = nil
-          allocation.should have_error(:blank).on :start_time
+          expect(allocation).to have_error(:blank).on :start_time
         end
       end
       context "should have error less_than_or_equal_to when" do
         it "start_time is greater than 23" do
           allocation.start_time = 24
-          allocation.should have_error(:less_than_or_equal_to).with_parameter(:count, 23).on :start_time
+          expect(allocation).to have_error(:less_than_or_equal_to).with_parameter(:count, 23).on :start_time
         end
       end
       context "should have error greater_than_or_equal_to when" do
         it "start_time is less than 0" do
           allocation.start_time = -1
-          allocation.should have_error(:greater_than_or_equal_to).with_parameter(:count, 0).on :start_time
+          expect(allocation).to have_error(:greater_than_or_equal_to).with_parameter(:count, 0).on :start_time
         end
       end
     end
@@ -51,19 +51,19 @@ describe Allocation do
       context "should be valid when" do
         it "day is in the list" do
           allocation.day = I18n.translate("date.day_names").first
-          allocation.should have(0).errors_on :day
+          expect(allocation).to have(0).errors_on :day
         end
       end
       context "should have error blank when" do
         it "day is null" do
           allocation.day = nil
-          allocation.should have_error(:blank).on :day
+          expect(allocation).to have_error(:blank).on :day
         end
       end
       context "should have error inclusion when" do
         it "day is not in the list" do
           allocation.day = "ANYTHING NOT IN THE LIST"
-          allocation.should have_error(:inclusion).on :day
+          expect(allocation).to have_error(:inclusion).on :day
         end
       end
     end
@@ -71,25 +71,25 @@ describe Allocation do
       context "should be valid when" do
         it "end_time is not null" do
           allocation.end_time = Time.now.hour
-          allocation.should have(0).errors_on :end_time
+          expect(allocation).to have(0).errors_on :end_time
         end
       end
       context "should have error blank when" do
         it "end_time is null" do
           allocation.end_time = nil
-          allocation.should have_error(:blank).on :end_time
+          expect(allocation).to have_error(:blank).on :end_time
         end
       end
       context "should have error less_than_or_equal_to when" do
         it "end_time is greater than 23" do
           allocation.end_time = 24
-          allocation.should have_error(:less_than_or_equal_to).with_parameter(:count, 23).on :end_time
+          expect(allocation).to have_error(:less_than_or_equal_to).with_parameter(:count, 23).on :end_time
         end
       end
       context "should have error greater_than_or_equal_to when" do
         it "end_time is less than 0" do
           allocation.end_time = -1
-          allocation.should have_error(:greater_than_or_equal_to).with_parameter(:count, 0).on :end_time
+          expect(allocation).to have_error(:greater_than_or_equal_to).with_parameter(:count, 0).on :end_time
         end
       end
     end
@@ -98,14 +98,14 @@ describe Allocation do
         it "end_time is greater_than_start_time" do
           allocation.start_time = (Time.now.at_beginning_of_day + 10.hours).hour
           allocation.end_time = (Time.now.at_beginning_of_day + 12.hours).hour
-          allocation.should have(0).errors_on :start_time
+          expect(allocation).to have(0).errors_on :start_time
         end
       end
       context "should have error end_time_before_start_time when" do
         it "start_time is greater_than_end_time" do
           allocation.end_time = (Time.now.at_beginning_of_day + 10.hours).hour
           allocation.start_time = (Time.now.at_beginning_of_day + 12.hours).hour
-          allocation.should have_error(:end_time_before_start_time).on :start_time
+          expect(allocation).to have_error(:end_time_before_start_time).on :start_time
         end
       end
     end
@@ -117,8 +117,8 @@ describe Allocation do
           allocation.end_time = (Time.now.at_beginning_of_day + 9.hours).hour
           allocation.course_class = other_allocation.course_class
           allocation.day = other_allocation.day
-          allocation.should have(0).errors_on :start_time
-          allocation.should have(0).errors_on :end_time
+          expect(allocation).to have(0).errors_on :start_time
+          expect(allocation).to have(0).errors_on :end_time
         end
       end
       context "should have error scheduling_conflict when" do
@@ -128,8 +128,8 @@ describe Allocation do
           allocation.end_time = (Time.now.at_beginning_of_day + 13.hours).hour
           allocation.course_class = other_allocation.course_class
           allocation.day = other_allocation.day
-          allocation.should have_error(:scheduling_conflict).on :start_time
-          allocation.should have(0).errors_on :end_time
+          expect(allocation).to have_error(:scheduling_conflict).on :start_time
+          expect(allocation).to have(0).errors_on :end_time
         end
         it "end_time between another allocation's start_time and end_time" do
           other_allocation = FactoryGirl.create(:allocation, :start_time => (Time.now.at_beginning_of_day + 10.hours).hour, :end_time => (Time.now.at_beginning_of_day + 12.hours).hour)
@@ -137,8 +137,8 @@ describe Allocation do
           allocation.end_time = (Time.now.at_beginning_of_day + 11.hours).hour
           allocation.course_class = other_allocation.course_class
           allocation.day = other_allocation.day
-          allocation.should have_error(:scheduling_conflict).on :end_time
-          allocation.should have(0).errors_on :start_time
+          expect(allocation).to have_error(:scheduling_conflict).on :end_time
+          expect(allocation).to have(0).errors_on :start_time
         end
       end
     end

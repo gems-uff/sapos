@@ -19,13 +19,13 @@ describe Level do
       context "should be valid when" do
         it "name is not null and is not taken" do
           level.name = "Level name"
-          level.should have(0).errors_on :name
+          expect(level).to have(0).errors_on :name
         end
       end
       context "should have error blank when" do
         it "name is null" do
           level.name = nil
-          level.should have_error(:blank).on :name
+          expect(level).to have_error(:blank).on :name
         end
       end
       context "should have error taken when" do
@@ -33,7 +33,7 @@ describe Level do
           name = "Level name"
           FactoryGirl.create(:level, :name => name)
           level.name = name
-          level.should have_error(:taken).on :name
+          expect(level).to have_error(:taken).on :name
         end
       end
     end
@@ -41,13 +41,13 @@ describe Level do
       context "should be valid when" do
         it "default_duration is not null" do
           level.default_duration = 48
-          level.should have(0).errors_on :default_duration
+          expect(level).to have(0).errors_on :default_duration
         end
       end
       context "should have error blank when" do
         it "default_duration is null" do
           level.default_duration = nil
-          level.should have_error(:blank).on :default_duration
+          expect(level).to have_error(:blank).on :default_duration
         end
       end
     end

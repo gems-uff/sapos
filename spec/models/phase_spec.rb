@@ -16,13 +16,13 @@ describe Phase do
       context "should be valid when" do
         it "name is not null and is not taken" do
           phase.name = "Phase name"
-          phase.should have(0).errors_on :name
+          expect(phase).to have(0).errors_on :name
         end
       end
       context "should have error blank when" do
         it "name is null" do
           phase.name = nil
-          phase.should have_error(:blank).on :name
+          expect(phase).to have_error(:blank).on :name
         end
       end
       context "should have error taken when" do
@@ -30,7 +30,7 @@ describe Phase do
           name = "Phase name"
           FactoryGirl.create(:phase, :name => name)
           phase.name = name
-          phase.should have_error(:taken).on :name
+          expect(phase).to have_error(:taken).on :name
         end
       end
     end
@@ -44,7 +44,7 @@ describe Phase do
         FactoryGirl.create(:phase)
         
         phases = Phase.where(Phase::find_all_for_enrollment(nil))
-        phases.count.should == Phase.count
+        expect(phases.count).to eq(Phase.count)
       end
 
       it "should return phases that have the same level as the enrollment" do
@@ -63,7 +63,7 @@ describe Phase do
         enrollment = FactoryGirl.create(:enrollment, :level => level1) 
         
         phases = Phase.where(Phase::find_all_for_enrollment(enrollment))
-        phases.count.should == 2
+        expect(phases.count).to eq(2)
       end
     end
   end

@@ -5,6 +5,7 @@
 class EnrollmentHoldsController < ApplicationController
   authorize_resource
   active_scaffold :"enrollment_hold" do |config|
+    config.create.label = :create_enrollment_hold_label
   	config.columns = [:enrollment, :year, :semester, :number_of_semesters, :active]
   	config.actions.swap :search, :field_search
     config.field_search.columns = [:enrollment, :active]

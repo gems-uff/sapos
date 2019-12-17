@@ -14,20 +14,20 @@ describe User do
       context "should be valid when" do
         it "email is not null" do
           user.email = "Username"
-          user.should have(0).errors_on :email
+          expect(user).to have(0).errors_on :email
         end
       end
       context "should have error blank when" do
         it "email is null" do
           user.email = nil
-          user.should have_error(:blank).on :email
+          expect(user).to have_error(:blank).on :email
         end
       end
       context "should have error taken when" do
         it "email is already in use" do
           FactoryGirl.create(:user, :email => 'email@sapos.com')
           user.email = 'email@sapos.com'
-          user.should have_error(:taken).on :email
+          expect(user).to have_error(:taken).on :email
         end
       end
     end
@@ -35,13 +35,13 @@ describe User do
       context "should be valid when" do
         it "name is not null and is unique" do
           user.name = "Username"
-          user.should have(0).errors_on :name
+          expect(user).to have(0).errors_on :name
         end
       end
       context "should have error blank when" do
         it "name is null" do
           user.name = nil
-          user.should have_error(:blank).on :name
+          expect(user).to have_error(:blank).on :name
         end
       end
       context "should have error taken when" do
@@ -49,7 +49,7 @@ describe User do
           name = "Username"
           FactoryGirl.create(:user, :name => name)
           user.name = name
-          user.should have_error(:taken).on :name
+          expect(user).to have_error(:taken).on :name
         end
       end
     end
@@ -57,13 +57,13 @@ describe User do
       context "should be valid when" do
         it "role is not null" do
           user.role = FactoryGirl.create(:role)
-          user.should have(0).errors_on :role
+          expect(user).to have(0).errors_on :role
         end
       end
       context "should have error blank when" do
         it "role is null" do
           user.role = nil
-          user.should have_error(:blank).on :role
+          expect(user).to have_error(:blank).on :role
         end
       end
     end

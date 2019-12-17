@@ -15,13 +15,13 @@ describe CourseClass do
       context "should be valid when" do
         it "course is not null" do
           course_class.course = Course.new
-          course_class.should have(0).errors_on :course
+          expect(course_class).to have(0).errors_on :course
         end
       end
       context "should have error blank when" do
         it "course is null" do
           course_class.course = nil
-          course_class.should have_error(:blank).on :course
+          expect(course_class).to have_error(:blank).on :course
         end
       end
     end
@@ -29,13 +29,13 @@ describe CourseClass do
       context "should be valid when" do
         it "professor is not null" do
           course_class.professor = Professor.new
-          course_class.should have(0).errors_on :professor
+          expect(course_class).to have(0).errors_on :professor
         end
       end
       context "should have error blank when" do
         it "professor is null" do
           course_class.professor = nil
-          course_class.should have_error(:blank).on :professor
+          expect(course_class).to have_error(:blank).on :professor
         end
       end
     end
@@ -43,13 +43,13 @@ describe CourseClass do
       context "should be valid when" do
         it "year is not null" do
           course_class.year = 2013
-          course_class.should have(0).errors_on :year
+          expect(course_class).to have(0).errors_on :year
         end
       end
       context "should have error blank when" do
         it "year is null" do
           course_class.year = nil
-          course_class.should have_error(:blank).on :year
+          expect(course_class).to have_error(:blank).on :year
         end
       end
     end
@@ -57,19 +57,19 @@ describe CourseClass do
       context "should be valid when" do
         it "semester is not null" do
           course_class.semester = CourseClass::SEMESTERS.first
-          course_class.should have(0).errors_on :semester
+          expect(course_class).to have(0).errors_on :semester
         end
       end
       context "should have error blank when" do
         it "semester is null" do
           course_class.semester = nil
-          course_class.should have_error(:blank).on :semester
+          expect(course_class).to have_error(:blank).on :semester
         end
       end
       context "should have error inclusion when" do
         it "semester is not in the list" do
           course_class.semester = 3
-          course_class.should have_error(:inclusion).on :semester
+          expect(course_class).to have_error(:inclusion).on :semester
         end
       end
     end
@@ -85,7 +85,7 @@ describe CourseClass do
           course_class.semester = CourseClass::SEMESTERS.first
           course_class.course = Course.new(:name => other_name)
           course_class.course.course_type = FactoryGirl.create(:course_type, :show_class_name => true)
-          course_class.to_label.should eql("#{other_name} (#{name}) - #{course_class.year}/#{course_class.semester}")
+          expect(course_class.to_label).to eql("#{other_name} (#{name}) - #{course_class.year}/#{course_class.semester}")
         end
         it "name is not null and course type doesnt show class name" do
           name = "name"
@@ -95,7 +95,7 @@ describe CourseClass do
           course_class.semester = CourseClass::SEMESTERS.first
           course_class.course = Course.new(:name => other_name)
           course_class.course.course_type = FactoryGirl.create(:course_type, :show_class_name => false)
-          course_class.to_label.should eql("#{other_name} - #{course_class.year}/#{course_class.semester}")
+          expect(course_class.to_label).to eql("#{other_name} - #{course_class.year}/#{course_class.semester}")
         end
         it "name is null" do
           course_name = "course_name"
@@ -103,7 +103,7 @@ describe CourseClass do
           course_class.semester = CourseClass::SEMESTERS.first
           course_class.course = Course.new(:name => course_name)
           course_class.course.course_type = FactoryGirl.create(:course_type, :show_class_name => true)
-          course_class.to_label.should eql("#{course_name} - #{course_class.year}/#{course_class.semester}")
+          expect(course_class.to_label).to eql("#{course_name} - #{course_class.year}/#{course_class.semester}")
         end
       end
     end
