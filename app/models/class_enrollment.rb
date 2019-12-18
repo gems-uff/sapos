@@ -19,7 +19,7 @@ class ClassEnrollment < ApplicationRecord
   validate :grade_for_situation
   validate :disapproved_by_absence_for_situation
   validate :check_multiple_class_enrollment_allowed
-  validate :professor_changed_only_valid_fields, if: -> {current_user.role_id == Role::ROLE_PROFESSOR}
+  validate :professor_changed_only_valid_fields, if: -> {current_user && (current_user.role_id == Role::ROLE_PROFESSOR)}
 
   after_save :notify_student_and_advisor
 

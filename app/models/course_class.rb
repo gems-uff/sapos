@@ -19,7 +19,7 @@ class CourseClass < ApplicationRecord
   validates :professor, :presence => true
   validates :year, :presence => true
   validates :semester, :presence => true, :inclusion => {:in => SEMESTERS}
-  validate :professor_changed_only_valid_fields, if: -> {current_user.role_id == Role::ROLE_PROFESSOR}
+  validate :professor_changed_only_valid_fields, if: -> {current_user && (current_user.role_id == Role::ROLE_PROFESSOR)}
 
   attr_reader :changed_from_course_class
   before_save :set_changed_from_course_class
