@@ -86,8 +86,8 @@ class ClassEnrollment < ApplicationRecord
   def should_send_email_to_professor?
     (!self.id.nil?) and 
     (
-      self.will_save_change_to_grade? or 
-      self.will_save_change_to_situation? or 
+      self.will_save_change_to_grade? or
+      self.will_save_change_to_situation? or
       self.will_save_change_to_disapproved_by_absence?
     )
   end
