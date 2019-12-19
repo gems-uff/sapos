@@ -190,7 +190,7 @@ GEM
       prawn (>= 0.11.1)
       railties (>= 3.0.0)
     racc (1.4.12)
-    rack (2.0.6)
+    rack (2.0.8)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (5.1.6.2)
