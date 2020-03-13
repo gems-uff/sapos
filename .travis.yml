@@ -11,10 +11,6 @@ before_script:
   - chmod +x ./cc-test-reporter
   - ./cc-test-reporter before-build
 script:
-  - echo "Role.all" | bundle exec rails c
-  - bundle exec rspec spec/models/user_spec.rb    
-    #  - bundle exec rake spec 
+  - bundle exec rake spec 
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
-    #  - ls
-    #  - echo "Role.all" | bundle exec rails c  
