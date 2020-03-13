@@ -16,7 +16,7 @@ FactoryGirl.define do
       id Role::ROLE_ADMINISTRADOR
       name "Administrador"
       description "Descricao Administrador"
-      initialize_with {Role.where(id: id, name: name).first_or_create}
+      initialize_with {Role.where(id: id).first_or_create(name: name, description: description)}
     end
   end
 end
