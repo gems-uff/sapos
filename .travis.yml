@@ -15,4 +15,4 @@ script:
 after_script:
   - ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
   - ls
-  - echo "Role.all" | rails c  
+  - echo "Role.all" | bundle exec rails c  
