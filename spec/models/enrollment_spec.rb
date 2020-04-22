@@ -154,7 +154,7 @@ describe Enrollment do
 
 
       inactive_enrollment = FactoryGirl.create(:enrollment, :level => level, :admission_date => admission_date)
-      FactoryGirl.create(:dismissal, :enrollment => inactive_enrollment)
+      FactoryGirl.create(:dismissal, :enrollment => inactive_enrollment, :date => (YearSemester.current.semester_begin + 1.month))
 
       one_month_phase = FactoryGirl.create(:phase)
       FactoryGirl.create(:phase_duration, :deadline_days => 0, :deadline_months => 1, :deadline_semesters => 0, :level => level, :phase => one_month_phase)
@@ -184,7 +184,7 @@ describe Enrollment do
     end
     describe "self.with_delayed_phases_on" do
       it "should return the expected enrollments" do
-        result = Enrollment.with_delayed_phases_on(2.months.from_now.to_date, nil)
+        result = Enrollment.with_delayed_phases_on(YearSemester.current.semester_begin + 2.months, nil)
 
         expected_result = [@delayed_enrollment.id, @enrollment_expired_deferral.id].sort
         expect(result.sort).to eql(expected_result.sort)
