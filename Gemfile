@@ -12,7 +12,7 @@ gem 'loofah', '~> 2.3.1'
 gem 'rails-html-sanitizer', '~> 1.0.4'
 gem 'rack', '>= 2.0.6'
 gem 'ffi', '>= 1.9.24'
-gem "nokogiri", "~> 1.10.4"
+gem "nokogiri", "~> 1.10.8"
 gem "actionview", ">= 5.1.6.2"
 
 gem 'rspec-collection_matchers'
