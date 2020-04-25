@@ -40,7 +40,7 @@ module ApplicationHelper
     options[:country] ||= :address_country
     options[:state] ||= :address_state
     options[:city] ||= :city
-    html = ""
+    html = "".html_safe
 
     country_id = options[:selected_country] || read_attribute(options[:country]) 
     state_id = options[:selected_state] || read_attribute(options[:state])
@@ -93,7 +93,7 @@ module ApplicationHelper
     options[:show_text_link] ||= :identity_issuing_place_widget_show_text
 
     country = CustomVariable.identity_issuing_country
-    html = ""
+    html = "".html_safe
     show_text = true
     unless country.nil?
       states = country.state.collect do |s| 
