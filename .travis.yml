@@ -1,10 +1,9 @@
 env:
   global:
-    - CC_TEST_REPORTER_ID = e124d2db428c426bc2e4a984bbc007b5ecf7c0ee2533b687adac0f301048afae
+    - CC_TEST_REPORTER_ID=e124d2db428c426bc2e4a984bbc007b5ecf7c0ee2533b687adac0f301048afae
 language: ruby
 rvm: 2.4
 cache: bundler
-sudo: false
 before_script: 
   - bundle exec rake db:reset
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
