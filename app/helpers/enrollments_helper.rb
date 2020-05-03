@@ -152,7 +152,7 @@ module EnrollmentsHelper
   def level_form_column(record, options)
     if record.dismissal or record.accomplishments.count > 0 or record.deferrals.count > 0
       if record.level
-        return record.level.name
+        return html_escape(record.level.name)
       end
     end
     selected = record.level.nil? ? nil : record.level.id 
