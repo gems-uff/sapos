@@ -93,6 +93,7 @@ group :development, :test do
   gem 'better_errors'
   gem 'spring'
   gem 'byebug'
+  gem 'simplecov', '0.17.1' 
 end
 
 group :production do
