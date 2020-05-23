@@ -69,7 +69,7 @@ gem 'active_scaffold_duplicate', '>= 1.1.0'
 gem 'recordselect'
 
 #Date Validation Plugin
-gem 'validates_timeliness'
+gem 'validates_timeliness', '~> 3.0.14'
 
 # Menu
 gem 'simple-navigation'

@@ -303,14 +303,14 @@ GEM
     thor (1.0.1)
     thread_safe (0.3.6)
     tilt (2.0.10)
-    timeliness (0.4.4)
+    timeliness (0.3.10)
     ttfunk (1.6.2.1)
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     uglifier (4.2.0)
       execjs (>= 0.3.0, < 3)
-    validates_timeliness (4.1.1)
-      timeliness (>= 0.3.10, < 1)
+    validates_timeliness (3.0.15)
+      timeliness (~> 0.3.7)
     warden (1.2.8)
       rack (>= 2.0.6)
     webrick (1.6.0)
@@ -376,7 +376,7 @@ DEPENDENCIES
   sql-parser
   sqlite3
   uglifier
-  validates_timeliness
+  validates_timeliness (~> 3.0.14)
   webrick
 
 RUBY VERSION
