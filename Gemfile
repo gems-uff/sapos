@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 ruby '~> 2.4.0'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.2.4.2'
+gem 'rails', '~> 5.2.4.3'
 
 gem 'rubyzip', '~> 1.3.0'
 gem 'loofah', '~> 2.3.1'
@@ -15,6 +15,9 @@ gem 'ffi', '>= 1.9.24'
 gem "nokogiri", "~> 1.10.8"
 gem "actionview", "~> 5.2.4.2"
 gem "rake", "~> 12.3.3"
+gem 'activestorage', '~> 5.2.4.3'
+gem 'actionpack', '~> 5.2.4.3'
+gem 'activesupport', '~> 5.2.4.3'
 
 gem 'rspec-collection_matchers'
 
