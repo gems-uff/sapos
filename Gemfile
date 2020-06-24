@@ -10,7 +10,7 @@ gem 'rails', '~> 5.2.4.3'
 gem 'rubyzip', '~> 1.3.0'
 gem 'loofah', '~> 2.3.1'
 gem 'rails-html-sanitizer', '~> 1.0.4'
-gem 'rack', '~> 2.0.8'
+gem 'rack', '~> 2.1.4'
 gem 'ffi', '>= 1.9.24'
 gem "nokogiri", "~> 1.10.8"
 gem "actionview", "~> 5.2.4.2"
