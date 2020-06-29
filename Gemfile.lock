@@ -383,7 +383,7 @@ DEPENDENCIES
   webrick
 
 RUBY VERSION
-   ruby 2.4.1p111
+   ruby 2.7.1p83
 
 BUNDLED WITH
    2.1.4
