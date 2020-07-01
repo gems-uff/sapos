@@ -14,9 +14,9 @@
 //= require jquery-ui
 //= require jquery_ujs
 //= require active_scaffold
+//= require codemirror/lib/codemirror
+//= require codemirror/mode/javascript/javascript
 //= require codemirror
-//= require codemirror/modes/sql
-//= require codemirror/modes/xml
 //= require_tree .
 
 
