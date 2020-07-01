@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
   clear_helpers
 
 
-  ActiveScaffold.set_defaults do |config|
+  ActiveScaffold.defaults do |config|
     config.ignore_columns.add [:created_at, :updated_at, :lock_version, :versions]
     config.create.link.label = :create_link
     config.delete.link.label = "<i title='#{I18n.t('active_scaffold.delete_link')}' class='fa fa-trash-o'></i>".html_safe
