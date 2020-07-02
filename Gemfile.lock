@@ -212,7 +212,7 @@ GEM
       railties (>= 3.0.0)
     raabro (1.1.6)
     racc (1.5.0)
-    rack (2.0.9)
+    rack (2.1.4)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (6.0.3.2)
@@ -371,7 +371,7 @@ DEPENDENCIES
   prawn
   prawn-table
   prawn_rails
-  rack (~> 2.0.8)
+  rack (~> 2.1.4)
   rails (~> 6.0.3.2)
   rails-erd
   rails-html-sanitizer
