@@ -2,7 +2,7 @@ env:
   global:
     - CC_TEST_REPORTER_ID=e124d2db428c426bc2e4a984bbc007b5ecf7c0ee2533b687adac0f301048afae
 language: ruby
-rvm: 2.4
+rvm: 2.7
 cache: bundler
 before_script: 
   - bundle exec rake db:reset

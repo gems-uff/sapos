@@ -1,0 +1,11 @@
+{
+  "name": "sapos",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/gems-uff/sapos.git",
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "codemirror": "^5.55.0"
+  }
+}

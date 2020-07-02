@@ -1,23 +1,23 @@
 source 'https://rubygems.org'
 
-# The following line is necessary to allow RVM choosing the correct ruby version. RVM 2.0 will probably be able to interpret the "~>" symbol and we will be able to safely remove the "#ruby=2.4" line.
-#ruby=2.4
-ruby '~> 2.4.0'
+# The following line is necessary to allow RVM choosing the correct ruby version. RVM 2.0 will probably be able to interpret the "~>" symbol and we will be able to safely remove the "#ruby=2.7" line.
+#ruby=2.7
+ruby '~> 2.7.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 5.2.4.3'
+gem 'rails', '~> 6.0.3.2'
 
 gem 'rubyzip', '~> 1.3.0'
 gem 'loofah', '~> 2.3.1'
-gem 'rails-html-sanitizer', '~> 1.0.4'
+gem 'rails-html-sanitizer'
 gem 'rack', '~> 2.0.8'
 gem 'ffi', '>= 1.9.24'
-gem "nokogiri", "~> 1.10.8"
-gem "actionview", "~> 5.2.4.2"
+gem "nokogiri", "~> 1.11.0.rc2"
+gem "actionview", "~> 6.0.3.2"
 gem "rake", "~> 12.3.3"
-gem 'activestorage', '~> 5.2.4.3'
-gem 'actionpack', '~> 5.2.4.3'
-gem 'activesupport', '~> 5.2.4.3'
+gem 'activestorage', '~> 6.0.3.2'
+gem 'actionpack', '~> 6.0.3.2'
+gem 'activesupport', '~> 6.0.3.2'
 
 gem 'rspec-collection_matchers'
 
@@ -79,11 +79,10 @@ gem 'simple-navigation'
 
 # Notification
 gem 'rufus-scheduler'
-gem 'codemirror-rails'
 
 # Image
 gem 'carrierwave', '1.3.1'
-gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave-activerecord.git', :branch => 'rails5'
+gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave-activerecord.git', :branch => 'rails6'
 
 
 group :development, :test do
