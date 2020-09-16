@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 ruby '~> 2.7.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.0.3.2'
+gem 'rails', '~> 6.0.3.3'
 
 gem 'rubyzip', '~> 1.3.0'
 gem 'loofah', '~> 2.3.1'
@@ -13,11 +13,11 @@ gem 'rails-html-sanitizer'
 gem 'rack', '~> 2.1.4'
 gem 'ffi', '>= 1.9.24'
 gem "nokogiri", "~> 1.11.0.rc2"
-gem "actionview", "~> 6.0.3.2"
+gem "actionview"
 gem "rake", "~> 12.3.3"
-gem 'activestorage', '~> 6.0.3.2'
-gem 'actionpack', '~> 6.0.3.2'
-gem 'activesupport', '~> 6.0.3.2'
+gem 'activestorage'
+gem 'actionpack'
+gem 'activesupport'
 
 gem 'rspec-collection_matchers'
 
