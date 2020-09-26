@@ -7,7 +7,7 @@ class NotificationLogsController < ApplicationController
 
   active_scaffold :"notification_log" do |config|
   	config.columns = [:notification_name, :to, :subject, :body, :created_at]
-  	config.show.columns = [:notification_name, :to, :subject, :body, :created_at]
+  	config.show.columns = [:notification_name, :to, :subject, :body, :attachments_file_names, :created_at]
   	config.columns[:notification_name].label = I18n.t('activerecord.attributes.notification_log.notification_name')
   	config.list.sorting = {:created_at => 'DESC'}
   	config.actions.exclude :create, :delete, :update

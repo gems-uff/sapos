@@ -31,6 +31,8 @@ class Notification < ApplicationRecord
   validates_format_of :notification_offset, :with => /\A(\-?\d+[yMwdhms]?)+\z/, :message => :offset_invalid_value
   validates_format_of :query_offset, :with => /\A(\-?\d+[yMwdhms]?)+\z/, :message => :offset_invalid_value
 
+  validate :has_grades_report_pdf_attachment_requirements
+
   validate do
     execution unless self.new_record?
   end
@@ -50,6 +52,18 @@ class Notification < ApplicationRecord
     self.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
   end
   after_create :update_next_execution!
+
+  def has_grades_report_pdf_attachment_requirements
+    if self.has_grades_report_pdf_attachment
+      if ! self.individual
+        errors.add(:has_grades_report_pdf_attachment, :individual_required)
+      end
+
+      if ! self.query.execute(prepare_params_and_derivations({:data_consulta=>Time.zone.now}))[:columns].include?("enrollments_id")
+        errors.add(:has_grades_report_pdf_attachment, :query_with_enrollments_id_alias_column_required)
+      end
+    end
+  end
 
   def query_params_ids
     (self.query.try(:params) || []).collect &:id
@@ -133,7 +147,7 @@ class Notification < ApplicationRecord
 
   def execute(options={})
     notifications = []
-
+    notifications_attachments = {}
     params = prepare_params_and_derivations(options[:override_params] || {})
 
     set_notification_params_values(params)
@@ -148,12 +162,25 @@ class Notification < ApplicationRecord
           bindings.merge!(Hash[result[:columns].zip(raw_result)])
 
           formatter = ERBFormatter.new(bindings)
-          notifications << {
+          
+          attachments = {}
+
+          #add grades_report_pdf attachment if required
+          if self.has_grades_report_pdf_attachment 
+            attachment_file_name = "#{I18n.t('pdf_content.enrollment.grades_report.title')} -  #{Enrollment.find(bindings["enrollments_id"]).student.name}.pdf"
+            attachment_file_contents = bindings["enrollments_id"]
+            attachments[:grades_report_pdf] = {:file_name => attachment_file_name, :file_contents => attachment_file_contents}
+          end
+
+          notification = {
               :notification_id => self.id,
               :to => formatter.format(self.to_template),
               :subject => formatter.format(self.subject_template),
               :body => formatter.format(self.body_template)
           }
+
+          notifications << notification
+          notifications_attachments[notification] = attachments
         end
       else
         unless result[:rows].empty?
@@ -169,7 +196,7 @@ class Notification < ApplicationRecord
       end
       self.update_next_execution! unless options[:skip_update]
     end
-    {:notifications => notifications, :query => result[:query]}
+    {:notifications => notifications, :notifications_attachments => notifications_attachments, :query => result[:query]}
   end
 
   def set_params_for_exhibition(override_params)
