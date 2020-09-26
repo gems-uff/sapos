@@ -45,7 +45,7 @@ module Notifier
     end
 
     messages = notifications[:notifications]
-    messages_attachments = notifications[:notifications_attachments]
+    messages_attachments = notifications[:notifications_attachments] || {}
 
     messages.each do |message|
       options = {}
