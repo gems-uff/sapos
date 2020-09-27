@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
-# The following line is necessary to allow RVM choosing the correct ruby version. RVM 2.0 will probably be able to interpret the "~>" symbol and we will be able to safely remove the "#ruby=2.7" line.
-#ruby=2.7
+# The following line is necessary to allow RVM choosing the correct ruby version. RVM 2.0 will probably be able to interpret the "~>" symbol and we will be able to safely remove the "#ruby=2.7.1" line.
+#ruby=2.7.1
 ruby '~> 2.7.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
@@ -89,7 +89,7 @@ group :development, :test do
   gem 'sqlite3'
   gem 'awesome_print'
   gem 'rspec-rails'
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails', '~> 4.11.1'
   gem 'webrick'
   gem 'binding_of_caller'
   gem 'better_errors'

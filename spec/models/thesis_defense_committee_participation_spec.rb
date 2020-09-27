@@ -45,9 +45,9 @@ let(:thesis_defense_committee_participation) { ThesisDefenseCommitteeParticipati
       end
       context "should have uniqueness error when" do
         it "already exists another advisement for the same enrollment" do
-          thesis_defense_committee_participation.professor = FactoryGirl.create(:professor)
-          thesis_defense_committee_participation.enrollment = FactoryGirl.create(:enrollment)
-          FactoryGirl.create(:thesis_defense_committee_participation, :professor => thesis_defense_committee_participation.professor, :enrollment => thesis_defense_committee_participation.enrollment)
+          thesis_defense_committee_participation.professor = FactoryBot.create(:professor)
+          thesis_defense_committee_participation.enrollment = FactoryBot.create(:enrollment)
+          FactoryBot.create(:thesis_defense_committee_participation, :professor => thesis_defense_committee_participation.professor, :enrollment => thesis_defense_committee_participation.enrollment)
           expect(thesis_defense_committee_participation).to have_error(:thesis_defense_committee_participation_professor_uniqueness).on :professor_id
         end
       end

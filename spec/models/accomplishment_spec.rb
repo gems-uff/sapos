@@ -15,11 +15,11 @@ describe Accomplishment do
         end
 
         it "phase has the enrollment level" do
-          level = FactoryGirl.create(:level)
-          phase = FactoryGirl.create(:phase)
-          accomplishment.enrollment = FactoryGirl.create(:enrollment, :level => level)
+          level = FactoryBot.create(:level)
+          phase = FactoryBot.create(:phase)
+          accomplishment.enrollment = FactoryBot.create(:enrollment, :level => level)
           accomplishment.phase = phase
-          phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :level => level)
+          phase_duration = FactoryBot.create(:phase_duration, :phase => phase, :level => level)
           
           expect(accomplishment).to have(0).errors_on :enrollment
         end
@@ -32,9 +32,9 @@ describe Accomplishment do
       end
       context "should have error enrollment_level when" do
         it "phase phase doesn't have the enrollment level" do
-          level = FactoryGirl.create(:level)
-          phase = FactoryGirl.create(:phase)
-          accomplishment.enrollment = FactoryGirl.create(:enrollment, :level => level)
+          level = FactoryBot.create(:level)
+          phase = FactoryBot.create(:phase)
+          accomplishment.enrollment = FactoryBot.create(:enrollment, :level => level)
           accomplishment.phase = phase
           
           expect(accomplishment).to have_error(:enrollment_level).on :enrollment

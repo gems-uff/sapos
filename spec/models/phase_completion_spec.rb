@@ -49,7 +49,7 @@ describe PhaseCompletion do
       context "should have error taken when" do
         it "(phase_id, enrollment_id) is not unique" do
           PhaseCompletion.destroy_all
-          FactoryGirl.create(:phase_completion, :phase_id => 1, :enrollment_id => 1)
+          FactoryBot.create(:phase_completion, :phase_id => 1, :enrollment_id => 1)
           
           phase_completion.phase_id = 1
           phase_completion.enrollment_id = 1

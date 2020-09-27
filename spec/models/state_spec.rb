@@ -27,7 +27,7 @@ describe State do
       context "should have error taken when" do
         it "name is already in use" do
           name = "State name"
-          FactoryGirl.create(:state, :name => name)
+          FactoryBot.create(:state, :name => name)
           state.name = name
           expect(state).to have_error(:taken).on :name
         end
@@ -49,7 +49,7 @@ describe State do
       context "should have error taken when" do
         it "code is already in use" do
           code = "State code"
-          FactoryGirl.create(:state, :code => code)
+          FactoryBot.create(:state, :code => code)
           state.code = code
           expect(state).to have_error(:taken).on :code
         end

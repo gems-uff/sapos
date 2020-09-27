@@ -26,7 +26,7 @@ describe CourseType do
       context "should have error taken when" do
         it "name is already in use" do
           name = "CourseType name"
-          FactoryGirl.create(:course_type, :name => name)
+          FactoryBot.create(:course_type, :name => name)
           course_type.name = name
           expect(course_type).to have_error(:taken).on :name
         end

@@ -15,9 +15,9 @@ describe Dismissal do
         end
 
         it "enrollment has an ended scholarship" do
-          dismissal.enrollment = FactoryGirl.create(:enrollment, :admission_date => 2.months.ago.to_date)
-          scholarship = FactoryGirl.create(:scholarship, :start_date => 3.months.ago.to_date, :end_date => 3.months.from_now.to_date)
-          scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => 1.month.ago.to_date, :end_date => 2.months.from_now.to_date, :cancel_date => nil, :scholarship => scholarship, :enrollment => dismissal.enrollment)
+          dismissal.enrollment = FactoryBot.create(:enrollment, :admission_date => 2.months.ago.to_date)
+          scholarship = FactoryBot.create(:scholarship, :start_date => 3.months.ago.to_date, :end_date => 3.months.from_now.to_date)
+          scholarship_duration = FactoryBot.create(:scholarship_duration, :start_date => 1.month.ago.to_date, :end_date => 2.months.from_now.to_date, :cancel_date => nil, :scholarship => scholarship, :enrollment => dismissal.enrollment)
           dismissal.date = 5.months.from_now.to_date
           expect(dismissal).to have(0).errors_on :enrollment
         end
@@ -31,9 +31,9 @@ describe Dismissal do
 
       context "should have error has_scholarship when" do
         it "enrollment has a valid scholarship during date" do
-          dismissal.enrollment = FactoryGirl.create(:enrollment, :admission_date => 2.months.ago.to_date)
-          scholarship = FactoryGirl.create(:scholarship, :start_date => 3.months.ago.to_date, :end_date => 3.months.from_now.to_date)
-          scholarship_duration = FactoryGirl.create(:scholarship_duration, :start_date => 1.month.ago.to_date, :end_date => 2.months.from_now.to_date, :cancel_date => nil, :scholarship => scholarship, :enrollment => dismissal.enrollment)
+          dismissal.enrollment = FactoryBot.create(:enrollment, :admission_date => 2.months.ago.to_date)
+          scholarship = FactoryBot.create(:scholarship, :start_date => 3.months.ago.to_date, :end_date => 3.months.from_now.to_date)
+          scholarship_duration = FactoryBot.create(:scholarship_duration, :start_date => 1.month.ago.to_date, :end_date => 2.months.from_now.to_date, :cancel_date => nil, :scholarship => scholarship, :enrollment => dismissal.enrollment)
           dismissal.date = 1.month.from_now.to_date
           expect(dismissal).not_to be_valid
           expect(dismissal.errors[:enrollment]).to include I18n.translate("activerecord.errors.models.dismissal.enrollment_has_scholarship")
@@ -57,12 +57,12 @@ describe Dismissal do
     describe "date" do
       context "should be valid when" do
         it "date is not null" do
-          dismissal.enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
+          dismissal.enrollment = FactoryBot.create(:enrollment, :admission_date => 3.days.ago.to_date)
           dismissal.date = Date.today
           expect(dismissal).to have(0).errors_on :date
         end
         it "is after enrollment admission date" do
-          enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
+          enrollment = FactoryBot.create(:enrollment, :admission_date => 3.days.ago.to_date)
           dismissal.enrollment = enrollment
           dismissal.date = Date.today
           expect(dismissal).to have(0).errors_on :date
@@ -74,7 +74,7 @@ describe Dismissal do
           expect(dismissal).to have_error(:blank).on :date
         end
         it "is before enrollment admission date" do
-          enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
+          enrollment = FactoryBot.create(:enrollment, :admission_date => 3.days.ago.to_date)
           dismissal.enrollment = enrollment
           dismissal.date = 4.days.ago.to_date
           expect(dismissal).to have_error(:date_before_enrollment_admission_date).on :date

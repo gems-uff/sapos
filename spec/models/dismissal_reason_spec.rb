@@ -23,7 +23,7 @@ describe DismissalReason do
       context "should have error taken when" do
         it "name is already in use" do
           name = "DismissalReason name"
-          FactoryGirl.create(:dismissal_reason, :name => name)
+          FactoryBot.create(:dismissal_reason, :name => name)
           dismissal_reason.name = name
           expect(dismissal_reason).to have_error(:taken).on :name
         end

@@ -27,7 +27,7 @@ describe Student do
       context "should have error taken when" do
         it "cpf is already in use" do
           cpf = "Student cpf"
-          FactoryGirl.create(:student, :cpf => cpf)
+          FactoryBot.create(:student, :cpf => cpf)
           student.cpf = cpf
           expect(student).to have_error(:taken).on :cpf
         end
@@ -51,41 +51,41 @@ describe Student do
   describe "Methods" do
     describe "enrollments_number" do
       it "should return the enrollment number when the student has one enrollment" do
-        student = FactoryGirl.create(:student)
-        FactoryGirl.create(:enrollment, :enrollment_number => "M123", :student => student)
+        student = FactoryBot.create(:student)
+        FactoryBot.create(:enrollment, :enrollment_number => "M123", :student => student)
         expect(student.enrollments_number).to eq("M123")
       end
 
       it "should return the enrollments number separated by comma when the student has two enrollments" do
-        student = FactoryGirl.create(:student)
-        FactoryGirl.create(:enrollment, :enrollment_number => "M123", :student => student)
-        FactoryGirl.create(:enrollment, :enrollment_number => "D234", :student => student)
+        student = FactoryBot.create(:student)
+        FactoryBot.create(:enrollment, :enrollment_number => "M123", :student => student)
+        FactoryBot.create(:enrollment, :enrollment_number => "D234", :student => student)
         expect(student.enrollments_number).to eq("M123, D234")
       end
     end
 
     describe "birthplace" do
       it "should return country, when birth_city is specified" do
-        city = FactoryGirl.create(:city)
-        student = FactoryGirl.create(:student, :birth_city => city)
+        city = FactoryBot.create(:city)
+        student = FactoryBot.create(:student, :birth_city => city)
         expect(student.birthplace).to eq("#{city.state.country.name}")
       end
       it "should return country, when birth_city is not specified" do
-        state = FactoryGirl.create(:state)
-        student = FactoryGirl.create(:student, :birth_state => state)
+        state = FactoryBot.create(:state)
+        student = FactoryBot.create(:student, :birth_state => state)
         expect(student.birthplace).to eq("#{state.country.name}")
       end
       it "should return nil when neither birth_city and birth_state are specified" do
-        student = FactoryGirl.create(:student)
+        student = FactoryBot.create(:student)
         expect(student.birthplace).to be_nil
       end
     end
   end
   describe "Before save" do
     it "should set the birth_state when birth_city is filled" do
-      birth_city = FactoryGirl.create(:city)
-      birth_state = FactoryGirl.create(:state)
-      student = FactoryGirl.build(:student, :birth_state => birth_state, :birth_city => nil)
+      birth_city = FactoryBot.create(:city)
+      birth_state = FactoryBot.create(:state)
+      student = FactoryBot.build(:student, :birth_state => birth_state, :birth_city => nil)
       student.birth_city = birth_city
       expect(student.birth_state).to eq(birth_state)
 
@@ -95,8 +95,8 @@ describe Student do
     end
 
     it "should not set the birth_state when birth_city is not filled" do
-      birth_state = FactoryGirl.create(:state)
-      student = FactoryGirl.build(:student, :birth_state => birth_state, :birth_city => nil)
+      birth_state = FactoryBot.create(:state)
+      student = FactoryBot.build(:student, :birth_state => birth_state, :birth_city => nil)
       expect(student.birth_state).to eq(birth_state)
       student.save
       expect(student.birth_state).to eq(birth_state)

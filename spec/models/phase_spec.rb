@@ -28,7 +28,7 @@ describe Phase do
       context "should have error taken when" do
         it "name is already in use" do
           name = "Phase name"
-          FactoryGirl.create(:phase, :name => name)
+          FactoryBot.create(:phase, :name => name)
           phase.name = name
           expect(phase).to have_error(:taken).on :name
         end
@@ -39,28 +39,28 @@ describe Phase do
   describe "Class methods" do
     describe "find_all_for_enrollment" do
       it "should return all phases if enrollment is nil" do
-        FactoryGirl.create(:phase)
-        FactoryGirl.create(:phase)
-        FactoryGirl.create(:phase)
+        FactoryBot.create(:phase)
+        FactoryBot.create(:phase)
+        FactoryBot.create(:phase)
         
         phases = Phase.where(Phase::find_all_for_enrollment(nil))
         expect(phases.count).to eq(Phase.count)
       end
 
       it "should return phases that have the same level as the enrollment" do
-        level1 = FactoryGirl.create(:level)
-        level2 = FactoryGirl.create(:level)
+        level1 = FactoryBot.create(:level)
+        level2 = FactoryBot.create(:level)
         
-        phase1 = FactoryGirl.create(:phase)
-        FactoryGirl.create(:phase_duration, :phase => phase1, :level => level1)
+        phase1 = FactoryBot.create(:phase)
+        FactoryBot.create(:phase_duration, :phase => phase1, :level => level1)
           
-        phase2 = FactoryGirl.create(:phase)
-        FactoryGirl.create(:phase_duration, :phase => phase2, :level => level1)
+        phase2 = FactoryBot.create(:phase)
+        FactoryBot.create(:phase_duration, :phase => phase2, :level => level1)
           
-        phase3 = FactoryGirl.create(:phase)
-        FactoryGirl.create(:phase_duration, :phase => phase3, :level => level2)
+        phase3 = FactoryBot.create(:phase)
+        FactoryBot.create(:phase_duration, :phase => phase3, :level => level2)
          
-        enrollment = FactoryGirl.create(:enrollment, :level => level1) 
+        enrollment = FactoryBot.create(:enrollment, :level => level1) 
         
         phases = Phase.where(Phase::find_all_for_enrollment(enrollment))
         expect(phases.count).to eq(2)

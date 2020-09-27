@@ -26,7 +26,7 @@ describe Sponsor do
       context "should have error taken when" do
         it "name is already in use" do
           name = "Sponsor name"
-          FactoryGirl.create(:sponsor, :name => name)
+          FactoryBot.create(:sponsor, :name => name)
           sponsor.name = name
           expect(sponsor).to have_error(:taken).on :name
         end

@@ -89,7 +89,7 @@ describe CustomVariable do
       it "should return Brasil when there is no variable, but there is a country named Brasil" do
         country = Country.find_by_name("Brasil")
         country.delete unless country.nil?
-        country = FactoryGirl.create(:country, :name => "Brasil")
+        country = FactoryBot.create(:country, :name => "Brasil")
 
         config = CustomVariable.find_by_variable(:identity_issuing_country)
         config.delete unless config.nil?
@@ -100,11 +100,11 @@ describe CustomVariable do
       it "should return England it is defined to England" do
         brasil = Country.find_by_name("Brasil")
         brasil.delete unless brasil.nil?
-        FactoryGirl.create(:country, :name => "Brasil")
+        FactoryBot.create(:country, :name => "Brasil")
 
         england = Country.find_by_name("England")
         england.delete unless england.nil?
-        england = FactoryGirl.create(:country, :name => "England")
+        england = FactoryBot.create(:country, :name => "England")
 
         config = CustomVariable.find_by_variable(:identity_issuing_country)
         config.delete unless config.nil?

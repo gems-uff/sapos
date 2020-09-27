@@ -32,14 +32,14 @@ describe Enrollment do
       end
       context "should have advisment error when it" do
         it "has just one advisor that is not a main advisor" do
-          enrollment.advisements << FactoryGirl.create(:advisement, :main_advisor => false)
+          enrollment.advisements << FactoryBot.create(:advisement, :main_advisor => false)
           expect(enrollment).not_to be_valid
           expect(enrollment.errors[:base]).to include I18n.translate("activerecord.errors.models.enrollment.main_advisor_required")
         end
 
         it "has more than one main advisor" do
-          enrollment.advisements << advisement1 = FactoryGirl.create(:advisement, :main_advisor => true)
-          enrollment.advisements << advisement2 = FactoryGirl.create(:advisement, :main_advisor => true)
+          enrollment.advisements << advisement1 = FactoryBot.create(:advisement, :main_advisor => true)
+          enrollment.advisements << advisement2 = FactoryBot.create(:advisement, :main_advisor => true)
           expect(enrollment).not_to be_valid
           expect(enrollment.errors[:base]).to include I18n.translate("activerecord.errors.models.enrollment.main_advisor_uniqueness")
         end
@@ -89,7 +89,7 @@ describe Enrollment do
       context "should have error taken when" do
         it "enrollment_number is already in use" do
           enrollment_number = "D123"
-          FactoryGirl.create(:enrollment, :enrollment_number => enrollment_number)
+          FactoryBot.create(:enrollment, :enrollment_number => enrollment_number)
           enrollment.enrollment_number = enrollment_number
           expect(enrollment).to have_error(:taken).on :enrollment_number
         end
@@ -98,14 +98,14 @@ describe Enrollment do
     describe "thesis_defense_date" do
       context "should be valid when" do
         it "is after admission_date" do
-          enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
+          enrollment = FactoryBot.create(:enrollment, :admission_date => 3.days.ago.to_date)
           enrollment.thesis_defense_date = 3.days.from_now.to_date
           expect(enrollment).to have(0).errors_on :thesis_defense_date
         end
       end
       context "should not be valid when" do
         it "is before admission_date" do
-          enrollment = FactoryGirl.create(:enrollment, :admission_date => 3.days.ago.to_date)
+          enrollment = FactoryBot.create(:enrollment, :admission_date => 3.days.ago.to_date)
           enrollment.thesis_defense_date = 4.days.ago.to_date
           expect(enrollment).to have_error(:thesis_defense_date_before_admission_date).on :thesis_defense_date
         end
@@ -115,31 +115,31 @@ describe Enrollment do
     describe "research_area" do
       context "should be valid when" do
         it "is empty" do
-          enrollment = FactoryGirl.create(:enrollment, :research_area => nil)
+          enrollment = FactoryBot.create(:enrollment, :research_area => nil)
           expect(enrollment).to have(0).errors_on :research_area
         end
 
         it "is the same research_area as the advisor" do
-          research_area = FactoryGirl.create(:research_area) 
-          enrollment = FactoryGirl.create(:enrollment, :research_area => research_area)
-          professor = FactoryGirl.create(:professor, :research_areas => [research_area])
-          FactoryGirl.create(:advisement, :enrollment => enrollment, :professor => professor)
+          research_area = FactoryBot.create(:research_area) 
+          enrollment = FactoryBot.create(:enrollment, :research_area => research_area)
+          professor = FactoryBot.create(:professor, :research_areas => [research_area])
+          FactoryBot.create(:advisement, :enrollment => enrollment, :professor => professor)
           expect(enrollment).to have(0).errors_on :research_area
         end
 
         it "there is no advisor" do
-          research_area = FactoryGirl.create(:research_area) 
-          enrollment = FactoryGirl.create(:enrollment, :research_area => research_area)
+          research_area = FactoryBot.create(:research_area) 
+          enrollment = FactoryBot.create(:enrollment, :research_area => research_area)
           expect(enrollment).to have(0).errors_on :research_area
         end
       end
       context "should not be valid when" do
         it "is not the same area as the advisor" do
-          research_area1 = FactoryGirl.create(:research_area) 
-          research_area2 = FactoryGirl.create(:research_area) 
-          enrollment = FactoryGirl.create(:enrollment, :research_area => research_area1)
-          professor = FactoryGirl.create(:professor, :research_areas => [research_area2])
-          FactoryGirl.create(:advisement, :enrollment => enrollment, :professor => professor)
+          research_area1 = FactoryBot.create(:research_area) 
+          research_area2 = FactoryBot.create(:research_area) 
+          enrollment = FactoryBot.create(:enrollment, :research_area => research_area1)
+          professor = FactoryBot.create(:professor, :research_areas => [research_area2])
+          FactoryBot.create(:advisement, :enrollment => enrollment, :professor => professor)
           enrollment.save
           expect(enrollment.errors[:research_area]).to include I18n.translate("activerecord.errors.models.enrollment.research_area_different_from_professors")
         end
@@ -149,27 +149,27 @@ describe Enrollment do
   describe "Methods" do
     before(:all) do
       admission_date = YearSemester.current.semester_begin
-      @delayed_enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
+      @delayed_enrollment = FactoryBot.create(:enrollment, :admission_date => admission_date)
       level = @delayed_enrollment.level
 
 
-      inactive_enrollment = FactoryGirl.create(:enrollment, :level => level, :admission_date => admission_date)
-      FactoryGirl.create(:dismissal, :enrollment => inactive_enrollment, :date => (YearSemester.current.semester_begin + 1.month))
+      inactive_enrollment = FactoryBot.create(:enrollment, :level => level, :admission_date => admission_date)
+      FactoryBot.create(:dismissal, :enrollment => inactive_enrollment, :date => (YearSemester.current.semester_begin + 1.month))
 
-      one_month_phase = FactoryGirl.create(:phase)
-      FactoryGirl.create(:phase_duration, :deadline_days => 0, :deadline_months => 1, :deadline_semesters => 0, :level => level, :phase => one_month_phase)
-      @two_semesters_phase = FactoryGirl.create(:phase)
-      FactoryGirl.create(:phase_duration, :deadline_days => 0, :deadline_months => 0, :deadline_semesters => 2, :level => level, :phase => @two_semesters_phase)
+      one_month_phase = FactoryBot.create(:phase)
+      FactoryBot.create(:phase_duration, :deadline_days => 0, :deadline_months => 1, :deadline_semesters => 0, :level => level, :phase => one_month_phase)
+      @two_semesters_phase = FactoryBot.create(:phase)
+      FactoryBot.create(:phase_duration, :deadline_days => 0, :deadline_months => 0, :deadline_semesters => 2, :level => level, :phase => @two_semesters_phase)
 
-      @enrollment_accomplished = FactoryGirl.create(:enrollment, :level => @delayed_enrollment.level, :admission_date => admission_date)
-      FactoryGirl.create(:accomplishment, :enrollment => @enrollment_accomplished, :phase => one_month_phase, :conclusion_date => 1.day.ago)
+      @enrollment_accomplished = FactoryBot.create(:enrollment, :level => @delayed_enrollment.level, :admission_date => admission_date)
+      FactoryBot.create(:accomplishment, :enrollment => @enrollment_accomplished, :phase => one_month_phase, :conclusion_date => 1.day.ago)
 
-      enrollment_active_deferral = FactoryGirl.create(:enrollment, :level => level, :admission_date => admission_date)
-      one_semester_deferral_type = FactoryGirl.create(:deferral_type, :phase => one_month_phase, :duration_days => 0, :duration_months => 0, :duration_semesters => 1)
-      FactoryGirl.create(:deferral, :enrollment => enrollment_active_deferral, :deferral_type => one_semester_deferral_type)
+      enrollment_active_deferral = FactoryBot.create(:enrollment, :level => level, :admission_date => admission_date)
+      one_semester_deferral_type = FactoryBot.create(:deferral_type, :phase => one_month_phase, :duration_days => 0, :duration_months => 0, :duration_semesters => 1)
+      FactoryBot.create(:deferral, :enrollment => enrollment_active_deferral, :deferral_type => one_semester_deferral_type)
 
-      @enrollment_expired_deferral = FactoryGirl.create(:enrollment, :level => level, :admission_date => (admission_date - 8.months))
-      FactoryGirl.create(:deferral, :enrollment => @enrollment_expired_deferral, :deferral_type => one_semester_deferral_type)
+      @enrollment_expired_deferral = FactoryBot.create(:enrollment, :level => level, :admission_date => (admission_date - 8.months))
+      FactoryBot.create(:deferral, :enrollment => @enrollment_expired_deferral, :deferral_type => one_semester_deferral_type)
 
     end
 
@@ -192,7 +192,7 @@ describe Enrollment do
     end
     describe "self.with_all_phases_accomplished_on" do
       it "should return the expected enrollments" do
-        FactoryGirl.create(:accomplishment, :enrollment => @enrollment_accomplished, :phase => @two_semesters_phase, :conclusion_date => 1.day.ago)
+        FactoryBot.create(:accomplishment, :enrollment => @enrollment_accomplished, :phase => @two_semesters_phase, :conclusion_date => 1.day.ago)
         
         result = Enrollment.with_all_phases_accomplished_on(Date.today)
 
@@ -203,58 +203,58 @@ describe Enrollment do
 
     describe "available_semesters" do
       before(:all) do
-        course1 = FactoryGirl.create(:course);
-        course2 = FactoryGirl.create(:course);
-        @class1 = FactoryGirl.create(:course_class, :year => "2012", :semester => "1")
-        @class2 = FactoryGirl.create(:course_class, :year => "2012", :semester => "1")
-        @class3 = FactoryGirl.create(:course_class, :year => "2012", :semester => "2")
-        @class4 = FactoryGirl.create(:course_class, :year => "2013", :semester => "1")
-        @class5 = FactoryGirl.create(:course_class, :year => "2013", :semester => "1", :course => course1)
-        @class6 = FactoryGirl.create(:course_class, :year => "2013", :semester => "2", :course => course1)
-        @class7 = FactoryGirl.create(:course_class, :year => "2013", :semester => "2", :course => course2)
+        course1 = FactoryBot.create(:course);
+        course2 = FactoryBot.create(:course);
+        @class1 = FactoryBot.create(:course_class, :year => "2012", :semester => "1")
+        @class2 = FactoryBot.create(:course_class, :year => "2012", :semester => "1")
+        @class3 = FactoryBot.create(:course_class, :year => "2012", :semester => "2")
+        @class4 = FactoryBot.create(:course_class, :year => "2013", :semester => "1")
+        @class5 = FactoryBot.create(:course_class, :year => "2013", :semester => "1", :course => course1)
+        @class6 = FactoryBot.create(:course_class, :year => "2013", :semester => "2", :course => course1)
+        @class7 = FactoryBot.create(:course_class, :year => "2013", :semester => "2", :course => course2)
       end
       it "shouldn't return any value when the enrollment doesn't have any classes" do
         admission_date = YearSemester.current.semester_begin
-        enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
+        enrollment = FactoryBot.create(:enrollment, :admission_date => admission_date)
         expect(enrollment.available_semesters.any?).to be_falsey
       end
 
       it "should return [[2013,2]] when it is enrolled to a class of 2013.2" do
         admission_date = YearSemester.current.semester_begin
-        enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
-        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
+        enrollment = FactoryBot.create(:enrollment, :admission_date => admission_date)
+        FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
         expect(enrollment.available_semesters.any?).to be_truthy
         expect(enrollment.available_semesters).to eq([[2013, 2]])
       end
 
       it "should return [[2013,2]] when it is enrolled to more than one class of 2013.2" do
         admission_date = YearSemester.current.semester_begin
-        enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
-        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
-        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class7)
+        enrollment = FactoryBot.create(:enrollment, :admission_date => admission_date)
+        FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
+        FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => @class7)
         expect(enrollment.available_semesters.any?).to be_truthy
         expect(enrollment.available_semesters).to eq([[2013, 2]])
       end
 
       it "should return [[2013, 1], [2013,2]] when it is enrolled a class of 2013.1 and a class of 2013.2" do
         admission_date = YearSemester.current.semester_begin
-        enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
-        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
-        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class5)
+        enrollment = FactoryBot.create(:enrollment, :admission_date => admission_date)
+        FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
+        FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => @class5)
         expect(enrollment.available_semesters.any?).to be_truthy
         expect(enrollment.available_semesters).to eq([[2013, 1], [2013, 2]])
       end
 
       it "should be ordered: [[2012, 1], [2012, 2], [2013, 1], [2013,2]]" do
         admission_date = YearSemester.current.semester_begin
-        enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
-        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class3)
-        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class5)
-        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class1)
-        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class7)
-        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class4)
-        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class2)
-        FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
+        enrollment = FactoryBot.create(:enrollment, :admission_date => admission_date)
+        FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => @class3)
+        FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => @class5)
+        FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => @class1)
+        FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => @class7)
+        FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => @class4)
+        FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => @class2)
+        FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => @class6)
         expect(enrollment.available_semesters.any?).to be_truthy
         expect(enrollment.available_semesters).to eq([[2012, 1], [2012, 2], [2013, 1], [2013,2]])
       end
@@ -263,15 +263,15 @@ describe Enrollment do
     describe "gpr" do
 
       before(:each) do
-        with_grade = FactoryGirl.create(:course_type, :has_score => true)
-        without_grade = FactoryGirl.create(:course_type, :has_score => nil)
+        with_grade = FactoryBot.create(:course_type, :has_score => true)
+        without_grade = FactoryBot.create(:course_type, :has_score => nil)
         # create courses by number of credits
-        courses = [4, 6, 6, 4, 2, 4].collect { |credits| FactoryGirl.create(:course, :credits => credits, :course_type => with_grade) }
+        courses = [4, 6, 6, 4, 2, 4].collect { |credits| FactoryBot.create(:course, :credits => credits, :course_type => with_grade) }
         courses[4].course_type = without_grade
         courses[4].save
 
         admission_date = YearSemester.current.semester_begin
-        @enrollment = FactoryGirl.create(:enrollment, :admission_date => admission_date)
+        @enrollment = FactoryBot.create(:enrollment, :admission_date => admission_date)
 
         # create classes and grades
         [
@@ -284,8 +284,8 @@ describe Enrollment do
           ["2013", "1", courses[5], nil, "registered"],
           ["2013", "2", courses[5], nil, "registered"]
         ].each do |year, semester, course, grade, situation|
-          course_class = FactoryGirl.create(:course_class, :year => year, :semester => semester, :course => course)
-          class_enrollment = FactoryGirl.create(:class_enrollment, :enrollment => @enrollment, :course_class => course_class)
+          course_class = FactoryBot.create(:course_class, :year => year, :semester => semester, :course => course)
+          class_enrollment = FactoryBot.create(:class_enrollment, :enrollment => @enrollment, :course_class => course_class)
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations." + situation)
           class_enrollment.grade = grade unless grade.nil?
           class_enrollment.save

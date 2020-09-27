@@ -15,11 +15,11 @@ describe Deferral do
         end
 
         it "deferral_type phase has the enrollment level" do
-          level = FactoryGirl.create(:level)
-          phase = FactoryGirl.create(:phase)
-          deferral.enrollment = FactoryGirl.create(:enrollment, :level => level)
-          deferral.deferral_type = FactoryGirl.create(:deferral_type, :phase => phase)
-          phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :level => level)
+          level = FactoryBot.create(:level)
+          phase = FactoryBot.create(:phase)
+          deferral.enrollment = FactoryBot.create(:enrollment, :level => level)
+          deferral.deferral_type = FactoryBot.create(:deferral_type, :phase => phase)
+          phase_duration = FactoryBot.create(:phase_duration, :phase => phase, :level => level)
           
           expect(deferral).to have(0).errors_on :enrollment
         end
@@ -33,10 +33,10 @@ describe Deferral do
 
       context "should have error enrollment_level when" do
         it "deferral_type phase doesn't have the enrollment level" do
-          level = FactoryGirl.create(:level)
-          phase = FactoryGirl.create(:phase)
-          deferral.enrollment = FactoryGirl.create(:enrollment, :level => level)
-          deferral.deferral_type = FactoryGirl.create(:deferral_type, :phase => phase)
+          level = FactoryBot.create(:level)
+          phase = FactoryBot.create(:phase)
+          deferral.enrollment = FactoryBot.create(:enrollment, :level => level)
+          deferral.deferral_type = FactoryBot.create(:deferral_type, :phase => phase)
           
           expect(deferral).to have_error(:enrollment_level).on :enrollment
         end
@@ -81,35 +81,35 @@ describe Deferral do
     end
     describe "valid_until" do
       it "should return 31th of july 2013" do
-        phase = FactoryGirl.create(:phase)
-        level = FactoryGirl.create(:level)
-        enrollment = FactoryGirl.create(:enrollment, :level => level, :admission_date => Date.new(2012, 3, 1))
-        phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :deadline_semesters => 1, :level => level, :deadline_days => 0)
-        deferral_type = FactoryGirl.create(:deferral_type, :phase => phase, :duration_semesters => 2, :duration_days => 0)
-        deferral = FactoryGirl.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
+        phase = FactoryBot.create(:phase)
+        level = FactoryBot.create(:level)
+        enrollment = FactoryBot.create(:enrollment, :level => level, :admission_date => Date.new(2012, 3, 1))
+        phase_duration = FactoryBot.create(:phase_duration, :phase => phase, :deadline_semesters => 1, :level => level, :deadline_days => 0)
+        deferral_type = FactoryBot.create(:deferral_type, :phase => phase, :duration_semesters => 2, :duration_days => 0)
+        deferral = FactoryBot.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
 
         expect(deferral.valid_until).to eql(Date.new(2013, 7, 31).strftime('%d/%m/%Y'))
       end
 
       it "should return 28th of february 2023" do
-        phase = FactoryGirl.create(:phase)
-        level = FactoryGirl.create(:level)
-        enrollment = FactoryGirl.create(:enrollment, :level => level, :admission_date => Date.new(2017, 8, 1))
-        phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :deadline_semesters => 8, :level => level, :deadline_days => 0)
-        deferral_type = FactoryGirl.create(:deferral_type, :phase => phase, :duration_semesters => 3, :duration_days => 0)
-        deferral = FactoryGirl.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
+        phase = FactoryBot.create(:phase)
+        level = FactoryBot.create(:level)
+        enrollment = FactoryBot.create(:enrollment, :level => level, :admission_date => Date.new(2017, 8, 1))
+        phase_duration = FactoryBot.create(:phase_duration, :phase => phase, :deadline_semesters => 8, :level => level, :deadline_days => 0)
+        deferral_type = FactoryBot.create(:deferral_type, :phase => phase, :duration_semesters => 3, :duration_days => 0)
+        deferral = FactoryBot.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
 
 
         expect(deferral.valid_until).to eql(Date.new(2023, 2, 28).strftime('%d/%m/%Y'))
       end
 
       it "should return 7th of june 2014" do
-        phase = FactoryGirl.create(:phase)
-        level = FactoryGirl.create(:level)
-        enrollment = FactoryGirl.create(:enrollment, :level => level, :admission_date => Date.new(2013, 8, 1))
-        phase_duration = FactoryGirl.create(:phase_duration, :phase => phase, :deadline_semesters => 1, :level => level, :deadline_days => 0)
-        deferral_type = FactoryGirl.create(:deferral_type, :phase => phase, :duration_months => 3, :duration_days => 7)
-        deferral = FactoryGirl.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
+        phase = FactoryBot.create(:phase)
+        level = FactoryBot.create(:level)
+        enrollment = FactoryBot.create(:enrollment, :level => level, :admission_date => Date.new(2013, 8, 1))
+        phase_duration = FactoryBot.create(:phase_duration, :phase => phase, :deadline_semesters => 1, :level => level, :deadline_days => 0)
+        deferral_type = FactoryBot.create(:deferral_type, :phase => phase, :duration_months => 3, :duration_days => 7)
+        deferral = FactoryBot.create(:deferral, :enrollment => enrollment, :deferral_type => deferral_type, :approval_date => Date.today)
 
         expect(deferral.valid_until).to eql(Date.new(2014, 6, 7).strftime('%d/%m/%Y'))
       end

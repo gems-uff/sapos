@@ -27,7 +27,7 @@ describe Institution do
       context "should have error taken when" do
         it "name is already in use" do
           name = "Institution name"
-          FactoryGirl.create(:institution, :name => name)
+          FactoryBot.create(:institution, :name => name)
           institution.name = name
           expect(institution).to have_error(:taken).on :name
         end

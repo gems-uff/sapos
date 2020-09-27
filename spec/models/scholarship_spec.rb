@@ -103,7 +103,7 @@ describe Scholarship do
       context "should have error taken when" do
         it "scholarship_number is already in use" do
           scholarship_number = "D123"
-          FactoryGirl.create(:scholarship, :scholarship_number => scholarship_number)
+          FactoryBot.create(:scholarship, :scholarship_number => scholarship_number)
           scholarship.scholarship_number = scholarship_number
           expect(scholarship).to have_error(:taken).on :scholarship_number
         end
@@ -123,12 +123,12 @@ describe Scholarship do
       let(:end_date) { 3.days.from_now.to_date }
 
       it 'should return end_date.end_of_month if there is end_date' do
-        scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => end_date + 2.months)
+        scholarship = FactoryBot.create(:scholarship, :start_date => end_date, :end_date => end_date + 2.months)
         expect(scholarship.last_date).to eq((end_date + 2.months).end_of_month)
       end
 
       it 'should be greater or equal to 100 years if there is no end_date' do
-        scholarship = FactoryGirl.create(:scholarship, :start_date => end_date, :end_date => nil)
+        scholarship = FactoryBot.create(:scholarship, :start_date => end_date, :end_date => nil)
         expect(scholarship.last_date).to be >= Date.today + 100.years - 1.day
       end
     end

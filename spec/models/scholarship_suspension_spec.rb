@@ -27,21 +27,21 @@ describe ScholarshipSuspension do
     describe "start_date" do
       context "should be valid when" do
         it "is after scholarship_duration start date" do
-          scholarship_duration = FactoryGirl.create(:scholarship_duration)
+          scholarship_duration = FactoryBot.create(:scholarship_duration)
           scholarship_suspension.scholarship_duration = scholarship_duration
           scholarship_suspension.start_date = scholarship_duration.start_date + 1.day
           scholarship_suspension.end_date = scholarship_duration.end_date
           expect(scholarship_suspension).to have(0).errors_on :start_date
         end
         it "is before scholarship_duration end date" do
-          scholarship_duration = FactoryGirl.create(:scholarship_duration)
+          scholarship_duration = FactoryBot.create(:scholarship_duration)
           scholarship_suspension.scholarship_duration = scholarship_duration
           scholarship_suspension.start_date = scholarship_duration.end_date - 1.day
           scholarship_suspension.end_date = scholarship_duration.end_date
           expect(scholarship_suspension).to have(0).errors_on :start_date
         end
         it "is before end date" do
-          scholarship_duration = FactoryGirl.create(:scholarship_duration)
+          scholarship_duration = FactoryBot.create(:scholarship_duration)
           scholarship_suspension.scholarship_duration = scholarship_duration
           scholarship_suspension.start_date = scholarship_duration.end_date - 1.day
           scholarship_suspension.end_date = scholarship_duration.end_date
@@ -50,21 +50,21 @@ describe ScholarshipSuspension do
       end
       context "should have error when" do
         it "is before scholarship_duration start date" do
-          scholarship_duration = FactoryGirl.create(:scholarship_duration)
+          scholarship_duration = FactoryBot.create(:scholarship_duration)
           scholarship_suspension.scholarship_duration = scholarship_duration
           scholarship_suspension.start_date = scholarship_duration.start_date - 1.day
           scholarship_suspension.end_date = scholarship_duration.end_date
           expect(scholarship_suspension).to have_error(:suspension_start_date_before_scholarship_start_date).on :start_date
         end
         it "is after scholarship_duration end date" do
-          scholarship_duration = FactoryGirl.create(:scholarship_duration)
+          scholarship_duration = FactoryBot.create(:scholarship_duration)
           scholarship_suspension.scholarship_duration = scholarship_duration
           scholarship_suspension.start_date = scholarship_duration.end_date + 1.day
           scholarship_suspension.end_date = scholarship_duration.end_date + 2.day
           expect(scholarship_suspension).to have_error(:suspension_start_date_after_scholarship_end_date).on :start_date
         end
         it "is after end date" do
-          scholarship_duration = FactoryGirl.create(:scholarship_duration)
+          scholarship_duration = FactoryBot.create(:scholarship_duration)
           scholarship_suspension.scholarship_duration = scholarship_duration
           scholarship_suspension.start_date = scholarship_duration.end_date + 1.day
           scholarship_suspension.end_date = scholarship_duration.end_date
@@ -79,7 +79,7 @@ describe ScholarshipSuspension do
     describe "end_date" do
       context "should be valid when" do
         it "is before scholarship_duration end date" do
-          scholarship_duration = FactoryGirl.create(:scholarship_duration)
+          scholarship_duration = FactoryBot.create(:scholarship_duration)
           scholarship_suspension.scholarship_duration = scholarship_duration
           scholarship_suspension.start_date = scholarship_duration.start_date
           scholarship_suspension.end_date = scholarship_duration.end_date - 1.day
@@ -88,7 +88,7 @@ describe ScholarshipSuspension do
       end
       context "should have error when" do
         it "is after scholarship_duration end date" do
-          scholarship_duration = FactoryGirl.create(:scholarship_duration)
+          scholarship_duration = FactoryBot.create(:scholarship_duration)
           scholarship_suspension.scholarship_duration = scholarship_duration
           scholarship_suspension.start_date = scholarship_duration.end_date - 1.day
           scholarship_suspension.end_date = scholarship_duration.end_date + 2.day
@@ -103,7 +103,7 @@ describe ScholarshipSuspension do
     describe "if_there_is_no_other_active_suspension" do
       context "should be valid when" do
         it "is not active" do
-          ss = FactoryGirl.create(
+          ss = FactoryBot.create(
             :scholarship_suspension, 
             :active => true)
           scholarship_suspension.scholarship_duration = ss.scholarship_duration 
@@ -116,7 +116,7 @@ describe ScholarshipSuspension do
       end
       context "should have error when" do
         it "there is a suspension overlap" do
-          ss = FactoryGirl.create(
+          ss = FactoryBot.create(
             :scholarship_suspension, 
             :active => true)
           scholarship_suspension.scholarship_duration = ss.scholarship_duration 

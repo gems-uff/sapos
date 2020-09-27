@@ -45,9 +45,9 @@ describe ProfessorResearchArea do
       end
       context "should have uniqueness error when" do
         it "already exists the same professor for the same research_area" do
-          professor_research_area.professor = FactoryGirl.create(:professor)
-          professor_research_area.research_area = FactoryGirl.create(:research_area)
-          FactoryGirl.create(:professor_research_area, :professor => professor_research_area.professor, :research_area => professor_research_area.research_area)
+          professor_research_area.professor = FactoryBot.create(:professor)
+          professor_research_area.research_area = FactoryBot.create(:research_area)
+          FactoryBot.create(:professor_research_area, :professor => professor_research_area.professor, :research_area => professor_research_area.research_area)
           expect(professor_research_area).to have_error(:unique_pair).on :professor_id
         end
       end

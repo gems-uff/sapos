@@ -26,7 +26,7 @@ describe ScholarshipType do
       context "should have error taken when" do
         it "name is already in use" do
           name = "ScholarshipType name"
-          FactoryGirl.create(:scholarship_type, :name => name)
+          FactoryBot.create(:scholarship_type, :name => name)
           scholarship_type.name = name
           expect(scholarship_type).to have_error(:taken).on :name
         end

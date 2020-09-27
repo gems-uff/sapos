@@ -31,7 +31,7 @@ describe Level do
       context "should have error taken when" do
         it "name is already in use" do
           name = "Level name"
-          FactoryGirl.create(:level, :name => name)
+          FactoryBot.create(:level, :name => name)
           level.name = name
           expect(level).to have_error(:taken).on :name
         end
