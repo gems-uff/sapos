@@ -13,9 +13,9 @@ FactoryBot.define do
     end
 
     factory :role_administrador do
-      id Role::ROLE_ADMINISTRADOR
-      name "Administrador"
-      description "Descricao Administrador"
+      id { Role::ROLE_ADMINISTRADOR }
+      name { "Administrador" }
+      description { "Descricao Administrador" }
       initialize_with {Role.where(id: id).first_or_create(name: name, description: description)}
     end
   end

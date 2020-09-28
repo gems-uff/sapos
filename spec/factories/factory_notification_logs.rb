@@ -4,6 +4,6 @@
 
 FactoryBot.define do
   factory :notification_log do
-    notification nil
+    notification { nil }
   end
 end

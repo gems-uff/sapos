@@ -7,7 +7,7 @@ FactoryBot.define do
   factory :course_class do
     course
     professor
-    year "2013"
-    semester "1"
+    year { "2013" }
+    semester { "1" }
   end
 end

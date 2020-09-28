@@ -8,6 +8,6 @@ FactoryBot.define do
     sequence :name do |name|
       "Level_#{name}"
     end
-    default_duration 48
+    default_duration { 48 }
   end
 end

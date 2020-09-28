@@ -7,6 +7,6 @@ FactoryBot.define do
   factory :class_enrollment do
     course_class
     enrollment
-    situation I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
+    situation { I18n.translate("activerecord.attributes.class_enrollment.situations.registered") }
   end
 end

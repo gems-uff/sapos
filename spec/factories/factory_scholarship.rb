@@ -9,7 +9,7 @@ FactoryBot.define do
     sequence :scholarship_number do |number|
       number
     end
-    start_date 3.days.ago
-    end_date 3.days.from_now
+    start_date { 3.days.ago }
+    end_date { 3.days.from_now }
   end
 end

@@ -7,6 +7,6 @@ FactoryBot.define do
   factory :advisement do
     professor
     enrollment
-    main_advisor true
+    main_advisor { true }
   end
 end

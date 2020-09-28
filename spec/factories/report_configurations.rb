@@ -4,13 +4,13 @@
 
 FactoryBot.define do
   factory :report_configuration do
-    name "MyString"
-    use_at_report false
-    use_at_transcript false
-    use_at_grades_report false
-    use_at_schedule false
-    text "MyText"
-    image "MyString"
-    signature_footer false
+    name { "MyString" }
+    use_at_report { false }
+    use_at_transcript { false }
+    use_at_grades_report { false }
+    use_at_schedule { false }
+    text { "MyText" }
+    image { "MyString" }
+    signature_footer { false }
   end
 end

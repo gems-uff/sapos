@@ -12,7 +12,7 @@ FactoryBot.define do
     sequence :code do |code|
       "#{code}"
     end
-    credits 10
-    workload 68
+    credits { 10 }
+    workload { 68 }
   end
 end

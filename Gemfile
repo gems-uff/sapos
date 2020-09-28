@@ -89,7 +89,7 @@ group :development, :test do
   gem 'sqlite3'
   gem 'awesome_print'
   gem 'rspec-rails'
-  gem 'factory_bot_rails', '~> 4.11.1'
+  gem 'factory_bot_rails'
   gem 'webrick'
   gem 'binding_of_caller'
   gem 'better_errors'

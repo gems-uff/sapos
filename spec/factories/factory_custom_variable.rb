@@ -3,8 +3,8 @@
 
 FactoryBot.define do
   factory :custom_variable do
-    description ""
-    value ""
-    variable ""
+    description { "" }
+    value { "" }
+    variable { "" }
   end
 end

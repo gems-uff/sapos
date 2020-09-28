@@ -5,8 +5,8 @@
 FactoryBot.define do
   factory :enrollment_hold do
     enrollment
-    year YearSemester.current.year
-    semester YearSemester.current.semester
-    number_of_semesters 1
+    year { YearSemester.current.year }
+    semester { YearSemester.current.semester }
+    number_of_semesters { 1 }
   end
 end

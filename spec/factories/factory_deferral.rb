@@ -6,7 +6,7 @@
 FactoryBot.define do
   factory :deferral do
     deferral_type
-    approval_date Date.parse("2014/01/01")
+    approval_date { Date.parse("2014/01/01") }
     enrollment
     after(:build) do |obj|
       if obj.deferral_type.phase.levels.empty?

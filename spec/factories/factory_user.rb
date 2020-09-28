@@ -11,7 +11,7 @@ FactoryBot.define do
     sequence :name do |name|
       "User_#{name}"
     end
-    password "password"
-    role_id Role::ROLE_ADMINISTRADOR
+    password { "password" }
+    role_id { Role::ROLE_ADMINISTRADOR }
   end
 end

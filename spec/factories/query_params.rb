@@ -4,8 +4,8 @@
 
 FactoryBot.define do
   factory :query_param do
-    query nil
-    default_value "MyString"
-    value_type "MyString"
+    query { nil }
+    default_value { "MyString" }
+    value_type { "MyString" }
   end
 end

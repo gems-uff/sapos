@@ -132,11 +132,11 @@ GEM
     exception_notification (2.6.1)
       actionmailer (>= 3.0.4)
     execjs (2.7.0)
-    factory_bot (4.11.1)
-      activesupport (>= 3.0.0)
-    factory_bot_rails (4.11.1)
-      factory_bot (~> 4.11.1)
-      railties (>= 3.0.0)
+    factory_bot (6.1.0)
+      activesupport (>= 5.0.0)
+    factory_bot_rails (6.1.0)
+      factory_bot (~> 6.1.0)
+      railties (>= 5.0.0)
     ffi (1.12.2)
     ffi (1.12.2-x86-mingw32)
     font-awesome-rails (4.7.0.5)
@@ -355,7 +355,7 @@ DEPENDENCIES
   coffee-rails
   devise (~> 4.7.1)
   exception_notification (= 2.6.1)
-  factory_bot_rails (~> 4.11.1)
+  factory_bot_rails
   ffi (>= 1.9.24)
   font-awesome-rails
   jbuilder

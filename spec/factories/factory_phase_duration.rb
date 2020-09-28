@@ -7,8 +7,8 @@ FactoryBot.define do
   factory :phase_duration do
     phase
     level
-    deadline_semesters 0
-    deadline_months 0
-    deadline_days 1
+    deadline_semesters { 0 }
+    deadline_months { 0 }
+    deadline_days { 1 }
   end
 end
