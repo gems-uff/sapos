@@ -121,6 +121,41 @@ describe Notification do
         end
       end
     end
+
+    describe "has_grades_report_pdf_attachment" do
+      context "should be valid when" do
+        it "email is individual and query has enrollments_id column alias" do
+          notification.has_grades_report_pdf_attachment = true
+          notification.sql_query = "SELECT ENROLLMENTS.ID AS enrollments_id FROM ENROLLMENTS"
+          notification.individual = true
+          expect(notification).to have(0).errors_on :has_grades_report_pdf_attachment
+        end
+      end
+      
+      context "should have error when" do
+        it "email individual is not individual" do
+          notification.has_grades_report_pdf_attachment = true
+          notification.sql_query = "SELECT ENROLLMENTS.ID AS enrollments_id FROM ENROLLMENTS"
+          notification.individual = false
+          expect(notification).to have_error(:individual_required).on :has_grades_report_pdf_attachment
+        end
+        
+        it "query has not enrollments_id column alias" do
+          notification.has_grades_report_pdf_attachment = true
+          notification.sql_query = "SELECT ENROLLMENTS.ID FROM ENROLLMENTS"
+          notification.individual = true
+          expect(notification).to have_error(:query_with_enrollments_id_alias_column_required).on :has_grades_report_pdf_attachment
+        end
+        
+        it "email is not individual and query has not enrollments_id column alias" do
+          notification.has_grades_report_pdf_attachment = true
+          notification.sql_query = "SELECT ENROLLMENTS.ID FROM ENROLLMENTS"
+          notification.individual = false
+          expect(notification).to have(2).errors_on :has_grades_report_pdf_attachment
+        end
+      end
+    end
+
   end
 
   describe "Methods" do

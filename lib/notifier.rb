@@ -45,10 +45,12 @@ module Notifier
     end
 
     messages = notifications[:notifications]
+    messages_attachments = notifications[:notifications_attachments] || {}
 
     messages.each do |message|
       options = {}
       m = message.merge(options)
+      m_attachments = messages_attachments[message]
       unless CustomVariable.notification_footer.empty?
         m[:body] += "\n\n\n" + CustomVariable.notification_footer
       end
@@ -58,24 +60,43 @@ module Notifier
         m[:to] = CustomVariable.redirect_email
       end
       unless m[:to].nil? or m[:to].empty?
-        ActionMailer::Base.mail(m).deliver!
+        
+        actionmailer_base = ActionMailer::Base.new
+
+        attachments_file_name_list = nil
+        if m_attachments
+          attachments_file_name_list = ""
+          m_attachments.keys.each do |attachment_key|
+            attachment = m_attachments[attachment_key]
+            actionmailer_base.attachments[attachment[:file_name]] = {mime_type: 'application/pdf', content: attachment[:file_contents]}
+            attachments_file_name_list += attachment[:file_name] + ", "
+          end
+          attachments_file_name_list = attachments_file_name_list[0..-3]
+        end
+ 
+        actionmailer_base.mail(m).deliver!
+
         NotificationLog.new(
           :notification_id => m[:notification_id], 
           :to => m[:to], 
           :subject => m[:subject],
-          :body => m[:body]
+          :body => m[:body],
+          :attachments_file_names => attachments_file_name_list
         ).save
-        Notifier.display_notification_info(m)
+        Notifier.display_notification_info(m, attachments_file_name_list)
       end
     end
   end
 
-  def self.display_notification_info(notification)
+  def self.display_notification_info(notification, attachments_file_name_list)
     Notifier.logger.info "\n#{Time.now.strftime('%Y/%m/%d %H:%M:%S')}"
     Notifier.logger.info "########## Notification ##########"
     Notifier.logger.info "Notifying #{notification[:to]}"
     Notifier.logger.info "Subject: #{notification[:subject]}"
     Notifier.logger.info "body: #{notification[:body]}"
+    if attachments_file_name_list
+      Notifier.logger.info "Attachments: #{attachments_file_name_list}"
+    end
     Notifier.logger.info "##################################"
   end
 end

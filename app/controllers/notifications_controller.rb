@@ -6,6 +6,8 @@ class NotificationsController < ApplicationController
   skip_authorization_check :only => [:notify]
   skip_before_action :authenticate_user!, :only => :notify
   before_action :permit_notification_params
+  helper PdfHelper
+  helper EnrollmentsPdfHelper
 
   def permit_notification_params
     params[:notification_params].permit! unless params[:notification_params].nil?
@@ -21,10 +23,10 @@ class NotificationsController < ApplicationController
                             :type => :member
 
 
-    form_columns = [:title, :frequency, :notification_offset, :query_offset, :query, :params, :individual, :to_template, :subject_template, :body_template]
+    form_columns = [:title, :frequency, :notification_offset, :query_offset, :query, :params, :individual, :has_grades_report_pdf_attachment, :to_template, :subject_template, :body_template]
     config.columns = form_columns
     config.update.columns = form_columns
-    config.create.columns = [:title, :frequency, :notification_offset, :query_offset, :query, :individual, :to_template, :subject_template, :body_template]
+    config.create.columns = [:title, :frequency, :notification_offset, :query_offset, :query, :individual, :has_grades_report_pdf_attachment, :to_template, :subject_template, :body_template]
     config.show.columns = form_columns + [:next_execution]
     config.list.columns = [:title, :frequency, :notification_offset, :query_offset, :next_execution]
 
@@ -35,6 +37,7 @@ class NotificationsController < ApplicationController
     config.columns[:frequency].options = {:options => Notification::FREQUENCIES}
     config.columns[:frequency].description = I18n.t('active_scaffold.notification.frequency_description')
     config.columns[:individual].description = I18n.t('active_scaffold.notification.individual_description')
+    config.columns[:has_grades_report_pdf_attachment].description = I18n.t('active_scaffold.notification.has_grades_report_pdf_attachment_description')
     config.columns[:notification_offset].description = I18n.t('active_scaffold.notification.notification_offset_description')
     config.columns[:query_offset].description = I18n.t('active_scaffold.notification.query_offset_description')
     config.columns[:query].update_columns = [:query, :params]
@@ -70,7 +73,26 @@ class NotificationsController < ApplicationController
       notification_params = notification_params.to_unsafe_h if notification_params.is_a?(ActionController::Parameters)
       query_date = Date.strptime(params[:data_consulta], "%Y-%m-%d") unless params[:data_consulta].nil?
       query_date ||= notification.query_date.to_date
-      Notifier.send_emails(notification.execute(override_params: notification_params))
+
+      notification_execute = notification.execute(override_params: notification_params)
+      notification_execute[:notifications].each do |message|
+
+        message_attachments = notification_execute[:notifications_attachments][message]
+        if message_attachments   
+          if message_attachments[:grades_report_pdf]
+            enrollments_id = message_attachments[:grades_report_pdf][:file_contents]
+
+            enrollment = Enrollment.find(enrollments_id)
+            class_enrollments = enrollment.class_enrollments.where(:situation => I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")).joins(:course_class).order("course_classes.year", "course_classes.semester")
+            accomplished_phases = enrollment.accomplishments.order(:conclusion_date)
+            deferrals = enrollment.deferrals.order(:approval_date)
+
+            message_attachments[:grades_report_pdf][:file_contents] = render_to_string(template: 'enrollments/grades_report_pdf', :assigns => {enrollment: enrollment, class_enrollments: class_enrollments, accomplished_phases: accomplished_phases, deferrals: deferrals})
+          end
+        end
+      end
+
+      Notifier.send_emails(notification_execute)
       self.successful = true
 
       flash[:info] = I18n.t('active_scaffold.notification.execute_now_success')

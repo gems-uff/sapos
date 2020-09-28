@@ -232,6 +232,7 @@ pt-BR:
         title: "Título"
         to_template: "Template do Destinatário"
         individual: "Individual"
+        has_grades_report_pdf_attachment: "Boletim anexado"
         no_name: "Sem nome"
       notification_log:
         body: "Corpo"
@@ -241,6 +242,7 @@ pt-BR:
         notification: "Notificação"
         notification_name: "Notificação"
         notification_removed_or_sync: "Notificação Síncrona ou Assíncrona Removida"
+        attachments_file_names: "Anexos"
       phase:
         accomplishments: "Realização de Etapas"
         description: "Descrição"
@@ -530,6 +532,8 @@ pt-BR:
           after_dismissal_date: "posterior a Data de Desligamento"
         notification:
           offset_invalid_value: "está com o valor inválido. Tente um número, seguido por y, M, W, d, h, m ou s"
+          individual_required: "requer que o email seja individual"
+          query_with_enrollments_id_alias_column_required: "requer que a Consulta possua com campo com alias enrollments_id" 
         scholarship:
           attributes:
             end_date:
@@ -848,6 +852,7 @@ pt-BR:
       execute_now: "Enviar agora"
       simulate: "Simular"
       individual_description: "Um e-mail para cada resultado"
+      has_grades_report_pdf_attachment_description: "Requer email individual e um campo na query, com alias enrollments_id"
       notification_offset_description: "Data de execução. Frequência Mensal com offset 3d executará todo dia 04 do mês"
       query_offset_description: "Data de consulta. Frequência Semestral com offset -1M terá variavel para dias 01/02 ou 01/07"
       execute_now_success: 'Notificação disparda com sucesso'
