@@ -45,9 +45,9 @@ describe CourseResearchArea do
       end
       context "should have uniqueness error when" do
         it "already exists the same course for the same research_area" do
-          course_research_area.course = FactoryGirl.create(:course)
-          course_research_area.research_area = FactoryGirl.create(:research_area)
-          FactoryGirl.create(:course_research_area, :course => course_research_area.course, :research_area => course_research_area.research_area)
+          course_research_area.course = FactoryBot.create(:course)
+          course_research_area.research_area = FactoryBot.create(:research_area)
+          FactoryBot.create(:course_research_area, :course => course_research_area.course, :research_area => course_research_area.research_area)
           expect(course_research_area).to have_error(:unique_pair).on :course_id
         end
       end

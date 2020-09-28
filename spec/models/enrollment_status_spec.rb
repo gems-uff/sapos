@@ -26,7 +26,7 @@ describe EnrollmentStatus do
       context "should have error taken when" do
         it "name is already in use" do
           name = "EnrollmentStatus name"
-          FactoryGirl.create(:enrollment_status, :name => name)
+          FactoryBot.create(:enrollment_status, :name => name)
           enrollment_status.name = name
           expect(enrollment_status).to have_error(:taken).on :name
         end

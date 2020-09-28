@@ -27,7 +27,7 @@ describe ResearchArea do
       context "should have error taken when" do
         it "name is already in use" do
           name = "ResearchArea name"
-          FactoryGirl.create(:research_area, :name => name)
+          FactoryBot.create(:research_area, :name => name)
           research_area.name = name
           expect(research_area).to have_error(:taken).on :name
         end
@@ -49,7 +49,7 @@ describe ResearchArea do
       context "should have error taken when" do
         it "code is already in use" do
           code = "ResearchArea code"
-          FactoryGirl.create(:research_area, :code => code)
+          FactoryBot.create(:research_area, :code => code)
           research_area.code = code
           expect(research_area).to have_error(:taken).on :code
         end

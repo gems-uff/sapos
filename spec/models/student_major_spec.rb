@@ -45,9 +45,9 @@ describe StudentMajor do
       end
       context "should have uniqueness error when" do
         it "already exists the same student for the same major" do
-          student_major.student = FactoryGirl.create(:student)
-          student_major.major = FactoryGirl.create(:major)
-          FactoryGirl.create(:student_major, :student => student_major.student, :major => student_major.major)
+          student_major.student = FactoryBot.create(:student)
+          student_major.major = FactoryBot.create(:major)
+          FactoryBot.create(:student_major, :student => student_major.student, :major => student_major.major)
           expect(student_major).to have_error(:unique_pair).on :student_id
         end
       end

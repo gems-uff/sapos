@@ -31,7 +31,7 @@ describe Professor do
       context "should have error taken when" do
         it "cpf is already in use" do
           cpf = "Professor cpf"
-          FactoryGirl.create(:professor, :cpf => cpf)
+          FactoryBot.create(:professor, :cpf => cpf)
           professor.cpf = cpf
           expect(professor).to have_error(:taken).on :cpf
         end
@@ -64,7 +64,7 @@ describe Professor do
       end
       context "should have error taken when" do
         it "email is already in use" do
-          other_professor = FactoryGirl.create(:professor, :email => "professor@sapos.com")
+          other_professor = FactoryBot.create(:professor, :email => "professor@sapos.com")
           professor.email = other_professor.email
           expect(professor).to have_error(:taken).on :email
         end
@@ -83,7 +83,7 @@ describe Professor do
       end
       context "should have error taken when" do
         it "enrollment_number is already in use" do
-          other_professor = FactoryGirl.create(:professor, :enrollment_number => "Enrollment number")
+          other_professor = FactoryBot.create(:professor, :enrollment_number => "Enrollment number")
           professor.enrollment_number = other_professor.enrollment_number
           expect(professor).to have_error(:taken).on :enrollment_number
         end
@@ -96,18 +96,18 @@ describe Professor do
         expect(professor.advisement_points).to eql("0.0")
       end
       it "should return the spected number if the professor has advisement_authorizations (default)" do
-        professor = FactoryGirl.create(:professor)
-        other_professor = FactoryGirl.create(:professor)
-        enrollment = FactoryGirl.create(:enrollment)
-        other_enrollment = FactoryGirl.create(:enrollment, :level => enrollment.level)
+        professor = FactoryBot.create(:professor)
+        other_professor = FactoryBot.create(:professor)
+        enrollment = FactoryBot.create(:enrollment)
+        other_enrollment = FactoryBot.create(:enrollment, :level => enrollment.level)
 
-        FactoryGirl.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
-        FactoryGirl.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
+        FactoryBot.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
+        FactoryBot.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
 
-        FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
-        FactoryGirl.create(:advisement, :professor => professor, :enrollment => other_enrollment)
+        FactoryBot.create(:advisement, :professor => professor, :enrollment => enrollment)
+        FactoryBot.create(:advisement, :professor => professor, :enrollment => other_enrollment)
 
-        FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => other_enrollment, :main_advisor => false)
+        FactoryBot.create(:advisement, :professor => other_professor, :enrollment => other_enrollment, :main_advisor => false)
 
         expect(professor.advisement_points).to eql("1.5")
       end
@@ -120,18 +120,18 @@ describe Professor do
         CustomVariable.create(:variable=>:single_advisor_points, :value=>"2.0")
         CustomVariable.create(:variable=>:multiple_advisor_points, :value=>"1.0")
 
-        professor = FactoryGirl.create(:professor)
-        other_professor = FactoryGirl.create(:professor)
-        enrollment = FactoryGirl.create(:enrollment)
-        other_enrollment = FactoryGirl.create(:enrollment, :level => enrollment.level)
+        professor = FactoryBot.create(:professor)
+        other_professor = FactoryBot.create(:professor)
+        enrollment = FactoryBot.create(:enrollment)
+        other_enrollment = FactoryBot.create(:enrollment, :level => enrollment.level)
 
-        FactoryGirl.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
-        FactoryGirl.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
+        FactoryBot.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
+        FactoryBot.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
 
-        FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
-        FactoryGirl.create(:advisement, :professor => professor, :enrollment => other_enrollment)
+        FactoryBot.create(:advisement, :professor => professor, :enrollment => enrollment)
+        FactoryBot.create(:advisement, :professor => professor, :enrollment => other_enrollment)
 
-        FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => other_enrollment, :main_advisor => false)
+        FactoryBot.create(:advisement, :professor => other_professor, :enrollment => other_enrollment, :main_advisor => false)
 
         expect(professor.advisement_points).to eql("3.0")
       end
@@ -139,39 +139,39 @@ describe Professor do
     describe "advisement_point" do
       context "should return 0 when" do
         it "the professor has no advisement_authorizations" do
-          enrollment = FactoryGirl.create(:enrollment)
+          enrollment = FactoryBot.create(:enrollment)
           expect(professor.advisement_point(enrollment)).to eql(0.0)
         end
         it "the enrollment is not advised by the professor" do
-          professor = FactoryGirl.create(:professor)
-          other_professor = FactoryGirl.create(:professor)
-          enrollment = FactoryGirl.create(:enrollment)
-          FactoryGirl.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
-          FactoryGirl.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
-          FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => enrollment)
+          professor = FactoryBot.create(:professor)
+          other_professor = FactoryBot.create(:professor)
+          enrollment = FactoryBot.create(:enrollment)
+          FactoryBot.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
+          FactoryBot.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
+          FactoryBot.create(:advisement, :professor => other_professor, :enrollment => enrollment)
 
           expect(professor.advisement_point(enrollment)).to eql(0.0)
         end
         it "the enrollment have a dismissal" do
-          professor = FactoryGirl.create(:professor)
-          enrollment = FactoryGirl.create(:enrollment)
-          FactoryGirl.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
-          FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
-          FactoryGirl.create(:dismissal, :enrollment => enrollment)
+          professor = FactoryBot.create(:professor)
+          enrollment = FactoryBot.create(:enrollment)
+          FactoryBot.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
+          FactoryBot.create(:advisement, :professor => professor, :enrollment => enrollment)
+          FactoryBot.create(:dismissal, :enrollment => enrollment)
 
           expect(professor.advisement_point(enrollment)).to eql(0.0)
         end
       end
       it "should return 1 when the professor is the only authorized advisor (default)" do
 
-        professor = FactoryGirl.create(:professor)
-        other_professor = FactoryGirl.create(:professor)
-        enrollment = FactoryGirl.create(:enrollment)
+        professor = FactoryBot.create(:professor)
+        other_professor = FactoryBot.create(:professor)
+        enrollment = FactoryBot.create(:enrollment)
 
-        FactoryGirl.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
+        FactoryBot.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
 
-        FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
-        FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
+        FactoryBot.create(:advisement, :professor => professor, :enrollment => enrollment)
+        FactoryBot.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
 
         expect(professor.advisement_point(enrollment)).to eql(1.0)
       end
@@ -181,28 +181,28 @@ describe Professor do
         config.delete unless config.nil?
         CustomVariable.create(:variable=>:single_advisor_points, :value=>"2.0")
 
-        professor = FactoryGirl.create(:professor)
-        other_professor = FactoryGirl.create(:professor)
-        enrollment = FactoryGirl.create(:enrollment)
+        professor = FactoryBot.create(:professor)
+        other_professor = FactoryBot.create(:professor)
+        enrollment = FactoryBot.create(:enrollment)
 
-        FactoryGirl.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
+        FactoryBot.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
 
-        FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
-        FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
+        FactoryBot.create(:advisement, :professor => professor, :enrollment => enrollment)
+        FactoryBot.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
 
         expect(professor.advisement_point(enrollment)).to eql(2.0)
       end      
 
       it "should return 0.5 when the professor is not the only authorized advisor (default)" do
-        professor = FactoryGirl.create(:professor)
-        other_professor = FactoryGirl.create(:professor)
-        enrollment = FactoryGirl.create(:enrollment)
+        professor = FactoryBot.create(:professor)
+        other_professor = FactoryBot.create(:professor)
+        enrollment = FactoryBot.create(:enrollment)
 
-        FactoryGirl.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
-        FactoryGirl.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
+        FactoryBot.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
+        FactoryBot.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
 
-        FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
-        FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
+        FactoryBot.create(:advisement, :professor => professor, :enrollment => enrollment)
+        FactoryBot.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
 
         expect(professor.advisement_point(enrollment)).to eql(0.5)
       end
@@ -212,15 +212,15 @@ describe Professor do
         config.delete unless config.nil?
         CustomVariable.create(:variable=>:multiple_advisor_points, :value=>"1.0")
 
-        professor = FactoryGirl.create(:professor)
-        other_professor = FactoryGirl.create(:professor)
-        enrollment = FactoryGirl.create(:enrollment)
+        professor = FactoryBot.create(:professor)
+        other_professor = FactoryBot.create(:professor)
+        enrollment = FactoryBot.create(:enrollment)
 
-        FactoryGirl.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
-        FactoryGirl.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
+        FactoryBot.create(:advisement_authorization, :professor => professor, :level => enrollment.level)
+        FactoryBot.create(:advisement_authorization, :professor => other_professor, :level => enrollment.level)
 
-        FactoryGirl.create(:advisement, :professor => professor, :enrollment => enrollment)
-        FactoryGirl.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
+        FactoryBot.create(:advisement, :professor => professor, :enrollment => enrollment)
+        FactoryBot.create(:advisement, :professor => other_professor, :enrollment => enrollment, :main_advisor => false)
 
         expect(professor.advisement_point(enrollment)).to eql(1.0)
       end

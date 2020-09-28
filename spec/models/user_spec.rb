@@ -5,7 +5,7 @@ require "spec_helper"
 
 describe User do
   before :all do
-    FactoryGirl.create :role_administrador
+    FactoryBot.create :role_administrador
   end
   let(:user) { User.new }
   subject { user }
@@ -25,7 +25,7 @@ describe User do
       end
       context "should have error taken when" do
         it "email is already in use" do
-          FactoryGirl.create(:user, :email => 'email@sapos.com')
+          FactoryBot.create(:user, :email => 'email@sapos.com')
           user.email = 'email@sapos.com'
           expect(user).to have_error(:taken).on :email
         end
@@ -47,7 +47,7 @@ describe User do
       context "should have error taken when" do
         it "name is already in use" do
           name = "Username"
-          FactoryGirl.create(:user, :name => name)
+          FactoryBot.create(:user, :name => name)
           user.name = name
           expect(user).to have_error(:taken).on :name
         end
@@ -56,7 +56,7 @@ describe User do
     describe "role" do
       context "should be valid when" do
         it "role is not null" do
-          user.role = FactoryGirl.create(:role)
+          user.role = FactoryBot.create(:role)
           expect(user).to have(0).errors_on :role
         end
       end

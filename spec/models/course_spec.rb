@@ -26,7 +26,7 @@ describe Course do
       context "should have error taken when" do
 	it "name of available course is already in use" do
           name = "Course"
-	  FactoryGirl.create(:course, :name => name, :available => true)
+	  FactoryBot.create(:course, :name => name, :available => true)
 	  course.name = name
 	  expect(course).to have_error(:check_unique_name_for_available_courses).on :name
 	end
@@ -62,7 +62,7 @@ describe Course do
       context "should have error taken when" do
         it "code is already in use" do
           code = "Code"
-          FactoryGirl.create(:course, :code => code)
+          FactoryBot.create(:course, :code => code)
           course.code = code
           expect(course).to have_error(:taken).on :code
         end

@@ -84,7 +84,7 @@ describe CourseClass do
           course_class.year = 2013
           course_class.semester = CourseClass::SEMESTERS.first
           course_class.course = Course.new(:name => other_name)
-          course_class.course.course_type = FactoryGirl.create(:course_type, :show_class_name => true)
+          course_class.course.course_type = FactoryBot.create(:course_type, :show_class_name => true)
           expect(course_class.to_label).to eql("#{other_name} (#{name}) - #{course_class.year}/#{course_class.semester}")
         end
         it "name is not null and course type doesnt show class name" do
@@ -94,7 +94,7 @@ describe CourseClass do
           course_class.year = 2013
           course_class.semester = CourseClass::SEMESTERS.first
           course_class.course = Course.new(:name => other_name)
-          course_class.course.course_type = FactoryGirl.create(:course_type, :show_class_name => false)
+          course_class.course.course_type = FactoryBot.create(:course_type, :show_class_name => false)
           expect(course_class.to_label).to eql("#{other_name} - #{course_class.year}/#{course_class.semester}")
         end
         it "name is null" do
@@ -102,7 +102,7 @@ describe CourseClass do
           course_class.year = 2013
           course_class.semester = CourseClass::SEMESTERS.first
           course_class.course = Course.new(:name => course_name)
-          course_class.course.course_type = FactoryGirl.create(:course_type, :show_class_name => true)
+          course_class.course.course_type = FactoryBot.create(:course_type, :show_class_name => true)
           expect(course_class.to_label).to eql("#{course_name} - #{course_class.year}/#{course_class.semester}")
         end
       end

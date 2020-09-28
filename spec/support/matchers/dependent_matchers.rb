@@ -6,7 +6,7 @@ RSpec::Matchers.define :be_able_to_be_destroyed do
 
   match do |actual|
     delete_success = true
-    obj = FactoryGirl.create(actual.class.name.underscore.to_sym)
+    obj = FactoryBot.create(actual.class.name.underscore.to_sym)
     begin
       obj.destroy
       delete_success = obj.destroyed?
@@ -40,8 +40,8 @@ RSpec::Matchers.define :restrict_destroy_when_exists do |dependent_class|
     @fk = (name + '_id').to_sym if @fk.nil? 
     restrict_success = true
 
-    obj = FactoryGirl.create(name.to_sym)
-    FactoryGirl.create(dependent_class, @fk=> obj.id)
+    obj = FactoryBot.create(name.to_sym)
+    FactoryBot.create(dependent_class, @fk=> obj.id)
     obj.reload
     begin
       obj.destroy
@@ -75,8 +75,8 @@ RSpec::Matchers.define :destroy_dependent do |dependent_class|
 
     destroy_success = true
 
-    obj = FactoryGirl.create(name.to_sym)
-    dependent = FactoryGirl.create(dependent_class, @fk => obj.id)
+    obj = FactoryBot.create(name.to_sym)
+    dependent = FactoryBot.create(dependent_class, @fk => obj.id)
     begin
       obj.destroy
       dependent.reload

@@ -4,7 +4,7 @@
 require "spec_helper"
 
 describe ClassEnrollment do
-  let(:class_enrollment) { FactoryGirl.build(:class_enrollment) }
+  let(:class_enrollment) { FactoryBot.build(:class_enrollment) }
   subject { class_enrollment }
   describe "Validations" do
     describe "enrollment" do
@@ -36,9 +36,9 @@ describe ClassEnrollment do
       end
       context "should have error taken when" do
         it "course_class is already assigned for the same enrollment" do
-          course_class = FactoryGirl.create(:course_class)
-          enrollment = FactoryGirl.create(:enrollment)
-          FactoryGirl.create(:class_enrollment, :enrollment => enrollment, :course_class => course_class)
+          course_class = FactoryBot.create(:course_class)
+          enrollment = FactoryBot.create(:enrollment)
+          FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => course_class)
 
           class_enrollment.course_class = course_class
           class_enrollment.enrollment = enrollment

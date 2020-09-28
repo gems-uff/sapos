@@ -80,7 +80,7 @@ describe EnrollmentHold do
     describe "base" do
       context "should have error when" do
         it "year-semester is before enrollment admission date" do
-          e = FactoryGirl.create(:enrollment)
+          e = FactoryBot.create(:enrollment)
           enrollment_hold.enrollment = e
           enrollment_hold.year = e.admission_date.year - 1
           enrollment_hold.semester = 1
@@ -88,7 +88,7 @@ describe EnrollmentHold do
         end
 
         it "year-semester is before enrollment admission date" do
-          d = FactoryGirl.create(:dismissal)
+          d = FactoryBot.create(:dismissal)
           e = d.enrollment
           enrollment_hold.enrollment = e
           enrollment_hold.year = e.admission_date.year

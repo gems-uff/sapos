@@ -26,7 +26,7 @@ describe Country do
       context "should have error taken when" do
         it "name is already in use" do
           name = "Country name"
-          FactoryGirl.create(:country, :name => name)
+          FactoryBot.create(:country, :name => name)
           country.name = name
           expect(country).to have_error(:taken).on :name
         end
