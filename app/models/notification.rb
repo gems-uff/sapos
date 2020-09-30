@@ -163,21 +163,21 @@ class Notification < ApplicationRecord
 
           formatter = ERBFormatter.new(bindings)
           
-          attachments = {}
-
-          #add grades_report_pdf attachment if required
-          if self.has_grades_report_pdf_attachment 
-            attachment_file_name = "#{I18n.t('pdf_content.enrollment.grades_report.title')} -  #{Enrollment.find(bindings["enrollments_id"]).student.name}.pdf"
-            attachment_file_contents = bindings["enrollments_id"]
-            attachments[:grades_report_pdf] = {:file_name => attachment_file_name, :file_contents => attachment_file_contents}
-          end
-
           notification = {
               :notification_id => self.id,
               :to => formatter.format(self.to_template),
               :subject => formatter.format(self.subject_template),
               :body => formatter.format(self.body_template)
           }
+
+          attachments = {}
+
+          #add grades_report_pdf attachment if required
+          if self.has_grades_report_pdf_attachment
+            notification[:enrollments_id] = bindings["enrollments_id"]
+            attachment_file_name = "#{I18n.t('pdf_content.enrollment.grades_report.title')} -  #{Enrollment.find(bindings["enrollments_id"]).student.name}.pdf"
+            attachments[:grades_report_pdf] = {:file_name => attachment_file_name}
+          end
 
           notifications << notification
           notifications_attachments[notification] = attachments

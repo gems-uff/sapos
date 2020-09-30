@@ -80,7 +80,7 @@ class NotificationsController < ApplicationController
         message_attachments = notification_execute[:notifications_attachments][message]
         if message_attachments   
           if message_attachments[:grades_report_pdf]
-            enrollments_id = message_attachments[:grades_report_pdf][:file_contents]
+            enrollments_id = message[:enrollments_id]
 
             enrollment = Enrollment.find(enrollments_id)
             class_enrollments = enrollment.class_enrollments.where(:situation => I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")).joins(:course_class).order("course_classes.year", "course_classes.semester")
