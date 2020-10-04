@@ -63,7 +63,8 @@ module ClassEnrollmentsHelper
 
   def enrollment_form_column(record, options)
     logger.info "  RecordSelect Helper ClassEnrollmentsHelper\\enrollment_form_column"
-    options.merge!(disabled: true) if current_user.role_id == Role::ROLE_PROFESSOR 
+    options.merge!(disabled: true) if current_user.role_id == Role::ROLE_PROFESSOR
+    options.merge!(style: "width:320px; background-image:none !important; color:#000000 !important;")
     record_select_field :enrollment, record.enrollment || Enrollment.new, options.merge!(class: "text-input")
   end
 
