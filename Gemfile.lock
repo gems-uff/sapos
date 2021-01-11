@@ -250,7 +250,7 @@ GEM
     rdoc (6.2.1)
     recordselect (3.10.1)
       rails (>= 4.0.0)
-    redcarpet (3.5.0)
+    redcarpet (3.5.1)
     request_store (1.5.0)
       rack (>= 1.4)
     responders (3.0.0)
