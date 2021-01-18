@@ -59,7 +59,7 @@ gem 'font-awesome-rails'
 # Prawn to PDF
 gem 'prawn'
 gem 'prawn-table' 
-gem 'prawn_rails'
+gem 'prawn-rails'
 gem 'odf-report'
 gem 'clamsy', :git => 'https://github.com/gems-uff/clamsy.git', :branch => 'rails5'
 
