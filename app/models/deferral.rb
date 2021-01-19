@@ -54,8 +54,8 @@ class Deferral < ApplicationRecord
     }
     message_to_student = {
       :to => enrollment.student.email,
-      :subject => I18n.t('notifications.deferral.email_to_student.subject', info),
-      :body => I18n.t('notifications.deferral.email_to_student.body', info)
+      :subject => I18n.t('notifications.deferral.email_to_student.subject', **info),
+      :body => I18n.t('notifications.deferral.email_to_student.body', **info)
     }
     emails = [message_to_student]
     enrollment.advisements.each do |advisement|

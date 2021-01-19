@@ -77,8 +77,8 @@ class Advisement < ApplicationRecord
     }
     emails = [{
       :to => professor.email,
-      :subject => I18n.t('notifications.advisement.email_to_advisor.subject', advisor_info),
-      :body => I18n.t('notifications.advisement.email_to_advisor.body', advisor_info)
+      :subject => I18n.t('notifications.advisement.email_to_advisor.subject', **advisor_info),
+      :body => I18n.t('notifications.advisement.email_to_advisor.body', **advisor_info)
     }]
     Notifier.send_emails(notifications: emails)
   end
