@@ -10,10 +10,10 @@ RSpec::Matchers.define :have_error do |erro|
 
 
 
-    message = I18n.translate("errors.messages.#{erro}", parametro)
+    message = I18n.translate("errors.messages.#{erro}", **parametro)
     if message.include?(translation_missing_message)
-      message = I18n.translate("activerecord.errors.models.#{record.class.to_s.underscore}.#{erro}", parametro)
-      message = message.include?(translation_missing_message) ? I18n.translate("activerecord.errors.models.#{record.class.to_s.underscore}.attributes.#{atributo}.#{erro}", parametro) : message
+      message = I18n.translate("activerecord.errors.models.#{record.class.to_s.underscore}.#{erro}", **parametro)
+      message = message.include?(translation_missing_message) ? I18n.translate("activerecord.errors.models.#{record.class.to_s.underscore}.attributes.#{atributo}.#{erro}", **parametro) : message
     end
     return message
   end
