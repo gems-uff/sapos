@@ -77,10 +77,13 @@ class CustomVariable < ApplicationRecord
 
   def self.professor_login_can_post_grades
     config = CustomVariable.find_by_variable(:professor_login_can_post_grades)
-    if (!config.nil?) && (!config.value.nil?) && (config.value.strip.downcase == "yes")
-      return true
+    if (!config.nil?) && (!config.value.nil?)
+      formatted_value = config.value.strip.downcase
+      if (formatted_value == "yes") || (formatted_value == "yes_all_semesters")
+        return formatted_value
+      end
     else
-      return false
+      return "no"
     end    
   end
 
