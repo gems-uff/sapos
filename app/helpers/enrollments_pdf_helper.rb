@@ -8,7 +8,7 @@ module EnrollmentsPdfHelper
     enrollment ||= options[:enrollment]
     pdf.bounding_box([0, pdf.cursor - 3], :width => 560) do
 
-      pdf.font('Courier', :size => 8) do
+      pdf.font('FreeMono', :size => 8) do
         birthdate = enrollment.student.birthdate.nil? ? rescue_blank_text(nil) : I18n.localize(enrollment.student.birthdate, :format => :default)
 
         data_table = [
@@ -85,7 +85,7 @@ module EnrollmentsPdfHelper
   def grades_report_header(pdf, options={})
     enrollment ||= options[:enrollment]
     pdf.bounding_box([0, pdf.cursor - 3], :width => 560) do
-      pdf.font('Courier', :size => 8) do
+      pdf.font('FreeMono', :size => 8) do
         pdf.line_width 0.5
 
         common_header_part1(pdf, enrollment)
@@ -113,7 +113,7 @@ module EnrollmentsPdfHelper
   def enrollment_header(pdf, options={})
     enrollment ||= options[:enrollment]
     pdf.bounding_box([0, pdf.cursor - 3], :width => 560) do
-      pdf.font('Courier', :size => 8) do
+      pdf.font('FreeMono', :size => 8) do
         pdf.line_width 0.5
 
         common_header_part1(pdf, enrollment, [
@@ -199,7 +199,7 @@ module EnrollmentsPdfHelper
 
       pdf.table(header, :column_widths => [560],
                 :row_colors => ["E5E5FF"],
-                :cell_style => {:font => "Helvetica",
+                :cell_style => {:font => "FreeSans",
                                 :size => 9,
                                 :inline_format => true,
                                 :border_width => 1,
@@ -226,7 +226,7 @@ module EnrollmentsPdfHelper
 
       pdf.table(header, :column_widths => table_width,
                 :row_colors => ["E5E5FF"],
-                :cell_style => {:font => "Helvetica",
+                :cell_style => {:font => "FreeSans",
                                 :size => 9,
                                 :inline_format => true,
                                 :border_width => 1,
@@ -287,7 +287,7 @@ module EnrollmentsPdfHelper
 
           pdf.table(table_data, :column_widths => table_width,
                     :row_colors => ["F2F2FF", "E5E5FF"],
-                    :cell_style => {:font => "Helvetica",
+                    :cell_style => {:font => "FreeSans",
                                     :size => 9,
                                     :inline_format => true,
                                     :border_width => 1,
@@ -298,7 +298,7 @@ module EnrollmentsPdfHelper
                     }
           ) do |table|
             table.column(1).align = :left
-            table.column(1).font = "Helvetica"
+            table.column(1).font = "FreeSans"
             table.column(1).padding = [2, 4]
           end
           pdf.fill_color "000080"
@@ -325,7 +325,7 @@ module EnrollmentsPdfHelper
                 ]]
       pdf.table(footer, :column_widths => table_width,
                 :row_colors => ["E5E5FF"],
-                :cell_style => {:font => "Helvetica",
+                :cell_style => {:font => "FreeSans",
                                 :size => 9,
                                 :inline_format => true,
                                 :border_width => 1,
@@ -369,7 +369,7 @@ module EnrollmentsPdfHelper
     pdf.table(header, :column_widths => table_width,
               :width => 560,
               :row_colors => ["E5E5FF"],
-              :cell_style => {:font => "Helvetica",
+              :cell_style => {:font => "FreeSans",
                               :size => 9,
                               :inline_format => true,
                               :border_width => 1,
@@ -436,7 +436,7 @@ module EnrollmentsPdfHelper
 
       pdf.table(table_data, :column_widths => table_width,
                 :row_colors => ["F2F2FF", "E5E5FF"],
-                :cell_style => {:font => "Helvetica",
+                :cell_style => {:font => "FreeSans",
                                 :size => 9,
                                 :inline_format => true,
                                 :border_width => 1,
@@ -449,7 +449,7 @@ module EnrollmentsPdfHelper
         table.row(0).borders = [:left, :right, :top]
         table.row(0).border_top_width = 1
         table.column(1).align = :left
-        table.column(1).font = "Helvetica"
+        table.column(1).font = "FreeSans"
         table.column(1).padding = [2, 4]
         bold_rows.each do |i|
           table.column(1).row(i).align = :right
@@ -466,7 +466,7 @@ module EnrollmentsPdfHelper
       ]
       pdf.table(footer, :column_widths => table_width,
                 :row_colors => ["E5E5FF"],
-                :cell_style => {:font => "Helvetica",
+                :cell_style => {:font => "FreeSans",
                                 :size => 9,
                                 :inline_format => true,
                                 :border_width => 1,
@@ -552,7 +552,7 @@ module EnrollmentsPdfHelper
     end
 
     if not data_table_rows.nil? 
-      table = curr_pdf.make_table(data_table_rows, :cell_style => {:borders => [:left, :right, :bottom, :top], :border_bottom_width => 0.5, :border_top_width => 0.5, :width => 560, :padding_top => 5.5, :padding_bottom => 7.5, :inline_format => true, :font => "Courier", :size => 8, :border_color => "000080" })
+      table = curr_pdf.make_table(data_table_rows, :cell_style => {:borders => [:left, :right, :bottom, :top], :border_bottom_width => 0.5, :border_top_width => 0.5, :width => 560, :padding_top => 5.5, :padding_bottom => 7.5, :inline_format => true, :font => "FreeMono", :size => 8, :border_color => "000080" })
       table.row(0).border_top_width = 1.0
 
       if data_table_rows_defense_committee.length == 0
@@ -565,17 +565,17 @@ module EnrollmentsPdfHelper
     if (not data_table_rows_defense_committee.nil?) && (data_table_rows_defense_committee.length > 0)
 
       #title row	 
-	    table_committee = curr_pdf.make_table(data_table_rows_defense_committee[0,1], :cell_style => {:borders => [:top, :left, :right], :border_top_width => 0.5, :width => 560, :padding_top => 5.5, :padding_bottom => 4.9, :inline_format => true, :font => "Courier", :size => 8, :border_color => "000080" })
+	    table_committee = curr_pdf.make_table(data_table_rows_defense_committee[0,1], :cell_style => {:borders => [:top, :left, :right], :border_top_width => 0.5, :width => 560, :padding_top => 5.5, :padding_bottom => 4.9, :inline_format => true, :font => "FreeMono", :size => 8, :border_color => "000080" })
       table_committee.draw
 			  	  	  
       #middle rows (if any)
       if data_table_rows_defense_committee.length > 2  
-	table_committee = curr_pdf.make_table(data_table_rows_defense_committee[1,data_table_rows_defense_committee.length - 2], :cell_style => {:borders => [:left, :right], :width => 560, :padding_top => 0.0, :padding_bottom => 1.0, :inline_format => true, :font => "Courier", :size => 8, :border_color => "000080" })
+	table_committee = curr_pdf.make_table(data_table_rows_defense_committee[1,data_table_rows_defense_committee.length - 2], :cell_style => {:borders => [:left, :right], :width => 560, :padding_top => 0.0, :padding_bottom => 1.0, :inline_format => true, :font => "FreeMono", :size => 8, :border_color => "000080" })
 	table_committee.draw
       end
 
       #last row 
-      table_committee = curr_pdf.make_table(data_table_rows_defense_committee[data_table_rows_defense_committee.length - 1,data_table_rows_defense_committee.length], :cell_style => {:borders => [:left, :right, :bottom], :border_bottom_width => 1.0 , :width => 560, :padding_top => 0.0, :padding_bottom => 8.5, :inline_format => true, :font => "Courier", :size => 8, :border_color => "000080" })
+      table_committee = curr_pdf.make_table(data_table_rows_defense_committee[data_table_rows_defense_committee.length - 1,data_table_rows_defense_committee.length], :cell_style => {:borders => [:left, :right, :bottom], :border_bottom_width => 1.0 , :width => 560, :padding_top => 0.0, :padding_bottom => 8.5, :inline_format => true, :font => "FreeMono", :size => 8, :border_color => "000080" })
       table_committee.draw
     end
 

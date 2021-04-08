@@ -79,7 +79,7 @@ module PdfHelper
     last_box_width2 = 335
 
     last_box_y = pdf.bounds.bottom - FOOTER_TOP_MARGIN  
-    pdf.font('Courier', :size => 8) do
+    pdf.font('FreeMono', :size => 8) do
       pdf.bounding_box([0, last_box_y], :width => last_box_width1, :height => last_box_height) do
         pdf.stroke_bounds
         current_x = x
@@ -88,7 +88,7 @@ module PdfHelper
       end
     end
 
-    pdf.font('Courier', :size => 6) do
+    pdf.font('FreeMono', :size => 6) do
       pdf.bounding_box([last_box_width1, last_box_y], :width => last_box_width2, :height => last_box_height) do
         pdf.stroke_bounds
         current_x = x
@@ -111,7 +111,7 @@ module PdfHelper
       end
     end
 
-    pdf.font('Courier', :size => 8) do
+    pdf.font('FreeMono', :size => 8) do
       pdf.bounding_box([last_box_width1 + last_box_width2, last_box_y], :width => pdf.bounds.right - last_box_width1 - last_box_width2 - diff_width, :height => last_box_height) do
         pdf.stroke_bounds
         current_x = x
@@ -133,7 +133,7 @@ module PdfHelper
     last_box_width2 = 335
 
     last_box_y = pdf.bounds.bottom  #pdf.bounds.bottom + last_box_height# pdf.cursor - 15
-    pdf.font('Courier', :size => 8) do
+    pdf.font('FreeMono', :size => 8) do
       pdf.bounding_box([0, last_box_y], :width => last_box_width1, :height => last_box_height) do
         current_x = x
         pdf.move_down last_box_height/2
@@ -177,6 +177,32 @@ module PdfHelper
       :bottom_margin => (pdf_config.signature_footer ? 96 + FOOTER_TOP_MARGIN : 1.cm),
       :filename => name
     }.merge(options)) do |pdf|
+
+      freefont_directory = "#{Rails.root}/vendor/assets/fonts/gnu-freefont/"
+
+      pdf.font_families.update("FreeMono" => {
+        :normal => freefont_directory + "FreeMono.ttf",
+        :bold => freefont_directory + "FreeMonoBold.ttf",
+        :italic => freefont_directory + "FreeMonoOblique.ttf",
+        :bold_italic => freefont_directory + "FreeMonoBoldOblique.ttf"
+      })
+
+      pdf.font_families.update("FreeSans" => {
+        :normal => freefont_directory + "FreeSans.ttf",
+        :bold => freefont_directory + "FreeSansBold.ttf",
+        :italic => freefont_directory + "FreeSansOblique.ttf",
+        :bold_italic => freefont_directory + "FreeSansBoldOblique.ttf"
+      })
+
+      pdf.font_families.update("FreeSerif" => {
+        :normal => freefont_directory + "FreeSerif.ttf",
+        :bold => freefont_directory + "FreeSerifBold.ttf",
+        :italic => freefont_directory + "FreeSerifOblique.ttf",
+        :bold_italic => freefont_directory + "FreeSerifBoldOblique.ttf"
+      })
+
+      pdf.fallback_fonts(["FreeSans"])
+
       pdf.fill_color "000080"
       pdf.stroke_color '000080'
       header(pdf, title, pdf_config)
@@ -193,7 +219,7 @@ module PdfHelper
         pdf.create_stamp("watermark") do
           pdf.rotate(60, :origin => [0, 0]) do
            pdf.fill_color "993333"
-           pdf.font('Courier', :size => 22) do
+           pdf.font('FreeMono', :size => 22) do
              pdf.draw_text I18n.t('pdf_content.professor_watermark'), :at => [0, 0]
            end
            pdf.fill_color "000000"
@@ -212,7 +238,7 @@ module PdfHelper
 
     pdf_table_with_title(pdf, [width], title, [], data, options) do |table|
       table.column(0).align = :left
-      table.column(0).font = "Courier"
+      table.column(0).font = "FreeMono"
       #table.column(0).size = 10
       table.column(0).padding = [2, 5]
       yield table unless block.nil?
@@ -232,7 +258,7 @@ module PdfHelper
     pdf.table(title, :column_widths => [widths.sum],
               :width => widths.sum,
               :row_colors => ["E5E5FF"],
-              :cell_style => {:font => "Helvetica",
+              :cell_style => {:font => "FreeSans",
                               :size => 9,
                               :inline_format => true,
                               :border_width => 1,
@@ -255,7 +281,7 @@ module PdfHelper
       pdf.table(header, :column_widths => widths,
                 :width => widths.sum,
                 :row_colors => ["E5E5FF"],
-                :cell_style => {:font => "Helvetica",
+                :cell_style => {:font => "FreeSans",
                                 :size => 9,
                                 :inline_format => true,
                                 :border_width => 1,
@@ -274,7 +300,7 @@ module PdfHelper
       pdf.table(data, :column_widths => widths,
                 :width => widths.sum,
                 :row_colors => ["F2F2FF", "E5E5FF"],
-                :cell_style => {:font => "Helvetica",
+                :cell_style => {:font => "FreeSans",
                                 :size => 9,
                                 :inline_format => true,
                                 :border_width => 1,
