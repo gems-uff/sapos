@@ -6,6 +6,6 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "codemirror": "^5.55.0"
+    "codemirror": "^5.58.2"
   }
 }
