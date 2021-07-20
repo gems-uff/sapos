@@ -12,6 +12,10 @@ class PhaseDuration < ApplicationRecord
   validates :phase, :presence => true
   validates :level, :presence => true
 
+  validates :deadline_semesters, numericality: { only_integer: true }
+  validates :deadline_months, numericality: { only_integer: true }
+  validates :deadline_days, numericality: { only_integer: true }
+
   validate :deadline_validation
 
 

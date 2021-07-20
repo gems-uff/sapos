@@ -54,6 +54,99 @@ describe PhaseDuration do
         end
       end
     end
+
+    #-------------------------------------------------------------------------
+
+    describe "deadline_semesters" do
+
+      context "should be invalid when" do
+  
+        invalid_values = {'nil': nil, 'empty string': '', 'not numeric string': 'a', 'not integer string': '1.5', 'not integer': 1.5}
+
+        invalid_values.each do |description, value| 
+          it "is #{description}" do 
+            phase_duration.deadline_semesters = value
+            expect( phase_duration.errors_on(:deadline_semesters) ).not_to be_empty
+          end
+        end  
+      end
+
+      context "should be valid when" do
+  
+        valid_values = {'zero string': '0', 'positive integer string': '1', 'negative integer string': '-1', 'zero': 0, 'positive integer': 1, 'negative integer': -1}
+
+        valid_values.each do |description, value| 
+          it "is #{description}" do 
+            phase_duration.deadline_semesters = value
+            expect( phase_duration.errors_on(:deadline_semesters) ).to be_empty
+          end
+        end  
+      end
+
+    end
+
+    #-------------------------------------------------------------------------
+
+    describe "deadline_months" do
+
+      context "should be invalid when" do
+  
+        invalid_values = {'nil': nil, 'empty string': '', 'not numeric string': 'a', 'not integer string': '1.5', 'not integer': 1.5}
+
+        invalid_values.each do |description, value| 
+          it "is #{description}" do 
+            phase_duration.deadline_months = value
+            expect( phase_duration.errors_on(:deadline_months) ).not_to be_empty
+          end
+        end  
+      end
+
+      context "should be valid when" do
+  
+        valid_values = {'zero string': '0', 'positive integer string': '1', 'negative integer string': '-1', 'zero': 0, 'positive integer': 1, 'negative integer': -1}
+
+        valid_values.each do |description, value| 
+          it "is #{description}" do 
+            phase_duration.deadline_months = value
+            expect( phase_duration.errors_on(:deadline_months) ).to be_empty
+          end
+        end  
+      end
+
+    end
+
+    #-------------------------------------------------------------------------
+
+    describe "deadline_days" do
+
+      context "should be invalid when" do
+  
+        invalid_values = {'nil': nil, 'empty string': '', 'not numeric string': 'a', 'not integer string': '1.5', 'not integer': 1.5}
+
+        invalid_values.each do |description, value| 
+          it "is #{description}" do 
+            phase_duration.deadline_days = value
+            expect( phase_duration.errors_on(:deadline_days) ).not_to be_empty
+          end
+        end  
+      end
+
+      context "should be valid when" do
+  
+        valid_values = {'zero string': '0', 'positive integer string': '1', 'negative integer string': '-1', 'zero': 0, 'positive integer': 1, 'negative integer': -1}
+
+        valid_values.each do |description, value| 
+          it "is #{description}" do 
+            phase_duration.deadline_days = value
+            expect( phase_duration.errors_on(:deadline_days) ).to be_empty
+          end
+        end  
+      end
+
+    end
+
+    #-------------------------------------------------------------------------
+
     describe "validate_destroy" do
       context "should be valid when" do
         it "there is no deferral with the same level and no accomplishment with the same phase and level as the phase_duration" do
