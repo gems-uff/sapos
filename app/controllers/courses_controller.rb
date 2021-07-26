@@ -40,7 +40,8 @@ class CoursesController < ApplicationController
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
 
   def record_select_conditions_from_controller
-    if params[:available]
+    if params[:available] ||
+    (( params[:action] == "browse" ) && ( request.referer.first( (root_url + "course_classes").size ) == ( root_url + "course_classes" )))
       [Course.arel_table[:available].eq(true).to_sql]
     else
       super
