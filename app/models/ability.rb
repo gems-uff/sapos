@@ -5,7 +5,7 @@ class Ability
   include CanCan::Ability
 
   ALL_MODELS = [Accomplishment, Advisement, AdvisementAuthorization, Allocation,
-                City, ClassEnrollment, Country, Course, CourseClass, CourseType,
+                City, ClassEnrollment, ClassSchedule, Country, Course, CourseClass, CourseType,
                 CustomVariable, Deferral, DeferralType, Dismissal, 
                 DismissalReason, Enrollment, EnrollmentHold, EnrollmentStatus, 
                 Institution, Level, Major, Notification, NotificationLog, Phase, 
@@ -36,7 +36,7 @@ class Ability
       can :manage, (Ability::ALL_MODELS - [Role, CustomVariable, ReportConfiguration])
       can :read, (Role)
     elsif role_id == Role::ROLE_PROFESSOR
-      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration])
+      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration, ClassSchedule])
       if user.professor
         if CustomVariable.professor_login_can_post_grades == "yes_all_semesters"
           can :update, ClassEnrollment, course_class: { professor: user.professor }

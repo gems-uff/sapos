@@ -56,6 +56,8 @@ Sapos::Application.routes.draw do
     end
   end
 
+  resources :class_schedules, concerns: :active_scaffold
+
   resources :course_types do
     concerns :active_scaffold
   end

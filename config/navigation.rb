@@ -109,6 +109,7 @@ SimpleNavigation::Configuration.run do |navigation|
       courses.item :course, 'Disciplinas', courses_path, :if => can_read?(Course)
       courses.item :course_type, 'Tipos de Disciplinas', course_types_path, :if => can_read?(CourseType)
       courses.item :course_class, 'Turmas', course_classes_path, :if => can_read?(CourseClass)
+      courses.item :course_class, 'Quadros de Horários', class_schedules_path, :if => can_read?(ClassSchedule)
       courses.item :class_enrollment, 'Inscrições', class_enrollments_path, :if => can_read?(ClassEnrollment)
       courses.item :allocation, 'Alocações', allocations_path, :if => can_read?(Allocation)
     end

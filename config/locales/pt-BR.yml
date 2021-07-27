@@ -81,6 +81,11 @@ pt-BR:
           aproved: "Aprovado"
           disapproved: "Reprovado"
           registered: "Incompleto"
+      class_schedule:
+        year: "Ano"
+        semester: "Semestre"
+        enrollment_start: "Data de Início das Inscrições"
+        enrollment_end: "Data de Fim das Inscrições"
       custom_variable:
         description: "Descrição"
         value: "Valor"
@@ -616,6 +621,9 @@ pt-BR:
       class_enrollment:
         one: "Inscrição"
         other: "Inscrições"
+      class_schedule:
+        one: "Quadro de Horários"
+        other: "Quadros de Horários"
       custom_variable:
         one: "Variável"
         other: "Variáveis"
@@ -758,6 +766,7 @@ pt-BR:
     create_another : "Criar Outro"
     create_city_label: "Adicionar Cidade"
     create_class_enrollment_label: "Adicionar Inscrição"
+    create_class_schedule_label: "Adicionar Quadro de Horário"
     create_custom_variable_label: "Adicionar Variável"
     create_country_label: "Adicionar País"
     create_course_class_label: "Adicionar Turma"
@@ -824,6 +833,7 @@ pt-BR:
     update_allocation_label: "Editar Alocação"
     update_city_label: "Editar Cidade"
     update_class_enrollment_label: "Editar Inscrição"
+    update_class_schedule_label: "Editar Quadro de Horário"
     update_custom_variable_label: "Editar Variável"
     update_country_label: "Editar País"
     update_course_class_label: "Editar Turma"
