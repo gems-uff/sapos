@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_24_175430) do
+ActiveRecord::Schema.define(version: 2021_07_30_223316) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -80,6 +80,15 @@ ActiveRecord::Schema.define(version: 2020_09_24_175430) do
     t.boolean "disapproved_by_absence", default: false
     t.index ["course_class_id"], name: "index_class_enrollments_on_course_class_id"
     t.index ["enrollment_id"], name: "index_class_enrollments_on_enrollment_id"
+  end
+
+  create_table "class_schedules", force: :cascade do |t|
+    t.integer "year"
+    t.integer "semester"
+    t.datetime "enrollment_start"
+    t.datetime "enrollment_end"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "countries", force: :cascade do |t|
@@ -197,6 +206,7 @@ ActiveRecord::Schema.define(version: 2020_09_24_175430) do
     t.string "name", limit: 255
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "user"
   end
 
   create_table "enrollments", force: :cascade do |t|

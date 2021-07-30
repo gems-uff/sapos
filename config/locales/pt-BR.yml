@@ -195,6 +195,7 @@ pt-BR:
         number_label: "semestre"
       enrollment_status:
         name: "Nome"
+        user: "Com usuário"
         enrollments: "Matrículas"
       institution:
         code: "Sigla"
