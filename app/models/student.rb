@@ -22,6 +22,22 @@ class Student < ApplicationRecord
   validates :cpf, :presence => true, :uniqueness => true
 
   before_save :set_birth_state_by_birth_city
+  
+  def self.where_without_user
+    self.joins(enrollments: :enrollment_status)
+    .where.not(email: User.select(:email))
+    .where(enrollment_statuses: { user: true })
+    .includes(enrollments: :dismissal)
+    .where(dismissals: {id: nil})
+  end
+
+  def can_have_new_user?
+    return false if ! User.where(email: self.email).empty?
+    return false if self.enrollments.empty?
+    self.enrollments.any? do |enrollment|
+      enrollment.enrollment_status.user && enrollment.dismissal.nil?
+    end
+  end
 
   def enrollments_number
     self.enrollments.collect { |enrollment| 
