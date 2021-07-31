@@ -1,0 +1,86 @@
+<% if @students.empty? %>
+  Nenhum aluno encontrado.
+<% else %>
+  <ol class="customform form">
+    <li class="form-element">
+      <table>
+        <thead>
+        <tr>
+          <th> Criar </th>
+          <th> Nome </th>
+          <th> Email </th>
+          <th> Matrículas </th>
+        </tr>
+        </thead>
+        <tbody class="records">
+            <% @students.each do |student| %>
+              <tr class="record"> 
+                <td class="create-column">
+                  <label> <input class="idcheck" checked type="checkbox" name="student_ids[]" id="student-input-<%= student.id %>" value="<%= student.id %>" /> </label>
+                </td>
+                <td class="name-column">
+                  <label for="student-input-<%= student.id %>"> <%= student.name %> </label>
+                </td>
+                <td class="email-column">
+                  <label for="student-input-<%= student.id %>"> <%= student.email %> </label>
+                </td>
+                <td class="entrollments-column">
+                  <label for="student-input-<%= student.id %>"> <%= student.enrollments_number %> </label>
+                </td>
+              </tr>
+            <% end %>
+            <tr>
+              <td class="create-column" colspan="4">
+                  <label> <input class="allitems" checked type="checkbox" /> Todos </label>
+                </td>
+            </tr>
+        </tbody>
+      </table>
+    </li>
+    <li>
+      <dl>
+        <dt>
+          <div>
+          <label for="email_field"> Corpo do email:</label>
+          <br>
+          <span class="description">
+            <span class="desc-title"> Este campo é gerado pela variável <strong> account_email</strong></span>
+              <span class="desc-title">Os campos de template utilizam linguagem ERB. <a href="http://stackoverflow.com/questions/7996695/rails-erb-syntax"> Ver detalhes </a>.</span>
+              <span class="desc-title">Variáveis: </span>
+        
+              <ul>
+              <li><strong>&lt;%= var('name') %&gt;</strong> <br> Nome do aluno </li>
+              <li><strong>&lt;%= var('email') %&gt;</strong> <br> Email do aluno </li>
+              <li><strong>&lt;%= var('enrollments_number') %&gt;</strong> <br> Matrículas do aluno </li>
+              <li><strong>&lt;%= var('url') %&gt;</strong> <br> URL de criação de senha </li>
+              </ul>
+            </span>
+          </div>
+        </dt>
+        <dd><textarea name="email_body" id="email_field"><%=@email%></textarea></dd>
+      </dl>
+    </li>
+  </ol>
+
+
+<% end %>
+
+<script>
+
+var cm = CodeMirror.fromTextArea(document.getElementById('email_field'),
+     {mode: 'text/html',
+      indentWithTabs: true,
+      smartIndent: true,
+      lineNumbers: true,
+      matchBrackets : true,
+      autofocus: true
+     }
+    );
+// cm.setSize("30em", "10em");
+
+$('.allitems').change(function () {
+  var _this = $(this);
+  $('input.idcheck').prop('checked', _this.prop('checked'));
+});
+
+</script>

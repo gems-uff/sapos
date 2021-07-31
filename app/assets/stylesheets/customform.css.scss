@@ -1,0 +1,54 @@
+@import 'variables';
+
+.tr_search_result {
+	background-color: #E6F2EF !important;
+}
+
+.customform th {
+	padding: 2px 5px;
+    font: bold 11px arial, sans-serif;
+    color: white;
+	border-right: 1px solid #C5DBF7;
+}
+
+.customform tr td:last-child {
+	border-right: 1px solid #C5DBF7;
+}
+
+.customform tr th:last-child {
+	border-right: 1px solid #427fa4;
+}
+
+
+.customform tr {
+    height: 1px;
+}
+.customform td {
+    padding: 0 !important;
+    height: 100%;
+}
+.customform label {
+    padding: 2px 4px;
+    display: block; 
+    min-height: 100%; /* for the latest browsers which support min-height */
+    height: auto !important; /* for newer IE versions */
+    height: 100%; /* the only height-related attribute that IE6 does not ignore  */
+}
+
+.customform tr:hover {
+    background-color: aquamarine;
+}
+
+.customform dl {
+    display: flex;
+}
+
+
+.customform dt {
+    width: 15em;
+    flex: 0 0 15em;
+}
+
+.customform dd {
+    flex: 1;
+}

@@ -109,6 +109,10 @@ Sapos::Application.routes.draw do
 
   resources :users do
     concerns :active_scaffold
+    collection do
+      get 'create_students'
+      post 'apply_create'
+    end
   end
 
   resources :roles do
