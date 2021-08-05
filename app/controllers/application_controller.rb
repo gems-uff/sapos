@@ -14,6 +14,7 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   before_action :parse_date
   before_action :set_paper_trail_whodunnit
+  before_action :set_root_url_variable!
 
   clear_helpers
 
@@ -45,6 +46,10 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def set_root_url_variable!
+    CustomVariable.set_auto_url(root_url)
+  end
 
   #def authenticate
   #  redirect_to login_url unless User.find_by_id(session[:user_id])

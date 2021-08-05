@@ -172,6 +172,30 @@ describe CustomVariable do
 
         expect(CustomVariable.notification_footer).to eq('bla')
       end
+    end
+
+    context "url" do
+      it "should raise an error when there is no variable defined nor global value set" do
+        config = CustomVariable.find_by_variable(:url)
+        config.delete unless config.nil?
+        CustomVariable.set_auto_url(nil)
+        expect{ CustomVariable.url }.to raise_error(an_instance_of(Exceptions::VariableException))
+      end
+
+      it "should return 'http://a.b.com' when autourl is defined to 'http://a.b.com'" do
+        config = CustomVariable.find_by_variable(:url)
+        config.delete unless config.nil?
+        CustomVariable.set_auto_url('http://a.b.com')
+        expect(CustomVariable.url).to eq('http://a.b.com')
+      end
+
+      it "should return 'bla' when it is defined to bla" do
+        config = CustomVariable.find_by_variable(:url)
+        config.delete unless config.nil?
+        CustomVariable.create(:variable=>:url, :value=>"bla")
+
+        expect(CustomVariable.url).to eq('bla')
+      end
     end 
   end
 

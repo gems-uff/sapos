@@ -4,6 +4,8 @@
 class CustomVariable < ApplicationRecord
   has_paper_trail
 
+  @@auto_url = nil
+
   VARIABLES = {
     "single_advisor_points" => :text,
     "multiple_advisor_points" => :text,
@@ -16,6 +18,7 @@ class CustomVariable < ApplicationRecord
     "grade_of_disapproval_for_absence" => :text,
     "professor_login_can_post_grades" => :text,
     "account_email" => :text,
+    "url" => :text,
   }
 
   validates :variable, :presence => true
@@ -91,6 +94,20 @@ class CustomVariable < ApplicationRecord
   def self.account_email
     config = CustomVariable.find_by_variable(:account_email)
     config.nil? ? "<%= var('name') %>,\n\nInformamos que a sua conta no SAPOS foi criada.\nAcesse <%= var('url') %> para definir a sua senha." : config.value
+  end
+
+  def self.set_auto_url(value)
+    @@auto_url = value
+  end
+
+  def self.url
+    config = CustomVariable.find_by_variable(:url)
+    if config.nil?
+      return @@auto_url unless @@auto_url.nil?
+      return root_url if defined?(root_url)
+      raise Exceptions::VariableException.new("Variável 'url' não está definida")
+    end
+    config.value
   end
 
   def to_label
