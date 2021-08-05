@@ -96,6 +96,7 @@ group :development, :test do
   gem 'spring'
   gem 'byebug'
   gem 'simplecov', '0.17.1' 
+  gem 'letter_opener_web'
 end
 
 group :production do
