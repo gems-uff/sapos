@@ -1,4 +1,4 @@
-en:
+pt-BR:
   devise:
     failure:
       invited: "Você tem um convite de usuário pendente. Aceite-o para criar seu usuário."

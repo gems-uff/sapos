@@ -34,7 +34,7 @@ CustomVariable.create(:description=>"Email de convite", :variable =>"account_ema
   
   
   
-  <%= @footer %>")
+  <%= CustomVariable.notification_footer %>")
 
 
 ['Graduação', 'Especialização', 'Mestrado', 'Doutorado'].each do |level|

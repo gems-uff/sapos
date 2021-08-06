@@ -9,7 +9,7 @@ Acesse o seguinte link para confirmar e definir sua senha:
 
 
 
-<%= @footer %>")
+<%= CustomVariable.notification_footer %>")
   end
 
   def down

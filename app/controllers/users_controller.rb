@@ -45,5 +45,5 @@ class UsersController < ApplicationController
   def create_students_respond_to_js
     render :partial => 'create_students'
   end
-    
+
 end

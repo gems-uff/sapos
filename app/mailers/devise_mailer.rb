@@ -9,7 +9,6 @@ class DeviseMailer < Devise::Mailer
 
   def invitation_instructions(record, token, opts={})
     @token = token
-    @footer = CustomVariable.notification_footer
     devise_mail(record, :invitation_instructions, opts) do |format|
       template = CustomVariable.account_email
       if template.nil?
