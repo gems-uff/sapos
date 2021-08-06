@@ -7,10 +7,16 @@ class DeviseMailer < Devise::Mailer
   include Devise::Controllers::UrlHelpers # Optional. eg. `confirmation_url`
   default template_path: 'devise/mailer' # to make sure that your mailer uses the devise views
 
-  def confirmation_instructions(record, token, opts={})
+  def invitation_instructions(record, token, opts={})
     @token = token
-    devise_mail(record, :confirmation_instructions, opts) do |format|
-      format.html { render :inline => CustomVariable.account_email }
+    @footer = CustomVariable.notification_footer
+    devise_mail(record, :invitation_instructions, opts) do |format|
+      template = CustomVariable.account_email
+      if template.nil?
+        format.text
+      else
+        format.text { render inline: template }
+      end
     end
   end
 end

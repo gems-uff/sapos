@@ -60,7 +60,6 @@ describe Student do
       end
       it "should return false if the student already has an user" do
         student = FactoryBot.create(:student, :email => 'abc@def.com')
-        FactoryBot.create(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
         FactoryBot.create(:user, :email => 'abc@def.com', :role => role)
         expect(student.can_have_new_user?).to eq(false)
       end

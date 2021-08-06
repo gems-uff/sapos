@@ -39,7 +39,7 @@ class Enrollment < ApplicationRecord
   validate :verify_research_area_with_advisors
 
   after_save :create_phase_completions
-  after_save :create_user
+  after_create :create_user
 
   attribute  :force_new_user, :boolean, default: false
 
@@ -162,7 +162,6 @@ class Enrollment < ApplicationRecord
 
   def create_user
     return unless self.should_have_user?
-    user = User.new({:email => self.student.email, :name => self.student.name, :role_id => Role::ROLE_ALUNO})
-    user.save
+    User.invite!({:email => self.student.email, :name => self.student.name, :role_id => Role::ROLE_ALUNO}, current_user)
   end
 end

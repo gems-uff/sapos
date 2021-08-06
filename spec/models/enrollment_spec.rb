@@ -337,8 +337,8 @@ describe Enrollment do
         user = User.find_by_email('abc@def.com')
         user.delete unless user.nil?
         student = FactoryBot.create(:student, :email => 'abc@def.com')
-        enrollment = FactoryBot.create(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
         FactoryBot.create(:user, :email => 'abc@def.com', :role => role)
+        enrollment = FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
         expect(enrollment.should_have_user?).to eq(false)
       end
       it "should return false if the enrollment status do not allow users" do

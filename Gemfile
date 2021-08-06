@@ -49,6 +49,7 @@ gem "kaminari"
 
 gem 'cancancan'
 gem "devise", "~> 4.7.1"
+gem 'devise_invitable', '~> 2.0.0'
 gem "paper_trail"
 
 gem 'sql-parser'

@@ -8,7 +8,7 @@ class User < ApplicationRecord
 
   has_paper_trail
 
-  devise :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,
+  devise :invitable, :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,
          :lockable
 
   validates :email, :presence => true, :uniqueness => true
