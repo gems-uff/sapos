@@ -12,7 +12,7 @@ class User < ApplicationRecord
          :lockable
 
   validates :email, :presence => true, :uniqueness => true
-  validates :name, :presence => true, :uniqueness => true
+  validates :name, :presence => true
   validate :role_valid?
   validates :role, :presence => true
   validate :role_is_professor_if_the_professor_field_is_filled
