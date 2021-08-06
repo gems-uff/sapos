@@ -82,7 +82,7 @@ gem 'simple-navigation'
 gem 'rufus-scheduler'
 
 # Image
-gem 'carrierwave', '1.3.2'
+gem 'carrierwave', '~>2.2.2'
 gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave-activerecord.git', :branch => 'rails6'
 
 
