@@ -32,11 +32,9 @@ class Student < ApplicationRecord
   end
 
   def can_have_new_user?
+    return false if self.email.nil? || self.email.empty?
     return false if ! User.where(email: self.email).empty?
-    return false if self.enrollments.empty?
-    self.enrollments.any? do |enrollment|
-      enrollment.enrollment_status.user && enrollment.dismissal.nil?
-    end
+    return true # ToDo associate user to Student
   end
 
   def enrollments_number

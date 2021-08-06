@@ -39,6 +39,9 @@ class Enrollment < ApplicationRecord
   validate :verify_research_area_with_advisors
 
   after_save :create_phase_completions
+  after_save :create_user
+
+  attribute  :force_new_user, :boolean, default: false
 
   def to_label
     return enrollment_number if student.nil?
@@ -113,7 +116,6 @@ class Enrollment < ApplicationRecord
     enrollments_with_all_phases_accomplished
   end
 
-
   def enrollment_has_main_advisor
     unless advisements.nil? or advisements.empty?
       #found = false
@@ -150,5 +152,17 @@ class Enrollment < ApplicationRecord
         :phase=>phase_duration.phase
       ).save
     end
+  end
+
+  def should_have_user?
+    return false unless self.student.can_have_new_user?
+    return true if force_new_user
+    self.enrollment_status.user && self.dismissal.nil?
+  end
+
+  def create_user
+    return unless self.should_have_user?
+    user = User.new({:email => self.student.email, :name => self.student.name, :role_id => Role::ROLE_ALUNO})
+    user.save
   end
 end

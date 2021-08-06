@@ -15,6 +15,9 @@ describe Enrollment do
 
 
   let(:enrollment) { Enrollment.new }
+  let(:enrollment_status_with_user) { FactoryBot.create(:enrollment_status, :user => true) }
+  let(:enrollment_status_without_user) { FactoryBot.create(:enrollment_status, :user => false) }
+  let(:role) { FactoryBot.create(:role) }
   subject { enrollment }
   describe "Validations" do
     describe "student" do
@@ -321,6 +324,43 @@ describe Enrollment do
       end
 
       
+    end
+    describe "should_have_user?" do
+      it "should return true if the student does not have an user and the enrollment status allows users" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        enrollment = FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
+        expect(enrollment.should_have_user?).to eq(true)
+      end
+      it "should return false if the student already has an user" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        enrollment = FactoryBot.create(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
+        FactoryBot.create(:user, :email => 'abc@def.com', :role => role)
+        expect(enrollment.should_have_user?).to eq(false)
+      end
+      it "should return false if the enrollment status do not allow users" do
+        enrollment = FactoryBot.create(:enrollment, :enrollment_status => enrollment_status_without_user)
+        expect(enrollment.should_have_user?).to eq(false)
+      end
+      it "should return false if the student enrollment was dismissed" do
+        dismissed_enrollment = FactoryBot.create(:enrollment, :enrollment_status => enrollment_status_with_user)
+        dismissal_reason = FactoryBot.create(:dismissal_reason, :name => 'a')
+        FactoryBot.create(:dismissal, :enrollment => dismissed_enrollment, :dismissal_reason => dismissal_reason)
+        expect(dismissed_enrollment.should_have_user?).to eq(false)
+      end
+      it "should return true if force_new_user is true" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        dismissed_enrollment = FactoryBot.create(:enrollment, :student => student, :enrollment_status => enrollment_status_without_user)
+        dismissal_reason = FactoryBot.create(:dismissal_reason, :name => 'a')
+        FactoryBot.create(:dismissal, :enrollment => dismissed_enrollment, :dismissal_reason => dismissal_reason)
+        dismissed_enrollment.force_new_user = true
+        expect(dismissed_enrollment.should_have_user?).to eq(true)
+      end
     end
   end
 

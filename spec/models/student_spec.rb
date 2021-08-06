@@ -9,8 +9,9 @@ describe Student do
   it { should destroy_dependent :student_major }
 
   let(:student) { Student.new }
-  let(:enrollment_status_with_user) {FactoryBot.create(:enrollment_status, :user => true)}
-  let(:enrollment_status_without_user) {FactoryBot.create(:enrollment_status, :user => false)}
+  let(:enrollment_status_with_user) { FactoryBot.create(:enrollment_status, :user => true) }
+  let(:enrollment_status_without_user) { FactoryBot.create(:enrollment_status, :user => false) }
+  let(:role) { FactoryBot.create(:role) }
   describe "Validations" do
     describe "cpf" do
       context "should be valid when" do
@@ -50,74 +51,20 @@ describe Student do
       end
   end
   describe "Methods" do
-    describe "where_without_user" do
-      it "should return students without associated users that have active enrollments that allow users" do
-        enrollment_status = 
-        student1 = FactoryBot.create(:student, :email => 'abc@def.com')
-        student2 = FactoryBot.create(:student, :email => 'fgh@ijk.com')
-        FactoryBot.create(:enrollment, :student => student1, :enrollment_status => enrollment_status_with_user)
-        FactoryBot.create(:enrollment, :student => student2, :enrollment_status => enrollment_status_with_user)
-        expect(Student.where_without_user).to eq([student1, student2])
-      end
-      it "should not return Students with active enrollments that do not allow users" do
-        student1 = FactoryBot.create(:student, :email => 'abc@def.com')
-        student2 = FactoryBot.create(:student, :email => 'fgh@ijk.com')
-        FactoryBot.create(:enrollment, :student => student1, :enrollment_status => enrollment_status_with_user)
-        FactoryBot.create(:enrollment, :student => student2, :enrollment_status => enrollment_status_without_user)
-        expect(Student.where_without_user).to eq([student1])
-      end
-      it "should not return Students without enrollments" do
-        student1 = FactoryBot.create(:student, :email => 'abc@def.com')
-        student2 = FactoryBot.create(:student, :email => 'fgh@ijk.com')
-        FactoryBot.create(:enrollment, :student => student1, :enrollment_status => enrollment_status_with_user)
-        expect(Student.where_without_user).to eq([student1])
-      end
-      it "should not return Students that already have Users" do
-        student1 = FactoryBot.create(:student, :email => 'abc@def.com')
-        student2 = FactoryBot.create(:student, :email => 'fgh@ijk.com')
-        FactoryBot.create(:enrollment, :student => student1, :enrollment_status => enrollment_status_with_user)
-        FactoryBot.create(:enrollment, :student => student2, :enrollment_status => enrollment_status_with_user)
-        FactoryBot.create(:user, :email => 'fgh@ijk.com')
-        expect(Student.where_without_user).to eq([student1])
-      end
-      it "should not return Students whose enrollments were disnmissed" do
-        student1 = FactoryBot.create(:student, :email => 'abc@def.com', :name => 'a')
-        student2 = FactoryBot.create(:student, :email => 'fgh@ijk.com', :name => 'b')
-        FactoryBot.create(:enrollment, :student => student1, :enrollment_status => enrollment_status_with_user)
-        dismissed_enrollment = FactoryBot.create(:enrollment, :student => student2, :enrollment_status => enrollment_status_with_user)
-        FactoryBot.create(:dismissal, :enrollment => dismissed_enrollment)
-        expect(Student.where_without_user).to eq([student1])
-      end
-    end
-
     describe "can_have_new_user?" do
       it "should return true if the student has an active enrollment that allows users and has no associated user" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
         student = FactoryBot.create(:student, :email => 'abc@def.com')
-        FactoryBot.create(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
         expect(student.can_have_new_user?).to eq(true)
-      end
-      it "should return false if the enrollment status do not allow users" do
-        student = FactoryBot.create(:student, :email => 'abc@def.com')
-        FactoryBot.create(:enrollment, :student => student, :enrollment_status => enrollment_status_without_user)
-        expect(student.can_have_new_user?).to eq(false)
-      end
-      it "should return false if the student do not have enrollments" do
-        student = FactoryBot.create(:student, :email => 'abc@def.com')
-        expect(student.can_have_new_user?).to eq(false)
       end
       it "should return false if the student already has an user" do
         student = FactoryBot.create(:student, :email => 'abc@def.com')
         FactoryBot.create(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
-        FactoryBot.create(:user, :email => 'abc@def.com')
+        FactoryBot.create(:user, :email => 'abc@def.com', :role => role)
         expect(student.can_have_new_user?).to eq(false)
       end
-      it "should return false if the student enrollment was dismissed" do
-        student = FactoryBot.create(:student, :email => 'abc@def.com', :name => 'C')
-        dismissed_enrollment = FactoryBot.create(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
-        dismissal_reason = FactoryBot.create(:dismissal_reason, :name => 'a')
-        FactoryBot.create(:dismissal, :enrollment => dismissed_enrollment, :dismissal_reason => dismissal_reason)
-        expect(student.can_have_new_user?).to eq(false)
-      end
+      
     end
 
     describe "enrollments_number" do

@@ -17,7 +17,7 @@ class User < ApplicationRecord
   validates :role, :presence => true
   validate :role_is_professor_if_the_professor_field_is_filled
   validate :selected_professor_is_already_linked_to_another_user
-    
+  
   before_destroy :validate_destroy
 
   def to_label

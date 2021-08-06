@@ -93,7 +93,7 @@ class CustomVariable < ApplicationRecord
 
   def self.account_email
     config = CustomVariable.find_by_variable(:account_email)
-    config.nil? ? "<%= var('name') %>,\n\nInformamos que a sua conta no SAPOS foi criada.\nAcesse <%= var('url') %> para definir a sua senha." : config.value
+    config.nil? ? "<p><%= @resource.name %>,</p>\n<p>Informamos que a sua conta no SAPOS foi criada.</p>\n<p><%= link_to 'Confirme sua conta', confirmation_url(@resource, :confirmation_token => @token) %></p>" : config.value
   end
 
   def self.set_auto_url(value)
