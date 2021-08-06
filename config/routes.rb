@@ -25,7 +25,10 @@ Sapos::Application.routes.draw do
 
   resources :scholarship_suspensions do concerns :active_scaffold end
 
-  devise_for :users, :controllers => {:registrations => "users"}
+  devise_for :users, :controllers => {
+    :registrations => "users",
+    :invitations => "user_invitations",
+  }
 
   resources :versions do
     concerns :active_scaffold
