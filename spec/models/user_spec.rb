@@ -44,14 +44,6 @@ describe User do
           expect(user).to have_error(:blank).on :name
         end
       end
-      context "should have error taken when" do
-        it "name is already in use" do
-          name = "Username"
-          FactoryBot.create(:user, :name => name)
-          user.name = name
-          expect(user).to have_error(:taken).on :name
-        end
-      end
     end
     describe "role" do
       context "should be valid when" do
