@@ -39,7 +39,7 @@ class Enrollment < ApplicationRecord
   validate :verify_research_area_with_advisors
 
   after_save :create_phase_completions
-  after_create :create_user
+  after_create :create_user!
 
   attribute  :force_new_user, :boolean, default: false
 
@@ -160,8 +160,15 @@ class Enrollment < ApplicationRecord
     self.enrollment_status.user && self.dismissal.nil?
   end
 
-  def create_user
-    return unless self.should_have_user?
-    User.invite!({:email => self.student.email, :name => self.student.name, :role_id => Role::ROLE_ALUNO}, current_user)
+  def create_user!
+    return false unless self.should_have_user?
+    begin
+      User.invite!({:email => self.student.email, :name => self.student.name, :role_id => Role::ROLE_ALUNO}, current_user)
+    rescue StandardError => err
+      eusers = User.where({:email => self.student.email})
+      eusers.destroy_all
+      return false
+    end
+    true
   end
 end

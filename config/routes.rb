@@ -112,10 +112,6 @@ Sapos::Application.routes.draw do
 
   resources :users do
     concerns :active_scaffold
-    collection do
-      get 'create_students'
-      post 'apply_create'
-    end
   end
 
   resources :roles do
@@ -168,6 +164,8 @@ Sapos::Application.routes.draw do
     record_select_routes
     collection do
       get 'to_pdf'
+      get 'new_users'
+      post 'create_users'
     end
     member do
       get 'academic_transcript_pdf'

@@ -437,6 +437,13 @@ module EnrollmentsHelper
     body.html_safe
   end
 
+  def readonly_dl_input(label, map, variable)
+    "<dl>
+      <dt><label for=\"field-#{variable}\">#{label}</label></dt>
+      <dd><input name=\"#{variable}\" class=\"fixed-text\" value=\"#{map[variable]}\" id=\"field-#{variable}\" readonly/></dd>
+    </dl>".html_safe
+  end
+
   def display_action_links(action_links, record, options, &block)
     search = search_params
     result = super

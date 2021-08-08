@@ -1,0 +1,30 @@
+<ol class="customform form">
+  <li class="form-element">
+    <%=readonly_dl_input("Matrículas", @counts, :enrollments)%>
+  </li>
+  <li class="form-element">
+    <%=readonly_dl_input("Alunos", @counts, :students)%>
+  </li>
+  <li class="form-element">
+    <%=readonly_dl_input("Alunos vinculados a Usuários", @counts, :existingstudents)%>
+  </li>
+  <li class="form-element">
+    <%=readonly_dl_input("Alunos sem email", @counts, :noemail)%>
+  </li>
+  <li class="form-element">
+    <dl>
+      <dt>
+        <div>
+          <label for="add_default">Adicionar alunos restantes</label>
+        </div> 
+      </dt>
+      <dd>
+        <select name="add_option" id="add_default">
+          <option value="0" selected> <%=pluralize(@counts[:default], 'aluno') %> <%= 'válido'.pluralize(@counts[:default]) %> </option>
+          <option value="1"> <%=pluralize(@counts[:force], 'aluno') %> sem restrições * </option>
+        </select>
+      </dd>
+    </dl>
+  </li>
+</ol>
+* A opção sem restrição adiciona tanto alunos com matrícula desligada quanto alunos com matrículas com tipo que normalmente não admitem usuários.

@@ -31,10 +31,19 @@ class Student < ApplicationRecord
     .where(dismissals: {id: nil})
   end
 
+  def has_user?
+    # ToDo associate user to Student
+    ! User.where(email: self.email).empty?
+  end
+
+  def has_email?
+    ! (self.email.nil? || self.email.empty?)
+  end
+
   def can_have_new_user?
-    return false if self.email.nil? || self.email.empty?
-    return false if ! User.where(email: self.email).empty?
-    return true # ToDo associate user to Student
+    return false unless has_email?
+    return false if has_user?
+    return true 
   end
 
   def enrollments_number
