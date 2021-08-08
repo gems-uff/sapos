@@ -16,9 +16,7 @@ shared_examples_for "enrollment_user_helper" do
 
   describe "enrollments_that_should_have_user" do
     it "should return a list with the first enrollment that allows users when it exists" do
-      user = User.find_by_email('abc@def.com')
-      user.delete unless user.nil?
-      
+      delete_users_by_emails ['abc@def.com']
       student = FactoryBot.create(:student, :email => 'abc@def.com')
       enrollments = Array.new(3) { FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user) }
       enrollments[0].enrollment_status = enrollment_status_without_user
@@ -32,8 +30,7 @@ shared_examples_for "enrollment_user_helper" do
     it "should append to a previous list if it is passed as parameter" do
       previous = FactoryBot.build(:enrollment)
 
-      user = User.find_by_email('abc@def.com')
-      user.delete unless user.nil?
+      delete_users_by_emails ['abc@def.com']
       student = FactoryBot.create(:student, :email => 'abc@def.com')
       enrollments = Array.new(3) { FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user) }
       enrollments[0].enrollment_status = enrollment_status_without_user
@@ -45,8 +42,7 @@ shared_examples_for "enrollment_user_helper" do
     end
 
     it "should return an empty list when no enrollments allow users" do
-      user = User.find_by_email('abc@def.com')
-      user.delete unless user.nil?
+      delete_users_by_emails ['abc@def.com']
       student = FactoryBot.create(:student, :email => 'abc@def.com')
       enrollments = Array.new(3) { FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_without_user) }
       expect(controller.new.enrollments_that_should_have_user(enrollments)).to eql({

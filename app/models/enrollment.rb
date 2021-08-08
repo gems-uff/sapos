@@ -163,7 +163,10 @@ class Enrollment < ApplicationRecord
   def create_user!
     return false unless self.should_have_user?
     begin
-      User.invite!({:email => self.student.email, :name => self.student.name, :role_id => Role::ROLE_ALUNO}, current_user)
+      student = self.student
+      user = User.invite!({:email => student.email, :name => student.name, :role_id => Role::ROLE_ALUNO}, current_user)
+      student.user = user
+      student.save
     rescue StandardError => err
       eusers = User.where({:email => self.student.email})
       eusers.destroy_all

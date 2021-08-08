@@ -436,6 +436,8 @@ pt-BR:
         name: "Nome do usuário"
         password: "Senha"
         password_confirmation: "Digite a senha novamente"
+        professor: "Professor"
+        student: "Aluno"
         role: Papel
       version:
         created_at: "Modificado em"
@@ -574,6 +576,10 @@ pt-BR:
           blank_deadline: "prazo deve ser de pelo menos um dia"
           has_deferral: "Já existe prorrogação para esta duração de etapa"
           has_level: "Já existe conclusão de etapa para a duração de etapa deste nível"
+        professor:
+          attributes:
+            user:
+              changed_to_different_user: "mudou de valor para outro usuário. Se esse for o objetivo da mudança, salve como vazio anteriormente"
         professor_research_area:
           unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
         query:
@@ -581,6 +587,10 @@ pt-BR:
           sql_execution_generated_an_error: "gerou o seguinte erro ao ser executada: '%{erro}'"        
         student_major:
           unique_pair: "não pode estar em dois ou mais cursos repetidos e curso não pode possuir o mesmo aluno duas ou mais vezes"
+        student:
+          attributes:
+            user:
+              changed_to_different_user: "mudou de valor para outro usuário. Se esse for o objetivo da mudança, salve como vazio anteriormente"
         thesis_defense_committee_participation:
           thesis_defense_committee_participation_professor_uniqueness: "não pode participar duas vezes da mesma banca"
         user:
@@ -591,7 +601,9 @@ pt-BR:
           invalid_role: "não pode ser maior do que seu papel"
           invalid_role_full: "O papel do usuário não pode ser maior do que o seu papel"
           selected_role_was_not_professor: "está selecionado mas o papel escolhido não é de professor"
+          selected_role_was_not_student: "está selecionado mas o papel escolhido não é de aluno"
           selected_professor_is_already_linked_to_another_user: "selecionado já está associado ao usuário %{nome_usuario}"
+          selected_student_is_already_linked_to_another_user: "selecionado já está associado ao usuário %{nome_usuario}"
       template:
         body: "Por favor, verifique o(s) seguinte(s) campo(s):"
         header:

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_06_053737) do
+ActiveRecord::Schema.define(version: 2021_08_08_033949) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -510,10 +510,12 @@ ActiveRecord::Schema.define(version: 2021_08_06_053737) do
     t.string "identity_issuing_place", limit: 255
     t.string "photo", limit: 255
     t.integer "birth_country_id"
+    t.integer "user_id"
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"
     t.index ["city_id"], name: "index_students_on_city_id"
+    t.index ["user_id"], name: "index_students_on_user_id"
   end
 
   create_table "thesis_defense_committee_participations", force: :cascade do |t|
@@ -574,4 +576,5 @@ ActiveRecord::Schema.define(version: 2021_08_06_053737) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "students", "users", on_delete: :nullify
 end
