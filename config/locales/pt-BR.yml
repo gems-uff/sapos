@@ -10,7 +10,7 @@ pt-BR:
     messages: &errors_messages
       accepted: "deve ser aceito"
       blank: "não pode ficar em branco"
-      confirmation: "não está igual"
+      confirmation: "não está igual à %{attribute}"
       empty: "não pode ficar vazio"
       equal_to: "deve ser igual a %{count}"
       even: "deve ser par"
@@ -434,7 +434,7 @@ pt-BR:
       user:
         name: "Nome do usuário"
         password: "Senha"
-        password_confirmation: "Digite a senha novamente"
+        password_confirmation: "Confirmação de senha"
         role: Papel
       version:
         created_at: "Modificado em"

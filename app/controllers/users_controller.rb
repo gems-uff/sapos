@@ -18,4 +18,11 @@ class UsersController < ApplicationController
 
     config.actions.exclude :deleted_records
   end
+
+  def after_update_save(record)
+    if record == current_user
+      bypass_sign_in(record)
+    end
+  end
+
 end
