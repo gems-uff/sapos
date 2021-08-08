@@ -24,6 +24,7 @@ class EnrollmentsController < ApplicationController
       :parameters => {:format => :pdf}
     config.action_links.add 'new_users',
       :label => I18n.t('active_scaffold.new_users_action'),
+      :ignore_method => :hide_new_users?,
       :type => :collection,
       :keep_open => false
 
@@ -296,8 +297,12 @@ class EnrollmentsController < ApplicationController
     end
   end
 
+  def hide_new_users?
+    cannot? :invite, User
+  end
 
   def new_users
+    raise CanCan::AccessDenied.new("Acesso negado!", :invite, User) if cannot? :invite, User
     each_record_in_page {}
     enrollments = find_page(:sorting => active_scaffold_config.list.user.sorting).items
     @counts = new_users_count(enrollments)
@@ -305,6 +310,7 @@ class EnrollmentsController < ApplicationController
   end
 
   def create_users
+    raise CanCan::AccessDenied.new("Acesso negado!", :invite, User) if cannot? :invite, User
     process_action_link_action do
       each_record_in_page {}
       enrollments = find_page(:sorting => active_scaffold_config.list.user.sorting).items

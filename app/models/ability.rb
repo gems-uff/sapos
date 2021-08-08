@@ -30,10 +30,12 @@ class Ability
 
     if role_id == Role::ROLE_ADMINISTRADOR
       can :manage, :all
+      can :invite, User
       cannot [:destroy, :update], Role
       cannot [:destroy, :create], NotificationParam
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [Role, CustomVariable, ReportConfiguration])
+      can :invite, User
       can :read, (Role)
     elsif role_id == Role::ROLE_PROFESSOR
       can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration])
