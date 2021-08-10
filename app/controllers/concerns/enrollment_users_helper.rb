@@ -4,13 +4,12 @@
 
 module EnrollmentUsersHelper extend ActiveSupport::Concern
 
-  def enrollments_that_should_have_user(enrollments, result=nil, &block)
+  def append_first_selection(collection, result=nil, &block)
     result = [] if result.nil?
     found = false
-    enrollments.each do |enrollment|
-      block.call(enrollment) if block_given?
-      if enrollment.should_have_user?
-        result << enrollment
+    collection.each do |item|
+      if block.call(item)
+        result << item
         found = true
         break
       end
@@ -31,33 +30,37 @@ module EnrollmentUsersHelper extend ActiveSupport::Concern
   end
 
   def new_users_count(enrollments)
-    student_enrollments = enrollments_to_students_map(enrollments)
     counts = {}
     counts[:enrollments] = enrollments.count
+    allowed_enrollments = enrollments.select { |e| e.enrollment_status.user }
+    counts[:allowedenrollments] = allowed_enrollments.count
+    student_enrollments = enrollments_to_students_map(allowed_enrollments)
     counts[:students] = student_enrollments.size
     counts[:existingstudents] = 0
     counts[:noemail] = 0
-     
     new_students = []
-    new_students_force = []
-    student_enrollments.each do |student, enrollments|
+    new_students_dismissed = []
+    new_students_all = []
+
+    student_enrollments.each do |student, enrollments|    
       counts[:noemail] += 1 unless student.has_email?
       counts[:existingstudents] += 1 if student.has_user?
-      if ! enrollments_that_should_have_user(enrollments, new_students)[:found]
-        enrollments_that_should_have_user(enrollments, new_students_force) do |enrollment|
-          enrollment.force_new_user = true
-        end
+      if student.can_have_new_user?
+        new_students_all << enrollments[0]
+        append_first_selection(enrollments, new_students) { |e| e.dismissal.nil? }
+        append_first_selection(enrollments, new_students_dismissed) { |e| ! e.dismissal.nil? }
       end
     end
     counts[:default] = new_students.count
-    counts[:force] = counts[:default] + new_students_force.count
+    counts[:dismissed] = new_students_dismissed.count
+    counts[:all] = new_students_all.count
     counts
   end
 
-  def create_enrollments_users(enrollments, force_new)
+  def create_enrollments_users(enrollments, mode)
     created = 0
     enrollments.each do |enrollment|
-      enrollment.force_new_user = force_new
+      enrollment.new_user_mode = mode
       created += 1 if enrollment.create_user!
     end
     created

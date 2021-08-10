@@ -41,7 +41,7 @@ class Enrollment < ApplicationRecord
   after_save :create_phase_completions
   after_create :create_user!
 
-  attribute  :force_new_user, :boolean, default: false
+  attribute  :new_user_mode, :string, default: "default"
 
   def to_label
     return enrollment_number if student.nil?
@@ -156,8 +156,11 @@ class Enrollment < ApplicationRecord
 
   def should_have_user?
     return false unless self.student.can_have_new_user?
-    return true if force_new_user
-    self.enrollment_status.user && self.dismissal.nil?
+    return false unless self.enrollment_status.user
+    return true if new_user_mode == "default" && self.dismissal.nil?
+    return true if new_user_mode == "dismissed" && ! self.dismissal.nil?
+    return true if new_user_mode == "all"
+    false
   end
 
   def create_user!

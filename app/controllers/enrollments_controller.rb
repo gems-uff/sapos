@@ -306,6 +306,7 @@ class EnrollmentsController < ApplicationController
     each_record_in_page {}
     enrollments = find_page(:sorting => active_scaffold_config.list.user.sorting).items
     @counts = new_users_count(enrollments)
+    @statuses_with_users = EnrollmentStatus.where(user: true).collect(&:name)
     respond_to_action(:new_users)
   end
 
@@ -314,7 +315,7 @@ class EnrollmentsController < ApplicationController
     process_action_link_action do
       each_record_in_page {}
       enrollments = find_page(:sorting => active_scaffold_config.list.user.sorting).items
-      created = create_enrollments_users(enrollments, params["add_option"] == "1")
+      created = create_enrollments_users(enrollments, params["add_option"])
       if created > 0
         flash[:info] = "#{created} #{"usuário".pluralize(created)} #{"criado".pluralize(created)}"
       else

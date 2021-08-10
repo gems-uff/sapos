@@ -1,7 +1,7 @@
 @import 'variables';
 
 
-.customform label {
+.customform dt label {
     padding: 2px 4px;
     display: block; 
     min-height: 100%; /* for the latest browsers which support min-height */
@@ -33,3 +33,12 @@
     outline: none;
 }
 
+#enrollment-info {
+    cursor: pointer; 
+    color: #3e82ae;
+}
+
+#toggle-enrollment-info {
+    display: none;
+    margin-top: 8px;
+}
