@@ -151,4 +151,12 @@ class Enrollment < ApplicationRecord
       ).save
     end
   end
+
+  def has_active_scholarship_now?
+    scholarship_durations.each do |scholarship_duration|
+      return true if scholarship_duration.active? 
+    end
+
+    return false
+  end
 end

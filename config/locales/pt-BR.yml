@@ -963,7 +963,7 @@ pt-BR:
         obs: "Obs.:"
         sequential_number: "Nº"
         situation: "Situação"
-        student_name: "Nome do Aluno"
+        student_name: "Nome do Aluno ( * Bolsista )"
         student_email: "E-mail do Aluno"
         title: "Resumo Semestral"
         year_semester: "Semestre/Ano"

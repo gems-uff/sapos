@@ -322,6 +322,49 @@ describe Enrollment do
 
       
     end
+
+    describe "self.has_active_scholarship_now?" do
+      describe "has no scholarship" do
+        it "should return false" do
+          enrollment = FactoryBot.create(:enrollment)
+          expect(enrollment.has_active_scholarship_now?).to be false
+        end 
+      end
+
+      describe "have scholarship(s) but none of them are active today" do
+        it "should return false" do
+
+          enrollment = FactoryBot.create(:enrollment)
+          scholarship1 = FactoryBot.create(:scholarship, :start_date => Date.today - 2.years, :end_date => Date.today + 2.years)
+          scholarship2 = FactoryBot.create(:scholarship, :start_date => Date.today - 2.years, :end_date => Date.today + 2.years)
+
+          scholarship_duration1 = FactoryBot.create(:scholarship_duration, :start_date => Date.today - 12.months, :end_date => Date.today - 6.months, :cancel_date => Date.today - 6.months, :enrollment => enrollment, :scholarship => scholarship1)
+
+          scholarship_duration2 = FactoryBot.create(:scholarship_duration, :start_date => Date.today + 6.months, :end_date => Date.today + 12.months, :cancel_date => Date.today + 12.months, :enrollment => enrollment, :scholarship => scholarship2)
+
+          enrollment.scholarship_durations << scholarship_duration1
+          enrollment.scholarship_durations << scholarship_duration2
+
+          expect(enrollment.has_active_scholarship_now?).to be false
+        end
+      end
+
+      describe "has an active scholarship today" do
+        it "should return true" do
+
+          enrollment = FactoryBot.create(:enrollment)
+          scholarship1 = FactoryBot.create(:scholarship, :start_date => Date.today - 2.years, :end_date => Date.today + 2.years)
+
+          scholarship_duration1 = FactoryBot.create(:scholarship_duration, :start_date => Date.today - 6.months, :end_date => Date.today + 6.months, :cancel_date => Date.today + 6.months, :enrollment => enrollment, :scholarship => scholarship1)
+
+          enrollment.scholarship_durations << scholarship_duration1
+
+          expect(enrollment.has_active_scholarship_now?).to be true
+        end
+      end
+
+    end
+
   end
 
    
