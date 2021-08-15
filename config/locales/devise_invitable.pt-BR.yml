@@ -1,0 +1,31 @@
+pt-BR:
+  devise:
+    failure:
+      invited: "Você tem um convite de usuário pendente. Aceite-o para criar seu usuário."
+    invitations:
+      send_instructions: "Um email de inscrição foi enviado para %{email}."
+      invitation_token_invalid: "O token de criação não é válido!"
+      updated: "Sua senha foi definida com sucesso. Boas vindas."
+      updated_not_active: "Sua senha foi definida com sucesso."
+      no_invitations_remaining: "Nenhum convite sobrando."
+      invitation_removed: "Seu convite foi removido."
+      new:
+        header: "Criar conta de usuário"
+        submit_button: "Criar conta"
+      edit:
+        header: "Definir senha"
+        submit_button: "Definir senha"
+    mailer:
+      invitation_instructions:
+        subject: "Novo usuário no SAPOS"
+        hello: "Olá %{email}"
+        someone_invited_you: "Informamos que a sua conta no SAPOS foi criada. Acesse o seguinte link para confirmar e definir sua senha:"
+        accept: "Criar conta"
+        accept_until: "Este link ficará válido até %{due_date}."
+        ignore: "Se você não quiser criar a sua conta, ignore este email. Sua conta não terá acesso até que você clique no link acima para definir sua senha."
+  time:
+    formats:
+      devise:
+        mailer:
+          invitation_instructions:
+            accept_until_format: "%B %d, %Y %I:%M %p"

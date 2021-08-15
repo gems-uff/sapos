@@ -56,7 +56,7 @@ module CourseClassesPdfHelper
 	  [
 	    i+=1,
 	    class_enrollment.enrollment.enrollment_number,
-	    class_enrollment.enrollment.student.name,
+	    class_enrollment.enrollment.student.name + (class_enrollment.enrollment.has_active_scholarship_now? ? " *" : ""),
 	    number_to_grade(class_enrollment.grade),
 	    class_enrollment.attendance_to_label,
 	    class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.registered") ? "" : class_enrollment.situation,
@@ -66,7 +66,7 @@ module CourseClassesPdfHelper
 	  [
 	    i+=1,
 	    class_enrollment.enrollment.enrollment_number,
-	    class_enrollment.enrollment.student.name,
+	    class_enrollment.enrollment.student.name + (class_enrollment.enrollment.has_active_scholarship_now? ? " *" : ""),
 	    class_enrollment.attendance_to_label,
 	    class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.registered") ? "" : class_enrollment.situation,
 	    class_enrollment.obs
@@ -83,6 +83,8 @@ module CourseClassesPdfHelper
       table.column(2).padding = [2, 4]
     end
 
+    pdf.move_down 10
+    pdf.text "<b>#{I18n.t("pdf_content.course_class.summary.active_scholarship_table_footer_subtitle")}</b>", :inline_format => true
 
     pdf.move_down 50
   end
@@ -112,7 +114,7 @@ module CourseClassesPdfHelper
         [
             i+=1,
             class_enrollment.enrollment.enrollment_number,
-            class_enrollment.enrollment.student.name,
+            class_enrollment.enrollment.student.name + (class_enrollment.enrollment.has_active_scholarship_now? ? " *" : ""),
             class_enrollment.enrollment.student.email
         ]
       end
@@ -126,6 +128,10 @@ module CourseClassesPdfHelper
       table.column(3).align = :left
       table.column(3).padding = [2, 4]
     end
+
+    pdf.move_down 10
+    pdf.text "<b>#{I18n.t("pdf_content.course_class.summary.active_scholarship_table_footer_subtitle")}</b>", :inline_format => true
+
   end
 
   def class_schedule_table(pdf, options={})

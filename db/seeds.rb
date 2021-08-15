@@ -25,6 +25,17 @@ Em caso de dúvida, procure a secretaria."
 CustomVariable.create(:description=>"Nota mínima para aprovação", :variable =>"minimum_grade_for_approval", :value => "6.0")
 CustomVariable.create(:description=>"Nota de reprovação por falta", :variable =>"grade_of_disapproval_for_absence", :value => "0.0")
 CustomVariable.create(:description=>"Professor logado no sistema pode lançar notas. O valor yes habilita turmas do semestre atual, yes_all_semesters habilita qualquer semestre.", :variable =>"professor_login_can_post_grades", :value => "no")
+CustomVariable.create(:description=>"Email de convite", :variable =>"account_email", :value => "<%= @resource.name %>,
+
+  Informamos que a sua conta no SAPOS foi criada.
+  
+  Acesse o seguinte link para confirmar e definir sua senha:
+  <%= accept_invitation_url(@resource, invitation_token: @token) %>
+  
+  
+  
+  <%= CustomVariable.notification_footer %>")
+
 
 ['Graduação', 'Especialização', 'Mestrado', 'Doutorado'].each do |level|
     Level.new do |l|

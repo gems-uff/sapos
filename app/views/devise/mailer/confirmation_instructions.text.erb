@@ -1,0 +1,9 @@
+<%= @resource.name %>,
+
+Você pode confirmar a sua conta através do link a seguir:
+<%= confirmation_url(@resource, :confirmation_token => @token) %>
+
+
+
+<%= CustomVariable.notification_footer %>
+

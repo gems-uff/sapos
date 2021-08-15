@@ -1,0 +1,44 @@
+@import 'variables';
+
+
+.customform dt label {
+    padding: 2px 4px;
+    display: block; 
+    min-height: 100%; /* for the latest browsers which support min-height */
+    height: auto !important; /* for newer IE versions */
+    height: 100%; /* the only height-related attribute that IE6 does not ignore  */
+}
+
+.customform dl {
+    display: flex;
+}
+
+.customform dt {
+    width: 15em;
+    flex: 0 0 15em;
+}
+
+.customform dd {
+    flex: 1;
+}
+
+.customform input.fixed-text:focus,
+.customform input.fixed-text:focus-visible,
+.customform input.fixed-text {
+    padding: 6px 0;
+    font: normal 11px verdana, sans-serif;
+    color: #555;
+    background-color:transparent;
+    border: none;
+    outline: none;
+}
+
+#enrollment-info {
+    cursor: pointer; 
+    color: #3e82ae;
+}
+
+#toggle-enrollment-info {
+    display: none;
+    margin-top: 8px;
+}

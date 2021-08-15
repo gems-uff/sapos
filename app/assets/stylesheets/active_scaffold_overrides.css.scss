@@ -174,6 +174,7 @@ noscript.active-scaffold {
 .active-scaffold-header div.actions a.new_existing,
 .active-scaffold-header div.actions a.show_search,
 .active-scaffold-header div.actions a.to_pdf,
+.active-scaffold-header div.actions a.new_users,
 .active-scaffold-header div.actions a.preview,
 .active-scaffold-header div.actions a.class_schedule_pdf,
 .active-scaffold-header div.actions a.show_config_list,
@@ -220,6 +221,18 @@ noscript.active-scaffold {
 .active-scaffold-header div.actions a.new,
 .active-scaffold-header div.actions a.new_existing {
     background-image: url("active_scaffold/default/add.png");
+}
+
+.active-scaffold-header div.actions a.new_users {
+    position: relative;
+}
+
+.active-scaffold-header div.actions a.new_users:before {
+    content: "\f007";  /* this is your text. You can also use UTF-8 character codes as I do here */
+    font-family: FontAwesome;
+    left:8px;
+    position:absolute;
+    top:25%;
 }
 
 .active-scaffold-header div.actions a.show_search {

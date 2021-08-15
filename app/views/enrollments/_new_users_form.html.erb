@@ -1,0 +1,50 @@
+<ol class="customform form">
+  <li class="form-element">
+    <%=readonly_dl_input("Matrículas", @counts, :enrollments)%>
+  </li>
+  <li class="form-element">
+    <%=readonly_dl_input("... que permitem usuários <span id='enrollment-info'>[?]</span> 
+    <div id='toggle-enrollment-info'> #{'Tipo'.pluralize(@statuses_with_users.count)}: #{@statuses_with_users.to_sentence(locale: :'pt-BR')} 
+    <br> Se quiser incluir outros tipos, configure \"Tipos de Matrícula\" </div>", @counts, :allowedenrollments)%>
+  </li>
+  <li class="form-element">
+    <%=readonly_dl_input("Alunos", @counts, :students)%>
+  </li>
+  <li class="form-element">
+    <%=readonly_dl_input("... vinculados a usuários", @counts, :existingstudents)%>
+  </li>
+  <li class="form-element">
+    <%=readonly_dl_input("... sem email", @counts, :noemail)%>
+  </li>
+  <li class="form-element">
+    <dl>
+      <dt><label>Adicionar</label></dt>
+      <dd>
+        <label>
+          <input type="radio" id="add_default" name="add_option" value="default" checked/>
+          <%=pluralize(@counts[:default], 'aluno') %> <%= 'válido'.pluralize(@counts[:default]) %>
+        </label>
+        <br>
+        <label>
+          <input type="radio" id="add_dismissed" name="add_option" value="dismissed"/>
+          <%=pluralize(@counts[:dismissed], 'aluno') %> <%= 'desligado'.pluralize(@counts[:dismissed]) %>
+        </label>
+        <br>
+        <label>
+          <input type="radio" id="add_all" name="add_option" value="all"/>
+          <%=pluralize(@counts[:all], 'aluno') %> <%= 'válido'.pluralize(@counts[:all]) %> ou <%= 'desligados'.pluralize(@counts[:all]) %>
+        </label>
+      </dd>
+    </dl>
+  </li>
+  
+
+</ol>
+
+<script>
+
+$('#enrollment-info').click(function () {
+  $("#toggle-enrollment-info").toggle();
+})
+
+</script>

@@ -15,6 +15,9 @@ describe Enrollment do
 
 
   let(:enrollment) { Enrollment.new }
+  let(:enrollment_status_with_user) { FactoryBot.create(:enrollment_status, :user => true) }
+  let(:enrollment_status_without_user) { FactoryBot.create(:enrollment_status, :user => false) }
+  let(:role) { FactoryBot.create(:role) }
   subject { enrollment }
   describe "Validations" do
     describe "student" do
@@ -321,6 +324,119 @@ describe Enrollment do
       end
 
       
+    end
+
+    describe "self.has_active_scholarship_now?" do
+      describe "has no scholarship" do
+        it "should return false" do
+          enrollment = FactoryBot.create(:enrollment)
+          expect(enrollment.has_active_scholarship_now?).to be false
+        end 
+      end
+
+      describe "have scholarship(s) but none of them are active today" do
+        it "should return false" do
+
+          enrollment = FactoryBot.create(:enrollment)
+          scholarship1 = FactoryBot.create(:scholarship, :start_date => Date.today - 2.years, :end_date => Date.today + 2.years)
+          scholarship2 = FactoryBot.create(:scholarship, :start_date => Date.today - 2.years, :end_date => Date.today + 2.years)
+
+          scholarship_duration1 = FactoryBot.create(:scholarship_duration, :start_date => Date.today - 12.months, :end_date => Date.today - 6.months, :cancel_date => Date.today - 6.months, :enrollment => enrollment, :scholarship => scholarship1)
+
+          scholarship_duration2 = FactoryBot.create(:scholarship_duration, :start_date => Date.today + 6.months, :end_date => Date.today + 12.months, :cancel_date => Date.today + 12.months, :enrollment => enrollment, :scholarship => scholarship2)
+
+          enrollment.scholarship_durations << scholarship_duration1
+          enrollment.scholarship_durations << scholarship_duration2
+
+          expect(enrollment.has_active_scholarship_now?).to be false
+        end
+      end
+
+      describe "has an active scholarship today" do
+        it "should return true" do
+
+          enrollment = FactoryBot.create(:enrollment)
+          scholarship1 = FactoryBot.create(:scholarship, :start_date => Date.today - 2.years, :end_date => Date.today + 2.years)
+
+          scholarship_duration1 = FactoryBot.create(:scholarship_duration, :start_date => Date.today - 6.months, :end_date => Date.today + 6.months, :cancel_date => Date.today + 6.months, :enrollment => enrollment, :scholarship => scholarship1)
+
+          enrollment.scholarship_durations << scholarship_duration1
+
+          expect(enrollment.has_active_scholarship_now?).to be true
+        end
+      end
+
+    end
+
+    describe "should_have_user?" do
+      it "should return false if the enrollment status do not allow users" do
+        enrollment = FactoryBot.create(:enrollment, :enrollment_status => enrollment_status_without_user)
+        expect(enrollment.should_have_user?).to eq(false)
+      end
+      it "should return false if the student already has an user" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        FactoryBot.create(:user, :email => 'abc@def.com', :role => role)
+        enrollment = FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
+        expect(enrollment.should_have_user?).to eq(false)
+      end
+
+      it "should return true if the student was not dismissed and new_user_mode is 'default'" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        enrollment = FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
+        enrollment.new_user_mode = 'default'
+        expect(enrollment.should_have_user?).to eq(true)
+      end
+      it "should return false if the student was not dismissed and new_user_mode is 'dismissed'" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        enrollment = FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
+        enrollment.new_user_mode = 'dismissed'
+        expect(enrollment.should_have_user?).to eq(false)
+      end
+      it "should return true if the student was not dismissed and new_user_mode is 'all'" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        enrollment = FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
+        enrollment.new_user_mode = 'all'
+        expect(enrollment.should_have_user?).to eq(true)
+      end
+      
+      it "should return false if the enrollment was dismissed and new_user_mode is 'default'" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        dismissed_enrollment = FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
+        dismissal_reason = FactoryBot.create(:dismissal_reason, :name => 'a')
+        FactoryBot.create(:dismissal, :enrollment => dismissed_enrollment, :dismissal_reason => dismissal_reason)
+        dismissed_enrollment.new_user_mode = 'default'
+        expect(dismissed_enrollment.should_have_user?).to eq(false)
+      end
+      it "should return true if the enrollment was dismissed and new_user_mode is 'dismissed'" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        dismissed_enrollment = FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
+        dismissal_reason = FactoryBot.create(:dismissal_reason, :name => 'a')
+        FactoryBot.create(:dismissal, :enrollment => dismissed_enrollment, :dismissal_reason => dismissal_reason)
+        dismissed_enrollment.new_user_mode = 'dismissed'
+        expect(dismissed_enrollment.should_have_user?).to eq(true)
+      end
+      it "should return true if the enrollment was dismissed and new_user_mode is 'all'" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        dismissed_enrollment = FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user)
+        dismissal_reason = FactoryBot.create(:dismissal_reason, :name => 'a')
+        FactoryBot.create(:dismissal, :enrollment => dismissed_enrollment, :dismissal_reason => dismissal_reason)
+        dismissed_enrollment.new_user_mode = 'all'
+        expect(dismissed_enrollment.should_have_user?).to eq(true)
+      end
     end
   end
 
