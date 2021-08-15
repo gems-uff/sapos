@@ -14,7 +14,8 @@ class CustomVariable < ApplicationRecord
     "notification_footer" => :text,
     "minimum_grade_for_approval" => :text,
     "grade_of_disapproval_for_absence" => :text,
-    "professor_login_can_post_grades" => :text
+    "professor_login_can_post_grades" => :text,
+    "account_email" => :text,
   }
 
   validates :variable, :presence => true
@@ -86,6 +87,12 @@ class CustomVariable < ApplicationRecord
       return "no"
     end    
   end
+
+  def self.account_email
+    config = CustomVariable.find_by_variable(:account_email)
+    config.nil? ? nil : config.value
+  end
+
 
   def to_label
     "#{self.variable}"

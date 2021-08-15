@@ -3,20 +3,23 @@
 
 class User < ApplicationRecord
 
-  has_one :professor  
+  has_one :professor
+  has_one :student
   belongs_to :role
 
   has_paper_trail
 
-  devise :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,
+  devise :invitable, :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,
          :lockable
 
   validates :email, :presence => true, :uniqueness => true
-  validates :name, :presence => true, :uniqueness => true
+  validates :name, :presence => true
   validate :role_valid?
   validates :role, :presence => true
   validate :role_is_professor_if_the_professor_field_is_filled
+  validate :role_is_student_if_the_student_field_is_filled
   validate :selected_professor_is_already_linked_to_another_user
+  validate :selected_student_is_already_linked_to_another_user
 
   validates_confirmation_of :password
 
@@ -73,14 +76,27 @@ class User < ApplicationRecord
   end
 
   def role_is_professor_if_the_professor_field_is_filled
-    if professor && (role.name != "Professor")
-      errors.add(:professor, I18n.t("activerecord.errors.models.user.selected_role_was_not_professor"))
+    if professor && (role.id != Role::ROLE_PROFESSOR)
+      errors.add(:professor, :selected_role_was_not_professor)
     end
   end
 
+  def role_is_student_if_the_student_field_is_filled
+    if student && (role.id != Role::ROLE_ALUNO)
+      errors.add(:student, I18n.t("activerecord.errors.models.user.selected_role_was_not_student"))
+    end
+  end
+
+
   def selected_professor_is_already_linked_to_another_user
-    if professor && (professor.errors.messages[:professor] == ["selected_professor_is_already_linked_to_another_user"])
+    if professor && (professor.errors.messages[:user].include? I18n.t('activerecord.errors.models.professor.attributes.user.changed_to_different_user'))
       errors.add(:professor, I18n.t("activerecord.errors.models.user.selected_professor_is_already_linked_to_another_user", :nome_usuario => User.find(professor.user_id_was).name))
+    end
+  end
+
+  def selected_student_is_already_linked_to_another_user
+    if student && (student.errors.messages[:user].include? I18n.t('activerecord.errors.models.student.attributes.user.changed_to_different_user'))
+      errors.add(:student, I18n.t("activerecord.errors.models.user.selected_student_is_already_linked_to_another_user", :nome_usuario => User.find(student.user_id_was).name))
     end
   end
 

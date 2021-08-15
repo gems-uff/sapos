@@ -39,6 +39,9 @@ class Enrollment < ApplicationRecord
   validate :verify_research_area_with_advisors
 
   after_save :create_phase_completions
+  after_create :create_user!
+
+  attribute  :new_user_mode, :string, default: "default"
 
   def to_label
     return enrollment_number if student.nil?
@@ -113,7 +116,6 @@ class Enrollment < ApplicationRecord
     enrollments_with_all_phases_accomplished
   end
 
-
   def enrollment_has_main_advisor
     unless advisements.nil? or advisements.empty?
       #found = false
@@ -156,7 +158,31 @@ class Enrollment < ApplicationRecord
     scholarship_durations.each do |scholarship_duration|
       return true if scholarship_duration.active? 
     end
-
     return false
   end
+
+  def should_have_user?
+    return false unless self.student.can_have_new_user?
+    return false unless self.enrollment_status.user
+    return true if new_user_mode == "default" && self.dismissal.nil?
+    return true if new_user_mode == "dismissed" && ! self.dismissal.nil?
+    return true if new_user_mode == "all"
+    false
+  end
+
+  def create_user!
+    return false unless self.should_have_user?
+    begin
+      student = self.student
+      user = User.invite!({:email => student.email, :name => student.name, :role_id => Role::ROLE_ALUNO}, current_user)
+      student.user = user
+      student.save
+    rescue StandardError => err
+      eusers = User.where({:email => self.student.email})
+      eusers.destroy_all
+      return false
+    end
+    true
+  end
+
 end

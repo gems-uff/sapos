@@ -18,7 +18,7 @@ class Professor < ApplicationRecord
   belongs_to :academic_title_country, :class_name => 'Country', :foreign_key => 'academic_title_country_id' 
   belongs_to :academic_title_institution, :class_name => 'Institution', :foreign_key => 'academic_title_institution_id'
   belongs_to :academic_title_level, :class_name => 'Level', :foreign_key => 'academic_title_level_id'
-  belongs_to :user   
+  belongs_to :user
     
 
   has_paper_trail
@@ -27,7 +27,7 @@ class Professor < ApplicationRecord
   validates :name, :presence => true
   validates :email, :uniqueness => true, :allow_nil => true, :allow_blank => true
   validates :enrollment_number, :uniqueness => true, :allow_blank => true
-  validate :selected_professor_is_already_linked_to_another_user
+  validate :changed_to_different_user
 
 #  It was considered that active advisements were enrollments without dismissals reasons
   def advisement_points
@@ -60,9 +60,9 @@ class Professor < ApplicationRecord
     "#{self.name}"
   end
 
-  def selected_professor_is_already_linked_to_another_user
+  def changed_to_different_user
     if (user_id_changed?) && (!user_id.nil?) && (!user_id_was.nil?)	  
-      errors.add(:professor, "selected_professor_is_already_linked_to_another_user")
+      errors.add(:user, :changed_to_different_user)
     end
   end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_24_175430) do
+ActiveRecord::Schema.define(version: 2021_08_08_033949) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -80,6 +80,15 @@ ActiveRecord::Schema.define(version: 2020_09_24_175430) do
     t.boolean "disapproved_by_absence", default: false
     t.index ["course_class_id"], name: "index_class_enrollments_on_course_class_id"
     t.index ["enrollment_id"], name: "index_class_enrollments_on_enrollment_id"
+  end
+
+  create_table "class_schedules", force: :cascade do |t|
+    t.integer "year"
+    t.integer "semester"
+    t.datetime "enrollment_start"
+    t.datetime "enrollment_end"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "countries", force: :cascade do |t|
@@ -197,6 +206,7 @@ ActiveRecord::Schema.define(version: 2020_09_24_175430) do
     t.string "name", limit: 255
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "user"
   end
 
   create_table "enrollments", force: :cascade do |t|
@@ -500,10 +510,12 @@ ActiveRecord::Schema.define(version: 2020_09_24_175430) do
     t.string "identity_issuing_place", limit: 255
     t.string "photo", limit: 255
     t.integer "birth_country_id"
+    t.integer "user_id"
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"
     t.index ["city_id"], name: "index_students_on_city_id"
+    t.index ["user_id"], name: "index_students_on_user_id"
   end
 
   create_table "thesis_defense_committee_participations", force: :cascade do |t|
@@ -539,7 +551,18 @@ ActiveRecord::Schema.define(version: 2020_09_24_175430) do
     t.datetime "locked_at"
     t.integer "role_id", default: 1, null: false
     t.string "unconfirmed_email"
+    t.string "invitation_token"
+    t.datetime "invitation_created_at"
+    t.datetime "invitation_sent_at"
+    t.datetime "invitation_accepted_at"
+    t.integer "invitation_limit"
+    t.string "invited_by_type"
+    t.integer "invited_by_id"
+    t.integer "invitations_count", default: 0
     t.index ["email"], name: "index_users_on_email"
+    t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
+    t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
+    t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by_type_and_invited_by_id"
     t.index ["role_id"], name: "index_users_on_role_id"
   end
 
@@ -553,4 +576,5 @@ ActiveRecord::Schema.define(version: 2020_09_24_175430) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "students", "users", on_delete: :nullify
 end

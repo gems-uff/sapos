@@ -3,13 +3,24 @@
 
 require "spec_helper"
 
+require Rails.root.join "spec/support/user_helpers.rb"
+
+RSpec.configure do |c|
+  c.include UserHelpers
+end
+
 describe Student do
+  before :all do
+    FactoryBot.create :role_aluno
+  end
   it { should be_able_to_be_destroyed }
   it { should restrict_destroy_when_exists :enrollment }
   it { should destroy_dependent :student_major }
 
   let(:student) { Student.new }
-  subject { student }
+  let(:enrollment_status_with_user) { FactoryBot.create(:enrollment_status, :user => true) }
+  let(:enrollment_status_without_user) { FactoryBot.create(:enrollment_status, :user => false) }
+  let(:role) { FactoryBot.create(:role) }
   describe "Validations" do
     describe "cpf" do
       context "should be valid when" do
@@ -46,9 +57,59 @@ describe Student do
           expect(student).to have_error(:blank).on :name
         end
       end
+    end
+    describe "user" do
+      context "should be valid when" do
+        it "user is null" do
+          delete_users_by_emails ['abc@def.com']
+          #user = FactoryBot.create(:user, :email => 'abc@def.com', :role_id => Role::ROLE_ALUNO)
+          student.user = nil
+          expect(student).to have(0).errors_on :user
+        end
+        it "user is set to null after a predefined vaule" do
+          delete_users_by_emails ['abc@def.com', 'def@ghi.com']
+          user1 = FactoryBot.create(:user, :email => 'abc@def.com', :role_id => Role::ROLE_ALUNO)
+          student.user = user1
+          student.save(validate: false)
+          student.user = nil
+          expect(student).to have(0).errors_on :user
+        end
+
       end
+      context "should have error changed_to_different_user when" do
+        it "user is set to a different user" do
+          delete_users_by_emails ['abc@def.com', 'def@ghi.com']
+          user1 = FactoryBot.create(:user, :email => 'abc@def.com', :role_id => Role::ROLE_ALUNO)
+          user2 = FactoryBot.create(:user, :email => 'def@ghi.com', :role_id => Role::ROLE_ALUNO)
+          student.user = user1
+          student.save(validate: false)
+          student.user = user2
+          expect(student).to have_error(:changed_to_different_user).on :user
+        end
+      end
+    end
   end
   describe "Methods" do
+    describe "can_have_new_user?" do
+      it "should return true if the student has an active enrollment that allows users and has no associated user" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        expect(student.can_have_new_user?).to eq(true)
+      end
+      it "should return false if the student has the same email as an user" do
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        FactoryBot.create(:user, :email => 'abc@def.com', :role => role)
+        expect(student.can_have_new_user?).to eq(false)
+      end
+      it "should return false if the student already has an user" do
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        student.user = FactoryBot.create(:user, :email => 'def@ghi.com', :role => role)
+        expect(student.can_have_new_user?).to eq(false)
+      end
+      
+    end
+
     describe "enrollments_number" do
       it "should return the enrollment number when the student has one enrollment" do
         student = FactoryBot.create(:student)

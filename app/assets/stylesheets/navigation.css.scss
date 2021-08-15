@@ -255,7 +255,7 @@ body a {
     background: #deeef9;
 }
 
-#login_form{
+#form_border form{
     border-style: none;
 }
 
@@ -263,11 +263,12 @@ body a {
     margin-right: 6px;
 }
 
-#error_login{
+#error_login,
+#error_explanation {
     background-color: #fcc;
     margin: 10px 0px;
     border: solid 1px #f66;
-    padding: 5px 0 5px 12px;
+    padding: 5px 12px 5px 12px;
 }
 
 #remember_me_input > label{
@@ -290,7 +291,8 @@ body a {
 
 
 
-#login_form input#user_email,
-#login_form input#user_password {
+#form_border form input#user_email,
+#form_border form input#user_password,
+#form_border form input#user_password_confirmation {
     width: 260px;
 }

@@ -3,7 +3,16 @@
 
 require "spec_helper"
 
+require Rails.root.join "spec/support/user_helpers.rb"
+
+RSpec.configure do |c|
+  c.include UserHelpers
+end
+
 describe Professor do
+  before :all do
+    FactoryBot.create :role_professor
+  end
   it { should be_able_to_be_destroyed }
   it { should restrict_destroy_when_exists :advisement_authorization }
   it { should restrict_destroy_when_exists :advisement }
@@ -86,6 +95,36 @@ describe Professor do
           other_professor = FactoryBot.create(:professor, :enrollment_number => "Enrollment number")
           professor.enrollment_number = other_professor.enrollment_number
           expect(professor).to have_error(:taken).on :enrollment_number
+        end
+      end
+    end
+    describe "user" do
+      context "should be valid when" do
+        it "user is null" do
+          delete_users_by_emails ['abc@def.com']
+          #user = FactoryBot.create(:user, :email => 'abc@def.com', :role_id => Role::ROLE_ALUNO)
+          professor.user = nil
+          expect(professor).to have(0).errors_on :user
+        end
+        it "user is set to null after a predefined vaule" do
+          delete_users_by_emails ['abc@def.com', 'def@ghi.com']
+          user1 = FactoryBot.create(:user, :email => 'abc@def.com', :role_id => Role::ROLE_PROFESSOR)
+          professor.user = user1
+          professor.save(validate: false)
+          professor.user = nil
+          expect(professor).to have(0).errors_on :user
+        end
+
+      end
+      context "should have error changed_to_different_user when" do
+        it "user is set to a different user" do
+          delete_users_by_emails ['abc@def.com', 'def@ghi.com']
+          user1 = FactoryBot.create(:user, :email => 'abc@def.com', :role_id => Role::ROLE_PROFESSOR)
+          user2 = FactoryBot.create(:user, :email => 'def@ghi.com', :role_id => Role::ROLE_PROFESSOR)
+          professor.user = user1
+          professor.save(validate: false)
+          professor.user = user2
+          expect(professor).to have_error(:changed_to_different_user).on :user
         end
       end
     end

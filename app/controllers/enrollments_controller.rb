@@ -7,6 +7,8 @@ class EnrollmentsController < ApplicationController
   authorize_resource
   include NumbersHelper
   include ApplicationHelper
+  include EnrollmentUsersHelper
+
   helper :class_enrollments
   helper :advisements
   helper :scholarship_durations
@@ -20,6 +22,12 @@ class EnrollmentsController < ApplicationController
       :page => true, 
       :type => :collection, 
       :parameters => {:format => :pdf}
+    config.action_links.add 'new_users',
+      :label => I18n.t('active_scaffold.new_users_action'),
+      :ignore_method => :hide_new_users?,
+      :type => :collection,
+      :keep_open => false
+
     config.action_links.add 'academic_transcript_pdf', 
       :label => "<i title='#{I18n.t('pdf_content.enrollment.academic_transcript.link')}' class='fa fa-book'></i>".html_safe, 
       :page => true, 
@@ -289,7 +297,39 @@ class EnrollmentsController < ApplicationController
     end
   end
 
+  def hide_new_users?
+    cannot? :invite, User
+  end
+
+  def new_users
+    raise CanCan::AccessDenied.new("Acesso negado!", :invite, User) if cannot? :invite, User
+    each_record_in_page {}
+    enrollments = find_page(:sorting => active_scaffold_config.list.user.sorting).items
+    @counts = new_users_count(enrollments)
+    @statuses_with_users = EnrollmentStatus.where(user: true).collect(&:name)
+    respond_to_action(:new_users)
+  end
+
+  def create_users
+    raise CanCan::AccessDenied.new("Acesso negado!", :invite, User) if cannot? :invite, User
+    process_action_link_action do
+      each_record_in_page {}
+      enrollments = find_page(:sorting => active_scaffold_config.list.user.sorting).items
+      created = create_enrollments_users(enrollments, params["add_option"])
+      if created > 0
+        flash[:info] = "#{created} #{"usuário".pluralize(created)} #{"criado".pluralize(created)}"
+      else
+        flash[:error] = "Nenhum usuário criado"
+      end      
+      self.successful  = true
+    end
+  end
+
   protected
+
+  def new_users_respond_to_js
+    render :partial => 'new_users'
+  end
 
   def before_update_save(record)
     return unless (record.valid? and record.class_enrollments.all? {|class_enrollment| class_enrollment.valid?})

@@ -67,6 +67,10 @@ SimpleNavigation::Configuration.run do |navigation|
       can_read
     end
 
+    primary.item :land, 'Principal', landing_url, :if => can_read?(:landing) do |land|
+      @landingsidebar.call(land)
+    end
+
     alunos_models = [Student, Dismissal, Enrollment, EnrollmentHold, Level, DismissalReason, EnrollmentStatus]
 
     primary.item :stud, 'Alunos', get_path_from(alunos_models), :if => can_read?(alunos_models) do |stud|

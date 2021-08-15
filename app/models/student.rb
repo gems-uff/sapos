@@ -15,13 +15,38 @@ class Student < ApplicationRecord
   belongs_to :birth_city, :class_name => 'City', :foreign_key => 'birth_city_id'
   belongs_to :birth_state, :class_name => 'State', :foreign_key => 'birth_state_id' 
   belongs_to :birth_country, :class_name => 'Country', :foreign_key => 'birth_country_id'
+  belongs_to :user, optional: true
 
   has_paper_trail  
    
   validates :name, :presence => true
   validates :cpf, :presence => true, :uniqueness => true
+  validate :changed_to_different_user
 
   before_save :set_birth_state_by_birth_city
+  
+  def self.where_without_user
+    self.joins(enrollments: :enrollment_status)
+    .where.not(email: User.select(:email))
+    .where(enrollment_statuses: { user: true })
+    .includes(enrollments: :dismissal)
+    .where(dismissals: {id: nil})
+  end
+
+  def has_user?
+    return true unless self.user_id.nil?
+    ! User.where(email: self.email).empty?
+  end
+
+  def has_email?
+    ! (self.email.nil? || self.email.empty?)
+  end
+
+  def can_have_new_user?
+    return false unless has_email?
+    return false if has_user?
+    return true 
+  end
 
   def enrollments_number
     self.enrollments.collect { |enrollment| 
@@ -57,6 +82,12 @@ class Student < ApplicationRecord
 
   def mount_uploader_name
     :photo
+  end
+
+  def changed_to_different_user
+    if (user_id_changed?) && (!user_id.nil?) && (!user_id_was.nil?)	  
+      errors.add(:user, :changed_to_different_user)
+    end
   end
 
   protected

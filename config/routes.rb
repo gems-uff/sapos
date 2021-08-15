@@ -25,7 +25,10 @@ Sapos::Application.routes.draw do
 
   resources :scholarship_suspensions do concerns :active_scaffold end
 
-  devise_for :users, :controllers => {:registrations => "users"}
+  devise_for :users, :controllers => {
+    :registrations => "users",
+    :invitations => "user_invitations",
+  }
 
   resources :versions do
     concerns :active_scaffold
@@ -161,6 +164,8 @@ Sapos::Application.routes.draw do
     record_select_routes
     collection do
       get 'to_pdf'
+      get 'new_users'
+      post 'create_users'
     end
     member do
       get 'academic_transcript_pdf'
@@ -262,6 +267,12 @@ Sapos::Application.routes.draw do
 
   resources :course_research_areas do
     concerns :active_scaffold
+  end
+
+  get 'landing', action: :index, controller: 'landing'
+
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
 
   # The priority is based upon order of creation:

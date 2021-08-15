@@ -49,6 +49,7 @@ gem "kaminari"
 
 gem 'cancancan'
 gem "devise", "~> 4.7.1"
+gem 'devise_invitable', '~> 2.0.0'
 gem "paper_trail"
 
 gem 'sql-parser'
@@ -96,6 +97,7 @@ group :development, :test do
   gem 'spring'
   gem 'byebug'
   gem 'simplecov', '0.17.1' 
+  gem 'letter_opener_web'
 end
 
 group :production do

@@ -1,0 +1,10 @@
+<%= @resource.name %>,
+
+Sua conta foi bloqueada no SAPOS por tentativas em excessso de login.
+
+Acesse o link a seguir para desbloquear a sua conta:
+<%= unlock_url(@resource, :unlock_token => @token) %>
+
+
+
+<%= CustomVariable.notification_footer %>

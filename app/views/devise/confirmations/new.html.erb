@@ -1,12 +1,25 @@
-<h2>Resend confirmation instructions</h2>
+<div id="login_form_wrapper">
+  <h2>Reenviar confirmação</h2>
 
-<%= form_for(resource, :as => resource_name, :url => confirmation_path(resource_name), :html => { :method => :post }) do |f| %>
-  <%= devise_error_messages! %>
+  <% if flash[:alert]  %>
+    <div id="error_login">
+    <%= flash[:alert] %>
+    </div>
+  <% end %>
+  <%= render "devise/shared/error_messages", resource: resource %>
+  <div id="form_border">
 
-  <div><%= f.label :email %><br />
-  <%= f.email_field :email %></div>
+    <%= form_for(resource, :as => resource_name, :url => confirmation_path(resource_name), :html => { :method => :post }) do |f| %>
 
-  <div><%= f.submit "Resend confirmation instructions" %></div>
-<% end %>
+      <div><%= f.label :email %><br />
+      <%= f.email_field :email %></div>
+
+      <br>
+
+      <div><%= f.submit "Enviar instruções" %></div>
+    <% end %>
+  </div>
+
+</div>
 
 <%= render :partial => "devise/shared/links" %>
