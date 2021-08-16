@@ -4,6 +4,14 @@
 module ApplicationHelper
   include NumbersHelper
 
+  def optional_navigation(options)
+    begin
+      render_navigation(options)
+    rescue NoMethodError => e
+      ""
+    end
+  end
+
   def display_none_if_logged_out
     'style="display:none;"'.html_safe unless user_signed_in?
   end

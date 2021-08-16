@@ -44,9 +44,9 @@
       
       <div class='clear_float'></div>
       <div class='content_wrapper'>
-        <div id='sub_navigation' <%= display_none_if_logged_out %>><%= render_navigation :level => 2 %></div>
+        <div id='sub_navigation' <%= display_none_if_logged_out %>><%= optional_navigation :level => 2 %></div>
         <div class='content'>
-          <div id='top_navigation' <%= display_none_if_logged_out %>><%= render_navigation :level => 1 %></div>
+          <div id='top_navigation' <%= display_none_if_logged_out %>><%= optional_navigation :level => 1 %></div>
           <div class='clear_float'></div>
           <div>
             <%= yield %>

@@ -319,7 +319,7 @@ GEM
       tilt
     sdoc (1.1.0)
       rdoc (>= 5.0)
-    simple-navigation (4.1.0)
+    simple-navigation (4.3.0)
       activesupport (>= 2.3.2)
     simplecov (0.17.1)
       docile (~> 1.1)

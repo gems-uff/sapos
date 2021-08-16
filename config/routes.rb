@@ -272,6 +272,8 @@ Sapos::Application.routes.draw do
   end
 
   get 'landing', action: :index, controller: 'landing'
+  get 'enrollment/:id', to: 'student_enrollment#show', as: :student_enrollment
+
 
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
