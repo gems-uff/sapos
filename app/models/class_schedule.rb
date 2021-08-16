@@ -10,5 +10,8 @@ class ClassSchedule < ApplicationRecord
   validates :enrollment_start, :presence => true
   validates :enrollment_end, :presence => true
 
+  def to_label
+    "#{year}.#{semester}"
+  end
 
 end

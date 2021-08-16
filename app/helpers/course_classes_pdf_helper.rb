@@ -134,8 +134,7 @@ module CourseClassesPdfHelper
 
   end
 
-  def class_schedule_table(pdf, options={})
-    course_classes ||= options[:course_classes]
+  def prepare_class_schedule_table(course_classes)
     star = false
     first = 1
     last = 5
@@ -148,20 +147,14 @@ module CourseClassesPdfHelper
         end
       end
     end
-
-    table_width = [286]
     header = [[
-      "<b>#{I18n.t("pdf_content.course_class.class_schedule.course_name")}</b>"
+      "id",
+      "#{I18n.t("pdf_content.course_class.class_schedule.course_name")}"
     ]]
-
-    count = last - first + 1
-    day_width = (320 / count).floor
     (first..last).each do |index|
-      table_width << day_width
-      header[0] << "<b>#{I18n.translate("date.day_names")[index]}</b>"
+      header[0] << "#{I18n.translate("date.day_names")[index]}"
     end
-    table_width << (520 - day_width * count)
-    header[0] << "<b>#{I18n.t("pdf_content.course_class.class_schedule.professor")}</b>"
+    header[0] << "#{I18n.t("pdf_content.course_class.class_schedule.professor")}"
 
     table_data = []
 
@@ -170,17 +163,18 @@ module CourseClassesPdfHelper
         
       course = header[0].map {|x| ""}
 
-      course[0] = course_class.name_with_class
+      course[0] = course_class.id
+      course[1] = course_class.name_with_class
 
       course_class.allocations.each do |allocation| 
         index = I18n.translate("date.day_names").index(allocation.day)
-        course[index + 1 - first] = "#{allocation.start_time}-#{allocation.end_time}"
-        course[index + 1 - first] += "\n#{allocation.room || ' '}"
+        course[index + 2 - first] = "#{allocation.start_time}-#{allocation.end_time}"
+        course[index + 2 - first] += "\n#{allocation.room || ' '}"
       end
 
       if course_class.allocations.empty?
         (first..last).each do |index|
-          course[index + 1 - first] = "*\n "
+          course[index + 2 - first] = "*\n "
         end
         star = true
       end
@@ -191,14 +185,37 @@ module CourseClassesPdfHelper
 
     table_data.sort_by! { |e| e[0] }
 
+    {
+      star: star,
+      first: first,
+      last: last,
+      header: header,
+      data: table_data,
+    }
+  end
+
+  def class_schedule_table(pdf, options={})
+    course_classes ||= options[:course_classes]
+    table = prepare_class_schedule_table(course_classes)
+    table[:header][0] = table[:header][0].drop(1).collect {|h| "<b>#{h}</b>"}
+    table[:data] = table[:data].collect {|row| row.drop(1) }
+
+    table_width = [286]
+    count = table[:last] - table[:first] + 1
+    day_width = (320 / count).floor
+    (table[:first]..table[:last]).each do |index|
+      table_width << day_width
+    end
+    table_width << (520 - day_width * count)
+    
     count = 0
     rows_per_page = 15
-    num_pages = (table_data.size.to_f / rows_per_page).ceil
+    num_pages = (table[:data].size.to_f / rows_per_page).ceil
 
-    table_data.each_slice(rows_per_page) do |data_slice|
+    table[:data].each_slice(rows_per_page) do |data_slice|
       count += 1
       last_page = (num_pages ==  count)
-      class_schedule_print_table(pdf, table_width, header, data_slice, star, last_page)
+      class_schedule_print_table(pdf, table_width, table[:header], data_slice, table[:star], last_page)
       pdf.start_new_page unless last_page
     end
   end

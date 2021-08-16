@@ -59,7 +59,12 @@ Sapos::Application.routes.draw do
     end
   end
 
-  resources :class_schedules, concerns: :active_scaffold
+  resources :class_schedules do
+    concerns :active_scaffold
+    member do
+      get 'class_schedule_pdf'
+    end
+  end
 
   resources :course_types do
     concerns :active_scaffold
