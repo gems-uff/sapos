@@ -278,6 +278,7 @@ Sapos::Application.routes.draw do
 
   get 'landing', action: :index, controller: 'landing'
   get 'enrollment/:id', to: 'student_enrollment#show', as: :student_enrollment
+  get 'enrollment/:id/enroll/:year-:semester', to: 'student_enrollment#enroll', as: :student_enroll
 
 
   if Rails.env.development?
