@@ -9,9 +9,12 @@ class CourseClass < ApplicationRecord
   has_paper_trail
 
   has_many :class_enrollments, :dependent => :destroy
+  has_many :class_enrollment_requests, :dependent => :destroy
   has_many :allocations, :dependent => :destroy
 
   has_many :enrollments, :through => :class_enrollments
+  has_many :enrollment_requests, :through => :class_enrollments
+
 
   validates :course, :presence => true
   validates :professor, :presence => true

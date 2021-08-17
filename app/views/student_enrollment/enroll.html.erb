@@ -2,39 +2,41 @@
 <% estars = "" %>
 <div class="landing-main enroll-main">
   <h2> Inscrição em disciplinas do semestre <%= @semester.to_label %> </h2>
-  <form>
-  <table class="enroll-table">
-    <thead>
-      <tr>
-        <th> Inscrição </th>
-        <% table[:header][0].drop(1).each do |head| %>
-          <th class="cell-<%= head.downcase %>"> <%= head %> </th>
-        <% end %>
-      </tr>
-    </thead>
-    <tbody>
-      <% table[:data].each do |row| %>
+  <%= form_with model: @enrollment_request do |form| %>
+    <table class="enroll-table">
+      <thead>
         <tr>
-          <td><input type="checkbox" id="enroll-<%= row[0] %>" name="enroll[]" value="<%= row[0] %>"/></td>
-          <% row.drop(1).each_with_index do |cell, index| %>
-            <td class="cell-<%= table[:header][0][index + 1].downcase %>"> 
-              <label for="enroll-<%= row[0] %>">
-                <%= cell.empty? ? "&nbsp; ".html_safe  : cell %> 
-              </label>
-            </td>
+          <th> Inscrição </th>
+          <% table[:header][0].drop(1).each do |head| %>
+            <th class="cell-<%= head.downcase %>"> <%= head %> </th>
           <% end %>
         </tr>
-      <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        <%= form.collection_check_boxes :course_classes, table[:data], :first, :first do |box| %>
+          <tr>
+            <td><%= box.check_box %></td>
+            <% box.object.drop(1).each_with_index do |cell, index| %>
+              <td class="cell-<%= table[:header][0][index + 1].downcase %>">
+                <%= box.label do %>
+                  <%= cell.empty? ? "&nbsp; ".html_safe  : cell %> 
+                <% end %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
 
-  <ul>
-  <% if table[:star] %>
-    <li>* <%= I18n.t("pdf_content.course_class.class_schedule.noschedule") %></li>
-    <% estars = "*" %>
+    <ul>
+    <% if table[:star] %>
+      <li>* <%= I18n.t("pdf_content.course_class.class_schedule.noschedule") %></li>
+      <% estars = "*" %>
+    <% end %>
+    <% unless CustomVariable.class_schedule_text.nil? or CustomVariable.class_schedule_text.empty? %>
+      <li>*<%= estars %> <%= CustomVariable.class_schedule_text %></li>
+    <% end %>
+    </ul>
+    <%= form.submit "Enviar" %>
   <% end %>
-  <% unless CustomVariable.class_schedule_text.nil? or CustomVariable.class_schedule_text.empty? %>
-    <li>*<%= estars %> <%= CustomVariable.class_schedule_text %></li>
-  <% end %>
-  </ul>
 </div>

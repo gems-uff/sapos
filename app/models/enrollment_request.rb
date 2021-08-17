@@ -4,6 +4,8 @@
 
 class EnrollmentRequest < ApplicationRecord
   belongs_to :enrollment
+  has_many :class_enrollment_requests, :dependent => :destroy
+  has_many :course_classes, through: :class_enrollment_requests
 
   has_paper_trail
 

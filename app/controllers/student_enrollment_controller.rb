@@ -14,6 +14,20 @@ class StudentEnrollmentController < ApplicationController
     ! (@enrollment.nil? || @enrollment.student.user != current_user || ! @enrollment.enrollment_status.user)
   end
 
+  def _redirect_semester
+    return redirect_alert("Matrícula inválida", landing_url) if ! _valid_enrollment
+    return redirect_alert("Matrícula desligada", student_enrollment_path(@enrollment.enrollment_number)) if ! @enrollment.dismissal.nil?
+    now = Time.now
+    @semester = ClassSchedule.find_by(
+      ClassSchedule.arel_table[:enrollment_start].lteq(now)
+        .and(ClassSchedule.arel_table[:enrollment_end].gteq(now))
+        .and(ClassSchedule.arel_table[:year].eq(params[:year]))
+        .and(ClassSchedule.arel_table[:semester].eq(params[:semester]))
+      )
+    return redirect_alert("Semestre inválido", student_enrollment_path(@enrollment.enrollment_number)) if @semester.nil?
+    nil
+  end
+
   def redirect_alert(message, url)
     flash[:notice] = message
     redirect_to url
@@ -36,21 +50,20 @@ class StudentEnrollmentController < ApplicationController
   end
 
   def enroll
-    return redirect_alert("Matrícula inválida", landing_url) if ! _valid_enrollment
-    return redirect_alert("Matrícula desligada", student_enrollment_path(@enrollment.enrollment_number)) if ! @enrollment.dismissal.nil?
-    now = Time.now
-    @semester = ClassSchedule.find_by(
-      ClassSchedule.arel_table[:enrollment_start].lteq(now),
-      ClassSchedule.arel_table[:enrollment_end].gteq(now),
-      ClassSchedule.arel_table[:year].gteq(params[:year]),
-      ClassSchedule.arel_table[:semester].gteq(params[:semester])
-    )
-    return redirect_alert("Semestre inválido", student_enrollment_path(@enrollment.enrollment_number)) if @semester.nil?
+    return unless _redirect_semester.nil?
+
     @available_classes = CourseClass.where(
       year: @semester.year,
       semester: @semester.semester,
     )
+    @enrollment_request = EnrollmentRequest.find_or_initialize_by(
+      enrollment: @enrollment,
+      year: @semester.year,
+      semester: @semester.semester
+    )
     render :enroll
   end
+
+
 
 end
