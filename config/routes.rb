@@ -280,6 +280,12 @@ Sapos::Application.routes.draw do
   get 'enrollment/:id', to: 'student_enrollment#show', as: :student_enrollment
   get 'enrollment/:id/enroll/:year-:semester', to: 'student_enrollment#enroll', as: :student_enroll
 
+  resources :enrollment_requests do
+    concerns :active_scaffold
+    record_select_routes
+  end
+  resources :class_enrollment_requests, concerns: :active_scaffold
+
 
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"

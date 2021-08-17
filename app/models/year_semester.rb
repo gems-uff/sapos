@@ -4,6 +4,8 @@
 class YearSemester
   attr_accessor :year, :semester
 
+  SEMESTERS = [1,2]
+
   FIRST_SEMESTER = 1
   SECOND_SEMESTER = 2
 
@@ -11,6 +13,10 @@ class YearSemester
   FIRST_SEMESTER_BEGIN_DAY = 1
   SECOND_SEMESTER_BEGIN_MONTH = 8
   SECOND_SEMESTER_BEGIN_DAY = 1
+
+  def self.selectable_years
+    ((Date.today.year-5)..Date.today.year+1).map { |y| y }.reverse
+  end
 
   def self.current
     today = Date.today

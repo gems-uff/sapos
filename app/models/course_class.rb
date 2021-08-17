@@ -13,12 +13,10 @@ class CourseClass < ApplicationRecord
 
   has_many :enrollments, :through => :class_enrollments
 
-  SEMESTERS = [1,2]
-
   validates :course, :presence => true
   validates :professor, :presence => true
   validates :year, :presence => true
-  validates :semester, :presence => true, :inclusion => {:in => SEMESTERS}
+  validates :semester, :presence => true, :inclusion => {:in => YearSemester::SEMESTERS}
   validate :professor_changed_only_valid_fields, if: -> {current_user && (current_user.role_id == Role::ROLE_PROFESSOR)}
 
   attr_reader :changed_from_course_class
@@ -43,10 +41,6 @@ class CourseClass < ApplicationRecord
   def name_with_class
     return course.name if name.nil? or name.empty? or course.course_type.nil? or not course.course_type.show_class_name
     "#{course.name} (#{name})"
-  end
-
-  def self.selectable_years
-    ((Date.today.year-5)..Date.today.year+1).map { |y| y }.reverse
   end
 
   private

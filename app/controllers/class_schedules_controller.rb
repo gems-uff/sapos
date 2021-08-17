@@ -20,12 +20,12 @@ class ClassSchedulesController < ApplicationController
     config.columns[:year].form_ui = :select
     config.columns[:semester].form_ui = :select
     config.columns[:semester].options = {
-      :options => CourseClass::SEMESTERS,
+      :options => YearSemester::SEMESTERS,
       :include_blank => true,
       :default => nil
     }
     config.columns[:year].options = {
-      :options => CourseClass.selectable_years,
+      :options => YearSemester.selectable_years,
       :include_blank => true,
       :default => nil
     }

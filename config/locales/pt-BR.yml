@@ -81,6 +81,15 @@ pt-BR:
           aproved: "Aprovado"
           disapproved: "Reprovado"
           registered: "Incompleto"
+      class_enrollment_request:
+        enrollment_request: "Pedido de Inscrição"
+        course_class: "Turma"
+        status_professor: "Situação Professor"
+        status_coord: "Situação Coordenação"
+        statuses:
+          aproved: "Válido"
+          disapproved: "Inválido"
+          registered: "Indefinido"
       class_schedule:
         year: "Ano"
         semester: "Semestre"
@@ -198,6 +207,13 @@ pt-BR:
         semester: "Semestre"
         number_of_semesters: "Número de Semestres"
         number_label: "semestre"
+      enrollment_request:
+        year: Ano
+        semester: Semestre
+        enrollment: Matrícula
+        last_student_change_at: Data de última modificação do Aluno
+        last_professor_change_at: Data de última modificação do Professor
+        last_coord_change_at: Data de última modificação da Coordenação
       enrollment_status:
         name: "Nome"
         user: "Com usuário"
@@ -634,6 +650,9 @@ pt-BR:
       class_enrollment:
         one: "Inscrição"
         other: "Inscrições"
+      class_enrollment_request:
+        one: "Pedido de Inscrição em Disciplina"
+        other: "Pedidos de Inscrição em Disciplina"
       class_schedule:
         one: "Quadro de Horários"
         other: "Quadros de Horários"
@@ -673,6 +692,9 @@ pt-BR:
       enrollment_hold:
         one: "Trancamento"
         other: "Trancamentos"
+      enrollment_request:
+        one: "Pedido de Inscrição"
+        other: "Pedidos de Inscrição"
       enrollment_status:
         one: "Tipo de Matrícula"
         other: "Tipos de Matrícula"
@@ -779,6 +801,7 @@ pt-BR:
     create_another : "Criar Outro"
     create_city_label: "Adicionar Cidade"
     create_class_enrollment_label: "Adicionar Inscrição"
+    create_class_enrollment_request_label: "Adicionar Pedido de Inscrição em Disciplina"
     create_class_schedule_label: "Adicionar Quadro de Horário"
     create_custom_variable_label: "Adicionar Variável"
     create_country_label: "Adicionar País"
@@ -791,6 +814,7 @@ pt-BR:
     create_dismissal_reason_label: "Adicionar Razão de Desligamento"
     create_enrollment_hold_label: "Adicionar Trancamento"
     create_enrollment_label: "Adicionar Matrícula"
+    create_enrollment_request_label: "Adicionar Pedido de Inscrição"
     create_enrollment_status_label: "Adicionar Tipo de Matrícula"
     create_institution_label: "Adicionar Instituição"
     create_level_label: "Adicionar Nível"
@@ -849,6 +873,7 @@ pt-BR:
     update_allocation_label: "Editar Alocação"
     update_city_label: "Editar Cidade"
     update_class_enrollment_label: "Editar Inscrição"
+    update_class_enrollment_request_label: "Modificar Pedido de Inscrição em Disciplina"
     update_class_schedule_label: "Editar Quadro de Horário"
     update_custom_variable_label: "Editar Variável"
     update_country_label: "Editar País"
@@ -856,6 +881,7 @@ pt-BR:
     update_course_label: "Editar Disciplina"
     update_course_type_label: "Editar Tipo de Disciplina"
     update_enrollment_label: "Modificar Matrícula"
+    update_enrollment_request_label: "Modificar Pedido de Inscrição"
     update_link: "Editar"
     update_major_label: "Modificar Curso"
     update_model: ""
