@@ -211,6 +211,7 @@ pt-BR:
         year: Ano
         semester: Semestre
         enrollment: Matrícula
+        class_enrollment_requests: Pedido de inscrição em disciplinas
         last_student_change_at: Data de última modificação do Aluno
         last_professor_change_at: Data de última modificação do Professor
         last_coord_change_at: Data de última modificação da Coordenação
@@ -554,6 +555,8 @@ pt-BR:
         enrollment_hold:
           before_admission_date: "anterior a Data de Admissão"
           after_dismissal_date: "posterior a Data de Desligamento"
+        enrollment_request:
+          at_least_one_class: "precisar ter pelo menos uma disciplina"
         notification:
           offset_invalid_value: "está com o valor inválido. Tente um número, seguido por y, M, W, d, h, m ou s"
           individual_required: "requer que o email seja individual"

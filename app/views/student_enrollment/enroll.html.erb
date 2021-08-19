@@ -1,19 +1,51 @@
 <% table = prepare_class_schedule_table(@available_classes)  %>
 <% estars = "" %>
 <div class="landing-main enroll-main">
-  <h2> Inscrição em disciplinas do semestre <%= @semester.to_label %> </h2>
-  <%= form_with model: @enrollment_request do |form| %>
+  <% if flash[:alert] %>
+      <div id="error_login"><%= flash[:alert] %></div>
+  <% end %>
+  
+  <h2> <%= t 'student_enrollment.enroll.title', semester: @semester.to_label %> </h2>
+  
+
+  <%= form_with model: @enrollment_request, url: :save_student_enroll, method: :post do |form| %>
+    <% if @enrollment_request.errors.any? %>
+      <div id="error_explanation">
+        <span>
+          <%= I18n.t("errors.messages.not_saved",
+                    count: @enrollment_request.errors.count,
+                    resource: @enrollment_request.class.model_name.human.downcase)
+          %>
+        </span>
+        <ul>
+          <% @enrollment_request.errors.details.keys.each do |attribute| %>
+            <% @enrollment_request.errors.full_messages_for(attribute).each do |message| %>
+              <li>
+                <%= message %>
+                <% if attribute == :class_enrollment_requests && @enrollment_request.persisted? %>
+                  <div>
+                    <%= form.check_box :delete_request, id: "delete_request" %> <%= form.label t('student_enrollment.enroll.remove'), for: "delete_request" %>
+                  </div>
+                <% end %>
+              </li>
+            <% end %>
+            
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
     <table class="enroll-table">
       <thead>
         <tr>
-          <th> Inscrição </th>
+          <th> <%= t 'student_enrollment.enroll.do_enroll' %> </th>
           <% table[:header][0].drop(1).each do |head| %>
             <th class="cell-<%= head.downcase %>"> <%= head %> </th>
           <% end %>
         </tr>
       </thead>
       <tbody>
-        <%= form.collection_check_boxes :course_classes, table[:data], :first, :first do |box| %>
+        <%= form.collection_check_boxes :course_class_ids, table[:data], :first, :first do |box| %>
           <tr>
             <td><%= box.check_box %></td>
             <% box.object.drop(1).each_with_index do |cell, index| %>
@@ -37,6 +69,6 @@
       <li>*<%= estars %> <%= CustomVariable.class_schedule_text %></li>
     <% end %>
     </ul>
-    <%= form.submit "Enviar" %>
+    <%= form.submit t('student_enrollment.enroll.submit') %>
   <% end %>
 </div>

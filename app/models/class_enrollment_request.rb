@@ -1,5 +1,5 @@
 class ClassEnrollmentRequest < ApplicationRecord
-  belongs_to :enrollment_request
+  belongs_to :enrollment_request, inverse_of: :class_enrollment_requests
   belongs_to :course_class
   
   has_paper_trail
@@ -13,5 +13,7 @@ class ClassEnrollmentRequest < ApplicationRecord
   validates :course_class, :presence => true
   validates :status_professor, :presence => true, :inclusion => {:in => STATUSES}
   validates :status_coord, :presence => true, :inclusion => {:in => STATUSES}
+  validates_uniqueness_of :course_class, :scope => [:enrollment_request]
+
 
 end

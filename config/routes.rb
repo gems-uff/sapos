@@ -279,6 +279,7 @@ Sapos::Application.routes.draw do
   get 'landing', action: :index, controller: 'landing'
   get 'enrollment/:id', to: 'student_enrollment#show', as: :student_enrollment
   get 'enrollment/:id/enroll/:year-:semester', to: 'student_enrollment#enroll', as: :student_enroll
+  post 'enrollment/:id/enroll/:year-:semester', to: 'student_enrollment#save_enroll', as: :save_student_enroll
 
   resources :enrollment_requests do
     concerns :active_scaffold

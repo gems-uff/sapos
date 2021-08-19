@@ -13,7 +13,7 @@ class CourseClass < ApplicationRecord
   has_many :allocations, :dependent => :destroy
 
   has_many :enrollments, :through => :class_enrollments
-  has_many :enrollment_requests, :through => :class_enrollments
+  has_many :enrollment_requests, :through => :class_enrollment_requests
 
 
   validates :course, :presence => true

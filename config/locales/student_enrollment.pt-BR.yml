@@ -1,0 +1,29 @@
+# encoding utf-8
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  student_enrollment:
+    show:
+      title: Matrícula %{number} %{status}
+      welcome: Bem-vindo ao Sapos. Você ainda não tem acesso a nada nesta matrícula, mas em breve várias funcionalidades interessantes aparecerão aqui para você!
+
+    show_enroll:
+      title: Inscrições em disciplinas do semestre %{semester} estão abertas! 
+      enroll_link_new: Clique aqui para fazer um pedido de inscrição
+      enroll_link_edit: Clique aqui para editar seu pedido de inscrição
+    
+    enroll:
+      title: Inscrição em disciplinas do semestre %{semester}
+      do_enroll: Inscrição
+      submit: Enviar
+      remove: Remover pedido?
+
+    alert:
+      invalid_enrollment: Matrícula %{enrollment} inválida
+      dismissed_enrollment: Matrícula %{enrollment} desligada
+      invalid_semester: Semester %{year}.%{semester} inválido
+
+    notice:
+      request_removed: Pedido de inscrição removido!
+      request_saved: Pedido de inscrição salvo!

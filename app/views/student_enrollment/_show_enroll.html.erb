@@ -1,4 +1,9 @@
 <div class="enrollment-show-box">
-  <h3> Inscrições em disciplinas do semestre <%= semester.to_label %> estão abertas! </h3>
-  <%= link_to "Clique aqui para se inscrever", student_enroll_path(id: @enrollment.enrollment_number, year: semester.year, semester: semester.semester) %>
+  <h3> <%= t 'student_enrollment.show_enroll.title', semester:  semester.to_label %> </h3>
+  <% linkpath = student_enroll_path(id: @enrollment.enrollment_number, year: semester.year, semester: semester.semester) %>
+  <% if enrollment_request.persisted? %>
+    <%= link_to t('student_enrollment.show_enroll.enroll_link_edit'), linkpath %>
+  <% else %>
+    <%= link_to t('student_enrollment.show_enroll.enroll_link_new'), linkpath %>
+  <% end %>
 </div>

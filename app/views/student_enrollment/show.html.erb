@@ -1,8 +1,13 @@
 
 <div class="landing-main">
-  <h2> Matrícula: <%= @enrollment.enrollment_number %> <%= @enrollment.dismissal.nil? ? "" : "(Desligada)" %> </h2>
+  <% if flash[:alert] %>
+      <div id="error_login"><%= flash[:alert] %></div>
+  <% end %>
+  
+  <h2> <%= t 'student_enrollment.show.title', number: @enrollment.enrollment_number, status: @enrollment.dismissal.nil? ? "" : "(Desligada)" %> </h2>
+  
   <% if @partials.empty? %>
-    <p> Bem-vindo ao Sapos. Você ainda não tem acesso a nada nesta matrícula, mas em breve várias funcionalidades interessantes aparecerão aqui para você! </p>
+    <p> <%= t 'student_enrollment.show.welcome' %> </p>
   <% else %>
     <% @partials.each do |partial, locals| %>
       <%= render :partial => partial, :locals => locals %>
