@@ -281,6 +281,9 @@ Sapos::Application.routes.draw do
   get 'enrollment/:id/enroll/:year-:semester', to: 'student_enrollment#enroll', as: :student_enroll
   post 'enrollment/:id/enroll/:year-:semester', to: 'student_enrollment#save_enroll', as: :save_student_enroll
 
+  get 'pendencies', to: 'pendencies#index', as: :pendencies
+
+
   resources :enrollment_requests do
     concerns :active_scaffold
     record_select_routes

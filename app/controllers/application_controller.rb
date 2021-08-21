@@ -14,6 +14,7 @@ class ApplicationController < ActionController::Base
   before_action :authenticate_user!
   before_action :parse_date
   before_action :set_paper_trail_whodunnit
+  before_action :set_landing
 
   clear_helpers
 
@@ -36,19 +37,22 @@ class ApplicationController < ActionController::Base
   # Defines which controller and action should be shown when the base
   # URL is acessed (root route in routes.rb).
   def root
-    @landingsidebar = Proc.new {}
+    if can? :read, :landing
+      redirect_to(:controller => 'landing', :action => 'index') and return
+    end
     [Enrollment, Professor, ScholarshipDuration, Phase, Course, City, User, Student].each do |model|
       if can? :read, model
         redirect_to(:controller => model.name.underscore.pluralize.downcase, :action => 'index') and return
       end
     end
-    if can? :read, :landing
-      redirect_to(:controller => 'landing', :action => 'index') and return
-    end
-
+    
   end
 
   private
+
+  def set_landing
+    @landingsidebar = Proc.new {}
+  end
 
   #def authenticate
   #  redirect_to login_url unless User.find_by_id(session[:user_id])

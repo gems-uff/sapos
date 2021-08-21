@@ -6,7 +6,10 @@ class LandingController < ApplicationController
   skip_authorization_check
 
   def index
-    unless current_user.nil? || current_user.student.nil?
+    raise CanCan::AccessDenied.new if current_user.nil?
+
+
+    unless current_user.student.nil?
       enrollments = current_user.student.enrollments.order(admission_date: :desc)
       max_enrollment = enrollments.each_with_index.max_by do |enrolmment, index|
         [
@@ -18,6 +21,8 @@ class LandingController < ApplicationController
       if ! max_enrollment.nil? && max_enrollment[0].enrollment_status.user
         return redirect_to student_enrollment_path(max_enrollment[0].enrollment_number)
       end
+    else
+      return redirect_to pendencies_path
     end
     set_sidebar
     render :index
