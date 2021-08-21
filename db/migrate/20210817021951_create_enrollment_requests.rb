@@ -4,9 +4,9 @@ class CreateEnrollmentRequests < ActiveRecord::Migration[6.0]
       t.integer :year
       t.integer :semester
       t.references :enrollment, foreign_key: true
+      t.string :status, default: "Solicitada"
       t.datetime :last_student_change_at
-      t.datetime :last_professor_change_at
-      t.datetime :last_coord_change_at
+      t.datetime :last_staff_change_at
 
       t.timestamps
     end

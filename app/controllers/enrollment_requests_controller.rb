@@ -7,9 +7,9 @@ class EnrollmentRequestsController < ApplicationController
 
   active_scaffold :"enrollment_request" do |config|
     config.list.sorting = {:year => 'DESC', :semester => 'DESC', :enrollment => 'ASC'}
-    config.list.columns = [:year, :semester, :enrollment]
-    config.create.columns = [:year, :semester, :enrollment, :last_student_change_at, :last_professor_change_at, :last_coord_change_at]
-    config.update.columns = [:year, :semester, :enrollment, :last_student_change_at, :last_professor_change_at, :last_coord_change_at]
+    config.list.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
+    config.create.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
+    config.update.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
     config.create.label = :create_enrollment_request_label
     config.update.label = :update_enrollment_request_label
 
@@ -27,6 +27,8 @@ class EnrollmentRequestsController < ApplicationController
       :include_blank => true,
       :default => nil
     }
+    config.columns[:status].form_ui = :select
+    config.columns[:status].options = {:options => ClassEnrollmentRequest::STATUSES, default: ClassEnrollmentRequest::REQUESTED, :include_blank => I18n.t("active_scaffold._select_")}
 
     config.actions.exclude :deleted_records
   end

@@ -11,9 +11,12 @@ class PendenciesController < ApplicationController
       land.item :pendencies, 'Pendências', pendencies_url, :if => Proc.new { can?(:read, :landing) }
     end
     @partials = []
-
-    @partials << ['pendencies/enrollment_requests', {conditions: []}] # ToDo constrains: https://github.com/activescaffold/active_scaffold/wiki/Embedded-Scaffolds
-
+    
+    pendency_condition = EnrollmentRequest.pendency_condition
+    requests = EnrollmentRequest.where(pendency_condition)
+    unless requests.empty?
+      @partials << ['pendencies/enrollment_requests', {conditions: pendency_condition}]
+    end
 
     render :index
   end

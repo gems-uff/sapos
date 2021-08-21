@@ -5,6 +5,8 @@ class ClassEnrollment < ApplicationRecord
   belongs_to :course_class
   belongs_to :enrollment
 
+  has_one  :class_enrollment_request, dependent: :nullify
+
   has_paper_trail
 
   REGISTERED = I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
@@ -22,6 +24,7 @@ class ClassEnrollment < ApplicationRecord
   validate :professor_changed_only_valid_fields, if: -> {current_user && (current_user.role_id == Role::ROLE_PROFESSOR)}
 
   after_save :notify_student_and_advisor
+  after_destroy :set_request_status
 
   default_scope {joins(:enrollment => :student).order('students.name').readonly(false)}
 
@@ -160,6 +163,15 @@ class ClassEnrollment < ApplicationRecord
       if !campos_modificaveis.include?(campo_modificado)
 	errors.add(:class_enrollment, I18n.t("activerecord.errors.models.class_enrollment.changes_to_disallowed_fields"))
       end
+    end
+  end
+
+  def set_request_status
+    request = self.class_enrollment_request
+    unless request.nil?
+      request.class_enrollment = nil
+      request.status = ClassEnrollmentRequest::VALID
+      request.save
     end
   end
 

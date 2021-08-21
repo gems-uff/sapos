@@ -9,13 +9,40 @@ class EnrollmentRequest < ApplicationRecord
 
   has_paper_trail
 
+  IMPOSSIBLE = ["id = -1"]
+
   validates :year, :presence => true
   validates :semester, :presence => true
   validates :enrollment, :presence => true
+  validates :status, :presence => true, :inclusion => {:in => ClassEnrollmentRequest::STATUSES}
   validates_uniqueness_of :enrollment, :scope => [:year, :semester]
   validates :class_enrollment_requests, :length => { minimum: 1, message: :at_least_one_class}
+  validate :validate_effected_status
 
   accepts_nested_attributes_for :class_enrollment_requests, :course_classes
+
+  def self.pendency_condition
+    return IMPOSSIBLE if current_user.nil?
+    er = EnrollmentRequest.arel_table.dup
+    cer = ClassEnrollmentRequest.arel_table
+    er.table_alias = 'er'
+    check_status = er
+      .join(cer)
+      .on(cer[:enrollment_request_id].eq(er[:id]))
+      .where(cer[:status].eq(ClassEnrollmentRequest::REQUESTED))
+    if current_user.role_id == Role::ROLE_COORDENACAO || current_user.role_id == Role::ROLE_COORDENACAO
+      return [
+        "id IN (#{check_status.project(er[:id]).to_sql})",
+      ]
+    end
+    if current_user.role_id == Role::ROLE_PROFESSOR && ! current_user.professor.nil?
+      check_status = check_status.where(er[:enrollment_id].in(current_user.professor.enrollments.map(&:id)))
+      return [
+        "id IN (#{check_status.project(er[:id]).to_sql})",
+      ]
+    end
+    IMPOSSIBLE
+  end
 
   def to_label
     "[#{self.year}.#{self.semester}] #{self.enrollment.to_label}"
@@ -36,4 +63,28 @@ class EnrollmentRequest < ApplicationRecord
     end
     to_remove.each(&:mark_for_destruction)
   end
+
+  def refresh_status!
+    if self.status == ClassEnrollmentRequest::EFFECTED
+      nstatus = self.class_enrollment_requests.collect(&:status).max_by {|stat| ClassEnrollmentRequest::STATUSES_PRIORITY.index stat}
+      self.status = nstatus
+      self.save 
+    elsif self.class_enrollment_requests.collect(&:status).all? { |stat| stat == ClassEnrollmentRequest::EFFECTED }
+      self.status = ClassEnrollmentRequest::EFFECTED
+      self.save
+    end
+  end
+
+  protected
+
+  def validate_effected_status
+    if self.status == ClassEnrollmentRequest::EFFECTED
+      if self.class_enrollment_requests.any? { |cer| cer.status != ClassEnrollmentRequest::EFFECTED }
+        errors.add(:status, :class_enrollment_request_is_not_effected)
+      end
+    end
+  end
+
+ 
+
 end

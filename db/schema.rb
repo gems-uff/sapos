@@ -72,10 +72,11 @@ ActiveRecord::Schema.define(version: 2021_08_17_022755) do
   create_table "class_enrollment_requests", force: :cascade do |t|
     t.integer "enrollment_request_id"
     t.integer "course_class_id"
-    t.string "status_professor", default: "Indefinido"
-    t.string "status_coord", default: "Indefinido"
+    t.integer "class_enrollment_id"
+    t.string "status", default: "Solicitada"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["class_enrollment_id"], name: "index_class_enrollment_requests_on_class_enrollment_id"
     t.index ["course_class_id"], name: "index_class_enrollment_requests_on_course_class_id"
     t.index ["enrollment_request_id"], name: "index_class_enrollment_requests_on_enrollment_request_id"
   end
@@ -217,9 +218,9 @@ ActiveRecord::Schema.define(version: 2021_08_17_022755) do
     t.integer "year"
     t.integer "semester"
     t.integer "enrollment_id"
+    t.string "status", default: "Solicitada"
     t.datetime "last_student_change_at"
-    t.datetime "last_professor_change_at"
-    t.datetime "last_coord_change_at"
+    t.datetime "last_staff_change_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["enrollment_id"], name: "index_enrollment_requests_on_enrollment_id"
@@ -599,6 +600,7 @@ ActiveRecord::Schema.define(version: 2021_08_17_022755) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "class_enrollment_requests", "class_enrollments"
   add_foreign_key "class_enrollment_requests", "course_classes"
   add_foreign_key "class_enrollment_requests", "enrollment_requests"
   add_foreign_key "enrollment_requests", "enrollments"
