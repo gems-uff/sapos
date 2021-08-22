@@ -88,8 +88,8 @@ pt-BR:
         status: "Situação"
         statuses:
           requested: "Solicitada"
-          valid: "Válido"
-          invalid: "Inválido"
+          valid: "Válida"
+          invalid: "Inválida"
           effected: "Efetivada"
       class_schedule:
         year: "Ano"
@@ -213,7 +213,7 @@ pt-BR:
         semester: Semestre
         enrollment: Matrícula
         status: "Situação"
-        class_enrollment_requests: Pedido de inscrição em disciplinas
+        class_enrollment_requests: Disciplinas
         last_student_change_at: Data de última modificação do Aluno
         last_staff_change_at: Data de última modificação da Equipe
       enrollment_status:

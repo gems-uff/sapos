@@ -4,12 +4,13 @@
 
 class EnrollmentRequestsController < ApplicationController
   authorize_resource
+  helper :course_classes
 
   active_scaffold :"enrollment_request" do |config|
     config.list.sorting = {:year => 'DESC', :semester => 'DESC', :enrollment => 'ASC'}
     config.list.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
     config.create.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
-    config.update.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
+    config.update.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at, :class_enrollment_requests]
     config.create.label = :create_enrollment_request_label
     config.update.label = :update_enrollment_request_label
 

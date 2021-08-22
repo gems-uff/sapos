@@ -9,7 +9,7 @@ class ClassEnrollmentRequest < ApplicationRecord
   VALID = I18n.translate("activerecord.attributes.class_enrollment_request.statuses.valid")
   INVALID = I18n.translate("activerecord.attributes.class_enrollment_request.statuses.invalid")
   EFFECTED = I18n.translate("activerecord.attributes.class_enrollment_request.statuses.effected")
-  STATUSES = [REQUESTED, VALID, INVALID, EFFECTED]
+  STATUSES = [INVALID, REQUESTED, VALID, EFFECTED]
   STATUSES_PRIORITY = [EFFECTED, VALID, INVALID, REQUESTED] 
 
   validates :enrollment_request, :presence => true
