@@ -875,6 +875,7 @@ pt-BR:
     search: "Buscar"
     search_link: "Buscar"
     show: "Mostrar"
+    show_block: "Mostrar"
     show_link: "Visualizar"
     show_model: ""
     to_pdf: "Gerar relatório"
