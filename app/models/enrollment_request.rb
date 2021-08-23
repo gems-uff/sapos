@@ -54,14 +54,25 @@ class EnrollmentRequest < ApplicationRecord
 
   def assign_course_class_ids(course_classes)
     # course classes is a list of strings representing course_class ids
-    to_remove = self.class_enrollment_requests.filter {|cer| ! course_classes.include? cer.course_class_id.to_s }
+    result = false
+    to_remove = self.class_enrollment_requests.filter do |cer|
+      next false if cer.status == ClassEnrollmentRequest::EFFECTED
+      if ! course_classes.include? cer.course_class_id.to_s
+        result = true
+        true
+      else 
+        false
+      end
+    end
     course_classes.each do |course_class_id|
       next if course_class_id.empty?
       if self.class_enrollment_requests.find_by(course_class_id: course_class_id).nil?
         self.class_enrollment_requests.build(course_class_id: course_class_id)
+        result = true
       end
     end
     to_remove.each(&:mark_for_destruction)
+    result
   end
 
   def refresh_status!

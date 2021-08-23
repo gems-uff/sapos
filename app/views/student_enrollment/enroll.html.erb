@@ -7,6 +7,9 @@
   
   <h2> <%= t 'student_enrollment.enroll.title', semester: @semester.to_label %> </h2>
   
+  <% if @enrollment_request.persisted? %>
+    <span class="show-enroll-status show-enroll-status-<%= ClassEnrollmentRequest::STATUSES_MAP[@enrollment_request.status] %>"> <%= t('student_enrollment.enroll.status', status: @enrollment_request.status.downcase) %> </span>
+  <% end %>
 
   <%= form_with model: @enrollment_request, url: :save_student_enroll, method: :post do |form| %>
     <% if @enrollment_request.errors.any? %>
@@ -46,8 +49,14 @@
       </thead>
       <tbody>
         <%= form.collection_check_boxes :course_class_ids, table[:data], :first, :first do |box| %>
-          <tr>
-            <td><%= box.check_box %></td>
+          <% cer = @enrollment_request.class_enrollment_requests.find_by(course_class_id: box.object[0]) %>
+          <tr <%= cer.nil? ? "" : "title=\"#{cer.status}\" class=\"enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.status] }\"".html_safe %>>
+            <td>
+              <%= box.label class: "check-label" do %>
+                <% readonly = (! cer.nil? && cer.status == ClassEnrollmentRequest::EFFECTED) %>
+                <%= box.check_box onclick: (readonly ?  "return false;" : ""), readonly: readonly  %>
+              <% end %>
+            </td>
             <% box.object.drop(1).each_with_index do |cell, index| %>
               <td class="cell-<%= table[:header][0][index + 1].downcase %>">
                 <%= box.label do %>

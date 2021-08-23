@@ -36,7 +36,10 @@ class EnrollmentRequestsController < ApplicationController
   record_select :per_page => 10, :search_on => [:year, :semester, :enrollment], :order_by => 'year DESC, semester DESC', :full_text_search => true
 
   def before_update_save(record)
-    record.last_staff_change_at = Time.current
+    if record.changed? || record.class_enrollment_requests.any? { |cer| cer.changed? }
+      record.last_staff_change_at = Time.current
+      # ToDo: notify student
+    end
   end
 
 end

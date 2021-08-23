@@ -34,9 +34,11 @@ class StudentEnrollmentController < ApplicationController
 
   def save_enroll
     return unless _prepare_enroll.nil?
-    @enrollment_request.assign_course_class_ids(enrollment_request_params[:course_class_ids])
-    @enrollment_request.status = ClassEnrollmentRequest::REQUESTED
-    @enrollment_request.last_student_change_at = Time.current
+    if @enrollment_request.assign_course_class_ids(enrollment_request_params[:course_class_ids])
+      @enrollment_request.status = ClassEnrollmentRequest::REQUESTED
+      @enrollment_request.last_student_change_at = Time.current
+      # ToDo: notify advisors and staff
+    end
     if enrollment_request_params[:delete_request] == "1"
       @enrollment_request.destroy!
       redirect_to student_enrollment_path(@enrollment.enrollment_number), notice: I18n.t("student_enrollment.notice.request_removed")

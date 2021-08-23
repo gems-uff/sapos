@@ -10,14 +10,18 @@ pt-BR:
 
     show_enroll:
       title: Inscrições em disciplinas do semestre %{semester} estão abertas! 
-      enroll_link_new: Clique aqui para fazer um pedido de inscrição
-      enroll_link_edit: Clique aqui para editar seu pedido de inscrição
+      enroll_link_new: Clique aqui para fazer um pedido de inscrição.
+      enroll_link_edit_valid: Seu pedido de inscrição foi marcado como válido. Clique aqui para editar
+      enroll_link_edit_requested: Clique aqui para editar seu pedido de inscrição.
+      enroll_link_edit_invalid: Seu pedido de inscrição foi marcado como inválido. Clique aqui para editar
+      enroll_link_edit_effected: Seu pedido de inscrição foi efetivado. Cliquei aqui para se inscrever em outras disciplinas
     
     enroll:
       title: Inscrição em disciplinas do semestre %{semester}
       do_enroll: Inscrição
       submit: Enviar
       remove: Remover pedido?
+      status: Sua inscrição está %{status}
 
     alert:
       invalid_enrollment: Matrícula %{enrollment} inválida

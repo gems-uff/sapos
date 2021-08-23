@@ -29,7 +29,7 @@ table.enroll-table  {
   background-color: #fff;
 }
 
-.enroll-table tr:hover {
+.enroll-table:not(.disable-pointer) tr:not(.enroll-row-effected):hover {
   background-color: #00cc80;
   cursor: pointer;
 }
@@ -50,7 +50,7 @@ table.enroll-table  {
   padding: 5px 4px;
 }
 
-.enroll-table label:hover {
+.enroll-table:not(.disable-pointer) tr:not(.enroll-row-effected) label:hover {
   cursor: pointer;
 }
 
@@ -64,3 +64,39 @@ table.enroll-table  {
   padding: 0;
 }
 
+.show-enroll-status {
+  display: block;
+  margin: 10px 0;
+}
+
+.show-enroll-status-valid {
+  color: green;
+} 
+
+.show-enroll-status-effected {
+  color: green;
+}
+
+.show-enroll-status-invalid {
+  color: darkred;
+} 
+
+.show-enroll-status-requested {
+  display: none;
+}
+
+.enroll-row-valid td:first-child {
+  background-color: lightgreen !important;
+}
+
+.enroll-row-invalid td:first-child {
+  background-color: lightcoral !important;
+}
+
+.enroll-row-effected td:first-child {
+  background-color: gray !important;
+}
+
+.enroll-table .check-label {
+  padding: 0;
+}
