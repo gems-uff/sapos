@@ -6,6 +6,8 @@ class EnrollmentRequest < ApplicationRecord
   belongs_to :enrollment
   has_many :class_enrollment_requests, :dependent => :destroy
   has_many :course_classes, through: :class_enrollment_requests
+  has_many :enrollment_request_comments, :dependent => :destroy
+
 
   has_paper_trail
 
@@ -42,6 +44,24 @@ class EnrollmentRequest < ApplicationRecord
       ]
     end
     IMPOSSIBLE
+  end
+
+  def last_student_read_time
+    time_list = [self.created_at]
+    time_list << self.last_student_change_at unless self.last_student_change_at.nil? 
+    time_list << self.student_view_at unless self.student_view_at.nil?
+    time_list.max
+  end
+
+  def last_staff_read_time
+    time_list = [self.created_at - 1.minute]
+    time_list << self.last_staff_change_at unless self.last_staff_change_at.nil? 
+    time_list.max
+  end
+
+  def student_unread_messages
+    comp_time = self.last_student_read_time
+    self.enrollment_request_comments.filter { |comment|  comment.updated_at > comp_time && comment.user != current_user }.count
   end
 
   def to_label

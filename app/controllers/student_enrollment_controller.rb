@@ -34,9 +34,17 @@ class StudentEnrollmentController < ApplicationController
 
   def save_enroll
     return unless _prepare_enroll.nil?
-    if @enrollment_request.assign_course_class_ids(enrollment_request_params[:course_class_ids])
+    message = enrollment_request_params[:message]
+    changed = false
+    changed ||= @enrollment_request.assign_course_class_ids(enrollment_request_params[:course_class_ids])
+    changed ||= ! message.empty?
+    if changed
+      unless message.empty?
+        @comment = @enrollment_request.enrollment_request_comments.build(message: message, user: current_user)
+      end
       @enrollment_request.status = ClassEnrollmentRequest::REQUESTED
       @enrollment_request.last_student_change_at = Time.current
+      @enrollment_request.student_view_at = @enrollment_request.last_student_change_at 
       # ToDo: notify advisors and staff
     end
     if enrollment_request_params[:delete_request] == "1"
@@ -45,6 +53,7 @@ class StudentEnrollmentController < ApplicationController
     elsif @enrollment_request.valid? && @enrollment_request.save
       redirect_to student_enrollment_path(@enrollment.enrollment_number), notice: I18n.t("student_enrollment.notice.request_saved")
     else
+      @enrollment_request.enrollment_request_comments.delete(@comment) if ! @comment.nil? && ! @comment.persisted?
       render :enroll
     end
   end
@@ -93,11 +102,16 @@ class StudentEnrollmentController < ApplicationController
       year: @semester.year,
       semester: @semester.semester
     )
+    if @enrollment_request.persisted?
+      @last_read = @enrollment_request.last_student_read_time
+      @enrollment_request.student_view_at = Time.current
+      @enrollment_request.save
+    end
     nil
   end
 
   def enrollment_request_params
-    params.require(:enrollment_request).permit(:delete_request, course_class_ids: [])
+    params.require(:enrollment_request).permit(:delete_request, :message, course_class_ids: [])
   end 
 
 end

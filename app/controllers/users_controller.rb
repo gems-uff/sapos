@@ -19,6 +19,7 @@ class UsersController < ApplicationController
 
     config.actions.exclude :deleted_records
   end
+  record_select :per_page => 10, :search_on => [:name, :email], :order_by => 'name ASC', :full_text_search => true
 
   def after_update_save(record)
     if record == current_user

@@ -119,6 +119,7 @@ Sapos::Application.routes.draw do
 
   resources :users do
     concerns :active_scaffold
+    record_select_routes
   end
 
   resources :roles do
@@ -289,7 +290,8 @@ Sapos::Application.routes.draw do
     record_select_routes
   end
   resources :class_enrollment_requests, concerns: :active_scaffold
-
+  resources :enrollment_request_comments, concerns: :active_scaffold
+  
 
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"

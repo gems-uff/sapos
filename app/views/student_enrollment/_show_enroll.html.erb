@@ -2,7 +2,11 @@
   <h3> <%= t 'student_enrollment.show_enroll.title', semester:  semester.to_label %> </h3>
   <% linkpath = student_enroll_path(id: @enrollment.enrollment_number, year: semester.year, semester: semester.semester) %>
   <% if enrollment_request.persisted? %>
+    <% unread = enrollment_request.student_unread_messages %>
     <%= link_to t("student_enrollment.show_enroll.enroll_link_edit_#{ClassEnrollmentRequest::STATUSES_MAP[enrollment_request.status]}"), linkpath %>
+    <% if unread > 0 %>
+      <%= t("student_enrollment.show_enroll.unread", count: unread) %>
+    <% end %>
   <% else %>
     <%= link_to t('student_enrollment.show_enroll.enroll_link_new'), linkpath %>
   <% end %>

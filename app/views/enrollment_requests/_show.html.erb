@@ -50,6 +50,7 @@ form_tag url_options, options
       </dd>
     </dl>
   <% end %>
+  
   <% cer_subform_id = sub_form_id(association: :class_enrollment_requests) %>
   <%= content_tag :li, class: ["sub-form-enroll"], id: cer_subform_id do %>
     <h5> 
@@ -105,6 +106,32 @@ form_tag url_options, options
     </div>
   <% end %>
 
+
+  <% comment_subform_id = sub_form_id(association: :enrollment_request_comments) %>
+  <%= content_tag :li, class: ["sub-form-comment"], id: comment_subform_id do %>
+    <h5> 
+      <%= t 'activerecord.attributes.enrollment_request.enrollment_request_comments' %> 
+      <%= link_to_visibility_toggle "#{comment_subform_id}-div" %>
+    </h5>
+    <div id="<%= comment_subform_id %>-div" class="enroll-messages">
+      <div class="log">
+        <% last_read = @record.last_staff_read_time %>
+        <% @record.enrollment_request_comments.each do |comment| %>
+          <div class="enroll-message  <%= comment.updated_at > last_read && comment.user != current_user ? "new-message" : "old-message" %>">
+            <span class="time"> <%= t('student_enrollment.enroll.message.time', time: comment.updated_at) %> </span>
+            <span class="author"> <%= t('student_enrollment.enroll.message.author', author: comment.user.name) %> </span>
+            <span class="content"> <%= simple_format(comment.message) %> </span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="message-box">
+        <span class="send-message"> <%= t('student_enrollment.enroll.message.send') %> </span>
+        <%= text_area_tag(:comment_message, @comment.nil? ? "" : @comment.message, size: '100x4' ) %>
+      </div>
+    </div>
+  <% end %>
+ </ol>
   <p class="form-footer">
     <%= submit_tag as_(submit_text), :class => "submit" %>
     <%= link_to(as_(:cancel), main_path_to_return, cancel_options) %>

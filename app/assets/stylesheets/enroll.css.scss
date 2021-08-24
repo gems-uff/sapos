@@ -1,8 +1,7 @@
 .sub-form-enroll {
-  float: left;
-  clear: left;
+  clear: both;
   display: block;
-  padding: 5px 0 5px 5px;
+  padding: 5px 0;
 }
 
 .sub-form-enroll h5 {
@@ -99,4 +98,43 @@ table.enroll-table  {
 
 .enroll-table .check-label {
   padding: 0;
+}
+
+.enroll-messages .log {
+  display: flex;
+  flex-direction: column;
+}
+
+.enroll-messages .enroll-message {
+  margin: 5px 0;
+  font: normal 11px verdana, sans-serif;
+  color: #555;
+  background-color: white;
+  border: 1px solid #eee;
+  border-radius: 7px;
+  padding: 5px
+
+
+}
+
+.enroll-messages .enroll-message .content {
+  margin: 3px 0;
+  display: block;
+}
+
+.enroll-messages .enroll-message .content p {
+  margin: 0;
+}
+
+.enroll-messages .message-box {
+  margin: 1em 0;
+}
+
+.enroll-messages .message-box .send-message {
+  display: block;
+  margin: 3px 0;
+}
+
+.enroll-messages .new-message {
+  color: darkgreen;
 }

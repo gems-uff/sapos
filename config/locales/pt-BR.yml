@@ -214,8 +214,16 @@ pt-BR:
         enrollment: Matrícula
         status: "Situação"
         class_enrollment_requests: Disciplinas
+        enrollment_request_comments: Comentários
         last_student_change_at: Data de última modificação do Aluno
         last_staff_change_at: Data de última modificação da Equipe
+      enrollment_request_comment:
+        enrollment_request: "Pedido de Inscrição"
+        message: Mensagem
+        user: Usuário
+        created_at: Data de criação
+        updated_at: Data de modificação
+
       enrollment_status:
         name: "Nome"
         user: "Com usuário"
@@ -662,8 +670,8 @@ pt-BR:
         one: "Inscrição"
         other: "Inscrições"
       class_enrollment_request:
-        one: "Pedido de Inscrição em Disciplina"
-        other: "Pedidos de Inscrição em Disciplina"
+        one: "Disciplina de Pedido de Inscrição"
+        other: "Disciplinas de Pedidos de Inscrição"
       class_schedule:
         one: "Quadro de Horários"
         other: "Quadros de Horários"
@@ -706,6 +714,9 @@ pt-BR:
       enrollment_request:
         one: "Pedido de Inscrição"
         other: "Pedidos de Inscrição"
+      enrollment_request_comment:
+        one: "Comentário de Pedido de Inscrição"
+        other: "Comentários de Pedidos de Inscrição"
       enrollment_status:
         one: "Tipo de Matrícula"
         other: "Tipos de Matrícula"
@@ -812,7 +823,7 @@ pt-BR:
     create_another : "Criar Outro"
     create_city_label: "Adicionar Cidade"
     create_class_enrollment_label: "Adicionar Inscrição"
-    create_class_enrollment_request_label: "Adicionar Pedido de Inscrição em Disciplina"
+    create_class_enrollment_request_label: "Adicionar Disciplina de Pedido de Inscrição"
     create_class_schedule_label: "Adicionar Quadro de Horário"
     create_custom_variable_label: "Adicionar Variável"
     create_country_label: "Adicionar País"
@@ -826,6 +837,7 @@ pt-BR:
     create_enrollment_hold_label: "Adicionar Trancamento"
     create_enrollment_label: "Adicionar Matrícula"
     create_enrollment_request_label: "Adicionar Pedido de Inscrição"
+    create_enrollment_request_comment_label: "Adicionar Comentário Pedido de Inscrição"
     create_enrollment_status_label: "Adicionar Tipo de Matrícula"
     create_institution_label: "Adicionar Instituição"
     create_level_label: "Adicionar Nível"
@@ -885,7 +897,7 @@ pt-BR:
     update_allocation_label: "Editar Alocação"
     update_city_label: "Editar Cidade"
     update_class_enrollment_label: "Editar Inscrição"
-    update_class_enrollment_request_label: "Modificar Pedido de Inscrição em Disciplina"
+    update_class_enrollment_request_label: "Modificar Disciplina de Pedido de Inscrição"
     update_class_schedule_label: "Editar Quadro de Horário"
     update_custom_variable_label: "Editar Variável"
     update_country_label: "Editar País"
@@ -894,6 +906,7 @@ pt-BR:
     update_course_type_label: "Editar Tipo de Disciplina"
     update_enrollment_label: "Modificar Matrícula"
     update_enrollment_request_label: "Modificar Pedido de Inscrição"
+    update_enrollment_request_comment_label: "Modificar Comentário de Pedido de Inscrição"
     update_link: "Editar"
     update_major_label: "Modificar Curso"
     update_model: ""

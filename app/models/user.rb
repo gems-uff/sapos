@@ -5,6 +5,7 @@ class User < ApplicationRecord
 
   has_one :professor
   has_one :student
+  has_many :enrollment_request_comments, :dependent => :destroy
   belongs_to :role
 
   has_paper_trail

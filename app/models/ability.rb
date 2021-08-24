@@ -7,7 +7,7 @@ class Ability
   ALL_MODELS = [Accomplishment, Advisement, AdvisementAuthorization, Allocation,
                 City, ClassEnrollment, ClassEnrollmentRequest, ClassSchedule, Country, Course, CourseClass, CourseType,
                 CustomVariable, Deferral, DeferralType, Dismissal, 
-                DismissalReason, Enrollment, EnrollmentHold, EnrollmentRequest, EnrollmentStatus, 
+                DismissalReason, Enrollment, EnrollmentHold, EnrollmentRequest, EnrollmentRequestComment, EnrollmentStatus, 
                 Institution, Level, Major, Notification, NotificationLog, Phase, 
                 PhaseCompletion, PhaseDuration, Professor, ProfessorResearchArea,
                 Query, ReportConfiguration, ResearchArea, Role, Scholarship, ScholarshipDuration, 
@@ -37,13 +37,13 @@ class Ability
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [Role, CustomVariable, ReportConfiguration])
       can :read, :pendencies
-      can :update, [ClassEnrollmentRequest, EnrollmentRequest]
+      can :update, [ClassEnrollmentRequest, EnrollmentRequestt, EnrollmentRequestComment]
       can :invite, User
       can :read, (Role)
     elsif role_id == Role::ROLE_PROFESSOR
       can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration, ClassSchedule])
       can :read, :pendencies
-      can :update, [ClassEnrollmentRequest, EnrollmentRequest]
+      can :update, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
       if user.professor
         if CustomVariable.professor_login_can_post_grades == "yes_all_semesters"
           can :update, ClassEnrollment, course_class: { professor: user.professor }
@@ -55,7 +55,7 @@ class Ability
       end
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, ReportConfiguration])
-      can :update, [ClassEnrollmentRequest, EnrollmentRequest]
+      can :update, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
       can :read, :pendencies
       can :read, (Query)
     elsif role_id == Role::ROLE_SUPORTE

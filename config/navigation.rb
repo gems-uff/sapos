@@ -117,7 +117,8 @@ SimpleNavigation::Configuration.run do |navigation|
       courses.item :class_enrollment, 'Inscrições', class_enrollments_path, :if => can_read?(ClassEnrollment)
       courses.item :allocation, 'Alocações', allocations_path, :if => can_read?(Allocation)
       courses.item :enrollment_request, 'Pedidos de Inscrição', enrollment_requests_path, :if => can_read?(EnrollmentRequest)
-      courses.item :class_enrollment_request, 'Pedidos de Inscrição em Disciplina', class_enrollment_requests_path, :if => can_read?(ClassEnrollmentRequest)
+      courses.item :class_enrollment_request, 'Disciplinas de Pedidos de Inscrição', class_enrollment_requests_path, :if => can_read?(ClassEnrollmentRequest)
+      courses.item :enrollment_request_comment, 'Comentários de Pedidos de Inscrição', enrollment_request_comments_path, :if => can_read?(EnrollmentRequestComment)
     end
 
     grade_models = [Major, Institution]

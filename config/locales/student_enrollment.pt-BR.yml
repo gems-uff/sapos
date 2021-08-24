@@ -15,13 +15,19 @@ pt-BR:
       enroll_link_edit_requested: Clique aqui para editar seu pedido de inscrição.
       enroll_link_edit_invalid: Seu pedido de inscrição foi marcado como inválido. Clique aqui para editar
       enroll_link_edit_effected: Seu pedido de inscrição foi efetivado. Cliquei aqui para se inscrever em outras disciplinas
-    
+      unread: (%{count} mensagens não lidas)
+
     enroll:
       title: Inscrição em disciplinas do semestre %{semester}
       do_enroll: Inscrição
       submit: Enviar
       remove: Remover pedido?
       status: Sua inscrição está %{status}
+      messages: Mensagens
+      message:
+        author: "%{author} enviou:"
+        time: "[%{time}]"
+        send: "Enviar mensagem (não será possível editar depois)"
 
     alert:
       invalid_enrollment: Matrícula %{enrollment} inválida

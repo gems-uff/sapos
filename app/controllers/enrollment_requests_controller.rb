@@ -10,7 +10,7 @@ class EnrollmentRequestsController < ApplicationController
     config.list.sorting = {:year => 'DESC', :semester => 'DESC', :enrollment => 'ASC'}
     config.list.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
     config.create.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
-    config.update.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at, :class_enrollment_requests]
+    config.update.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at, :class_enrollment_requests, :enrollment_request_comments]
     config.create.label = :create_enrollment_request_label
     config.update.label = :update_enrollment_request_label
 
@@ -36,8 +36,15 @@ class EnrollmentRequestsController < ApplicationController
   record_select :per_page => 10, :search_on => [:year, :semester, :enrollment], :order_by => 'year DESC, semester DESC', :full_text_search => true
 
   def before_update_save(record)
-    if record.changed? || record.class_enrollment_requests.any? { |cer| cer.changed? }
+    message = params[:comment_message]
+    changed = false
+    changed ||= record.changed? || record.class_enrollment_requests.any? { |cer| cer.changed? }
+    changed ||= ! message.empty?
+    if changed
       record.last_staff_change_at = Time.current
+      unless message.empty?
+        @comment = record.enrollment_request_comments.build(message: message, user: current_user)
+      end
       # ToDo: notify student
     end
   end

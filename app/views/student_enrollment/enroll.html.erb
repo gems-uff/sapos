@@ -78,6 +78,25 @@
       <li>*<%= estars %> <%= CustomVariable.class_schedule_text %></li>
     <% end %>
     </ul>
+
+    <h4> <%= t('student_enrollment.enroll.messages') %> </h4>
+    <div class="enroll-messages">
+      <div class="log">
+        <% @enrollment_request.enrollment_request_comments.each do |comment| %>
+          <div class="enroll-message <%= comment.updated_at > @last_read && comment.user != current_user ? "new-message" : "old-message" %>">
+            <span class="time"> <%= t('student_enrollment.enroll.message.time', time: comment.updated_at) %> </span>
+            <span class="author"> <%= t('student_enrollment.enroll.message.author', author: comment.user.name) %> </span>
+            <span class="content"> <%= simple_format(comment.message) %> </span>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="message-box">
+        <span class="send-message"> <%= t('student_enrollment.enroll.message.send') %> </span>
+        <%= form.text_area(:message, size: '100x4', value: @comment.nil? ? "" : @comment.message ) %>
+      </div>
+    </div>
+
     <%= form.submit t('student_enrollment.enroll.submit') %>
   <% end %>
 </div>
