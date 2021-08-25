@@ -37,3 +37,7 @@ pt-BR:
     notice:
       request_removed: Pedido de inscrição removido!
       request_saved: Pedido de inscrição salvo!
+
+  enrollment_request:
+    validate:
+      link: "Validar"

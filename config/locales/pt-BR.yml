@@ -816,6 +816,7 @@ pt-BR:
     click_to_reset: "Clique aqui para remover o filtro criado"
     close: "Fechar"
     create: "Salvar"
+    validate: "Validar"
     create_accomplishment_label: "Criar Realização de Etapas"
     create_advisement_authorization_label: "Adicionar Credenciamento"
     create_advisement_label: "Adicionar Orientação"

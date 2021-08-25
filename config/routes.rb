@@ -288,6 +288,10 @@ Sapos::Application.routes.draw do
   resources :enrollment_requests do
     concerns :active_scaffold
     record_select_routes
+    member do
+      get 'show_validate'
+      patch 'validate'
+    end
   end
   resources :class_enrollment_requests, concerns: :active_scaffold
   resources :enrollment_request_comments, concerns: :active_scaffold

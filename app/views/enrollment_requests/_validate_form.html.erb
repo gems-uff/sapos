@@ -1,6 +1,6 @@
 <% 
    method ||= :patch
-   form_action ||= :update
+   form_action ||= :validate
    url_options ||= params_for(:action => form_action)
    xhr = request.xhr? if xhr.nil?
    submit_text ||= form_action

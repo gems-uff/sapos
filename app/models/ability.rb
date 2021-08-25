@@ -20,7 +20,7 @@ class Ability
         :to_pdf, :summary_pdf, :academic_transcript_pdf, :grades_report_pdf, 
         :browse, :simulate, :set_query_date, :cities, :states, :preview, :to => :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing, 
-        :execute_now, :execute_now, :notify, :duplicate, :to => :update
+        :execute_now, :execute_now, :notify, :duplicate, :validate, :show_validate, :to => :update
     alias_action :delete, :destroy_existing, :to => :destroy
     #as_action_aliases
 
@@ -38,12 +38,16 @@ class Ability
       can :manage, (Ability::ALL_MODELS - [Role, CustomVariable, ReportConfiguration])
       can :read, :pendencies
       can :update, [ClassEnrollmentRequest, EnrollmentRequestt, EnrollmentRequestComment]
+      can :validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
+      can :show_validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
       can :invite, User
       can :read, (Role)
     elsif role_id == Role::ROLE_PROFESSOR
       can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration, ClassSchedule])
       can :read, :pendencies
       can :update, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
+      can :validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
+      can :show_validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
       if user.professor
         if CustomVariable.professor_login_can_post_grades == "yes_all_semesters"
           can :update, ClassEnrollment, course_class: { professor: user.professor }
@@ -56,6 +60,8 @@ class Ability
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, ReportConfiguration])
       can :update, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
+      can :validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
+      can :show_validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
       can :read, :pendencies
       can :read, (Query)
     elsif role_id == Role::ROLE_SUPORTE
