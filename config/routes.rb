@@ -271,6 +271,8 @@ Sapos::Application.routes.draw do
 
   get 'landing', action: :index, controller: 'landing'
 
+  resources :email_templates, concerns: :active_scaffold
+
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end

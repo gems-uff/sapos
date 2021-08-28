@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_08_033949) do
+ActiveRecord::Schema.define(version: 2021_08_28_150353) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -82,15 +82,6 @@ ActiveRecord::Schema.define(version: 2021_08_08_033949) do
     t.index ["enrollment_id"], name: "index_class_enrollments_on_enrollment_id"
   end
 
-  create_table "class_schedules", force: :cascade do |t|
-    t.integer "year"
-    t.integer "semester"
-    t.datetime "enrollment_start"
-    t.datetime "enrollment_end"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
   create_table "countries", force: :cascade do |t|
     t.string "name", limit: 255
     t.datetime "created_at", null: false
@@ -143,9 +134,9 @@ ActiveRecord::Schema.define(version: 2021_08_08_033949) do
   create_table "custom_variables", force: :cascade do |t|
     t.string "description", limit: 255
     t.string "variable", limit: 255
-    t.text "value", limit: 255
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "value"
   end
 
   create_table "deferral_types", force: :cascade do |t|
@@ -189,6 +180,16 @@ ActiveRecord::Schema.define(version: 2021_08_08_033949) do
     t.datetime "updated_at", null: false
     t.index ["dismissal_reason_id"], name: "index_dismissals_on_dismissal_reason_id"
     t.index ["enrollment_id"], name: "index_dismissals_on_enrollment_id"
+  end
+
+  create_table "email_templates", force: :cascade do |t|
+    t.string "name"
+    t.string "to"
+    t.string "subject"
+    t.text "body"
+    t.boolean "enabled", default: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "enrollment_holds", force: :cascade do |t|
