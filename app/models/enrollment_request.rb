@@ -96,6 +96,7 @@ class EnrollmentRequest < ApplicationRecord
   end
 
   def refresh_status!
+    self.class_enrollment_requests.reload
     if self.status == ClassEnrollmentRequest::EFFECTED
       nstatus = self.class_enrollment_requests.collect(&:status).max_by {|stat| ClassEnrollmentRequest::STATUSES_PRIORITY.index stat}
       self.status = nstatus
