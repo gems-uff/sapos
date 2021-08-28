@@ -6,9 +6,26 @@ class ClassEnrollmentRequestsController < ApplicationController
   authorize_resource
   
   active_scaffold :"class_enrollment_request" do |config|
+
+    config.action_links.add 'show_effect',
+      :label => I18n.t('class_enrollment_request.actions.effect'),
+      :ignore_method => :hide_effect?,
+      :type => :collection,
+      :keep_open => false
+
+    config.action_links.add 'single_effect',
+      :label =>  "<i title='#{I18n.t('class_enrollment_request.actions.effect_single')}' class='fa fa-book'></i>".html_safe,
+      :ignore_method => :hide_single_effect?,
+      :type => :member,
+      :keep_open => false,
+      :position => false,
+      :crud_type => :update,
+      :method => :put,
+      :confirm  => I18n.t('class_enrollment_request.actions.effect_confirm')
+
     config.list.sorting = {:enrollment_request => 'ASC'}
     columns = [:enrollment_request, :course_class, :status, :class_enrollment]
-    config.list.columns = columns
+    config.list.columns = columns + [:allocations, :professor]
     config.create.columns = columns
     config.update.columns = columns
 
@@ -18,6 +35,8 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.create.label = :create_class_enrollment_request_label
     config.update.label = :update_class_enrollment_request_label
     config.actions.swap :search, :field_search
+
+    config.columns[:class_enrollment].actions_for_association_links.delete :new
 
     config.field_search.columns = [
       :status,
@@ -119,4 +138,78 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     [sql, Time.now, Time.now]
   end
+
+  def hide_effect?
+    cannot? :effect, ClassEnrollmentRequest
+  end
+
+  def hide_single_effect?(record)
+    record.status == ClassEnrollmentRequest::EFFECTED || (cannot? :effect, ClassEnrollmentRequest)
+  end
+
+  def single_effect
+    raise CanCan::AccessDenied.new("Acesso negado!", :effect, ClassEnrollmentRequest) if cannot? :effect, ClassEnrollmentRequest
+    process_action_link_action do |record|
+      if (self.successful = record.to_effected && record.save)
+        flash[:info] = I18n.t('class_enrollment_request.effect.applied', count: 1)
+      else
+        flash[:error] = I18n.t('class_enrollment_request.effect.applied', count: 0)
+      end
+    end
+  end
+
+  def show_effect
+    raise CanCan::AccessDenied.new("Acesso negado!", :effect, ClassEnrollmentRequest) if cannot? :effect, ClassEnrollmentRequest
+    each_record_in_page {}
+    class_enrollment_requests = find_page(:sorting => active_scaffold_config.list.user.sorting).items
+    @count = class_enrollment_requests.filter { |record| record.status != ClassEnrollmentRequest::EFFECTED }.count
+    respond_to_action(:show_effect)
+  end
+
+  def effect
+    raise CanCan::AccessDenied.new("Acesso negado!", :effect, ClassEnrollmentRequest) if cannot? :effect, ClassEnrollmentRequest
+    count = 0
+    each_record_in_page {}
+    class_enrollment_requests = find_page(:sorting => active_scaffold_config.list.user.sorting).items
+    class_enrollment_requests.each do |record|
+      changed = record.to_effected && record.save
+      count += 1 if changed
+    end
+    do_refresh_list
+    @message = I18n.t('class_enrollment_request.effect.applied', count: count)
+    respond_to_action(:effect)
+    #return_to_main
+  end
+
+  protected
+
+  def show_effect_respond_to_html
+    render(:action => 'show_effect')
+  end
+  
+  def show_effect_respond_to_js
+    render(:partial => 'effect')
+  end
+
+  def effect_respond_on_iframe
+    flash[:info] = @message
+    responds_to_parent do
+      render :action => 'on_effect', :formats => [:js], :layout => false
+    end
+  end
+
+  def effect_respond_to_html
+    flash[:info] = @message
+    return_to_main
+  end
+  
+  def effect_respond_to_js
+    flash.now[:info] = @message
+    do_refresh_list 
+    @popstate = true
+    render :action => 'on_effect', :formats => [:js]
+  end
+
+
+
 end

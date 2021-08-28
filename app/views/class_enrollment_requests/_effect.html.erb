@@ -1,0 +1,20 @@
+<%
+  url_options =  params_for(action: :effect)
+  effect_text ||= :effect
+  xhr ||= request.xhr?
+  options = {
+    id: element_form_id(action: 'effect'),
+    class: "as_form effect",
+    remote: xhr,
+    data: {loading: true},
+    method: :post
+  }
+-%>
+<%= form_tag url_options, options do %>
+  <div>
+    <%= t 'class_enrollment_request.effect.count', count: @count %>
+  </div>
+  <%= submit_tag as_(effect_text), :class => "submit" %>
+  <%= link_to as_(:cancel), main_path_to_return, :class => 'as_cancel' %>
+  <%= loading_indicator_tag(:action => :effect) %>
+<% end %>

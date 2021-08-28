@@ -85,6 +85,8 @@ pt-BR:
         enrollment_request: "Pedido de Inscrição"
         course_class: "Turma"
         class_enrollment: "Inscriçao"
+        allocations: "Alocações"
+        professor: "Professor"
         status: "Situação"
         year: "Ano"
         semester: "Semestre"
@@ -679,8 +681,8 @@ pt-BR:
         one: "Inscrição"
         other: "Inscrições"
       class_enrollment_request:
-        one: "Disciplina de Pedido de Inscrição"
-        other: "Disciplinas de Pedidos de Inscrição"
+        one: "Efetivar Inscrição"
+        other: "Efetivar Inscrições"
       class_schedule:
         one: "Quadro de Horários"
         other: "Quadros de Horários"

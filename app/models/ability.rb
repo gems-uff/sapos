@@ -20,7 +20,7 @@ class Ability
         :to_pdf, :summary_pdf, :academic_transcript_pdf, :grades_report_pdf, 
         :browse, :simulate, :set_query_date, :cities, :states, :preview, :to => :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing, 
-        :execute_now, :execute_now, :notify, :duplicate, :validate, :show_validate, :to => :update
+        :execute_now, :execute_now, :notify, :duplicate, :validate, :show_validate, :effect, :show_effect, :to => :update
     alias_action :delete, :destroy_existing, :to => :destroy
     #as_action_aliases
 
@@ -31,6 +31,7 @@ class Ability
     if role_id == Role::ROLE_ADMINISTRADOR
       can :manage, :all
       can :invite, User
+      can :effect, ClassEnrollmentRequest
       can :read, :pendencies
       cannot [:destroy, :update], Role
       cannot [:destroy, :create], NotificationParam
@@ -40,6 +41,7 @@ class Ability
       can :update, [ClassEnrollmentRequest, EnrollmentRequestt, EnrollmentRequestComment]
       can :validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
       can :show_validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
+      can :effect, ClassEnrollmentRequest
       can :invite, User
       can :read, (Role)
     elsif role_id == Role::ROLE_PROFESSOR
@@ -62,6 +64,7 @@ class Ability
       can :update, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
       can :validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
       can :show_validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
+      can :effect, ClassEnrollmentRequest
       can :read, :pendencies
       can :read, (Query)
     elsif role_id == Role::ROLE_SUPORTE

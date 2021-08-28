@@ -29,6 +29,33 @@ class ClassEnrollmentRequest < ApplicationRecord
   after_create :update_main_request_status_on_create
   after_destroy :update_main_request_status_on_destroy
 
+  def allocations
+    self.course_class.allocations.collect do |allocation|
+      "#{allocation.day} (#{allocation.start_time}-#{allocation.end_time})"
+    end.join("; ")
+  end
+
+  def professor
+    self.course_class.professor.to_label if self.course_class.professor
+  end
+
+  def to_effected
+    changed = false
+    if self.class_enrollment.nil?
+      self.class_enrollment = ClassEnrollment.new(
+        enrollment: self.enrollment_request.enrollment,
+        course_class: self.course_class,
+        situation: ClassEnrollment::REGISTERED
+      )
+      changed ||= true
+    end
+    if self.status != EFFECTED
+      self.status = EFFECTED
+      changed ||= true
+    end
+    changed
+  end
+
   protected
 
   def validate_class_enrollment_match

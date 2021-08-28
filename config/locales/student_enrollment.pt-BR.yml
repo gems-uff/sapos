@@ -41,3 +41,23 @@ pt-BR:
   enrollment_request:
     validate:
       link: "Validar"
+
+  class_enrollment_request:
+    actions:
+      effect: "Efetivar"
+      effect_single: "Efetivar"
+      effect_confirm: "Efetivar inscrição?"
+    effect:
+      count:
+        zero: "Nenhuma inscrição da lista pode ser efetivada!"
+        one: "Uma inscrição da lista pode ser efetivada"
+        other: "%{count} inscrições da lista podem ser efetivadas"
+      applied:
+        zero: "Nenhuma inscrição efetivada"
+        one: "Uma inscrição efetivada"
+        other: "%{count} inscrições efetivadas"
+
+  
+  active_scaffold:
+    effect: "Efetivar"
+    

@@ -293,7 +293,16 @@ Sapos::Application.routes.draw do
       patch 'validate'
     end
   end
-  resources :class_enrollment_requests, concerns: :active_scaffold
+  resources :class_enrollment_requests do
+    concerns :active_scaffold
+    collection do
+      get 'show_effect'
+      post 'effect'
+    end
+    member do
+      put 'single_effect'
+    end
+  end
   resources :enrollment_request_comments, concerns: :active_scaffold
   
 
