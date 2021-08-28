@@ -175,6 +175,12 @@ pt-BR:
           approved: "Aprovado"
           reproved: "Reprovado"
           invalid: "--"
+      email_template:
+        name: "Nome"
+        body: "Template do Corpo"
+        to: "Template do Destinatário"
+        subject: "Template do Assunto"
+        enabled: "Habilitado"
       enrollment:
         accomplishments: "Realização de Etapa"
         accomplishment_date: "até"
@@ -957,6 +963,9 @@ pt-BR:
         last_time: "Última execução"
         next_time: "Próxima execução"
         frequency: "Frequência"
+
+    email_template:
+      body_default: "<%= CustomVariable.notification_footer %>"
 
     errors:
       full_messages:

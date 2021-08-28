@@ -304,6 +304,7 @@ Sapos::Application.routes.draw do
     end
   end
   resources :enrollment_request_comments, concerns: :active_scaffold
+  resources :email_templates, concerns: :active_scaffold
   
 
   if Rails.env.development?
