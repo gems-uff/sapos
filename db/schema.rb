@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_24_021753) do
+ActiveRecord::Schema.define(version: 2021_08_29_031419) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -201,6 +201,16 @@ ActiveRecord::Schema.define(version: 2021_08_24_021753) do
     t.datetime "updated_at", null: false
     t.index ["dismissal_reason_id"], name: "index_dismissals_on_dismissal_reason_id"
     t.index ["enrollment_id"], name: "index_dismissals_on_enrollment_id"
+  end
+
+  create_table "email_templates", force: :cascade do |t|
+    t.string "name"
+    t.string "to"
+    t.string "subject"
+    t.text "body"
+    t.boolean "enabled", default: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "enrollment_holds", force: :cascade do |t|

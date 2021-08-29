@@ -46,9 +46,15 @@
 }
 
 .to_template-input,
-.subject_template-input {
+.subject_template-input,
+.to-input,
+.subject-input {
 	width: ($showwidth - 4px);
 	margin-left: 2px !important;
+}
+
+.active-scaffold-as_email_templates .name-input {
+	width: 280px;
 }
 
 .notification_offset-input,

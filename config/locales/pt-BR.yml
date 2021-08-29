@@ -240,7 +240,6 @@ pt-BR:
         user: Usuário
         created_at: Data de criação
         updated_at: Data de modificação
-
       enrollment_status:
         name: "Nome"
         user: "Com usuário"
@@ -722,6 +721,9 @@ pt-BR:
       dismissal_reason:
         one: "Razão de Desligamento"
         other: "Razões de Desligamento"
+      email_template:
+        one: "Template de Email"
+        other: "Templates de Email"
       enrollment: 
         one: "Matrícula"
         other: "Matrículas"
@@ -852,6 +854,7 @@ pt-BR:
     create_deferral_type_label: "Adicionar Tipo de Prorrogação"
     create_dismissal_label: "Adicionar Desligamento"
     create_dismissal_reason_label: "Adicionar Razão de Desligamento"
+    create_email_template_label: "Adicionar Template de Email"
     create_enrollment_hold_label: "Adicionar Trancamento"
     create_enrollment_label: "Adicionar Matrícula"
     create_enrollment_request_label: "Adicionar Pedido de Inscrição"
@@ -922,6 +925,7 @@ pt-BR:
     update_course_class_label: "Editar Turma"
     update_course_label: "Editar Disciplina"
     update_course_type_label: "Editar Tipo de Disciplina"
+    update_email_template_label: "Modificar Notificação"
     update_enrollment_label: "Modificar Matrícula"
     update_enrollment_request_label: "Modificar Pedido de Inscrição"
     update_enrollment_request_comment_label: "Modificar Comentário de Pedido de Inscrição"
@@ -963,9 +967,6 @@ pt-BR:
         last_time: "Última execução"
         next_time: "Próxima execução"
         frequency: "Frequência"
-
-    email_template:
-      body_default: "<%= CustomVariable.notification_footer %>"
 
     errors:
       full_messages:

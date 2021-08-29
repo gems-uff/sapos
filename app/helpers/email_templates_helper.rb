@@ -4,7 +4,7 @@
 module EmailTemplatesHelper
 
   def body_form_column(record, options)
-    code_mirror_text_area(:body, "record_body_#{record.id}", "text/html", options.merge(:value => record.body || I18n.t('active_scaffold.email_template.body_default')))
+    code_mirror_text_area(:body, "record_body_#{record.id}", "text/html", options.merge(:value => record.body || I18n.t('email_template.body.default')))
   end
 
   def body_show_column(record, column)

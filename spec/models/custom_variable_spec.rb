@@ -173,23 +173,6 @@ describe CustomVariable do
         expect(CustomVariable.notification_footer).to eq('bla')
       end
     end
-
-    context "account_email" do
-      it "should return nil when there is no variable defined" do
-        config = CustomVariable.find_by_variable(:account_email)
-        config.delete unless config.nil?
-
-        expect(CustomVariable.account_email).to eq(nil)
-      end
-
-      it "should return 'bla' when it is defined to 'bla'" do
-        config = CustomVariable.find_by_variable(:account_email)
-        config.delete unless config.nil?
-        CustomVariable.create(:variable=>:account_email, :value=>"bla")
-
-        expect(CustomVariable.account_email).to eq("bla")
-      end
-    end 
   
   end
 
