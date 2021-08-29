@@ -128,26 +128,14 @@ class ClassEnrollment < ApplicationRecord
 
   def notify_student_and_advisor
     return if grade.nil? or !(saved_change_to_grade? or saved_change_to_situation? or saved_change_to_disapproved_by_absence?)
-    info = {
-        :name => enrollment.student.name,
-        :course => course_class.label_with_course,
-        :situation => situation,
-        :grade => grade_to_view,
-        :absence => ((attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false'))
-    }
-    message_to_student = {
-        :to => enrollment.student.email,
-        :subject => I18n.t('notifications.class_enrollment.email_to_student.subject', **info),
-        :body => I18n.t('notifications.class_enrollment.email_to_student.body', **info)
-    }
-    emails = [message_to_student]
+    emails = [EmailTemplate.load_template("class_enrollments:email_to_student").prepare_message({
+      :record => self
+    })]
     enrollment.advisements.each do |advisement|
-      professor_info = info.merge(:advisor_name => advisement.professor.name)
-      emails << message_to_advisor = {
-          :to => advisement.professor.email,
-          :subject => I18n.t('notifications.class_enrollment.email_to_advisor.subject', professor_info),
-          :body => I18n.t('notifications.class_enrollment.email_to_advisor.body', professor_info)
-      }
+      emails << EmailTemplate.load_template("class_enrollments:email_to_advisor").prepare_message({
+        :record => self,
+        :advisement => advisement
+      })
     end
     Notifier.send_emails(notifications: emails)
   end
@@ -158,7 +146,7 @@ class ClassEnrollment < ApplicationRecord
 
     campos_modificados.each do |campo_modificado|
       if !campos_modificaveis.include?(campo_modificado)
-	errors.add(:class_enrollment, I18n.t("activerecord.errors.models.class_enrollment.changes_to_disallowed_fields"))
+	      errors.add(:class_enrollment, I18n.t("activerecord.errors.models.class_enrollment.changes_to_disallowed_fields"))
       end
     end
   end

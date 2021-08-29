@@ -71,15 +71,9 @@ class Advisement < ApplicationRecord
   end
 
   def notify_advisor
-    advisor_info = {
-      :name => enrollment.student.name,
-      :advisor_name => professor.name
-    }
-    emails = [{
-      :to => professor.email,
-      :subject => I18n.t('notifications.advisement.email_to_advisor.subject', **advisor_info),
-      :body => I18n.t('notifications.advisement.email_to_advisor.body', **advisor_info)
-    }]
+    emails = [EmailTemplate.load_template("advisements:email_to_advisor").prepare_message({
+      :record => self
+    })]
     Notifier.send_emails(notifications: emails)
   end
 

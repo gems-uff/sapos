@@ -1,6 +1,8 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+require 'erubi'
+
 class ERBFormatter
 
   @attributes = {}
@@ -34,6 +36,6 @@ class ERBFormatter
   alias_method :l, :localize
 
   def format(code)
-    ERB.new(code, 0).result(binding)
+    eval(Erubi::Engine.new(code).src)
   end
 end

@@ -11,35 +11,128 @@ class EmailTemplate < ApplicationRecord
   validates :subject, :presence => true 
 
   BUILTIN_TEMPLATES = {
+    "accomplishments:email_to_advisor" => {
+      path: File.join("accomplishments", "mailer", "email_to_advisor.text.erb"),
+      subject: I18n.t('notifications.accomplishment.email_to_advisor.subject'),
+      to: "<%= var(:advisement).professor.email %>",
+      variables: {
+        record: "Accomplishment",
+        advisement: "Advisement"
+      }
+    },
+    "accomplishments:email_to_student" => {
+      path: File.join("accomplishments", "mailer", "email_to_student.text.erb"),
+      subject: I18n.t('notifications.accomplishment.email_to_student.subject'),
+      to: "<%= var(:record).enrollment.student.email %>",
+      variables: {
+        record: "Accomplishment"
+      }
+    },
+    "advisements:email_to_advisor" => {
+      path: File.join("advisements", "mailer", "email_to_advisor.text.erb"),
+      subject: I18n.t('notifications.advisement.email_to_advisor.subject'),
+      to: "<%= var(:professor).email %>",
+      variables: {
+        record: "Advisement"
+      }
+    },
+    "class_enrollments:email_to_advisor" => {
+      path: File.join("class_enrollments", "mailer", "email_to_advisor.text.erb"),
+      subject: I18n.t('notifications.class_enrollment.email_to_advisor.subject'),
+      to: "<%= var(:advisement).professor.email %>",
+      variables: {
+        record: "ClassEnrollment",
+        advisement: "Advisement"
+      }
+    },
+    "class_enrollments:email_to_professor" => {
+      path: File.join("class_enrollments", "mailer", "email_to_professor.text.erb"),
+      subject: I18n.t('notifications.class_enrollment.email_to_professor.subject'),
+      to: "<%= var(:record).course_class.professor.email %>",
+      variables: {
+        record: "ClassEnrollment"
+      }
+    },
+    "class_enrollments:email_to_student" => {
+      path: File.join("class_enrollments", "mailer", "email_to_student.text.erb"),
+      subject: I18n.t('notifications.class_enrollment.email_to_student.subject'),
+      to: "<%= var(:record).enrollment.student.email %>",
+      variables: {
+        record: "ClassEnrollment"
+      }
+    },
+    "course_classes:email_to_professor" => {
+      path: File.join("course_classes", "mailer", "email_to_professor.text.erb"),
+      subject: I18n.t('notifications.course_class.email_to_professor.subject'),
+      to: "<%= var(:record).professor.email %>",
+      variables: {
+        record: "CourseClass"
+      }
+    },
+    "deferrals:email_to_advisor" => {
+      path: File.join("deferrals", "mailer", "email_to_advisor.text.erb"),
+      subject: I18n.t('notifications.deferral.email_to_advisor.subject'),
+      to: "<%= var(:advisement).professor.email %>",
+      variables: {
+        record: "Deferral",
+        advisement: "Advisement"
+      }
+    },
+    "deferrals:email_to_student" => {
+      path: File.join("deferrals", "mailer", "email_to_student.text.erb"),
+      subject: I18n.t('notifications.deferral.email_to_student.subject'),
+      to: "<%= var(:record).enrollment.student.email %>",
+      variables: {
+        record: "Deferral"
+      }
+    },
     "devise:confirmation_instructions" => {
       path: File.join("devise", "mailer", "confirmation_instructions.text.erb"),
-      subject: "<%= t 'devise.mailer.confirmation_instructions.subject' %>",
+      subject: I18n.t('devise.mailer.confirmation_instructions.subject'),
       to: "<%= @resource.email %>",
+      variables: {
+        '@resourse' => "User"
+      }
     },
     "devise:email_changed" => {
       path: File.join("devise", "mailer", "email_changed.text.erb"),
-      subject: "<%= t 'devise.mailer.email_changed.subject' %>",
+      subject: I18n.t('devise.mailer.email_changed.subject'),
       to: "<%= @resource.email %>",
+      variables: {
+        '@resourse' => "User"
+      }
     },
     "devise:invitation_instructions" => {
       path: File.join("devise", "mailer", "invitation_instructions.text.erb"),
-      subject: "<%= t 'devise.mailer.invitation_instructions.subject' %>",
+      subject: I18n.t('devise.mailer.invitation_instructions.subject'),
       to: "<%= @resource.email %>",
+      variables: {
+        '@resourse' => "User"
+      }
     },
     "devise:password_change" => {
       path: File.join("devise", "mailer", "password_change.text.erb"),
-      subject: "<%= t 'devise.mailer.password_change.subject' %>",
+      subject: I18n.t('devise.mailer.password_change.subject'),
       to: "<%= @resource.email %>",
+      variables: {
+        '@resourse' => "User"
+      }
     },
     "devise:reset_password_instructions" => {
       path: File.join("devise", "mailer", "reset_password_instructions.text.erb"),
-      subject: "<%= t 'devise.mailer.reset_password_instructions.subject' %>",
+      subject: I18n.t('devise.mailer.reset_password_instructions.subject'),
       to: "<%= @resource.email %>",
+      variables: {
+        '@resourse' => "User"
+      }
     },
     "devise:unlock_instructions" => {
       path: File.join("devise", "mailer", "unlock_instructions.text.erb"),
-      subject: "<%= t 'devise.mailer.unlock_instructions.subject' %>",
+      subject: I18n.t('devise.mailer.unlock_instructions.subject'),
       to: "<%= @resource.email %>",
+      variables: {
+        '@resourse' => "User"
+      }
     },
     
   }
@@ -67,7 +160,22 @@ class EmailTemplate < ApplicationRecord
     unless CustomVariable.redirect_email.nil?
       headers[:subject] = headers[:subject] + " (Originalmente para #{headers[:to]})"
       headers[:to] = CustomVariable.redirect_email
+      headers[:skip_redirect] = true
     end
-  end    
+    headers[:skip_message] = ! self.enabled
+    headers[:skip_footer] = true
+  end
+
+  def prepare_message(bindings)
+    formatter = ERBFormatter.new(bindings)
+    message = {
+      :to => formatter.format(self.to),
+      :subject => formatter.format(self.subject),
+      :body => formatter.format(self.body),
+      :skip_footer => true
+    }
+    self.update_mailer_headers(message)
+    message
+  end
 
 end
