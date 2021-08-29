@@ -90,6 +90,49 @@ describe Student do
     end
   end
   describe "Methods" do
+    describe "emails" do
+      it "should return an empty list when no email is stored" do
+        student = FactoryBot.create(:student, :email => '')
+        expect(student.emails).to eq([])
+      end
+
+      it "should return a list with one email when a single one is stored" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        expect(student.emails).to eq(['abc@def.com'])
+      end
+
+      it "should return a list of emails when multiple are stored" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com def@ghi.com, ghi@jkl.com;jkl@mno.com')
+        expect(student.emails).to eq(['abc@def.com', 'def@ghi.com', 'ghi@jkl.com', 'jkl@mno.com'])
+      end
+    end
+
+    describe "first_email" do
+      it "should return nil when no email is stored" do
+        student = FactoryBot.create(:student, :email => '')
+        expect(student.first_email).to eq(nil)
+      end
+
+      it "should return the email when a single one is stored" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com')
+        expect(student.first_email).to eq('abc@def.com')
+      end
+
+      it "should return the first email when multiple are stored" do
+        user = User.find_by_email('abc@def.com')
+        user.delete unless user.nil?
+        student = FactoryBot.create(:student, :email => 'abc@def.com def@ghi.com, ghi@jkl.com;jkl@mno.com')
+        expect(student.first_email).to eq('abc@def.com')
+      end
+    end
+
+
     describe "can_have_new_user?" do
       it "should return true if the student has an active enrollment that allows users and has no associated user" do
         user = User.find_by_email('abc@def.com')
@@ -100,6 +143,11 @@ describe Student do
       it "should return false if the student has the same email as an user" do
         student = FactoryBot.create(:student, :email => 'abc@def.com')
         FactoryBot.create(:user, :email => 'abc@def.com', :role => role)
+        expect(student.can_have_new_user?).to eq(false)
+      end
+      it "should return false if the student has the same email as an user among a list of emails" do
+        student = FactoryBot.create(:student, :email => 'abc@def.com;def@ghi.com')
+        FactoryBot.create(:user, :email => 'def@ghi.com', :role => role)
         expect(student.can_have_new_user?).to eq(false)
       end
       it "should return false if the student already has an user" do
