@@ -312,17 +312,16 @@ class EnrollmentsController < ApplicationController
 
   def create_users
     raise CanCan::AccessDenied.new("Acesso negado!", :invite, User) if cannot? :invite, User
-    process_action_link_action do
-      each_record_in_page {}
-      enrollments = find_page(:sorting => active_scaffold_config.list.user.sorting).items
-      created = create_enrollments_users(enrollments, params["add_option"])
-      if created > 0
-        flash[:info] = "#{created} #{"usuário".pluralize(created)} #{"criado".pluralize(created)}"
-      else
-        flash[:error] = "Nenhum usuário criado"
-      end      
-      self.successful  = true
+    each_record_in_page {}
+    enrollments = find_page(:sorting => active_scaffold_config.list.user.sorting).items
+    created = create_enrollments_users(enrollments, params["add_option"])
+    if created > 0
+      @info_message = "#{created} #{"usuário".pluralize(created)} #{"criado".pluralize(created)}"
+    else
+      @error_message = "Nenhum usuário criado"
     end
+    self.successful  = true
+    respond_to_action(:create_users)
   end
 
   protected
@@ -330,6 +329,30 @@ class EnrollmentsController < ApplicationController
   def new_users_respond_to_js
     render :partial => 'new_users'
   end
+
+  def create_users_respond_on_iframe
+    flash[:info] = @info_message unless @info_message.nil?
+    flash[:error] = @error_message unless @error_message.nil?
+    responds_to_parent do
+      render :action => 'on_create_users', :formats => [:js], :layout => false
+    end
+  end
+
+  def create_users_respond_to_html
+    flash[:info] = @info_message unless @info_message.nil?
+    flash[:error] = @error_message unless @error_message.nil?
+    return_to_main
+  end
+  
+  def create_users_respond_to_js
+    flash.now[:info] = @info_message unless @info_message.nil?
+    flash.now[:error] = @error_message unless @error_message.nil?
+    do_refresh_list 
+    @popstate = true
+    render :action => 'on_create_users', :formats => [:js]
+  end
+
+
 
   def before_update_save(record)
     return unless (record.valid? and record.class_enrollments.all? {|class_enrollment| class_enrollment.valid?})

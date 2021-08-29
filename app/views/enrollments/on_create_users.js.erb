@@ -1,0 +1,9 @@
+try {
+<%
+  form_selector ||= "#{element_form_id(:action => :create_users)}"
+%>
+var action_link = ActiveScaffold.find_action_link('<%= form_selector %>');
+if (action_link) action_link.close(true);
+<%= render :partial => 'refresh_list', no_history: true %>
+} catch (e) { alert('RJS error:\n\n' + e.toString());}
+
