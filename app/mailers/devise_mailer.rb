@@ -9,28 +9,18 @@ class DeviseMailer < Devise::Mailer
 
   def headers_for(action, opts)
     headers = super
-    unless CustomVariable.redirect_email.nil?
-      headers[:subject] = headers[:subject] + " (Originalmente para #{headers[:to]})"
-      headers[:to] = CustomVariable.redirect_email
-    end
+    headers[:subject] = render_to_string(inline: @template.subject) unless @template.subject.nil?
+    headers[:to] = render_to_string(inline: @template.to) unless @template.to.nil?
+    headers[:body] = render_to_string(inline: @template.body) unless @template.body.nil?
+    @template.update_mailer_headers(headers)
     headers
   end
 
   def devise_mail(record, action, opts = {}, &block)
-    if CustomVariable.redirect_email != ""
+    @template = EmailTemplate.devise_template(action)
+    if CustomVariable.redirect_email != "" && @template.enabled
       super
     end
   end
 
-  def invitation_instructions(record, token, opts={})
-    @token = token
-    devise_mail(record, :invitation_instructions, opts) do |format|
-      template = CustomVariable.account_email
-      if template.nil?
-        format.text
-      else
-        format.text { render inline: template }
-      end
-    end
-  end
 end

@@ -665,6 +665,9 @@ pt-BR:
       dismissal_reason:
         one: "Razão de Desligamento"
         other: "Razões de Desligamento"
+      email_template:
+        one: "Template de Email"
+        other: "Templates de Email"
       enrollment: 
         one: "Matrícula"
         other: "Matrículas"
@@ -786,6 +789,7 @@ pt-BR:
     create_deferral_type_label: "Adicionar Tipo de Prorrogação"
     create_dismissal_label: "Adicionar Desligamento"
     create_dismissal_reason_label: "Adicionar Razão de Desligamento"
+    create_email_template_label: "Adicionar Template de Email"
     create_enrollment_hold_label: "Adicionar Trancamento"
     create_enrollment_label: "Adicionar Matrícula"
     create_enrollment_status_label: "Adicionar Tipo de Matrícula"
@@ -851,6 +855,7 @@ pt-BR:
     update_course_class_label: "Editar Turma"
     update_course_label: "Editar Disciplina"
     update_course_type_label: "Editar Tipo de Disciplina"
+    update_email_template_label: "Modificar Notificação"
     update_enrollment_label: "Modificar Matrícula"
     update_link: "Editar"
     update_major_label: "Modificar Curso"
@@ -890,9 +895,6 @@ pt-BR:
         last_time: "Última execução"
         next_time: "Próxima execução"
         frequency: "Frequência"
-
-    email_template:
-      body_default: "<%= CustomVariable.notification_footer %>"
 
     errors:
       full_messages:

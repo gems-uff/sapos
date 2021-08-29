@@ -1,0 +1,7 @@
+pt-BR:
+  email_template:
+    name:
+      builtin: "Configurar template interno:"
+      builtin_confirm: "O formulário foi alterado. Ao continuar as informações dele serão perdidas. Deseja continuar?"
+    body:
+      default: "<%= CustomVariable.notification_footer %>"

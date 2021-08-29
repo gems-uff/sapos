@@ -1,0 +1,57 @@
+<% column_options = active_scaffold_input_text_options active_scaffold_input_options(column, scope, :object => record) %>
+<dl>
+	<dt>
+		<%= label_tag label_for(column, column_options), column.label %>
+    </dt>
+	<dd>
+		<%= text_field(:record, :name, column_options) %>
+    
+    <%= t 'email_template.name.builtin' %> 
+    <select class="select_builtin_options">
+      <option></option>
+      <% EmailTemplate::BUILTIN_TEMPLATES.each do |key, value| %>
+        <option value="<%= key %>"><%= key %></option>
+      <% end %>
+    </select>
+	</dd>
+</dl>
+
+<script>
+  $('.select_builtin_options').on('change', function() {
+    if (this.value == "") return false;
+    var form = $(this).parents(".form");
+    var name = this.value;
+    var require_confirmation = (
+      (form.find(".name-input").val() != "")
+      || (form.find(".to-input").val() != "")
+      || (form.find(".subject-input").val() != "")
+      || (form.find('.body-input ~ .CodeMirror')[0].CodeMirror.getValue() != "<%= t('email_template.body.default').html_safe %>")
+     
+    );
+    if (require_confirmation && !confirm("<%= I18n.t 'email_template.name.builtin_confirm' %>")) {
+      this.value = "";
+      return false;
+    }
+
+    fetch("<%= builtin_email_templates_path %>?" + new URLSearchParams({
+      name
+    }))
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(json) {
+      if (json !== null) {
+        form.find(".name-input").val(name);
+        form.find(".to-input").val(json["to"]);
+        form.find(".subject-input").val(json["subject"]);
+        form.find('.body-input ~ .CodeMirror')[0].CodeMirror.setValue(json["body"]); 
+      }
+    })
+    return false;
+  }); 
+
+	/*$('.select_builtin_email_template').on('click', function(e) {
+    $(this).parent("dd").find(".select_builtin_options_div").toggle
+    return false;
+  });*/
+</script>
