@@ -31,7 +31,7 @@ def create_code(result, wrap, foreign_keys, references_by_table, newtype, useold
         result << "    remove_index :#{reftable}, name: \"index_#{reftable}_on_#{columns.join('_and_')}\" if index_exists?(:#{reftable}, name: \"index_#{reftable}_on_#{columns.join('_and_')}\")"
       end
     end
-    result << "    change_column :#{table}, :id, #{newtype}"
+    result << "    change_column :#{table}, :id, #{newtype}, unique: true, null: false, auto_increment: true"
     references.each do |reftable, fk_attr, columns, oldname|
       result << "    change_column :#{reftable}, :#{fk_attr}, #{newtype}"
       if useoldname
@@ -63,7 +63,7 @@ def create_migration(wrap, references_by_table, add_extra, foreign_keys)
   result = []
   result << 'class MigrateIdsToBigint < ActiveRecord::Migration[6.0]'
   result << '  def up'
-  create_code(result, wrap, foreign_keys, references_by_table, ":bigint", true)
+  create_code(result, wrap, foreign_keys, references_by_table, ":integer, limit: 8", true)
   result << ''
   result << '    # new indexes'
   add_extra.each do |table, fk_attr|
