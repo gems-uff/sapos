@@ -9,7 +9,7 @@ class CreateThesisDefenseCommitteeParticipations < ActiveRecord::Migration[5.1]
 
       t.timestamps
     end
-    add_index :thesis_defense_committee_participations, :professor_id
-    add_index :thesis_defense_committee_participations, :enrollment_id
+    #add_index :thesis_defense_committee_participations, :professor_id
+    #add_index :thesis_defense_committee_participations, :enrollment_id
   end
 end
