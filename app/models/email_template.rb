@@ -31,7 +31,7 @@ class EmailTemplate < ApplicationRecord
     "advisements:email_to_advisor" => {
       path: File.join("advisements", "mailer", "email_to_advisor.text.erb"),
       subject: I18n.t('notifications.advisement.email_to_advisor.subject'),
-      to: "<%= var(:professor).email %>",
+      to: "<%= var(:record).professor.email %>",
       variables: {
         record: "Advisement"
       }
