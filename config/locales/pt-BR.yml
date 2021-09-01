@@ -576,6 +576,10 @@ pt-BR:
           attributes:
             date:
               invalid_date: não é uma data válida
+        email_template:
+          attributes:
+            name:
+              uniqueness: já existe
         enrollment:
           main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
@@ -1009,36 +1013,27 @@ pt-BR:
   notifications:
     accomplishment:
       email_to_student:
-        subject: "%{phase}"
-        body: "%{name},\n\nInformamos que você realizou %{phase}."
+        subject: "<%= var(:record).phase.name %>"
       email_to_advisor:
-        subject: "%{name} completou uma etapa"
-        body: "%{advisor_name},\n\nInformamos que seu orientando %{name} completou a etapa %{phase}."
+        subject: "<%= var(:record).enrollment.student.name %> completou uma etapa"
     advisement:
       email_to_advisor:
         subject: "Nova orientação"
-        body: "%{advisor_name},\n\nInformamos que %{name} foi cadastrado como seu orientando."
     class_enrollment:
       email_to_student:
-        subject: "Sua inscrição em %{course} foi atualizada"
-        body: "%{name},\n\nInformamos que sua inscrição em %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
+        subject: "Sua inscrição em <%= var(:record).course_class.label_with_course %> foi atualizada"
       email_to_advisor:
-        subject: "Inscrição em %{course} de %{name} foi atualizada"
-        body: "%{advisor_name},\n\nInformamos que a inscrição em %{course} de seu orientando %{name} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}"
+        subject: "Inscrição em <%= var(:record).course_class.label_with_course %> de <%= var(:record).enrollment.to_label %> foi atualizada"
       email_to_professor:
-        subject: "Alteração da nota de %{name} na turma %{course}"
-        body: "%{professor},\n\nInformamos que a inscrição de %{name} na turma %{course} foi atualizada:\n-Situação: %{situation}\n-Nota: %{grade}\n-Reprovado por falta: %{absence}\n\n* Valores alterados"
+        subject: "Alteração da nota de <%= var(:record).enrollment.to_label %> na turma <%= var(:record).course_class.label_with_course %>"
     course_class:
       email_to_professor:
-        subject: "Alteração de notas da turma %{class}"
-        body: "%{professor},\n\nInformamos que as notas da sua turma %{class} foram lançadas ou alteradas:\n%{values}\n\n* Valores alterados"
+        subject: "Alteração de notas da turma <%= var(:record).label_with_course %>"
     deferral:
       email_to_student:
         subject: "Pedido de prorrogação deferido"
-        body: "%{name},\n\nInformamos que seu pedido de %{deferral} para %{phase} foi deferido."
       email_to_advisor:
         subject: "Pedido de prorrogação de orientando deferido"
-        body: "%{advisor_name},\n\nInformamos que o pedido de %{deferral} para %{phase} de seu orientando %{name} foi deferido."
   pdf_content:
     professor_watermark: "DOCUMENTO VÁLIDO APENAS PARA USO INTERNO E PESSOAL DO PROFESSOR"
     advisements:

@@ -12,6 +12,6 @@ class CreateEnrollmentHolds < ActiveRecord::Migration[5.1]
 
       t.timestamps
     end
-    add_index :enrollment_holds, :enrollment_id
+    #add_index :enrollment_holds, :enrollment_id
   end
 end

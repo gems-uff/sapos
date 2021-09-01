@@ -50,11 +50,12 @@ module Notifier
     messages.each do |message|
       options = {}
       m = message.merge(options)
+      next if m[:skip_message]
       m_attachments = messages_attachments[message]
-      unless CustomVariable.notification_footer.empty?
+      if ! CustomVariable.notification_footer.empty? && ! m[:skip_footer]
         m[:body] += "\n\n\n" + CustomVariable.notification_footer
       end
-      unless CustomVariable.redirect_email.nil?
+      if ! CustomVariable.redirect_email.nil? && ! m[:skip_redirect]
         Notifier.logger.info "Custom Variable 'redirect_email' is set. Redirecting the emails"
         m[:body] = "Originalmente para #{m[:to]}\n\n" + m[:body]
         m[:to] = CustomVariable.redirect_email

@@ -57,6 +57,10 @@ pt-BR:
     mailer:
       confirmation_instructions:
         subject: 'Instruções para confirmação'
+      email_changed:
+        subject: 'Seu email no SAPOS foi alterado'
+      password_change:
+        subject: 'Sua senha no SAPOS foi alterada'
       reset_password_instructions:
         subject: 'Instruções para reinicialização de senha'
       unlock_instructions:

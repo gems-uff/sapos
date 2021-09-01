@@ -31,21 +31,9 @@ class ClassEnrollmentsController < ApplicationController
 
   def before_update_save(record)
     return if record.grade.nil? or !record.valid? or !record.should_send_email_to_professor?
-    absence_changed = record.will_save_change_to_disapproved_by_absence? ? '*' : ''
-    info = {
-      :name => record.enrollment.to_label,
-      :professor => record.course_class.professor.name,
-      :course => record.course_class.label_with_course,
-      :situation => "#{record.situation}#{record.will_save_change_to_situation? ? '*' : ''}",
-      :grade => "#{record.grade_to_view}#{record.will_save_change_to_grade? ? '*' : ''}",
-      :absence => ((record.attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false')) + absence_changed
-    }
-    message_to_professor = {
-      :to => record.course_class.professor.email,
-      :subject => I18n.t('notifications.class_enrollment.email_to_professor.subject', info),
-      :body => I18n.t('notifications.class_enrollment.email_to_professor.body', info)
-    }
-    emails = [message_to_professor]
+    emails = [EmailTemplate.load_template("class_enrollments:email_to_professor").prepare_message({
+      :record => record,
+    })]
     Notifier.send_emails(notifications: emails)
   end
 

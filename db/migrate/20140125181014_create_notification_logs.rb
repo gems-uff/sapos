@@ -8,6 +8,6 @@ class CreateNotificationLogs < ActiveRecord::Migration[5.1]
 
       t.timestamps
     end
-    add_index :notification_logs, :notification_id
+    #add_index :notification_logs, :notification_id
   end
 end

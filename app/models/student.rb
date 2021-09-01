@@ -25,21 +25,24 @@ class Student < ApplicationRecord
 
   before_save :set_birth_state_by_birth_city
   
-  def self.where_without_user
-    self.joins(enrollments: :enrollment_status)
-    .where.not(email: User.select(:email))
-    .where(enrollment_statuses: { user: true })
-    .includes(enrollments: :dismissal)
-    .where(dismissals: {id: nil})
-  end
-
   def has_user?
     return true unless self.user_id.nil?
-    ! User.where(email: self.email).empty?
+    ! User.where(email: self.emails).empty?
   end
 
   def has_email?
     ! (self.email.nil? || self.email.empty?)
+  end
+
+  def emails
+    return [] unless self.has_email?
+    return self.email.split(/[\s,;]/).filter { |email| email != "" }
+  end
+
+  def first_email
+    emails = self.emails
+    return nil if emails.empty?
+    return emails[0]
   end
 
   def can_have_new_user?

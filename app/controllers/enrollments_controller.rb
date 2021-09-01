@@ -312,17 +312,16 @@ class EnrollmentsController < ApplicationController
 
   def create_users
     raise CanCan::AccessDenied.new("Acesso negado!", :invite, User) if cannot? :invite, User
-    process_action_link_action do
-      each_record_in_page {}
-      enrollments = find_page(:sorting => active_scaffold_config.list.user.sorting).items
-      created = create_enrollments_users(enrollments, params["add_option"])
-      if created > 0
-        flash[:info] = "#{created} #{"usuário".pluralize(created)} #{"criado".pluralize(created)}"
-      else
-        flash[:error] = "Nenhum usuário criado"
-      end      
-      self.successful  = true
+    each_record_in_page {}
+    enrollments = find_page(:sorting => active_scaffold_config.list.user.sorting).items
+    created = create_enrollments_users(enrollments, params["add_option"])
+    if created > 0
+      @info_message = "#{created} #{"usuário".pluralize(created)} #{"criado".pluralize(created)}"
+    else
+      @error_message = "Nenhum usuário criado"
     end
+    self.successful  = true
+    respond_to_action(:create_users)
   end
 
   protected
@@ -331,26 +330,38 @@ class EnrollmentsController < ApplicationController
     render :partial => 'new_users'
   end
 
+  def create_users_respond_on_iframe
+    flash[:info] = @info_message unless @info_message.nil?
+    flash[:error] = @error_message unless @error_message.nil?
+    responds_to_parent do
+      render :action => 'on_create_users', :formats => [:js], :layout => false
+    end
+  end
+
+  def create_users_respond_to_html
+    flash[:info] = @info_message unless @info_message.nil?
+    flash[:error] = @error_message unless @error_message.nil?
+    return_to_main
+  end
+  
+  def create_users_respond_to_js
+    flash.now[:info] = @info_message unless @info_message.nil?
+    flash.now[:error] = @error_message unless @error_message.nil?
+    do_refresh_list 
+    @popstate = true
+    render :action => 'on_create_users', :formats => [:js]
+  end
+
+
+
   def before_update_save(record)
     return unless (record.valid? and record.class_enrollments.all? {|class_enrollment| class_enrollment.valid?})
     emails = []
     record.class_enrollments.each do |class_enrollment| 
       if class_enrollment.should_send_email_to_professor?
-        absence_changed = class_enrollment.will_save_change_to_disapproved_by_absence? ? '*' : ''
-        info = {
-          :name => record.to_label,
-          :professor => class_enrollment.course_class.professor.name,
-          :course => class_enrollment.course_class.label_with_course,
-          :situation => "#{class_enrollment.situation}#{class_enrollment.will_save_change_to_situation? ? '*' : ''}",
-          :grade => "#{class_enrollment.grade_to_view}#{class_enrollment.will_save_change_to_grade? ? '*' : ''}",
-          :absence => ((class_enrollment.attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false')) + absence_changed
-        }
-        message_to_professor = {
-          :to => class_enrollment.course_class.professor.email,
-          :subject => I18n.t('notifications.class_enrollment.email_to_professor.subject', info),
-          :body => I18n.t('notifications.class_enrollment.email_to_professor.body', info)
-        }
-        emails << message_to_professor
+        emails << EmailTemplate.load_template("class_enrollments:email_to_professor").prepare_message({
+          :record => class_enrollment,
+        })
       end
     end
     return if emails.empty?

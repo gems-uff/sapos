@@ -1,0 +1,17 @@
+<%
+  record = var(:record)
+  name = record.enrollment.student.name
+  course = record.course_class.label_with_course
+  situation = record.situation
+  grade = record.grade_to_view
+  absence = ((record.attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false'))
+%>
+<%= name %>,
+
+Informamos que sua inscrição em <%= course %> foi atualizada:
+-Situação: <%= situation %>
+-Nota: <%= grade %>
+-Reprovado por falta: <%= absence %>
+
+
+<%= CustomVariable.notification_footer %>

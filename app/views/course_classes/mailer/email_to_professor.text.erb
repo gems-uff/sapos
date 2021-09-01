@@ -1,0 +1,25 @@
+<% 
+  record = var(:record)
+ %>
+<%= record.professor.name %>,
+
+Informamos que as notas da sua turma <%= record.label_with_course %> foram lançadas ou alteradas:
+<% record.class_enrollments.each do |class_enrollment| %>
+<%-
+  enrollment = class_enrollment.enrollment.to_label
+  situation = "#{class_enrollment.situation}#{class_enrollment.will_save_change_to_situation? ? '*' : ''}"
+  grade = "#{class_enrollment.grade_to_view}#{class_enrollment.will_save_change_to_grade? ? '*' : ''}"
+  absence_changed = class_enrollment.will_save_change_to_disapproved_by_absence? ? '*' : ''
+  if class_enrollment.attendance_to_label == "I"
+    absence = "#{I18n.t('activerecord.attributes.class_enrollment.disapproved_by_absence')}#{absence_changed}"
+  else
+    absence = "#{I18n.t('active_scaffold.false')} #{I18n.t('activerecord.attributes.class_enrollment.disapproved_by_absence')}#{absence_changed}"
+  end
+%>
+-<%= enrollment %>: <%= situation %> - <%= grade %> (<%= absence %>)
+<% end -%>
+
+* Valores alterados
+
+
+<%= CustomVariable.notification_footer %>

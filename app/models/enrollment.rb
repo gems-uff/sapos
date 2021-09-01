@@ -174,11 +174,13 @@ class Enrollment < ApplicationRecord
     return false unless self.should_have_user?
     begin
       student = self.student
-      user = User.invite!({:email => student.email, :name => student.name, :role_id => Role::ROLE_ALUNO}, current_user)
+      user = User.invite!({:email => student.first_email, :name => student.name, :role_id => Role::ROLE_ALUNO}, current_user) do |invitable|
+        invitable.skip_confirmation!
+      end
       student.user = user
       student.save
     rescue StandardError => err
-      eusers = User.where({:email => self.student.email})
+      eusers = User.where({:email => self.student.first_email})
       eusers.destroy_all
       return false
     end

@@ -314,6 +314,14 @@ Sapos::Application.routes.draw do
   end
 
 
+  resources :email_templates do
+    concerns :active_scaffold
+    collection do
+      get 'builtin'
+    end
+
+  end
+
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end

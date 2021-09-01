@@ -4,7 +4,7 @@
 class User < ApplicationRecord
 
   has_one :professor
-  has_one :student
+  has_one :student, dependent: :nullify
   has_many :enrollment_request_comments, :dependent => :destroy
   belongs_to :role
 
@@ -12,6 +12,8 @@ class User < ApplicationRecord
 
   devise :invitable, :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,
          :lockable
+
+  after_create :skip_confirmation!, unless: Proc.new { self.invitation_token.nil? }
 
   validates :email, :presence => true, :uniqueness => true
   validates :name, :presence => true
