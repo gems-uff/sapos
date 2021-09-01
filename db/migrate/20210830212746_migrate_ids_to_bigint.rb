@@ -1,5 +1,25 @@
 class MigrateIdsToBigint < ActiveRecord::Migration[6.0]
   def up
+    if ActiveRecord::Base.connection.adapter_name.downcase.starts_with? 'sqlite'
+      add_column :students, :temp_user_id, :integer, limit: 8
+      Student.update_all("temp_user_id = user_id")
+      remove_reference :students, :user
+
+      add_column :students, :user_id, :integer, limit: 8
+      Student.update_all("user_id = temp_user_id")
+      remove_column :students, :temp_user_id
+      add_index :students, :user_id unless index_exists?(:students, :user_id)
+
+      # new indexes
+      add_index :course_research_areas, :course_id unless index_exists?(:course_research_areas, :course_id)
+      add_index :course_research_areas, :research_area_id unless index_exists?(:course_research_areas, :research_area_id)
+      add_index :enrollments, :research_area_id unless index_exists?(:enrollments, :research_area_id)
+      add_index :notifications, :query_id unless index_exists?(:notifications, :query_id)
+      add_index :phase_completions, :enrollment_id unless index_exists?(:phase_completions, :enrollment_id)
+      add_index :phase_completions, :phase_id unless index_exists?(:phase_completions, :phase_id)
+      return
+    end
+
     remove_index :versions, name: "index_versions_on_item_type_and_item_id" if index_exists?(:versions, name: "index_versions_on_item_type_and_item_id")
     
     add_column :students, :temp_user_id, :integer, limit: 8
@@ -341,6 +361,25 @@ class MigrateIdsToBigint < ActiveRecord::Migration[6.0]
   end
 
   def down
+    if ActiveRecord::Base.connection.adapter_name.downcase.starts_with? 'sqlite'
+      # new indexes
+      remove_index :course_research_areas, name: "index_course_research_areas_on_course_id" if index_exists?(:course_research_areas, name: "index_course_research_areas_on_course_id")
+      remove_index :course_research_areas, name: "index_course_research_areas_on_research_area_id" if index_exists?(:course_research_areas, name: "index_course_research_areas_on_research_area_id")
+      remove_index :enrollments, name: "index_enrollments_on_research_area_id" if index_exists?(:enrollments, name: "index_enrollments_on_research_area_id")
+      remove_index :notifications, name: "index_notifications_on_query_id" if index_exists?(:notifications, name: "index_notifications_on_query_id")
+      remove_index :phase_completions, name: "index_phase_completions_on_enrollment_id" if index_exists?(:phase_completions, name: "index_phase_completions_on_enrollment_id")
+      remove_index :phase_completions, name: "index_phase_completions_on_phase_id" if index_exists?(:phase_completions, name: "index_phase_completions_on_phase_id")
+
+      remove_index :students, name: "index_students_on_user_id" if index_exists?(:students, name: "index_students_on_user_id")
+      add_column :students, :temp_user_id, :integer
+      Student.update_all("temp_user_id = user_id")
+      remove_column :students, :user_id
+
+      add_reference :students, :user, foreign_key: { on_delete: :nullify }
+      Student.update_all("user_id = temp_user_id")
+      remove_column :students, :temp_user_id
+      return
+    end
     # new indexes
     remove_index :course_research_areas, name: "index_course_research_areas_on_course_id" if index_exists?(:course_research_areas, name: "index_course_research_areas_on_course_id")
     remove_index :course_research_areas, name: "index_course_research_areas_on_research_area_id" if index_exists?(:course_research_areas, name: "index_course_research_areas_on_research_area_id")
