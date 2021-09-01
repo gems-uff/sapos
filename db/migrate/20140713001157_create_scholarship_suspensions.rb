@@ -12,6 +12,6 @@ class CreateScholarshipSuspensions < ActiveRecord::Migration[5.1]
 
       t.timestamps
     end
-    add_index :scholarship_suspensions, :scholarship_duration_id
+    #add_index :scholarship_suspensions, :scholarship_duration_id
   end
 end

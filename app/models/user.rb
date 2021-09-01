@@ -4,7 +4,7 @@
 class User < ApplicationRecord
 
   has_one :professor
-  has_one :student
+  has_one :student, dependent: :nullify
   belongs_to :role
 
   has_paper_trail

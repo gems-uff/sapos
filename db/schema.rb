@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_28_150353) do
+ActiveRecord::Schema.define(version: 2021_08_30_212746) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -106,6 +106,8 @@ ActiveRecord::Schema.define(version: 2021_08_28_150353) do
     t.integer "research_area_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.index ["course_id"], name: "index_course_research_areas_on_course_id"
+    t.index ["research_area_id"], name: "index_course_research_areas_on_research_area_id"
   end
 
   create_table "course_types", force: :cascade do |t|
@@ -224,6 +226,7 @@ ActiveRecord::Schema.define(version: 2021_08_28_150353) do
     t.integer "research_area_id"
     t.index ["enrollment_status_id"], name: "index_enrollments_on_enrollment_status_id"
     t.index ["level_id"], name: "index_enrollments_on_level_id"
+    t.index ["research_area_id"], name: "index_enrollments_on_research_area_id"
     t.index ["student_id"], name: "index_enrollments_on_student_id"
   end
 
@@ -288,6 +291,7 @@ ActiveRecord::Schema.define(version: 2021_08_28_150353) do
     t.boolean "individual", default: true
     t.integer "query_id", null: false
     t.boolean "has_grades_report_pdf_attachment", default: false
+    t.index ["query_id"], name: "index_notifications_on_query_id"
   end
 
   create_table "phase_completions", force: :cascade do |t|
@@ -297,6 +301,8 @@ ActiveRecord::Schema.define(version: 2021_08_28_150353) do
     t.datetime "completion_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["enrollment_id"], name: "index_phase_completions_on_enrollment_id"
+    t.index ["phase_id"], name: "index_phase_completions_on_phase_id"
   end
 
   create_table "phase_durations", force: :cascade do |t|
@@ -511,7 +517,7 @@ ActiveRecord::Schema.define(version: 2021_08_28_150353) do
     t.string "identity_issuing_place", limit: 255
     t.string "photo", limit: 255
     t.integer "birth_country_id"
-    t.integer "user_id"
+    t.integer "user_id", limit: 8
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"
@@ -577,5 +583,4 @@ ActiveRecord::Schema.define(version: 2021_08_28_150353) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
-  add_foreign_key "students", "users", on_delete: :nullify
 end

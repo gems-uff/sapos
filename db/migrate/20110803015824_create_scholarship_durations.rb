@@ -13,8 +13,8 @@ class CreateScholarshipDurations < ActiveRecord::Migration[5.1]
       t.timestamps
     end
     
-    add_index :scholarship_durations, :scholarship_id
-    add_index :scholarship_durations, :enrollment_id
+    #add_index :scholarship_durations, :scholarship_id
+    #add_index :scholarship_durations, :enrollment_id
   end
 
   def self.down
