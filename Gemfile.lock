@@ -270,7 +270,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.20.3, < 2.0)
     rake (12.3.3)
-    rdoc (6.2.1)
+    rdoc (6.3.1)
     recordselect (3.10.1)
       rails (>= 4.0.0)
     redcarpet (3.5.1)
