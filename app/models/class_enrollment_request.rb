@@ -29,6 +29,22 @@ class ClassEnrollmentRequest < ApplicationRecord
   after_create :update_main_request_status_on_create
   after_destroy :update_main_request_status_on_destroy
 
+  def self.pendency_condition
+    return ["id = -1"] if current_user.nil?
+    cer = ClassEnrollmentRequest.arel_table.dup
+    cer.table_alias = 'cer'
+    check_status = cer.where(
+      cer[:status].not_eq(ClassEnrollmentRequest::EFFECTED)
+      .and(cer[:status].not_eq(ClassEnrollmentRequest::INVALID))
+    )
+    if current_user.role_id == Role::ROLE_COORDENACAO || current_user.role_id == Role::ROLE_SECRETARIA
+      return [
+        "id IN (#{check_status.project(cer[:id]).to_sql})",
+      ]
+    end
+    ["id = -1"]
+  end
+
   def allocations
     self.course_class.allocations.collect do |allocation|
       "#{allocation.day} (#{allocation.start_time}-#{allocation.end_time})"

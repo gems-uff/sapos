@@ -11,8 +11,6 @@ class EnrollmentRequest < ApplicationRecord
 
   has_paper_trail
 
-  IMPOSSIBLE = ["id = -1"]
-
   validates :year, :presence => true
   validates :semester, :presence => true
   validates :enrollment, :presence => true
@@ -24,7 +22,7 @@ class EnrollmentRequest < ApplicationRecord
   accepts_nested_attributes_for :class_enrollment_requests, :course_classes
 
   def self.pendency_condition
-    return IMPOSSIBLE if current_user.nil?
+    return ["id = -1"] if current_user.nil?
     er = EnrollmentRequest.arel_table.dup
     cer = ClassEnrollmentRequest.arel_table
     er.table_alias = 'er'
@@ -32,7 +30,7 @@ class EnrollmentRequest < ApplicationRecord
       .join(cer)
       .on(cer[:enrollment_request_id].eq(er[:id]))
       .where(cer[:status].eq(ClassEnrollmentRequest::REQUESTED))
-    if current_user.role_id == Role::ROLE_COORDENACAO || current_user.role_id == Role::ROLE_COORDENACAO
+    if current_user.role_id == Role::ROLE_COORDENACAO || current_user.role_id == Role::ROLE_SECRETARIA
       return [
         "id IN (#{check_status.project(er[:id]).to_sql})",
       ]
@@ -43,7 +41,7 @@ class EnrollmentRequest < ApplicationRecord
         "id IN (#{check_status.project(er[:id]).to_sql})",
       ]
     end
-    IMPOSSIBLE
+    ["id = -1"]
   end
 
   def last_student_read_time

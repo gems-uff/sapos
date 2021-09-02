@@ -18,6 +18,12 @@ class PendenciesController < ApplicationController
       @partials << ['pendencies/enrollment_requests', {conditions: pendency_condition}]
     end
 
+    class_pendency_condition = ClassEnrollmentRequest.pendency_condition
+    class_requests = ClassEnrollmentRequest.where(class_pendency_condition)
+    unless class_requests.empty?
+      @partials << ['pendencies/class_enrollment_requests', {conditions: class_pendency_condition}]
+    end
+
     render :index
   end
 
