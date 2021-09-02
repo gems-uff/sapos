@@ -127,7 +127,7 @@ form_tag url_options, options
 
       <div class="message-box">
         <span class="send-message"> <%= t('student_enrollment.enroll.message.send') %> </span>
-        <%= text_area_tag(:comment_message, @comment.nil? ? "" : @comment.message, size: '100x4' ) %>
+        <%= text_area_tag("record[comment_message]", @comment.nil? ? "" : @comment.message, size: '100x4' ) %>
       </div>
     </div>
   <% end %>

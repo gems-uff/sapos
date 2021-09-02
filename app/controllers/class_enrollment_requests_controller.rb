@@ -151,6 +151,10 @@ class ClassEnrollmentRequestsController < ApplicationController
     raise CanCan::AccessDenied.new("Acesso negado!", :effect, ClassEnrollmentRequest) if cannot? :effect, ClassEnrollmentRequest
     process_action_link_action do |record|
       if (self.successful = record.to_effected && record.save)
+        emails = [EmailTemplate.load_template("class_enrollment_requests:email_to_student").prepare_message({
+          :record => record,
+        })]
+        Notifier.send_emails(notifications: emails)
         flash[:info] = I18n.t('class_enrollment_request.effect.applied', count: 1)
       else
         flash[:error] = I18n.t('class_enrollment_request.effect.applied', count: 0)
@@ -173,12 +177,17 @@ class ClassEnrollmentRequestsController < ApplicationController
     class_enrollment_requests = find_page(:sorting => active_scaffold_config.list.user.sorting).items
     class_enrollment_requests.each do |record|
       changed = record.to_effected && record.save
+      if changed
+        emails = [EmailTemplate.load_template("class_enrollment_requests:email_to_student").prepare_message({
+          :record => record,
+        })]
+        Notifier.send_emails(notifications: emails)
+      end
       count += 1 if changed
     end
     do_refresh_list
     @message = I18n.t('class_enrollment_request.effect.applied', count: count)
     respond_to_action(:effect)
-    #return_to_main
   end
 
   protected

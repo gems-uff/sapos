@@ -1026,14 +1026,25 @@ pt-BR:
         subject: "Inscrição em <%= var(:record).course_class.label_with_course %> de <%= var(:record).enrollment.to_label %> foi atualizada"
       email_to_professor:
         subject: "Alteração da nota de <%= var(:record).enrollment.to_label %> na turma <%= var(:record).course_class.label_with_course %>"
+    class_enrollment_request:
+      email_to_student:
+        subject: "Seu pedido de inscrição em <%= var(:record).class_enrollment.course_class.label_with_course %> foi efetivado"
     course_class:
       email_to_professor:
         subject: "Alteração de notas da turma <%= var(:record).label_with_course %>"
+    enrollment_request:
+      email_to_student:
+        subject: "Alteração de situação de pedido de inscrição de <%= var(:record).year %>.<%= var(:record).semester %>"
     deferral:
       email_to_student:
         subject: "Pedido de prorrogação deferido"
       email_to_advisor:
         subject: "Pedido de prorrogação de orientando deferido"
+    student_enrollment:
+      email_to_student:
+        subject: "Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> <%= var(:record).created_at == var(:record).updated_at ? 'realizado' : 'atualizado' %>"
+      email_to_advisor:
+        subject: "Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> de orientando foi <%= var(:record).created_at == var(:record).updated_at ? 'realizado' : 'atualizado' %>"
   pdf_content:
     professor_watermark: "DOCUMENTO VÁLIDO APENAS PARA USO INTERNO E PESSOAL DO PROFESSOR"
     advisements:

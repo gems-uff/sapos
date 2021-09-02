@@ -45,7 +45,18 @@ class StudentEnrollmentController < ApplicationController
       @enrollment_request.status = ClassEnrollmentRequest::REQUESTED
       @enrollment_request.last_student_change_at = Time.current
       @enrollment_request.student_view_at = @enrollment_request.last_student_change_at 
-      # ToDo: notify advisors and staff
+      
+      emails = [EmailTemplate.load_template("student_enrollments:email_to_student").prepare_message({
+        :record => @enrollment_request
+      })]
+      @enrollment_request.enrollment.advisements.each do |advisement|
+        emails << EmailTemplate.load_template("student_enrollments:email_to_advisor").prepare_message({
+          :record => @enrollment_request,
+          :advisement => advisement
+        })
+      end
+      Notifier.send_emails(notifications: emails)
+      
     end
     if enrollment_request_params[:delete_request] == "1"
       @enrollment_request.destroy!

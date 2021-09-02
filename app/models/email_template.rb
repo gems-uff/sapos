@@ -61,6 +61,14 @@ class EmailTemplate < ApplicationRecord
         record: "ClassEnrollment"
       }
     },
+    "class_enrollment_requests:email_to_student" => {
+      path: File.join("class_enrollment_requests", "mailer", "email_to_student.text.erb"),
+      subject: I18n.t('notifications.class_enrollment_request.email_to_student.subject'),
+      to: "<%= var(:record).class_enrollment.enrollment.student.email %>",
+      variables: {
+        record: "ClassEnrollmentRequest",
+      }
+    },
     "course_classes:email_to_professor" => {
       path: File.join("course_classes", "mailer", "email_to_professor.text.erb"),
       subject: I18n.t('notifications.course_class.email_to_professor.subject'),
@@ -84,6 +92,15 @@ class EmailTemplate < ApplicationRecord
       to: "<%= var(:record).enrollment.student.email %>",
       variables: {
         record: "Deferral"
+      }
+    },
+    "enrollment_requests:email_to_student" => {
+      path: File.join("enrollment_requests", "mailer", "email_to_student.text.erb"),
+      subject: I18n.t('notifications.enrollment_request.email_to_student.subject'),
+      to: "<%= var(:record).enrollment.student.email %>",
+      variables: {
+        record: "EnrollmentRequest",
+        student_enrollment_url: "URL",
       }
     },
     "devise:confirmation_instructions" => {
@@ -134,7 +151,23 @@ class EmailTemplate < ApplicationRecord
         '@resourse' => "User"
       }
     },
-    
+    "student_enrollments:email_to_student" => {
+      path: File.join("student_enrollment", "mailer", "email_to_student.text.erb"),
+      subject: I18n.t('notifications.student_enrollment.email_to_student.subject'),
+      to: "<%= var(:record).enrollment.student.email %>",
+      variables: {
+        record: "EnrollmentRequest",
+      }
+    },
+    "student_enrollments:email_to_advisor" => {
+      path: File.join("student_enrollment", "mailer", "email_to_advisor.text.erb"),
+      subject: I18n.t('notifications.student_enrollment.email_to_advisor.subject'),
+      to: "<%= var(:advisement).professor.email %>",
+      variables: {
+        record: "EnrollmentRequest",
+        advisement: "Advisement"
+      }
+    },
   }
 
   def self.devise_template(action)

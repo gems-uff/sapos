@@ -1,0 +1,6 @@
+<%= var(:record).enrollment.student.name %>,
+
+Informamos que seu pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> foi <%= var(:record).created_at == var(:record).updated_at ? 'realizado' : 'atualizado' %>.
+
+
+<%= CustomVariable.notification_footer %>

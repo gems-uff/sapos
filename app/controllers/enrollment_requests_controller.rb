@@ -55,7 +55,7 @@ class EnrollmentRequestsController < ApplicationController
   protected
 
   def before_update_save(record)
-    message = params[:comment_message]
+    message = params.require(:record).permit(:comment_message)[:comment_message]
     changed = false
     changed ||= record.changed? || record.class_enrollment_requests.any? { |cer| cer.changed? }
     changed ||= ! message.nil? && ! message.empty?
@@ -64,7 +64,11 @@ class EnrollmentRequestsController < ApplicationController
       if ! message.nil? && ! message.empty?
         @comment = record.enrollment_request_comments.build(message: message, user: current_user)
       end
-      # ToDo: notify student
+      emails = [EmailTemplate.load_template("enrollment_requests:email_to_student").prepare_message({
+        :record => record,
+        :student_enrollment_url => student_enroll_url(id: record.enrollment.enrollment_number, year: record.year, semester: record.semester)
+      })]
+      Notifier.send_emails(notifications: emails)
     end
   end
 
