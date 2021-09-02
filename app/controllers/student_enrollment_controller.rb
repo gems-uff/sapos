@@ -12,8 +12,8 @@ class StudentEnrollmentController < ApplicationController
     if @enrollment.dismissal.nil?
       now = Time.now
       open_semester = ClassSchedule.find_by(
-        ClassSchedule.arel_table[:enrollment_start].lteq(now),
-        ClassSchedule.arel_table[:enrollment_end].gteq(now),
+        ClassSchedule.arel_table[:enrollment_start].lteq(now)
+        .and(ClassSchedule.arel_table[:enrollment_end].gteq(now))
       )
       unless open_semester.nil?
         enrollment_request = EnrollmentRequest.find_or_initialize_by(
@@ -28,12 +28,12 @@ class StudentEnrollmentController < ApplicationController
   end
 
   def enroll
-    return unless _prepare_enroll.nil?
+    return unless _prepare_enroll(false).nil?
     render :enroll
   end
 
   def save_enroll
-    return unless _prepare_enroll.nil?
+    return unless _prepare_enroll(true).nil?
     message = enrollment_request_params[:message]
     changed = false
     changed ||= @enrollment_request.assign_course_class_ids(enrollment_request_params[:course_class_ids])
@@ -82,27 +82,27 @@ class StudentEnrollmentController < ApplicationController
     nil
   end
 
-  def _redirect_semester
+  def _redirect_semester(check_time)
     redirect = _valid_enrollment
     return redirect unless redirect.nil?
     if @enrollment.dismissal.present?
       return redirect_to student_enrollment_path(@enrollment.enrollment_number), alert: I18n.t("student_enrollment.alert.dismissed_enrollment", enrollment: params[:id])
     end
-    now = Time.now
     @semester = ClassSchedule.find_by(
-      ClassSchedule.arel_table[:enrollment_start].lteq(now)
-        .and(ClassSchedule.arel_table[:enrollment_end].gteq(now))
-        .and(ClassSchedule.arel_table[:year].eq(params[:year]))
-        .and(ClassSchedule.arel_table[:semester].eq(params[:semester]))
+      ClassSchedule.arel_table[:year].eq(params[:year])
+      .and(ClassSchedule.arel_table[:semester].eq(params[:semester]))
     )
     if @semester.nil?
       return redirect_to student_enrollment_path(@enrollment.enrollment_number), alert: I18n.t("student_enrollment.alert.invalid_semester", year: params[:year], semester: params[:semester])
     end
+    if check_time && ! @semester.enroll_open?
+      return redirect_to student_enrollment_path(@enrollment.enrollment_number), alert: I18n.t("student_enrollment.alert.closed_enrollment", year: params[:year], semester: params[:semester])
+    end
     nil
   end
 
-  def _prepare_enroll
-    redirect = _redirect_semester
+  def _prepare_enroll(check_time)
+    redirect = _redirect_semester(check_time)
     return redirect unless redirect.nil?
     @available_classes = CourseClass.where(
       year: @semester.year,

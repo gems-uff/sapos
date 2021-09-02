@@ -28,11 +28,13 @@ pt-BR:
         author: "%{author} enviou:"
         time: "[%{time}]"
         send: "Enviar mensagem (não será possível editar depois)"
+      closed_enrollment: O período de inscrições no semestre %{semester} fechou. Esta página apenas exibe a situação.
 
     alert:
       invalid_enrollment: Matrícula %{enrollment} inválida
       dismissed_enrollment: Matrícula %{enrollment} desligada
-      invalid_semester: Semester %{year}.%{semester} inválido
+      invalid_semester: Semestre %{year}.%{semester} inválido
+      closed_enrollment: O período de inscrições no semestre %{year}.%{semester} fechou
 
     notice:
       request_removed: Pedido de inscrição removido!

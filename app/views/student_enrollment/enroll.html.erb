@@ -1,8 +1,12 @@
 <% table = prepare_class_schedule_table(@available_classes)  %>
 <% estars = "" %>
+<% closed = ! @semester.enroll_open? %>
 <div class="landing-main enroll-main">
   <% if flash[:alert] %>
       <div id="error_login"><%= flash[:alert] %></div>
+  <% end %>
+  <% if closed %>
+      <div id="error_login"><%= t 'student_enrollment.enroll.closed_enrollment', semester: @semester.to_label %></div>
   <% end %>
   
   <h2> <%= t 'student_enrollment.enroll.title', semester: @semester.to_label %> </h2>
@@ -53,7 +57,7 @@
           <tr <%= cer.nil? ? "" : "title=\"#{cer.status}\" class=\"enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.status] }\"".html_safe %>>
             <td>
               <%= box.label class: "check-label" do %>
-                <% readonly = (! cer.nil? && cer.status == ClassEnrollmentRequest::EFFECTED) %>
+                <% readonly = (closed || (! cer.nil? && cer.status == ClassEnrollmentRequest::EFFECTED)) %>
                 <%= box.check_box onclick: (readonly ?  "return false;" : ""), readonly: readonly  %>
               <% end %>
             </td>
@@ -79,24 +83,29 @@
     <% end %>
     </ul>
 
-    <h4> <%= t('student_enrollment.enroll.messages') %> </h4>
-    <div class="enroll-messages">
-      <div class="log">
-        <% @enrollment_request.enrollment_request_comments.each do |comment| %>
-          <div class="enroll-message <%= comment.updated_at > @last_read && comment.user != current_user ? "new-message" : "old-message" %>">
-            <span class="time"> <%= t('student_enrollment.enroll.message.time', time: comment.updated_at) %> </span>
-            <span class="author"> <%= t('student_enrollment.enroll.message.author', author: comment.user.name) %> </span>
-            <span class="content"> <%= simple_format(comment.message) %> </span>
+    <% if ! @enrollment_request.enrollment_request_comments.empty? || ! closed %>
+      <h4> <%= t('student_enrollment.enroll.messages') %> </h4>
+      <div class="enroll-messages">
+        <div class="log">
+          <% @enrollment_request.enrollment_request_comments.each do |comment| %>
+            <div class="enroll-message <%= comment.updated_at > @last_read && comment.user != current_user ? "new-message" : "old-message" %>">
+              <span class="time"> <%= t('student_enrollment.enroll.message.time', time: comment.updated_at) %> </span>
+              <span class="author"> <%= t('student_enrollment.enroll.message.author', author: comment.user.name) %> </span>
+              <span class="content"> <%= simple_format(comment.message) %> </span>
+            </div>
+          <% end %>
+        </div>
+
+        <% unless closed %>
+          <div class="message-box">
+            <span class="send-message"> <%= t('student_enrollment.enroll.message.send') %> </span>
+            <%= form.text_area(:message, size: '100x4', value: @comment.nil? ? "" : @comment.message ) %>
           </div>
         <% end %>
       </div>
-
-      <div class="message-box">
-        <span class="send-message"> <%= t('student_enrollment.enroll.message.send') %> </span>
-        <%= form.text_area(:message, size: '100x4', value: @comment.nil? ? "" : @comment.message ) %>
-      </div>
-    </div>
-
-    <%= form.submit t('student_enrollment.enroll.submit') %>
+    <% end %>
+    <% unless closed %>
+      <%= form.submit t('student_enrollment.enroll.submit') %>
+    <% end %>
   <% end %>
 </div>

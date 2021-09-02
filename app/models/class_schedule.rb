@@ -12,4 +12,9 @@ class ClassSchedule < ApplicationRecord
     "#{year}.#{semester}"
   end
 
+  def enroll_open?(now=nil)
+    now ||= Time.now
+    return self.enrollment_start <= now && now <= self.enrollment_end
+  end
+
 end
