@@ -39,6 +39,10 @@ class ClassEnrollmentRequest < ApplicationRecord
     self.course_class.professor.to_label if self.course_class.professor
   end
 
+  def parent_status
+    self.enrollment_request.status
+  end
+
   def to_effected
     changed = false
     if self.class_enrollment.nil?

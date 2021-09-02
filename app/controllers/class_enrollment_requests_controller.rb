@@ -25,12 +25,13 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     config.list.sorting = {:enrollment_request => 'ASC'}
     columns = [:enrollment_request, :course_class, :status, :class_enrollment]
-    config.list.columns = columns + [:allocations, :professor]
+    config.list.columns = [:enrollment_request, :course_class, :status, :parent_status, :class_enrollment, :allocations, :professor]
     config.create.columns = columns
     config.update.columns = columns
 
     config.columns.add :enrollment_number, :student, :enrollment_level, :enrollment_status, :admission_date, :scholarship_durations_active, :professor
     config.columns.add :year, :semester
+    config.columns.add :parent_status
 
     config.create.label = :create_class_enrollment_request_label
     config.update.label = :update_class_enrollment_request_label
@@ -40,6 +41,7 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     config.field_search.columns = [
       :status,
+      :parent_status,
       :year,
       :semester,
       :enrollment_number, 
@@ -102,6 +104,12 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.columns[:professor].search_ui = :select
 
     config.columns[:course_class].search_ui = :record_select
+
+    config.columns[:parent_status].includes = [:enrollment_request]
+    config.columns[:parent_status].search_sql = "enrollment_requests.status"
+    config.columns[:parent_status].search_ui = :select
+    config.columns[:parent_status].options = {:options => ClassEnrollmentRequest::STATUSES, default: ClassEnrollmentRequest::REQUESTED, :include_blank => I18n.t("active_scaffold._select_")}
+
 
     config.columns[:class_enrollment].allow_add_existing = false;
 
