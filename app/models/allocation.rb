@@ -19,6 +19,16 @@ class Allocation < ApplicationRecord
       #{self.start_time}:00 - #{self.end_time}:00 #{"- #{I18n.t("activerecord.attributes.allocation.room")} : #{self.room}" if self.room }"
   end
 
+  def intersects(other)
+    return nil if self.day != other.day
+    if self.start_time.between?(other.start_time, other.end_time)
+      return :start_time
+    elsif self.end_time.between?(other.start_time, other.end_time)
+      return :end_time
+    end
+    return nil
+  end
+
   private
   def start_end_time_validation
     if !self.start_time.blank? and !self.end_time.blank? and self.end_time <= self.start_time
@@ -32,11 +42,9 @@ class Allocation < ApplicationRecord
     if allocations and !self.start_time.blank? and !self.end_time.blank?
       allocations.each do |allocation|
         if allocation.id != self.id
-          if self.start_time.between?(allocation.start_time, allocation.end_time)
-            errors.add(:start_time, I18n.t("activerecord.errors.models.allocation.scheduling_conflict"))
-            break
-          elsif self.end_time.between?(allocation.start_time, allocation.end_time)
-            errors.add(:end_time, I18n.t("activerecord.errors.models.allocation.scheduling_conflict"))
+          intersection = self.intersects(allocation)
+          unless intersection.nil?
+            errors.add(intersection, I18n.t("activerecord.errors.models.allocation.scheduling_conflict"))
             break
           end
         end

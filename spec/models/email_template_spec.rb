@@ -21,7 +21,7 @@ describe EmailTemplate do
         it "already exists another email template for the same name" do
           FactoryBot.create(:email_template, name: "temp")
           email_template.name = "temp"
-          expect(email_template).to have_error(:uniqueness).on :name
+          expect(email_template).to have_error(:taken).on :name
         end
       end
     end

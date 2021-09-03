@@ -557,6 +557,10 @@ pt-BR:
           attributes:
             class_enrollment:
               must_represent_the_same_enrollment_and_class: "deve estar associada à mesma matrícula e turma"
+            course_class:
+              previously_approved: "já foi cursada anteriormente com aprovação"
+              taken: "duplicada"
+              impossible_allocation: "possui conflito de horário"
         course:
           check_unique_name_for_available_courses: "de disciplina já existe no currículo vigente"     
         course_class:
@@ -580,7 +584,7 @@ pt-BR:
         email_template:
           attributes:
             name:
-              uniqueness: já existe
+              taken: já existe
         enrollment:
           main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"

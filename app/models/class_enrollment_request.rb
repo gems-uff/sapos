@@ -20,10 +20,12 @@ class ClassEnrollmentRequest < ApplicationRecord
 
   validates :enrollment_request, :presence => true
   validates :course_class, :presence => true
-  validates :status, :presence => true, :inclusion => {:in => STATUSES}
   validates_uniqueness_of :course_class, :scope => [:enrollment_request]
+  validates :status, :presence => true, :inclusion => {:in => STATUSES}
   validates :class_enrollment, :presence => true, if: -> { status == EFFECTED }
   validate :validate_class_enrollment_match
+  validate :validate_course_class_duplication
+  validate :validate_allocation_match
 
   after_save :update_main_request_status_on_save
   after_create :update_main_request_status_on_create
@@ -83,6 +85,40 @@ class ClassEnrollmentRequest < ApplicationRecord
     return if ce.nil?
     if ce.course_class_id != self.course_class_id || ce.enrollment_id != self.enrollment_request.enrollment_id
       errors.add(:class_enrollment, :must_represent_the_same_enrollment_and_class)
+    end
+  end
+
+  def validate_course_class_duplication
+    enrollment_request = self.enrollment_request
+    course_class = self.course_class
+    return if enrollment_request.nil? || course_class.nil?
+    enrollment = self.enrollment_request.enrollment
+    return if enrollment.nil?
+    enrollment.class_enrollments.each do |class_enrollment|
+      if class_enrollment.course_class_id == self.course_class_id
+        if ! course_class.course.course_type.allow_multiple_classes && class_enrollment.situation != ClassEnrollment::DISAPPROVED 
+          errors.add(:course_class, :previously_approved)
+        end
+      end
+    end
+  end
+
+  def validate_allocation_match
+    enrollment_request = self.enrollment_request
+    course_class = self.course_class
+    return if enrollment_request.nil? || course_class.nil?
+    course_class.allocations.each do |allocation|
+      enrollment_request.class_enrollment_requests.each do |cer|
+        next if cer == self 
+        cer_course_class = cer.course_class
+        next if cer_course_class.nil?
+        cer_course_class.allocations.each do |other|
+          unless allocation.intersects(other).nil?
+            errors.add(:course_class, :impossible_allocation)
+            break
+          end
+        end
+      end
     end
   end
 

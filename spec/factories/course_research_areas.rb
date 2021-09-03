@@ -4,5 +4,7 @@
 
 FactoryBot.define do
   factory :course_research_areas do
+    course { nil }
+    research_area { nil }
   end
 end
