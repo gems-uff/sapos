@@ -8,21 +8,21 @@ class EnrollmentRequest < ApplicationRecord
   has_many :course_classes, through: :class_enrollment_requests
   has_many :enrollment_request_comments, :dependent => :destroy
 
-
   has_paper_trail
 
   validates :year, :presence => true
-  validates :semester, :presence => true
+  validates :semester, :presence => true, :inclusion => {:in => YearSemester::SEMESTERS}
   validates :enrollment, :presence => true
-  validates :status, :presence => true, :inclusion => {:in => ClassEnrollmentRequest::STATUSES}
   validates_uniqueness_of :enrollment, :scope => [:year, :semester]
-  validates :class_enrollment_requests, :length => { minimum: 1, message: :at_least_one_class}
+  validates :status, :presence => true, :inclusion => {:in => ClassEnrollmentRequest::STATUSES}
   validate :validate_effected_status
+  validates :class_enrollment_requests, :length => { minimum: 1, message: :at_least_one_class}
 
   accepts_nested_attributes_for :class_enrollment_requests, :course_classes
 
-  def self.pendency_condition
-    return ["id = -1"] if current_user.nil?
+  def self.pendency_condition(user=nil)
+    user ||= current_user
+    return ["id = -1"] if user.nil?
     er = EnrollmentRequest.arel_table.dup
     cer = ClassEnrollmentRequest.arel_table
     er.table_alias = 'er'
@@ -30,13 +30,13 @@ class EnrollmentRequest < ApplicationRecord
       .join(cer)
       .on(cer[:enrollment_request_id].eq(er[:id]))
       .where(cer[:status].eq(ClassEnrollmentRequest::REQUESTED))
-    if current_user.role_id == Role::ROLE_COORDENACAO || current_user.role_id == Role::ROLE_SECRETARIA
+    if user.role_id == Role::ROLE_COORDENACAO || user.role_id == Role::ROLE_SECRETARIA
       return [
         "id IN (#{check_status.project(er[:id]).to_sql})",
       ]
     end
-    if current_user.role_id == Role::ROLE_PROFESSOR && ! current_user.professor.nil?
-      check_status = check_status.where(er[:enrollment_id].in(current_user.professor.enrollments.map(&:id)))
+    if user.role_id == Role::ROLE_PROFESSOR && ! user.professor.nil?
+      check_status = check_status.where(er[:enrollment_id].in(user.professor.enrollments.map(&:id)))
       return [
         "id IN (#{check_status.project(er[:id]).to_sql})",
       ]
@@ -57,9 +57,10 @@ class EnrollmentRequest < ApplicationRecord
     time_list.max
   end
 
-  def student_unread_messages
+  def student_unread_messages(user=nil)
+    user ||= current_user
     comp_time = self.last_student_read_time
-    self.enrollment_request_comments.filter { |comment|  comment.updated_at > comp_time && comment.user != current_user }.count
+    self.enrollment_request_comments.filter { |comment|  comment.updated_at > comp_time && comment.user != user }.count
   end
 
   def to_label

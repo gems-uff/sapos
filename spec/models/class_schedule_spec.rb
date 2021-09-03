@@ -20,7 +20,7 @@ RSpec.describe ClassSchedule, type: :model do
     end
     describe "semester" do
       context "should be valid when" do
-        it "semester is in Semesters lis" do
+        it "semester is in Semesters list" do
           class_schedule.semester = YearSemester::SEMESTERS[0]
           expect(class_schedule).to have(0).errors_on :semester
         end
