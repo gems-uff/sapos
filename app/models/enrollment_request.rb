@@ -97,8 +97,10 @@ class EnrollmentRequest < ApplicationRecord
     self.class_enrollment_requests.reload
     if self.status == ClassEnrollmentRequest::EFFECTED
       nstatus = self.class_enrollment_requests.collect(&:status).max_by {|stat| ClassEnrollmentRequest::STATUSES_PRIORITY.index stat}
-      self.status = nstatus
-      self.save 
+      unless nstatus.nil?
+        self.status = nstatus
+        self.save
+      end 
     elsif self.class_enrollment_requests.collect(&:status).all? { |stat| stat == ClassEnrollmentRequest::EFFECTED }
       self.status = ClassEnrollmentRequest::EFFECTED
       self.save
@@ -114,7 +116,5 @@ class EnrollmentRequest < ApplicationRecord
       end
     end
   end
-
- 
 
 end

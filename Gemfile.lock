@@ -123,6 +123,10 @@ GEM
     concurrent-ruby (1.1.9)
     cow_proxy (0.3.3)
     crass (1.0.6)
+    database_cleaner-active_record (2.0.1)
+      activerecord (>= 5.a)
+      database_cleaner-core (~> 2.0.0)
+    database_cleaner-core (2.0.1)
     debug_inspector (0.0.3)
     devise (4.7.1)
       bcrypt (~> 3.0)
@@ -379,6 +383,7 @@ DEPENDENCIES
   carrierwave-activerecord!
   clamsy!
   coffee-rails
+  database_cleaner-active_record
   devise (~> 4.7.1)
   devise_invitable (~> 2.0.0)
   exception_notification (= 2.6.1)

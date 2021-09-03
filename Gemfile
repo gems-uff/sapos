@@ -100,6 +100,10 @@ group :development, :test do
   gem 'letter_opener_web'
 end
 
+group :test do
+  gem 'database_cleaner-active_record'
+end
+
 group :production do
   gem 'mysql2'
   gem 'exception_notification', '2.6.1', :require => 'exception_notifier'

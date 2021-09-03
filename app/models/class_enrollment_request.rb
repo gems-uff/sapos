@@ -28,18 +28,18 @@ class ClassEnrollmentRequest < ApplicationRecord
   validate :validate_allocation_match
 
   after_save :update_main_request_status_on_save
-  after_create :update_main_request_status_on_create
   after_destroy :update_main_request_status_on_destroy
 
-  def self.pendency_condition
-    return ["id = -1"] if current_user.nil?
+  def self.pendency_condition(user=nil)
+    user ||= current_user
+    return ["id = -1"] if user.nil?
     cer = ClassEnrollmentRequest.arel_table.dup
     cer.table_alias = 'cer'
     check_status = cer.where(
       cer[:status].not_eq(ClassEnrollmentRequest::EFFECTED)
       .and(cer[:status].not_eq(ClassEnrollmentRequest::INVALID))
     )
-    if current_user.role_id == Role::ROLE_COORDENACAO || current_user.role_id == Role::ROLE_SECRETARIA
+    if user.role_id == Role::ROLE_COORDENACAO || user.role_id == Role::ROLE_SECRETARIA
       return [
         "id IN (#{check_status.project(cer[:id]).to_sql})",
       ]
@@ -48,17 +48,20 @@ class ClassEnrollmentRequest < ApplicationRecord
   end
 
   def allocations
-    self.course_class.allocations.collect do |allocation|
+    return "" unless course_class = self.course_class
+    course_class.allocations.collect do |allocation|
       "#{allocation.day} (#{allocation.start_time}-#{allocation.end_time})"
     end.join("; ")
   end
 
   def professor
-    self.course_class.professor.to_label if self.course_class.professor
+    return nil unless course_class = self.course_class
+    course_class.professor.to_label if course_class.professor
   end
 
   def parent_status
-    self.enrollment_request.status
+    return nil unless enrollment_request = self.enrollment_request
+    enrollment_request.status
   end
 
   def to_effected
@@ -123,19 +126,17 @@ class ClassEnrollmentRequest < ApplicationRecord
   end
 
   def update_main_request_status_on_save
+    return unless enrollment_request = self.enrollment_request
     if saved_change_to_attribute?(:status) && (self.status == EFFECTED || self.status_before_last_save == EFFECTED)
-      self.enrollment_request.refresh_status!
-    end
-  end
-
-  def update_main_request_status_on_create
-    if self.status != EFFECTED && self.enrollment_request.status == EFFECTED
-      self.enrollment_request.refresh_status!
+      enrollment_request.refresh_status!
+    elsif self.created_at == self.updated_at && enrollment_request.status == EFFECTED # new_record
+      enrollment_request.refresh_status!
     end
   end
 
   def update_main_request_status_on_destroy
-    if self.status != EFFECTED && self.enrollment_request.status != EFFECTED
+    return unless enrollment_request = self.enrollment_request
+    if (self.status != EFFECTED && enrollment_request.status != EFFECTED)
       self.enrollment_request.refresh_status!
     end
   end

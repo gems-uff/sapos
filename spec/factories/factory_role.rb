@@ -19,6 +19,20 @@ FactoryBot.define do
       initialize_with {Role.where(id: id).first_or_create(name: name, description: description)}
     end
 
+    factory :role_coordenacao do
+      id { Role::ROLE_COORDENACAO }
+      name { "Coordenacao" }
+      description { "Descricao Coordenacao" }
+      initialize_with {Role.where(id: id).first_or_create(name: name, description: description)}
+    end
+
+    factory :role_secretaria do
+      id { Role::ROLE_SECRETARIA }
+      name { "Secretaria" }
+      description { "Descricao Secretaria" }
+      initialize_with {Role.where(id: id).first_or_create(name: name, description: description)}
+    end
+
     factory :role_professor do
       id { Role::ROLE_PROFESSOR }
       name { "Professor" }
