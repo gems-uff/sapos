@@ -98,6 +98,7 @@ pt-BR:
         admission_date: "Data de Admissão"
         scholarship_durations_active: "Possui bolsa?"
         professor: "Professor"
+        advisor: "Orientador"
         statuses:
           requested: "Solicitada"
           valid: "Válida"

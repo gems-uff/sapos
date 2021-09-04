@@ -22,7 +22,7 @@ class EnrollmentRequest < ApplicationRecord
 
   def self.pendency_condition(user=nil)
     user ||= current_user
-    return ["id = -1"] if user.nil?
+    return ["0 = -1"] if user.nil?
     er = EnrollmentRequest.arel_table.dup
     cer = ClassEnrollmentRequest.arel_table
     er.table_alias = 'er'
@@ -32,16 +32,16 @@ class EnrollmentRequest < ApplicationRecord
       .where(cer[:status].eq(ClassEnrollmentRequest::REQUESTED))
     if user.role_id == Role::ROLE_COORDENACAO || user.role_id == Role::ROLE_SECRETARIA
       return [
-        "id IN (#{check_status.project(er[:id]).to_sql})",
+        EnrollmentRequest.arel_table[:id].in(check_status.project(er[:id])).to_sql
       ]
     end
     if user.role_id == Role::ROLE_PROFESSOR && ! user.professor.nil?
       check_status = check_status.where(er[:enrollment_id].in(user.professor.enrollments.map(&:id)))
       return [
-        "id IN (#{check_status.project(er[:id]).to_sql})",
+        EnrollmentRequest.arel_table[:id].in(check_status.project(er[:id])).to_sql
       ]
     end
-    ["id = -1"]
+    ["0 = -1"]
   end
 
   def last_student_read_time

@@ -32,7 +32,7 @@ class ClassEnrollmentRequest < ApplicationRecord
 
   def self.pendency_condition(user=nil)
     user ||= current_user
-    return ["id = -1"] if user.nil?
+    return ["0 = -1"] if user.nil?
     cer = ClassEnrollmentRequest.arel_table.dup
     cer.table_alias = 'cer'
     check_status = cer.where(
@@ -41,10 +41,10 @@ class ClassEnrollmentRequest < ApplicationRecord
     )
     if user.role_id == Role::ROLE_COORDENACAO || user.role_id == Role::ROLE_SECRETARIA
       return [
-        "id IN (#{check_status.project(cer[:id]).to_sql})",
+        ClassEnrollmentRequest.arel_table[:id].in(check_status.project(cer[:id])).to_sql
       ]
     end
-    ["id = -1"]
+    ["0 = -1"]
   end
 
   def allocations

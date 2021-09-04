@@ -39,7 +39,7 @@ class Ability
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [Role, CustomVariable, ReportConfiguration])
       can :read, :pendencies
-      can :update, [ClassEnrollmentRequest, EnrollmentRequestt, EnrollmentRequestComment]
+      can :update, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
       can :validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
       can :show_validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
       can :effect, ClassEnrollmentRequest

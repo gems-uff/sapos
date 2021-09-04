@@ -40,10 +40,13 @@ module ClassEnrollmentRequestsHelper
     select :search, :scholarship_durations_active, options_for_select([["Sim", 1], ["Não", 0]]), {:include_blank => as_(:_select_)}, input_name
   end
 
-  def professor_search_column(record, options)
+  def advisor_search_column(record, options)
     custom_record_select(Professor, record, options)
   end
 
+  def professor_search_column(record, options)
+    custom_record_select(Professor, record, options)
+  end
 
 
   protected

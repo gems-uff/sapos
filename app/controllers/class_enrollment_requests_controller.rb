@@ -29,9 +29,9 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.create.columns = columns
     config.update.columns = columns
 
-    config.columns.add :enrollment_number, :student, :enrollment_level, :enrollment_status, :admission_date, :scholarship_durations_active, :professor
+    config.columns.add :enrollment_number, :student, :enrollment_level, :enrollment_status, :admission_date, :scholarship_durations_active, :advisor 
     config.columns.add :year, :semester
-    config.columns.add :parent_status
+    config.columns.add :parent_status, :professor
 
     config.create.label = :create_class_enrollment_request_label
     config.update.label = :update_class_enrollment_request_label
@@ -50,8 +50,9 @@ class ClassEnrollmentRequestsController < ApplicationController
       :enrollment_status, 
       :admission_date, 
       :scholarship_durations_active, 
-      :professor,
+      :advisor,
       :course_class,
+      :professor
     ]
 
     config.columns[:year].includes = [:enrollment_request]
@@ -99,9 +100,9 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.columns[:scholarship_durations_active].search_ui = :select
 
 
-    config.columns[:professor].includes = { :enrollment_request => { :enrollment => :advisements } }
-    config.columns[:professor].search_sql = "advisements.professor_id"
-    config.columns[:professor].search_ui = :select
+    config.columns[:advisor].includes = { :enrollment_request => { :enrollment => :advisements } }
+    config.columns[:advisor].search_sql = "advisements.professor_id"
+    config.columns[:advisor].search_ui = :select
 
     config.columns[:course_class].search_ui = :record_select
 
@@ -109,6 +110,10 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.columns[:parent_status].search_sql = "enrollment_requests.status"
     config.columns[:parent_status].search_ui = :select
     config.columns[:parent_status].options = {:options => ClassEnrollmentRequest::STATUSES, default: ClassEnrollmentRequest::REQUESTED, :include_blank => I18n.t("active_scaffold._select_")}
+
+    config.columns[:professor].includes = [:course_class]
+    config.columns[:professor].search_sql = "course_classes.professor_id"
+    config.columns[:professor].search_ui = :select
 
 
     config.columns[:class_enrollment].allow_add_existing = false;
