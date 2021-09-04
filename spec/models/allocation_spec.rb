@@ -143,4 +143,56 @@ describe Allocation do
       end
     end
   end
+  describe "Methods" do
+    describe "intersects" do
+      it "should return start_time if the start time is between the other range" do
+        day = I18n.translate("date.day_names").first
+        other = FactoryBot.build(:allocation, day: day, start_time: 9, end_time: 11)
+        allocation.day = day
+        allocation.start_time = 10
+        allocation.end_time = 12
+        expect(allocation.intersects(other)).to eq(:start_time)
+      end
+      it "should return end_time if the start time is between the other range" do
+        day = I18n.translate("date.day_names").first
+        other = FactoryBot.build(:allocation, day: day, start_time: 9, end_time: 11)
+        allocation.day = day
+        allocation.start_time = 8
+        allocation.end_time = 10
+        expect(allocation.intersects(other)).to eq(:end_time)
+      end
+      it "should return nil if it does not intersect" do
+        day = I18n.translate("date.day_names").first
+        other = FactoryBot.build(:allocation, day: day, start_time: 9, end_time: 11)
+        allocation.day = day
+        allocation.start_time = 14
+        allocation.end_time = 16
+        expect(allocation.intersects(other)).to eq(nil)
+      end
+      it "should return nil if the start matchs the other end" do
+        day = I18n.translate("date.day_names").first
+        other = FactoryBot.build(:allocation, day: day, start_time: 9, end_time: 11)
+        allocation.day = day
+        allocation.start_time = 11
+        allocation.end_time = 13
+        expect(allocation.intersects(other)).to eq(nil)
+      end
+      it "should return nil if the end matchs the other start" do
+        day = I18n.translate("date.day_names").first
+        other = FactoryBot.build(:allocation, day: day, start_time: 9, end_time: 11)
+        allocation.day = day
+        allocation.start_time = 7
+        allocation.end_time = 9
+        expect(allocation.intersects(other)).to eq(nil)
+      end
+      it "should return start_time if both times match" do
+        day = I18n.translate("date.day_names").first
+        other = FactoryBot.build(:allocation, day: day, start_time: 9, end_time: 11)
+        allocation.day = day
+        allocation.start_time = 9
+        allocation.end_time = 11
+        expect(allocation.intersects(other)).to eq(:start_time)
+      end
+    end
+  end
 end

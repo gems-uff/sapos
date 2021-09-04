@@ -103,6 +103,8 @@ pt-BR:
           valid: "Válida"
           invalid: "Inválida"
           effected: "Efetivada"
+      class_enrollment_requests:
+        course_class: Turma
       class_schedule:
         year: "Ano"
         semester: "Semestre"

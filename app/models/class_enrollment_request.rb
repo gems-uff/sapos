@@ -97,11 +97,13 @@ class ClassEnrollmentRequest < ApplicationRecord
     return if enrollment_request.nil? || course_class.nil?
     enrollment = self.enrollment_request.enrollment
     return if enrollment.nil?
+    course = course_class.course
+
     enrollment.class_enrollments.reload
     this_class_enrollment = self.class_enrollment
     enrollment.class_enrollments.each do |class_enrollment|
-      if class_enrollment.course_class_id == self.course_class_id && class_enrollment != this_class_enrollment
-        if ! course_class.course.course_type.allow_multiple_classes && class_enrollment.situation != ClassEnrollment::DISAPPROVED 
+      if class_enrollment.course_class.course_id == course.id && class_enrollment != this_class_enrollment
+        if ! course.course_type.allow_multiple_classes && class_enrollment.situation != ClassEnrollment::DISAPPROVED 
           errors.add(:course_class, :previously_approved)
         end
       end

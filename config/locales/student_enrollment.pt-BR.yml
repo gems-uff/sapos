@@ -29,6 +29,9 @@ pt-BR:
         time: "[%{time}]"
         send: "Enviar mensagem (não será possível editar depois)"
       closed_enrollment: O período de inscrições no semestre %{semester} fechou. Esta página apenas exibe a situação.
+      class_errors:
+        one: Erro
+        other: "%{count} erros"
 
     alert:
       invalid_enrollment: Matrícula %{enrollment} inválida

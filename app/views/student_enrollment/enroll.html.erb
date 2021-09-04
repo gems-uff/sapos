@@ -53,7 +53,14 @@
       </thead>
       <tbody>
         <%= form.collection_check_boxes :course_class_ids, table[:data], :first, :first do |box| %>
-          <% cer = @enrollment_request.class_enrollment_requests.find_by(course_class_id: box.object[0]) %>
+          <% 
+            cer = nil 
+            @enrollment_request.class_enrollment_requests.each do |temp_cer|
+              if temp_cer.course_class_id == box.object[0]
+                cer = temp_cer
+              end
+            end 
+          %> 
           <tr <%= cer.nil? ? "" : "title=\"#{cer.status}\" class=\"enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.status] }\"".html_safe %>>
             <td>
               <%= box.label class: "check-label" do %>
@@ -65,6 +72,16 @@
               <td class="cell-<%= table[:header][0][index + 1].downcase %>">
                 <%= box.label do %>
                   <%= cell.empty? ? "&nbsp; ".html_safe  : cell %> 
+                  <% if ! cer.nil? && ! cer.errors.empty? && index == 0 %>
+                    <details>
+                      <summary><%= t('student_enrollment.enroll.class_errors', count: cer.errors.full_messages.count) %> </summary>
+                      <ul>
+                        <% cer.errors.full_messages.each do |message| %>
+                          <li> <%= message %> </li>
+                        <% end %>
+                      </ul>
+                    </details>
+                  <% end %>
                 <% end %>
               </td>
             <% end %>

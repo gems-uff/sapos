@@ -21,9 +21,9 @@ class Allocation < ApplicationRecord
 
   def intersects(other)
     return nil if self.day != other.day
-    if self.start_time.between?(other.start_time, other.end_time)
+    if other.start_time <= self.start_time && self.start_time < other.end_time
       return :start_time
-    elsif self.end_time.between?(other.start_time, other.end_time)
+    elsif other.start_time < self.end_time && self.end_time <= other.end_time
       return :end_time
     end
     return nil
