@@ -11,6 +11,8 @@ class EnrollmentRequestsController < ApplicationController
     config.list.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
     config.create.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
     config.update.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at, :class_enrollment_requests, :enrollment_request_comments]
+    config.show.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at, :class_enrollment_requests, :enrollment_request_comments]
+    
     config.create.label = :create_enrollment_request_label
     config.update.label = :update_enrollment_request_label
 

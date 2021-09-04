@@ -39,18 +39,16 @@ class Ability
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [Role, CustomVariable, ReportConfiguration])
       can :read, :pendencies
-      can :update, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
-      can :validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
-      can :show_validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
+      can :validate, EnrollmentRequest
+      can :show_validate, EnrollmentRequest
       can :effect, ClassEnrollmentRequest
       can :invite, User
       can :read, (Role)
     elsif role_id == Role::ROLE_PROFESSOR
-      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration, ClassSchedule])
+      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration])
       can :read, :pendencies
-      can :update, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
-      can :validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
-      can :show_validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
+      can :validate, EnrollmentRequest
+      can :show_validate, EnrollmentRequest
       if user.professor
         if CustomVariable.professor_login_can_post_grades == "yes_all_semesters"
           can :update, ClassEnrollment, course_class: { professor: user.professor }
@@ -62,9 +60,8 @@ class Ability
       end
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, ReportConfiguration])
-      can :update, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
-      can :validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
-      can :show_validate, [ClassEnrollmentRequest, EnrollmentRequest, EnrollmentRequestComment]
+      can :validate, EnrollmentRequest
+      can :show_validate, EnrollmentRequest
       can :effect, ClassEnrollmentRequest
       can :read, :pendencies
       can :read, (Query)

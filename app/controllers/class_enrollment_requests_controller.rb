@@ -26,6 +26,7 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.list.sorting = {:enrollment_request => 'ASC'}
     columns = [:enrollment_request, :course_class, :status, :class_enrollment]
     config.list.columns = [:enrollment_request, :course_class, :status, :parent_status, :class_enrollment, :allocations, :professor]
+    config.show.columns = [:enrollment_request, :course_class, :status, :parent_status, :class_enrollment, :allocations, :professor]
     config.create.columns = columns
     config.update.columns = columns
 
