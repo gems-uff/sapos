@@ -15,6 +15,6 @@
     <%= t 'class_enrollment_request.effect.count', count: @count %>
   </div>
   <%= submit_tag as_(effect_text), :class => "submit" %>
-  <%= link_to as_(:cancel), main_path_to_return, :class => 'as_cancel' %>
+  <%= link_to as_(:cancel), main_path_to_return, :class => 'as_cancel', :remote => true, :data => {:refresh => true} %>
   <%= loading_indicator_tag(:action => :effect) %>
 <% end %>
