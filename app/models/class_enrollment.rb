@@ -24,28 +24,29 @@ class ClassEnrollment < ApplicationRecord
   validate :professor_changed_only_valid_fields, if: -> {current_user && (current_user.role_id == Role::ROLE_PROFESSOR)}
 
   after_save :notify_student_and_advisor
-  after_destroy :set_request_status
+  after_save :class_enrollment_request_cascade
+  after_destroy :set_request_status_after_destroy
 
   default_scope {joins(:enrollment => :student).order('students.name').readonly(false)}
 
   def check_multiple_class_enrollment_allowed
     return if not self.course_class
-      other_class_enrollments = ClassEnrollment.
-          joins(:course_class => {:course => :course_type}).
-          includes(:course_class => {:course => :course_type}).
-          where(CourseType.arel_table[:allow_multiple_classes].eq(false)).
-          where(:enrollment_id => self.enrollment_id).
-          where(ClassEnrollment.arel_table[:situation].not_eq(DISAPPROVED)).
-          where(Course.arel_table[:id].eq( self.course_class.course_id)).
-          where.not(:id => self.id).
-	  where.not((self.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved"))? "1" : "0").
-          group(:enrollment_id).
-          having("count(course_id) > 0")
+    other_class_enrollments = ClassEnrollment.
+        joins(:course_class => {:course => :course_type}).
+        includes(:course_class => {:course => :course_type}).
+        where(CourseType.arel_table[:allow_multiple_classes].eq(false)).
+        where(:enrollment_id => self.enrollment_id).
+        where(ClassEnrollment.arel_table[:situation].not_eq(DISAPPROVED)).
+        where(Course.arel_table[:id].eq( self.course_class.course_id)).
+        where.not(:id => self.id).
+        where.not((self.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved"))? "1" : "0").
+        group(:enrollment_id).
+        having("count(course_id) > 0")
 
-      unless other_class_enrollments.empty?
-        self.errors.add(:course_class, :multiple_class_enrollments_not_allowed)
-      end
+    unless other_class_enrollments.empty?
+      self.errors.add(:course_class, :multiple_class_enrollments_not_allowed)
     end
+  end
 
   def to_label
     "#{self.enrollment.student.name} - #{self.course_class.name_with_class}"
@@ -154,12 +155,30 @@ class ClassEnrollment < ApplicationRecord
     end
   end
 
-  def set_request_status
+  def set_request_status_after_destroy
     request = self.class_enrollment_request
     unless request.nil?
       request.class_enrollment = nil
       request.status = ClassEnrollmentRequest::VALID
       request.save
+    end
+  end
+
+  def class_enrollment_request_cascade
+    if saved_change_to_attribute?(:course_class_id)
+      request = self.class_enrollment_request
+      unless request.nil?
+        request.course_class = self.course_class
+        request.save
+      end
+    end
+    if saved_change_to_attribute?(:enrollment_id)
+      request = self.class_enrollment_request
+      if ! request.nil? && request.enrollment_request.enrollment != self.enrollment
+        request.class_enrollment = nil
+        request.status = ClassEnrollmentRequest::REQUESTED
+        request.save
+      end
     end
   end
 

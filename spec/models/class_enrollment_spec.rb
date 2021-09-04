@@ -222,6 +222,66 @@ describe ClassEnrollment do
         end
       end
     end
+
+    describe "set_request_status_after_destroy" do
+      it "should set the class enrollment request status to valid after destroy" do
+        course_class = FactoryBot.create(:course_class)
+        enrollment = FactoryBot.create(:enrollment)
+        class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
+        enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)
+        cer = enrollment_request.class_enrollment_requests.build(
+          course_class: course_class,
+          status: ClassEnrollmentRequest::EFFECTED,
+          class_enrollment: class_enrollment
+        )
+        enrollment_request.save
+
+        class_enrollment.destroy!
+        cer.reload
+        expect(cer.status).to eq(ClassEnrollmentRequest::VALID)
+      end
+    end
+
+    describe "class_enrollment_request_cascade" do
+      it "should update course class of class enrollment request when course class of class enrollment changes" do
+        course_class = FactoryBot.create(:course_class)
+        enrollment = FactoryBot.create(:enrollment)
+        class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
+        enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)
+        cer = enrollment_request.class_enrollment_requests.build(
+          course_class: course_class,
+          status: ClassEnrollmentRequest::EFFECTED,
+          class_enrollment: class_enrollment
+        )
+        enrollment_request.save
+        course_class2 = FactoryBot.create(:course_class)
+
+        class_enrollment.course_class = course_class2
+        class_enrollment.save
+        cer.reload
+        expect(cer.course_class).to eq(course_class2)
+      end
+
+      it "should disassociate class enrollment from request when enrollment changes" do
+        course_class = FactoryBot.create(:course_class)
+        enrollment = FactoryBot.create(:enrollment)
+        class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
+        enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)
+        cer = enrollment_request.class_enrollment_requests.build(
+          course_class: course_class,
+          status: ClassEnrollmentRequest::EFFECTED,
+          class_enrollment: class_enrollment
+        )
+        enrollment_request.save
+        enrollment = FactoryBot.create(:enrollment)
+
+        class_enrollment.enrollment = enrollment
+        class_enrollment.save
+        cer.reload
+        expect(cer.class_enrollment).to eq(nil)
+        expect(cer.status).to eq(ClassEnrollmentRequest::REQUESTED)
+      end
+    end
   end
 end
 
