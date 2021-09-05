@@ -16,8 +16,8 @@ module ApplicationHelper
     'style="display:none;"'.html_safe unless user_signed_in?
   end
 
-  def transparent_if_logged_out
-    'style="background: transparent;border: 0;"'.html_safe unless user_signed_in?
+  def signed_in_class
+    user_signed_in? ? 'signed-in' : 'signed-out'
   end
 
   def rescue_blank_text(texts = nil, options = {})

@@ -12,6 +12,7 @@ table.enroll-table  {
   border: none;
   border-collapse:collapse;
   border-spacing: none;
+  width: 100%;
 }
 
 .enroll-table th {
@@ -37,7 +38,6 @@ table.enroll-table  {
 .enroll-table td, .enroll-table th {
   text-align: center;
   font-family: Verdana, sans-serif;
-  font-size: 11px;
   border: none;
   
 }
@@ -107,7 +107,7 @@ table.enroll-table  {
 
 .enroll-messages .enroll-message {
   margin: 5px 0;
-  font: normal 11px verdana, sans-serif;
+  font: normal verdana, sans-serif;
   color: #555;
   background-color: white;
   border: 1px solid #eee;

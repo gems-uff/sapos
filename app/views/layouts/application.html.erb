@@ -22,41 +22,25 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-
-<span class="notice"><%= notice %></span>
-
-<div id='main_content'>
-  <div class='menu'>
-    <div class='header'>
-      <div class='logo'>
+  <div id='container' class='<%= signed_in_class %>'>
+    <span class="notice"><%= notice %></span>
+    <div id='header'>
+      <div id='logo'>
         <%= link_to root_path do %>
           <%= image_tag 'logoSapos.png' %>
         <% end %>
       </div>
-      <div class="sub">
-        <span id="saposgif">
-          Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %>
-        </span>
+      <div id="sub">
+        Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %>
       </div>
     </div>
-
-    <div class='menu_content' <%= transparent_if_logged_out %>>
-      <div class='clear_float'></div>
-      <div class='content_wrapper'>
-        <div class='content'>
-          <div id='top_navigation' <%= display_none_if_logged_out %>><%= optional_navigation :level => 1 %></div>
-          <div class='inner-content'>
-            <div id='sub_navigation' <%= display_none_if_logged_out %>><%= optional_navigation :level => 2 %></div>
-            <div class='main'>
-              <%= yield %>
-            </div>
-          </div>
-        </div>
-        <div class='clear_float'></div>
+    <div id='top_navigation' <%= display_none_if_logged_out %>><%= optional_navigation :level => 1 %></div>
+    <div id='main'>
+      <div id='sub_navigation' <%= display_none_if_logged_out %>><%= optional_navigation :level => 2 %></div>
+      <div id='content'>
+        <%= yield %>
       </div>
     </div>
   </div>
-</div>
-
 </body>
 </html>
