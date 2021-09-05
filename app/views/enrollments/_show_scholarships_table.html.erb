@@ -1,0 +1,37 @@
+<table class="showtable listed-records-table">
+  <thead>
+    <tr>
+      <th><%= I18n.t('activerecord.attributes.scholarship.scholarship_number') %></th>
+      <% if show_sponsor %>
+        <th><%= I18n.t('activerecord.attributes.scholarship.sponsor') %></th>
+      <% end %>
+      <th><%= I18n.t('activerecord.attributes.scholarship_duration.start_date') %></th>
+      <th><%= I18n.t('activerecord.attributes.scholarship_duration.end_date') %></th>
+      <th><%= I18n.t('activerecord.attributes.scholarship_duration.cancel_date') %></th>
+      <% if show_obs %>
+        <th><%= I18n.t('activerecord.attributes.scholarship_duration.obs') %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody class="records">
+    <% count = 0 %>
+    <% scholarship_durations.each do |sd| %>
+      <% count += 1 %>
+      <% tr_class = count.even? ? "even-record" : "" %>
+      <% end_date = sd.end_date.nil? ? "-" : I18n.localize(sd.end_date, :format => :monthyear2) %>
+      <% cancel_date = sd.cancel_date.nil? ? "-" : I18n.localize(sd.cancel_date, :format => :monthyear2) %>
+      <tr class="record <%= tr_class %>">
+        <td title='<%= sd.scholarship.sponsor.name %>'><%= sd.scholarship.scholarship_number %></td>
+        <% if show_sponsor %>
+          <td> <%= sd.scholarship.sponsor.name %> </td>
+        <% end %>
+        <td><%= I18n.localize(sd.start_date, :format => :monthyear2) %></td>
+        <td><%= end_date %></td>
+        <td><%= cancel_date %></td>
+        <% if show_obs %>
+          <td><%= sd.obs %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -1,0 +1,34 @@
+<table class="showtable listed-records-table">
+  <thead>
+    <tr>
+      <th><%= I18n.t('activerecord.models.course.one') %></th>
+      <th><%= I18n.t('activerecord.attributes.class_enrollment.situation') %></th>
+      <th><%= I18n.t('activerecord.attributes.class_enrollment.grade') %></th>
+      <th><%= I18n.t('activerecord.attributes.class_enrollment.disapproved_by_absence') %></th>
+      <% if show_obs %>
+        <th><%= I18n.t('activerecord.attributes.class_enrollment.obs') %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody class="records">
+    <% count = 0 %>
+    <% class_enrollments.each do |class_enrollment| %>
+      <% count += 1 %>
+      <% tr_class = count.even? ? "even-record" : "" %>
+      <% grade = (class_enrollment.grade / 10.0) rescue 0 %>
+      <tr class="record <%= tr_class %>">
+        <td><%= class_enrollment.course_class.course.name %></td>
+        <td><%= class_enrollment.situation %></td>
+        <td><%= grade %></td>
+        <% if class_enrollment.attendance_to_label == "I" %>
+          <td>Sim</td>
+        <% else %>
+          <td>Não</td>
+        <% end %>
+        <% if show_obs %>
+          <td><%= class_enrollment.obs %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

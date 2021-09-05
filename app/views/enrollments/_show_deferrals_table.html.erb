@@ -1,0 +1,25 @@
+<table class="showtable listed-records-table">
+  <thead>
+    <tr>
+      <th><%= I18n.t('activerecord.attributes.deferral.approval_date') %></th>
+      <th><%= I18n.t('activerecord.attributes.deferral.deferral_type') %></th>
+      <% if show_obs %>
+        <th><%= I18n.t('activerecord.attributes.deferral.obs') %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody class="records">
+    <% count = 0 %>
+    <% deferrals.each do |deferral| %>
+      <% count += 1 %>
+      <% tr_class = count.even? ? "even-record" : "" %>
+      <tr class="record <%= tr_class %>">
+        <td><%= I18n.localize(deferral.approval_date, :format => :monthyear2) %></td>
+        <td><%= deferral.deferral_type.name %></td>
+        <% if show_obs %>
+          <td><%= deferral.obs %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

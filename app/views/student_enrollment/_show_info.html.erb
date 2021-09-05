@@ -1,0 +1,13 @@
+<div class="info-show-box">
+  <div class="name-admission-container">
+    <div class="student-name"> <%= enrollment.student.name %> </div>
+    <div class="enrollment-admission" title="<%= t 'activerecord.attributes.enrollment.admission_date' %>"> <%= l enrollment.admission_date, format: :monthyear %> </div>
+  </div>
+  <ul class="other-info">
+    <% if ! enrollment.research_area.nil? %>
+      <li> <span class="attr"><%= t 'activerecord.attributes.enrollment.research_area' %>:</span>
+           <span class="value"><%= enrollment.research_area.name %></span> </li>
+    <% end %>
+  </ul>
+
+</div>

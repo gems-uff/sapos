@@ -9,6 +9,9 @@ class StudentEnrollmentController < ApplicationController
   def show
     return unless _valid_enrollment.nil?
     @partials = []
+
+    @partials << ['student_enrollment/show_info', { enrollment: @enrollment }]
+
     if @enrollment.dismissal.nil?
       now = Time.now
       open_semester = ClassSchedule.find_by(
@@ -21,9 +24,42 @@ class StudentEnrollmentController < ApplicationController
           year: open_semester.year,
           semester: open_semester.semester
         )
-        @partials << ['student_enrollment/show_enroll', {semester: open_semester, enrollment_request: enrollment_request}]
+        @partials << ['student_enrollment/show_enroll', { semester: open_semester, enrollment_request: enrollment_request }]
       end
+    else
+      @partials << ['student_enrollment/show_dismissal', { 
+        enrollment: @enrollment,
+        dismissal: @enrollment.dismissal,
+        thesis_defense_committee_professors: @enrollment.thesis_defense_committee_professors
+      }]
+
     end
+
+    unless @enrollment.class_enrollments.empty?
+      @partials << ['student_enrollment/show_class_enrollments', { class_enrollments: @enrollment.class_enrollments }]
+    end
+
+
+    unless @enrollment.advisements.empty?
+      @partials << ['student_enrollment/show_advisements', { advisements: @enrollment.advisements }]
+    end
+
+    unless @enrollment.phase_completions.empty?
+      @partials << ['student_enrollment/show_phases', { phase_completions: @enrollment.phase_completions }]
+    end
+
+    unless @enrollment.deferrals.empty?
+      @partials << ['student_enrollment/show_deferrals', { deferrals: @enrollment.deferrals }]
+    end
+
+    unless @enrollment.enrollment_holds.empty?
+      @partials << ['student_enrollment/show_holds', { holds: @enrollment.enrollment_holds }]
+    end
+
+    unless @enrollment.scholarship_durations.empty?
+      @partials << ['student_enrollment/show_scholarships', { scholarship_durations: @enrollment.scholarship_durations }]
+    end
+
     render :show
   end
 

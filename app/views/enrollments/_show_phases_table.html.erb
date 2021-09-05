@@ -1,0 +1,29 @@
+<table class="showtable listed-records-table">
+  <thead>
+    <tr>
+      <th><%= t 'activerecord.models.phase.one' %></th>
+      <th><%= t 'activerecord.attributes.phase_completion.due_date' %></th>
+      <th><%= t 'activerecord.attributes.phase_completion.completion_date' %></th>
+      <% if show_obs %>
+        <th><%= t 'activerecord.attributes.accomplishment.obs' %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody class="records">
+    <% count = 0 %>
+    <% phase_completions.each do |phase_completion| %>
+      <% count += 1 %>
+      <% tr_class = count.even? ? "even-record" : "" %>
+      <% completion_date = phase_completion.completion_date.nil? ? '-' : I18n.l(phase_completion.completion_date, :format => dateformat) %>
+      <% accomplishment = phase_completion.phase_accomplishment %>
+      <tr class="record <%= tr_class %>">
+        <td><%= phase_completion.phase.name %></td>
+        <td><%= I18n.l(phase_completion.due_date, :format => dateformat) %></td>
+        <td><%= completion_date %></td>
+        <% if show_obs %>
+          <td><%= accomplishment.nil? ? '-' : accomplishment.obs %></td>
+        <% end %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

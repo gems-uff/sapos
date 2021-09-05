@@ -1,0 +1,9 @@
+<div class="holds-show-box show-box">
+  <details open>
+    <summary><%= t 'activerecord.models.enrollment_hold.other' %></summary>
+    <%= render :partial => 'enrollments/show_holds_table', :locals => { 
+        holds: holds
+        } 
+    %>
+  </details>
+</div>

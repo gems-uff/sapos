@@ -180,261 +180,60 @@ module EnrollmentsHelper
 
   def enrollment_advisements_show_column(record, column)
     return "-" if record.advisements.empty? 
-    
-    body = ""
-    count = 0
-
-    body += "<table class=\"showtable listed-records-table\">"
-    
-    body += "<thead>
-              <tr>
-                <th>#{I18n.t('activerecord.attributes.advisement.professor')}</th>
-                <th>#{I18n.t('activerecord.attributes.advisement.professor_enrollment_number')}</th>
-              </tr>
-            </thead>"
-            
-    body += "<tbody class=\"records\">"
-
-    record.advisements.each do |advisement|
-      count += 1
-      tr_class = count.even? ? "even-record" : ""
-
-      if advisement.main_advisor
-        body += "<tr class=\"record #{tr_class}\">
-                  <td title='#{I18n.t('activerecord.attributes.advisement.main_advisor')}'><strong>#{advisement.professor.name}*</strong></td>
-                  <td><strong>#{advisement.professor.enrollment_number}</strong></td>
-                </tr>"
-      else
-        body += "<tr class=\"record #{tr_class}\">
-                  <td>#{advisement.professor.name}</td>
-                  <td>#{advisement.professor.enrollment_number}</td>
-                </tr>"
-      end
-    end
-
-    body += "</tbody>"
-    body += "</table>"
-    body.html_safe
-  end
-
-  def enrollment_accomplishments_show_column(record, column)
-    return "-" if record.accomplishments.empty?
-
-    body = ""
-    count = 0
-
-    body += "<table class=\"showtable listed-records-table\">"
-    
-    body += "<thead>
-              <tr>
-                <th>#{I18n.t('activerecord.attributes.accomplishment.phase')}</th>
-                <th>#{I18n.t('activerecord.attributes.accomplishment.conclusion_date')}</th>
-                <th>#{I18n.t('activerecord.attributes.accomplishment.obs')}</th>
-              </tr>
-            </thead>"
-            
-    body += "<tbody class=\"records\">"
-
-    record.accomplishments.each do |accomplishment|
-      count += 1
-      tr_class = count.even? ? "even-record" : ""
-
-      body += "<tr class=\"record #{tr_class}\">
-                <td>#{accomplishment.phase.name}</td>
-		<td>#{accomplishment.conclusion_date.nil? ? I18n.t('activerecord.attributes.enrollment.accomplishment_conclusion_date_not_given') : I18n.localize(accomplishment.conclusion_date, :format => :monthyear2)}</td>
-                <td>#{accomplishment.obs}</td>
-              </tr>"
-    end
-
-    body += "</tbody>"
-    body += "</table>"
-    body.html_safe
+    return render(:partial => "enrollments/show_advisements_table", :locals => { 
+      advisements: record.advisements,
+      show_enrollment_number: true
+    })
   end
 
   def enrollment_deferrals_show_column(record, column)
     return "-" if record.deferrals.empty?
-    
-    body = ""
-    count = 0
-
-    body += "<table class=\"showtable listed-records-table\">"
-    
-    body += "<thead>
-              <tr>
-                <th>#{I18n.t('activerecord.attributes.deferral.approval_date')}</th>
-                <th>#{I18n.t('activerecord.attributes.deferral.deferral_type')}</th>
-                <th>#{I18n.t('activerecord.attributes.deferral.obs')}</th>
-              </tr>
-            </thead>"
-    
-    body += "<tbody class=\"records\">"
-
-    record.deferrals.each do |deferral|
-      count += 1
-      tr_class = count.even? ? "even-record" : ""
-
-      body += "<tr class=\"record #{tr_class}\">
-                <td>#{I18n.localize(deferral.approval_date, :format => :monthyear2)}</td>
-                <td>#{deferral.deferral_type.name}</td>
-                <td>#{deferral.obs}</td>
-              </tr>"
-    end
-
-    body += "</tbody>"
-    body += "</table>"
-    body.html_safe
+    return render(:partial => "enrollments/show_deferrals_table", :locals => { 
+      deferrals: record.deferrals,
+      show_obs: true
+    })
   end
 
   def enrollment_scholarship_durations_show_column(record, column)
     return "-" if record.scholarships.empty?
-    
-    body = ""
-    count = 0
-
-    body += "<table class=\"showtable listed-records-table\">"
-    
-    body += "<thead>
-              <tr>
-                <th>#{I18n.t('activerecord.attributes.scholarship.scholarship_number')}</th>
-                <th>#{I18n.t('activerecord.attributes.scholarship_duration.start_date')}</th>
-                <th>#{I18n.t('activerecord.attributes.scholarship_duration.end_date')}</th>
-                <th>#{I18n.t('activerecord.attributes.scholarship_duration.cancel_date')}</th>
-                <th>#{I18n.t('activerecord.attributes.scholarship_duration.obs')}</th>
-              </tr>
-            </thead>"
-
-    body += "<tbody class=\"records\">"
-    nilvalue = '-'
-    record.scholarship_durations.each do |sd|
-      count += 1
-      tr_class = count.even? ? "even-record" : ""
-      end_date = sd.end_date.nil? ? nilvalue : I18n.localize(sd.end_date, :format => :monthyear2)
-      cancel_date = sd.cancel_date.nil? ? nilvalue : I18n.localize(sd.cancel_date, :format => :monthyear2)
-      
-      body += "<tr class=\"record #{tr_class}\">
-                <td title='#{sd.scholarship.sponsor.name}'>#{sd.scholarship.scholarship_number}</td>
-                <td>#{I18n.localize(sd.start_date, :format => :monthyear2)}</td>
-                <td>#{end_date}</td>
-                <td>#{cancel_date}</td>
-                <td>#{sd.obs}</td>
-              </tr>"
-    end
-
-    body += "</tbody>"
-    body += "</table>"
-    body.html_safe
+    return render(:partial => "enrollments/show_scholarships_table", :locals => { 
+      scholarship_durations: record.scholarship_durations,
+      show_sponsor: false,
+      show_obs: true
+    })
   end
+
+  def enrollment_enrollment_holds_show_column(record, column)
+    return "-" if record.class_enrollments.empty?
+    return render(:partial => "enrollments/show_holds_table", :locals => { 
+      holds: record.enrollment_holds,
+    })
+  end
+
 
   def enrollment_class_enrollments_show_column(record, column)
     return "-" if record.class_enrollments.empty?
-    
-    body = ""
-    count = 0
-
-    body += "<table class=\"showtable listed-records-table\">"
-    
-    body += "<thead>
-              <tr>
-                <th>#{I18n.t('activerecord.models.course.one')}</th>
-                <th>#{I18n.t('activerecord.attributes.class_enrollment.situation')}</th>
-                <th>#{I18n.t('activerecord.attributes.class_enrollment.grade')}</th>
-                <th>#{I18n.t('activerecord.attributes.class_enrollment.disapproved_by_absence')}</th>
-                <th>#{I18n.t('activerecord.attributes.class_enrollment.obs')}</th>
-              </tr>
-            </thead>"
-            
-    body += "<tbody class=\"records\">"
-
-    record.class_enrollments.each do |class_enrollment|
-      count += 1
-      tr_class = count.even? ? "even-record" : ""
-
-      grade = (class_enrollment.grade / 10.0) rescue 0
-      body += "<tr class=\"record #{tr_class}\">
-                <td>#{class_enrollment.course_class.course.name}</td>
-                <td>#{class_enrollment.situation}</td>
-                <td>#{grade}</td>"
-
-      if class_enrollment.attendance_to_label == "I"                                                                                       
-        body += "<td>Sim</td>"
-      else
-        body += "<td>Não</td>"
-      end
-
-      body += "<td>#{class_enrollment.obs}</td>
-             </tr>"
-    end
-
-    body += "</tbody>"
-    body += "</table>"
-    body.html_safe
+    return render(:partial => "enrollments/show_class_enrollments_table", :locals => { 
+      class_enrollments: record.class_enrollments,
+      show_obs: true
+    })
   end
 
   def enrollment_thesis_defense_committee_participations_show_column(record, column)
     return "-" if record.thesis_defense_committee_participations.empty?
-    
-    body = ""
-    count = 0
-
-    body += "<table class=\"showtable listed-records-table\">"
-    
-    body += "<thead>
-              <tr>
-                <th>#{I18n.t('activerecord.attributes.professor.name')}</th>
-                <th>#{I18n.t('activerecord.attributes.professor.institution')}</th>
-              </tr>
-            </thead>"
-
-    body += "<tbody class=\"records\">"
-            
-    record.thesis_defense_committee_professors.each do |professor|
-      count += 1
-      tr_class = count.even? ? "even-record" : ""
-
-      body += "<tr class=\"record #{tr_class}\">
-                <td>#{professor.name}</td>
-                <td>#{rescue_blank_text(professor.institution, :method_call => :name)}</td>
-              </tr>"
-    end
-
-    body += "</tbody>"
-    body += "</table>"
-    body.html_safe
+    return render(:partial => "enrollments/show_defense_committee_table", :locals => { 
+      thesis_defense_committee_professors: record.thesis_defense_committee_professors,
+    })
   end
 
 
   def enrollment_phase_due_dates_show_column(record, column)
     return "-" if record.phase_completions.empty?
-
-    body = ""
-    count = 0
-
-    body += "<table class=\"showtable listed-records-table\">"
-    
-    body += "<thead>
-              <tr>
-                <th>#{I18n.t('activerecord.models.phase.one')}</th>
-                <th>#{I18n.t('activerecord.attributes.phase_completion.due_date')}</th>
-                <th>#{I18n.t('activerecord.attributes.phase_completion.completion_date')}</th>
-              </tr>
-            </thead>"
-            
-    body += "<tbody class=\"records\">"
-
-    record.phase_completions.each do |phase_completion|
-      count += 1
-      tr_class = count.even? ? "even-record" : ""
-      completion_date = phase_completion.completion_date.nil? ? '-' : I18n.localize(phase_completion.completion_date, :format => :defaultdate)
-      body += "<tr class=\"record #{tr_class}\">
-                <td>#{phase_completion.phase.name}</td>
-                <td>#{I18n.localize(phase_completion.due_date, :format => :defaultdate)}</td>
-                <td>#{completion_date}</td>
-              </tr>"
-    end
-
-    body += "</tbody>"
-    body += "</table>"
-    body.html_safe
+    render(:partial => "enrollments/show_phases_table", :locals => { 
+      phase_completions: record.phase_completions,
+      dateformat: :defaultdate,
+      show_obs: true
+    })
   end
 
   def readonly_dl_input(label, map, variable)

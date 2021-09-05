@@ -1,0 +1,10 @@
+<div class="class-enrollments-show-box show-box">
+  <details open>
+    <summary> <%= t 'activerecord.models.course.other' %> </summary>
+    <%= render :partial => 'enrollments/show_class_enrollments_table', :locals => { 
+        class_enrollments: class_enrollments,
+        show_obs: false,
+        } 
+    %>
+  </details>
+</div>

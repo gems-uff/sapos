@@ -1,0 +1,40 @@
+<div class="dismissal-show-box show-box">
+  <details open>
+    <summary> <%= t 'activerecord.models.dismissal.one' %> </summary>
+    <ul>
+      <li>
+        <span class="attr"><%= t 'activerecord.attributes.dismissal.date' %></span>
+        <span class="value"><%= I18n.l(dismissal.date, format: :monthyear) %>
+      </li>
+      <li>
+        <span class="attr"><%= t 'activerecord.attributes.dismissal.dismissal_reason' %></span>
+        <span class="value"><%= dismissal.dismissal_reason.name %>
+      </li>
+      <% if enrollment.thesis_title.present? %>
+        <li>
+          <span class="attr"><%= t 'activerecord.attributes.enrollment.thesis_title' %></span>
+          <span class="value"><%= enrollment.thesis_title %>
+        </li>
+      <% end %>
+      <% if enrollment.thesis_defense_date.present? %>
+        <li>
+          <span class="attr"><%= t 'activerecord.attributes.enrollment.thesis_defense_date' %></span>
+          <span class="value"><%= enrollment.thesis_defense_date %>
+        </li>
+      <% end %>
+      <% if enrollment.thesis_defense_date.present? %>
+        <li>
+          <span class="attr"><%= t 'activerecord.attributes.dismissal_reason.thesis_judgement' %></span>
+          <span class="value"><%= rescue_blank_text(enrollment.dismissal.dismissal_reason, :method_call => :thesis_judgement) %>
+        </li>
+      <% end %>
+      
+    </ul>
+    <% unless thesis_defense_committee_professors.empty? %>
+      <h4><%= t 'activerecord.attributes.enrollment.thesis_defense_committee_professors' %></h4>
+      <%= render :partial => 'enrollments/show_defense_committee_table', :locals => { 
+        thesis_defense_committee_professors: thesis_defense_committee_professors
+      } %> 
+    <% end %>
+  </details>
+</div>

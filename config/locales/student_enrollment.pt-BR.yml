@@ -5,7 +5,7 @@
 pt-BR:
   student_enrollment:
     show:
-      title: Matrícula %{number} %{status}
+      title: Matrícula de %{level} %{number} %{status}
       welcome: Bem-vindo ao Sapos. Você ainda não tem acesso a nada nesta matrícula, mas em breve várias funcionalidades interessantes aparecerão aqui para você!
 
     show_enroll:

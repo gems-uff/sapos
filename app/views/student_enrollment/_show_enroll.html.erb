@@ -1,4 +1,4 @@
-<div class="enrollment-show-box">
+<div class="enrollment-show-box show-box">
   <h3> <%= t 'student_enrollment.show_enroll.title', semester:  semester.to_label %> </h3>
   <% linkpath = student_enroll_path(id: @enrollment.enrollment_number, year: semester.year, semester: semester.semester) %>
   <% if enrollment_request.persisted? %>

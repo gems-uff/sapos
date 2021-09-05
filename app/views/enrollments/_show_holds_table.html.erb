@@ -1,0 +1,19 @@
+<table class="showtable listed-records-table">
+  <thead>
+    <tr>
+      <th><%= I18n.t('activerecord.attributes.enrollment_hold.semester') %></th>
+      <th><%= I18n.t('activerecord.attributes.enrollment_hold.number_of_semesters') %></th>
+    </tr>
+  </thead>
+  <tbody class="records">
+    <% count = 0 %>
+    <% holds.each do |hold| %>
+      <% count += 1 %>
+      <% tr_class = count.even? ? "even-record" : "" %>
+      <tr class="record <%= tr_class %>">
+        <td><%= hold.date_label %></td>
+        <td><%= hold.number_label %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

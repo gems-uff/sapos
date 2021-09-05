@@ -1,0 +1,6 @@
+<div class="deferrals-show-box show-box">
+  <details open>
+    <summary> <%= t 'activerecord.models.deferral.other' %> </summary>
+    <%= render :partial => 'enrollments/show_deferrals_table', :locals => { deferrals: deferrals, show_obs: false } %>
+  </details>
+</div>

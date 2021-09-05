@@ -43,9 +43,14 @@ class PhaseCompletion < ApplicationRecord
   end
 
   def calculate_completion_date
-    phase_accomplishment = enrollment.accomplishments.where(:phase_id => phase.id)[0]
+    phase_accomplishment = self.phase_accomplishment
     self.completion_date = nil
     self.completion_date = phase_accomplishment.conclusion_date unless phase_accomplishment.nil?
   end
+
+  def phase_accomplishment
+    self.enrollment.accomplishments.where(:phase_id => phase.id)[0]
+  end
+  
 
 end

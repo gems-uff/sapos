@@ -125,7 +125,7 @@ class EnrollmentsController < ApplicationController
 
     config.create.columns = columns - [:accomplishments, :deferrals, :phase_due_dates]
     config.update.columns = columns - [:phase_due_dates]
-    config.show.columns = columns
+    config.show.columns =  columns - [:accomplishments]
 
     config.actions.exclude :deleted_records
   end
