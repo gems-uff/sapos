@@ -1212,7 +1212,8 @@ small._default_value {
 }
 
 #main_content .menu {
-  width: 1075px;
+  width: auto;
+  max-width: 1075px;
 }
 
 .active-scaffold li.form-element dt {
