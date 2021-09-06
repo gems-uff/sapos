@@ -13,8 +13,8 @@
 ActiveRecord::Schema.define(version: 2021_08_30_212746) do
 
   create_table "accomplishments", force: :cascade do |t|
-    t.integer "enrollment_id", limit: 8
-    t.integer "phase_id", limit: 8
+    t.integer "enrollment_id"
+    t.integer "phase_id"
     t.date "conclusion_date"
     t.string "obs", limit: 255
     t.datetime "created_at", null: false
@@ -24,8 +24,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
   end
 
   create_table "advisement_authorizations", force: :cascade do |t|
-    t.integer "professor_id", limit: 8
-    t.integer "level_id", limit: 8
+    t.integer "professor_id"
+    t.integer "level_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["level_id"], name: "index_advisement_authorizations_on_level_id"
@@ -33,8 +33,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
   end
 
   create_table "advisements", force: :cascade do |t|
-    t.integer "professor_id", limit: 8, null: false
-    t.integer "enrollment_id", limit: 8, null: false
+    t.integer "professor_id", null: false
+    t.integer "enrollment_id", null: false
     t.boolean "main_advisor", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -47,7 +47,7 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
     t.string "room", limit: 255
     t.integer "start_time"
     t.integer "end_time"
-    t.integer "course_class_id", limit: 8
+    t.integer "course_class_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["course_class_id"], name: "index_allocations_on_course_class_id"
@@ -63,7 +63,7 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
 
   create_table "cities", force: :cascade do |t|
     t.string "name", limit: 255
-    t.integer "state_id", limit: 8
+    t.integer "state_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["state_id"], name: "index_cities_on_state_id"
@@ -73,8 +73,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
     t.text "obs"
     t.integer "grade"
     t.string "situation", limit: 255
-    t.integer "course_class_id", limit: 8
-    t.integer "enrollment_id", limit: 8
+    t.integer "course_class_id"
+    t.integer "enrollment_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "disapproved_by_absence", default: false
@@ -91,8 +91,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
 
   create_table "course_classes", force: :cascade do |t|
     t.string "name", limit: 255
-    t.integer "course_id", limit: 8
-    t.integer "professor_id", limit: 8
+    t.integer "course_id"
+    t.integer "professor_id"
     t.integer "year"
     t.integer "semester"
     t.datetime "created_at", null: false
@@ -125,7 +125,7 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
     t.string "code", limit: 255
     t.text "content"
     t.integer "credits"
-    t.integer "course_type_id", limit: 8
+    t.integer "course_type_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "workload"
@@ -145,7 +145,7 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
     t.string "name", limit: 255
     t.string "description", limit: 255
     t.integer "duration_semesters", default: 0
-    t.integer "phase_id", limit: 8
+    t.integer "phase_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "duration_months", default: 0
@@ -156,8 +156,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
   create_table "deferrals", force: :cascade do |t|
     t.date "approval_date"
     t.string "obs", limit: 255
-    t.integer "enrollment_id", limit: 8
-    t.integer "deferral_type_id", limit: 8
+    t.integer "enrollment_id"
+    t.integer "deferral_type_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["deferral_type_id"], name: "index_deferrals_on_deferral_type_id"
@@ -175,8 +175,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
 
   create_table "dismissals", force: :cascade do |t|
     t.date "date"
-    t.integer "enrollment_id", limit: 8
-    t.integer "dismissal_reason_id", limit: 8
+    t.integer "enrollment_id"
+    t.integer "dismissal_reason_id"
     t.text "obs"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -195,7 +195,7 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
   end
 
   create_table "enrollment_holds", force: :cascade do |t|
-    t.integer "enrollment_id", limit: 8
+    t.integer "enrollment_id"
     t.integer "year"
     t.integer "semester"
     t.integer "number_of_semesters", default: 1
@@ -214,9 +214,9 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
 
   create_table "enrollments", force: :cascade do |t|
     t.string "enrollment_number", limit: 255
-    t.integer "student_id", limit: 8
-    t.integer "level_id", limit: 8
-    t.integer "enrollment_status_id", limit: 8
+    t.integer "student_id"
+    t.integer "level_id"
+    t.integer "enrollment_status_id"
     t.date "admission_date"
     t.text "obs"
     t.datetime "created_at", null: false
@@ -247,8 +247,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
 
   create_table "majors", force: :cascade do |t|
     t.string "name", limit: 255
-    t.integer "level_id", limit: 8
-    t.integer "institution_id", limit: 8
+    t.integer "level_id"
+    t.integer "institution_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["institution_id"], name: "index_majors_on_institution_id"
@@ -256,7 +256,7 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
   end
 
   create_table "notification_logs", force: :cascade do |t|
-    t.integer "notification_id", limit: 8
+    t.integer "notification_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "to", limit: 255
@@ -267,8 +267,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
   end
 
   create_table "notification_params", force: :cascade do |t|
-    t.integer "notification_id", limit: 8
-    t.integer "query_param_id", limit: 8
+    t.integer "notification_id"
+    t.integer "query_param_id"
     t.string "value", limit: 255
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -306,8 +306,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
   end
 
   create_table "phase_durations", force: :cascade do |t|
-    t.integer "phase_id", limit: 8
-    t.integer "level_id", limit: 8
+    t.integer "phase_id"
+    t.integer "level_id"
     t.integer "deadline_semesters", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -327,8 +327,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
   end
 
   create_table "professor_research_areas", force: :cascade do |t|
-    t.integer "professor_id", limit: 8
-    t.integer "research_area_id", limit: 8
+    t.integer "professor_id"
+    t.integer "research_area_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["professor_id"], name: "index_professor_research_areas_on_professor_id"
@@ -348,21 +348,21 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
     t.string "identity_expedition_date", limit: 255
     t.string "neighborhood", limit: 255
     t.string "address", limit: 255
-    t.integer "city_id", limit: 8
+    t.integer "city_id"
     t.string "zip_code", limit: 255
     t.string "telephone1", limit: 255
     t.string "telephone2", limit: 255
     t.string "siape", limit: 255
     t.string "enrollment_number", limit: 255
     t.string "identity_issuing_place", limit: 255
-    t.integer "institution_id", limit: 8
+    t.integer "institution_id"
     t.string "email", limit: 255
     t.date "academic_title_date"
-    t.integer "academic_title_country_id", limit: 8
-    t.integer "academic_title_institution_id", limit: 8
-    t.integer "academic_title_level_id", limit: 8
+    t.integer "academic_title_country_id"
+    t.integer "academic_title_institution_id"
+    t.integer "academic_title_level_id"
     t.text "obs"
-    t.integer "user_id", limit: 8
+    t.integer "user_id"
     t.index ["academic_title_country_id"], name: "index_professors_on_academic_title_country_id"
     t.index ["academic_title_institution_id"], name: "index_professors_on_academic_title_institution_id"
     t.index ["academic_title_level_id"], name: "index_professors_on_academic_title_level_id"
@@ -381,7 +381,7 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
   end
 
   create_table "query_params", force: :cascade do |t|
-    t.integer "query_id", limit: 8
+    t.integer "query_id"
     t.string "name", limit: 255
     t.string "default_value", limit: 255
     t.string "value_type", limit: 255
@@ -422,8 +422,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
   end
 
   create_table "scholarship_durations", force: :cascade do |t|
-    t.integer "scholarship_id", limit: 8, null: false
-    t.integer "enrollment_id", limit: 8, null: false
+    t.integer "scholarship_id", null: false
+    t.integer "enrollment_id", null: false
     t.date "start_date"
     t.date "end_date"
     t.text "obs"
@@ -438,7 +438,7 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
     t.date "start_date"
     t.date "end_date"
     t.boolean "active", default: true
-    t.integer "scholarship_duration_id", limit: 8
+    t.integer "scholarship_duration_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["scholarship_duration_id"], name: "index_scholarship_suspensions_on_scholarship_duration_id"
@@ -452,15 +452,15 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
 
   create_table "scholarships", force: :cascade do |t|
     t.string "scholarship_number", limit: 255
-    t.integer "level_id", limit: 8
-    t.integer "sponsor_id", limit: 8
-    t.integer "scholarship_type_id", limit: 8
+    t.integer "level_id"
+    t.integer "sponsor_id"
+    t.integer "scholarship_type_id"
     t.date "start_date"
     t.date "end_date"
     t.text "obs"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "professor_id", limit: 8
+    t.integer "professor_id"
     t.index ["level_id"], name: "index_scholarships_on_level_id"
     t.index ["professor_id"], name: "index_scholarships_on_professor_id"
     t.index ["scholarship_type_id"], name: "index_scholarships_on_scholarship_type_id"
@@ -476,15 +476,15 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
   create_table "states", force: :cascade do |t|
     t.string "name", limit: 255
     t.string "code", limit: 255
-    t.integer "country_id", limit: 8
+    t.integer "country_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["country_id"], name: "index_states_on_country_id"
   end
 
   create_table "student_majors", force: :cascade do |t|
-    t.integer "major_id", limit: 8, null: false
-    t.integer "student_id", limit: 8, null: false
+    t.integer "major_id", null: false
+    t.integer "student_id", null: false
     t.index ["major_id"], name: "index_student_majors_on_major_id"
     t.index ["student_id"], name: "index_student_majors_on_student_id"
   end
@@ -505,18 +505,18 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
     t.date "identity_expedition_date"
     t.string "employer", limit: 255
     t.string "job_position", limit: 255
-    t.integer "birth_state_id", limit: 8
-    t.integer "city_id", limit: 8
+    t.integer "birth_state_id"
+    t.integer "city_id"
     t.string "neighborhood", limit: 255
     t.string "zip_code", limit: 255
     t.string "address", limit: 255
     t.string "telephone1", limit: 255
     t.string "telephone2", limit: 255
     t.string "email", limit: 255
-    t.integer "birth_city_id", limit: 8
+    t.integer "birth_city_id"
     t.string "identity_issuing_place", limit: 255
     t.string "photo", limit: 255
-    t.integer "birth_country_id", limit: 8
+    t.integer "birth_country_id"
     t.integer "user_id", limit: 8
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
@@ -526,8 +526,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
   end
 
   create_table "thesis_defense_committee_participations", force: :cascade do |t|
-    t.integer "professor_id", limit: 8
-    t.integer "enrollment_id", limit: 8
+    t.integer "professor_id"
+    t.integer "enrollment_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["enrollment_id"], name: "index_thesis_defense_committee_participations_on_enrollment_id"
@@ -556,7 +556,7 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
     t.integer "failed_attempts", default: 0
     t.string "unlock_token", limit: 255
     t.datetime "locked_at"
-    t.integer "role_id", limit: 8, default: 1, null: false
+    t.integer "role_id", default: 1, null: false
     t.string "unconfirmed_email"
     t.string "invitation_token"
     t.datetime "invitation_created_at"
@@ -564,7 +564,7 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
     t.datetime "invitation_accepted_at"
     t.integer "invitation_limit"
     t.string "invited_by_type"
-    t.integer "invited_by_id", limit: 8
+    t.integer "invited_by_id"
     t.integer "invitations_count", default: 0
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
@@ -575,7 +575,7 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
 
   create_table "versions", force: :cascade do |t|
     t.string "item_type", limit: 255, null: false
-    t.integer "item_id", limit: 8, null: false
+    t.integer "item_id", null: false
     t.string "event", limit: 255, null: false
     t.string "whodunnit", limit: 255
     t.text "object", limit: 16777215
