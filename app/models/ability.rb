@@ -45,7 +45,10 @@ class Ability
       can :invite, User
       can :read, (Role)
     elsif role_id == Role::ROLE_PROFESSOR
-      can :read, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration])
+      can :read, (Ability::ALL_MODELS - [
+        User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration,
+        Country, State, City, EmailTemplate
+      ])
       can :read, :pendencies
       can :validate, EnrollmentRequest
       can :show_validate, EnrollmentRequest
