@@ -94,15 +94,16 @@ class StudentEnrollmentController < ApplicationController
       
     end
     if enrollment_request_params[:delete_request] == "1"
-      @enrollment_request.destroy!
-      redirect_to student_enrollment_path(@enrollment.enrollment_number), notice: I18n.t("student_enrollment.notice.request_removed")
+      if @enrollment_request.destroy_request(@semester)
+        return redirect_to student_enrollment_path(@enrollment.enrollment_number), notice: I18n.t("student_enrollment.notice.request_removed")
+      end
     elsif @enrollment_request.valid_request?(remove_class_enrollments)
-      @enrollment_request.save_request(remove_class_enrollments)
-      redirect_to student_enrollment_path(@enrollment.enrollment_number), notice: I18n.t("student_enrollment.notice.request_saved")
-    else
-      @enrollment_request.enrollment_request_comments.delete(@comment) if ! @comment.nil? && ! @comment.persisted?
-      render :enroll
+      if @enrollment_request.save_request(remove_class_enrollments)
+        return redirect_to student_enrollment_path(@enrollment.enrollment_number), notice: I18n.t("student_enrollment.notice.request_saved")
+      end
     end
+    @enrollment_request.enrollment_request_comments.delete(@comment) if ! @comment.nil? && ! @comment.persisted?
+    render :enroll
   end
 
   private

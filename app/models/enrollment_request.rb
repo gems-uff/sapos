@@ -146,6 +146,37 @@ class EnrollmentRequest < ApplicationRecord
     false
   end
 
+  def valid_destroy?(class_schedule=nil)
+    return false if ! self.can_destroy?
+    return false if ! class_schedule.nil? && ! class_schedule.main_enroll_open? && ! class_schedule.adjust_enroll_remove_open?
+    return false if self.class_enrollment_requests.any? do |cer|
+      if cer.status == ClassEnrollmentRequest::EFFECTED
+        next true if ! cer.class_enrollment.can_destroy?
+      end
+      ! cer.can_destroy?
+    end
+    true
+  end
+
+  def destroy_request(class_schedule=nil)
+    if ! self.valid_destroy?(class_schedule)
+      errors.add(:base, :impossible_removal)
+      return false
+    end
+    ActiveRecord::Base.transaction do
+      self.class_enrollment_requests.each do |cer| 
+        if cer.status == ClassEnrollmentRequest::EFFECTED
+          class_enrollment = cer.class_enrollment
+          cer.destroy!
+          class_enrollment.class_enrollment_request = nil
+          class_enrollment.destroy!
+        end
+      end
+      self.destroy!
+    end
+    true
+  end
+
   protected
 
   def validate_effected_status
