@@ -23,6 +23,7 @@ pt-BR:
       submit: Enviar
       remove: Remover pedido?
       status: Sua inscrição está %{status}
+      class_status: Situação
       messages: Mensagens
       message:
         author: "%{author} enviou:"

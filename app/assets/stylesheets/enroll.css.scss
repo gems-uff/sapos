@@ -29,7 +29,7 @@ table.enroll-table  {
   background-color: #fff;
 }
 
-.enroll-table:not(.disable-pointer) tr:not(.enroll-row-effected):hover {
+.enroll-table:not(.disable-pointer) tr:hover {
   background-color: #00cc80;
   cursor: pointer;
 }
@@ -49,7 +49,7 @@ table.enroll-table  {
   padding: 5px 4px;
 }
 
-.enroll-table:not(.disable-pointer) tr:not(.enroll-row-effected) label:hover {
+.enroll-table:not(.disable-pointer) tr label:hover {
   cursor: pointer;
 }
 
@@ -85,15 +85,15 @@ table.enroll-table  {
 }
 
 .enroll-row-valid td:first-child {
-  background-color: lightgreen !important;
+  color: green !important;
 }
 
 .enroll-row-invalid td:first-child {
-  background-color: lightcoral !important;
+  color: lightcoral !important;
 }
 
 .enroll-row-effected td:first-child {
-  background-color: gray !important;
+  color: green !important;
 }
 
 .enroll-table .check-label {

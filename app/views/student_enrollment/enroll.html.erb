@@ -45,6 +45,9 @@
     <table class="enroll-table">
       <thead>
         <tr>
+          <% if @enrollment_request.persisted? %>
+             <th> <%= t 'student_enrollment.enroll.class_status' %> </th>
+          <% end %>
           <th> <%= t 'student_enrollment.enroll.do_enroll' %> </th>
           <% table[:header][0].drop(1).each do |head| %>
             <th class="cell-<%= head.downcase %>"> <%= head %> </th>
@@ -62,6 +65,17 @@
             end 
           %> 
           <tr <%= cer.nil? ? "" : "title=\"#{cer.status}\" class=\"enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.status] }\"".html_safe %>>
+            <% if @enrollment_request.persisted? %>
+              <td>
+                <%= box.label do %>
+                  <% if ! cer.nil? %>
+                    <%= cer.status %>
+                  <% else %>
+                    &nbsp;
+                  <% end %>
+                <% end %>
+              </td>
+            <% end %>
             <td>
               <%= box.label class: "check-label" do %>
                 <%= box.check_box %>
