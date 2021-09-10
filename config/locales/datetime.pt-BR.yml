@@ -70,6 +70,7 @@ pt-BR:
       long: "%A, %d de %B de %Y, %H:%M h"
       longdate: "%d de %B de %Y"
       defaultdate: "%d-%m-%Y"
+      defaultdatetime: "%d/%m/%Y %H:%M"
       picker: "%a, %d %b %Y %H:%M:%S"
       day: "%A, %d de %B de %Y"
       monthyear: "%B-%Y"

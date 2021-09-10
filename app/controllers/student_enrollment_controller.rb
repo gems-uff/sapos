@@ -14,10 +14,7 @@ class StudentEnrollmentController < ApplicationController
 
     if @enrollment.dismissal.nil?
       now = Time.now
-      open_semester = ClassSchedule.find_by(
-        ClassSchedule.arel_table[:enrollment_start].lteq(now)
-        .and(ClassSchedule.arel_table[:enrollment_end].gteq(now))
-      )
+      open_semester = ClassSchedule.find_by(ClassSchedule.arel_enroll_open?)
       unless open_semester.nil?
         enrollment_request = EnrollmentRequest.find_or_initialize_by(
           enrollment: @enrollment,
@@ -71,7 +68,10 @@ class StudentEnrollmentController < ApplicationController
   def save_enroll
     return unless _prepare_enroll(true).nil?
     message = enrollment_request_params[:message]
-    changed, remove_class_enrollments = @enrollment_request.assign_course_class_ids(enrollment_request_params[:course_class_ids])
+    changed, remove_class_enrollments = @enrollment_request.assign_course_class_ids(
+      enrollment_request_params[:course_class_ids],
+      @semester
+    )
     changed ||= ! message.empty?
     if changed
       unless message.empty?
@@ -96,7 +96,8 @@ class StudentEnrollmentController < ApplicationController
     if enrollment_request_params[:delete_request] == "1"
       @enrollment_request.destroy!
       redirect_to student_enrollment_path(@enrollment.enrollment_number), notice: I18n.t("student_enrollment.notice.request_removed")
-    elsif @enrollment_request.save_request(remove_class_enrollments)
+    elsif @enrollment_request.valid_request?(remove_class_enrollments)
+      @enrollment_request.save_request(remove_class_enrollments)
       redirect_to student_enrollment_path(@enrollment.enrollment_number), notice: I18n.t("student_enrollment.notice.request_saved")
     else
       @enrollment_request.enrollment_request_comments.delete(@comment) if ! @comment.nil? && ! @comment.persisted?

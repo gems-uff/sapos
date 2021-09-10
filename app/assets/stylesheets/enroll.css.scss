@@ -138,3 +138,22 @@ table.enroll-table  {
 .enroll-messages .new-message {
   color: darkgreen;
 }
+
+.enroll-title {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.enroll-title .schedule-title {
+  font-weight: bold;
+}
+
+.enroll-title .schedule-date-attr {
+  color: #666;
+  width: 270px;
+  display: inline-block;
+}
+
+.enroll-title .schedule-date-attr::after {
+  content: ":"
+}

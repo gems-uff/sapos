@@ -17,8 +17,11 @@ class EnrollmentRequest < ApplicationRecord
   validates :status, :presence => true, :inclusion => {:in => ClassEnrollmentRequest::STATUSES}
   validate :validate_effected_status
   validates :class_enrollment_requests, :length => { minimum: 1, message: :at_least_one_class}
+  validate :validate_insertion_removal
 
   accepts_nested_attributes_for :class_enrollment_requests, :course_classes
+
+  attr_accessor :valid_insertion, :valid_removal
 
   def self.pendency_condition(user=nil)
     user ||= current_user
@@ -71,18 +74,26 @@ class EnrollmentRequest < ApplicationRecord
     self.class_enrollment_requests.collect { |cer| cer.course_class_id }
   end
 
-  def assign_course_class_ids(course_classes)
+  def assign_course_class_ids(course_classes, class_schedule=nil)
     # course classes is a list of strings representing course_class ids
     result = false
+    self.valid_insertion = true
+    self.valid_removal = true
     remove_class_enrollments = []
+    to_remove = []
     to_remove = self.class_enrollment_requests.filter do |cer|
       if ! course_classes.include? cer.course_class_id.to_s
-        if cer.status == ClassEnrollmentRequest::EFFECTED
-          cer.class_enrollment.mark_for_destruction
-          remove_class_enrollments << cer.class_enrollment
+        if class_schedule.nil? || class_schedule.main_enroll_open? || class_schedule.adjust_enroll_remove_open?
+          if cer.status == ClassEnrollmentRequest::EFFECTED
+            cer.class_enrollment.mark_for_destruction
+            remove_class_enrollments << cer.class_enrollment
+          end
+          result = true
+          true
+        else 
+          self.valid_removal = false
+          false
         end
-        result = true
-        true
       else 
         false
       end
@@ -90,10 +101,15 @@ class EnrollmentRequest < ApplicationRecord
     course_classes.each do |course_class_id|
       next if course_class_id.empty?
       if self.class_enrollment_requests.find_by(course_class_id: course_class_id).nil?
-        self.class_enrollment_requests.build(course_class_id: course_class_id)
-        result = true
+        if class_schedule.nil? || class_schedule.main_enroll_open? || class_schedule.adjust_enroll_insert_open?
+          self.class_enrollment_requests.build(course_class_id: course_class_id)
+          result = true
+        else
+          self.valid_insertion = false
+        end
       end
     end
+    
     to_remove.each(&:mark_for_destruction)
     [result, remove_class_enrollments]
   end
@@ -112,8 +128,12 @@ class EnrollmentRequest < ApplicationRecord
     end
   end
 
+  def valid_request?(remove_class_enrollments)
+    self.valid? && remove_class_enrollments.all? { |ce| ce.can_destroy? }
+  end
+
   def save_request(remove_class_enrollments)
-    if self.valid? && remove_class_enrollments.all? { |ce| ce.can_destroy? }
+    if self.valid_request?(remove_class_enrollments)
       ActiveRecord::Base.transaction do
         self.save!
         remove_class_enrollments.each do |ce|
@@ -133,6 +153,15 @@ class EnrollmentRequest < ApplicationRecord
       if self.class_enrollment_requests.any? { |cer| cer.status != ClassEnrollmentRequest::EFFECTED }
         errors.add(:status, :class_enrollment_request_is_not_effected)
       end
+    end
+  end
+
+  def validate_insertion_removal
+    if ! self.valid_insertion.nil? && ! self.valid_insertion
+      errors.add(:base, :impossible_insertion)
+    end
+    if ! self.valid_removal.nil? && ! self.valid_removal
+      errors.add(:base, :impossible_removal)
     end
   end
 

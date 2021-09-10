@@ -111,6 +111,9 @@ pt-BR:
         semester: "Semestre"
         enrollment_start: "Data de Início das Inscrições"
         enrollment_end: "Data de Fim das Inscrições"
+        enrollment_adjust: "Início do Período de Ajustes"
+        enrollment_insert: "Data Limite para Adicionar Disciplinas"
+        enrollment_remove: "Data Limite para Remover Disciplinas"
       custom_variable:
         description: "Descrição"
         value: "Valor"
@@ -602,6 +605,9 @@ pt-BR:
           attributes:
             status:
               class_enrollment_request_is_not_effected: "'efetivada' só é permitida quando todos os pedidos de disciplinas estão efetivados"
+            base:
+              impossible_insertion: "Tentativa de inserir disciplina(s) fora do período de ajustes"
+              impossible_removal: "Tentativa de remover disciplina(s) fora do período de ajustes"
         notification:
           offset_invalid_value: "está com o valor inválido. Tente um número, seguido por y, M, W, d, h, m ou s"
           individual_required: "requer que o email seja individual"
@@ -849,6 +855,8 @@ pt-BR:
     close: "Fechar"
     create: "Salvar"
     validate: "Validar"
+    forms:
+      repeat: "Repetir %{attribute}"
     create_accomplishment_label: "Criar Realização de Etapas"
     create_advisement_authorization_label: "Adicionar Credenciamento"
     create_advisement_label: "Adicionar Orientação"

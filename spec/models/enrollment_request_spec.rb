@@ -407,6 +407,184 @@ RSpec.describe EnrollmentRequest, type: :model do
         expect(enrollment_request.class_enrollment_requests).to include(cer1)
         expect(enrollment_request.class_enrollment_requests).not_to include(cer2)
       end
+      context "class schedule restrictions" do
+        it "should work properly with the class schedule enrollment time" do
+          enrollment = FactoryBot.create(:enrollment)
+          course_class1 = FactoryBot.create(:course_class)
+          course_class2 = FactoryBot.create(:course_class)
+          course_class3 = FactoryBot.create(:course_class)
+          now = Time.now
+          class_schedule = FactoryBot.build(
+            :class_schedule,
+            enrollment_start: now - 1.day,
+            enrollment_end: now + 1.day,
+            enrollment_adjust: now - 5.days,
+            enrollment_insert: now - 4.days,
+            enrollment_remove: now - 4.days,
+          )
+
+          enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)
+          cer1 = enrollment_request.class_enrollment_requests.build(
+            status: ClassEnrollmentRequest::REQUESTED, course_class: course_class1
+          )
+          cer2 = enrollment_request.class_enrollment_requests.build(
+            status: ClassEnrollmentRequest::VALID, course_class: course_class2
+          )
+          enrollment_request.save
+
+          changed, remove_class_enrollments = enrollment_request.assign_course_class_ids([
+            course_class1.id.to_s, course_class3.id.to_s
+          ], class_schedule)
+          expect(changed).to eq(true)
+          expect(remove_class_enrollments).to eq([])
+          enrollment_request.save_request(remove_class_enrollments)
+          
+          expect(enrollment_request.class_enrollment_requests.count).to eq(2)
+          expect(enrollment_request.class_enrollment_requests).to include(cer1)
+          expect(enrollment_request.class_enrollment_requests).not_to include(cer2)
+        end
+        it "should work properly within the class schedule adjustment time" do
+          enrollment = FactoryBot.create(:enrollment)
+          course_class1 = FactoryBot.create(:course_class)
+          course_class2 = FactoryBot.create(:course_class)
+          course_class3 = FactoryBot.create(:course_class)
+          now = Time.now
+          class_schedule = FactoryBot.build(
+            :class_schedule,
+            enrollment_start: now - 5.days,
+            enrollment_end: now - 4.days,
+            enrollment_adjust: now - 1.day,
+            enrollment_insert: now + 1.day,
+            enrollment_remove: now + 1.day,
+          )
+
+          enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)
+          cer1 = enrollment_request.class_enrollment_requests.build(
+            status: ClassEnrollmentRequest::REQUESTED, course_class: course_class1
+          )
+          cer2 = enrollment_request.class_enrollment_requests.build(
+            status: ClassEnrollmentRequest::VALID, course_class: course_class2
+          )
+          enrollment_request.save
+
+          changed, remove_class_enrollments = enrollment_request.assign_course_class_ids([
+            course_class1.id.to_s, course_class3.id.to_s
+          ], class_schedule)
+          expect(changed).to eq(true)
+          expect(remove_class_enrollments).to eq([])
+          enrollment_request.save_request(remove_class_enrollments)
+          
+          expect(enrollment_request.class_enrollment_requests.count).to eq(2)
+          expect(enrollment_request.class_enrollment_requests).to include(cer1)
+          expect(enrollment_request.class_enrollment_requests).not_to include(cer2)
+        end
+        it "should not update anything if the enrollment time is not open in the class schedule" do
+          enrollment = FactoryBot.create(:enrollment)
+          course_class1 = FactoryBot.create(:course_class)
+          course_class2 = FactoryBot.create(:course_class)
+          course_class3 = FactoryBot.create(:course_class)
+          now = Time.now
+          class_schedule = FactoryBot.build(
+            :class_schedule,
+            enrollment_start: now - 5.days,
+            enrollment_end: now - 4.days,
+            enrollment_adjust: now - 5.days,
+            enrollment_insert: now - 4.days,
+            enrollment_remove: now - 4.days,
+          )
+
+          enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)
+          cer1 = enrollment_request.class_enrollment_requests.build(
+            status: ClassEnrollmentRequest::REQUESTED, course_class: course_class1
+          )
+          cer2 = enrollment_request.class_enrollment_requests.build(
+            status: ClassEnrollmentRequest::VALID, course_class: course_class2
+          )
+          enrollment_request.save
+
+          changed, remove_class_enrollments = enrollment_request.assign_course_class_ids([
+            course_class1.id.to_s, course_class3.id.to_s
+          ], class_schedule)
+          expect(changed).to eq(false)
+          expect(remove_class_enrollments).to eq([])
+          enrollment_request.save_request(remove_class_enrollments)
+
+          expect(enrollment_request).to have_error(:impossible_insertion).on :base
+          expect(enrollment_request).to have_error(:impossible_removal).on :base
+          expect(enrollment_request.class_enrollment_requests.count).to eq(2)
+          expect(enrollment_request.class_enrollment_requests).to include(cer1, cer2)
+        end
+        it "should not remove anything if the enrollment time is open only for insertions" do
+          enrollment = FactoryBot.create(:enrollment)
+          course_class1 = FactoryBot.create(:course_class)
+          course_class2 = FactoryBot.create(:course_class)
+          course_class3 = FactoryBot.create(:course_class)
+          now = Time.now
+          class_schedule = FactoryBot.build(
+            :class_schedule,
+            enrollment_start: now - 5.days,
+            enrollment_end: now - 4.days,
+            enrollment_adjust: now - 1.day,
+            enrollment_insert: now + 1.day,
+            enrollment_remove: now - 4.days,
+          )
+
+          enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)
+          cer1 = enrollment_request.class_enrollment_requests.build(
+            status: ClassEnrollmentRequest::REQUESTED, course_class: course_class1
+          )
+          cer2 = enrollment_request.class_enrollment_requests.build(
+            status: ClassEnrollmentRequest::VALID, course_class: course_class2
+          )
+          enrollment_request.save
+
+          changed, remove_class_enrollments = enrollment_request.assign_course_class_ids([
+            course_class1.id.to_s, course_class3.id.to_s
+          ], class_schedule)
+          expect(changed).to eq(true)
+          expect(remove_class_enrollments).to eq([])
+          enrollment_request.save_request(remove_class_enrollments)
+          
+          expect(enrollment_request).to have_error(:impossible_removal).on :base
+          expect(enrollment_request.class_enrollment_requests.count).to eq(2)
+          expect(enrollment_request.class_enrollment_requests).to include(cer1, cer2)
+        end
+        it "should not insert anything if the enrollment time is open only for removals" do
+          enrollment = FactoryBot.create(:enrollment)
+          course_class1 = FactoryBot.create(:course_class)
+          course_class2 = FactoryBot.create(:course_class)
+          course_class3 = FactoryBot.create(:course_class)
+          now = Time.now
+          class_schedule = FactoryBot.build(
+            :class_schedule,
+            enrollment_start: now - 5.days,
+            enrollment_end: now - 4.days,
+            enrollment_adjust: now - 1.day,
+            enrollment_insert: now - 4.days,
+            enrollment_remove: now + 1.day,
+          )
+
+          enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)
+          cer1 = enrollment_request.class_enrollment_requests.build(
+            status: ClassEnrollmentRequest::REQUESTED, course_class: course_class1
+          )
+          cer2 = enrollment_request.class_enrollment_requests.build(
+            status: ClassEnrollmentRequest::VALID, course_class: course_class2
+          )
+          enrollment_request.save
+
+          changed, remove_class_enrollments = enrollment_request.assign_course_class_ids([
+            course_class1.id.to_s, course_class3.id.to_s
+          ], class_schedule)
+          expect(changed).to eq(true)
+          expect(remove_class_enrollments).to eq([])
+          enrollment_request.save_request(remove_class_enrollments)
+          
+          expect(enrollment_request).to have_error(:impossible_insertion).on :base
+          expect(enrollment_request.class_enrollment_requests.count).to eq(2)
+          expect(enrollment_request.class_enrollment_requests).to include(cer1, cer2)
+        end
+      end
     end
     describe "refresh_status!" do
       context "when status is effected" do

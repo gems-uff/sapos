@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_30_212746) do
+ActiveRecord::Schema.define(version: 2021_09_10_181140) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -101,6 +101,9 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
     t.datetime "enrollment_end"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.datetime "enrollment_adjust"
+    t.datetime "enrollment_insert"
+    t.datetime "enrollment_remove"
   end
 
   create_table "countries", force: :cascade do |t|

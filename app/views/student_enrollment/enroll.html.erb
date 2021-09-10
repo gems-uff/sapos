@@ -9,8 +9,50 @@
       <div id="error_login"><%= t 'student_enrollment.enroll.closed_enrollment', semester: @semester.to_label %></div>
   <% end %>
   
-  <h2> <%= t 'student_enrollment.enroll.title', semester: @semester.to_label %> </h2>
-  
+  <div class="enroll-title">
+    <h2> <%= t 'student_enrollment.enroll.title', semester: @semester.to_label %> </h2>
+    
+    <div class="schedule">
+      <span class="schedule-title"> <%= t 'student_enrollment.enroll.dates.date' %> </span>
+    
+      <ul>
+        <li>
+          <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.start' %></span>
+          <span class="schedule-date-value"><%= l @semester.enrollment_start, format: :defaultdatetime %></span>
+        </li>
+        <li>
+          <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.end' %></span>
+          <span class="schedule-date-value"><%= l @semester.enrollment_end, format: :defaultdatetime %></span>
+        </li>
+        <% if @semester.enrollment_start != @semester.enrollment_adjust && @semester.enrollment_end < @semester.enrollment_adjust  %>
+          <li>
+            <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.adjust' %></span>
+            <span class="schedule-date-value"><%= l @semester.enrollment_adjust, format: :defaultdatetime  %></span>
+          </li>
+        <% end %>
+        <% if @semester.enrollment_end < @semester.enrollment_insert && @semester.enrollment_remove == @semester.enrollment_insert %>
+          <li>
+            <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.end_adjust' %></span>
+            <span class="schedule-date-value"><%= l @semester.enrollment_insert, format: :defaultdatetime  %></span>
+          </li>
+        <% else %>
+          <% if @semester.enrollment_end < @semester.enrollment_insert %>
+            <li>
+              <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.adjust_insert' %></span>
+              <span class="schedule-date-value"><%= l @semester.enrollment_insert, format: :defaultdatetime  %></span>
+            </li>
+          <% end %>
+          <% if @semester.enrollment_end < @semester.enrollment_remove %>
+            <li>
+              <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.adjust_remove' %></span>
+              <span class="schedule-date-value"><%= l @semester.enrollment_remove, format: :defaultdatetime  %></span>
+            </li>
+          <% end %>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+
   <% if @enrollment_request.persisted? %>
     <span class="show-enroll-status show-enroll-status-<%= ClassEnrollmentRequest::STATUSES_MAP[@enrollment_request.status] %>"> <%= t('student_enrollment.enroll.status', status: @enrollment_request.status.downcase) %> </span>
   <% end %>
@@ -63,42 +105,45 @@
                 cer = temp_cer
               end
             end 
-          %> 
-          <tr <%= cer.nil? ? "" : "title=\"#{cer.status}\" class=\"enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.status] }\"".html_safe %>>
-            <% if @enrollment_request.persisted? %>
-              <td>
-                <%= box.label do %>
-                  <% if ! cer.nil? %>
-                    <%= cer.status %>
-                  <% else %>
-                    &nbsp;
+          %>
+          <% if @semester.main_enroll_open? || @semester.adjust_enroll_insert_open? || ! cer.nil? %>
+            <tr <%= cer.nil? ? "" : "title=\"#{cer.status}\" class=\"enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.status] }\"".html_safe %>>
+              <% if @enrollment_request.persisted? %>
+                <td>
+                  <%= box.label do %>
+                    <% if ! cer.nil? %>
+                      <%= cer.status %>
+                    <% else %>
+                      &nbsp;
+                    <% end %>
                   <% end %>
-                <% end %>
-              </td>
-            <% end %>
-            <td>
-              <%= box.label class: "check-label" do %>
-                <%= box.check_box %>
+                </td>
               <% end %>
-            </td>
-            <% box.object.drop(1).each_with_index do |cell, index| %>
-              <td class="cell-<%= table[:header][0][index + 1].downcase %>">
-                <%= box.label do %>
-                  <%= cell.empty? ? "&nbsp; ".html_safe  : cell %> 
-                  <% if ! cer.nil? && ! cer.errors.empty? && index == 0 %>
-                    <details>
-                      <summary><%= t('student_enrollment.enroll.class_errors', count: cer.errors.full_messages.count) %> </summary>
-                      <ul>
-                        <% cer.errors.full_messages.each do |message| %>
-                          <li> <%= message %> </li>
-                        <% end %>
-                      </ul>
-                    </details>
-                  <% end %>
+              <td>
+                <%= box.label class: "check-label" do %>
+                  <% readonly = closed || (! @semester.main_enroll_open? && ! @semester.adjust_enroll_remove_open? && ! cer.nil?) %>
+                  <%= box.check_box onclick: (readonly ?  "return false;" : ""), readonly: readonly  %>
                 <% end %>
               </td>
-            <% end %>
-          </tr>
+              <% box.object.drop(1).each_with_index do |cell, index| %>
+                <td class="cell-<%= table[:header][0][index + 1].downcase %>">
+                  <%= box.label do %>
+                    <%= cell.empty? ? "&nbsp; ".html_safe  : cell %> 
+                    <% if ! cer.nil? && ! cer.errors.empty? && index == 0 %>
+                      <details>
+                        <summary><%= t('student_enrollment.enroll.class_errors', count: cer.errors.full_messages.count) %> </summary>
+                        <ul>
+                          <% cer.errors.full_messages.each do |message| %>
+                            <li> <%= message %> </li>
+                          <% end %>
+                        </ul>
+                      </details>
+                    <% end %>
+                  <% end %>
+                </td>
+              <% end %>
+            </tr>
+          <% end %>
         <% end %>
       </tbody>
     </table>

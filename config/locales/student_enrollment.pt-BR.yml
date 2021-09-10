@@ -9,7 +9,8 @@ pt-BR:
       welcome: Bem-vindo ao Sapos. Você ainda não tem acesso a nada nesta matrícula, mas em breve várias funcionalidades interessantes aparecerão aqui para você!
 
     show_enroll:
-      title: Inscrições em disciplinas do semestre %{semester} estão abertas! 
+      title_main: Inscrições em disciplinas do semestre %{semester} estão abertas! 
+      title_adjust: Período de ajustes do semestre %{semester} está aberto! 
       enroll_link_new: Clique aqui para fazer um pedido de inscrição.
       enroll_link_edit_valid: Seu pedido de inscrição foi marcado como válido. Clique aqui para editar
       enroll_link_edit_requested: Clique aqui para editar seu pedido de inscrição.
@@ -25,6 +26,15 @@ pt-BR:
       status: Sua inscrição está %{status}
       class_status: Situação
       messages: Mensagens
+      dates:
+        date: "Datas"
+        start: "Início do Período de Inscrições"
+        end: "Fim do Período de Inscrições"
+        adjust: "Início do Período de Ajustes"
+        end_adjust: "Fim do Período de Ajustes"
+        adjust_insert: "Limite para Adicionar Disciplinas"
+        adjust_remove: "Limite para Remover Disciplinas"
+        
       message:
         author: "%{author} enviou:"
         time: "[%{time}]"

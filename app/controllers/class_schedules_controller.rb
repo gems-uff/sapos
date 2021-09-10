@@ -3,9 +3,10 @@ class ClassSchedulesController < ApplicationController
   helper :course_classes
 
   active_scaffold :"class_schedule" do |config|
-    config.list.columns = [:year, :semester, :enrollment_start, :enrollment_end]
-    config.create.columns = [:year, :semester, :enrollment_start, :enrollment_end]
-    config.update.columns = [:year, :semester, :enrollment_start, :enrollment_end]
+    columns = [:year, :semester, :enrollment_start, :enrollment_end, :enrollment_adjust, :enrollment_insert, :enrollment_remove]
+    config.list.columns = columns
+    config.create.columns = columns
+    config.update.columns = columns
     config.create.label = :create_class_schedule_label
     config.update.label = :update_class_schedule_label
 
