@@ -74,9 +74,13 @@ class EnrollmentRequest < ApplicationRecord
   def assign_course_class_ids(course_classes)
     # course classes is a list of strings representing course_class ids
     result = false
+    remove_class_enrollments = []
     to_remove = self.class_enrollment_requests.filter do |cer|
-      next false if cer.status == ClassEnrollmentRequest::EFFECTED
       if ! course_classes.include? cer.course_class_id.to_s
+        if cer.status == ClassEnrollmentRequest::EFFECTED
+          cer.class_enrollment.mark_for_destruction
+          remove_class_enrollments << cer.class_enrollment
+        end
         result = true
         true
       else 
@@ -91,7 +95,7 @@ class EnrollmentRequest < ApplicationRecord
       end
     end
     to_remove.each(&:mark_for_destruction)
-    result
+    [result, remove_class_enrollments]
   end
 
   def refresh_status!
@@ -106,6 +110,20 @@ class EnrollmentRequest < ApplicationRecord
       self.status = ClassEnrollmentRequest::EFFECTED
       self.save
     end
+  end
+
+  def save_request(remove_class_enrollments)
+    if self.valid? && remove_class_enrollments.all? { |ce| ce.can_destroy? }
+      ActiveRecord::Base.transaction do
+        self.save!
+        remove_class_enrollments.each do |ce|
+          ce.class_enrollment_request = nil
+          ce.destroy!
+        end
+      end
+      return true
+    end
+    false
   end
 
   protected

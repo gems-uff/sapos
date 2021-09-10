@@ -64,8 +64,7 @@
           <tr <%= cer.nil? ? "" : "title=\"#{cer.status}\" class=\"enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.status] }\"".html_safe %>>
             <td>
               <%= box.label class: "check-label" do %>
-                <% readonly = (closed || (! cer.nil? && cer.status == ClassEnrollmentRequest::EFFECTED)) %>
-                <%= box.check_box onclick: (readonly ?  "return false;" : ""), readonly: readonly  %>
+                <%= box.check_box %>
               <% end %>
             </td>
             <% box.object.drop(1).each_with_index do |cell, index| %>

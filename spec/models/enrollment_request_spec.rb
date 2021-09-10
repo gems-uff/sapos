@@ -348,7 +348,9 @@ RSpec.describe EnrollmentRequest, type: :model do
         )
         enrollment_request.save
 
-        expect(enrollment_request.assign_course_class_ids([course_class1.id.to_s, course_class2.id.to_s])).to eq(false)
+        changed, remove_class_enrollments = enrollment_request.assign_course_class_ids([course_class1.id.to_s, course_class2.id.to_s])
+        expect(changed).to eq(false)
+        expect(remove_class_enrollments).to eq([])
         enrollment_request.save
         
         expect(enrollment_request.class_enrollment_requests.count).to eq(2)
@@ -369,14 +371,16 @@ RSpec.describe EnrollmentRequest, type: :model do
         )
         enrollment_request.save
 
-        expect(enrollment_request.assign_course_class_ids([course_class1.id.to_s, course_class3.id.to_s])).to eq(true)
-        enrollment_request.save
+        changed, remove_class_enrollments = enrollment_request.assign_course_class_ids([course_class1.id.to_s, course_class3.id.to_s])
+        expect(changed).to eq(true)
+        expect(remove_class_enrollments).to eq([])
+        enrollment_request.save_request(remove_class_enrollments)
         
         expect(enrollment_request.class_enrollment_requests.count).to eq(2)
         expect(enrollment_request.class_enrollment_requests).to include(cer1)
         expect(enrollment_request.class_enrollment_requests).not_to include(cer2)
       end
-      it "should not remove effected class enrollment requests" do
+      it "should remove effected class enrollment requests with their associated class enrollments" do
         enrollment = FactoryBot.create(:enrollment)
         course_class1 = FactoryBot.create(:course_class)
         course_class2 = FactoryBot.create(:course_class)
@@ -393,11 +397,15 @@ RSpec.describe EnrollmentRequest, type: :model do
         )
         enrollment_request.save
 
-        expect(enrollment_request.assign_course_class_ids([course_class1.id.to_s, course_class3.id.to_s])).to eq(true)
-        enrollment_request.save
+        changed, remove_class_enrollments = enrollment_request.assign_course_class_ids([course_class1.id.to_s, course_class3.id.to_s])
+        expect(changed).to eq(true)
+        expect(remove_class_enrollments).to eq([class_enrollment])
+        enrollment_request.save_request(remove_class_enrollments)
         
-        expect(enrollment_request.class_enrollment_requests.count).to eq(3)
-        expect(enrollment_request.class_enrollment_requests).to include(cer1, cer2)
+        expect { class_enrollment.reload }.to raise_error ActiveRecord::RecordNotFound
+        expect(enrollment_request.class_enrollment_requests.count).to eq(2)
+        expect(enrollment_request.class_enrollment_requests).to include(cer1)
+        expect(enrollment_request.class_enrollment_requests).not_to include(cer2)
       end
     end
     describe "refresh_status!" do
