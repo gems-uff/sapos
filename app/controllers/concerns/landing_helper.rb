@@ -12,7 +12,7 @@ module LandingHelper extend ActiveSupport::Concern
         enrollments.each do |enrollment|
           if enrollment.enrollment_status.user
             number = enrollment.enrollment_number
-            path = student_enrollment_path(number)
+            path = student_enrollment_path(enrollment.id)
             land.item number, number, path, :if => Proc.new { can?(:read, :landing) }
             @emptylanding = false
           end

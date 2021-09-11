@@ -95,11 +95,11 @@ class StudentEnrollmentController < ApplicationController
     end
     if enrollment_request_params[:delete_request] == "1"
       if @enrollment_request.destroy_request(@semester)
-        return redirect_to student_enrollment_path(@enrollment.enrollment_number), notice: I18n.t("student_enrollment.notice.request_removed")
+        return redirect_to student_enrollment_path(@enrollment.id), notice: I18n.t("student_enrollment.notice.request_removed")
       end
     elsif @enrollment_request.valid_request?(remove_class_enrollments)
       if @enrollment_request.save_request(remove_class_enrollments)
-        return redirect_to student_enrollment_path(@enrollment.enrollment_number), notice: I18n.t("student_enrollment.notice.request_saved")
+        return redirect_to student_enrollment_path(@enrollment.id), notice: I18n.t("student_enrollment.notice.request_saved")
       end
     end
     @enrollment_request.enrollment_request_comments.delete(@comment) if ! @comment.nil? && ! @comment.persisted?
@@ -112,7 +112,7 @@ class StudentEnrollmentController < ApplicationController
     raise CanCan::AccessDenied.new if current_user.nil?
     raise CanCan::AccessDenied.new if current_user.student.nil?
     set_sidebar
-    @enrollment = Enrollment.find_by(enrollment_number: params[:id])
+    @enrollment = Enrollment.find(params[:id])
     if (@enrollment.nil? || @enrollment.student.user != current_user || ! @enrollment.enrollment_status.user)
       return redirect_to landing_url, alert: I18n.t("student_enrollment.alert.invalid_enrollment", enrollment: params[:id])
     end
@@ -123,17 +123,17 @@ class StudentEnrollmentController < ApplicationController
     redirect = _valid_enrollment
     return redirect unless redirect.nil?
     if @enrollment.dismissal.present?
-      return redirect_to student_enrollment_path(@enrollment.enrollment_number), alert: I18n.t("student_enrollment.alert.dismissed_enrollment", enrollment: params[:id])
+      return redirect_to student_enrollment_path(@enrollment.id), alert: I18n.t("student_enrollment.alert.dismissed_enrollment", enrollment: params[:id])
     end
     @semester = ClassSchedule.find_by(
       ClassSchedule.arel_table[:year].eq(params[:year])
       .and(ClassSchedule.arel_table[:semester].eq(params[:semester]))
     )
     if @semester.nil?
-      return redirect_to student_enrollment_path(@enrollment.enrollment_number), alert: I18n.t("student_enrollment.alert.invalid_semester", year: params[:year], semester: params[:semester])
+      return redirect_to student_enrollment_path(@enrollment.id), alert: I18n.t("student_enrollment.alert.invalid_semester", year: params[:year], semester: params[:semester])
     end
     if check_time && ! @semester.enroll_open?
-      return redirect_to student_enrollment_path(@enrollment.enrollment_number), alert: I18n.t("student_enrollment.alert.closed_enrollment", year: params[:year], semester: params[:semester])
+      return redirect_to student_enrollment_path(@enrollment.id), alert: I18n.t("student_enrollment.alert.closed_enrollment", year: params[:year], semester: params[:semester])
     end
     nil
   end

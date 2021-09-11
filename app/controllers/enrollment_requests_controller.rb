@@ -68,7 +68,7 @@ class EnrollmentRequestsController < ApplicationController
       end
       emails = [EmailTemplate.load_template("enrollment_requests:email_to_student").prepare_message({
         :record => record,
-        :student_enrollment_url => student_enroll_url(id: record.enrollment.enrollment_number, year: record.year, semester: record.semester)
+        :student_enrollment_url => student_enroll_url(id: record.enrollment.id, year: record.year, semester: record.semester)
       })]
       Notifier.send_emails(notifications: emails)
     end

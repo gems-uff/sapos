@@ -19,7 +19,7 @@ class LandingController < ApplicationController
         ]
       end
       if ! max_enrollment.nil? && max_enrollment[0].enrollment_status.user
-        return redirect_to student_enrollment_path(max_enrollment[0].enrollment_number)
+        return redirect_to student_enrollment_path(max_enrollment[0].id)
       end
     else
       return redirect_to pendencies_path
