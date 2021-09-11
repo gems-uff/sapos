@@ -42,6 +42,7 @@ class ClassSchedulesController < ApplicationController
     @year = schedule.year
     @semester = schedule.semester
     @course_classes = CourseClass.where(year: @year, semester: @semester)
+    @on_demand = Course.joins(:course_type).where(course_types: { on_demand: true })
 
     respond_to do |format|
       format.pdf do

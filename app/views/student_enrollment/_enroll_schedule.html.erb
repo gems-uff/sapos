@@ -1,0 +1,39 @@
+<div class="schedule">
+  <span class="schedule-title"> <%= t 'student_enrollment.enroll.dates.date' %> </span>
+
+  <ul>
+    <li>
+      <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.start' %></span>
+      <span class="schedule-date-value"><%= l semester.enrollment_start, format: :defaultdatetime %></span>
+    </li>
+    <li>
+      <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.end' %></span>
+      <span class="schedule-date-value"><%= l semester.enrollment_end, format: :defaultdatetime %></span>
+    </li>
+    <% if semester.enrollment_start != semester.enrollment_adjust && semester.enrollment_end < semester.enrollment_adjust  %>
+      <li>
+        <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.adjust' %></span>
+        <span class="schedule-date-value"><%= l semester.enrollment_adjust, format: :defaultdatetime  %></span>
+      </li>
+    <% end %>
+    <% if semester.enrollment_end < semester.enrollment_insert && semester.enrollment_remove == semester.enrollment_insert %>
+      <li>
+        <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.end_adjust' %></span>
+        <span class="schedule-date-value"><%= l semester.enrollment_insert, format: :defaultdatetime  %></span>
+      </li>
+    <% else %>
+      <% if semester.enrollment_end < semester.enrollment_insert %>
+        <li>
+          <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.adjust_insert' %></span>
+          <span class="schedule-date-value"><%= l semester.enrollment_insert, format: :defaultdatetime  %></span>
+        </li>
+      <% end %>
+      <% if semester.enrollment_end < semester.enrollment_remove %>
+        <li>
+          <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.adjust_remove' %></span>
+          <span class="schedule-date-value"><%= l semester.enrollment_remove, format: :defaultdatetime  %></span>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
+</div>

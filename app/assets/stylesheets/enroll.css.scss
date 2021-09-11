@@ -139,21 +139,16 @@ table.enroll-table  {
   color: darkgreen;
 }
 
-.enroll-title {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.enroll-title .schedule-title {
+.schedule .schedule-title {
   font-weight: bold;
 }
 
-.enroll-title .schedule-date-attr {
+.schedule .schedule-date-attr {
   color: #666;
   width: 270px;
   display: inline-block;
 }
 
-.enroll-title .schedule-date-attr::after {
+.schedule .schedule-date-attr::after {
   content: ":"
 }

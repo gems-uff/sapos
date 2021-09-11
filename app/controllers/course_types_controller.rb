@@ -7,12 +7,11 @@ class CourseTypesController < ApplicationController
 
   active_scaffold :course_type do |config|
     config.list.sorting = {:name => 'ASC'}
-    config.list.columns = [:name, :has_score, :schedulable, :show_class_name, :allow_multiple_classes]
+    columns = [:name, :has_score, :schedulable, :show_class_name, :allow_multiple_classes, :on_demand]
+    config.list.columns = columns
+    config.columns = columns
     config.create.label = :create_course_type_label
     config.update.label = :update_course_type_label
-
-    config.columns =
-        [:name, :has_score, :schedulable, :show_class_name, :allow_multiple_classes]
 
     config.actions.exclude :deleted_records
   end

@@ -1,0 +1,25 @@
+<% if enrollment_request.errors.any? %>
+  <div id="error_explanation">
+    <span>
+      <%= I18n.t("errors.messages.not_saved",
+                count: enrollment_request.errors.count,
+                resource: enrollment_request.class.model_name.human.downcase)
+      %>
+    </span>
+    <ul>
+      <% enrollment_request.errors.details.keys.each do |attribute| %>
+        <% enrollment_request.errors.full_messages_for(attribute).each do |message| %>
+          <li>
+            <%= message %>
+            <% if attribute == :class_enrollment_requests && enrollment_request.persisted? %>
+              <div>
+                <%= form.check_box :delete_request, id: "delete_request" %> <%= form.label t('student_enrollment.enroll.remove'), for: "delete_request" %>
+              </div>
+            <% end %>
+          </li>
+        <% end %>
+        
+      <% end %>
+    </ul>
+  </div>
+<% end %>

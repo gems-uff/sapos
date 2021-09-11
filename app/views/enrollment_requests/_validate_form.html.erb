@@ -59,7 +59,7 @@ form_tag url_options, options
     </h5>
     <div id="<%= cer_subform_id %>-div">
       <input type="hidden" name="record[class_enrollment_requests][0]" value="">
-      <% table = prepare_class_schedule_table(@record.class_enrollment_requests.collect(&:course_class)) %>
+      <% table = prepare_class_schedule_table(@record.class_enrollment_requests.collect(&:course_class), [], [], keep_on_demand=true) %>
       <table class="disable-pointer enroll-table <%= sub_form_list_id(association: :class_enrollment_requests) %>">
         <thead>
           <tr>
@@ -74,7 +74,7 @@ form_tag url_options, options
         <tbody>
           <% table[:data].each do |row| %>
             <tr> 
-              <% cer = @record.class_enrollment_requests.find_by(course_class_id: row[0]) %>
+              <% cer = @record.class_enrollment_requests.find_by(course_class_id: row[0][:id]) %>
               <input type="hidden" name="record[class_enrollment_requests][<%=cer.id%>][id]" value="<%=cer.id%>">
               <input type="hidden" name="record[class_enrollment_requests][<%=cer.id%>][course_class]" value="<%=cer.course_class_id%>">
               <input type="hidden" name="record[class_enrollment_requests][<%=cer.id%>][class_enrollment]" value="<%=cer.class_enrollment_id%>">

@@ -53,26 +53,25 @@ module CourseClassesPdfHelper
       table_data = course_class.class_enrollments.joins({:enrollment => :student}).order("students.name").map do |class_enrollment|
 
         if course_class.course.course_type.has_score    
-	  [
-	    i+=1,
-	    class_enrollment.enrollment.enrollment_number,
-	    class_enrollment.enrollment.student.name + (class_enrollment.enrollment.has_active_scholarship_now? ? " *" : ""),
-	    number_to_grade(class_enrollment.grade),
-	    class_enrollment.attendance_to_label,
-	    class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.registered") ? "" : class_enrollment.situation,
-	    class_enrollment.obs
-	  ]
-	else
-	  [
-	    i+=1,
-	    class_enrollment.enrollment.enrollment_number,
-	    class_enrollment.enrollment.student.name + (class_enrollment.enrollment.has_active_scholarship_now? ? " *" : ""),
-	    class_enrollment.attendance_to_label,
-	    class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.registered") ? "" : class_enrollment.situation,
-	    class_enrollment.obs
-	  ]
-	end	 
-
+          [
+            i+=1,
+            class_enrollment.enrollment.enrollment_number,
+            class_enrollment.enrollment.student.name + (class_enrollment.enrollment.has_active_scholarship_now? ? " *" : ""),
+            number_to_grade(class_enrollment.grade),
+            class_enrollment.attendance_to_label,
+            class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.registered") ? "" : class_enrollment.situation,
+            class_enrollment.obs
+          ]
+        else
+          [
+            i+=1,
+            class_enrollment.enrollment.enrollment_number,
+            class_enrollment.enrollment.student.name + (class_enrollment.enrollment.has_active_scholarship_now? ? " *" : ""),
+            class_enrollment.attendance_to_label,
+            class_enrollment.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.registered") ? "" : class_enrollment.situation,
+            class_enrollment.obs
+          ]
+        end	 
       end
     else
       table_data = []
@@ -134,7 +133,8 @@ module CourseClassesPdfHelper
 
   end
 
-  def prepare_class_schedule_table(course_classes)
+  def prepare_class_schedule_table(course_classes, on_demand, advisement_authorizations=nil, keep_on_demand=false)
+    advisement_authorizations ||= []
     star = false
     first = 1
     last = 5
@@ -148,7 +148,7 @@ module CourseClassesPdfHelper
       end
     end
     header = [[
-      "id",
+      "meta",
       "#{I18n.t("pdf_content.course_class.class_schedule.course_name")}"
     ]]
     (first..last).each do |index|
@@ -157,13 +157,15 @@ module CourseClassesPdfHelper
     header[0] << "#{I18n.t("pdf_content.course_class.class_schedule.professor")}"
 
     table_data = []
+    on_demand_professors = {}
 
     course_classes.each do |course_class|
-      next unless course_class.course.course_type.schedulable
+      course_type = course_class.course.course_type
+      next unless course_type.schedulable
         
       course = header[0].map {|x| ""}
 
-      course[0] = course_class.id
+      course[0] = {id: course_class.id, course_id: course_class.course_id, on_demand: course_type.on_demand}
       course[1] = course_class.name_with_class
 
       course_class.allocations.each do |allocation| 
@@ -180,11 +182,39 @@ module CourseClassesPdfHelper
       end
 
       course[-1] = rescue_blank_text(course_class.professor, :method_call => :name)
-      table_data << course
+      if ! course_type.on_demand || keep_on_demand
+        table_data << course
+      else
+        (on_demand_professors[course_class.course_id] ||= []) << course_class.professor
+      end
     end
 
-    table_data.sort_by! { |e| e[0] }
+    table_data.sort_by! { |e| e[0][:id] }
+    
+    demand_data = []
+    
+    on_demand.each do |course|
+      professors = advisement_authorizations
+      found_professors = on_demand_professors[course.id]
+      if found_professors.present?
+        different_professors = found_professors.filter { |prof| ! advisement_authorizations.include? prof }
+        professors = different_professors + advisement_authorizations
+      end
+      course_data = header[0].map {|x| ""}
+      course_data[0] = {id: nil, course_id: course.id, on_demand: true, professors: professors}
+      course_data[1] = course.name
+      (first..last).each do |index|
+        course_data[index + 2 - first] = "*\n "
+      end
+      course_data[-1] = ""
+      star = true
+      demand_data << course_data
+    end
 
+    demand_data.sort_by! {|c| c[0][:course_id]}
+
+    table_data += demand_data
+    
     {
       star: star,
       first: first,
@@ -196,7 +226,8 @@ module CourseClassesPdfHelper
 
   def class_schedule_table(pdf, options={})
     course_classes ||= options[:course_classes]
-    table = prepare_class_schedule_table(course_classes)
+    on_demand ||= options[:on_demand]
+    table = prepare_class_schedule_table(course_classes, on_demand)
     table[:header][0] = table[:header][0].drop(1).collect {|h| "<b>#{h}</b>"}
     table[:data] = table[:data].collect {|row| row.drop(1) }
 

@@ -1,5 +1,3 @@
-<% table = prepare_class_schedule_table(@available_classes)  %>
-<% estars = "" %>
 <% closed = ! @semester.enroll_open? %>
 <div class="landing-main enroll-main">
   <% if flash[:alert] %>
@@ -9,176 +7,31 @@
       <div id="error_login"><%= t 'student_enrollment.enroll.closed_enrollment', semester: @semester.to_label %></div>
   <% end %>
   
-  <div class="enroll-title">
-    <h2> <%= t 'student_enrollment.enroll.title', semester: @semester.to_label %> </h2>
-    
-    <div class="schedule">
-      <span class="schedule-title"> <%= t 'student_enrollment.enroll.dates.date' %> </span>
-    
-      <ul>
-        <li>
-          <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.start' %></span>
-          <span class="schedule-date-value"><%= l @semester.enrollment_start, format: :defaultdatetime %></span>
-        </li>
-        <li>
-          <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.end' %></span>
-          <span class="schedule-date-value"><%= l @semester.enrollment_end, format: :defaultdatetime %></span>
-        </li>
-        <% if @semester.enrollment_start != @semester.enrollment_adjust && @semester.enrollment_end < @semester.enrollment_adjust  %>
-          <li>
-            <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.adjust' %></span>
-            <span class="schedule-date-value"><%= l @semester.enrollment_adjust, format: :defaultdatetime  %></span>
-          </li>
-        <% end %>
-        <% if @semester.enrollment_end < @semester.enrollment_insert && @semester.enrollment_remove == @semester.enrollment_insert %>
-          <li>
-            <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.end_adjust' %></span>
-            <span class="schedule-date-value"><%= l @semester.enrollment_insert, format: :defaultdatetime  %></span>
-          </li>
-        <% else %>
-          <% if @semester.enrollment_end < @semester.enrollment_insert %>
-            <li>
-              <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.adjust_insert' %></span>
-              <span class="schedule-date-value"><%= l @semester.enrollment_insert, format: :defaultdatetime  %></span>
-            </li>
-          <% end %>
-          <% if @semester.enrollment_end < @semester.enrollment_remove %>
-            <li>
-              <span class="schedule-date-attr"><%= t 'student_enrollment.enroll.dates.adjust_remove' %></span>
-              <span class="schedule-date-value"><%= l @semester.enrollment_remove, format: :defaultdatetime  %></span>
-            </li>
-          <% end %>
-        <% end %>
-      </ul>
-    </div>
-  </div>
+  <h2> <%= t 'student_enrollment.enroll.title', semester: @semester.to_label %> </h2>
+  <%= render partial: "enroll_schedule", locals: { semester: @semester } %>
 
   <% if @enrollment_request.persisted? %>
     <span class="show-enroll-status show-enroll-status-<%= ClassEnrollmentRequest::STATUSES_MAP[@enrollment_request.status] %>"> <%= t('student_enrollment.enroll.status', status: @enrollment_request.status.downcase) %> </span>
   <% end %>
 
   <%= form_with model: @enrollment_request, url: :save_student_enroll, method: :post do |form| %>
-    <% if @enrollment_request.errors.any? %>
-      <div id="error_explanation">
-        <span>
-          <%= I18n.t("errors.messages.not_saved",
-                    count: @enrollment_request.errors.count,
-                    resource: @enrollment_request.class.model_name.human.downcase)
-          %>
-        </span>
-        <ul>
-          <% @enrollment_request.errors.details.keys.each do |attribute| %>
-            <% @enrollment_request.errors.full_messages_for(attribute).each do |message| %>
-              <li>
-                <%= message %>
-                <% if attribute == :class_enrollment_requests && @enrollment_request.persisted? %>
-                  <div>
-                    <%= form.check_box :delete_request, id: "delete_request" %> <%= form.label t('student_enrollment.enroll.remove'), for: "delete_request" %>
-                  </div>
-                <% end %>
-              </li>
-            <% end %>
-            
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
-
-    <table class="enroll-table">
-      <thead>
-        <tr>
-          <% if @enrollment_request.persisted? %>
-             <th> <%= t 'student_enrollment.enroll.class_status' %> </th>
-          <% end %>
-          <th> <%= t 'student_enrollment.enroll.do_enroll' %> </th>
-          <% table[:header][0].drop(1).each do |head| %>
-            <th class="cell-<%= head.downcase %>"> <%= head %> </th>
-          <% end %>
-        </tr>
-      </thead>
-      <tbody>
-        <%= form.collection_check_boxes :course_class_ids, table[:data], :first, :first do |box| %>
-          <% 
-            cer = nil 
-            @enrollment_request.class_enrollment_requests.each do |temp_cer|
-              if temp_cer.course_class_id == box.object[0]
-                cer = temp_cer
-              end
-            end 
-          %>
-          <% if @semester.main_enroll_open? || @semester.adjust_enroll_insert_open? || ! cer.nil? %>
-            <tr <%= cer.nil? ? "" : "title=\"#{cer.status}\" class=\"enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.status] }\"".html_safe %>>
-              <% if @enrollment_request.persisted? %>
-                <td>
-                  <%= box.label do %>
-                    <% if ! cer.nil? %>
-                      <%= cer.status %>
-                    <% else %>
-                      &nbsp;
-                    <% end %>
-                  <% end %>
-                </td>
-              <% end %>
-              <td>
-                <%= box.label class: "check-label" do %>
-                  <% readonly = closed || (! @semester.main_enroll_open? && ! @semester.adjust_enroll_remove_open? && ! cer.nil?) %>
-                  <%= box.check_box onclick: (readonly ?  "return false;" : ""), readonly: readonly  %>
-                <% end %>
-              </td>
-              <% box.object.drop(1).each_with_index do |cell, index| %>
-                <td class="cell-<%= table[:header][0][index + 1].downcase %>">
-                  <%= box.label do %>
-                    <%= cell.empty? ? "&nbsp; ".html_safe  : cell %> 
-                    <% if ! cer.nil? && ! cer.errors.empty? && index == 0 %>
-                      <details>
-                        <summary><%= t('student_enrollment.enroll.class_errors', count: cer.errors.full_messages.count) %> </summary>
-                        <ul>
-                          <% cer.errors.full_messages.each do |message| %>
-                            <li> <%= message %> </li>
-                          <% end %>
-                        </ul>
-                      </details>
-                    <% end %>
-                  <% end %>
-                </td>
-              <% end %>
-            </tr>
-          <% end %>
-        <% end %>
-      </tbody>
-    </table>
-
-    <ul>
-    <% if table[:star] %>
-      <li>* <%= I18n.t("pdf_content.course_class.class_schedule.noschedule") %></li>
-      <% estars = "*" %>
-    <% end %>
-    <% unless CustomVariable.class_schedule_text.nil? or CustomVariable.class_schedule_text.empty? %>
-      <li>*<%= estars %> <%= CustomVariable.class_schedule_text %></li>
-    <% end %>
-    </ul>
-
-    <% if ! @enrollment_request.enrollment_request_comments.empty? || ! closed %>
-      <h4> <%= t('student_enrollment.enroll.messages') %> </h4>
-      <div class="enroll-messages">
-        <div class="log">
-          <% @enrollment_request.enrollment_request_comments.each do |comment| %>
-            <div class="enroll-message <%= comment.updated_at > @last_read && comment.user != current_user ? "new-message" : "old-message" %>">
-              <span class="time"> <%= t('student_enrollment.enroll.message.time', time: comment.updated_at) %> </span>
-              <span class="author"> <%= t('student_enrollment.enroll.message.author', author: comment.user.name) %> </span>
-              <span class="content"> <%= simple_format(comment.message) %> </span>
-            </div>
-          <% end %>
-        </div>
-
-        <% unless closed %>
-          <div class="message-box">
-            <span class="send-message"> <%= t('student_enrollment.enroll.message.send') %> </span>
-            <%= form.text_area(:message, size: '100x4', value: @comment.nil? ? "" : @comment.message ) %>
-          </div>
-        <% end %>
-      </div>
-    <% end %>
+    <%= render partial: "enroll_errors", locals: { enrollment_request: @enrollment_request, form: form } %>
+    <%= render partial: "enroll_table", locals: { 
+      enrollment: @enrollment,
+      enrollment_request: @enrollment_request,
+      semester: @semester,
+      available_classes: @available_classes,
+      on_demand: @on_demand,
+      advisement_authorizations: @advisement_authorizations,
+      closed: closed,
+      form: form } %>
+    <%= render partial: "enroll_comments", locals: {
+      enrollment_request: @enrollment_request,
+      last_read: @last_read,
+      old_comment: @comment,
+      closed: closed,
+      form: form } %>
+    
     <% unless closed %>
       <%= form.submit t('student_enrollment.enroll.submit') %>
     <% end %>

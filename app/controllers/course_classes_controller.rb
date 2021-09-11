@@ -84,6 +84,7 @@ class CourseClassesController < ApplicationController
 
     each_record_in_page {}
     @course_classes = find_page
+    @on_demand = Course.joins(:course_type).where(course_types: { on_demand: true })
     @search = search_params
 
     if search_params.nil? or search_params[:year].empty? or search_params[:semester].empty?

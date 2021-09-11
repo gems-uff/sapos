@@ -1,0 +1,130 @@
+<% 
+  table = prepare_class_schedule_table(available_classes, on_demand, advisement_authorizations) 
+  estars = "" 
+  found_main_authorized = nil
+  found_advisor_authorized = nil
+  enrollment.advisements.each do |advisement|
+    professor = advisement.professor
+    if advisement_authorizations.include? professor
+      found_advisor_authorized = professor
+      found_main_authorized = professor if advisement.main_advisor
+    end
+  end
+  select_professor = found_main_authorized || found_advisor_authorized
+%>
+
+<table class="enroll-table">
+  <thead>
+    <tr>
+      <% if enrollment_request.persisted? %>
+          <th> <%= t 'student_enrollment.enroll.class_status' %> </th>
+      <% end %>
+      <th> <%= t 'student_enrollment.enroll.do_enroll' %> </th>
+      <% table[:header][0].drop(1).each do |head| %>
+        <th class="cell-<%= head.downcase %>"> <%= head %> </th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+    <%= form.hidden_field :course_class_ids, multiple: true, value:"" %>
+    <% table[:data].each_with_index do |row, row_index| %>
+      <% 
+        cer = nil 
+        enrollment_request.class_enrollment_requests.each do |temp_cer|
+          if ! row[0][:on_demand] && temp_cer.course_class_id == row[0][:id]
+            cer = temp_cer
+          elsif row[0][:on_demand] && temp_cer.course_class.course_id == row[0][:course_id]
+            cer = temp_cer
+            row[0][:id] = cer.course_class_id
+            row[-1] = cer.course_class.professor.name
+          end
+        end 
+      %>
+      <% if semester.main_enroll_open? || semester.adjust_enroll_insert_open? || ! cer.nil? %>
+        <% if ! row[0][:on_demand] || ! cer.nil? %>
+          <tr <%= cer.nil? ? "" : "title=\"#{cer.status}\" class=\"enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.status] }\"".html_safe %>>
+            <% if enrollment_request.persisted? %>
+              <%= render layout: "enroll_table_td", locals: { labelid: row[0][:id], row_index: row_index, form: form } do %>
+                <%= ! cer.nil? ? cer.status : "&nbsp; ".html_safe %>
+              <% end %>
+            <% end %>
+            <%= render layout: "enroll_table_td", locals: { labelid: row[0][:id], row_index: row_index, form: form, labelclass: "check-label" } do %>
+              <% readonly = closed || (! semester.main_enroll_open? && ! semester.adjust_enroll_remove_open? && ! cer.nil?) %>
+              <%= form.check_box :course_class_ids, { data: { row: row_index }, class: row[0][:on_demand] ? "on_demand_check" : "class_enrollment_check", id: "table_row_#{row_index}", multiple: true, skip_default_ids: false, onclick: (readonly ?  "return false;" : ""), readonly: readonly }, row[0][:id], "" %>
+            <% end %>
+            <%= render layout: "enroll_table_td", locals: { labelid: row[0][:id], row_index: row_index, form: form, tdclass: "cell-#{table[:header][0][1].downcase}" } do %>
+              <%= row[1].empty? ? "&nbsp; ".html_safe  : row[1] %> 
+              <% if ! cer.nil? && ! cer.errors.empty? %>
+                <details>
+                  <summary><%= t('student_enrollment.enroll.class_errors', count: cer.errors.full_messages.count) %> </summary>
+                  <ul>
+                    <% cer.errors.full_messages.each do |message| %>
+                      <li> <%= message %> </li>
+                    <% end %>
+                  </ul>
+                </details>
+              <% end %>
+            <% end %>
+            <% row.drop(2).each_with_index do |cell, index| %>
+              <%= render layout: "enroll_table_td", locals: { labelid: row[0][:id], row_index: row_index, form: form, tdclass: "cell-#{table[:header][0][index + 2].downcase}" } do %>
+                <%= cell.empty? ? "&nbsp; ".html_safe  : cell %> 
+              <% end %>
+            <% end %>
+          </tr>
+        <% end %>
+        <% if row[0][:on_demand] %>
+          <tr id="on_demand_row_<%= row_index %>" <%= cer.nil? ? "" : 'style="display: none;"'.html_safe %>>
+            <% if enrollment_request.persisted? %>
+              <%= render layout: "enroll_table_td", locals: { labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form } do %>
+                &nbsp;
+              <% end %>
+            <% end %>
+            <%= render layout: "enroll_table_td", locals: { labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, labelclass: "check-label" } do %>
+              <% readonly = closed || (! semester.main_enroll_open? && ! semester.adjust_enroll_remove_open? && ! cer.nil?) %>
+              <%= form.check_box "course_ids[#{row[0][:course_id]}][selected]", { id: "table_row_demand_#{row_index}", skip_default_ids: false, onclick: (readonly ?  "return false;" : ""), readonly: readonly }%>
+            <% end %>
+            <%= render layout: "enroll_table_td", locals: { labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, tdclass: "cell-#{table[:header][0][1].downcase}" } do %>
+              <%= row[1].empty? ? "&nbsp; ".html_safe  : row[1] %> 
+            <% end %>
+            <% row[2..-2].each_with_index do |cell, index| %>
+              <%= render layout: "enroll_table_td", locals: { labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, tdclass: "cell-#{table[:header][0][index + 2].downcase}" } do %>
+                <%= cell.empty? ? "&nbsp; ".html_safe  : cell %> 
+              <% end %>
+            <% end %>
+            <%= render layout: "enroll_table_td", locals: { labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, tdclass: "cell-#{table[:header][0][-1].downcase}" } do %>
+              <% 
+                 options = {} 
+                 options = { selected: select_professor.id } if ! select_professor.nil?
+                 options = { selected: cer.course_class.professor.id } if ! cer.nil?
+              %>
+              <%= form.collection_select("course_ids[#{row[0][:course_id]}][professor]", row[0][:professors], :id, :name, options) %>
+            <% end %>
+          </tr>
+        <% end %>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>
+
+<ul>
+  <% if table[:star] %>
+    <li>* <%= I18n.t("pdf_content.course_class.class_schedule.noschedule") %></li>
+    <% estars = "*" %>
+  <% end %>
+  <% unless CustomVariable.class_schedule_text.nil? or CustomVariable.class_schedule_text.empty? %>
+    <li>*<%= estars %> <%= CustomVariable.class_schedule_text %></li>
+  <% end %>
+</ul>
+
+<script>
+  
+  $(".on_demand_check").on("change", function() {
+    var ischecked = $(this).is(":checked");
+    if (!ischecked) {
+      $(this).parents('tr').hide();
+      $("#on_demand_row_" + $(this).data('row')).show();
+    }
+  })
+
+
+</script>

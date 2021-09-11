@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_10_181140) do
+ActiveRecord::Schema.define(version: 2021_09_10_214629) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -142,6 +142,7 @@ ActiveRecord::Schema.define(version: 2021_09_10_181140) do
     t.boolean "schedulable", default: true
     t.boolean "show_class_name", default: true
     t.boolean "allow_multiple_classes", default: false, null: false
+    t.boolean "on_demand", default: false, null: false
   end
 
   create_table "courses", force: :cascade do |t|

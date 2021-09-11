@@ -1,0 +1,7 @@
+<% tdclass ||= nil %>
+<% labelclass ||= nil %>
+<td <%= tdclass.nil? ? "" : "class=#{tdclass}" %>>
+  <%= form.label labelid, for: "table_row_#{row_index}", class: labelclass  do %>
+    <%= yield %>
+  <% end %>
+</td>
