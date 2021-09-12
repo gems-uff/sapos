@@ -147,8 +147,8 @@ SimpleNavigation::Configuration.run do |navigation|
       configuration.item :custom_variables, 'Configurações de Relatório', report_configurations_path, :if => can_read?(ReportConfiguration)
     end
 
-    primary.item :user, 'Perfil', edit_user_registration_path, highlights_on: %r(/users) do |user|
-      user.item :password, "Editar perfil", edit_user_registration_path
+    primary.item :user, 'Perfil', edit_user_registration_path, highlights_on: %r(/users), if: Proc.new { user_signed_in? } do |user|
+      user.item :password, "Editar perfil", edit_user_registration_path, if: Proc.new { user_signed_in? }
     end
 
     primary.item :logout, 'Logout', destroy_user_session_path
