@@ -103,4 +103,16 @@ class User < ApplicationRecord
     end
   end
 
+  def self.find_for_database_authentication(conditions={})
+    user = self.find_by(email: conditions[:email])  
+    return user unless user.nil?
+    
+    cpf = nil
+    cpf = conditions[:email].gsub(/[\.\-]/, '') if ! conditions[:email].include? '@'
+    unless cpf.nil?
+      self.joins(:professor).where("REPLACE(REPLACE(professors.cpf, '-', ''), '.', '') = ?", cpf).first ||  
+      self.joins(:student).where("REPLACE(REPLACE(students.cpf, '-', ''), '.', '') = ?", cpf).first 
+    end
+  end
+
 end

@@ -8,8 +8,8 @@
         <%= flash[:name] %>
 
         <div id="login_input">
-          <%= f.label :email %>
-          <%= f.email_field :email %>
+          <%= f.label :email, 'Email ou CPF' %>
+          <%= f.text_field :email %>
         </div>
 
         <br/>
