@@ -153,6 +153,7 @@ pt-BR:
         schedulable: "Aparecer no QH"
         show_class_name: "Mostrar nome da turma no QH e Histórico"
         allow_multiple_classes: "Permitir mais de uma inscrição"
+        on_demand: "Criação de turmas por demanda"
       deferral:
         approval_date: "Data de aprovação"
         deferral_type: "Tipo de Prorrogação"
