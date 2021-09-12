@@ -9,6 +9,7 @@ pt-BR:
       expired: "expirou, por favor solicite um novo"
       not_found: "não encontrado"
       already_confirmed: "já foi confirmado, por favor tente fazer login"
+      confirmation_period_expired: "precisa ser confirmado dentro de %{period}, por favor peça uma nova"
       not_locked: "não estava bloqueado"
       not_saved:
         one: "1 erro impediu que %{resource} fosse salvo:"
@@ -18,18 +19,20 @@ pt-BR:
     failure:
       already_authenticated: 'Você já está logado.'
       unauthenticated: ''
+      last_attemp: 'Você tem mais uma tentativa antes da sua conta ser bloqueada.'
       unconfirmed: 'Você precisa confirmar a sua conta para continuar.'
       locked: 'Sua conta está bloqueada.'
       invalid: 'Senha ou e-mail inválidos.'
       invalid_token: 'Token de autenticação inválido.'
       timeout: 'A sua sessão expirou, por favor faça login novamente para continuar.'
       inactive: 'A sua conta ainda não foi ativada.'
-      user:
-        not_found_in_database: "Email ou senha inválida."
+      not_found_in_database: "Email ou senha inválida."
     sessions:
       signed_in: 'Login feito com sucesso.'
       signed_out: 'Logout feito com sucesso.'
+      already_signed_out: 'Logout feito com sucesso.'
     passwords:
+      no_token: "Você não pode acessar essa página sem vir de um email de alteração de senha. Se você veio de um email de alteração de senha, por favor verifique que você usou a URL completa."
       send_instructions: 'Dentro de minutos você receberá um e-mail com as instruções de reinicialização de sua senha.'
       updated: 'Sua senha foi alterada com sucesso. Você está logado.'
       updated_not_active: 'Sua senha foi alterada com sucesso.'
@@ -40,8 +43,13 @@ pt-BR:
       confirmed: 'Sua conta foi confirmada com sucesso.'
     registrations:
       signed_up: 'Bem-vindo! Você registrou-se com sucesso.'
+      signed_up_but_inactive: "Bem-vindo! Você registrou-se com sucesso. No entanto, não pudemos realizar seu login porque sua conta está inativa."
+      signed_up_but_locked: "Bem-vindo! Você registrou-se com sucesso. No entanto, não pudemos realizar seu login porque sua conta está bloqueada."
+      signed_up_but_unconfirmed: "Uma mensagem com um link de confirmação foi enviada ao seu email. Por favor, use o link para ativar sua conta."
       inactive_signed_up: 'Você registrou-se com sucesso. No entanto, não pudemos realizar seu login porque sua conta está %{reason}.'
+      update_needs_confirmation: "Você atualizou a sua conta com sucesso, mas precisamos verificar seu novo endereço de email. Por favor, verifique seu email e use o link de confirmação."
       updated: 'Você atualizou a sua conta com sucesso.'
+      updated_but_not_signed_in: 'Sua conta foi atualizada com sucesso, mas como sua senha mudou, é necessário logar-se novamente.'
       destroyed: 'Até mais! Sua conta foi cancelada com sucesso. Esperamos vê-lo em breve.'
       reasons:
         inactive: 'inativa'

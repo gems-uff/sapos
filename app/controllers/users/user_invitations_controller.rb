@@ -3,7 +3,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 
-class UserInvitationsController < Devise::InvitationsController
+class Users::UserInvitationsController < Devise::InvitationsController
   def new
     redirect_to root_path
   end

@@ -145,7 +145,10 @@ SimpleNavigation::Configuration.run do |navigation|
       configuration.item :notification_logs, 'Notificações Enviadas', notification_logs_path, :if => can_read?(NotificationLog)
       configuration.item :custom_variables, 'Variáveis', custom_variables_path, :if => can_read?(CustomVariable)
       configuration.item :custom_variables, 'Configurações de Relatório', report_configurations_path, :if => can_read?(ReportConfiguration)
-      
+    end
+
+    primary.item :user, 'Perfil', edit_user_registration_path, highlights_on: %r(/users) do |user|
+      user.item :password, "Editar perfil", edit_user_registration_path
     end
 
     primary.item :logout, 'Logout', destroy_user_session_path

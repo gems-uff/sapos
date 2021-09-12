@@ -25,10 +25,22 @@ Sapos::Application.routes.draw do
 
   resources :scholarship_suspensions do concerns :active_scaffold end
 
-  devise_for :users, :controllers => {
-    :registrations => "users",
-    :invitations => "user_invitations",
-  }
+  devise_for :users,  :controllers => {
+    confirmations: "users/confirmations",
+    passwords: "users/passwords",
+    sessions: "users/sessions",
+    unlocks: "users/unlocks",
+    invitations: "users/user_invitations",
+  }, skip: [:registrations]
+
+  devise_scope :user do
+    get 'users/sign_up', to: 'users/registrations#new', as: :new_user_registration
+    get 'users/profile', to: 'users/registrations#edit', as: :edit_user_registration
+    patch 'users/profile', to: 'users/registrations#update', as: :user_registration
+    put 'users/profile', to: 'users/registrations#update'
+    post 'users/profile', to: 'users/registrations#update'
+    delete 'users/profile', to: 'users/registrations#update'
+  end
 
   resources :versions do
     concerns :active_scaffold

@@ -1,0 +1,36 @@
+.edit-profile-main ol.form {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.edit-profile-main .form li.form-element dl {
+    display: flex;
+}
+
+.edit-profile-main .form li.form-element dl dt {
+    width: 15em;
+    color: #555;
+}
+
+.edit-profile-main .form li.form-element.required dl dt label {
+    font-weight: bold;
+}
+
+.edit-profile-main .form li.form-element dl input {
+    border: solid 1px #a4c7d0;
+    padding: 2px;
+    width: 250px;
+}
+
+.edit-profile-main .info {
+    font-size: 0.8rem;
+}
+
+.edit-profile-main .submit {
+    font-weight: bold;
+    font-size: 1.2rem;
+    font-family: Arial, sans-serif;
+    letter-spacing: 0;
+    margin: 5px 0 0 0;
+}

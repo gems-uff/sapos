@@ -106,7 +106,7 @@ class EmailTemplate < ApplicationRecord
     "devise:confirmation_instructions" => {
       path: File.join("devise", "mailer", "confirmation_instructions.text.erb"),
       subject: I18n.t('devise.mailer.confirmation_instructions.subject'),
-      to: "<%= @resource.email %>",
+      to: "<%= @resource.unconfirmed_email || @resource.email %>",
       variables: {
         '@resourse' => "User"
       }
