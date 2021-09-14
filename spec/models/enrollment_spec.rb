@@ -148,6 +148,46 @@ describe Enrollment do
         end
       end
     end
+
+    describe "enrollment_holds" do
+      context "should be valid when" do
+        it "enrollment_holds is empty" do
+          enrollment.enrollment_holds = []
+          expect(enrollment).to have(0).errors_on :enrollment_holds
+        end
+        it "enrollment_hold ocurrs after admission date and before dismissal date" do
+          enrollment.admission_date = 3.days.ago.to_date
+          enrollment.dismissal = FactoryBot.build(:dismissal, date: 4.years.since)
+          enrollment.enrollment_holds.build(
+            year: enrollment.admission_date.year + 2,
+            semester: 1,
+            number_of_semesters: 1,
+          )
+          expect(enrollment).to have(0).errors_on :enrollment_holds
+        end
+      end
+      context "should have error invalid" do
+        it "enrollment_hold ocurrs before admission date" do
+          enrollment.admission_date = 3.days.ago.to_date
+          enrollment.enrollment_holds.build(
+            year: enrollment.admission_date.year - 5,
+            semester: 1,
+            number_of_semesters: 1,
+          )
+          expect(enrollment).to have_error(:invalid).on :enrollment_holds
+        end
+        it "enrollment_hold ocurrs after dismissal date" do
+          enrollment.admission_date = 3.days.ago.to_date
+          enrollment.dismissal = FactoryBot.build(:dismissal, date: 4.years.since)
+          enrollment.enrollment_holds.build(
+            year: enrollment.admission_date.year + 6,
+            semester: 1,
+            number_of_semesters: 1,
+          )
+          expect(enrollment).to have_error(:invalid).on :enrollment_holds
+        end
+      end
+    end
   end
   describe "Methods" do
     before(:all) do

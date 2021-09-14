@@ -253,7 +253,9 @@ pt-BR:
         year: "Ano"
         semester: "Semestre"
         number_of_semesters: "Número de Semestres"
-        number_label: "semestre"
+        number_label:
+          one: "1 semestre"
+          other: "%{count} semestres"
       enrollment_request:
         year: Ano
         semester: Semestre

@@ -25,18 +25,18 @@ class EnrollmentHold < ApplicationRecord
   end
 
   def number_label
-    "#{number_of_semesters} #{I18n.t("activerecord.attributes.enrollment_hold.number_label").pluralize(number_of_semesters)}"
+    I18n.t("activerecord.attributes.enrollment_hold.number_label", count: number_of_semesters)
   end
 
   def validate_dates
     return if enrollment.nil? or year.nil? or semester.nil?
     admission_date = enrollment.admission_date
     if self.start_date < admission_date
-      errors.add(:base, I18n.t("activerecord.errors.models.enrollment_hold.before_admission_date"))      
+      errors.add(:base, :before_admission_date)
     end
     dismissal = enrollment.dismissal
     if !dismissal.nil? and self.end_date > dismissal.date
-      errors.add(:base, I18n.t("activerecord.errors.models.enrollment_hold.after_dismissal_date"))      
+      errors.add(:base, :after_dismissal_date)      
     end
   end
 
