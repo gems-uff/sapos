@@ -1,0 +1,90 @@
+<% alt_name = options[:name].sub "[#{column.name}]", "[#{column.name}_]" %>
+<% remove_name = options[:name].sub "[#{column.name}]", "[remove_#{column.name}]" %>
+
+<%= active_scaffold_input_carrierwave(column, options) %>
+<a href="#" id="<%= options[:id] %>_togglewebcam" style="<%= options[:object].send(column.name).file.nil? ? 'display:block;' : 'display:none;' %> margin: 3px 0;"> Webcam </a>
+<a href="#" id="<%= options[:id] %>_togglefile" style="display:none; margin: 3px 0;"> Arquivo </a>
+
+<div style="display:none; margin-left: 2px;" id="<%= options[:id] %>_camera_inputs">
+  <input autocomplete="off" class="photo-input text-input" id="<%= options[:id] %>_" name="<%= alt_name %>[base64_contents]" type="hidden">
+  <input autocomplete="off" class="photo-input text-input" id="<%= options[:id] %>_filename" name="<%= alt_name %>[filename]" type="hidden" value="camera.jpg">
+  <div id="<%= options[:id] %>_camera" style="width: 400px; height: 300px;"></div>
+  <div><a href="#" id="<%= options[:id] %>_takesnapshot" style="margin: 3px 0;"> Tirar foto </a></div>
+  <div class="previewwebcamimage"></div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    var input = $("#<%= options[:id] %>");
+    if (!input.length) return;
+    var remove_photo = input.parents(".carrierwave_controls").find('input[name="record[remove_photo]"]');
+
+    carrierwave_preview('.students-view', input);
+
+    var togglewebcam = $('#<%= options[:id] %>_togglewebcam');
+    var togglefile = $('#<%= options[:id] %>_togglefile');
+
+    var camerainput_div = $('#<%= options[:id] %>_camera_inputs');
+    var camerainput = $('#<%= options[:id] %>_');
+    var camerainputname = $('#<%= options[:id] %>_filename');
+
+    var webcam = $('#<%= options[:id] %>_camera');
+    var takesnapshot_link = $('#<%= options[:id] %>_takesnapshot');
+    
+    var init = false;
+    var toggler = function(e){
+      e.preventDefault();
+      togglewebcam.toggle();
+      togglefile.toggle();
+      camerainput_div.toggle()
+      input.toggle();
+      if (webcam.is(":visible")) {
+        if (!init) {
+          Webcam.attach(webcam[0]);
+          init = true;
+
+          form = input.parents("form").parent().find(".as_cancel").on("click", function(){
+            Webcam.reset();
+          })
+          form = input.parents("form").on("submit", function(){
+            Webcam.reset();
+          })
+        }
+
+        camerainput.attr('name', '<%= options[:name] %>[base64_contents]');
+        camerainputname.attr('name', '<%= options[:name] %>[filename]');
+        input.attr('name', '<%= alt_name %>');
+        
+      } else {
+        if (init) {
+          Webcam.reset();
+          init = false;
+        }
+
+        camerainput.attr('name', '<%= alt_name %>[base64_contents]');
+        camerainputname.attr('name', '<%= alt_name %>[filename]');
+        input.attr('name', '<%= options[:name] %>');
+      }
+    }
+    togglewebcam.on('click', toggler);
+    togglefile.on('click', toggler);
+    
+    takesnapshot_link.on('click', function(e) {
+      e.preventDefault();
+      Webcam.snap(function (data_uri) {
+        var preview = camerainput_div.find('.previewwebcamimage')
+        preview.html(['<p>Visualização:</p><img class="thumb" src="', data_uri, '" title="photo"/>'].join(''));
+        var raw_image_data = data_uri.replace(/^data\:image\/\w+\;base64\,/, '');
+        camerainput.val(raw_image_data);
+        camerainputname.val((new Date().getTime()) + '.jpg');
+        input.parents(".carrierwave_controls").find('input[name="<%= remove_name %>"]').val('false');
+      });
+     
+    });
+
+    remove_photo.next().on('click', function(e) {
+      togglewebcam.show();
+    })
+
+  });
+</script>

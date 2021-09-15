@@ -21,9 +21,9 @@ module UploaderReferenceCounter
     if old_image
       if old_image.medium_hash.downcase != model.send("#{uploader}_before_type_cast").downcase	      
         #remove the old image
-	model.send("#{uploader}_was").remove!
+	      model.send("#{uploader}_was").remove!
       else
-	#the new image is the same as the old image. nothing needs to be done       
+	      #the new image is the same as the old image. nothing needs to be done       
         return
       end
     end
@@ -55,11 +55,11 @@ module UploaderReferenceCounter
     if image
       #if there is an image, decrease reference_counter of image or remove it	    
       if image.reference_counter > 1
-	#only decrease the counter and save      
+	      #only decrease the counter and save      
         image.reference_counter -= 1
-	image.save 
+	      image.save 
       else
-	#call the super class remove! method to remove the image      
+	      #call the super class remove! method to remove the image      
         super
       end	
     end

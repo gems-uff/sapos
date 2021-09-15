@@ -81,4 +81,12 @@ class ProfileUploader < CarrierWave::Uploader::Base
   #   "something.jpg" if original_filename
   # end
 
+  def extension_allowlist
+    %w(jpg jpeg gif png)
+  end
+
+  def content_type_allowlist
+    /image\//
+  end
+
 end

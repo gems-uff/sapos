@@ -33,6 +33,16 @@ module StudentsHelper
       text: record.identity_issuing_place
     )
   end
+
+  def photo_form_column(record, options)
+    config = ActiveScaffold::Config::Core.new(:student)
+    render(:partial => "students/photo_widget", :locals => { 
+      config: config,
+      record: record,
+      options: options,
+      column: config.columns[:photo],
+    })
+  end
   
   def photo_show_column(record, column)
     return '-' if record.photo.blank?
