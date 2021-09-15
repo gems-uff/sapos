@@ -12,6 +12,7 @@ module ProfessorsHelper
 
   def identity_issuing_place_form_column(record, options)
     identity_issuing_place_widget(
+      record, options,
       text: record.identity_issuing_place
     )
   end

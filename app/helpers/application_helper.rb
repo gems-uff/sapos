@@ -52,71 +52,12 @@ module ApplicationHelper
     })
   end
 
-  def identity_issuing_place_widget(options={})
-    options[:text] ||= ""
-    options[:select_field] ||= :identity_issuing_place_select
-    options[:text_field] ||= :identity_issuing_place
-    options[:show_states_link] ||= :identity_issuing_place_widget_show_states
-    options[:show_text_link] ||= :identity_issuing_place_widget_show_text
-
-    country = CustomVariable.identity_issuing_country
-    html = "".html_safe
-    show_text = true
-    unless country.nil?
-      states = country.state.collect do |s| 
-        show_text = false if s.name == options[:text]
-        [s.name, s.name]
-      end
-      show_text = false if options[:text].empty?
-
-      html += select_tag(
-        "record[#{options[:select_field]}]", 
-        options_for_select([[I18n.translate("helpers.city_widget.select_state"), ""]] + states, options[:text]),
-        class: "identity_issuing_place_widget_select", 
-        data: {
-          :text_field_id => "#record_#{options[:text_field]}"
-        },
-        style: "display: #{show_text ? 'none' : 'inline-block'}"
-      )
-    end
-    html += text_field_tag(
-      "record[#{options[:text_field]}]", 
-      options[:text], 
-      class: "text-input",
-      maxlength: 255,
-      size: 30,
-      style: "display: #{show_text ? 'inline-block' : 'none'}"
-    )
-    unless country.nil?
-      html += link_to(
-        I18n.translate("helpers.identity_issuing_place_widget.show_states", :country=>country.name),
-        "#",
-        id: options[:show_states_link],
-        class: "identity_issuing_place_widget_show_state",
-        data: {
-          :hide => "#record_#{options[:text_field]}",
-          :show1 => "#record_#{options[:select_field]}",
-          :show2 => "##{options[:show_text_link]}",
-        },
-        style: "display: #{show_text ? 'inline-block' : 'none'}"
-      )
-      html += link_to(
-        I18n.translate("helpers.identity_issuing_place_widget.show_text"),
-        "#", 
-        id: options[:show_text_link],
-        class: "identity_issuing_place_widget_show_text",
-        data: {
-          :hide => "#record_#{options[:select_field]}",
-          :show1 => "#record_#{options[:text_field]}",
-          :show2 => "##{options[:show_states_link]}",
-        },
-        style: "display: #{show_text ? 'none' : 'inline-block'}"
-      )
-    end
-    
-    html
+  def identity_issuing_place_widget(record, options, attributes={})
+    return render(:partial => "application/identity_issuing_place_widget", :locals => { 
+      record: record,
+      options: options,
+      attributes: attributes,
+    })
   end
-
-  
 
 end
