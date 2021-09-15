@@ -99,7 +99,6 @@ $(document).ready(function () {
   $.datepicker.setDefaults($.datepicker.regional['pt-BR'] );
 
   window.onbeforeunload = confirmOnPageExit;
-  cityWidget();
   identityIssuingPlaceWidget();
 });
 

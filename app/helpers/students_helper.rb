@@ -7,28 +7,24 @@ module StudentsHelper
   end
 
   def city_form_column(record, options)
-    city = record.city || City.new
-    state = city.state || State.new
-    country = state.country || Country.new
-
     city_widget(
+      record, options,
       country: :address_country, state: :address_state, city: :city,
-      selected_country: country.id,
-      selected_state: state.id,
-      selected_city: city.id
+      selected_city: record.city
     )
   end
 
   def birth_city_form_column(record, options)
-    city = record.birth_city || City.new
-    state = city.state || record.birth_state || State.new
-    country = state.country || record.birth_country || Country.new
+    city = record.birth_city
+    state = (city.nil? ? nil : city.state) || record.birth_state
+    country = (state.nil? ? nil : state.country) || record.birth_country
 
     city_widget(
+      record, options,
       country: :birth_country, state: :birth_state, city: :birth_city,
-      selected_country: country.id,
-      selected_state: state.id,
-      selected_city: city.id
+      selected_country: country,
+      selected_state: state,
+      selected_city: city
     )
   end
 

@@ -3,15 +3,10 @@
 
 module ProfessorsHelper
   def city_form_column(record, options)
-    city = record.city || City.new
-    state = city.state || State.new
-    country = state.country || Country.new
-
     city_widget(
+      record, options,
       country: :address_country, state: :address_state, city: :city,
-      selected_country: country.id,
-      selected_state: state.id,
-      selected_city: city.id
+      selected_city: record.city
     )
   end
 

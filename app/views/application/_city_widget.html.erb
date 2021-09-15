@@ -1,0 +1,97 @@
+<% 
+  attributes[:country] ||= :address_country
+  attributes[:state] ||= :address_state
+  attributes[:city] ||= :city
+
+  country = attributes[:selected_country] || read_attribute(record, attributes[:country]) 
+  state = attributes[:selected_state] || read_attribute(record, attributes[:state])
+  city = attributes[:selected_city] || read_attribute(record, attributes[:city])  
+  
+  state = city.state if state.nil? && city.present?
+  country = state.country if country.nil? && state.present?
+  state = nil if country.nil? || (state.present? && state.country_id != country.id)
+  city = nil if state.nil? || (city.present? && city.state_id != state.id)
+
+  country_id = country.nil? ? nil : country.id
+  state_id = state.nil? ? nil : state.id
+  city_id = city.nil? ? nil : city.id
+ 
+
+  select_country_id = "widget_" + (options[:id].sub "_#{attributes[:city]}_", "_#{attributes[:country]}_")
+  country_name = options[:name].sub "[#{attributes[:city]}]", "[#{attributes[:country]}]"
+  country_options = options_for_select(
+    [[t("helpers.city_widget.select_country"), ""]] +
+      Country.all.collect{|c| [c.name, c.id]},
+    country_id
+  )
+
+  select_state_id = "widget_" + (options[:id].sub "_#{attributes[:city]}_", "_#{attributes[:state]}_")
+  state_name = options[:name].sub "[#{attributes[:city]}]", "[#{attributes[:state]}]"
+  state_options = options_for_select(
+    [[t("helpers.city_widget.select_state"), ""]] +
+      State.where("country_id" => country_id).collect{|s| [s.name, s.id]}, 
+    state_id
+  )
+  states_path = states_country_path("*")
+
+  select_city_id = "widget_" + options[:id]
+  city_name = options[:name]
+  city_options = options_for_select(
+    [[t("helpers.city_widget.select_city"), ""]] +
+      City.where("state_id" => state_id).collect{|c| [c.name, c.id]},
+    city_id
+  )
+  cities_path = cities_state_path("*")
+  
+%>
+
+<%= select_tag(country_name, country_options, { id: select_country_id }) %>
+<%= select_tag(state_name, state_options, { id: select_state_id })%>
+<%= select_tag(city_name, city_options, { id: select_city_id }) %>
+<%= loading_indicator_tag({ }) %>
+
+<script>
+  function replaceList(url, domElement, defaultText, done) {
+    $(domElement).siblings(".loading-indicator").css('visibility', 'visible');
+    $.getJSON(url, function (json) {
+      stateList = "<option value>"+defaultText+"</option>";
+      $.each(json, function (i, tuple) {
+        stateList += "<option value=\""+ tuple[1] +"\">" + tuple[0] + "</option>";
+      });
+      $(domElement).html(stateList);
+      done();
+      $(domElement).siblings(".loading-indicator").css('visibility', 'hidden');
+    });
+  }
+  function eraseList(domElement, defaultText) {
+    stateList = "<option value>"+defaultText+"</option>"
+    $(domElement).html(stateList);
+  }
+
+  $(document).ready(function() {
+    $("#<%= select_country_id %>").on('change', function() {
+      var countryId = this.value;
+      console.log(countryId);
+      if (countryId == "") {
+        eraseList("#<%= select_state_id %>", "<%= t("helpers.city_widget.select_state") %>");
+        $("#<%= select_state_id %>").trigger("change");
+        return;
+      }
+      var url = "<%= states_path %>".replace("*", countryId);
+      replaceList(url, "#<%= select_state_id %>", "<%= t("helpers.city_widget.select_state") %>", function() {
+        $("#<%= select_city_id %>").html("<option value><%= t("helpers.city_widget.select_city") %></option>");
+      });		
+    })
+
+    $("#<%= select_state_id %>").on('change', function() {
+      var stateId = this.value;
+      if (stateId == "") {
+        eraseList("#<%= select_city_id %>", "<%= t("helpers.city_widget.select_city") %>");
+        $("#<%= select_city_id %>").trigger("change");
+        return;
+      }
+      var url = "<%= cities_path %>".replace("*", stateId);
+      replaceList(url, "#<%= select_city_id %>", "<%= t("helpers.city_widget.select_city") %>", function() {});		
+    })
+  });
+</script>
