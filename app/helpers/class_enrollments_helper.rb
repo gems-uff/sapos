@@ -77,4 +77,39 @@ module ClassEnrollmentsHelper
     check_box :record, :disapproved_by_absence_to_view, options
   end
 
+  def grade_not_count_in_gpr_form_column(record, options)
+
+    justification_size = "30"
+    justification_label = I18n.t("helpers.class_enrollments.justification_grade_not_count_in_gpr")
+
+    if controller_name != "class_enrollments"
+      justification_size = "8"
+      justification_label = justification_label.strip 
+    end
+
+    html = check_box :record, :grade_not_count_in_gpr, options.merge({:style => "margin: 0px 0px 0px 8px;"})
+    html = ActiveSupport::SafeBuffer.new("<span style='display:inline-block;vertical-align:middle;'>") + html + ActiveSupport::SafeBuffer.new("</span>")
+
+    html << label_tag("", justification_label, :style => "margin: 0 8px;")  
+
+    html << text_field_tag( "record[justification_grade_not_count_in_gpr]", record.justification_grade_not_count_in_gpr, :class => "text-input", :autocomplete => "off", :maxlength => "255", :size => justification_size, :name => options[:name].sub("grade_not_count_in_gpr","justification_grade_not_count_in_gpr"))
+
+    html
+
+  end
+
+  def obs_form_column(record, options)
+    extra_options = {}
+
+    if controller_name == "course_classes"
+      extra_options ={:cols => "6"}
+    end
+
+    text_area(:record, :obs, options.merge(extra_options))
+  end
+
+  def justification_grade_not_count_in_gpr_form_column(record, options)
+    return ""
+  end
+
 end

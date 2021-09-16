@@ -254,7 +254,7 @@ module EnrollmentsPdfHelper
         [
             class_enrollment.course_class.course.code,
             class_enrollment.course_class.name_with_class,
-            class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : I18n.t("pdf_content.enrollment.grade_list.course_approved"),
+            class_enrollment.grade_not_count_in_gpr.present? ? "*" : (class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : I18n.t("pdf_content.enrollment.grade_list.course_approved")),
             class_enrollment.course_class.course.credits,
             class_enrollment.course_class.course.workload_text,
             "#{class_enrollment.course_class.semester}/#{class_enrollment.course_class.year}"
@@ -413,7 +413,7 @@ module EnrollmentsPdfHelper
           table_data << [
               class_enrollment.course_class.course.code,
               class_enrollment.course_class.name_with_class,
-              class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : "--",
+              class_enrollment.grade_not_count_in_gpr.present? ? "*" : (class_enrollment.course_class.course.course_type.has_score ? number_to_grade(class_enrollment.grade) : "--"),
               class_enrollment.course_class.course.credits,
               class_enrollment.course_class.course.workload_text,
               ys,
@@ -563,7 +563,6 @@ module EnrollmentsPdfHelper
     end
     
     if (not data_table_rows_defense_committee.nil?) && (data_table_rows_defense_committee.length > 0)
-
       #title row	 
 	    table_committee = curr_pdf.make_table(data_table_rows_defense_committee[0,1], :cell_style => {:borders => [:top, :left, :right], :border_top_width => 0.5, :width => 560, :padding_top => 5.5, :padding_bottom => 4.9, :inline_format => true, :font => "FreeMono", :size => 8, :border_color => "000080" })
       table_committee.draw
@@ -577,6 +576,43 @@ module EnrollmentsPdfHelper
       #last row 
       table_committee = curr_pdf.make_table(data_table_rows_defense_committee[data_table_rows_defense_committee.length - 1,data_table_rows_defense_committee.length], :cell_style => {:borders => [:left, :right, :bottom], :border_bottom_width => 1.0 , :width => 560, :padding_top => 0.0, :padding_bottom => 8.5, :inline_format => true, :font => "FreeMono", :size => 8, :border_color => "000080" })
       table_committee.draw
+    end
+
+  end
+
+  def justification_grade_not_count_in_gpr_table(curr_pdf, options={})
+
+    enrollment ||= options[:enrollment]
+
+    class_enrollments_which_grade_not_count_in_gpr = enrollment.class_enrollments.where(class_enrollments: { grade_not_count_in_gpr: 1 } )
+
+    if class_enrollments_which_grade_not_count_in_gpr.length > 0 
+      
+      data_table_rows_justification_grade_not_count_in_gpr = [["<b>*</b> #{I18n.t('pdf_content.enrollment.grades_report.courses_which_grade_not_count_in_gpr')}"]]
+
+      class_enrollments_which_grade_not_count_in_gpr.each do |class_enrollment|
+        
+        if class_enrollment.justification_grade_not_count_in_gpr.to_s.strip.empty?
+          justification = I18n.t('rescue_blank_text')
+        else
+          justification = class_enrollment.justification_grade_not_count_in_gpr
+        end
+        data_table_rows_justification_grade_not_count_in_gpr << ["<b>#{class_enrollment.course_class.course.code} / #{justification}</b>"]   
+      end
+
+      #title row         
+      table_justification_grade_not_count_in_gpr = curr_pdf.make_table(data_table_rows_justification_grade_not_count_in_gpr[0,1], :cell_style => {:borders => [:top, :left, :right], :border_top_width => 0.5, :width => 560, :padding_top => 5.5, :padding_bottom => 4.9, :inline_format => true, :font => "FreeMono", :size => 8, :border_color => "000080" })
+      table_justification_grade_not_count_in_gpr.draw
+
+      #middle rows (if any)
+      if data_table_rows_justification_grade_not_count_in_gpr.length > 2
+        table_justification_grade_not_count_in_gpr = curr_pdf.make_table(data_table_rows_justification_grade_not_count_in_gpr[1,data_table_rows_justification_grade_not_count_in_gpr.length - 2], :cell_style => {:borders => [:left, :right], :width => 560, :padding_top => 0.0, :padding_bottom => 1.0, :inline_format => true, :font => "FreeMono", :size => 8, :border_color => "000080" })
+        table_justification_grade_not_count_in_gpr.draw
+      end
+
+      #last row 
+      table_justification_grade_not_count_in_gpr = curr_pdf.make_table(data_table_rows_justification_grade_not_count_in_gpr[data_table_rows_justification_grade_not_count_in_gpr.length - 1,data_table_rows_justification_grade_not_count_in_gpr.length], :cell_style => {:borders => [:left, :right, :bottom], :border_bottom_width => 1.0 , :width => 560, :padding_top => 0.0, :padding_bottom => 8.5, :inline_format => true, :font => "FreeMono", :size => 8, :border_color => "000080" })
+      table_justification_grade_not_count_in_gpr.draw
     end
 
   end

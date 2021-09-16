@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_08_30_212746) do
+ActiveRecord::Schema.define(version: 2021_09_09_121558) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -78,6 +78,8 @@ ActiveRecord::Schema.define(version: 2021_08_30_212746) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "disapproved_by_absence", default: false
+    t.boolean "grade_not_count_in_gpr", default: false
+    t.string "justification_grade_not_count_in_gpr", default: ""
     t.index ["course_class_id"], name: "index_class_enrollments_on_course_class_id"
     t.index ["enrollment_id"], name: "index_class_enrollments_on_enrollment_id"
   end

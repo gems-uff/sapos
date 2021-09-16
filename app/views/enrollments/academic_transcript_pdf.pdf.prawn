@@ -12,6 +12,8 @@ new_document('transcript.pdf', I18n.t("pdf_content.enrollment.header.title"), :w
 
     transcript_table(pdf, class_enrollments: @class_enrollments)
 
+    justification_grade_not_count_in_gpr_table(pdf, enrollment: @enrollment)
+
     thesis_table(pdf, enrollment: @enrollment)
 
     enrollment_holds_table(pdf, enrollment: @enrollment)

@@ -10,6 +10,8 @@ new_document('grades_report.pdf', I18n.t('pdf_content.enrollment.grades_report.t
 
     grades_report_table(pdf, enrollment: @enrollment, class_enrollments: @class_enrollments)
 
+    justification_grade_not_count_in_gpr_table(pdf, enrollment: @enrollment)
+
     thesis_table(pdf, enrollment: @enrollment, show_advisors: true)
 
     accomplished_table(pdf, accomplished_phases: @accomplished_phases)
