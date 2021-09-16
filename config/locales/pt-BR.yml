@@ -603,7 +603,7 @@ pt-BR:
           before_admission_date: "anterior a Data de Admissão"
           after_dismissal_date: "posterior a Data de Desligamento"
         enrollment_request:
-          at_least_one_class: "precisar ter pelo menos uma disciplina"
+          at_least_one_class: "deve incluir pelo menos uma seleção"
           attributes:
             status:
               class_enrollment_request_is_not_effected: "'efetivada' só é permitida quando todos os pedidos de disciplinas estão efetivados"
