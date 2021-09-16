@@ -200,6 +200,8 @@ module CourseClassesPdfHelper
         different_professors = found_professors.filter { |prof| ! advisement_authorizations.include? prof }
         professors = different_professors + advisement_authorizations
       end
+      next unless found_professors.present? || course.available
+         
       course_data = header[0].map {|x| ""}
       course_data[0] = {id: nil, course_id: course.id, on_demand: true, professors: professors}
       course_data[1] = course.name
