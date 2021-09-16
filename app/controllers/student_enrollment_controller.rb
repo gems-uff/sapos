@@ -73,7 +73,7 @@ class StudentEnrollmentController < ApplicationController
       end
     else
       course_class_ids = enrollment_request_params[:course_class_ids]
-      enrollment_request_params[:course_ids].each do |course_id, data|
+      (enrollment_request_params[:course_ids] || []).each do |course_id, data|
         if data[:selected] == "1"
           course_class = CourseClass.find_by(
             course_id: course_id.to_i, professor_id: data[:professor].to_i,
