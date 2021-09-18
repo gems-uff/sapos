@@ -75,7 +75,7 @@ pt-BR:
         disapproved_by_absence: "Reprovado por Falta"
         enrollment: "Matrícula"
         grade: "Nota"
-        grade_not_count_in_gpr: "Não contabilizar nota no CR"
+        grade_not_count_in_gpr: "Não contabilizar nota"
         obs: "Observação"
         situation: "Situação"
         situations:
@@ -1063,7 +1063,7 @@ pt-BR:
         total_credits: "Créditos Acumulados"
         total_gpr: "CR Acumulado"
         accomplishment_conclusion_date_not_given: "---------/----"
-        courses_which_grade_not_count_in_gpr: "DISCIPLINAS QUE NÃO CONTABILIZAM NOTA NO CR / JUSTIFICATIVA:" 
+        courses_which_grade_not_count_in_gpr: "DISCIPLINAS QUE NÃO CONTABILIZAM NOTA / JUSTIFICATIVA:" 
       scholarships:
         number: "NÚMERO"
         sponsor: "AGÊNCIA"
