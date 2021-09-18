@@ -59,10 +59,13 @@ pt-BR:
     effected_change: "Alguma disciplina já estava efetivada como uma inscrição antes da alteração. Ao selecionar uma situação diferente, a inscrição será removida!"
     validate:
       link: "Validar"
+    actions:
+      help: "Informações"
 
   class_enrollment_request:
     actions:
-      effect: "Efetivar"
+      help: "Informações"
+      effect: "Efetivar lista"
     invalid:
       label: "Invalidar"
       confirm: "Invalidar pedido? Se o pedido estiver efetivado, isso resultará na remoção da inscrição."

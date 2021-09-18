@@ -13,6 +13,11 @@ class ClassEnrollmentRequestsController < ApplicationController
       type: :collection,
       keep_open: false
 
+    config.action_links.add 'help',
+      label: I18n.t('class_enrollment_request.actions.help'),
+      type: :collection,
+      keep_open: false
+
     base_member = { type: :member, keep_open: false, position: false, crud_type: :update, method: :put, refresh_list: true }
     config.action_links.add "set_invalid",
       label:  "<i title='#{I18n.t('class_enrollment_request.invalid.label')}' class='fa fa-times-circle'></i>".html_safe,
@@ -259,6 +264,11 @@ class ClassEnrollmentRequestsController < ApplicationController
     respond_to_action(:show_effect)
   end
 
+  def help
+    raise CanCan::AccessDenied.new("Acesso negado!", :read, ClassEnrollmentRequest) if cannot? :read, ClassEnrollmentRequest
+    respond_to_action(:help)
+  end
+
   def effect
     raise CanCan::AccessDenied.new("Acesso negado!", :effect, ClassEnrollmentRequest) if cannot? :effect, ClassEnrollmentRequest
     count = 0
@@ -287,6 +297,14 @@ class ClassEnrollmentRequestsController < ApplicationController
   
   def show_effect_respond_to_js
     render(:partial => 'effect')
+  end
+
+  def help_respond_to_html
+    render(:action => 'help')
+  end
+  
+  def help_respond_to_js
+    render(:partial => 'enrollment_requests/shared_help')
   end
 
   def effect_respond_on_iframe

@@ -176,6 +176,7 @@ noscript.active-scaffold {
 .active-scaffold-header div.actions a.to_pdf,
 .active-scaffold-header div.actions a.new_users,
 .active-scaffold-header div.actions a.show_effect,
+.active-scaffold-header div.actions a.help,
 .active-scaffold-header div.actions a.preview,
 .active-scaffold-header div.actions a.class_schedule_pdf,
 .active-scaffold-header div.actions a.show_config_list,
@@ -241,12 +242,25 @@ noscript.active-scaffold {
 }
 
 .active-scaffold-header div.actions a.show_effect:before {
-    content: "\f02d";  /* this is your text. You can also use UTF-8 character codes as I do here */
+    content: "\f055";  /* this is your text. You can also use UTF-8 character codes as I do here */
     font-family: FontAwesome;
     left:8px;
     position:absolute;
     top:25%;
 }
+
+.active-scaffold-header div.actions a.help {
+    position: relative;
+}
+
+.active-scaffold-header div.actions a.help:before {
+    content: "\f05a";  /* this is your text. You can also use UTF-8 character codes as I do here */
+    font-family: FontAwesome;
+    left:8px;
+    position:absolute;
+    top:25%;
+}
+
 
 .active-scaffold-header div.actions a.show_search {
     background-image: url("active_scaffold/magnifier.png");

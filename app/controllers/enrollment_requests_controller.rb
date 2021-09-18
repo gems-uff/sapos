@@ -7,6 +7,12 @@ class EnrollmentRequestsController < ApplicationController
   helper :course_classes
 
   active_scaffold :"enrollment_request" do |config|
+
+    config.action_links.add 'help',
+      label: I18n.t('enrollment_request.actions.help'),
+      type: :collection,
+      keep_open: false
+
     config.columns << :status
     config.list.sorting = {:year => 'DESC', :semester => 'DESC', :enrollment => 'ASC'}
     config.list.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
@@ -40,5 +46,18 @@ class EnrollmentRequestsController < ApplicationController
       })]
       Notifier.send_emails(notifications: emails)
     end
-  end 
+  end
+
+  def help
+    raise CanCan::AccessDenied.new("Acesso negado!", :read, ClassEnrollmentRequest) if cannot? :read, ClassEnrollmentRequest
+    respond_to_action(:help)
+  end
+
+  def help_respond_to_html
+    render(:action => 'help')
+  end
+  
+  def help_respond_to_js
+    render(:partial => 'shared_help')
+  end
 end

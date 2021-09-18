@@ -19,7 +19,7 @@ class Ability
   def initialize(user)
     alias_action :list, :row, :show_search, :render_field, :class_schedule_pdf,
         :to_pdf, :summary_pdf, :academic_transcript_pdf, :grades_report_pdf, 
-        :browse, :simulate, :set_query_date, :cities, :states, :preview, :builtin, :to => :read
+        :browse, :simulate, :set_query_date, :cities, :states, :preview, :builtin, :help, :to => :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing, 
         :execute_now, :execute_now, :notify, :duplicate, :to => :update
     alias_action :delete, :destroy_existing, :to => :destroy
@@ -40,6 +40,7 @@ class Ability
       cannot [:destroy, :create], NotificationParam
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [Role, CustomVariable, ReportConfiguration])
+      can :read, :pendencies
       cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
       can :read, (Role)
     elsif role_id == Role::ROLE_PROFESSOR
@@ -63,6 +64,7 @@ class Ability
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, ReportConfiguration])
       can :invite, User
+      can :read, :pendencies
       cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
       can :read, (Query)
     elsif role_id == Role::ROLE_SUPORTE

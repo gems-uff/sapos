@@ -1,3 +1,8 @@
 <div class="pendency-type-box">
   <%= render :active_scaffold => "class_enrollment_requests", conditions: conditions %>
+
+  <span class="pendency-description">
+    Essa lista de pendências exibe apenas pedidos de inscrição em disciplinas sem decisão ou válidos (Situações: 'Solicitada' e 'Válida'). <br>
+    Para ver a lista completa com pedidos marcados como inválido ou efetivado, acesse <%= link_to "Disciplinas > Efetivar Inscrições", class_enrollment_requests_path %>
+  </span>
 </div>

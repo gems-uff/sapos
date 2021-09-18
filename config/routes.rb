@@ -300,10 +300,14 @@ Sapos::Application.routes.draw do
   resources :enrollment_requests do
     concerns :active_scaffold
     record_select_routes
+    collection do
+      get 'help'
+    end
   end
   resources :class_enrollment_requests do
     concerns :active_scaffold
     collection do
+      get 'help'
       get 'show_effect'
       post 'effect'
     end
