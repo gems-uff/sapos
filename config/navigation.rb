@@ -66,9 +66,11 @@ SimpleNavigation::Configuration.run do |navigation|
       return can_read ? Proc.new { true } : Proc.new { false } if proc
       can_read
     end
-
+    #highlights_on: %r(/users), 
     primary.item :land, 'Principal', landing_url, :if => can_read?(:landing) do |land|
+      land.item :pendencies, 'Pendências', pendencies_url, :if => Proc.new { can?(:read, :pendencies) }
       @landingsidebar.call(land)
+      land.item :password, "Editar perfil", edit_user_registration_path, highlights_on: %r(/users/profile), if: Proc.new { user_signed_in? }
     end
 
     alunos_models = [Student, Dismissal, Enrollment, EnrollmentHold, Level, DismissalReason, EnrollmentStatus]
@@ -145,10 +147,6 @@ SimpleNavigation::Configuration.run do |navigation|
       configuration.item :notification_logs, 'Notificações Enviadas', notification_logs_path, :if => can_read?(NotificationLog)
       configuration.item :custom_variables, 'Variáveis', custom_variables_path, :if => can_read?(CustomVariable)
       configuration.item :custom_variables, 'Configurações de Relatório', report_configurations_path, :if => can_read?(ReportConfiguration)
-    end
-
-    primary.item :user, 'Perfil', edit_user_registration_path, highlights_on: %r(/users), if: Proc.new { user_signed_in? } do |user|
-      user.item :password, "Editar perfil", edit_user_registration_path, if: Proc.new { user_signed_in? }
     end
 
     primary.item :logout, 'Logout', destroy_user_session_path

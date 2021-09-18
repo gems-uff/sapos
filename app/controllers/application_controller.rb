@@ -51,7 +51,28 @@ class ApplicationController < ActionController::Base
   private
 
   def set_landing
-    @landingsidebar = Proc.new {}
+    @landingsidebar = Proc.new do |land|
+      student_landing_menu(land)
+    end
+  end
+
+  def student_landing_menu(land)
+    return if current_user.blank? || current_user.student.blank?
+
+    @emptylanding = true
+    enrollments = current_user.student.enrollments.order(admission_date: :desc)
+    enrollments.each do |enrollment|
+      if enrollment.enrollment_status.user
+        number = enrollment.enrollment_number
+        path = student_enrollment_path(enrollment.id)
+        land.item number, number, path, :if => Proc.new { can?(:read, :landing) }
+        @emptylanding = false
+      end
+    end
+
+    if @emptylanding
+      land.item :landing, 'Principal', landing_url, :if => Proc.new { can?(:read, :landing) }
+    end
   end
 
   #def authenticate

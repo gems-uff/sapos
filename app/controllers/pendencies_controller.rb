@@ -7,9 +7,6 @@ class PendenciesController < ApplicationController
   def index
     raise CanCan::AccessDenied.new if current_user.nil?
     raise CanCan::AccessDenied.new if current_user.role_id == 
-    @landingsidebar = Proc.new do |land|
-      land.item :pendencies, 'Pendências', pendencies_url, :if => Proc.new { can?(:read, :landing) }
-    end
     @partials = []
     
     pendency_condition = EnrollmentRequest.pendency_condition

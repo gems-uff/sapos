@@ -2,7 +2,6 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class StudentEnrollmentController < ApplicationController
-  include LandingHelper
   helper :course_classes
   skip_authorization_check
 
@@ -128,7 +127,6 @@ class StudentEnrollmentController < ApplicationController
   def _valid_enrollment
     raise CanCan::AccessDenied.new if current_user.nil?
     raise CanCan::AccessDenied.new if current_user.student.nil?
-    set_sidebar
     @enrollment = Enrollment.find(params[:id])
     if (@enrollment.nil? || @enrollment.student.user != current_user || ! @enrollment.enrollment_status.user)
       return redirect_to landing_url, alert: I18n.t("student_enrollment.alert.invalid_enrollment", enrollment: params[:id])

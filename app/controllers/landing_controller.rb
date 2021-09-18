@@ -2,7 +2,6 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class LandingController < ApplicationController
-  include LandingHelper
   skip_authorization_check
 
   def index
@@ -24,7 +23,6 @@ class LandingController < ApplicationController
     else
       return redirect_to pendencies_path
     end
-    set_sidebar
     render :index
   end
 
