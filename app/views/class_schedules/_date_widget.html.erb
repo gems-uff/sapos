@@ -1,4 +1,4 @@
-<%= active_scaffold_input_date_picker config.columns[attribute], options %>
+<%= active_scaffold_input_datetime_picker config.columns[attribute], options %>
 <% unless same.nil? %>
     <% attr_column = config.columns[attribute] %>
     <% attr_id_control = "record_#{attr_column.name}_#{[params[:eid], params[:parent_id] || params[:id]].compact.join '_'}" %>

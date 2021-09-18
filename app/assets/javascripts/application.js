@@ -97,6 +97,8 @@ function queryStringToHash(query) {
 $(document).ready(function () {
   $.datepicker.regional['pt-BR'].dateFormat = 'dd/mm/yy';
   $.datepicker.setDefaults($.datepicker.regional['pt-BR'] );
+  $.timepicker.regional['pt-BR'].timeFormat = 'dd M yy HH:mm:ss';
+  $.timepicker.setDefaults($.datepicker.regional['pt-BR'] );
 
   window.onbeforeunload = confirmOnPageExit;
 });

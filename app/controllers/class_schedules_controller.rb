@@ -7,6 +7,7 @@ class ClassSchedulesController < ApplicationController
     config.list.columns = columns
     config.create.columns = columns
     config.update.columns = columns
+    config.show.columns = columns
     config.create.label = :create_class_schedule_label
     config.update.label = :update_class_schedule_label
 
@@ -30,6 +31,16 @@ class ClassSchedulesController < ApplicationController
       :include_blank => true,
       :default => nil
     }
+    config.columns[:enrollment_start].form_ui = :datetime_picker
+    config.columns[:enrollment_start].options = { format: :picker }
+    config.columns[:enrollment_end].form_ui = :datetime_picker
+    config.columns[:enrollment_end].options = { format: :picker }
+    config.columns[:enrollment_adjust].form_ui = :datetime_picker
+    config.columns[:enrollment_adjust].options = { format: :picker }
+    config.columns[:enrollment_insert].form_ui = :datetime_picker
+    config.columns[:enrollment_insert].options = { format: :picker }
+    config.columns[:enrollment_remove].form_ui = :datetime_picker
+    config.columns[:enrollment_remove].options = { format: :picker }
   end
 
   def class_schedule_pdf
