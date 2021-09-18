@@ -1000,7 +1000,7 @@ pt-BR:
         link: "Quadro de Horários"
         professor: "Professor"
         course_name: "Disciplina"
-        noschedule: "Horário a combinar"
+        noschedule: "Horário a combinar com o orientador"
         year_semester_error: 'Selecione Ano/Semestre na busca!'
     report_configurations:
       preview: "Visualizar"
