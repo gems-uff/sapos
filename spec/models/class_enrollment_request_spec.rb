@@ -11,7 +11,7 @@ end
 
 RSpec.describe ClassEnrollmentRequest, type: :model do
   
-  describe "ClassEnrollmentRequest" do
+  describe "Main Scenario" do
     
     before(:all) do
       @course_type = FactoryBot.create(:course_type)
@@ -284,34 +284,38 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
       Enrollment.delete_all
       CourseClass.delete_all
     end
-    describe "should return a condition that returns valid and requested ClassEnrollmentRequests" do
-      it "when user has a coordination role" do
-        role = FactoryBot.create(:role_coordenacao)
-        user = FactoryBot.create(:user, role: role)
-        result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
-        expect(result.count).to eq(2)
-        expect(result).to include(@valid, @requested)
-      end
-      it "when user has a secretary role" do
-        role = FactoryBot.create(:role_secretaria)
-        user = FactoryBot.create(:user, role: role)
-        result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
-        expect(result.count).to eq(2)
-        expect(result).to include(@valid, @requested)
-      end
-    end
-    describe "should return a condition that does not return anything" do
-      it "when user has an admin role" do
-        role = FactoryBot.create(:role_administrador)
-        user = FactoryBot.create(:user, role: role)
-        result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
-        expect(result.count).to eq(0)
-      end
-      it "when user has a professor role" do
-        role = FactoryBot.create(:role_professor)
-        user = FactoryBot.create(:user, role: role)
-        result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
-        expect(result.count).to eq(0)
+    describe "Class Methods" do
+      describe "pendency_condition" do
+        describe "should return a condition that returns valid and requested ClassEnrollmentRequests" do
+          it "when user has a coordination role" do
+            role = FactoryBot.create(:role_coordenacao)
+            user = FactoryBot.create(:user, role: role)
+            result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
+            expect(result.count).to eq(2)
+            expect(result).to include(@valid, @requested)
+          end
+          it "when user has a secretary role" do
+            role = FactoryBot.create(:role_secretaria)
+            user = FactoryBot.create(:user, role: role)
+            result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
+            expect(result.count).to eq(2)
+            expect(result).to include(@valid, @requested)
+          end
+        end
+        describe "should return a condition that does not return anything" do
+          it "when user has an admin role" do
+            role = FactoryBot.create(:role_administrador)
+            user = FactoryBot.create(:user, role: role)
+            result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
+            expect(result.count).to eq(0)
+          end
+          it "when user has a professor role" do
+            role = FactoryBot.create(:role_professor)
+            user = FactoryBot.create(:user, role: role)
+            result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
+            expect(result.count).to eq(0)
+          end
+        end
       end
     end
   end

@@ -189,7 +189,8 @@ class EnrollmentRequest < ApplicationRecord
         end
         cer.mark_for_destruction
         request_change[:remove_class_enrollment_requests] << cer
-      else 
+      else
+        request_change[:existing_class_enrollment_requests] << cer
         self.valid_removal = false
       end
     end
