@@ -300,10 +300,6 @@ Sapos::Application.routes.draw do
   resources :enrollment_requests do
     concerns :active_scaffold
     record_select_routes
-    member do
-      get 'show_validate'
-      patch 'validate'
-    end
   end
   resources :class_enrollment_requests do
     concerns :active_scaffold
@@ -312,7 +308,10 @@ Sapos::Application.routes.draw do
       post 'effect'
     end
     member do
-      put 'single_effect'
+      put 'set_invalid'
+      put 'set_requested'
+      put 'set_valid'
+      put 'set_effected'
     end
   end
   resources :enrollment_request_comments, concerns: :active_scaffold

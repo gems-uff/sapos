@@ -10,17 +10,16 @@ module EnrollmentRequestsHelper
       "value=\"#{column_status}\""
     ]
     checked = column_status == record_status
-    if checked
-      result << 'checked="checked"'
-    end
-    if [column_status, record_status].include?(ClassEnrollmentRequest::EFFECTED)
+    result << 'checked="checked"' if checked
+    classes = ["class-enrollment-request-status", "radio-#{column_status.parameterize}"]
+
+    if column_status == ClassEnrollmentRequest::EFFECTED && cannot?(:effect, ClassEnrollmentRequest)
       result << 'readonly="readonly"'
-      unless checked
-        result << 'disabled="disabled"'
-      end
-    else
-      result << "class=\"class-enrollment-request-status-radio radio-#{column_status.parameterize}\""
+      result << 'disabled="disabled"' unless checked
     end
+
+    classes << 'effected-item' if record_status == ClassEnrollmentRequest::EFFECTED
+    result << "class=\"#{classes.join(' ')}\""
     result.join(' ').html_safe
   end
 

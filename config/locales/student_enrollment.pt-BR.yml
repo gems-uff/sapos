@@ -55,24 +55,46 @@ pt-BR:
       request_saved: Pedido de inscrição salvo!
 
   enrollment_request:
+    nested_notice: "Mudanças feitas aqui serão salvas, mas elas podem não refletir visualmente na tabela externa. Uma atualização manual da página no navegador (F5) pode ser necessária."
+    effected_change: "Alguma disciplina já estava efetivada como uma inscrição antes da alteração. Ao selecionar uma situação diferente, a inscrição será removida!"
     validate:
       link: "Validar"
 
   class_enrollment_request:
     actions:
       effect: "Efetivar"
-      effect_single: "Efetivar"
-      effect_confirm: "Efetivar inscrição?"
-    effect:
-      count:
-        zero: "Nenhuma inscrição da lista pode ser efetivada!"
-        one: "Uma inscrição da lista pode ser efetivada"
-        other: "%{count} inscrições da lista podem ser efetivadas"
+    invalid:
+      label: "Invalidar"
+      confirm: "Invalidar pedido? Se o pedido estiver efetivado, isso resultará na remoção da inscrição."
+      applied:
+        zero: "Nenhuma inscrição invalidada"
+        one: "Uma inscrição invalidada"
+        other: "%{count} inscrições invalidadas"
+    requested:
+      label: "Remover decisão"
+      confirm: "Remover decisão? Se o pedido estiver efetivado, isso resultará na remoção da inscrição."
+      applied:
+        zero: "Nenhuma decisão removida"
+        one: "Uma decisão removida"
+        other: "%{count} decisões removidas"
+    valid:
+      label: "Validar"
+      confirm: "Validar pedido? Se o pedido estiver efetivado, isso resultará na remoção da inscrição."
+      applied:
+        zero: "Nenhuma inscrição validada"
+        one: "Uma inscrição validada"
+        other: "%{count} inscrições validadas"
+    effected:
+      label: "Efetivar"
+      confirm: "Efetivar inscrição?"
       applied:
         zero: "Nenhuma inscrição efetivada"
         one: "Uma inscrição efetivada"
         other: "%{count} inscrições efetivadas"
-
+      count:
+        zero: "Nenhuma inscrição da lista pode ser efetivada!"
+        one: "Uma inscrição da lista pode ser efetivada"
+        other: "%{count} inscrições da lista podem ser efetivadas"
   
   active_scaffold:
     effect: "Efetivar"

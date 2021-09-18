@@ -1,0 +1,8 @@
+<% cancel_link = true if cancel_link.nil? %>
+
+<%= render :partial => "base_form", :locals => {:xhr => xhr ||= nil,
+                                                :form_action => form_action ||= :update,
+                                                :submit_text => :validate,
+                                                :method => method ||= :patch,
+                                                :cancel_link => cancel_link,
+                                                :headline => @record.to_label } %>

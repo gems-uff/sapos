@@ -23,28 +23,27 @@ class ClassEnrollmentRequest < ApplicationRecord
   validates_uniqueness_of :course_class, :scope => [:enrollment_request]
   validates :status, :presence => true, :inclusion => {:in => STATUSES}
   validates :class_enrollment, :presence => true, if: -> { status == EFFECTED }
-  validate :validate_class_enrollment_match
-  validate :validate_course_class_duplication
+
+  validate :that_class_enrollment_matches_course_and_enrollment
+  validate :that_course_class_does_not_exist_in_a_class_enrollment
   validate :validate_allocation_match
 
-  after_save :update_main_request_status_on_save
-  after_destroy :update_main_request_status_on_destroy
+  before_validation :create_class_enrollment, on: %i[create update]
+  after_save :destroy_class_enrollment
 
   def self.pendency_condition(user=nil)
     user ||= current_user
     return ["0 = -1"] if user.nil?
+    return ["0 = -1"] if user.cannot?(:read_pendencies, ClassEnrollmentRequest)
+
     cer = ClassEnrollmentRequest.arel_table.dup
     cer.table_alias = 'cer'
     check_status = cer.where(
       cer[:status].not_eq(ClassEnrollmentRequest::EFFECTED)
       .and(cer[:status].not_eq(ClassEnrollmentRequest::INVALID))
     )
-    if user.role_id == Role::ROLE_COORDENACAO || user.role_id == Role::ROLE_SECRETARIA
-      return [
-        ClassEnrollmentRequest.arel_table[:id].in(check_status.project(cer[:id])).to_sql
-      ]
-    end
-    ["0 = -1"]
+
+    [ClassEnrollmentRequest.arel_table[:id].in(check_status.project(cer[:id])).to_sql]
   end
 
   def allocations
@@ -64,50 +63,38 @@ class ClassEnrollmentRequest < ApplicationRecord
     enrollment_request.status
   end
 
-  def to_effected
-    changed = false
-    if self.class_enrollment.nil?
-      self.class_enrollment = ClassEnrollment.new(
-        enrollment: self.enrollment_request.enrollment,
-        course_class: self.course_class,
-        situation: ClassEnrollment::REGISTERED
-      )
-      changed ||= true
-    end
-    if self.status != EFFECTED
-      self.status = EFFECTED
-      changed ||= true
-    end
-    changed
+  def set_status!(new_status)
+    changed = new_status != status || (new_status == EFFECTED && class_enrollment.blank?)
+    self.status = new_status
+    changed && save
   end
 
   protected
 
-  def validate_class_enrollment_match
+  def that_class_enrollment_matches_course_and_enrollment
     ce = self.class_enrollment
-    return if ce.nil?
-    if ce.course_class_id != self.course_class_id || ce.enrollment_id != self.enrollment_request.enrollment_id
-      errors.add(:class_enrollment, :must_represent_the_same_enrollment_and_class)
-    end
+    return if ce.blank?
+    return if ce.course_class_id == self.course_class_id && ce.enrollment_id == self.enrollment_request.enrollment_id
+
+    errors.add(:class_enrollment, :must_represent_the_same_enrollment_and_class)
   end
 
-  def validate_course_class_duplication
+  def that_course_class_does_not_exist_in_a_class_enrollment
     enrollment_request = self.enrollment_request
     course_class = self.course_class
     return if enrollment_request.nil? || course_class.nil?
     enrollment = self.enrollment_request.enrollment
     return if enrollment.nil?
     course = course_class.course
-
-    enrollment.class_enrollments.reload
-    this_class_enrollment = self.class_enrollment
-    enrollment.class_enrollments.each do |class_enrollment|
-      if class_enrollment.course_class.course_id == course.id && class_enrollment != this_class_enrollment
-        if ! course.course_type.allow_multiple_classes && class_enrollment.situation != ClassEnrollment::DISAPPROVED 
-          errors.add(:course_class, :previously_approved)
-        end
-      end
+    
+    return if enrollment.class_enrollments.none? do |enrollment_class|
+      enrollment_class.course_class.course_id == course.id &&
+        enrollment_class != class_enrollment &&
+        !course.course_type.allow_multiple_classes &&
+        enrollment_class.situation != ClassEnrollment::DISAPPROVED
     end
+
+    errors.add(:course_class, :previously_approved)
   end
 
   def validate_allocation_match
@@ -129,19 +116,23 @@ class ClassEnrollmentRequest < ApplicationRecord
     end
   end
 
-  def update_main_request_status_on_save
-    return unless enrollment_request = self.enrollment_request
-    if saved_change_to_attribute?(:status) && (self.status == EFFECTED || self.status_before_last_save == EFFECTED)
-      enrollment_request.refresh_status!
-    elsif self.created_at == self.updated_at && enrollment_request.status == EFFECTED # new_record
-      enrollment_request.refresh_status!
+  def create_class_enrollment
+    if self.status == EFFECTED && self.class_enrollment.blank?
+      self.class_enrollment = ClassEnrollment.new(
+        enrollment: self.enrollment_request.enrollment,
+        course_class: self.course_class,
+        situation: ClassEnrollment::REGISTERED
+      )
     end
   end
 
-  def update_main_request_status_on_destroy
-    return unless enrollment_request = self.enrollment_request
-    if (self.status != EFFECTED && enrollment_request.status != EFFECTED)
-      self.enrollment_request.refresh_status!
+  def destroy_class_enrollment
+    if self.status != EFFECTED && self.class_enrollment.present? && self.class_enrollment.can_destroy?
+      old_status = self.status
+      self.class_enrollment.destroy
+      self.status = old_status
+      self.class_enrollment = nil
+      self.save
     end
   end
 

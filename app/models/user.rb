@@ -28,6 +28,12 @@ class User < ApplicationRecord
 
   before_destroy :validate_destroy
 
+  delegate :can?, :cannot?, to: :ability
+
+  def ability
+    @ability ||= Ability.new(self)
+  end
+
   def to_label
     "#{self.name}"
   end

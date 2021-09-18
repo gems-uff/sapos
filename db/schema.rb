@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_10_214629) do
+ActiveRecord::Schema.define(version: 2021_09_18_002500) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -244,7 +244,6 @@ ActiveRecord::Schema.define(version: 2021_09_10_214629) do
     t.integer "year"
     t.integer "semester"
     t.integer "enrollment_id"
-    t.string "status", default: "Solicitada"
     t.datetime "last_student_change_at"
     t.datetime "last_staff_change_at"
     t.datetime "created_at", precision: 6, null: false

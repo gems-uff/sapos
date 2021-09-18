@@ -97,7 +97,6 @@ class StudentEnrollmentController < ApplicationController
         unless message.empty?
           @comment = @enrollment_request.enrollment_request_comments.build(message: message, user: current_user)
         end
-        @enrollment_request.status = ClassEnrollmentRequest::REQUESTED
         @enrollment_request.last_student_change_at = Time.current
         @enrollment_request.student_view_at = @enrollment_request.last_student_change_at 
         

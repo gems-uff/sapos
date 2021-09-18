@@ -14,18 +14,41 @@ class EnrollmentRequest < ApplicationRecord
   validates :semester, :presence => true, :inclusion => {:in => YearSemester::SEMESTERS}
   validates :enrollment, :presence => true
   validates_uniqueness_of :enrollment, :scope => [:year, :semester]
-  validates :status, :presence => true, :inclusion => {:in => ClassEnrollmentRequest::STATUSES}
-  validate :validate_effected_status
   validates :class_enrollment_requests, :length => { minimum: 1, message: :at_least_one_class}
-  validate :validate_insertion_removal
+  
+  validate :that_valid_insertion_is_not_set_to_false
+  validate :that_valid_removal_is_not_set_to_false
 
   accepts_nested_attributes_for :class_enrollment_requests, :course_classes
 
   attr_accessor :valid_insertion, :valid_removal
 
+  def status
+    all_effected = true
+    all_valid = true
+    any_invalid = false
+    class_enrollment_requests.each do |cer|
+      cer_status = cer.status
+      if cer_status != ClassEnrollmentRequest::EFFECTED
+        all_effected = false
+        all_valid = false if cer_status != ClassEnrollmentRequest::VALID
+      end
+      if cer_status == ClassEnrollmentRequest::INVALID
+        any_invalid = true
+      end
+    end
+    status = ClassEnrollmentRequest::REQUESTED
+    status = ClassEnrollmentRequest::VALID if all_valid
+    status = ClassEnrollmentRequest::EFFECTED if all_effected
+    status = ClassEnrollmentRequest::INVALID if any_invalid
+    status
+  end
+
   def self.pendency_condition(user=nil)
     user ||= current_user
-    return ["0 = -1"] if user.nil?
+    return ["0 = -1"] if user.blank? 
+    return ["0 = -1"] if user.cannot?(:read_pendencies, EnrollmentRequest) && user.cannot?(:read_advisement_pendencies, EnrollmentRequest)
+
     er = EnrollmentRequest.arel_table.dup
     cer = ClassEnrollmentRequest.arel_table
     er.table_alias = 'er'
@@ -33,18 +56,15 @@ class EnrollmentRequest < ApplicationRecord
       .join(cer)
       .on(cer[:enrollment_request_id].eq(er[:id]))
       .where(cer[:status].eq(ClassEnrollmentRequest::REQUESTED))
-    if user.role_id == Role::ROLE_COORDENACAO || user.role_id == Role::ROLE_SECRETARIA
-      return [
-        EnrollmentRequest.arel_table[:id].in(check_status.project(er[:id])).to_sql
-      ]
-    end
-    if user.role_id == Role::ROLE_PROFESSOR && ! user.professor.nil?
-      check_status = check_status.where(er[:enrollment_id].in(user.professor.enrollments.map(&:id)))
-      return [
-        EnrollmentRequest.arel_table[:id].in(check_status.project(er[:id])).to_sql
-      ]
-    end
-    ["0 = -1"]
+    
+    return [
+      EnrollmentRequest.arel_table[:id].in(check_status.project(er[:id])).to_sql
+    ] if user.can?(:read_pendencies, EnrollmentRequest)
+    
+    return ["0 = -1"] if user.professor.blank?
+
+    check_status = check_status.where(er[:enrollment_id].in(user.professor.enrollments.map(&:id)))
+    [EnrollmentRequest.arel_table[:id].in(check_status.project(er[:id])).to_sql]
   end
 
   def last_student_read_time
@@ -114,20 +134,6 @@ class EnrollmentRequest < ApplicationRecord
     [result, remove_class_enrollments]
   end
 
-  def refresh_status!
-    self.class_enrollment_requests.reload
-    if self.status == ClassEnrollmentRequest::EFFECTED
-      nstatus = self.class_enrollment_requests.collect(&:status).max_by {|stat| ClassEnrollmentRequest::STATUSES_PRIORITY.index stat}
-      unless nstatus.nil?
-        self.status = nstatus
-        self.save
-      end 
-    elsif self.class_enrollment_requests.collect(&:status).all? { |stat| stat == ClassEnrollmentRequest::EFFECTED }
-      self.status = ClassEnrollmentRequest::EFFECTED
-      self.save
-    end
-  end
-
   def valid_request?(remove_class_enrollments)
     self.valid? && remove_class_enrollments.all? { |ce| ce.can_destroy? }
   end
@@ -179,21 +185,16 @@ class EnrollmentRequest < ApplicationRecord
 
   protected
 
-  def validate_effected_status
-    if self.status == ClassEnrollmentRequest::EFFECTED
-      if self.class_enrollment_requests.any? { |cer| cer.status != ClassEnrollmentRequest::EFFECTED }
-        errors.add(:status, :class_enrollment_request_is_not_effected)
-      end
-    end
+  def that_valid_insertion_is_not_set_to_false
+    return if valid_insertion.nil? || self.valid_insertion
+
+    errors.add(:base, :impossible_insertion)
   end
 
-  def validate_insertion_removal
-    if ! self.valid_insertion.nil? && ! self.valid_insertion
-      errors.add(:base, :impossible_insertion)
-    end
-    if ! self.valid_removal.nil? && ! self.valid_removal
-      errors.add(:base, :impossible_removal)
-    end
+  def that_valid_removal_is_not_set_to_false
+    return if valid_removal.nil? || self.valid_removal
+
+    errors.add(:base, :impossible_removal)
   end
 
 end

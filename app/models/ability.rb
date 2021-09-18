@@ -21,8 +21,11 @@ class Ability
         :to_pdf, :summary_pdf, :academic_transcript_pdf, :grades_report_pdf, 
         :browse, :simulate, :set_query_date, :cities, :states, :preview, :builtin, :to => :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing, 
-        :execute_now, :execute_now, :notify, :duplicate, :validate, :show_validate, :effect, :show_effect, :to => :update
+        :execute_now, :execute_now, :notify, :duplicate, :to => :update
     alias_action :delete, :destroy_existing, :to => :destroy
+
+    alias_action :set_invalid, :set_requested, :set_valid, :to => :update
+    alias_action :ser_effected, :show_effect, :to => :effect
     #as_action_aliases
 
     user ||= User.new
@@ -31,18 +34,13 @@ class Ability
 
     if role_id == Role::ROLE_ADMINISTRADOR
       can :manage, :all
-      can :invite, User
-      can :effect, ClassEnrollmentRequest
-      can :read, :pendencies
+      cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
+      cannot [:read_pendencies], ClassEnrollmentRequest
       cannot [:destroy, :update], Role
       cannot [:destroy, :create], NotificationParam
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [Role, CustomVariable, ReportConfiguration])
-      can :read, :pendencies
-      can :validate, EnrollmentRequest
-      can :show_validate, EnrollmentRequest
-      can :effect, ClassEnrollmentRequest
-      can :invite, User
+      cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
       can :read, (Role)
     elsif role_id == Role::ROLE_PROFESSOR
       can :read, (Ability::ALL_MODELS - [
@@ -50,9 +48,10 @@ class Ability
         Country, State, City, EmailTemplate
       ])
       can :read, :pendencies
-      can :validate, EnrollmentRequest
-      can :show_validate, EnrollmentRequest
       if user.professor
+        can :read_advisement_pendencies, EnrollmentRequest
+        can :update, EnrollmentRequest, enrollment: { advisements: { professor: user.professor } }
+        can :update, ClassEnrollmentRequest, enrollment_request: { enrollment: { advisements: { professor: user.professor } } }
         if CustomVariable.professor_login_can_post_grades == "yes_all_semesters"
           can :update, ClassEnrollment, course_class: { professor: user.professor }
           can :update, CourseClass, professor: user.professor
@@ -63,16 +62,13 @@ class Ability
       end
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, ReportConfiguration])
-      can :validate, EnrollmentRequest
-      can :show_validate, EnrollmentRequest
-      can :effect, ClassEnrollmentRequest
-      can :read, :pendencies
+      can :invite, User
+      cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
       can :read, (Query)
     elsif role_id == Role::ROLE_SUPORTE
       can [:read, :update, :photo], (Student)
       can :read, :pendencies
     elsif role_id == Role::ROLE_ALUNO
-      #can :read, :landing
       can :manage, []
     elsif role_id == Role::ROLE_DESCONHECIDO
       can :manage, []

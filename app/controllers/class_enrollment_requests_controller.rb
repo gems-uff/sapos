@@ -8,20 +8,39 @@ class ClassEnrollmentRequestsController < ApplicationController
   active_scaffold :"class_enrollment_request" do |config|
 
     config.action_links.add 'show_effect',
-      :label => I18n.t('class_enrollment_request.actions.effect'),
-      :ignore_method => :hide_effect?,
-      :type => :collection,
-      :keep_open => false
+      label: I18n.t('class_enrollment_request.actions.effect'),
+      ignore_method:  :hide_effect_actions?,
+      type: :collection,
+      keep_open: false
 
-    config.action_links.add 'single_effect',
-      :label =>  "<i title='#{I18n.t('class_enrollment_request.actions.effect_single')}' class='fa fa-book'></i>".html_safe,
-      :ignore_method => :hide_single_effect?,
-      :type => :member,
-      :keep_open => false,
-      :position => false,
-      :crud_type => :update,
-      :method => :put,
-      :confirm  => I18n.t('class_enrollment_request.actions.effect_confirm')
+    base_member = { type: :member, keep_open: false, position: false, crud_type: :update, method: :put, refresh_list: true }
+    config.action_links.add "set_invalid",
+      label:  "<i title='#{I18n.t('class_enrollment_request.invalid.label')}' class='fa fa-times-circle'></i>".html_safe,
+      ignore_method: :hide_validate_actions?,
+      security_method: :set_invalid_security_method,
+      confirm: I18n.t('class_enrollment_request.invalid.confirm'),
+      **base_member
+
+    config.action_links.add "set_requested",
+      label:  "<i title='#{I18n.t('class_enrollment_request.requested.label')}' class='fa fa-question-circle'></i>".html_safe,
+      ignore_method: :hide_validate_actions?,
+      security_method: :set_requested_security_method,
+      confirm: I18n.t('class_enrollment_request.requested.confirm'),
+      **base_member
+
+    config.action_links.add "set_valid",
+      label:  "<i title='#{I18n.t('class_enrollment_request.valid.label')}' class='fa fa-check-circle'></i>".html_safe,
+      ignore_method: :hide_validate_actions?,
+      security_method: :set_valid_security_method,
+      confirm: I18n.t('class_enrollment_request.valid.confirm'),
+      **base_member
+
+    config.action_links.add 'set_effected',
+      label:  "<i title='#{I18n.t('class_enrollment_request.effected.label')}' class='fa fa-plus-circle'></i>".html_safe,
+      ignore_method: :hide_effect_actions?,
+      security_method: :set_effected_security_method,
+      confirm: I18n.t('class_enrollment_request.effected.confirm'),
+      **base_member
 
     config.list.sorting = {:enrollment_request => 'ASC'}
     columns = [:enrollment_request, :course_class, :status, :class_enrollment]
@@ -108,7 +127,7 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.columns[:course_class].search_ui = :record_select
 
     config.columns[:parent_status].includes = [:enrollment_request]
-    config.columns[:parent_status].search_sql = "enrollment_requests.status"
+    config.columns[:parent_status].search_sql = ""
     config.columns[:parent_status].search_ui = :select
     config.columns[:parent_status].options = {:options => ClassEnrollmentRequest::STATUSES, default: ClassEnrollmentRequest::REQUESTED, :include_blank => I18n.t("active_scaffold._select_")}
 
@@ -124,7 +143,7 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.columns[:status].form_ui = :select
     config.columns[:status].options = {:options => ClassEnrollmentRequest::STATUSES, default: ClassEnrollmentRequest::REQUESTED, :include_blank => I18n.t("active_scaffold._select_")}
 
-    config.actions.exclude :deleted_records
+    config.actions.exclude :deleted_records, :show, :delete, :create, :update
   end
 
   def self.condition_for_admission_date_column(column, value, like_pattern)
@@ -153,26 +172,82 @@ class ClassEnrollmentRequestsController < ApplicationController
     [sql, Time.now, Time.now]
   end
 
-  def hide_effect?
-    cannot? :effect, ClassEnrollmentRequest
-  end
-
-  def hide_single_effect?(record)
-    record.status == ClassEnrollmentRequest::EFFECTED || (cannot? :effect, ClassEnrollmentRequest)
-  end
-
-  def single_effect
-    raise CanCan::AccessDenied.new("Acesso negado!", :effect, ClassEnrollmentRequest) if cannot? :effect, ClassEnrollmentRequest
-    process_action_link_action do |record|
-      if (self.successful = record.to_effected && record.save)
-        emails = [EmailTemplate.load_template("class_enrollment_requests:email_to_student").prepare_message({
-          :record => record,
-        })]
-        Notifier.send_emails(notifications: emails)
-        flash[:info] = I18n.t('class_enrollment_request.effect.applied', count: 1)
+  def self.condition_for_parent_status_column(column, value, like_pattern)
+    check_parent = 'cer.enrollment_request_id = enrollment_requests.id'
+    invalid = "select 1 from class_enrollment_requests cer where cer.status = '#{ClassEnrollmentRequest::INVALID}' and #{check_parent}"
+    not_valid = "select 1 from class_enrollment_requests cer where cer.status != '#{ClassEnrollmentRequest::VALID}' and cer.status != '#{ClassEnrollmentRequest::EFFECTED}' and #{check_parent}"
+    not_effected = "select 1 from class_enrollment_requests cer where cer.status != '#{ClassEnrollmentRequest::EFFECTED}' and #{check_parent}"
+    case value
+      when ClassEnrollmentRequest::INVALID then
+        sql = "exists (#{invalid})"
+      when ClassEnrollmentRequest::VALID then
+        sql = "not exists (#{not_valid})"
+      when ClassEnrollmentRequest::EFFECTED then
+        sql = "not exists (#{not_effected})"
+      when ClassEnrollmentRequest::REQUESTED then
+        sql = "not exists (#{invalid}) and exists (#{not_valid})"
       else
-        flash[:error] = I18n.t('class_enrollment_request.effect.applied', count: 0)
+        return ""
+    end
+    [sql]
+  end
+
+  def hide_validate_actions?(record)
+    cannot? :update, record
+  end
+
+  def set_invalid_security_method(record)
+    record.status != ClassEnrollmentRequest::INVALID && can?(:update, record)
+  end
+
+  def set_requested_security_method(record)
+    record.status != ClassEnrollmentRequest::REQUESTED && can?(:update, record)
+  end
+
+  def set_valid_security_method(record)
+    record.status != ClassEnrollmentRequest::VALID && can?(:update, record)
+  end
+
+  def set_effected_security_method(record)
+    record.status != ClassEnrollmentRequest::EFFECTED && can?(:update, record)
+  end
+
+  def hide_effect_actions?(record=nil)
+    return cannot? :effect, ClassEnrollmentRequest if record.blank?
+    cannot? :effect, record
+  end
+
+  def set_status(status, message)
+    process_action_link_action(:set_status) do |record|
+      if self.successful = record.set_status!(status)
+        yield record if block_given?
+        flash[:info] = I18n.t(message, count: 1)
+      else
+        flash[:error] = I18n.t(message, count: 0)
       end
+    end
+  end
+
+  def set_invalid
+    raise CanCan::AccessDenied.new("Acesso negado!", :update, ClassEnrollmentRequest) if cannot? :update, ClassEnrollmentRequest
+    set_status(ClassEnrollmentRequest::INVALID, 'class_enrollment_request.invalid.applied')
+  end
+
+  def set_requested
+    raise CanCan::AccessDenied.new("Acesso negado!", :update, ClassEnrollmentRequest) if cannot? :update, ClassEnrollmentRequest
+    set_status(ClassEnrollmentRequest::REQUESTED, 'class_enrollment_request.requested.applied')
+  end
+
+  def set_valid
+    raise CanCan::AccessDenied.new("Acesso negado!", :update, ClassEnrollmentRequest) if cannot? :update, ClassEnrollmentRequest
+    set_status(ClassEnrollmentRequest::VALID, 'class_enrollment_request.valid.applied')
+  end
+
+  def set_effected
+    raise CanCan::AccessDenied.new("Acesso negado!", :effect, ClassEnrollmentRequest) if cannot? :effect, ClassEnrollmentRequest
+    set_status(ClassEnrollmentRequest::EFFECTED, 'class_enrollment_request.effected.applied') do |record|
+      emails = [EmailTemplate.load_template("class_enrollment_requests:email_to_student").prepare_message({record: record})]
+      Notifier.send_emails(notifications: emails)
     end
   end
 
@@ -190,7 +265,7 @@ class ClassEnrollmentRequestsController < ApplicationController
     each_record_in_page {}
     class_enrollment_requests = find_page(:sorting => active_scaffold_config.list.user.sorting).items
     class_enrollment_requests.each do |record|
-      changed = record.to_effected && record.save
+      changed = record.set_status!(ClassEnrollmentRequest::EFFECTED)
       if changed
         emails = [EmailTemplate.load_template("class_enrollment_requests:email_to_student").prepare_message({
           :record => record,
@@ -200,7 +275,7 @@ class ClassEnrollmentRequestsController < ApplicationController
       count += 1 if changed
     end
     do_refresh_list
-    @message = I18n.t('class_enrollment_request.effect.applied', count: count)
+    @message = I18n.t('class_enrollment_request.effected.applied', count: count)
     respond_to_action(:effect)
   end
 
@@ -233,6 +308,20 @@ class ClassEnrollmentRequestsController < ApplicationController
     render :action => 'on_effect', :formats => [:js]
   end
 
+  def set_status_respond_to_html
+    return_to_main
+  end
 
+  def set_status_respond_to_js
+    do_refresh_list if successful? && !render_parent?
+    render(:action => 'on_set_status')
+  end
+
+  def set_status_respond_on_iframe
+    do_refresh_list if successful? && !render_parent?
+    responds_to_parent do
+      render :action => 'on_set_status', :formats => [:js], :layout => false
+    end
+  end
 
 end

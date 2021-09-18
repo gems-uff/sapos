@@ -1,0 +1,80 @@
+<% if nested? %>
+  <span class="nested-enroll-notice"> <%= t 'enrollment_request.nested_notice' %> </span>
+<% end %>
+
+<% cer_subform_id = sub_form_id(association: :class_enrollment_requests) %>
+<%= content_tag :li, class: ["sub-form-enroll"], id: cer_subform_id do %>
+  <h5> 
+    <%= t 'activerecord.attributes.enrollment_request.class_enrollment_requests' %> 
+    <%= link_to_visibility_toggle "#{cer_subform_id}-div" %>
+  </h5>
+
+
+  <div id="<%= cer_subform_id %>-div">
+    <span class="effected-change-alert" style="display: none">
+      <%= t 'enrollment_request.effected_change' %>
+    </span>
+    <input type="hidden" name="record[class_enrollment_requests][0]" value="">
+    <% table = prepare_class_schedule_table(@record.class_enrollment_requests.collect(&:course_class), [], [], keep_on_demand=true) %>
+    <table class="disable-pointer enroll-table <%= sub_form_list_id(association: :class_enrollment_requests) %>">
+      <thead>
+        <tr>
+          <% ClassEnrollmentRequest::STATUSES.each do |status| %>
+            <th> <%= status %> </th>
+          <% end %>
+          <% table[:header][0].drop(1).each do |head| %>
+            <th class="cell-<%= head.downcase %>"> <%= head %> </th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% table[:data].each do |row| %>
+          <tr> 
+            <% cer = @record.class_enrollment_requests.find_by(course_class_id: row[0][:id]) %>
+            <input type="hidden" name="record[class_enrollment_requests][<%=cer.id%>][id]" value="<%=cer.id%>">
+            <input type="hidden" name="record[class_enrollment_requests][<%=cer.id%>][course_class]" value="<%=cer.course_class_id%>">
+            <input type="hidden" name="record[class_enrollment_requests][<%=cer.id%>][class_enrollment]" value="<%=cer.class_enrollment_id%>">
+            <% ClassEnrollmentRequest::STATUSES.each do |status| %>
+              <td> <label> <input <%= class_request_attribute(status, cer.status) %> name="record[class_enrollment_requests][<%=cer.id%>][status]"/> </label> </td>
+            <% end %>
+            <% row.drop(1).each_with_index do |cell, index| %>
+              <td class="cell-<%= table[:header][0][index + 1].downcase %>">
+                <label> <%= cell %> </label>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr>
+          <% ClassEnrollmentRequest::STATUSES.each do |status| %>
+            <th> 
+              <% if status != ClassEnrollmentRequest::EFFECTED || can?(:effect, ClassEnrollmentRequest) %>
+                <a href="#" class="enrollment-request-all" data-attr="<%= status.parameterize %>"> Todas </a>
+              <% end %>
+            </th>
+          <% end %>
+          <% table[:header][0].drop(1).each do |head| %>
+            <th></th>
+          <% end %>
+      </tfoot>
+    </table>
+  </div>
+<% end %>
+
+<script>
+$("#<%= cer_subform_id %>-div .enrollment-request-all").click(function() {
+  let attr = $(this).data('attr')
+  $(this).parents('.enroll-table').find('.radio-' + attr + ':not(.effected-item)').click();
+  return false;
+})
+
+$("#<%= cer_subform_id %>-div .effected-item").on('change', function(event) {
+  var count = $('#<%= cer_subform_id %>-div .effected-item.radio-efetivada:not(":checked")').length;
+  if (count > 0) {
+    $("#<%= cer_subform_id %>-div .effected-change-alert").show();
+  } else {
+    $("#<%= cer_subform_id %>-div .effected-change-alert").hide();
+  }
+})
+</script>
