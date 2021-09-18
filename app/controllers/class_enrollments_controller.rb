@@ -15,12 +15,13 @@ class ClassEnrollmentsController < ApplicationController
     config.columns[:course_class].form_ui = :record_select
     config.columns[:grade].options =  {:format => :i18n_number, :i18n_options => {:format_as => "grade"}}
     config.columns[:situation].form_ui = :select
-    config.columns[:situation].options = {:options => ClassEnrollment::SITUATIONS, :include_blank => I18n.t("active_scaffold._select_")}
+    config.columns[:situation].options = {:options => ClassEnrollment::SITUATIONS, :include_blank => I18n.t("active_scaffold._short_select_")}
 
     #config.columns =
     #    [:enrollment, :course_class, :situation, :grade, :disapproved_by_absence, :obs]
     config.columns =
-	[:enrollment, :course_class, :situation, :disapproved_by_absence, :grade, :obs]     
+	[:enrollment, :course_class, :situation, :disapproved_by_absence, :grade, :grade_not_count_in_gpr, :justification_grade_not_count_in_gpr, :obs]     
+    config.columns[:justification_grade_not_count_in_gpr].label = ""
 
     config.actions.exclude :deleted_records
   end

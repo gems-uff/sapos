@@ -75,6 +75,7 @@ pt-BR:
         disapproved_by_absence: "Reprovado por Falta"
         enrollment: "Matrícula"
         grade: "Nota"
+        grade_not_count_in_gpr: "Não contabilizar nota"
         obs: "Observação"
         situation: "Situação"
         situations:
@@ -852,6 +853,7 @@ pt-BR:
     'false': "Não"
     'true': "Sim"
     _select_: "Selecione uma opção"
+    _short_select_: "Selecione"
     add: "Adicionar"
     add_existing: "Adicionar Existente"
     cancel: "Cancelar"
@@ -1030,6 +1032,9 @@ pt-BR:
       submit: 'Salvar %{model}'
       update: 'Atualizar %{model}'
 
+    class_enrollments:
+      justification_grade_not_count_in_gpr: "    Justificativa     "
+
   notifications:
     accomplishment:
       email_to_student:
@@ -1102,7 +1107,7 @@ pt-BR:
         link: "Quadro de Horários"
         professor: "Professor"
         course_name: "Disciplina"
-        noschedule: "Horário a combinar"
+        noschedule: "Horário a combinar com o orientador"
         year_semester_error: 'Selecione Ano/Semestre na busca!'
     report_configurations:
       preview: "Visualizar"
@@ -1164,7 +1169,8 @@ pt-BR:
         title: "BOLETIM ESCOLAR / PÓS-GRADUAÇÃO"
         total_credits: "Créditos Acumulados"
         total_gpr: "CR Acumulado"
-        accomplishment_conclusion_date_not_given: "---------/----" 
+        accomplishment_conclusion_date_not_given: "---------/----"
+        courses_which_grade_not_count_in_gpr: "DISCIPLINAS QUE NÃO CONTABILIZAM NOTA / JUSTIFICATIVA:" 
       scholarships:
         number: "NÚMERO"
         sponsor: "AGÊNCIA"

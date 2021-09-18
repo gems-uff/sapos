@@ -315,11 +315,57 @@ describe Enrollment do
         it "should return 0 if it is not enrolled in any classes of the semester" do
           expect(@enrollment.gpr_by_semester(2011, 2)).to be_nil
         end
+
+        it "should return 7.75 when one class_enrollment grade not count in gpr" do
+          course_type = FactoryBot.create(:course_type, :has_score => true)  
+
+          course1 = FactoryBot.create(:course, :course_type => course_type)
+          course2 = FactoryBot.create(:course, :course_type => course_type)
+          course3 = FactoryBot.create(:course, :course_type => course_type)   
+          
+          class1 = FactoryBot.create(:course_class, :year => "2021", :semester => "1", :course => course1)
+          class2 = FactoryBot.create(:course_class, :year => "2021", :semester => "1", :course => course2)
+          class3 = FactoryBot.create(:course_class, :year => "2021", :semester => "1", :course => course3)
+        
+          enrollment = FactoryBot.create(:enrollment)
+ 
+          class_enrollment1 = FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => class1, :grade => 70 , :grade_not_count_in_gpr => nil, :situation => I18n.t("activerecord.attributes.class_enrollment.situations.aproved") )
+          class_enrollment2 = FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => class2, :grade => 80, :grade_not_count_in_gpr => true, :situation => I18n.t("activerecord.attributes.class_enrollment.situations.aproved") )
+          class_enrollment3 = FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => class3, :grade => 85, :grade_not_count_in_gpr => false, :situation => I18n.t("activerecord.attributes.class_enrollment.situations.aproved") )
+ 
+          expect( (enrollment.gpr_by_semester(2021, 1) * 10).round ).to eq(775)
+
+        end
       end
 
       describe "total_gpr" do
         it "should return 83" do
           expect(@enrollment.total_gpr.round).to eq(83)
+        end
+
+        it "should return 8.17 when one class_enrollment grade not count in gpr" do
+
+          course_type = FactoryBot.create(:course_type, :has_score => true)  
+
+          course1 = FactoryBot.create(:course, :course_type => course_type)
+          course2 = FactoryBot.create(:course, :course_type => course_type)
+          course3 = FactoryBot.create(:course, :course_type => course_type)   
+          course4 = FactoryBot.create(:course, :course_type => course_type)   
+
+          class1 = FactoryBot.create(:course_class, :year => "2021", :semester => "1", :course => course1)
+          class2 = FactoryBot.create(:course_class, :year => "2021", :semester => "1", :course => course2)
+          class3 = FactoryBot.create(:course_class, :year => "2021", :semester => "1", :course => course3)
+          class4 = FactoryBot.create(:course_class, :year => "2021", :semester => "2", :course => course4)
+
+          enrollment = FactoryBot.create(:enrollment)
+ 
+          class_enrollment1 = FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => class1, :grade => 70 , :grade_not_count_in_gpr => nil, :situation => I18n.t("activerecord.attributes.class_enrollment.situations.aproved") )
+          class_enrollment2 = FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => class2, :grade => 80, :grade_not_count_in_gpr => true, :situation => I18n.t("activerecord.attributes.class_enrollment.situations.aproved") )
+          class_enrollment3 = FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => class3, :grade => 85, :grade_not_count_in_gpr => false, :situation => I18n.t("activerecord.attributes.class_enrollment.situations.aproved") )
+          class_enrollment4 = FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => class4, :grade => 90, :grade_not_count_in_gpr => nil, :situation => I18n.t("activerecord.attributes.class_enrollment.situations.aproved") )
+
+          expect( (enrollment.total_gpr * 10).round ).to eq(817)
+
         end
       end
 

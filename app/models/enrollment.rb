@@ -62,6 +62,7 @@ class Enrollment < ApplicationRecord
         'course_classes.semester' => semester, 
         'course_types.has_score' => true)
       .where(ClassEnrollment.arel_table[:situation].not_eq(I18n.translate("activerecord.attributes.class_enrollment.situations.registered")))
+      .where(class_enrollments: { grade_not_count_in_gpr: [0, nil] } )
       .select('sum(credits*grade) as grade, sum(credits) as credits')
     result[0]['grade'].to_f / result[0]['credits'].to_f unless result[0]['credits'].nil? or result[0]['credits'] == 0
     #In Rails 4, replace the second where with
@@ -72,6 +73,7 @@ class Enrollment < ApplicationRecord
     result = self.class_enrollments.joins(course_class: {course: :course_type})
       .where('course_types.has_score' => true)
       .where(ClassEnrollment.arel_table[:situation].not_eq(I18n.translate("activerecord.attributes.class_enrollment.situations.registered")))
+      .where(class_enrollments: { grade_not_count_in_gpr: [0, nil] } )
       .select('sum(credits*grade) as grade, sum(credits) as credits')
     result[0]['grade'].to_f / result[0]['credits'].to_f unless result[0]['credits'].nil? or result[0]['credits'] == 0
      #In Rails 4, replace the second where with
