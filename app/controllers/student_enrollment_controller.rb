@@ -79,13 +79,14 @@ class StudentEnrollmentController < ApplicationController
             course_id: course_id.to_i, professor_id: data[:professor].to_i,
             year: @semester.year, semester: @semester.semester
           )
-          if course_class.nil?
+          course = Course.find(course_id)
+          if course_class.blank? && course.present?
             course_class = CourseClass.create(
               course_id: course_id.to_i, professor_id: data[:professor].to_i,
-              year: @semester.year, semester: @semester.semester
+              year: @semester.year, semester: @semester.semester, name: course.name
             )
           end
-          course_class_ids << course_class.id.to_s
+          course_class_ids << course_class.id.to_s if course_class.present?
         end
       end
       course_class_ids = course_class_ids.uniq
