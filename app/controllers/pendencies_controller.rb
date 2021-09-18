@@ -2,11 +2,11 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class PendenciesController < ApplicationController
-  skip_authorization_check
+  authorize_resource class: false
 
   def index
+    raise CanCan::AccessDenied.new if cannot? :read, :pendency
     raise CanCan::AccessDenied.new if current_user.nil?
-    raise CanCan::AccessDenied.new if current_user.role_id == 
     @partials = []
     
     pendency_condition = EnrollmentRequest.pendency_condition

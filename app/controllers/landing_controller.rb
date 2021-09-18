@@ -2,7 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class LandingController < ApplicationController
-  skip_authorization_check
+  authorize_resource class: false
 
   def index
     raise CanCan::AccessDenied.new if current_user.nil?
@@ -21,7 +21,7 @@ class LandingController < ApplicationController
         return redirect_to student_enrollment_path(max_enrollment[0].id)
       end
     else
-      return redirect_to pendencies_path
+      return redirect_to pendencies_path if can? :read, :pendency
     end
     render :index
   end

@@ -71,7 +71,7 @@ class StudentsController < ApplicationController
 
   private
   def check_current_user
-    if current_user.role_id == Role::ROLE_SUPORTE
+    if can? :update_only_photo, Student
       active_scaffold_config.update.columns = [:photo, :email]
       active_scaffold_config.show.columns = [:photo, :email]
     end

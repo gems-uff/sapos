@@ -34,13 +34,16 @@ class Ability
 
     if role_id == Role::ROLE_ADMINISTRADOR
       can :manage, :all
+      cannot :update_only_photo, Student 
+      cannot [:show, :enroll, :save_enroll], :student_enrollment
       cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
       cannot [:read_pendencies], ClassEnrollmentRequest
       cannot [:destroy, :update], Role
       cannot [:destroy, :create], NotificationParam
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [Role, CustomVariable, ReportConfiguration])
-      can :read, :pendencies
+      cannot :update_only_photo, Student 
+      can :read, :pendency
       cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
       can :read, (Role)
     elsif role_id == Role::ROLE_PROFESSOR
@@ -48,7 +51,7 @@ class Ability
         User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration,
         Country, State, City, EmailTemplate
       ])
-      can :read, :pendencies
+      can :read, :pendency
       if user.professor
         can :read_advisement_pendencies, EnrollmentRequest
         can :update, EnrollmentRequest, enrollment: { advisements: { professor: user.professor } }
@@ -63,15 +66,17 @@ class Ability
       end
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [User, Role, CustomVariable, Query, Version, Notification, ReportConfiguration])
+      cannot :update_only_photo, Student 
       can :invite, User
-      can :read, :pendencies
+      can :read, :pendency
       cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
       can :read, (Query)
     elsif role_id == Role::ROLE_SUPORTE
-      can [:read, :update, :photo], (Student)
-      can :read, :pendencies
+      can [:read, :update, :update_only_photo], (Student)
+      can :read, :pendency
     elsif role_id == Role::ROLE_ALUNO
       can :manage, []
+      can [:show, :enroll, :save_enroll], :student_enrollment if user.present? && user.student.present?
     elsif role_id == Role::ROLE_DESCONHECIDO
       can :manage, []
     end

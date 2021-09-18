@@ -68,7 +68,7 @@ SimpleNavigation::Configuration.run do |navigation|
     end
     #highlights_on: %r(/users), 
     primary.item :land, 'Principal', landing_url, :if => can_read?(:landing) do |land|
-      land.item :pendencies, 'Pendências', pendencies_url, :if => Proc.new { can?(:read, :pendencies) }
+      land.item :pendencies, 'Pendências', pendencies_url, :if => Proc.new { can?(:read, :pendency) }
       @landingsidebar.call(land)
       land.item :password, "Editar perfil", edit_user_registration_path, highlights_on: %r(/users/profile), if: Proc.new { user_signed_in? }
     end

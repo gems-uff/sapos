@@ -65,7 +65,7 @@ class ApplicationController < ActionController::Base
       if enrollment.enrollment_status.user
         number = enrollment.enrollment_number
         path = student_enrollment_path(enrollment.id)
-        land.item number, number, path, :if => Proc.new { can?(:read, :landing) }
+        land.item number, number, path, :if => Proc.new { can?(:show, :student_enrollment) }
         @emptylanding = false
       end
     end

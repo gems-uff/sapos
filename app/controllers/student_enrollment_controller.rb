@@ -3,7 +3,7 @@
 
 class StudentEnrollmentController < ApplicationController
   helper :course_classes
-  skip_authorization_check
+  authorize_resource class: false
 
   
   def show
@@ -48,8 +48,6 @@ class StudentEnrollmentController < ApplicationController
   private
 
   def _valid_enrollment
-    raise CanCan::AccessDenied.new if current_user.nil?
-    raise CanCan::AccessDenied.new if current_user.student.nil?
     @enrollment = Enrollment.find(params[:id])
     if (@enrollment.nil? || @enrollment.student.user != current_user || ! @enrollment.enrollment_status.user)
       return redirect_to landing_url, alert: I18n.t("student_enrollment.alert.invalid_enrollment", enrollment: params[:id])
