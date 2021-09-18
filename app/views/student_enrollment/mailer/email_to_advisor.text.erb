@@ -2,5 +2,26 @@
 
 Informamos que o pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> de seu orientando <%= var(:record).enrollment.student.name %> foi <%= var(:record).created_at == var(:record).updated_at ? 'realizado' : 'atualizado' %>.
 
+<% if var(:insert_class_enrollment_requests).any? %>
+As seguintes disciplinas foram solicitadas:
+<% var(:insert_class_enrollment_requests).each do |cer| %>
+- <%= cer.course_class.to_label %>
+<% end -%>
+
+<% end -%>
+<% if var(:remove_class_enrollment_requests).any? %>
+As seguintes solicitações foram removidas:
+<% var(:remove_class_enrollment_requests).each do |cer| %>
+- <%= cer.course_class.to_label %>
+<% end -%>
+
+<% end -%>
+<% if var(:existing_class_enrollment_requests).any? %>
+As seguintes solicitações continuam no pedido:
+<% var(:existing_class_enrollment_requests).each do |cer| %>
+- <%= cer.course_class.to_label %> (<%= cer.status %>)
+<% end -%>
+
+<% end -%>
 
 <%= CustomVariable.notification_footer %>

@@ -1,0 +1,6 @@
+<%= var(:advisement).professor.name %>,
+
+Informamos que o pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> de seu orientando <%= var(:record).enrollment.student.name %> foi removido.
+
+
+<%= CustomVariable.notification_footer %>

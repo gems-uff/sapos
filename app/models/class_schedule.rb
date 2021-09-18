@@ -39,6 +39,16 @@ class ClassSchedule < ApplicationRecord
     false
   end
 
+  def open_for_removing_class_enrollments?(now=nil)
+    now ||= Time.now
+    main_enroll_open?(now) || adjust_enroll_remove_open?(now)
+  end
+
+  def open_for_inserting_class_enrollments?(now=nil)
+    now ||= Time.now
+    main_enroll_open?(now) || adjust_enroll_insert_open?(now)
+  end
+
   def self.arel_main_enroll_open?(now=nil)
     now ||= Time.now
     ClassSchedule.arel_table[:enrollment_start].lteq(now)

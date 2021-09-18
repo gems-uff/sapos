@@ -168,6 +168,23 @@ class EmailTemplate < ApplicationRecord
         advisement: "Advisement"
       }
     },
+    "student_enrollments:removal_email_to_student" => {
+      path: File.join("student_enrollment", "mailer", "removal_email_to_student.text.erb"),
+      subject: I18n.t('notifications.student_enrollment.removal_email_to_student.subject'),
+      to: "<%= var(:record).enrollment.student.email %>",
+      variables: {
+        record: "EnrollmentRequest",
+      }
+    },
+    "student_enrollments:removal_email_to_advisor" => {
+      path: File.join("student_enrollment", "mailer", "removal_email_to_advisor.text.erb"),
+      subject: I18n.t('notifications.student_enrollment.removal_email_to_advisor.subject'),
+      to: "<%= var(:advisement).professor.email %>",
+      variables: {
+        record: "EnrollmentRequest",
+        advisement: "Advisement"
+      }
+    },
   }
 
   def self.devise_template(action)

@@ -67,6 +67,11 @@ class EnrollmentRequest < ApplicationRecord
     [EnrollmentRequest.arel_table[:id].in(check_status.project(er[:id])).to_sql]
   end
 
+  def student_change!
+    self.last_student_change_at = Time.current
+    self.student_view_at = self.last_student_change_at 
+  end
+
   def last_student_read_time
     time_list = [self.created_at]
     time_list << self.last_student_change_at unless self.last_student_change_at.nil? 
@@ -96,53 +101,29 @@ class EnrollmentRequest < ApplicationRecord
 
   def assign_course_class_ids(course_classes, class_schedule=nil)
     # course classes is a list of strings representing course_class ids
-    result = false
-    self.valid_insertion = true
+    request_change = {
+      remove_class_enrollments: [],
+      remove_class_enrollment_requests: [],
+      insert_class_enrollment_requests: [],
+      existing_class_enrollment_requests: [],
+    }
     self.valid_removal = true
-    remove_class_enrollments = []
-    to_remove = []
-    to_remove = self.class_enrollment_requests.filter do |cer|
-      if ! course_classes.include? cer.course_class_id.to_s
-        if class_schedule.nil? || class_schedule.main_enroll_open? || class_schedule.adjust_enroll_remove_open?
-          if cer.status == ClassEnrollmentRequest::EFFECTED
-            cer.class_enrollment.mark_for_destruction
-            remove_class_enrollments << cer.class_enrollment
-          end
-          result = true
-          true
-        else 
-          self.valid_removal = false
-          false
-        end
-      else 
-        false
-      end
-    end
-    course_classes.each do |course_class_id|
-      next if course_class_id.empty?
-      if self.class_enrollment_requests.find_by(course_class_id: course_class_id).nil?
-        if class_schedule.nil? || class_schedule.main_enroll_open? || class_schedule.adjust_enroll_insert_open?
-          self.class_enrollment_requests.build(course_class_id: course_class_id)
-          result = true
-        else
-          self.valid_insertion = false
-        end
-      end
-    end
-    
-    to_remove.each(&:mark_for_destruction)
-    [result, remove_class_enrollments]
+    self.valid_insertion = true
+
+    prepare_removal_of_course_classes(course_classes, class_schedule, request_change)
+    prepare_insertion_of_course_classes(course_classes, class_schedule, request_change)
+    request_change
   end
 
-  def valid_request?(remove_class_enrollments)
-    self.valid? && remove_class_enrollments.all? { |ce| ce.can_destroy? }
+  def valid_request?(request_change)
+    self.valid? && request_change[:remove_class_enrollments].all? { |ce| ce.can_destroy? }
   end
 
-  def save_request(remove_class_enrollments)
-    if self.valid_request?(remove_class_enrollments)
+  def save_request(request_change)
+    if self.valid_request?(request_change)
       ActiveRecord::Base.transaction do
         self.save!
-        remove_class_enrollments.each do |ce|
+        request_change[:remove_class_enrollments].each do |ce|
           ce.class_enrollment_request = nil
           ce.destroy!
         end
@@ -197,4 +178,38 @@ class EnrollmentRequest < ApplicationRecord
     errors.add(:base, :impossible_removal)
   end
 
+  def prepare_removal_of_course_classes(course_classes, class_schedule, request_change)
+    class_enrollment_requests.each do |cer|
+      next if course_classes.include? cer.course_class_id.to_s
+  
+      if class_schedule.blank? || class_schedule.open_for_removing_class_enrollments?
+        if cer.status == ClassEnrollmentRequest::EFFECTED
+          cer.class_enrollment.mark_for_destruction
+          request_change[:remove_class_enrollments] << cer.class_enrollment
+        end
+        cer.mark_for_destruction
+        request_change[:remove_class_enrollment_requests] << cer
+      else 
+        self.valid_removal = false
+      end
+    end
+  end
+
+  def prepare_insertion_of_course_classes(course_classes, class_schedule, request_change)
+    course_classes.each do |course_class_id|
+      next if course_class_id.empty?
+
+      attributes = { course_class_id: course_class_id }
+      cer = self.class_enrollment_requests.find_by(attributes)
+      if cer.present?
+        request_change[:existing_class_enrollment_requests] << cer
+      else
+        if class_schedule.nil? || class_schedule.open_for_inserting_class_enrollments?
+          request_change[:insert_class_enrollment_requests] << self.class_enrollment_requests.build(attributes)
+        else
+          self.valid_insertion = false
+        end
+      end
+    end
+  end
 end

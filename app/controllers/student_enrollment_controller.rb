@@ -5,57 +5,28 @@ class StudentEnrollmentController < ApplicationController
   helper :course_classes
   skip_authorization_check
 
+  
   def show
     return unless _valid_enrollment.nil?
-    @partials = []
 
-    @partials << ['student_enrollment/show_info', { enrollment: @enrollment }]
+    @partials = [['student_enrollment/show_info', { enrollment: @enrollment }]]
 
-    if @enrollment.dismissal.nil?
-      now = Time.now
-      open_semester = ClassSchedule.find_by(ClassSchedule.arel_enroll_open?)
-      unless open_semester.nil?
-        enrollment_request = EnrollmentRequest.find_or_initialize_by(
-          enrollment: @enrollment,
-          year: open_semester.year,
-          semester: open_semester.semester
-        )
-        @partials << ['student_enrollment/show_enroll', { semester: open_semester, enrollment_request: enrollment_request }]
+    if @enrollment.dismissal.blank?
+      existing_partial('student_enrollment/show_enroll', :semester, ClassSchedule.find_by(ClassSchedule.arel_enroll_open?)) do |semester|
+        enrollment_request = EnrollmentRequest.find_or_initialize_by(enrollment: @enrollment, year: semester.year, semester: semester.semester)
+        { enrollment_request: enrollment_request }
       end
-    else
-      @partials << ['student_enrollment/show_dismissal', { 
-        enrollment: @enrollment,
-        dismissal: @enrollment.dismissal,
-        thesis_defense_committee_professors: @enrollment.thesis_defense_committee_professors
-      }]
-
     end
 
-    unless @enrollment.class_enrollments.empty?
-      @partials << ['student_enrollment/show_class_enrollments', { class_enrollments: @enrollment.class_enrollments }]
-    end
-
-
-    unless @enrollment.advisements.empty?
-      @partials << ['student_enrollment/show_advisements', { advisements: @enrollment.advisements }]
-    end
-
-    unless @enrollment.phase_completions.empty?
-      @partials << ['student_enrollment/show_phases', { phase_completions: @enrollment.phase_completions }]
-    end
-
-    unless @enrollment.deferrals.empty?
-      @partials << ['student_enrollment/show_deferrals', { deferrals: @enrollment.deferrals }]
-    end
-
-    unless @enrollment.enrollment_holds.empty?
-      @partials << ['student_enrollment/show_holds', { holds: @enrollment.enrollment_holds }]
-    end
-
-    unless @enrollment.scholarship_durations.empty?
-      @partials << ['student_enrollment/show_scholarships', { scholarship_durations: @enrollment.scholarship_durations }]
-    end
-
+    existing_partial('student_enrollment/show_dismissal', :dismissal, @enrollment.dismissal,
+                        enrollment: @enrollment, thesis_defense_committee_professors: @enrollment.thesis_defense_committee_professors)
+    existing_partial('student_enrollment/show_class_enrollments', :class_enrollments, @enrollment.class_enrollments)
+    existing_partial('student_enrollment/show_advisements', :advisements, @enrollment.advisements)
+    existing_partial('student_enrollment/show_phases', :phase_completions, @enrollment.phase_completions)
+    existing_partial('student_enrollment/show_deferrals', :deferrals, @enrollment.deferrals)
+    existing_partial('student_enrollment/show_holds', :holds, @enrollment.enrollment_holds)
+    existing_partial('student_enrollment/show_scholarships', :scholarship_durations, @enrollment.scholarship_durations)
+    
     render :show
   end
 
@@ -67,58 +38,10 @@ class StudentEnrollmentController < ApplicationController
   def save_enroll
     return unless _prepare_enroll(true).nil?
     if enrollment_request_params[:delete_request] == "1"
-      if @enrollment_request.destroy_request(@semester)
-        return redirect_to student_enrollment_path(@enrollment.id), notice: I18n.t("student_enrollment.notice.request_removed")
-      end
+      return if delete_enrollment_request_and_redirect
     else
-      course_class_ids = enrollment_request_params[:course_class_ids]
-      (enrollment_request_params[:course_ids] || []).each do |course_id, data|
-        if data[:selected] == "1"
-          course_class = CourseClass.find_by(
-            course_id: course_id.to_i, professor_id: data[:professor].to_i,
-            year: @semester.year, semester: @semester.semester
-          )
-          course = Course.find(course_id)
-          if course_class.blank? && course.present?
-            course_class = CourseClass.create(
-              course_id: course_id.to_i, professor_id: data[:professor].to_i,
-              year: @semester.year, semester: @semester.semester, name: course.name
-            )
-          end
-          course_class_ids << course_class.id.to_s if course_class.present?
-        end
-      end
-      course_class_ids = course_class_ids.uniq
-
-      message = enrollment_request_params[:message]
-      changed, remove_class_enrollments = @enrollment_request.assign_course_class_ids(course_class_ids, @semester)
-      changed ||= ! message.empty?
-      if changed
-        unless message.empty?
-          @comment = @enrollment_request.enrollment_request_comments.build(message: message, user: current_user)
-        end
-        @enrollment_request.last_student_change_at = Time.current
-        @enrollment_request.student_view_at = @enrollment_request.last_student_change_at 
-        
-        emails = [EmailTemplate.load_template("student_enrollments:email_to_student").prepare_message({
-          :record => @enrollment_request
-        })]
-        @enrollment_request.enrollment.advisements.each do |advisement|
-          emails << EmailTemplate.load_template("student_enrollments:email_to_advisor").prepare_message({
-            :record => @enrollment_request,
-            :advisement => advisement
-          })
-        end
-        Notifier.send_emails(notifications: emails)
-        
-      end
-      if @enrollment_request.valid_request?(remove_class_enrollments)
-        if @enrollment_request.save_request(remove_class_enrollments)
-          return redirect_to student_enrollment_path(@enrollment.id), notice: I18n.t("student_enrollment.notice.request_saved")
-        end
-      end
+      return if save_enrollment_request_and_redirect
     end
-    @enrollment_request.enrollment_request_comments.delete(@comment) if ! @comment.nil? && ! @comment.persisted?
     render :enroll
   end
 
@@ -177,6 +100,83 @@ class StudentEnrollmentController < ApplicationController
 
   def enrollment_request_params
     params.require(:enrollment_request).permit(:delete_request, :message, course_class_ids: [], course_ids: [:selected, :professor] )
-  end 
+  end
+
+  def existing_partial(partial, attribute, association, others={})
+    return if association.blank?
+    
+    extra = yield association if block_given?
+    extra ||= {}
+    @partials << [partial, { attribute => association }.merge(others).merge(extra)]
+  end
+
+  def delete_enrollment_request_and_redirect
+    if @enrollment_request.destroy_request(@semester)
+      attributes = { record: @enrollment_request }
+      emails = [EmailTemplate.load_template("student_enrollments:removal_email_to_student").prepare_message(attributes)]
+      @enrollment_request.enrollment.advisements.each do |advisement|
+        emails << EmailTemplate.load_template("student_enrollments:removal_email_to_advisor")
+                              .prepare_message(attributes.merge({ advisement: advisement }))
+      end
+      Notifier.send_emails(notifications: emails)
+      return redirect_to student_enrollment_path(@enrollment.id), notice: I18n.t("student_enrollment.notice.request_removed")
+    end
+    false
+  end
+
+  def save_enrollment_request_and_redirect
+    message = enrollment_request_params[:message]
+    request_change = @enrollment_request.assign_course_class_ids(prepare_course_class_ids, @semester)
+    changed = request_change[:remove_class_enrollment_requests].any? || request_change[:insert_class_enrollment_requests].any? 
+    changed ||= message.present?
+    if changed
+      @comment = @enrollment_request.enrollment_request_comments.build(message: message, user: current_user) unless message.empty?
+      @enrollment_request.student_change!
+    end
+    if @enrollment_request.valid_request?(request_change)
+      if @enrollment_request.save_request(request_change)
+        notify_enrollment_request_change(@enrollment_request, request_change) if changed
+        return redirect_to student_enrollment_path(@enrollment.id), notice: I18n.t("student_enrollment.notice.request_saved")
+      end
+    end
+    @enrollment_request.enrollment_request_comments.delete(@comment) if ! @comment.nil? && ! @comment.persisted?
+    false
+  end
+
+  def find_or_create_course_class_in_this_semester(course_id, professor_id)
+    attributes = {
+      course_id: course_id, professor_id: professor_id,
+      year: @semester.year, semester: @semester.semester
+    }
+    course_class = CourseClass.find_by(attributes)
+    return course_class if course_class.present?
+
+    course = Course.find(course_id)
+    course_class = CourseClass.create(attributes.merge({ name: course.name })) if course.present?
+    course_class
+  end
+
+  def prepare_course_class_ids
+    course_class_ids = enrollment_request_params[:course_class_ids] || []
+    on_demand_course_ids = enrollment_request_params[:course_ids] || []
+
+    on_demand_course_ids.each do |course_id, data|
+      next if data[:selected] != "1"
+      
+      course_class = find_or_create_course_class_in_this_semester(course_id.to_i, data[:professor].to_i)
+      course_class_ids << course_class.id.to_s if course_class.present?
+    end
+    course_class_ids.uniq
+  end
+
+  def notify_enrollment_request_change(enrollment_request, request_change)
+    attributes = { record: enrollment_request }.merge(request_change)
+    emails = [EmailTemplate.load_template("student_enrollments:email_to_student").prepare_message(attributes)]
+    enrollment_request.enrollment.advisements.each do |advisement|
+      emails << EmailTemplate.load_template("student_enrollments:email_to_advisor")
+                             .prepare_message(attributes.merge({ advisement: advisement }))
+    end
+    Notifier.send_emails(notifications: emails)
+  end
 
 end
