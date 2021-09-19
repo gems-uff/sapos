@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 module EnrollmentRequestsHelper
+  
+  include EnrollmentSearchHelperConcern
 
   def class_request_attribute(column_status, record_status)
     result = [
@@ -23,6 +25,14 @@ module EnrollmentRequestsHelper
     result.join(' ').html_safe
   end
 
+  alias_method :student_search_column, :custom_student_search_column
+  alias_method :enrollment_level_search_column, :custom_enrollment_level_search_column
+  alias_method :enrollment_status_search_column, :custom_enrollment_status_search_column
+  alias_method :admission_date_search_column, :custom_admission_date_search_column
+  alias_method :scholarship_durations_active_search_column, :custom_scholarship_durations_active_search_column
+  alias_method :advisor_search_column, :custom_advisor_search_column
+  alias_method :professor_search_column, :custom_professor_search_column
+  
   def class_enrollment_requests_show_column(record, column)
     return "-" if record.class_enrollment_requests.nil?
 
@@ -90,6 +100,5 @@ module EnrollmentRequestsHelper
     body += "</table>"
     body.html_safe
   end
-
 
 end

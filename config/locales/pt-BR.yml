@@ -244,6 +244,12 @@ pt-BR:
         last_student_change_at: Data de última modificação do Aluno
         last_staff_change_at: Data de última modificação da Equipe
         student_view_at: Data de última visualização do Aluno
+        student: "Aluno"
+        enrollment_level: "Nível"
+        enrollment_status: "Tipo de Matrícula"
+        admission_date: "Data de Admissão"
+        scholarship_durations_active: "Possui bolsa?"
+        advisor: "Orientador"
       enrollment_request_comment:
         enrollment_request: "Pedido de Inscrição"
         message: Mensagem
