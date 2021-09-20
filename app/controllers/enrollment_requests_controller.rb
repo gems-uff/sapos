@@ -105,7 +105,7 @@ class EnrollmentRequestsController < ApplicationController
   end
 
   def help
-    raise CanCan::AccessDenied.new("Acesso negado!", :read, ClassEnrollmentRequest) if cannot? :read, ClassEnrollmentRequest
+    raise CanCan::AccessDenied.new if cannot? :read, ClassEnrollmentRequest
     respond_to_action(:help)
   end
 

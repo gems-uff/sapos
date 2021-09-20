@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
 
   check_authorization :unless => :devise_controller?
 
-  skip_authorization_check :only => [:root]
+  skip_authorization_check :only => [:root, :route_not_found]
 
   before_action :authenticate_user!
   before_action :parse_date
@@ -45,7 +45,30 @@ class ApplicationController < ActionController::Base
         redirect_to(:controller => model.name.underscore.pluralize.downcase, :action => 'index') and return
       end
     end
-    
+  end
+
+  def route_not_found
+    ExceptionNotifier.notify_exception(exception, data: {
+      reason: I18n.t('unauthorized.not_found'),
+      user_id: current_user&.id,
+      user_name: current_user&.name,
+      user_email: current_user&.email,
+      url: request.original_url,
+    }) if defined?(ExceptionNotifier)
+    redirect_to root_url, :notice => I18n.t('unauthorized.default')
+  end
+
+  rescue_from CanCan::AccessDenied do |exception|
+    ExceptionNotifier.notify_exception(exception, data: {
+      reason: I18n.t('unauthorized.access_denied'),
+      user_id: current_user&.id,
+      user_name: current_user&.name,
+      user_email: current_user&.email,
+      url: request.original_url,
+      exception_action: exception.action,
+      exception_message: exception.message
+    }) if defined?(ExceptionNotifier)
+    redirect_to root_url, :notice => exception.message
   end
 
   private

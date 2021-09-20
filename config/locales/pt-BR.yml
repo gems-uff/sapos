@@ -1209,3 +1209,8 @@ pt-BR:
 
   rescue_blank_text: "Não informado"
 
+  unauthorized:
+    not_found: "Não encontrado"
+    access_denied: "Acesso negado"
+    default: "Esta URL não existe ou você não possui autorização para acessá-la. Tentativa de acesso reportada."
+  

@@ -49,8 +49,8 @@ class StudentEnrollmentController < ApplicationController
 
   def _valid_enrollment
     @enrollment = Enrollment.find(params[:id])
-    if (@enrollment.nil? || @enrollment.student.user != current_user || ! @enrollment.enrollment_status.user)
-      return redirect_to landing_url, alert: I18n.t("student_enrollment.alert.invalid_enrollment", enrollment: params[:id])
+    if (@enrollment.blank? || @enrollment.student.user != current_user || !@enrollment.enrollment_status.user)
+      raise CanCan::AccessDenied.new
     end
     nil
   end
@@ -66,7 +66,7 @@ class StudentEnrollmentController < ApplicationController
       .and(ClassSchedule.arel_table[:semester].eq(params[:semester]))
     )
     if @semester.nil?
-      return redirect_to student_enrollment_path(@enrollment.id), alert: I18n.t("student_enrollment.alert.invalid_semester", year: params[:year], semester: params[:semester])
+      raise CanCan::AccessDenied.new
     end
     if check_time && ! @semester.enroll_open?
       return redirect_to student_enrollment_path(@enrollment.id), alert: I18n.t("student_enrollment.alert.closed_enrollment", year: params[:year], semester: params[:semester])

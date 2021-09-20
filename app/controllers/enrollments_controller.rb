@@ -209,7 +209,7 @@ class EnrollmentsController < ApplicationController
   end
 
   def new_users
-    raise CanCan::AccessDenied.new("Acesso negado!", :invite, User) if cannot? :invite, User
+    raise CanCan::AccessDenied.new if cannot? :invite, User
     each_record_in_page {}
     enrollments = find_page(:sorting => active_scaffold_config.list.user.sorting).items
     @counts = new_users_count(enrollments)
@@ -218,7 +218,7 @@ class EnrollmentsController < ApplicationController
   end
 
   def create_users
-    raise CanCan::AccessDenied.new("Acesso negado!", :invite, User) if cannot? :invite, User
+    raise CanCan::AccessDenied.new if cannot? :invite, User
     each_record_in_page {}
     enrollments = find_page(:sorting => active_scaffold_config.list.user.sorting).items
     created = create_enrollments_users(enrollments, params["add_option"])

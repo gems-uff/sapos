@@ -173,27 +173,27 @@ class ClassEnrollmentRequestsController < ApplicationController
   end
 
   def set_invalid
-    raise CanCan::AccessDenied.new("Acesso negado!", :update, ClassEnrollmentRequest) if cannot? :update, ClassEnrollmentRequest
+    raise CanCan::AccessDenied.new if cannot? :update, ClassEnrollmentRequest
     set_status(ClassEnrollmentRequest::INVALID, 'class_enrollment_request.invalid.applied')
   end
 
   def set_requested
-    raise CanCan::AccessDenied.new("Acesso negado!", :update, ClassEnrollmentRequest) if cannot? :update, ClassEnrollmentRequest
+    raise CanCan::AccessDenied.new if cannot? :update, ClassEnrollmentRequest
     set_status(ClassEnrollmentRequest::REQUESTED, 'class_enrollment_request.requested.applied')
   end
 
   def set_valid
-    raise CanCan::AccessDenied.new("Acesso negado!", :update, ClassEnrollmentRequest) if cannot? :update, ClassEnrollmentRequest
+    raise CanCan::AccessDenied.new if cannot? :update, ClassEnrollmentRequest
     set_status(ClassEnrollmentRequest::VALID, 'class_enrollment_request.valid.applied')
   end
 
   def set_effected
-    raise CanCan::AccessDenied.new("Acesso negado!", :effect, ClassEnrollmentRequest) if cannot? :effect, ClassEnrollmentRequest
+    raise CanCan::AccessDenied.new if cannot? :effect, ClassEnrollmentRequest
     set_status(ClassEnrollmentRequest::EFFECTED, 'class_enrollment_request.effected.applied')
   end
 
   def show_effect
-    raise CanCan::AccessDenied.new("Acesso negado!", :effect, ClassEnrollmentRequest) if cannot? :effect, ClassEnrollmentRequest
+    raise CanCan::AccessDenied.new if cannot? :effect, ClassEnrollmentRequest
     each_record_in_page {}
     class_enrollment_requests = find_page(:sorting => active_scaffold_config.list.user.sorting).items
     @count = class_enrollment_requests.filter { |record| record.status != ClassEnrollmentRequest::EFFECTED }.count
@@ -201,12 +201,12 @@ class ClassEnrollmentRequestsController < ApplicationController
   end
 
   def help
-    raise CanCan::AccessDenied.new("Acesso negado!", :read, ClassEnrollmentRequest) if cannot? :read, ClassEnrollmentRequest
+    raise CanCan::AccessDenied.new if cannot? :read, ClassEnrollmentRequest
     respond_to_action(:help)
   end
 
   def effect
-    raise CanCan::AccessDenied.new("Acesso negado!", :effect, ClassEnrollmentRequest) if cannot? :effect, ClassEnrollmentRequest
+    raise CanCan::AccessDenied.new if cannot? :effect, ClassEnrollmentRequest
     count = 0
     each_record_in_page {}
     class_enrollment_requests = find_page(:sorting => active_scaffold_config.list.user.sorting).items
