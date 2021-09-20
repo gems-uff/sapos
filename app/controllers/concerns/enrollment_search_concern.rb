@@ -33,7 +33,7 @@ module EnrollmentSearchConcern extend ActiveSupport::Concern
       config.columns[:scholarship_durations_active].search_ui = :select
     end
 
-    def add_admission_date_search_column(config)
+    def add_advisor_search_column(config)
       config.columns[:advisor].search_sql = "advisements.professor_id"
       config.columns[:advisor].search_ui = :select
     end

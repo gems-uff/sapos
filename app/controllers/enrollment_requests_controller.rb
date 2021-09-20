@@ -43,7 +43,7 @@ class EnrollmentRequestsController < ApplicationController
     add_scholarship_durations_active_search_column(config)
     config.columns[:scholarship_durations_active].includes = [ :enrollment ]
 
-    add_admission_date_search_column(config)
+    add_advisor_search_column(config)
     config.columns[:advisor].includes = { :enrollment => :advisements }
 
     config.columns[:status].search_sql = ""

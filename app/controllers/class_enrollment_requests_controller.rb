@@ -93,7 +93,7 @@ class ClassEnrollmentRequestsController < ApplicationController
     add_scholarship_durations_active_search_column(config)
     config.columns[:scholarship_durations_active].includes = { :enrollment_request => :enrollment }
 
-    add_admission_date_search_column(config)
+    add_advisor_search_column(config)
     config.columns[:advisor].includes = { :enrollment_request => { :enrollment => :advisements } }
 
     config.columns[:course_class].search_ui = :record_select
