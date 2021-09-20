@@ -64,11 +64,6 @@ class ClassEnrollmentRequest < ApplicationRecord
     course_class.professor.to_label if course_class.professor
   end
 
-  def parent_status
-    return nil unless enrollment_request = self.enrollment_request
-    enrollment_request.status
-  end
-
   def set_status!(new_status)
     changed = new_status != status || 
       (new_status == EFFECTED && action == INSERT && class_enrollment.blank?) ||

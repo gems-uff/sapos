@@ -7,17 +7,21 @@
 <p> Para a inscrição online em disciplinas de alunos, comece criando um <%= link_to "Quadro de Horários", class_schedules_path %> com a configuração de datas para inscrição e período de ajustes. </p>
 <% end %>
 
-<p> Durante a inscrição online, alunos fazem <%= link_to "Pedidos de Inscrição", enrollment_requests_path %> com <%= link_to "Pedidos de Disciplinas", class_enrollment_requests_path %>. Esses pedidos devem ser validados e efetivados. </p>
+<p> Durante a inscrição online, alunos fazem <%= link_to "Pedidos de Inscrição", enrollment_requests_path %> com <%= link_to "Pedidos de Inscrição em Disciplina", class_enrollment_requests_path %>.
+    Cada pedido pode ser de <em>adição</em> ou <em>remoção</em> de disciplina.
+    Pedidos de adição são criados para disciplinas em que alunos desejam se inscrever.
+    Pedidos de remoção são criados para disciplinas em que alunos já estão inscritos e desejam se desinscrever. </p>
 
-<p> Inicialmente, um pedido de disciplina é criado com a situação <span class='status'><i class='fa fa-question-circle'></i> Solicitada</span>, indicando que nenhuma decisão foi tomada ainda. 
-    Orientadores, coordenação e secretaria podem atuar no pedido alterando a situação de cada disciplina para <span class='status'><i class='fa fa-times-circle'></i> Inválida</span> ou <span class='status'><i class='fa fa-check-circle'></i> Válida</span> e podem enviar comentários para que o aluno faça ajustes. </p>
+<p> Os pedidos devem ser validados e efetivados.
+    Inicialmente, um pedido é criado com a situação <span class='status'><i class='fa fa-question-circle'></i> Solicitada</span>, indicando que nenhuma decisão foi tomada ainda. 
+    Orientadores, coordenação e secretaria podem atuar no pedido alterando a situação de cada disciplina para <span class='status'><i class='fa fa-times-circle'></i> Inválida</span> ou <span class='status'><i class='fa fa-check-circle'></i> Válida</span> e podem enviar comentários para que alunos façam ajustes. </p>
 
-<p> Este processo de validação de pedidos <em>não</em> resulta automaticamente na criação de <%= link_to "Inscrições", class_enrollments_path %>.
-    Para que inscriçoes sejam criadas, é necessário que os pedidos de disciplinas sejam <span class='status'><i class='fa fa-plus-circle'></i> Efetivados</span> pela coordenação ou secretaria. </p>
+<p> Este processo de validação de pedidos <em>não</em> resulta automaticamente na criação ou remoção de <%= link_to "Inscrições", class_enrollments_path %>.
+    Para que inscriçoes sejam criadas ou removidas, é necessário que os pedidos de disciplinas sejam <span class='status'><i class='fa fa-plus-circle'></i> Efetivados</span> pela coordenação ou secretaria. Quando um pedido de adição é efetivado, uma inscrição é criada. Opostamente, quando um pedido de remoção é efetivado, uma inscrição é removida. </p>
 
 <% if can? :effect, ClassEnrollmentRequest %>
-<p> Pedidos podem ser efetivados individualmente, ou podem ser efetivados de uma vez por meio da ação no topo de <%= link_to "Efetivar Inscrições", class_enrollment_requests_path %>. 
-    Esta ação é sujeita à condições de busca. Portanto, é possível usar a busca para selecionar todas as disciplinas válidas e efetivá-las de uma vez.
+<p> Pedidos podem ser efetivados individualmente, ou podem ser efetivados de uma vez por meio da ação no topo de <%= link_to "Pedidos de Inscrição em Disciplina", class_enrollment_requests_path %>. 
+    Esta ação é sujeita às condições de busca. Portanto, é possível usar a busca para selecionar todos os pedidos válidos e efetivá-los de uma vez. </p>
 <% end %>
 
 
@@ -26,7 +30,7 @@
 <li> <span class='status'><i class='fa fa-times-circle'></i> Inválida</span>: Pedido invalidado por orientador, coordenação ou secretaria </li>
 <li> <span class='status'><i class='fa fa-question-circle'></i> Solicitada</span>: Pedido feito por aluno ainda sem decisão </li>
 <li> <span class='status'><i class='fa fa-check-circle'></i> Válida</span>: Pedido validado por orientador, coordenação ou secretaria </li>
-<li> <span class='status'><i class='fa fa-plus-circle'></i> Efetivada</span>: Pedido válido e efetivado como uma inscrição em disciplina pela coordenação ou secretaria </li>
+<li> <span class='status'><i class='fa fa-plus-circle'></i> Efetivada</span>: Pedido válido e efetivado pela coordenação ou secretaria </li>
 </ul>
 
 </div>

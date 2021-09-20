@@ -51,13 +51,13 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     config.list.sorting = {:enrollment_request => 'ASC'}
     columns = [:enrollment_request, :course_class, :status, :class_enrollment]
-    config.list.columns = [:enrollment_request, :course_class, :status, :parent_status, :class_enrollment, :allocations, :professor, :action]
-    config.show.columns = [:enrollment_request, :course_class, :status, :parent_status, :class_enrollment, :allocations, :professor, :action]
+    config.list.columns = [:enrollment_request, :course_class, :class_enrollment, :allocations, :professor, :action, :status]
+    config.show.columns = [:enrollment_request, :course_class, :class_enrollment, :allocations, :professor, :action, :status]
     config.create.columns = columns
     config.update.columns = columns
 
     config.columns.add :enrollment_number, :student, :enrollment_level, :enrollment_status, :admission_date, :scholarship_durations_active, :advisor 
-    config.columns.add :year, :semester, :parent_status, :professor
+    config.columns.add :year, :semester, :professor
 
     config.create.label = :create_class_enrollment_request_label
     config.update.label = :update_class_enrollment_request_label
@@ -98,11 +98,6 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     config.columns[:course_class].search_ui = :record_select
 
-    config.columns[:parent_status].includes = [:enrollment_request]
-    config.columns[:parent_status].search_sql = ""
-    config.columns[:parent_status].search_ui = :select
-    config.columns[:parent_status].options = {:options => ClassEnrollmentRequest::STATUSES, default: ClassEnrollmentRequest::REQUESTED, :include_blank => I18n.t("active_scaffold._select_")}
-
     config.columns[:professor].includes = [:course_class]
     config.columns[:professor].search_sql = "course_classes.professor_id"
     config.columns[:professor].search_ui = :select
@@ -110,7 +105,6 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.field_search.columns = [
       :action,
       :status,
-      :parent_status,
       :year,
       :semester,
       :enrollment_number, 
@@ -140,10 +134,6 @@ class ClassEnrollmentRequestsController < ApplicationController
   class <<self
     alias_method :condition_for_admission_date_column, :custom_condition_for_admission_date_column
     alias_method :condition_for_scholarship_durations_active_column, :custom_condition_for_scholarship_durations_active_column
-  end
-
-  def self.condition_for_parent_status_column(column, value, like_pattern)
-    custom_condition_for_status(value, 'exists', 'not exists', ' and cer.enrollment_request_id = enrollment_requests.id')
   end
 
   def hide_validate_actions?(record)

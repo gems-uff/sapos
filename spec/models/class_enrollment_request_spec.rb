@@ -199,15 +199,6 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
           expect(class_enrollment_request.professor).to eq(professor.to_label)
         end
       end
-      describe "parent_status" do
-        it "should return nil when enrollment_request is nil" do
-          class_enrollment_request.enrollment_request = nil
-          expect(class_enrollment_request.parent_status).to eq(nil)
-        end
-        it "should return the status of the enrollment_request" do
-          expect(class_enrollment_request.parent_status).to eq(ClassEnrollmentRequest::REQUESTED)
-        end
-      end
       describe "set_status!" do
         it "should build a class_enrollment and set the status to effected if there is no associated class_enrollment" do
           class_enrollment_request.status = ClassEnrollmentRequest::VALID
