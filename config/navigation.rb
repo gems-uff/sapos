@@ -1,8 +1,93 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+def get_path_from(models)
+  models = models.is_a?(Array) ? models : [models]
+  models.each do |model|
+    if can_read?(model, false)
+      return self.send("#{model.name.underscore.pluralize.downcase}_path")
+    end
+  end
+end
+
+def can_read?(models, proc = true)
+  can_read = false
+  models = models.is_a?(Array) ? models : [models]
+  models.each do |model|
+    can_read ||= can?(:read, model)
+  end
+  return can_read ? Proc.new { true } : Proc.new { false } if proc
+  can_read
+end
+
+class NavigationHelper
+
+  attr_accessor :container, :parentkey, :binds
+
+  def initialize(binds, container, options = {})
+    @binds = binds
+    @container = container
+    @parentkey = options.fetch(:parentkey, nil)
+  end
+  
+  # Add an item to the primary navigation. The following params apply:
+  # key - a symbol which uniquely defines your navigation item in the scope of the primary_navigation
+  #       in the mainitem.call, key will be used to produce the I18n name: navigation.{key}.label
+  #       in the submenu.item, key will be used to produce the I18n name: navigation.{parentkey}.{key}
+  # url - the address that the generated item links to. You can also use url_helpers (named routes, restful routes helper, url_for etc.)
+  # options - can be used to specify attributes that will be included in the rendered navigation item (e.g. id, class etc.)
+  #           some special options that can be set:
+  #           :if - Specifies a proc to call to determine if the item should
+  #                 be rendered (e.g. <tt>:if => Proc.new { current_user.admin? }</tt>). The
+  #                 proc should evaluate to a true or false value and is evaluated in the context of the view.
+  #           :unless - Specifies a proc to call to determine if the item should not
+  #                     be rendered (e.g. <tt>:unless => Proc.new { current_user.admin? }</tt>). The
+  #                     proc should evaluate to a true or false value and is evaluated in the context of the view.
+  #           :method - Specifies the http-method for the generated link - default is :get.
+  #           :highlights_on - if autohighlighting is turned off and/or you want to explicitly specify
+  #                            when the item should be highlighted, you can set a regexp which is matched
+  #                            against the current URI.
+  #
+  def item(key, url, options = {})
+    parentkey = @parentkey || key
+    childi18n = @parentkey.nil? ? :label : key
+
+    @container.item(key, I18n.t("navigation.#{parentkey}.#{childi18n}"), url, **options) do |item_container|
+      yield NavigationHelper.new(@binds, item_container, parentkey: key) if block_given?
+    end
+  end
+
+  # Create item for a list of models.
+  # Use the first one the user can read to create the url
+  def listitem(key, models, options = {}, &block)
+    options[:if] ||= can_read?(models)
+    url = get_path_from(models)
+    item(key, url, options, &block)
+  end
+
+  # Create item for a model if the user has read permission
+  # Use the singular name of the model to create the key
+  def modelitem(model, options = {}, &block)
+    key = model.name.underscore.singularize.downcase
+    listitem(key, model, options, &block)
+  end
+
+  protected
+
+  def get_path_from(*args)
+    @binds.eval("method(:get_path_from)").call *args
+  end
+
+  def can_read?(*args)
+    @binds.eval("method(:can_read?)").call *args
+  end
+end
+
+
 # Configures your navigation
 SimpleNavigation::Configuration.run do |navigation|
+
+  
   # Specify a custom renderer if needed.
   # The default renderer is SimpleNavigation::Renderer::List which renders HTML lists.
   # The renderer can also be specified as option in the render_navigation call.
@@ -28,128 +113,98 @@ SimpleNavigation::Configuration.run do |navigation|
   # This turns it off globally (for the whole plugin)
   # navigation.auto_highlight = false
 
+
   # Define the primary navigation
   navigation.items do |primary|
-    # Add an item to the primary navigation. The following params apply:
-    # key - a symbol which uniquely defines your navigation item in the scope of the primary_navigation
-    # name - will be displayed in the rendered navigation. This can also be a call to your I18n-framework.
-    # url - the address that the generated item links to. You can also use url_helpers (named routes, restful routes helper, url_for etc.)
-    # options - can be used to specify attributes that will be included in the rendered navigation item (e.g. id, class etc.)
-    #           some special options that can be set:
-    #           :if - Specifies a proc to call to determine if the item should
-    #                 be rendered (e.g. <tt>:if => Proc.new { current_user.admin? }</tt>). The
-    #                 proc should evaluate to a true or false value and is evaluated in the context of the view.
-    #           :unless - Specifies a proc to call to determine if the item should not
-    #                     be rendered (e.g. <tt>:unless => Proc.new { current_user.admin? }</tt>). The
-    #                     proc should evaluate to a true or false value and is evaluated in the context of the view.
-    #           :method - Specifies the http-method for the generated link - default is :get.
-    #           :highlights_on - if autohighlighting is turned off and/or you want to explicitly specify
-    #                            when the item should be highlighted, you can set a regexp which is matched
-    #                            against the current URI.
-    #
+    
+    mainhelper = NavigationHelper.new(binding, primary)
 
-    def get_path_from(models)
-      models = models.is_a?(Array) ? models : [models]
-      models.each do |model|
-        if can_read?(model, false)
-          return self.send("#{model.name.underscore.pluralize.downcase}_path")
-        end
-      end
+    mainhelper.item :main, landing_url, if: can_read?(:landing) do |submenu|
+      submenu.item :pendencies, pendencies_url, if: can_read?(:pendency)
+      @landingsidebar.call(submenu.container)
+      submenu.item :profile, edit_user_registration_path, highlights_on: %r(/users/profile), if: -> { user_signed_in? }
     end
 
-    def can_read?(models, proc = true)
-      can_read = false
-      models = models.is_a?(Array) ? models : [models]
-      models.each do |model|
-        can_read ||= can?(:read, model)
-      end
-      return can_read ? Proc.new { true } : Proc.new { false } if proc
-      can_read
-    end
-    #highlights_on: %r(/users), 
-    primary.item :land, 'Principal', landing_url, :if => can_read?(:landing) do |land|
-      land.item :pendencies, 'Pendências', pendencies_url, :if => Proc.new { can?(:read, :pendency) }
-      @landingsidebar.call(land)
-      land.item :password, "Editar perfil", edit_user_registration_path, highlights_on: %r(/users/profile), if: Proc.new { user_signed_in? }
+    students_models = [Student, Dismissal, Enrollment, EnrollmentHold, Level, DismissalReason, EnrollmentStatus]
+    mainhelper.listitem :students, students_models do |submenu|
+      submenu.modelitem Student
+      submenu.modelitem Dismissal
+      submenu.modelitem Enrollment
+      submenu.modelitem EnrollmentHold
+      submenu.modelitem Level
+      submenu.modelitem DismissalReason
+      submenu.modelitem EnrollmentStatus
     end
 
-    alunos_models = [Student, Dismissal, Enrollment, EnrollmentHold, Level, DismissalReason, EnrollmentStatus]
-
-    primary.item :stud, 'Alunos', get_path_from(alunos_models), :if => can_read?(alunos_models) do |stud|
-      stud.item :student, 'Alunos', students_path, :if => can_read?(Student)
-      stud.item :dismissal, 'Desligamentos', dismissals_path, :if => can_read?(Dismissal)
-      stud.item :enrollment, 'Matrículas', enrollments_path, :if => can_read?(Enrollment)
-      stud.item :enrollment_hold, 'Trancamentos', enrollment_holds_path, :if => can_read?(EnrollmentHold)
-      stud.item :level, 'Níveis', levels_path, :if => can_read?(Level)
-      stud.item :dismissal_reason, 'Razões de Desligamento', dismissal_reasons_path, :if => can_read?(DismissalReason)
-      stud.item :enrollment_status, 'Tipos de Matrícula', enrollment_statuses_path, :if => can_read?(EnrollmentStatus)
+    professors_models = [Professor, Advisement, AdvisementAuthorization]
+    mainhelper.listitem :professors, professors_models do |submenu|
+      submenu.modelitem Professor
+      submenu.modelitem Advisement
+      submenu.modelitem AdvisementAuthorization
+      submenu.modelitem ThesisDefenseCommitteeParticipation
     end
 
-
-    professores_models = [Professor, Advisement, AdvisementAuthorization]
-    primary.item :prof, 'Professores', get_path_from(professores_models), :if => can_read?(professores_models) do |prof|
-      prof.item :professor, 'Professores', professors_path, :if => can_read?(Professor)
-      prof.item :advisement, 'Orientações', advisements_path, :if => can_read?(Advisement)
-      prof.item :advisement_authorizations, 'Credenciamentos', advisement_authorizations_path, :if => can_read?(AdvisementAuthorization)
-      prof.item :thesis_defense_committee_participations, 'Bancas', thesis_defense_committee_participations_path, :if => can_read?(ThesisDefenseCommitteeParticipation)
+    scholar_models = [Scholarship, ScholarshipType, ScholarshipDuration]
+    mainhelper.listitem :scholarships, scholar_models do |submenu|
+      submenu.modelitem Sponsor
+      submenu.modelitem ScholarshipDuration
+      submenu.modelitem Scholarship
+      submenu.modelitem ScholarshipType
     end
 
-    bolsas_models = [Scholarship, ScholarshipType, ScholarshipDuration]
-    primary.item :scholarships, 'Bolsas', get_path_from(bolsas_models), :if => can_read?(bolsas_models) do |scholarships|
-      scholarships.item :sponsor, 'Agências de Fomento', sponsors_path, :if => can_read?(Sponsor)
-      scholarships.item :scholarship_duration, 'Alocação de Bolsas', scholarship_durations_path, :if => can_read?(ScholarshipDuration)
-      scholarships.item :scholarship, 'Bolsas', scholarships_path, :if => can_read?(Scholarship)
-      scholarships.item :scholarship_type, 'Tipos de Bolsa', scholarship_types_path, :if => can_read?(ScholarshipType)
+    phases_models = [Deferral, Accomplishment, Phase, DeferralType]
+    mainhelper.listitem :phases, phases_models do |submenu|
+      submenu.modelitem Deferral
+      submenu.modelitem Accomplishment
+      submenu.modelitem Phase
+      submenu.modelitem DeferralType
     end
 
-    etapas_models = [Deferral, Accomplishment, Phase, DeferralType]
-    primary.item :phases, 'Etapas', get_path_from(etapas_models), :if => can_read?(etapas_models) do |phases|
-      phases.item :deferral, 'Prorrogações Concedidas', deferrals_path, :if => can_read?(Deferral)
-      phases.item :accomplishment, 'Realizações de Etapas', accomplishments_path, :if => can_read?(Accomplishment)
-      phases.item :phase, 'Tipos de Etapas', phases_path, :if => can_read?(Phase)
-      phases.item :deferral_type, 'Tipos de Prorrogação', deferral_types_path, :if => can_read?(DeferralType)
-    end
-
-    primary.item :courses, 'Disciplinas', courses_path, :if => can_read?(Course) do |courses|
-      courses.item :research_area, 'Áreas de Pesquisa', research_areas_path, :if => can_read?(ResearchArea)
-      courses.item :course, 'Disciplinas', courses_path, :if => can_read?(Course)
-      courses.item :course_type, 'Tipos de Disciplinas', course_types_path, :if => can_read?(CourseType)
-      courses.item :course_class, 'Turmas', course_classes_path, :if => can_read?(CourseClass)
-      courses.item :course_class, 'Quadros de Horários', class_schedules_path, :if => can_read?(ClassSchedule)
-      courses.item :class_enrollment, 'Inscrições', class_enrollments_path, :if => can_read?(ClassEnrollment)
-      courses.item :allocation, 'Alocações', allocations_path, :if => can_read?(Allocation)
-      courses.item :enrollment_request, 'Pedidos de Inscrição', enrollment_requests_path, :if => can_read?(EnrollmentRequest)
-      courses.item :class_enrollment_request, 'Efetivar Inscrições', class_enrollment_requests_path, :if => can_read?(ClassEnrollmentRequest)
-      #courses.item :enrollment_request_comment, 'Comentários de Pedidos de Inscrição', enrollment_request_comments_path, :if => can_read?(EnrollmentRequestComment)
+    courses_models = [
+      Course, ResearchArea, CourseType, CourseClass, ClassSchedule, ClassEnrollment, Allocation, 
+      EnrollmentRequest, ClassEnrollmentRequest
+    ]
+    mainhelper.listitem :courses, courses_models do |submenu|
+      submenu.modelitem ResearchArea
+      submenu.modelitem Course
+      submenu.modelitem CourseType
+      submenu.modelitem CourseClass
+      submenu.modelitem ClassSchedule
+      submenu.modelitem ClassEnrollment
+      submenu.modelitem Allocation
+      submenu.modelitem EnrollmentRequest
+      submenu.modelitem ClassEnrollmentRequest
     end
 
     grade_models = [Major, Institution]
-    primary.item :grade, 'Formação', majors_path, :if => can_read?(grade_models) do |grade|
-      grade.item :major, 'Cursos', majors_path, :if => can_read?(Major)
-      grade.item :institution, 'Instituições', institutions_path, :if => can_read?(Institution)
+    mainhelper.listitem :grades, grade_models do |submenu|
+      submenu.modelitem Major
+      submenu.modelitem Institution
     end
 
-    localidades_models = [City, State, Country]
-    primary.item :locations, 'Localidades', get_path_from(localidades_models), :if => can_read?(localidades_models) do |locations|
-      locations.item :city, 'Cidades', cities_path, :if => can_read?(City)
-      locations.item :state, 'Estados', states_path, :if => can_read?(State)
-      locations.item :country, 'Países', countries_path, :if => can_read?(Country)
+    locations_models = [City, State, Country]
+    mainhelper.listitem :locations, locations_models do |submenu|
+      submenu.modelitem City
+      submenu.modelitem State
+      submenu.modelitem Country
     end
 
-    configuracoes_models = [User, Role, CustomVariable, Version, Notification, NotificationLog, ReportConfiguration, EmailTemplate]
-    primary.item :configuration, 'Configurações', get_path_from(configuracoes_models), :if => can_read?(configuracoes_models) do |configuration|
-      configuration.item :user, 'Usuários', users_path, :if => can_read?(User)
-      configuration.item :roles, 'Papéis', roles_path, :if => can_read?(Role)
-      configuration.item :versions, 'Log', versions_path, :if => can_read?(Version)
-      configuration.item :notifications, 'Notificações', notifications_path, :if => can_read?(Notification)
-      configuration.item :email_templates, 'Templates de Email', email_templates_path, :if => can_read?(EmailTemplate)
-      configuration.item :queries, 'Consultas', queries_path, :if => can_read?(Query)
-      configuration.item :notification_logs, 'Notificações Enviadas', notification_logs_path, :if => can_read?(NotificationLog)
-      configuration.item :custom_variables, 'Variáveis', custom_variables_path, :if => can_read?(CustomVariable)
-      configuration.item :custom_variables, 'Configurações de Relatório', report_configurations_path, :if => can_read?(ReportConfiguration)
+    config_models = [
+      User, Role, CustomVariable, Version, Notification, NotificationLog, ReportConfiguration, EmailTemplate
+    ]
+    mainhelper.listitem :configurations, config_models do |submenu|
+      submenu.modelitem User
+      submenu.modelitem Role
+      submenu.modelitem Version
+      submenu.modelitem Notification
+      submenu.modelitem EmailTemplate
+      submenu.modelitem Query
+      submenu.modelitem NotificationLog
+      submenu.modelitem CustomVariable
+      submenu.modelitem ReportConfiguration
     end
 
-    primary.item :logout, 'Logout', destroy_user_session_path
+    mainhelper.item :logout, destroy_user_session_path
 
     # Add an item which has a sub navigation (same params, but with block)
     #primary.item :key_2, 'name', url, options do |sub_nav|

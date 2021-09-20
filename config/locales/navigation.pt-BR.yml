@@ -1,0 +1,76 @@
+pt-BR:
+  navigation:
+    main:
+      label: Principal
+      pendencies: Pendências
+      profile: Editar perfil
+
+    students:
+      label: Alunos
+      student: Alunos
+      dismissal: Desligamentos
+      enrollment: Matrículas
+      enrollment: Matrículas
+      enrollment_hold: Trancamentos
+      level: Níveis
+      dismissal_reason: Razões de Desligamento
+      enrollment_status: Tipos de Matrícula
+
+    professors:
+      label: Professores
+      professor: Professores
+      advisement: Orientações
+      advisement_authorization: Credenciamentos
+      thesis_defense_committee_participation: Bancas
+
+    scholarships:
+      label: Bolsas
+      sponsor: Agências de Fomento
+      scholarship_duration: Alocação de Bolsas
+      scholarship: Bolsas
+      scholarship_type: Tipos de Bolsa
+
+    phases:
+      label: Etapas
+      deferral: Prorrogações Concedidas
+      accomplishment: Realizações de Etapas
+      phase: Tipos de Etapas
+      deferral_type: Tipos de Prorrogação
+
+    courses:
+      label: Disciplinas
+      research_area: Áreas de Pesquisa
+      course: Disciplinas
+      course_type: Tipos de Disciplinas
+      course_class: Turmas
+      class_schedule: Quadros de Horários
+      class_enrollment: Inscrições
+      allocation: Alocações
+      enrollment_request: Pedidos de Inscrição
+      class_enrollment_request: Pedidos de Inscrição em Disciplina
+
+    grades:
+      label: Formação
+      major: Cursos
+      institution: Instituições
+
+    locations:
+      label: Localidades
+      city: Cidades
+      state: Estados
+      country: Países
+
+    configurations:
+      label: Configurações
+      user: Usuários
+      role: Papéis
+      version: Log
+      notification: Notificações
+      email_template: Templates de Email
+      query: Consultas
+      notification_log: Notificações Enviadas
+      custom_variable: Variáveis
+      report_configuration: Configurações de Relatório
+
+    logout:
+      label: 'Logout'

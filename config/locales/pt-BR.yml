@@ -721,8 +721,8 @@ pt-BR:
         one: "Inscrição"
         other: "Inscrições"
       class_enrollment_request:
-        one: "Efetivar Inscrição"
-        other: "Efetivar Inscrições"
+        one: "Pedido de Inscrição em Disciplina"
+        other: "Pedidos de Inscrição em Disciplina"
       class_schedule:
         one: "Quadro de Horários"
         other: "Quadros de Horários"
