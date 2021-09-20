@@ -271,6 +271,7 @@ class ClassEnrollmentRequestsController < ApplicationController
 
   def set_status_respond_to_js
     do_refresh_list if successful? && !render_parent?
+    @popstate = true
     render(:action => 'on_set_status')
   end
 

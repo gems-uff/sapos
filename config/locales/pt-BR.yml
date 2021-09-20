@@ -1083,9 +1083,9 @@ pt-BR:
       email_to_advisor:
         subject: "Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> de orientando foi <%= var(:record).created_at == var(:record).updated_at ? 'realizado' : 'atualizado' %>"
       removal_email_to_student:
-        subject: "Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> removido"
+        subject: "Remoção do Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> <%= requesting ? 'solicitada' : 'realizada' %>"
       removal_email_to_advisor:
-        subject: "Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> de orientando foi removido"
+        subject: "Remoção do Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> de orientando foi <%= requesting ? 'solicitada' : 'realizada' %>"
   pdf_content:
     professor_watermark: "DOCUMENTO VÁLIDO APENAS PARA USO INTERNO E PESSOAL DO PROFESSOR"
     advisements:

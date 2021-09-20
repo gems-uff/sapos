@@ -109,15 +109,20 @@ class StudentEnrollmentController < ApplicationController
   end
 
   def delete_enrollment_request_and_redirect
+    is_requesting = @enrollment_request.has_effected_class_enrollment?
     if @enrollment_request.destroy_request(@semester)
-      attributes = { record: @enrollment_request }
+      attributes = { record: @enrollment_request, requesting: is_requesting }
       emails = [EmailTemplate.load_template("student_enrollments:removal_email_to_student").prepare_message(attributes)]
       @enrollment_request.enrollment.advisements.each do |advisement|
         emails << EmailTemplate.load_template("student_enrollments:removal_email_to_advisor")
                               .prepare_message(attributes.merge({ advisement: advisement }))
       end
       Notifier.send_emails(notifications: emails)
-      return redirect_to student_enrollment_path(@enrollment.id), notice: I18n.t("student_enrollment.notice.request_removed")
+      return redirect_to student_enrollment_path(@enrollment.id), notice: (
+        is_requesting ? 
+          I18n.t("student_enrollment.notice.removal_requested") :
+          I18n.t("student_enrollment.notice.request_removed")
+      )
     end
     false
   end

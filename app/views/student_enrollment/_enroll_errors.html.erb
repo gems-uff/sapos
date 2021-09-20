@@ -13,7 +13,12 @@
             <%= message %>
             <% if attribute == :class_enrollment_requests && enrollment_request.persisted? %>
               <div>
-                <%= form.check_box :delete_request, id: "delete_request" %> <%= form.label t('student_enrollment.enroll.remove'), for: "delete_request" %>
+                <%= form.check_box :delete_request, id: "delete_request" %> 
+                <% if enrollment_request.has_effected_class_enrollment? %>
+                  <%= form.label t('student_enrollment.enroll.request_removal'), for: "delete_request" %>
+                <% else %>
+                  <%= form.label t('student_enrollment.enroll.remove'), for: "delete_request" %>
+                <% end %>
               </div>
             <% end %>
           </li>

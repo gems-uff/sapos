@@ -3,6 +3,8 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class EnrollmentRequest < ApplicationRecord
+  attr_accessor :valid_insertion, :valid_removal, :user_saving
+
   belongs_to :enrollment
   has_many :class_enrollment_requests, dependent: :destroy, autosave: true
   has_many :course_classes, through: :class_enrollment_requests
@@ -14,35 +16,13 @@ class EnrollmentRequest < ApplicationRecord
   validates :semester, :presence => true, :inclusion => {:in => YearSemester::SEMESTERS}
   validates :enrollment, :presence => true
   validates_uniqueness_of :enrollment, :scope => [:year, :semester]
-  validates :class_enrollment_requests, :length => { minimum: 1, message: :at_least_one_class}
   
+  validate :that_there_is_at_least_one_class_enrollment_request_insert, if: :user_saving
   validate :that_valid_insertion_is_not_set_to_false
   validate :that_valid_removal_is_not_set_to_false
 
   accepts_nested_attributes_for :class_enrollment_requests, :course_classes
 
-  attr_accessor :valid_insertion, :valid_removal
-
-  def status
-    all_effected = true
-    all_valid = true
-    any_invalid = false
-    class_enrollment_requests.each do |cer|
-      cer_status = cer.status
-      if cer_status != ClassEnrollmentRequest::EFFECTED
-        all_effected = false
-        all_valid = false if cer_status != ClassEnrollmentRequest::VALID
-      end
-      if cer_status == ClassEnrollmentRequest::INVALID
-        any_invalid = true
-      end
-    end
-    status = ClassEnrollmentRequest::REQUESTED
-    status = ClassEnrollmentRequest::VALID if all_valid
-    status = ClassEnrollmentRequest::EFFECTED if all_effected
-    status = ClassEnrollmentRequest::INVALID if any_invalid
-    status
-  end
 
   def self.pendency_condition(user=nil)
     user ||= current_user
@@ -65,6 +45,31 @@ class EnrollmentRequest < ApplicationRecord
 
     check_status = check_status.where(er[:enrollment_id].in(user.professor.enrollments.map(&:id)))
     [EnrollmentRequest.arel_table[:id].in(check_status.project(er[:id])).to_sql]
+  end
+
+  def to_label
+    "[#{year}.#{semester}] #{enrollment.to_label}"
+  end
+
+  def status
+    all_effected = true
+    all_valid = true
+    any_invalid = false
+    class_enrollment_requests.each do |cer|
+      cer_status = cer.status
+      if cer_status != ClassEnrollmentRequest::EFFECTED
+        all_effected = false
+        all_valid = false if cer_status != ClassEnrollmentRequest::VALID
+      end
+      if cer_status == ClassEnrollmentRequest::INVALID
+        any_invalid = true
+      end
+    end
+    status = ClassEnrollmentRequest::REQUESTED
+    status = ClassEnrollmentRequest::VALID if all_valid
+    status = ClassEnrollmentRequest::EFFECTED if all_effected
+    status = ClassEnrollmentRequest::INVALID if any_invalid
+    status
   end
 
   def student_change!
@@ -91,13 +96,16 @@ class EnrollmentRequest < ApplicationRecord
     self.enrollment_request_comments.filter { |comment|  comment.updated_at > comp_time && comment.user != user }.count
   end
 
-  def to_label
-    "[#{self.year}.#{self.semester}] #{self.enrollment.to_label}"
+  def has_effected_class_enrollment?
+    class_enrollment_requests.any? do |cer| 
+      (cer.action == ClassEnrollmentRequest::INSERT && cer.status == ClassEnrollmentRequest::EFFECTED) ||
+        (cer.action == ClassEnrollmentRequest::REMOVE && cer.status != ClassEnrollmentRequest::EFFECTED)
+    end
   end
 
   def course_class_ids
-    self.class_enrollment_requests.filter { |cer| cer.action == ClassEnrollmentRequest::INSERT }
-                                  .collect { |cer| cer.course_class_id }
+    class_enrollment_requests.filter { |cer| cer.action == ClassEnrollmentRequest::INSERT }
+                             .collect { |cer| cer.course_class_id }
   end
 
   def assign_course_class_ids(course_classes, class_schedule=nil)
@@ -139,15 +147,25 @@ class EnrollmentRequest < ApplicationRecord
   end
 
   def save_request
-    class_enrollment_requests.all? do |cer|
+    self.user_saving = true
+    result = class_enrollment_requests.all? do |cer|
       cer.save
     end && save
+    self.user_saving = false
+    result
   end
 
   def valid_destroy?(class_schedule=nil)
     return false if !self.can_destroy?
-    return false if class_schedule.present? && !class_schedule.main_enroll_open? && !class_schedule.adjust_enroll_remove_open?
-    true
+    return true if class_schedule.blank?
+    return false if !class_schedule.enroll_open?
+
+    can_remove = class_enrollment_requests.all? do |cer|
+      next true if cer.action == ClassEnrollmentRequest::INSERT && cer.status != ClassEnrollmentRequest::EFFECTED 
+      next true if cer.action == ClassEnrollmentRequest::REMOVE && cer.status == ClassEnrollmentRequest::EFFECTED
+
+      class_schedule.open_for_removing_class_enrollments?
+    end
   end
 
   def destroy_request(class_schedule=nil)
@@ -156,32 +174,33 @@ class EnrollmentRequest < ApplicationRecord
       return false
     end
 
-    can_destroy = false
-    self.class_enrollment_requests.each do |cer|
-      if cer.action == ClassEnrollmentRequest::INSERT
-        if cer.status == ClassEnrollmentRequest::EFFECTED
-          cer.action = ClassEnrollmentRequest::REMOVE
-          cer.status = ClassEnrollmentRequest::REQUESTED
-          can_destroy = false
-        else
-          cer.destroy
-        end
-      elsif cer.status == ClassEnrollmentRequest::EFFECTED
-        cer.destroy
+    destroying = true
+    class_enrollment_requests.each do |cer|
+      if cer.action == ClassEnrollmentRequest::INSERT && cer.status == ClassEnrollmentRequest::EFFECTED
+        cer.action = ClassEnrollmentRequest::REMOVE
+        cer.status = ClassEnrollmentRequest::REQUESTED
+        destroying = false
+      elsif cer.action == ClassEnrollmentRequest::REMOVE && cer.status != ClassEnrollmentRequest::EFFECTED
+        destroying = false
       else
-        can_destroy = false
+        cer.destroy
       end
     end
-
-    if can_destroy
-      destroy!
-    else
-      save!
-    end
-    true
+    result = destroying ? destroy! : save
+    destroying = false
+    result
   end
 
   protected
+
+  def that_there_is_at_least_one_class_enrollment_request_insert
+    insertions = class_enrollment_requests.filter do |cer| 
+      cer.action == ClassEnrollmentRequest::INSERT && !cer.marked_for_destruction? 
+    end
+    return if insertions.count >= 1
+    
+    errors.add(:class_enrollment_requests, :at_least_one_class)
+  end
 
   def that_valid_insertion_is_not_set_to_false
     return if valid_insertion.nil? || self.valid_insertion

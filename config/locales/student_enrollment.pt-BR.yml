@@ -23,6 +23,7 @@ pt-BR:
       do_enroll: Inscrição
       submit: Enviar
       remove: Remover pedido?
+      request_removal: Solicitar remoção do pedido?
       status: Sua inscrição está %{status}
       class_status: Situação
       messages: Mensagens
@@ -52,6 +53,7 @@ pt-BR:
 
     notice:
       request_removed: Pedido de inscrição removido!
+      removal_requested: Pedido de remoção solicitado!
       request_saved: Pedido de inscrição salvo!
 
   enrollment_request:
