@@ -125,17 +125,18 @@ class StudentEnrollmentController < ApplicationController
   def save_enrollment_request_and_redirect
     message = enrollment_request_params[:message]
     request_change = @enrollment_request.assign_course_class_ids(prepare_course_class_ids, @semester)
-    changed = request_change[:remove_class_enrollment_requests].any? || request_change[:insert_class_enrollment_requests].any? 
+    changed = request_change[:new_removal_requests].any? || 
+      request_change[:new_insertion_requests].any? ||
+      request_change[:remove_removal_requests].any? ||
+      request_change[:remove_insertion_requests].any?
     changed ||= message.present?
     if changed
       @comment = @enrollment_request.enrollment_request_comments.build(message: message, user: current_user) unless message.empty?
       @enrollment_request.student_change!
     end
-    if @enrollment_request.valid_request?(request_change)
-      if @enrollment_request.save_request(request_change)
-        notify_enrollment_request_change(@enrollment_request, request_change) if changed
-        return redirect_to student_enrollment_path(@enrollment.id), notice: I18n.t("student_enrollment.notice.request_saved")
-      end
+    if @enrollment_request.valid_request? && @enrollment_request.save_request
+      notify_enrollment_request_change(@enrollment_request, request_change) if changed
+      return redirect_to student_enrollment_path(@enrollment.id), notice: I18n.t("student_enrollment.notice.request_saved")
     end
     @enrollment_request.enrollment_request_comments.delete(@comment) if ! @comment.nil? && ! @comment.persisted?
     false

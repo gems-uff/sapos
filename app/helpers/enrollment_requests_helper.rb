@@ -6,7 +6,8 @@ module EnrollmentRequestsHelper
   
   include EnrollmentSearchHelperConcern
 
-  def class_request_attribute(column_status, record_status)
+  def class_request_attribute(record, column_status)
+    record_status = record.status
     result = [
       'type="radio"',
       "value=\"#{column_status}\""
@@ -15,7 +16,7 @@ module EnrollmentRequestsHelper
     result << 'checked="checked"' if checked
     classes = ["class-enrollment-request-status", "radio-#{column_status.parameterize}"]
 
-    if column_status == ClassEnrollmentRequest::EFFECTED && cannot?(:effect, ClassEnrollmentRequest)
+    if (column_status == ClassEnrollmentRequest::EFFECTED && cannot?(:effect, record)) || cannot?(:update, record)
       result << 'readonly="readonly"'
       result << 'disabled="disabled"' unless checked
     end
@@ -43,6 +44,8 @@ module EnrollmentRequestsHelper
     
     body += "<thead>
               <tr>
+                <th>#{I18n.t('activerecord.attributes.class_enrollment_request.action')}</th>
+                <th>#{I18n.t('activerecord.attributes.class_enrollment_request.status')}</th>
                 <th>#{I18n.t('activerecord.attributes.class_enrollment_request.course_class')}</th>
                 <th>#{I18n.t('activerecord.attributes.class_enrollment_request.allocations')}</th>
                 <th>#{I18n.t('activerecord.attributes.class_enrollment_request.professor')}</th>
@@ -56,6 +59,8 @@ module EnrollmentRequestsHelper
       tr_class = count.even? ? "even-record" : ""
 
       body += "<tr class=\"record #{tr_class}\">
+                  <td>#{cer.action}</td>
+                  <td>#{cer.status}</td>
                   <td>#{cer.course_class.to_label}</td>
                   <td>#{cer.allocations}</td>
                   <td>#{cer.professor}</td>

@@ -56,6 +56,7 @@ class Ability
         can :read_advisement_pendencies, EnrollmentRequest
         can :update, EnrollmentRequest, enrollment: { advisements: { professor: user.professor } }
         can :update, ClassEnrollmentRequest, enrollment_request: { enrollment: { advisements: { professor: user.professor } } }
+        cannot :update, ClassEnrollmentRequest, status: ClassEnrollmentRequest::EFFECTED
         if CustomVariable.professor_login_can_post_grades == "yes_all_semesters"
           can :update, ClassEnrollment, course_class: { professor: user.professor }
           can :update, CourseClass, professor: user.professor

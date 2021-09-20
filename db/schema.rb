@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_18_002500) do
+ActiveRecord::Schema.define(version: 2021_09_20_034348) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -76,6 +76,7 @@ ActiveRecord::Schema.define(version: 2021_09_18_002500) do
     t.string "status", default: "Solicitada"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "action", default: "Adição"
     t.index ["class_enrollment_id"], name: "index_class_enrollment_requests_on_class_enrollment_id"
     t.index ["course_class_id"], name: "index_class_enrollment_requests_on_course_class_id"
     t.index ["enrollment_request_id"], name: "index_class_enrollment_requests_on_enrollment_request_id"

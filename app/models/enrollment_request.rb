@@ -4,7 +4,7 @@
 
 class EnrollmentRequest < ApplicationRecord
   belongs_to :enrollment
-  has_many :class_enrollment_requests, :dependent => :destroy
+  has_many :class_enrollment_requests, dependent: :destroy, autosave: true
   has_many :course_classes, through: :class_enrollment_requests
   has_many :enrollment_request_comments, :dependent => :destroy
 
@@ -96,70 +96,87 @@ class EnrollmentRequest < ApplicationRecord
   end
 
   def course_class_ids
-    self.class_enrollment_requests.collect { |cer| cer.course_class_id }
+    self.class_enrollment_requests.filter { |cer| cer.action == ClassEnrollmentRequest::INSERT }
+                                  .collect { |cer| cer.course_class_id }
   end
 
   def assign_course_class_ids(course_classes, class_schedule=nil)
     # course classes is a list of strings representing course_class ids
     request_change = {
-      remove_class_enrollments: [],
-      remove_class_enrollment_requests: [],
-      insert_class_enrollment_requests: [],
-      existing_class_enrollment_requests: [],
+      new_removal_requests: [],
+      new_insertion_requests: [],
+      remove_removal_requests: [],
+      remove_insertion_requests: [],
+      existing_removal_requests: [],
+      existing_insertion_requests: [],
     }
     self.valid_removal = true
     self.valid_insertion = true
 
-    prepare_removal_of_course_classes(course_classes, class_schedule, request_change)
-    prepare_insertion_of_course_classes(course_classes, class_schedule, request_change)
+    remaining = course_classes.clone
+    class_enrollment_requests.each do |cer|
+      if remaining.delete(cer.course_class_id.to_s).present?
+        next select_insertion(cer, class_schedule, request_change) if cer.action == ClassEnrollmentRequest::INSERT
+        next select_effected_removal(cer, class_schedule, request_change) if cer.status == ClassEnrollmentRequest::EFFECTED
+
+        select_requested_removal(cer, class_schedule, request_change)
+      else
+        next unselect_removal(cer, class_schedule, request_change) if cer.action == ClassEnrollmentRequest::REMOVE
+        next unselect_effected_insertion(cer, class_schedule, request_change) if cer.status == ClassEnrollmentRequest::EFFECTED
+        
+        unselect_requested_insertion(cer, class_schedule, request_change)
+      end
+    end
+    (remaining - ['', nil]).each do |course_class_id|
+      select_new(course_class_id, class_schedule, request_change)
+    end
+
     request_change
   end
 
-  def valid_request?(request_change)
-    self.valid? && request_change[:remove_class_enrollments].all? { |ce| ce.can_destroy? }
+  def valid_request?
+    class_enrollment_requests.all?(&:valid?) && valid?
   end
 
-  def save_request(request_change)
-    if self.valid_request?(request_change)
-      ActiveRecord::Base.transaction do
-        self.save!
-        request_change[:remove_class_enrollments].each do |ce|
-          ce.class_enrollment_request = nil
-          ce.destroy!
-        end
-      end
-      return true
-    end
-    false
+  def save_request
+    class_enrollment_requests.all? do |cer|
+      cer.save
+    end && save
   end
 
   def valid_destroy?(class_schedule=nil)
-    return false if ! self.can_destroy?
-    return false if ! class_schedule.nil? && ! class_schedule.main_enroll_open? && ! class_schedule.adjust_enroll_remove_open?
-    return false if self.class_enrollment_requests.any? do |cer|
-      if cer.status == ClassEnrollmentRequest::EFFECTED
-        next true if ! cer.class_enrollment.can_destroy?
-      end
-      ! cer.can_destroy?
-    end
+    return false if !self.can_destroy?
+    return false if class_schedule.present? && !class_schedule.main_enroll_open? && !class_schedule.adjust_enroll_remove_open?
     true
   end
 
   def destroy_request(class_schedule=nil)
-    if ! self.valid_destroy?(class_schedule)
+    if !self.valid_destroy?(class_schedule)
       errors.add(:base, :impossible_removal)
       return false
     end
-    ActiveRecord::Base.transaction do
-      self.class_enrollment_requests.each do |cer| 
+
+    can_destroy = false
+    self.class_enrollment_requests.each do |cer|
+      if cer.action == ClassEnrollmentRequest::INSERT
         if cer.status == ClassEnrollmentRequest::EFFECTED
-          class_enrollment = cer.class_enrollment
-          cer.destroy!
-          class_enrollment.class_enrollment_request = nil
-          class_enrollment.destroy!
+          cer.action = ClassEnrollmentRequest::REMOVE
+          cer.status = ClassEnrollmentRequest::REQUESTED
+          can_destroy = false
+        else
+          cer.destroy
         end
+      elsif cer.status == ClassEnrollmentRequest::EFFECTED
+        cer.destroy
+      else
+        can_destroy = false
       end
-      self.destroy!
+    end
+
+    if can_destroy
+      destroy!
+    else
+      save!
     end
     true
   end
@@ -178,39 +195,67 @@ class EnrollmentRequest < ApplicationRecord
     errors.add(:base, :impossible_removal)
   end
 
-  def prepare_removal_of_course_classes(course_classes, class_schedule, request_change)
-    class_enrollment_requests.each do |cer|
-      next if course_classes.include? cer.course_class_id.to_s
-  
-      if class_schedule.blank? || class_schedule.open_for_removing_class_enrollments?
-        if cer.status == ClassEnrollmentRequest::EFFECTED
-          cer.class_enrollment.mark_for_destruction
-          request_change[:remove_class_enrollments] << cer.class_enrollment
-        end
-        cer.mark_for_destruction
-        request_change[:remove_class_enrollment_requests] << cer
-      else
-        request_change[:existing_class_enrollment_requests] << cer
-        self.valid_removal = false
-      end
-    end
+
+  def unselect_removal(cer, class_schedule, request_change)
+    request_change[:existing_removal_requests] << cer
   end
 
-  def prepare_insertion_of_course_classes(course_classes, class_schedule, request_change)
-    course_classes.each do |course_class_id|
-      next if course_class_id.empty?
-
-      attributes = { course_class_id: course_class_id }
-      cer = self.class_enrollment_requests.find_by(attributes)
-      if cer.present?
-        request_change[:existing_class_enrollment_requests] << cer
-      else
-        if class_schedule.nil? || class_schedule.open_for_inserting_class_enrollments?
-          request_change[:insert_class_enrollment_requests] << self.class_enrollment_requests.build(attributes)
-        else
-          self.valid_insertion = false
-        end
-      end
+  def unselect_effected_insertion(cer, class_schedule, request_change)
+    if class_schedule.present? && !class_schedule.open_for_removing_class_enrollments?
+      request_change[:existing_insertion_requests] << cer
+      self.valid_removal = false
+      return
     end
+    request_change[:new_removal_requests] << cer
+    cer.action = ClassEnrollmentRequest::REMOVE
+    cer.status = ClassEnrollmentRequest::REQUESTED
   end
+
+  def unselect_requested_insertion(cer, class_schedule, request_change)
+    if class_schedule.present? && !class_schedule.enroll_open?
+      request_change[:existing_insertion_requests] << cer
+      self.valid_removal = false
+      return
+    end
+    request_change[:remove_insertion_requests] << cer
+    cer.mark_for_destruction
+  end
+
+  def select_new(course_class_id, class_schedule, request_change)
+    if class_schedule.present? && !class_schedule.open_for_inserting_class_enrollments?
+      self.valid_insertion = false
+      return
+    end
+    request_change[:new_insertion_requests] << self.class_enrollment_requests.build(
+      course_class_id: course_class_id,
+      action: ClassEnrollmentRequest::INSERT,
+      status: ClassEnrollmentRequest::REQUESTED
+    )
+  end
+
+  def select_insertion(cer, class_schedule, request_change)
+    request_change[:existing_insertion_requests] << cer
+  end
+
+  def select_effected_removal(cer, class_schedule, request_change)
+    if class_schedule.present? && !class_schedule.open_for_inserting_class_enrollments?
+      self.valid_insertion = false
+      return
+    end
+    request_change[:new_insertion_requests] << cer
+    cer.action = ClassEnrollmentRequest::INSERT
+    cer.status = ClassEnrollmentRequest::REQUESTED
+  end
+
+  def select_requested_removal(cer, class_schedule, request_change)
+    if class_schedule.present? && !class_schedule.enroll_open?
+      request_change[:existing_removal_requests] << cer
+      self.valid_insertion = false
+      return
+    end
+    cer.action = ClassEnrollmentRequest::INSERT
+    cer.status = ClassEnrollmentRequest::EFFECTED
+    request_change[:remove_removal_requests] << cer
+  end
+
 end

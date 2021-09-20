@@ -51,8 +51,8 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     config.list.sorting = {:enrollment_request => 'ASC'}
     columns = [:enrollment_request, :course_class, :status, :class_enrollment]
-    config.list.columns = [:enrollment_request, :course_class, :status, :parent_status, :class_enrollment, :allocations, :professor]
-    config.show.columns = [:enrollment_request, :course_class, :status, :parent_status, :class_enrollment, :allocations, :professor]
+    config.list.columns = [:enrollment_request, :course_class, :status, :parent_status, :class_enrollment, :allocations, :professor, :action]
+    config.show.columns = [:enrollment_request, :course_class, :status, :parent_status, :class_enrollment, :allocations, :professor, :action]
     config.create.columns = columns
     config.update.columns = columns
 
@@ -108,6 +108,7 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.columns[:professor].search_ui = :select
 
     config.field_search.columns = [
+      :action,
       :status,
       :parent_status,
       :year,
@@ -129,6 +130,9 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.columns[:course_class].form_ui = :record_select
     config.columns[:status].form_ui = :select
     config.columns[:status].options = {:options => ClassEnrollmentRequest::STATUSES, default: ClassEnrollmentRequest::REQUESTED, :include_blank => I18n.t("active_scaffold._select_")}
+
+    config.columns[:action].form_ui = :select
+    config.columns[:action].options = {:options => ClassEnrollmentRequest::ACTIONS, default: ClassEnrollmentRequest::INSERT, :include_blank => I18n.t("active_scaffold._select_")}
 
     config.actions.exclude :deleted_records, :show, :delete, :create, :update
   end
@@ -195,10 +199,7 @@ class ClassEnrollmentRequestsController < ApplicationController
 
   def set_effected
     raise CanCan::AccessDenied.new("Acesso negado!", :effect, ClassEnrollmentRequest) if cannot? :effect, ClassEnrollmentRequest
-    set_status(ClassEnrollmentRequest::EFFECTED, 'class_enrollment_request.effected.applied') do |record|
-      emails = [EmailTemplate.load_template("class_enrollment_requests:email_to_student").prepare_message({record: record})]
-      Notifier.send_emails(notifications: emails)
-    end
+    set_status(ClassEnrollmentRequest::EFFECTED, 'class_enrollment_request.effected.applied')
   end
 
   def show_effect
@@ -220,14 +221,7 @@ class ClassEnrollmentRequestsController < ApplicationController
     each_record_in_page {}
     class_enrollment_requests = find_page(:sorting => active_scaffold_config.list.user.sorting).items
     class_enrollment_requests.each do |record|
-      changed = record.set_status!(ClassEnrollmentRequest::EFFECTED)
-      if changed
-        emails = [EmailTemplate.load_template("class_enrollment_requests:email_to_student").prepare_message({
-          :record => record,
-        })]
-        Notifier.send_emails(notifications: emails)
-      end
-      count += 1 if changed
+      count += 1 if record.set_status!(ClassEnrollmentRequest::EFFECTED)
     end
     do_refresh_list
     @message = I18n.t('class_enrollment_request.effected.applied', count: count)

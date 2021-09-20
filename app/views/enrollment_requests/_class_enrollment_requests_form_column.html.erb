@@ -19,6 +19,7 @@
     <table class="disable-pointer enroll-table <%= sub_form_list_id(association: :class_enrollment_requests) %>">
       <thead>
         <tr>
+          <th class="cell-action"> <%= t('activerecord.attributes.class_enrollment_request.action') %> </th>
           <% ClassEnrollmentRequest::STATUSES.each do |status| %>
             <th> <%= status %> </th>
           <% end %>
@@ -34,8 +35,11 @@
             <input type="hidden" name="record[class_enrollment_requests][<%=cer.id%>][id]" value="<%=cer.id%>">
             <input type="hidden" name="record[class_enrollment_requests][<%=cer.id%>][course_class]" value="<%=cer.course_class_id%>">
             <input type="hidden" name="record[class_enrollment_requests][<%=cer.id%>][class_enrollment]" value="<%=cer.class_enrollment_id%>">
+            <td class="cell-action">
+              <label> <%= cer.action %> </label>
+            </td>
             <% ClassEnrollmentRequest::STATUSES.each do |status| %>
-              <td> <label> <input <%= class_request_attribute(status, cer.status) %> name="record[class_enrollment_requests][<%=cer.id%>][status]"/> </label> </td>
+              <td> <label> <input <%= class_request_attribute(cer, status) %> name="record[class_enrollment_requests][<%=cer.id%>][status]"/> </label> </td>
             <% end %>
             <% row.drop(1).each_with_index do |cell, index| %>
               <td class="cell-<%= table[:header][0][index + 1].downcase %>">
@@ -47,6 +51,7 @@
       </tbody>
       <tfoot>
         <tr>
+          <th></th>
           <% ClassEnrollmentRequest::STATUSES.each do |status| %>
             <th> 
               <% if status != ClassEnrollmentRequest::EFFECTED || can?(:effect, ClassEnrollmentRequest) %>

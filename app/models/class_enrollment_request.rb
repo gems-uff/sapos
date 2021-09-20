@@ -10,7 +10,6 @@ class ClassEnrollmentRequest < ApplicationRecord
   INVALID = I18n.translate("activerecord.attributes.class_enrollment_request.statuses.invalid")
   EFFECTED = I18n.translate("activerecord.attributes.class_enrollment_request.statuses.effected")
   STATUSES = [INVALID, REQUESTED, VALID, EFFECTED]
-  STATUSES_PRIORITY = [EFFECTED, VALID, INVALID, REQUESTED]
   STATUSES_MAP = {
     INVALID => :invalid,
     REQUESTED => :requested,
@@ -18,18 +17,25 @@ class ClassEnrollmentRequest < ApplicationRecord
     EFFECTED => :effected
   }
 
+  INSERT = I18n.translate("activerecord.attributes.class_enrollment_request.actions.insert")
+  REMOVE = I18n.translate("activerecord.attributes.class_enrollment_request.actions.remove")
+  ACTIONS = [INSERT, REMOVE]
+
   validates :enrollment_request, :presence => true
   validates :course_class, :presence => true
   validates_uniqueness_of :course_class, :scope => [:enrollment_request]
   validates :status, :presence => true, :inclusion => {:in => STATUSES}
-  validates :class_enrollment, :presence => true, if: -> { status == EFFECTED }
+  validates :action, :presence => true, :inclusion => {:in => ACTIONS}
+  validates :class_enrollment, :presence => true, if: -> { status == EFFECTED && action == INSERT }
+  validates :class_enrollment, :presence => false, if: -> { status == EFFECTED && action == REMOVE }
 
   validate :that_class_enrollment_matches_course_and_enrollment
   validate :that_course_class_does_not_exist_in_a_class_enrollment
   validate :validate_allocation_match
 
-  before_validation :create_class_enrollment, on: %i[create update]
-  after_save :destroy_class_enrollment
+  before_validation :create_or_destroy_class_enrollment, on: %i[create update]
+  after_save :destroy_or_create_class_enrollment
+  after_save :send_effected_email
 
   def self.pendency_condition(user=nil)
     user ||= current_user
@@ -64,7 +70,9 @@ class ClassEnrollmentRequest < ApplicationRecord
   end
 
   def set_status!(new_status)
-    changed = new_status != status || (new_status == EFFECTED && class_enrollment.blank?)
+    changed = new_status != status || 
+      (new_status == EFFECTED && action == INSERT && class_enrollment.blank?) ||
+      (new_status == EFFECTED && action == REMOVE && class_enrollment.present?)
     self.status = new_status
     changed && save
   end
@@ -80,13 +88,13 @@ class ClassEnrollmentRequest < ApplicationRecord
   end
 
   def that_course_class_does_not_exist_in_a_class_enrollment
-    enrollment_request = self.enrollment_request
-    course_class = self.course_class
-    return if enrollment_request.nil? || course_class.nil?
+    return if action != INSERT
+    return if enrollment_request.blank? || course_class.blank?
+  
     enrollment = self.enrollment_request.enrollment
     return if enrollment.nil?
+
     course = course_class.course
-    
     return if enrollment.class_enrollments.none? do |enrollment_class|
       enrollment_class.course_class.course_id == course.id &&
         enrollment_class != class_enrollment &&
@@ -98,14 +106,17 @@ class ClassEnrollmentRequest < ApplicationRecord
   end
 
   def validate_allocation_match
-    enrollment_request = self.enrollment_request
-    course_class = self.course_class
-    return if enrollment_request.nil? || course_class.nil?
+    return if action != INSERT
+    return if enrollment_request.blank? || course_class.blank?
+
     course_class.allocations.each do |allocation|
       enrollment_request.class_enrollment_requests.each do |cer|
-        next if cer == self 
+        next if cer == self
+        next if cer.action != INSERT
+
         cer_course_class = cer.course_class
         next if cer_course_class.nil?
+
         cer_course_class.allocations.each do |other|
           unless allocation.intersects(other).nil?
             errors.add(:course_class, :impossible_allocation)
@@ -116,24 +127,52 @@ class ClassEnrollmentRequest < ApplicationRecord
     end
   end
 
-  def create_class_enrollment
-    if self.status == EFFECTED && self.class_enrollment.blank?
+  def create_or_destroy_class_enrollment
+    return if status != EFFECTED
+
+    if action == INSERT && class_enrollment.blank?
       self.class_enrollment = ClassEnrollment.new(
         enrollment: self.enrollment_request.enrollment,
         course_class: self.course_class,
         situation: ClassEnrollment::REGISTERED
       )
     end
+    if action == REMOVE && class_enrollment.present? && class_enrollment.can_destroy?
+      self.class_enrollment.destroy!
+    end
   end
 
-  def destroy_class_enrollment
-    if self.status != EFFECTED && self.class_enrollment.present? && self.class_enrollment.can_destroy?
-      old_status = self.status
-      self.class_enrollment.destroy
+  def destroy_or_create_class_enrollment
+    return if self.status == EFFECTED
+
+    if action == INSERT && class_enrollment.present? && class_enrollment.can_destroy?
+      old_status = status
+      class_enrollment.destroy
       self.status = old_status
       self.class_enrollment = nil
-      self.save
+      save
     end
+    if action == REMOVE && class_enrollment.blank?
+      self.class_enrollment = ClassEnrollment.new(
+        enrollment: self.enrollment_request.enrollment,
+        course_class: self.course_class,
+        situation: ClassEnrollment::REGISTERED
+      )
+      save
+    end
+  end
+
+  def send_effected_email
+    return if status != EFFECTED || !saved_change_to_status?
+
+    if action == INSERT
+      emails = [EmailTemplate.load_template("class_enrollment_requests:email_to_student")
+                              .prepare_message({ record: self })]
+    else
+      emails = [EmailTemplate.load_template("class_enrollment_requests:removal_email_to_student")
+                             .prepare_message({ record: self })]
+    end
+    Notifier.send_emails(notifications: emails)
   end
 
 end

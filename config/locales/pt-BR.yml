@@ -83,6 +83,7 @@ pt-BR:
           disapproved: "Reprovado"
           registered: "Incompleto"
       class_enrollment_request:
+        action: "Ação"
         enrollment_request: "Pedido de Inscrição"
         course_class: "Turma"
         class_enrollment: "Inscriçao"
@@ -105,6 +106,9 @@ pt-BR:
           valid: "Válida"
           invalid: "Inválida"
           effected: "Efetivada"
+        actions:
+          insert: "Adição"
+          remove: "Remoção"
       class_enrollment_requests:
         course_class: Turma
       class_schedule:
@@ -1059,7 +1063,9 @@ pt-BR:
         subject: "Alteração da nota de <%= var(:record).enrollment.to_label %> na turma <%= var(:record).course_class.label_with_course %>"
     class_enrollment_request:
       email_to_student:
-        subject: "Seu pedido de inscrição em <%= var(:record).class_enrollment.course_class.label_with_course %> foi efetivado"
+        subject: "Seu pedido de inscrição em <%= var(:record).course_class.label_with_course %> foi efetivado"
+      email_to_student:
+        subject: "Seu pedido de remoção da disciplina <%= var(:record).course_class.label_with_course %> foi efetivado"
     course_class:
       email_to_professor:
         subject: "Alteração de notas da turma <%= var(:record).label_with_course %>"

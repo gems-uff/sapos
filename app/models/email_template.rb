@@ -69,6 +69,14 @@ class EmailTemplate < ApplicationRecord
         record: "ClassEnrollmentRequest",
       }
     },
+    "class_enrollment_requests:removal_email_to_student" => {
+      path: File.join("class_enrollment_requests", "mailer", "removal_email_to_student.text.erb"),
+      subject: I18n.t('notifications.class_enrollment_request.removal_email_to_student.subject'),
+      to: "<%= var(:record).enrollment_request.enrollment.student.email %>",
+      variables: {
+        record: "ClassEnrollmentRequest",
+      }
+    },
     "course_classes:email_to_professor" => {
       path: File.join("course_classes", "mailer", "email_to_professor.text.erb"),
       subject: I18n.t('notifications.course_class.email_to_professor.subject'),

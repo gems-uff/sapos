@@ -45,11 +45,18 @@
           <tr <%= cer.nil? ? "" : "title=\"#{cer.status}\" class=\"enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.status] }\"".html_safe %>>
             <% if enrollment_request.persisted? %>
               <%= render layout: "enroll_table_td", locals: { labelid: row[0][:id], row_index: row_index, form: form } do %>
-                <%= ! cer.nil? ? cer.status : "&nbsp; ".html_safe %>
+                <% 
+                  row_status = "&nbsp; "
+                  if cer.present?
+                    row_status = cer.status 
+                    row_status = "#{cer.action} #{row_status}" if cer.action == ClassEnrollmentRequest::REMOVE
+                  end
+                %>
+                <%= row_status.html_safe %>
               <% end %>
             <% end %>
             <%= render layout: "enroll_table_td", locals: { labelid: row[0][:id], row_index: row_index, form: form, labelclass: "check-label" } do %>
-              <% readonly = closed || (! semester.main_enroll_open? && ! semester.adjust_enroll_remove_open? && ! cer.nil?) %>
+              <% readonly = closed || (!semester.main_enroll_open? && !semester.adjust_enroll_remove_open? && cer.present?) %>
               <%= form.check_box :course_class_ids, { data: { row: row_index }, class: row[0][:on_demand] ? "on_demand_check" : "class_enrollment_check", id: "table_row_#{row_index}", multiple: true, skip_default_ids: false, onclick: (readonly ?  "return false;" : ""), readonly: readonly }, row[0][:id], "" %>
             <% end %>
             <%= render layout: "enroll_table_td", locals: { labelid: row[0][:id], row_index: row_index, form: form, tdclass: "cell-#{table[:header][0][1].downcase}" } do %>
