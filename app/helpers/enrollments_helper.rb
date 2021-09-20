@@ -173,67 +173,66 @@ module EnrollmentsHelper
     end
   end
 
+  def enrollment_admission_date_show_column(record, column)
+    I18n.localize(record.admission_date, format: :monthyear)
+  end
+
   def enrollment_dismissal_show_column(record, column)
-    return "-" if record.dismissal.nil?
-    return "#{record.dismissal.dismissal_reason.name} - #{I18n.localize(record.dismissal.date, format: :monthyear)}"
+    return '-' if record.dismissal.nil?
+    "#{record.dismissal.dismissal_reason.name} - #{I18n.localize(record.dismissal.date, format: :monthyear)}"
   end
 
   def enrollment_advisements_show_column(record, column)
-    return "-" if record.advisements.empty? 
-    return render(:partial => "enrollments/show_advisements_table", :locals => { 
-      advisements: record.advisements,
-      show_enrollment_number: true
-    })
+    return '-' if record.advisements.empty? 
+    render(partial: 'enrollments/show_advisements_table', 
+           locals: { advisements: record.advisements,
+                     show_enrollment_number: true })
   end
 
   def enrollment_deferrals_show_column(record, column)
-    return "-" if record.deferrals.empty?
-    return render(:partial => "enrollments/show_deferrals_table", :locals => { 
-      deferrals: record.deferrals,
-      show_obs: true
-    })
+    return '-' if record.deferrals.empty?
+    render(partial: 'enrollments/show_deferrals_table', 
+           locals: { deferrals: record.deferrals,
+                     dateformat: :monthyear,
+                     show_obs: true })
   end
 
   def enrollment_scholarship_durations_show_column(record, column)
-    return "-" if record.scholarships.empty?
-    return render(:partial => "enrollments/show_scholarships_table", :locals => { 
-      scholarship_durations: record.scholarship_durations,
-      show_sponsor: false,
-      show_obs: true
-    })
+    return '-' if record.scholarships.empty?
+    render(partial: 'enrollments/show_scholarships_table', 
+           locals: { scholarship_durations: record.scholarship_durations,
+                     show_sponsor: false,
+                     dateformat: :monthyear,
+                     show_obs: true })
   end
 
   def enrollment_enrollment_holds_show_column(record, column)
-    return "-" if record.class_enrollments.empty?
-    return render(:partial => "enrollments/show_holds_table", :locals => { 
-      holds: record.enrollment_holds,
-    })
+    return '-' if record.class_enrollments.empty?
+    render(partial: 'enrollments/show_holds_table', 
+           locals: { holds: record.enrollment_holds })
   end
 
 
   def enrollment_class_enrollments_show_column(record, column)
-    return "-" if record.class_enrollments.empty?
-    return render(:partial => "enrollments/show_class_enrollments_table", :locals => { 
-      class_enrollments: record.class_enrollments,
-      show_obs: true
-    })
+    return '-' if record.class_enrollments.empty?
+    render(partial: 'enrollments/show_class_enrollments_table', 
+           locals: { class_enrollments: record.class_enrollments,
+                     show_obs: true })
   end
 
   def enrollment_thesis_defense_committee_participations_show_column(record, column)
-    return "-" if record.thesis_defense_committee_participations.empty?
-    return render(:partial => "enrollments/show_defense_committee_table", :locals => { 
-      thesis_defense_committee_professors: record.thesis_defense_committee_professors,
-    })
+    return '-' if record.thesis_defense_committee_participations.empty?
+    render(partial: 'enrollments/show_defense_committee_table', 
+           locals: { thesis_defense_committee_professors: record.thesis_defense_committee_professors })
   end
 
 
   def enrollment_phase_due_dates_show_column(record, column)
-    return "-" if record.phase_completions.empty?
-    render(:partial => "enrollments/show_phases_table", :locals => { 
-      phase_completions: record.phase_completions,
-      dateformat: :defaultdate,
-      show_obs: true
-    })
+    return '-' if record.phase_completions.empty?
+    render(partial: 'enrollments/show_phases_table', 
+           locals: { phase_completions: record.phase_completions,
+                     dateformat: :monthyear,
+                     show_obs: true })
   end
 
   def readonly_dl_input(label, map, variable)

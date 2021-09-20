@@ -75,7 +75,9 @@ pt-BR:
         disapproved_by_absence: "Reprovado por Falta"
         enrollment: "Matrícula"
         grade: "Nota"
+        grade_label: "Nota"
         grade_not_count_in_gpr: "Não contabilizar nota"
+        justification_grade_not_count_in_gpr: "Justificativa para não contabilizar nota"
         obs: "Observação"
         situation: "Situação"
         situations:

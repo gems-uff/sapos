@@ -62,6 +62,19 @@ class ClassEnrollment < ApplicationRecord
     !grade.nil?
   end
 
+  def grade_label(show=true)
+    result = ""
+    if grade_not_count_in_gpr.present?
+      result = "*"
+    elsif !course_has_grade
+      result = "--"
+    else
+      show = true
+    end
+    result = "#{(grade/10.0).round(2)}#{result}" if show && grade.present?
+    result
+  end
+
   def course_has_grade
     if self.try(:course_class).try(:course).try(:course_type).nil?
       true
@@ -101,19 +114,26 @@ class ClassEnrollment < ApplicationRecord
   def grade_for_situation
     if course_has_grade
       unless self.grade.blank?
-        self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_gt_100")) if self.grade > 100
-        self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_lt_0")) if self.grade < 0
+        self.errors.add(:grade, :grade_gt_100) if self.grade > 100
+        self.errors.add(:grade, :grade_lt_0) if self.grade < 0
       end
+      minimum = CustomVariable.minimum_grade_for_approval
       case self.situation
         when I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
-          self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_registered")) unless self.grade.blank?
+          self.errors.add(:grade, :grade_for_situation_registered) if self.grade.present?
         when I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
-	  self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_aproved", :minimum_grade_for_approval=>(CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',','))) if (self.grade.blank? || self.grade < CustomVariable.minimum_grade_for_approval)
+          self.errors.add(
+            :grade, :grade_for_situation_aproved,
+              minimum_grade_for_approval: (minimum.to_f / 10.0).to_s.tr('.', ',')
+          ) if (self.grade.blank? || self.grade < minimum) && grade_not_count_in_gpr.blank?
         when I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
-	  self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_for_situation_disapproved", :minimum_grade_for_approval=>(CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',','))) if (self.grade.blank? || self.grade >= CustomVariable.minimum_grade_for_approval)
+	        self.errors.add(
+            :grade, :grade_for_situation_disapproved,
+              minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr('.', ',')
+          ) if (self.grade.blank? || self.grade >= minimum) && grade_not_count_in_gpr.blank?
       end
     else
-      self.errors.add(:grade, I18n.translate("activerecord.errors.models.class_enrollment.grade_filled_for_course_without_score")) unless self.grade.blank?
+      self.errors.add(:grade, :grade_filled_for_course_without_score) unless self.grade.blank?
     end
     self.errors.blank?
   end

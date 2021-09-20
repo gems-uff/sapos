@@ -18,14 +18,14 @@
     <% scholarship_durations.each do |sd| %>
       <% count += 1 %>
       <% tr_class = count.even? ? "even-record" : "" %>
-      <% end_date = sd.end_date.nil? ? "-" : I18n.localize(sd.end_date, :format => :monthyear2) %>
-      <% cancel_date = sd.cancel_date.nil? ? "-" : I18n.localize(sd.cancel_date, :format => :monthyear2) %>
+      <% end_date = sd.end_date.nil? ? "-" : I18n.localize(sd.end_date, :format => dateformat) %>
+      <% cancel_date = sd.cancel_date.nil? ? "-" : I18n.localize(sd.cancel_date, :format => dateformat) %>
       <tr class="record <%= tr_class %>">
         <td title='<%= sd.scholarship.sponsor.name %>'><%= sd.scholarship.scholarship_number %></td>
         <% if show_sponsor %>
           <td> <%= sd.scholarship.sponsor.name %> </td>
         <% end %>
-        <td><%= I18n.localize(sd.start_date, :format => :monthyear2) %></td>
+        <td><%= I18n.localize(sd.start_date, :format => dateformat) %></td>
         <td><%= end_date %></td>
         <td><%= cancel_date %></td>
         <% if show_obs %>
