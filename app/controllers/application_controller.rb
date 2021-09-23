@@ -15,6 +15,7 @@ class ApplicationController < ActionController::Base
   before_action :parse_date
   before_action :set_paper_trail_whodunnit
   before_action :set_landing
+  before_action :prepare_exception_notifier
 
   clear_helpers
 
@@ -47,20 +48,16 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  rescue_from CanCan::AccessDenied do |exception|
-    ExceptionNotifier.notify_exception(exception, data: {
-      reason: I18n.t('unauthorized.access_denied'),
+  private
+
+  def prepare_exception_notifier
+    request.env["exception_notifier.exception_data"] = {
       user_id: current_user&.id,
       user_name: current_user&.name,
       user_email: current_user&.email,
       url: request.original_url,
-      exception_action: exception.action,
-      exception_message: exception.message
-    }) if defined?(ExceptionNotifier)
-    redirect_to root_url, :notice => exception.message
+    }
   end
-
-  private
 
   def set_landing
     @landingsidebar = Proc.new do |land|
