@@ -65,5 +65,11 @@ Sapos::Application.configure do
 
   #this line was added to replace the quiet_assets gem functionality
   config.assets.quiet = true
-  
+
+  config.middleware.use ExceptionNotification::Rack,
+    email: {
+      email_prefix: '[SAPOS: Error] ',
+      sender_address: %{"SAPOS Exception Notifier" <erro-sapos@sapos.ic.uff.br>},
+      exception_recipients: %w{letter@saposletteropener.com}
+    }
 end

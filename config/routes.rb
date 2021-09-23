@@ -341,8 +341,6 @@ Sapos::Application.routes.draw do
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
 
-  match '*unmatched', to: 'application#route_not_found', via: :all
-
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

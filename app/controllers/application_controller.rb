@@ -47,17 +47,6 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def route_not_found
-    ExceptionNotifier.notify_exception(exception, data: {
-      reason: I18n.t('unauthorized.not_found'),
-      user_id: current_user&.id,
-      user_name: current_user&.name,
-      user_email: current_user&.email,
-      url: request.original_url,
-    }) if defined?(ExceptionNotifier)
-    redirect_to root_url, :notice => I18n.t('unauthorized.default')
-  end
-
   rescue_from CanCan::AccessDenied do |exception|
     ExceptionNotifier.notify_exception(exception, data: {
       reason: I18n.t('unauthorized.access_denied'),
