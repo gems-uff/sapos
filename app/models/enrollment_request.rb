@@ -17,10 +17,10 @@ class EnrollmentRequest < ApplicationRecord
   validates :enrollment, :presence => true
   validates_uniqueness_of :enrollment, :scope => [:year, :semester]
   
-  validate :that_all_requests_are_valid
   validate :that_there_is_at_least_one_class_enrollment_request_insert, if: :user_saving
   validate :that_valid_insertion_is_not_set_to_false
   validate :that_valid_removal_is_not_set_to_false
+  validate :that_all_requests_are_valid
 
   accepts_nested_attributes_for :class_enrollment_requests, :course_classes
 
@@ -73,9 +73,10 @@ class EnrollmentRequest < ApplicationRecord
     status
   end
 
-  def student_change!
-    self.last_student_change_at = Time.current
-    self.student_view_at = self.last_student_change_at 
+  def student_change!(now=nil)
+    now ||= Time.current
+    self.last_student_change_at = now
+    self.student_view_at = now
   end
 
   def last_student_read_time
@@ -118,6 +119,7 @@ class EnrollmentRequest < ApplicationRecord
       remove_insertion_requests: [],
       existing_removal_requests: [],
       existing_insertion_requests: [],
+      no_action: [],
     }
     self.valid_removal = true
     self.valid_insertion = true
@@ -219,6 +221,11 @@ class EnrollmentRequest < ApplicationRecord
   end
 
   def unselect_removal(cer, class_schedule, request_change)
+    if cer.status == ClassEnrollmentRequest::EFFECTED
+      request_change[:no_action] << cer
+      return
+    end
+
     request_change[:existing_removal_requests] << cer
   end
 
@@ -261,6 +268,7 @@ class EnrollmentRequest < ApplicationRecord
 
   def select_effected_removal(cer, class_schedule, request_change)
     if class_schedule.present? && !class_schedule.open_for_inserting_class_enrollments?
+      request_change[:no_action] << cer
       self.valid_insertion = false
       return
     end

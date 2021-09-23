@@ -19,8 +19,6 @@ gem 'activestorage'
 gem 'actionpack'
 gem 'activesupport'
 
-gem 'rspec-collection_matchers'
-
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
 
@@ -43,7 +41,6 @@ gem 'jquery-ui-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 # gem 'turbolinks'
 
-gem "rails-erd"
 gem "kaminari"
 #gem "schema_plus"
 
@@ -87,21 +84,48 @@ gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave
 
 
 group :development, :test do
+# Use SQLite database for development
   gem 'sqlite3'
+
+  # Prints Ruby object in full color
   gem 'awesome_print'
-  gem 'rspec-rails'
-  gem 'factory_bot_rails'
-  gem 'webrick'
+
+  # View a better error page
   gem 'binding_of_caller'
   gem 'better_errors'
-  gem 'spring'
-  gem 'byebug'
-  gem 'simplecov', '0.17.1' 
+  
+  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+
+  # Open /letter_opener in the browser to view 'sent' emails
   gem 'letter_opener_web'
+
+  # Create entity-relationship diagram
+  gem "rails-erd"
+
+  # HTTP server toolkit
+  gem 'webrick'
+  gem 'spring'
 end
 
 group :test do
+  # Test runner
+  gem 'rspec-rails'
+
+  # Fixtures replacement
+  gem 'factory_bot_rails'
+  
+  # Suport 'have' syntax of rspec
+  gem 'rspec-collection_matchers'
+
+  # Simpler specs
+  gem 'shoulda-matchers'
+
+  # Clean database for every test
   gem 'database_cleaner-active_record'
+
+  # Measure code coverage
+  gem 'simplecov'
 end
 
 # Notify exceptions
