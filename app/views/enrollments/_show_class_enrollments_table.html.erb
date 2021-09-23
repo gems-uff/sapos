@@ -3,6 +3,7 @@
 <table class="showtable listed-records-table">
   <thead>
     <tr>
+      <th><%= I18n.t('activerecord.attributes.course_class.semester') %></th>
       <th><%= I18n.t('activerecord.models.course.one') %></th>
       <th><%= I18n.t('activerecord.attributes.class_enrollment.situation') %></th>
       <th><%= I18n.t('activerecord.attributes.class_enrollment.grade') %></th>
@@ -20,6 +21,7 @@
       <% tr_class = count.even? ? "even-record" : "" %>
       <% no_gpr_class_enrollments << class_enrollment if class_enrollment.grade_not_count_in_gpr.present? %>
       <tr class="record <%= tr_class %>">
+        <td><%= class_enrollment.course_class.semester_label %></td>
         <td><%= class_enrollment.course_class.course.name %></td>
         <td><%= class_enrollment.situation %></td>
         <td><%= class_enrollment.grade_label(false) %></td>
@@ -41,6 +43,7 @@
   <table class="showtable listed-records-table">
     <thead>
       <tr>
+        <th><%= I18n.t('activerecord.attributes.course_class.semester') %></th>
         <th><%= I18n.t('activerecord.models.course.one') %></th>
         <th><%= I18n.t('activerecord.attributes.class_enrollment.justification_grade_not_count_in_gpr') %></th>
       </tr>
@@ -51,6 +54,7 @@
         <% count += 1 %>
         <% tr_class = count.even? ? "even-record" : "" %>
         <tr class="record <%= tr_class %>">
+          <td><%= class_enrollment.course_class.semester_label %></td>
           <td><%= class_enrollment.course_class.course.name %></td>
           <td><%= class_enrollment.justification_grade_not_count_in_gpr %></td>
         </tr>
