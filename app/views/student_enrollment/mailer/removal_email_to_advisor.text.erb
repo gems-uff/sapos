@@ -1,6 +1,6 @@
 <%= var(:advisement).professor.name %>,
 
-Informamos que foi <%= requesting ? 'solicitada' : 'realizada' %> a remoção do pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> de seu orientando <%= var(:record).enrollment.student.name %>.
+Informamos que foi <%= var(:requesting) ? 'solicitada' : 'realizada' %> a remoção do pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> de seu orientando <%= var(:record).enrollment.student.name %>.
 
 
 <%= CustomVariable.notification_footer %>

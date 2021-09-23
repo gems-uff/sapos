@@ -30,9 +30,9 @@ Foram solicitadas remoções das seguintes disciplinas:
 <% end -%>
 
 <% end -%>
-<% if var(:new_insertion_requests).any? %>
+<% if var(:remove_insertion_requests).any? %>
 Foram desfeitas solicitações de inscrição nas seguintes disciplinas:
-<% var(:new_insertion_requests).each do |cer| %>
+<% var(:remove_insertion_requests).each do |cer| %>
 - <%= cer.course_class.to_label %>
 <% end -%>
 

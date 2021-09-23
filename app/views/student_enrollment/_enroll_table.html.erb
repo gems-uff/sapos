@@ -38,20 +38,25 @@
             row[0][:id] = cer.course_class_id
             row[-1] = cer.course_class.professor.name
           end
-        end 
+        end
+        tr_class = ""
+        row_status = "&nbsp; "
+        if cer.present?
+          row_status = cer.status
+          tr_class = "enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[row_status]}"
+          if cer.errors.present?
+            row_status = t("student_enrollment.enroll.with_class_errors", count: cer.errors.count)
+            tr_class = "enroll-row-error"
+          end
+          row_status = "#{cer.action} #{row_status}" if cer.action == ClassEnrollmentRequest::REMOVE
+        end
+        show_status = cer&.errors&.any? ? t("class_enrollment_request.status.error") : cer&.status
       %>
       <% if semester.main_enroll_open? || semester.adjust_enroll_insert_open? || ! cer.nil? %>
         <% if ! row[0][:on_demand] || ! cer.nil? %>
-          <tr <%= cer.nil? ? "" : "title=\"#{cer.status}\" class=\"enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.status] }\"".html_safe %>>
+          <tr class="<%= tr_class %>">
             <% if enrollment_request.persisted? %>
               <%= render layout: "enroll_table_td", locals: { labelid: row[0][:id], row_index: row_index, form: form } do %>
-                <% 
-                  row_status = "&nbsp; "
-                  if cer.present?
-                    row_status = cer.status 
-                    row_status = "#{cer.action} #{row_status}" if cer.action == ClassEnrollmentRequest::REMOVE
-                  end
-                %>
                 <%= row_status.html_safe %>
               <% end %>
             <% end %>

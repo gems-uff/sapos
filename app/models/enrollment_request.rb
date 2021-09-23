@@ -17,6 +17,7 @@ class EnrollmentRequest < ApplicationRecord
   validates :enrollment, :presence => true
   validates_uniqueness_of :enrollment, :scope => [:year, :semester]
   
+  validate :that_all_requests_are_valid
   validate :that_there_is_at_least_one_class_enrollment_request_insert, if: :user_saving
   validate :that_valid_insertion_is_not_set_to_false
   validate :that_valid_removal_is_not_set_to_false
@@ -142,10 +143,6 @@ class EnrollmentRequest < ApplicationRecord
     request_change
   end
 
-  def valid_request?
-    class_enrollment_requests.all?(&:valid?) && valid?
-  end
-
   def save_request
     self.user_saving = true
     result = class_enrollment_requests.all? do |cer|
@@ -214,6 +211,12 @@ class EnrollmentRequest < ApplicationRecord
     errors.add(:base, :impossible_removal)
   end
 
+  def that_all_requests_are_valid
+    invalid = class_enrollment_requests.filter { |cer| !cer.valid? }
+    return if invalid.blank?
+
+    errors.add(:base, :invalid_class, count: invalid.count)
+  end
 
   def unselect_removal(cer, class_schedule, request_change)
     request_change[:existing_removal_requests] << cer

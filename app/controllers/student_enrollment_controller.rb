@@ -139,7 +139,7 @@ class StudentEnrollmentController < ApplicationController
       @comment = @enrollment_request.enrollment_request_comments.build(message: message, user: current_user) unless message.empty?
       @enrollment_request.student_change!
     end
-    if @enrollment_request.valid_request? && @enrollment_request.save_request
+    if @enrollment_request.valid? && @enrollment_request.save_request
       notify_enrollment_request_change(@enrollment_request, request_change) if changed
       return redirect_to student_enrollment_path(@enrollment.id), notice: I18n.t("student_enrollment.notice.request_saved")
     end
