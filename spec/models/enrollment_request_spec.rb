@@ -1,17 +1,28 @@
 require 'spec_helper'
 
+def prepare_course_class(allocations, to_destroy, attributes = {})
+  days = I18n.translate("date.day_names")
+  to_destroy << cc = FactoryBot.create(:course_class, attributes)
+  allocations.each do |day, start_time, end_time|
+    to_destroy << FactoryBot.create(:allocation,  course_class: cc, day: days[day], 
+                                                  start_time: start_time, end_time: end_time)
+  end
+  cc
+end
+
 RSpec.describe EnrollmentRequest, type: :model do
 
   describe 'Main Scenario' do
 
     before(:all) do
       @destroy_later = []
+      @destroy_all = []
       @course_type = FactoryBot.create(:course_type)
       @course = FactoryBot.create(:course, course_type: @course_type)
-      @course_class =  FactoryBot.create(:course_class, course: @course)
+      @course_class =  prepare_course_class([[0, 9, 11], [2, 9, 11]], @destroy_all, course: @course)
     end
     after(:all) do
-      @course_class.delete
+      @destroy_all.each(&:delete)
       @course.delete
       @course_type.delete
     end
@@ -45,7 +56,7 @@ RSpec.describe EnrollmentRequest, type: :model do
       describe 'that_there_is_at_least_one_class_enrollment_request_insert' do
         context 'should add error at_least_on during saving when' do
           before(:each) do 
-            enrollment_request.user_saving = true
+            enrollment_request.student_saving = true
           end
           it 'there are only removals' do
             @cer.action = ClassEnrollmentRequest::REMOVE
@@ -70,19 +81,62 @@ RSpec.describe EnrollmentRequest, type: :model do
       describe 'that_all_requests_are_valid' do
         it 'should add error invalid_class when a class enrollrement request has an error' do
           @cer.status = 'something wrong'
-          expect(enrollment_request).to have_error(:invalid_class).with_parameter(:count, 1).on :base
+          enrollment_request.student_saving = true
+          expect(enrollment_request).to have_error(:invalid_class).with_parameters(count: 1).on :base
         end
       end
       describe 'that_valid_insertion_is_not_set_to_false' do
         it 'should add error impossible_insertion when valid_insertion is set to false' do
           enrollment_request.valid_insertion = false
+          enrollment_request.student_saving = true
           expect(enrollment_request).to have_error(:impossible_insertion).on :base
         end
       end
       describe 'that_valid_removal_is_not_set_to_false' do
         it 'should add error impossible_removal when valid_removal is set to false' do
           enrollment_request.valid_removal = false
+          enrollment_request.student_saving = true
           expect(enrollment_request).to have_error(:impossible_removal).on :base
+        end
+      end
+      describe 'that_allocations_do_not_match' do
+        it 'should not add error impossible_allocation when allocations match in different dates' do
+          another_course_class = prepare_course_class([[1, 9, 11], [3, 9, 11]], @destroy_later)
+          enrollment_request.class_enrollment_requests.build(course_class: another_course_class)
+          enrollment_request.student_saving = true
+          expect(enrollment_request).to be_valid
+        end
+        context "should add error impossible_allocation when" do
+          it "another course class in the request intersects an allocation" do
+            another_course_class = prepare_course_class([[0, 14, 16], [2, 8, 10]], @destroy_later)
+            enrollment_request.class_enrollment_requests.build(
+              course_class: another_course_class
+            )
+            enrollment_request.student_saving = true
+            expect(enrollment_request).to have_error(
+              :impossible_allocation
+            ).with_parameters(day: I18n.translate("date.day_names")[2], start: "8", end: "10").on :base
+          end
+          it "another course class in the request intersects an allocation through the other side" do
+            another_course_class = prepare_course_class([[0, 14, 16], [2, 10, 12]], @destroy_later)
+            enrollment_request.class_enrollment_requests.build(
+              course_class: another_course_class
+            )
+            enrollment_request.student_saving = true
+            expect(enrollment_request).to have_error(
+              :impossible_allocation
+            ).with_parameters(day: I18n.translate("date.day_names")[2], start: "10", end: "12").on :base
+          end
+          it "another course class in the request has the same allocation" do
+            another_course_class = prepare_course_class([[0, 9, 11], [2, 14, 16]], @destroy_later)
+            enrollment_request.class_enrollment_requests.build(
+              course_class: another_course_class
+            )
+            enrollment_request.student_saving = true
+            expect(enrollment_request).to have_error(
+              :impossible_allocation
+            ).with_parameters(day: I18n.translate("date.day_names")[0], start: "9", end: "11").on :base
+          end
         end
       end
     end
@@ -503,8 +557,6 @@ RSpec.describe EnrollmentRequest, type: :model do
             expect(request_change[:no_action]).to eq([@cer8])
             
             enrollment_request.save_request
-            
-            expect(enrollment_request.class_enrollment_requests.count).to eq(9)
             expect(enrollment_request.class_enrollment_requests).to include(
               @cer, @cer2, @cer3, @cer4, @cer5, @cer6, @cer7, @cer8
             )

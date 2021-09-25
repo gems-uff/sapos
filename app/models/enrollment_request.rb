@@ -3,7 +3,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class EnrollmentRequest < ApplicationRecord
-  attr_accessor :valid_insertion, :valid_removal, :user_saving
+  attr_accessor :valid_insertion, :valid_removal, :student_saving
 
   belongs_to :enrollment
   has_many :class_enrollment_requests, dependent: :destroy, autosave: true
@@ -17,13 +17,13 @@ class EnrollmentRequest < ApplicationRecord
   validates :enrollment, :presence => true
   validates_uniqueness_of :enrollment, :scope => [:year, :semester]
   
-  validate :that_there_is_at_least_one_class_enrollment_request_insert, if: :user_saving
-  validate :that_valid_insertion_is_not_set_to_false
-  validate :that_valid_removal_is_not_set_to_false
-  validate :that_all_requests_are_valid
+  validate :that_allocations_do_not_match, if: :student_saving
+  validate :that_there_is_at_least_one_class_enrollment_request_insert, if: :student_saving
+  validate :that_valid_insertion_is_not_set_to_false, if: :student_saving
+  validate :that_valid_removal_is_not_set_to_false, if: :student_saving
+  validate :that_all_requests_are_valid, if: :student_saving
 
-  accepts_nested_attributes_for :class_enrollment_requests, :course_classes
-
+  #accepts_nested_attributes_for :class_enrollment_requests, :course_classes
 
   def self.pendency_condition(user=nil)
     user ||= current_user
@@ -106,8 +106,7 @@ class EnrollmentRequest < ApplicationRecord
   end
 
   def course_class_ids
-    class_enrollment_requests.filter { |cer| cer.action == ClassEnrollmentRequest::INSERT }
-                             .collect { |cer| cer.course_class_id }
+    insertions.collect { |cer| cer.course_class_id }
   end
 
   def assign_course_class_ids(course_classes, class_schedule=nil)
@@ -146,11 +145,12 @@ class EnrollmentRequest < ApplicationRecord
   end
 
   def save_request
-    self.user_saving = true
+    self.student_saving = true
+    return false if !valid?
     result = class_enrollment_requests.all? do |cer|
       cer.save
     end && save
-    self.user_saving = false
+    self.student_saving = false
     result
   end
 
@@ -192,10 +192,28 @@ class EnrollmentRequest < ApplicationRecord
 
   protected
 
-  def that_there_is_at_least_one_class_enrollment_request_insert
-    insertions = class_enrollment_requests.filter do |cer| 
+  def insertions
+    class_enrollment_requests.filter do |cer| 
       cer.action == ClassEnrollmentRequest::INSERT && !cer.marked_for_destruction? 
     end
+  end
+
+  def that_allocations_do_not_match
+    allocatted = Hash.new { |hash, key| hash[key] = {} }
+    allocations = Allocation.includes(:course_class).where(course_classes: {id: course_class_ids})
+    allocations.each do |allocation|
+      (allocation.start_time...allocation.end_time).each do |hour|
+        if allocatted[allocation.day][hour]
+          errors.add(:base, :impossible_allocation, 
+            day: allocation.day, start: allocation.start_time, end:allocation.end_time)
+            return
+          end
+          allocatted[allocation.day][hour] = true
+        end
+      end
+    end
+    
+  def that_there_is_at_least_one_class_enrollment_request_insert
     return if insertions.count >= 1
     
     errors.add(:class_enrollment_requests, :at_least_one_class)
@@ -214,7 +232,14 @@ class EnrollmentRequest < ApplicationRecord
   end
 
   def that_all_requests_are_valid
-    invalid = class_enrollment_requests.filter { |cer| !cer.valid? }
+    invalid = class_enrollment_requests.filter do |cer|
+      next false if cer.marked_for_destruction?
+      old = cer.student_saving
+      cer.student_saving = student_saving
+      result = !cer.valid?
+      cer.student_saving = old
+      result
+    end
     return if invalid.blank?
 
     errors.add(:base, :invalid_class, count: invalid.count)

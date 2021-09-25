@@ -106,13 +106,17 @@ describe ClassEnrollment do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = nil
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          expect(class_enrollment).to have_error(:grade_for_situation_aproved).with_parameter(:minimum_grade_for_approval, (CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',',')).on :grade
+          expect(class_enrollment).to have_error(:grade_for_situation_aproved).with_parameters(
+            minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr('.', ',')
+          ).on :grade
         end
         it "situation is aproved and grade is less than 60" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
           class_enrollment.grade = 59
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          expect(class_enrollment).to have_error(:grade_for_situation_aproved).with_parameter(:minimum_grade_for_approval, (CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',',')).on :grade
+          expect(class_enrollment).to have_error(:grade_for_situation_aproved).with_parameters(
+            minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr('.', ',')
+          ).on :grade
         end
       end
       context "should have error grade_for_situation_disapproved when" do
@@ -120,13 +124,17 @@ describe ClassEnrollment do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
           class_enrollment.grade = nil
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          expect(class_enrollment).to have_error(:grade_for_situation_disapproved).with_parameter(:minimum_grade_for_approval, (CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',',')).on :grade
+          expect(class_enrollment).to have_error(:grade_for_situation_disapproved).with_parameters(
+            minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr('.', ',')
+          ).on :grade
         end
         it "situation is disapproved and grade is greater than 59" do
           class_enrollment.situation = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
           class_enrollment.grade = 60
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
-          expect(class_enrollment).to have_error(:grade_for_situation_disapproved).with_parameter(:minimum_grade_for_approval, (CustomVariable.minimum_grade_for_approval.to_f/10.0).to_s.tr('.',',')).on :grade
+          expect(class_enrollment).to have_error(:grade_for_situation_disapproved).with_parameters(
+            minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr('.', ',')
+          ).on :grade
         end
       end
       context "should have error grade_filled_for_course_without_score when" do

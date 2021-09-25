@@ -37,13 +37,13 @@ describe Allocation do
       context "should have error less_than_or_equal_to when" do
         it "start_time is greater than 23" do
           allocation.start_time = 24
-          expect(allocation).to have_error(:less_than_or_equal_to).with_parameter(:count, 23).on :start_time
+          expect(allocation).to have_error(:less_than_or_equal_to).with_parameters(count: 23).on :start_time
         end
       end
       context "should have error greater_than_or_equal_to when" do
         it "start_time is less than 0" do
           allocation.start_time = -1
-          expect(allocation).to have_error(:greater_than_or_equal_to).with_parameter(:count, 0).on :start_time
+          expect(allocation).to have_error(:greater_than_or_equal_to).with_parameters(count: 0).on :start_time
         end
       end
     end
@@ -83,13 +83,13 @@ describe Allocation do
       context "should have error less_than_or_equal_to when" do
         it "end_time is greater than 23" do
           allocation.end_time = 24
-          expect(allocation).to have_error(:less_than_or_equal_to).with_parameter(:count, 23).on :end_time
+          expect(allocation).to have_error(:less_than_or_equal_to).with_parameters(count: 23).on :end_time
         end
       end
       context "should have error greater_than_or_equal_to when" do
         it "end_time is less than 0" do
           allocation.end_time = -1
-          expect(allocation).to have_error(:greater_than_or_equal_to).with_parameter(:count, 0).on :end_time
+          expect(allocation).to have_error(:greater_than_or_equal_to).with_parameters(count: 0).on :end_time
         end
       end
     end

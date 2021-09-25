@@ -260,13 +260,13 @@ class ClassEnrollmentRequestsController < ApplicationController
   end
 
   def set_status_respond_to_js
-    do_refresh_list if successful? && !render_parent?
+    do_refresh_list if !render_parent?
     @popstate = true
     render(:action => 'on_set_status')
   end
 
   def set_status_respond_on_iframe
-    do_refresh_list if successful? && !render_parent?
+    do_refresh_list if !render_parent?
     responds_to_parent do
       render :action => 'on_set_status', :formats => [:js], :layout => false
     end

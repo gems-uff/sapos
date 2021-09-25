@@ -44,9 +44,6 @@ pt-BR:
       class_errors:
         one: Erro
         other: "%{count} erros"
-      with_class_errors:
-        one: Com Erro
-        other: Com %{count} Erros
 
     alert:
       invalid_enrollment: Matrícula %{enrollment} inválida

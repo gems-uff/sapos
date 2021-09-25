@@ -28,43 +28,20 @@
   <tbody>
     <%= form.hidden_field :course_class_ids, multiple: true, value:"" %>
     <% table[:data].each_with_index do |row, row_index| %>
-      <% 
-        cer = nil 
-        enrollment_request.class_enrollment_requests.each do |temp_cer|
-          if ! row[0][:on_demand] && temp_cer.course_class_id == row[0][:id]
-            cer = temp_cer
-          elsif row[0][:on_demand] && temp_cer.course_class.course_id == row[0][:course_id]
-            cer = temp_cer
-            row[0][:id] = cer.course_class_id
-            row[-1] = cer.course_class.professor.name
-          end
-        end
-        tr_class = ""
-        row_status = "&nbsp; "
-        if cer.present?
-          row_status = cer.status
-          tr_class = "enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[row_status]}"
-          if cer.errors.present?
-            row_status = t("student_enrollment.enroll.with_class_errors", count: cer.errors.count)
-            tr_class = "enroll-row-error"
-          end
-          row_status = "#{cer.action} #{row_status}" if cer.action == ClassEnrollmentRequest::REMOVE
-        end
-        show_status = cer&.errors&.any? ? t("class_enrollment_request.status.error") : cer&.status
-      %>
-      <% if semester.main_enroll_open? || semester.adjust_enroll_insert_open? || ! cer.nil? %>
-        <% if ! row[0][:on_demand] || ! cer.nil? %>
-          <tr class="<%= tr_class %>">
+      <% cer = find_class_enrollment_request_for_class_schedule_table_row(enrollment_request, row) %>
+      <% if display_class_schedule_table_row? semester, cer %>
+        <% if display_non_on_demand_or_selected_on_demand? row, cer %>
+          <tr <%= cer_tr_class(cer) %>>
             <% if enrollment_request.persisted? %>
-              <%= render layout: "enroll_table_td", locals: { labelid: row[0][:id], row_index: row_index, form: form } do %>
-                <%= row_status.html_safe %>
+              <%= enroll_table_td(labelid: row[0][:id], row_index: row_index, form: form) do %>
+                <%= cer_row_status(cer) %>
               <% end %>
             <% end %>
-            <%= render layout: "enroll_table_td", locals: { labelid: row[0][:id], row_index: row_index, form: form, labelclass: "check-label" } do %>
+            <%= enroll_table_td(labelid: row[0][:id], row_index: row_index, form: form, labelclass: "check-label") do %>
               <% readonly = closed || (!semester.main_enroll_open? && !semester.adjust_enroll_remove_open? && cer.present?) %>
               <%= form.check_box :course_class_ids, { data: { row: row_index }, class: row[0][:on_demand] ? "on_demand_check" : "class_enrollment_check", id: "table_row_#{row_index}", multiple: true, skip_default_ids: false, onclick: (readonly ?  "return false;" : ""), readonly: readonly }, row[0][:id], "" %>
             <% end %>
-            <%= render layout: "enroll_table_td", locals: { labelid: row[0][:id], row_index: row_index, form: form, tdclass: "cell-#{table[:header][0][1].downcase}" } do %>
+            <%= enroll_table_td(labelid: row[0][:id], row_index: row_index, form: form, tdclass: "cell-#{table[:header][0][1].downcase}") do %>
               <%= row[1].empty? ? "&nbsp; ".html_safe  : row[1] %> 
               <% if ! cer.nil? && ! cer.errors.empty? %>
                 <details>
@@ -78,32 +55,32 @@
               <% end %>
             <% end %>
             <% row.drop(2).each_with_index do |cell, index| %>
-              <%= render layout: "enroll_table_td", locals: { labelid: row[0][:id], row_index: row_index, form: form, tdclass: "cell-#{table[:header][0][index + 2].downcase}" } do %>
+              <%= enroll_table_td(labelid: row[0][:id], row_index: row_index, form: form, tdclass: "cell-#{table[:header][0][index + 2].downcase}") do %>
                 <%= cell.empty? ? "&nbsp; ".html_safe  : cell %> 
               <% end %>
             <% end %>
           </tr>
         <% end %>
         <% if row[0][:on_demand] %>
-          <tr id="on_demand_row_<%= row_index %>" <%= cer.nil? ? "" : 'style="display: none;"'.html_safe %>>
+          <tr id="on_demand_row_<%= row_index %>" <%= on_demand_row_style(cer) %> <%= cer_tr_class(cer) %>>
             <% if enrollment_request.persisted? %>
-              <%= render layout: "enroll_table_td", locals: { labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form } do %>
-                &nbsp;
+              <%= enroll_table_td(labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form) do %>
+                <%= cer_row_status(cer) %>
               <% end %>
             <% end %>
-            <%= render layout: "enroll_table_td", locals: { labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, labelclass: "check-label" } do %>
+            <%= enroll_table_td(labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, labelclass: "check-label") do %>
               <% readonly = closed || (! semester.main_enroll_open? && ! semester.adjust_enroll_remove_open? && ! cer.nil?) %>
               <%= form.check_box "course_ids[#{row[0][:course_id]}][selected]", { id: "table_row_demand_#{row_index}", skip_default_ids: false, onclick: (readonly ?  "return false;" : ""), readonly: readonly }%>
             <% end %>
-            <%= render layout: "enroll_table_td", locals: { labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, tdclass: "cell-#{table[:header][0][1].downcase}" } do %>
+            <%= enroll_table_td(labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, tdclass: "cell-#{table[:header][0][1].downcase}") do %>
               <%= row[1].empty? ? "&nbsp; ".html_safe  : row[1] %> 
             <% end %>
             <% row[2..-2].each_with_index do |cell, index| %>
-              <%= render layout: "enroll_table_td", locals: { labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, tdclass: "cell-#{table[:header][0][index + 2].downcase}" } do %>
+              <%= enroll_table_td(labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, tdclass: "cell-#{table[:header][0][index + 2].downcase}") do %>
                 <%= cell.empty? ? "&nbsp; ".html_safe  : cell %> 
               <% end %>
             <% end %>
-            <%= render layout: "enroll_table_td", locals: { labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, tdclass: "cell-#{table[:header][0][-1].downcase}" } do %>
+            <%= enroll_table_td(labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, tdclass: "cell-#{table[:header][0][-1].downcase}") do %>
               <% 
                  options = {} 
                  options = { selected: select_professor.id } if ! select_professor.nil?

@@ -581,7 +581,7 @@ pt-BR:
             course_class:
               previously_approved: "já foi cursada anteriormente com aprovação"
               taken: "duplicada"
-              impossible_allocation: "possui conflito de horário"
+              
         course:
           check_unique_name_for_available_courses: "de disciplina já existe no currículo vigente"     
         course_class:
@@ -623,8 +623,9 @@ pt-BR:
               impossible_insertion: "Tentativa de inserir disciplina(s) fora do período de ajustes"
               impossible_removal: "Tentativa de remover disciplina(s) fora do período de ajustes"
               invalid_class:
-                one: "Um erro encontrado na seleção de disciplinas"
-                other: "%{count} erros encontrados na seleção de disciplinas"
+                one: "Erro encontrado na seleção de disciplinas"
+                other: "Erros encontrados na seleção de disciplinas"
+              impossible_allocation: "Há pelo menos um conflito de horário nas disciplinas escolhidas. Confira %{day}, %{start}-%{end}"
         notification:
           offset_invalid_value: "está com o valor inválido. Tente um número, seguido por y, M, W, d, h, m ou s"
           individual_required: "requer que o email seja individual"

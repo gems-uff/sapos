@@ -80,8 +80,10 @@ class StudentEnrollmentController < ApplicationController
     @available_classes = CourseClass.where(
       year: @semester.year,
       semester: @semester.semester,
-    )
-    @on_demand = Course.joins(:course_type).where(course_types: { on_demand: true })
+    ).includes(:allocations)
+     .includes(course: [ :course_type ])
+     .includes(:professor)
+    @on_demand = Course.includes(:course_type).where(course_types: { on_demand: true })
     @advisement_authorizations = Professor.joins(:advisement_authorizations).order(:name).distinct
     @enrollment_request = EnrollmentRequest.find_or_initialize_by(
       enrollment: @enrollment,
@@ -139,7 +141,7 @@ class StudentEnrollmentController < ApplicationController
       @comment = @enrollment_request.enrollment_request_comments.build(message: message, user: current_user) unless message.empty?
       @enrollment_request.student_change!
     end
-    if @enrollment_request.valid? && @enrollment_request.save_request
+    if @enrollment_request.save_request
       notify_enrollment_request_change(@enrollment_request, request_change) if changed
       return redirect_to student_enrollment_path(@enrollment.id), notice: I18n.t("student_enrollment.notice.request_saved")
     end

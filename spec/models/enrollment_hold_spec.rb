@@ -31,7 +31,9 @@ describe EnrollmentHold do
       context "should have error when" do
         it "it is lower than or equal to 0" do
           enrollment_hold.number_of_semesters = 0
-          expect(enrollment_hold).to have_error(:greater_than_or_equal_to).with_parameter(:count, 1).on :number_of_semesters
+          expect(enrollment_hold).to have_error(:greater_than_or_equal_to).with_parameters(
+            count: 1
+          ).on :number_of_semesters
         end
 
         it "it is blank" do

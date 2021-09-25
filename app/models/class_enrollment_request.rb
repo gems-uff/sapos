@@ -1,4 +1,6 @@
 class ClassEnrollmentRequest < ApplicationRecord
+  attr_accessor :student_saving, :db_status, :db_action
+
   belongs_to :enrollment_request, inverse_of: :class_enrollment_requests
   belongs_to :course_class
   belongs_to :class_enrollment, optional: true
@@ -23,19 +25,20 @@ class ClassEnrollmentRequest < ApplicationRecord
 
   validates :enrollment_request, :presence => true
   validates :course_class, :presence => true
-  validates_uniqueness_of :course_class, :scope => [:enrollment_request]
+  validates_uniqueness_of :course_class, :scope => [:enrollment_request_id], if: -> { !student_saving }
   validates :status, :presence => true, :inclusion => {:in => STATUSES}
   validates :action, :presence => true, :inclusion => {:in => ACTIONS}
   validates :class_enrollment, :presence => true, if: -> { status == EFFECTED && action == INSERT }
   validates :class_enrollment, :presence => false, if: -> { status == EFFECTED && action == REMOVE }
 
-  validate :that_class_enrollment_matches_course_and_enrollment
-  validate :that_course_class_does_not_exist_in_a_class_enrollment
-  validate :validate_allocation_match
+  validate :that_class_enrollment_matches_course_and_enrollment, if: -> { !student_saving && !marked_for_destruction? }
+  validate :that_course_class_does_not_exist_in_a_class_enrollment, if: -> {!marked_for_destruction?}
 
   before_validation :create_or_destroy_class_enrollment, on: %i[create update]
   after_save :destroy_or_create_class_enrollment
   after_save :send_effected_email
+  after_save :set_db_status
+  after_initialize :set_db_status
 
   def self.pendency_condition(user=nil)
     user ||= current_user
@@ -100,40 +103,18 @@ class ClassEnrollmentRequest < ApplicationRecord
     errors.add(:course_class, :previously_approved)
   end
 
-  def validate_allocation_match
-    return if action != INSERT
-    return if enrollment_request.blank? || course_class.blank?
-
-    course_class.allocations.each do |allocation|
-      enrollment_request.class_enrollment_requests.each do |cer|
-        next if cer == self
-        next if cer.action != INSERT
-
-        cer_course_class = cer.course_class
-        next if cer_course_class.nil?
-
-        cer_course_class.allocations.each do |other|
-          unless allocation.intersects(other).nil?
-            errors.add(:course_class, :impossible_allocation)
-            break
-          end
-        end
-      end
-    end
-  end
-
   def create_or_destroy_class_enrollment
     return if status != EFFECTED
 
     if action == INSERT && class_enrollment.blank?
       self.class_enrollment = ClassEnrollment.new(
-        enrollment: self.enrollment_request.enrollment,
-        course_class: self.course_class,
+        enrollment: enrollment_request.enrollment,
+        course_class: course_class,
         situation: ClassEnrollment::REGISTERED
       )
     end
     if action == REMOVE && class_enrollment.present? && class_enrollment.can_destroy?
-      self.class_enrollment.destroy!
+      class_enrollment.destroy!
     end
   end
 
@@ -149,8 +130,8 @@ class ClassEnrollmentRequest < ApplicationRecord
     end
     if action == REMOVE && class_enrollment.blank?
       self.class_enrollment = ClassEnrollment.new(
-        enrollment: self.enrollment_request.enrollment,
-        course_class: self.course_class,
+        enrollment: enrollment_request.enrollment,
+        course_class: course_class,
         situation: ClassEnrollment::REGISTERED
       )
       save
@@ -168,6 +149,11 @@ class ClassEnrollmentRequest < ApplicationRecord
                              .prepare_message({ record: self })]
     end
     Notifier.send_emails(notifications: emails)
+  end
+
+  def set_db_status
+    self.db_status = status
+    self.db_action = action
   end
 
 end
