@@ -58,7 +58,7 @@ pt-BR:
 
   enrollment_request:
     nested_notice: "Mudanças feitas aqui serão salvas, mas elas podem não refletir visualmente na tabela externa. Uma atualização manual da página no navegador (F5) pode ser necessária."
-    effected_change: "Alguma disciplina já estava efetivada como uma inscrição antes da alteração. Ao selecionar uma situação diferente, a inscrição será removida!"
+    effected_change: "Algum pedido já estava efetivado antes da alteração. Se esse pedido efetivado for de adição, ao selecionar uma situação diferente, a inscrição será removida! Caso contrário, se for um pedido efetivado de remoção, ao selecionar uma situação diferente, a inscrição será recriada."
     validate:
       link: "Validar"
     actions:

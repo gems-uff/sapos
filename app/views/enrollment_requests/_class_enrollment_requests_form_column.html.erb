@@ -1,3 +1,11 @@
+<%
+  status_map = {
+    ClassEnrollmentRequest::INVALID => "<i class='fa fa-times-circle' title='#{ClassEnrollmentRequest::INVALID}'></i>",
+    ClassEnrollmentRequest::REQUESTED => "<i class='fa fa-question-circle' title='#{ClassEnrollmentRequest::REQUESTED}'></i>",
+    ClassEnrollmentRequest::VALID => "<i class='fa fa-check-circle' title='#{ClassEnrollmentRequest::VALID}'></i>",
+    ClassEnrollmentRequest::EFFECTED => "<i class='fa fa-plus-circle' title='#{ClassEnrollmentRequest::EFFECTED}'></i>",
+  }
+%>
 <% if nested? %>
   <span class="nested-enroll-notice"> <%= t 'enrollment_request.nested_notice' %> </span>
 <% end %>
@@ -21,7 +29,7 @@
         <tr>
           <th class="cell-action"> <%= t('activerecord.attributes.class_enrollment_request.action') %> </th>
           <% ClassEnrollmentRequest::STATUSES.each do |status| %>
-            <th> <%= status %> </th>
+            <th> <span class="stat"><%= status_map[status].html_safe %></span> </th>
           <% end %>
           <% table[:header][0].drop(1).each do |head| %>
             <th class="cell-<%= head.downcase %>"> <%= head %> </th>
@@ -70,7 +78,7 @@
 <script>
 $("#<%= cer_subform_id %>-div .enrollment-request-all").click(function() {
   let attr = $(this).data('attr')
-  $(this).parents('.enroll-table').find('.radio-' + attr + ':not(.effected-item)').click();
+  $(this).parents('.enroll-table').find('.radio-' + attr).click();
   return false;
 })
 

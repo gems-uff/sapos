@@ -49,6 +49,14 @@ table.enroll-table  {
   padding: 5px 4px;
 }
 
+.enroll-table .stat {
+  width: 100%;
+  height: 100%;
+  display: block;
+  padding: 0 4px;
+}
+
+
 .enroll-table:not(.disable-pointer) tr label:hover {
   cursor: pointer;
 }
