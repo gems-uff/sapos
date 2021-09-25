@@ -17,7 +17,6 @@ class EnrollmentRequestsController < ApplicationController
 
     config.columns.add :status, :student, :enrollment_level, :enrollment_status
     config.columns.add :admission_date, :scholarship_durations_active, :advisor, :has_advisor 
-    config.list.sorting = {:year => 'DESC', :semester => 'DESC', :enrollment => 'ASC'}
     config.list.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
     config.update.columns = [:class_enrollment_requests, :enrollment_request_comments]
     config.show.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at, :class_enrollment_requests, :enrollment_request_comments]
@@ -69,6 +68,11 @@ class EnrollmentRequestsController < ApplicationController
       :has_advisor,
       :advisor
     ]
+
+    config.columns[:enrollment].sort_by sql: 'students.name'
+    config.columns[:enrollment].includes = { enrollment: :student }
+
+    config.list.sorting = {:year => 'DESC', :semester => 'DESC', :enrollment => 'ASC'}
 
 
     config.update.link.label = "<i title='#{I18n.t('enrollment_request.validate.link')}' class='fa fa-check-square-o'></i>".html_safe

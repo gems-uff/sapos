@@ -189,7 +189,6 @@ module CourseClassesPdfHelper
       end
     end
 
-    table_data.sort_by! { |e| e[0][:id] }
     
     demand_data = []
     
@@ -213,9 +212,10 @@ module CourseClassesPdfHelper
       demand_data << course_data
     end
 
-    demand_data.sort_by! {|c| c[0][:course_id]}
-
+    
     table_data += demand_data
+
+    table_data.sort_by! { |e| e[1] }
     
     {
       star: star,

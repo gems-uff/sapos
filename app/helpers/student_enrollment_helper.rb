@@ -34,9 +34,10 @@ module StudentEnrollmentHelper
     return 'style="display: none;"'.html_safe
   end
 
-  def cer_tr_class(cer)
-    return '' if cer.blank?
-    "class=\"enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.db_status]}\"".html_safe 
+  def cer_tr_class(cer, count)
+    even = count.even? ? 'even-record' : '' 
+    return "class=\"record #{even}\"".html_safe if cer.blank?
+    "class=\"record #{even} enroll-row-#{ClassEnrollmentRequest::STATUSES_MAP[cer.db_status]}\"".html_safe 
   end
 
   def cer_row_status(cer)

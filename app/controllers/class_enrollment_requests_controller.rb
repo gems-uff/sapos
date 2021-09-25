@@ -49,7 +49,7 @@ class ClassEnrollmentRequestsController < ApplicationController
       confirm: I18n.t('class_enrollment_request.effected.confirm'),
       **base_member
 
-    config.list.sorting = {:enrollment_request => 'ASC'}
+    
     columns = [:enrollment_request, :course_class, :status, :class_enrollment]
     config.list.columns = [:enrollment_request, :course_class, :class_enrollment, :allocations, :professor, :action, :status]
     config.show.columns = [:enrollment_request, :course_class, :class_enrollment, :allocations, :professor, :action, :status]
@@ -58,7 +58,7 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     config.columns.add :enrollment_number, :student, :enrollment_level, :enrollment_status
     config.columns.add :admission_date, :scholarship_durations_active, :advisor, :has_advisor 
-    config.columns.add :year, :semester, :professor
+    config.columns.add :year, :semester, :allocations, :professor
 
     config.create.label = :create_class_enrollment_request_label
     config.update.label = :update_class_enrollment_request_label
@@ -102,8 +102,8 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     config.columns[:course_class].search_ui = :record_select
 
-    config.columns[:professor].includes = [:course_class]
-    config.columns[:professor].search_sql = "course_classes.professor_id"
+    config.columns[:professor].includes = { course_class: :professor }
+    config.columns[:professor].search_sql = "professors.id"
     config.columns[:professor].search_ui = :select
 
     config.field_search.columns = [
@@ -132,6 +132,18 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     config.columns[:action].form_ui = :select
     config.columns[:action].options = {:options => ClassEnrollmentRequest::ACTIONS, default: ClassEnrollmentRequest::INSERT, :include_blank => I18n.t("active_scaffold._select_")}
+
+    config.columns[:enrollment_request].sort_by sql: 'students.name'
+    config.columns[:enrollment_request].includes = { enrollment_request: { enrollment: :student }}
+    config.list.sorting = {enrollment_request: 'ASC'}
+
+    config.columns[:course_class].sort_by sql: 'courses.name'
+    config.columns[:course_class].includes =  { course_class: :course }
+
+    config.columns[:allocations].sort_by method: proc { self.allocations.to_s }
+    config.columns[:allocations].includes = { course_class: :allocations }
+
+    config.columns[:professor].sort_by sql: 'professors.name'
 
     config.actions.exclude :deleted_records, :show, :delete, :create, :update
   end
