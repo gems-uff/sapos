@@ -56,7 +56,8 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.create.columns = columns
     config.update.columns = columns
 
-    config.columns.add :enrollment_number, :student, :enrollment_level, :enrollment_status, :admission_date, :scholarship_durations_active, :advisor 
+    config.columns.add :enrollment_number, :student, :enrollment_level, :enrollment_status
+    config.columns.add :admission_date, :scholarship_durations_active, :advisor, :has_advisor 
     config.columns.add :year, :semester, :professor
 
     config.create.label = :create_class_enrollment_request_label
@@ -79,22 +80,25 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.columns[:enrollment_number].search_sql = "enrollment_requests.enrollment_id"
 
     add_student_search_column(config)
-    config.columns[:student].includes = { :enrollment_request => :enrollment }
+    config.columns[:student].includes = { enrollment_request: :enrollment }
     
     add_enrollment_level_search_column(config)
-    config.columns[:enrollment_level].includes = { :enrollment_request => :enrollment }
+    config.columns[:enrollment_level].includes = { enrollment_request: :enrollment }
 
     add_enrollment_status_search_column(config)
-    config.columns[:enrollment_status].includes = { :enrollment_request => :enrollment }
+    config.columns[:enrollment_status].includes = { enrollment_request: :enrollment }
 
     add_admission_date_search_column(config)
-    config.columns[:admission_date].includes = { :enrollment_request => :enrollment }
+    config.columns[:admission_date].includes = { enrollment_request: :enrollment }
 
     add_scholarship_durations_active_search_column(config)
-    config.columns[:scholarship_durations_active].includes = { :enrollment_request => :enrollment }
+    config.columns[:scholarship_durations_active].includes = { enrollment_request: :enrollment }
 
     add_advisor_search_column(config)
-    config.columns[:advisor].includes = { :enrollment_request => { :enrollment => :advisements } }
+    config.columns[:advisor].includes = { enrollment_request: { enrollment: :advisements } }
+
+    add_has_advisor_search_column(config)
+    config.columns[:has_advisor].includes = { enrollment_request: [ :enrollment ] }
 
     config.columns[:course_class].search_ui = :record_select
 
@@ -113,6 +117,7 @@ class ClassEnrollmentRequestsController < ApplicationController
       :enrollment_status, 
       :admission_date, 
       :scholarship_durations_active, 
+      :has_advisor,
       :advisor,
       :course_class,
       :professor
@@ -134,6 +139,7 @@ class ClassEnrollmentRequestsController < ApplicationController
   class <<self
     alias_method :condition_for_admission_date_column, :custom_condition_for_admission_date_column
     alias_method :condition_for_scholarship_durations_active_column, :custom_condition_for_scholarship_durations_active_column
+    alias_method :condition_for_has_advisor_column, :custom_condition_for_has_advisor_column
   end
 
   def hide_validate_actions?(record)

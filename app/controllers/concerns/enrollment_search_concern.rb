@@ -38,6 +38,11 @@ module EnrollmentSearchConcern extend ActiveSupport::Concern
       config.columns[:advisor].search_ui = :select
     end
 
+    def add_has_advisor_search_column(config)
+      config.columns[:has_advisor].search_sql = ""
+      config.columns[:has_advisor].search_ui = :select
+    end
+
     def custom_condition_for_admission_date_column(column, value, like_pattern)
       month = value[:month].empty? ? 1 : value[:month]
       year = value[:year].empty? ? 1 : value[:year]
@@ -62,6 +67,20 @@ module EnrollmentSearchConcern extend ActiveSupport::Concern
       end
   
       [sql, Time.now, Time.now]
+    end
+
+    def custom_condition_for_has_advisor_column(column, value, like_pattern)
+      query_advisements = "select enrollment_id from advisements"
+      case value
+        when '0' then
+          sql = "enrollments.id not in (#{query_advisements})"
+        when '1' then
+          sql = "enrollments.id in (#{query_advisements})"
+        else
+          return ""
+      end
+  
+      [sql]
     end
 
     def custom_condition_for_accomplishments_column(column, value, like_pattern)

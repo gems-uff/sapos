@@ -15,7 +15,8 @@ class EnrollmentRequestsController < ApplicationController
       type: :collection,
       keep_open: false
 
-    config.columns.add :status, :student, :enrollment_level, :enrollment_status, :admission_date, :scholarship_durations_active, :advisor
+    config.columns.add :status, :student, :enrollment_level, :enrollment_status
+    config.columns.add :admission_date, :scholarship_durations_active, :advisor, :has_advisor 
     config.list.sorting = {:year => 'DESC', :semester => 'DESC', :enrollment => 'ASC'}
     config.list.columns = [:year, :semester, :enrollment, :status, :last_student_change_at, :last_staff_change_at]
     config.update.columns = [:class_enrollment_requests, :enrollment_request_comments]
@@ -46,9 +47,14 @@ class EnrollmentRequestsController < ApplicationController
     add_advisor_search_column(config)
     config.columns[:advisor].includes = { :enrollment => :advisements }
 
+    add_has_advisor_search_column(config)
+    config.columns[:has_advisor].includes = [ :enrollment ]
+
     config.columns[:status].search_sql = ""
     config.columns[:status].search_ui = :select
-    config.columns[:status].options = {:options => ClassEnrollmentRequest::STATUSES, default: ClassEnrollmentRequest::REQUESTED, :include_blank => I18n.t("active_scaffold._select_")}
+    config.columns[:status].options = { options: ClassEnrollmentRequest::STATUSES,
+                                        default: ClassEnrollmentRequest::REQUESTED,
+                                        include_blank: I18n.t("active_scaffold._select_")}
 
     config.field_search.columns = [
       :status,
@@ -60,6 +66,7 @@ class EnrollmentRequestsController < ApplicationController
       :enrollment_status, 
       :admission_date, 
       :scholarship_durations_active, 
+      :has_advisor,
       :advisor
     ]
 
@@ -74,6 +81,7 @@ class EnrollmentRequestsController < ApplicationController
   class <<self
     alias_method :condition_for_admission_date_column, :custom_condition_for_admission_date_column
     alias_method :condition_for_scholarship_durations_active_column, :custom_condition_for_scholarship_durations_active_column
+    alias_method :condition_for_has_advisor_column, :custom_condition_for_has_advisor_column
   end
 
   def self.condition_for_status_column(column, value, like_pattern)

@@ -102,6 +102,7 @@ pt-BR:
         scholarship_durations_active: "Possui bolsa?"
         professor: "Professor"
         advisor: "Orientador"
+        has_advisor: "Possui orientador?"
         statuses:
           requested: "Solicitada"
           valid: "Válida"
@@ -255,6 +256,7 @@ pt-BR:
         admission_date: "Data de Admissão"
         scholarship_durations_active: "Possui bolsa?"
         advisor: "Orientador"
+        has_advisor: "Possui orientador?"
       enrollment_request_comment:
         enrollment_request: "Pedido de Inscrição"
         message: Mensagem

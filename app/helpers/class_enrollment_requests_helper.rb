@@ -13,6 +13,7 @@ module ClassEnrollmentRequestsHelper
   alias_method :admission_date_search_column, :custom_admission_date_search_column
   alias_method :scholarship_durations_active_search_column, :custom_scholarship_durations_active_search_column
   alias_method :advisor_search_column, :custom_advisor_search_column
+  alias_method :has_advisor_search_column, :custom_has_advisor_search_column
   alias_method :professor_search_column, :custom_professor_search_column
   
 end

@@ -44,12 +44,16 @@ module EnrollmentSearchHelperConcern
     select_date record[:admission_date], options.merge(local_options)
   end
 
-  def custom_scholarship_durations_active_search_column(record, input_name)
-    select :search, :scholarship_durations_active, options_for_select([["Sim", 1], ["Não", 0]]), {:include_blank => as_(:_select_)}, input_name
+  def custom_scholarship_durations_active_search_column(record, options)
+    select :search, :scholarship_durations_active, options_for_select([["Sim", 1], ["Não", 0]]), {:include_blank => as_(:_select_)}, options
   end
 
   def custom_advisor_search_column(record, options)
     custom_record_select(Professor, record, options)
+  end
+
+  def custom_has_advisor_search_column(record, options)
+    select :search, :has_advisor, options_for_select([["Sim", 1], ["Não", 0]]), {:include_blank => as_(:_select_)}, options
   end
 
   def custom_professor_search_column(record, options)
