@@ -1072,7 +1072,7 @@ pt-BR:
     class_enrollment_request:
       email_to_student:
         subject: "Seu pedido de inscrição em <%= var(:record).course_class.label_with_course %> foi efetivado"
-      email_to_student:
+      removal_email_to_student:
         subject: "Seu pedido de remoção da disciplina <%= var(:record).course_class.label_with_course %> foi efetivado"
     course_class:
       email_to_professor:
