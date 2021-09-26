@@ -150,6 +150,7 @@ pt-BR:
         name: "Nome"
         professor: "Professor"
         semester: "Semestre"
+        schedulable: "Aparecer no QH"
         year: "Ano"
       course_research_area:
         course: "Curso"

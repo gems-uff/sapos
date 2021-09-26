@@ -59,10 +59,10 @@ class CourseClassesController < ApplicationController
 
 
     config.create.columns =
-        [:name, :course, :professor, :year, :semester, :allocations]
+        [:name, :course, :professor, :year, :semester, :schedulable, :allocations]
 
     config.update.columns =
-        [:name, :course, :professor, :year, :semester, :class_enrollments, :allocations]
+        [:name, :course, :professor, :year, :semester, :schedulable, :class_enrollments, :allocations]
 
     config.actions.exclude :deleted_records
   end

@@ -160,6 +160,8 @@ module CourseClassesPdfHelper
     on_demand_professors = {}
 
     course_classes.each do |course_class|
+      next if !course_class.schedulable
+
       course_type = course_class.course.course_type
       next unless course_type.schedulable
         
