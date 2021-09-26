@@ -150,7 +150,7 @@ pt-BR:
         name: "Nome"
         professor: "Professor"
         semester: "Semestre"
-        schedulable: "Aparecer no QH"
+        not_schedulable: "Não aparecer no QH"
         year: "Ano"
       course_research_area:
         course: "Curso"
