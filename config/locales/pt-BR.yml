@@ -248,9 +248,9 @@ pt-BR:
         status: "Situação"
         class_enrollment_requests: Disciplinas
         enrollment_request_comments: Comentários
-        last_student_change_at: Data de última modificação do Aluno
-        last_staff_change_at: Data de última modificação por Outros
-        student_view_at: Data de última visualização do Aluno
+        last_student_change_at: Data de última modificação pelo aluno
+        last_staff_change_at: Data de última modificação por outros
+        student_view_at: Data de última visualização pelo aluno
         student: "Aluno"
         enrollment_level: "Nível"
         enrollment_status: "Tipo de Matrícula"
