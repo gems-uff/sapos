@@ -62,11 +62,11 @@ pt-BR:
     validate:
       link: "Validar"
     actions:
-      help: "Informações"
+      help: "Ajuda"
 
   class_enrollment_request:
     actions:
-      help: "Informações"
+      help: "Ajuda"
       effect: "Efetivar lista"
     invalid:
       label: "Invalidar"
