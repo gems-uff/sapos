@@ -89,7 +89,7 @@ class EnrollmentRequestsController < ApplicationController
   end
 
   def self.condition_for_status_column(column, value, like_pattern)
-    custom_condition_for_status(value, 'id in', 'id not in', '')
+    custom_condition_for_status(value, 'enrollment_requests.id in', 'enrollment_requests.id not in', '')
   end
 
 
