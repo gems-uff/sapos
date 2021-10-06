@@ -51,6 +51,7 @@ class Ability
         User, Role, CustomVariable, Query, Version, Notification, NotificationLog, ReportConfiguration,
         Country, State, City, EmailTemplate
       ])
+      can :photo, Student
       can :read, :pendency
       if user.professor
         can :read_advisement_pendencies, EnrollmentRequest
