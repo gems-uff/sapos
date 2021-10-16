@@ -44,5 +44,11 @@ As seguintes solicitações de remoção de disciplinas continuam no pedido:
 <% end -%>
 
 <% end -%>
+<% if var(:message).present? %>
+
+Nova mensagem:
+[<%= var(:user).name %>] <%= var(:message) %>
+
+<% end %>
 
 <%= CustomVariable.notification_footer %>

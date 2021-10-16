@@ -207,7 +207,16 @@ class ClassEnrollmentRequestsController < ApplicationController
 
   def set_effected
     raise CanCan::AccessDenied.new if cannot? :effect, ClassEnrollmentRequest
-    set_status(ClassEnrollmentRequest::EFFECTED, 'class_enrollment_request.effected.applied')
+    set_status(ClassEnrollmentRequest::EFFECTED, 'class_enrollment_request.effected.applied') do |record|
+      if record.action == ClassEnrollmentRequest::INSERT
+        emails = [EmailTemplate.load_template("class_enrollment_requests:email_to_student")
+                                .prepare_message({ record: record })]
+      else
+        emails = [EmailTemplate.load_template("class_enrollment_requests:removal_email_to_student")
+                               .prepare_message({ record: record })]
+      end
+      Notifier.send_emails(notifications: emails)
+    end
   end
 
   def show_effect
@@ -228,9 +237,40 @@ class ClassEnrollmentRequestsController < ApplicationController
     count = 0
     each_record_in_page {}
     class_enrollment_requests = find_page(:sorting => active_scaffold_config.list.user.sorting).items
-    class_enrollment_requests.each do |record|
-      count += 1 if record.set_status!(ClassEnrollmentRequest::EFFECTED)
+    emails = []
+
+    enrollment_request_id = nil
+    effected = []
+    class_enrollment_requests.sort_by(&:enrollment_request_id).each do |record|
+      if record.enrollment_request_id != enrollment_request_id
+        if effected.present?
+          enrollment_request = effected[0].enrollment_request
+          emails << EmailTemplate.load_template("enrollment_requests:email_to_student").prepare_message({
+            record: enrollment_request,
+            student_enrollment_url: student_enroll_url(id: enrollment_request.enrollment.id, year: enrollment_request.year, semester: enrollment_request.semester),
+            keep: enrollment_request.class_enrollment_requests.select { |cer| !effected.include? cer },
+            change: effected
+          })
+        end
+        effected = []
+        enrollment_request_id = record.enrollment_request_id
+      end
+      if record.set_status!(ClassEnrollmentRequest::EFFECTED)
+        count += 1
+        effected << record
+      end
     end
+    if effected.present?
+      enrollment_request = effected[0].enrollment_request
+      emails << EmailTemplate.load_template("enrollment_requests:email_to_student").prepare_message({
+        record: enrollment_request,
+        student_enrollment_url: student_enroll_url(id: enrollment_request.enrollment.id, year: enrollment_request.year, semester: enrollment_request.semester),
+        keep: enrollment_request.class_enrollment_requests.select { |cer| !effected.include? cer },
+        change: effected
+      })
+    end
+    Notifier.send_emails(notifications: emails)
+
     do_refresh_list
     @message = I18n.t('class_enrollment_request.effected.applied', count: count)
     respond_to_action(:effect)

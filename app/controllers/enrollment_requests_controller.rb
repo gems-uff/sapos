@@ -106,11 +106,26 @@ class EnrollmentRequestsController < ApplicationController
       changed = true
     end
     if changed && record.errors.none?
+      result = {
+        change: [],
+        keep: [],
+      }
+      record.class_enrollment_requests.each do |cer|
+        if cer.status_changed?
+          result[:change] << cer
+        else
+          result[:keep] << cer
+        end
+      end
       record.last_staff_change_at = Time.current
       record.enrollment_request_comments << @comment if @comment.present?
       emails = [EmailTemplate.load_template("enrollment_requests:email_to_student").prepare_message({
-        :record => record,
-        :student_enrollment_url => student_enroll_url(id: record.enrollment.id, year: record.year, semester: record.semester)
+        record: record,
+        student_enrollment_url: student_enroll_url(id: record.enrollment.id, year: record.year, semester: record.semester),
+        message: message,
+        user: current_user,
+        change: result[:change],
+        keep: result[:keep]
       })]
       Notifier.send_emails(notifications: emails)
     end
