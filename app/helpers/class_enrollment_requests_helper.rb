@@ -6,7 +6,7 @@ module ClassEnrollmentRequestsHelper
 
   include EnrollmentSearchHelperConcern
 
-  alias_method :enrollment_number_search_column, :custom_enrollment_number_search_column
+  alias_method :enrollment_search_column, :custom_enrollment_number_search_column
   alias_method :student_search_column, :custom_student_search_column
   alias_method :enrollment_level_search_column, :custom_enrollment_level_search_column
   alias_method :enrollment_status_search_column, :custom_enrollment_status_search_column

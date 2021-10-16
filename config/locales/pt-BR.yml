@@ -95,7 +95,7 @@ pt-BR:
         status: "Situação"
         year: "Ano"
         semester: "Semestre"
-        enrollment_number: "Número de Matrícula"
+        enrollment: "Matrícula"
         student: "Aluno"
         enrollment_level: "Nível"
         enrollment_status: "Tipo de Matrícula"

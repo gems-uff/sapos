@@ -4,6 +4,8 @@ class ClassEnrollmentRequest < ApplicationRecord
   belongs_to :enrollment_request, inverse_of: :class_enrollment_requests
   belongs_to :course_class
   belongs_to :class_enrollment, optional: true
+
+  has_one :enrollment, :through => :enrollment_request
   
   has_paper_trail
 

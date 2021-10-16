@@ -27,6 +27,7 @@ class EnrollmentRequestsController < ApplicationController
     add_semester_search_column(config)
 
     config.columns[:enrollment].search_ui = :record_select
+    config.columns[:enrollment].actions_for_association_links  = [:show]
 
     add_student_search_column(config)
     config.columns[:student].includes = [ :enrollment ]

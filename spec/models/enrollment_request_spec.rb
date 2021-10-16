@@ -143,7 +143,7 @@ RSpec.describe EnrollmentRequest, type: :model do
     describe 'Methods' do
       describe 'to_label' do
         it 'should return the semester and the enrollment label' do
-          expect(enrollment_request.to_label).to eq("[2021.1] #{enrollment.to_label}")
+          expect(enrollment_request.to_label).to eq("2021.1")
         end
       end
       describe 'status' do
