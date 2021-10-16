@@ -207,7 +207,7 @@ module EnrollmentsHelper
   end
 
   def enrollment_enrollment_holds_show_column(record, column)
-    return '-' if record.class_enrollments.empty?
+    return '-' if record.enrollment_holds.empty?
     render(partial: 'enrollments/show_holds_table', 
            locals: { holds: record.enrollment_holds })
   end
