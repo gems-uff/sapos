@@ -623,6 +623,7 @@ pt-BR:
             status:
               class_enrollment_request_is_not_effected: "'efetivada' só é permitida quando todos os pedidos de disciplinas estão efetivados"
             base:
+              cannot_effect: "Usuário sem permissão para efetivar solicitações"
               impossible_insertion: "Tentativa de inserir disciplina(s) fora do período de ajustes"
               impossible_removal: "Tentativa de remover disciplina(s) fora do período de ajustes"
               invalid_class:

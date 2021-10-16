@@ -100,23 +100,27 @@ class EnrollmentRequestsController < ApplicationController
     @comment = nil
     message = params[:record][:comment_message]
     changed = false
-    changed ||= record.changed? || record.class_enrollment_requests.any? { |cer| cer.changed? }
+    changed ||= record.changed?
+    result = {
+      change: [],
+      keep: [],
+    }
+    record.class_enrollment_requests.each do |cer| 
+      changed = true if cer.changed?
+      if cer.status_changed?
+        result[:change] << cer
+        if cer.status == ClassEnrollmentRequest::EFFECTED && cannot?(:effect, cer)
+          record.errors.add(:base, :cannot_effect)          
+        end
+      else
+        result[:keep] << cer
+      end
+    end
     if message.present?
       @comment = EnrollmentRequestComment.new(message: message, user: current_user)
       changed = true
     end
     if changed && record.errors.none?
-      result = {
-        change: [],
-        keep: [],
-      }
-      record.class_enrollment_requests.each do |cer|
-        if cer.status_changed?
-          result[:change] << cer
-        else
-          result[:keep] << cer
-        end
-      end
       record.last_staff_change_at = Time.current
       record.enrollment_request_comments << @comment if @comment.present?
       emails = [EmailTemplate.load_template("enrollment_requests:email_to_student").prepare_message({
