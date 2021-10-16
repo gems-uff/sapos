@@ -88,6 +88,7 @@ pt-BR:
         action: "Ação"
         enrollment_request: "Pedido de Inscrição"
         course_class: "Turma"
+        course_type: "Tipo de Disciplina"
         class_enrollment: "Inscriçao"
         allocations: "Alocações"
         professor: "Professor"

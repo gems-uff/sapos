@@ -58,7 +58,7 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     config.columns.add :enrollment_number, :student, :enrollment_level, :enrollment_status
     config.columns.add :admission_date, :scholarship_durations_active, :advisor, :has_advisor 
-    config.columns.add :year, :semester, :allocations, :professor
+    config.columns.add :year, :semester, :allocations, :professor, :course_type
 
     config.create.label = :create_class_enrollment_request_label
     config.update.label = :update_class_enrollment_request_label
@@ -100,7 +100,14 @@ class ClassEnrollmentRequestsController < ApplicationController
     add_has_advisor_search_column(config)
     config.columns[:has_advisor].includes = { enrollment_request: [ :enrollment ] }
 
+
+    
+
     config.columns[:course_class].search_ui = :record_select
+
+    config.columns[:course_type].includes = { course_class: { course: :course_type } }
+    config.columns[:course_type].search_ui = :select
+    config.columns[:course_type].search_sql = "course_types.id"
 
     config.columns[:professor].includes = { course_class: :professor }
     config.columns[:professor].search_sql = "professors.id"
@@ -120,6 +127,7 @@ class ClassEnrollmentRequestsController < ApplicationController
       :has_advisor,
       :advisor,
       :course_class,
+      :course_type,
       :professor
     ]
 

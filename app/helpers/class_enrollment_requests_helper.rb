@@ -16,4 +16,9 @@ module ClassEnrollmentRequestsHelper
   alias_method :has_advisor_search_column, :custom_has_advisor_search_column
   alias_method :professor_search_column, :custom_professor_search_column
   
+
+  def course_type_search_column(record, options)
+    select :search, :course_type, options_for_klass(CourseType), {:include_blank => as_(:_select_)}, options
+  end
+
 end
