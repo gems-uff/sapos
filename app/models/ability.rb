@@ -72,7 +72,7 @@ class Ability
       can :invite, User
       can :read, :pendency
       cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
-      can :read, (Query)
+      can [:read, :execute], (Query)
     elsif role_id == Role::ROLE_SUPORTE
       can [:read, :update, :update_only_photo], (Student)
       can :read, :pendency
