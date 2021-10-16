@@ -880,6 +880,7 @@ pt-BR:
     close: "Fechar"
     create: "Salvar"
     validate: "Validar"
+    save: "Salvar"
     forms:
       repeat: "Repetir %{attribute}"
     create_accomplishment_label: "Criar Realização de Etapas"

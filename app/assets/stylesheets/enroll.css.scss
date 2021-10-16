@@ -56,6 +56,11 @@ table.enroll-table  {
   padding: 0 4px;
 }
 
+.enroll-table .stat a {
+  font-family: Verdana, sans-serif;
+  font-size: inherit;
+  padding: 0;
+}
 
 .enroll-table:not(.disable-pointer) tr label:hover {
   cursor: pointer;

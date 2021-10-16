@@ -29,7 +29,17 @@
         <tr>
           <th class="cell-action"> <%= t('activerecord.attributes.class_enrollment_request.action') %> </th>
           <% ClassEnrollmentRequest::STATUSES.each do |status| %>
-            <th> <span class="stat"><%= status_map[status].html_safe %></span> </th>
+            <th> 
+              <span class="stat">
+                <% if status != ClassEnrollmentRequest::EFFECTED || can?(:effect, ClassEnrollmentRequest) %>
+                  <a href="#" class="enrollment-request-all" data-attr="<%= status.parameterize %>">
+                    <%= status_map[status].html_safe %>
+                  </a>
+                <% else %>
+                  <%= status_map[status].html_safe %>
+                <% end %>
+              </span>
+            </th>
           <% end %>
           <% table[:header][0].drop(1).each do |head| %>
             <th class="cell-<%= head.downcase %>"> <%= head %> </th>
@@ -57,20 +67,6 @@
           </tr>
         <% end %>
       </tbody>
-      <tfoot>
-        <tr>
-          <th></th>
-          <% ClassEnrollmentRequest::STATUSES.each do |status| %>
-            <th> 
-              <% if status != ClassEnrollmentRequest::EFFECTED || can?(:effect, ClassEnrollmentRequest) %>
-                <a href="#" class="enrollment-request-all" data-attr="<%= status.parameterize %>"> Todas </a>
-              <% end %>
-            </th>
-          <% end %>
-          <% table[:header][0].drop(1).each do |head| %>
-            <th></th>
-          <% end %>
-      </tfoot>
     </table>
   </div>
 <% end %>

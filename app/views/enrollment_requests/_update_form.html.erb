@@ -2,7 +2,7 @@
 
 <%= render :partial => "base_form", :locals => {:xhr => xhr ||= nil,
                                                 :form_action => form_action ||= :update,
-                                                :submit_text => :validate,
+                                                :submit_text => :save,
                                                 :method => method ||= :patch,
                                                 :cancel_link => cancel_link,
                                                 :headline => @record.to_label } %>
