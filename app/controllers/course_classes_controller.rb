@@ -5,7 +5,6 @@
 class CourseClassesController < ApplicationController
   authorize_resource
   include NumbersHelper
-  helper :class_enrollments
 
   before_action :remove_constraint_to_show_enrollment_column, only: [:edit]
 

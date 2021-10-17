@@ -60,6 +60,10 @@ module EnrollmentSearchHelperConcern
     custom_record_select(Professor, record, options)
   end
 
+  def custom_course_type_search_column(record, options)
+    select :search, :course_type, options_for_klass(CourseType), {:include_blank => as_(:_select_)}, options
+  end
+
   protected
 
   def options_for_klass(klass)

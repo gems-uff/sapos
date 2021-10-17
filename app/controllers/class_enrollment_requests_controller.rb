@@ -102,18 +102,13 @@ class ClassEnrollmentRequestsController < ApplicationController
     add_has_advisor_search_column(config)
     config.columns[:has_advisor].includes = { enrollment_request: [ :enrollment ] }
 
-
-    
-
     config.columns[:course_class].search_ui = :record_select
 
+    add_course_type_search_column(config)
     config.columns[:course_type].includes = { course_class: { course: :course_type } }
-    config.columns[:course_type].search_ui = :select
-    config.columns[:course_type].search_sql = "course_types.id"
 
+    add_professor_search_column(config)
     config.columns[:professor].includes = { course_class: :professor }
-    config.columns[:professor].search_sql = "professors.id"
-    config.columns[:professor].search_ui = :select
 
     config.field_search.columns = [
       :action,

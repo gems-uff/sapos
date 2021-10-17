@@ -10,7 +10,6 @@ class EnrollmentsController < ApplicationController
   include ApplicationHelper
   include EnrollmentUsersHelper
 
-  helper :class_enrollments
   helper :advisements
   helper :scholarship_durations
 
