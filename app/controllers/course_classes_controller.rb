@@ -14,6 +14,7 @@ class CourseClassesController < ApplicationController
 
     config.list.sorting = {:name => 'ASC', :id => 'DESC'}
     config.list.columns = [:name, :course, :professor, :year, :semester, :class_enrollments_count]
+    config.show.columns = [:year, :semester, :name, :course, :professor, :allocations, :class_enrollments_count, :class_enrollments, :enrollments]
     config.create.label = :create_course_class_label
     config.update.label = :update_course_class_label
 

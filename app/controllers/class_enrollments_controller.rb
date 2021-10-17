@@ -18,6 +18,11 @@ class ClassEnrollmentsController < ApplicationController
     config.list.columns = [:enrollment,:course_class, :situation, :grade_label, :disapproved_by_absence]
     config.create.columns = columns - [:grade_label]
     config.update.columns = columns - [:grade_label]
+    config.show.columns = [
+      :enrollment, :course_class, :situation, :disapproved_by_absence, 
+      :grade_label, :grade_not_count_in_gpr, :justification_grade_not_count_in_gpr,
+      :obs, 
+    ]
     config.list.columns = [:enrollment,:course_class, :situation, :grade_label, :disapproved_by_absence]
     config.create.label = :create_class_enrollment_label
     config.update.label = :update_class_enrollment_label
