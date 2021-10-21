@@ -51,14 +51,14 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     
     columns = [:enrollment_request, :course_class, :status, :class_enrollment]
-    config.list.columns = [:enrollment_request, :course_class, :class_enrollment, :allocations, :professor, :action, :status]
+    config.list.columns = [:enrollment_request, :enrollment, :course_class, :class_enrollment, :allocations, :professor, :action, :status]
     config.show.columns = [:enrollment_request, :course_class, :class_enrollment, :allocations, :professor, :action, :status]
     config.create.columns = columns
     config.update.columns = columns
 
-    config.columns.add :enrollment_number, :student, :enrollment_level, :enrollment_status
+    config.columns.add :student, :enrollment_level, :enrollment_status
     config.columns.add :admission_date, :scholarship_durations_active, :advisor, :has_advisor 
-    config.columns.add :year, :semester, :allocations, :professor
+    config.columns.add :year, :semester, :allocations, :professor, :course_type
 
     config.create.label = :create_class_enrollment_request_label
     config.update.label = :update_class_enrollment_request_label
@@ -75,9 +75,11 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.columns[:semester].includes = [:enrollment_request]
     config.columns[:semester].search_sql = "enrollment_requests.semester"
 
-    add_enrollment_number_search_column(config)
-    config.columns[:enrollment_number].includes = [:enrollment_request]
-    config.columns[:enrollment_number].search_sql = "enrollment_requests.enrollment_id"
+    config.columns[:enrollment].search_ui = :select
+    config.columns[:enrollment].search_sql = "enrollment_requests.enrollment_id"
+    config.columns[:enrollment].sort_by sql: 'students.name'
+    config.columns[:enrollment].includes = { enrollment_request: { enrollment: :student }}
+    config.columns[:enrollment].actions_for_association_links  = [:show]
 
     add_student_search_column(config)
     config.columns[:student].includes = { enrollment_request: :enrollment }
@@ -102,16 +104,18 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     config.columns[:course_class].search_ui = :record_select
 
+    add_course_type_search_column(config)
+    config.columns[:course_type].includes = { course_class: { course: :course_type } }
+
+    add_professor_search_column(config)
     config.columns[:professor].includes = { course_class: :professor }
-    config.columns[:professor].search_sql = "professors.id"
-    config.columns[:professor].search_ui = :select
 
     config.field_search.columns = [
       :action,
       :status,
       :year,
       :semester,
-      :enrollment_number, 
+      :enrollment, 
       :student, 
       :enrollment_level, 
       :enrollment_status, 
@@ -120,6 +124,7 @@ class ClassEnrollmentRequestsController < ApplicationController
       :has_advisor,
       :advisor,
       :course_class,
+      :course_type,
       :professor
     ]
 
@@ -133,9 +138,9 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.columns[:action].form_ui = :select
     config.columns[:action].options = {:options => ClassEnrollmentRequest::ACTIONS, default: ClassEnrollmentRequest::INSERT, :include_blank => I18n.t("active_scaffold._select_")}
 
-    config.columns[:enrollment_request].sort_by sql: 'students.name'
-    config.columns[:enrollment_request].includes = { enrollment_request: { enrollment: :student }}
-    config.list.sorting = {enrollment_request: 'ASC'}
+    config.columns[:enrollment_request].sort_by sql: 'enrollment_requests.year, enrollment_requests.semester'
+    config.columns[:enrollment_request].includes = [ :enrollment_request ]
+    config.list.sorting = {enrollment: 'ASC'}
 
     config.columns[:course_class].sort_by sql: 'courses.name'
     config.columns[:course_class].includes =  { course_class: :course }
@@ -207,7 +212,16 @@ class ClassEnrollmentRequestsController < ApplicationController
 
   def set_effected
     raise CanCan::AccessDenied.new if cannot? :effect, ClassEnrollmentRequest
-    set_status(ClassEnrollmentRequest::EFFECTED, 'class_enrollment_request.effected.applied')
+    set_status(ClassEnrollmentRequest::EFFECTED, 'class_enrollment_request.effected.applied') do |record|
+      if record.action == ClassEnrollmentRequest::INSERT
+        emails = [EmailTemplate.load_template("class_enrollment_requests:email_to_student")
+                                .prepare_message({ record: record })]
+      else
+        emails = [EmailTemplate.load_template("class_enrollment_requests:removal_email_to_student")
+                               .prepare_message({ record: record })]
+      end
+      Notifier.send_emails(notifications: emails)
+    end
   end
 
   def show_effect
@@ -228,9 +242,40 @@ class ClassEnrollmentRequestsController < ApplicationController
     count = 0
     each_record_in_page {}
     class_enrollment_requests = find_page(:sorting => active_scaffold_config.list.user.sorting).items
-    class_enrollment_requests.each do |record|
-      count += 1 if record.set_status!(ClassEnrollmentRequest::EFFECTED)
+    emails = []
+
+    enrollment_request_id = nil
+    effected = []
+    class_enrollment_requests.sort_by(&:enrollment_request_id).each do |record|
+      if record.enrollment_request_id != enrollment_request_id
+        if effected.present?
+          enrollment_request = effected[0].enrollment_request
+          emails << EmailTemplate.load_template("enrollment_requests:email_to_student").prepare_message({
+            record: enrollment_request,
+            student_enrollment_url: student_enroll_url(id: enrollment_request.enrollment.id, year: enrollment_request.year, semester: enrollment_request.semester),
+            keep: enrollment_request.class_enrollment_requests.select { |cer| !effected.include? cer },
+            change: effected
+          })
+        end
+        effected = []
+        enrollment_request_id = record.enrollment_request_id
+      end
+      if record.set_status!(ClassEnrollmentRequest::EFFECTED)
+        count += 1
+        effected << record
+      end
     end
+    if effected.present?
+      enrollment_request = effected[0].enrollment_request
+      emails << EmailTemplate.load_template("enrollment_requests:email_to_student").prepare_message({
+        record: enrollment_request,
+        student_enrollment_url: student_enroll_url(id: enrollment_request.enrollment.id, year: enrollment_request.year, semester: enrollment_request.semester),
+        keep: enrollment_request.class_enrollment_requests.select { |cer| !effected.include? cer },
+        change: effected
+      })
+    end
+    Notifier.send_emails(notifications: emails)
+
     do_refresh_list
     @message = I18n.t('class_enrollment_request.effected.applied', count: count)
     respond_to_action(:effect)
@@ -290,4 +335,5 @@ class ClassEnrollmentRequestsController < ApplicationController
     end
   end
 
+  
 end

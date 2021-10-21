@@ -49,7 +49,7 @@ class EnrollmentRequest < ApplicationRecord
   end
 
   def to_label
-    "[#{year}.#{semester}] #{enrollment.to_label}"
+    "#{year}.#{semester}"
   end
 
   def status

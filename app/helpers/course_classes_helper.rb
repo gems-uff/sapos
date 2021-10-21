@@ -4,6 +4,15 @@
 module CourseClassesHelper
   include PdfHelper
   include CourseClassesPdfHelper
+  include ClassEnrollmentHelperConcern
+
+  # ClassEnrollmentHelperConcern
+  alias_method :class_enrollment_enrollment_form_column, :custom_enrollment_form_column
+  alias_method :class_enrollment_disapproved_by_absence_form_column, :custom_disapproved_by_absence_form_column
+  alias_method :class_enrollment_grade_form_column, :custom_grade_form_column
+  alias_method :class_enrollment_grade_not_count_in_gpr_form_column, :custom_grade_not_count_in_gpr_form_column
+  alias_method :class_enrollment_obs_form_column, :custom_obs_form_column
+
 
   def permit_rs_browse_params
     [:page, :update, :utf8]

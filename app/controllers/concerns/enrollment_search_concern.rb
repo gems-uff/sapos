@@ -43,6 +43,16 @@ module EnrollmentSearchConcern extend ActiveSupport::Concern
       config.columns[:has_advisor].search_ui = :select
     end
 
+    def add_course_type_search_column(config)
+      config.columns[:course_type].search_sql = "course_types.id"
+      config.columns[:course_type].search_ui = :select
+    end
+
+    def add_professor_search_column(config)
+      config.columns[:professor].search_sql = "professors.id"
+      config.columns[:professor].search_ui = :select
+    end
+
     def custom_condition_for_admission_date_column(column, value, like_pattern)
       month = value[:month].empty? ? 1 : value[:month]
       year = value[:year].empty? ? 1 : value[:year]

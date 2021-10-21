@@ -3,6 +3,26 @@
 Informamos que seu pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> foi verificado.
 - Situação: <%= var(:record).status %>.
 
+<% if var(:change).any? %>
+Foram alteradas as situações das seguintes solicitações:
+<% var(:change).each do |cer| %>
+- <%= cer.course_class.name_with_class %>: <%= cer.action %> <%= cer.status %>
+<% end %>
+
+<% end %>
+<% if var(:keep).any? %>
+Foram mantidas as situações das seguintes solicitações:
+<% var(:keep).each do |cer| %>
+- <%= cer.course_class.name_with_class %>: <%= cer.action %> <%= cer.status %>
+<% end %>
+
+<% end %>
+<% if var(:message).present? %>
+Nova mensagem:
+[<%= var(:user).name %>] <%= var(:message) %>
+
+<% end %>
+
 Verifique sua inscrição aqui: <%= var(:student_enrollment_url) %> 
 
 

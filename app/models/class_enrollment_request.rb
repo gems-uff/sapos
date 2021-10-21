@@ -4,6 +4,8 @@ class ClassEnrollmentRequest < ApplicationRecord
   belongs_to :enrollment_request, inverse_of: :class_enrollment_requests
   belongs_to :course_class
   belongs_to :class_enrollment, optional: true
+
+  has_one :enrollment, :through => :enrollment_request
   
   has_paper_trail
 
@@ -36,7 +38,6 @@ class ClassEnrollmentRequest < ApplicationRecord
 
   before_validation :create_or_destroy_class_enrollment, on: %i[create update]
   after_save :destroy_or_create_class_enrollment
-  after_save :send_effected_email
   after_save :set_db_status
   after_initialize :set_db_status
 
@@ -136,19 +137,6 @@ class ClassEnrollmentRequest < ApplicationRecord
       )
       save
     end
-  end
-
-  def send_effected_email
-    return if status != EFFECTED || !saved_change_to_status?
-
-    if action == INSERT
-      emails = [EmailTemplate.load_template("class_enrollment_requests:email_to_student")
-                              .prepare_message({ record: self })]
-    else
-      emails = [EmailTemplate.load_template("class_enrollment_requests:removal_email_to_student")
-                             .prepare_message({ record: self })]
-    end
-    Notifier.send_emails(notifications: emails)
   end
 
   def set_db_status

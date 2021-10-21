@@ -44,6 +44,12 @@ As seguintes solicitações de remoção de disciplinas continuam no pedido:
 <% end -%>
 
 <% end -%>
+<% if var(:message).present? %>
+
+Nova mensagem:
+[<%= var(:user).name %>] <%= var(:message) %>
+
+<% end %>
 
 Por favor, acesse o SAPOS para validar o pedido.
 

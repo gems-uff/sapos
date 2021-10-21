@@ -6,6 +6,15 @@ module EnrollmentsHelper
   include PdfHelper
   include EnrollmentsPdfHelper
 
+  include ClassEnrollmentHelperConcern
+
+  # ClassEnrollmentHelperConcern
+  alias_method :class_enrollment_course_class_form_column, :custom_course_class_form_column
+  alias_method :class_enrollment_disapproved_by_absence_form_column, :custom_disapproved_by_absence_form_column
+  alias_method :class_enrollment_grade_form_column, :custom_grade_form_column
+  alias_method :class_enrollment_grade_not_count_in_gpr_form_column, :custom_grade_not_count_in_gpr_form_column
+  alias_method :class_enrollment_obs_form_column, :custom_obs_form_column
+
   @@config = YAML::load_file("#{Rails.root}/config/properties.yml")
   @@range = @@config["scholarship_year_range"]
 
@@ -70,6 +79,55 @@ module EnrollmentsHelper
     }
     check_box(record, :enrollment_hold, select_html_options) 
   end
+
+  def course_class_year_semester_search_column(record, options)
+
+  	disciplinas_filtro = Course.all.collect{|c| [I18n.transliterate(c.name.squish.downcase), c.name, c.id]}
+  	disciplinas_filtro.sort_by!{ |elemento| elemento[0] }
+
+  	disciplinas_sem_nome_repetido = []
+  	ultimo_copiado = ""
+  	disciplinas_filtro.each do |elemento|
+  	  if elemento[0] != ultimo_copiado
+  	    disciplinas_sem_nome_repetido.push(elemento[1..2])
+  	    ultimo_copiado = elemento[0] 
+  	  end 
+  	end
+
+  	html = select_tag(
+  		"#{options[:name]}[course]", 
+  		options_for_select(disciplinas_sem_nome_repetido),
+  		:prompt => as_(:_select_),
+  		:id => "#{options[:id]}_course",
+  		:class => "as_search_search_course_class_option"
+  	)
+
+  	html << label_tag(
+  		"#{options[:id]}_year_semester",
+  		I18n.t("activerecord.attributes.enrollment.year_semester_label"),
+  		:style => "margin: 0 15px;"
+  	)
+
+  	html << select_tag(
+  		"#{options[:name]}[year]", 
+  		options_for_select(CourseClass.group(:year).select(:year).collect{|y| y[:year]}),
+  		:include_blank => as_(:_select_),
+  		:id => "#{options[:id]}_year",
+  		:class => "as_search_search_course_class_option"
+  	)
+
+	  html << select_tag(
+  		"#{options[:name]}[semester]", 
+  		options_for_select(CourseClass.group(:semester).select(:semester).collect{|y| y[:semester]}),
+  		:include_blank => as_(:_select_),
+  		:id => "#{options[:id]}_semester",
+  		:class => "as_search_search_course_class_option"
+  	)
+
+  	#select :record, "id", options_for_select(CourseClass.group(:semester).select(:semester).collect{|y| y[:semester]}), {:include_blank => as_('- select -')}, options
+  	content_tag :span, html, :class => 'search_course_class'
+  end
+
 
   def approval_date_form_column(record, options)
     date_select :record, :approval_date, {

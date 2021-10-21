@@ -142,7 +142,7 @@ class StudentEnrollmentController < ApplicationController
       @enrollment_request.student_change!
     end
     if @enrollment_request.save_request
-      notify_enrollment_request_change(@enrollment_request, request_change) if changed
+      notify_enrollment_request_change(@enrollment_request, request_change, message, current_user) if changed
       return redirect_to student_enrollment_path(@enrollment.id), notice: I18n.t("student_enrollment.notice.request_saved")
     end
     @enrollment_request.enrollment_request_comments.delete(@comment) if ! @comment.nil? && ! @comment.persisted?
@@ -175,8 +175,8 @@ class StudentEnrollmentController < ApplicationController
     course_class_ids.uniq
   end
 
-  def notify_enrollment_request_change(enrollment_request, request_change)
-    attributes = { record: enrollment_request }.merge(request_change)
+  def notify_enrollment_request_change(enrollment_request, request_change, message, user)
+    attributes = { record: enrollment_request, message: message, user: user }.merge(request_change)
     emails = [EmailTemplate.load_template("student_enrollments:email_to_student").prepare_message(attributes)]
     enrollment_request.enrollment.advisements.each do |advisement|
       emails << EmailTemplate.load_template("student_enrollments:email_to_advisor")
