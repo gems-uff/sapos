@@ -14,6 +14,8 @@ module EnrollmentsHelper
   alias_method :class_enrollment_grade_form_column, :custom_grade_form_column
   alias_method :class_enrollment_grade_not_count_in_gpr_form_column, :custom_grade_not_count_in_gpr_form_column
   alias_method :class_enrollment_obs_form_column, :custom_obs_form_column
+  alias_method :class_enrollment_justification_grade_not_count_in_gpr_form_column, :custom_justification_grade_not_count_in_gpr_form_column
+  alias_method :field_attributes, :custom_field_attributes
 
   @@config = YAML::load_file("#{Rails.root}/config/properties.yml")
   @@range = @@config["scholarship_year_range"]

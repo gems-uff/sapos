@@ -10,8 +10,8 @@ class ClassEnrollmentsController < ApplicationController
     include EnrollmentRequestSearchConcern
     columns = [
       :enrollment, :course_class, :situation, :disapproved_by_absence, 
-      :justification_grade_not_count_in_gpr, :grade,  :grade_not_count_in_gpr, 
-      :obs, :grade_label
+      :grade, :obs, :grade_not_count_in_gpr, 
+      :justification_grade_not_count_in_gpr, :grade_label
     ]
     config.columns = columns
     config.list.sorting = {:enrollment => 'ASC'}
@@ -20,8 +20,7 @@ class ClassEnrollmentsController < ApplicationController
     config.update.columns = columns - [:grade_label]
     config.show.columns = [
       :enrollment, :course_class, :situation, :disapproved_by_absence, 
-      :grade_label, :grade_not_count_in_gpr, :justification_grade_not_count_in_gpr,
-      :obs, 
+      :grade_label, :obs, :grade_not_count_in_gpr, :justification_grade_not_count_in_gpr,
     ]
     config.list.columns = [:enrollment,:course_class, :situation, :grade_label, :disapproved_by_absence]
     config.create.label = :create_class_enrollment_label
@@ -33,6 +32,7 @@ class ClassEnrollmentsController < ApplicationController
     config.columns[:situation].form_ui = :select
     config.columns[:situation].options = {:options => ClassEnrollment::SITUATIONS, :include_blank => I18n.t("active_scaffold._short_select_")}
     config.columns[:justification_grade_not_count_in_gpr].form_ui = :hidden
+    config.columns[:justification_grade_not_count_in_gpr].label = ""
 
     config.columns.add :student, :enrollment_level, :enrollment_status
     config.columns.add :admission_date, :scholarship_durations_active, :advisor, :has_advisor 

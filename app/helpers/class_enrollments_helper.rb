@@ -17,6 +17,8 @@ module ClassEnrollmentsHelper
   alias_method :has_advisor_search_column, :custom_has_advisor_search_column
   alias_method :professor_search_column, :custom_professor_search_column
   alias_method :course_type_search_column, :custom_course_type_search_column
+  alias_method :class_enrollment_justification_grade_not_count_in_gpr_form_column, :custom_justification_grade_not_count_in_gpr_form_column
+  alias_method :field_attributes, :custom_field_attributes
 
   # ClassEnrollmentHelperConcern
   alias_method :enrollment_form_column, :custom_enrollment_form_column

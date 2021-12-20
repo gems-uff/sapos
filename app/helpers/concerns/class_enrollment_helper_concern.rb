@@ -60,4 +60,22 @@ module ClassEnrollmentHelperConcern
     text_area(:record, :obs, options.merge(extra_options))
   end
 
+  def custom_justification_grade_not_count_in_gpr_form_column(record, options)
+    return ""
+  end
+
+  def custom_field_attributes(column, record)
+    if (column.name == :obs) && (controller_name != "class_enrollments")
+      return {:style => "padding-left: 10px;"}
+    end
+
+    if column.name == :grade_not_count_in_gpr
+      if current_user && (current_user.role_id == Role::ROLE_PROFESSOR)
+        return {:style => "display:none;"}
+      elsif controller_name != "class_enrollments"  
+        return {:style => "width: 190px;"}
+      end 
+    end
+  end
+
 end

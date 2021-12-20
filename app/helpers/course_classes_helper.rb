@@ -12,6 +12,8 @@ module CourseClassesHelper
   alias_method :class_enrollment_grade_form_column, :custom_grade_form_column
   alias_method :class_enrollment_grade_not_count_in_gpr_form_column, :custom_grade_not_count_in_gpr_form_column
   alias_method :class_enrollment_obs_form_column, :custom_obs_form_column
+  alias_method :class_enrollment_justification_grade_not_count_in_gpr_form_column, :custom_justification_grade_not_count_in_gpr_form_column
+  alias_method :field_attributes, :custom_field_attributes
 
 
   def permit_rs_browse_params

@@ -170,7 +170,12 @@ class ClassEnrollment < ApplicationRecord
 
     campos_modificados.each do |campo_modificado|
       if !campos_modificaveis.include?(campo_modificado)
-	      errors.add(:class_enrollment, I18n.t("activerecord.errors.models.class_enrollment.changes_to_disallowed_fields"))
+        if (campo_modificado == 'justification_grade_not_count_in_gpr') && (justification_grade_not_count_in_gpr_change == ["", nil])
+          next
+        else
+          errors.add(:class_enrollment, I18n.t("activerecord.errors.models.class_enrollment.changes_to_disallowed_fields"))
+          break
+        end
       end
     end
   end
