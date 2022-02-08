@@ -19,6 +19,9 @@ gem 'activestorage'
 gem 'actionpack'
 gem 'activesupport'
 
+# Use Active record session store
+gem 'activerecord-session_store'
+
 # Use sqlite3 as the database for Active Record
 # gem 'sqlite3'
 

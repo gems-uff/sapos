@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_09_26_144815) do
+ActiveRecord::Schema.define(version: 2022_02_08_204825) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -516,6 +516,15 @@ ActiveRecord::Schema.define(version: 2021_09_26_144815) do
     t.index ["professor_id"], name: "index_scholarships_on_professor_id"
     t.index ["scholarship_type_id"], name: "index_scholarships_on_scholarship_type_id"
     t.index ["sponsor_id"], name: "index_scholarships_on_sponsor_id"
+  end
+
+  create_table "sessions", force: :cascade do |t|
+    t.string "session_id", null: false
+    t.text "data"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["session_id"], name: "index_sessions_on_session_id", unique: true
+    t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
   create_table "sponsors", force: :cascade do |t|

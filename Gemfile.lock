@@ -79,6 +79,12 @@ GEM
     activerecord (6.0.4.1)
       activemodel (= 6.0.4.1)
       activesupport (= 6.0.4.1)
+    activerecord-session_store (2.0.0)
+      actionpack (>= 5.2.4.1)
+      activerecord (>= 5.2.4.1)
+      multi_json (~> 1.11, >= 1.11.2)
+      rack (>= 2.0.8, < 3)
+      railties (>= 5.2.4.1)
     activestorage (6.0.4.1)
       actionpack (= 6.0.4.1)
       activejob (= 6.0.4.1)
@@ -211,6 +217,7 @@ GEM
     mini_mime (1.1.1)
     mini_portile2 (2.6.1)
     minitest (5.14.4)
+    multi_json (1.15.0)
     mysql2 (0.5.3)
     mysql2 (0.5.3-x86-mingw32)
     nio4r (2.5.8)
@@ -376,6 +383,7 @@ DEPENDENCIES
   actionview
   active_scaffold!
   active_scaffold_duplicate (>= 1.1.0)
+  activerecord-session_store
   activestorage
   activesupport
   awesome_print
