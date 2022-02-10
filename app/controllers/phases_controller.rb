@@ -11,7 +11,7 @@ class PhasesController < ApplicationController
     config.create.label = :create_phase_label
     config.columns[:enrollments].form_ui = :record_select
 #    config.columns[:levels].form_ui = :select
-    form_columns = [:name, :description, :is_language, :extend_on_hold, :phase_durations]
+    form_columns = [:name, :description, :is_language, :extend_on_hold, :active, :phase_durations]
     config.create.columns = form_columns
     config.update.columns = form_columns
     config.show.columns = form_columns + [:enrollments]

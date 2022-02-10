@@ -336,6 +336,7 @@ pt-BR:
         phase_durations: "Duração de Etapas"
         phase_completions: "Realização de Etapas"
         is_language: "Exame de Línguas"
+        active: "Ativa?"
       phase_duration:
         deadline_days: "Prazo Máximo(dias)"
         deadline_months: "Prazo Máximo(meses)"
