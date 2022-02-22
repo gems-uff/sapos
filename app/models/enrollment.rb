@@ -195,4 +195,11 @@ class Enrollment < ApplicationRecord
     true
   end
 
+  def completed_or_active_phase_completions
+    phase_completions.joins(:phase)
+        .where.not(:completion_date => nil)
+      .or(phase_completions.joins(:phase)
+        .where('phases.active' => true) )
+  end
+
 end

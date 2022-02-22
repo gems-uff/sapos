@@ -288,13 +288,9 @@ module EnrollmentsHelper
 
 
   def enrollment_phase_due_dates_show_column(record, column)
-    completed_or_active_phases = record.phase_completions.joins(:phase)
-                                .where.not(:completion_date => nil)
-                             .or(record.phase_completions.joins(:phase)
-                                .where('phases.active' => true) )
-    return '-' if completed_or_active_phases.empty?
+    return '-' if record.completed_or_active_phase_completions.empty?
     render(partial: 'enrollments/show_phases_table', 
-           locals: { phase_completions: completed_or_active_phases,
+           locals: { phase_completions: record.completed_or_active_phase_completions,
                      dateformat: :monthyear,
                      show_obs: true })
   end
