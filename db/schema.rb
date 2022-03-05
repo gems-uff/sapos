@@ -375,6 +375,7 @@ ActiveRecord::Schema.define(version: 2022_02_08_204825) do
     t.datetime "updated_at", null: false
     t.boolean "is_language", default: false
     t.boolean "extend_on_hold", default: false
+    t.boolean "active", default: true
   end
 
   create_table "professor_research_areas", force: :cascade do |t|

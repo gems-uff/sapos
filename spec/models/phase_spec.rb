@@ -34,6 +34,26 @@ describe Phase do
         end
       end
     end
+
+    describe "active" do
+      context "should be valid when" do
+        it "active value is true" do
+          phase.name = true
+          expect(phase).to have(0).errors_on :active
+        end
+        it "active value is false" do
+          phase.name = false
+          expect(phase).to have(0).errors_on :active
+        end
+      end
+
+      context "should be invalid when" do
+        it "active is null" do
+          phase.active = nil
+          expect(phase).to have(1).errors_on :active
+        end
+      end
+    end
   end
 
   describe "Class methods" do

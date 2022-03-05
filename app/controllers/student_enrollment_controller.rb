@@ -22,7 +22,7 @@ class StudentEnrollmentController < ApplicationController
                         enrollment: @enrollment, thesis_defense_committee_professors: @enrollment.thesis_defense_committee_professors)
     existing_partial('student_enrollment/show_class_enrollments', :class_enrollments, @enrollment.class_enrollments)
     existing_partial('student_enrollment/show_advisements', :advisements, @enrollment.advisements)
-    existing_partial('student_enrollment/show_phases', :phase_completions, @enrollment.phase_completions)
+    existing_partial('student_enrollment/show_phases', :phase_completions, @enrollment.completed_or_active_phase_completions)
     existing_partial('student_enrollment/show_deferrals', :deferrals, @enrollment.deferrals)
     existing_partial('student_enrollment/show_holds', :holds, @enrollment.enrollment_holds)
     existing_partial('student_enrollment/show_scholarships', :scholarship_durations, @enrollment.scholarship_durations)

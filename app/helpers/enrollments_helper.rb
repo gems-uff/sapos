@@ -51,7 +51,7 @@ module EnrollmentsHelper
         :name => "search[delayed_phase][year]"
     }
 
-    select(:record, :phases, options_for_select([["Alguma", "all"]] + Phase.all.map {|phase| [phase.name, phase.id]}), {:include_blank => as_(:_select_)}, select_html_options) + label_tag(:delayed_phase_date, I18n.t("activerecord.attributes.enrollment.delayed_phase_date"), :style => "margin: 0px 15px") +  select_day(Date.today.day, local_options, day_html_options) +  select_month(Date.today.month, local_options, month_html_options) + select_year(Date.today.year, local_options, year_html_options)
+    select(:record, :phases, options_for_select([["Alguma", "all"]] + Phase.where(:active => true).map {|phase| [phase.name, phase.id]}), {:include_blank => as_(:_select_)}, select_html_options) + label_tag(:delayed_phase_date, I18n.t("activerecord.attributes.enrollment.delayed_phase_date"), :style => "margin: 0px 15px") +  select_day(Date.today.day, local_options, day_html_options) +  select_month(Date.today.month, local_options, month_html_options) + select_year(Date.today.year, local_options, year_html_options)
   end
 
   def accomplishments_search_column(record, input_name)
@@ -288,9 +288,9 @@ module EnrollmentsHelper
 
 
   def enrollment_phase_due_dates_show_column(record, column)
-    return '-' if record.phase_completions.empty?
+    return '-' if record.completed_or_active_phase_completions.empty?
     render(partial: 'enrollments/show_phases_table', 
-           locals: { phase_completions: record.phase_completions,
+           locals: { phase_completions: record.completed_or_active_phase_completions,
                      dateformat: :monthyear,
                      show_obs: true })
   end

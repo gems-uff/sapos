@@ -12,6 +12,7 @@ class Phase < ApplicationRecord
   has_paper_trail
   
   validates :name, :presence => true, :uniqueness => true
+  validates :active, inclusion: [true, false]
 
   after_save :create_phase_completions
 
