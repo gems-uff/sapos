@@ -232,7 +232,7 @@ describe ClassEnrollment do
     end
 
     describe "set_request_status_after_destroy" do
-      it "should set the class enrollment request status to valid after destroy" do
+      it "should set the class enrollment request status to invalid after destroy" do
         course_class = FactoryBot.create(:course_class)
         enrollment = FactoryBot.create(:enrollment)
         class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
@@ -246,7 +246,7 @@ describe ClassEnrollment do
 
         class_enrollment.destroy!
         cer.reload
-        expect(cer.status).to eq(ClassEnrollmentRequest::VALID)
+        expect(cer.status).to eq(ClassEnrollmentRequest::INVALID)
       end
     end
 

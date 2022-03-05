@@ -184,7 +184,7 @@ class ClassEnrollment < ApplicationRecord
     request = self.class_enrollment_request
     unless request.nil?
       request.class_enrollment = nil
-      request.status = ClassEnrollmentRequest::VALID if request.action == ClassEnrollmentRequest::INSERT
+      request.status = ClassEnrollmentRequest::INVALID if request.action == ClassEnrollmentRequest::INSERT
       request.status = ClassEnrollmentRequest::EFFECTED if request.action == ClassEnrollmentRequest::REMOVE
       request.save
     end
