@@ -164,6 +164,7 @@ pt-BR:
         semester: "Semestre"
         not_schedulable: "Não aparecer no QH"
         year: "Ano"
+        obs_schedule: "Obs QH"
       course_research_area:
         course: "Curso"
         research_area: "Área de Pesquisa"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_08_204825) do
+ActiveRecord::Schema.define(version: 2022_03_17_153130) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -125,6 +125,7 @@ ActiveRecord::Schema.define(version: 2022_02_08_204825) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "not_schedulable", default: false
+    t.string "obs_schedule"
     t.index ["course_id"], name: "index_course_classes_on_course_id"
     t.index ["professor_id"], name: "index_course_classes_on_professor_id"
   end

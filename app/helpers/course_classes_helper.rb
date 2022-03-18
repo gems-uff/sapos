@@ -45,4 +45,14 @@ module CourseClassesHelper
     select :record, :semester, options_for_select(YearSemester::SEMESTERS, record.semester), {:include_blank => true}, options
   end
 
+  def not_schedulable_form_column(record, options)
+    options.merge!(disabled: true) if current_user.role_id == Role::ROLE_PROFESSOR
+    check_box :record, :not_schedulable, options
+  end
+
+  def obs_schedule_form_column(record, options)
+    options.merge!(disabled: true) if current_user.role_id == Role::ROLE_PROFESSOR
+    text_field :record, :obs_schedule, options.merge!(class: "name-input text-input", autocomplete: "off", maxlength: "255", size: "30")
+  end
+
 end

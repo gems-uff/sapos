@@ -46,8 +46,12 @@ class CourseClass < ApplicationRecord
   end
 
   def name_with_class
-    return course.name if name.nil? or name.empty? or course.course_type.nil? or not course.course_type.show_class_name
-    "#{course.name} (#{name})"
+    append_obs_schedule = ""
+    if (! self.obs_schedule.nil?) && (self.obs_schedule.strip != "")
+      append_obs_schedule = " - #{self.obs_schedule.strip}"
+    end
+    return "#{course.name}#{append_obs_schedule}" if name.nil? or name.empty? or course.course_type.nil? or not course.course_type.show_class_name
+    "#{course.name} (#{name})#{append_obs_schedule}"
   end
 
   private
