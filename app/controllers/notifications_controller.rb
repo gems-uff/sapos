@@ -117,8 +117,41 @@ class NotificationsController < ApplicationController
   end
 
   def notify
-    Notifier.asynchronous_emails
-    render :inline => 'Ok'
+    Notifier.logger.info "Sending Registered Notifications"
+
+    Notifier.logger.info "[Notifications] #{Time.now} - Notifications from DB"
+    notifications = []
+    notifications_attachments = {}
+
+    #Get the next execution time arel table
+    next_execution = Notification.arel_table[:next_execution]
+
+    #Find notifications that should run
+    Notification.where(next_execution.lt(Time.now)).each do |notification|
+      execute_return = notification.execute
+      notifications << execute_return[:notifications]
+      notifications_attachments.merge!(execute_return[:notifications_attachments])
+    end
+
+    notifications_flatten = notifications.flatten
+
+    notifications_flatten.each do |message|
+      message_attachments = notifications_attachments[message]
+      if message_attachments
+        if message_attachments[:grades_report_pdf]
+          enrollments_id = message[:enrollments_id]
+          enrollment = Enrollment.find(enrollments_id)
+          class_enrollments = enrollment.class_enrollments.where(:situation => I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")).joins(:course_class).order("course_classes.year", "course_classes.semester")
+          accomplished_phases = enrollment.accomplishments.order(:conclusion_date)
+          deferrals = enrollment.deferrals.order(:approval_date)
+          message_attachments[:grades_report_pdf][:file_contents] = render_to_string(template: 'enrollments/grades_report_pdf.pdf.prawn',  :assigns => {enrollment: enrollment, class_enrollments: class_enrollments, accomplished_phases: accomplished_phases, deferrals: deferrals})
+        end
+      end
+    end
+
+    Notifier.send_emails({:notifications => notifications_flatten, :notifications_attachments => notifications_attachments})
+
+    render :inline => 'Ok', :content_type => 'text/html'
   end
 
 end

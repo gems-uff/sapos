@@ -13,25 +13,6 @@ module Notifier
     Rails.application.config.should_send_emails
   end
 
-  def self.run_notifications
-    Notifier.logger.info "[Notifications] #{Time.now} - Notifications from DB"
-    notifications = []
-
-    #Get the next execution time arel table
-    next_execution = Notification.arel_table[:next_execution]
-
-    #Find notifications that should run
-    Notification.where(next_execution.lt(Time.now)).each do |notification|
-      notifications << notification.execute[:notifications]
-    end
-    {:notifications => notifications.flatten }
-  end
-
-  def self.asynchronous_emails
-    Notifier.logger.info "Sending Registered Notifications"
-    Notifier.send_emails(Notifier.run_notifications)
-  end
-
   def self.send_emails(notifications)
     Notifier.logger.info "Starting send_emails function."
     unless Notifier.should_run?

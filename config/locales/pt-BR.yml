@@ -1014,7 +1014,7 @@ pt-BR:
       has_grades_report_pdf_attachment_description: "Requer email individual e um campo na query, com alias enrollments_id"
       notification_offset_description: "Data de execução. Frequência Mensal com offset 3d executará todo dia 04 do mês"
       query_offset_description: "Data de consulta. Frequência Semestral com offset -1M terá variavel para dias 01/02 ou 01/07"
-      execute_now_success: 'Notificação disparda com sucesso'
+      execute_now_success: 'Notificação disparada com sucesso'
       query_date: "Data de Consulta"
       set_query_date: "Escolher Data de Consulta"
       should_send_emails: "Enviar e-mails" 

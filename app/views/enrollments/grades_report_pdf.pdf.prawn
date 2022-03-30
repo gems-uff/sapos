@@ -2,7 +2,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-new_document('grades_report.pdf', I18n.t('pdf_content.enrollment.grades_report.title'), :watermark => (current_user.role_id == Role::ROLE_PROFESSOR), :pdf_type => :grades_report) do |pdf|
+new_document('grades_report.pdf', I18n.t('pdf_content.enrollment.grades_report.title'), :watermark => (current_user.nil? ? false : (current_user.role_id == Role::ROLE_PROFESSOR)), :pdf_type => :grades_report) do |pdf|
 
     enrollment_student_header(pdf, enrollment: @enrollment)
 
