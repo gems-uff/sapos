@@ -4,7 +4,7 @@
 class Query < ApplicationRecord
 
   has_many :notifications, inverse_of: :query
-  has_many :params, class_name: 'QueryParam', dependent: :destroy, validate: false
+  has_many :params, class_name: 'QueryParam', dependent: :destroy, validate: false, :before_add => :get_query_param_ids, :before_remove => :get_query_param_ids
 
 
   accepts_nested_attributes_for :params, reject_if: :all_blank, allow_destroy: true
@@ -13,6 +13,20 @@ class Query < ApplicationRecord
   validates :sql, :presence => true
   validate :ensure_valid_params
   validates_associated :params
+
+  after_update :after_update_query
+
+  def after_update_query
+    if (! @query_param_ids_before_query_update.nil?) && (self.params.ids.to_set != @query_param_ids_before_query_update)
+      self.notifications.each do |notification|
+        notification.touch
+      end
+    end
+  end
+
+  def get_query_param_ids(param)
+    @query_param_ids_before_query_update = self.params.ids.to_set
+  end
 
   def map_params(simulation_params = {})
     simulation_params = simulation_params.symbolize_keys

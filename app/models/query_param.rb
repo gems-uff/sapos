@@ -3,7 +3,7 @@
 
 class QueryParam < ApplicationRecord
   belongs_to :query
-  has_many :notification_params
+  has_many :notification_params, :dependent => :destroy
 
   attr_accessor :simulation_value
 

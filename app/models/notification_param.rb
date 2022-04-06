@@ -2,7 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 class NotificationParam < ApplicationRecord
-  belongs_to :notification, :inverse_of => :params, :touch => true
+  belongs_to :notification, :inverse_of => :params
   belongs_to :query_param
 
 
