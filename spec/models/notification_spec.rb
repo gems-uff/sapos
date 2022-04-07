@@ -60,6 +60,13 @@ describe Notification do
           expect(notification).to have_error(:blank).on :notification_offset
         end
       end
+      context "should have error when" do
+        it "frequency is 'manual' and notification_offset is different of '0'" do
+          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.manual")
+          notification.notification_offset = "1"
+          expect(notification).to have_error(:manual_frequency_requires_notification_offset_to_be_zero).on :notification_offset
+        end
+      end
     end
 
     describe "query_offset" do

@@ -17,7 +17,8 @@ class Notification < ApplicationRecord
       I18n.translate("activerecord.attributes.notification.frequencies.semiannual"),
       I18n.translate("activerecord.attributes.notification.frequencies.monthly"),
       I18n.translate("activerecord.attributes.notification.frequencies.weekly"),
-      I18n.translate("activerecord.attributes.notification.frequencies.daily")
+      I18n.translate("activerecord.attributes.notification.frequencies.daily"),
+      I18n.translate("activerecord.attributes.notification.frequencies.manual")
   ]
 
   validates :body_template, :presence => true, on: :update
@@ -32,6 +33,8 @@ class Notification < ApplicationRecord
   validates_format_of :query_offset, :with => /\A(\-?\d+[yMwdhms]?)+\z/, :message => :offset_invalid_value
 
   validate :has_grades_report_pdf_attachment_requirements
+
+  validate :frequency_manual_has_notification_offset_equals_zero
 
   validate do
     execution unless self.new_record?
@@ -52,6 +55,12 @@ class Notification < ApplicationRecord
     self.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
   end
   after_create :update_next_execution!
+
+  def frequency_manual_has_notification_offset_equals_zero
+    if (self.notification_offset != "0") && (self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.manual"))
+      errors.add(:notification_offset, :manual_frequency_requires_notification_offset_to_be_zero)
+    end
+  end
 
   def has_grades_report_pdf_attachment_requirements
     if self.has_grades_report_pdf_attachment
@@ -128,8 +137,10 @@ class Notification < ApplicationRecord
   end
 
   def update_next_execution!
-    self.next_execution = self.calculate_next_notification_date
-    self.save!
+    if self.frequency != I18n.translate("activerecord.attributes.notification.frequencies.manual")
+      self.next_execution = self.calculate_next_notification_date
+      self.save!
+    end
   end
 
   def query_date

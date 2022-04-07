@@ -127,7 +127,7 @@ class NotificationsController < ApplicationController
     next_execution = Notification.arel_table[:next_execution]
 
     #Find notifications that should run
-    Notification.where(next_execution.lt(Time.now)).each do |notification|
+    Notification.where.not(frequency: I18n.translate("activerecord.attributes.notification.frequencies.manual")).where(next_execution.lt(Time.now)).each do |notification|
       execute_return = notification.execute
       notifications << execute_return[:notifications]
       notifications_attachments.merge!(execute_return[:notifications_attachments])

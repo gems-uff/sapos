@@ -309,6 +309,7 @@ pt-BR:
           monthly: "Mensal"
           weekly: "Semanal"
           daily: "Diária"
+          manual: "Manual"
         next_execution: "Próxima Execução"
         notification_offset: "Offset da Notificação"
         query_offset: "Offset da Consulta"
@@ -647,7 +648,8 @@ pt-BR:
         notification:
           offset_invalid_value: "está com o valor inválido. Tente um número, seguido por y, M, W, d, h, m ou s"
           individual_required: "requer que o email seja individual"
-          query_with_enrollments_id_alias_column_required: "requer que a Consulta possua com campo com alias enrollments_id" 
+          query_with_enrollments_id_alias_column_required: "requer que a Consulta possua com campo com alias enrollments_id"
+          manual_frequency_requires_notification_offset_to_be_zero: ": Quando a Frequência for Manual, deixar Offset da Notificação com valor 0" 
         scholarship:
           attributes:
             end_date:
