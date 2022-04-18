@@ -174,6 +174,73 @@ describe Professor do
 
         expect(professor.advisement_points).to eql("3.0")
       end
+
+      describe "test total points with included level parameter" do
+        before(:each) do
+          config = CustomVariable.find_by_variable(:single_advisor_points)
+          config.delete unless config.nil?
+          config = CustomVariable.find_by_variable(:multiple_advisor_points)
+          config.delete unless config.nil?
+          CustomVariable.create(:variable=>:single_advisor_points, :value=>"1.0")
+          CustomVariable.create(:variable=>:multiple_advisor_points, :value=>"0.5")
+
+          @level1 = FactoryBot.create(:level)
+          @level2 = FactoryBot.create(:level)
+
+          @professor1 = FactoryBot.create(:professor)
+          @professor2 = FactoryBot.create(:professor)
+          @professor3 = FactoryBot.create(:professor)
+
+          FactoryBot.create(:advisement_authorization, :professor => @professor1, :level => @level1)
+          FactoryBot.create(:advisement_authorization, :professor => @professor2, :level => @level2)
+
+          enrollment1 = FactoryBot.create(:enrollment, :level => @level1)
+          enrollment2 = FactoryBot.create(:enrollment, :level => @level2)
+
+          FactoryBot.create(:advisement, :professor => @professor1, :enrollment => enrollment1)
+          FactoryBot.create(:advisement, :professor => @professor1, :enrollment => enrollment2, :main_advisor => false)
+          FactoryBot.create(:advisement, :professor => @professor2, :enrollment => enrollment2)
+          FactoryBot.create(:advisement, :professor => @professor3, :enrollment => enrollment1, :main_advisor => false)
+          FactoryBot.create(:advisement, :professor => @professor3, :enrollment => enrollment2, :main_advisor => false)
+        end
+
+        it "should return 1.5 total points to authorized professor with one single and one multiple advisements" do
+          expect(@professor1.advisement_points).to eql("1.5")
+        end
+
+        it "should return 1.0 level points to authorized professor with single advisement on level" do
+          expect(@professor1.advisement_points(@level1.id)).to eql("1.0")
+        end
+
+        it "should return 0.5 level points to authorized professor with multiple advisement on level, is not the main advisor" do
+          expect(@professor1.advisement_points(@level2.id)).to eql("0.5")
+        end
+
+        it "should return 0.5 total points to authorized professor with one multiple advisement" do
+          expect(@professor2.advisement_points).to eql("0.5")
+        end
+
+        it "should return 0.5 level points to authorized professor with multiple advisement on level, is the main advisor" do
+          expect(@professor2.advisement_points(@level2.id)).to eql("0.5")
+        end
+
+        it "should return 0.0 level-1 points to professor which is autorized only in level-2" do
+          expect(@professor2.advisement_points(@level1.id)).to eql("0.0")
+        end
+
+        it "should return 0.0 total points to not authorized professor" do
+          expect(@professor3.advisement_points).to eql("0.0")
+        end
+
+        it "should return 0.0 level-1 points to professor not autorized in level-1" do
+          expect(@professor3.advisement_points(@level1.id)).to eql("0.0")
+        end
+
+        it "should return 0.0 level-2 points to professor not autorized in level-2" do
+          expect(@professor3.advisement_points(@level2.id)).to eql("0.0")
+        end
+      end
+
     end
     describe "advisement_point" do
       context "should return 0 when" do

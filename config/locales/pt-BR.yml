@@ -294,6 +294,8 @@ pt-BR:
         majors: "Cursos"
         phase_durations: "Duração de Etapas"
         scholarships: "Bolsas"
+        show_advisements_points_in_list: "Mostrar pts por orientacao na lista"
+        short_name_showed_in_list_header: "Título da coluna pts por orientação"
       major:
         institution: "Instituição"
         level: "Nível"
@@ -354,7 +356,7 @@ pt-BR:
       professor: 
         address: "Logradouro"
         advisement_authorizations: "Credenciamentos"
-        advisement_points: "Pontos de Orientação"
+        advisement_points: "Pontos Total"
         advisements: "Orientandos"
         advisements_with_points: "Orientandos"
         birthdate: "Data de Nascimento"

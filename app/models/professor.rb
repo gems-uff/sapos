@@ -29,12 +29,21 @@ class Professor < ApplicationRecord
   validates :enrollment_number, :uniqueness => true, :allow_blank => true
   validate :changed_to_different_user
 
+  def create_advisement_points_of_level_method(column_name)
+    self.class.send(:define_method, column_name) {advisement_points(column_name[26..-1])}
+  end
+
 #  It was considered that active advisements were enrollments without dismissals reasons
-  def advisement_points
+  def advisement_points(level_id = nil)
+
     return "#{0.0}" if self.advisement_authorizations.empty?
 
     enrollments = Enrollment.joins(["LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id", :advisements]).
         where("advisements.professor_id = :professor_id AND dismissals.id IS NULL", :professor_id => self.id)
+
+    if(level_id != nil)
+      enrollments = enrollments.where(:level_id => level_id.to_i)
+    end
 
     enrollments_with_single_advisor = enrollments.where("1 = (SELECT COUNT(*) FROM advisements WHERE advisements.enrollment_id = enrollments.id AND advisements.professor_id in (SELECT advisement_authorizations.professor_id from advisement_authorizations))")
 

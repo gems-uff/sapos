@@ -9,6 +9,8 @@ class ProfessorsController < ApplicationController
   include ApplicationHelper
   helper :professor_research_areas
 
+  before_action :set_list_columns
+
   active_scaffold :professor do |config|
     config.columns.add :advisement_points
     config.columns.add :advisements_with_points
@@ -95,5 +97,34 @@ class ProfessorsController < ApplicationController
     config.actions.exclude :deleted_records
   end
   record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
+
+  def set_list_columns
+    if Professor.first != nil
+
+      Professor.instance_methods.grep(/^advisement_points_of_level/).each do |advisement_points_of_level|
+        active_scaffold_config.list.columns.exclude advisement_points_of_level
+        Professor.undef_method advisement_points_of_level
+      end
+
+      levels_to_show = Level.where(:show_advisements_points_in_list => true).order(:short_name_showed_in_list_header)
+      levels_to_add = []
+
+      levels_to_show.each do |level|
+        method_name = "advisement_points_of_level#{level.id}"
+        Professor.first.create_advisement_points_of_level_method(method_name)
+        active_scaffold_config.columns.add method_name
+        levels_to_add.push(method_name) 
+
+        if (level.short_name_showed_in_list_header != nil) && (level.short_name_showed_in_list_header != "")
+          active_scaffold_config.columns[method_name].label = level.short_name_showed_in_list_header
+        else
+          active_scaffold_config.columns[method_name].label = level.name
+        end
+      end
+
+      insert_position = Array(active_scaffold_config.list.columns).find_index(:advisement_points) + 1
+      Array(active_scaffold_config.list.columns).insert(insert_position, *levels_to_add)
+    end
+  end
 
 end

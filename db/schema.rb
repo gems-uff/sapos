@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_03_17_153130) do
+ActiveRecord::Schema.define(version: 2022_04_11_182230) do
 
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
@@ -295,6 +295,8 @@ ActiveRecord::Schema.define(version: 2022_03_17_153130) do
     t.datetime "updated_at", null: false
     t.string "course_name", limit: 255
     t.integer "default_duration", default: 0
+    t.boolean "show_advisements_points_in_list"
+    t.string "short_name_showed_in_list_header"
   end
 
   create_table "majors", force: :cascade do |t|
