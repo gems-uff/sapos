@@ -221,10 +221,10 @@ GEM
     mysql2 (0.5.3)
     mysql2 (0.5.3-x86-mingw32)
     nio4r (2.5.8)
-    nokogiri (1.13.4)
+    nokogiri (1.13.5)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
-    nokogiri (1.13.4-x86-mingw32)
+    nokogiri (1.13.5-x86-mingw32)
       racc (~> 1.4)
     odf-report (0.7.0)
       mime-types
@@ -410,7 +410,7 @@ DEPENDENCIES
   letter_opener_web
   loofah (~> 2.3.1)
   mysql2
-  nokogiri (~> 1.13.4)
+  nokogiri (~> 1.13.5)
   odf-report
   paper_trail
   prawn

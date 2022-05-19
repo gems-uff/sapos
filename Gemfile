@@ -12,7 +12,7 @@ gem 'loofah', '~> 2.3.1'
 gem 'rails-html-sanitizer'
 gem 'rack', '~> 2.1.4'
 gem 'ffi', '>= 1.9.24'
-gem "nokogiri", "~> 1.13.4"
+gem "nokogiri", "~> 1.13.5"
 gem "actionview"
 gem "rake", "~> 12.3.3"
 gem 'activestorage'
