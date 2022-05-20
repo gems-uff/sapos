@@ -125,7 +125,7 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.item :profile, edit_user_registration_path, highlights_on: %r(/users/profile), if: -> { user_signed_in? }
     end
 
-    students_models = [Student, Dismissal, Enrollment, EnrollmentHold, Level, DismissalReason, EnrollmentStatus]
+    students_models = [Enrollment, Dismissal, Student, EnrollmentHold, Level, DismissalReason, EnrollmentStatus]
     mainhelper.listitem :students, students_models do |submenu|
       submenu.modelitem Student
       submenu.modelitem Dismissal
