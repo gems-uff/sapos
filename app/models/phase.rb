@@ -21,14 +21,24 @@ class Phase < ApplicationRecord
   end
 
   def self.find_all_for_enrollment(enrollment)
-    return [] if enrollment.nil?
-    ["phases.id IN (
-      SELECT phases.id
-      FROM phases
-      LEFT OUTER JOIN phase_durations
-      ON phase_durations.phase_id = phases.id
-      WHERE phase_durations.level_id = ?
-    )", enrollment.level_id]
+    if enrollment.nil?
+      ["phases.id IN (
+        SELECT phases.id
+        FROM phases
+        WHERE (phases.active = 1)      
+      )"]
+    else
+      ["phases.id IN (
+        SELECT phases.id
+        FROM phases
+        LEFT OUTER JOIN phase_durations
+        ON phase_durations.phase_id = phases.id
+        WHERE (
+          (phases.active = 1)
+          AND (phase_durations.level_id = ?)
+        )
+      )", enrollment.level_id]
+    end
   end
 
   def total_duration(enrollment, options={})

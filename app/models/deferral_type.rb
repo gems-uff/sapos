@@ -27,13 +27,24 @@ class DeferralType < ApplicationRecord
   end
 
   def self.find_all_for_enrollment(enrollment)
-    return [] if enrollment.nil?
-    ["deferral_types.id IN (
-      SELECT deferral_types.id
-      FROM deferral_types
-      INNER JOIN phases ON deferral_types.phase_id = phases.id 
-      LEFT OUTER JOIN phase_durations ON phase_durations.phase_id = phases.id
-      WHERE phase_durations.level_id = ?
-    )", enrollment.level_id]
+    if enrollment.nil?
+      ["deferral_types.id IN (
+        SELECT deferral_types.id
+        FROM deferral_types
+        INNER JOIN phases ON deferral_types.phase_id = phases.id 
+        WHERE (phases.active = 1)
+      )"]
+    else
+      ["deferral_types.id IN (
+        SELECT deferral_types.id
+        FROM deferral_types
+        INNER JOIN phases ON deferral_types.phase_id = phases.id 
+        LEFT OUTER JOIN phase_durations ON phase_durations.phase_id = phases.id
+        WHERE (
+          (phases.active = 1)
+          AND (phase_durations.level_id = ?)
+        )
+      )", enrollment.level_id]
+    end
   end
 end

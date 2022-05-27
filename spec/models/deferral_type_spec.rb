@@ -92,6 +92,31 @@ describe DeferralType do
         deferral_types = DeferralType.where(DeferralType::find_all_for_enrollment(enrollment))
         expect(deferral_types.count).to eq(2)
       end
+
+      it "should not return an deferral_type, whose phase is inactive, if enrollment is nil" do
+        Deferral.destroy_all
+        DeferralType.destroy_all
+        phase1 = FactoryBot.create(:phase, :active => false)
+        FactoryBot.create(:deferral_type, :phase => phase1)
+        deferral_types = DeferralType.where(DeferralType::find_all_for_enrollment(nil))
+        expect(deferral_types.count).to eq(0)
+      end
+
+      it "should not return an deferral_type, whose phase is inactive, that have the same level as the enrollment" do
+        Deferral.destroy_all
+        DeferralType.destroy_all
+        level1 = FactoryBot.create(:level)
+
+        phase1 = FactoryBot.create(:phase, :active => false)
+        FactoryBot.create(:phase_duration, :phase => phase1, :level => level1)
+        FactoryBot.create(:deferral_type, :phase => phase1)
+
+        enrollment = FactoryBot.create(:enrollment, :level => level1)
+
+        deferral_types = DeferralType.where(DeferralType::find_all_for_enrollment(enrollment))
+        expect(deferral_types.count).to eq(0)
+      end
+
     end
   end
 end

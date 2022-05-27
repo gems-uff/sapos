@@ -85,6 +85,27 @@ describe Phase do
         phases = Phase.where(Phase::find_all_for_enrollment(enrollment))
         expect(phases.count).to eq(2)
       end
+
+      it "should not return an inactivated phase if enrollment is nil" do
+        Phase.destroy_all
+        FactoryBot.create(:phase, :active => false)
+        phases = Phase.where(Phase::find_all_for_enrollment(nil))
+        expect(phases.count).to eq(0)
+      end
+
+      it "should not return an inactivated phase that have the same level as the enrollment" do
+        Phase.destroy_all
+        level1 = FactoryBot.create(:level)
+        
+        phase1 = FactoryBot.create(:phase, :active => false)
+        FactoryBot.create(:phase_duration, :phase => phase1, :level => level1)
+
+        enrollment = FactoryBot.create(:enrollment, :level => level1)
+
+        phases = Phase.where(Phase::find_all_for_enrollment(enrollment))
+        expect(phases.count).to eq(0)
+      end
+
     end
   end
 end
