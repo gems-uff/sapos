@@ -322,6 +322,8 @@ pt-BR:
         individual: "Individual"
         has_grades_report_pdf_attachment: "Boletim anexado"
         no_name: "Sem nome"
+        notification_params: "Parâmetros"
+        query: "Consulta"
       notification_log:
         body: "Corpo"
         to: "Para"

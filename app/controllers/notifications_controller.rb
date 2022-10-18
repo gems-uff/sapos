@@ -23,7 +23,7 @@ class NotificationsController < ApplicationController
                             :type => :member
 
 
-    form_columns = [:title, :frequency, :notification_offset, :query_offset, :query, :params, :individual, :has_grades_report_pdf_attachment, :to_template, :subject_template, :body_template]
+    form_columns = [:title, :frequency, :notification_offset, :query_offset, :query, :notification_params, :individual, :has_grades_report_pdf_attachment, :to_template, :subject_template, :body_template]
     config.columns = form_columns
     config.update.columns = form_columns
     config.create.columns = [:title, :frequency, :notification_offset, :query_offset, :query, :individual, :has_grades_report_pdf_attachment, :to_template, :subject_template, :body_template]
