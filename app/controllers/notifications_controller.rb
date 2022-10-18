@@ -105,14 +105,11 @@ class NotificationsController < ApplicationController
 
     notification_params = params[:notification_params]
     notification_params = notification_params.to_unsafe_h if notification_params.is_a?(ActionController::Parameters)
-    if notification_params
 
-      result = @notification.execute(skip_update: true, override_params: notification_params)
-      @messages = result[:notifications]
-      @query_sql = result[:query]
-    else
-      @messages = []
-    end
+    result = @notification.execute(skip_update: true, override_params: notification_params)
+    @messages = result[:notifications]
+    @query_sql = result[:query]
+
     render :action => 'simulate'
   end
 
