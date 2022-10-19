@@ -52,7 +52,9 @@ class Notification < ApplicationRecord
   end
 
   before_create do
-    self.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
+    if self.frequency.nil?
+      self.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
+    end
   end
   after_create :update_next_execution!
 
@@ -145,7 +147,13 @@ class Notification < ApplicationRecord
 
   def query_date
     next_date = self.next_execution
-    next_date = calculate_next_notification_date if next_date.nil?  
+    if self.frequency != I18n.translate("activerecord.attributes.notification.frequencies.manual")
+      next_date ||= calculate_next_notification_date
+    else
+      next_date ||= self.notification_params.find { |p| p.name == 'data_consulta' }.try(:value).try(:to_date)
+      next_date ||= self.notification_params.find { |p| p.name == 'data_consulta' }.try(:query_param).try(:default_value).try(:to_date)
+      next_date ||= Date.today
+    end
     next_date + StringTimeDelta::parse(self.query_offset) - StringTimeDelta::parse(self.notification_offset)
   end
 
