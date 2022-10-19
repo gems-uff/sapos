@@ -23,11 +23,12 @@
 
 
     <div class="actions" style="display: block">
-      <% if params[:notification_params].try(:[], :data_consulta) %>
           <p class="simulate_query_date">
             <span>
+            <% if params[:notification_params].try(:[], :data_consulta) %>
               <%= I18n.t('active_scaffold.notification.query_date') %>:
               <%= params[:notification_params][:data_consulta] %>
+            <% end %>  
             </span>
             &nbsp;&nbsp;&nbsp;
             <a id="as_notifications-execute_now-<%= @notification.id %>-link" data-remote="true" data-method="post" class="execute_now as_action" href="<%= execute_now_notification_path(@notification, :notification_params => params[:notification_params]) %>">
@@ -36,7 +37,6 @@
             <%= loading_indicator_tag(:action => :execute_now, :id => @notification.id) %>
           </p>
 
-      <% end %>
     </div>
 
 
