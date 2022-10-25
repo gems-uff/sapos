@@ -87,6 +87,9 @@ describe Phase do
       end
 
       it "should not return an inactivated phase if enrollment is nil" do
+        Deferral.destroy_all
+        DeferralType.destroy_all
+        Accomplishment.destroy_all
         Phase.destroy_all
         FactoryBot.create(:phase, :active => false)
         phases = Phase.where(Phase::find_all_for_enrollment(nil))
@@ -94,6 +97,9 @@ describe Phase do
       end
 
       it "should not return an inactivated phase that have the same level as the enrollment" do
+        Deferral.destroy_all
+        DeferralType.destroy_all
+        Accomplishment.destroy_all
         Phase.destroy_all
         level1 = FactoryBot.create(:level)
         
