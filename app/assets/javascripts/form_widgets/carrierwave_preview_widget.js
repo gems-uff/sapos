@@ -1,10 +1,13 @@
 function carrierwave_preview(as_container, input) {
-	
+	var img_style = "";
+		if(as_container == ".students-view"){
+		img_style = ' style="width: 400px; height: 300px; Object-fit: contain; background-color: #f2f1f0;" ';
+	}
 	// Show previously loaded image
 	var a = $(as_container + ' .carrierwave_controls a')[0];
 	if (a){
 		var img_src = a.textContent;
-		$(a).html('<img src="'+img_src+'"/>');
+		$(a).html('<img src="'+img_src+'" ' + img_style + ' />');
 		a.nextSibling.remove();
 		$(a).css('display', 'block');
 	}
@@ -19,7 +22,7 @@ function carrierwave_preview(as_container, input) {
             reader.onload = (function(theFile) {
                 return function(e) {
                     $(as_container + ' .previewimage').html(['<p>Visualização:</p><img class="thumb" src="', e.target.result,
-                                    '" title="', escape(theFile.name), '"/>'].join(''));
+                                    '" title="', escape(theFile.name), '" ' + img_style + ' />'].join(''));
                 };
             })(f);
 
