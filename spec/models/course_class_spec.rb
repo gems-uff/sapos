@@ -107,5 +107,17 @@ describe CourseClass do
         end
       end
     end
+
+    describe "name_with_class_formated_to_reports" do
+      context "course_class name, course name and obs_schedule has '<' characters" do
+        it "replaces '<' characters with '&lt;'" do
+          course_class.name = "class 4 < 5"
+          course_class.course = Course.new(:name => "course x < y")
+          course_class.course.course_type = FactoryBot.create(:course_type, :show_class_name => true)
+          course_class.obs_schedule = "w < z"
+          expect(course_class.name_with_class_formated_to_reports).to eql("course x &lt; y (class 4 &lt; 5) - w &lt; z") 
+        end
+      end
+    end
   end
 end

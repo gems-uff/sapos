@@ -15,7 +15,7 @@ module CourseClassesPdfHelper
                   ]]
 
     top_data = [[
-                    course_class.name_with_class,
+                    course_class.name_with_class_formated_to_reports,
                     "#{course_class.semester}º/#{course_class.year}",
                     ''
                 ]]
@@ -133,7 +133,7 @@ module CourseClassesPdfHelper
 
   end
 
-  def prepare_class_schedule_table(course_classes, on_demand, advisement_authorizations=nil, keep_on_demand=false)
+  def prepare_class_schedule_table(course_classes, on_demand, advisement_authorizations=nil, keep_on_demand=false, used_to_render_a_pdf_report: false)
     advisement_authorizations ||= []
     star = false
     first = 1
@@ -168,7 +168,7 @@ module CourseClassesPdfHelper
       course = header[0].map {|x| ""}
 
       course[0] = {id: course_class.id, course_id: course_class.course_id, on_demand: course_type.on_demand}
-      course[1] = course_class.name_with_class
+      used_to_render_a_pdf_report ? course[1] = course_class.name_with_class_formated_to_reports : course[1] = course_class.name_with_class
 
       course_class.allocations.each do |allocation| 
         index = I18n.translate("date.day_names").index(allocation.day)
@@ -231,7 +231,7 @@ module CourseClassesPdfHelper
   def class_schedule_table(pdf, options={})
     course_classes ||= options[:course_classes]
     on_demand ||= options[:on_demand]
-    table = prepare_class_schedule_table(course_classes, on_demand)
+    table = prepare_class_schedule_table(course_classes, on_demand, used_to_render_a_pdf_report: true)
     table[:header][0] = table[:header][0].drop(1).collect {|h| "<b>#{h}</b>"}
     table[:data] = table[:data].collect {|row| row.drop(1) }
 

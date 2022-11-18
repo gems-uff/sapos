@@ -54,6 +54,10 @@ class CourseClass < ApplicationRecord
     "#{course.name} (#{name})#{append_obs_schedule}"
   end
 
+  def name_with_class_formated_to_reports
+    name_with_class.gsub('<', '&lt;')
+  end
+
   private
 
   def professor_changed_only_valid_fields
