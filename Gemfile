@@ -8,7 +8,7 @@ ruby '~> 2.7.1'
 gem 'rails', '~> 6.0.5.1'
 
 gem 'rubyzip', '~> 1.3.0'
-gem 'loofah', '~> 2.3.1'
+gem 'loofah', '~> 2.19.1'
 gem 'rails-html-sanitizer'
 gem 'rack', '~> 2.1.4'
 gem 'ffi', '>= 1.9.24'

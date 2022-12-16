@@ -203,7 +203,7 @@ GEM
       actionmailer (>= 3.2)
       letter_opener (~> 1.0)
       railties (>= 3.2)
-    loofah (2.3.1)
+    loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.7.1)
@@ -272,8 +272,8 @@ GEM
       activesupport (>= 4.2)
       choice (~> 0.2.0)
       ruby-graphviz (~> 1.2)
-    rails-html-sanitizer (1.4.3)
-      loofah (~> 2.3)
+    rails-html-sanitizer (1.4.4)
+      loofah (~> 2.19, >= 2.19.1)
     railties (6.0.5.1)
       actionpack (= 6.0.5.1)
       activesupport (= 6.0.5.1)
@@ -407,7 +407,7 @@ DEPENDENCIES
   json
   kaminari
   letter_opener_web
-  loofah (~> 2.3.1)
+  loofah (~> 2.19.1)
   mysql2
   nokogiri (~> 1.13.10)
   odf-report
