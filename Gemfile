@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 ruby '~> 2.7.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.0.5.1'
+gem 'rails', '~> 6.0.6.1'
 
 gem 'rubyzip', '~> 1.3.0'
 gem 'loofah', '~> 2.19.1'
@@ -134,7 +134,7 @@ end
 # Notify exceptions
 gem 'exception_notification'
 group :production do
-  gem 'mysql2'
+  gem 'mysql2', '~> 0.5.4'
 end
 
 gem 'json'
