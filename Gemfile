@@ -18,6 +18,7 @@ gem "rake", "~> 12.3.3"
 gem 'activestorage'
 gem 'actionpack'
 gem 'activesupport'
+gem "mail", "< 2.8.0"
 
 # Use Active record session store
 gem 'activerecord-session_store'
