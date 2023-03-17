@@ -133,6 +133,7 @@ GEM
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0.0)
     database_cleaner-core (2.0.1)
+    date (3.3.3)
     debug_inspector (0.0.3)
     devise (4.7.1)
       bcrypt (~> 3.0)
@@ -206,8 +207,11 @@ GEM
     loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
-    mail (2.7.1)
+    mail (2.8.1)
       mini_mime (>= 0.1.1)
+      net-imap
+      net-pop
+      net-smtp
     marcel (1.0.2)
     method_source (1.0.0)
     mime-types (3.3.1)
@@ -219,6 +223,15 @@ GEM
     minitest (5.17.0)
     multi_json (1.15.0)
     mysql2 (0.5.4)
+    net-imap (0.3.4)
+      date
+      net-protocol
+    net-pop (0.1.2)
+      net-protocol
+    net-protocol (0.2.1)
+      timeout
+    net-smtp (0.3.3)
+      net-protocol
     nio4r (2.5.8)
     nokogiri (1.13.10)
       mini_portile2 (~> 2.8.0)
@@ -356,6 +369,7 @@ GEM
     thread_safe (0.3.6)
     tilt (2.0.10)
     timeliness (0.3.10)
+    timeout (0.3.2)
     ttfunk (1.6.2.1)
     tzinfo (1.2.10)
       thread_safe (~> 0.1)
@@ -365,7 +379,7 @@ GEM
       timeliness (~> 0.3.7)
     warden (1.2.8)
       rack (>= 2.0.6)
-    webrick (1.6.0)
+    webrick (1.6.1)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -408,7 +422,7 @@ DEPENDENCIES
   kaminari
   letter_opener_web
   loofah (~> 2.19.1)
-  mail (< 2.8.0)
+  mail (~> 2.8.1)
   mysql2 (~> 0.5.4)
   nokogiri (~> 1.13.10)
   odf-report
