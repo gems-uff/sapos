@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 ruby '~> 2.7.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.0.6.1'
+gem 'rails', '~> 6.1', '>= 6.1.7.3'
 
 gem 'rubyzip', '~> 1.3.0'
 gem 'loofah', '~> 2.19.1'
@@ -14,7 +14,7 @@ gem 'rack', '~> 2.2.6'
 gem 'ffi', '>= 1.9.24'
 gem "nokogiri", "~> 1.14.3"
 gem "actionview"
-gem "rake", "~> 12.3.3"
+gem "rake", '~> 13.0', '>= 13.0.6'
 gem 'activestorage'
 gem 'actionpack'
 gem 'activesupport'
@@ -49,14 +49,14 @@ gem "kaminari"
 #gem "schema_plus"
 
 gem 'cancancan'
-gem "devise", "~> 4.7.1"
+gem "devise", "~> 4.9"
 gem 'devise_invitable', '~> 2.0.0'
-gem "paper_trail"
+gem "paper_trail", '~> 14.0'
 
 gem 'sql-parser'
 
 # Iconography
-gem 'font-awesome-rails'
+gem 'font-awesome-rails', '~> 4.7', '>= 4.7.0.8'
 
 # Prawn to PDF
 gem 'prawn'
@@ -84,7 +84,7 @@ gem 'rufus-scheduler'
 
 # Image
 gem 'carrierwave', '~>2.2.2'
-gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave-activerecord.git', :branch => 'rails6'
+gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave-activerecord.git', :branch => 'rails61'
 
 
 group :development, :test do
@@ -133,7 +133,7 @@ group :test do
 end
 
 # Notify exceptions
-gem 'exception_notification'
+gem 'exception_notification', '~> 4.5'
 group :production do
   gem 'mysql2', '~> 0.5.4'
 end
