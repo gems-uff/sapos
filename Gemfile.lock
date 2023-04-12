@@ -233,10 +233,10 @@ GEM
     net-smtp (0.3.3)
       net-protocol
     nio4r (2.5.8)
-    nokogiri (1.13.10)
+    nokogiri (1.14.3)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
-    nokogiri (1.13.10-x86-mingw32)
+    nokogiri (1.14.3-x86-mingw32)
       racc (~> 1.4)
     odf-report (0.7.0)
       mime-types
@@ -424,7 +424,7 @@ DEPENDENCIES
   loofah (~> 2.19.1)
   mail (~> 2.8.1)
   mysql2 (~> 0.5.4)
-  nokogiri (~> 1.13.10)
+  nokogiri (~> 1.14.3)
   odf-report
   paper_trail
   prawn
