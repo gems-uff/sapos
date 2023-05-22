@@ -21,15 +21,14 @@ module Sapos
     #config.action_controller.permit_all_parameters = true
     #config.action_controller.action_on_unpermitted_parameters = :raise
 
+    config.eager_load_paths << Rails.root.join('lib')
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
 
     # Custom directories with classes and modules you want to be autoloadable.
     # config.autoload_paths += %W(#{config.root}/extras)
-
-    config.eager_load_paths += Dir["#{config.root}/lib/**/"]
-    config.autoload_paths = config.eager_load_paths
+    config.autoload_paths += Dir["#{config.root}/lib/**/"]
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
