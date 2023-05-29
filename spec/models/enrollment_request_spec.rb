@@ -190,8 +190,8 @@ RSpec.describe EnrollmentRequest, type: :model do
         it 'should update both the last_student_change_at and the student_view_at attributes' do
           time = Time.current
           enrollment_request.student_change!(time)
-          expect(enrollment_request.last_student_change_at).to eq(time)
-          expect(enrollment_request.student_view_at).to eq(time)
+          expect(enrollment_request.last_student_change_at.to_s).to eq(time.to_s)
+          expect(enrollment_request.student_view_at.to_s).to eq(time.to_s)
         end
       end
       describe 'last_student_read_time' do

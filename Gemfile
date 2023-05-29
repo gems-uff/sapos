@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 ruby '~> 2.7.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '~> 6.1', '>= 6.1.7.3'
+gem 'rails', '~> 7.0', '>= 7.0.4.3'
 
 gem 'rubyzip', '~> 1.3.0'
 gem 'loofah', '~> 2.19.1'
@@ -84,10 +84,13 @@ gem 'rufus-scheduler'
 
 # Image
 gem 'carrierwave', '~>2.2.2'
-gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave-activerecord.git', :branch => 'rails61'
+gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave-activerecord.git', :branch => 'rails7'
 
 
 group :development, :test do
+
+gem 'rspec-rails'
+
 # Use SQLite database for development
   gem 'sqlite3'
 
@@ -114,7 +117,7 @@ end
 
 group :test do
   # Test runner
-  gem 'rspec-rails'
+#  gem 'rspec-rails'
 
   # Fixtures replacement
   gem 'factory_bot_rails'
