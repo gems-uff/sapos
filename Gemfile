@@ -19,6 +19,7 @@ gem 'activestorage'
 gem 'actionpack'
 gem 'activesupport'
 gem "mail", "~> 2.8.1"
+gem "i18n", "~> 1.13.0"
 
 # Use Active record session store
 gem 'activerecord-session_store'
