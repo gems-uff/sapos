@@ -7,9 +7,9 @@ class PhaseCompletion < ApplicationRecord
   belongs_to :enrollment
   belongs_to :phase
 
-  validates :enrollment_id, :presence => true
-  validates :phase_id, :presence => true
-  validates :phase_id, :uniqueness => {:scope => :enrollment_id}
+  validates :enrollment, :presence => true
+  validates :phase, :presence => true
+  validates :phase, :uniqueness => {:scope => :enrollment}
 
   after_initialize :init
 

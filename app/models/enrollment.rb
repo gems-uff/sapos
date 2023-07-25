@@ -7,7 +7,7 @@ class Enrollment < ApplicationRecord
   belongs_to :student
   belongs_to :level
   belongs_to :enrollment_status
-  belongs_to :research_area
+  belongs_to :research_area, optional: true
 
   attr_readonly :professors
   

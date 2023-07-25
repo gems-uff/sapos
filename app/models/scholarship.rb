@@ -4,8 +4,8 @@
 class Scholarship < ApplicationRecord
   belongs_to :level
   belongs_to :sponsor
-  belongs_to :scholarship_type
-  belongs_to :professor
+  belongs_to :scholarship_type, optional: true
+  belongs_to :professor, optional: true
   has_many :scholarship_durations, :dependent => :destroy
   has_many :enrollments, :through => :scholarship_durations
 

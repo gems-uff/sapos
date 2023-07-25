@@ -13,12 +13,12 @@ class Professor < ApplicationRecord
   has_many :thesis_defense_committee_participations, :dependent => :restrict_with_exception
   has_many :thesis_defense_committee_enrollments, :source => :enrollment, :through => :thesis_defense_committee_participations
   
-  belongs_to :city
-  belongs_to :institution
-  belongs_to :academic_title_country, :class_name => 'Country', :foreign_key => 'academic_title_country_id' 
-  belongs_to :academic_title_institution, :class_name => 'Institution', :foreign_key => 'academic_title_institution_id'
-  belongs_to :academic_title_level, :class_name => 'Level', :foreign_key => 'academic_title_level_id'
-  belongs_to :user
+  belongs_to :city, optional: true
+  belongs_to :institution, optional: true
+  belongs_to :academic_title_country, optional: true, :class_name => 'Country', :foreign_key => 'academic_title_country_id' 
+  belongs_to :academic_title_institution, optional: true, :class_name => 'Institution', :foreign_key => 'academic_title_institution_id'
+  belongs_to :academic_title_level, optional: true, :class_name => 'Level', :foreign_key => 'academic_title_level_id'
+  belongs_to :user, optional: true
     
 
   has_paper_trail

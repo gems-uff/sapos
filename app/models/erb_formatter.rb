@@ -3,7 +3,7 @@
 
 require 'erubi'
 
-class ERBFormatter
+class ErbFormatter
 
   @attributes = {}
   @records = nil

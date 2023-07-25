@@ -1,9 +1,9 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-require File.expand_path('../boot', __FILE__)
+require_relative "boot"
 
-require 'rails/all'
+require "rails/all"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -11,6 +11,10 @@ Bundler.require(*Rails.groups)
 
 module Sapos
   class Application < Rails::Application
+    
+    # Initialize configuration defaults for originally generated Rails version.
+    config.load_defaults 6.1
+
     # Allow the notifier to send emails
     config.should_send_emails = false
 

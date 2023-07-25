@@ -9,7 +9,7 @@
 
 # Ignore the default SQLite database.
 /db/*.sqlite3
-/db/*.sqlite3-journal
+/db/*.sqlite3-*
 
 #Ignoring rvm
 .rvmrc
@@ -19,21 +19,40 @@
 .volta
 
 # Ignore all logfiles and tempfiles.
-/log/*.log
-/tmp
-/nbproject/private/
-/app/assets/images/report_configuration
-/app/assets/images/student
-/public/assets
-/public/images/active_scaffold
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# Ignore pidfiles, but keep the directory.
+/tmp/pids/*
+!/tmp/pids/
+!/tmp/pids/.keep
+
+# Ignore uploaded files in development.
+/storage/*
+!/storage/.keep
+/uploads
 /public/uploads/pdf_header
 /public/uploads/tmp
 /public/uploads/report_configuration
+
+# Ignore master key for decrypting credentials and more.
+/config/master.key
+
+# Ignore generated files
+/public/assets
+/public/images/active_scaffold
 /public/javascripts/active_scaffold
 /public/stylesheets/active_scaffold
-/uploads
-.idea/
-nbproject/
+/app/assets/images/report_configuration
+/app/assets/images/student
+.byebug_history
 coverage/
 /vendor/bundle
+
+# Ignore IDEs and text editors
+.idea/
+nbproject/
+/nbproject/private/
 .DS_Store

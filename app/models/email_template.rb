@@ -225,7 +225,7 @@ class EmailTemplate < ApplicationRecord
   end
 
   def prepare_message(bindings)
-    formatter = ERBFormatter.new(bindings)
+    formatter = ErbFormatter.new(bindings)
     message = {
       :to => formatter.format(self.to),
       :subject => formatter.format(self.subject),

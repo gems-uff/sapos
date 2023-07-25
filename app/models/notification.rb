@@ -180,7 +180,7 @@ class Notification < ApplicationRecord
           bindings = {}.merge(params)
           bindings.merge!(Hash[result[:columns].zip(raw_result)])
 
-          formatter = ERBFormatter.new(bindings)
+          formatter = ErbFormatter.new(bindings)
           
           notification = {
               :notification_id => self.id,
@@ -204,7 +204,7 @@ class Notification < ApplicationRecord
       else
         unless result[:rows].empty?
           bindings = {:rows => result[:rows], :columns => result[:columns]}.merge(params)
-          formatter = ERBFormatter.new(bindings)
+          formatter = ErbFormatter.new(bindings)
           notifications << {
               :notification_id => self.id,
               :to => formatter.format(self.to_template),

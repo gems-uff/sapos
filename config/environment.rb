@@ -2,9 +2,9 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 # Load the Rails application.
-require File.expand_path('../application', __FILE__)
+require_relative "application"
 
 # Initialize the Rails application.
-Sapos::Application.initialize!
+Rails.application.initialize!
 
 APP_VERSION = `git describe --tag --always` unless defined? APP_VERSION
