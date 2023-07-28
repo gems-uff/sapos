@@ -13,7 +13,8 @@ module Sapos
   class Application < Rails::Application
     
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 6.1
+    #config.load_defaults 6.1
+    config.autoloader = :zeitwerk
 
     # Allow the notifier to send emails
     config.should_send_emails = false

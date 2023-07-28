@@ -97,6 +97,9 @@ group :development do
 end
 
 group :development, :test do
+
+gem 'rspec-rails'
+
 # Use SQLite database for development
   gem 'sqlite3'
 
@@ -119,7 +122,7 @@ end
 
 group :test do
   # Test runner
-  gem 'rspec-rails'
+#  gem 'rspec-rails'
 
   # Fixtures replacement
   gem 'factory_bot_rails'

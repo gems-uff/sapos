@@ -38,6 +38,9 @@ GEM
       activejob (= 6.1.7.4)
       activesupport (= 6.1.7.4)
       mail (~> 2.5, >= 2.5.4)
+      net-imap
+      net-pop
+      net-smtp
       rails-dom-testing (~> 2.0)
     actionpack (6.1.7.4)
       actionview (= 6.1.7.4)
@@ -86,7 +89,6 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
-      zeitwerk (~> 2.3)
     addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     ast (2.4.2)
@@ -228,10 +230,10 @@ GEM
     net-smtp (0.3.3)
       net-protocol
     nio4r (2.5.9)
-    nokogiri (1.14.3)
+    nokogiri (1.14.5)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
-    nokogiri (1.14.3-x86-mingw32)
+    nokogiri (1.14.5-x86-mingw32)
       racc (~> 1.4)
     orm_adapter (0.5.0)
     paper_trail (14.0.0)
@@ -379,7 +381,7 @@ GEM
       sprockets (>= 3.0.0)
     sqlite3 (1.4.2)
     ssrf_filter (1.0.7)
-    thor (1.2.1)
+    thor (1.2.2)
     tilt (2.0.10)
     timeliness (0.3.10)
     timeout (0.3.2)
@@ -403,7 +405,6 @@ GEM
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    zeitwerk (2.6.8)
 
 PLATFORMS
   ruby
