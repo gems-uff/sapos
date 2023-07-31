@@ -1,10 +1,13 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
+# Provides functions to calculate the dates based on Year and Semester
 class YearSemester
   attr_accessor :year, :semester
 
-  SEMESTERS = [1,2]
+  SEMESTERS = [1, 2]
 
   FIRST_SEMESTER = 1
   SECOND_SEMESTER = 2
@@ -15,7 +18,7 @@ class YearSemester
   SECOND_SEMESTER_BEGIN_DAY = 1
 
   def self.selectable_years
-    ((Date.today.year-5)..Date.today.year+1).map { |y| y }.reverse
+    ((Date.today.year - 5)..Date.today.year + 1).map { |y| y }.reverse
   end
 
   def self.current
@@ -40,14 +43,13 @@ class YearSemester
     end
     year_semester = YearSemester.new
     year_semester.year = current_year
-    year_semester.semester= current_semester
+    year_semester.semester = current_semester
     year_semester
   end
 
-  def initialize(options={})
+  def initialize(options = {})
     self.year ||= options[:year]
     self.semester ||= options[:semester]
-    
   end
 
   def semester_end
@@ -101,15 +103,15 @@ class YearSemester
 
   def -(number_of_semesters)
     if number_of_semesters < 0
-      self.+(number_of_semesters*-1)
+      self.+(number_of_semesters * -1)
     else
       result_year = self.year
       result_semester = self.semester
-      if (number_of_semesters % 2 == 1)
+      if number_of_semesters % 2 == 1
         result_year -= 1 if self.first_semester?
         result_semester = self.opposite_semester
       end
-      result_year -= (number_of_semesters/2)
+      result_year -= (number_of_semesters / 2)
       year_semester = YearSemester.new
       year_semester.semester = result_semester
       year_semester.year = result_year
@@ -119,15 +121,15 @@ class YearSemester
 
   def +(number_of_semesters)
     if number_of_semesters < 0
-      self.-(number_of_semesters*-1)
+      self.-(number_of_semesters * -1)
     else
       result_year = self.year
       result_semester = self.semester
-      if (number_of_semesters % 2 == 1)
+      if number_of_semesters % 2 == 1
         result_year += 1 if self.second_semester?
         result_semester = self.opposite_semester
       end
-      result_year += (number_of_semesters/2)
+      result_year += (number_of_semesters / 2)
       year_semester = YearSemester.new
       year_semester.semester = result_semester
       year_semester.year = result_year
@@ -148,5 +150,4 @@ class YearSemester
     self.semester = result.semester
     self
   end
-
 end

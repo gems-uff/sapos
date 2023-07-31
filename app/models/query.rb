@@ -1,16 +1,17 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
+# Represents a Query
 class Query < ApplicationRecord
-
   has_many :notifications, inverse_of: :query
-  has_many :params, class_name: 'QueryParam', dependent: :destroy, validate: false, :before_add => :get_query_param_ids, :before_remove => :get_query_param_ids
-
+  has_many :params, class_name: "QueryParam", dependent: :destroy, validate: false, before_add: :get_query_param_ids, before_remove: :get_query_param_ids
 
   accepts_nested_attributes_for :params, reject_if: :all_blank, allow_destroy: true
 
-  validates :name, :presence => true
-  validates :sql, :presence => true
+  validates :name, presence: true
+  validates :sql, presence: true
   validate :ensure_valid_params
   validates_associated :params
 
@@ -36,7 +37,7 @@ class Query < ApplicationRecord
       param.simulation_value = simulation_params[param_name]
       param.validate_value(param.simulation_value)
 
-      current_params[param_name] = (param.errors.empty? ? param.parsed_value : '')
+      current_params[param_name] = (param.errors.empty? ? param.parsed_value : "")
     end
     current_params
   end
@@ -51,49 +52,48 @@ class Query < ApplicationRecord
 
       db_resource = ApplicationRecord.connection.exec_query(query)
 
-      {columns: db_resource.columns, rows: db_resource.rows}
-    elsif ApplicationRecord.connection.adapter_name == 'Mysql2'
+      { columns: db_resource.columns, rows: db_resource.rows }
+    elsif ApplicationRecord.connection.adapter_name == "Mysql2"
       conf = ApplicationRecord.configurations
-      client = Mysql2::Client.new(conf["#{Rails.env}_read_only"] ? conf["#{Rails.env}_read_only"] : conf[Rails.env])
+      client = Mysql2::Client.new(conf["#{Rails.env}_read_only"] || conf[Rails.env])
       results = client.query(query)
       client.close
 
-      {columns: results.fields, rows: results.entries.collect(&:values)}
+      { columns: results.fields, rows: results.entries.collect(&:values) }
     end
   end
 
   def execute(override_params = {})
-    #Generate query using the parameters specified by the simulation
+    # Generate query using the parameters specified by the simulation
     current_params = map_params(override_params)
 
     valid_params = self.params.find { |p| p.errors.size.nonzero? }.nil?
 
-    if not valid_params
-      {:columns => [], :rows => [], :query => '', :errors => self.params}
+    if !valid_params
+      { columns: [], rows: [], query: "", errors: self.params }
     else
 
       generated_query = ::Query.parse_sql_and_params(sql, current_params)
 
-      #Query the Database safely
+      # Query the Database safely
       db_resource = run_read_only_query(generated_query)
 
-      #Build the notifications with the results from the query
-      db_resource.merge(:query => generated_query, :errors => self.errors)
+      # Build the notifications with the results from the query
+      db_resource.merge(query: generated_query, errors: self.errors)
     end
   end
 
 
   def ensure_valid_params
-    return if (sql.nil? || sql.strip.empty?)	  
+    return if sql.nil? || sql.strip.empty?
     begin
       self.execute
     rescue ActiveRecord::PreparedStatementInvalid => e
       variable_name = e.message.match(/missing value for :([a-zA-Z0-9_]+)/)[1]
 
-      self.errors.add(:sql, I18n.translate("activerecord.errors.models.query.sql_has_an_undefined_parameter", :parametro => variable_name))
+      self.errors.add(:sql, :sql_has_an_undefined_parameter, parametro: variable_name)
     rescue Exception => e
-      self.errors.add(:sql, I18n.translate("activerecord.errors.models.query.sql_execution_generated_an_error", :erro => e.message))
+      self.errors.add(:sql, :sql_execution_generated_an_error, erro: e.message)
     end
   end
-
 end

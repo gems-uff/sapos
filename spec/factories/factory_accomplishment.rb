@@ -3,6 +3,8 @@
 
 # Read about factories at https://github.com/thoughtbot/factory_bot
 
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :accomplishment do
     phase
@@ -13,11 +15,10 @@ FactoryBot.define do
       end
       if obj.phase.levels.empty?
         level = FactoryBot.create(:level)
-        phase_duration = FactoryBot.create(:phase_duration, :level => level, :phase => obj.phase)
+        FactoryBot.create(:phase_duration, level: level, phase: obj.phase)
       else
         level = obj.phase.levels.first
       end
-      
       obj.enrollment.level = level
     end
   end

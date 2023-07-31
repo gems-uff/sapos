@@ -1,9 +1,11 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "spec_helper"
 
-describe YearSemester do
+RSpec.describe YearSemester do
   let(:year_semester) { YearSemester.new }
   let(:current_year) { Date.today.year }
   subject { year_semester }

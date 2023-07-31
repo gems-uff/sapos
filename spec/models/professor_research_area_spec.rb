@@ -1,56 +1,24 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "spec_helper"
 
-describe ProfessorResearchArea do
-  let(:professor_research_area) { ProfessorResearchArea.new }
+RSpec.describe ProfessorResearchArea, type: :model do
+  let(:professor) { FactoryBot.build(:professor) }
+  let(:research_area) { FactoryBot.build(:research_area) }
+  let(:professor_research_area) do
+    ProfessorResearchArea.new(
+      professor: professor,
+      research_area: research_area
+    )
+  end
   subject { professor_research_area }
   describe "Validations" do
-    describe "professor" do
-      context "should be valid when" do
-        it "professor is not null" do
-          professor_research_area.professor = Professor.new
-          expect(professor_research_area).to have(0).errors_on :professor
-        end
-      end
-      context "should have error blank when" do
-        it "professor is null" do
-          professor_research_area.professor = nil
-          expect(professor_research_area).to have_error(:blank).on :professor
-        end
-      end
-    end
-    describe "research_area" do
-      context "should be valid when" do
-        it "research_area is not null" do
-          professor_research_area.research_area = ResearchArea.new
-          expect(professor_research_area).to have(0).errors_on :research_area
-        end
-      end
-      context "should have error blank when" do
-        it "professor is null" do
-          professor_research_area.research_area = nil
-          expect(professor_research_area).to have_error(:blank).on :research_area
-        end
-      end
-    end
-
-    describe "professor_id" do
-      context "should be valid when" do
-        it "don't exists the professor for the same research_area" do
-          professor_research_area.professor = Professor.new
-          expect(professor_research_area).to have(0).errors_on :professor_id
-        end
-      end
-      context "should have uniqueness error when" do
-        it "already exists the same professor for the same research_area" do
-          professor_research_area.professor = FactoryBot.create(:professor)
-          professor_research_area.research_area = FactoryBot.create(:research_area)
-          FactoryBot.create(:professor_research_area, :professor => professor_research_area.professor, :research_area => professor_research_area.research_area)
-          expect(professor_research_area).to have_error(:unique_pair).on :professor_id
-        end
-      end
-    end
+    it { should be_valid }
+    it { should belong_to(:professor).required(true) }
+    it { should belong_to(:research_area).required(true) }
+    it { should validate_uniqueness_of(:professor).scoped_to(:research_area_id).with_message(:unique_pair) }
   end
 end

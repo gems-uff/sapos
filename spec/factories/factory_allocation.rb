@@ -3,6 +3,8 @@
 
 # Read about factories at https://github.com/thoughtbot/factory_bot
 
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :allocation do
     day { I18n.translate("date.day_names").first }

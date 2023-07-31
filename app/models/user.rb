@@ -1,24 +1,27 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
+# Represents an User
 class User < ApplicationRecord
+  has_paper_trail
+
+  belongs_to :role, optional: false
 
   has_one :professor
   has_one :student, dependent: :nullify
-  has_many :enrollment_request_comments, :dependent => :destroy
-  belongs_to :role
-
-  has_paper_trail
+  has_many :enrollment_request_comments, dependent: :destroy
 
   devise :invitable, :database_authenticatable, :recoverable, :rememberable, :registerable, :trackable, :confirmable,
          :lockable
 
   after_create :skip_confirmation!, unless: Proc.new { self.invitation_token.nil? }
 
-  validates :email, :presence => true, :uniqueness => true
-  validates :name, :presence => true
+  validates :role, presence: true
+  validates :email, presence: true, uniqueness: { case_sensitive: false }
+  validates :name, presence: true
   validate :role_valid?
-  validates :role, :presence => true
   validate :role_is_professor_if_the_professor_field_is_filled
   validate :role_is_student_if_the_student_field_is_filled
   validate :selected_professor_is_already_linked_to_another_user
@@ -55,13 +58,13 @@ class User < ApplicationRecord
   end
 
   def role_valid?
-    return if current_user.nil?
-    return if role.nil?
+    return if current_user.blank?
+    return if role.blank?
     if Role::ORDER.index(current_user.role.id) < Role::ORDER.index(self.role_id_was)
-      errors.add(:role, I18n.translate("activerecord.errors.models.user.invalid_role_was")) 
+      errors.add(:role, :invalid_role_was)
     end
     if Role::ORDER.index(current_user.role.id) < Role::ORDER.index(role.id)
-      errors.add(:role, I18n.translate("activerecord.errors.models.user.invalid_role")) 
+      errors.add(:role, :invalid_role)
     end
   end
 
@@ -74,12 +77,12 @@ class User < ApplicationRecord
     super
   end
 
-  #Application need a user to log in
+  # Application need a user to log in
   def validate_destroy
-    errors.add(:base, I18n.t("activerecord.errors.models.user.delete")) if User.count == 1
-    unless current_user.nil?
-      errors.add(:base, I18n.t("activerecord.errors.models.user.invalid_role_full")) if Role::ORDER.index(current_user.role.id) < Role::ORDER.index(self.role.id) 
-      errors.add(:base, I18n.t("activerecord.errors.models.user.self_delete")) if current_user.id == self.id
+    errors.add(:base, :delete) if User.count == 1
+    unless current_user.blank?
+      errors.add(:base, :invalid_role_full) if Role::ORDER.index(current_user.role.id) < Role::ORDER.index(self.role.id)
+      errors.add(:base, :self_delete) if current_user.id == self.id
     end
     errors.blank?
   end
@@ -92,33 +95,32 @@ class User < ApplicationRecord
 
   def role_is_student_if_the_student_field_is_filled
     if student && (role.id != Role::ROLE_ALUNO)
-      errors.add(:student, I18n.t("activerecord.errors.models.user.selected_role_was_not_student"))
+      errors.add(:student, :selected_role_was_not_student)
     end
   end
 
 
   def selected_professor_is_already_linked_to_another_user
-    if professor && (professor.errors.messages[:user].include? I18n.t('activerecord.errors.models.professor.attributes.user.changed_to_different_user'))
-      errors.add(:professor, I18n.t("activerecord.errors.models.user.selected_professor_is_already_linked_to_another_user", :nome_usuario => User.find(professor.user_id_was).name))
+    if professor && (professor.errors.messages[:user].include? I18n.t("activerecord.errors.models.professor.attributes.user.changed_to_different_user"))
+      errors.add(:professor, :selected_professor_is_already_linked_to_another_user, nome_usuario: User.find(professor.user_id_was).name)
     end
   end
 
   def selected_student_is_already_linked_to_another_user
-    if student && (student.errors.messages[:user].include? I18n.t('activerecord.errors.models.student.attributes.user.changed_to_different_user'))
-      errors.add(:student, I18n.t("activerecord.errors.models.user.selected_student_is_already_linked_to_another_user", :nome_usuario => User.find(student.user_id_was).name))
+    if student && (student.errors.messages[:user].include? I18n.t("activerecord.errors.models.student.attributes.user.changed_to_different_user"))
+      errors.add(:student, :selected_student_is_already_linked_to_another_user, nome_usuario: User.find(student.user_id_was).name)
     end
   end
 
-  def self.find_for_database_authentication(conditions={})
-    user = self.find_by(email: conditions[:email])  
-    return user unless user.nil?
-    
+  def self.find_for_database_authentication(conditions = {})
+    user = self.find_by(email: conditions[:email])
+    return user unless user.blank?
+
     cpf = nil
-    cpf = conditions[:email].gsub(/[\.\-]/, '') if ! conditions[:email].include? '@'
+    cpf = conditions[:email].gsub(/[.-]/, "") if ! conditions[:email].include? "@"
     unless cpf.nil?
-      self.joins(:professor).where("REPLACE(REPLACE(professors.cpf, '-', ''), '.', '') = ?", cpf).first ||  
-      self.joins(:student).where("REPLACE(REPLACE(students.cpf, '-', ''), '.', '') = ?", cpf).first 
+      self.joins(:professor).where("REPLACE(REPLACE(professors.cpf, '-', ''), '.', '') = ?", cpf).first ||
+      self.joins(:student).where("REPLACE(REPLACE(students.cpf, '-', ''), '.', '') = ?", cpf).first
     end
   end
-
 end

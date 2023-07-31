@@ -3,10 +3,12 @@
 
 # Read about factories at https://github.com/thoughtbot/factory_bot
 
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :professor do
     sequence :cpf do |cpf|
-      "#{cpf}"
+      "b#{cpf}"
     end
     sequence :name do |name|
       "Professor_#{name}"

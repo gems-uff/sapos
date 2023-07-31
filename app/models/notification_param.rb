@@ -1,22 +1,32 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class NotificationParam < ApplicationRecord
-  belongs_to :notification, :inverse_of => :params
-  belongs_to :query_param
+# frozen_string_literal: true
 
+# Represents a NotificationParam
+class NotificationParam < ApplicationRecord
+  belongs_to :notification, inverse_of: :params
+  belongs_to :query_param
 
   delegate :name, :value_type, :type, :default_value, to: :query_param
 
-  validate do
-    if self.query_param.query.id != self.notification.query.id
-      self.errors.add :value, :mismatch_query
-    end
+  validate :that_types_of_variables_are_correct
 
+  def parsed_value
+    self.query_param.parsed_value
+  end
 
-    # Copied from QueryParam, extract to module or concern
-    unless value.to_s.empty?
-      case value_type
+  protected
+    def that_types_of_variables_are_correct
+      return if self.query_param.blank?
+      return if self.notification.blank?
+      if self.query_param.query.id != self.notification.query.id
+        self.errors.add :value, :mismatch_query
+      end
+
+      # Copied from QueryParam. ToDo: extract to module or concern
+      unless value.to_s.empty?
+        case value_type
         when QueryParam::VALUE_DATE
           begin
             unless value.is_a?(ActiveSupport::TimeWithZone)
@@ -48,12 +58,7 @@ class NotificationParam < ApplicationRecord
           if value.to_f.to_s != value.to_s
             self.errors.add :default_value, :invalid_float
           end
+        end
       end
     end
-  end
-
-
-  def parsed_value
-    self.query_param.parsed_value
-  end
 end

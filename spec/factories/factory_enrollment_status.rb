@@ -3,6 +3,8 @@
 
 # Read about factories at https://github.com/thoughtbot/factory_bot
 
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :enrollment_status do
     sequence :name do |name|

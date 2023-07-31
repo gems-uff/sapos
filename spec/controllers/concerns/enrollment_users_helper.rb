@@ -1,8 +1,9 @@
-# encoding utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-require 'spec_helper'
+# frozen_string_literal: true
+
+require "spec_helper"
 require Rails.root.join "spec/support/user_helpers.rb"
 
 RSpec.configure do |c|
@@ -11,8 +12,21 @@ end
 
 shared_examples_for "enrollment_user_helper" do
   let(:controller) { described_class } # Controller that includes concert
-  let(:enrollment_status_with_user) { FactoryBot.create(:enrollment_status, :user => true) }
-  let(:enrollment_status_without_user) { FactoryBot.create(:enrollment_status, :user => false) }
+  before(:all) do
+    @enrollment_status_with_user = FactoryBot.create(:enrollment_status, user: true)
+    @enrollment_status_without_user = FactoryBot.create(:enrollment_status, user: false)
+    @role = FactoryBot.create(:role)
+    @destroy_later = []
+  end
+  after(:each) do
+    @destroy_later.each(&:delete)
+    @destroy_later.clear
+  end
+  after(:all) do
+    @enrollment_status_with_user.delete
+    @enrollment_status_without_user.delete
+    @role.delete
+  end
 
   describe "append_first_selection" do
     it "should return a list with the first element that matches the condition" do
@@ -20,7 +34,7 @@ shared_examples_for "enrollment_user_helper" do
 
       expect(controller.new.append_first_selection(input) { |n| n % 3 == 0 }).to eql({
         found: true,
-        result: [3] 
+        result: [3]
       })
     end
 
@@ -31,7 +45,7 @@ shared_examples_for "enrollment_user_helper" do
 
       expect(controller.new.append_first_selection(input, previous) { |n| n % 3 == 0 }).to eql({
         found: true,
-        result: [2, 3] 
+        result: [2, 3]
       })
     end
 
@@ -40,17 +54,20 @@ shared_examples_for "enrollment_user_helper" do
 
       expect(controller.new.append_first_selection(input) { |n| n == 10 }).to eql({
         found: false,
-        result: [] 
+        result: []
       })
     end
   end
 
   describe "enrollments_to_students_map" do
     it "should return a map with an entry for every student" do
-      emails = ['abc@def.com', 'def@ghi.com', 'ghi@jkl.com']
+      emails = ["abc@def.com", "def@ghi.com", "ghi@jkl.com"]
       delete_users_by_emails emails
-      students = emails.map { |email| FactoryBot.create(:student, :email => email) }
-      enrollments = students.map { |student| FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user) }
+      students = emails.map do |email|
+        @destroy_later << student = FactoryBot.create(:student, email: email)
+        student
+      end
+      enrollments = students.map { |student| FactoryBot.build(:enrollment, student: student, enrollment_status: @enrollment_status_with_user) }
       expect(controller.new.enrollments_to_students_map(enrollments)).to eql({
         students[0] => [enrollments[0]],
         students[1] => [enrollments[1]],
@@ -59,11 +76,14 @@ shared_examples_for "enrollment_user_helper" do
     end
 
     it "should group enrollments by student" do
-      emails = ['abc@def.com', 'def@ghi.com', 'ghi@jkl.com']
+      emails = ["abc@def.com", "def@ghi.com", "ghi@jkl.com"]
       delete_users_by_emails emails
-      students = emails.map { |email| FactoryBot.create(:student, :email => email) }
-      enrollments = students.map { |student| FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user) }
-      enrollments << FactoryBot.build(:enrollment, :student => students[1], :enrollment_status => enrollment_status_with_user)
+      students = emails.map do |email|
+        @destroy_later << student = FactoryBot.create(:student, email: email)
+        student
+      end
+      enrollments = students.map { |student| FactoryBot.build(:enrollment, student: student, enrollment_status: @enrollment_status_with_user) }
+      enrollments << FactoryBot.build(:enrollment, student: students[1], enrollment_status: @enrollment_status_with_user)
 
       expect(controller.new.enrollments_to_students_map(enrollments)).to eql({
         students[0] => [enrollments[0]],
@@ -75,16 +95,20 @@ shared_examples_for "enrollment_user_helper" do
 
   describe "new_users_count" do
     let(:enrollments) do
-      emails = ['abc@def.com', 'def@ghi.com', 'ghi@jkl.com', 'jkl@mno.com', 'mno@pqr.com']
+      emails = ["abc@def.com", "def@ghi.com", "ghi@jkl.com", "jkl@mno.com", "mno@pqr.com"]
       delete_users_by_emails emails
-      FactoryBot.create(:user, :email => 'abc@def.com', :role => FactoryBot.create(:role))
-      students = emails.map { |email| FactoryBot.create(:student, :email => email) }
-      students << FactoryBot.create(:student, :email => nil)
-      enrollments = students.map { |student| FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user) }
-      enrollments << FactoryBot.build(:enrollment, :student => students[1], :enrollment_status => enrollment_status_with_user)
-      enrollments[2].enrollment_status = enrollment_status_without_user
+      @destroy_later << FactoryBot.create(:user, email: "abc@def.com", role: @role)
+      students = emails.map do |email|
+        @destroy_later << student = FactoryBot.create(:student, email: email)
+        student
+      end
+      students << student = FactoryBot.create(:student, email: nil)
+      @destroy_later << student
+      enrollments = students.map { |student| FactoryBot.build(:enrollment, student: student, enrollment_status: @enrollment_status_with_user) }
+      enrollments << FactoryBot.build(:enrollment, student: students[1], enrollment_status: @enrollment_status_with_user)
+      enrollments[2].enrollment_status = @enrollment_status_without_user
       enrollments[3].dismissal = FactoryBot.build(:dismissal)
-      enrollments << FactoryBot.build(:enrollment, :student => students[4], :enrollment_status => enrollment_status_with_user)
+      enrollments << FactoryBot.build(:enrollment, student: students[4], enrollment_status: @enrollment_status_with_user)
       enrollments[4].dismissal = FactoryBot.build(:dismissal)
       enrollments
     end
@@ -116,16 +140,20 @@ shared_examples_for "enrollment_user_helper" do
 
   describe "create_users" do
     let(:enrollments) do
-      emails = ['abc@def.com', 'def@ghi.com', 'ghi@jkl.com', 'jkl@mno.com', 'mno@pqr.com']
+      emails = ["abc@def.com", "def@ghi.com", "ghi@jkl.com", "jkl@mno.com", "mno@pqr.com"]
       delete_users_by_emails emails
-      FactoryBot.create(:user, :email => 'abc@def.com', :role => FactoryBot.create(:role))
-      students = emails.map { |email| FactoryBot.create(:student, :email => email) }
-      students << FactoryBot.create(:student, :email => nil)
-      enrollments = students.map { |student| FactoryBot.build(:enrollment, :student => student, :enrollment_status => enrollment_status_with_user) }
-      enrollments << FactoryBot.build(:enrollment, :student => students[1], :enrollment_status => enrollment_status_with_user)
-      enrollments[2].enrollment_status = enrollment_status_without_user
+      @destroy_later << FactoryBot.create(:user, email: "abc@def.com", role: @role)
+      students = emails.map do |email|
+        @destroy_later << student = FactoryBot.create(:student, email: email)
+        student
+      end
+      students << student = FactoryBot.create(:student, email: nil)
+      @destroy_later << student
+      enrollments = students.map { |student| FactoryBot.build(:enrollment, student: student, enrollment_status: @enrollment_status_with_user) }
+      enrollments << FactoryBot.build(:enrollment, student: students[1], enrollment_status: @enrollment_status_with_user)
+      enrollments[2].enrollment_status = @enrollment_status_without_user
       enrollments[3].dismissal = FactoryBot.build(:dismissal)
-      enrollments << FactoryBot.build(:enrollment, :student => students[4], :enrollment_status => enrollment_status_with_user)
+      enrollments << FactoryBot.build(:enrollment, student: students[4], enrollment_status: @enrollment_status_with_user)
       enrollments[4].dismissal = FactoryBot.build(:dismissal)
       enrollments
     end
@@ -139,5 +167,4 @@ shared_examples_for "enrollment_user_helper" do
       expect(controller.new.create_enrollments_users(enrollments, "all")).to eql(3)
     end
   end
-
 end

@@ -1,3 +1,6 @@
+
+# frozen_string_literal: true
+
 module UserHelpers
   def delete_users_by_emails(emails)
     emails.each do |email|

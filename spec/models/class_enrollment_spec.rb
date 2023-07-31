@@ -1,71 +1,44 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "spec_helper"
 
-describe ClassEnrollment do
-  let(:class_enrollment) { FactoryBot.build(:class_enrollment) }
+RSpec.describe ClassEnrollment, type: :model do
+  it { should be_able_to_be_destroyed }
+  it { should have_one(:class_enrollment_request).dependent(:nullify) }
+
+  before(:all) do
+    @destroy_later = []
+  end
+  after(:each) do
+    @destroy_later.each(&:delete)
+    @destroy_later.clear
+  end
+  let(:course_class) { FactoryBot.build(:course_class) }
+  let(:enrollment) { FactoryBot.build(:enrollment) }
+
+  let(:class_enrollment) do
+    ClassEnrollment.new(
+      enrollment: enrollment,
+      course_class: course_class,
+      situation: I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
+    )
+  end
   subject { class_enrollment }
   describe "Validations" do
-    describe "enrollment" do
-      context "should be valid when" do
-        it "enrollment is not null" do
-          class_enrollment.enrollment = Enrollment.new
-          expect(class_enrollment).to have(0).errors_on :enrollment 
-        end
-      end
-      context "should have error blank when" do
-        it "enrollment is null" do
-          class_enrollment.enrollment = nil
-          expect(class_enrollment).to have_error(:blank).on :enrollment
-        end
-      end
-    end
-    describe "course_class" do
-      context "should be valid when" do
-        it "course_class is not null and is unique for the enrollment" do
-          class_enrollment.course_class = CourseClass.new
-          expect(class_enrollment).to have(0).errors_on :course_class
-        end
-      end
-      context "should have error blank when" do
-        it "course_class is null" do
-          class_enrollment.course_class = nil
-          expect(class_enrollment).to have_error(:blank).on :course_class
-        end
-      end
-      context "should have error taken when" do
-        it "course_class is already assigned for the same enrollment" do
-          course_class = FactoryBot.create(:course_class)
-          enrollment = FactoryBot.create(:enrollment)
-          FactoryBot.create(:class_enrollment, :enrollment => enrollment, :course_class => course_class)
+    it { should be_valid }
+    it { should belong_to(:course_class).required(true) }
+    it { should belong_to(:enrollment).required(true) }
+    it { should validate_uniqueness_of(:course_class).scoped_to(:enrollment_id) }
+    it { should validate_inclusion_of(:situation).in_array([
+      I18n.translate("activerecord.attributes.class_enrollment.situations.registered"),
+      I18n.translate("activerecord.attributes.class_enrollment.situations.aproved"),
+      I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
+    ]) }
+    it { should validate_presence_of(:situation) }
 
-          class_enrollment.course_class = course_class
-          class_enrollment.enrollment = enrollment
-          expect(class_enrollment).to have_error(:taken).on :course_class_id
-        end
-      end
-    end
-    describe "situation" do
-      context "should be valid when" do
-        it "situation is in the list" do
-          class_enrollment.situation = ClassEnrollment::SITUATIONS.first
-          expect(class_enrollment).to have(0).errors_on :situation
-        end
-      end
-      context "should have error blank when" do
-        it "situation is null" do
-          class_enrollment.situation = nil
-          expect(class_enrollment).to have_error(:blank).on :situation
-        end
-      end
-      context "should have error inclusion when" do
-        it "situation is not in the list" do
-          class_enrollment.situation = "ANYTHING NOT IN THE LIST"
-          expect(class_enrollment).to have_error(:inclusion).on :situation
-        end
-      end
-    end
     describe "grade for situation" do
       context "should be valid when" do
         it "situation is registered and grade is nil" do
@@ -107,7 +80,7 @@ describe ClassEnrollment do
           class_enrollment.grade = nil
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
           expect(class_enrollment).to have_error(:grade_for_situation_aproved).with_parameters(
-            minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr('.', ',')
+            minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr(".", ",")
           ).on :grade
         end
         it "situation is aproved and grade is less than 60" do
@@ -115,7 +88,7 @@ describe ClassEnrollment do
           class_enrollment.grade = 59
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
           expect(class_enrollment).to have_error(:grade_for_situation_aproved).with_parameters(
-            minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr('.', ',')
+            minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr(".", ",")
           ).on :grade
         end
       end
@@ -125,7 +98,7 @@ describe ClassEnrollment do
           class_enrollment.grade = nil
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
           expect(class_enrollment).to have_error(:grade_for_situation_disapproved).with_parameters(
-            minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr('.', ',')
+            minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr(".", ",")
           ).on :grade
         end
         it "situation is disapproved and grade is greater than 59" do
@@ -133,7 +106,7 @@ describe ClassEnrollment do
           class_enrollment.grade = 60
           allow(class_enrollment).to receive(:course_has_grade).and_return(true)
           expect(class_enrollment).to have_error(:grade_for_situation_disapproved).with_parameters(
-            minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr('.', ',')
+            minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr(".", ",")
           ).on :grade
         end
       end
@@ -232,10 +205,10 @@ describe ClassEnrollment do
     end
 
     describe "set_request_status_after_destroy" do
-      it "should set the class enrollment request status to invalid after destroy" do
-        course_class = FactoryBot.create(:course_class)
-        enrollment = FactoryBot.create(:enrollment)
-        class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
+      it "should set the class enrollment request status to valid after destroy" do
+        @destroy_later << course_class = FactoryBot.create(:course_class)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment)
+        @destroy_later << class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
         enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)
         cer = enrollment_request.class_enrollment_requests.build(
           course_class: course_class,
@@ -252,9 +225,9 @@ describe ClassEnrollment do
 
     describe "class_enrollment_request_cascade" do
       it "should update course class of class enrollment request when course class of class enrollment changes" do
-        course_class = FactoryBot.create(:course_class)
-        enrollment = FactoryBot.create(:enrollment)
-        class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
+        @destroy_later << course_class = FactoryBot.create(:course_class)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment)
+        @destroy_later << class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
         enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)
         cer = enrollment_request.class_enrollment_requests.build(
           course_class: course_class,
@@ -262,7 +235,7 @@ describe ClassEnrollment do
           class_enrollment: class_enrollment
         )
         enrollment_request.save
-        course_class2 = FactoryBot.create(:course_class)
+        @destroy_later << course_class2 = FactoryBot.create(:course_class)
 
         class_enrollment.course_class = course_class2
         class_enrollment.save
@@ -271,9 +244,9 @@ describe ClassEnrollment do
       end
 
       it "should disassociate class enrollment from request when enrollment changes" do
-        course_class = FactoryBot.create(:course_class)
-        enrollment = FactoryBot.create(:enrollment)
-        class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
+        @destroy_later << course_class = FactoryBot.create(:course_class)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment)
+        @destroy_later << class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
         enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)
         cer = enrollment_request.class_enrollment_requests.build(
           course_class: course_class,
@@ -281,7 +254,7 @@ describe ClassEnrollment do
           class_enrollment: class_enrollment
         )
         enrollment_request.save
-        enrollment = FactoryBot.create(:enrollment)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment)
 
         class_enrollment.enrollment = enrollment
         class_enrollment.save
@@ -292,4 +265,3 @@ describe ClassEnrollment do
     end
   end
 end
-

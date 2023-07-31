@@ -3,6 +3,8 @@
 
 # Read about factories at https://github.com/thoughtbot/factory_bot
 
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :course do
     course_type
@@ -10,7 +12,7 @@ FactoryBot.define do
       "Course_#{name}"
     end
     sequence :code do |code|
-      "#{code}"
+      "Code_#{code}"
     end
     credits { 10 }
     workload { 68 }

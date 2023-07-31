@@ -1,98 +1,51 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "spec_helper"
 
-describe Course do
+RSpec.describe Course, type: :model do
   it { should be_able_to_be_destroyed }
-  it { should restrict_destroy_when_exists :course_class }
+  it { should have_many(:course_research_areas).dependent(:destroy) }
+  it { should have_many(:course_classes).dependent(:restrict_with_exception) }
+  it { should have_many(:research_areas).through(:course_research_areas) }
 
-  let(:course) { Course.new }
+  before(:all) do
+    @destroy_later = []
+  end
+  after(:each) do
+    @destroy_later.each(&:delete)
+    @destroy_later.clear
+  end
+
+  let(:course_type) { FactoryBot.build(:course_type) }
+  let(:course) do
+    Course.new(
+      course_type: course_type,
+      name: "Disciplina",
+      code: "Abc",
+      credits: 10,
+      workload: 68
+    )
+  end
   subject { course }
   describe "Validations" do
+    it { should be_valid }
+    it { should belong_to(:course_type).required(true) }
+    it { should validate_presence_of(:name) }
+    it { should validate_uniqueness_of(:code) }
+    it { should validate_presence_of(:code) }
+    it { should validate_presence_of(:credits) }
+    it { should validate_presence_of(:workload) }
+
     describe "name" do
-      context "should be valid when" do
-        it "name is not null and is not taken" do
-          course.name = "Course"
-          expect(course).to have(0).errors_on :name
-        end
-      end
-      context "should have error blank when" do
-        it "name is null" do
-          course.name = nil
-          expect(course).to have_error(:blank).on :name
-        end
-      end
       context "should have error taken when" do
-	it "name of available course is already in use" do
+        it "name of available course is already in use" do
           name = "Course"
-	  FactoryBot.create(:course, :name => name, :available => true)
-	  course.name = name
-	  expect(course).to have_error(:check_unique_name_for_available_courses).on :name
-	end
-      end
-    end
-    describe "course_type" do
-      context "should be valid when" do
-        it "course_type is not null" do
-          course.course_type = CourseType.new
-          expect(course).to have(0).errors_on :course_type
-        end
-      end
-      context "should have error blank when" do
-        it "course_type is null" do
-          course.course_type = nil
-          expect(course).to have_error(:blank).on :course_type
-        end
-      end
-    end
-    describe "code" do
-      context "should be valid when" do
-        it "code is not null and is not taken" do
-          course.code = "Code"
-          expect(course).to have(0).errors_on :code
-        end
-      end
-      context "should have error blank when" do
-        it "code is null" do
-          course.code = nil
-          expect(course).to have_error(:blank).on :code
-        end
-      end
-      context "should have error taken when" do
-        it "code is already in use" do
-          code = "Code"
-          FactoryBot.create(:course, :code => code)
-          course.code = code
-          expect(course).to have_error(:taken).on :code
-        end
-      end
-    end
-    describe "credits" do
-      context "should be valid when" do
-        it "credits is not null" do
-          course.credits = 10
-          expect(course).to have(0).errors_on :credits
-        end
-      end
-      context "should have error blank when" do
-        it "credits is null" do
-          course.credits = nil
-          expect(course).to have_error(:blank).on :credits
-        end
-      end
-    end
-    describe "workload" do
-      context "should be valid when" do
-        it "workload is not null" do
-          course.workload = 10
-          expect(course).to have(0).errors_on :workload
-        end
-      end
-      context "should have error blank when" do
-        it "workload is null" do
-          course.workload = nil
-          expect(course).to have_error(:blank).on :workload
+          @destroy_later << FactoryBot.create(:course, name: name, available: true)
+          course.name = name
+          expect(course).to have_error(:check_unique_name_for_available_courses).on :name
         end
       end
     end
@@ -113,14 +66,13 @@ describe Course do
     context "workload_text" do
       it "should return N/A when there is no workload" do
         course.workload = nil
-        expect(course.workload_text).to eq(I18n.translate('activerecord.attributes.course.empty_workload'))
+        expect(course.workload_text).to eq(I18n.translate("activerecord.attributes.course.empty_workload"))
       end
 
       it "should return 5h when workload is 5" do
         course.workload = 5
-        expect(course.workload_text).to eq(I18n.translate('activerecord.attributes.course.workload_time', :time => 5))
+        expect(course.workload_text).to eq(I18n.translate("activerecord.attributes.course.workload_time", time: 5))
       end
     end
-
   end
 end

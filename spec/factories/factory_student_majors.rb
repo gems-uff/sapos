@@ -3,9 +3,11 @@
 
 # Read about factories at https://github.com/thoughtbot/factory_bot
 
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :student_major do
-  	student
-  	major
+    student
+    major
   end
 end

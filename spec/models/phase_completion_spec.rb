@@ -1,63 +1,26 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-require 'spec_helper'
+# frozen_string_literal: true
 
-describe PhaseCompletion do
-  let(:phase_completion) { PhaseCompletion.new }
-  subject { deferral }
+require "spec_helper"
+
+RSpec.describe PhaseCompletion, type: :model do
+  let(:phase) { FactoryBot.build(:phase) }
+  let(:level) { FactoryBot.build(:level) }
+  let(:enrollment) { FactoryBot.build(:enrollment, level: level) }
+
+  let(:phase_completion) do
+    PhaseCompletion.new(
+      phase: phase,
+      enrollment: enrollment
+    )
+  end
+  subject { phase_completion }
   describe "Validations" do
-    describe "enrollment" do
-      context "should be valid when" do
-        it "enrollment_id is not null" do
-          phase_completion.enrollment = FactoryBot.build(:enrollment)
-          expect(phase_completion).to have(0).errors_on :enrollment
-        end
-      end
-      context "should have error blank when" do
-        it "enrollment_id is null" do
-          phase_completion.enrollment = nil
-          expect(phase_completion).to have_error(:blank).on :enrollment
-        end
-      end
-    end
-    describe "phase_id" do
-      context "should be valid when" do
-        it "phase_id is not null" do
-          PhaseCompletion.destroy_all
-          phase_completion.phase = FactoryBot.build(:phase)
-          expect(phase_completion).to have(0).errors_on :phase
-        end
-      end
-      context "should have error blank when" do
-        it "phase_id is null" do
-          phase_completion.phase = nil
-          expect(phase_completion).to have_error(:blank).on :phase
-        end
-      end
-    end
-
-    describe "unique (phase_id, enrollment_id)" do
-      context "should be valid when" do
-        it "(phase_id, enrollment_id) is unique" do
-          PhaseCompletion.destroy_all
-          phase_completion.phase = FactoryBot.build(:phase)
-          phase_completion.enrollment = FactoryBot.build(:enrollment)
-          expect(phase_completion).to have(0).errors_on :phase
-        end
-      end
-      context "should have error taken when" do
-        it "(phase_id, enrollment_id) is not unique" do
-          PhaseCompletion.destroy_all
-          phase = FactoryBot.create(:phase)
-          enrollment = FactoryBot.create(:enrollment)
-          FactoryBot.create(:phase_completion, :phase => phase, :enrollment => enrollment)
-          
-          phase_completion.phase = phase
-          phase_completion.enrollment = enrollment
-          expect(phase_completion).to have_error(:taken).on :phase
-        end
-      end
-    end
+    it { should be_valid }
+    it { should belong_to(:phase).required(true) }
+    it { should belong_to(:enrollment).required(true) }
+    it { should validate_uniqueness_of(:phase).scoped_to(:enrollment_id) }
   end
 end

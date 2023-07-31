@@ -1,130 +1,47 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-require 'spec_helper'
+require "spec_helper"
 
-describe Notification do
-  let(:notification) do 
-    query = FactoryBot.create(:query)
-    notification = FactoryBot.create(:notification, :query => query)
+RSpec.describe Notification, type: :model do
+  it { should be_able_to_be_destroyed }
+  it { should have_many(:notification_logs) }
+  it { should have_many(:notification_params).dependent(:destroy).class_name("NotificationParam") }
+  it { should have_many(:params).dependent(:destroy).class_name("NotificationParam").conditions(active: true) }
+
+  before(:all) do
+    @destroy_later = []
+    @query = FactoryBot.create(:query)
+  end
+  after(:all) do
+    @query.delete
+  end
+  after(:each) do
+    @destroy_later.each(&:delete)
+    @destroy_later.clear
+  end
+  let(:notification) do
+    @destroy_later << notification = FactoryBot.create(:notification, query: @query)
     notification
   end
   subject { notification }
   describe "Validations" do
-    describe "body_template" do
-      context "should be valid when" do
-        it "body_template is not null" do
-          notification.body_template = "MSG"
-          expect(notification).to have(0).errors_on :body_template
-        end
-      end
-      context "should have error blank when" do
-        it "body_template is null" do
-          notification.body_template = nil
-          expect(notification).to have_error(:blank).on :body_template
-        end
-      end
-    end
-
-    describe "frequency" do
-      context "should be valid when" do
-        it "frequency is not null" do
-          notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.annual")
-          expect(notification).to have(0).errors_on :frequency
-        end
-      end
-      context "should have error blank when" do
-        it "frequency is null" do
-          notification.frequency = nil
-          expect(notification).to have_error(:blank).on :frequency
-        end
-      end
-      context "should have error inclusion when" do
-        it "frequency is not in the list" do
-          notification.frequency = "bla"
-          expect(notification).to have_error(:inclusion).on :frequency
-        end
-      end
-    end
+    it { should be_valid }
+    it { should belong_to(:query).inverse_of(:notifications).required(true) }
+    it { should validate_presence_of(:body_template).on(:update) }
+    it { should validate_inclusion_of(:frequency).in_array(Notification::FREQUENCIES).on(:update) }
+    it { should validate_presence_of(:frequency).on(:update) }
+    it { should validate_presence_of(:notification_offset).on(:update) }
+    it { should validate_presence_of(:query_offset).on(:update) }
+    it { should validate_presence_of(:subject_template).on(:update) }
+    it { should validate_presence_of(:to_template).on(:update) }
 
     describe "notification_offset" do
-      context "should be valid when" do
-        it "notification_offset is not null" do
-          notification.notification_offset = "5"
-          expect(notification).to have(0).errors_on :notification_offset
-        end
-      end
-      context "should have error blank when" do
-        it "notification_offset is null" do
-          notification.notification_offset = nil
-          expect(notification).to have_error(:blank).on :notification_offset
-        end
-      end
       context "should have error when" do
         it "frequency is 'manual' and notification_offset is different of '0'" do
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.manual")
           notification.notification_offset = "1"
           expect(notification).to have_error(:manual_frequency_requires_notification_offset_to_be_zero).on :notification_offset
-        end
-      end
-    end
-
-    describe "query_offset" do
-      context "should be valid when" do
-        it "query_offset is not null" do
-          notification.query_offset = "5"
-          expect(notification).to have(0).errors_on :query_offset
-        end
-      end
-      context "should have error blank when" do
-        it "query_offset is null" do
-          notification.query_offset = nil
-          expect(notification).to have_error(:blank).on :query_offset
-        end
-      end
-    end
-
-    describe "query" do
-      context "should be valid when" do
-        it "query is not null" do
-          notification.sql_query = "SELECT * FROM USERS"
-          expect(notification).to have(0).errors_on :query
-        end
-      end
-      context "should have error blank when" do
-        it "query is null" do
-          notification.query = nil
-          expect(notification).to have_error(:blank).on :query
-        end
-      end
-    end
-
-    describe "subject_template" do
-      context "should be valid when" do
-        it "subject_template is not null" do
-          notification.subject_template = "SELECT * FROM USERS"
-          expect(notification).to have(0).errors_on :subject_template
-        end
-      end
-      context "should have error blank when" do
-        it "subject_template is null" do
-          notification.subject_template = nil
-          expect(notification).to have_error(:blank).on :subject_template
-        end
-      end
-    end
-
-    describe "to_template" do
-      context "should be valid when" do
-        it "to_template is not null" do
-          notification.to_template = "SELECT * FROM USERS"
-          expect(notification).to have(0).errors_on :to_template
-        end
-      end
-      context "should have error blank when" do
-        it "to_template is null" do
-          notification.to_template = nil
-          expect(notification).to have_error(:blank).on :to_template
         end
       end
     end
@@ -138,7 +55,7 @@ describe Notification do
           expect(notification).to have(0).errors_on :has_grades_report_pdf_attachment
         end
       end
-      
+
       context "should have error when" do
         it "email individual is not individual" do
           notification.has_grades_report_pdf_attachment = true
@@ -146,14 +63,13 @@ describe Notification do
           notification.individual = false
           expect(notification).to have_error(:individual_required).on :has_grades_report_pdf_attachment
         end
-        
+
         it "query has not enrollments_id column alias" do
           notification.has_grades_report_pdf_attachment = true
           notification.sql_query = "SELECT ENROLLMENTS.ID FROM ENROLLMENTS"
           notification.individual = true
           expect(notification).to have_error(:query_with_enrollments_id_alias_column_required).on :has_grades_report_pdf_attachment
         end
-        
         it "email is not individual and query has not enrollments_id column alias" do
           notification.has_grades_report_pdf_attachment = true
           notification.sql_query = "SELECT ENROLLMENTS.ID FROM ENROLLMENTS"
@@ -162,7 +78,6 @@ describe Notification do
         end
       end
     end
-
   end
 
   describe "Methods" do
@@ -171,7 +86,7 @@ describe Notification do
         it "should be 01/04 if today is 01/03" do
           notification = FactoryBot.create(:notification)
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.daily")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("01/03"))).to eq(Time.parse("01/04"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("01/03"))).to eq(Time.parse("01/04"))
         end
       end
 
@@ -179,25 +94,25 @@ describe Notification do
         it "should be 2014/01/20(monday) if today is 2014/01/14(tuesday)" do
           notification = FactoryBot.create(:notification)
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.weekly")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("2014/01/14"))).to eq(Time.parse("2014/01/20"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("2014/01/14"))).to eq(Time.parse("2014/01/20"))
         end
 
         it "should be 2014/01/16(thursday) if today is 2014/01/14(tuesday) and offset is 3" do
-          notification = FactoryBot.create(:notification, :notification_offset => "3")
+          notification = FactoryBot.create(:notification, notification_offset: "3")
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.weekly")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("2014/01/14"))).to eq(Time.parse("2014/01/16"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("2014/01/14"))).to eq(Time.parse("2014/01/16"))
         end
 
         it "should be 2014/01/18(saturday) if today is 2014/01/14(tuesday) and offset is -2" do
-          notification = FactoryBot.create(:notification, :notification_offset => "-2")
+          notification = FactoryBot.create(:notification, notification_offset: "-2")
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.weekly")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("2014/01/14"))).to eq(Time.parse("2014/01/18"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("2014/01/14"))).to eq(Time.parse("2014/01/18"))
         end
 
-         it "should be 2014/02/01(saturday) if today is 2014/01/25(saturday) and offset is -2" do
-          notification = FactoryBot.create(:notification, :notification_offset => "-2")
+        it "should be 2014/02/01(saturday) if today is 2014/01/25(saturday) and offset is -2" do
+          notification = FactoryBot.create(:notification, notification_offset: "-2")
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.weekly")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("2014/01/25"))).to eq(Time.parse("2014/02/01"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("2014/01/25"))).to eq(Time.parse("2014/02/01"))
         end
       end
 
@@ -205,19 +120,19 @@ describe Notification do
         it "should be 02/01 if today is 01/17" do
           notification = FactoryBot.create(:notification)
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.monthly")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("01/17"))).to eq(Time.parse("02/01"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("01/17"))).to eq(Time.parse("02/01"))
         end
 
         it "should be 02/15 if today is 01/17 and offset is 14" do
-          notification = FactoryBot.create(:notification, :notification_offset => "14")
+          notification = FactoryBot.create(:notification, notification_offset: "14")
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.monthly")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("01/17"))).to eq(Time.parse("02/15"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("01/17"))).to eq(Time.parse("02/15"))
         end
 
         it "should be 02/08 if today is 01/17 and offset is 1w" do
-          notification = FactoryBot.create(:notification, :notification_offset => "1w")
+          notification = FactoryBot.create(:notification, notification_offset: "1w")
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.monthly")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("01/17"))).to eq(Time.parse("02/08"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("01/17"))).to eq(Time.parse("02/08"))
         end
       end
 
@@ -225,44 +140,41 @@ describe Notification do
         it "should be 03/01 of this year if today is 09/01 of last year" do
           notification = FactoryBot.create(:notification)
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("09/01") - 1.year)).to eq(Time.parse("03/01"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("09/01") - 1.year)).to eq(Time.parse("03/01"))
         end
 
         it "should be 03/01 of this year if today is 02/01" do
           notification = FactoryBot.create(:notification)
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("02/01"))).to eq(Time.parse("03/01"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("02/01"))).to eq(Time.parse("03/01"))
         end
 
         it "should be 08/01 if today is 04/01" do
           notification = FactoryBot.create(:notification)
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("04/01"))).to eq(Time.parse("08/01"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("04/01"))).to eq(Time.parse("08/01"))
         end
 
         it "should be 03/01 of next year if today is 09/01" do
           notification = FactoryBot.create(:notification)
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("09/01"))).to eq((Time.parse("03/01") + 1.year))
+          expect(notification.calculate_next_notification_date(time: Time.parse("09/01"))).to eq((Time.parse("03/01") + 1.year))
         end
 
         it "should be 07/01 if today is 02/15 and offset is -31" do
-          notification = FactoryBot.create(:notification, :notification_offset => "-31")
+          notification = FactoryBot.create(:notification, notification_offset: "-31")
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("02/15"))).to eq(Time.parse("07/01"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("02/15"))).to eq(Time.parse("07/01"))
         end
-
       end
 
       describe "for annual frequency" do
         it "should be 2015/01/01 if today is 2014/06/27" do
           notification = FactoryBot.create(:notification)
           notification.frequency = I18n.translate("activerecord.attributes.notification.frequencies.annual")
-          expect(notification.calculate_next_notification_date(:time => Time.parse("2014/06/27"))).to eq(Time.parse("2015/01/01"))
+          expect(notification.calculate_next_notification_date(time: Time.parse("2014/06/27"))).to eq(Time.parse("2015/01/01"))
         end
       end
     end
-
   end
-
 end

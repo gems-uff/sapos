@@ -3,13 +3,15 @@
 
 # Read about factories at https://github.com/thoughtbot/factory_bot
 
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :enrollment do
     student
     level
     enrollment_status
     sequence :enrollment_number do |number|
-      number
+      "M#{number}"
     end
     admission_date { YearSemester.current.semester_begin }
   end

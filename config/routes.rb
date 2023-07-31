@@ -2,11 +2,13 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 Rails.application.routes.draw do
-  # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
+  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   concern :active_scaffold, ActiveScaffold::Routing::Basic.new(association: true)
   concern :active_scaffold_association, ActiveScaffold::Routing::Association.new
 
+  # Defines the root path route ("/")
+  # root "articles#index"
   root :to => "application#root"
 
   resources :enrollment_holds do concerns :active_scaffold end

@@ -1,0 +1,6 @@
+inherit_gem:
+  rubocop-rails_config:
+    - config/rails.yml
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes

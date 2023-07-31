@@ -1,40 +1,25 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "spec_helper"
 
-describe AdvisementAuthorization do
-  let(:advisement_authorization) { AdvisementAuthorization.new }
+RSpec.describe AdvisementAuthorization, type: :model do
+  it { should be_able_to_be_destroyed }
+  let(:professor) { FactoryBot.build(:professor) }
+  let(:level) { FactoryBot.build(:level) }
+  let(:advisement_authorization) do
+    AdvisementAuthorization.new(
+      professor: professor,
+      level: level
+    )
+  end
   subject { advisement_authorization }
   describe "Validations" do
-    describe "professor" do
-      context "should be valid when" do
-        it "professor is not null" do
-          advisement_authorization.professor = Professor.new
-          expect(advisement_authorization).to have(0).errors_on :professor
-        end
-      end
-      context "should have error blank when" do
-        it "professor is null" do
-          advisement_authorization.professor = nil
-          expect(advisement_authorization).to have_error(:blank).on :professor
-        end
-      end
-    end
-    describe "level" do
-      context "should be valid when" do
-        it "level is not null" do
-          advisement_authorization.level = Level.new
-          expect(advisement_authorization).to have(0).errors_on :level
-        end
-      end
-      context "should have error blank when" do
-        it "level is null" do
-          advisement_authorization.level = nil
-          expect(advisement_authorization).to have_error(:blank).on :level
-        end
-      end
-    end
+    it { should be_valid }
+    it { should belong_to(:professor).required(true) }
+    it { should belong_to(:level).required(true) }
   end
   describe "Methods" do
     describe "to_label" do

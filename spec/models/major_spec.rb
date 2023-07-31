@@ -1,57 +1,30 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "spec_helper"
 
-describe Major do
+RSpec.describe Major, type: :model do
   it { should be_able_to_be_destroyed }
-  it { should destroy_dependent :student_major }
+  it { should have_many(:student_majors).dependent(:destroy) }
+  it { should have_many(:students).through(:student_majors) }
 
-  let(:major) { Major.new }
+  let(:level) { FactoryBot.build(:level) }
+  let(:institution) { FactoryBot.build(:institution) }
+  let(:major) do
+    Major.new(
+      name: "computacao",
+      level: level,
+      institution: institution
+    )
+  end
   subject { major }
   describe "Validations" do
-    describe "institution" do
-      context "should be valid when" do
-        it "institution is not null" do
-          major.institution = Institution.new
-          expect(major).to have(0).errors_on :institution
-        end
-      end
-      context "should have error blank when" do
-        it "institution is null" do
-          major.institution = nil
-          expect(major).to have_error(:blank).on :institution
-        end
-      end
-    end
-    describe "level" do
-      context "should be valid when" do
-        it "level is not null" do
-          major.level = Level.new
-          expect(major).to have(0).errors_on :level
-        end
-      end
-      context "should have error blank when" do
-        it "level is null" do
-          major.level = nil
-          expect(major).to have_error(:blank).on :level
-        end
-      end
-    end
-    describe "name" do
-      context "should be valid when" do
-        it "name is not null" do
-          major.name = "Name"
-          expect(major).to have(0).errors_on :name
-        end
-      end
-      context "should have error blank when" do
-        it "name is null" do
-          major.name = nil
-          expect(major).to have_error(:blank).on :name
-        end
-      end
-    end
+    it { should be_valid }
+    it { should belong_to(:level).required(true) }
+    it { should belong_to(:institution).required(true) }
+    it { should validate_presence_of(:name) }
   end
 
   describe "Methods" do
@@ -60,9 +33,9 @@ describe Major do
         level_name = "Major Level"
         major_name = "Major Name"
         institution_name = "Major Institution"
-        major.level = Level.new(:name => level_name)
+        major.level = Level.new(name: level_name)
         major.name = major_name
-        major.institution = Institution.new(:name => institution_name)
+        major.institution = Institution.new(name: institution_name)
         expected = "#{major_name} - #{institution_name} - (#{level_name})"
         expect(major.to_label).to eql(expected)
       end

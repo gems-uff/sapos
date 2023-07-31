@@ -1,60 +1,30 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "spec_helper"
 
-describe ResearchArea do
+RSpec.describe ResearchArea, type: :model do
   it { should be_able_to_be_destroyed }
-  it { should destroy_dependent :course_research_area }
-  it { should destroy_dependent :professor_research_area }
-  
-  let(:research_area) { ResearchArea.new }
+  it { should have_many(:course_research_areas).dependent(:destroy) }
+  it { should have_many(:courses).through(:course_research_areas) }
+  it { should have_many(:enrollments).dependent(:restrict_with_exception) }
+  it { should have_many(:professor_research_areas).dependent(:destroy) }
+  it { should have_many(:professors).through(:professor_research_areas) }
+  let(:research_area) do
+    ResearchArea.new(
+      name: "Engenharia de Software",
+      code: "ES"
+    )
+  end
   subject { research_area }
   describe "Validations" do
-    describe "name" do
-      context "should be valid when" do
-        it "name is not null and is not taken" do
-          research_area.name = "ResearchArea name"
-          expect(research_area).to have(0).errors_on :name
-        end
-      end
-      context "should have error blank when" do
-        it "name is null" do
-          research_area.name = nil
-          expect(research_area).to have_error(:blank).on :name
-        end
-      end
-      context "should have error taken when" do
-        it "name is already in use" do
-          name = "ResearchArea name"
-          FactoryBot.create(:research_area, :name => name)
-          research_area.name = name
-          expect(research_area).to have_error(:taken).on :name
-        end
-      end
-    end
-    describe "code" do
-      context "should be valid when" do
-        it "code is not null and is not taken" do
-          research_area.code = "ResearchArea code"
-          expect(research_area).to have(0).errors_on :code
-        end
-      end
-      context "should have error blank when" do
-        it "code is null" do
-          research_area.code = nil
-          expect(research_area).to have_error(:blank).on :code
-        end
-      end
-      context "should have error taken when" do
-        it "code is already in use" do
-          code = "ResearchArea code"
-          FactoryBot.create(:research_area, :code => code)
-          research_area.code = code
-          expect(research_area).to have_error(:taken).on :code
-        end
-      end
-    end
+    it { should be_valid }
+    it { should validate_uniqueness_of(:name) }
+    it { should validate_presence_of(:name) }
+    it { should validate_uniqueness_of(:code) }
+    it { should validate_presence_of(:code) }
   end
   describe "Methods" do
     describe "to_label" do

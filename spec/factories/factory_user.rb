@@ -3,6 +3,8 @@
 
 # Read about factories at https://github.com/thoughtbot/factory_bot
 
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :user do
     sequence :email do |email|
@@ -12,6 +14,6 @@ FactoryBot.define do
       "User_#{name}"
     end
     password { "password" }
-    role_id { Role::ROLE_ADMINISTRADOR }
+    role factory: :role_administrador
   end
 end

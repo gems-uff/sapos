@@ -1,122 +1,36 @@
-require 'spec_helper'
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
+
+require "spec_helper"
 
 RSpec.describe ClassSchedule, type: :model do
-  let(:class_schedule) { ClassSchedule.new }
+  it { should be_able_to_be_destroyed }
+
+  let(:class_schedule) do
+    ClassSchedule.new(
+      year: 2023,
+      semester: 2,
+      enrollment_start: Time.now,
+      enrollment_end: Time.now,
+      enrollment_adjust: Time.now,
+      enrollment_insert: Time.now,
+      enrollment_remove: Time.now
+    )
+  end
   subject { class_schedule }
   describe "Validations" do
-    describe "year" do
-      context "should be valid when" do
-        it "year is not null" do
-          class_schedule.year = 2021
-          expect(class_schedule).to have(0).errors_on :year
-        end
-      end
-      context "should have error blank when" do
-        it "year is null" do
-          class_schedule.year = nil
-          expect(class_schedule).to have_error(:blank).on :year
-        end
-      end
-    end
-    describe "semester" do
-      context "should be valid when" do
-        it "semester is in Semesters list" do
-          class_schedule.semester = YearSemester::SEMESTERS[0]
-          expect(class_schedule).to have(0).errors_on :semester
-        end
-      end
-      context "should have error blank when" do
-        it "semester is null" do
-          class_schedule.semester = nil
-          expect(class_schedule).to have_error(:blank).on :semester
-        end
-      end
-      context "should have error inclusion when" do
-        it "semester is not in the list" do
-          class_schedule.semester = 10
-          expect(class_schedule).to have_error(:inclusion).on :semester
-        end
-      end
-      context "should have error taken when" do
-        it "semester already exists for the same year" do
-          FactoryBot.create(:class_schedule, year: 2021, semester: YearSemester::SEMESTERS[0])
-
-          class_schedule.year = 2021
-          class_schedule.semester = YearSemester::SEMESTERS[0]
-          expect(class_schedule).to have_error(:taken).on :semester
-        end
-      end
-    end
-    describe "enrollment_start" do
-      context "should be valid when" do
-        it "enrollment_start is not null" do
-          class_schedule.enrollment_start = Time.now
-          expect(class_schedule).to have(0).errors_on :enrollment_start
-        end
-      end
-      context "should have error blank when" do
-        it "enrollment_start is null" do
-          class_schedule.enrollment_start = nil
-          expect(class_schedule).to have_error(:blank).on :enrollment_start
-        end
-      end
-    end
-    describe "enrollment_end" do
-      context "should be valid when" do
-        it "enrollment_end is not null" do
-          class_schedule.enrollment_end = Time.now
-          expect(class_schedule).to have(0).errors_on :enrollment_end
-        end
-      end
-      context "should have error blank when" do
-        it "enrollment_end is null" do
-          class_schedule.enrollment_end = nil
-          expect(class_schedule).to have_error(:blank).on :enrollment_end
-        end
-      end
-    end
-    describe "enrollment_adjust" do
-      context "should be valid when" do
-        it "enrollment_adjust is not null" do
-          class_schedule.enrollment_adjust = Time.now
-          expect(class_schedule).to have(0).errors_on :enrollment_adjust
-        end
-      end
-      context "should have error blank when" do
-        it "enrollment_adjust is null" do
-          class_schedule.enrollment_adjust = nil
-          expect(class_schedule).to have_error(:blank).on :enrollment_adjust
-        end
-      end
-    end
-    describe "enrollment_insert" do
-      context "should be valid when" do
-        it "enrollment_insert is not null" do
-          class_schedule.enrollment_insert = Time.now
-          expect(class_schedule).to have(0).errors_on :enrollment_insert
-        end
-      end
-      context "should have error blank when" do
-        it "enrollment_insert is null" do
-          class_schedule.enrollment_insert = nil
-          expect(class_schedule).to have_error(:blank).on :enrollment_insert
-        end
-      end
-    end
-    describe "enrollment_remove" do
-      context "should be valid when" do
-        it "enrollment_remove is not null" do
-          class_schedule.enrollment_remove = Time.now
-          expect(class_schedule).to have(0).errors_on :enrollment_remove
-        end
-      end
-      context "should have error blank when" do
-        it "enrollment_remove is null" do
-          class_schedule.enrollment_remove = nil
-          expect(class_schedule).to have_error(:blank).on :enrollment_remove
-        end
-      end
-    end
+    it { should be_valid }
+    it { should validate_presence_of(:year) }
+    it { should validate_inclusion_of(:semester).in_array(YearSemester::SEMESTERS) }
+    it { should validate_uniqueness_of(:semester).scoped_to(:year) }
+    it { should validate_presence_of(:semester) }
+    it { should validate_presence_of(:enrollment_start) }
+    it { should validate_presence_of(:enrollment_end) }
+    it { should validate_presence_of(:enrollment_adjust) }
+    it { should validate_presence_of(:enrollment_insert) }
+    it { should validate_presence_of(:enrollment_remove) }
   end
   describe "Methods" do
     describe "to_label" do

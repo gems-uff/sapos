@@ -1,9 +1,9 @@
-#encoding: UTF-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-RSpec::Matchers.define :be_able_to_be_destroyed do 
+# frozen_string_literal: true
 
+RSpec::Matchers.define :be_able_to_be_destroyed do
   match do |actual|
     delete_success = true
     obj = FactoryBot.create(actual.class.name.underscore.to_sym)
@@ -23,78 +23,4 @@ RSpec::Matchers.define :be_able_to_be_destroyed do
   failure_message_when_negated do |actual|
     "It should not be possible to delete a #{actual.class.name} record"
   end
-
-end
-
-
-RSpec::Matchers.define :restrict_destroy_when_exists do |dependent_class|
-
-  @fk = nil
-
-  chain :with_fk do |fk|
-    @fk = fk
-  end
-
-  match do |actual|
-    name = actual.class.name.underscore
-    @fk = (name + '_id').to_sym if @fk.nil? 
-    restrict_success = true
-
-    obj = FactoryBot.create(name.to_sym)
-    FactoryBot.create(dependent_class, @fk=> obj.id)
-    obj.reload
-    begin
-      obj.destroy
-      restrict_success = false if obj.destroyed?
-    rescue ActiveRecord::DeleteRestrictionError
-    end    
-    restrict_success
-  end
-
-  failure_message do |actual|
-    "destroy should be restricted when there is a #{dependent_class}"
-  end
-
-  failure_message_when_negated do |record|
-    "destroy should not be restricted when there is a #{dependent_class}"
-  end
-
-end
-
-RSpec::Matchers.define :destroy_dependent do |dependent_class|
-
-  @fk = nil
-
-  chain :with_fk do |fk|
-    @fk = fk
-  end
-
-  match do |actual|
-    name = actual.class.name.underscore
-    @fk = (name + '_id').to_sym if @fk.nil? 
-
-    destroy_success = true
-
-    obj = FactoryBot.create(name.to_sym)
-    dependent = FactoryBot.create(dependent_class, @fk => obj.id)
-    begin
-      obj.destroy
-      dependent.reload
-      destroy_success = obj.destroyed? && dependent.destroyed?
-    rescue ActiveRecord::DeleteRestrictionError
-      destroy_success = false
-    rescue ActiveRecord::RecordNotFound
-      destroy_success = obj.destroyed? 
-    end    
-    destroy_success
-  end
-
-  failure_message do |actual|
-    "destroy should be propagated to #{dependent_class}"
-  end
-
-  failure_message_when_negated do |record|
-    "destroy should be propagated to #{dependent_class}"
-  end
-
 end

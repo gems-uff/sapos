@@ -1,19 +1,19 @@
-#encoding: UTF-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-RSpec::Matchers.define :have_error do |erro|
+# frozen_string_literal: true
 
+RSpec::Matchers.define :have_error do |erro|
   def error_message(record, atributo, erro)
-    translation_missing_message = "translation missing:"
-    parameters = @parameters.blank? ?  {} : @parameters
+    translation_missing_message = "Translation missing:"
+    parameters = @parameters.blank? ? {} : @parameters
 
     message = I18n.translate("errors.messages.#{erro}", **parameters)
     if message.include?(translation_missing_message)
       message = I18n.translate("activerecord.errors.models.#{record.class.to_s.underscore}.#{erro}", **parameters)
       message = message.include?(translation_missing_message) ? I18n.translate("activerecord.errors.models.#{record.class.to_s.underscore}.attributes.#{atributo}.#{erro}", **parameters) : message
     end
-    return message
+    message
   end
 
   chain :on do |atributo|
@@ -46,6 +46,6 @@ RSpec::Matchers.define :have_error do |erro|
   end
 
   description do
-    "deve incluir erro de '#{erro.to_s}'"
+    "deve incluir erro de '#{erro}'"
   end
 end

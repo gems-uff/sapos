@@ -1,111 +1,53 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "spec_helper"
 
-describe Scholarship do
+RSpec.describe Scholarship, type: :model do
   it { should be_able_to_be_destroyed }
-  it { should destroy_dependent :scholarship_duration }
+  it { should have_many(:scholarship_durations).dependent(:destroy) }
+  it { should have_many(:enrollments).through(:scholarship_durations) }
 
-  let(:scholarship) { Scholarship.new }
+  let(:start_date) { 3.months.ago.to_date }
+  let(:end_date) { 3.months.from_now.to_date }
+  let(:scholarship_number) { "M123" }
+  let(:sponsor) { FactoryBot.build(:sponsor) }
+  let(:level) { FactoryBot.build(:level) }
+  let(:scholarship) do
+    Scholarship.new(
+      scholarship_number: scholarship_number,
+      level: level,
+      sponsor: sponsor,
+      start_date: start_date,
+      end_date: end_date
+    )
+  end
   subject { scholarship }
   describe "Validations" do
-    describe "level" do
-      context "should be valid when" do
-        it "level is not null" do
-          scholarship.level = Level.new
-          expect(scholarship).to have(0).errors_on :level
-        end
-      end
-      context "should have error blank when" do
-        it "level is null" do
-          scholarship.level = nil
-          expect(scholarship).to have_error(:blank).on :level
-        end
-      end
-    end
-    describe "sponsor" do
-      context "should be valid when" do
-        it "sponsor is not null" do
-          scholarship.sponsor = Sponsor.new
-          expect(scholarship).to have(0).errors_on :sponsor
-        end
-      end
-      context "should have error blank when" do
-        it "sponsor is null" do
-          scholarship.sponsor = nil
-          expect(scholarship).to have_error(:blank).on :sponsor
-        end
-      end
-    end
-    describe "start_date" do
-      context "is after scholarship_duration.start_date" do
-        scholarship_duration = ScholarshipDuration.new
-        it "should return an error message" do
-          scholarship.start_date = Date.today
-          scholarship_duration.scholarship = scholarship
-          scholarship_duration.start_date  = scholarship.start_date - 1.day
-          scholarship.validate
-          expect(scholarship_duration).to have_error(:start_date_before_scholarship_start_date).on :start_date
-        end
-      end
-    end
+    it { should be_valid }
+    it { should belong_to(:level).required(true) }
+    it { should belong_to(:sponsor).required(true) }
+    it { should belong_to(:scholarship_type).required(false) }
+    it { should belong_to(:professor).required(false) }
+    it { should validate_uniqueness_of(:scholarship_number) }
+    it { should validate_presence_of(:scholarship_number) }
+    it { should accept_a_month_year_assignment_of(:start_date, presence: true) }
+    it { should validate_presence_of(:start_date) }
+    it { should accept_a_month_year_assignment_of(:end_date) }
+
     describe "end_date" do
-      context "is before scholarship_duration.end_date and scholarship.cancel_date is nil" do
-        scholarship_duration = ScholarshipDuration.new
-        it "should return an error message" do
-          scholarship.end_date = Date.today
-          scholarship_duration.scholarship = scholarship
-          scholarship_duration.end_date  = scholarship.end_date + 1.day
-          scholarship_duration.cancel_date = nil
-          scholarship.validate
-          expect(scholarship_duration).to have_error(:end_date_after_scholarship_end_date).on :end_date
-        end
-      end
-      context "is before scholarship_duration.cancel_date" do
-        scholarship_duration = ScholarshipDuration.new
-        it "should return an error message" do
-          scholarship.end_date = Date.today
-          scholarship_duration.scholarship = scholarship
-          scholarship_duration.cancel_date  = scholarship.end_date + 1.day
-          scholarship.validate
-          expect(scholarship_duration).to have_error(:cancel_date_after_scholarship_end_date).on :cancel_date
-        end
-      end
       context "should be valid when" do
         it "end_date is greater than start_date" do
-          scholarship.end_date = Date.today
-          scholarship.start_date = 1.day.ago
+          scholarship.end_date = start_date + 1.month
           expect(scholarship).to have(0).errors_on :end_date
         end
       end
       context "should have error on_or_after when" do
         it "start_date is greater than end_date" do
-          scholarship.start_date = 2.days.from_now
-          scholarship.end_date = 2.days.ago
+          scholarship.end_date = start_date - 1.month
           expect(scholarship).to have_error(:on_or_after).on :end_date
-        end
-      end
-    end
-    describe "scholarship_number" do
-      context "should be valid when" do
-        it "scholarship_number is not null and is not taken" do
-          scholarship.scholarship_number = "M123"
-          expect(scholarship).to have(0).errors_on :scholarship_number
-        end
-      end
-      context "should have error blank when" do
-        it "scholarship_number is null" do
-          scholarship.scholarship_number = nil
-          expect(scholarship).to have_error(:blank).on :scholarship_number
-        end
-      end
-      context "should have error taken when" do
-        it "scholarship_number is already in use" do
-          scholarship_number = "D123"
-          FactoryBot.create(:scholarship, :scholarship_number => scholarship_number)
-          scholarship.scholarship_number = scholarship_number
-          expect(scholarship).to have_error(:taken).on :scholarship_number
         end
       end
     end
@@ -113,22 +55,17 @@ describe Scholarship do
   describe "Methods" do
     describe "to_label" do
       it "should return the expected string" do
-        scholarship_number = 123
-        scholarship.scholarship_number = scholarship_number
-        expect(scholarship.to_label).to eql("#{scholarship_number}")
+        expect(scholarship.to_label).to eql(scholarship_number.to_s)
       end
     end
-
-    describe 'last_date' do
+    describe "last_date" do
       let(:end_date) { 3.days.from_now.to_date }
-
-      it 'should return end_date.end_of_month if there is end_date' do
-        scholarship = FactoryBot.create(:scholarship, :start_date => end_date, :end_date => end_date + 2.months)
+      it "should return end_date.end_of_month if there is end_date" do
+        scholarship.end_date = end_date + 2.months
         expect(scholarship.last_date).to eq((end_date + 2.months).end_of_month)
       end
-
-      it 'should be greater or equal to 100 years if there is no end_date' do
-        scholarship = FactoryBot.create(:scholarship, :start_date => end_date, :end_date => nil)
+      it "should be greater or equal to 100 years if there is no end_date" do
+        scholarship.end_date = nil
         expect(scholarship.last_date).to be >= Date.today + 100.years - 1.day
       end
     end

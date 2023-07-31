@@ -32,6 +32,9 @@
 # Ignore uploaded files in development.
 /storage/*
 !/storage/.keep
+/tmp/storage/*
+!/tmp/storage/
+!/tmp/storage/.keep
 /uploads
 /public/uploads/pdf_header
 /public/uploads/tmp
@@ -47,7 +50,6 @@
 /public/stylesheets/active_scaffold
 /app/assets/images/report_configuration
 /app/assets/images/student
-.byebug_history
 coverage/
 /vendor/bundle
 

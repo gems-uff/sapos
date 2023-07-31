@@ -1,9 +1,11 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "spec_helper"
 
-describe Role do
+RSpec.describe Role, type: :model do
   it { should be_able_to_be_destroyed }
-  it { should restrict_destroy_when_exists :user }
+  it { should have_many(:users).dependent(:restrict_with_exception) }
 end

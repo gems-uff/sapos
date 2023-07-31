@@ -1,157 +1,186 @@
-source 'https://rubygems.org'
+# frozen_string_literal: true
+
+source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 # The following line is necessary to allow RVM choosing the correct ruby version. RVM 2.0 will probably be able to interpret the "~>" symbol and we will be able to safely remove the "#ruby=2.7.1" line.
-#ruby=2.7.1
-ruby '~> 2.7.1'
+ruby "~> 2.7.1"
 
-# Bundle edge Rails instead: gem 'rails', github: 'rails/rails', branch: 'main'
-gem 'rails', '~> 6.1', '>= 6.1.7.4'
+# Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
+gem "rails", "~> 7.0.6"
+
+# The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
+gem "sprockets-rails"
+
 # Use sqlite3 as the database for Active Record
-# gem 'sqlite3', '~> 1.4'
-# Use Puma as the app server
-gem 'puma', '~> 5.0'
-# Use SCSS for stylesheets
-gem 'sass-rails', '>= 6'
-# Use Uglifier as compressor for JavaScript assets
-gem 'uglifier'
-# See https://github.com/sstephenson/execjs#readme for more supported runtimes
-# gem 'therubyracer', platforms: :ruby
-# Use CoffeeScript for .js.coffee assets and views
-gem 'coffee-rails'
-# Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
-# gem 'webpacker', '~> 5.0'
-# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
-# gem 'turbolinks', '~> 5'
-# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
-gem 'jbuilder', '~> 2.7'
-# Use Redis adapter to run Action Cable in production
-# gem 'redis', '~> 4.0'
-# Use Active Model has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
+# gem "sqlite3", "~> 1.4"
 
-# Use Active Storage variant
-# gem 'image_processing', '~> 1.2'
+# Use the Puma web server [https://github.com/puma/puma]
+gem "puma", "~> 5.0"
+
+# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
+# gem "importmap-rails"
+
+# Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
+# gem "turbo-rails"
+
+# Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
+# gem "stimulus-rails"
+
+# Use Uglifier as compressor for JavaScript assets
+gem "uglifier"
+
+# Use CoffeeScript for .js.coffee assets and views
+gem "coffee-rails"
+
+# Build JSON APIs with ease [https://github.com/rails/jbuilder]
+gem "jbuilder"
+
+# Use Redis adapter to run Action Cable in production
+# gem "redis", "~> 4.0"
+
+# Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
+# gem "kredis"
+
+# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
+# gem "bcrypt", "~> 3.1.7"
+
+# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # Reduces boot times through caching; required in config/boot.rb
-gem 'bootsnap', '>= 1.4.4', require: false
+gem "bootsnap", require: false
 
+# Use Sass to process CSS
+gem "sassc-rails"
+
+# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
+# gem "image_processing", "~> 1.2"
 
 # Use jquery as the JavaScript library
-gem 'jquery-rails'
-gem 'jquery-ui-rails'
+gem "jquery-rails"
+gem "jquery-ui-rails"
 
 # Pagination
 gem "kaminari"
 
 # User access
-gem 'cancancan'
+gem "cancancan"
 gem "devise", "~> 4.9"
-gem 'devise_invitable', '~> 2.0.0'
+gem "devise_invitable", "~> 2.0.0"
 gem "paper_trail"
 
 # Use Active record session store
-gem 'activerecord-session_store'
+gem "activerecord-session_store"
 
 # Iconography
-gem 'font-awesome-rails'
+gem "font-awesome-rails"
 
 # Prawn to PDF
-gem 'prawn'
-gem 'prawn-table' 
-gem 'prawn-rails'
+gem "prawn"
+gem "prawn-table"
+gem "prawn-rails"
 
 # Redcarpet for Readme MarkDown (or README.md) - Credits Page
-gem 'redcarpet' 
+gem "redcarpet"
 
-# Active scaffold support for Rails 3
-gem 'active_scaffold', :git => 'https://github.com/activescaffold/active_scaffold.git'
-gem 'active_scaffold_duplicate', '>= 1.1.0'
-gem 'recordselect'
+# Active scaffold support for newer Rails
+gem "active_scaffold", git: "https://github.com/activescaffold/active_scaffold.git"
+gem "active_scaffold_duplicate", ">= 1.1.0"
+gem "recordselect"
 
-#Date Validation Plugin
-gem 'validates_timeliness'
+# Date Validation Plugin
+gem "validates_timeliness", "~> 7.0.0.beta1"
 
 # Menu
-gem 'simple-navigation'
+gem "simple-navigation"
 
 # Notification
-gem 'rufus-scheduler'
+gem "rufus-scheduler"
 
 # Image
-gem 'carrierwave'
-gem 'carrierwave-activerecord', :git => 'https://github.com/gems-uff/carrierwave-activerecord.git', :branch => 'rails61'
+gem "carrierwave"
+gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-activerecord.git", branch: "rails7"
+
+# Temporary fix of warnings
+# In the beggining of rails command executions, it shows some warnings related to these gems
+# If I'm not mistaken, the warnings should disappear on Ruby 3 or when a gem that depends on these gems update (I don't know which)
+# So, try to remove these gems from this file in the future and check if the warnings appear.
+gem "net-http"
+gem "net-smtp"
+gem "net-imap"
 
 
 group :development do
-  # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
-  gem 'web-console', '>= 4.1.0'
-  # Display performance information such as SQL time and flame graphs for each request in your browser.
-  # Can be configured to work on production as well see: https://github.com/MiniProfiler/rack-mini-profiler/blob/master/README.md
-  gem 'rack-mini-profiler', '~> 2.0'
-  gem 'listen', '~> 3.3'
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
+  # Use console on exceptions pages [https://github.com/rails/web-console]
+  gem "web-console"
+
+  # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
+  # gem "rack-mini-profiler"
+
+  # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
+  # gem "spring"
+
   # Linter
-  gem 'rubocop', require: false
+  gem "rubocop", require: false
+  gem "rubocop-rails_config", require: false
 end
 
 group :development, :test do
-
-gem 'rspec-rails'
-
-# Use SQLite database for development
-  gem 'sqlite3'
+  # Use SQLite database for development
+  gem "sqlite3"
 
   # Prints Ruby object in full color
-  gem 'awesome_print'
+  gem "awesome_print"
 
   # View a better error page
-  gem 'binding_of_caller'
-  gem 'better_errors'
-  
-  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
-  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+  gem "binding_of_caller"
+  gem "better_errors"
+
+  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
+  gem "debug", platforms: %i[ mri mingw x64_mingw ]
 
   # Open /letter_opener in the browser to view 'sent' emails
-  gem 'letter_opener_web'
+  gem "letter_opener_web"
 
   # Create entity-relationship diagram
   gem "rails-erd"
 end
 
 group :test do
+  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
+  # gem "capybara"
+  # gem "selenium-webdriver"
+  # gem "webdrivers"
+
   # Test runner
-#  gem 'rspec-rails'
+  gem "rspec-rails"
 
   # Fixtures replacement
-  gem 'factory_bot_rails'
-  
+  gem "factory_bot_rails"
+
   # Suport 'have' syntax of rspec
-  gem 'rspec-collection_matchers'
+  gem "rspec-collection_matchers"
 
   # Simpler specs
-  gem 'shoulda-matchers'
+  gem "shoulda-matchers"
 
   # Clean database for every test
-  gem 'database_cleaner-active_record'
+  gem "database_cleaner-active_record"
 
   # Measure code coverage
-  gem 'simplecov'
+  gem "simplecov"
 end
 
 # Notify exceptions
-gem 'exception_notification'
+gem "exception_notification"
 group :production do
   # Use MySQL database for production
-  gem 'mysql2'
+  gem "mysql2"
 end
 
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
-  gem 'rdoc'
-  gem 'sdoc', require: false
+  gem "rdoc"
+  gem "sdoc", require: false
 end
-
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

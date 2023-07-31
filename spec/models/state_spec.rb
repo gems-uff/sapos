@@ -1,73 +1,30 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "spec_helper"
 
-describe State do
+RSpec.describe State, type: :model do
   it { should be_able_to_be_destroyed }
-  it { should restrict_destroy_when_exists(:student).with_fk :birth_state_id }
-  it { should restrict_destroy_when_exists(:city).with_fk :state_id }
+  it { should have_many(:cities).dependent(:restrict_with_exception) }
+  it { should have_many(:student_birth_states).class_name("Student").with_foreign_key("birth_state_id").dependent(:restrict_with_exception) }
 
-  let(:state) { State.new }
+  let(:country) { FactoryBot.build(:country) }
+  let(:state) do
+    State.new(
+      country: country,
+      name: "Rio de Janeiro",
+      code: "RJ"
+    )
+  end
   subject { state }
   describe "Validations" do
-    describe "name" do
-      context "should be valid when" do
-        it "name is not null and is not taken" do
-          state.name = "State name"
-          expect(state).to have(0).errors_on :name
-        end
-      end
-      context "should have error blank when" do
-        it "name is null" do
-          state.name = nil
-          expect(state).to have_error(:blank).on :name
-        end
-      end
-      context "should have error taken when" do
-        it "name is already in use" do
-          name = "State name"
-          FactoryBot.create(:state, :name => name)
-          state.name = name
-          expect(state).to have_error(:taken).on :name
-        end
-      end
-    end
-    describe "code" do
-      context "should be valid when" do
-        it "code is not null and is not taken" do
-          state.code = "State code"
-          expect(state).to have(0).errors_on :code
-        end
-      end
-      context "should have error blank when" do
-        it "code is null" do
-          state.code = nil
-          expect(state).to have_error(:blank).on :code
-        end
-      end
-      context "should have error taken when" do
-        it "code is already in use" do
-          code = "State code"
-          FactoryBot.create(:state, :code => code)
-          state.code = code
-          expect(state).to have_error(:taken).on :code
-        end
-      end
-    end
-    describe "country" do
-      context "should be valid when" do
-        it "country is not null" do
-          state.country = Country.new
-          expect(state).to have(0).errors_on :country
-        end
-      end
-      context "should have error blank when" do
-        it "country is null" do
-          state.country = nil
-          expect(state).to have_error(:blank).on :country
-        end
-      end
-    end
+    it { should be_valid }
+    it { should belong_to(:country).required(true) }
+    it { should validate_uniqueness_of(:name) }
+    it { should validate_presence_of(:name) }
+    it { should validate_uniqueness_of(:code) }
+    it { should validate_presence_of(:code) }
   end
 end

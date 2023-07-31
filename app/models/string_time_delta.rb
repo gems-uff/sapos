@@ -1,18 +1,24 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class StringTimeDelta
+# frozen_string_literal: true
 
+# Provides functions to convert string to duration
+class StringTimeDelta
   DURATIONS = {
-    'y' => :year,
-    'M' => :month,
-    'w' => :week,
-    'd' => :day,
-    'h' => :hour,
-    'm' => :minute,
-    's' => :second
+    "y" => :year,
+    "M" => :month,
+    "w" => :week,
+    "d" => :day,
+    "h" => :hour,
+    "m" => :minute,
+    "s" => :second
   }
   DURATION_LETTERS = DURATIONS.keys.join
+  DURATION_REGEX = /^(-?)([\d.#{DURATION_LETTERS}]+)$/
+  FLOAT_DURATION = /^(\d+|\d+\.\d*|\d*\.\d+)([#{DURATION_LETTERS}])(.*)$/
+  DAY_DURATION = /^\d+$/
+  FLOAT_DAY_DURATION = /^\d*\.\d*$/
 
   def self.multiply(delta, times)
     return -delta if times == -1
@@ -32,29 +38,29 @@ class StringTimeDelta
   # s -> second
   # M -> month
   # y -> year
-  # 'nada' -> day
-  def self.parse(string, opts={})
+  # "nada" -> day
+  def self.parse(string, opts = {})
     string = string.to_s
 
-    return 0.second if string == ''
+    return 0.second if string == ""
 
-    m = string.match(/^(-?)([\d\.#{DURATION_LETTERS}]+)$/)
+    m = string.match(DURATION_REGEX)
 
     return nil if m.nil? && opts[:no_error]
     raise ArgumentError.new("cannot parse '#{string}'") if m.nil?
 
-    mod = m[1] == '-' ? -1 : 1
+    mod = m[1] == "-" ? -1 : 1
     val = 0.second
 
     s = m[2]
 
     while s.length > 0
       m = nil
-      if m = s.match(/^(\d+|\d+\.\d*|\d*\.\d+)([#{DURATION_LETTERS}])(.*)$/)
-        val += m[1].to_i.send(DURATIONS[m[2]]) 
-      elsif s.match(/^\d+$/)
+      if m = s.match(FLOAT_DURATION)
+        val += m[1].to_i.send(DURATIONS[m[2]])
+      elsif s.match(DAY_DURATION)
         val += s.to_i.send(:day)
-      elsif s.match(/^\d*\.\d*$/)
+      elsif s.match(FLOAT_DAY_DURATION)
         val += s.to_i.send(:day)
       elsif opts[:no_error]
         return nil
@@ -68,7 +74,5 @@ class StringTimeDelta
     end
 
     StringTimeDelta.multiply(val, mod)
-
   end
-
 end

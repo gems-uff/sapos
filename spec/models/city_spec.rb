@@ -1,44 +1,27 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "spec_helper"
 
-describe City do
+RSpec.describe City, type: :model do
   it { should be_able_to_be_destroyed }
-  it { should restrict_destroy_when_exists(:student).with_fk :city_id }
-  it { should restrict_destroy_when_exists(:student).with_fk :birth_city_id }
-  it { should restrict_destroy_when_exists(:professor).with_fk :city_id }
+  it { should have_many(:students).dependent(:restrict_with_exception) }
+  it { should have_many(:student_birth_cities).class_name("Student").with_foreign_key(:birth_city_id).dependent(:restrict_with_exception) }
+  it { should have_many(:professors).dependent(:restrict_with_exception) }
 
-  let(:city) { City.new }
+  let(:state) { FactoryBot.build(:state) }
+  let(:city) do
+    City.new(
+      name: "niteroi",
+      state: state
+    )
+  end
   subject { city }
   describe "Validations" do
-    describe "state" do
-      context "should be valid when" do
-        it "state is not null" do
-          city.state = State.new
-          expect(city).to have(0).errors_on :state
-        end
-      end
-      context "should have error blank when" do
-        it "state is null" do
-          city.state = nil
-          expect(city).to have_error(:blank).on :state
-        end
-      end
-    end
-    describe "name" do
-      context "should be valid when" do
-        it "name is not null" do
-          city.name = "City name"
-          expect(city).to have(0).errors_on :name
-        end
-      end
-      context "should have error blank when" do
-        it "name is null" do
-          city.name = nil
-          expect(city).to have_error(:blank).on :name
-        end
-      end
-    end
+    it { should be_valid }
+    it { should belong_to(:state).required(true) }
+    it { should validate_presence_of(:name) }
   end
 end

@@ -1,4 +1,9 @@
-require 'spec_helper'
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
+
+require "spec_helper"
 
 def prepare_course_class(allocations, to_destroy, attributes = {})
   days = I18n.translate("date.day_names")
@@ -10,24 +15,47 @@ def prepare_course_class(allocations, to_destroy, attributes = {})
 end
 
 RSpec.describe ClassEnrollmentRequest, type: :model do
-  
+  before(:all) do
+    @destroy_later = []
+    @level = FactoryBot.create(:level)
+    @enrollment_status = FactoryBot.create(:enrollment_status)
+    @student = FactoryBot.create(:student)
+    @professor = FactoryBot.create(:professor)
+    @course_type = FactoryBot.create(:course_type)
+  end
+  after(:all) do
+    @course_type.delete
+    @level.delete
+    @enrollment_status.delete
+    @professor.delete
+    @student.delete
+  end
+  after(:each) do
+    @destroy_later.each(&:delete)
+    @destroy_later.clear
+  end
   describe "Main Scenario" do
-    
     before(:all) do
-      @destroy_later = []
       @destroy_all = []
-      @course_type = FactoryBot.create(:course_type)
       @course = FactoryBot.create(:course, course_type: @course_type)
-      @course_class = prepare_course_class([[0, 9, 11], [2, 9, 11]], @destroy_all, course: @course)
+      @course_class = prepare_course_class([[0, 9, 11], [2, 9, 11]], @destroy_all, course: @course, professor: @professor)
+      @enrollment = FactoryBot.create(
+        :enrollment,
+        level: @level,
+        enrollment_status: @enrollment_status,
+        student: @student
+      )
+    end
+    after(:each) do
+      @enrollment.reload
     end
     after(:all) do
       @destroy_all.each(&:delete)
       @course.delete
-      @course_type.delete
+      @enrollment.delete
     end
-    let(:enrollment) { FactoryBot.create(:enrollment) }
-    let(:enrollment_request) { FactoryBot.build(:enrollment_request, enrollment: enrollment) }
-    let(:class_enrollment_request) { 
+    let(:enrollment_request) { FactoryBot.build(:enrollment_request, enrollment: @enrollment) }
+    let(:class_enrollment_request) {
       enrollment_request.class_enrollment_requests.build(
         course_class: @course_class,
         status: ClassEnrollmentRequest::REQUESTED,
@@ -35,54 +63,47 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
       )
     }
     subject { class_enrollment_request }
-    after(:each) do
-      @destroy_later.each(&:delete)
-      @destroy_later.clear
-    end
     describe "Validations" do
       it { should be_valid }
       it { should validate_presence_of(:enrollment_request) }
-      it { should validate_presence_of(:course_class) }
       it { should validate_uniqueness_of(:course_class).scoped_to(:enrollment_request_id) }
-      it { should validate_presence_of(:status) }
+      it { should validate_presence_of(:course_class) }
       it { should validate_inclusion_of(:status).in_array(ClassEnrollmentRequest::STATUSES) }
-      it { should validate_presence_of(:action) }
+      it { should validate_presence_of(:status) }
       it { should validate_inclusion_of(:action).in_array(ClassEnrollmentRequest::ACTIONS) }
-      
+      it { should validate_presence_of(:action) }
+
       describe "course_class" do
         context "should be valid when" do
           it "course_class exists in a previous class_enrollment of the student, but its type allow multiple classes" do
             @course_type.update!(allow_multiple_classes: true)
-            @destroy_later << class_enrollment = FactoryBot.create(
-              :class_enrollment,
-              enrollment: enrollment,
+            @destroy_later << class_enrollment = @enrollment.class_enrollments.create(
               course_class: @course_class,
               situation: ClassEnrollment::APPROVED
             )
+            @enrollment.reload
             expect(class_enrollment).to be_valid
 
             expect(class_enrollment_request).to have(0).errors_on :course_class
           end
           it "course_class exists in a previous class_enrollment of the student, but the student was disapproved" do
             @course_type.update!(allow_multiple_classes: false)
-            @destroy_later << class_enrollment = FactoryBot.create(
-              :class_enrollment,
-              enrollment: enrollment,
+            @destroy_later << @enrollment.class_enrollments.create(
               course_class: @course_class,
               situation: ClassEnrollment::DISAPPROVED
             )
+            @enrollment.reload
             expect(class_enrollment_request).to have(0).errors_on :course_class
           end
         end
         context "should have error approved before when" do
           it "course_class exists in a previous class_enrollment of the student" do
             @course_type.update!(allow_multiple_classes: false)
-            @destroy_later << class_enrollment = FactoryBot.create(
-              :class_enrollment,
-              enrollment: enrollment,
+            @destroy_later << @enrollment.class_enrollments.create(
               course_class: @course_class,
               situation: ClassEnrollment::APPROVED
             )
+            @enrollment.reload
             expect(class_enrollment_request).to have_error(:previously_approved).on :course_class
           end
         end
@@ -99,14 +120,14 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
             class_enrollment_request.status = ClassEnrollmentRequest::EFFECTED
             class_enrollment_request.action = ClassEnrollmentRequest::INSERT
             @destroy_later << class_enrollment_request.class_enrollment = FactoryBot.create(
-              :class_enrollment, enrollment: enrollment, course_class: @course_class)
+              :class_enrollment, enrollment: @enrollment, course_class: @course_class)
             expect(class_enrollment_request).to have(0).errors_on :class_enrollment
           end
           it "class_enrollment is filled, action is remove, and status is not effected" do
             class_enrollment_request.status = ClassEnrollmentRequest::REQUESTED
             class_enrollment_request.action = ClassEnrollmentRequest::REMOVE
             @destroy_later << class_enrollment_request.class_enrollment = FactoryBot.create(
-              :class_enrollment, enrollment: enrollment, course_class: @course_class)
+              :class_enrollment, enrollment: @enrollment, course_class: @course_class)
             expect(class_enrollment_request).to have(0).errors_on :class_enrollment
           end
           it "class_enrollment is null, action is remove, and status is effected" do
@@ -118,7 +139,7 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
         end
         context "should have error must_represent_the_same_enrollment_and_class when" do
           it "class_enrollment is associated to a different enrollment" do
-            @destroy_later << enrollment_other = FactoryBot.create(:enrollment)
+            @destroy_later << enrollment_other = FactoryBot.create(:enrollment, student: @student, level: @level, enrollment_status: @enrollment_status)
             class_enrollment_request.status = ClassEnrollmentRequest::EFFECTED
             @destroy_later << class_enrollment_request.class_enrollment = FactoryBot.create(
               :class_enrollment, enrollment: enrollment_other, course_class: @course_class)
@@ -126,10 +147,10 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
               :must_represent_the_same_enrollment_and_class).on :class_enrollment
           end
           it "class_enrollment is associated to a different course_class" do
-            @destroy_later << course_class_other = FactoryBot.create(:course_class)
+            @destroy_later << course_class_other = FactoryBot.create(:course_class, professor: @professor)
             class_enrollment_request.status = ClassEnrollmentRequest::EFFECTED
             @destroy_later << class_enrollment_request.class_enrollment = FactoryBot.create(
-              :class_enrollment, enrollment: enrollment, course_class: course_class_other)
+              :class_enrollment, enrollment: @enrollment, course_class: course_class_other)
             expect(class_enrollment_request).to have_error(
               :must_represent_the_same_enrollment_and_class).on :class_enrollment
           end
@@ -150,7 +171,7 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
         end
         it "should destroy a class enrollment when status is effected, class enrollment is blank, action is remove" do
           @destroy_later << class_enrollment_request.class_enrollment = FactoryBot.create(
-            :class_enrollment, enrollment: enrollment, course_class: @course_class)
+            :class_enrollment, enrollment: @enrollment, course_class: @course_class)
           class_enrollment_request.status = ClassEnrollmentRequest::EFFECTED
           class_enrollment_request.action = ClassEnrollmentRequest::REMOVE
           if class_enrollment_request.save
@@ -165,12 +186,12 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
           expect(class_enrollment_request.allocations).to eq("")
         end
         it "should return an empty string when course class does not have allocations" do
-          class_enrollment_request.course_class = prepare_course_class([], @destroy_later)
+          class_enrollment_request.course_class = prepare_course_class([], @destroy_later, professor: @professor)
           expect(class_enrollment_request.allocations).to eq("")
         end
         it "should return a semicolon separated string when course class has allocations" do
           days = I18n.translate("date.day_names")
-          class_enrollment_request.course_class = prepare_course_class([[0, 9, 11], [2, 14, 16]], @destroy_later)
+          class_enrollment_request.course_class = prepare_course_class([[0, 9, 11], [2, 14, 16]], @destroy_later, professor: @professor)
           expect(class_enrollment_request.allocations).to eq("#{days[0]} (9-11); #{days[2]} (14-16)")
         end
       end
@@ -180,14 +201,14 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
           expect(class_enrollment_request.professor).to eq(nil)
         end
         it "should return nil when the professor of the course class is nil" do
-          course_class = prepare_course_class([], @destroy_later)
+          course_class = prepare_course_class([], @destroy_later, professor: @professor)
           course_class.professor = nil
           class_enrollment_request.course_class = course_class
           expect(class_enrollment_request.professor).to eq(nil)
         end
         it "should return the name of the professor of the course class" do
           professor = FactoryBot.build(:professor)
-          course_class = prepare_course_class([], @destroy_later)
+          course_class = prepare_course_class([], @destroy_later, professor: @professor)
           course_class.professor = professor
           class_enrollment_request.course_class = course_class
           expect(class_enrollment_request.professor).to eq(professor.to_label)
@@ -202,7 +223,7 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
           @destroy_later << class_enrollment_request
         end
         it "should set the status to effected if there is an associated class_enrollment" do
-          class_enrollment = FactoryBot.build(:class_enrollment, enrollment: enrollment, course_class: @course_class)
+          class_enrollment = FactoryBot.build(:class_enrollment, enrollment: @enrollment, course_class: @course_class)
           class_enrollment_request.status = ClassEnrollmentRequest::VALID
           class_enrollment_request.class_enrollment = class_enrollment
           expect(class_enrollment_request.set_status!(ClassEnrollmentRequest::EFFECTED)).to eq(true)
@@ -210,7 +231,7 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
           @destroy_later << class_enrollment_request
         end
         it "should not change anything if it is already effected" do
-          class_enrollment = FactoryBot.build(:class_enrollment, enrollment: enrollment, course_class: @course_class)
+          class_enrollment = FactoryBot.build(:class_enrollment, enrollment: @enrollment, course_class: @course_class)
           class_enrollment_request.status = ClassEnrollmentRequest::EFFECTED
           class_enrollment_request.class_enrollment = class_enrollment
           expect(class_enrollment_request.set_status!(ClassEnrollmentRequest::EFFECTED)).to eq(false)
@@ -224,10 +245,13 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
       @destroy_later = []
       @destroy_all = []
 
-      @destroy_all << enrollment = FactoryBot.create(:enrollment)
-      @destroy_all << course_class_effected = FactoryBot.create(:course_class)
-      @destroy_all << course_class_invalid = FactoryBot.create(:course_class)
-      @destroy_all << course_class_valid = FactoryBot.create(:course_class)
+      @destroy_all << enrollment = FactoryBot.create(:enrollment, student: @student, level: @level, enrollment_status: @enrollment_status)
+      @destroy_all << course_effected = FactoryBot.create(:course, course_type: @course_type)
+      @destroy_all << course_invalid = FactoryBot.create(:course, course_type: @course_type)
+      @destroy_all << course_valid = FactoryBot.create(:course, course_type: @course_type)
+      @destroy_all << course_class_effected = FactoryBot.create(:course_class, course: course_effected, professor: @professor)
+      @destroy_all << course_class_invalid = FactoryBot.create(:course_class, course: course_invalid, professor: @professor)
+      @destroy_all << course_class_valid = FactoryBot.create(:course_class, course: course_valid, professor: @professor)
       @destroy_all << class_enrollment = FactoryBot.create(
         :class_enrollment, enrollment: enrollment, course_class: course_class_effected)
       @destroy_all << enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)

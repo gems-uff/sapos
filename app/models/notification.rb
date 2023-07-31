@@ -1,14 +1,18 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
+# Represents a Notification
 class Notification < ApplicationRecord
+  has_paper_trail
+
+  belongs_to :query, inverse_of: :notifications, optional: false
 
   has_many :notification_logs
-  has_many :notification_params, class_name: 'NotificationParam', dependent: :destroy
-  has_many :params, -> { where(active: true) }, class_name: 'NotificationParam', dependent: :destroy
-  belongs_to :query, :inverse_of => :notifications
+  has_many :notification_params, class_name: "NotificationParam", dependent: :destroy
+  has_many :params, -> { where(active: true) }, class_name: "NotificationParam", dependent: :destroy
 
-  has_paper_trail
 
   RESERVED_PARAMS = %w{numero_ultimo_semestre ano_ultimo_semestre numero_semestre_atual ano_semestre_atual}
 
@@ -21,16 +25,16 @@ class Notification < ApplicationRecord
       I18n.translate("activerecord.attributes.notification.frequencies.manual")
   ]
 
-  validates :body_template, :presence => true, on: :update
-  validates :frequency, :presence => true, :inclusion => {:in => FREQUENCIES}, on: :update
-  validates :notification_offset, :presence => true, on: :update
-  validates :query_offset, :presence => true, on: :update
-  validates :subject_template, :presence => true, on: :update
-  validates :to_template, :presence => true, on: :update
-  validates :query, :presence => true, on: :update
+  validates :query, presence: true, on: :update
+  validates :body_template, presence: true, on: :update
+  validates :frequency, presence: true, inclusion: { in: FREQUENCIES }, on: :update
+  validates :notification_offset, presence: true, on: :update
+  validates :query_offset, presence: true, on: :update
+  validates :subject_template, presence: true, on: :update
+  validates :to_template, presence: true, on: :update
 
-  validates_format_of :notification_offset, :with => /\A(\-?\d+[yMwdhms]?)+\z/, :message => :offset_invalid_value
-  validates_format_of :query_offset, :with => /\A(\-?\d+[yMwdhms]?)+\z/, :message => :offset_invalid_value
+  validates_format_of :notification_offset, with: /\A(-?\d+[yMwdhms]?)+\z/, message: :offset_invalid_value
+  validates_format_of :query_offset, with: /\A(-?\d+[yMwdhms]?)+\z/, message: :offset_invalid_value
 
   validate :has_grades_report_pdf_attachment_requirements
 
@@ -70,30 +74,29 @@ class Notification < ApplicationRecord
         errors.add(:has_grades_report_pdf_attachment, :individual_required)
       end
 
-      if ! self.query.execute(prepare_params_and_derivations({:data_consulta=>Time.zone.now}))[:columns].include?("enrollments_id")
+      if ! self.query.execute(prepare_params_and_derivations({ data_consulta: Time.zone.now }))[:columns].include?("enrollments_id")
         errors.add(:has_grades_report_pdf_attachment, :query_with_enrollments_id_alias_column_required)
       end
     end
   end
 
   def query_params_ids
-    (self.query.try(:params) || []).collect &:id
+    (self.query.try(:params) || []).collect(&:id)
   end
 
   def build_params_for_creation
     self.query_params_ids.each do |query_param_id|
-      self.params.build(:query_param_id => query_param_id, :active => true)
+      self.params.build(query_param_id: query_param_id, active: true)
     end
   end
 
   def hammer_current_params!
-
-    notification_params_ids = (self.notification_params || []).collect &:query_param_id
+    notification_params_ids = (self.notification_params || []).collect(&:query_param_id)
 
     new_params = query_params_ids - notification_params_ids
 
     new_params.each do |query_param_id|
-      self.notification_params.create(:query_param_id => query_param_id, :notification_id => self.id, :active => true)
+      self.notification_params.create(query_param_id: query_param_id, notification_id: self.id, active: true)
     end
 
     if self.will_save_change_to_query_id?
@@ -110,18 +113,18 @@ class Notification < ApplicationRecord
   end
 
   def to_label
-    self.title || I18n.t('activerecord.attributes.notification.no_name')
+    self.title || I18n.t("activerecord.attributes.notification.no_name")
   end
 
   def sql_query
-    self.query.try(:sql) || ''
+    self.query.try(:sql) || ""
   end
 
   def sql_query=(val)
-    self.query.sql= val
+    self.query.sql = val
   end
 
-  def calculate_next_notification_date(options={})
+  def calculate_next_notification_date(options = {})
     time = options[:time]
     time ||= Time.now
     if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.semiannual")
@@ -135,7 +138,7 @@ class Notification < ApplicationRecord
       dates = (-2..2).map { |n| time.midnight + n.day } if self.frequency == I18n.translate("activerecord.attributes.notification.frequencies.daily")
     end
 
-    dates.find { |date| (date + StringTimeDelta::parse(self.notification_offset)) > time } + StringTimeDelta::parse(self.notification_offset)    
+    dates.find { |date| (date + StringTimeDelta.parse(self.notification_offset)) > time } + StringTimeDelta.parse(self.notification_offset)
   end
 
   def update_next_execution!
@@ -150,11 +153,11 @@ class Notification < ApplicationRecord
     if self.frequency != I18n.translate("activerecord.attributes.notification.frequencies.manual")
       next_date ||= calculate_next_notification_date
     else
-      next_date ||= self.notification_params.find { |p| p.name == 'data_consulta' }.try(:value).try(:to_date)
-      next_date ||= self.notification_params.find { |p| p.name == 'data_consulta' }.try(:query_param).try(:default_value).try(:to_date)
+      next_date ||= self.notification_params.find { |p| p.name == "data_consulta" }.try(:value).try(:to_date)
+      next_date ||= self.notification_params.find { |p| p.name == "data_consulta" }.try(:query_param).try(:default_value).try(:to_date)
       next_date ||= Date.today
     end
-    next_date + StringTimeDelta::parse(self.query_offset) - StringTimeDelta::parse(self.notification_offset)
+    next_date + StringTimeDelta.parse(self.query_offset) - StringTimeDelta.parse(self.notification_offset)
   end
 
   def set_notification_params_values(params)
@@ -164,7 +167,7 @@ class Notification < ApplicationRecord
     end
   end
 
-  def execute(options={})
+  def execute(options = {})
     notifications = []
     notifications_attachments = {}
     params = prepare_params_and_derivations(options[:override_params] || {})
@@ -174,28 +177,28 @@ class Notification < ApplicationRecord
     result = self.query.execute(params)
 
     unless options[:only_validate]
-      #Build the notifications with the results from the query
+      # Build the notifications with the results from the query
       if self.individual
         result[:rows].each do |raw_result|
           bindings = {}.merge(params)
           bindings.merge!(Hash[result[:columns].zip(raw_result)])
 
           formatter = ErbFormatter.new(bindings)
-          
+
           notification = {
-              :notification_id => self.id,
-              :to => formatter.format(self.to_template),
-              :subject => formatter.format(self.subject_template),
-              :body => formatter.format(self.body_template)
+              notification_id: self.id,
+              to: formatter.format(self.to_template),
+              subject: formatter.format(self.subject_template),
+              body: formatter.format(self.body_template)
           }
 
           attachments = {}
 
-          #add grades_report_pdf attachment if required
+          # add grades_report_pdf attachment if required
           if self.has_grades_report_pdf_attachment
             notification[:enrollments_id] = bindings["enrollments_id"]
-            attachment_file_name = "#{I18n.t('pdf_content.enrollment.grades_report.title')} -  #{Enrollment.find(bindings["enrollments_id"]).student.name}.pdf"
-            attachments[:grades_report_pdf] = {:file_name => attachment_file_name}
+            attachment_file_name = "#{I18n.t("pdf_content.enrollment.grades_report.title")} -  #{Enrollment.find(bindings["enrollments_id"]).student.name}.pdf"
+            attachments[:grades_report_pdf] = { file_name: attachment_file_name }
           end
 
           notifications << notification
@@ -203,19 +206,22 @@ class Notification < ApplicationRecord
         end
       else
         unless result[:rows].empty?
-          bindings = {:rows => result[:rows], :columns => result[:columns]}.merge(params)
+          bindings = { rows: result[:rows], columns: result[:columns] }.merge(params)
           formatter = ErbFormatter.new(bindings)
           notifications << {
-              :notification_id => self.id,
-              :to => formatter.format(self.to_template),
-              :subject => formatter.format(self.subject_template),
-              :body => formatter.format(self.body_template)
+              notification_id: self.id,
+              to: formatter.format(self.to_template),
+              subject: formatter.format(self.subject_template),
+              body: formatter.format(self.body_template)
           }
         end
       end
       self.update_next_execution! unless options[:skip_update]
     end
-    {:notifications => notifications, :notifications_attachments => notifications_attachments, :query => result[:query]}
+    { notifications: notifications,
+      notifications_attachments: notifications_attachments,
+      query: result[:query]
+    }
   end
 
   def set_params_for_exhibition(override_params)
@@ -238,41 +244,36 @@ class Notification < ApplicationRecord
     end
     this_semester = YearSemester.on_date qdate
     last_semester = this_semester - 1
-    #Generate query using the parameters specified by the notification
-    params = {
-        #Temos que definir todos os possíveis parametros que as buscas podem querer usar
-        :ano_semestre_atual => this_semester.year,
-        :numero_semestre_atual => this_semester.semester,
-        :ano_ultimo_semestre => last_semester.year,
-        :numero_ultimo_semestre => last_semester.semester,
+    # Generate query using the parameters specified by the notification
+    {
+      # Temos que definir todos os possíveis parametros que as buscas podem querer usar
+      ano_semestre_atual: this_semester.year,
+      numero_semestre_atual: this_semester.semester,
+      ano_ultimo_semestre: last_semester.year,
+      numero_ultimo_semestre: last_semester.semester,
     }
   end
 
   def execution
-    begin
-      self.execute(:skip_update => true, :only_validate => true)
-    rescue => e
-#///////////////////////////////////////////////////
-# A mensagem de erro correta já está sendo exibida
-#  O bloco apenas serve para capturar a exceção
-#///////////////////////////////////////////////////
-#      splitted = e.to_s.split(' -:- ')
-#      if splitted.size > 1
-#        field = splitted[0].to_sym
-#        message = splitted[1..-1].join(' -:- ')
-#        errors.add(field, ': ' + message)
-#      else
-#        errors.add(:base, e.to_s)
-#      end
-#
-      false
-    end
+    self.execute(skip_update: true, only_validate: true)
+  rescue
+    # ///////////////////////////////////////////////////
+    # A mensagem de erro correta já está sendo exibida
+    #  O bloco apenas serve para capturar a exceção
+    # ///////////////////////////////////////////////////
+    #      splitted = e.to_s.split(" -:- ")
+    #      if splitted.size > 1
+    #        field = splitted[0].to_sym
+    #        message = splitted[1..-1].join(" -:- ")
+    #        errors.add(field, ": " + message)
+    #      else
+    #        errors.add(:base, e.to_s)
+    #      end
+    #
+    false
   end
-
 
   def get_simulation_query_date
-    self.params.find { |p| p.name == 'data_consulta' }.simulation_value
+    self.params.find { |p| p.name == "data_consulta" }.simulation_value
   end
 end
-
-

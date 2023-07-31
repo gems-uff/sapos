@@ -674,9 +674,14 @@ pt-BR:
           start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
           unfinished_scholarship: "A bolsa ainda está alocada. Por favor, feche a alocação antes de criar uma nova"
           attributes:
-            start_date_after_end_date: "posterior a Data de Limite de Concessão"
+            start_date:
+              start_date_after_end_date: "posterior a Data de Limite de Concessão"
+              start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
+            end_date:
+              end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
             cancel_date:
-              on_or_after:  "anterior a Data de Início"
+              cancel_date_before_start_date:  "anterior a Data de Início"
+              cancel_date_after_end_date: "posterior a Data Limite de Concessão"
         scholarship_suspension:
           suspension_start_date_after_end_date: "posterior a Data de Fim"
           suspension_start_date_before_scholarship_start_date: "anterior a Data de Início da Alocação"

@@ -1,6 +1,8 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require_relative "boot"
 
 require "rails/all"
@@ -11,25 +13,30 @@ Bundler.require(*Rails.groups)
 
 module Sapos
   class Application < Rails::Application
-    
     # Initialize configuration defaults for originally generated Rails version.
-    #config.load_defaults 6.1
-    config.autoloader = :zeitwerk
+    # Using defaults of rails < 5, since it was the original generated version.
+    #   Consider checking which defaults we should update:
+    #   https://guides.rubyonrails.org/configuring.html#versioned-default-values
+    # config.load_defaults 7.0
+    config.active_record.belongs_to_required_by_default = true
+    config.active_record.legacy_connection_handling = false
+    ActiveSupport.to_time_preserves_timezone = true
+
 
     # Allow the notifier to send emails
     config.should_send_emails = false
 
-    #config.action_controller.permit_all_parameters = true
-    #config.action_controller.action_on_unpermitted_parameters = :raise
+    # config.action_controller.permit_all_parameters = true
+    # config.action_controller.action_on_unpermitted_parameters = :raise
 
-    config.eager_load_paths << Rails.root.join('lib')
+    config.eager_load_paths << Rails.root.join("lib")
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
 
     # Custom directories with classes and modules you want to be autoloadable.
     # config.autoload_paths += %W(#{config.root}/extras)
-    config.autoload_paths += Dir["#{config.root}/lib/**/"]
+    config.autoload_paths << "#{config.root}/lib"
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
@@ -40,10 +47,10 @@ module Sapos
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
-    config.time_zone = 'Brasilia'
+    config.time_zone = "Brasilia"
 
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-    # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
+    # config.i18n.load_path += Dir[Rails.root.join("my", "locales", "*.{rb,yml}").to_s]
     # config.i18n.default_locale = :de
     config.i18n.enforce_available_locales = false
     config.i18n.default_locale = "pt-BR"
@@ -66,9 +73,8 @@ module Sapos
     config.assets.enabled = true
 
     # Version of your assets, change this if you want to expire all your assets
-    config.assets.version = '1.0'
-
+    config.assets.version = "1.0"
   end
 
-  ActionMailer::Base.default :from => 'SAPOS <sapos@sapos.ic.uff.br>'
+  ActionMailer::Base.default from: "SAPOS <sapos@sapos.ic.uff.br>"
 end
