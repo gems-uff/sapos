@@ -14,12 +14,13 @@ class DeferralType < ApplicationRecord
   validates :phase, presence: true
   validates :name, presence: true
 
-  validate :duration_validation
+  validate :that_duration_is_not_blank
 
-  def duration_validation
-    if ([0, nil].include?(self.duration_semesters)) && ([0, nil].include?(self.duration_months)) && ([0, nil].include?(self.duration_days))
-      errors.add(:duration, :blank_duration)
-    end
+  def that_duration_is_not_blank
+    return unless [0, nil].include?(self.duration_semesters)
+    return unless [0, nil].include?(self.duration_months)
+    return unless [0, nil].include?(self.duration_days)
+    errors.add(:duration, :blank_duration)
   end
 
   def to_label

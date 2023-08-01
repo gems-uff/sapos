@@ -1,24 +1,18 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
+# Helper for Deferrals
 module DeferralsHelper
-  @@config = YAML::load_file("#{Rails.root}/config/properties.yml")    
-  @@range = @@config["scholarship_year_range"] 
-  
-  def approval_date_form_column(record,options)
-    date_select :record, :approval_date, {
-         :discard_day => true,
-         :start_year => Time.now.year - @@range,
-         :end_year => Time.now.year + @@range,
-         :include_blank => true,
-         :default => nil,
-    }.merge(options)
+  def approval_date_form_column(record, options)
+    scholarship_month_year_widget record, options, :approval_date
   end
 
-  #TODO: remove current deferraltype if enrollment was changed
+  # TODO: remove current deferraltype if enrollment was changed
   def options_for_association_conditions(association, record)
     if association.name == :deferral_type
-      DeferralType::find_all_for_enrollment(record.enrollment)
+      DeferralType.find_all_for_enrollment(record.enrollment)
     else
       super
     end

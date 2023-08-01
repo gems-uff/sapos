@@ -3,9 +3,10 @@
 
 # frozen_string_literal: true
 
-# Helper for Dismissals
-module DismissalsHelper
-  def date_form_column(record, options)
-    scholarship_month_year_widget record, options, :date
+# Fix running tests in the first day of the month
+
+module DateHelpers
+  def middle_of_month(date)
+    Date.new(date.year, date.month, 15)
   end
 end

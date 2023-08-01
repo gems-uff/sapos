@@ -1,0 +1,41 @@
+<% 
+  div_id = options[:id] + "_div"
+    
+%>
+<div style="display: inline-block;" id="<%= div_id %>">
+  <% if extra[:multiparameter] %>
+    <%= date_select :record, attribute, date_options, extra[:select_options] %>
+  <% else %>
+    <%= select_date record[attribute], date_options, extra[:select_options] %>
+  <% end %>
+  <% if extra[:force_send] %>
+    <%= hidden_field(:record, attribute, options.merge(required: false)) %>
+  <% end %>
+</div>
+
+<% if extra[:force_send] %>
+  <script>
+    $(document).ready(function() {
+      var hidden_input = $("#<%= options[:id] %>");
+      $("#<%= div_id %> select").on('change', function() {
+        <% if extra[:multiparameter] %>
+          var id = $(this).attr('id');
+          var subname = id.slice(0, -2);
+          var month = subname + '2i';
+          var year = subname + '1i';
+        <% else %>
+          var month = "<%= options[:id] %>_month";
+          var year = "<%= options[:id] %>_year";
+        <% end %>
+        var yvalue = $("#"+year).val();
+        var mvalue = $("#"+month).val() - 1;
+      
+        var new_date = $.datepicker.formatDate($.datepicker.regional['pt-BR'].dateFormat, new Date(yvalue, mvalue, 1));
+        if (mvalue == -1 || yvalue == "") {
+          new_date = "";
+        }
+        hidden_input.val(new_date);
+      });
+    });
+  </script>
+<% end %>

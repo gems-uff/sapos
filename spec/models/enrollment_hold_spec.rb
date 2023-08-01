@@ -5,6 +5,12 @@
 
 require "spec_helper"
 
+require "./spec/support/date_helpers"
+
+RSpec.configure do |c|
+  c.include DateHelpers
+end
+
 RSpec.describe EnrollmentHold, type: :model do
   it { should be_able_to_be_destroyed }
 
@@ -20,8 +26,8 @@ RSpec.describe EnrollmentHold, type: :model do
   let(:enrollment_hold) do
     EnrollmentHold.new(
       enrollment: enrollment,
-      semester: 1,
-      year: 2023,
+      semester: YearSemester.current.semester,
+      year: YearSemester.current.year,
       number_of_semesters: 1
     )
   end

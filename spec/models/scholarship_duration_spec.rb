@@ -4,6 +4,12 @@
 
 require "spec_helper"
 
+require "./spec/support/date_helpers"
+
+RSpec.configure do |c|
+  c.include DateHelpers
+end
+
 RSpec.describe ScholarshipDuration, type: :model do
   it { should be_able_to_be_destroyed }
   it { should have_many(:scholarship_suspensions).dependent(:destroy) }
@@ -16,8 +22,8 @@ RSpec.describe ScholarshipDuration, type: :model do
     @destroy_later.clear
   end
 
-  let(:start_date) { 3.months.ago.to_date }
-  let(:end_date) { 3.months.from_now.to_date }
+  let(:start_date) { middle_of_month 3.months.ago.to_date }
+  let(:end_date) { middle_of_month 3.months.from_now.to_date }
   let(:level) { FactoryBot.build(:level) }
   let(:enrollment) { FactoryBot.build(:enrollment, level: level) }
   let(:scholarship) { FactoryBot.build(:scholarship, start_date: start_date, end_date: end_date, level: level) }
