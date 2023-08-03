@@ -109,7 +109,7 @@ GEM
       msgpack (~> 1.2)
     builder (3.2.4)
     cancancan (3.5.0)
-    carrierwave (3.0.1)
+    carrierwave (3.0.2)
       activemodel (>= 6.0.0)
       activesupport (>= 6.0.0)
       addressable (~> 2.6)
@@ -268,7 +268,7 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.7.1)
-    rack (2.2.7)
+    rack (2.2.8)
     rack-test (2.1.0)
       rack (>= 1.3)
     rails (7.0.6)
@@ -320,7 +320,7 @@ GEM
       actionpack (>= 5.2)
       railties (>= 5.2)
     rexml (3.2.6)
-    rouge (4.1.2)
+    rouge (4.1.3)
     rspec-collection_matchers (1.2.0)
       rspec-expectations (>= 2.99.0.beta1)
     rspec-core (3.12.2)
@@ -340,7 +340,7 @@ GEM
       rspec-mocks (~> 3.12)
       rspec-support (~> 3.12)
     rspec-support (3.12.1)
-    rubocop (1.55.0)
+    rubocop (1.55.1)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
       parallel (~> 1.10)
@@ -439,7 +439,7 @@ GEM
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    zeitwerk (2.6.9)
+    zeitwerk (2.6.11)
 
 PLATFORMS
   ruby
@@ -495,6 +495,7 @@ DEPENDENCIES
   simplecov
   sprockets-rails
   sqlite3
+  stringio
   tzinfo-data
   uglifier
   validates_timeliness (~> 7.0.0.beta1)

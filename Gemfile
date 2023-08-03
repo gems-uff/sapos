@@ -177,6 +177,10 @@ gem "exception_notification"
 group :production do
   # Use MySQL database for production
   gem "mysql2"
+
+  # Temporary fix for passenger
+  gem "stringio"
+
 end
 
 group :doc do

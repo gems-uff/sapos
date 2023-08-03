@@ -10,15 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
-
+ActiveRecord::Schema[7.0].define(version: 2022_04_11_182230) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
     t.date "conclusion_date"
     t.string "obs", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["enrollment_id"], name: "index_accomplishments_on_enrollment_id"
     t.index ["phase_id"], name: "index_accomplishments_on_phase_id"
   end
@@ -26,8 +25,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "advisement_authorizations", force: :cascade do |t|
     t.integer "professor_id"
     t.integer "level_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["level_id"], name: "index_advisement_authorizations_on_level_id"
     t.index ["professor_id"], name: "index_advisement_authorizations_on_professor_id"
   end
@@ -36,8 +35,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.integer "professor_id", null: false
     t.integer "enrollment_id", null: false
     t.boolean "main_advisor", default: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["enrollment_id"], name: "index_advisements_on_enrollment_id"
     t.index ["professor_id"], name: "index_advisements_on_professor_id"
   end
@@ -48,24 +47,24 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.integer "start_time"
     t.integer "end_time"
     t.integer "course_class_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["course_class_id"], name: "index_allocations_on_course_class_id"
   end
 
   create_table "carrier_wave_files", force: :cascade do |t|
     t.string "medium_hash", limit: 255
     t.binary "binary"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.integer "reference_counter", default: 0
   end
 
   create_table "cities", force: :cascade do |t|
     t.string "name", limit: 255
     t.integer "state_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["state_id"], name: "index_cities_on_state_id"
   end
 
@@ -74,8 +73,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.integer "course_class_id"
     t.integer "class_enrollment_id"
     t.string "status", default: "Solicitada"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "action", default: "Adição"
     t.index ["class_enrollment_id"], name: "index_class_enrollment_requests_on_class_enrollment_id"
     t.index ["course_class_id"], name: "index_class_enrollment_requests_on_course_class_id"
@@ -88,8 +87,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.string "situation", limit: 255
     t.integer "course_class_id"
     t.integer "enrollment_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.boolean "disapproved_by_absence", default: false
     t.boolean "grade_not_count_in_gpr", default: false
     t.string "justification_grade_not_count_in_gpr", default: ""
@@ -100,19 +99,19 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "class_schedules", force: :cascade do |t|
     t.integer "year"
     t.integer "semester"
-    t.datetime "enrollment_start"
-    t.datetime "enrollment_end"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.datetime "enrollment_adjust"
-    t.datetime "enrollment_insert"
-    t.datetime "enrollment_remove"
+    t.datetime "enrollment_start", precision: nil
+    t.datetime "enrollment_end", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "enrollment_adjust", precision: nil
+    t.datetime "enrollment_insert", precision: nil
+    t.datetime "enrollment_remove", precision: nil
   end
 
   create_table "countries", force: :cascade do |t|
     t.string "name", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "nationality", default: "-"
   end
 
@@ -122,8 +121,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.integer "professor_id"
     t.integer "year"
     t.integer "semester"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.boolean "not_schedulable", default: false
     t.string "obs_schedule"
     t.index ["course_id"], name: "index_course_classes_on_course_id"
@@ -133,8 +132,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "course_research_areas", force: :cascade do |t|
     t.integer "course_id"
     t.integer "research_area_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at", precision: nil
+    t.datetime "updated_at", precision: nil
     t.index ["course_id"], name: "index_course_research_areas_on_course_id"
     t.index ["research_area_id"], name: "index_course_research_areas_on_research_area_id"
   end
@@ -142,8 +141,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "course_types", force: :cascade do |t|
     t.string "name", limit: 255
     t.boolean "has_score"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.boolean "schedulable", default: true
     t.boolean "show_class_name", default: true
     t.boolean "allow_multiple_classes", default: false, null: false
@@ -156,8 +155,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.text "content"
     t.integer "credits"
     t.integer "course_type_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.integer "workload"
     t.boolean "available", default: true
     t.index ["course_type_id"], name: "index_courses_on_course_type_id"
@@ -166,8 +165,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "custom_variables", force: :cascade do |t|
     t.string "description", limit: 255
     t.string "variable", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.text "value"
   end
 
@@ -176,8 +175,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.string "description", limit: 255
     t.integer "duration_semesters", default: 0
     t.integer "phase_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.integer "duration_months", default: 0
     t.integer "duration_days", default: 0
     t.index ["phase_id"], name: "index_deferral_types_on_phase_id"
@@ -188,8 +187,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.string "obs", limit: 255
     t.integer "enrollment_id"
     t.integer "deferral_type_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["deferral_type_id"], name: "index_deferrals_on_deferral_type_id"
     t.index ["enrollment_id"], name: "index_deferrals_on_enrollment_id"
   end
@@ -197,8 +196,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "dismissal_reasons", force: :cascade do |t|
     t.string "name", limit: 255
     t.text "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.boolean "show_advisor_name", default: false
     t.string "thesis_judgement", limit: 255
   end
@@ -208,8 +207,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.integer "enrollment_id"
     t.integer "dismissal_reason_id"
     t.text "obs"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["dismissal_reason_id"], name: "index_dismissals_on_dismissal_reason_id"
     t.index ["enrollment_id"], name: "index_dismissals_on_enrollment_id"
   end
@@ -220,8 +219,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.string "subject"
     t.text "body"
     t.boolean "enabled", default: true
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "enrollment_holds", force: :cascade do |t|
@@ -229,8 +228,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.integer "year"
     t.integer "semester"
     t.integer "number_of_semesters", default: 1
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.boolean "active", default: true
     t.index ["enrollment_id"], name: "index_enrollment_holds_on_enrollment_id"
   end
@@ -239,8 +238,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.text "message"
     t.integer "enrollment_request_id"
     t.integer "user_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["enrollment_request_id"], name: "index_enrollment_request_comments_on_enrollment_request_id"
     t.index ["user_id"], name: "index_enrollment_request_comments_on_user_id"
   end
@@ -249,18 +248,18 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.integer "year"
     t.integer "semester"
     t.integer "enrollment_id"
-    t.datetime "last_student_change_at"
-    t.datetime "last_staff_change_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.datetime "student_view_at"
+    t.datetime "last_student_change_at", precision: nil
+    t.datetime "last_staff_change_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "student_view_at", precision: nil
     t.index ["enrollment_id"], name: "index_enrollment_requests_on_enrollment_id"
   end
 
   create_table "enrollment_statuses", force: :cascade do |t|
     t.string "name", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.boolean "user"
   end
 
@@ -271,8 +270,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.integer "enrollment_status_id"
     t.date "admission_date"
     t.text "obs"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "thesis_title", limit: 255
     t.date "thesis_defense_date"
     t.integer "research_area_id"
@@ -284,15 +283,15 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
 
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "code", limit: 255
   end
 
   create_table "levels", force: :cascade do |t|
     t.string "name", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "course_name", limit: 255
     t.integer "default_duration", default: 0
     t.boolean "show_advisements_points_in_list"
@@ -303,16 +302,16 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.string "name", limit: 255
     t.integer "level_id"
     t.integer "institution_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["institution_id"], name: "index_majors_on_institution_id"
     t.index ["level_id"], name: "index_majors_on_level_id"
   end
 
   create_table "notification_logs", force: :cascade do |t|
     t.integer "notification_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "to", limit: 255
     t.string "subject", limit: 255
     t.text "body"
@@ -324,8 +323,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.integer "notification_id"
     t.integer "query_param_id"
     t.string "value", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.boolean "active", default: false, null: false
     t.index ["notification_id"], name: "index_notification_params_on_notification_id"
     t.index ["query_param_id"], name: "index_notification_params_on_query_param_id"
@@ -339,9 +338,9 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.string "notification_offset", limit: 255
     t.string "query_offset", limit: 255
     t.string "frequency", limit: 255
-    t.datetime "next_execution"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "next_execution", precision: nil
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.boolean "individual", default: true
     t.integer "query_id", null: false
     t.boolean "has_grades_report_pdf_attachment", default: false
@@ -351,10 +350,10 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "phase_completions", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
-    t.datetime "due_date"
-    t.datetime "completion_date"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "due_date", precision: nil
+    t.datetime "completion_date", precision: nil
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["enrollment_id"], name: "index_phase_completions_on_enrollment_id"
     t.index ["phase_id"], name: "index_phase_completions_on_phase_id"
   end
@@ -363,8 +362,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.integer "phase_id"
     t.integer "level_id"
     t.integer "deadline_semesters", default: 0
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.integer "deadline_months", default: 0
     t.integer "deadline_days", default: 0
     t.index ["level_id"], name: "index_phase_durations_on_level_id"
@@ -374,8 +373,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "phases", force: :cascade do |t|
     t.string "name", limit: 255
     t.string "description", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.boolean "is_language", default: false
     t.boolean "extend_on_hold", default: false
     t.boolean "active", default: true
@@ -384,8 +383,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "professor_research_areas", force: :cascade do |t|
     t.integer "professor_id"
     t.integer "research_area_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["professor_id"], name: "index_professor_research_areas_on_professor_id"
     t.index ["research_area_id"], name: "index_professor_research_areas_on_research_area_id"
   end
@@ -394,8 +393,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.string "name", limit: 255
     t.string "cpf", limit: 255
     t.date "birthdate"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "sex", limit: 255
     t.string "civil_status", limit: 255
     t.string "identity_number", limit: 255
@@ -430,8 +429,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "queries", force: :cascade do |t|
     t.string "name", limit: 255
     t.text "sql"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "description", limit: 255
   end
 
@@ -440,8 +439,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.string "name", limit: 255
     t.string "default_value", limit: 255
     t.string "value_type", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["query_id"], name: "index_query_params_on_query_id"
   end
 
@@ -458,22 +457,22 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.decimal "scale", precision: 10, scale: 8
     t.integer "x"
     t.integer "y"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "research_areas", force: :cascade do |t|
     t.string "name", limit: 255
     t.string "code", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "roles", force: :cascade do |t|
     t.string "name", limit: 50, null: false
     t.string "description", limit: 255, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "scholarship_durations", force: :cascade do |t|
@@ -482,8 +481,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.date "start_date"
     t.date "end_date"
     t.text "obs"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.date "cancel_date"
     t.index ["enrollment_id"], name: "index_scholarship_durations_on_enrollment_id"
     t.index ["scholarship_id"], name: "index_scholarship_durations_on_scholarship_id"
@@ -494,15 +493,15 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.date "end_date"
     t.boolean "active", default: true
     t.integer "scholarship_duration_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["scholarship_duration_id"], name: "index_scholarship_suspensions_on_scholarship_duration_id"
   end
 
   create_table "scholarship_types", force: :cascade do |t|
     t.string "name", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "scholarships", force: :cascade do |t|
@@ -513,8 +512,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.date "start_date"
     t.date "end_date"
     t.text "obs"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.integer "professor_id"
     t.index ["level_id"], name: "index_scholarships_on_level_id"
     t.index ["professor_id"], name: "index_scholarships_on_professor_id"
@@ -525,24 +524,24 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "sessions", force: :cascade do |t|
     t.string "session_id", null: false
     t.text "data"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["session_id"], name: "index_sessions_on_session_id", unique: true
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
   create_table "sponsors", force: :cascade do |t|
     t.string "name", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
   end
 
   create_table "states", force: :cascade do |t|
     t.string "name", limit: 255
     t.string "code", limit: 255
     t.integer "country_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["country_id"], name: "index_states_on_country_id"
   end
 
@@ -556,8 +555,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "students", force: :cascade do |t|
     t.string "name", limit: 255
     t.string "cpf", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.text "obs"
     t.date "birthdate"
     t.string "sex", limit: 255
@@ -592,8 +591,8 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
   create_table "thesis_defense_committee_participations", force: :cascade do |t|
     t.integer "professor_id"
     t.integer "enrollment_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["enrollment_id"], name: "index_thesis_defense_committee_participations_on_enrollment_id"
     t.index ["professor_id"], name: "index_thesis_defense_committee_participations_on_professor_id"
   end
@@ -602,30 +601,30 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.string "name", limit: 255
     t.string "hashed_password", limit: 255
     t.string "salt", limit: 255
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
     t.string "email", limit: 255, default: "", null: false
     t.string "encrypted_password", limit: 255, default: "", null: false
     t.string "reset_password_token", limit: 255
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
+    t.datetime "reset_password_sent_at", precision: nil
+    t.datetime "remember_created_at", precision: nil
     t.integer "sign_in_count", default: 0
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
+    t.datetime "current_sign_in_at", precision: nil
+    t.datetime "last_sign_in_at", precision: nil
     t.string "current_sign_in_ip", limit: 255
     t.string "last_sign_in_ip", limit: 255
     t.string "confirmation_token", limit: 255
-    t.datetime "confirmed_at"
-    t.datetime "confirmation_sent_at"
+    t.datetime "confirmed_at", precision: nil
+    t.datetime "confirmation_sent_at", precision: nil
     t.integer "failed_attempts", default: 0
     t.string "unlock_token", limit: 255
-    t.datetime "locked_at"
+    t.datetime "locked_at", precision: nil
     t.integer "role_id", default: 1, null: false
     t.string "unconfirmed_email"
     t.string "invitation_token"
-    t.datetime "invitation_created_at"
-    t.datetime "invitation_sent_at"
-    t.datetime "invitation_accepted_at"
+    t.datetime "invitation_created_at", precision: nil
+    t.datetime "invitation_sent_at", precision: nil
+    t.datetime "invitation_accepted_at", precision: nil
     t.integer "invitation_limit"
     t.string "invited_by_type"
     t.integer "invited_by_id"
@@ -643,7 +642,7 @@ ActiveRecord::Schema[6.1].define(version: 2022_04_11_182230) do
     t.string "event", limit: 255, null: false
     t.string "whodunnit", limit: 255
     t.text "object", limit: 16777215
-    t.datetime "created_at"
+    t.datetime "created_at", precision: nil
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
