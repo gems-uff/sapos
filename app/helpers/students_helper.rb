@@ -1,9 +1,11 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 module StudentsHelper
   def enrollments_column(record, column)
-    return record.enrollments_number
+    record.enrollments_number
   end
 
   def city_form_column(record, options)
@@ -37,21 +39,20 @@ module StudentsHelper
 
   def photo_form_column(record, options)
     config = ActiveScaffold::Config::Core.new(:student)
-    render(:partial => "students/photo_widget", :locals => { 
+    render(partial: "students/photo_widget", locals: {
       config: config,
       record: record,
       options: options,
       column: config.columns[:photo],
     })
   end
-  
+
   def photo_show_column(record, column)
-    return '-' if record.photo.blank?
+    return "-" if record.photo.blank?
     image_tag photo_student_path(record) + "?hash=#{record.photo_before_type_cast}", style: "width: 400px; height: 300px; Object-fit: contain; background-color: #f2f1f0;"
   end
 
   def permit_rs_browse_params
     [:page, :update, :utf8]
   end
-
 end

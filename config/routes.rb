@@ -1,6 +1,8 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -9,13 +11,13 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "articles#index"
-  root :to => "application#root"
+  root to: "application#root"
 
   resources :enrollment_holds do concerns :active_scaffold end
 
   resources :scholarship_suspensions do concerns :active_scaffold end
 
-  devise_for :users,  :controllers => {
+  devise_for :users,  controllers: {
     confirmations: "users/confirmations",
     passwords: "users/passwords",
     sessions: "users/sessions",
@@ -24,12 +26,12 @@ Rails.application.routes.draw do
   }, skip: [:registrations]
 
   devise_scope :user do
-    get 'users/sign_up', to: 'users/registrations#new', as: :new_user_registration
-    get 'users/profile', to: 'users/registrations#edit', as: :edit_user_registration
-    patch 'users/profile', to: 'users/registrations#update', as: :user_registration
-    put 'users/profile', to: 'users/registrations#update'
-    post 'users/profile', to: 'users/registrations#update'
-    delete 'users/profile', to: 'users/registrations#update'
+    get "users/sign_up", to: "users/registrations#new", as: :new_user_registration
+    get "users/profile", to: "users/registrations#edit", as: :edit_user_registration
+    patch "users/profile", to: "users/registrations#update", as: :user_registration
+    put "users/profile", to: "users/registrations#update"
+    post "users/profile", to: "users/registrations#update"
+    delete "users/profile", to: "users/registrations#update"
   end
 
   resources :versions do
@@ -54,17 +56,17 @@ Rails.application.routes.draw do
     concerns :active_scaffold
     record_select_routes
     member do
-      get 'summary_pdf'
+      get "summary_pdf"
     end
     collection do
-      get 'class_schedule_pdf'
+      get "class_schedule_pdf"
     end
   end
 
   resources :class_schedules do
     concerns :active_scaffold
     member do
-      get 'class_schedule_pdf'
+      get "class_schedule_pdf"
     end
   end
 
@@ -111,12 +113,12 @@ Rails.application.routes.draw do
 
   resources :states do
     concerns :active_scaffold
-    get 'cities', on: :member
+    get "cities", on: :member
   end
 
   resources :countries do
     concerns :active_scaffold
-    get 'states', on: :member
+    get "states", on: :member
   end
 
   resources :users do
@@ -132,7 +134,7 @@ Rails.application.routes.draw do
     concerns :active_scaffold
     record_select_routes
     collection do
-      get 'to_pdf'
+      get "to_pdf"
     end
   end
 
@@ -140,7 +142,7 @@ Rails.application.routes.draw do
     concerns :active_scaffold
     record_select_routes
     collection do
-      get 'to_pdf'
+      get "to_pdf"
     end
   end
 
@@ -148,7 +150,7 @@ Rails.application.routes.draw do
     concerns :active_scaffold
     record_select_routes
     collection do
-      get 'to_pdf'
+      get "to_pdf"
     end
   end
 
@@ -173,13 +175,13 @@ Rails.application.routes.draw do
     concerns :active_scaffold
     record_select_routes
     collection do
-      get 'to_pdf'
-      get 'new_users'
-      post 'create_users'
+      get "to_pdf"
+      get "new_users"
+      post "create_users"
     end
     member do
-      get 'academic_transcript_pdf'
-      get 'grades_report_pdf'
+      get "academic_transcript_pdf"
+      get "grades_report_pdf"
     end
   end
 
@@ -191,7 +193,7 @@ Rails.application.routes.draw do
     concerns :active_scaffold
     record_select_routes
     member do
-      get 'photo'
+      get "photo"
     end
   end
 
@@ -238,19 +240,19 @@ Rails.application.routes.draw do
   resources :notifications do
     concerns :active_scaffold
     member do
-      post 'execute_now'
-      get 'simulate'
+      post "execute_now"
+      get "simulate"
     end
 
     collection do
-      get 'notify'
+      get "notify"
     end
   end
 
   resources :queries do
     concerns :active_scaffold
     member do
-      get 'execute'
+      get "execute"
     end
   end
 
@@ -265,12 +267,12 @@ Rails.application.routes.draw do
   resources :report_configurations do
     concerns :active_scaffold
     collection do
-      put 'preview'
-      post 'preview'
-      patch 'preview'
+      put "preview"
+      post "preview"
+      patch "preview"
     end
     member do
-      get 'logo'
+      get "logo"
     end
   end
 
@@ -279,56 +281,52 @@ Rails.application.routes.draw do
     concerns :active_scaffold
   end
 
-  get 'landing', action: :index, controller: 'landing'
-  get 'enrollment/:id', to: 'student_enrollment#show', as: :student_enrollment
-  get 'enrollment/:id/enroll/:year-:semester', to: 'student_enrollment#enroll', as: :student_enroll
-  post 'enrollment/:id/enroll/:year-:semester', to: 'student_enrollment#save_enroll', as: :save_student_enroll
+  get "landing", action: :index, controller: "landing"
+  get "enrollment/:id", to: "student_enrollment#show", as: :student_enrollment
+  get "enrollment/:id/enroll/:year-:semester", to: "student_enrollment#enroll", as: :student_enroll
+  post "enrollment/:id/enroll/:year-:semester", to: "student_enrollment#save_enroll", as: :save_student_enroll
 
-  get 'pendencies', to: 'pendencies#index', as: :pendencies
+  get "pendencies", to: "pendencies#index", as: :pendencies
 
 
   resources :enrollment_requests do
     concerns :active_scaffold
     record_select_routes
     collection do
-      get 'help'
+      get "help"
     end
   end
   resources :class_enrollment_requests do
     concerns :active_scaffold
     collection do
-      get 'help'
-      get 'show_effect'
-      post 'effect'
+      get "help"
+      get "show_effect"
+      post "effect"
     end
     member do
-      put 'set_invalid'
-      put 'set_requested'
-      put 'set_valid'
-      put 'set_effected'
+      put "set_invalid"
+      put "set_requested"
+      put "set_valid"
+      put "set_effected"
     end
   end
   resources :enrollment_request_comments, concerns: :active_scaffold
-  
   resources :email_templates do
     concerns :active_scaffold
     collection do
-      get 'builtin'
+      get "builtin"
     end
-
   end
 
 
   resources :email_templates do
     concerns :active_scaffold
     collection do
-      get 'builtin'
+      get "builtin"
     end
-
   end
 
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
-
 end

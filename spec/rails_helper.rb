@@ -11,6 +11,13 @@ require "rspec/rails"
 # Add additional requires below this line. Rails is not loaded until this point!
 require "rspec/collection_matchers"
 require "simplecov"
+require "capybara/rails"
+require "capybara/rspec"
+
+require "support/user_helpers"
+require "support/place_widgets_helpers"
+
+Capybara.server = :puma
 SimpleCov.start "rails"
 
 
@@ -95,6 +102,10 @@ RSpec.configure do |config|
       puts "  #{leaked.join("\n  ")}"
     end
   end
+
+  config.include UserHelpers
+  config.include PlaceWidgetsHelpers
+  config.include Warden::Test::Helpers
 end
 
 

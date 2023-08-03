@@ -149,9 +149,9 @@ end
 
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
-  # gem "capybara"
-  # gem "selenium-webdriver"
-  # gem "webdrivers"
+  gem "capybara"
+  gem "selenium-webdriver"
+  gem "webdrivers"
 
   # Test runner
   gem "rspec-rails"
@@ -181,6 +181,8 @@ group :production do
   # Temporary fix for passenger
   gem "stringio"
 
+  # Open /letter_opener in the browser to view 'sent' emails
+  gem "letter_opener_web"
 end
 
 group :doc do

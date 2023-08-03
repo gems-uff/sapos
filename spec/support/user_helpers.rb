@@ -8,4 +8,17 @@ module UserHelpers
       user.delete unless user.nil?
     end
   end
+
+  def create_confirmed_user(role, email = "user@ic.uff.br", name = "ana", password = "A1b2c3d4!", **kwargs)
+    user = User.create(
+      role: role,
+      email: email,
+      name: name,
+      password: password,
+      **kwargs
+    )
+    user.skip_confirmation!
+    user.save!
+    user
+  end
 end

@@ -55,7 +55,6 @@ RSpec.describe Student, type: :model do
       end
       context "should have error changed_to_different_user when" do
         it "user is set to a different user" do
-          # delete_users_by_emails ["abc@def.com", "def@ghi.com"]
           @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", role_id: Role::ROLE_ALUNO)
           @destroy_later << user2 = FactoryBot.create(:user, email: "def@ghi.com", role_id: Role::ROLE_ALUNO)
           student.user = user1

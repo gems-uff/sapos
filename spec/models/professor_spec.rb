@@ -5,12 +5,6 @@
 
 require "spec_helper"
 
-require Rails.root.join "spec/support/user_helpers.rb"
-
-RSpec.configure do |c|
-  c.include UserHelpers
-end
-
 RSpec.describe Professor, type: :model do
   it { should be_able_to_be_destroyed }
   it { should have_many(:advisements).dependent(:restrict_with_exception) }

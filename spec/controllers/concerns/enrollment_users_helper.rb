@@ -4,11 +4,6 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require Rails.root.join "spec/support/user_helpers.rb"
-
-RSpec.configure do |c|
-  c.include UserHelpers
-end
 
 shared_examples_for "enrollment_user_helper" do
   let(:controller) { described_class } # Controller that includes concert
