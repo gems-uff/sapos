@@ -919,6 +919,7 @@ noscript.active-scaffold {
     color: #888;
 }
 
+.active-scaffold input.recordselect,
 .active-scaffold input.text-input,
 .active-scaffold select {
     font: bold 12px arial;
@@ -926,6 +927,7 @@ noscript.active-scaffold {
     border: solid 1px #a4c7d0;
 }
 
+.active-scaffold input.recordselect,
 .active-scaffold input.text-input {
     padding: 2px;
 }
@@ -948,6 +950,7 @@ noscript.active-scaffold {
 }
 
 .active-scaffold select:focus,
+.active-scaffold input.recordselect:focus,
 .active-scaffold input.text-input:focus {
     background-color: #d3e5ea;
 }
@@ -1078,6 +1081,7 @@ noscript.active-scaffold {
     font: bold 12px arial;
 }
 
+.active-scaffold .sub-form input.recordselect,
 .active-scaffold .sub-form input.text-input,
 .active-scaffold .sub-form select {
     letter-spacing: 0;

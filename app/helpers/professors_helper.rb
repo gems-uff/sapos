@@ -1,6 +1,8 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 module ProfessorsHelper
   def city_form_column(record, options)
     city_widget(
@@ -25,7 +27,7 @@ module ProfessorsHelper
     count = 0
     total_point = 0.0
     advisements.each do |advisement|
-      count +=1;
+      count += 1
       tr_class = count.even? ? "even-record" : ""
       point = record.advisement_point(advisement.enrollment)
       total_point += point
@@ -59,5 +61,4 @@ module ProfessorsHelper
   def permit_rs_browse_params
     [:page, :update, :utf8]
   end
-
 end
