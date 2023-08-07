@@ -69,9 +69,9 @@ module ApplicationHelper
     config = ActiveScaffold::Config::Core.new(record.class)
     extra[:date_options] ||= {}
     extra[:select_options] ||= {}
-    extra[:required] ||= extra[:required].blank? ? config.columns[attribute].required? : extra[:required]
-    extra[:multiparameter] ||= extra[:multiparameter].blank? ? true : extra[:multiparameter]
-    extra[:force_send] ||= extra[:force_send].blank? ? false : extra[:force_send]
+    extra[:required] ||= extra[:required].nil? ? config.columns[attribute].required? : extra[:required]
+    extra[:multiparameter] ||= extra[:multiparameter].nil? ? true : extra[:multiparameter]
+    extra[:force_send] ||= extra[:force_send].nil? ? false : extra[:force_send]
     date_options = { discard_day: true,
                      start_year: Time.now.year - @@range,
                      end_year: Time.now.year + @@range }.merge(extra[:date_options])

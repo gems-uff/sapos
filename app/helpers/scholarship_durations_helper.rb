@@ -57,7 +57,6 @@ module ScholarshipDurationsHelper
   def adviser_search_column(record, options)
     local_options = {
         include_blank: true,
-        class: "text-input"
     }
     record_select_field :adviser, Professor.new, options.merge(local_options)
   end
@@ -67,7 +66,11 @@ module ScholarshipDurationsHelper
         include_blank: true
     }
 
-    select_tag record[:sponsor], options_from_collection_for_select(Sponsor.order("name"), "id", "name"), options.merge(local_options)
+    select_tag(
+      record[:sponsor],
+      options_from_collection_for_select(Sponsor.order("name"), "id", "name"),
+      options.merge(local_options)
+    )
   end
 
   def scholarship_types_search_column(record, options)
@@ -75,11 +78,19 @@ module ScholarshipDurationsHelper
         include_blank: true
     }
 
-    select_tag record[:scholarship_types], options_from_collection_for_select(ScholarshipType.order("name"), "id", "name"), options.merge(local_options)
+    select_tag(
+      record[:scholarship_types],
+      options_from_collection_for_select(ScholarshipType.order("name"), "id", "name"),
+      options.merge(local_options)
+    )
   end
 
   def active_search_column(record, options)
-    select_tag(record[:active], options_for_select([["Todas", "all"], ["Ativas", "active"], ["Inativas", "not_active"]]), options)
+    select_tag(
+      record[:active],
+      options_for_select([["Todas", "all"], ["Ativas", "active"], ["Inativas", "not_active"]]),
+      options
+    )
   end
 
   def level_search_column(record, options)
@@ -87,6 +98,10 @@ module ScholarshipDurationsHelper
         include_blank: true
     }
 
-    select_tag record[:level], options_from_collection_for_select(Level.order("name"), "id", "name"), options.merge(local_options)
+    select_tag(
+      record[:level],
+      options_from_collection_for_select(Level.order("name"), "id", "name"),
+      options.merge(local_options)
+    )
   end
 end

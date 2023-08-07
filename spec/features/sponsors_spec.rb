@@ -5,20 +5,18 @@
 
 require "spec_helper"
 
-# ToDo: advisement_authorizarion
-
-RSpec.describe "Level features", type: :feature do
-  let(:url_path) { "/levels" }
-  let(:plural_name) { "levels" }
-  let(:model) { Level }
+RSpec.describe "Sponsor features", type: :feature do
+  let(:url_path) { "/sponsors" }
+  let(:plural_name) { "sponsors" }
+  let(:model) { Sponsor }
   before(:all) do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
     @destroy_all << @user = create_confirmed_user(@role_adm)
-    @destroy_all << @record = FactoryBot.create(:level, name: "Mestrado", default_duration: 24)
-    @destroy_all << FactoryBot.create(:level, name: "Doutorado", default_duration: 48)
-    @destroy_all << FactoryBot.create(:level, name: "Especialização", default_duration: 0)
+    @destroy_all << @record = FactoryBot.create(:sponsor, name: "CNPq")
+    @destroy_all << FactoryBot.create(:sponsor, name: "CAPES")
+    @destroy_all << FactoryBot.create(:sponsor, name: "FAPERJ")
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -36,14 +34,14 @@ RSpec.describe "Level features", type: :feature do
     end
 
     it "should show table" do
-      expect(page).to have_content "Níveis"
+      expect(page).to have_content "Agências de Fomento"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Nome", "Nome completo do curso", "Duração padrão (meses)", "Credenciamentos", ""
+        "Nome", ""
       ]
     end
 
     it "should sort the list by name, asc" do
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Doutorado", "Especialização", "Mestrado"]
+      expect(page.all("tr td.name-column").map(&:text)).to eq ["CAPES", "CNPq", "FAPERJ"]
     end
   end
 
@@ -56,22 +54,20 @@ RSpec.describe "Level features", type: :feature do
 
     it "should be able to insert and remove record" do
       # Insert record
-      expect(page).to have_content "Adicionar Nível"
+      expect(page).to have_content "Adicionar Agência de Fomento"
       within("#as_#{plural_name}-create--form") do
-        fill_in "Nome", with: "Graduação"
-        fill_in "Duração padrão (meses)", with: "48"
+        fill_in "Nome", with: "Serrapilheira"
       end
       click_button "Salvar"
-      expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Graduação")
-      expect(page).to have_css("tr:nth-child(1) td.default_duration-column", text: "48")
+      expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Serrapilheira")
 
       # Remove inserted record
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Graduação", "Doutorado", "Especialização", "Mestrado"]
+      expect(page.all("tr td.name-column").map(&:text)).to eq ["Serrapilheira", "CAPES", "CNPq", "FAPERJ"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
       sleep(0.2)
       visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Doutorado", "Especialização", "Mestrado"]
+      expect(page.all("tr td.name-column").map(&:text)).to eq ["CAPES", "CNPq", "FAPERJ"]
     end
   end
 
@@ -85,11 +81,9 @@ RSpec.describe "Level features", type: :feature do
     it "should be able to edit student" do
       within(".as_form") do
         fill_in "Nome", with: "Teste"
-        fill_in "Duração padrão (meses)", with: "12"
       end
       click_button "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
-      expect(page).to have_css("td.default_duration-column", text: "12")
     end
   end
 
@@ -101,9 +95,9 @@ RSpec.describe "Level features", type: :feature do
     end
 
     it "should be able to search by name" do
-      fill_in "search", with: "Especia"
+      fill_in "search", with: "CNP"
       sleep(0.8)
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Especialização"]
+      expect(page.all("tr td.name-column").map(&:text)).to eq ["CNPq"]
     end
   end
 end

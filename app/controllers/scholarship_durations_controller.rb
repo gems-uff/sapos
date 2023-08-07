@@ -1,39 +1,49 @@
-# encoding: utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
 
 class ScholarshipDurationsController < ApplicationController
   authorize_resource
 
   active_scaffold :scholarship_duration do |config|
-    config.action_links.add 'to_pdf', :label => I18n.t('active_scaffold.to_pdf'), :page => true, :type => :collection, :parameters => {:format => :pdf}
+    config.action_links.add(
+      "to_pdf", label: I18n.t("active_scaffold.to_pdf"), page: true,
+      type: :collection, parameters: { format: :pdf }
+    )
 
-    #Enables advanced search A.K.A FieldSearch
+    # Enables advanced search A.K.A FieldSearch
     config.actions.swap :search, :field_search
 
-    #virtual columns for advanced search
+    # virtual columns for advanced search
     config.columns.add :adviser, :sponsors, :scholarship_types, :active, :level
 
-    config.field_search.columns = [:scholarship, :start_date, :end_date, :cancel_date, :enrollment, :adviser, :sponsors, :scholarship_types, :level, :active]
-    config.columns[:start_date].search_sql = 'scholarship_durations.start_date'
-    config.columns[:end_date].search_sql = 'scholarship_durations.end_date'
-    config.columns[:cancel_date].search_sql = 'scholarship_durations.cancel_date'
-    config.columns[:enrollment].search_sql = 'enrollments.enrollment_number'
-    config.columns[:adviser].search_sql = ''
-    config.columns[:sponsors].search_sql = ''
-    config.columns[:scholarship_types].search_sql = ''
-    config.columns[:active].search_sql = ''
-    config.columns[:level].search_sql = ''
+    config.field_search.columns = [
+      :scholarship, :start_date, :end_date, :cancel_date, :enrollment,
+      :adviser, :sponsors, :scholarship_types, :level, :active
+    ]
+    config.columns[:start_date].search_sql = "scholarship_durations.start_date"
+    config.columns[:end_date].search_sql = "scholarship_durations.end_date"
+    config.columns[:cancel_date].search_sql = "scholarship_durations.cancel_date"
+    config.columns[:enrollment].search_sql = "enrollments.enrollment_number"
+    config.columns[:adviser].search_sql = ""
+    config.columns[:sponsors].search_sql = ""
+    config.columns[:scholarship_types].search_sql = ""
+    config.columns[:active].search_sql = ""
+    config.columns[:level].search_sql = ""
     config.columns[:scholarship].search_ui = :text
     config.columns[:enrollment].search_ui = :text
     config.columns[:adviser].search_ui = :record_select
 
-    config.list.sorting = {:scholarship => 'ASC'}
+    config.list.sorting = { scholarship: "ASC" }
     config.list.columns = [:scholarship, :start_date, :end_date, :cancel_date, :enrollment]
     config.create.label = :create_scholarship_duration_label
-    config.columns = [:scholarship, :enrollment, :start_date, :cancel_date, :end_date, :obs, :scholarship_suspensions]
-    config.columns[:scholarship].search_sql = 'scholarships.scholarship_number'
-    config.columns[:scholarship].sort_by :sql => 'scholarships.scholarship_number'
+    config.columns = [
+      :scholarship, :enrollment, :start_date, :cancel_date,
+      :end_date, :obs, :scholarship_suspensions
+    ]
+    config.columns[:scholarship].search_sql = "scholarships.scholarship_number"
+    config.columns[:scholarship].sort_by sql: "scholarships.scholarship_number"
     config.columns[:scholarship].form_ui = :record_select
     config.columns[:scholarship].update_columns = [:end_date]
     config.columns[:scholarship].send_form_on_update_column = true
@@ -41,15 +51,18 @@ class ScholarshipDurationsController < ApplicationController
     config.columns[:enrollment].update_columns = [:end_date]
     config.columns[:enrollment].send_form_on_update_column = true
     config.columns[:end_date].send_form_on_update_column = true
-    config.columns[:start_date].options = {:format => :monthyear}
-    config.columns[:end_date].options = {:format => :monthyear}
-    config.columns[:cancel_date].options = {:format => :monthyear}
+    config.columns[:start_date].options = { format: :monthyear }
+    config.columns[:end_date].options = { format: :monthyear }
+    config.columns[:cancel_date].options = { format: :monthyear }
     config.create.columns = [:scholarship, :enrollment, :start_date, :end_date, :cancel_date, :obs]
-    config.update.columns = [:scholarship, :enrollment, :start_date, :end_date, :cancel_date, :obs, :scholarship_suspensions]
+    config.update.columns = [
+      :scholarship, :enrollment, :start_date, :end_date, :cancel_date,
+      :obs, :scholarship_suspensions
+    ]
 
     config.actions.exclude :deleted_records
   end
-  record_select :per_page => 10, :full_text_search => true
+  record_select per_page: 10, full_text_search: true
 
   def record_select_includes
     [:enrollment, :scholarship]
@@ -87,11 +100,11 @@ class ScholarshipDurationsController < ApplicationController
 
   def self.condition_for_scholarship_types_column(column, value, like_pattern)
     unless value.blank?
-	    sql = "scholarship_durations.scholarship_id IN (
+      sql = "scholarship_durations.scholarship_id IN (
 		     SELECT scholarships.id
 		     FROM   scholarships
 		     WHERE  scholarships.scholarship_type_id = ?
-		   )"
+		  )"
 
       [sql, value]
     end
@@ -99,17 +112,20 @@ class ScholarshipDurationsController < ApplicationController
 
   def self.condition_for_active_column(column, value, like_pattern)
     unless value.blank?
-      query_active_scholarships = "DATE(scholarship_durations.end_date) >= DATE(?) AND  (scholarship_durations.cancel_date is NULL OR DATE(scholarship_durations.cancel_date) >= DATE(?))"
-      query_inactive_scholarships = "DATE(scholarship_durations.end_date) < DATE(?) OR DATE(scholarship_durations.cancel_date) < DATE(?)"
+      query_active_scholarships = "DATE(scholarship_durations.end_date) >= DATE(?) AND (
+        scholarship_durations.cancel_date is NULL OR
+        DATE(scholarship_durations.cancel_date) >= DATE(?)
+      )"
+      query_inactive_scholarships = "DATE(scholarship_durations.end_date) < DATE(?) OR
+        DATE(scholarship_durations.cancel_date) < DATE(?)"
       case value
-        when "active" then
-          sql = query_active_scholarships
-        when "not_active" then
-          sql = query_inactive_scholarships
-        else
-          return ""
+      when "active" then
+        sql = query_active_scholarships
+      when "not_active" then
+        sql = query_inactive_scholarships
+      else
+        return ""
       end
-
 
       [sql, Time.now, Time.now]
     end
@@ -173,29 +189,30 @@ class ScholarshipDurationsController < ApplicationController
   end
 
   def after_render_field(record, column)
-    if column.name == :enrollment or column.name == :scholarship
-      if record.enrollment.nil? and params[:parent_controller] == "enrollments"
-        if params[:parent_id].nil? or params[:parent_id].empty?
+    if column.name == :enrollment || column.name == :scholarship
+      if record.enrollment.nil? && params[:parent_controller] == "enrollments"
+        if params[:parent_id].nil? || params[:parent_id].empty?
           record.enrollment = Enrollment.new
         else
           record.enrollment = Enrollment.find(params[:parent_id])
         end
-        hash = params[:record].slice("admission_date(3i)", "admission_date(2i)", "admission_date(1i)")
+        hash = params[:record].slice(
+          "admission_date(3i)", "admission_date(2i)", "admission_date(1i)"
+        )
 
         record.enrollment.attributes = hash
-        unless params[:record]["level"].nil? or params[:record]["level"].empty? 
-           record.enrollment.level = Level.find(params[:record]["level"])
-        end 
+        unless params[:record]["level"].blank?
+          record.enrollment.level = Level.find(params[:record]["level"])
+        end
       end
       record.update_end_date
     end
   end
 
   def to_pdf
-    pdf = Prawn::Document.new
-
-    each_record_in_page {}
-    scholarship_durations_list = find_page(:sorting => active_scaffold_config.list.user.sorting).items
+    # pdf = Prawn::Document.new
+    each_record_in_page { }
+    scholarship_durations_list = find_page(sorting: active_scaffold_config.list.user.sorting).items
 
     @scholarship_durations = scholarship_durations_list.map do |scp|
       [
@@ -209,15 +226,18 @@ class ScholarshipDurationsController < ApplicationController
 
     respond_to do |format|
       format.pdf do
-        send_data render_to_string, :filename => I18n.t("pdf_content.scholarship_durations.to_pdf.filename"), :type => 'application/pdf'
+        send_data(
+          render_to_string,
+          filename: "#{I18n.t("pdf_content.scholarship_durations.to_pdf.filename")}.pdf",
+          type: "application/pdf"
+        )
       end
     end
   end
 
   protected
-  def do_new
-    super
-    @record.init
-  end 
-
-end 
+    def do_new
+      super
+      @record.init
+    end
+end

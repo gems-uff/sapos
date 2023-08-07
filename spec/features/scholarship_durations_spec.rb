@@ -1,0 +1,166 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
+
+require "spec_helper"
+
+# Todo: search
+
+RSpec.describe "ScholarshipDurations features", type: :feature do
+  let(:url_path) { "/scholarship_durations" }
+  let(:plural_name) { "scholarship_durations" }
+  let(:model) { ScholarshipDuration }
+  before(:all) do
+    @destroy_later = []
+    @destroy_all = []
+    @role_adm = FactoryBot.create :role_administrador
+    @destroy_all << @enrollment_status = FactoryBot.create(:enrollment_status, name: "Regular")
+
+    @destroy_all << @level1 = FactoryBot.create(:level, name: "Doutorado")
+    @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
+
+    @destroy_all << @sponsor1 = FactoryBot.create(:sponsor, name: "CNPq")
+    @destroy_all << @sponsor2 = FactoryBot.create(:sponsor, name: "CAPES")
+
+    @destroy_all << @scholarship_type1 = FactoryBot.create(:scholarship_type, name: "Individual")
+    @destroy_all << @scholarship_type2 = FactoryBot.create(:scholarship_type, name: "Projeto")
+
+    @destroy_all << @scholarship1 = FactoryBot.create(:scholarship, scholarship_number: "B1", level: @level2, sponsor: @sponsor1, start_date: 3.years.ago, end_date: 1.year.from_now, scholarship_type: @scholarship_type1)
+    @destroy_all << @scholarship2 = FactoryBot.create(:scholarship, scholarship_number: "B2", level: @level1, sponsor: @sponsor2, start_date: 3.years.ago, end_date: 4.years.from_now, scholarship_type: @scholarship_type1)
+    @destroy_all << @scholarship3 = FactoryBot.create(:scholarship, scholarship_number: "B3", level: @level1, sponsor: @sponsor1, start_date: 3.years.ago, end_date: 1.year.from_now, scholarship_type: @scholarship_type2)
+
+    @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana")
+    @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia")
+    @destroy_all << @student3 = FactoryBot.create(:student, name: "Carol")
+    @destroy_all << @student4 = FactoryBot.create(:student, name: "Dani")
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1, level: @level2, enrollment_status: @enrollment_status, admission_date: 3.years.ago.to_date)
+    @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student2, level: @level1, enrollment_status: @enrollment_status)
+    @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status)
+    @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status)
+
+    @destroy_all << @record = FactoryBot.create(:scholarship_duration, enrollment: @enrollment1, scholarship: @scholarship1, start_date: 2.years.ago, end_date: 1.months.from_now)
+    @destroy_all << FactoryBot.create(:scholarship_duration, enrollment: @enrollment2, scholarship: @scholarship2, start_date: 3.years.ago, end_date: 2.years.ago)
+    @destroy_all << FactoryBot.create(:scholarship_duration, enrollment: @enrollment3, scholarship: @scholarship2, start_date: 1.years.ago, end_date: Date.today)
+
+    @destroy_all << @user = create_confirmed_user(@role_adm)
+  end
+  after(:each) do
+    @destroy_later.each(&:delete)
+    @destroy_later.clear
+  end
+  after(:all) do
+    @role_adm.delete
+    @destroy_all.each(&:delete)
+    @destroy_all.clear
+  end
+
+  describe "view list page" do
+    before(:each) do
+      login_as(@user)
+      visit url_path
+    end
+
+    it "should show table" do
+      expect(page).to have_content "Alocação de Bolsas"
+      expect(page.all("tr th").map(&:text)).to eq [
+        "Número da Bolsa", "Data de Início", "Data Limite de Concessão", "Data de Encerramento", "Matrícula", ""
+      ]
+    end
+
+    it "should not have a sorting -- show in id order" do
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1", "B2", "B2"]
+    end
+  end
+
+  describe "insert page", js: true do
+    before(:each) do
+      login_as(@user)
+      visit url_path
+      click_link "Adicionar"
+    end
+
+    it "should be able to insert and remove record" do
+      # Insert record
+      expect(page).to have_content "Adicionar Bolsa"
+      fill_record_select("scholarship_", "scholarships", "B3")
+      page.send_keys :escape
+      fill_record_select("enrollment_", "enrollments", "M04")
+      click_button "Salvar"
+      expect(page).to have_css("tr:nth-child(1) td.scholarship-column", text: "B3")
+      expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04")
+
+      # Remove inserted record
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B3", "B1", "B2", "B2"]
+      record = model.last
+      accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
+      sleep(0.2)
+      visit current_path
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1", "B2", "B2"]
+    end
+
+    it "should have a record_select widget for scholarship" do
+      expect_to_have_record_select(page, "scholarship_", "scholarships")
+    end
+
+    it "should have a record_select widget for enrollment" do
+      page.send_keys :escape
+      expect_to_have_record_select(page, "enrollment_", "enrollments")
+    end
+
+    it "should have a month_year widget for start_date" do
+      page.send_keys :escape
+      field = "start_date"
+      expect(page.all("select#record_#{field}_2i option").map(&:text)).to eq ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+      expect(page.all("select#record_#{field}_1i option").map(&:text)).to include(1.years.ago.year.to_s, 1.years.since.year.to_s)
+    end
+
+    it "should have an optional month_year widget for end_date" do
+      page.send_keys :escape
+      field = "end_date"
+      expect(page.all("select#record_#{field}_2i option").map(&:text)).to eq ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+      expect(page.all("select#record_#{field}_1i option").map(&:text)).to include(1.years.ago.year.to_s, 1.years.since.year.to_s)
+    end
+
+    it "should have an optional month_year widget for cancel_date" do
+      page.send_keys :escape
+      field = "end_date"
+      expect(page.all("select#record_#{field}_2i option").map(&:text)).to eq ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+      expect(page.all("select#record_#{field}_1i option").map(&:text)).to include(1.years.ago.year.to_s, 1.years.since.year.to_s)
+    end
+  end
+
+  describe "edit page", js: true do
+    before(:each) do
+      login_as(@user)
+      visit url_path
+      find("#as_#{plural_name}-edit-#{@record.id}-link").click
+    end
+
+    it "should be able to edit record" do
+      date = 3.months.from_now
+      within(".as_form") do
+        find(:select, "record_end_date_2i").find(:option, text: I18n.l(date, format: "%B")).select_option
+        find(:select, "record_end_date_1i").find(:option, text: date.year.to_s).select_option
+      end
+      click_button "Atualizar"
+      expect(page).to have_css("#as_#{plural_name}-list-#{@record.id}-row td.end_date-column", text: I18n.l(date, format: "%B-%Y"))
+      @record.end_date = 1.month.from_now
+      @record.save!
+    end
+  end
+
+  describe "generate report", js: true do
+    before(:each) do
+      login_as(@user)
+      visit url_path
+    end
+
+    it "should download a pdf report of scholarships" do
+      click_link "Gerar relatório"
+
+      wait_for_download
+      expect(download).to match(/Relatório de Alocação de Bolsas\.pdf/)
+    end
+  end
+end

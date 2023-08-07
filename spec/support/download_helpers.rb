@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 module DownloadHelpers
-  TIMEOUT = 2
+  TIMEOUT = 1
   PATH    = Rails.root.join("tmp/test_downloads")
 
   extend self
