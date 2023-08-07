@@ -37,10 +37,9 @@ RSpec.describe "Level features", type: :feature do
 
     it "should show table" do
       expect(page).to have_content "Níveis"
-      expect(page).to have_content "Nome"
-      expect(page).to have_content "Nome completo do curso"
-      expect(page).to have_content "Duração padrão (meses)"
-      expect(page).to have_content "Credenciamentos"
+      expect(page.all("tr th").map(&:text)).to eq [
+        "Nome", "Nome completo do curso", "Duração padrão (meses)", "Credenciamentos", "Tipos de Matrícula", ""
+      ]
     end
 
     it "should sort the list by name, asc" do

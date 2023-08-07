@@ -1,22 +1,20 @@
-# encoding: utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "prawn/measurement_extensions"
 
-new_document('transcript.pdf', I18n.t("pdf_content.enrollment.header.title"), :watermark => (current_user.role_id == Role::ROLE_PROFESSOR), :pdf_type => :transcript) do |pdf|
-    
-    enrollment_student_header(pdf, enrollment: @enrollment)
+new_document("transcript.pdf", I18n.t("pdf_content.enrollment.header.title"), watermark: (current_user.role_id == Role::ROLE_PROFESSOR), pdf_type: :transcript) do |pdf|
+  enrollment_student_header(pdf, enrollment: @enrollment)
 
-    enrollment_header(pdf, enrollment: @enrollment)
+  enrollment_header(pdf, enrollment: @enrollment)
 
-    transcript_table(pdf, class_enrollments: @class_enrollments)
+  transcript_table(pdf, class_enrollments: @class_enrollments)
 
-    justification_grade_not_count_in_gpr_table(pdf, enrollment: @enrollment)
+  justification_grade_not_count_in_gpr_table(pdf, enrollment: @enrollment)
 
-    thesis_table(pdf, enrollment: @enrollment)
+  thesis_table(pdf, enrollment: @enrollment)
 
-    enrollment_holds_table(pdf, enrollment: @enrollment)
-
+  enrollment_holds_table(pdf, enrollment: @enrollment)
 end
-

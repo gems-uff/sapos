@@ -5,14 +5,13 @@
 
 require "spec_helper"
 
-# ToDo: webcam photo widget
-# ToDo: majors
-# ToDo: edit page of who can only update photo
+# ToDo: advisement_points (table and show)
+# ToDo: professor research area
 
-RSpec.describe "Student features", type: :feature do
-  let(:url_path) { "/students" }
-  let(:plural_name) { "students" }
-  let(:model) { Student }
+RSpec.describe "Professors features", type: :feature do
+  let(:url_path) { "/professors" }
+  let(:plural_name) { "professors" }
+  let(:model) { Professor }
   before(:all) do
     @destroy_later = []
     @destroy_all = []
@@ -20,16 +19,16 @@ RSpec.describe "Student features", type: :feature do
     prepare_city_widget(@destroy_all)
     @state = State.first
     @city = City.first
-    @destroy_all << level = FactoryBot.create(:level)
-    @destroy_all << enrollment_status = FactoryBot.create(:enrollment_status)
-    @destroy_all << FactoryBot.create(:student, name: "Carol", cpf: "3")
+    @destroy_all << @level1 = FactoryBot.create(:level, name: "Mestrado", default_duration: 24)
+    @destroy_all << @level2 = FactoryBot.create(:level, name: "Doutorado", default_duration: 48)
+    @destroy_all << @level3 = FactoryBot.create(:level, name: "Especialização", default_duration: 0)
+
+    @destroy_all << FactoryBot.create(:professor, name: "Carol", cpf: "3")
     @destroy_all << @record = FactoryBot.create(
-      :student, name: "Bia", cpf: "2",
-      city: @city, birth_city: @city, birth_state: @city.state, birth_country: @city.state.country,
-      identity_issuing_place: @state.name, birthdate: 25.years.ago
+      :professor, name: "Bia", cpf: "2",
+      city: @city, identity_issuing_place: @state.name, birthdate: 25.years.ago
     )
-    @destroy_all << FactoryBot.create(:student, name: "Dani", cpf: "4")
-    @destroy_all << FactoryBot.create(:enrollment, enrollment_number: "M001", student: @record, level: level, enrollment_status: enrollment_status)
+    @destroy_all << FactoryBot.create(:professor, name: "Dani", cpf: "4")
     @destroy_all << @user = create_confirmed_user(@role_adm)
   end
   after(:each) do
@@ -49,18 +48,14 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should show table" do
-      expect(page).to have_content "Alunos"
+      expect(page).to have_content "Professores"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Nome", "CPF", "Matrículas", ""
+        "Nome", "CPF", "Data de Nascimento", "Pontos Total", "Matrícula", ""
       ]
     end
 
     it "should sort the list by name, asc" do
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia", "Carol", "Dani"]
-    end
-
-    it "should show the enrollment number" do
-      expect(page).to have_css("tr:nth-child(1) td.enrollments-column", text: "M001")
     end
   end
 
@@ -73,14 +68,13 @@ RSpec.describe "Student features", type: :feature do
 
     it "should be able to insert and remove record" do
       # Insert record
-      expect(page).to have_content "Adicionar Aluno"
+      expect(page).to have_content "Adicionar Professor"
       within("#as_#{plural_name}-create--form") do
         fill_in "Nome", with: "Ana"
         fill_in "CPF", with: "1"
       end
       click_button "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Ana")
-      expect(Student.last.photo.file).to eq nil
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Ana", "Bia", "Carol", "Dani"]
@@ -89,23 +83,6 @@ RSpec.describe "Student features", type: :feature do
       sleep(0.2)
       visit current_path
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia", "Carol", "Dani"]
-    end
-
-    it "should be able to upload image" do
-      expect(page).to have_content "Adicionar Aluno"
-      within("#as_#{plural_name}-create--form") do
-        fill_in "Nome", with: "Erica"
-        fill_in "CPF", with: "5"
-        attach_file("Foto", Rails.root + "spec/fixtures/user.png")
-      end
-      click_button "Salvar"
-      expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Erica")
-      expect(Student.last.photo.file).not_to eq nil
-    end
-
-
-    it "should have city widget for birth_city" do
-      expect_to_have_city_widget(page, "birth_city_", "birth_state_", "birth_country_")
     end
 
     it "should have city widget for address" do
@@ -119,7 +96,7 @@ RSpec.describe "Student features", type: :feature do
 
     it "should have a selection for civil_status options" do
       expect(page.all("select#record_civil_status_ option").map(&:text)).to eq ["Solteiro(a)", "Casado(a)"]
-      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["Solteiro(a)", "Casado(a)"]
+      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["solteiro", "casado"]
     end
 
     it "should have identity issuing place widget for identity issuing place" do
@@ -131,6 +108,15 @@ RSpec.describe "Student features", type: :feature do
       find("#record_birthdate_").click
       expect(page).to have_selector("#ui-datepicker-div", visible: true)
       expect(page.all("select.ui-datepicker-year option").map(&:text)).to include(100.years.ago.year.to_s)
+    end
+
+    it "should have a selection for academic_title_level options" do
+      expect(page.all("select#record_academic_title_level_ option").map(&:text)).to eq ["Selecione uma opção", "Doutorado", "Especialização", "Mestrado"]
+      expect(page.all("select#record_academic_title_level_ option").map(&:value)).to eq ["", @level2.id.to_s, @level3.id.to_s, @level1.id.to_s]
+    end
+
+    it "should have a selection for academic_title_country options" do
+      expect(page.all("select#record_academic_title_country_ option").map(&:text)).to eq ["Selecione uma opção", "Brasil", "USA"]
     end
   end
 
@@ -149,12 +135,6 @@ RSpec.describe "Student features", type: :feature do
       click_button "Atualizar"
       expect(page).to have_css("td.name-column", text: "teste")
       expect(page).to have_css("td.cpf-column", text: "9")
-    end
-
-    it "should load the original city widget values" do
-      expect(find("#widget_record_birth_city_#{@record.id}").value).to eq @city.id.to_s
-      expect(find("#widget_record_birth_state_#{@record.id}").value).to eq @city.state.id.to_s
-      expect(find("#widget_record_birth_country_#{@record.id}").value).to eq @city.state.country.id.to_s
     end
 
     it "should have city widget for address" do

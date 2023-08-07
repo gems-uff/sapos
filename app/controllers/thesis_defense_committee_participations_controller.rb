@@ -1,12 +1,13 @@
-# encoding: utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
 
 class ThesisDefenseCommitteeParticipationsController < ApplicationController
   authorize_resource
 
   active_scaffold :"thesis_defense_committee_participation" do |config|
-  	columns = [:enrollment, :professor]
+    columns = [:enrollment, :professor]
     config.create.label = :create_thesis_defense_committee_participation_label
     config.list.columns = columns
     config.create.columns = columns

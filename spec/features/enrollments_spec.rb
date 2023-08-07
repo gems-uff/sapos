@@ -67,13 +67,8 @@ RSpec.describe "Enrollments features", type: :feature do
     it "should be able to insert and remove records" do
       # Insert record
       expect(page).to have_content "Adicionar Matrícula"
-      within("#as_#{plural_name}-create--form") do
-        fill_in "Número de Matrícula", with: "M04"
-        find("#record_student_").click
-        fill_in "Nome do Aluno", with: "Dan"
-        sleep(0.5)
-      end
-      find("#record-select-students .current").click
+      within("#as_#{plural_name}-create--form") { fill_in "Número de Matrícula", with: "M04" }
+      fill_record_select("student_", "students", "Dan")
       within("#as_#{plural_name}-create--form") do
         find(:select, "record_enrollment_status_").find(:option, text: @enrollment_status.name).select_option
         find(:select, "record_level_").find(:option, text: @level.name).select_option
@@ -98,9 +93,7 @@ RSpec.describe "Enrollments features", type: :feature do
     end
 
     it "should have a record_select widget for research_area" do
-      find("#record_research_area_").click
-      sleep(0.2)
-      expect(page).to have_selector("#record-select-research_areas", visible: true)
+      expect_to_have_record_select(page, "research_area_", "research_areas")
     end
   end
 

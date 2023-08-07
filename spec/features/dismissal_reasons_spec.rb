@@ -37,10 +37,9 @@ RSpec.describe "DismissalReason features", type: :feature do
 
     it "should show table" do
       expect(page).to have_content "Razões de Desligamento"
-      expect(page).to have_content "Nome"
-      expect(page).to have_content "Descrição"
-      expect(page).to have_content "Mostrar Orientador no Histórico"
-      expect(page).to have_content "Julgamento da Tese"
+      expect(page.all("tr th").map(&:text)).to eq [
+        "Nome", "Descrição", "Mostrar Orientador no Histórico", "Julgamento da Tese", ""
+      ]
     end
 
     it "should sort the list by name, asc" do

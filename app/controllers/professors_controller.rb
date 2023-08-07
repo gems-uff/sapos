@@ -1,6 +1,7 @@
-# encoding: utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
 
 class ProfessorsController < ApplicationController
   authorize_resource
@@ -15,25 +16,25 @@ class ProfessorsController < ApplicationController
     config.columns.add :advisement_points
     config.columns.add :advisements_with_points
     config.list.columns = [:name, :cpf, :birthdate, :advisement_points, :enrollment_number]
-    config.list.sorting = {:name => 'ASC'}
+    config.list.sorting = { name: "ASC" }
     config.create.label = :create_professor_label
-    config.columns[:advisement_points].sort_by :method => "advisement_points_order"
+    config.columns[:advisement_points].sort_by method: "advisement_points_order"
     config.columns[:enrollments].associated_limit = nil
-    config.columns[:birthdate].options = {'date:yearRange' => 'c-100:c'}
+    config.columns[:birthdate].options = { data: { "minDate" => "-100Y", "maxDate" => "-0Y", "yearRange": "-100:-0" } }
     config.columns[:civil_status].form_ui = :select
-    config.columns[:civil_status].options = {:options => [['Solteiro(a)', 'solteiro'],
-                                                          ['Casado(a)', 'casado']]}
+    config.columns[:civil_status].options = { options: [["Solteiro(a)", "solteiro"],
+                                                        ["Casado(a)", "casado"]] }
     config.columns[:institution].form_ui = :record_select
     config.columns[:sex].form_ui = :select
-    config.columns[:sex].options = {:options => [['Masculino', 'M'],
-                                                 ['Feminino', 'F']]}
+    config.columns[:sex].options = { options: [["Masculino", "M"],
+                                               ["Feminino", "F"]] }
     config.columns[:scholarships].form_ui = :record_select
-    config.columns[:professor_research_areas].includes = {:research_areas => :professor_research_areas}
-    
+    config.columns[:professor_research_areas].includes = { research_areas: :professor_research_areas }
+
     config.columns[:academic_title_institution].form_ui = :record_select
     config.columns[:academic_title_country].form_ui = :select
     config.columns[:academic_title_level].form_ui = :select
-    
+
     form_columns = [:name,
                 :email,
                :sex,
@@ -45,7 +46,7 @@ class ProfessorsController < ApplicationController
                :zip_code,
                :telephone1,
                :telephone2,
-               :cpf,   
+               :cpf,
                :identity_expedition_date,
                :identity_issuing_body,
                :identity_issuing_place,
@@ -96,7 +97,7 @@ class ProfessorsController < ApplicationController
 
     config.actions.exclude :deleted_records
   end
-  record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
+  record_select per_page: 10, search_on: [:name], order_by: "name", full_text_search: true
 
   def set_list_columns
     if Professor.first != nil
@@ -106,14 +107,14 @@ class ProfessorsController < ApplicationController
         Professor.undef_method advisement_points_of_level
       end
 
-      levels_to_show = Level.where(:show_advisements_points_in_list => true).order(:short_name_showed_in_list_header)
+      levels_to_show = Level.where(show_advisements_points_in_list: true).order(:short_name_showed_in_list_header)
       levels_to_add = []
 
       levels_to_show.each do |level|
         method_name = "advisement_points_of_level#{level.id}"
         Professor.first.create_advisement_points_of_level_method(method_name)
         active_scaffold_config.columns.add method_name
-        levels_to_add.push(method_name) 
+        levels_to_add.push(method_name)
 
         if (level.short_name_showed_in_list_header != nil) && (level.short_name_showed_in_list_header != "")
           active_scaffold_config.columns[method_name].label = level.short_name_showed_in_list_header
@@ -126,5 +127,4 @@ class ProfessorsController < ApplicationController
       Array(active_scaffold_config.list.columns).insert(insert_position, *levels_to_add)
     end
   end
-
 end

@@ -1,10 +1,10 @@
-# encoding: utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-module AdvisementsPdfHelper
+# frozen_string_literal: true
 
-  def advisements_table(pdf, options={})
+module AdvisementsPdfHelper
+  def advisements_table(pdf, options = {})
     advisements ||= options[:advisements]
 
     widths = [140, 140, 140, 140]
@@ -20,8 +20,5 @@ module AdvisementsPdfHelper
       table.column(2).align = :left
       table.column(2).padding = [2, 4]
     end
-
-   
   end
-
 end

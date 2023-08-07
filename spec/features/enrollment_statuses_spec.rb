@@ -35,8 +35,9 @@ RSpec.describe "EnrollmentStatuses features", type: :feature do
 
     it "should show table" do
       expect(page).to have_content "Tipos de Matrícula"
-      expect(page).to have_content "Nome"
-      expect(page).to have_content "Com usuário"
+      expect(page.all("tr th").map(&:text)).to eq [
+        "Nome", "Com usuário", ""
+      ]
     end
 
     it "should sort the list by name, asc" do

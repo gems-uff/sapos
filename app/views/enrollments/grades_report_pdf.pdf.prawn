@@ -1,27 +1,24 @@
-# encoding: utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-new_document('grades_report.pdf', I18n.t('pdf_content.enrollment.grades_report.title'), :watermark => (current_user.nil? ? false : (current_user.role_id == Role::ROLE_PROFESSOR)), :pdf_type => :grades_report) do |pdf|
+# frozen_string_literal: true
 
-    enrollment_student_header(pdf, enrollment: @enrollment)
+new_document("grades_report.pdf", I18n.t("pdf_content.enrollment.grades_report.title"), watermark: (current_user.nil? ? false : (current_user.role_id == Role::ROLE_PROFESSOR)), pdf_type: :grades_report) do |pdf|
+  enrollment_student_header(pdf, enrollment: @enrollment)
 
-    grades_report_header(pdf, enrollment: @enrollment)
+  grades_report_header(pdf, enrollment: @enrollment)
 
-    grades_report_table(pdf, enrollment: @enrollment, class_enrollments: @class_enrollments)
+  grades_report_table(pdf, enrollment: @enrollment, class_enrollments: @class_enrollments)
 
-    justification_grade_not_count_in_gpr_table(pdf, enrollment: @enrollment)
+  justification_grade_not_count_in_gpr_table(pdf, enrollment: @enrollment)
 
-    thesis_table(pdf, enrollment: @enrollment, show_advisors: true)
+  thesis_table(pdf, enrollment: @enrollment, show_advisors: true)
 
-    accomplished_table(pdf, accomplished_phases: @accomplished_phases)
+  accomplished_table(pdf, accomplished_phases: @accomplished_phases)
 
-    deferrals_table(pdf, deferrals: @deferrals)
+  deferrals_table(pdf, deferrals: @deferrals)
 
-    enrollment_holds_table(pdf, enrollment: @enrollment)
+  enrollment_holds_table(pdf, enrollment: @enrollment)
 
-    enrollment_scholarships_table(pdf, enrollment: @enrollment)
-
-
+  enrollment_scholarships_table(pdf, enrollment: @enrollment)
 end
-

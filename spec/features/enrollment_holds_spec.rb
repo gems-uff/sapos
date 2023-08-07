@@ -66,12 +66,7 @@ RSpec.describe "EnrollmentHolds features", type: :feature do
     it "should be able to insert and remove record" do
       # Insert record
       expect(page).to have_content "Adicionar Trancamento"
-      within("#as_#{plural_name}-create--form") do
-        fill_in "Matrícula", with: "M04"
-        find("#record_enrollment_").click
-        sleep(0.5)
-      end
-      find("#record-select-enrollments .current").click
+      fill_record_select("enrollment_", "enrollments", "M04")
       within("#as_#{plural_name}-create--form") do
         find(:select, "record_year_").find(:option, text: YearSemester.current.year.to_s).select_option
         find(:select, "record_semester_").find(:option, text: YearSemester.current.semester.to_s).select_option
@@ -91,9 +86,7 @@ RSpec.describe "EnrollmentHolds features", type: :feature do
     end
 
     it "should have a record_select widget for enrollment" do
-      find("#record_enrollment_").click
-      sleep(0.2)
-      expect(page).to have_selector("#record-select-enrollments", visible: true)
+      expect_to_have_record_select(page, "enrollment_", "enrollments")
     end
   end
 

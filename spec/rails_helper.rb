@@ -16,6 +16,8 @@ require "capybara/rspec"
 
 require "support/user_helpers"
 require "support/place_widgets_helpers"
+require "support/record_select_helpers"
+require "support/download_helpers"
 
 Capybara.server = :puma
 SimpleCov.start "rails"
@@ -81,9 +83,37 @@ RSpec.configure do |config|
   # rspec-rails.
   config.infer_base_class_for_anonymous_controllers = false
 
+  Capybara.register_driver :selenium do |app|
+    profile = Selenium::WebDriver::Firefox::Profile.new
+    profile["devtools.selfxss.count"] = 9999
+    profile["browser.download.dir"] = DownloadHelpers::PATH.to_s
+    profile["browser.download.folderList"] = 2
+
+    # Suppress "open with" dialog
+    profile["browser.helperApps.neverAsk.saveToDisk"] =
+      "text/csv,text/tsv,text/xml,text/plain,application/pdf,application/doc,application/docx,image/jpeg,application/gzip,application/x-gzip"
+    options = Selenium::WebDriver::Firefox::Options.new
+    options.profile = profile
+    Capybara::Selenium::Driver.new(
+      app,
+      browser: :firefox,
+      options: options
+    )
+  end
+
+  config.include UserHelpers
+  config.include PlaceWidgetsHelpers
+  config.include RecordSelectHelpers
+  config.include DownloadHelpers
+  config.include Warden::Test::Helpers
+
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
     DatabaseCleaner.clean_with(:truncation)
+  end
+
+  config.before(:each) do
+    DownloadHelpers.clear_downloads
   end
 
   config.around(:each) do |example|
@@ -102,10 +132,6 @@ RSpec.configure do |config|
       puts "  #{leaked.join("\n  ")}"
     end
   end
-
-  config.include UserHelpers
-  config.include PlaceWidgetsHelpers
-  config.include Warden::Test::Helpers
 end
 
 

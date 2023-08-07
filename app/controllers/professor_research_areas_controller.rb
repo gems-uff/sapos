@@ -1,6 +1,7 @@
-# encoding: utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
 
 class ProfessorResearchAreasController < ApplicationController
   authorize_resource
@@ -20,4 +21,4 @@ class ProfessorResearchAreasController < ApplicationController
   end
 
   record_select
-end 
+end
