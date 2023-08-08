@@ -1,6 +1,7 @@
-# encoding: utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
 
 class MajorsController < ApplicationController
   authorize_resource
@@ -8,10 +9,8 @@ class MajorsController < ApplicationController
   helper :student_majors
 
   active_scaffold :major do |config|
-    config.list.sorting = {:name => 'ASC'}
+    config.list.sorting = { name: "ASC" }
     config.create.label = :create_major_label
-    #este abaixo não está funcionando...
-    config.update.label = :update_major_label
 
     config.columns[:institution].clear_link
     config.columns[:level].clear_link
@@ -27,5 +26,10 @@ class MajorsController < ApplicationController
 
     config.actions.exclude :deleted_records
   end
-  record_select :per_page => 10, :search_on => [:name], :order_by => 'name', :full_text_search => true
-end 
+  record_select(
+    per_page: 10,
+    search_on: [:name],
+    order_by: "name",
+    full_text_search: true
+  )
+end
