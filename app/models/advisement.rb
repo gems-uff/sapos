@@ -25,7 +25,8 @@ class Advisement < ApplicationRecord
     "#{enrollment.enrollment_number} - #{professor.name}"
   end
 
-  # defines if an certain advisement is active (An active advisement is an advisement which the student doesn't have a dismissal reason
+  # defines if an certain advisement is active (An active advisement is 
+  # an advisement which the student doesn't have a dismissal reason
   def active
     return false if enrollment.blank?
     dismissals = Dismissal.where(enrollment_id: enrollment.id)

@@ -911,7 +911,7 @@ pt-BR:
     save: "Salvar"
     forms:
       repeat: "Repetir %{attribute}"
-    create_accomplishment_label: "Criar Realização de Etapas"
+    create_accomplishment_label: "Adicionar Realização de Etapa"
     create_advisement_authorization_label: "Adicionar Credenciamento"
     create_advisement_label: "Adicionar Orientação"
     create_allocation_label: "Adicionar Alocação"
@@ -940,7 +940,7 @@ pt-BR:
     create_major_label: "Adicionar Curso"
     create_new: "Criar Novo"
     create_notification_label: "Adicionar Notificação"
-    create_phase_label: "Adicionar Fase"
+    create_phase_label: "Adicionar Etapa"
     create_professor_label: "Adicionar Professor"
     create_professor_research_area_label: "Adicionar Área de Pesquisa do Professor"
     create_query_label: "Adicionar Consulta"

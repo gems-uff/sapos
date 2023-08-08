@@ -6,7 +6,7 @@
 # Helper for Deferrals
 module DeferralsHelper
   def approval_date_form_column(record, options)
-    scholarship_month_year_widget record, options, :approval_date
+    scholarship_month_year_widget record, options, :approval_date, required: false
   end
 
   # TODO: remove current deferraltype if enrollment was changed
