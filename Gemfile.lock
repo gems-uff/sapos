@@ -10,10 +10,10 @@ GIT
 
 GIT
   remote: https://github.com/gems-uff/carrierwave-activerecord.git
-  revision: 890aa1f1ed6539b870ac852e534a885eb40ce488
+  revision: 4594819359fe3e14aa8439a334ef981249d28a27
   branch: rails7
   specs:
-    carrierwave-activerecord (0.1.0rc18)
+    carrierwave-activerecord (0.1.0rc19)
       activerecord (~> 7.0)
       carrierwave (>= 0.10.0)
 

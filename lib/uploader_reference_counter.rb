@@ -3,7 +3,11 @@
 
 # frozen_string_literal: true
 
-# ToDo: CarrierWave 3 has a deduplication_index and renames files accordingly. We may be able to remove this file
+# ToDo: When the user edits a model that has a figure to remove/replace the figure,
+# it does not decrease the reference_counter, leaving the image stored in the db
+# We should find a way to remove it
+# - maybe use the deduplication_index of carrierwave 3 to remove this file entirely
+
 
 module UploaderReferenceCounter
   # Uses the reference_counter field when calling store! and remove! methods of Uploader

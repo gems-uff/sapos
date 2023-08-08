@@ -180,9 +180,6 @@ group :production do
 
   # Temporary fix for passenger
   gem "stringio"
-
-  # Open /letter_opener in the browser to view 'sent' emails
-  gem "letter_opener_web"
 end
 
 group :doc do

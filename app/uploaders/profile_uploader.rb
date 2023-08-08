@@ -32,6 +32,10 @@ class ProfileUploader < CarrierWave::Uploader::Base
 
   # Param must be a hash with to 'base64_contents' and 'filename'.
   def cache!(file)
+    return if file.blank?
+    if defined? file.file
+      file = file.file
+    end
     # avoid the carrier_wave to create duplicate database entry of same file due file termination case
     if (defined? file.original_filename) && (file.original_filename.is_a? String)
       file.original_filename.downcase!

@@ -1004,7 +1004,6 @@ pt-BR:
     update_model: ""
     update_notification_label: "Modificar Notificação"
     update_professor_research_area_label: "Área de Pesquisa do Professor"
-    update_report_configuration_label: "Modificar Configuração de Relatório"
     update_research_area_label: "Editar Área de Pesquisa"
     update_student_label: "Modificar Aluno"
     update_student_major_label: "Editar Curso do Aluno"

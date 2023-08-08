@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_04_11_182230) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_08_192848) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -58,6 +58,9 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_11_182230) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.integer "reference_counter", default: 0
+    t.string "original_filename"
+    t.string "content_type"
+    t.integer "size"
   end
 
   create_table "cities", force: :cascade do |t|
