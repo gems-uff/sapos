@@ -7,16 +7,21 @@
 
 require "spec_helper"
 
-RSpec.describe "Versions features", type: :feature do
-  let(:url_path) { "/versions" }
-  let(:plural_name) { "versions" }
-  let(:model) { Version }
+RSpec.describe "Roles features", type: :feature do
+  let(:url_path) { "/roles" }
+  let(:plural_name) { "role" }
+  let(:model) { Role }
   before(:all) do
     @destroy_later = []
     @destroy_all = []
+    @destroy_all << FactoryBot.create(:role_desconhecido)
+    @destroy_all << FactoryBot.create(:role_coordenacao)
+    @destroy_all << FactoryBot.create(:role_secretaria)
+    @destroy_all << FactoryBot.create(:role_professor)
+    @destroy_all << FactoryBot.create(:role_aluno)
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
+    @destroy_all << FactoryBot.create(:role_suporte)
     @destroy_all << @user = create_confirmed_user(@role_adm)
-    @destroy_all << @country1 = FactoryBot.create(:country, name: "Brasil", nationality: "brasileiro(a)")
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -34,17 +39,14 @@ RSpec.describe "Versions features", type: :feature do
     end
 
     it "should show table" do
-      expect(page).to have_content "Log"
+      expect(page).to have_content "Papéis"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Modelo", "Versão Atual", "Ação", "Usuário", "Modificado em", ""
+        "Id", "Nome", "Descrição", ""
       ]
     end
 
     it "should sort the list by created_at, desc" do
-      # First item is the user login
-      expect(page.all("tr:nth-child(1) td.item_type-column").map(&:text)).to eq ["Usuário"]
-      # Second item is the country
-      expect(page.all("tr:nth-child(2) td.item_type-column").map(&:text)).to eq ["País"]
+      expect(page.all("tr td.name-column").map(&:text)).to eq ["Desconhecido", "Coordenação", "Secretaria", "Professor", "Aluno", "Administrador", "Suporte"]
     end
 
     it "should not have insert link" do
@@ -64,9 +66,9 @@ RSpec.describe "Versions features", type: :feature do
     end
 
     it "should be able to search by model name" do
-      fill_in "search", with: "Country"
+      fill_in "search", with: "Coor"
       sleep(0.8)
-      expect(page.all("tr td.item_type-column").map(&:text)).to eq ["País"]
+      expect(page.all("tr td.name-column").map(&:text)).to eq ["Coordenação"]
     end
   end
 end

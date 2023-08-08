@@ -23,7 +23,7 @@ FactoryBot.define do
 
     factory :role_coordenacao do
       id { Role::ROLE_COORDENACAO }
-      name { "Coordenacao" }
+      name { "Coordenação" }
       description { "Descricao Coordenacao" }
       initialize_with { Role.where(id: id).first_or_create(name: name, description: description) }
     end
@@ -46,6 +46,20 @@ FactoryBot.define do
       id { Role::ROLE_ALUNO }
       name { "Aluno" }
       description { "Descricao Aluno" }
+      initialize_with { Role.where(id: id).first_or_create(name: name, description: description) }
+    end
+
+    factory :role_suporte do
+      id { Role::ROLE_SUPORTE }
+      name { "Suporte" }
+      description { "Descricao Suporte" }
+      initialize_with { Role.where(id: id).first_or_create(name: name, description: description) }
+    end
+
+    factory :role_desconhecido do
+      id { Role::ROLE_DESCONHECIDO }
+      name { "Desconhecido" }
+      description { "Descricao Desconhecido" }
       initialize_with { Role.where(id: id).first_or_create(name: name, description: description) }
     end
   end

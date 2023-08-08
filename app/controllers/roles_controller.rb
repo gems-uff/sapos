@@ -1,6 +1,7 @@
-# encoding: utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
 
 class RolesController < ApplicationController
   authorize_resource
@@ -12,7 +13,6 @@ class RolesController < ApplicationController
     config.columns[:description].form_ui = :textarea
     config.show.link = false
 
-    config.actions.exclude :deleted_records
+    config.actions.exclude :create, :delete, :update, :deleted_records
   end
-
 end
