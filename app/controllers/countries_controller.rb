@@ -8,6 +8,7 @@ class CountriesController < ApplicationController
 
   active_scaffold :country do |config|
     config.create.label = :create_country_label
+    config.list.sorting = { name: "ASC" }
     config.columns = [:name, :nationality]
 
     config.actions.exclude :deleted_records

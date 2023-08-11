@@ -69,12 +69,18 @@ module ApplicationHelper
     config = ActiveScaffold::Config::Core.new(record.class)
     extra[:date_options] ||= {}
     extra[:select_options] ||= {}
-    extra[:required] ||= extra[:required].nil? ? config.columns[attribute].required? : extra[:required]
-    extra[:multiparameter] ||= extra[:multiparameter].nil? ? true : extra[:multiparameter]
+    extra[:required] ||= extra[:required].nil? ?
+      config.columns[attribute].required? :
+      extra[:required]
+    extra[:multiparameter] ||= extra[:multiparameter].nil? ?
+      true :
+      extra[:multiparameter]
     extra[:force_send] ||= extra[:force_send].nil? ? false : extra[:force_send]
-    date_options = { discard_day: true,
-                     start_year: Time.now.year - @@range,
-                     end_year: Time.now.year + @@range }.merge(extra[:date_options])
+    date_options = {
+      discard_day: true,
+      start_year: Time.now.year - @@range,
+      end_year: Time.now.year + @@range
+    }.merge(extra[:date_options])
     unless extra[:required]
       date_options[:include_blank] = true
       date_options[:default] = nil
@@ -85,5 +91,43 @@ module ApplicationHelper
                      date_options: options.merge(date_options),
                      attribute: attribute,
                      extra: extra })
+  end
+
+  def code_mirror_text_area_widget(column, id, type, options, set_size = false)
+    set_size_str = set_size ?
+      ".setSize(null, '#{options[:value].count("\n") + 2}em')" :
+      ""
+    block = text_area(:record, :sql_query, options)
+    block + "<script>
+    CodeMirror.fromTextArea(document.getElementById('#{id}'),
+     {mode: '#{type}',
+      indentWithTabs: true,
+      smartIndent: true,
+      lineNumbers: true,
+      matchBrackets : true,
+      autofocus: true
+     }
+    )#{set_size_str};
+    </script>".html_safe
+  end
+
+  def code_mirror_view_widget(id, type, value, set_size = false)
+    set_size_str = set_size ?
+      ".setSize(null, '#{value.count("\n") + 2}em')" :
+      ""
+    "<div id='#{id}'></div>
+    <script>
+    CodeMirror(document.getElementById('#{id}'),
+     {mode: '#{type}',
+      value: '#{escape_javascript(value)}',
+      indentWithTabs: true,
+      smartIndent: true,
+      lineNumbers: true,
+      matchBrackets : true,
+      autofocus: true,
+      readOnly: true
+     }
+    )#{set_size_str};
+    </script>".html_safe
   end
 end

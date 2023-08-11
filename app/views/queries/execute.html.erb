@@ -1,16 +1,16 @@
 <h4><%= @query.to_label %></h4>
 
-<%= render 'params_form', :resource => @query %>
+<%= render "params_form", :resource => @query %>
 
 <div class="actions" style="display: block; margin: 10px 0">
   <a id="as_queries-execute-<%= @query.id %>-link" class="execute as_action again" href="javascript:void(0)"><i class="fa fa-table" title="Executar"></i>
     Executar</a>
   &nbsp;&nbsp;
-  <%= render 'show_sql', sql_query: @query_result[:query] %>
+  <%= render "show_sql", sql_query: @query_result[:query] %>
 </div>
 
 <div style="width: 865px; overflow-x: auto;" class="as_content">
-  <table class="showtable listed-records-table">
+  <table class="query-results showtable listed-records-table">
     <thead>
     <tr>
       <% @query_result[:columns].each do |column_name| %>
@@ -31,7 +31,7 @@
   </table>
 </div>
 <p class="form-footer">
-  <%= link_to as_(:close), main_path_to_return, :class => 'as_cancel', :remote => request.xhr? %>
+  <%= link_to as_(:close), main_path_to_return, :class => "as_cancel", :remote => request.xhr? %>
   <%= loading_indicator_tag(:action => :create, :id => params[:id]) %>
 </p>
 
