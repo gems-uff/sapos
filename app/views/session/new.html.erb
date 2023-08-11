@@ -1,34 +1,34 @@
 <div id="login_form_wrapper">
   <% if flash[:alert] %>
-      <div id="error_login"><%= flash[:alert] %></div>
+    <div id="error_login"><%= flash[:alert] %></div>
   <% end %>
 
   <div id="form_border">
-    <%= form_for('login', :html => {:id => 'login_form'}) do %>
-        <%= flash[:name] %>
+    <%= form_for("login", html: { id: "login_form" }) do %>
+      <%= flash[:name] %>
 
-        <div id="login_input">
-          <label for="name">Login:</label>
-          <%= text_field_tag :name %>
-        </div>
+      <div id="login_input">
+        <label for="name">Login:</label>
+        <%= text_field_tag :name %>
+      </div>
 
-        <br/>
+      <br/>
 
-        <div id="password_input">
-          <label for="password">Senha:</label>
-          <%= password_field_tag :password %>
-        </div>
+      <div id="password_input">
+        <label for="password">Senha:</label>
+        <%= password_field_tag :password %>
+      </div>
 
-        <br/>
+      <br/>
 
-        <div id="remember_me_input">
-          <label for="remember_me">Continuar conectado</label>
-          <%= check_box_tag :remember_me %>
-        </div>
+      <div id="remember_me_input">
+        <label for="remember_me">Continuar conectado</label>
+        <%= check_box_tag :remember_me %>
+      </div>
 
-        <br/>
+      <br/>
 
-        <%= submit_tag "Login" %>
+      <%= submit_tag "Login" %>
     <% end %>
   </div>
 </div>

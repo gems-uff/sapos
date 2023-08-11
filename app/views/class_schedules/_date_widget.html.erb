@@ -1,16 +1,25 @@
 <%= active_scaffold_input_datetime_picker config.columns[attribute], options %>
 <% unless same.nil? %>
-    <% attr_column = config.columns[attribute] %>
-    <% attr_id_control = "record_#{attr_column.name}_#{[params[:eid], params[:parent_id] || params[:id]].compact.join '_'}" %>
-    <% same_column = config.columns[same] %>
-    <% same_id_control = "record_#{same_column.name}_#{[params[:eid], params[:parent_id] || params[:id]].compact.join '_'}" %>
-     
-    <a href="#" id="set_same_<%= attr_id_control %>"> <%= t('active_scaffold.forms.repeat', attribute: t("activerecord.attributes.class_schedule.#{same}")) %> </a>
+  <% attr_column = config.columns[attribute] %>
+  <% attr_id_control = "record_#{attr_column.name}_#{
+    [params[:eid], params[:parent_id] || params[:id]].compact.join "_"
+  }" %>
+  <% same_column = config.columns[same] %>
+  <% same_id_control = "record_#{same_column.name}_#{
+    [params[:eid], params[:parent_id] || params[:id]].compact.join "_"
+  }" %>
 
-    <script>
-        $("#set_same_<%= attr_id_control %>").on('click', function() {
-            $("#<%= attr_id_control %>").val($("#<%= same_id_control %>").val());
-            return false;
-        })
-    </script>
+  <a href="#" id="set_same_<%= attr_id_control %>">
+    <%= t(
+      "active_scaffold.forms.repeat",
+      attribute: t("activerecord.attributes.class_schedule.#{same}")
+    ) %>
+  </a>
+
+  <script>
+    $("#set_same_<%= attr_id_control %>").on("click", function() {
+      $("#<%= attr_id_control %>").val($("#<%= same_id_control %>").val());
+      return false;
+    })
+  </script>
 <% end %>

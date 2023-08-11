@@ -1,13 +1,13 @@
 <% if sql_query.to_s.empty? %>
-    <small id="toggle_sql" class="toggle_sql" style="text-decoration: line-through;">SQL</small>
+  <small id="toggle_sql" class="toggle_sql" style="text-decoration: line-through;">SQL</small>
 <% else %>
-    <a href="javascript:void(0)">
-      <small id="toggle_sql" class="toggle_sql">SQL</small>
-    </a>
-    <pre id="generated_sql" style="display: none"><%= sql_query %></pre>
-    <script type="text/javascript">
-        $("#toggle_sql").click(function () {
-            $('#generated_sql').toggle()
-        });
-    </script>
+  <a href="javascript:void(0)">
+    <small id="toggle_sql" class="toggle_sql">SQL</small>
+  </a>
+  <pre id="generated_sql" style="display: none"><%= sql_query %></pre>
+  <script type="text/javascript">
+    $("#toggle_sql").click(function () {
+      $("#generated_sql").toggle()
+    });
+  </script>
 <% end %>

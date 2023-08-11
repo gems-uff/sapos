@@ -3,19 +3,18 @@
 <table class="showtable listed-records-table">
   <thead>
     <tr>
-      <th><%= I18n.t('activerecord.attributes.course_class.semester') %></th>
-      <th><%= I18n.t('activerecord.models.course.one') %></th>
-      <th><%= I18n.t('activerecord.attributes.class_enrollment.situation') %></th>
-      <th><%= I18n.t('activerecord.attributes.class_enrollment.grade') %></th>
-      <th><%= I18n.t('activerecord.attributes.class_enrollment.disapproved_by_absence') %></th>
+      <th><%= I18n.t("activerecord.attributes.course_class.semester") %></th>
+      <th><%= I18n.t("activerecord.models.course.one") %></th>
+      <th><%= I18n.t("activerecord.attributes.class_enrollment.situation") %></th>
+      <th><%= I18n.t("activerecord.attributes.class_enrollment.grade") %></th>
+      <th><%= I18n.t("activerecord.attributes.class_enrollment.disapproved_by_absence") %></th>
       <% if show_obs %>
-        <th><%= I18n.t('activerecord.attributes.class_enrollment.obs') %></th>
+        <th><%= I18n.t("activerecord.attributes.class_enrollment.obs") %></th>
       <% end %>
     </tr>
   </thead>
   <tbody class="records">
     <% count = 0 %>
-    
     <% class_enrollments.each do |class_enrollment| %>
       <% count += 1 %>
       <% tr_class = count.even? ? "even-record" : "" %>
@@ -43,9 +42,9 @@
   <table class="showtable listed-records-table">
     <thead>
       <tr>
-        <th><%= I18n.t('activerecord.attributes.course_class.semester') %></th>
-        <th><%= I18n.t('activerecord.models.course.one') %></th>
-        <th><%= I18n.t('activerecord.attributes.class_enrollment.justification_grade_not_count_in_gpr') %></th>
+        <th><%= I18n.t("activerecord.attributes.course_class.semester") %></th>
+        <th><%= I18n.t("activerecord.models.course.one") %></th>
+        <th><%= I18n.t("activerecord.attributes.class_enrollment.justification_grade_not_count_in_gpr") %></th>
       </tr>
     </thead>
     <tbody class="records">

@@ -1,12 +1,11 @@
 <div class="scholarships-show-box show-box">
   <details open>
-    <summary> <%= t 'activerecord.models.scholarship.other' %> </summary>
-    <%= render :partial => 'enrollments/show_scholarships_table', :locals => { 
-        scholarship_durations: scholarship_durations,
-        show_obs: false,
-        dateformat: :monthyear,
-        show_sponsor: true,
-        } 
-    %>
+    <summary> <%= t "activerecord.models.scholarship.other" %> </summary>
+    <%= render partial: "enrollments/show_scholarships_table", locals: {
+      scholarship_durations: scholarship_durations,
+      show_obs: false,
+      dateformat: :monthyear,
+      show_sponsor: true,
+    } %>
   </details>
 </div>

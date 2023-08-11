@@ -1,14 +1,14 @@
 <div class="landing-main">
-  <h2> <%= t 'pendencies.index.title' %> </h2>
+  <h2> <%= t "pendencies.index.title" %> </h2>
   <% if flash[:alert] %>
       <div id="error_login"><%= flash[:alert] %></div>
   <% end %>
-  
+
   <% if @partials.empty? %>
-    <p> <%= t 'pendencies.index.none' %> </p>
+    <p> <%= t "pendencies.index.none" %> </p>
   <% else %>
     <% @partials.each do |partial, locals| %>
-      <%= render :partial => partial, :locals => locals %>
+      <%= render partial: partial, locals: locals %>
     <% end %>
   <% end %>
 </div>

@@ -1,8 +1,8 @@
 <table class="showtable listed-records-table">
   <thead>
     <tr>
-      <th><%= I18n.t('activerecord.attributes.professor.name') %></th>
-      <th><%= I18n.t('activerecord.attributes.professor.institution') %></th>
+      <th><%= I18n.t("activerecord.attributes.professor.name") %></th>
+      <th><%= I18n.t("activerecord.attributes.professor.institution") %></th>
     </tr>
   </thead>
   <tbody class="records">
@@ -12,7 +12,7 @@
       <% tr_class = count.even? ? "even-record" : "" %>
       <tr class="record <%= tr_class %>">
         <td><%= professor.name %></td>
-        <td><%= rescue_blank_text(professor.institution, :method_call => :name) %></td>
+        <td><%= rescue_blank_text(professor.institution, method_call: :name) %></td>
       </tr>
     <% end %>
   </tbody>

@@ -9,7 +9,12 @@
 
   <div id="form_border">
 
-    <%= form_for(resource, :as => resource_name, :url => password_path(resource_name), :html => { :method => :put }) do |f| %>
+    <%= form_for(
+      resource,
+      as: resource_name,
+      url: password_path(resource_name),
+      html: { method: :put }
+    ) do |f| %>
       <%= f.hidden_field :reset_password_token %>
 
       <div><%= f.label :password, "Nova senha" %><br />
@@ -24,7 +29,7 @@
 
       <div><%= f.submit "Alterar minha senha" %></div>
     <% end %>
-  
+
   </div>
 </div>
-<%= render :partial => "devise/shared/links" %>
+<%= render partial: "devise/shared/links" %>

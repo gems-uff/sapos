@@ -1,9 +1,9 @@
 <div class="enrollment-show-box show-box">
   <h3>
     <% if semester.main_enroll_open? %>
-      <%= t 'student_enrollment.show_enroll.title_main', semester:  semester.to_label %>
+      <%= t "student_enrollment.show_enroll.title_main", semester:  semester.to_label %>
     <% else %>
-      <%= t 'student_enrollment.show_enroll.title_adjust', semester:  semester.to_label %>
+      <%= t "student_enrollment.show_enroll.title_adjust", semester:  semester.to_label %>
     <% end %>
   </h3>
   <% linkpath = student_enroll_path(id: @enrollment.id, year: semester.year, semester: semester.semester) %>
@@ -14,6 +14,6 @@
       <%= t("student_enrollment.show_enroll.unread", count: unread) %>
     <% end %>
   <% else %>
-    <%= link_to t('student_enrollment.show_enroll.enroll_link_new'), linkpath %>
+    <%= link_to t("student_enrollment.show_enroll.enroll_link_new"), linkpath %>
   <% end %>
 </div>

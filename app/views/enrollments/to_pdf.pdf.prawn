@@ -3,7 +3,11 @@
 
 # frozen_string_literal: true
 
-new_document("to_pdf.pdf", I18n.t("pdf_content.enrollment.to_pdf.filename"), pdf_type: :report) do |pdf|
+new_document(
+  "to_pdf.pdf",
+  I18n.t("pdf_content.enrollment.to_pdf.filename"),
+  pdf_type: :report
+) do |pdf|
   search_table(pdf, search: @search)
   enrollments_table(pdf, enrollments: @enrollments)
 end

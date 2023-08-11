@@ -3,6 +3,10 @@
 
 # frozen_string_literal: true
 
-new_document("relatorio.pdf", I18n.t("pdf_content.advisements.to_pdf.filename"), pdf_type: :report) do |pdf|
+new_document(
+  "relatorio.pdf",
+  I18n.t("pdf_content.advisements.to_pdf.filename"),
+  pdf_type: :report
+) do |pdf|
   advisements_table(pdf, advisements: @advisements)
 end

@@ -9,7 +9,12 @@
   <%= render "devise/shared/error_messages", resource: resource %>
   <div id="form_border">
 
-    <%= form_for(resource, :as => resource_name, :url => unlock_path(resource_name), :html => { :method => :post }) do |f| %>
+    <%= form_for(
+      resource,
+      as: resource_name,
+      url: unlock_path(resource_name),
+      html: { method: :post }
+    ) do |f| %>
 
       <div><%= f.label :email %><br />
       <%= f.email_field :email %></div>
@@ -22,4 +27,4 @@
 
 </div>
 
-<%= render :partial => "devise/shared/links" %>
+<%= render partial: "devise/shared/links" %>

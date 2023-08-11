@@ -3,8 +3,8 @@
     <%=readonly_dl_input("Matrículas", @counts, :enrollments)%>
   </li>
   <li class="form-element">
-    <%=readonly_dl_input("... que permitem usuários <span id='enrollment-info'>[?]</span> 
-    <div id='toggle-enrollment-info'> #{'Tipo'.pluralize(@statuses_with_users.count)}: #{@statuses_with_users.to_sentence(locale: :'pt-BR')} 
+    <%=readonly_dl_input("... que permitem usuários <span id='enrollment-info'>[?]</span>
+    <div id='toggle-enrollment-info'> #{'Tipo'.pluralize(@statuses_with_users.count)}: #{@statuses_with_users.to_sentence(locale: :'pt-BR')}
     <br> Se quiser incluir outros tipos, configure \"Tipos de Matrícula\" </div>", @counts, :allowedenrollments)%>
   </li>
   <li class="form-element">
@@ -37,8 +37,6 @@
       </dd>
     </dl>
   </li>
-  
-
 </ol>
 
 <script>

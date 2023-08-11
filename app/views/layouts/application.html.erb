@@ -5,19 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <%= favicon_link_tag 'logoSapos-circle.png' %>
 
-  <%= stylesheet_link_tag "application", :media => "all", debug: false %>
-
-
-  <%#= stylesheet_link_tag :all %>
-<%# javascript_include_tag :defaults %>
-  <%#= stylesheet_link_tag 'jquery-ui' %>
-
-  <%#= javascript_include_tag 'jquery.min' %>
-  <%#= javascript_include_tag 'rails_jquery.js' %>
-  <%#= javascript_include_tag 'jquery-ui-min' %>
-  <%#= javascript_include_tag 'date_picker_bridge.js' %>
-  <%#= javascript_include_tag 'application.js' %>
-  <%#= stylesheet_link_tag 'active_scaffold_overrides' %>
+  <%= stylesheet_link_tag "application", media: "all", debug: false %>
 
   <%= javascript_include_tag 'application' %>
   <%= csrf_meta_tags %>
@@ -35,9 +23,13 @@
         Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %>
       </div>
     </div>
-    <div id='top_navigation' <%= display_none_if_logged_out %>><%= optional_navigation :level => 1 %></div>
+    <div id='top_navigation' <%= display_none_if_logged_out %>>
+      <%= optional_navigation level: 1 %>
+    </div>
     <div id='main'>
-      <div id='sub_navigation' <%= display_none_if_logged_out %>><%= optional_navigation :level => 2 %></div>
+      <div id='sub_navigation' <%= display_none_if_logged_out %>>
+        <%= optional_navigation level: 2 %>
+      </div>
       <div id='content'>
         <%= yield %>
       </div>

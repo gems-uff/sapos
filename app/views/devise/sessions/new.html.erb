@@ -4,7 +4,12 @@
   <% end %>
 
   <div id="form_border">
-    <%= form_for(resource, :as => resource_name, :url => session_path(resource_name), :html => {:id => 'login_form'}) do |f| %>
+    <%= form_for(
+      resource,
+      as: resource_name,
+      url: session_path(resource_name),
+      html: { id: "login_form" }
+    ) do |f| %>
         <%= flash[:name] %>
 
         <div id="login_input">
@@ -24,7 +29,10 @@
 
         <% if devise_mapping.rememberable? -%>
             <div id="remember_me_input">
-              <div><%= f.check_box :remember_me %> <%= f.label :remember_me, "Lembrar de mim" %></div>
+              <div>
+                <%= f.check_box :remember_me %>
+                <%= f.label :remember_me, "Lembrar de mim" %>
+              </div>
             </div>
 
         <% end -%>
@@ -35,4 +43,4 @@
     <% end %>
   </div>
 </div>
-<%= render :partial => "devise/shared/links" %>
+<%= render partial: "devise/shared/links" %>

@@ -4,19 +4,19 @@
       <div id="error_login"><%= flash[:alert] %></div>
   <% end %>
   <% if closed %>
-      <div id="error_login"><%= t 'student_enrollment.enroll.closed_enrollment', semester: @semester.to_label %></div>
+      <div id="error_login"><%= t "student_enrollment.enroll.closed_enrollment", semester: @semester.to_label %></div>
   <% end %>
-  
-  <h2> <%= t 'student_enrollment.enroll.title', semester: @semester.to_label %> </h2>
+
+  <h2> <%= t "student_enrollment.enroll.title", semester: @semester.to_label %> </h2>
   <%= render partial: "enroll_schedule", locals: { semester: @semester } %>
 
   <% if @enrollment_request.persisted? %>
-    <span class="show-enroll-status show-enroll-status-<%= ClassEnrollmentRequest::STATUSES_MAP[@enrollment_request.status] %>"> <%= t('student_enrollment.enroll.status', status: @enrollment_request.status.downcase) %> </span>
+    <span class="show-enroll-status show-enroll-status-<%= ClassEnrollmentRequest::STATUSES_MAP[@enrollment_request.status] %>"> <%= t("student_enrollment.enroll.status", status: @enrollment_request.status.downcase) %> </span>
   <% end %>
 
   <%= form_with model: @enrollment_request, url: :save_student_enroll, method: :post do |form| %>
     <%= render partial: "enroll_errors", locals: { enrollment_request: @enrollment_request, form: form } %>
-    <%= render partial: "enroll_table", locals: { 
+    <%= render partial: "enroll_table", locals: {
       enrollment: @enrollment,
       enrollment_request: @enrollment_request,
       semester: @semester,
@@ -31,9 +31,8 @@
       old_comment: @comment,
       closed: closed,
       form: form } %>
-    
     <% unless closed %>
-      <%= form.submit t('student_enrollment.enroll.submit') %>
+      <%= form.submit t("student_enrollment.enroll.submit") %>
     <% end %>
   <% end %>
 </div>

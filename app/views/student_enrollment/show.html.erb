@@ -1,16 +1,20 @@
-
 <div class="landing-main">
   <% if flash[:alert] %>
       <div id="error_login"><%= flash[:alert] %></div>
   <% end %>
-  
-  <h2> <%= t 'student_enrollment.show.title', level: @enrollment.level.name, number: @enrollment.enrollment_number, status: @enrollment.dismissal.nil? ? "" : "(Desligada)" %> </h2>
-  
+
+  <h2> <%= t(
+    "student_enrollment.show.title",
+    level: @enrollment.level.name,
+    number: @enrollment.enrollment_number,
+    status: @enrollment.dismissal.nil? ? "" : "(Desligada)"
+  ) %> </h2>
+
   <% if @partials.empty? %>
-    <p> <%= t 'student_enrollment.show.welcome' %> </p>
+    <p> <%= t "student_enrollment.show.welcome" %> </p>
   <% else %>
     <% @partials.each do |partial, locals| %>
-      <%= render :partial => partial, :locals => locals %>
+      <%= render partial: partial, locals: locals %>
     <% end %>
   <% end %>
 </div>

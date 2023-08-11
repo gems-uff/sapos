@@ -1,9 +1,15 @@
 <%
-   controller ||= params[:controller]
+  controller ||= params[:controller]
 
-   pagination_url_params = params.merge(:controller => controller, :action => :browse, :search => params[:search], :update => 1)
-   prev_url = url_for(pagination_url_params.merge(:page => page.prev.number, :escape => false)) if page.prev?
-   next_url = url_for(pagination_url_params.merge(:page => page.next.number, :escape => false)) if page.next?
+  pagination_url_params = params.merge(
+    controller: controller, action: :browse, search: params[:search], update: 1
+  )
+  prev_url = url_for(
+    pagination_url_params.merge(page: page.prev.number, escape: false)
+  ) if page.prev?
+  next_url = url_for(
+    pagination_url_params.merge(page: page.next.number, escape: false)
+  ) if page.next?
 -%>
 <ol>
   <li class="found">
@@ -12,23 +18,29 @@
         pluralize(page.pager.count, " encontrado", " encontrados")
     %></li>
   <% if page.prev? -%>
-      <li class="pagination previous">
-        <%= link_to image_tag('record_select/previous.gif', :alt => rs_('Anteriores')) + " " + rs_("%d Anteriores",
-                                                                                                 page.pager.per_page),
-                    {:url => prev_url},
-                    {:href => prev_url, :method => :get, :remote => true} %>
-      </li>
+    <li class="pagination previous">
+      <%= link_to(
+        image_tag(
+          "record_select/previous.gif", alt: rs_("Anteriores")
+        ) + " " + rs_("%d Anteriores", page.pager.per_page),
+        { url: prev_url },
+        { href: prev_url, method: :get, remote: true }
+      ) %>
+    </li>
   <% end -%>
   <% page.items.each do |record| -%>
-      <li class="record <%= cycle 'odd', 'even' %>" id="rs<%= record.id -%>">
-        <%= render_record_in_list(record, controller) %>
-      </li>
+    <li class="record <%= cycle "odd", "even" %>" id="rs<%= record.id -%>">
+      <%= render_record_in_list(record, controller) %>
+    </li>
   <% end -%>
   <% if page.next? -%>
-      <li class="pagination next">
-        <%= link_to (rs_("Próximos %d", page.pager.per_page) + " " + image_tag('record_select/next.gif', :alt => rs_('Próximos'))).html_safe,
-                    {:url => next_url},
-                    {:href => next_url, :method => :get, :remote => true} %>
-      </li>
+    <li class="pagination next">
+      <%= link_to(
+        (rs_("Próximos %d", page.pager.per_page) + " " +
+          image_tag("record_select/next.gif", alt: rs_("Próximos"))).html_safe,
+        { url: next_url },
+        { href: next_url, method: :get, remote: true }
+      ) %>
+    </li>
   <% end -%>
 </ol>

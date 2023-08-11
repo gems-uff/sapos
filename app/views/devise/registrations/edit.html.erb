@@ -1,25 +1,30 @@
 <div class="landing-main edit-profile-main">
   <h2>Editar perfil</h2>
 
-  <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+  <%= form_for(
+    resource,
+    as: resource_name,
+    url: registration_path(resource_name),
+    html: { method: :put }
+  ) do |f| %>
     <%= render "devise/shared/error_messages", resource: resource %>
 
     <ol class="form">
       <li class="form-element required">
         <dl>
           <dt> <%= f.label :email %> </dt>
-          <dd> 
-            <%= f.email_field :email, autofocus: true, autocomplete: "email", id: "email_field" %> 
+          <dd>
+            <%= f.email_field :email, autofocus: true, autocomplete: "email", id: "email_field" %>
             <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
               <div class="info">Aguardando confirmação para: <%= resource.unconfirmed_email %></div>
             <% end %>
           </dd>
         </dl>
       </li>
-      
+
       <li class="form-element">
         <dl>
-          <dt> 
+          <dt>
             <%= f.label :password %>
             <div class="info">
               Deixe em branco se não quiser alterar

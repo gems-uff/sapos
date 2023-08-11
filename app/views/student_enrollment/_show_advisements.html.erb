@@ -1,10 +1,10 @@
 <div class="scholarships-show-box show-box">
   <details open>
-    <summary> <%= t 'activerecord.models.advisement.other' %> </summary>
-    <%= render :partial => 'enrollments/show_advisements_table', :locals => { 
+    <summary> <%= t "activerecord.models.advisement.other" %> </summary>
+    <%= render partial: "enrollments/show_advisements_table", locals: {
         advisements: advisements,
         show_enrollment_number: false,
-      } 
+      }
     %>
   </details>
 </div>

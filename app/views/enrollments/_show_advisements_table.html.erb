@@ -1,9 +1,9 @@
 <table class="showtable listed-records-table">
   <thead>
     <tr>
-      <th><%= I18n.t('activerecord.attributes.advisement.professor') %></th>
+      <th><%= I18n.t("activerecord.attributes.advisement.professor") %></th>
       <% if show_enrollment_number %>
-        <th><%= I18n.t('activerecord.attributes.advisement.professor_enrollment_number') %></th>
+        <th><%= I18n.t("activerecord.attributes.advisement.professor_enrollment_number") %></th>
       <% end %>
     </tr>
   </thead>
@@ -14,7 +14,9 @@
       <% tr_class = count.even? ? "even-record" : "" %>
       <% if advisement.main_advisor %>
         <tr class="record <%= tr_class %>">
-          <td title='<%= I18n.t('activerecord.attributes.advisement.main_advisor') %>'><strong><%= advisement.professor.name %>*</strong></td>
+          <td title='<%= I18n.t("activerecord.attributes.advisement.main_advisor") %>'>
+            <strong><%= advisement.professor.name %>*</strong>
+          </td>
           <% if show_enrollment_number %>
             <td><strong><%= advisement.professor.enrollment_number %></strong></td>
           <% end %>
