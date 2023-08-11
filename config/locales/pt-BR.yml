@@ -997,7 +997,6 @@ pt-BR:
     update_course_class_label: "Editar Turma"
     update_course_label: "Editar Disciplina"
     update_course_type_label: "Editar Tipo de Disciplina"
-    update_email_template_label: "Modificar Notificação"
     update_enrollment_label: "Modificar Matrícula"
     update_enrollment_request_comment_label: "Modificar Comentário de Pedido de Inscrição"
     update_link: "Editar"
