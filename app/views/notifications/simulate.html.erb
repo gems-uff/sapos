@@ -24,7 +24,7 @@
       <% if params[:notification_params].try(:[], :data_consulta) %>
         <%= I18n.t("active_scaffold.notification.query_date") %>:
         <%= params[:notification_params][:data_consulta] %>
-      <% end %>  
+      <% end %>
       </span>
       &nbsp;&nbsp;&nbsp;
       <a id="as_notifications-execute_now-<%= @notification.id %>-link"
@@ -39,7 +39,7 @@
     </p>
   </div>
 
-  <table class="showtable listed-records-table">
+  <table class="notification-results showtable listed-records-table">
     <thead>
     <tr>
       <th><%= I18n.t("activerecord.attributes.notification_log.to") %></th>

@@ -103,7 +103,7 @@ RSpec.describe "Queries features", type: :feature do
       find("#as_#{plural_name}-execute-#{@record.id}-link").click
     end
 
-    it "should be able to duplicate record with logo" do
+    it "should be able to show query result" do
       expect(page.all("table.query-results tbody tr").size).to eq 3
       expect(page.all("table.query-results thead th").map(&:text)).to eq ["name", "sql"]
     end

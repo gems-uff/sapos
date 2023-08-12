@@ -1,6 +1,7 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-module NotificationParamsHelper
+# frozen_string_literal: true
 
+module NotificationParamsHelper
 end
