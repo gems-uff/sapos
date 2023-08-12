@@ -1,14 +1,15 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-require 'singleton'
+# frozen_string_literal: true
+
+require "singleton"
 
 module Notifier
-
   def self.logger
     Rails.logger
   end
-  
+
   def self.should_run?
     Rails.application.config.should_send_emails
   end
@@ -20,7 +21,7 @@ module Notifier
       return
     end
 
-    if CustomVariable.redirect_email == ''
+    if CustomVariable.redirect_email == ""
       Notifier.logger.info "Custom Variable 'redirect_email' is empty. Stoping process."
       return
     end
@@ -41,8 +42,7 @@ module Notifier
         m[:body] = "Originalmente para #{m[:to]}\n\n" + m[:body]
         m[:to] = CustomVariable.redirect_email
       end
-      unless m[:to].nil? or m[:to].empty?
-        
+      unless m[:to].blank?
         actionmailer_base = ActionMailer::Base.new
 
         attachments_file_name_list = nil
@@ -50,20 +50,22 @@ module Notifier
           attachments_file_name_list = ""
           m_attachments.keys.each do |attachment_key|
             attachment = m_attachments[attachment_key]
-            actionmailer_base.attachments[attachment[:file_name]] = {mime_type: 'application/pdf', content: attachment[:file_contents]}
+            actionmailer_base.attachments[attachment[:file_name]] = {
+              mime_type: "application/pdf", content: attachment[:file_contents]
+            }
             attachments_file_name_list += attachment[:file_name] + ", "
           end
           attachments_file_name_list = attachments_file_name_list[0..-3]
         end
- 
+
         actionmailer_base.mail(m).deliver!
 
         NotificationLog.new(
-          :notification_id => m[:notification_id], 
-          :to => m[:to], 
-          :subject => m[:subject],
-          :body => m[:body],
-          :attachments_file_names => attachments_file_name_list
+          notification_id: m[:notification_id],
+          to: m[:to],
+          subject: m[:subject],
+          body: m[:body],
+          attachments_file_names: attachments_file_name_list
         ).save
         Notifier.display_notification_info(m, attachments_file_name_list)
       end
@@ -71,7 +73,7 @@ module Notifier
   end
 
   def self.display_notification_info(notification, attachments_file_name_list)
-    Notifier.logger.info "\n#{Time.now.strftime('%Y/%m/%d %H:%M:%S')}"
+    Notifier.logger.info "\n#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}"
     Notifier.logger.info "########## Notification ##########"
     Notifier.logger.info "Notifying #{notification[:to]}"
     Notifier.logger.info "Subject: #{notification[:subject]}"

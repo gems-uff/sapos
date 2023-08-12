@@ -1,5 +1,8 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
+
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
@@ -68,7 +71,7 @@ Rails.application.configure do
   # config.action_view.annotate_rendered_view_with_filenames = true
 
   # Allow the notifier to send emails
-  config.should_send_emails = Rails.const_defined?('Server') 
+  config.should_send_emails = Rails.const_defined?("Server")
 
   # Only use best-standards-support built into browsers
   config.action_dispatch.best_standards_support = :builtin
@@ -78,22 +81,22 @@ Rails.application.configure do
   config.public_file_server.enabled = false
 
   # Configure ActionMailer
-  config.action_mailer.default_url_options = { :host => 'localhost:3000' }
+  config.action_mailer.default_url_options = { host: "localhost:3000" }
   # config.action_mailer.delivery_method = :sendmail
-  # config.action_mailer.sendmail_settings = {:location => '/usr/sbin/sendmail' }
+  # config.action_mailer.sendmail_settings = {location: "/usr/sbin/sendmail" }
 
   config.action_mailer.delivery_method = :letter_opener_web
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = false
 
   # config.action_mailer.smtp_settings = {
-  #     :address              => "smtp.gmail.com",
-  #     :port                 => 587,
-  #     :domain               => "gmail.com",
-  #     :user_name            => "everton.moreth@gmail.com",
-  #     :password             => "gjoao.pe,feijao!O",
-  #     :authentication       => "plain",
-  #     :enable_starttls_auto => true
+  #     address:              "smtp.gmail.com",
+  #     port:                 587,
+  #     domain:               "gmail.com",
+  #     user_name:            "everton.moreth@gmail.com",
+  #     password:             "gjoao.pe,feijao!O",
+  #     authentication:       "plain",
+  #     enable_starttls_auto: true
   # }
 
   # Uncomment if you wish to allow Action Cable access from any origin.
@@ -101,7 +104,7 @@ Rails.application.configure do
 
   config.middleware.use ExceptionNotification::Rack,
     email: {
-      email_prefix: '[SAPOS: Error] ',
+      email_prefix: "[SAPOS: Error] ",
       sender_address: %{"SAPOS Exception Notifier" <erro-sapos@sapos.ic.uff.br>},
       exception_recipients: %w{letter@saposletteropener.com}
     }

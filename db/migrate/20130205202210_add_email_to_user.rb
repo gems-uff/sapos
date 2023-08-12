@@ -1,13 +1,14 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-class AddEmailToUser < ActiveRecord::Migration[5.1]
+# frozen_string_literal: true
 
+class AddEmailToUser < ActiveRecord::Migration[5.1]
   def self.up
     change_table :users do |t|
       ## Database authenticatable
-      t.string :email, :null => false, :default => ""
-      t.string :encrypted_password, :null => false, :default => ""
+      t.string :email, null: false, default: ""
+      t.string :encrypted_password, null: false, default: ""
 
       ## Recoverable
       t.string :reset_password_token
@@ -17,7 +18,7 @@ class AddEmailToUser < ActiveRecord::Migration[5.1]
       t.datetime :remember_created_at
 
       ## Trackable
-      t.integer :sign_in_count, :default => 0
+      t.integer :sign_in_count, default: 0
       t.datetime :current_sign_in_at
       t.datetime :last_sign_in_at
       t.string :current_sign_in_ip
@@ -29,10 +30,11 @@ class AddEmailToUser < ActiveRecord::Migration[5.1]
       t.datetime :confirmation_sent_at
 
       ## Lockable
-      t.integer  :failed_attempts, :default => 0 # Only if lock strategy is :failed_attempts
-      t.string   :unlock_token # Only if unlock strategy is :email or :both
+      # Only if lock strategy is :failed_attempts
+      t.integer  :failed_attempts, default: 0
+      # Only if unlock strategy is :email or :both
+      t.string   :unlock_token
       t.datetime :locked_at
-
     end
   end
 

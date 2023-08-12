@@ -1,11 +1,16 @@
-require 'active_support/inflector'
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
+
+require "active_support/inflector"
 
 
 def columns_to_index(columns)
   if columns.count == 1
-    return ':' + columns[0]
+    return ":" + columns[0]
   end
-  result = columns.collect { |x| ':' + x }.join(', ')
+  result = columns.collect { |x| ":" + x }.join(", ")
   "[#{result}]"
 end
 
@@ -20,7 +25,7 @@ def create_code(result, wrap, foreign_keys, references_by_table, newtype, useold
     result << "    #{sing1}.update_all(\"temp_#{sing2}_id = #{sing2}_id\")"
     result << "    remove_reference :#{col1}, :#{sing2}"
   end
-  result << ''
+  result << ""
 
   references_by_table.each do |table, references|
     result << "    # #{table}"
@@ -28,7 +33,7 @@ def create_code(result, wrap, foreign_keys, references_by_table, newtype, useold
       if useoldname
         result << "    remove_index :#{reftable}, name: \"#{oldname}\" if index_exists?(:#{reftable}, name: \"#{oldname}\")"
       else
-        result << "    remove_index :#{reftable}, name: \"index_#{reftable}_on_#{columns.join('_and_')}\" if index_exists?(:#{reftable}, name: \"index_#{reftable}_on_#{columns.join('_and_')}\")"
+        result << "    remove_index :#{reftable}, name: \"index_#{reftable}_on_#{columns.join("_and_")}\" if index_exists?(:#{reftable}, name: \"index_#{reftable}_on_#{columns.join("_and_")}\")"
       end
     end
     result << "    change_column :#{table}, :id, #{newtype}, unique: true, null: false, auto_increment: true"
@@ -40,16 +45,16 @@ def create_code(result, wrap, foreign_keys, references_by_table, newtype, useold
         result << "    add_index :#{reftable}, #{columns_to_index(columns)}, name: \"#{oldname}\" unless index_exists?(:#{reftable}, #{columns_to_index(columns)})"
       end
     end
-    result << ''
+    result << ""
   end
-  
-  result << ''
+
+  result << ""
   wrap.each do |table, schema_tup|
     result << "    change_column :#{table}, :#{schema_tup[0]}, #{newtype}"
     result << "    add_index :#{table}, #{columns_to_index(schema_tup[1])} unless index_exists?(:#{table}, #{columns_to_index(schema_tup[1])})"
   end
   foreign_keys.each do |fk, col1, col2, extra|
-    extra = ", foreign_key: {#{extra.delete_prefix(',')} }" if extra
+    extra = ", foreign_key: {#{extra.delete_prefix(",")} }" if extra
     sing1 = col1.singularize.capitalize
     sing2 = col2.singularize
     result << "    add_reference :#{col1}, :#{sing2}#{extra}"
@@ -61,25 +66,25 @@ end
 
 def create_migration(wrap, references_by_table, add_extra, foreign_keys)
   result = []
-  result << 'class MigrateIdsToBigint < ActiveRecord::Migration[6.0]'
-  result << '  def up'
+  result << "class MigrateIdsToBigint < ActiveRecord::Migration[6.0]"
+  result << "  def up"
   create_code(result, wrap, foreign_keys, references_by_table, ":integer, limit: 8", true)
-  result << ''
-  result << '    # new indexes'
+  result << ""
+  result << "    # new indexes"
   add_extra.each do |table, fk_attr|
     result << "    add_index :#{table}, #{columns_to_index([fk_attr])} unless index_exists?(:#{table}, #{columns_to_index([fk_attr])})"
   end
-  result << '  end'
-  result << ''
-  result << '  def down'
-  result << '    # new indexes'
+  result << "  end"
+  result << ""
+  result << "  def down"
+  result << "    # new indexes"
   add_extra.each do |table, fk_attr|
     result << "    remove_index :#{table}, name: \"index_#{table}_on_#{fk_attr}\" if index_exists?(:#{table}, name: \"index_#{table}_on_#{fk_attr}\")"
   end
-  result << ''
+  result << ""
   create_code(result, wrap, foreign_keys, references_by_table, ":integer", false)
-  result << '  end'
-  result << 'end'
+  result << "  end"
+  result << "end"
   result.join($/)
 end
 
@@ -102,9 +107,9 @@ class MigrateBigintGenerator < Rails::Generators::Base
         table_name = name.pluralize
         fk_attr = name + "_id"
         if match[1]
-          classname = match[1].match(/:class_name => '(.*?)'/)
+          classname = match[1].match(/class_name: "(.*?)"/)
           table_name = classname[1].downcase.pluralize if classname
-          fk = match[1].match(/:foreign_key => '(.*?)'/)
+          fk = match[1].match(/foreign_key: "(.*?)"/)
           fk_attr = fk[1] if fk
         end
         indexes << [fk_attr, table_name, name]
@@ -114,22 +119,17 @@ class MigrateBigintGenerator < Rails::Generators::Base
 
     schema = File.read("db/schema.rb")
     tables = {}
-    foreign_keys = []
     schema.scan(/  create_table "(.*?)".*? do \|t\|(.*?)end\n/m).collect do |match|
       indexes = []
-      
       match[1].scan(/t.index \["(.*?)"\], name: "(.*?)"/).collect do |indexmatch|
         fk_attr = indexmatch[0]
-        if indexmatch[0].count(',') > 0
+        if indexmatch[0].count(",") > 0
           fk_attr = fk_attr.match(/([\w_]*?id)/)[0]
         end
         columns = indexmatch[0].split(/", "/)
         if fk_attr.end_with? "_id"
           indexes << [fk_attr, columns, indexmatch[1]]
         end
-        #if indexmatch[1] != "index_#{match[0]}_on_#{columns.join('_and_')}"
-        #   puts [fk_attr, columns, indexmatch[1]].inspect
-        #end
       end
       tables[match[0]] = indexes
     end
@@ -145,7 +145,7 @@ class MigrateBigintGenerator < Rails::Generators::Base
       if model_indexes = models[table]
         # Find relationships that existed in rails, but that did not exist in the database
         model_indexes.each do |fk_attr, table_name, belongs_to|
-          unless schema_indexes.any? {|x| x[0] == fk_attr}
+          unless schema_indexes.any? { |x| x[0] == fk_attr }
             add_extra << [table, fk_attr]
           end
         end
@@ -164,11 +164,11 @@ class MigrateBigintGenerator < Rails::Generators::Base
           end
         end
       else
-        #puts(key) # carrier_wave_files
+        # puts(key) # carrier_wave_files
       end
     end
 
     result = create_migration(wrap, references_by_table, add_extra, foreign_keys)
-    create_file "db/migrate/#{Time.now.strftime('%Y%m%d%H%M%S')}_migrate_ids_to_bigint.rb", result
+    create_file "db/migrate/#{Time.now.strftime("%Y%m%d%H%M%S")}_migrate_ids_to_bigint.rb", result
   end
 end

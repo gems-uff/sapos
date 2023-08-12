@@ -1,6 +1,8 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 class AddAccessColumnsToStudent < ActiveRecord::Migration[5.1]
   def self.up
     add_column :students, :birthdate, :date
@@ -8,16 +10,16 @@ class AddAccessColumnsToStudent < ActiveRecord::Migration[5.1]
     add_column :students, :civil_status, :string
     add_column :students, :father_name, :string
     add_column :students, :mother_name, :string
-    add_column :students, :country_id, :integer, :references => 'countries'
-    add_column :students, :birthplace, :integer, :references => 'states'
+    add_column :students, :country_id, :integer, references: "countries"
+    add_column :students, :birthplace, :integer, references: "states"
     add_column :students, :identity_number, :string
     add_column :students, :identity_issuing_body, :string
     add_column :students, :identity_expedition_date, :date
     add_column :students, :employer, :string
     add_column :students, :job_position, :string
-    add_column :students, :level_id, :integer, :references => 'levels'
-    add_column :students, :state_id, :integer, :references => 'states'
-    add_column :students, :city_id, :integer, :references => 'cities'
+    add_column :students, :level_id, :integer, references: "levels"
+    add_column :students, :state_id, :integer, references: "states"
+    add_column :students, :city_id, :integer, references: "cities"
     add_column :students, :neighbourhood, :string
     add_column :students, :zip_code, :string
     add_column :students, :address, :string

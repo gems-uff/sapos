@@ -1,15 +1,14 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 class CreateCoursesStudents < ActiveRecord::Migration[5.1]
   def self.up
-    create_table :courses_students, :id => false do |t|
-      t.references :course, :null => false
-      t.references :student, :null => false    
+    create_table :courses_students, id: false do |t|
+      t.references :course, null: false
+      t.references :student, null: false
     end
-    
-    #add_index :courses_students, :course_id
-    #add_index :courses_students, :student_id
   end
 
   def self.down

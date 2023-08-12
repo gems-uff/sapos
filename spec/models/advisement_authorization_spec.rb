@@ -25,7 +25,7 @@ RSpec.describe AdvisementAuthorization, type: :model do
     describe "to_label" do
       it "should return the expected string" do
         level_name = "AuthorizedLevel"
-        advisement_authorization.level = Level.new(:name => level_name)
+        advisement_authorization.level = Level.new(name: level_name)
         expect(advisement_authorization.to_label).to eql(level_name)
       end
     end

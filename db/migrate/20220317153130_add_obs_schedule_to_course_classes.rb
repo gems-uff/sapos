@@ -1,6 +1,8 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 class AddObsScheduleToCourseClasses < ActiveRecord::Migration[6.0]
   def up
     change_table :course_classes do |t|
@@ -14,4 +16,3 @@ class AddObsScheduleToCourseClasses < ActiveRecord::Migration[6.0]
     end
   end
 end
-

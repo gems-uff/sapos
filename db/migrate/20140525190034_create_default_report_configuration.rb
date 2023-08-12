@@ -1,11 +1,12 @@
-# encoding utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 class CreateDefaultReportConfiguration < ActiveRecord::Migration[5.1]
   def up
-
-    if ActiveRecord::Base.connection.table_exists? CarrierWave::Storage::ActiveRecord::ActiveRecordFile.table_name
+    table_name = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.table_name
+    if ActiveRecord::Base.connection.table_exists? table_name
       ReportConfiguration.new do |rc|
         rc.image = File.open(Rails.root.join("public/images/logoUFF.jpg").to_s)
         rc.name = "Padrão"
@@ -26,7 +27,8 @@ PROGRAMA DE PÓS-GRADUAÇÃO EM COMPUTAÇÃO"
   end
 
   def down
-    if ActiveRecord::Base.connection.table_exists? CarrierWave::Storage::ActiveRecord::ActiveRecordFile.table_name
+    table_name = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.table_name
+    if ActiveRecord::Base.connection.table_exists? table_name
       rc = ReportConfiguration.find_by_name("Padrão")
       rc.destroy unless rc.nil?
     end

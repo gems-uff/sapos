@@ -1,9 +1,11 @@
 # Original de https://github.com/ddengler/prawn-grouping/blob/master/lib/prawn/grouping.rb
+
+# frozen_string_literal: true
+
 require "prawn"
 
 module Prawn
   module Grouping
-
     # Groups a given block vertiacally within the current context, if possible.
     #
     # Parameters are:
@@ -40,27 +42,29 @@ module Prawn
           bounds.move_past_bottom
           b.call(self)
         end
-        return false
+        false
       else
         # just render it
         fits_current_context.call if fits_current_context
         b.call(self)
-        return true
+        true
       end
     end
 
     private
-
-    def create_box_clone
-      Prawn::Document.new(:page_size => state.page.size, :page_layout => state.page.layout) do |pdf|
-        pdf.margin_box = @bounding_box.dup
-        pdf.text_formatter = @text_formatter.dup
-        pdf.font_families.update font_families
-        pdf.font font.family
-        pdf.font_size font_size
-        pdf.default_leading = default_leading
+      def create_box_clone
+        Prawn::Document.new(
+          page_size: state.page.size,
+          page_layout: state.page.layout
+        ) do |pdf|
+          pdf.margin_box = @bounding_box.dup
+          pdf.text_formatter = @text_formatter.dup
+          pdf.font_families.update font_families
+          pdf.font font.family
+          pdf.font_size font_size
+          pdf.default_leading = default_leading
+        end
       end
-    end
   end
 end
 

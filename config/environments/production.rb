@@ -1,6 +1,8 @@
-# encoding: utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
+
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
@@ -81,16 +83,16 @@ Rails.application.configure do
   # Allow the notifier to send emails
   config.should_send_emails = true
   config.action_mailer.delivery_method = :sendmail
-  config.action_mailer.default_url_options = { :host => 'sapos.ic.uff.br' }
-  config.action_mailer.sendmail_settings = { :arguments => '-i ', :location => '/usr/sbin/sendmail' }
+  config.action_mailer.default_url_options = { host: "sapos.ic.uff.br" }
+  config.action_mailer.sendmail_settings = { arguments: "-i ", location: "/usr/sbin/sendmail" }
 
   config.middleware.use ExceptionNotification::Rack,
     email: {
-      email_prefix: '[SAPOS: Error] ',
+      email_prefix: "[SAPOS: Error] ",
       sender_address: %{"SAPOS Exception Notifier" <erro-sapos@sapos.ic.uff.br>},
       exception_recipients: %w{sapos-ic-uff@googlegroups.com}
     }
-    
+
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
   config.i18n.fallbacks = true

@@ -1,6 +1,7 @@
-# encoding utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
 
 if Rails.env.development? || Rails.env.test?
   require "rspec/core/rake_task"
@@ -8,7 +9,7 @@ if Rails.env.development? || Rails.env.test?
   namespace :rcov do
     RSpec::Core::RakeTask.new(:rspec_run) do |t|
       Rake::Task["db:test:prepare"].invoke
-      t.pattern = 'spec/**/*_spec.rb'
+      t.pattern = "spec/**/*_spec.rb"
       t.rcov = true
       t.rcov_opts = %w{--rails --exclude osx\/objc,gems\/,spec\/,controllers\/,helpers\/}
     end

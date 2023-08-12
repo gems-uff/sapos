@@ -1,4 +1,6 @@
-require 'active_record/connection_adapters/abstract_mysql_adapter'
+# frozen_string_literal: true
+
+require "active_record/connection_adapters/abstract_mysql_adapter"
 
 module ActiveRecord
   module ConnectionAdapters

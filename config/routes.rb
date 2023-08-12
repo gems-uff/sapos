@@ -26,9 +26,12 @@ Rails.application.routes.draw do
   }, skip: [:registrations]
 
   devise_scope :user do
-    get "users/sign_up", to: "users/registrations#new", as: :new_user_registration
-    get "users/profile", to: "users/registrations#edit", as: :edit_user_registration
-    patch "users/profile", to: "users/registrations#update", as: :user_registration
+    get "users/sign_up",
+      to: "users/registrations#new", as: :new_user_registration
+    get "users/profile",
+      to: "users/registrations#edit", as: :edit_user_registration
+    patch "users/profile",
+      to: "users/registrations#update", as: :user_registration
     put "users/profile", to: "users/registrations#update"
     post "users/profile", to: "users/registrations#update"
     delete "users/profile", to: "users/registrations#update"
@@ -283,8 +286,10 @@ Rails.application.routes.draw do
 
   get "landing", action: :index, controller: "landing"
   get "enrollment/:id", to: "student_enrollment#show", as: :student_enrollment
-  get "enrollment/:id/enroll/:year-:semester", to: "student_enrollment#enroll", as: :student_enroll
-  post "enrollment/:id/enroll/:year-:semester", to: "student_enrollment#save_enroll", as: :save_student_enroll
+  get "enrollment/:id/enroll/:year-:semester",
+    to: "student_enrollment#enroll", as: :student_enroll
+  post "enrollment/:id/enroll/:year-:semester",
+    to: "student_enrollment#save_enroll", as: :save_student_enroll
 
   get "pendencies", to: "pendencies#index", as: :pendencies
 

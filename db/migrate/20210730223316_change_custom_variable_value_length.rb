@@ -1,3 +1,8 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
+
 class ChangeCustomVariableValueLength < ActiveRecord::Migration[6.0]
   def up
     change_column :custom_variables, :value, :text
@@ -5,7 +10,7 @@ class ChangeCustomVariableValueLength < ActiveRecord::Migration[6.0]
 
   def down
     add_column :custom_variables, :temp_value, :string
-  
+
     CustomVariable.find_each do |variable|
       temp_value = variable.value
       if temp_value.length > 255

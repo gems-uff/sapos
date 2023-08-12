@@ -17,10 +17,7 @@ module Sapos
     # Using defaults of rails < 5, since it was the original generated version.
     #   Consider checking which defaults we should update:
     #   https://guides.rubyonrails.org/configuring.html#versioned-default-values
-    # config.load_defaults 7.0
-    config.active_record.belongs_to_required_by_default = true
-    config.active_record.legacy_connection_handling = false
-    ActiveSupport.to_time_preserves_timezone = true
+    config.load_defaults 7.0
 
 
     # Allow the notifier to send emails

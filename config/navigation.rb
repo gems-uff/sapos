@@ -1,6 +1,8 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 def get_path_from(models)
   models = models.is_a?(Array) ? models : [models]
   models.each do |model|
@@ -21,7 +23,6 @@ def can_read?(models, proc = true)
 end
 
 class NavigationHelper
-
   attr_accessor :container, :parentkey, :binds
 
   def initialize(binds, container, options = {})
@@ -29,7 +30,7 @@ class NavigationHelper
     @container = container
     @parentkey = options.fetch(:parentkey, nil)
   end
-  
+
   # Add an item to the primary navigation. The following params apply:
   # key - a symbol which uniquely defines your navigation item in the scope of the primary_navigation
   #       in the mainitem.call, key will be used to produce the I18n name: navigation.{key}.label
@@ -38,10 +39,10 @@ class NavigationHelper
   # options - can be used to specify attributes that will be included in the rendered navigation item (e.g. id, class etc.)
   #           some special options that can be set:
   #           :if - Specifies a proc to call to determine if the item should
-  #                 be rendered (e.g. <tt>:if => Proc.new { current_user.admin? }</tt>). The
+  #                 be rendered (e.g. <tt>if: Proc.new { current_user.admin? }</tt>). The
   #                 proc should evaluate to a true or false value and is evaluated in the context of the view.
   #           :unless - Specifies a proc to call to determine if the item should not
-  #                     be rendered (e.g. <tt>:unless => Proc.new { current_user.admin? }</tt>). The
+  #                     be rendered (e.g. <tt>unless: Proc.new { current_user.admin? }</tt>). The
   #                     proc should evaluate to a true or false value and is evaluated in the context of the view.
   #           :method - Specifies the http-method for the generated link - default is :get.
   #           :highlights_on - if autohighlighting is turned off and/or you want to explicitly specify
@@ -52,8 +53,12 @@ class NavigationHelper
     parentkey = @parentkey || key
     childi18n = @parentkey.nil? ? :label : key
 
-    @container.item(key, I18n.t("navigation.#{parentkey}.#{childi18n}"), url, **options) do |item_container|
-      yield NavigationHelper.new(@binds, item_container, parentkey: key) if block_given?
+    @container.item(
+      key, I18n.t("navigation.#{parentkey}.#{childi18n}"), url, **options
+    ) do |item_container|
+      yield NavigationHelper.new(
+        @binds, item_container, parentkey: key
+      ) if block_given?
     end
   end
 
@@ -73,21 +78,18 @@ class NavigationHelper
   end
 
   protected
+    def get_path_from(*args)
+      @binds.eval("method(:get_path_from)").call(*args)
+    end
 
-  def get_path_from(*args)
-    @binds.eval("method(:get_path_from)").call *args
-  end
-
-  def can_read?(*args)
-    @binds.eval("method(:can_read?)").call *args
-  end
+    def can_read?(*args)
+      @binds.eval("method(:can_read?)").call(*args)
+    end
 end
 
 
 # Configures your navigation
 SimpleNavigation::Configuration.run do |navigation|
-
-  
   # Specify a custom renderer if needed.
   # The default renderer is SimpleNavigation::Renderer::List which renders HTML lists.
   # The renderer can also be specified as option in the render_navigation call.
@@ -116,16 +118,21 @@ SimpleNavigation::Configuration.run do |navigation|
 
   # Define the primary navigation
   navigation.items do |primary|
-    
     mainhelper = NavigationHelper.new(binding, primary)
 
     mainhelper.item :main, landing_url, if: can_read?(:landing) do |submenu|
       submenu.item :pendencies, pendencies_url, if: can_read?(:pendency)
       @landingsidebar.call(submenu.container)
-      submenu.item :profile, edit_user_registration_path, highlights_on: %r(/users/profile), if: -> { user_signed_in? }
+      submenu.item(
+        :profile, edit_user_registration_path,
+        highlights_on: %r(/users/profile), if: -> { user_signed_in? }
+      )
     end
 
-    students_models = [Enrollment, Dismissal, Student, EnrollmentHold, Level, DismissalReason, EnrollmentStatus]
+    students_models = [
+      Enrollment, Dismissal, Student, EnrollmentHold, Level,
+      DismissalReason, EnrollmentStatus
+    ]
     mainhelper.listitem :students, students_models do |submenu|
       submenu.modelitem Student
       submenu.modelitem Dismissal
@@ -161,8 +168,8 @@ SimpleNavigation::Configuration.run do |navigation|
     end
 
     courses_models = [
-      Course, ResearchArea, CourseType, CourseClass, ClassSchedule, ClassEnrollment, Allocation, 
-      EnrollmentRequest, ClassEnrollmentRequest
+      Course, ResearchArea, CourseType, CourseClass, ClassSchedule,
+      ClassEnrollment, Allocation, EnrollmentRequest, ClassEnrollmentRequest
     ]
     mainhelper.listitem :courses, courses_models do |submenu|
       submenu.modelitem ResearchArea
@@ -190,7 +197,8 @@ SimpleNavigation::Configuration.run do |navigation|
     end
 
     config_models = [
-      User, Role, CustomVariable, Version, Notification, NotificationLog, ReportConfiguration, EmailTemplate
+      User, Role, CustomVariable, Version, Notification,
+      NotificationLog, ReportConfiguration, EmailTemplate
     ]
     mainhelper.listitem :configurations, config_models do |submenu|
       submenu.modelitem User
@@ -207,16 +215,16 @@ SimpleNavigation::Configuration.run do |navigation|
     mainhelper.item :logout, destroy_user_session_path
 
     # Add an item which has a sub navigation (same params, but with block)
-    #primary.item :key_2, 'name', url, options do |sub_nav|
+    # primary.item :key_2, 'name', url, options do |sub_nav|
     # Add an item to the sub navigation (same params again)
     #  sub_nav.item :key_2_1, 'name', url, options
-    #end
+    # end
 
     # You can also specify a condition-proc that needs to be fullfilled to display an item.
     # Conditions are part of the options. They are evaluated in the context of the views,
     # thus you can use all the methods and vars you have available in the views.
-    #primary.item :key_3, 'Admin', url, :class => 'special', :if => Proc.new { current_user.admin? }
-    #primary.item :key_4, 'Account', url, :unless => Proc.new { logged_in? }
+    # primary.item :key_3, 'Admin', url, class: 'special', if: Proc.new { current_user.admin? }
+    # primary.item :key_4, 'Account', url, unless: Proc.new { logged_in? }
 
     # you can also specify a css id or class to attach to this particular level
     # works for all levels of the menu
@@ -225,7 +233,5 @@ SimpleNavigation::Configuration.run do |navigation|
 
     # You can turn off auto highlighting for a specific level
     # primary.auto_highlight = false
-
   end
-
 end

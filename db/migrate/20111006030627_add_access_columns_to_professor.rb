@@ -1,6 +1,8 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 class AddAccessColumnsToProfessor < ActiveRecord::Migration[5.1]
   def self.up
     add_column :professors, :sex, :string
@@ -10,8 +12,8 @@ class AddAccessColumnsToProfessor < ActiveRecord::Migration[5.1]
     add_column :professors, :identity_expedition_date, :string
     add_column :professors, :neighbourhood, :string
     add_column :professors, :address, :string
-    add_column :professors, :state_id, :integer, :references => 'states'
-    add_column :professors, :city_id, :integer, :references => 'cities'
+    add_column :professors, :state_id, :integer, references: "states"
+    add_column :professors, :city_id, :integer, references: "cities"
     add_column :professors, :zip_code, :string
     add_column :professors, :telephone1, :string
     add_column :professors, :telephone2, :string
