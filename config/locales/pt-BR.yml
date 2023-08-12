@@ -1007,7 +1007,6 @@ pt-BR:
     update_student_label: "Modificar Aluno"
     update_student_major_label: "Editar Curso do Aluno"
     update_thesis_defense_committee_participation: "Editar Participação em Banca"
-    update_user_label: "Modificar Usuário"
     record_not_saved: "A validação falhou!"
     query:
       execute: 'Executar'
