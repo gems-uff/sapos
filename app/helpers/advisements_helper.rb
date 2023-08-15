@@ -29,12 +29,10 @@ module AdvisementsHelper
   end
 
   def professor_form_column(record, options)
-    logger.info "  RecordSelect Helper AdvisementsHelper\\professor_form_column"
     record_select_field :professor, record.professor || Professor.new, options
   end
 
   def enrollment_form_column(record, options)
-    logger.info "  RecordSelect Helper AdvisementsHelper\\enrollment_form_column"
     record_select_field :enrollment, record.enrollment || Enrollment.new, options
   end
 end

@@ -3,15 +3,12 @@
 
 module ClassEnrollmentHelperConcern
   def custom_enrollment_form_column(record, options)
-    logger.info "  RecordSelect Helper ClassEnrollmentsHelper\\enrollment_form_column"
-
     options[:disabled] = true if current_user.role_id == Role::ROLE_PROFESSOR
     options[:style] = "width:320px; background-image:none !important; color:#000000 !important;"
     record_select_field(:enrollment, record.enrollment || Enrollment.new, options)
   end
 
   def custom_course_class_form_column(record, options)
-    logger.info "  RecordSelect Helper ClassEnrollmentsHelper\\course_class_form_column"
     options[:disabled] = true if current_user.role_id == Role::ROLE_PROFESSOR
     record_select_field(:course_class, record.course_class || CourseClass.new, options.merge!(class: "text-input"))
   end
