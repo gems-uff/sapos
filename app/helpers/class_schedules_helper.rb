@@ -1,14 +1,15 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
-module ClassSchedulesHelper
+# frozen_string_literal: true
 
-  def _start_date_column(record, options, attribute, same=nil)
+module ClassSchedulesHelper
+  def _start_date_column(record, options, attribute, same = nil)
     unless record.persisted?
       record.send("#{attribute}=", DateTime.current.midnight)
     end
     config = ActiveScaffold::Config::Core.new(:class_schedule)
-    render(:partial => "class_schedules/date_widget", :locals => { 
+    render(partial: "class_schedules/date_widget", locals: {
       config: config,
       record: record,
       options: options,
@@ -17,12 +18,12 @@ module ClassSchedulesHelper
     })
   end
 
-  def _end_date_column(record, options, attribute, same=nil)
+  def _end_date_column(record, options, attribute, same = nil)
     unless record.persisted?
       record.send("#{attribute}=", DateTime.current.midnight + 1.day - 1.second)
     end
     config = ActiveScaffold::Config::Core.new(:class_schedule)
-    render(:partial => "class_schedules/date_widget", :locals => { 
+    render(partial: "class_schedules/date_widget", locals: {
       config: config,
       record: record,
       options: options,
