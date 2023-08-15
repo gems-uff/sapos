@@ -1,11 +1,10 @@
 <div class="phases-show-box show-box">
   <details open>
-    <summary> <%= t 'activerecord.models.phase.other' %> </summary>
-    <%= render :partial => 'enrollments/show_phases_table', :locals => { 
-        phase_completions: phase_completions,
-        dateformat: :monthyear,
-        show_obs: false 
-      } 
-    %>
+    <summary> <%= t "activerecord.models.phase.other" %> </summary>
+    <%= render partial: "enrollments/show_phases_table", locals: {
+      phase_completions: phase_completions,
+      dateformat: :monthyear,
+      show_obs: false
+    } %>
   </details>
 </div>

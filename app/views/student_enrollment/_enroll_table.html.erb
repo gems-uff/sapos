@@ -1,6 +1,6 @@
-<% 
-  table = prepare_class_schedule_table(available_classes, on_demand, advisement_authorizations) 
-  estars = "" 
+<%
+  table = prepare_class_schedule_table(available_classes, on_demand, advisement_authorizations)
+  estars = ""
   found_main_authorized = nil
   found_advisor_authorized = nil
   enrollment.advisements.each do |advisement|
@@ -17,9 +17,9 @@
   <thead>
     <tr>
       <% if enrollment_request.persisted? %>
-          <th> <%= t 'student_enrollment.enroll.class_status' %> </th>
+          <th> <%= t "student_enrollment.enroll.class_status" %> </th>
       <% end %>
-      <th> <%= t 'student_enrollment.enroll.do_enroll' %> </th>
+      <th> <%= t "student_enrollment.enroll.do_enroll" %> </th>
       <% table[:header][0].drop(1).each do |head| %>
         <th class="cell-<%= head.downcase %>"> <%= head %> </th>
       <% end %>
@@ -47,7 +47,7 @@
               <%= row[1].empty? ? "&nbsp; ".html_safe  : row[1] %> 
               <% if ! cer.nil? && ! cer.errors.empty? %>
                 <details>
-                  <summary><%= t('student_enrollment.enroll.class_errors', count: cer.errors.full_messages.count) %> </summary>
+                  <summary><%= t("student_enrollment.enroll.class_errors", count: cer.errors.full_messages.count) %> </summary>
                   <ul>
                     <% cer.errors.full_messages.each do |message| %>
                       <li> <%= message %> </li>
@@ -58,7 +58,7 @@
             <% end %>
             <% row.drop(2).each_with_index do |cell, index| %>
               <%= enroll_table_td(labelid: row[0][:id], row_index: row_index, form: form, tdclass: "cell-#{table[:header][0][index + 2].downcase}") do %>
-                <%= cell.empty? ? "&nbsp; ".html_safe  : cell %> 
+                <%= cell.empty? ? "&nbsp; ".html_safe  : cell %>
               <% end %>
             <% end %>
           </tr>
@@ -75,16 +75,16 @@
               <%= form.check_box "course_ids[#{row[0][:course_id]}][selected]", { id: "table_row_demand_#{row_index}", skip_default_ids: false, onclick: (readonly ?  "return false;" : ""), readonly: readonly }%>
             <% end %>
             <%= enroll_table_td(labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, tdclass: "cell-#{table[:header][0][1].downcase}") do %>
-              <%= row[1].empty? ? "&nbsp; ".html_safe  : row[1] %> 
+              <%= row[1].empty? ? "&nbsp; ".html_safe  : row[1] %>
             <% end %>
             <% row[2..-2].each_with_index do |cell, index| %>
               <%= enroll_table_td(labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, tdclass: "cell-#{table[:header][0][index + 2].downcase}") do %>
-                <%= cell.empty? ? "&nbsp; ".html_safe  : cell %> 
+                <%= cell.empty? ? "&nbsp; ".html_safe  : cell %>
               <% end %>
             <% end %>
             <%= enroll_table_td(labelid: row[0][:course_id], row_index: "demand_#{row_index}", form: form, tdclass: "cell-#{table[:header][0][-1].downcase}") do %>
-              <% 
-                 options = {} 
+              <%
+                 options = {}
                  options = { selected: select_professor.id } if ! select_professor.nil?
                  options = { selected: cer.course_class.professor.id } if ! cer.nil?
               %>
@@ -102,20 +102,17 @@
     <li>* <%= I18n.t("pdf_content.course_class.class_schedule.noschedule") %></li>
     <% estars = "*" %>
   <% end %>
-  <% unless CustomVariable.class_schedule_text.nil? or CustomVariable.class_schedule_text.empty? %>
+  <% unless CustomVariable.class_schedule_text.nil? || CustomVariable.class_schedule_text.empty? %>
     <li>*<%= estars %> <%= CustomVariable.class_schedule_text %></li>
   <% end %>
 </ul>
 
 <script>
-  
   $(".on_demand_check").on("change", function() {
     var ischecked = $(this).is(":checked");
     if (!ischecked) {
-      $(this).parents('tr').hide();
-      $("#on_demand_row_" + $(this).data('row')).show();
+      $(this).parents("tr").hide();
+      $("#on_demand_row_" + $(this).data("row")).show();
     }
   })
-
-
 </script>

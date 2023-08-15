@@ -1,16 +1,18 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
+# Represents a CourseClass Allocation time slot
 class Allocation < ApplicationRecord
-
-  belongs_to :course_class
-
   has_paper_trail
 
-  validates :day, :inclusion => {:in => I18n.translate("date.day_names")}, :presence => true
-  validates :course_class, :presence => true
-  validates :start_time, :presence => true, :numericality => { :greater_than_or_equal_to => 0, :less_than_or_equal_to => 23 }
-  validates :end_time, :presence => true,  :numericality => { :greater_than_or_equal_to => 0, :less_than_or_equal_to => 23 }
+  belongs_to :course_class, optional: false
+
+  validates :day, inclusion: { in: I18n.translate("date.day_names") }, presence: true
+  validates :course_class, presence: true
+  validates :start_time, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 23 }
+  validates :end_time, presence: true, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 23 }
   validate :start_end_time_validation
   validate :scheduling_conflict_validation
 
@@ -25,35 +27,31 @@ class Allocation < ApplicationRecord
 
   def intersects(other)
     return nil if self.day != other.day
-    if other.start_time <= self.start_time && self.start_time < other.end_time
-      return :start_time
-    elsif other.start_time < self.end_time && self.end_time <= other.end_time
-      return :end_time
-    end
-    return nil
+    return :start_time if other.start_time <= self.start_time && self.start_time < other.end_time
+    return :end_time if other.start_time < self.end_time && self.end_time <= other.end_time
+    nil
   end
 
   private
-  def start_end_time_validation
-    if !self.start_time.blank? and !self.end_time.blank? and self.end_time <= self.start_time
-      errors.add(:start_time, I18n.t("activerecord.errors.models.allocation.end_time_before_start_time"))
+    def start_end_time_validation
+      if !self.start_time.blank? && !self.end_time.blank? && self.end_time <= self.start_time
+        errors.add(:start_time, :end_time_before_start_time)
+      end
     end
-  end
 
-  def scheduling_conflict_validation
-    allocations = Allocation.where(:course_class_id => self.course_class, :day => self.day)
+    def scheduling_conflict_validation
+      allocations = Allocation.where(course_class_id: self.course_class, day: self.day)
 
-    if allocations and !self.start_time.blank? and !self.end_time.blank?
-      allocations.each do |allocation|
-        if allocation.id != self.id
-          intersection = self.intersects(allocation)
-          unless intersection.nil?
-            errors.add(intersection, I18n.t("activerecord.errors.models.allocation.scheduling_conflict"))
-            break
+      if allocations && !self.start_time.blank? && !self.end_time.blank?
+        allocations.each do |allocation|
+          if allocation.id != self.id
+            intersection = self.intersects(allocation)
+            unless intersection.nil?
+              errors.add(intersection, :scheduling_conflict)
+              break
+            end
           end
         end
       end
     end
-  end
-
 end
