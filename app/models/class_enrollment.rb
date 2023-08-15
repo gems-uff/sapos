@@ -101,7 +101,7 @@ class ClassEnrollment < ApplicationRecord
   end
 
   def disapproved_by_absence_to_view
-    self.disapproved_by_absence.blank? ? false : self.disapproved_by_absence
+    self.disapproved_by_absence.nil? ? false : self.disapproved_by_absence
   end
 
   def should_send_email_to_professor?
@@ -152,7 +152,7 @@ class ClassEnrollment < ApplicationRecord
           grade_of_disapproval_for_absence: (CustomVariable.grade_of_disapproval_for_absence.to_f / 10.0).to_s.tr(".", ","))) if
             self.disapproved_by_absence &&
             course_has_grade &&
-            (!CustomVariable.grade_of_disapproval_for_absence.blank?) &&
+            (CustomVariable.grade_of_disapproval_for_absence.present?) &&
             ((self.grade.blank?) || (self.grade > CustomVariable.grade_of_disapproval_for_absence))
       end
       self.errors.blank?
