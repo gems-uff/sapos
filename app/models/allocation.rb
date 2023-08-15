@@ -21,6 +21,10 @@ class Allocation < ApplicationRecord
       #{self.start_time}:00 - #{self.end_time}:00 #{"- #{I18n.t("activerecord.attributes.allocation.room")} : #{self.room}" if self.room }"
   end
 
+  def to_shortlabel
+    "#{self.start_time}-#{self.end_time}\n#{self.room || ' '}"
+  end
+
   def intersects(other)
     return nil if self.day != other.day
     return :start_time if other.start_time <= self.start_time && self.start_time < other.end_time
