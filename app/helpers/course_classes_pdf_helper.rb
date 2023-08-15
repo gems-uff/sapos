@@ -155,7 +155,7 @@ module CourseClassesPdfHelper
 
   def prepare_class_schedule_table(
     course_classes, on_demand, advisement_authorizations = nil,
-    keep_on_demand = false, used_to_render_a_pdf_report = false
+    keep_on_demand = false, used_to_render_a_pdf_report: false
   )
     advisement_authorizations ||= []
     star = false
@@ -284,7 +284,9 @@ module CourseClassesPdfHelper
     table[:data].each_slice(rows_per_page) do |data_slice|
       count += 1
       last_page = (num_pages == count)
-      class_schedule_print_table(pdf, table_width, table[:header], data_slice, table[:star], last_page)
+      class_schedule_print_table(
+        pdf, table_width, table[:header], data_slice, table[:star], last_page
+      )
       pdf.start_new_page unless last_page
     end
   end
