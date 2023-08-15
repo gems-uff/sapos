@@ -993,7 +993,6 @@ pt-BR:
     update_class_enrollment_label: "Editar Inscrição"
     update_class_enrollment_request_label: "Modificar Disciplina de Pedido de Inscrição"
     update_custom_variable_label: "Editar Variável"
-    update_course_class_label: "Editar Turma"
     update_enrollment_label: "Modificar Matrícula"
     update_enrollment_request_comment_label: "Modificar Comentário de Pedido de Inscrição"
     update_link: "Editar"

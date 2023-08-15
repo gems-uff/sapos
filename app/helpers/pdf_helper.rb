@@ -13,20 +13,40 @@ module PdfHelper
 
   def header(pdf, title, pdf_config, options = {}, &block)
     if pdf_config.nil?
-      type = options[:pdf_type] || :report; # report, transcript, grades_report, schedule
+      # report, transcript, grades_report, schedule
+      type = options[:pdf_type] || :report
       pdf_type = :"use_at_#{type}"
-      pdf_config = options[:pdf_config] || ReportConfiguration.where(pdf_type => true).order("`order` desc").first || ReportConfiguration.new
+      pdf_config = (
+        options[:pdf_config] ||
+        ReportConfiguration.where(pdf_type => true).order(order: :desc).first ||
+        ReportConfiguration.new
+      )
     end
 
-    pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.left + pdf.bounds.right, height: HEIGHT) do
-      pdf.bounding_box([0, pdf.cursor], width: pdf.bounds.left + pdf.bounds.right - 170, height: 68) do
+    pdf.bounding_box(
+      [0, pdf.cursor],
+      width: pdf.bounds.left + pdf.bounds.right,
+      height: HEIGHT
+    ) do
+      pdf.bounding_box(
+        [0, pdf.cursor],
+        width: pdf.bounds.left + pdf.bounds.right - 170,
+        height: 68
+      ) do
         pdf.stroke_bounds
         pdf.pad(15) do
-          pdf.text "<b>#{pdf_config.text}</b>", align: :center, font_size: 9, inline_format: true
+          pdf.text(
+            "<b>#{pdf_config.text}</b>",
+            align: :center, font_size: 9, inline_format: true
+          )
         end
       end
 
-      pdf.bounding_box([0, pdf.cursor - 3], width: pdf.bounds.left + pdf.bounds.right - 170, height: 19) do
+      pdf.bounding_box(
+        [0, pdf.cursor - 3],
+        width: pdf.bounds.left + pdf.bounds.right - 170,
+        height: 19
+      ) do
         pdf.stroke_bounds
 
         pdf.fill_color "333399"
@@ -37,12 +57,19 @@ module PdfHelper
         )
         pdf.fill_color "ffffff"
         pdf.pad(5) do
-          pdf.text "<b>#{title}</b>", font_size: 11, align: :center, inline_format: true, character_spacing: 2.4
+          pdf.text(
+            "<b>#{title}</b>",
+            font_size: 11, align: :center,
+            inline_format: true, character_spacing: 2.4
+          )
         end
         pdf.fill_color "000080"
       end
 
-      pdf.bounding_box([pdf.bounds.left + pdf.bounds.right - 153, HEIGHT], width: 153, height: HEIGHT) do
+      pdf.bounding_box(
+        [pdf.bounds.left + pdf.bounds.right - 153, HEIGHT],
+        width: 153, height: HEIGHT
+      ) do
         unless options[:hide_logo_stroke_bounds]
           pdf.stroke_bounds
         end
@@ -78,44 +105,70 @@ module PdfHelper
 
     last_box_y = pdf.bounds.bottom - FOOTER_TOP_MARGIN
     pdf.font("FreeMono", size: 8) do
-      pdf.bounding_box([0, last_box_y], width: last_box_width1, height: last_box_height) do
+      pdf.bounding_box(
+        [0, last_box_y],
+        width: last_box_width1, height: last_box_height
+      ) do
         pdf.stroke_bounds
         current_x = x
         pdf.move_down last_box_height / 2
-        pdf.draw_text("#{I18n.t("pdf_content.enrollment.footer.location")}, #{I18n.localize(Date.today, format: :long)}", at: [current_x, pdf.cursor])
+        pdf.draw_text(
+          "#{I18n.t("pdf_content.enrollment.footer.location")}, #{I18n.localize(
+            Date.today, format: :long
+          )}", at: [current_x, pdf.cursor])
       end
     end
 
     pdf.font("FreeMono", size: 6) do
-      pdf.bounding_box([last_box_width1, last_box_y], width: last_box_width2, height: last_box_height) do
+      pdf.bounding_box(
+        [last_box_width1, last_box_y],
+        width: last_box_width2,
+        height: last_box_height
+      ) do
         pdf.stroke_bounds
         current_x = x
         pdf.move_down 8
 
-        pdf.draw_text("#{I18n.t("pdf_content.enrollment.footer.warning1")}", at: [current_x, pdf.cursor])
+        pdf.draw_text(
+          "#{I18n.t("pdf_content.enrollment.footer.warning1")}",
+          at: [current_x, pdf.cursor]
+        )
 
         underline_width = 3.7
         pdf.move_down 30
-        underline = "__________________________________________________________________________"
+        underline = "_" * 74
         current_x += (last_box_width2 - underline.size * underline_width) / 2
 
         pdf.draw_text(underline, at: [current_x, pdf.cursor])
 
         pdf.move_down 8
         font_width = 6.7
-        coordinator_signature = I18n.t("pdf_content.enrollment.footer.coordinator_signature")
-        current_x += (last_box_width2 - coordinator_signature.size * font_width) / 2
+        coordinator_signature = I18n.t(
+          "pdf_content.enrollment.footer.coordinator_signature"
+        )
+        current_x += (
+          last_box_width2 - coordinator_signature.size * font_width
+        ) / 2
         pdf.draw_text(coordinator_signature, at: [current_x, pdf.cursor])
       end
     end
 
     pdf.font("FreeMono", size: 8) do
-      pdf.bounding_box([last_box_width1 + last_box_width2, last_box_y], width: pdf.bounds.right - last_box_width1 - last_box_width2 - diff_width, height: last_box_height) do
+      pdf.bounding_box(
+        [last_box_width1 + last_box_width2, last_box_y],
+        width: pdf.bounds.right -
+          last_box_width1 -
+          last_box_width2 -
+          diff_width,
+        height: last_box_height
+      ) do
         pdf.stroke_bounds
         current_x = x
         pdf.move_down last_box_height / 2
-        # pdf.number_pages("#{I18n.t("pdf_content.enrollment.footer.page")} <page>/<total>")
-        pdf.draw_text("#{I18n.t("pdf_content.enrollment.footer.page")} #{pdf.page_number}", at: [current_x, pdf.cursor])
+        pdf.draw_text(
+          "#{I18n.t("pdf_content.enrollment.footer.page")} #{pdf.page_number}",
+          at: [current_x, pdf.cursor]
+        )
       end
     end
   end
@@ -130,12 +183,19 @@ module PdfHelper
     last_box_width1 = 165
     # last_box_width2 = 335
 
-    last_box_y = pdf.bounds.bottom  # pdf.bounds.bottom + last_box_height# pdf.cursor - 15
+    last_box_y = pdf.bounds.bottom
     pdf.font("FreeMono", size: 8) do
-      pdf.bounding_box([0, last_box_y], width: last_box_width1, height: last_box_height) do
+      pdf.bounding_box(
+        [0, last_box_y],
+        width: last_box_width1,
+        height: last_box_height
+      ) do
         current_x = x
         pdf.move_down last_box_height / 2
-        pdf.draw_text("SAPOS - #{I18n.localize(Time.zone.now, format: :long)}", at: [current_x, pdf.cursor])
+        pdf.draw_text(
+          "SAPOS - #{I18n.localize(Time.zone.now, format: :long)}",
+          at: [current_x, pdf.cursor]
+        )
       end
     end
   end
@@ -146,7 +206,9 @@ module PdfHelper
     while true do
       column = data_table.collect { |row| row[index] }
       break if column.all? { |field| field.nil? }
-      column_size = data_table.collect { |row| row[index + 1].nil? ? "" : row[index] }
+      column_size = data_table.collect do |row|
+        row[index + 1].nil? ? "" : row[index]
+      end
       size = column_size.max_by { |field| field.to_s.size }.size
       column.each_with_index do |field, i|
         spaces = size >= field.to_s.size ? (" " * (size - field.to_s.size)) : ""
@@ -163,16 +225,24 @@ module PdfHelper
 
 
   def new_document(name, title, options = {}, &block)
-    type = options[:pdf_type] || :report; # report, transcript, grades_report, schedule
+    type = options[:pdf_type] || :report
     pdf_type = :"use_at_#{type}"
-    pdf_config = options[:pdf_config] || ReportConfiguration.where(pdf_type => true).order(order: :desc).first || ReportConfiguration.new
+    pdf_config = (
+      options[:pdf_config] ||
+      ReportConfiguration.where(pdf_type => true).order(order: :desc).first ||
+      ReportConfiguration.new
+    )
 
     prawn_document({
       page_size: "A4",
       left_margin: 0.6.cm,
-      right_margin: (0.6.cm + ((options[:page_layout] == :landscape) ? 1.87 : 1.25)),
+      right_margin: (
+        0.6.cm + ((options[:page_layout] == :landscape) ? 1.87 : 1.25)
+      ),
       top_margin: 0.8.cm,
-      bottom_margin: (pdf_config.signature_footer ? 96 + FOOTER_TOP_MARGIN : 1.cm),
+      bottom_margin: (
+        pdf_config.signature_footer ? 96 + FOOTER_TOP_MARGIN : 1.cm
+      ),
       filename: name
     }.merge(options)) do |pdf|
       freefont_directory = "#{Rails.root}/vendor/assets/fonts/gnu-freefont/"
@@ -217,7 +287,9 @@ module PdfHelper
           pdf.rotate(60, origin: [0, 0]) do
             pdf.fill_color "993333"
             pdf.font("FreeMono", size: 22) do
-              pdf.draw_text I18n.t("pdf_content.professor_watermark"), at: [0, 0]
+              pdf.draw_text(
+                I18n.t("pdf_content.professor_watermark"), at: [0, 0]
+              )
             end
             pdf.fill_color "000000"
           end
@@ -242,12 +314,13 @@ module PdfHelper
     end
   end
 
-  def pdf_table_with_title(pdf, widths, title, header, data, options = {}, &block)
-    # width = (pdf.bounds.left + pdf.bounds.right).floor
-    # width = options[:width] if options.has_key? :width
-
+  def pdf_table_with_title(
+    pdf, widths, title, header, data, options = {}, &block
+  )
     title_distance = 3
-    title_distance = options[:title_distance] if options.has_key? :title_distance
+    title_distance = options[:title_distance] if options.has_key?(
+      :title_distance
+    )
     options[:distance] = 0 unless options.has_key? :distance
 
     # Table
@@ -268,9 +341,6 @@ module PdfHelper
   end
 
   def simple_pdf_table(pdf, widths, header, data, options = {}, &block)
-    # distance = 3
-    # distance = options[:distance] if options.has_key? :distance
-
     # Header
     unless header.empty?
       pdf.table(header, column_widths: widths,
