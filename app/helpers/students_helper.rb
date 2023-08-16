@@ -49,7 +49,11 @@ module StudentsHelper
 
   def photo_show_column(record, column)
     return "-" if record.photo.blank?
-    image_tag photo_student_path(record) + "?hash=#{record.photo_before_type_cast}", style: "width: 400px; height: 300px; Object-fit: contain; background-color: #f2f1f0;"
+    image_tag(
+      photo_student_path(record) + "?hash=#{record.photo_before_type_cast}",
+      style: "width: 400px; height: 300px; Object-fit: contain;
+              background-color: #f2f1f0;"
+    )
   end
 
   def permit_rs_browse_params

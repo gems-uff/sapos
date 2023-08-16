@@ -80,7 +80,9 @@ module ScholarshipDurationsHelper
 
     select_tag(
       record[:scholarship_types],
-      options_from_collection_for_select(ScholarshipType.order("name"), "id", "name"),
+      options_from_collection_for_select(
+        ScholarshipType.order("name"), "id", "name"
+      ),
       options.merge(local_options)
     )
   end
@@ -88,7 +90,9 @@ module ScholarshipDurationsHelper
   def active_search_column(record, options)
     select_tag(
       record[:active],
-      options_for_select([["Todas", "all"], ["Ativas", "active"], ["Inativas", "not_active"]]),
+      options_for_select(
+        [["Todas", "all"], ["Ativas", "active"], ["Inativas", "not_active"]]
+      ),
       options
     )
   end

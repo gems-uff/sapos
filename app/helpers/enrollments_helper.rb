@@ -11,85 +11,126 @@ module EnrollmentsHelper
   include ClassEnrollmentHelperConcern
 
   # ClassEnrollmentHelperConcern
-  alias_method :class_enrollment_course_class_form_column, :custom_course_class_form_column
-  alias_method :class_enrollment_disapproved_by_absence_form_column, :custom_disapproved_by_absence_form_column
-  alias_method :class_enrollment_grade_form_column, :custom_grade_form_column
-  alias_method :class_enrollment_grade_not_count_in_gpr_form_column, :custom_grade_not_count_in_gpr_form_column
-  alias_method :class_enrollment_obs_form_column, :custom_obs_form_column
-  alias_method :class_enrollment_justification_grade_not_count_in_gpr_form_column, :custom_justification_grade_not_count_in_gpr_form_column
-  alias_method :field_attributes, :custom_field_attributes
+  alias_method(
+    :class_enrollment_course_class_form_column,
+    :custom_course_class_form_column
+  )
+  alias_method(
+    :class_enrollment_disapproved_by_absence_form_column,
+    :custom_disapproved_by_absence_form_column
+  )
+  alias_method(
+    :class_enrollment_grade_form_column,
+    :custom_grade_form_column
+  )
+  alias_method(
+    :class_enrollment_grade_not_count_in_gpr_form_column,
+    :custom_grade_not_count_in_gpr_form_column
+  )
+  alias_method(
+    :class_enrollment_obs_form_column,
+    :custom_obs_form_column
+  )
+  alias_method(
+    :class_enrollment_justification_grade_not_count_in_gpr_form_column,
+    :custom_justification_grade_not_count_in_gpr_form_column
+  )
+  alias_method(
+    :field_attributes,
+    :custom_field_attributes
+  )
 
   # overriding dismissal date to_label
   def dismissal_column(record, input_name)
-    I18n.localize(record.dismissal.to_label.to_date, { format: :monthyear }) if record.present? && record.dismissal.present?
+    I18n.localize(record.dismissal.to_label.to_date, { format: :monthyear }) if
+      record.present? && record.dismissal.present?
   end
 
   # display the "user_type" field as a dropdown with options
   def scholarship_durations_active_search_column(record, input_name)
-    select :record, :scholarship_durations, options_for_select([["Sim", 1], ["Não", 0]]), { include_blank: as_(:_select_) }, input_name
+    select(
+      :record, :scholarship_durations,
+      options_for_select([["Sim", 1], ["Não", 0]]),
+      { include_blank: as_(:_select_) },
+      input_name
+    )
   end
 
   def active_search_column(record, input_name)
-    select :record, :dismissal, options_for_select([["Sim", 1], ["Não", 0]]), { include_blank: as_(:_select_) }, input_name
+    select(
+      :record, :dismissal,
+      options_for_select([["Sim", 1], ["Não", 0]]),
+      { include_blank: as_(:_select_) },
+      input_name
+    )
   end
 
   def delayed_phase_search_column(record, input_name)
-    local_options = {
-        include_blank: false
-    }
-    select_html_options = {
-        name: "search[delayed_phase][phase]"
-    }
-    day_html_options = {
-        name: "search[delayed_phase][day]"
-    }
-    month_html_options = {
-        name: "search[delayed_phase][month]"
-    }
-    year_html_options = {
-        name: "search[delayed_phase][year]"
-    }
+    local_options = { include_blank: false }
+    select_html_options = { name: "search[delayed_phase][phase]" }
+    day_html_options = { name: "search[delayed_phase][day]" }
+    month_html_options = { name: "search[delayed_phase][month]" }
+    year_html_options = { name: "search[delayed_phase][year]" }
 
-    select(:record, :phases, options_for_select([["Alguma", "all"]] + Phase.where(active: true).map { |phase| [phase.name, phase.id] }), { include_blank: as_(:_select_) }, select_html_options) +
-      label_tag(:delayed_phase_date, I18n.t("activerecord.attributes.enrollment.delayed_phase_date"), style: "margin: 0px 15px") +
-      select_day(Date.today.day, local_options, day_html_options) + select_month(Date.today.month, local_options, month_html_options) +
-      select_year(Date.today.year, local_options, year_html_options)
-  end
-
-  def accomplishments_search_column(record, input_name)
-    local_options = {
-        include_blank: false
-    }
-    select_html_options = {
-        name: "search[accomplishments][phase]"
-    }
-    day_html_options = {
-        name: "search[accomplishments][day]"
-    }
-    month_html_options = {
-        name: "search[accomplishments][month]"
-    }
-    year_html_options = {
-        name: "search[accomplishments][year]"
-    }
-
-    select(:record, :phases, options_for_select([["Todas", "all"]] + Phase.all.map { |phase| [phase.name, phase.id] }), { include_blank: as_(:_select_) }, select_html_options) +
-      label_tag(:accomplishments_date, I18n.t("activerecord.attributes.enrollment.accomplishment_date"), style: "margin: 0px 15px") +
+    (
+      select(
+        :record, :phases,
+        options_for_select([["Alguma", "all"]] +
+          Phase.where(active: true).map { |phase| [phase.name, phase.id] }
+        ),
+        { include_blank: as_(:_select_) },
+        select_html_options
+      ) +
+      label_tag(
+        :delayed_phase_date,
+        I18n.t("activerecord.attributes.enrollment.delayed_phase_date"),
+        style: "margin: 0px 15px"
+      ) +
       select_day(Date.today.day, local_options, day_html_options) +
       select_month(Date.today.month, local_options, month_html_options) +
       select_year(Date.today.year, local_options, year_html_options)
+    )
+  end
+
+  def accomplishments_search_column(record, input_name)
+    local_options = { include_blank: false }
+    select_html_options = { name: "search[accomplishments][phase]" }
+    day_html_options = { name: "search[accomplishments][day]" }
+    month_html_options = { name: "search[accomplishments][month]" }
+    year_html_options = { name: "search[accomplishments][year]"}
+
+    (
+      select(
+        :record, :phases,
+        options_for_select([["Todas", "all"]] +
+          Phase.all.map { |phase| [phase.name, phase.id] }
+        ),
+        { include_blank: as_(:_select_) },
+        select_html_options
+      ) +
+      label_tag(
+        :accomplishments_date,
+        I18n.t("activerecord.attributes.enrollment.accomplishment_date"),
+        style: "margin: 0px 15px"
+      ) +
+      select_day(Date.today.day, local_options, day_html_options) +
+      select_month(Date.today.month, local_options, month_html_options) +
+      select_year(Date.today.year, local_options, year_html_options)
+    )
   end
 
   def enrollment_hold_search_column(record, input_name)
     select_html_options = {
-        name: "search[enrollment_hold][hold]",
-        style: "float:left; margin: 5px 2px;"
+      name: "search[enrollment_hold][hold]",
+      style: "float:left; margin: 5px 2px;"
     }
     check_box(record, :enrollment_hold, select_html_options)
   end
 
   def course_class_year_semester_search_column(record, options)
-    disciplinas_filtro = Course.all.collect { |c| [I18n.transliterate(c.name.squish.downcase), c.name, c.id] }
+    disciplinas_filtro = Course.all.collect do |c|
+      [I18n.transliterate(c.name.squish.downcase), c.name, c.id]
+    end
     disciplinas_filtro.sort_by! { |elemento| elemento[0] }
 
     disciplinas_sem_nome_repetido = []
@@ -108,67 +149,71 @@ module EnrollmentsHelper
       id: "#{options[:id]}_course",
       class: "as_search_search_course_class_option"
     )
-
     html << label_tag(
       "#{options[:id]}_year_semester",
       I18n.t("activerecord.attributes.enrollment.year_semester_label"),
       style: "margin: 0 15px;"
     )
-
     html << select_tag(
       "#{options[:name]}[year]",
-      options_for_select(CourseClass.group(:year).select(:year).collect { |y| y[:year] }),
+      options_for_select(
+        CourseClass.group(:year).select(:year).collect { |y| y[:year] }
+      ),
       include_blank: as_(:_select_),
       id: "#{options[:id]}_year",
       class: "as_search_search_course_class_option"
     )
-
     html << select_tag(
       "#{options[:name]}[semester]",
-      options_for_select(CourseClass.group(:semester).select(:semester).collect { |y| y[:semester] }),
+      options_for_select(
+        CourseClass.group(:semester).select(:semester)
+        .collect { |y| y[:semester] }
+      ),
       include_blank: as_(:_select_),
       id: "#{options[:id]}_semester",
       class: "as_search_search_course_class_option"
     )
-
-    # select :record, "id", options_for_select(CourseClass.group(:semester).select(:semester).collect{|y| y[:semester]}), {:include_blank => as_("- select -")}, options
     content_tag :span, html, class: "search_course_class"
   end
 
   def admission_date_search_column(record, options)
     scholarship_month_year_widget(
       record, options, :admission_date, required: false, multiparameter: false,
-                                        date_options: { prefix: options[:name] }
+      date_options: { prefix: options[:name] }
     )
   end
 
   def deferral_approval_date_form_column(record, options)
-    scholarship_month_year_widget record, options, :approval_date, required: false
+    scholarship_month_year_widget(
+      record, options, :approval_date, required: false
+    )
   end
 
   def accomplishment_conclusion_date_form_column(record, options)
-    scholarship_month_year_widget record, options, :conclusion_date, required: false
+    scholarship_month_year_widget(
+      record, options, :conclusion_date, required: false
+    )
   end
 
   def dismissal_date_form_column(record, options)
-    scholarship_month_year_widget record, options, :date, required: false
+    scholarship_month_year_widget(record, options, :date, required: false)
   end
 
   def admission_date_form_column(record, options)
-    scholarship_month_year_widget record, options, :admission_date
+    scholarship_month_year_widget(record, options, :admission_date)
   end
 
   def level_form_column(record, options)
-    if record.dismissal || record.accomplishments.count > 0 || record.deferrals.count > 0
-      if record.level
-        return html_escape(record.level.name)
-      end
+    fixed_level = (
+      record.dismissal ||
+      record.accomplishments.count > 0 ||
+      record.deferrals.count > 0
+    ) && record.level
+    if fixed_level
+      return html_escape(record.level.name)
     end
-    # selected = record.level.blank? ? nil : record.level.id
-    # scope ||= nil
     column = active_scaffold_config.columns[:level]
     active_scaffold_input_select column, options
-    # select :record, :level, options_for_select(Level.all.map {|level| [level.name, level.id]}, :selected => selected)
   end
 
   # TODO: remove current accomplishments and current deferral_type if level was changed
@@ -188,7 +233,9 @@ module EnrollmentsHelper
 
   def enrollment_dismissal_show_column(record, column)
     return "-" if record.dismissal.nil?
-    "#{record.dismissal.dismissal_reason.name} - #{I18n.localize(record.dismissal.date, format: :monthyear)}"
+    "#{record.dismissal.dismissal_reason.name} - #{I18n.localize(
+      record.dismissal.date, format: :monthyear
+    )}"
   end
 
   def enrollment_advisements_show_column(record, column)
@@ -228,24 +275,38 @@ module EnrollmentsHelper
                      show_obs: true })
   end
 
-  def enrollment_thesis_defense_committee_participations_show_column(record, column)
+  def enrollment_thesis_defense_committee_participations_show_column(
+    record, column
+  )
     return "-" if record.thesis_defense_committee_participations.empty?
-    render(partial: "enrollments/show_defense_committee_table",
-           locals: { thesis_defense_committee_professors: record.thesis_defense_committee_professors })
+    render(
+      partial: "enrollments/show_defense_committee_table",
+      locals: {
+        thesis_defense_committee_professors:
+          record.thesis_defense_committee_professors
+      }
+    )
   end
 
   def enrollment_phase_due_dates_show_column(record, column)
     return "-" if record.completed_or_active_phase_completions.empty?
-    render(partial: "enrollments/show_phases_table",
-           locals: { phase_completions: record.completed_or_active_phase_completions,
-                     dateformat: :monthyear,
-                     show_obs: true })
+    render(
+      partial: "enrollments/show_phases_table",
+      locals: {
+        phase_completions: record.completed_or_active_phase_completions,
+        dateformat: :monthyear,
+        show_obs: true
+      }
+    )
   end
 
   def readonly_dl_input(label, map, variable)
     "<dl>
       <dt><label for=\"field-#{variable}\">#{label}</label></dt>
-      <dd><input name=\"#{variable}\" class=\"fixed-text\" value=\"#{map[variable]}\" id=\"field-#{variable}\" readonly/></dd>
+      <dd><input name=\"#{variable}\"
+                 class=\"fixed-text\"
+                 value=\"#{map[variable]}\"
+                 id=\"field-#{variable}\" readonly/></dd>
     </dl>".html_safe
   end
 
@@ -257,13 +318,34 @@ module EnrollmentsHelper
     end
     columns ||= list_columns
     if search[:delayed_phase][:phase] == "all"
-      phase_date = Date.new(search[:delayed_phase][:year].to_i, search[:delayed_phase][:month].to_i, search[:delayed_phase][:day].to_i)
-      phases = record.delayed_phases(date: phase_date).collect { |p| p.name }.join(", ")
-      result += ("</tr></table></td><tr class='record tr_search_result'><td style='text-align: right;'>Etapas atrasadas</td><td colspan='#{columns.size}'>#{phases}<table><tr>".html_safe).html_safe
+      phase_date = Date.new(
+        search[:delayed_phase][:year].to_i,
+        search[:delayed_phase][:month].to_i,
+        search[:delayed_phase][:day].to_i
+      )
+      phases = record.delayed_phases(date: phase_date)
+        .collect { |p| p.name }.join(", ")
+      result += ("
+        </tr></table></td>
+        <tr class='record tr_search_result'>
+          <td style='text-align: right;'>Etapas atrasadas</td>
+          <td colspan='#{columns.size}'>#{phases}
+            <table><tr>".html_safe).html_safe
     end
-    if search[:enrollment_hold].present? && search[:enrollment_hold][:hold].to_i != 0
-      holds = record.enrollment_holds.where(active: true).collect(&:to_label).join(", ")
-      result += ("</tr></table></td><tr class='record tr_search_result'><td style='text-align: right;'>Trancamento</td><td colspan='#{columns.size}'>#{holds}<table><tr>".html_safe).html_safe
+
+    searching_hold = (
+      search[:enrollment_hold].present? &&
+      search[:enrollment_hold][:hold].to_i != 0
+    )
+    if searching_hold
+      holds = record.enrollment_holds.where(active: true)
+        .collect(&:to_label).join(", ")
+      result += ("
+        </tr></table></td>
+        <tr class='record tr_search_result'>
+          <td style='text-align: right;'>Trancamento</td>
+          <td colspan='#{columns.size}'>#{holds}
+            <table><tr>".html_safe).html_safe
     end
 
     result

@@ -1,6 +1,8 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 module StudentMajorsHelper
   def student_form_column(record, options)
     record_select_field :student, record.student || Student.new, options

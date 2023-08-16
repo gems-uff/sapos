@@ -9,11 +9,13 @@ module ScholarshipDurationsPdfHelper
 
     widths = [112, 112, 112, 112, 112]
 
-    header = [["<b>#{I18n.t('activerecord.attributes.scholarship_duration.scholarship')}</b>",
-               "<b>#{I18n.t('activerecord.attributes.scholarship_duration.start_date')}</b>",
-               "<b>#{I18n.t('activerecord.attributes.scholarship_duration.end_date')}</b>",
-               "<b>#{I18n.t('activerecord.attributes.scholarship_duration.cancel_date')}</b>",
-               "<b>#{I18n.t('activerecord.attributes.scholarship_duration.enrollment')}</b>"]]
+    header = [[
+      "<b>#{I18n.t('activerecord.attributes.scholarship_duration.scholarship')}</b>",
+      "<b>#{I18n.t('activerecord.attributes.scholarship_duration.start_date')}</b>",
+      "<b>#{I18n.t('activerecord.attributes.scholarship_duration.end_date')}</b>",
+      "<b>#{I18n.t('activerecord.attributes.scholarship_duration.cancel_date')}</b>",
+      "<b>#{I18n.t('activerecord.attributes.scholarship_duration.enrollment')}</b>"
+    ]]
     simple_pdf_table(pdf, widths, header, scholarship_durations)
   end
 end

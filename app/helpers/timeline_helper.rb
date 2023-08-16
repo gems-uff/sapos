@@ -34,7 +34,9 @@ module TimelineHelper
     def script(element_id, var_name, days, start_date, end_date)
       "<script>
         var #{var_name} = #{events};
-        var timeline = new Chronoline(document.getElementById('#{escape_javascript(element_id)}'), #{var_name},
+        var timeline = new Chronoline(
+          document.getElementById('#{escape_javascript(element_id)}'),
+          #{var_name},
           {animated: true,
           draggable: true,
           visibleSpan:  DAY_IN_MILLISECONDS * #{days},

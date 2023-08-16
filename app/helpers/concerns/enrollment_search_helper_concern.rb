@@ -11,7 +11,8 @@ module EnrollmentSearchHelperConcern
       controller: remote_controller
     )
     html = record_select_field(options[:name], klass.new, record_select_options)
-    html = self.class.field_error_proc.call(html, self) if record.errors[options[:name]].any?
+    html = self.class.field_error_proc.call(html, self) if
+      record.errors[options[:name]].any?
     html
   end
 
@@ -24,11 +25,21 @@ module EnrollmentSearchHelperConcern
   end
 
   def custom_enrollment_level_search_column(record, options)
-    select :search, :enrollment_level, options_for_klass(Level), { include_blank: as_(:_select_) }, options
+    select(
+      :search, :enrollment_level,
+      options_for_klass(Level),
+      { include_blank: as_(:_select_) },
+      options
+    )
   end
 
   def custom_enrollment_status_search_column(record, options)
-    select :search, :enrollment_status, options_for_klass(EnrollmentStatus), { include_blank: as_(:_select_) }, options
+    select(
+      :search, :enrollment_status,
+      options_for_klass(EnrollmentStatus),
+      { include_blank: as_(:_select_) },
+      options
+    )
   end
 
   def custom_admission_date_search_column(record, options)
@@ -40,7 +51,12 @@ module EnrollmentSearchHelperConcern
   end
 
   def custom_scholarship_durations_active_search_column(_record, input_name)
-    select :search, :scholarship_durations_active, options_for_select([["Sim", 1], ["Não", 0]]), { include_blank: as_(:_select_) }, input_name
+    select(
+      :search, :scholarship_durations_active,
+      options_for_select([["Sim", 1], ["Não", 0]]),
+      { include_blank: as_(:_select_) },
+      input_name
+    )
   end
 
   def custom_advisor_search_column(record, options)
@@ -48,7 +64,12 @@ module EnrollmentSearchHelperConcern
   end
 
   def custom_has_advisor_search_column(record, options)
-    select :search, :has_advisor, options_for_select([["Sim", 1], ["Não", 0]]), { include_blank: as_(:_select_) }, options
+    select(
+      :search, :has_advisor,
+      options_for_select([["Sim", 1], ["Não", 0]]),
+      { include_blank: as_(:_select_) },
+      options
+    )
   end
 
   def custom_professor_search_column(record, options)
@@ -56,11 +77,18 @@ module EnrollmentSearchHelperConcern
   end
 
   def custom_course_type_search_column(record, options)
-    select :search, :course_type, options_for_klass(CourseType), { include_blank: as_(:_select_) }, options
+    select(
+      :search, :course_type,
+      options_for_klass(CourseType),
+      { include_blank: as_(:_select_) },
+      options
+    )
   end
 
   protected
     def options_for_klass(klass)
-      options_for_select(klass.all.collect { |record| [record.to_label, record.id] })
+      options_for_select(
+        klass.all.collect { |record| [record.to_label, record.id] }
+      )
     end
 end

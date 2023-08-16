@@ -20,7 +20,10 @@ module ProfessorsHelper
   end
 
   def professor_advisements_with_points_show_column(record, options)
-    advisements = record.advisements.joins([:enrollment, "LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id"]).where("dismissals.id IS NULL")
+    advisements = record.advisements.joins([
+      :enrollment,
+      "LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id"
+    ]).where("dismissals.id IS NULL")
     return "-" if advisements.empty?
 
     body = ""
@@ -43,18 +46,19 @@ module ProfessorsHelper
               </tr>"
 
 
-    resp = "<table class=\"showtable listed-records-table\">
-              <thead>
-                <tr>
-                  <th>#{I18n.t("activerecord.attributes.advisement.student_name")}</th>
-                  <th>#{I18n.t("activerecord.attributes.enrollment.enrollment_number")}</th>
-                  <th>#{I18n.t("activerecord.attributes.professor.advisement_points")}</th>
-                </tr>
-              </thead>
-              <tboby class=\"records\">
-              #{body}
-              </tbody>
-            </table>"
+    resp =
+      "<table class=\"showtable listed-records-table\">
+        <thead>
+          <tr>
+            <th>#{I18n.t("activerecord.attributes.advisement.student_name")}</th>
+            <th>#{I18n.t("activerecord.attributes.enrollment.enrollment_number")}</th>
+            <th>#{I18n.t("activerecord.attributes.professor.advisement_points")}</th>
+          </tr>
+        </thead>
+        <tboby class=\"records\">
+        #{body}
+        </tbody>
+      </table>"
     resp.html_safe
   end
 

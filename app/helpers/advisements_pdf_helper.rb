@@ -9,10 +9,12 @@ module AdvisementsPdfHelper
 
     widths = [140, 140, 140, 140]
 
-    header = [["<b>#{I18n.t("pdf_content.advisements.to_pdf.professor_name")}</b>",
-               "<b>#{I18n.t("pdf_content.advisements.to_pdf.enrollment_number")}</b>",
-               "<b>#{I18n.t("pdf_content.advisements.to_pdf.student_name")}</b>",
-               "<b>#{I18n.t("pdf_content.advisements.to_pdf.level_name")}</b>"]]
+    header = [[
+      "<b>#{I18n.t("pdf_content.advisements.to_pdf.professor_name")}</b>",
+      "<b>#{I18n.t("pdf_content.advisements.to_pdf.enrollment_number")}</b>",
+      "<b>#{I18n.t("pdf_content.advisements.to_pdf.student_name")}</b>",
+      "<b>#{I18n.t("pdf_content.advisements.to_pdf.level_name")}</b>"
+    ]]
 
     simple_pdf_table(pdf, widths, header, advisements) do |table|
       table.column(0).align = :left

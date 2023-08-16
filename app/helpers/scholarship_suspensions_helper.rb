@@ -6,12 +6,12 @@
 # Helper for Scholarship Suspensions
 module ScholarshipSuspensionsHelper
   def start_date_form_column(record, options)
-    scholarship_month_year_widget record, options, :start_date
+    scholarship_month_year_widget(record, options, :start_date)
   end
 
   def end_date_form_column(record, options)
     scholarship_month_year_widget(
-      record, options, :end_date, 
+      record, options, :end_date,
       select_options: { class: "end_date-input" }, required: false
     )
   end
