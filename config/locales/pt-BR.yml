@@ -989,7 +989,6 @@ pt-BR:
     total_label: "Total"
     update: "Atualizar"
     update_advisement_authorization_label: "Editar Credenciamento"
-    update_allocation_label: "Editar Alocação"
     update_class_enrollment_label: "Editar Inscrição"
     update_class_enrollment_request_label: "Modificar Disciplina de Pedido de Inscrição"
     update_custom_variable_label: "Editar Variável"
