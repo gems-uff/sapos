@@ -25,6 +25,7 @@ RSpec.describe "Accomplishments features", type: :feature do
 
     @destroy_all << FactoryBot.create(:phase_duration, level: @level2, phase: @phase2, deadline_months: 3, deadline_days: 0)
     @destroy_all << FactoryBot.create(:phase_duration, level: @level1, phase: @phase2, deadline_months: 3, deadline_days: 0)
+    @destroy_all << FactoryBot.create(:phase_duration, level: @level1, phase: @phase3, deadline_months: 3, deadline_days: 0)
 
     @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana")
     @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia")
@@ -46,6 +47,7 @@ RSpec.describe "Accomplishments features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    PhaseCompletion.delete_all
   end
 
   describe "view list page" do
@@ -94,6 +96,20 @@ RSpec.describe "Accomplishments features", type: :feature do
       sleep(0.2)
       visit current_path
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia", "M01 - Ana", "M03 - Carol"]
+    end
+
+    it "should show enrollment_level error when phase does not include enrollment level" do
+      # Insert record
+      page.send_keys :escape
+      date = Date.today
+      within("#as_#{plural_name}-create--form") do
+        find(:select, "record_conclusion_date_2i").find(:option, text: I18n.l(date, format: "%B")).select_option
+        find(:select, "record_conclusion_date_1i").find(:option, text: date.year.to_s).select_option
+        find(:select, "record_phase_").find(:option, text: "Exame de Qualificação").select_option
+      end
+      fill_record_select("enrollment_", "enrollments", "M01")
+      click_button "Salvar"
+      expect(page).to have_content "Matrícula não possui o mesmo nível que a etapa"
     end
 
     it "should have a record_select widget for enrollment" do

@@ -12,7 +12,9 @@ class Accomplishment < ApplicationRecord
   belongs_to :phase, optional: false
 
   validates :enrollment, presence: true
-  validates :enrollment, uniqueness: { scope: :phase_id, message: :accomplishment_enrollment_uniqueness }
+  validates :enrollment, uniqueness: {
+    scope: :phase_id, message: :accomplishment_enrollment_uniqueness
+  }
   validates :phase, presence: true
 
   validates :conclusion_date, presence: true
@@ -28,7 +30,9 @@ class Accomplishment < ApplicationRecord
   end
 
   def update_completion_date
-    phase_completion = PhaseCompletion.where(enrollment_id: enrollment_id, phase_id: phase_id).first
+    phase_completion = PhaseCompletion.where(
+      enrollment_id: enrollment_id, phase_id: phase_id
+    ).first
     return unless phase_completion
 
     phase_completion.calculate_completion_date
@@ -44,14 +48,17 @@ class Accomplishment < ApplicationRecord
   end
 
   def notify_student_and_advisor
-    emails = [EmailTemplate.load_template("accomplishments:email_to_student").prepare_message({ record: self })]
+    emails = [
+      EmailTemplate.load_template(
+        "accomplishments:email_to_student"
+      ).prepare_message({ record: self })]
     enrollment.advisements.each do |advisement|
-      emails << EmailTemplate.load_template("accomplishments:email_to_advisor").prepare_message(
-        {
-          record: self,
-          advisement: advisement
-        }
-      )
+      emails << EmailTemplate.load_template(
+        "accomplishments:email_to_advisor"
+      ).prepare_message({
+        record: self,
+        advisement: advisement
+      })
     end
     Notifier.send_emails(notifications: emails)
   end
