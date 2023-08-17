@@ -41,7 +41,7 @@ RSpec.describe PhaseDuration, type: :model do
           phase_duration.deadline_days = 0
           phase_duration.deadline_months = 0
           phase_duration.deadline_semesters = nil
-          expect(phase_duration).to have_error(:blank_deadline).on :deadline
+          expect(phase_duration).to have_error(:blank_deadline).on :base
         end
       end
     end
@@ -94,7 +94,7 @@ RSpec.describe PhaseDuration, type: :model do
         phase_duration.deadline_semesters = deadline_semesters
         phase_duration.deadline_months = deadline_months
         phase_duration.deadline_days = deadline_days
-        expected = "#{deadline_semesters} períodos, #{deadline_months} meses e #{deadline_days} dias"
+        expected = "#{deadline_semesters} período, #{deadline_months} meses e #{deadline_days} dias"
         expect(phase_duration.to_label).to eql(expected)
       end
     end

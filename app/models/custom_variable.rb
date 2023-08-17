@@ -76,7 +76,8 @@ class CustomVariable < ApplicationRecord
     config = CustomVariable.find_by_variable(:professor_login_can_post_grades)
     if (!config.blank?) && (!config.value.nil?)
       formatted_value = config.value.strip.downcase
-      return formatted_value if (formatted_value == "yes") || (formatted_value == "yes_all_semesters")
+      return formatted_value if
+        (formatted_value == "yes") || (formatted_value == "yes_all_semesters")
     else
       "no"
     end
@@ -90,30 +91,35 @@ class CustomVariable < ApplicationRecord
     def check_constraints_between_variables
       case self.variable
       when "minimum_grade_for_approval"
-        self.errors.add(:value, :minimum_grade_for_approval_not_gt_grade_of_disapproval_for_absence, {
-          minimum_grade_for_approval: (self.value.blank? ? 6.0 : self.value.tr(",", ".")).to_s,
-          grade_of_disapproval_for_absence: (CustomVariable.grade_of_disapproval_for_absence.to_f / 10.0).to_s
-        }) if
-          (!CustomVariable.grade_of_disapproval_for_absence.blank?) &&
-          (((self.value.blank?) && (CustomVariable.grade_of_disapproval_for_absence >= 60)) ||
-           ((!self.value.blank?) && (CustomVariable.grade_of_disapproval_for_absence >= ((self.value.tr(",", ".").to_f) * 10.0).to_i))
-          )
+        grade = CustomVariable.grade_of_disapproval_for_absence
+        minimum = self.value.blank? ? 6.0 : self.value.tr(",", ".").to_f
+        self.errors.add(
+          :value,
+          :minimum_grade_for_approval_not_gt_grade_of_disapproval_for_absence, {
+            minimum_grade_for_approval: minimum.to_s,
+            grade_of_disapproval_for_absence: (grade.to_f / 10.0).to_s
+          }
+        ) if !grade.nil? && (grade >= (minimum * 10.0).to_i)
       when "grade_of_disapproval_for_absence"
-        self.errors.add(:value, :grade_of_disapproval_for_absence_not_lt_minimum_grade_for_approval, {
-          grade_of_disapproval_for_absence: self.value.tr(",", "."),
-          minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s
-        }) if
-          (!self.value.blank?) &&
-          (((self.value.tr(",", ".").to_f) * 10.0).to_i >= CustomVariable.minimum_grade_for_approval)
+        minimum = CustomVariable.minimum_grade_for_approval
+        grade = self.value.tr(",", ".").to_f
+        self.errors.add(
+          :value,
+          :grade_of_disapproval_for_absence_not_lt_minimum_grade_for_approval, {
+            grade_of_disapproval_for_absence: grade.to_s,
+            minimum_grade_for_approval: (minimum.to_f / 10.0).to_s
+          }
+        ) if (!self.value.blank?) && ((grade * 10.0).to_i >= minimum)
       end
     end
 
     def validate_destroy
       case self.variable
       when "minimum_grade_for_approval"
-        self.errors.add(:base, :validate_destroy_of_minimum_grade_for_approval) if
-          (!CustomVariable.grade_of_disapproval_for_absence.blank?) &&
-          (CustomVariable.grade_of_disapproval_for_absence >= 60)
+        grade = CustomVariable.grade_of_disapproval_for_absence
+        self.errors.add(
+          :base, :validate_destroy_of_minimum_grade_for_approval
+        ) if (!grade.blank?) && (grade >= 60)
       end
       self.errors.blank?
     end

@@ -6,9 +6,15 @@
 # Represents a Query
 class Query < ApplicationRecord
   has_many :notifications, inverse_of: :query
-  has_many :params, class_name: "QueryParam", dependent: :destroy, validate: false, before_add: :get_query_param_ids, before_remove: :get_query_param_ids
+  has_many :params,
+    class_name: "QueryParam",
+    dependent: :destroy, validate: false,
+    before_add: :get_query_param_ids,
+    before_remove: :get_query_param_ids
 
-  accepts_nested_attributes_for :params, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :params,
+    reject_if: :all_blank,
+    allow_destroy: true
 
   validates :name, presence: true
   validates :sql, presence: true
@@ -18,10 +24,10 @@ class Query < ApplicationRecord
   after_update :after_update_query
 
   def after_update_query
-    if (! @query_param_ids_before_query_update.nil?) && (self.params.ids.to_set != @query_param_ids_before_query_update)
-      self.notifications.each do |notification|
-        notification.touch
-      end
+    return if @query_param_ids_before_query_update.nil?
+    return if self.params.ids.to_set == @query_param_ids_before_query_update
+    self.notifications.each do |notification|
+      notification.touch
     end
   end
 
@@ -37,7 +43,8 @@ class Query < ApplicationRecord
       param.simulation_value = simulation_params[param_name]
       param.validate_value(param.simulation_value)
 
-      current_params[param_name] = (param.errors.empty? ? param.parsed_value : "")
+      current_params[param_name] =
+        param.errors.empty? ? param.parsed_value : ""
     end
     current_params
   end
@@ -55,7 +62,9 @@ class Query < ApplicationRecord
       { columns: db_resource.columns, rows: db_resource.rows }
     elsif ApplicationRecord.connection.adapter_name == "Mysql2"
       conf = ApplicationRecord.configurations
-      client = Mysql2::Client.new(conf["#{Rails.env}_read_only"] || conf[Rails.env])
+      client = Mysql2::Client.new(
+        conf["#{Rails.env}_read_only"] || conf[Rails.env]
+      )
       results = client.query(query)
       client.close
 
@@ -90,8 +99,9 @@ class Query < ApplicationRecord
       self.execute
     rescue ActiveRecord::PreparedStatementInvalid => e
       variable_name = e.message.match(/missing value for :([a-zA-Z0-9_]+)/)[1]
-
-      self.errors.add(:sql, :sql_has_an_undefined_parameter, parametro: variable_name)
+      self.errors.add(
+        :sql, :sql_has_an_undefined_parameter, parametro: variable_name
+      )
     rescue Exception => e
       self.errors.add(:sql, :sql_execution_generated_an_error, erro: e.message)
     end

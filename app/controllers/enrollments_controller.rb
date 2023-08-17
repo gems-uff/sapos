@@ -166,7 +166,7 @@ class EnrollmentsController < ApplicationController
     @enrollment = Enrollment.find(params[:id])
 
     @class_enrollments = @enrollment.class_enrollments
-      .where(situation: I18n.translate("activerecord.attributes.class_enrollment.situations.aproved"))
+      .where(situation: ClassEnrollment::APPROVED)
       .joins(:course_class)
       .order("course_classes.year", "course_classes.semester")
 
@@ -183,7 +183,7 @@ class EnrollmentsController < ApplicationController
     @enrollment = Enrollment.find(params[:id])
 
     @class_enrollments = @enrollment.class_enrollments
-      .where(situation: I18n.translate("activerecord.attributes.class_enrollment.situations.aproved"))
+      .where(situation: ClassEnrollment::APPROVED)
       .joins(:course_class)
       .order("course_classes.year", "course_classes.semester")
 

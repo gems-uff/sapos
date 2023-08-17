@@ -10,9 +10,18 @@ class Student < ApplicationRecord
   mount_uploader :photo, ProfileUploader
 
   belongs_to :city, optional: true
-  belongs_to :birth_city, optional: true, class_name: "City", foreign_key: "birth_city_id"
-  belongs_to :birth_state, optional: true, class_name: "State", foreign_key: "birth_state_id"
-  belongs_to :birth_country, optional: true, class_name: "Country", foreign_key: "birth_country_id"
+  belongs_to :birth_city,
+    optional: true,
+    class_name: "City",
+    foreign_key: "birth_city_id"
+  belongs_to :birth_state,
+    optional: true,
+    class_name: "State",
+    foreign_key: "birth_state_id"
+  belongs_to :birth_country,
+    optional: true,
+    class_name: "Country",
+    foreign_key: "birth_country_id"
   belongs_to :user, optional: true
 
   has_many :student_majors, dependent: :destroy
@@ -80,8 +89,10 @@ class Student < ApplicationRecord
   end
 
   def identity_issuing_place_to_label
-    return "#{I18n.t("pdf_content.enrollment.header.identity_issuing_state")}" unless State.where("name LIKE ?", self.identity_issuing_place).empty?
-    "#{I18n.t("pdf_content.enrollment.header.identity_issuing_country")}"
+    if State.where("name LIKE ?", self.identity_issuing_place).present?
+      return I18n.t("pdf_content.enrollment.header.identity_issuing_state")
+    end
+    I18n.t("pdf_content.enrollment.header.identity_issuing_country")
   end
 
   def mount_uploader_name

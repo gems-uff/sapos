@@ -116,20 +116,20 @@ RSpec.describe ScholarshipSuspension, type: :model do
         expect(scholarship_suspension.to_label).to eql(
           "#{I18n.localize(start_date, format: :monthyear)} - "\
           "#{I18n.localize(end_date, format: :monthyear)}: "\
-          "#{I18n.t("activerecord.attributes.scholarship_suspension.active_options.active")}"
+          "#{ScholarshipSuspension::ACTIVE}"
         )
       end
     end
     describe "active_label" do
       it "should return active when it is active" do
         expect(scholarship_suspension.active_label).to eql(
-          I18n.t("activerecord.attributes.scholarship_suspension.active_options.active")
+          ScholarshipSuspension::ACTIVE
         )
       end
       it "should return inactive when it is inactive" do
         scholarship_suspension.active = false
         expect(scholarship_suspension.active_label).to eql(
-          I18n.t("activerecord.attributes.scholarship_suspension.active_options.inactive")
+          ScholarshipSuspension::INACTIVE
         )
       end
     end

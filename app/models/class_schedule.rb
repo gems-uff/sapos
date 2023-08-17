@@ -8,7 +8,10 @@ class ClassSchedule < ApplicationRecord
   has_paper_trail
 
   validates :year, presence: true
-  validates :semester, presence: true, inclusion: { in: YearSemester::SEMESTERS }, uniqueness: { scope: [:year] }
+  validates :semester,
+    presence: true,
+    inclusion: { in: YearSemester::SEMESTERS },
+    uniqueness: { scope: [:year] }
   validates :enrollment_start, presence: true
   validates :enrollment_end, presence: true
   validates :enrollment_adjust, presence: true

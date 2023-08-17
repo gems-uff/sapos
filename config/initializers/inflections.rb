@@ -59,6 +59,7 @@ ActiveSupport::Inflector.inflections(:'pt-BR') do |inflect|
 
   # Irregulares
   inflect.irregular "país", "países"
+  inflect.irregular "mês", "meses"
 end
 
 # These inflection rules are supported but not enabled by default:

@@ -3,6 +3,12 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+
+require "simplecov"
+SimpleCov.start "rails" do
+  #enable_coverage_for_eval
+end
+
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 # Prevent database truncation if the environment is production
@@ -10,7 +16,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require "rspec/rails"
 # Add additional requires below this line. Rails is not loaded until this point!
 require "rspec/collection_matchers"
-require "simplecov"
+
 require "capybara/rails"
 require "capybara/rspec"
 
@@ -20,7 +26,6 @@ require "support/record_select_helpers"
 require "support/download_helpers"
 
 Capybara.server = :puma
-SimpleCov.start "rails"
 
 
 # Requires supporting ruby files with custom matchers and macros, etc, in

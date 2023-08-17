@@ -47,8 +47,12 @@ class Phase < ApplicationRecord
   def total_duration(enrollment, options = {})
     date ||= options[:until_date]
 
-    total_time = phase_durations.select { |duration| duration.level_id == enrollment.level.id }[0].duration
-    deferrals = enrollment.deferrals.select { |deferral| deferral.deferral_type.phase == self }
+    total_time = phase_durations.select do |duration|
+      duration.level_id == enrollment.level.id
+    end[0].duration
+    deferrals = enrollment.deferrals.select do |deferral|
+      deferral.deferral_type.phase == self
+    end
     deferrals.each do |deferral|
       if date.blank? || date >= deferral.approval_date
         deferral_duration = deferral.deferral_type.duration

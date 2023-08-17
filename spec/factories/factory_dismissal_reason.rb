@@ -7,7 +7,7 @@
 
 FactoryBot.define do
   factory :dismissal_reason do
-    thesis_judgement { I18n.translate("activerecord.attributes.dismissal_reason.thesis_judgements.approved") }
+    thesis_judgement { DismissalReason::APPROVED }
     sequence :name do |name|
       "DismissalReason_#{name}"
     end

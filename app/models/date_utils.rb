@@ -6,7 +6,11 @@
 class DateUtils
   def self.add_to_date(date, total_semesters, total_months, total_days)
     if total_semesters != 0
-      semester_months = (12 * (total_semesters / 2)) + ((date.month == 3 ? 5 : 7) * (total_semesters % 2)) - 1
+      semester_months = (
+        12 * (total_semesters / 2)
+      ) + (
+        (date.month == 3 ? 5 : 7) * (total_semesters % 2)
+      ) - 1
       date = semester_months.months.since(date).end_of_month
     end
 

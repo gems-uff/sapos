@@ -39,8 +39,12 @@ class EmailTemplate < ApplicationRecord
       }
     },
     "class_enrollments:email_to_advisor" => {
-      path: File.join("class_enrollments", "mailer", "email_to_advisor.text.erb"),
-      subject: I18n.t("notifications.class_enrollment.email_to_advisor.subject"),
+      path: File.join(
+        "class_enrollments", "mailer", "email_to_advisor.text.erb"
+      ),
+      subject: I18n.t(
+        "notifications.class_enrollment.email_to_advisor.subject"
+      ),
       to: "<%= var(:advisement).professor.email %>",
       variables: {
         record: "ClassEnrollment",
@@ -48,32 +52,48 @@ class EmailTemplate < ApplicationRecord
       }
     },
     "class_enrollments:email_to_professor" => {
-      path: File.join("class_enrollments", "mailer", "email_to_professor.text.erb"),
-      subject: I18n.t("notifications.class_enrollment.email_to_professor.subject"),
+      path: File.join(
+        "class_enrollments", "mailer", "email_to_professor.text.erb"
+      ),
+      subject: I18n.t(
+        "notifications.class_enrollment.email_to_professor.subject"
+      ),
       to: "<%= var(:record).course_class.professor.email %>",
       variables: {
         record: "ClassEnrollment"
       }
     },
     "class_enrollments:email_to_student" => {
-      path: File.join("class_enrollments", "mailer", "email_to_student.text.erb"),
-      subject: I18n.t("notifications.class_enrollment.email_to_student.subject"),
+      path: File.join(
+        "class_enrollments", "mailer", "email_to_student.text.erb"
+      ),
+      subject: I18n.t(
+        "notifications.class_enrollment.email_to_student.subject"
+      ),
       to: "<%= var(:record).enrollment.student.email %>",
       variables: {
         record: "ClassEnrollment"
       }
     },
     "class_enrollment_requests:email_to_student" => {
-      path: File.join("class_enrollment_requests", "mailer", "email_to_student.text.erb"),
-      subject: I18n.t("notifications.class_enrollment_request.email_to_student.subject"),
+      path: File.join(
+        "class_enrollment_requests", "mailer", "email_to_student.text.erb"
+      ),
+      subject: I18n.t(
+        "notifications.class_enrollment_request.email_to_student.subject"
+      ),
       to: "<%= var(:record).class_enrollment.enrollment.student.email %>",
       variables: {
         record: "ClassEnrollmentRequest",
       }
     },
     "class_enrollment_requests:removal_email_to_student" => {
-      path: File.join("class_enrollment_requests", "mailer", "removal_email_to_student.text.erb"),
-      subject: I18n.t("notifications.class_enrollment_request.removal_email_to_student.subject"),
+      path: File.join(
+        "class_enrollment_requests", "mailer", "removal_email_to_student.text.erb"
+      ),
+      subject: I18n.t(
+        "notifications.class_enrollment_request.removal_email_to_student.subject"
+      ),
       to: "<%= var(:record).enrollment_request.enrollment.student.email %>",
       variables: {
         record: "ClassEnrollmentRequest",
@@ -105,8 +125,12 @@ class EmailTemplate < ApplicationRecord
       }
     },
     "enrollment_requests:email_to_student" => {
-      path: File.join("enrollment_requests", "mailer", "email_to_student.text.erb"),
-      subject: I18n.t("notifications.enrollment_request.email_to_student.subject"),
+      path: File.join(
+        "enrollment_requests", "mailer", "email_to_student.text.erb"
+      ),
+      subject: I18n.t(
+        "notifications.enrollment_request.email_to_student.subject"
+      ),
       to: "<%= var(:record).enrollment.student.email %>",
       variables: {
         record: "EnrollmentRequest",
@@ -179,16 +203,24 @@ class EmailTemplate < ApplicationRecord
       }
     },
     "student_enrollments:removal_email_to_student" => {
-      path: File.join("student_enrollment", "mailer", "removal_email_to_student.text.erb"),
-      subject: I18n.t("notifications.student_enrollment.removal_email_to_student.subject"),
+      path: File.join(
+        "student_enrollment", "mailer", "removal_email_to_student.text.erb"
+      ),
+      subject: I18n.t(
+        "notifications.student_enrollment.removal_email_to_student.subject"
+      ),
       to: "<%= var(:record).enrollment.student.email %>",
       variables: {
         record: "EnrollmentRequest",
       }
     },
     "student_enrollments:removal_email_to_advisor" => {
-      path: File.join("student_enrollment", "mailer", "removal_email_to_advisor.text.erb"),
-      subject: I18n.t("notifications.student_enrollment.removal_email_to_advisor.subject"),
+      path: File.join(
+        "student_enrollment", "mailer", "removal_email_to_advisor.text.erb"
+      ),
+      subject: I18n.t(
+        "notifications.student_enrollment.removal_email_to_advisor.subject"
+      ),
       to: "<%= var(:advisement).professor.email %>",
       variables: {
         record: "EnrollmentRequest",
@@ -210,7 +242,9 @@ class EmailTemplate < ApplicationRecord
       unless builtin.blank?
         template.subject = builtin[:subject]
         template.to = builtin[:to]
-        template.body = File.read File.join(Rails.root, "app", "views", builtin[:path])
+        template.body = File.read File.join(
+          Rails.root, "app", "views", builtin[:path]
+        )
       end
     end
     template
@@ -218,7 +252,8 @@ class EmailTemplate < ApplicationRecord
 
   def update_mailer_headers(headers)
     unless CustomVariable.redirect_email.nil?
-      headers[:subject] = headers[:subject] + " (Originalmente para #{headers[:to]})"
+      headers[:subject] = headers[:subject] +
+        " (Originalmente para #{headers[:to]})"
       headers[:to] = CustomVariable.redirect_email
       headers[:skip_redirect] = true
     end

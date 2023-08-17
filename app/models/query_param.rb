@@ -21,11 +21,15 @@ class QueryParam < ApplicationRecord
   VALUE_TIME = "Time"
   VALUE_LITERAL = "Literal"
 
-  VALUE_TYPES = [VALUE_STRING, VALUE_INTEGER, VALUE_FLOAT, VALUE_LIST, VALUE_LITERAL,
-                 VALUE_DATE, VALUE_DATETIME, VALUE_TIME, VALUE_LITERAL]
+  VALUE_TYPES = [
+    VALUE_STRING, VALUE_INTEGER, VALUE_FLOAT, VALUE_LIST, VALUE_LITERAL,
+    VALUE_DATE, VALUE_DATETIME, VALUE_TIME, VALUE_LITERAL
+  ]
 
   validates :value_type, presence: true, inclusion: VALUE_TYPES
-  validates :name, presence: true, format: { with: /\A([a-z_][a-zA-Z_0-9]+)?\z/, message: :invalid_name }
+  validates :name,
+    presence: true,
+    format: { with: /\A([a-z_][a-zA-Z_0-9]+)?\z/, message: :invalid_name }
 
   validate do
     validate_value(default_value)

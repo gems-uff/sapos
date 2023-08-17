@@ -71,9 +71,8 @@ module CourseClassesPdfHelper
           row << number_to_grade(class_enrollment.grade)
         end
         row << class_enrollment.attendance_to_label
-        row << class_enrollment.situation == I18n.translate(
-          "activerecord.attributes.class_enrollment.situations.registered"
-        ) ? "" : class_enrollment.situation
+        row << class_enrollment.situation == ClassEnrollment::REGISTERED ?
+          "" : class_enrollment.situation
         row << class_enrollment.obs
         row
       end

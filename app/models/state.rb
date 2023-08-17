@@ -10,7 +10,10 @@ class State < ApplicationRecord
   belongs_to :country, optional: false
 
   has_many :cities, dependent: :restrict_with_exception
-  has_many :student_birth_states, class_name: "Student", foreign_key: "birth_state_id", dependent: :restrict_with_exception
+  has_many :student_birth_states,
+    class_name: "Student",
+    foreign_key: "birth_state_id",
+    dependent: :restrict_with_exception
 
   validates :country, presence: true
   validates :name, presence: true, uniqueness: true

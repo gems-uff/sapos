@@ -15,12 +15,15 @@ class EnrollmentRequest < ApplicationRecord
   has_many :enrollment_request_comments, dependent: :destroy
 
   validates :year, presence: true
-  validates :semester, presence: true, inclusion: { in: YearSemester::SEMESTERS }
+  validates :semester,
+    presence: true,
+    inclusion: { in: YearSemester::SEMESTERS }
   validates :enrollment, presence: true
   validates_uniqueness_of :enrollment, scope: [:year, :semester]
 
   validate :that_allocations_do_not_match, if: :student_saving
-  validate :that_there_is_at_least_one_class_enrollment_request_insert, if: :student_saving
+  validate :that_there_is_at_least_one_class_enrollment_request_insert,
+    if: :student_saving
   validate :that_valid_insertion_is_not_set_to_false, if: :student_saving
   validate :that_valid_removal_is_not_set_to_false, if: :student_saving
   validate :that_all_requests_are_valid, if: :student_saving
@@ -28,7 +31,8 @@ class EnrollmentRequest < ApplicationRecord
   def self.pendency_condition(user = nil)
     user ||= current_user
     return ["0 = -1"] if user.blank?
-    return ["0 = -1"] if user.cannot?(:read_pendencies, EnrollmentRequest) && user.cannot?(:read_advisement_pendencies, EnrollmentRequest)
+    return ["0 = -1"] if user.cannot?(:read_pendencies, EnrollmentRequest) &&
+      user.cannot?(:read_advisement_pendencies, EnrollmentRequest)
 
     er = EnrollmentRequest.arel_table.dup
     cer = ClassEnrollmentRequest.arel_table
@@ -44,7 +48,8 @@ class EnrollmentRequest < ApplicationRecord
 
     return ["0 = -1"] if user.professor.blank?
 
-    check_status = check_status.where(er[:enrollment_id].in(user.professor.enrollments.map(&:id)))
+    check_status = check_status
+      .where(er[:enrollment_id].in(user.professor.enrollments.map(&:id)))
     [EnrollmentRequest.arel_table[:id].in(check_status.project(er[:id])).to_sql]
   end
 
@@ -81,27 +86,29 @@ class EnrollmentRequest < ApplicationRecord
 
   def last_student_read_time
     time_list = [self.created_at]
-    time_list << self.last_student_change_at unless self.last_student_change_at.blank?
-    time_list << self.student_view_at unless self.student_view_at.blank?
+    time_list << self.last_student_change_at if
+      self.last_student_change_at.present?
+    time_list << self.student_view_at if self.student_view_at.present?
     time_list.max
   end
 
   def last_staff_read_time
     time_list = [self.created_at - 1.minute]
-    time_list << self.last_staff_change_at unless self.last_staff_change_at.blank?
+    time_list << self.last_staff_change_at if self.last_staff_change_at.present?
     time_list.max
   end
 
   def student_unread_messages(user = nil)
     user ||= current_user
     comp_time = self.last_student_read_time
-    self.enrollment_request_comments.filter { |comment|  comment.updated_at > comp_time && comment.user != user }.count
+    self.enrollment_request_comments.filter do |comment|
+      comment.updated_at > comp_time && comment.user != user
+    end.count
   end
 
   def has_effected_class_enrollment?
     class_enrollment_requests.any? do |cer|
-      (cer.action == ClassEnrollmentRequest::INSERT && cer.status == ClassEnrollmentRequest::EFFECTED) ||
-        (cer.action == ClassEnrollmentRequest::REMOVE && cer.status != ClassEnrollmentRequest::EFFECTED)
+      cer.insert_effected? || cer.remove_not_effected?
     end
   end
 
@@ -126,14 +133,20 @@ class EnrollmentRequest < ApplicationRecord
     remaining = course_classes.clone
     class_enrollment_requests.each do |cer|
       if remaining.delete(cer.course_class_id.to_s).present?
-        next select_insertion(cer, class_schedule, request_change) if cer.action == ClassEnrollmentRequest::INSERT
-        next select_effected_removal(cer, class_schedule, request_change) if cer.status == ClassEnrollmentRequest::EFFECTED
-
+        if cer.action == ClassEnrollmentRequest::INSERT
+          next select_insertion(cer, class_schedule, request_change)
+        end
+        if cer.status == ClassEnrollmentRequest::EFFECTED
+          next select_effected_removal(cer, class_schedule, request_change)
+        end
         select_requested_removal(cer, class_schedule, request_change)
       else
-        next unselect_removal(cer, class_schedule, request_change) if cer.action == ClassEnrollmentRequest::REMOVE
-        next unselect_effected_insertion(cer, class_schedule, request_change) if cer.status == ClassEnrollmentRequest::EFFECTED
-
+        if cer.action == ClassEnrollmentRequest::REMOVE
+          next unselect_removal(cer, class_schedule, request_change)
+        end
+        if cer.status == ClassEnrollmentRequest::EFFECTED
+          next unselect_effected_insertion(cer, class_schedule, request_change)
+        end
         unselect_requested_insertion(cer, class_schedule, request_change)
       end
     end
@@ -160,8 +173,8 @@ class EnrollmentRequest < ApplicationRecord
     return false if !class_schedule.enroll_open?
 
     class_enrollment_requests.all? do |cer|
-      next true if cer.action == ClassEnrollmentRequest::INSERT && cer.status != ClassEnrollmentRequest::EFFECTED
-      next true if cer.action == ClassEnrollmentRequest::REMOVE && cer.status == ClassEnrollmentRequest::EFFECTED
+      next true if cer.insert_not_effected?
+      next true if cer.remove_effected?
 
       class_schedule.open_for_removing_class_enrollments?
     end
@@ -175,11 +188,11 @@ class EnrollmentRequest < ApplicationRecord
 
     destroying = true
     class_enrollment_requests.each do |cer|
-      if cer.action == ClassEnrollmentRequest::INSERT && cer.status == ClassEnrollmentRequest::EFFECTED
+      if cer.insert_effected?
         cer.action = ClassEnrollmentRequest::REMOVE
         cer.status = ClassEnrollmentRequest::REQUESTED
         destroying = false
-      elsif cer.action == ClassEnrollmentRequest::REMOVE && cer.status != ClassEnrollmentRequest::EFFECTED
+      elsif cer.remove_not_effected?
         destroying = false
       else
         cer.destroy
@@ -193,18 +206,25 @@ class EnrollmentRequest < ApplicationRecord
   protected
     def insertions
       class_enrollment_requests.filter do |cer|
-        cer.action == ClassEnrollmentRequest::INSERT && !cer.marked_for_destruction?
+        cer.action == ClassEnrollmentRequest::INSERT &&
+        !cer.marked_for_destruction?
       end
     end
 
     def that_allocations_do_not_match
       allocatted = Hash.new { |hash, key| hash[key] = {} }
-      allocations = Allocation.includes(:course_class).where(course_classes: { id: course_class_ids })
+      allocations = Allocation.includes(:course_class).where(
+        course_classes: { id: course_class_ids }
+      )
       allocations.each do |allocation|
         (allocation.start_time...allocation.end_time).each do |hour|
           if allocatted[allocation.day][hour]
-            errors.add(:base, :impossible_allocation,
-              day: allocation.day, start: allocation.start_time, end: allocation.end_time)
+            errors.add(
+              :base, :impossible_allocation,
+              day: allocation.day,
+              start: allocation.start_time,
+              end: allocation.end_time
+            )
             return
           end
           allocatted[allocation.day][hour] = true
@@ -254,7 +274,11 @@ class EnrollmentRequest < ApplicationRecord
     end
 
     def unselect_effected_insertion(cer, class_schedule, request_change)
-      if class_schedule.present? && !class_schedule.open_for_removing_class_enrollments?
+      not_open_for_removing_class_enrollments = (
+        class_schedule.present? &&
+        !class_schedule.open_for_removing_class_enrollments?
+      )
+      if not_open_for_removing_class_enrollments
         request_change[:existing_insertion_requests] << cer
         self.valid_removal = false
         return
@@ -275,15 +299,20 @@ class EnrollmentRequest < ApplicationRecord
     end
 
     def select_new(course_class_id, class_schedule, request_change)
-      if class_schedule.present? && !class_schedule.open_for_inserting_class_enrollments?
+      not_open_for_inserting_class_enrollments = (
+        class_schedule.present? &&
+        !class_schedule.open_for_inserting_class_enrollments?
+      )
+      if not_open_for_inserting_class_enrollments
         self.valid_insertion = false
         return
       end
-      request_change[:new_insertion_requests] << self.class_enrollment_requests.build(
-        course_class_id: course_class_id,
-        action: ClassEnrollmentRequest::INSERT,
-        status: ClassEnrollmentRequest::REQUESTED
-      )
+      request_change[:new_insertion_requests] <<
+        self.class_enrollment_requests.build(
+          course_class_id: course_class_id,
+          action: ClassEnrollmentRequest::INSERT,
+          status: ClassEnrollmentRequest::REQUESTED
+        )
     end
 
     def select_insertion(cer, class_schedule, request_change)
@@ -291,7 +320,11 @@ class EnrollmentRequest < ApplicationRecord
     end
 
     def select_effected_removal(cer, class_schedule, request_change)
-      if class_schedule.present? && !class_schedule.open_for_inserting_class_enrollments?
+      not_open_for_inserting_class_enrollments = (
+        class_schedule.present? &&
+        !class_schedule.open_for_inserting_class_enrollments?
+      )
+      if not_open_for_inserting_class_enrollments
         request_change[:no_action] << cer
         self.valid_insertion = false
         return

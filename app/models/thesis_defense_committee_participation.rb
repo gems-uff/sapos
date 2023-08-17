@@ -12,7 +12,10 @@ class ThesisDefenseCommitteeParticipation < ApplicationRecord
 
   validates :professor, presence: true
   validates :enrollment, presence: true
-  validates :professor, uniqueness: { scope: :enrollment_id, message: :thesis_defense_committee_participation_professor_uniqueness }
+  validates :professor, uniqueness: {
+    scope: :enrollment_id,
+    message: :thesis_defense_committee_participation_professor_uniqueness
+  }
 
   def to_label
     "#{enrollment.enrollment_number} - #{professor.name}"

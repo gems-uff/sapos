@@ -12,7 +12,7 @@ FactoryBot.define do
     body_template { "test" }
     notification_offset { 0 }
     query_offset { 0 }
-    frequency { I18n.translate("activerecord.attributes.notification.frequencies.semiannual") }
+    frequency { Notification::SEMIANNUAL }
     title { "test" }
     query
   end

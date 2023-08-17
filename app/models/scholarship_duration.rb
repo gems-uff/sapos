@@ -15,21 +15,28 @@ class ScholarshipDuration < ApplicationRecord
 
   validates :scholarship, presence: true
   validates :enrollment, presence: true
-  validates :enrollment, uniqueness: { message: :enrollment_and_scholarship_uniqueness,
-                                       if: :student_has_other_scholarship_duration }
+  validates :enrollment, uniqueness: {
+    message: :enrollment_and_scholarship_uniqueness,
+    if: :student_has_other_scholarship_duration
+  }
 
   validate :if_scholarship_is_not_with_another_student
   validate :scholarship_level_equals_enrollment_level
 
   # validates if a scholarship duration start date isn't before it's end date
-  validates_date :start_date, on_or_before: :end_date, on_or_before_message: :start_date_after_end_date
+  validates_date :start_date,
+    on_or_before: :end_date,
+    on_or_before_message: :start_date_after_end_date
   validates :start_date, presence: true
 
   # validates if a cancel date of an scholarship duration is valid
-  validates_date :cancel_date, on_or_after: :start_date, allow_nil: true,
-                               on_or_after_message: :cancel_date_before_start_date
-  validates_date :cancel_date, on_or_before: :end_date, allow_nil: true,
-                               on_or_before_message: :cancel_date_after_end_date
+  validates_date :cancel_date,
+    on_or_after: :start_date,
+    allow_nil: true,
+    on_or_after_message: :cancel_date_before_start_date
+  validates_date :cancel_date,
+    on_or_before: :end_date, allow_nil: true,
+    on_or_before_message: :cancel_date_after_end_date
 
   validate :check_date_boundaries_of_scholarship
 
@@ -63,14 +70,17 @@ class ScholarshipDuration < ApplicationRecord
   end
 
   def init
-    self.start_date = Date.today.beginning_of_month + 1.month if self.start_date.nil?
+    if self.start_date.nil?
+      self.start_date = Date.today.beginning_of_month + 1.month
+    end
     self.update_end_date
   end
 
   def update_end_date
     dates = []
     unless self.enrollment.nil? || self.enrollment.level.nil?
-      dates << (self.enrollment.admission_date + (self.enrollment.level.default_duration - 1).months).end_of_month
+      default_duration = (self.enrollment.level.default_duration - 1).months
+      dates << (self.enrollment.admission_date + default_duration).end_of_month
     end
     unless self.scholarship.nil?
       dates << self.scholarship.end_date unless self.scholarship.end_date.nil?
@@ -91,7 +101,8 @@ class ScholarshipDuration < ApplicationRecord
   end
 
   # this validation is only called for checking uniqueness of scholarship durations
-  # if start date of a new scholarship duration is earlier than an existing scholarship duration then
+  # if start date of a new scholarship duration is earlier
+  # than an existing scholarship duration then
   def student_has_other_scholarship_duration
     return false if enrollment.nil?
     return false if scholarship.nil?
@@ -102,11 +113,9 @@ class ScholarshipDuration < ApplicationRecord
     # -> cancel_date não é nulo -> schoarslhip.start_date > cancel_date
     # -> scholarship.cancel_date é nulo -> schoarslhip.start_date > end_date
 
-    if self.id.nil?
-      scholarships_with_student = ScholarshipDuration.where(enrollment_id: enrollment.id).all
-    else
-      scholarships_with_student = ScholarshipDuration.where(enrollment_id: enrollment.id).where.not(id: self.id).all
-    end
+    durations = ScholarshipDuration.where(enrollment_id: enrollment.id)
+    durations = durations.where.not(id: self.id) if self.id.present?
+    scholarships_with_student = durations.all
 
     scholarships_with_student.each do |scholarship|
       if scholarship.start_date <= start_date # se a bolsa é antiga
@@ -128,16 +137,16 @@ class ScholarshipDuration < ApplicationRecord
   end
 
   def warning_message
-    if self.id.nil?
-      scholarships_with_student = ScholarshipDuration.where(scholarship_id: scholarship.id).all
-    else
-      scholarships_with_student = ScholarshipDuration.where(scholarship_id: scholarship.id).where.not(id: self.id).all
-    end
+    durations = ScholarshipDuration.where(scholarship_id: scholarship.id)
+    durations = durations.where.not(id: self.id) if self.id.present?
+    scholarships_with_student = durations.all
 
     message = nil
     scholarships_with_student.each do |scholarship|
       if scholarship.start_date <= start_date && scholarship.cancel_date.nil?
-        message = I18n.t("activerecord.errors.models.scholarship_duration.unfinished_scholarship")
+        message = I18n.t(
+          "activerecord.errors.models.scholarship_duration.unfinished_scholarship"
+        )
         break
       end
     end
@@ -146,11 +155,9 @@ class ScholarshipDuration < ApplicationRecord
 
   def if_scholarship_is_not_with_another_student
     return if scholarship.nil?
-    if self.id.nil?
-      scholarships_with_student = ScholarshipDuration.where(scholarship_id: scholarship.id).all
-    else
-      scholarships_with_student = ScholarshipDuration.where(scholarship_id: scholarship.id).where.not(id: self.id).all
-    end
+    durations = ScholarshipDuration.where(scholarship_id: scholarship.id)
+    durations = durations.where.not(id: self.id) if self.id.present?
+    scholarships_with_student = durations.all
 
     scholarships_with_student.each do |scholarship|
       if scholarship.start_date <= start_date # se a bolsa é antiga
@@ -168,12 +175,16 @@ class ScholarshipDuration < ApplicationRecord
       else # se a bolsa é futura
         if cancel_date.nil?
           if scholarship.start_date <= end_date
-            errors.add(:end_date, :scholarship_start_date_after_end_or_cancel_date)
+            errors.add(
+              :end_date, :scholarship_start_date_after_end_or_cancel_date
+            )
             break
           end
         else
           if scholarship.start_date <= cancel_date
-            errors.add(:cancel_date, :scholarship_start_date_after_end_or_cancel_date)
+            errors.add(
+              :cancel_date, :scholarship_start_date_after_end_or_cancel_date
+            )
             break
           end
         end
@@ -204,8 +215,11 @@ class ScholarshipDuration < ApplicationRecord
   end
 
   def scholarship_level_equals_enrollment_level
-    if defined?(scholarship.level_id) && defined?(enrollment.level_id) && (scholarship.level_id != enrollment.level_id)
-      errors.add(:scholarship, I18n.t("activerecord.errors.models.scholarship_duration.the_levels_of_scholarship_and_enrollment_are_different"))
-    end
+    return unless defined?(scholarship.level_id)
+    return unless defined?(enrollment.level_id)
+    return if scholarship.level_id == enrollment.level_id
+    errors.add(
+      :scholarship, :the_levels_of_scholarship_and_enrollment_are_different
+    )
   end
 end

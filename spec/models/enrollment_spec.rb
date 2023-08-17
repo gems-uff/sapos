@@ -387,13 +387,13 @@ RSpec.describe Enrollment, type: :model do
 
           @destroy_later << FactoryBot.create(:class_enrollment,
                             enrollment: enrollment, course_class: class1, grade: 70, grade_not_count_in_gpr: nil,
-                            situation: I18n.t("activerecord.attributes.class_enrollment.situations.aproved"))
+                            situation: ClassEnrollment::APPROVED)
           @destroy_later << FactoryBot.create(:class_enrollment,
                             enrollment: enrollment, course_class: class2, grade: 80, grade_not_count_in_gpr: true,
-                            situation: I18n.t("activerecord.attributes.class_enrollment.situations.aproved"))
+                            situation: ClassEnrollment::APPROVED)
           @destroy_later << FactoryBot.create(:class_enrollment,
                             enrollment: enrollment, course_class: class3, grade: 85, grade_not_count_in_gpr: false,
-                            situation: I18n.t("activerecord.attributes.class_enrollment.situations.aproved"))
+                            situation: ClassEnrollment::APPROVED)
 
           expect((enrollment.gpr_by_semester(2021, 1) * 10).round).to eq(775)
         end
@@ -421,16 +421,16 @@ RSpec.describe Enrollment, type: :model do
 
           @destroy_later << FactoryBot.create(:class_enrollment,
                             enrollment: enrollment, course_class: class1, grade: 70, grade_not_count_in_gpr: nil,
-                            situation: I18n.t("activerecord.attributes.class_enrollment.situations.aproved"))
+                            situation: ClassEnrollment::APPROVED)
           @destroy_later << FactoryBot.create(:class_enrollment,
                             enrollment: enrollment, course_class: class2, grade: 80, grade_not_count_in_gpr: true,
-                            situation: I18n.t("activerecord.attributes.class_enrollment.situations.aproved"))
+                            situation: ClassEnrollment::APPROVED)
           @destroy_later << FactoryBot.create(:class_enrollment,
                             enrollment: enrollment, course_class: class3, grade: 85, grade_not_count_in_gpr: false,
-                            situation: I18n.t("activerecord.attributes.class_enrollment.situations.aproved"))
+                            situation: ClassEnrollment::APPROVED)
           @destroy_later << FactoryBot.create(:class_enrollment,
                             enrollment: enrollment, course_class: class4, grade: 90, grade_not_count_in_gpr: nil,
-                            situation: I18n.t("activerecord.attributes.class_enrollment.situations.aproved"))
+                            situation: ClassEnrollment::APPROVED)
 
           expect((enrollment.total_gpr * 10).round).to eq(817)
         end

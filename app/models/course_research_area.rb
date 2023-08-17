@@ -12,7 +12,8 @@ class CourseResearchArea < ApplicationRecord
 
   validates :course, presence: true
   validates :research_area, presence: true
-  validates :course, uniqueness: { scope: :research_area_id, message: :unique_pair }
+  validates :course,
+    uniqueness: { scope: :research_area_id, message: :unique_pair }
 
   def to_label
     "#{self.course.name} - #{self.research_area.name}"

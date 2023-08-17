@@ -29,18 +29,27 @@ class Course < ApplicationRecord
   end
 
   def workload_text
-    return I18n.translate("activerecord.attributes.course.empty_workload") if workload.nil?
-    I18n.translate("activerecord.attributes.course.workload_time", time: workload)
+    return I18n.translate(
+      "activerecord.attributes.course.empty_workload"
+    ) if workload.nil?
+    I18n.translate(
+      "activerecord.attributes.course.workload_time",
+      time: workload
+    )
   end
 
   def self.ids_de_disciplinas_com_nome_parecido(id_disciplina_selecionada)
     ids = []
     disciplina_selecionada = Course.find_by(id: id_disciplina_selecionada)
-    unless disciplina_selecionada.blank?
-      nome_disciplina_selecionada = I18n.transliterate(disciplina_selecionada.name.squish.downcase)
+    if disciplina_selecionada.present?
+      nome_disciplina_selecionada = I18n.transliterate(
+        disciplina_selecionada.name.squish.downcase
+      )
       disciplinas = Course.all.collect { |c| [c.name, c.id] }
       disciplinas.each do |disciplina|
-        if nome_disciplina_selecionada == I18n.transliterate(disciplina[0].squish.downcase)
+        if nome_disciplina_selecionada == I18n.transliterate(
+          disciplina[0].squish.downcase
+        )
           ids.push(disciplina[1])
         end
       end
@@ -52,9 +61,12 @@ class Course < ApplicationRecord
     def check_unique_name_for_available_courses
       if available && name.present?
         nome_da_disciplina = I18n.transliterate(name.squish.downcase)
-        nomes_das_outras_disciplinas = Course.where(available: true).where.not(id: id).collect { |c| [c.name] }
+        nomes_das_outras_disciplinas = Course
+          .where(available: true).where.not(id: id).collect { |c| [c.name] }
         nomes_das_outras_disciplinas.each do |nome_da_outra_disciplina|
-          if nome_da_disciplina == I18n.transliterate(nome_da_outra_disciplina[0].squish.downcase)
+          if nome_da_disciplina == I18n.transliterate(
+            nome_da_outra_disciplina[0].squish.downcase
+          )
             errors.add(:name, :check_unique_name_for_available_courses)
           end
         end

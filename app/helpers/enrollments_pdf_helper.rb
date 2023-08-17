@@ -447,14 +447,10 @@ module EnrollmentsPdfHelper
           ]
 
           semester_credits += class_enrollment.course_class.course.credits if
-            class_enrollment.situation == I18n.translate(
-              "activerecord.attributes.class_enrollment.situations.aproved"
-            )
+            class_enrollment.situation == ClassEnrollment::APPROVED
           semester_workload += class_enrollment.course_class.course.workload if
             class_enrollment.course_class.course.workload &&
-            class_enrollment.situation == I18n.translate(
-              "activerecord.attributes.class_enrollment.situations.aproved"
-            )
+            class_enrollment.situation == ClassEnrollment::APPROVED
         end
         bold_rows << row_index
 
@@ -594,9 +590,7 @@ module EnrollmentsPdfHelper
           else
             data_table_rows[-1][0] += "#{I18n.t(
               "pdf_content.enrollment.thesis.judgement"
-            )} <b>#{I18n.t(
-              "activerecord.attributes.dismissal_reason.thesis_judgements.invalid"
-            )}</b>"
+            )} <b>#{DismissalReason::INVALID}</b>"
           end
         end
         if has_advisors && show_advisors

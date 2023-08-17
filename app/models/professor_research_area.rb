@@ -13,7 +13,8 @@ class ProfessorResearchArea < ApplicationRecord
   validates :professor, presence: true
   validates :research_area, presence: true
   # A professor can't have the same research_area more than once
-  validates :professor, uniqueness: { scope: :research_area_id, message: :unique_pair }
+  validates :professor,
+    uniqueness: { scope: :research_area_id, message: :unique_pair }
 
   def to_label
     "#{self.professor.name} - #{self.research_area.name}"

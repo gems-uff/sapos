@@ -10,7 +10,8 @@ class EnrollmentHold < ApplicationRecord
   belongs_to :enrollment, optional: false
 
   validates :enrollment, presence: true
-  validates :number_of_semesters, numericality: { greater_than_or_equal_to: 1 }, presence: true
+  validates :number_of_semesters,
+    numericality: { greater_than_or_equal_to: 1 }, presence: true
   validates :semester, inclusion: [1, 2], presence: true
   validates :year, presence: true
 
@@ -27,7 +28,10 @@ class EnrollmentHold < ApplicationRecord
   end
 
   def number_label
-    I18n.t("activerecord.attributes.enrollment_hold.number_label", count: number_of_semesters)
+    I18n.t(
+      "activerecord.attributes.enrollment_hold.number_label",
+      count: number_of_semesters
+    )
   end
 
   def validate_dates

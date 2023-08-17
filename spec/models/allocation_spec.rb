@@ -137,5 +137,23 @@ RSpec.describe Allocation, type: :model do
         expect(allocation.intersects(other)).to eq(:start_time)
       end
     end
+    describe "to_shortlabel" do
+      it "should return the expected string" do
+        allocation.start_time = 9
+        allocation.end_time = 11
+        allocation.room = '100'
+        expect(allocation.to_shortlabel).to eql("9-11\n100")
+      end
+    end
+    describe "to_label" do
+      it "should return the expected string" do
+        allocation.start_time = 9
+        allocation.end_time = 11
+        allocation.course_class.name = "Programação"
+        allocation.day = "Segunda"
+        allocation.room = '100'
+        expect(allocation.to_label).to eql("Programação - Segunda, 9:00 - 11:00 - Sala : 100")
+      end
+    end
   end
 end

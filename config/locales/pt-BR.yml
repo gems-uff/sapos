@@ -697,7 +697,7 @@ pt-BR:
           phase_duration_has_deferral: "Não foi possível remover duração de etapa para %{level}, pois já existe prorrogação para este nível"
           phase_duration_has_level: "Não foi possível remover duração de etapa para %{level}, pois já existe matrícula com esta etapa concluída"
         phase_duration:
-          blank_deadline: "prazo deve ser de pelo menos um dia"
+          blank_deadline: "Prazo deve ser de pelo menos um dia"
           has_deferral: "Já existe prorrogação para esta duração de etapa"
           has_level: "Já existe conclusão de etapa para a duração de etapa deste nível"
         professor:

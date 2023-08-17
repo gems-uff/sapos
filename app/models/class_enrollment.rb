@@ -12,9 +12,15 @@ class ClassEnrollment < ApplicationRecord
 
   has_one :class_enrollment_request, dependent: :nullify
 
-  REGISTERED = I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
-  APPROVED = I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
-  DISAPPROVED = I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
+  REGISTERED = I18n.translate(
+    "activerecord.attributes.class_enrollment.situations.registered"
+  )
+  APPROVED = I18n.translate(
+    "activerecord.attributes.class_enrollment.situations.aproved"
+  )
+  DISAPPROVED = I18n.translate(
+    "activerecord.attributes.class_enrollment.situations.disapproved"
+  )
   SITUATIONS = [REGISTERED, APPROVED, DISAPPROVED]
 
   validates :enrollment, presence: true
@@ -24,31 +30,33 @@ class ClassEnrollment < ApplicationRecord
   validate :grade_for_situation
   validate :disapproved_by_absence_for_situation
   validate :check_multiple_class_enrollment_allowed
-  validate :professor_changed_only_valid_fields, if: -> { current_user && (current_user.role_id == Role::ROLE_PROFESSOR) }
+  validate :professor_changed_only_valid_fields,
+    if: -> { current_user && (current_user.role_id == Role::ROLE_PROFESSOR) }
 
   after_save :notify_student_and_advisor
   after_save :class_enrollment_request_cascade
   after_destroy :set_request_status_after_destroy
 
-  default_scope { joins(enrollment: :student).order("students.name").readonly(false) }
+  default_scope {
+    joins(enrollment: :student).order("students.name").readonly(false)
+  }
 
   def check_multiple_class_enrollment_allowed
-    return if not self.course_class
-    other_class_enrollments = ClassEnrollment.
-        joins(course_class: { course: :course_type }).
-        includes(course_class: { course: :course_type }).
-        where(CourseType.arel_table[:allow_multiple_classes].eq(false)).
-        where(enrollment_id: self.enrollment_id).
-        where(ClassEnrollment.arel_table[:situation].not_eq(DISAPPROVED)).
-        where(Course.arel_table[:id].eq(self.course_class.course_id)).
-        where.not(id: self.id).
-        where.not((self.situation == I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")) ? "1" : "0").
-        group(:enrollment_id).
-        having("count(course_id) > 0")
+    return if self.course_class.blank?
+    other_class_enrollments = ClassEnrollment
+      .joins(course_class: { course: :course_type })
+      .includes(course_class: { course: :course_type })
+      .where(CourseType.arel_table[:allow_multiple_classes].eq(false))
+      .where(enrollment_id: self.enrollment_id)
+      .where(ClassEnrollment.arel_table[:situation].not_eq(DISAPPROVED))
+      .where(Course.arel_table[:id].eq(self.course_class.course_id))
+      .where.not(id: self.id)
+      .where.not((self.situation == DISAPPROVED) ? "1" : "0")
+      .group(:enrollment_id)
+      .having("count(course_id) > 0")
 
-    unless other_class_enrollments.empty?
-      self.errors.add(:course_class, :multiple_class_enrollments_not_allowed)
-    end
+    return if other_class_enrollments.empty?
+    self.errors.add(:course_class, :multiple_class_enrollments_not_allowed)
   end
 
   def to_label
@@ -56,8 +64,13 @@ class ClassEnrollment < ApplicationRecord
   end
 
   def attendance_to_label
-    unless self.disapproved_by_absence.blank? || self.situation == I18n.t("activerecord.attributes.class_enrollment.situations.registered")
-      self.disapproved_by_absence ? I18n.t("pdf_content.course_class.summary.attendance_false") : I18n.t("pdf_content.course_class.summary.attendance_true")
+    return if self.disapproved_by_absence.nil?
+    return if self.situation == REGISTERED
+
+    if self.disapproved_by_absence
+      I18n.t("pdf_content.course_class.summary.attendance_false")
+    else
+      I18n.t("pdf_content.course_class.summary.attendance_true")
     end
   end
 
@@ -122,49 +135,79 @@ class ClassEnrollment < ApplicationRecord
         end
         minimum = CustomVariable.minimum_grade_for_approval
         case self.situation
-        when I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
-          self.errors.add(:grade, :grade_for_situation_registered) if self.grade.present?
-        when I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
+        when REGISTERED
+          self.errors.add(
+            :grade, :grade_for_situation_registered
+          ) if self.grade.present?
+        when APPROVED
           self.errors.add(
             :grade, :grade_for_situation_aproved,
-              minimum_grade_for_approval: (minimum.to_f / 10.0).to_s.tr(".", ",")
-          ) if (self.grade.blank? || self.grade < minimum) && grade_not_count_in_gpr.blank?
-        when I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
+            minimum_grade_for_approval: (minimum.to_f / 10.0).to_s.tr(".", ",")
+          ) if (
+            self.grade.blank? || self.grade < minimum
+          ) && grade_not_count_in_gpr.blank?
+        when DISAPPROVED
           self.errors.add(
             :grade, :grade_for_situation_disapproved,
-              minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0).to_s.tr(".", ",")
-          ) if (self.grade.blank? || self.grade >= minimum) && grade_not_count_in_gpr.blank?
+            minimum_grade_for_approval: (minimum.to_f / 10.0).to_s.tr(".", ",")
+          ) if (
+            self.grade.blank? || self.grade >= minimum
+          ) && grade_not_count_in_gpr.blank?
         end
       else
-        self.errors.add(:grade, :grade_filled_for_course_without_score) unless self.grade.blank?
+        self.errors.add(
+          :grade, :grade_filled_for_course_without_score
+        ) if self.grade.present?
       end
       self.errors.blank?
     end
 
     def disapproved_by_absence_for_situation
+      grade_of_disapproval = CustomVariable.grade_of_disapproval_for_absence
       case self.situation
-      when I18n.translate("activerecord.attributes.class_enrollment.situations.registered")
-        self.errors.add(:disapproved_by_absence, I18n.translate("activerecord.errors.models.class_enrollment.disapproved_by_absence_for_situation_registered")) if self.disapproved_by_absence
-      when I18n.translate("activerecord.attributes.class_enrollment.situations.aproved")
-        self.errors.add(:disapproved_by_absence, I18n.translate("activerecord.errors.models.class_enrollment.disapproved_by_absence_for_situation_aproved")) if self.disapproved_by_absence
-      when I18n.translate("activerecord.attributes.class_enrollment.situations.disapproved")
-        self.errors.add(:disapproved_by_absence, I18n.translate("activerecord.errors.models.class_enrollment.disapproved_by_absence_for_situation_disapproved",
-          grade_of_disapproval_for_absence: (CustomVariable.grade_of_disapproval_for_absence.to_f / 10.0).to_s.tr(".", ","))) if
-            self.disapproved_by_absence &&
-            course_has_grade &&
-            (CustomVariable.grade_of_disapproval_for_absence.present?) &&
-            ((self.grade.blank?) || (self.grade > CustomVariable.grade_of_disapproval_for_absence))
+      when REGISTERED
+        self.errors.add(
+          :disapproved_by_absence,
+          :disapproved_by_absence_for_situation_registered
+        ) if self.disapproved_by_absence
+      when APPROVED
+        self.errors.add(
+          :disapproved_by_absence,
+          :disapproved_by_absence_for_situation_aproved
+        ) if self.disapproved_by_absence
+      when DISAPPROVED
+        self.errors.add(
+          :disapproved_by_absence,
+          :disapproved_by_absence_for_situation_disapproved,
+          grade_of_disapproval_for_absence: (
+            grade_of_disapproval.to_f / 10.0
+          ).to_s.tr(".", ",")
+        ) if self.disapproved_by_absence &&
+          course_has_grade &&
+          grade_of_disapproval.present? &&
+          ((self.grade.blank?) || (self.grade > grade_of_disapproval))
       end
       self.errors.blank?
     end
 
     def notify_student_and_advisor
-      return if grade.nil? || !(saved_change_to_grade? || saved_change_to_situation? || saved_change_to_disapproved_by_absence?)
-      emails = [EmailTemplate.load_template("class_enrollments:email_to_student").prepare_message({
-        record: self
-      })]
+      return if grade.nil?
+      return if !(
+        saved_change_to_grade? ||
+        saved_change_to_situation? ||
+        saved_change_to_disapproved_by_absence?
+      )
+      emails = [
+        EmailTemplate.load_template(
+          "class_enrollments:email_to_student"
+        ).prepare_message({
+          record: self
+        })
+      ]
       enrollment.advisements.each do |advisement|
-        emails << EmailTemplate.load_template("class_enrollments:email_to_advisor").prepare_message({
+        emails << EmailTemplate.load_template(
+          "class_enrollments:email_to_advisor"
+        ).prepare_message({
           record: self,
           advisement: advisement
         })
@@ -173,18 +216,18 @@ class ClassEnrollment < ApplicationRecord
     end
 
     def professor_changed_only_valid_fields
-      campos_modificaveis = ["grade", "situation", "disapproved_by_absence", "obs"]
+      campos_modificaveis = [
+        "grade", "situation", "disapproved_by_absence", "obs"
+      ]
       campos_modificados  = self.changed
 
       campos_modificados.each do |campo_modificado|
-        if !campos_modificaveis.include?(campo_modificado)
-          if (campo_modificado == "justification_grade_not_count_in_gpr") && (justification_grade_not_count_in_gpr_change == ["", nil])
-            next
-          else
-            errors.add(:class_enrollment, I18n.t("activerecord.errors.models.class_enrollment.changes_to_disallowed_fields"))
-            break
-          end
-        end
+        next if campos_modificaveis.include?(campo_modificado)
+        next if (campo_modificado == "justification_grade_not_count_in_gpr") &&
+          (justification_grade_not_count_in_gpr_change == ["", nil])
+
+        errors.add(:class_enrollment, I18n.t(:changes_to_disallowed_fields))
+        break
       end
     end
 
@@ -192,8 +235,10 @@ class ClassEnrollment < ApplicationRecord
       request = self.class_enrollment_request
       unless request.blank?
         request.class_enrollment = nil
-        request.status = ClassEnrollmentRequest::INVALID if request.action == ClassEnrollmentRequest::INSERT
-        request.status = ClassEnrollmentRequest::EFFECTED if request.action == ClassEnrollmentRequest::REMOVE
+        request.status = ClassEnrollmentRequest::INVALID if
+          request.action == ClassEnrollmentRequest::INSERT
+        request.status = ClassEnrollmentRequest::EFFECTED if
+          request.action == ClassEnrollmentRequest::REMOVE
         request.save
       end
     end
@@ -208,7 +253,11 @@ class ClassEnrollment < ApplicationRecord
       end
       if saved_change_to_attribute?(:enrollment_id)
         request = self.class_enrollment_request
-        if request.present? && request.enrollment_request.enrollment != self.enrollment
+        changed_enrollment = (
+          request.present? &&
+          request.enrollment_request.enrollment != self.enrollment
+        )
+        if changed_enrollment
           request.class_enrollment = nil
           request.status = ClassEnrollmentRequest::REQUESTED
           request.save

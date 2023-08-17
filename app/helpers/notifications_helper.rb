@@ -24,10 +24,8 @@ module NotificationsHelper
   def next_execution_column(record, options)
     return "-" if record.blank?
     return "-" if record.next_execution.nil?
-    return "-" if record.frequency == I18n.translate(
-      "activerecord.attributes.notification.frequencies.manual"
-    )
-    I18n.localize(record.next_execution, { format: :day })
+    return "-" if record.frequency == Notification::MANUAL
+    I18n.localize(record.next_execution, format: :day)
   end
 
   def sql_query_show_column(record, column)

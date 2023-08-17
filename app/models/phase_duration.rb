@@ -24,13 +24,18 @@ class PhaseDuration < ApplicationRecord
   after_commit :create_phase_completions, on: [:create, :update]
 
   def to_label
-    "#{deadline_semesters} períodos, #{deadline_months} meses e #{deadline_days} dias"
+    pluralize = ActionController::Base.helpers.method(:pluralize)
+    semesters_l = pluralize.call(deadline_semesters, "período")
+    months_l = pluralize.call(deadline_months, "mês")
+    days_l = pluralize.call(deadline_days, "dia")
+    "#{semesters_l}, #{months_l} e #{days_l}"
   end
 
   def deadline_validation
-    if ([0, nil].include?(self.deadline_semesters)) && ([0, nil].include?(self.deadline_months)) && ([0, nil].include?(self.deadline_days))
-      errors.add(:deadline, I18n.t("activerecord.errors.models.phase_duration.blank_deadline"))
-    end
+    return unless [0, nil].include?(self.deadline_semesters)
+    return unless [0, nil].include?(self.deadline_months)
+    return unless [0, nil].include?(self.deadline_days)
+    errors.add(:base, :blank_deadline)
   end
 
   def duration
@@ -56,17 +61,22 @@ class PhaseDuration < ApplicationRecord
     end
     if has_deferral
       errors.add(:base, :has_deferral)
-      phase.errors.add(:base, :phase_duration_has_deferral, level: level.to_label)
+      phase.errors.add(
+        :base, :phase_duration_has_deferral, level: level.to_label
+      )
     end
     if has_level
       errors.add(:base, :has_level)
       phase.errors.add(:base, :phase_duration_has_level, level: level.to_label)
     end
-    !has_deferral and !has_level
+    !has_deferral && !has_level
   end
 
   def create_phase_completions
-    PhaseCompletion.joins(:enrollment).where(phase_id: phase.id, enrollments: { level_id: level.id }).destroy_all
+    PhaseCompletion
+      .joins(:enrollment)
+      .where(phase_id: phase.id, enrollments: { level_id: level.id })
+      .destroy_all
 
     Enrollment.where(level_id: level_id).each do |enrollment|
       PhaseCompletion.new(

@@ -36,7 +36,7 @@ class PhaseCompletion < ApplicationRecord
   end
 
   def calculate_due_date
-    return unless phase.phase_durations.where(level_id: enrollment.level_id).any?
+    return if phase.phase_durations.where(level_id: enrollment.level_id).none?
     self.due_date = DateUtils.add_hash_to_date(
       enrollment.admission_date,
       phase.total_duration(enrollment)
@@ -46,7 +46,8 @@ class PhaseCompletion < ApplicationRecord
   def calculate_completion_date
     phase_accomplishment = self.phase_accomplishment
     self.completion_date = nil
-    self.completion_date = phase_accomplishment.conclusion_date unless phase_accomplishment.blank?
+    return if phase_accomplishment.blank?
+    self.completion_date = phase_accomplishment.conclusion_date
   end
 
   def phase_accomplishment

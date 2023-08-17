@@ -12,8 +12,10 @@ class Deferral < ApplicationRecord
   belongs_to :deferral_type, optional: false
 
   validates :enrollment, presence: true
-  validates :enrollment, uniqueness: { scope: :deferral_type_id,
-                                       message: :enrollment_and_deferral_uniqueness }
+  validates :enrollment, uniqueness: {
+    scope: :deferral_type_id,
+    message: :enrollment_and_deferral_uniqueness
+  }
   validates :deferral_type, presence: true
   validates :approval_date, presence: true
 
@@ -37,7 +39,9 @@ class Deferral < ApplicationRecord
   end
 
   def recalculate_due_date_for_phase_completion
-    phase_completion = PhaseCompletion.where(enrollment_id: enrollment_id, phase_id: deferral_type.phase_id).first
+    phase_completion = PhaseCompletion.where(
+      enrollment_id: enrollment_id, phase_id: deferral_type.phase_id
+    ).first
     if phase_completion
       phase_completion.calculate_due_date
       phase_completion.save
@@ -53,11 +57,17 @@ class Deferral < ApplicationRecord
   end
 
   def notify_student_and_advisor
-    emails = [EmailTemplate.load_template("deferrals:email_to_student").prepare_message({
-      record: self
-    })]
+    emails = [
+      EmailTemplate.load_template(
+        "deferrals:email_to_student"
+      ).prepare_message({
+        record: self
+      })
+    ]
     enrollment.advisements.each do |advisement|
-      emails << EmailTemplate.load_template("deferrals:email_to_advisor").prepare_message({
+      emails << EmailTemplate.load_template(
+        "deferrals:email_to_advisor"
+      ).prepare_message({
         record: self,
         advisement: advisement
       })

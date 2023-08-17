@@ -8,17 +8,32 @@ class ScholarshipSuspension < ApplicationRecord
   include ::MonthYearConcern
   has_paper_trail
 
+  ACTIVE = I18n.t(
+    "activerecord.attributes.scholarship_suspension.active_options.active"
+  )
+  INACTIVE = I18n.t(
+    "activerecord.attributes.scholarship_suspension.active_options.inactive"
+  )
+
   belongs_to :scholarship_duration, optional: false
 
   validates :scholarship_duration, presence: true
   validates :start_date, presence: true
   validates :end_date, presence: true
 
-  validates_date :start_date, on_or_before: :end_date, on_or_before_message: :suspension_start_date_after_end_date
-  validates_date :start_date, on_or_after: :scholarship_duration_start_date, on_or_after_message: :suspension_start_date_before_scholarship_start_date
-  validates_date :start_date, on_or_before: :scholarship_duration_end_date, on_or_before_message: :suspension_start_date_after_scholarship_end_date
+  validates_date :start_date,
+    on_or_before: :end_date,
+    on_or_before_message: :suspension_start_date_after_end_date
+  validates_date :start_date,
+    on_or_after: :scholarship_duration_start_date,
+    on_or_after_message: :suspension_start_date_before_scholarship_start_date
+  validates_date :start_date,
+    on_or_before: :scholarship_duration_end_date,
+    on_or_before_message: :suspension_start_date_after_scholarship_end_date
 
-  validates_date :end_date, on_or_before: :scholarship_duration_end_date, on_or_before_message: :suspension_end_date_after_scholarship_end_date
+  validates_date :end_date,
+    on_or_before: :scholarship_duration_end_date,
+    on_or_before_message: :suspension_end_date_after_scholarship_end_date
 
   validate :if_there_is_no_other_active_suspension
 
@@ -37,8 +52,12 @@ class ScholarshipSuspension < ApplicationRecord
       active: true
     ).where(
       ss[:id].not_eq(id).and(
-        ss[:start_date].gteq(start_date).and(ss[:start_date].lteq(end_date))
-        .or(ss[:start_date].lteq(start_date).and(ss[:end_date].gteq(start_date)))
+        ss[:start_date].gteq(start_date)
+        .and(ss[:start_date].lteq(end_date))
+        .or(
+          ss[:start_date].lteq(start_date)
+          .and(ss[:end_date].gteq(start_date))
+        )
       )
     )
     unless suspensions.empty?
@@ -54,11 +73,7 @@ class ScholarshipSuspension < ApplicationRecord
   end
 
   def active_label
-    if active
-      I18n.t("activerecord.attributes.scholarship_suspension.active_options.active")
-    else
-      I18n.t("activerecord.attributes.scholarship_suspension.active_options.inactive")
-    end
+    active ? ACTIVE : INACTIVE
   end
 
   def scholarship_duration_start_date

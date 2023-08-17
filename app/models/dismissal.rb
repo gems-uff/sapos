@@ -15,14 +15,16 @@ class Dismissal < ApplicationRecord
   validates :dismissal_reason, presence: true
   validates :enrollment, presence: true
   validates :date, presence: true
-  validates_date :date, on_or_after: :enrollment_admission_date, on_or_after_message: :date_before_enrollment_admission_date
+  validates_date :date,
+    on_or_after: :enrollment_admission_date,
+    on_or_after_message: :date_before_enrollment_admission_date
 
   validate :if_enrollment_has_not_scholarship
 
   month_year_date :date
 
   def to_label
-    "#{date}"
+    date.to_fs
   end
 
   def enrollment_admission_date

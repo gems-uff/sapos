@@ -7,14 +7,21 @@
 class DismissalReason < ApplicationRecord
   has_paper_trail
 
-  THESIS_JUDGEMENT = [
-    I18n.translate("activerecord.attributes.dismissal_reason.thesis_judgements.approved"),
-    I18n.translate("activerecord.attributes.dismissal_reason.thesis_judgements.reproved"),
-    I18n.translate("activerecord.attributes.dismissal_reason.thesis_judgements.invalid")
-  ]
+  APPROVED = I18n.t(
+    "activerecord.attributes.dismissal_reason.thesis_judgements.approved"
+  )
+  REPROVED = I18n.t(
+    "activerecord.attributes.dismissal_reason.thesis_judgements.reproved"
+  )
+  INVALID = I18n.t(
+    "activerecord.attributes.dismissal_reason.thesis_judgements.invalid"
+  )
+
+  THESIS_JUDGEMENT = [APPROVED, REPROVED, INVALID]
 
   validates :name, presence: true, uniqueness: true
-  validates :thesis_judgement, presence: true, inclusion: { in: THESIS_JUDGEMENT }
+  validates :thesis_judgement,
+    presence: true, inclusion: { in: THESIS_JUDGEMENT }
 
   def to_label
     "#{self.name}"

@@ -217,9 +217,9 @@ class ScholarshipDurationsController < ApplicationController
     @scholarship_durations = scholarship_durations_list.map do |scp|
       [
           scp.scholarship[:scholarship_number],
-          scp[:start_date],
-          scp[:end_date],
-          scp[:cancel_date],
+          scp[:start_date]&.to_fs,
+          scp[:end_date]&.to_fs,
+          scp[:cancel_date]&.to_fs,
           scp.enrollment[:enrollment_number]
       ]
     end

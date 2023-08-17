@@ -24,7 +24,9 @@ class StringTimeDelta
     return -delta if times == -1
     return delta if times == 1
     return 0.second if times == 0
-    return StringTimeDelta.multiply(StringTimeDelta.multiply(delta, -times), -1) if times < 0
+    return StringTimeDelta.multiply(
+      StringTimeDelta.multiply(delta, -times), -1
+    ) if times < 0
     delta + StringTimeDelta.multiply(delta, times - 1)
   end
 

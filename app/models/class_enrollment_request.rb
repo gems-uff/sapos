@@ -9,16 +9,25 @@ class ClassEnrollmentRequest < ApplicationRecord
 
   attr_accessor :student_saving, :db_status, :db_action
 
-  belongs_to :enrollment_request, inverse_of: :class_enrollment_requests, optional: false
+  belongs_to :enrollment_request,
+    inverse_of: :class_enrollment_requests, optional: false
   belongs_to :course_class, optional: false
   belongs_to :class_enrollment, optional: true
 
   has_one :enrollment, through: :enrollment_request
 
-  REQUESTED = I18n.translate("activerecord.attributes.class_enrollment_request.statuses.requested")
-  VALID = I18n.translate("activerecord.attributes.class_enrollment_request.statuses.valid")
-  INVALID = I18n.translate("activerecord.attributes.class_enrollment_request.statuses.invalid")
-  EFFECTED = I18n.translate("activerecord.attributes.class_enrollment_request.statuses.effected")
+  REQUESTED = I18n.translate(
+    "activerecord.attributes.class_enrollment_request.statuses.requested"
+  )
+  VALID = I18n.translate(
+    "activerecord.attributes.class_enrollment_request.statuses.valid"
+  )
+  INVALID = I18n.translate(
+    "activerecord.attributes.class_enrollment_request.statuses.invalid"
+  )
+  EFFECTED = I18n.translate(
+    "activerecord.attributes.class_enrollment_request.statuses.effected"
+  )
   STATUSES = [INVALID, REQUESTED, VALID, EFFECTED]
   STATUSES_MAP = {
     INVALID => :invalid,
@@ -27,20 +36,31 @@ class ClassEnrollmentRequest < ApplicationRecord
     EFFECTED => :effected
   }
 
-  INSERT = I18n.translate("activerecord.attributes.class_enrollment_request.actions.insert")
-  REMOVE = I18n.translate("activerecord.attributes.class_enrollment_request.actions.remove")
+  INSERT = I18n.translate(
+    "activerecord.attributes.class_enrollment_request.actions.insert"
+  )
+  REMOVE = I18n.translate(
+    "activerecord.attributes.class_enrollment_request.actions.remove"
+  )
   ACTIONS = [INSERT, REMOVE]
 
   validates :enrollment_request, presence: true
   validates :course_class, presence: true
-  validates_uniqueness_of :course_class, scope: [:enrollment_request_id], if: -> { !student_saving }
+  validates_uniqueness_of :course_class,
+    scope: [:enrollment_request_id], if: -> { !student_saving }
   validates :status, presence: true, inclusion: { in: STATUSES }
   validates :action, presence: true, inclusion: { in: ACTIONS }
-  validates :class_enrollment, presence: true, if: -> { status == EFFECTED && action == INSERT }
-  validates :class_enrollment, presence: false, if: -> { status == EFFECTED && action == REMOVE }
+  validates :class_enrollment,
+    presence: true, if: -> { status == EFFECTED && action == INSERT }
 
-  validate :that_class_enrollment_matches_course_and_enrollment, if: -> { !student_saving && !marked_for_destruction? }
-  validate :that_course_class_does_not_exist_in_a_class_enrollment, if: -> { !marked_for_destruction? }
+  # The before_validation :create_or_destroy_class_enrollment makes it always valid
+  # validates :class_enrollment,
+  #   presence: false, if: -> { status == EFFECTED && action == REMOVE }
+
+  validate :that_class_enrollment_matches_course_and_enrollment,
+    if: -> { !student_saving && !marked_for_destruction? }
+  validate :that_course_class_does_not_exist_in_a_class_enrollment,
+    if: -> { !marked_for_destruction? }
 
   before_validation :create_or_destroy_class_enrollment, on: %i[create update]
   after_save :destroy_or_create_class_enrollment
@@ -59,7 +79,11 @@ class ClassEnrollmentRequest < ApplicationRecord
       .and(cer[:status].not_eq(ClassEnrollmentRequest::INVALID))
     )
 
-    [ClassEnrollmentRequest.arel_table[:id].in(check_status.project(cer[:id])).to_sql]
+    [
+      ClassEnrollmentRequest.arel_table[:id].in(
+        check_status.project(cer[:id])
+      ).to_sql
+    ]
   end
 
   def allocations
@@ -82,13 +106,36 @@ class ClassEnrollmentRequest < ApplicationRecord
     changed && save
   end
 
+  def insert_effected?
+    self.action == ClassEnrollmentRequest::INSERT &&
+    self.status == ClassEnrollmentRequest::EFFECTED
+  end
+
+  def insert_not_effected?
+    self.action == ClassEnrollmentRequest::INSERT &&
+    self.status != ClassEnrollmentRequest::EFFECTED
+  end
+
+  def remove_effected?
+    self.action == ClassEnrollmentRequest::REMOVE &&
+    self.status == ClassEnrollmentRequest::EFFECTED
+  end
+
+  def remove_not_effected?
+    self.action == ClassEnrollmentRequest::REMOVE &&
+    self.status != ClassEnrollmentRequest::EFFECTED
+  end
+
   protected
     def that_class_enrollment_matches_course_and_enrollment
       ce = self.class_enrollment
       return if ce.blank?
-      return if ce.course_class_id == self.course_class_id && ce.enrollment_id == self.enrollment_request.enrollment_id
+      return if ce.course_class_id == self.course_class_id &&
+        ce.enrollment_id == self.enrollment_request.enrollment_id
 
-      errors.add(:class_enrollment, :must_represent_the_same_enrollment_and_class)
+      errors.add(
+        :class_enrollment, :must_represent_the_same_enrollment_and_class
+      )
     end
 
     def that_course_class_does_not_exist_in_a_class_enrollment
@@ -118,7 +165,11 @@ class ClassEnrollmentRequest < ApplicationRecord
           situation: ClassEnrollment::REGISTERED
         )
       end
-      if action == REMOVE && class_enrollment.present? && class_enrollment.can_destroy?
+      removing_class_enrollment = (
+        action == REMOVE &&
+        class_enrollment.present? && class_enrollment.can_destroy?
+      )
+      if removing_class_enrollment
         class_enrollment.destroy!
       end
     end
@@ -126,7 +177,11 @@ class ClassEnrollmentRequest < ApplicationRecord
     def destroy_or_create_class_enrollment
       return if self.status == EFFECTED
 
-      if action == INSERT && class_enrollment.present? && class_enrollment.can_destroy?
+      inserting_removal = (
+        action == INSERT &&
+        class_enrollment.present? && class_enrollment.can_destroy?
+      )
+      if inserting_removal
         old_status = status
         class_enrollment.destroy
         self.status = old_status

@@ -27,7 +27,9 @@ class Enrollment < ApplicationRecord
   has_many :enrollment_holds, dependent: :destroy
   has_many :class_enrollments, dependent: :destroy
   has_many :thesis_defense_committee_participations, dependent: :destroy
-  has_many :thesis_defense_committee_professors, source: :professor, through: :thesis_defense_committee_participations
+  has_many :thesis_defense_committee_professors,
+    source: :professor,
+    through: :thesis_defense_committee_participations
   has_many :phase_completions, dependent: :destroy
 
   validates :enrollment_number, presence: true, uniqueness: true
@@ -38,7 +40,10 @@ class Enrollment < ApplicationRecord
   validates_associated :dismissal
   validate :enrollment_has_main_advisor
 
-  validates_date :thesis_defense_date, on_or_after: :admission_date, allow_nil: true, on_or_after_message: :thesis_defense_date_before_admission_date
+  validates_date :thesis_defense_date,
+    on_or_after: :admission_date,
+    allow_nil: true,
+    on_or_after_message: :thesis_defense_date_before_admission_date
 
   validate :verify_research_area_with_advisors
 
@@ -57,28 +62,41 @@ class Enrollment < ApplicationRecord
     self.class_enrollments.joins(course_class: :course)
       .group("course_classes.year", "course_classes.semester")
       .order("course_classes.year", "course_classes.semester")
-      .select(["course_classes.year", "course_classes.semester"]).collect { |y| [y.year, y.semester] }
+      .select(["course_classes.year", "course_classes.semester"])
+      .collect { |y| [y.year, y.semester] }
   end
 
   def gpr_by_semester(year, semester)
-    result = self.class_enrollments.joins(course_class: { course: :course_type })
+    result = self.class_enrollments
+      .joins(course_class: { course: :course_type })
       .where(
         "course_classes.year" => year,
         "course_classes.semester" => semester,
         "course_types.has_score" => true)
-      .where(ClassEnrollment.arel_table[:situation].not_eq(I18n.translate("activerecord.attributes.class_enrollment.situations.registered")))
+      .where(
+        ClassEnrollment.arel_table[:situation]
+        .not_eq(ClassEnrollment::REGISTERED)
+      )
       .where(class_enrollments: { grade_not_count_in_gpr: [0, nil] })
       .select("sum(credits*grade) as grade, sum(credits) as credits")
-    result[0]["grade"].to_f / result[0]["credits"].to_f unless result[0]["credits"].blank?
+    return if result[0]["credits"].blank?
+
+    result[0]["grade"].to_f / result[0]["credits"].to_f
   end
 
   def total_gpr
-    result = self.class_enrollments.joins(course_class: { course: :course_type })
+    result = self.class_enrollments
+      .joins(course_class: { course: :course_type })
       .where("course_types.has_score" => true)
-      .where(ClassEnrollment.arel_table[:situation].not_eq(I18n.translate("activerecord.attributes.class_enrollment.situations.registered")))
+      .where(
+        ClassEnrollment.arel_table[:situation]
+        .not_eq(ClassEnrollment::REGISTERED)
+      )
       .where(class_enrollments: { grade_not_count_in_gpr: [0, nil] })
       .select("sum(credits*grade) as grade, sum(credits) as credits")
-    result[0]["grade"].to_f / result[0]["credits"].to_f unless result[0]["credits"].blank?
+    return if result[0]["credits"].blank?
+
+    result[0]["grade"].to_f / result[0]["credits"].to_f
   end
 
   def self.with_delayed_phases_on(date, phases)
@@ -116,10 +134,25 @@ class Enrollment < ApplicationRecord
     enrollments = Enrollment.all
     enrollments_with_all_phases_accomplished = []
     enrollments.each do |enrollment|
-      accomplished_phases = Accomplishment.where("enrollment_id = :enrollment_id and DATE(conclusion_date) <= DATE(:conclusion_date)", enrollment_id: enrollment.id, conclusion_date: date).map { |ac| ac.phase }
-      phases_duration = PhaseDuration.where("level_id = :level_id", level_id: enrollment.level_id)
-      phases_duration = phases_duration.where("phase_id not in (:accomplished_phases)", accomplished_phases: accomplished_phases) unless accomplished_phases.blank?
-      enrollments_with_all_phases_accomplished << enrollment.id if phases_duration.blank?
+      accomplished_phases = Accomplishment.where(
+        "
+          enrollment_id = :enrollment_id
+          and DATE(conclusion_date) <= DATE(:conclusion_date)
+        ",
+        enrollment_id: enrollment.id,
+        conclusion_date: date
+      ).map { |ac| ac.phase }
+      phases_duration = PhaseDuration.where(
+        "level_id = :level_id",
+        level_id: enrollment.level_id
+      )
+      phases_duration = phases_duration.where(
+        "phase_id not in (:accomplished_phases)",
+        accomplished_phases: accomplished_phases
+      ) if accomplished_phases.present?
+      next if phases_duration.present?
+
+      enrollments_with_all_phases_accomplished << enrollment.id
     end
     enrollments_with_all_phases_accomplished
   end
@@ -136,15 +169,17 @@ class Enrollment < ApplicationRecord
   end
 
   def verify_research_area_with_advisors
-    unless advisements.blank? || research_area.blank?
-      research_areas = []
-      advisements.each do |advisement|
-        research_areas += advisement.professor.research_areas unless advisement.professor.research_areas.nil?
-      end
-      unless research_areas.include? research_area
-        errors.add(:research_area, :research_area_different_from_professors)
-      end
+    return if advisements.blank?
+    return if research_area.blank?
+
+    research_areas = []
+    advisements.each do |advisement|
+      next if advisement.professor.research_areas.blank?
+      research_areas += advisement.professor.research_areas
     end
+
+    return if research_areas.include? research_area
+    errors.add(:research_area, :research_area_different_from_professors)
   end
 
   def create_phase_completions
@@ -178,7 +213,11 @@ class Enrollment < ApplicationRecord
     return false unless self.should_have_user?
     begin
       student = self.student
-      user = User.invite!({ email: student.first_email, name: student.name, role_id: Role::ROLE_ALUNO }, current_user) do |invitable|
+      user = User.invite!({
+        email: student.first_email,
+        name: student.name,
+        role_id: Role::ROLE_ALUNO
+      }, current_user) do |invitable|
         invitable.skip_confirmation!
       end
       student.user = user
@@ -193,8 +232,8 @@ class Enrollment < ApplicationRecord
 
   def completed_or_active_phase_completions
     phase_completions.joins(:phase)
-        .where.not(completion_date: nil)
+      .where.not(completion_date: nil)
       .or(phase_completions.joins(:phase)
-        .where("phases.active" => true))
+      .where("phases.active" => true))
   end
 end

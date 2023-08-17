@@ -28,7 +28,11 @@ class DeferralType < ApplicationRecord
   end
 
   def duration
-    { semesters: self.duration_semesters, months: self.duration_months, days: self.duration_days }
+    {
+      semesters: self.duration_semesters,
+      months: self.duration_months,
+      days: self.duration_days
+    }
   end
 
   def self.find_all_for_enrollment(enrollment)

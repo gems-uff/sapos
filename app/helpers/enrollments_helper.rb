@@ -42,7 +42,7 @@ module EnrollmentsHelper
 
   # overriding dismissal date to_label
   def dismissal_column(record, input_name)
-    I18n.localize(record.dismissal.to_label.to_date, { format: :monthyear }) if
+    I18n.localize(record.dismissal.to_label.to_date, format: :monthyear) if
       record.present? && record.dismissal.present?
   end
 
