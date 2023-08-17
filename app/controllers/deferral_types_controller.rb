@@ -9,7 +9,8 @@ class DeferralTypesController < ApplicationController
   active_scaffold :deferral_type do |config|
     config.list.sorting = { name: "ASC" }
     columns = [
-      :name, :description, :duration_semesters, :duration_months, :duration_days, :phase
+      :name, :description, :duration_semesters,
+      :duration_months, :duration_days, :phase
     ]
     config.list.columns = columns
     config.create.label = :create_deferral_type_label

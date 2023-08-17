@@ -58,7 +58,8 @@ class ScholarshipsController < ApplicationController
     ]
     config.show.columns = [
       :scholarship_number, :level, :sponsor, :scholarship_type,
-      :professor, :start_date, :end_date, :obs, :timeline, :scholarship_durations
+      :professor, :start_date, :end_date, :obs, :timeline,
+      :scholarship_durations
     ]
 
     config.actions.exclude :deleted_records
@@ -128,16 +129,18 @@ class ScholarshipsController < ApplicationController
 
   def to_pdf
     each_record_in_page { }
-    scholarships_from_page = find_page(sorting: active_scaffold_config.list.user.sorting).items
+    scholarships_from_page = find_page(
+      sorting: active_scaffold_config.list.user.sorting
+    ).items
 
     @scholarships = scholarships_from_page.map do |s|
       [
-          s[:scholarship_number],
-          s.level.nil? ? nil : s.level[:name],
-          s.sponsor.nil? ? nil : s.sponsor[:name],
-          s.scholarship_type.nil? ? nil : s.scholarship_type[:name],
-          s[:start_date].nil? ? nil : I18n.l(s[:start_date], format: :monthyear),
-          s[:end_date].nil? ? nil : I18n.l(s[:end_date], format: :monthyear)
+        s[:scholarship_number],
+        s.level.nil? ? nil : s.level[:name],
+        s.sponsor.nil? ? nil : s.sponsor[:name],
+        s.scholarship_type.nil? ? nil : s.scholarship_type[:name],
+        s[:start_date].nil? ? nil : I18n.l(s[:start_date], format: :monthyear),
+        s[:end_date].nil? ? nil : I18n.l(s[:end_date], format: :monthyear)
       ]
     end
 

@@ -11,8 +11,13 @@ class LevelsController < ApplicationController
     config.list.sorting = { name: "ASC" }
     config.create.label = :create_level_label
 
-    config.columns = [:name, :course_name, :default_duration, :show_advisements_points_in_list, :short_name_showed_in_list_header, :advisement_authorizations]
-    config.list.columns = [:name, :course_name, :default_duration, :advisement_authorizations]
+    config.columns = [
+      :name, :course_name, :default_duration, :show_advisements_points_in_list,
+      :short_name_showed_in_list_header, :advisement_authorizations
+    ]
+    config.list.columns = [
+      :name, :course_name, :default_duration, :advisement_authorizations
+    ]
 
     config.actions.exclude :deleted_records
   end

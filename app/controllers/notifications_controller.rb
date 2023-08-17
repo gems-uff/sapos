@@ -106,9 +106,7 @@ class NotificationsController < ApplicationController
 
             enrollment = Enrollment.find(enrollments_id)
             class_enrollments = enrollment.class_enrollments.where(
-              situation: I18n.translate(
-                "activerecord.attributes.class_enrollment.situations.aproved"
-              )
+              situation: ClassEnrollment::APPROVED
             ).joins(:course_class).order(
               "course_classes.year", "course_classes.semester"
             )
@@ -165,15 +163,14 @@ class NotificationsController < ApplicationController
     next_execution = Notification.arel_table[:next_execution]
 
     # Find notifications that should run
-    Notification.where.not(frequency: I18n.translate(
-      "activerecord.attributes.notification.frequencies.manual"
-    )).where(next_execution.lt(Time.now)).each do |notification|
-      execute_return = notification.execute
-      notifications << execute_return[:notifications]
-      notifications_attachments.merge!(
-        execute_return[:notifications_attachments]
-      )
-    end
+    Notification.where.not(frequency: Notification::MANUAL)
+      .where(next_execution.lt(Time.now)).each do |notification|
+        execute_return = notification.execute
+        notifications << execute_return[:notifications]
+        notifications_attachments.merge!(
+          execute_return[:notifications_attachments]
+        )
+      end
 
     notifications_flatten = notifications.flatten
 
@@ -184,9 +181,7 @@ class NotificationsController < ApplicationController
           enrollments_id = message[:enrollments_id]
           enrollment = Enrollment.find(enrollments_id)
           class_enrollments = enrollment.class_enrollments.where(
-            situation: I18n.translate(
-              "activerecord.attributes.class_enrollment.situations.aproved"
-            )
+            situation: ClassEnrollment::APPROVED
           ).joins(:course_class).order(
             "course_classes.year", "course_classes.semester"
           )

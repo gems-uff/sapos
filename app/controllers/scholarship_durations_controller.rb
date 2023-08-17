@@ -7,10 +7,11 @@ class ScholarshipDurationsController < ApplicationController
   authorize_resource
 
   active_scaffold :scholarship_duration do |config|
-    config.action_links.add(
-      "to_pdf", label: I18n.t("active_scaffold.to_pdf"), page: true,
-      type: :collection, parameters: { format: :pdf }
-    )
+    config.action_links.add "to_pdf",
+      label: I18n.t("active_scaffold.to_pdf"),
+      page: true,
+      type: :collection,
+      parameters: { format: :pdf }
 
     # Enables advanced search A.K.A FieldSearch
     config.actions.swap :search, :field_search
@@ -24,7 +25,8 @@ class ScholarshipDurationsController < ApplicationController
     ]
     config.columns[:start_date].search_sql = "scholarship_durations.start_date"
     config.columns[:end_date].search_sql = "scholarship_durations.end_date"
-    config.columns[:cancel_date].search_sql = "scholarship_durations.cancel_date"
+    config.columns[:cancel_date].search_sql =
+      "scholarship_durations.cancel_date"
     config.columns[:enrollment].search_sql = "enrollments.enrollment_number"
     config.columns[:adviser].search_sql = ""
     config.columns[:sponsors].search_sql = ""
@@ -36,7 +38,9 @@ class ScholarshipDurationsController < ApplicationController
     config.columns[:adviser].search_ui = :record_select
 
     config.list.sorting = { scholarship: "ASC" }
-    config.list.columns = [:scholarship, :start_date, :end_date, :cancel_date, :enrollment]
+    config.list.columns = [
+      :scholarship, :start_date, :end_date, :cancel_date, :enrollment
+    ]
     config.create.label = :create_scholarship_duration_label
     config.columns = [
       :scholarship, :enrollment, :start_date, :cancel_date,
@@ -54,7 +58,9 @@ class ScholarshipDurationsController < ApplicationController
     config.columns[:start_date].options = { format: :monthyear }
     config.columns[:end_date].options = { format: :monthyear }
     config.columns[:cancel_date].options = { format: :monthyear }
-    config.create.columns = [:scholarship, :enrollment, :start_date, :end_date, :cancel_date, :obs]
+    config.create.columns = [
+      :scholarship, :enrollment, :start_date, :end_date, :cancel_date, :obs
+    ]
     config.update.columns = [
       :scholarship, :enrollment, :start_date, :end_date, :cancel_date,
       :obs, :scholarship_suspensions
@@ -112,12 +118,16 @@ class ScholarshipDurationsController < ApplicationController
 
   def self.condition_for_active_column(column, value, like_pattern)
     unless value.blank?
-      query_active_scholarships = "DATE(scholarship_durations.end_date) >= DATE(?) AND (
-        scholarship_durations.cancel_date is NULL OR
-        DATE(scholarship_durations.cancel_date) >= DATE(?)
-      )"
-      query_inactive_scholarships = "DATE(scholarship_durations.end_date) < DATE(?) OR
-        DATE(scholarship_durations.cancel_date) < DATE(?)"
+      query_active_scholarships = "
+        DATE(scholarship_durations.end_date) >= DATE(?) AND (
+          scholarship_durations.cancel_date is NULL OR
+          DATE(scholarship_durations.cancel_date) >= DATE(?)
+        )
+      "
+      query_inactive_scholarships = "
+        DATE(scholarship_durations.end_date) < DATE(?) OR
+        DATE(scholarship_durations.cancel_date) < DATE(?)
+      "
       case value
       when "active" then
         sql = query_active_scholarships
@@ -212,23 +222,26 @@ class ScholarshipDurationsController < ApplicationController
   def to_pdf
     # pdf = Prawn::Document.new
     each_record_in_page { }
-    scholarship_durations_list = find_page(sorting: active_scaffold_config.list.user.sorting).items
+    scholarship_durations_list = find_page(
+      sorting: active_scaffold_config.list.user.sorting
+    ).items
 
     @scholarship_durations = scholarship_durations_list.map do |scp|
       [
-          scp.scholarship[:scholarship_number],
-          scp[:start_date]&.to_fs,
-          scp[:end_date]&.to_fs,
-          scp[:cancel_date]&.to_fs,
-          scp.enrollment[:enrollment_number]
+        scp.scholarship[:scholarship_number],
+        scp[:start_date]&.to_fs,
+        scp[:end_date]&.to_fs,
+        scp[:cancel_date]&.to_fs,
+        scp.enrollment[:enrollment_number]
       ]
     end
 
     respond_to do |format|
       format.pdf do
+        title = I18n.t("pdf_content.scholarship_durations.to_pdf.filename")
         send_data(
           render_to_string,
-          filename: "#{I18n.t("pdf_content.scholarship_durations.to_pdf.filename")}.pdf",
+          filename: "#{title}.pdf",
           type: "application/pdf"
         )
       end

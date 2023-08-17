@@ -19,7 +19,9 @@ class DeferralsController < ApplicationController
     config.create.columns = [:enrollment, :approval_date, :obs, :deferral_type]
     config.update.columns = [:enrollment, :approval_date, :obs, :deferral_type]
     config.show.columns = [:enrollment, :approval_date, :obs, :deferral_type]
-    config.list.columns = [:enrollment, :approval_date, :deferral_type, :valid_until]
+    config.list.columns = [
+      :enrollment, :approval_date, :deferral_type, :valid_until
+    ]
     config.search.columns = [:enrollment]
 
     config.create.label = :create_deferral_label

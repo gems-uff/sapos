@@ -1,12 +1,13 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 class LandingController < ApplicationController
   authorize_resource class: false
 
   def index
     raise CanCan::AccessDenied.new if current_user.nil?
-
 
     unless current_user.student.nil?
       enrollments = current_user.student.enrollments.order(admission_date: :desc)
@@ -25,5 +26,4 @@ class LandingController < ApplicationController
     end
     render :index
   end
-
 end

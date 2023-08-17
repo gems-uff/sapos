@@ -44,9 +44,10 @@ class ReportConfigurationsController < ApplicationController
     @pdf_config = record
     respond_to do |format|
       format.pdf do
+        title = I18n.t("pdf_content.report_configurations.preview")
         send_data(
           render_to_string,
-          filename: "#{I18n.t("pdf_content.report_configurations.preview")}.pdf",
+          filename: "#{title}.pdf",
           type: "application/pdf"
         )
       end
