@@ -100,6 +100,30 @@ RSpec.describe "Allocations features", type: :feature do
       expect(page.all("tr td.course_class-column").map(&:text)).to eq ["Algebra - 2022/2", "Algebra - 2022/2", "Versionamento - 2022/2", "Versionamento - 2022/2", "Tópicos em ES (Mineração de Repositórios) - 2022/2", "Tópicos em ES (Mineração de Repositórios) - 2022/2"]
     end
 
+    it "should show end_time_before_start_time error when end time occurs before start time" do
+      # Insert record
+      fill_record_select("course_class_", "course_classes", "Programação")
+      within("#as_#{plural_name}-create--form") do
+        find(:select, "record_day_").find(:option, text: "Quinta").select_option
+        fill_in "Hora de início", with: "11"
+        fill_in "Hora de fim", with: "9"
+      end
+      click_button "Salvar"
+      expect(page).to have_content "Hora de início menor do que a hora de fim"
+    end
+
+    it "should show scheduling_conflict error when end time occurs between other allocation" do
+      # Insert record
+      fill_record_select("course_class_", "course_classes", "Versionamento")
+      within("#as_#{plural_name}-create--form") do
+        find(:select, "record_day_").find(:option, text: "Segunda").select_option
+        fill_in "Hora de início", with: "10"
+        fill_in "Hora de fim", with: "12"
+      end
+      click_button "Salvar"
+      expect(page).to have_content "Hora de fim este horário já está sendo usado em outra alocação da mesma turma"
+    end
+
     it "should have a selection for day" do
       expect(page.all("select#record_day_ option").map(&:text)).to eq ["Selecione uma opção", "Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"]
     end

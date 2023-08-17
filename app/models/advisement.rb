@@ -25,7 +25,7 @@ class Advisement < ApplicationRecord
     "#{enrollment.enrollment_number} - #{professor.name}"
   end
 
-  # defines if an certain advisement is active (An active advisement is 
+  # defines if an certain advisement is active (An active advisement is
   # an advisement which the student doesn't have a dismissal reason
   def active
     return false if enrollment.blank?
@@ -51,8 +51,10 @@ class Advisement < ApplicationRecord
 
   def co_advisor
     return false if enrollment.blank?
-    co_advisors = Advisement.where(main_advisor: false, enrollment_id: enrollment.id)
-    !co_advisors.empty?
+    co_advisors = Advisement.where(
+      main_advisor: false, enrollment_id: enrollment.id
+    )
+    co_advisors.present?
   end
 
   def co_advisor_order
@@ -78,9 +80,13 @@ class Advisement < ApplicationRecord
   end
 
   def notify_advisor
-    emails = [EmailTemplate.load_template("advisements:email_to_advisor").prepare_message({
-      record: self
-    })]
+    emails = [
+      EmailTemplate.load_template(
+        "advisements:email_to_advisor"
+      ).prepare_message({
+        record: self
+      })
+    ]
     Notifier.send_emails(notifications: emails)
   end
 end
