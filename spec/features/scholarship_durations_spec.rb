@@ -5,8 +5,6 @@
 
 require "spec_helper"
 
-# Todo: search
-
 RSpec.describe "ScholarshipDurations features", type: :feature do
   let(:url_path) { "/scholarship_durations" }
   let(:plural_name) { "scholarship_durations" }
@@ -26,22 +24,25 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     @destroy_all << @scholarship_type1 = FactoryBot.create(:scholarship_type, name: "Individual")
     @destroy_all << @scholarship_type2 = FactoryBot.create(:scholarship_type, name: "Projeto")
 
-    @destroy_all << @scholarship1 = FactoryBot.create(:scholarship, scholarship_number: "B1", level: @level2, sponsor: @sponsor1, start_date: 3.years.ago, end_date: 1.year.from_now, scholarship_type: @scholarship_type1)
-    @destroy_all << @scholarship2 = FactoryBot.create(:scholarship, scholarship_number: "B2", level: @level1, sponsor: @sponsor2, start_date: 3.years.ago, end_date: 4.years.from_now, scholarship_type: @scholarship_type1)
-    @destroy_all << @scholarship3 = FactoryBot.create(:scholarship, scholarship_number: "B3", level: @level1, sponsor: @sponsor1, start_date: 3.years.ago, end_date: 1.year.from_now, scholarship_type: @scholarship_type2)
+    @destroy_all << @scholarship1 = FactoryBot.create(:scholarship, scholarship_number: "B1", level: @level2, sponsor: @sponsor1, start_date: 3.years.ago.at_beginning_of_month, end_date: 1.year.from_now.at_beginning_of_month, scholarship_type: @scholarship_type1)
+    @destroy_all << @scholarship2 = FactoryBot.create(:scholarship, scholarship_number: "B2", level: @level1, sponsor: @sponsor2, start_date: 3.years.ago.at_beginning_of_month, end_date: 4.years.from_now.at_beginning_of_month, scholarship_type: @scholarship_type1)
+    @destroy_all << @scholarship3 = FactoryBot.create(:scholarship, scholarship_number: "B3", level: @level1, sponsor: @sponsor1, start_date: 3.years.ago.at_beginning_of_month, end_date: 1.year.from_now.at_beginning_of_month, scholarship_type: @scholarship_type2)
 
     @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana")
     @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia")
     @destroy_all << @student3 = FactoryBot.create(:student, name: "Carol")
     @destroy_all << @student4 = FactoryBot.create(:student, name: "Dani")
-    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1, level: @level2, enrollment_status: @enrollment_status, admission_date: 3.years.ago.to_date)
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1, level: @level2, enrollment_status: @enrollment_status, admission_date: 3.years.ago.at_beginning_of_month.to_date)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student2, level: @level1, enrollment_status: @enrollment_status)
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status)
 
-    @destroy_all << @record = FactoryBot.create(:scholarship_duration, enrollment: @enrollment1, scholarship: @scholarship1, start_date: 2.years.ago, end_date: 1.months.from_now)
-    @destroy_all << FactoryBot.create(:scholarship_duration, enrollment: @enrollment2, scholarship: @scholarship2, start_date: 3.years.ago, end_date: 2.years.ago)
-    @destroy_all << FactoryBot.create(:scholarship_duration, enrollment: @enrollment3, scholarship: @scholarship2, start_date: 1.years.ago, end_date: Date.today)
+    @destroy_all << @record = FactoryBot.create(:scholarship_duration, enrollment: @enrollment1, scholarship: @scholarship1, start_date: 2.years.ago.at_beginning_of_month, end_date: 1.months.from_now.at_beginning_of_month)
+    @destroy_all << FactoryBot.create(:scholarship_duration, enrollment: @enrollment2, scholarship: @scholarship2, start_date: 3.years.ago.at_beginning_of_month, end_date: 2.years.ago.at_beginning_of_month)
+    @destroy_all << FactoryBot.create(:scholarship_duration, enrollment: @enrollment3, scholarship: @scholarship2, start_date: 1.years.ago.at_beginning_of_month, cancel_date: 6.months.from_now.at_beginning_of_month, end_date: 1.year.from_now.at_beginning_of_month)
+
+    @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Erica", cpf: "3")
+    @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment1, professor: @professor1, main_advisor: true)
 
     @destroy_all << @user = create_confirmed_user(@role_adm)
   end
@@ -147,6 +148,84 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
       expect(page).to have_css("#as_#{plural_name}-list-#{@record.id}-row td.end_date-column", text: I18n.l(date, format: "%B-%Y"))
       @record.end_date = 1.month.from_now
       @record.save!
+    end
+  end
+
+  describe "search page", js: true do
+    before(:each) do
+      login_as(@user)
+      visit url_path
+      click_link "Buscar"
+    end
+
+    it "should be able to search by scholarship" do
+      fill_in "Número da Bolsa", with: "B1"
+      click_button "Buscar"
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1"]
+    end
+
+    it "should be able to search by start_date" do
+      date = 1.years.ago.at_beginning_of_month
+      find(:select, "search_start_date_month").find(:option, text: I18n.l(date, format: "%B")).select_option
+      find(:select, "search_start_date_year").find(:option, text: date.year.to_s).select_option
+      click_button "Buscar"
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2"]
+    end
+
+    it "should be able to search by end_date" do
+      date = 9.months.from_now.at_beginning_of_month
+      find(:select, "search_end_date_month").find(:option, text: I18n.l(date, format: "%B")).select_option
+      find(:select, "search_end_date_year").find(:option, text: date.year.to_s).select_option
+      click_button "Buscar"
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2"]
+    end
+
+    it "should be able to search by cancel_date" do
+      date = 6.months.from_now.at_beginning_of_month
+      find(:select, "search_cancel_date_month").find(:option, text: I18n.l(date, format: "%B")).select_option
+      find(:select, "search_cancel_date_year").find(:option, text: date.year.to_s).select_option
+      click_button "Buscar"
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2"]
+    end
+
+    it "should be able to search by enrollment" do
+      fill_in "Matrícula", with: "M01"
+      click_button "Buscar"
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1"]
+    end
+
+    it "should be able to search by advisor" do
+      search_record_select("adviser", "professors", "Erica")
+      click_button "Buscar"
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1"]
+    end
+
+    it "should be able to search by sponsor" do
+      expect(page.all("select#search_sponsors option").map(&:text)).to eq ["", "CAPES", "CNPq"]
+      find(:select, "search_sponsors").find(:option, text: "CNPq").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1"]
+    end
+
+    it "should be able to search by scholarship_type" do
+      expect(page.all("select#search_scholarship_types option").map(&:text)).to eq ["", "Individual", "Projeto"]
+      find(:select, "search_scholarship_types").find(:option, text: "Individual").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1", "B2", "B2"]
+    end
+
+    it "should be able to search by level" do
+      expect(page.all("select#search_level option").map(&:text)).to eq ["", "Doutorado", "Mestrado"]
+      find(:select, "search_level").find(:option, text: "Doutorado").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2", "B2"]
+    end
+
+    it "should be able to search by active" do
+      expect(page.all("select#search_active option").map(&:text)).to eq ["Todas", "Ativas", "Inativas"]
+      find(:select, "search_active").find(:option, text: "Inativas").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2"]
     end
   end
 

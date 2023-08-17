@@ -6,9 +6,6 @@
 require "spec_helper"
 
 # ToDo: relationships
-# ToDo: search
-# ToDo: add users
-# ToDo: Reports
 
 RSpec.describe "Enrollments features", type: :feature do
   let(:url_path) { "/enrollments" }
@@ -18,23 +15,61 @@ RSpec.describe "Enrollments features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
+    @destroy_all << @role_student = FactoryBot.create(:role_aluno)
     @destroy_all << @user = create_confirmed_user(@role_adm)
-    @destroy_all << @level = FactoryBot.create(:level, name: "Doutorado")
-    @destroy_all << @enrollment_status = FactoryBot.create(:enrollment_status, name: "Regular")
-    @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana")
-    @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia")
+    @destroy_all << @level1 = FactoryBot.create(:level, name: "Doutorado")
+    @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
+
+    @destroy_all << @enrollment_status1 = FactoryBot.create(:enrollment_status, name: "Regular")
+    @destroy_all << @enrollment_status2 = FactoryBot.create(:enrollment_status, name: "Avulso")
+    @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana", email: "ana.sapos@ic.uff.br")
+    @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia", email: "bia.sapos@ic.uff.br")
     @destroy_all << @student3 = FactoryBot.create(:student, name: "Carol")
     @destroy_all << @student4 = FactoryBot.create(:student, name: "Dani")
 
-    @destroy_all << @record = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level, enrollment_status: @enrollment_status)
-    @destroy_all << FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student2, level: @level, enrollment_status: @enrollment_status)
-    @destroy_all << FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level, enrollment_status: @enrollment_status)
+    @destroy_all << @user2 = create_confirmed_user(@role_student, "bia.sapos@ic.uff.br", "Bia", "A1b2c3d4!", student: @student2)
+
+    @destroy_all << @reasearch_area1 = FactoryBot.create(:research_area, name: "Ciência de Dados", code: "CD")
+
+    @destroy_all << @phase2 = FactoryBot.create(:phase, name: "Pedido de Banca")
+    @destroy_all << @phase3 = FactoryBot.create(:phase, name: "Exame de Qualificação")
+    @destroy_all << FactoryBot.create(:phase_duration, level: @level2, phase: @phase2, deadline_months: 3, deadline_days: 0)
+    @destroy_all << FactoryBot.create(:phase_duration, level: @level1, phase: @phase2, deadline_months: 3, deadline_days: 0)
+    @destroy_all << FactoryBot.create(:phase_duration, level: @level1, phase: @phase3, deadline_months: 3, deadline_days: 0)
+
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level2, enrollment_status: @enrollment_status1, admission_date: 3.years.ago.at_beginning_of_month.to_date)
+    @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student2, level: @level2, enrollment_status: @enrollment_status2)
+    @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status1, research_area: @reasearch_area1)
+    @record = @enrollment1
+
+    @destroy_all << @dismissal_reason1 = FactoryBot.create(:dismissal_reason, name: "Reprovado", thesis_judgement: "Reprovado")
+    @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment3, date: 1.day.ago, dismissal_reason: @dismissal_reason1)
+
+    @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Erica", cpf: "3")
+    @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment1, professor: @professor1, main_advisor: true)
+    @destroy_all << @sponsor1 = FactoryBot.create(:sponsor, name: "CNPq")
+    @destroy_all << @scholarship_type2 = FactoryBot.create(:scholarship_type, name: "Projeto")
+    @destroy_all << @scholarship3 = FactoryBot.create(:scholarship, scholarship_number: "B3", level: @level2, sponsor: @sponsor1, start_date: 3.years.ago, end_date: 1.year.from_now, scholarship_type: @scholarship_type2)
+    @destroy_all << FactoryBot.create(:scholarship_duration, enrollment: @enrollment1, scholarship: @scholarship3, start_date: 2.years.ago, end_date: 1.months.from_now)
+
+    @destroy_all << FactoryBot.create(:accomplishment, enrollment: @enrollment2, phase: @phase2, conclusion_date: 1.day.ago)
+
+    @destroy_all << @course_type1 = FactoryBot.create(:course_type, name: "Obrigatória", has_score: true, schedulable: true, show_class_name: false, allow_multiple_classes: false, on_demand: false)
+    @destroy_all << @course2 = FactoryBot.create(:course, name: "Algebra", code: "C1-old", credits: 4, workload: 60, course_type: @course_type1, available: false)
+    @destroy_all << @course_class3 = FactoryBot.create(:course_class, name: "Algebra", course: @course2, professor: @professor1, year: 2021, semester: 1)
+    @destroy_all << FactoryBot.create(:class_enrollment, enrollment: @enrollment2, course_class: @course_class3, grade: 80, situation: ClassEnrollment::APPROVED)
+
+    @destroy_all << FactoryBot.create(:enrollment_hold, enrollment: @enrollment1, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1)
+
+    @enrollment_status1.update!(user: true)
+    @enrollment_status2.update!(user: true)
   end
   after(:each) do
     @destroy_later.each(&:delete)
     @destroy_later.clear
   end
   after(:all) do
+    PhaseCompletion.destroy_all
     @destroy_all.each(&:delete)
     @destroy_all.clear
   end
@@ -70,8 +105,8 @@ RSpec.describe "Enrollments features", type: :feature do
       within("#as_#{plural_name}-create--form") { fill_in "Número de Matrícula", with: "M04" }
       fill_record_select("student_", "students", "Dan")
       within("#as_#{plural_name}-create--form") do
-        find(:select, "record_enrollment_status_").find(:option, text: @enrollment_status.name).select_option
-        find(:select, "record_level_").find(:option, text: @level.name).select_option
+        find(:select, "record_enrollment_status_").find(:option, text: @enrollment_status1.name).select_option
+        find(:select, "record_level_").find(:option, text: @level1.name).select_option
       end
       click_button "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.enrollment_number-column", text: "M04")
@@ -110,6 +145,172 @@ RSpec.describe "Enrollments features", type: :feature do
       end
       click_button "Atualizar"
       expect(page).to have_css("tr:nth-child(2) td.enrollment_number-column", text: "M05")
+    end
+  end
+
+  describe "search page", js: true do
+    before(:each) do
+      login_as(@user)
+      visit url_path
+      click_link "Buscar"
+    end
+
+    it "should be able to search by enrollment_number" do
+      fill_in "Número de Matrícula", with: "M02"
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
+    end
+
+    it "should be able to search by student" do
+      search_record_select("student", "students", "Ana")
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
+    end
+
+    it "should be able to search by level" do
+      expect(page.all("select#search_level option").map(&:text)).to eq ["", "Doutorado", "Mestrado"]
+      find(:select, "search_level").find(:option, text: "Mestrado").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M01", "M02"]
+    end
+
+    it "should be able to search by enrollment_status" do
+      expect(page.all("select#search_enrollment_status option").map(&:text)).to eq ["Selecione uma opção", "Avulso", "Regular"]
+      find(:select, "search_enrollment_status").find(:option, text: "Avulso").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M01"]
+    end
+
+    it "should be able to search by admision_date" do
+      date = 3.years.ago.at_beginning_of_month.to_date
+      find(:select, "search_admission_date_month").find(:option, text: I18n.l(date, format: "%B")).select_option
+      find(:select, "search_admission_date_year").find(:option, text: date.year.to_s).select_option
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
+    end
+
+    it "should be able to search by active" do
+      expect(page.all("select#search_active option").map(&:text)).to eq ["Todas", "Ativas", "Inativas"]
+      find(:select, "search_active").find(:option, text: "Inativas").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M03"]
+    end
+
+    it "should be able to search by scholarship_durations_active" do
+      expect(page.all("select#search_scholarship_durations_active option").map(&:text)).to eq ["Selecione uma opção", "Sim", "Não"]
+      find(:select, "search_scholarship_durations_active").find(:option, text: "Sim").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
+    end
+
+    it "should be able to search by advisor" do
+      fill_in "Orientador", with: "Erica"
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
+    end
+
+    it "should be able to search by phase" do
+      expect(page.all("select[name=\"search[accomplishments][phase]\"] option").map(&:text)).to eq ["Selecione uma opção", "Todas", "Pedido de Banca", "Exame de Qualificação"]
+      find(:css, "select[name=\"search[accomplishments][phase]\"]").find(:option, text: "Pedido de Banca").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M01"]
+    end
+
+    it "should be able to search by delayed_phase" do
+      expect(page.all("select[name=\"search[delayed_phase][phase]\"] option").map(&:text)).to eq ["Selecione uma opção", "Alguma", "Pedido de Banca", "Exame de Qualificação"]
+      find(:css, "select[name=\"search[delayed_phase][phase]\"]").find(:option, text: "Pedido de Banca").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
+    end
+
+    it "should be able to search by course_class" do
+      find(:select, "search_course_class_year_semester_course").find(:option, text: "Algebra").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M01"]
+    end
+
+    it "should be able to search by research_area" do
+      search_record_select("research_area", "research_areas", "Ciência de Dados")
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M03"]
+    end
+
+    it "should be able to search for enrollment on hold" do
+      find(:css, "input[name=\"search[enrollment_hold][hold]\"][type=\"checkbox\"]").set(true)
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
+    end
+  end
+
+  describe "generate report", js: true do
+    before(:each) do
+      login_as(@user)
+      visit url_path
+    end
+
+    it "should download a pdf report of orientations" do
+      click_link "Gerar relatório"
+
+      wait_for_download
+      expect(download).to match(/Relatório de Matrículas\.pdf/)
+    end
+  end
+
+  describe "academic transcript report", js: true do
+    before(:each) do
+      login_as(@user)
+      visit url_path
+    end
+
+    it "should download an academic transcript" do
+      find("#as_#{plural_name}-academic_transcript_pdf-#{@record.id}-link").click
+
+      wait_for_download
+      expect(download).to match(/Histórico Escolar - Ana\.pdf/)
+    end
+  end
+
+  describe "grades report", js: true do
+    before(:each) do
+      login_as(@user)
+      visit url_path
+    end
+
+    it "should download grade report" do
+      find("#as_#{plural_name}-grades_report_pdf-#{@record.id}-link").click
+
+      wait_for_download
+      expect(download).to match(/BOLETIM ESCOLAR _ PÓS-GRADUAÇÃO - Ana\.pdf/)
+    end
+  end
+
+  describe "add users page", js: true do
+    before(:each) do
+      login_as(@user)
+      visit url_path
+      click_link "Adicionar usuários"
+    end
+
+    it "should show the numbers related to creating users" do
+      expect(page).to have_content "Matrículas"
+      expect(page).to have_field("field-enrollments", with: "3")
+      expect(page).to have_content "que permitem usuários [?]"
+      expect(page).to have_field("field-allowedenrollments", with: "3")
+      expect(page).to have_content "Alunos"
+      expect(page).to have_field("field-students", with: "3")
+      expect(page).to have_content "vinculados a usuários"
+      expect(page).to have_field("field-existingstudents", with: "1")
+      expect(page).to have_content "sem email"
+      expect(page).to have_field("field-noemail", with: "1")
+    end
+
+    it "should create users" do
+      click_button "Adicionar"
+      expect(User.all.size).to eq 3
+      User.all.each do |user|
+        next if [@user.id, @user2.id].include? user.id
+        user.destroy
+      end
     end
   end
 end
