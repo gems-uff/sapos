@@ -1,6 +1,7 @@
-# encoding utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
 
 class EnrollmentRequestCommentsController < ApplicationController
   authorize_resource
@@ -12,6 +13,5 @@ class EnrollmentRequestCommentsController < ApplicationController
     config.columns[:user].form_ui = :record_select
 
     config.actions.exclude :deleted_records
-
   end
 end
