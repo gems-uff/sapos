@@ -31,6 +31,4 @@ class PendenciesController < ApplicationController
 
     render :index
   end
-
-
 end
