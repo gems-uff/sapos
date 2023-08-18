@@ -56,14 +56,14 @@ class Query < ApplicationRecord
 
   def run_read_only_query(query)
     if ApplicationRecord.connection.adapter_name == "SQLite"
-
       db_resource = ApplicationRecord.connection.exec_query(query)
 
       { columns: db_resource.columns, rows: db_resource.rows }
     elsif ApplicationRecord.connection.adapter_name == "Mysql2"
       conf = ApplicationRecord.configurations
       client = Mysql2::Client.new(
-        conf["#{Rails.env}_read_only"] || conf[Rails.env]
+        conf.configs_for(env_name: "#{Rails.env}_read_only")[0] ||
+        conf.configs_for(env_name: conf[Rails.env])[0]
       )
       results = client.query(query)
       client.close
