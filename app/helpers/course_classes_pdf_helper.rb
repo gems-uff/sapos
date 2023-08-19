@@ -187,7 +187,7 @@ module CourseClassesPdfHelper
       course_type = course_class.course.course_type
       next unless course_type.schedulable
 
-      course = header[0].map { |x| "" }
+      course = header[0].map { |x| [] }
 
       course[0] = {
         id: course_class.id, course_id: course_class.course_id,
@@ -199,8 +199,10 @@ module CourseClassesPdfHelper
 
       course_class.allocations.each do |allocation|
         index = I18n.translate("date.day_names").index(allocation.day)
-        course[index + 2 - first] = allocation.to_shortlabel
+        course[index + 2 - first] << allocation.to_shortlabel
       end
+
+      course = course.map { |x| x.kind_of?(Array) ? x.join("\n") : x }
 
       if course_class.allocations.empty?
         (first..last).each do |index|

@@ -129,6 +129,14 @@ class StudentEnrollmentController < ApplicationController
         year: @semester.year,
         semester: @semester.semester
       )
+      @approved_courses = Course.joins(:course_type)
+        .joins(course_classes: [ :class_enrollments ])
+        .where(course_types: { allow_multiple_classes: false })
+        .where(class_enrollments: {
+          situation: ClassEnrollment::APPROVED,
+          enrollment: @enrollment
+        }).ids
+
       if @enrollment_request.persisted?
         @last_read = @enrollment_request.last_student_read_time
         @enrollment_request.student_view_at = Time.current
@@ -206,6 +214,9 @@ class StudentEnrollmentController < ApplicationController
         @enrollment_request.enrollment_request_comments.delete(@comment)
       end
       false
+    rescue ValidationException => e
+      flash.alert = e.message
+      false
     end
 
     def find_or_create_course_class_in_this_semester(course_id, professor_id)
@@ -231,6 +242,10 @@ class StudentEnrollmentController < ApplicationController
 
       on_demand_course_ids.each do |course_id, data|
         next if data[:selected] != "1"
+        raise ValidationException.new I18n.t(
+          "student_enrollment.enroll.errors.select_on_demand_professor",
+          course: Course.find(course_id.to_i).name
+        ) if data[:professor].blank?
 
         course_class = find_or_create_course_class_in_this_semester(
           course_id.to_i, data[:professor].to_i
@@ -260,4 +275,8 @@ class StudentEnrollmentController < ApplicationController
       end
       Notifier.send_emails(notifications: emails)
     end
+end
+
+
+class ValidationException < StandardError
 end

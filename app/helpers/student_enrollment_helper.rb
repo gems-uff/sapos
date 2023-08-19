@@ -22,10 +22,12 @@ module StudentEnrollmentHelper
     cer
   end
 
-  def display_class_schedule_table_row?(semester, cer)
+  def display_class_schedule_table_row?(semester, approved_courses, row, cer)
+    return true if cer.present?
+    return false if approved_courses.include? row[0][:course_id]
+
     semester.main_enroll_open? ||
-    semester.adjust_enroll_insert_open? ||
-    cer.present?
+    semester.adjust_enroll_insert_open?
   end
 
   def display_non_on_demand_or_selected_on_demand?(row, cer)
