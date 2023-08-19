@@ -9,14 +9,16 @@ pt-BR:
       welcome: Bem-vindo ao Sapos. Você ainda não tem acesso a nada nesta matrícula, mas em breve várias funcionalidades interessantes aparecerão aqui para você!
 
     show_enroll:
-      title_main: Inscrições em disciplinas do semestre %{semester} estão abertas! 
-      title_adjust: Período de ajustes do semestre %{semester} está aberto! 
+      title_main: Inscrições em disciplinas do semestre %{semester} estão abertas!
+      title_adjust: Período de ajustes do semestre %{semester} está aberto!
       enroll_link_new: Clique aqui para fazer um pedido de inscrição.
       enroll_link_edit_valid: Seu pedido de inscrição foi marcado como válido. Clique aqui para editar
       enroll_link_edit_requested: Clique aqui para editar seu pedido de inscrição.
       enroll_link_edit_invalid: Seu pedido de inscrição foi marcado como inválido. Clique aqui para editar
-      enroll_link_edit_effected: Seu pedido de inscrição foi efetivado. Cliquei aqui para se inscrever em outras disciplinas
-      unread: (%{count} mensagens não lidas)
+      enroll_link_edit_effected: Seu pedido de inscrição foi efetivado. Clique aqui para se inscrever em outras disciplinas
+      unread:
+        one: (1 mensagem não lida)
+        other: (%{count} mensagens não lidas)
 
     enroll:
       title: Inscrição em disciplinas do semestre %{semester}
@@ -35,7 +37,10 @@ pt-BR:
         end_adjust: "Fim do Período de Ajustes"
         adjust_insert: "Limite para Adicionar Disciplinas"
         adjust_remove: "Limite para Remover Disciplinas"
-        
+      on_demand_select: Selecione
+      errors:
+        select_on_demand_professor: É necessário selecionar um professor para %{course}
+
       message:
         author: "%{author} enviou:"
         time: "[%{time}]"
@@ -100,7 +105,6 @@ pt-BR:
         zero: "Nenhuma inscrição da lista pode ser efetivada!"
         one: "Uma inscrição da lista pode ser efetivada"
         other: "%{count} inscrições da lista podem ser efetivadas"
-  
+
   active_scaffold:
     effect: "Efetivar"
-    
