@@ -1,0 +1,34 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      deferral:
+        approval_date: "Data de aprovação"
+        deferral_type: "Tipo de prorrogação"
+        enrollment: "Matrícula"
+        enrollment_id: "Matrícula"
+        obs: "Observação"
+        valid_until: "Validade"
+
+    errors:
+      models:
+        deferral:
+          enrollment_and_deferral_uniqueness: "já possui esta prorrogação"
+          enrollment_level: "não possui o mesmo nível que a prorrogação"
+
+    models:
+      deferral:
+        one: "Prorrogação"
+        other: "Prorrogações"
+
+  active_scaffold:
+    create_deferral_label: "Adicionar Prorrogação"
+
+  notifications:
+    deferral:
+      email_to_student:
+        subject: "Pedido de prorrogação deferido"
+      email_to_advisor:
+        subject: "Pedido de prorrogação de orientando deferido"

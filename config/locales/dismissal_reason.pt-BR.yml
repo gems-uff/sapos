@@ -1,0 +1,23 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      dismissal_reason:
+        description: "Descrição"
+        name: "Nome"
+        show_advisor_name: "Mostrar Orientador no Histórico"
+        thesis_judgement: "Julgamento da Tese"
+        thesis_judgements:
+          approved: "Aprovado"
+          reproved: "Reprovado"
+          invalid: "--"
+
+    models:
+      dismissal_reason:
+        one: "Razão de Desligamento"
+        other: "Razões de Desligamento"
+
+  active_scaffold:
+    create_dismissal_reason_label: "Adicionar Razão de Desligamento"

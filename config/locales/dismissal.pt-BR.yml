@@ -1,0 +1,28 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      dismissal:
+        date: "Data"
+        dismissal_reason: "Motivo do Desligamento"
+        enrollment: "Matrícula"
+        obs: "Observação"
+
+    errors:
+      models:
+        dismissal:
+          date_before_enrollment_admission_date: "anterior a Data de Admissão"
+          enrollment_has_scholarship: "possui uma bolsa ativa na data de desligamento"
+          attributes:
+            date:
+              invalid_date: não é uma data válida
+
+    models:
+      dismissal:
+        one: "Desligamento"
+        other: "Desligamentos"
+
+  active_scaffold:
+    create_dismissal_label: "Adicionar Desligamento"

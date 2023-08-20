@@ -1,0 +1,22 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      professor_research_area:
+        professor: "Professor"
+        research_area: "Área de Pesquisa"
+
+    errors:
+      models:
+        professor_research_area:
+          unique_pair: "não pode estar em duas ou mais áreas de pesquisa repetidas e área de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
+
+    models:
+      professor_research_area:
+        one: "Área de Pesquisa do Professor"
+        other: "Área de Pesquisa dos Professores"
+
+  active_scaffold:
+    create_professor_research_area_label: "Adicionar Área de Pesquisa do Professor"

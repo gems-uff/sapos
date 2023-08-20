@@ -1,0 +1,21 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      course_type:
+        has_score: "Tem nota"
+        name: "Nome"
+        schedulable: "Aparecer no QH"
+        show_class_name: "Mostrar nome da turma no QH e Histórico"
+        allow_multiple_classes: "Permitir mais de uma inscrição"
+        on_demand: "Criação de turmas por demanda"
+
+    models:
+      course_type:
+        one: "Tipo de Disciplina"
+        other: "Tipos de Disciplina"
+
+  active_scaffold:
+    create_course_type_label: "Adicionar Tipo de Disciplina"

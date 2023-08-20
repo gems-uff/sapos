@@ -1,0 +1,20 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      city:
+        name: "Nome"
+        state: "Estado"
+        professors: "Residência de Professores"
+        students: "Residência de Alunos"
+        student_birth_cities: "Naturalidade de Alunos"
+
+    models:
+      city:
+        one: "Cidade"
+        other: "Cidades"
+
+  active_scaffold:
+    create_city_label: "Adicionar Cidade"

@@ -1,0 +1,14 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      notification_param:
+        value: Valor
+        query_param: Parâmetro
+
+    models:
+      notification_param:
+        one: Parâmetro
+        other: Parâmetros

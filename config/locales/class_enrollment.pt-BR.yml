@@ -1,0 +1,67 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      class_enrollment:
+        course_class_id: "Turma"
+        course_class: "Turma"
+        disapproved_by_absence: "Reprovado por Falta"
+        enrollment: "Matrícula"
+        grade: "Nota"
+        grade_label: "Nota"
+        grade_not_count_in_gpr: "Não contabilizar nota"
+        justification_grade_not_count_in_gpr: "Justificativa para não contabilizar nota"
+        obs: "Observação"
+        situation: "Situação"
+        situations:
+          aproved: "Aprovado"
+          disapproved: "Reprovado"
+          registered: "Incompleto"
+        course_type: "Tipo de Disciplina"
+        professor: "Professor"
+        year: "Ano"
+        semester: "Semestre"
+        enrollment: "Matrícula"
+        student: "Aluno"
+        enrollment_level: "Nível"
+        enrollment_status: "Tipo de Matrícula"
+        admission_date: "Data de Admissão"
+        scholarship_durations_active: "Possui bolsa?"
+        advisor: "Orientador"
+        has_advisor: "Possui orientador?"
+
+    errors:
+      models:
+        class_enrollment:
+          attributes:
+            course_class:
+              multiple_class_enrollments_not_allowed: "de inscrição única. Não é permitido fazer mais de uma inscrição nesta disciplina."
+          disapproved_by_absence_for_situation_aproved: "deve estar desmarcado para situação'Aprovado'"
+          disapproved_by_absence_for_situation_registered: "deve estar desmarcado para situação 'Incompleto'"
+          disapproved_by_absence_for_situation_disapproved: "deve ter nota menor ou igual a %{grade_of_disapproval_for_absence}"
+          grade_filled_for_course_without_score: "Esta disciplina não possui nota"
+          grade_for_situation_aproved: "deve ser maior ou igual a %{minimum_grade_for_approval} para situação 'Aprovado'"
+          grade_for_situation_disapproved: "deve ser menor que %{minimum_grade_for_approval} para situação 'Reprovado'"
+          grade_for_situation_registered: "deve estar em branco para situação 'Incompleto'"
+          grade_gt_100: "deve ser menor ou igual a 10.0"
+          grade_lt_0: "deve ser maior ou igual a 0.0"
+          changes_to_disallowed_fields: "houve modificação de campos não válidos"
+
+    models:
+      class_enrollment:
+        one: "Inscrição"
+        other: "Inscrições"
+
+  active_scaffold:
+    create_class_enrollment_label: "Adicionar Inscrição"
+
+  notifications:
+    class_enrollment:
+      email_to_student:
+        subject: "Sua inscrição em <%= var(:record).course_class.label_with_course %> foi atualizada"
+      email_to_advisor:
+        subject: "Inscrição em <%= var(:record).course_class.label_with_course %> de <%= var(:record).enrollment.to_label %> foi atualizada"
+      email_to_professor:
+        subject: "Alteração da nota de <%= var(:record).enrollment.to_label %> na turma <%= var(:record).course_class.label_with_course %>"

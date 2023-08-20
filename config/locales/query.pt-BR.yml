@@ -1,0 +1,28 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      query:
+        name: Nome
+        description: Descrição
+        sql: Consulta
+        notifications: Notificações
+        params: Parâmetros
+
+    errors:
+      models:
+        query:
+          sql_has_an_undefined_parameter: "tem um parâmetro chamado '%{parametro}' que não foi definido."
+          sql_execution_generated_an_error: "gerou o seguinte erro ao ser executada: '%{erro}'"
+
+    models:
+      query:
+        one: Consulta
+        other: Consultas
+
+  active_scaffold:
+    create_query_label: "Adicionar Consulta"
+    query:
+      execute: 'Executar'

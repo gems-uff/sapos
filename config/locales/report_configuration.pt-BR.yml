@@ -1,0 +1,33 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      report_configuration:
+        name: "Nome"
+        image: "Logo"
+        signature_footer: "Rodapé com assinatura"
+        text: "Header"
+        use_at_grades_report: "Usar no boletim"
+        use_at_report: "Usar em relatórios"
+        use_at_schedule: "Usar no quadro de horários"
+        use_at_transcript: "Usar no histórico"
+        order: "Prioridade"
+        scale: "Escala"
+        x: "X"
+        y: "Y"
+
+    models:
+      report_configuration:
+        one: "Configuração de relatório"
+        other: "Configurações de relatório"
+
+  active_scaffold:
+    create_report_configuration_label: "Adicionar Configuração de Relatório"
+    report_configurations:
+      preview: "Visualizar"
+
+  pdf_content:
+    report_configurations:
+      preview: "Visualizar"

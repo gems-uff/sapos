@@ -14,7 +14,6 @@ class StudentsController < ApplicationController
     config.list.sorting = { name: "ASC" }
     config.list.columns = [:name, :cpf, :enrollments]
     config.create.label = :create_student_label
-    config.update.label = :update_student_label
 
     config.columns[:birthdate].options = {
       data: { "minDate" => "-100Y", "maxDate" => "-0Y", "yearRange": "-100:-0" }

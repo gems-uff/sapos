@@ -1,4 +1,31 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
 pt-BR:
+  activerecord:
+    attributes:
+      email_template:
+        name: "Nome"
+        body: "Template do Corpo"
+        to: "Template do Destinatário"
+        subject: "Template do Assunto"
+        enabled: "Habilitado"
+
+    errors:
+      models:
+        email_template:
+          attributes:
+            name:
+              taken: já existe
+
+    models:
+      email_template:
+        one: "Template de Email"
+        other: "Templates de Email"
+
+  active_scaffold:
+    create_email_template_label: "Adicionar Template de Email"
+
   email_template:
     name:
       builtin: "Configurar template interno:"

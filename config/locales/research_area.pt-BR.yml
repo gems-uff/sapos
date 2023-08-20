@@ -1,0 +1,19 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      research_area:
+        code: "Código"
+        name: "Nome"
+        professor_research_areas: "Professores"
+        professors: "Professores"
+
+    models:
+      research_area:
+        one: "Área de Pesquisa"
+        other: "Áreas de Pesquisa"
+
+  active_scaffold:
+    create_research_area_label: "Adicionar Área de Pesquisa"

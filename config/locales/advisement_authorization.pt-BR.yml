@@ -1,0 +1,17 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      advisement_authorization:
+        level: "Nível"
+        professor: "Orientador"
+
+    models:
+      advisement_authorization:
+        one: "Credenciamento"
+        other: "Credenciamentos"
+
+  active_scaffold:
+    create_advisement_authorization_label: "Adicionar Credenciamento"

@@ -1,0 +1,60 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      class_enrollment_request:
+        action: "Ação"
+        enrollment_request: "Pedido de Inscrição"
+        course_class: "Turma"
+        course_type: "Tipo de Disciplina"
+        class_enrollment: "Inscrição"
+        allocations: "Alocações"
+        status: "Situação"
+        year: "Ano"
+        semester: "Semestre"
+        enrollment: "Matrícula"
+        student: "Aluno"
+        enrollment_level: "Nível"
+        enrollment_status: "Tipo de Matrícula"
+        admission_date: "Data de Admissão"
+        scholarship_durations_active: "Possui bolsa?"
+        professor: "Professor"
+        advisor: "Orientador"
+        has_advisor: "Possui orientador?"
+        statuses:
+          requested: "Solicitada"
+          valid: "Válida"
+          invalid: "Inválida"
+          effected: "Efetivada"
+        actions:
+          insert: "Adição"
+          remove: "Remoção"
+      class_enrollment_requests:
+        course_class: Turma
+
+    errors:
+      models:
+        class_enrollment_request:
+          attributes:
+            class_enrollment:
+              must_represent_the_same_enrollment_and_class: "deve estar associada à mesma matrícula e turma"
+            course_class:
+              previously_approved: "já foi cursada anteriormente com aprovação"
+              taken: "duplicada"
+
+    models:
+      class_enrollment_request:
+        one: "Pedido de Inscrição em Disciplina"
+        other: "Pedidos de Inscrição em Disciplina"
+
+  active_scaffold:
+    create_class_enrollment_request_label: "Adicionar Disciplina de Pedido de Inscrição"
+
+  notifications:
+    class_enrollment_request:
+      email_to_student:
+        subject: "Seu pedido de inscrição em <%= var(:record).course_class.label_with_course %> foi efetivado"
+      removal_email_to_student:
+        subject: "Seu pedido de remoção da disciplina <%= var(:record).course_class.label_with_course %> foi efetivado"

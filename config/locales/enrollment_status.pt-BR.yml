@@ -1,0 +1,18 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      enrollment_status:
+        name: "Nome"
+        user: "Com usuário"
+        enrollments: "Matrículas"
+
+    models:
+      enrollment_status:
+        one: "Tipo de Matrícula"
+        other: "Tipos de Matrícula"
+
+  active_scaffold:
+    create_enrollment_status_label: "Adicionar Tipo de Matrícula"

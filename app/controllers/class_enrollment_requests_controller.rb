@@ -74,7 +74,6 @@ class ClassEnrollmentRequestsController < ApplicationController
     config.columns.add :year, :semester, :allocations, :professor, :course_type
 
     config.create.label = :create_class_enrollment_request_label
-    config.update.label = :update_class_enrollment_request_label
     config.actions.swap :search, :field_search
 
     config.columns[:class_enrollment].actions_for_association_links.delete :new

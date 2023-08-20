@@ -1,0 +1,47 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      advisement:
+        active: "Orientação ativa?"
+        co_advisor: "Possui coorientador?"
+        co_advisor_list: "Lista de Coorientadores"
+        enrollment: "Matrícula"
+        enrollment_number: "Número de Matrícula"
+        level: "Nível"
+        main_advisor: "Orientador Principal"
+        professor: "Orientador"
+        student_name: "Nome do Aluno"
+        professor_enrollment_number: "Matrícula do Orientador"
+
+    errors:
+      advisement:
+        already_with_main_advisor: "já possui um orientador principal"
+
+      models:
+        advisement:
+          advisement_professor_uniqueness: "não pode ser orientador duas vezes da mesma matrícula"
+
+    models:
+      advisement:
+        one: "Orientação"
+        other: "Orientações"
+
+  active_scaffold:
+    create_advisement_label: "Adicionar Orientação"
+
+  notifications:
+    advisement:
+      email_to_advisor:
+        subject: "Nova orientação"
+
+  pdf_content:
+    advisements:
+      to_pdf:
+        enrollment_number: "Número de Matrícula"
+        filename: "Relatório de Orientações"
+        level_name: "Nível"
+        professor_name: "Professor"
+        student_name: "Aluno"

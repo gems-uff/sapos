@@ -1,0 +1,61 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      scholarship_duration:
+        active: "Ativa?"
+        adviser: "Orientador"
+        cancel_date: "Data de Encerramento"
+        end_date: "Data Limite de Concessão"
+        enrollment: "Matrícula"
+        enrollment_id: "Matrícula"
+        last_scholarship_duration_end_date: "Bolsa"
+        level: "Nível"
+        scholarship: "Número da Bolsa"
+        scholarship_end_date: "Data de Fim de Bolsa"
+        scholarship_start_date: "Data de Início de Bolsa"
+        scholarship_suspensions: "Suspensões"
+        scholarship_types: "Tipo de Bolsa"
+        sponsors: "Agência de Fomento"
+        start_date: "Data de Início"
+        obs: "Observação"
+
+    errors:
+      models:
+        scholarship_duration:
+          the_levels_of_scholarship_and_enrollment_are_different: "não pode ser alocado a esta Matrícula porque eles são de níveis diferentes"
+          end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
+          cancel_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
+          end_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
+          cancel_date_after_end_date: "posterior a Data Limite de Concessão"
+          enrollment_and_scholarship_uniqueness: "já possui uma Bolsa alocada nesse período"
+          scholarship_start_date_after_end_or_cancel_date: "posterior a Data de Início de outra alocação de bolsa"
+          start_date_after_scholarship_end_date: "da alocação de bolsa deve ser posterior a data de limite de concessão de uma alocação que não tem data de encerramento"
+          start_date_before_scholarship_cancel_date: "anterior a Data de Encerramento de outra alocação de bolsa"
+          start_date_before_scholarship_end_date: "anterior a Data de Limite de Concessão de outra alocação de bolsa"
+          start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
+          unfinished_scholarship: "A bolsa ainda está alocada. Por favor, feche a alocação antes de criar uma nova"
+          attributes:
+            start_date:
+              start_date_after_end_date: "posterior a Data de Limite de Concessão"
+              start_date_before_scholarship_start_date: "anterior a Data de Início de Bolsa"
+            end_date:
+              end_date_after_scholarship_end_date: "posterior a Data de Fim de Bolsa"
+            cancel_date:
+              cancel_date_before_start_date:  "anterior a Data de Início"
+              cancel_date_after_end_date: "posterior a Data Limite de Concessão"
+
+    models:
+      scholarship_duration:
+        one: "Alocação de Bolsa"
+        other: "Alocação de Bolsas"
+
+  active_scaffold:
+    create_scholarship_duration_label: "Adicionar Bolsa"
+
+  pdf_content:
+    scholarship_durations:
+      to_pdf:
+        filename: "Relatório de Alocação de Bolsas"

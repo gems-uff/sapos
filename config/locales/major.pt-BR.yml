@@ -1,0 +1,20 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      major:
+        institution: "Instituição"
+        level: "Nível"
+        name: "Nome"
+        student_majors: "Alunos"
+        students: "Alunos"
+
+    models:
+      major:
+        one: "Curso"
+        other: "Cursos"
+
+  active_scaffold:
+    create_major_label: "Adicionar Curso"

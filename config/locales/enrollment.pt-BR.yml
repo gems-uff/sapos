@@ -1,0 +1,140 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      enrollment:
+        accomplishments: "Realização de Etapa"
+        accomplishment_date: "até"
+        active: "Ativo?"
+        admission_date: "Data de Admissão"
+        advisements: "Orientadores"
+        class_enrollments: "Inscrições"
+        course_class_year_semester: "Disciplina"
+        deferrals: "Prorrogações"
+        delayed_phase: "Etapa atrasada"
+        delayed_phase_date: "em"
+        dismissal: "Desligamento"
+        enrollment_hold: "Trancado?"
+        enrollment_holds: "Trancamentos"
+        enrollment_number: "Número de Matrícula"
+        enrollment_status: "Tipo de Matrícula"
+        research_area: "Área de Concentração"
+        level: "Nível"
+        phase: "Etapa"
+        phase_completions: "Realização de Etapas"
+        phase_due_dates: "Conclusão de Etapas"
+        professor: "Orientador"
+        scholarship_durations: "Bolsas"
+        scholarship_durations_active: "Possui bolsa?"
+        scholarships: "Números das Bolsas"
+        student: "Nome do Aluno"
+        thesis_title: "Título da Tese"
+        thesis_defense_date: "Data de Defesa"
+        year_semester_label: "em"
+        listed_advisors: "Orientadores"
+        listed_accomplishments: "Realização de Etapas"
+        listed_deferrals: "Prorrogações"
+        listed_scholarships: "Bolsas"
+        listed_class_enrollments: "Inscrições"
+        thesis_defense_committee_participations: "Banca Avaliadora"
+        thesis_defense_committee_professors: "Banca Avaliadora"
+        accomplishment_conclusion_date_not_given: "---------/----"
+
+    errors:
+      models:
+        enrollment:
+          main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
+          main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
+          thesis_defense_date_before_admission_date: "anterior a Data de Admissão"
+          research_area_different_from_professors: "diferente de áreas de pesquisa do(s) orientador(es)"
+
+    models:
+      enrollment:
+        one: "Matrícula"
+        other: "Matrículas"
+
+  active_scaffold:
+    create_enrollment_label: "Adicionar Matrícula"
+    new_users_action: "Adicionar usuários"
+    new_users_headline: "Adicionar Usuários para Alunos"
+    new_users_submit: "Adicionar"
+
+  pdf_content:
+    enrollment:
+      to_pdf:
+        filename: "Relatório de Matrículas"
+      header:
+        approved: "Aprovado em"
+        no_test: "Nenhum exame realizado"
+        course: "CURSO:               "
+        enrollment_admission_date: "MÊS/ANO DE INGRESSO NO CURSO:"
+        enrollment_admission_result: "RESULTADO DO EXAME DE SELEÇÃO:"
+        title: "HISTÓRICO ESCOLAR / PÓS-GRADUAÇÃO"
+        enrollment_dismissal_date: "MÊS/ANO DE DESLIGAMENTO DO CURSO:"
+        enrollment_dismissal_reason: "MOTIVO:"
+        enrollment_number: "MATRÍCULA: "
+        field_of_study: "ÁREA DE CONCENTRAÇÃO:"
+        identity_issuing_body: "ÓRGÃO EXPEDIDOR:"
+        identity_issuing_state: "ESTADO EXPEDIDOR:"
+        identity_issuing_country: "PAÍS EXPEDIDOR:"
+        language_tests: "EXAME(S) DE LÍNGUA(S)"
+        program_level: "CONCEITO CAPES:      "
+        student_birthdate: "DATA NASCIMENTO: "
+        student_birthplace: "NACIONALIDADE:  "
+        student_cpf: "C.P.F.:    "
+        student_identity_number: "IDENTIDADE:"
+        student_name: "ALUNO:     "
+        entrance_exam_approved: "Aprovado"
+      footer:
+        coordinator_signature: "ASSINATURA DO COORDENADOR"
+        location: "Niterói"
+        page: "Pág. nº "
+        warning1: "Este documento só é válido sem rasuras, com selo da UFF e com a assinatura do Coordenador."
+      academic_transcript:
+        deferrals: "PRORROGAÇÕES"
+        accomplished_phases: "ETAPAS OBRIGATÓRIAS CONCLUÍDAS"
+        advisors: "Orientadores"
+        enrollment_holds: "TRANCAMENTOS"
+        link: "Histórico"
+        title: "Histórico Escolar"
+        total_credits: "Total"
+        scholarships: "BOLSAS"
+      grade_list:
+        title: "DISCIPLINAS CURSADAS COM APROVEITAMENTO"
+        course_approved: "AP"
+        course_code: "CÓDIGO"
+        course_credits: "NÚMERO DE CRÉDITOS"
+        course_grade: "NOTA / CONCEITO"
+        course_name: "DENOMINAÇÃO"
+        course_workload: "CARGA HORÁRIA"
+        course_year_semester: "PERÍODO"
+        total: "TOTAL"
+        situation: "SITUAÇÃO"
+        semester_summary: "RESUMO DO PERÍODO"
+      grades_report:
+        accomplished_phases: "ETAPAS OBRIGATÓRIAS CONCLUÍDAS"
+        advisors: "Orientadores"
+        link: "Boletim"
+        title: "BOLETIM ESCOLAR / PÓS-GRADUAÇÃO"
+        total_credits: "Créditos Acumulados"
+        total_gpr: "CR Acumulado"
+        accomplishment_conclusion_date_not_given: "---------/----"
+        courses_which_grade_not_count_in_gpr: "DISCIPLINAS QUE NÃO CONTABILIZAM NOTA / JUSTIFICATIVA:"
+      scholarships:
+        number: "NÚMERO"
+        sponsor: "AGÊNCIA"
+        start_date: "DATA DE INÍCIO"
+        end_date: "DATA LIMITE"
+        cancel_date: "ENCERRAMENTO"
+      search:
+        attribute: "Campo"
+        value: "Valor"
+      thesis:
+        title: "TESE / DISSERTAÇÃO - TÍTULO:"
+        date: "DATA DA DEFESA:"
+        judgement: "JULGAMENTO:"
+        approved: "Aprovado"
+        advisors: "ORIENTADOR(ES):"
+        defense_committee: "MEMBROS DA BANCA EXAMINADORA / INSTITUIÇÃO DE ORIGEM:"

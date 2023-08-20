@@ -1,0 +1,17 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      sponsor:
+        name: "Nome"
+        scholarships: "Bolsas"
+
+    models:
+      sponsor:
+        one: "Agência de Fomento"
+        other: "Agências de Fomento"
+
+  active_scaffold:
+    create_sponsor_label: "Adicionar Agência de Fomento"

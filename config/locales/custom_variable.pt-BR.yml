@@ -1,0 +1,26 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      custom_variable:
+        description: "Descrição"
+        value: "Valor"
+        variable: "Variável"
+
+    errors:
+      models:
+        custom_variable:
+          minimum_grade_for_approval_not_gt_grade_of_disapproval_for_absence: "da nota mínima para aprovação %{minimum_grade_for_approval} precisa ser maior que o valor da nota de reprovação por falta %{grade_of_disapproval_for_absence}"
+          grade_of_disapproval_for_absence_not_lt_minimum_grade_for_approval: "da nota de reprovação por falta %{grade_of_disapproval_for_absence} precisa ser menor que o valor da nota mínima para aprovação %{minimum_grade_for_approval}"
+          validate_destroy_of_minimum_grade_for_approval: "Para poder excluir a nota mínima para aprovação (que assumirá o valor padrão 6,0), é necessário que a nota de reprovação por falta seja menor que 6,0 ou que seja excluída"
+          check_duplicate: "a variável %{variable} já existe e não pode ser duplicada"
+
+    models:
+      custom_variable:
+        one: "Variável"
+        other: "Variáveis"
+
+  active_scaffold:
+    create_custom_variable_label: "Adicionar Variável"

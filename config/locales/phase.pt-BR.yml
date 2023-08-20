@@ -1,0 +1,30 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      phase:
+        accomplishments: "Realização de Etapas"
+        description: "Descrição"
+        enrollments: "Matrículas"
+        extend_on_hold: "Prorrogar com Trancamentos"
+        name: "Nome"
+        phase_durations: "Duração de Etapas"
+        phase_completions: "Realização de Etapas"
+        is_language: "Exame de Línguas"
+        active: "Ativa?"
+
+    errors:
+      models:
+        phase:
+          phase_duration_has_deferral: "Não foi possível remover duração de etapa para %{level}, pois já existe prorrogação para este nível"
+          phase_duration_has_level: "Não foi possível remover duração de etapa para %{level}, pois já existe matrícula com esta etapa concluída"
+
+    models:
+      phase:
+        one: "Etapa"
+        other: "Etapas"
+
+  active_scaffold:
+    create_phase_label: "Adicionar Etapa"

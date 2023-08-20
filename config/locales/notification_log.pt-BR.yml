@@ -1,0 +1,20 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      notification_log:
+        body: "Corpo"
+        to: "Para"
+        subject: "Assunto"
+        created_at: "Data de Execução"
+        notification: "Notificação"
+        notification_name: "Notificação"
+        notification_removed_or_sync: "Notificação Síncrona ou Assíncrona Removida"
+        attachments_file_names: "Anexos"
+
+    models:
+      notification_log:
+        one: "Notificação Enviada"
+        other: "Notificações Enviadas"

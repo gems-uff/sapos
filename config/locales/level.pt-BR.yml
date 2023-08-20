@@ -1,0 +1,25 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      level:
+        advisement_authorizations: "Credenciamentos"
+        name: "Nome"
+        course_name: "Nome completo do curso"
+        default_duration: "Duração padrão (meses)"
+        enrollments: "Matrículas"
+        majors: "Cursos"
+        phase_durations: "Duração de Etapas"
+        scholarships: "Bolsas"
+        show_advisements_points_in_list: "Mostrar pts por orientacao na lista"
+        short_name_showed_in_list_header: "Título da coluna pts por orientação"
+
+    models:
+      level:
+        one: "Nível"
+        other: "Níveis"
+
+  active_scaffold:
+    create_level_label: "Adicionar Nível"

@@ -1,0 +1,28 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      version:
+        created_at: "Modificado em"
+        current_object: "Versão Atual"
+        current_object_destroyed: "Objeto Deletado"
+        event: "Ação"
+        event_options:
+          create: "Criação"
+          destroy: "Remoção"
+          update: "Atualização"
+        item_id: "ID do Objeto"
+        item_type: "Modelo"
+        label: "%{event} de %{type}"
+        object: "Objeto Anterior"
+        old_version: "Versão Antiga"
+        relationship_object: "Objeto de Relacionamento"
+        user: "Usuário"
+        whodunnit: "Usuário"
+
+    models:
+      version:
+        one: "Log"
+        other: "Log"

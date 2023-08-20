@@ -1,0 +1,14 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      course_research_area:
+        course: "Curso"
+        research_area: "Área de Pesquisa"
+
+    models:
+      course_research_area:
+        one: "Área de Pesquisa do Curso"
+        other: "Áreas de Pesquisa do Curso"

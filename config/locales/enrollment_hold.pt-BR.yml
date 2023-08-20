@@ -1,0 +1,29 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      enrollment_hold:
+        active: "Trancado?"
+        enrollment: "Matrícula"
+        year: "Ano"
+        semester: "Semestre"
+        number_of_semesters: "Número de Semestres"
+        number_label:
+          one: "1 semestre"
+          other: "%{count} semestres"
+
+    errors:
+      models:
+        enrollment_hold:
+          before_admission_date: "anterior a Data de Admissão"
+          after_dismissal_date: "posterior a Data de Desligamento"
+
+    models:
+      enrollment_hold:
+        one: "Trancamento"
+        other: "Trancamentos"
+
+  active_scaffold:
+    create_enrollment_hold_label: "Adicionar Trancamento"

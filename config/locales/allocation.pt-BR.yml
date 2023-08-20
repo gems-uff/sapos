@@ -1,0 +1,26 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      allocation:
+        course_class: "Turma"
+        day: "Dia"
+        end_time: "Hora de fim"
+        room: "Sala"
+        start_time: "Hora de início"
+
+    errors:
+      models:
+        allocation:
+          end_time_before_start_time: "menor do que a hora de fim"
+          scheduling_conflict: "este horário já está sendo usado em outra alocação da mesma turma"
+
+    models:
+      allocation:
+        one: "Alocação"
+        other: "Alocações"
+
+  active_scaffold:
+    create_allocation_label: "Adicionar Alocação"

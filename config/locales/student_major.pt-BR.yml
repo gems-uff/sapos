@@ -1,0 +1,23 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      student_major:
+        major: "Curso"
+        student: "Aluno"
+        student_id: "Aluno"
+
+    errors:
+      models:
+        student_major:
+          unique_pair: "não pode estar em dois ou mais cursos repetidos e curso não pode possuir o mesmo aluno duas ou mais vezes"
+
+    models:
+      student_major:
+        one: "Curso do Aluno"
+        other: "Curso dos Alunos"
+
+  active_scaffold:
+    create_student_major_label: "Adicionar Curso do Aluno"

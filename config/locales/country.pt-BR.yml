@@ -1,0 +1,18 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      country:
+        name: "Nome"
+        state: "Estados"
+        nationality: "Nacionalidade"
+
+    models:
+      country:
+        one: "País"
+        other: "Países"
+
+  active_scaffold:
+    create_country_label: "Adicionar País"

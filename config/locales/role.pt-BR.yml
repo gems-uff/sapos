@@ -1,0 +1,17 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      role:
+        description: "Descrição"
+        name: "Nome"
+
+    models:
+      role:
+        one: "Papel"
+        other: "Papéis"
+
+  active_scaffold:
+    create_role_label: "Adicionar Papel"

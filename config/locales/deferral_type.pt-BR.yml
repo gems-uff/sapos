@@ -1,0 +1,27 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      deferral_type:
+        description: "Descrição"
+        duration: "Duração"
+        duration_days: "Duração(dias)"
+        duration_months: "Duração(meses)"
+        duration_semesters: "Duração(períodos)"
+        name: "Nome"
+        phase: "Etapa"
+
+    errors:
+      models:
+        deferral_type:
+          blank_duration: "duração deve ser de pelo menos um dia"
+
+    models:
+      deferral_type:
+        one: "Tipo de Prorrogação"
+        other: "Tipos de Prorrogação"
+
+  active_scaffold:
+    create_deferral_type_label: "Adicionar Tipo de Prorrogação"

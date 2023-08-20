@@ -1,0 +1,23 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      phase_duration:
+        deadline_days: "Prazo Máximo(dias)"
+        deadline_months: "Prazo Máximo(meses)"
+        deadline_semesters: "Prazo Máximo(períodos)"
+        level: "Nível"
+
+    errors:
+      models:
+        phase_duration:
+          blank_deadline: "Prazo deve ser de pelo menos um dia"
+          has_deferral: "Já existe prorrogação para esta duração de etapa"
+          has_level: "Já existe conclusão de etapa para a duração de etapa deste nível"
+
+    models:
+      phase_duration:
+        one: "Duração de Etapa"
+        other: "Duração de Etapas"

@@ -57,7 +57,6 @@ class EnrollmentsController < ApplicationController
     config.list.sorting = { enrollment_number: "ASC" }
 
     config.create.label = :create_enrollment_label
-    config.update.label = :update_enrollment_label
     config.actions.swap :search, :field_search
 
     config.field_search.columns = [

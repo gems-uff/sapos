@@ -1,0 +1,20 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      enrollment_request_comment:
+        enrollment_request: "Pedido de Inscrição"
+        message: Mensagem
+        user: Usuário
+        created_at: Data de criação
+        updated_at: Data de modificação
+
+    models:
+      enrollment_request_comment:
+        one: "Comentário de Pedido de Inscrição"
+        other: "Comentários de Pedidos de Inscrição"
+
+  active_scaffold:
+    create_enrollment_request_comment_label: "Adicionar Comentário Pedido de Inscrição"

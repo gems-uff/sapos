@@ -1,0 +1,43 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      scholarship:
+        available: "Disponível"
+        available_label: "a partir de"
+        end_date: "Data de Fim"
+        enrollments: "Matrículas"
+        level: "Nível"
+        scholarship_number: "Número da Bolsa"
+        scholarship_type: "Tipo"
+        sponsor: "Agência"
+        start_date: "Data de Início"
+        timeline: "Linha do Tempo"
+        scholarship_caption: "Bolsa"
+        end_date_caption: "Alocação encerrada na data limite"
+        cancel_date_caption: "Alocação encerrada antes da data limite"
+        end_date_tip: "Limite"
+        present: "Presente"
+        scholarship_durations: "Alocação de Bolsas"
+
+    errors:
+      models:
+        scholarship:
+          attributes:
+            end_date:
+              on_or_after: "anterior a Data de Início"
+
+    models:
+      scholarship:
+        one: "Bolsa"
+        other: "Bolsas"
+
+  active_scaffold:
+    create_scholarship_label: "Adicionar Bolsa"
+
+  pdf_content:
+    scholarships:
+      to_pdf:
+        filename: "Relatório de Bolsas"

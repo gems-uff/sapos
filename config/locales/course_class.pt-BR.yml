@@ -1,0 +1,64 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      course_class:
+        allocations: "Alocações"
+        class_enrollments: "Inscrições"
+        class_enrollments_count: "Alunos Inscritos"
+        course: "Disciplina"
+        enrollments: "Matrículas"
+        name: "Nome"
+        professor: "Professor"
+        semester: "Semestre"
+        not_schedulable: "Não aparecer no QH"
+        year: "Ano"
+        obs_schedule: "Obs QH"
+
+    errors:
+      models:
+        course_class:
+          changes_to_disallowed_fields: "houve modificação de campos não válidos"
+
+    models:
+      course_class:
+        one: "Turma"
+        other: "Turmas"
+
+  active_scaffold:
+    create_course_class_label: "Adicionar Turma"
+
+  notifications:
+    course_class:
+      email_to_professor:
+        subject: "Alteração de notas da turma <%= var(:record).label_with_course %>"
+
+  pdf_content:
+    course_class:
+      summary:
+        attendance: "Freq S/I"
+        attendance_false: "I"
+        attendance_true: "S"
+        course_name: "Nome da Disciplina"
+        enrollment_number: "Matrícula"
+        email_title: "Lista de E-mails"
+        final_grade: "Nota Final"
+        lesson: "Aulas Dadas"
+        link: "Pauta"
+        obs: "Obs.:"
+        sequential_number: "Nº"
+        situation: "Situação"
+        student_name: "Nome do Aluno"
+        student_email: "E-mail do Aluno"
+        title: "Resumo Semestral"
+        year_semester: "Semestre/Ano"
+        active_scholarship_table_footer_subtitle: "* aluno bolsista"
+      class_schedule:
+        title: "QUADRO DE HORÁRIOS"
+        link: "Quadro de Horários"
+        professor: "Professor"
+        course_name: "Disciplina"
+        noschedule: "Horário a combinar com o orientador"
+        year_semester_error: 'Selecione Ano/Semestre na busca!'

@@ -1,0 +1,33 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      scholarship_suspension:
+        active: "Suspensão ativa?"
+        start_date: "Data de Início"
+        end_date: "Data de Fim"
+        scholarship_duration: "Alocação"
+        active_options:
+          active: "Bolsa Suspensa"
+          inactive: "Bolsa Ativa"
+
+    errors:
+      models:
+        scholarship_suspension:
+          suspension_start_date_after_end_date: "posterior a Data de Fim"
+          suspension_start_date_before_scholarship_start_date: "anterior a Data de Início da Alocação"
+          suspension_start_date_after_scholarship_end_date: "posterior a Data de Fim da Alocação"
+          suspension_end_date_after_scholarship_end_date: "posterior a Data de Fim da Alocação"
+          active_suspension: "Existe uma outra suspensão ativa no mesmo intervalo de tempo"
+          attributes:
+            start_date:
+              invalid_date: inválida
+            end_date:
+              invalid_date: inválida
+
+    models:
+      scholarship_suspension:
+        one: "Suspensão de Bolsa"
+        other: "Suspensões de Bolsas"

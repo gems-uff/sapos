@@ -1,0 +1,18 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      phase_completion:
+        enrollment: "Matrícula"
+        enrollment_id: "Matrícula"
+        phase: "Etapa"
+        phase_id: "Etapa"
+        due_date: "Validade"
+        completion_date: "Conclusão"
+
+    models:
+      phase_completion:
+        one: "Realização de Etapa"
+        other: "Realização de Etapas"

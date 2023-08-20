@@ -1,0 +1,20 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      state:
+        code: "Sigla"
+        country: "País"
+        name: "Nome"
+        cities: "Cidades"
+        student_birth_states: "Naturalidade de Alunos"
+
+    models:
+      state:
+        one: "Estado"
+        other: "Estados"
+
+  active_scaffold:
+    create_state_label: "Adicionar Estado"

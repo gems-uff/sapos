@@ -1,0 +1,49 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      enrollment_request:
+        year: Ano
+        semester: Semestre
+        enrollment: Matrícula
+        status: "Situação"
+        class_enrollment_requests: Disciplinas
+        enrollment_request_comments: Comentários
+        last_student_change_at: Data de última modificação pelo aluno
+        last_staff_change_at: Data de última modificação por outros
+        student_view_at: Data de última visualização pelo aluno
+        student: "Aluno"
+        enrollment_level: "Nível"
+        enrollment_status: "Tipo de Matrícula"
+        admission_date: "Data de Admissão"
+        scholarship_durations_active: "Possui bolsa?"
+        advisor: "Orientador"
+        has_advisor: "Possui orientador?"
+
+    errors:
+      models:
+        enrollment_request:
+          at_least_one_class: "deve incluir pelo menos uma seleção"
+          attributes:
+            status:
+              class_enrollment_request_is_not_effected: "'efetivada' só é permitida quando todos os pedidos de disciplinas estão efetivados"
+            base:
+              cannot_effect: "Usuário sem permissão para efetivar solicitações"
+              impossible_insertion: "Tentativa de inserir disciplina(s) fora do período de ajustes"
+              impossible_removal: "Tentativa de remover disciplina(s) fora do período de ajustes"
+              invalid_class:
+                one: "Erro encontrado na seleção de disciplinas"
+                other: "Erros encontrados na seleção de disciplinas"
+              impossible_allocation: "Há pelo menos um conflito de horário nas disciplinas escolhidas. Confira %{day}, %{start}-%{end}"
+
+    models:
+      enrollment_request:
+        one: "Pedido de Inscrição"
+        other: "Pedidos de Inscrição"
+
+  notifications:
+    enrollment_request:
+      email_to_student:
+        subject: "Alteração de situação de pedido de inscrição de <%= var(:record).year %>.<%= var(:record).semester %>"

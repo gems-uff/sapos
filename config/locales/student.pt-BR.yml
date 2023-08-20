@@ -1,0 +1,49 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      student:
+        address: "Logradouro"
+        birth_city: "Naturalidade"
+        birth_state: "Estado de Origem"
+        birth_country: "País de Origem"
+        birthdate: "Data de Nascimento"
+        city: "Residência"
+        civil_status: "Estado Civil"
+        cpf: "CPF"
+        employer: "Empresa"
+        enrollments: "Matrículas"
+        enrollments_number: "Matrículas"
+        father_name: "Nome do Pai"
+        identity_expedition_date: "Data de expedição da Identidade"
+        identity_issuing_body: "Órgão Expeditor"
+        identity_issuing_place: "Local de Expedição"
+        identity_number: "Número da identidade"
+        job_position: "Cargo"
+        majors: "Cursos"
+        mother_name: "Nome da Mãe"
+        name: "Nome"
+        neighborhood: "Bairro"
+        photo: "Foto"
+        sex: "Sexo"
+        student_majors: "Cursos"
+        telephone1: "1º Telefone"
+        telephone2: "2º Telefone"
+        zip_code: "CEP"
+
+    errors:
+      models:
+        student:
+          attributes:
+            user:
+              changed_to_different_user: "mudou de valor para outro usuário. Se esse for o objetivo da mudança, salve como vazio anteriormente"
+
+    models:
+      student:
+        one: "Aluno"
+        other: "Alunos"
+
+  active_scaffold:
+    create_student_label: "Adicionar Aluno"

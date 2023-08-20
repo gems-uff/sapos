@@ -1,0 +1,18 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      report:
+        name: Nome
+        description: Descrição
+        has_table: Modo tabela?
+        table_name: Nome da tabela
+        query_id: Consulta
+        query: Consulta
+
+    models:
+      report:
+        one: Relatório
+        other: Relatórios

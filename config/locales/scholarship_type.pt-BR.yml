@@ -1,0 +1,17 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      scholarship_type:
+        name: "Nome"
+        scholarships: "Bolsas"
+
+    models:
+      scholarship_type:
+        one: "Tipo de Bolsa"
+        other: "Tipos de Bolsa"
+
+  active_scaffold:
+    create_scholarship_type_label: "Adicionar Tipo de Bolsa"

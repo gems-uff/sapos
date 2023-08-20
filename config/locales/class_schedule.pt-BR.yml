@@ -1,0 +1,22 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      class_schedule:
+        year: "Ano"
+        semester: "Semestre"
+        enrollment_start: "Data de Início das Inscrições"
+        enrollment_end: "Data de Fim das Inscrições"
+        enrollment_adjust: "Início do Período de Ajustes"
+        enrollment_insert: "Data Limite para Adicionar Disciplinas"
+        enrollment_remove: "Data Limite para Remover Disciplinas"
+
+    models:
+      class_schedule:
+        one: "Quadro de Horários"
+        other: "Quadros de Horários"
+
+  active_scaffold:
+    create_class_schedule_label: "Adicionar Quadro de Horário"

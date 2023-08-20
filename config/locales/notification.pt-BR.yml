@@ -1,0 +1,67 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      notification:
+        body_template: "Template do Corpo"
+        frequency: "Frequência"
+        frequencies:
+          annual: "Anual"
+          semiannual: "Semestral"
+          monthly: "Mensal"
+          weekly: "Semanal"
+          daily: "Diária"
+          manual: "Manual"
+        next_execution: "Próxima Execução"
+        notification_offset: "Offset da Notificação"
+        query_offset: "Offset da Consulta"
+        sql_query: "Consulta"
+        subject_template: "Template do Assunto"
+        title: "Título"
+        to_template: "Template do Destinatário"
+        individual: "Individual"
+        has_grades_report_pdf_attachment: "Boletim anexado"
+        no_name: "Sem nome"
+        notification_params: "Parâmetros"
+        query: "Consulta"
+
+    errors:
+      models:
+        notification:
+          offset_invalid_value: "está com o valor inválido. Tente um número, seguido por y, M, W, d, h, m ou s"
+          individual_required: "requer que o email seja individual"
+          query_with_enrollments_id_alias_column_required: "requer que a Consulta possua com campo com alias enrollments_id"
+          manual_frequency_requires_notification_offset_to_be_zero: ": Quando a Frequência for Manual, deixar Offset da Notificação com valor 0"
+
+    models:
+      notification:
+        one: "Notificação"
+        other: "Notificações"
+
+  active_scaffold:
+    create_notification_label: "Adicionar Notificação"
+    notification:
+      sql_query_default: "SELECT students.name as name FROM students\nWHERE students.created_at < :data_consulta"
+      body_template_default: "<%= var('name') %>"
+      frequency_description: "Diária: todo dia; Semanal: toda segunda; Mensal: dia 01 de cada mês; Semestral: 01/03 e 01/08; Anual: 01/01"
+      execute_now: "Enviar agora"
+      simulate: "Simular"
+      individual_description: "Um e-mail para cada resultado"
+      has_grades_report_pdf_attachment_description: "Requer email individual e um campo na query, com alias enrollments_id"
+      notification_offset_description: "Data de execução. Frequência Mensal com offset 3d executará todo dia 04 do mês"
+      query_offset_description: "Data de consulta. Frequência Semestral com offset -1M terá variavel para dias 01/02 ou 01/07"
+      execute_now_success: 'Notificação disparada com sucesso'
+      query_date: "Data de Consulta"
+      set_query_date: "Escolher Data de Consulta"
+      should_send_emails: "Enviar e-mails"
+      asynchronous:
+        title: "Notificações assíncronas"
+        simulation: "Simulação"
+        notyet: "Ainda não executado"
+        nojob: "Não há job agendado"
+        preview: "Informações"
+        last_time: "Última execução"
+        next_time: "Próxima execução"
+        frequency: "Frequência"

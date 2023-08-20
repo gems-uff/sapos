@@ -1,0 +1,31 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      course:
+        available: "Disciplina do currículo vigente"
+        code: "Código"
+        content: "Ementa"
+        course_type: "Tipo de Disciplina"
+        credits: "Créditos"
+        name: "Nome"
+        course_research_areas: "Áreas de Pesquisa"
+        workload: "Carga Horária"
+        empty_workload: "N/A"
+        workload_time: "%{time}h"
+        workload_text: "Carga Horária"
+
+    errors:
+      models:
+        course:
+          check_unique_name_for_available_courses: "de disciplina já existe no currículo vigente"
+
+    models:
+      course:
+        one: "Disciplina"
+        other: "Disciplinas"
+
+  active_scaffold:
+    create_course_label: "Adicionar Disciplina"

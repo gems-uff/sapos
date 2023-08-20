@@ -1,0 +1,55 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      professor:
+        address: "Logradouro"
+        advisement_authorizations: "Credenciamentos"
+        advisement_points: "Pontos Total"
+        advisements: "Orientandos"
+        advisements_with_points: "Orientandos"
+        birthdate: "Data de Nascimento"
+        civil_status: "Estado Civil"
+        city: "Residência"
+        cpf: "CPF"
+        email: "E-mail"
+        enrollment_number: "Matrícula"
+        enrollments: "Orientandos"
+        identity_expedition_date: "Data de expedição da Identidade"
+        identity_issuing_body: "Órgão Expeditor"
+        identity_issuing_place: "Local de Expedição"
+        identity_number: "Número da identidade"
+        institution: "Instituição"
+        name: "Nome"
+        neighborhood: "Bairro"
+        professor_research_areas: "Áreas de Pesquisa"
+        research_areas: "Áreas de Pesquisa"
+        scholarships: "Bolsas"
+        sex: "Sexo"
+        telephone1: "1º Telefone"
+        telephone2: "2º Telefone"
+        zip_code: "CEP"
+        thesis_defense_committee_participations: "Participações em Banca"
+        thesis_defense_committee_enrollments: "Avaliados"
+        academic_title_level: "Nível de Titulação"
+        academic_title_institution: "Instituição de Titulação"
+        academic_title_country: "País de Titulação"
+        academic_title_date: "Data de Titulação"
+        obs: "Observações"
+
+    errors:
+      models:
+        professor:
+          attributes:
+            user:
+              changed_to_different_user: "mudou de valor para outro usuário. Se esse for o objetivo da mudança, salve como vazio anteriormente"
+
+    models:
+      professor:
+        one: "Professor"
+        other: "Professores"
+
+  active_scaffold:
+    create_professor_label: "Adicionar Professor"

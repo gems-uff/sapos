@@ -1,0 +1,22 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      thesis_defense_committee_participation:
+        enrollment: "Matrícula"
+        professor: "Professor"
+
+    errors:
+      models:
+        thesis_defense_committee_participation:
+          thesis_defense_committee_participation_professor_uniqueness: "não pode participar duas vezes da mesma banca"
+
+    models:
+      thesis_defense_committee_participation:
+        one: "Participação em Banca"
+        other: "Participações em Bancas"
+
+  active_scaffold:
+    create_thesis_defense_committee_participation_label: "Adicionar Participação em Banca"

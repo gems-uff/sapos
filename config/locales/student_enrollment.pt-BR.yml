@@ -1,4 +1,3 @@
-# encoding utf-8
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
@@ -108,3 +107,14 @@ pt-BR:
 
   active_scaffold:
     effect: "Efetivar"
+
+  notifications:
+    student_enrollment:
+      email_to_student:
+        subject: "Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> <%= var(:record).created_at == var(:record).updated_at ? 'realizado' : 'atualizado' %>"
+      email_to_advisor:
+        subject: "Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> de orientando foi <%= var(:record).created_at == var(:record).updated_at ? 'realizado' : 'atualizado' %>"
+      removal_email_to_student:
+        subject: "Remoção do Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> <%= var(:requesting) ? 'solicitada' : 'realizada' %>"
+      removal_email_to_advisor:
+        subject: "Remoção do Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> de orientando foi <%= var(:requesting) ? 'solicitada' : 'realizada' %>"
