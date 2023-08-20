@@ -1,0 +1,72 @@
+
+<%
+  readonly = closed || (
+    !semester.main_enroll_open? &&
+    !semester.adjust_enroll_remove_open? &&
+    cer.present?
+  )
+
+  check_box_name = "course_ids[#{row[0][:course_id]}][selected]"
+  check_box_options = {
+    id: "table_row_demand_#{row_index}",
+    skip_default_ids: false,
+    onclick: (readonly ?  "return false;" : ""),
+    readonly: readonly
+  }
+
+  options = {
+    labelid: row[0][:course_id],
+    row_index: "demand_#{row_index}",
+    form: form
+  }
+
+  label_options = options.merge(
+    tdclass: "cell-#{table[:header][0][1].downcase}"
+  )
+  professor_options = options.merge(
+    tdclass: "cell-#{table[:header][0][-1].downcase}"
+  )
+
+  on_demand_name = "course_ids[#{row[0][:course_id]}][professor]"
+  on_demand_options = {}
+  on_demand_options = { selected: select_professor.id } if !select_professor.nil?
+  on_demand_options = { selected: cer.course_class.professor.id } if !cer.nil?
+  on_demand_options[:include_blank] = I18n.t(
+    "student_enrollment.enroll.on_demand_select"
+  )
+
+%>
+
+<tr id="on_demand_row_<%= row_index %>"
+    <%= on_demand_row_style(cer) %>
+    <%= cer_tr_class(cer, count) %>
+>
+  <% if enrollment_request.persisted? %>
+    <%= enroll_table_td(options) do %>
+      <%= cer_row_status(cer) %>
+    <% end %>
+  <% end %>
+  <%= enroll_table_td(options.merge(labelclass: "check-label")) do %>
+    <%= form.check_box check_box_name, check_box_options %>
+  <% end %>
+  <%= enroll_table_td(label_options) do %>
+    <%= row[1].empty? ? "&nbsp; ".html_safe : row[1] %>
+  <% end %>
+  <% row[2..-2].each_with_index do |cell, index| %>
+    <%
+      day_options = options.merge(
+        tdclass: "cell-#{table[:header][0][index + 2].downcase}"
+      )
+    %>
+    <%= enroll_table_td(day_options) do %>
+      <%= (cell.empty? ? "&nbsp; " : cell.strip.sub("\n", "<br/>")).html_safe %>
+    <% end %>
+  <% end %>
+  <%= enroll_table_td(professor_options) do %>
+    <%= form.collection_select(
+      on_demand_name, row[0][:professors], :id, :name, on_demand_options, {
+        id: "enrollment_request-course_ids-#{row[0][:course_id]}-professor"
+      }
+    ) %>
+  <% end %>
+</tr>

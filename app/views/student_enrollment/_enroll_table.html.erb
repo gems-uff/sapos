@@ -39,140 +39,29 @@
       %>
       <% if display_class_schedule_table_row? semester, approved_courses, row, cer %>
         <% if display_non_on_demand_or_selected_on_demand? row, cer %>
-          <tr <%= cer_tr_class(cer, count) %>>
-            <% if enrollment_request.persisted? %>
-              <%= enroll_table_td(
-                labelid: row[0][:id], row_index: row_index, form: form
-              ) do %>
-                <%= cer_row_status(cer) %>
-              <% end %>
-            <% end %>
-            <%= enroll_table_td(
-              labelid: row[0][:id], row_index: row_index, form: form,
-              labelclass: "check-label"
-            ) do %>
-              <% readonly = closed || (
-                !semester.main_enroll_open? &&
-                !semester.adjust_enroll_remove_open? &&
-                cer.present?
-              ) %>
-              <%= form.check_box :course_class_ids, {
-                data: { row: row_index },
-                class: row[0][:on_demand] ?
-                  "on_demand_check" : "class_enrollment_check",
-                id: "table_row_#{row_index}",
-                multiple: true,
-                skip_default_ids: false,
-                onclick: (readonly ?  "return false;" : ""),
-                readonly: readonly
-              }, row[0][:id], "" %>
-            <% end %>
-            <%= enroll_table_td(
-              labelid: row[0][:id],
-              row_index: row_index,
-              form: form,
-              tdclass: "cell-#{table[:header][0][1].downcase}"
-            ) do %>
-              <%= row[1].empty? ? "&nbsp; ".html_safe  : row[1] %>
-              <% if ! cer.nil? && ! cer.errors.empty? %>
-                <details>
-                  <summary><%= t(
-                    "student_enrollment.enroll.class_errors",
-                    count: cer.errors.full_messages.count
-                  ) %> </summary>
-                  <ul>
-                    <% cer.errors.full_messages.each do |message| %>
-                      <li> <%= message %> </li>
-                    <% end %>
-                  </ul>
-                </details>
-              <% end %>
-            <% end %>
-            <% row.drop(2).each_with_index do |cell, index| %>
-              <%= enroll_table_td(
-                labelid: row[0][:id],
-                row_index: row_index,
-                form: form,
-                tdclass: "cell-#{table[:header][0][index + 2].downcase}"
-              ) do %>
-                <% if cell.empty? %>
-                  &nbsp;
-                <% else %>
-                  <%= cell.strip.sub("\n", "<br/>").html_safe %>
-                <% end %>
-              <% end %>
-            <% end %>
-          </tr>
+          <%= render partial: "enroll_table_default_row", locals: {
+            semester: semester,
+            enrollment_request: enrollment_request,
+            closed: closed,
+            cer: cer,
+            row: row,
+            row_index: row_index,
+            count: count,
+            table: table,
+            form: form } %>
         <% end %>
         <% if row[0][:on_demand] %>
-          <tr id="on_demand_row_<%= row_index %>"
-              <%= on_demand_row_style(cer) %>
-              <%= cer_tr_class(cer, count) %>
-          >
-            <% if enrollment_request.persisted? %>
-              <%= enroll_table_td(
-                labelid: row[0][:course_id],
-                row_index: "demand_#{row_index}",
-                form: form
-              ) do %>
-                <%= cer_row_status(cer) %>
-              <% end %>
-            <% end %>
-            <%= enroll_table_td(
-              labelid: row[0][:course_id],
-              row_index: "demand_#{row_index}",
-              form: form, labelclass: "check-label"
-            ) do %>
-              <% readonly = closed || (
-                ! semester.main_enroll_open? &&
-                ! semester.adjust_enroll_remove_open? &&
-                ! cer.nil?
-              ) %>
-              <%= form.check_box "course_ids[#{row[0][:course_id]}][selected]", {
-                id: "table_row_demand_#{row_index}",
-                skip_default_ids: false,
-                onclick: (readonly ?  "return false;" : ""),
-                readonly: readonly
-              }%>
-            <% end %>
-            <%= enroll_table_td(
-              labelid: row[0][:course_id],
-              row_index: "demand_#{row_index}",
-              form: form,
-              tdclass: "cell-#{table[:header][0][1].downcase}"
-            ) do %>
-              <%= row[1].empty? ? "&nbsp; ".html_safe  : row[1] %>
-            <% end %>
-            <% row[2..-2].each_with_index do |cell, index| %>
-              <%= enroll_table_td(
-                labelid: row[0][:course_id],
-                row_index: "demand_#{row_index}",
-                form: form,
-                tdclass: "cell-#{table[:header][0][index + 2].downcase}"
-              ) do %>
-                <%= cell.empty? ? "&nbsp; ".html_safe  : cell %>
-              <% end %>
-            <% end %>
-            <%= enroll_table_td(
-              labelid: row[0][:course_id],
-              row_index: "demand_#{row_index}",
-              form: form,
-              tdclass: "cell-#{table[:header][0][-1].downcase}"
-            ) do %>
-              <%
-                 options = {}
-                 options = { selected: select_professor.id } if ! select_professor.nil?
-                 options = { selected: cer.course_class.professor.id } if ! cer.nil?
-                 options[:include_blank] = I18n.t("student_enrollment.enroll.on_demand_select")
-              %>
-              <%= %>
-              <%= form.collection_select(
-                "course_ids[#{row[0][:course_id]}][professor]", row[0][:professors], :id, :name, options, {
-                  id: "enrollment_request-course_ids-#{row[0][:course_id]}-professor"
-                }
-              ) %>
-            <% end %>
-          </tr>
+          <%= render partial: "enroll_table_on_demand_row", locals: {
+            semester: semester,
+            enrollment_request: enrollment_request,
+            closed: closed,
+            cer: cer,
+            row: row,
+            row_index: row_index,
+            count: count,
+            table: table,
+            form: form,
+            select_professor: select_professor } %>
         <% end %>
       <% end %>
     <% end %>

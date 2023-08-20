@@ -63,7 +63,7 @@ RSpec.describe "Deferrals features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Prorrogações"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Matrícula", "Data de aprovação", "Tipo de Prorrogação", "Validade", ""
+        "Matrícula", "Data de aprovação", "Tipo de prorrogação", "Validade", ""
       ]
     end
 

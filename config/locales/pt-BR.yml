@@ -177,7 +177,7 @@ pt-BR:
         on_demand: "Criação de turmas por demanda"
       deferral:
         approval_date: "Data de aprovação"
-        deferral_type: "Tipo de Prorrogação"
+        deferral_type: "Tipo de prorrogação"
         enrollment: "Matrícula"
         enrollment_id: "Matrícula"
         obs: "Observação"
