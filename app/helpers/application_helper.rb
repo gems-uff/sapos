@@ -7,9 +7,6 @@
 module ApplicationHelper
   include NumbersHelper
 
-  @@config = YAML.load_file("#{Rails.root}/config/properties.yml")
-  @@range = @@config["scholarship_year_range"]
-
   def optional_navigation(options)
     render_navigation(options)
   rescue NoMethodError
@@ -76,10 +73,11 @@ module ApplicationHelper
       true :
       extra[:multiparameter]
     extra[:force_send] ||= extra[:force_send].nil? ? false : extra[:force_send]
+    year_range = CustomVariable.month_year_range
     date_options = {
       discard_day: true,
-      start_year: Time.now.year - @@range,
-      end_year: Time.now.year + @@range
+      start_year: Time.now.year - year_range,
+      end_year: Time.now.year + year_range
     }.merge(extra[:date_options])
     unless extra[:required]
       date_options[:include_blank] = true

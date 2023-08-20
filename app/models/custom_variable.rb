@@ -18,6 +18,7 @@ class CustomVariable < ApplicationRecord
     "minimum_grade_for_approval" => :text,
     "grade_of_disapproval_for_absence" => :text,
     "professor_login_can_post_grades" => :text,
+    "month_year_range" => :text,
   }
 
   validates :variable, presence: true
@@ -81,6 +82,11 @@ class CustomVariable < ApplicationRecord
     else
       "no"
     end
+  end
+
+  def self.month_year_range
+    config = CustomVariable.find_by_variable(:month_year_range)
+    config.blank? ? 20 : config.value.to_i
   end
 
   def to_label
