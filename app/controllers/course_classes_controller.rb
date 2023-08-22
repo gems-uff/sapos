@@ -13,7 +13,7 @@ class CourseClassesController < ApplicationController
     config.columns.add :class_enrollments_count
 
     config.action_links.add "class_schedule_pdf",
-      label: I18n.t("pdf_content.course_class.class_schedule.link"),
+      label: I18n.t("pdf_content.class_schedule.class_schedule_pdf.link"),
       page: true,
       type: :collection,
       parameters: { format: :pdf }
@@ -111,7 +111,7 @@ class CourseClassesController < ApplicationController
     )
     if empty_year_semester
       flash[:error] = I18n.t(
-        "pdf_content.course_class.class_schedule.year_semester_error"
+        "pdf_content.class_schedule.class_schedule_pdf.year_semester_error"
       )
       redirect_to action: :index
     else
@@ -120,13 +120,13 @@ class CourseClassesController < ApplicationController
 
       respond_to do |format|
         format.pdf do
-          send_data(
-            render_to_string,
-            filename: "#{I18n.t(
-              "pdf_content.course_class.class_schedule.link"
-            )} (#{@year}_#{@semester}).pdf",
-            type: "application/pdf"
+          stream = render_to_string(
+            template: "class_schedules/class_schedule_pdf"
           )
+          filename = "#{I18n.t(
+            "pdf_content.class_schedule.class_schedule_pdf.title"
+          )} (#{@year}_#{@semester}).pdf"
+          send_data(stream, filename: filename, type: "application/pdf")
         end
       end
     end

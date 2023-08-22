@@ -6,6 +6,7 @@
 module CourseClassesHelper
   include PdfHelper
   include CourseClassesPdfHelper
+  include ClassSchedulesPdfHelper
   include ClassEnrollmentHelperConcern
 
   # ClassEnrollmentHelperConcern

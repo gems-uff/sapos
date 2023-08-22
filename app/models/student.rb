@@ -88,13 +88,6 @@ class Student < ApplicationRecord
     nil
   end
 
-  def identity_issuing_place_to_label
-    if State.where("name LIKE ?", self.identity_issuing_place).present?
-      return I18n.t("pdf_content.enrollment.header.identity_issuing_state")
-    end
-    I18n.t("pdf_content.enrollment.header.identity_issuing_country")
-  end
-
   def mount_uploader_name
     :photo
   end

@@ -70,7 +70,7 @@
 
 <ul>
   <% if table[:star] %>
-    <li>* <%= I18n.t("pdf_content.course_class.class_schedule.noschedule") %></li>
+    <li>* <%= I18n.t("activerecord.attributes.class_schedule.table.noschedule") %></li>
     <% estars = "*" %>
   <% end %>
   <% unless CustomVariable.class_schedule_text.nil? || CustomVariable.class_schedule_text.empty? %>

@@ -23,7 +23,7 @@ class ClassSchedulesController < ApplicationController
 
     config.action_links.add "class_schedule_pdf",
       label: "<i title='#{
-        I18n.t("pdf_content.course_class.class_schedule.link")
+        I18n.t("pdf_content.class_schedule.class_schedule_pdf.link")
       }' class='fa fa-book'></i>".html_safe,
       page: true,
       type: :member,
@@ -58,7 +58,9 @@ class ClassSchedulesController < ApplicationController
   def class_schedule_pdf
     schedule = ClassSchedule.find(params[:id])
     if schedule.nil?
-      flash[:error] = "Semestre não encontrado"
+      flash[:error] = I18n.t(
+        "pdf_content.class_schedule.class_schedule_pdf.year_semester_not_found"
+      )
       return redirect_to action: :index
     end
 
@@ -71,10 +73,11 @@ class ClassSchedulesController < ApplicationController
 
     respond_to do |format|
       format.pdf do
-        stream = render_to_string(template: "course_classes/class_schedule_pdf")
-        send_data stream, filename: "#{I18n.t(
-          "pdf_content.course_class.class_schedule.link"
-        )} (#{@year}_#{@semester}).pdf", type: "application/pdf"
+        stream = render_to_string
+        filename = "#{I18n.t(
+          "pdf_content.class_schedule.class_schedule_pdf.title"
+        )} (#{@year}_#{@semester}).pdf"
+        send_data(stream, filename: filename, type: "application/pdf")
       end
     end
   end

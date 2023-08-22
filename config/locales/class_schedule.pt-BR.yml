@@ -12,6 +12,11 @@ pt-BR:
         enrollment_adjust: "Início do Período de Ajustes"
         enrollment_insert: "Data Limite para Adicionar Disciplinas"
         enrollment_remove: "Data Limite para Remover Disciplinas"
+        table:
+          professor: "Professor"
+          course_name: "Disciplina"
+          noschedule: "Horário a combinar com o orientador"
+
 
     models:
       class_schedule:
@@ -20,3 +25,11 @@ pt-BR:
 
   active_scaffold:
     create_class_schedule_label: "Adicionar Quadro de Horário"
+
+  pdf_content:
+    class_schedule:
+      class_schedule_pdf:
+        title: "QUADRO DE HORÁRIOS"
+        link: "Quadro de Horários"
+        year_semester_error: 'Selecione Ano/Semestre na busca!'
+        year_semester_not_found: 'Ano/Semestre não encontrado!'

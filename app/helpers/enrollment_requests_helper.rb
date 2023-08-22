@@ -5,6 +5,7 @@
 
 module EnrollmentRequestsHelper
   include EnrollmentSearchHelperConcern
+  include ClassScheduleHelperConcern
 
   def class_request_attribute(record, column_status)
     record_status = record.status

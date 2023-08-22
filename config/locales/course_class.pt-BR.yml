@@ -39,8 +39,6 @@ pt-BR:
     course_class:
       summary:
         attendance: "Freq S/I"
-        attendance_false: "I"
-        attendance_true: "S"
         course_name: "Nome da Disciplina"
         enrollment_number: "Matrícula"
         email_title: "Lista de E-mails"
@@ -55,10 +53,3 @@ pt-BR:
         title: "Resumo Semestral"
         year_semester: "Semestre/Ano"
         active_scholarship_table_footer_subtitle: "* aluno bolsista"
-      class_schedule:
-        title: "QUADRO DE HORÁRIOS"
-        link: "Quadro de Horários"
-        professor: "Professor"
-        course_name: "Disciplina"
-        noschedule: "Horário a combinar com o orientador"
-        year_semester_error: 'Selecione Ano/Semestre na busca!'

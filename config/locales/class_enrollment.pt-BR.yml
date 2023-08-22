@@ -8,6 +8,9 @@ pt-BR:
         course_class_id: "Turma"
         course_class: "Turma"
         disapproved_by_absence: "Reprovado por Falta"
+        attendances:
+          attendance_false: "I"
+          attendance_true: "S"
         enrollment: "Matrícula"
         grade: "Nota"
         grade_label: "Nota"

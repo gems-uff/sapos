@@ -9,6 +9,13 @@ module EnrollmentsPdfHelper
     I18n.t(key, *args)
   end
 
+  def identity_issuing_place_to_label(student)
+    if State.where("name LIKE ?", student.identity_issuing_place).present?
+      return i18n_eht("identity_issuing_state")
+    end
+    i18n_eht("identity_issuing_country")
+  end
+
   def enrollment_student_header(pdf, options = {})
     enrollment ||= options[:enrollment]
     pdf.bounding_box([0, pdf.cursor - 3], width: 560) do
@@ -37,7 +44,7 @@ module EnrollmentsPdfHelper
             "#{i18n_eht(:identity_issuing_body)} <b>#{
               rescue_blank_text(enrollment.student.identity_issuing_body)
             }  </b>",
-            "#{enrollment.student.identity_issuing_place_to_label} <b>#{
+            "#{identity_issuing_place_to_label(enrollment.student)} <b>#{
               rescue_blank_text(enrollment.student.identity_issuing_place)
             }</b>"
           ], [

@@ -3,7 +3,7 @@
 
 # frozen_string_literal: true
 
-title = I18n.t("pdf_content.course_class.class_schedule.title")
+title = I18n.t("pdf_content.class_schedule.class_schedule_pdf.title")
 new_document(
   "class_schedule.pdf",
   "#{title} (#{@year}/#{@semester})".upcase,

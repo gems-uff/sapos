@@ -4,6 +4,7 @@
 # frozen_string_literal: true
 
 module StudentEnrollmentHelper
+  include ClassScheduleHelperConcern
   def find_class_enrollment_request_for_class_schedule_table_row(
     enrollment_request, row
   )

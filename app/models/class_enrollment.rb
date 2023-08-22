@@ -12,6 +12,13 @@ class ClassEnrollment < ApplicationRecord
 
   has_one :class_enrollment_request, dependent: :nullify
 
+  ATTENDANCE_TRUE = I18n.translate(
+    "activerecord.attributes.class_enrollment.attendances.attendance_true"
+  )
+  ATTENDANCE_FALSE = I18n.translate(
+    "activerecord.attributes.class_enrollment.attendances.attendance_false"
+  )
+
   REGISTERED = I18n.translate(
     "activerecord.attributes.class_enrollment.situations.registered"
   )
@@ -67,11 +74,7 @@ class ClassEnrollment < ApplicationRecord
     return if self.disapproved_by_absence.nil?
     return if self.situation == REGISTERED
 
-    if self.disapproved_by_absence
-      I18n.t("pdf_content.course_class.summary.attendance_false")
-    else
-      I18n.t("pdf_content.course_class.summary.attendance_true")
-    end
+    self.disapproved_by_absence ? ATTENDANCE_FALSE : ATTENDANCE_TRUE
   end
 
   def grade_filled?
