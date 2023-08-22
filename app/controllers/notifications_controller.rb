@@ -89,6 +89,32 @@ class NotificationsController < ApplicationController
     record.update_next_execution!
   end
 
+  def prepare_attachments(attachments)
+    if attachments
+      if attachments[:grades_report_pdf]
+        enrollments_id = message[:enrollments_id]
+        enrollment = Enrollment.find(enrollments_id)
+        class_enrollments = enrollment.class_enrollments.where(
+          situation: ClassEnrollment::APPROVED
+        ).joins(:course_class).order(
+          "course_classes.year", "course_classes.semester"
+        )
+        accomplished_phases = enrollment.accomplishments
+          .order(:conclusion_date)
+        deferrals = enrollment.deferrals.order(:approval_date)
+        attachments[:grades_report_pdf][:file_contents] = render_to_string(
+          template: "enrollments/grades_report_pdf.pdf.prawn",
+          assigns: {
+            enrollment: enrollment,
+            class_enrollments: class_enrollments,
+            accomplished_phases: accomplished_phases,
+            deferrals: deferrals
+          }
+        )
+      end
+    end
+  end
+
   def execute_now
     process_action_link_action do |notification|
       notification_params = params[:notification_params]
@@ -99,32 +125,9 @@ class NotificationsController < ApplicationController
         override_params: notification_params
       )
       notification_execute[:notifications].each do |message|
-        attachments = notification_execute[:notifications_attachments][message]
-        if attachments
-          if attachments[:grades_report_pdf]
-            enrollments_id = message[:enrollments_id]
-
-            enrollment = Enrollment.find(enrollments_id)
-            class_enrollments = enrollment.class_enrollments.where(
-              situation: ClassEnrollment::APPROVED
-            ).joins(:course_class).order(
-              "course_classes.year", "course_classes.semester"
-            )
-            accomplished_phases = enrollment.accomplishments
-              .order(:conclusion_date)
-            deferrals = enrollment.deferrals.order(:approval_date)
-
-            attachments[:grades_report_pdf][:file_contents] = render_to_string(
-              template: "enrollments/grades_report_pdf",
-              assigns: {
-                enrollment: enrollment,
-                class_enrollments: class_enrollments,
-                accomplished_phases: accomplished_phases,
-                deferrals: deferrals
-              }
-            )
-          end
-        end
+        prepare_attachments(
+          notification_execute[:notifications_attachments][message]
+        )
       end
 
       Notifier.send_emails(notification_execute)
@@ -175,30 +178,7 @@ class NotificationsController < ApplicationController
     notifications_flatten = notifications.flatten
 
     notifications_flatten.each do |message|
-      attachments = notifications_attachments[message]
-      if attachments
-        if attachments[:grades_report_pdf]
-          enrollments_id = message[:enrollments_id]
-          enrollment = Enrollment.find(enrollments_id)
-          class_enrollments = enrollment.class_enrollments.where(
-            situation: ClassEnrollment::APPROVED
-          ).joins(:course_class).order(
-            "course_classes.year", "course_classes.semester"
-          )
-          accomplished_phases = enrollment.accomplishments
-            .order(:conclusion_date)
-          deferrals = enrollment.deferrals.order(:approval_date)
-          attachments[:grades_report_pdf][:file_contents] = render_to_string(
-            template: "enrollments/grades_report_pdf.pdf.prawn",
-            assigns: {
-              enrollment: enrollment,
-              class_enrollments: class_enrollments,
-              accomplished_phases: accomplished_phases,
-              deferrals: deferrals
-            }
-          )
-        end
-      end
+      prepare_attachments(notifications_attachments[message])
     end
 
     Notifier.send_emails({

@@ -178,7 +178,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
       find("#as_#{plural_name}-class_schedule_pdf-#{@record.id}-link").click
 
       wait_for_download
-      expect(download).to match(/Quadro de Horários \(2022_1\)\.pdf/)
+      expect(download).to match(/QUADRO DE HORÁRIOS \(2022_1\)\.pdf/)
     end
   end
 end

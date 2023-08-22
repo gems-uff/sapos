@@ -219,7 +219,7 @@ RSpec.describe "CourseClasses features", type: :feature do
 
       click_link "Quadro de Horários"
       wait_for_download
-      expect(download).to match(/Quadro de Horários \(2022_2\)\.pdf/)
+      expect(download).to match(/QUADRO DE HORÁRIOS \(2022_2\)\.pdf/)
     end
   end
 
