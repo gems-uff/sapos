@@ -43,6 +43,38 @@ RSpec.describe Notification, type: :model do
           notification.notification_offset = "1"
           expect(notification).to have_error(:manual_frequency_requires_notification_offset_to_be_zero).on :notification_offset
         end
+        it "the letter does not represent a duration" do
+          notification.frequency = Notification::MONTHLY
+          notification.notification_offset = "1A"
+          expect(notification).to have_error(:offset_invalid_value).on :notification_offset
+        end
+        it "the duration letter does not have a unit" do
+          notification.frequency = Notification::MONTHLY
+          notification.notification_offset = "M"
+          expect(notification).to have_error(:offset_invalid_value).on :notification_offset
+        end
+      end
+      context "should be valid when" do
+        it "the duration is a number" do
+          notification.frequency = Notification::MONTHLY
+          notification.notification_offset = "1"
+          expect(notification).to be_valid
+        end
+        it "the duration is a number with units" do
+          notification.frequency = Notification::MONTHLY
+          notification.notification_offset = "1w"
+          expect(notification).to be_valid
+        end
+        it "the duration is a number with multiple units" do
+          notification.frequency = Notification::MONTHLY
+          notification.notification_offset = "2M1w"
+          expect(notification).to be_valid
+        end
+        it "the duration has multiple numbers, but ends with no unit in the end" do
+          notification.frequency = Notification::MONTHLY
+          notification.notification_offset = "2M1"
+          expect(notification).to be_valid
+        end
       end
     end
 

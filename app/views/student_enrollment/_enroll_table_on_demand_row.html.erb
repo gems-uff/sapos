@@ -59,7 +59,7 @@
       )
     %>
     <%= enroll_table_td(day_options) do %>
-      <%= (cell.empty? ? "&nbsp; " : cell.strip.sub("\n", "<br/>")).html_safe %>
+      <%= (cell.empty? ? "&nbsp; " : cell.strip.gsub("\n", "<br/>")).html_safe %>
     <% end %>
   <% end %>
   <%= enroll_table_td(professor_options) do %>

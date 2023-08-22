@@ -47,10 +47,10 @@ class Notification < ApplicationRecord
   validates :to_template, presence: true, on: :update
 
   validates_format_of :notification_offset,
-    with: /\A(-?\d+[yMwdhms]?)+\z/,
+    with: /\A(-?\d+[yMwdhms])*(-?\d*)\z/,
     message: :offset_invalid_value
   validates_format_of :query_offset,
-    with: /\A(-?\d+[yMwdhms]?)+\z/,
+    with: /\A(-?\d+[yMwdhms])*(-?\d*)\z/,
     message: :offset_invalid_value
 
   validate :has_grades_report_pdf_attachment_requirements

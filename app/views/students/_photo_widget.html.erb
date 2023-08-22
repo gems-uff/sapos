@@ -43,7 +43,13 @@
     if (!input.length) return;
     var remove_photo = input.parents(".carrierwave_controls").find('input[name="record[remove_photo]"]');
 
-    carrierwave_preview('.students-view', input);
+    <%
+      photo_path = ""
+      if record.present? && record.photo.present?
+        photo_path = photo_student_path(record, hash: record.photo_before_type_cast)
+      end
+    %>
+    carrierwave_preview('.students-view', input, "<%= photo_path%>");
 
     var togglewebcam = $('#<%= options[:id] %>_togglewebcam');
     var togglefile = $('#<%= options[:id] %>_togglefile');

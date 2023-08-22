@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_08_192848) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_22_203155) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -602,8 +602,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_08_192848) do
 
   create_table "users", force: :cascade do |t|
     t.string "name", limit: 255
-    t.string "hashed_password", limit: 255
-    t.string "salt", limit: 255
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.string "email", limit: 255, default: "", null: false
