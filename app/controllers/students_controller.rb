@@ -16,7 +16,10 @@ class StudentsController < ApplicationController
     config.create.label = :create_student_label
 
     config.columns[:birthdate].options = {
-      data: { "minDate" => "-100Y", "maxDate" => "-0Y", "yearRange": "-100:-0" }
+      data: CustomVariable.past_calendar_range
+    }
+    config.columns[:identity_expedition_date].options = {
+      data: CustomVariable.past_calendar_range
     }
     config.columns[:birth_city].form_ui = :select
     config.columns[:birth_state].form_ui = :hidden

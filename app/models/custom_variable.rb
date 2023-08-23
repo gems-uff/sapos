@@ -19,6 +19,9 @@ class CustomVariable < ApplicationRecord
     "grade_of_disapproval_for_absence" => :text,
     "professor_login_can_post_grades" => :text,
     "month_year_range" => :text,
+    "year_semester_range" => :text,
+    "past_calendar_range" => :text,
+    "academic_calendar_range" => :text,
   }
 
   validates :variable, presence: true
@@ -86,15 +89,22 @@ class CustomVariable < ApplicationRecord
 
   def self.month_year_range
     config = CustomVariable.find_by_variable(:month_year_range)
-    return [20, 10, false] if config.blank? || config.value.blank?
-    swap = false
-    value = config.value
-    if value.starts_with?("-")
-      swap = true
-      value = value[1..]
-    end
-    return value.split(":").map(&:to_i) + [swap] if value.include? ":"
-    [value.to_i, value.to_i, swap]
+    self.parse_range(config, [20, 10, false])
+  end
+
+  def self.year_semester_range
+    config = CustomVariable.find_by_variable(:year_semester_range)
+    self.parse_range(config, [5, 1, true])
+  end
+
+  def self.past_calendar_range
+    config = CustomVariable.find_by_variable(:past_calendar_range)
+    self.parse_calendar_range(config, [100, 0, false])
+  end
+
+  def self.academic_calendar_range
+    config = CustomVariable.find_by_variable(:academic_calendar_range)
+    self.parse_calendar_range(config, [20, 10, false])
   end
 
   def to_label
@@ -102,6 +112,30 @@ class CustomVariable < ApplicationRecord
   end
 
   private
+    def self.parse_range(config, default)
+      return default if config.blank? || config.value.blank?
+      swap = false
+      value = config.value
+      if value.starts_with?("~")
+        swap = true
+        value = value[1..]
+      end
+      return value.split(":").map(&:to_i) + [swap] if value.include? ":"
+      [value.to_i, value.to_i, swap]
+    end
+
+    def self.parse_calendar_range(config, default)
+      start_year, end_year, _ = self.parse_range(config, default)
+      start_year = -start_year
+      start_year_t = start_year <= 0 ? "-#{-start_year}" : "+#{start_year}"
+      end_year_t = end_year <= 0 ? "-#{-end_year}" : "+#{end_year}"
+      {
+        "minDate" => "#{start_year_t}Y",
+        "maxDate" => "#{end_year_t}Y",
+        "yearRange": "#{start_year_t}:#{end_year_t}"
+      }
+    end
+
     def check_constraints_between_variables
       case self.variable
       when "minimum_grade_for_approval"

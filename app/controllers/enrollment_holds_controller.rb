@@ -19,12 +19,12 @@ class EnrollmentHoldsController < ApplicationController
     config.columns[:year].form_ui = :select
     config.columns[:semester].form_ui = :select
     config.columns[:semester].options = {
-      options: ["1", "2"],
+      options: YearSemester::SEMESTERS,
       include_blank: true,
       default: nil,
     }
     config.columns[:year].options = {
-      options: ((Date.today.year - 10)..(Date.today.year + 10)).map { |y| y },
+      options: YearSemester.selectable_years,
       include_blank: true,
       default: nil,
     }

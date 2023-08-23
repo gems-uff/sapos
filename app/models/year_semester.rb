@@ -18,7 +18,10 @@ class YearSemester
   SECOND_SEMESTER_BEGIN_DAY = 1
 
   def self.selectable_years
-    ((Date.today.year - 5)..Date.today.year + 1).map { |y| y }.reverse
+    start_year, end_year, swap = CustomVariable.year_semester_range
+    result = ((Date.today.year - start_year)..(Date.today.year + end_year)).to_a
+    result = result.reverse if swap
+    result
   end
 
   def self.current

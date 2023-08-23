@@ -22,9 +22,9 @@ class ProfessorsController < ApplicationController
     config.create.label = :create_professor_label
     config.columns[:advisement_points].sort_by method: "advisement_points_order"
     config.columns[:enrollments].associated_limit = nil
-    config.columns[:birthdate].options = { data: {
-      "minDate" => "-100Y", "maxDate" => "-0Y", "yearRange": "-100:-0"
-    } }
+    config.columns[:birthdate].options = {
+      data: CustomVariable.past_calendar_range
+    }
     config.columns[:civil_status].form_ui = :select
     config.columns[:civil_status].options = {
       options: [["Solteiro(a)", "solteiro"], ["Casado(a)", "casado"]]
@@ -37,10 +37,17 @@ class ProfessorsController < ApplicationController
     config.columns[:professor_research_areas].includes = {
       research_areas: :professor_research_areas
     }
-
+    config.columns[:identity_issuing_place].form_ui = ""
+    config.columns[:identity_expedition_date].form_ui = :date_picker
+    config.columns[:identity_expedition_date].options = {
+      data: CustomVariable.past_calendar_range
+    }
     config.columns[:academic_title_institution].form_ui = :record_select
     config.columns[:academic_title_country].form_ui = :select
     config.columns[:academic_title_level].form_ui = :select
+    config.columns[:academic_title_date].options = {
+      data: CustomVariable.past_calendar_range
+    }
 
     form_columns = [
       :name, :email, :sex, :civil_status, :birthdate, :city, :neighborhood,

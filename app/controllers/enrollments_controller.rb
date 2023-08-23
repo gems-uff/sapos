@@ -111,6 +111,9 @@ class EnrollmentsController < ApplicationController
     config.columns[:scholarship_durations_active].search_ui = :select
     config.columns[:student].form_ui = :record_select
     config.columns[:student].search_ui = :record_select
+    config.columns[:thesis_defense_date].options = {
+      data: CustomVariable.academic_calendar_range
+    }
 
     columns = [
       :enrollment_number,
