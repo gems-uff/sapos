@@ -61,10 +61,10 @@ class Query < ApplicationRecord
       { columns: db_resource.columns, rows: db_resource.rows }
     elsif ApplicationRecord.connection.adapter_name == "Mysql2"
       conf = ApplicationRecord.configurations
-      client = Mysql2::Client.new(
+      client = Mysql2::Client.new((
         conf.configs_for(env_name: "#{Rails.env}_read_only")[0] ||
-        conf.configs_for(env_name: conf[Rails.env])[0]
-      )
+        conf.configs_for(env_name: Rails.env)[0]
+      ).configuration_hash)
       results = client.query(query)
       client.close
 
