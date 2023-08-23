@@ -46,7 +46,7 @@
     <%
       photo_path = ""
       if record.present? && record.photo.present?
-        photo_path = photo_student_path(record, hash: record.photo_before_type_cast)
+        photo_path = record.photo.url
       end
     %>
     carrierwave_preview('.students-view', input, "<%= photo_path%>");

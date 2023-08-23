@@ -2,7 +2,7 @@ function carrierwave_preview(as_container, input, previous_url) {
   // Show previously loaded image
   var a = $(as_container + ' .carrierwave_controls a')[0];
   if (a){
-    $(a).html('<img src="'+previous_url+'" class="preview-previous" />');
+    $(a).html('<img src="'+previous_url+'" class="preview-image" />');
     a.nextSibling.remove();
     $(a).css('display', 'block');
   }
@@ -17,9 +17,9 @@ function carrierwave_preview(as_container, input, previous_url) {
       reader.onload = (function(theFile) {
         return function(e) {
           $(as_container + ' .previewimage').html([
-            '<p>Visualização:</p><img class="thumb" src="', e.target.result,
+            '<p>Visualização:</p><img class="thumb preview-image" src="', e.target.result,
             '" title="', escape(theFile.name),
-            '" ' + img_style + ' />'
+            '" />'
           ].join(''));
         };
       })(f);

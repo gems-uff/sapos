@@ -23,9 +23,7 @@
   <%
     logo_path = ""
     if record.present? && record.image.present?
-      logo_path = logo_report_configuration_path(
-        record, hash: record.image_before_type_cast
-      )
+      logo_path = record.image.url
     end
   %>
   carrierwave_preview(
