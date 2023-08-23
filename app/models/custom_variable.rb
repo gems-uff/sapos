@@ -86,7 +86,15 @@ class CustomVariable < ApplicationRecord
 
   def self.month_year_range
     config = CustomVariable.find_by_variable(:month_year_range)
-    config.blank? ? 20 : config.value.to_i
+    return [20, 10, false] if config.blank? || config.value.blank?
+    swap = false
+    value = config.value
+    if value.starts_with?("-")
+      swap = true
+      value = value[1..]
+    end
+    return value.split(":").map(&:to_i) + [swap] if value.include? ":"
+    [value.to_i, value.to_i, swap]
   end
 
   def to_label

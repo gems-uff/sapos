@@ -6,6 +6,6 @@
 # Helper for Dismissals
 module DismissalsHelper
   def date_form_column(record, options)
-    scholarship_month_year_widget record, options, :date, required: false
+    month_year_widget record, options, :date, required: false
   end
 end

@@ -6,7 +6,7 @@
 # Helper for Accomplishments
 module AccomplishmentsHelper
   def conclusion_date_form_column(record, options)
-    scholarship_month_year_widget record, options, :conclusion_date
+    month_year_widget record, options, :conclusion_date
   end
 
   # TODO: remove current accomplishments and current deferral_type if level was changed

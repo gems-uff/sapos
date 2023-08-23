@@ -177,30 +177,30 @@ module EnrollmentsHelper
   end
 
   def admission_date_search_column(record, options)
-    scholarship_month_year_widget(
+    month_year_widget(
       record, options, :admission_date, required: false, multiparameter: false,
       date_options: { prefix: options[:name] }
     )
   end
 
   def deferral_approval_date_form_column(record, options)
-    scholarship_month_year_widget(
+    month_year_widget(
       record, options, :approval_date, required: false
     )
   end
 
   def accomplishment_conclusion_date_form_column(record, options)
-    scholarship_month_year_widget(
+    month_year_widget(
       record, options, :conclusion_date, required: false
     )
   end
 
   def dismissal_date_form_column(record, options)
-    scholarship_month_year_widget(record, options, :date, required: false)
+    month_year_widget(record, options, :date, required: false)
   end
 
   def admission_date_form_column(record, options)
-    scholarship_month_year_widget(record, options, :admission_date)
+    month_year_widget(record, options, :admission_date)
   end
 
   def level_form_column(record, options)

@@ -9,34 +9,34 @@ module ScholarshipsHelper
   include ScholarshipsPdfHelper
 
   def scholarship_duration_cancel_date_form_column(record, options)
-    scholarship_month_year_widget record, options, :cancel_date
+    month_year_widget record, options, :cancel_date
   end
 
   def scholarship_duration_start_date_form_column(record, options)
-    scholarship_month_year_widget record, options, :start_date
+    month_year_widget record, options, :start_date
   end
 
   def scholarship_duration_end_date_form_column(record, options)
-    scholarship_month_year_widget record, options, :end_date
+    month_year_widget record, options, :end_date
   end
 
   def scholarship_start_date_form_column(record, options)
-    scholarship_month_year_widget record, options, :start_date
+    month_year_widget record, options, :start_date
   end
 
   def scholarship_end_date_form_column(record, options)
-    scholarship_month_year_widget record, options, :end_date
+    month_year_widget record, options, :end_date
   end
 
   def start_date_search_column(record, options)
-    scholarship_month_year_widget(
+    month_year_widget(
       record, options, :start_date, required: false, multiparameter: false,
                                     date_options: { prefix: options[:name] }
     )
   end
 
   def end_date_search_column(record, options)
-    scholarship_month_year_widget(
+    month_year_widget(
       record, options, :end_date, required: false, multiparameter: false,
                                   date_options: { prefix: options[:name] }
     )

@@ -43,7 +43,7 @@ module EnrollmentSearchHelperConcern
   end
 
   def custom_admission_date_search_column(record, options)
-    scholarship_month_year_widget(
+    month_year_widget(
       record, options, :admission_date,
       required: false, multiparameter: false,
       date_options: { prefix: options[:name] }

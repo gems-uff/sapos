@@ -62,7 +62,7 @@ module ApplicationHelper
     })
   end
 
-  def scholarship_month_year_widget(record, options, attribute, extra = {})
+  def month_year_widget(record, options, attribute, extra = {})
     config = ActiveScaffold::Config::Core.new(record.class)
     extra[:date_options] ||= {}
     extra[:select_options] ||= {}
@@ -74,16 +74,19 @@ module ApplicationHelper
       extra[:multiparameter]
     extra[:force_send] ||= extra[:force_send].nil? ? false : extra[:force_send]
     year_range = CustomVariable.month_year_range
+    start_year = Time.now.year - year_range[0]
+    end_year = Time.now.year + year_range[1]
+    start_year, end_year = end_year, start_year if year_range[2]
     date_options = {
       discard_day: true,
-      start_year: Time.now.year - year_range,
-      end_year: Time.now.year + year_range
+      start_year: start_year,
+      end_year: end_year
     }.merge(extra[:date_options])
     unless extra[:required]
       date_options[:include_blank] = true
       date_options[:default] = nil
     end
-    render(partial: "application/scholarship_month_year_widget",
+    render(partial: "application/month_year_widget",
            locals: { record: record,
                      options: options,
                      date_options: options.merge(date_options),
