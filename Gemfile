@@ -81,6 +81,7 @@ gem "font-awesome-rails"
 gem "prawn"
 gem "prawn-table"
 gem "prawn-rails"
+gem "matrix", "~> 0.4.2"
 
 # Redcarpet for Readme MarkDown (or README.md) - Credits Page
 gem "redcarpet"
@@ -155,7 +156,6 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
-  gem "webdrivers"
 
   # Test runner
   gem "rspec-rails"
