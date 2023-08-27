@@ -53,6 +53,27 @@ RSpec.describe Notification, type: :model do
           notification.notification_offset = "M"
           expect(notification).to have_error(:offset_invalid_value).on :notification_offset
         end
+        it "the duration is smaller than the annual frequence" do
+          notification.frequency = Notification::ANNUAL
+          notification.notification_offset = "-367d"
+          expect(notification).to have_error(:offset_bigger_than_frequency).on :notification_offset
+        end
+        it "the duration is smaller than the monthly frequence" do
+          notification.frequency = Notification::MONTHLY
+          notification.notification_offset = "-40d"
+          expect(notification).to have_error(:offset_bigger_than_frequency).on :notification_offset
+        end
+        it "the duration is smaller than the weekly frequence" do
+          notification.frequency = Notification::WEEKLY
+          notification.notification_offset = "-9d"
+          expect(notification).to have_error(:offset_bigger_than_frequency).on :notification_offset
+        end
+        it "the duration is smaller than the daily frequence" do
+          notification.frequency = Notification::DAILY
+          notification.notification_offset = "-2d"
+          expect(notification).to have_error(:offset_bigger_than_frequency).on :notification_offset
+        end
+
       end
       context "should be valid when" do
         it "the duration is a number" do
@@ -66,12 +87,12 @@ RSpec.describe Notification, type: :model do
           expect(notification).to be_valid
         end
         it "the duration is a number with multiple units" do
-          notification.frequency = Notification::MONTHLY
+          notification.frequency = Notification::ANNUAL
           notification.notification_offset = "2M1w"
           expect(notification).to be_valid
         end
         it "the duration has multiple numbers, but ends with no unit in the end" do
-          notification.frequency = Notification::MONTHLY
+          notification.frequency = Notification::ANNUAL
           notification.notification_offset = "2M1"
           expect(notification).to be_valid
         end

@@ -30,6 +30,7 @@ pt-BR:
     errors:
       models:
         notification:
+          offset_bigger_than_frequency: "não pode ser um valor que ultrapasse a frequência"
           offset_invalid_value: "está com o valor inválido. Tente um número, seguido por y, M, W, d, h, m ou s"
           individual_required: "requer que o email seja individual"
           query_with_enrollments_id_alias_column_required: "requer que a Consulta possua com campo com alias enrollments_id"

@@ -53,6 +53,9 @@ class Notification < ApplicationRecord
     with: /\A(-?\d+[yMwdhms])*(-?\d*)\z/,
     message: :offset_invalid_value
 
+  validate :has_notification_offset_within_range,
+    :if => Proc.new { |o| o.errors.empty? }
+
   validate :has_grades_report_pdf_attachment_requirements
 
   validate :frequency_manual_has_notification_offset_equals_zero
@@ -102,6 +105,19 @@ class Notification < ApplicationRecord
         )
       end
     end
+  end
+
+  def has_notification_offset_within_range
+    time_delta = StringTimeDelta.parse(self.notification_offset)
+    time_delta = -time_delta if time_delta < 0
+    errors.add(
+      :notification_offset,
+      :offset_bigger_than_frequency
+    ) if (time_delta >= 365.days && self.frequency == ANNUAL) ||
+         (time_delta >= 153.days && self.frequency == SEMIANNUAL) || # 8M - 3M
+         (time_delta >= 28.days && self.frequency == MONTHLY) ||
+         (time_delta >= 7.days && self.frequency == WEEKLY) ||
+         (time_delta >= 1.days && self.frequency == DAILY)
   end
 
   def query_params_ids

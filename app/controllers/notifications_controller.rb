@@ -89,7 +89,7 @@ class NotificationsController < ApplicationController
     record.update_next_execution!
   end
 
-  def prepare_attachments(attachments)
+  def prepare_attachments(message, attachments)
     if attachments
       if attachments[:grades_report_pdf]
         enrollments_id = message[:enrollments_id]
@@ -126,7 +126,7 @@ class NotificationsController < ApplicationController
       )
       notification_execute[:notifications].each do |message|
         prepare_attachments(
-          notification_execute[:notifications_attachments][message]
+          message, notification_execute[:notifications_attachments][message]
         )
       end
 
@@ -178,7 +178,7 @@ class NotificationsController < ApplicationController
     notifications_flatten = notifications.flatten
 
     notifications_flatten.each do |message|
-      prepare_attachments(notifications_attachments[message])
+      prepare_attachments(message, notifications_attachments[message])
     end
 
     Notifier.send_emails({
