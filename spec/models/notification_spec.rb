@@ -73,7 +73,6 @@ RSpec.describe Notification, type: :model do
           notification.notification_offset = "-2d"
           expect(notification).to have_error(:offset_bigger_than_frequency).on :notification_offset
         end
-
       end
       context "should be valid when" do
         it "the duration is a number" do

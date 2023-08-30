@@ -5,6 +5,7 @@
 
 class CourseClassesController < ApplicationController
   authorize_resource
+  include SharedPdfConcern
   include NumbersHelper
 
   before_action :remove_constraint_to_show_enrollment_column, only: [:edit]
@@ -81,18 +82,14 @@ class CourseClassesController < ApplicationController
   )
 
   def summary_pdf
-    @course_class = CourseClass.find(params[:id])
-    course_class = @course_class
+    course_class = CourseClass.find(params[:id])
 
     respond_to do |format|
       format.pdf do
-        send_data(
-          render_to_string,
-          filename: "#{I18n.t(
-            "pdf_content.course_class.summary.title"
-          )} - #{course_class.name_with_class}.pdf",
+        title = I18n.t("pdf_content.course_class.summary.title")
+        send_data render_course_classes_summary_pdf(course_class),
+          filename: "#{title} - #{course_class.name_with_class}.pdf",
           type: "application/pdf"
-        )
       end
     end
   end
@@ -115,18 +112,15 @@ class CourseClassesController < ApplicationController
       )
       redirect_to action: :index
     else
-      @year = search_params[:year]
-      @semester = search_params[:semester]
+      year = search_params[:year]
+      semester = search_params[:semester]
 
       respond_to do |format|
         format.pdf do
-          stream = render_to_string(
-            template: "class_schedules/class_schedule_pdf"
-          )
-          filename = "#{I18n.t(
-            "pdf_content.class_schedule.class_schedule_pdf.title"
-          )} (#{@year}_#{@semester}).pdf"
-          send_data(stream, filename: filename, type: "application/pdf")
+          title = I18n.t("pdf_content.class_schedule.class_schedule_pdf.title")
+          send_data render_class_schedules_class_schedule_pdf(year, semester),
+            filename: "#{title} (#{year}_#{semester}).pdf",
+            type: "application/pdf"
         end
       end
     end

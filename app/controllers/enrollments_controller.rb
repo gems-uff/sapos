@@ -5,6 +5,7 @@
 
 class EnrollmentsController < ApplicationController
   include EnrollmentSearchConcern
+  include SharedPdfConcern
 
   authorize_resource
   include NumbersHelper
@@ -211,20 +212,12 @@ class EnrollmentsController < ApplicationController
   end
 
   def academic_transcript_pdf
-    @enrollment = Enrollment.find(params[:id])
-
-    @class_enrollments = @enrollment.class_enrollments
-      .where(situation: ClassEnrollment::APPROVED)
-      .joins(:course_class)
-      .order("course_classes.year", "course_classes.semester")
-
-    @accomplished_phases = @enrollment.accomplishments.order(:conclusion_date)
-
+    enrollment = Enrollment.find(params[:id])
     respond_to do |format|
       format.pdf do
         title = I18n.t("pdf_content.enrollment.academic_transcript.title")
-        student = @enrollment.student.name
-        send_data render_to_string,
+        student = enrollment.student.name
+        send_data render_enrollments_academic_transcript_pdf(enrollment),
           filename: "#{title} - #{student}.pdf",
           type: "application/pdf"
       end
@@ -232,23 +225,12 @@ class EnrollmentsController < ApplicationController
   end
 
   def grades_report_pdf
-    @enrollment = Enrollment.find(params[:id])
-
-    @class_enrollments = @enrollment.class_enrollments
-      .where(situation: ClassEnrollment::APPROVED)
-      .joins(:course_class)
-      .order("course_classes.year", "course_classes.semester")
-
-
-    @accomplished_phases = @enrollment.accomplishments.order(:conclusion_date)
-
-    @deferrals = @enrollment.deferrals.order(:approval_date)
-
+    enrollment = Enrollment.find(params[:id])
     respond_to do |format|
       format.pdf do
         title = I18n.t("pdf_content.enrollment.grades_report.title")
-        student = @enrollment.student.name
-        send_data render_to_string,
+        student = enrollment.student.name
+        send_data render_enrollments_grades_report_pdf(enrollment),
           filename: "#{title} - #{student}.pdf",
           type: "application/pdf"
       end

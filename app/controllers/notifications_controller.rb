@@ -4,6 +4,8 @@
 # frozen_string_literal: true
 
 class NotificationsController < ApplicationController
+  include SharedPdfConcern
+
   authorize_resource
   skip_authorization_check only: [:notify]
   skip_before_action :authenticate_user!, only: :notify
@@ -92,25 +94,9 @@ class NotificationsController < ApplicationController
   def prepare_attachments(message, attachments)
     if attachments
       if attachments[:grades_report_pdf]
-        enrollments_id = message[:enrollments_id]
-        enrollment = Enrollment.find(enrollments_id)
-        class_enrollments = enrollment.class_enrollments.where(
-          situation: ClassEnrollment::APPROVED
-        ).joins(:course_class).order(
-          "course_classes.year", "course_classes.semester"
-        )
-        accomplished_phases = enrollment.accomplishments
-          .order(:conclusion_date)
-        deferrals = enrollment.deferrals.order(:approval_date)
-        attachments[:grades_report_pdf][:file_contents] = render_to_string(
-          template: "enrollments/grades_report_pdf.pdf.prawn",
-          assigns: {
-            enrollment: enrollment,
-            class_enrollments: class_enrollments,
-            accomplished_phases: accomplished_phases,
-            deferrals: deferrals
-          }
-        )
+        enrollment = Enrollment.find(message[:enrollments_id])
+        attachments[:grades_report_pdf][:file_contents] =
+          render_enrollments_grades_report_pdf(enrollment)
       end
     end
   end

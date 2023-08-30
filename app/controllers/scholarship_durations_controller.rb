@@ -239,11 +239,9 @@ class ScholarshipDurationsController < ApplicationController
     respond_to do |format|
       format.pdf do
         title = I18n.t("pdf_content.scholarship_durations.to_pdf.filename")
-        send_data(
-          render_to_string,
+        send_data render_to_string,
           filename: "#{title}.pdf",
           type: "application/pdf"
-        )
       end
     end
   end

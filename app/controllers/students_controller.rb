@@ -56,7 +56,7 @@ class StudentsController < ApplicationController
 
   def photo
     student = Student.find params[:id]
-    send_data(student.photo.read, filename: student.photo_identifier)
+    send_data student.photo.read, filename: student.photo_identifier
   end
 
   private
