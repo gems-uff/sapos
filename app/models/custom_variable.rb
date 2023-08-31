@@ -176,7 +176,7 @@ class CustomVariable < ApplicationRecord
       case self.variable
       when "minimum_grade_for_approval", "grade_of_disapproval_for_absence"
         if CustomVariable.find_by_variable(self.variable).present?
-          self.errors.add(:base, :check_duplicate, { variable: self.variable })
+          self.errors.add(:base, :check_duplicate, variable: self.variable)
         end
       end
     end
