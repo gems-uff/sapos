@@ -2058,118 +2058,6 @@ queries = [
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
     SQL
   },
-  { name: "CHECK JUBILAMENTO",
-    description: "Lista alunos que precisam ser jubilados por terem CR < 6, ou CR < 7 em dois períodos consecutivos, ou 2 reprovações ou mais ",
-    params: [
-      {
-        name: "ano_semestre_atual",
-        value_type: "Integer",
-      },
-      {
-        name: "numero_semestre_atual",
-        value_type: "Integer",
-      },
-      {
-        name: "ano_ultimo_semestre",
-        value_type: "Integer",
-      },
-      {
-        name: "numero_ultimo_semestre",
-        value_type: "Integer",
-      },
-    ],
-    notifications: [],
-    sql: <<~SQL
-      SELECT s.name, s.email,
-             e.enrollment_number,
-             cc.year,
-             cc.semester,
-             round(((SUM(ce.grade * c.credits)/SUM(c.credits))/10), 1) AS cr_periodo,
-             "CR < 6" AS motivo
-      FROM students s, enrollments e, class_enrollments ce, courses c,
-           course_types ct, course_classes cc, enrollment_statuses es
-      WHERE s.id = e.student_id
-      AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
-      AND e.enrollment_status_id = es.id
-      AND es.name = "Regular"
-      AND ce.enrollment_id = e.id
-      AND ct.has_score = 1
-      AND ct.id = c.course_type_id
-      AND c.id = cc.course_id
-      AND cc.id = ce.course_class_id
-      AND ce.situation != "Incompleto"
-      AND ce.grade_not_count_in_gpr = False
-      GROUP BY s.name, e.enrollment_number, cc.year, cc.semester
-      HAVING SUM(ce.grade * c.credits)/SUM(c.credits) < 59.5
-        AND COUNT(ce.id) > 1
-
-      UNION
-
-      SELECT s.name, s.email,
-             e.enrollment_number,
-             cc.year,
-             cc.semester,
-             "--" AS cr_periodo,
-             "2 reprovações" AS motivo
-      FROM students s, enrollments e, class_enrollments ce,
-           courses c, course_classes cc, enrollment_statuses es
-      WHERE s.id = e.student_id
-      AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
-      AND e.enrollment_status_id = es.id
-      AND es.name = "Regular"
-      AND ce.enrollment_id = e.id
-      AND c.id = cc.course_id
-      AND cc.id = ce.course_class_id
-      AND ce.situation = "Reprovado"
-      GROUP BY s.name, e.enrollment_number
-      HAVING COUNT(*) >= 2
-
-      UNION
-
-      SELECT s.name, s.email,
-             enrollment_number,
-             cc.year,
-             cc.semester,
-             round(((SUM(ce.grade * c.credits)/SUM(c.credits))/10), 1) AS cr_periodo,
-             "CR < 7 em dois períodos consecutivos" AS motivo
-      FROM students s, enrollments e, class_enrollments ce,
-           courses c, course_types ct, course_classes cc, enrollment_statuses es
-      WHERE s.id = e.student_id
-      AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
-      AND e.enrollment_status_id = es.id
-      AND es.name = "Regular"
-      AND ce.enrollment_id = e.id
-      AND ct.has_score = 1
-      AND ct.id = c.course_type_id
-      AND c.id = cc.course_id
-      AND cc.id = ce.course_class_id
-      AND ce.situation != "Incompleto"
-      AND ce.grade_not_count_in_gpr = False
-      AND cc.year = :ano_semestre_atual
-      AND cc.semester = :numero_semestre_atual
-      /* e também teve CR menor do que 7 no semestre anterior */
-      AND e.id IN (SELECT e.id
-                   FROM enrollments e, class_enrollments ce, courses c,
-                   course_types ct, course_classes cc, enrollment_statuses es
-                   WHERE e.id NOT IN (SELECT enrollment_id FROM dismissals)
-                   AND e.enrollment_status_id = es.id
-                   AND es.name = "Regular"
-                   AND ce.enrollment_id = e.id
-                   AND ct.has_score = 1
-                   AND ct.id = c.course_type_id
-                   AND c.id = cc.course_id
-                   AND cc.id = ce.course_class_id
-                   AND ce.situation != "Incompleto"
-                   AND ce.grade_not_count_in_gpr = False
-                   AND cc.year = :ano_ultimo_semestre
-                   AND cc.semester = :numero_ultimo_semestre
-                   GROUP BY e.id
-                   HAVING SUM(ce.grade * c.credits)/SUM(c.credits) < 69.5)
-      GROUP BY s.name, e.enrollment_number, cc.year, cc.semester
-      HAVING SUM(ce.grade * c.credits)/SUM(c.credits) < 69.5
-      ORDER BY s.name
-    SQL
-  },
   { name: "Alunos que se inscreveram em Estudo Orientado",
     description: "Usar para checar se todos entregaram o plano de estudo.",
     params: [
@@ -2674,6 +2562,118 @@ unless is_sqlite
         AND es.name = "Regular" /* Aluno regular */
         AND ct.name = "Pesquisa de Dissertação e Tese" /* Já se inscreveu em pesquisa de tese ou dissertação */
         ORDER BY nome
+      SQL
+    },
+    { name: "CHECK JUBILAMENTO",
+      description: "Lista alunos que precisam ser jubilados por terem CR < 6, ou CR < 7 em dois períodos consecutivos, ou 2 reprovações ou mais ",
+      params: [
+        {
+          name: "ano_semestre_atual",
+          value_type: "Integer",
+        },
+        {
+          name: "numero_semestre_atual",
+          value_type: "Integer",
+        },
+        {
+          name: "ano_ultimo_semestre",
+          value_type: "Integer",
+        },
+        {
+          name: "numero_ultimo_semestre",
+          value_type: "Integer",
+        },
+      ],
+      notifications: [],
+      sql: <<~SQL
+        SELECT s.name, s.email,
+               e.enrollment_number,
+               cc.year,
+               cc.semester,
+               round(((SUM(ce.grade * c.credits)/SUM(c.credits))/10), 1) AS cr_periodo,
+               "CR < 6" AS motivo
+        FROM students s, enrollments e, class_enrollments ce, courses c,
+             course_types ct, course_classes cc, enrollment_statuses es
+        WHERE s.id = e.student_id
+        AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
+        AND e.enrollment_status_id = es.id
+        AND es.name = "Regular"
+        AND ce.enrollment_id = e.id
+        AND ct.has_score = 1
+        AND ct.id = c.course_type_id
+        AND c.id = cc.course_id
+        AND cc.id = ce.course_class_id
+        AND ce.situation != "Incompleto"
+        AND ce.grade_not_count_in_gpr = False
+        GROUP BY s.name, e.enrollment_number, cc.year, cc.semester
+        HAVING SUM(ce.grade * c.credits)/SUM(c.credits) < 59.5
+          AND COUNT(ce.id) > 1
+
+        UNION
+
+        SELECT s.name, s.email,
+               e.enrollment_number,
+               cc.year,
+               cc.semester,
+               "--" AS cr_periodo,
+               "2 reprovações" AS motivo
+        FROM students s, enrollments e, class_enrollments ce,
+             courses c, course_classes cc, enrollment_statuses es
+        WHERE s.id = e.student_id
+        AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
+        AND e.enrollment_status_id = es.id
+        AND es.name = "Regular"
+        AND ce.enrollment_id = e.id
+        AND c.id = cc.course_id
+        AND cc.id = ce.course_class_id
+        AND ce.situation = "Reprovado"
+        GROUP BY s.name, e.enrollment_number
+        HAVING COUNT(*) >= 2
+
+        UNION
+
+        SELECT s.name, s.email,
+               enrollment_number,
+               cc.year,
+               cc.semester,
+               round(((SUM(ce.grade * c.credits)/SUM(c.credits))/10), 1) AS cr_periodo,
+               "CR < 7 em dois períodos consecutivos" AS motivo
+        FROM students s, enrollments e, class_enrollments ce,
+             courses c, course_types ct, course_classes cc, enrollment_statuses es
+        WHERE s.id = e.student_id
+        AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
+        AND e.enrollment_status_id = es.id
+        AND es.name = "Regular"
+        AND ce.enrollment_id = e.id
+        AND ct.has_score = 1
+        AND ct.id = c.course_type_id
+        AND c.id = cc.course_id
+        AND cc.id = ce.course_class_id
+        AND ce.situation != "Incompleto"
+        AND ce.grade_not_count_in_gpr = False
+        AND cc.year = :ano_semestre_atual
+        AND cc.semester = :numero_semestre_atual
+        /* e também teve CR menor do que 7 no semestre anterior */
+        AND e.id IN (SELECT e.id
+                     FROM enrollments e, class_enrollments ce, courses c,
+                     course_types ct, course_classes cc, enrollment_statuses es
+                     WHERE e.id NOT IN (SELECT enrollment_id FROM dismissals)
+                     AND e.enrollment_status_id = es.id
+                     AND es.name = "Regular"
+                     AND ce.enrollment_id = e.id
+                     AND ct.has_score = 1
+                     AND ct.id = c.course_type_id
+                     AND c.id = cc.course_id
+                     AND cc.id = ce.course_class_id
+                     AND ce.situation != "Incompleto"
+                     AND ce.grade_not_count_in_gpr = False
+                     AND cc.year = :ano_ultimo_semestre
+                     AND cc.semester = :numero_ultimo_semestre
+                     GROUP BY e.id
+                     HAVING SUM(ce.grade * c.credits)/SUM(c.credits) < 69.5)
+        GROUP BY s.name, e.enrollment_number, cc.year, cc.semester
+        HAVING SUM(ce.grade * c.credits)/SUM(c.credits) < 69.5
+        ORDER BY name
       SQL
     },
     { name: "Tempo médio de titulação por período",
