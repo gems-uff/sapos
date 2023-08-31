@@ -6,8 +6,6 @@ require "spec_helper"
 RSpec.describe Notification, type: :model do
   it { should be_able_to_be_destroyed }
   it { should have_many(:notification_logs) }
-  it { should have_many(:notification_params).dependent(:destroy).class_name("NotificationParam") }
-  it { should have_many(:params).dependent(:destroy).class_name("NotificationParam").conditions(active: true) }
 
   before(:all) do
     @destroy_later = []

@@ -4,79 +4,65 @@
   <table class="showtable listed-records-table">
     <thead>
     <tr>
+      <th>Tipo</th>
       <th>Variável</th>
       <th>Valor</th>
       <th>Default</th>
     </tr>
     </thead>
     <tbody class="records">
-    <% resource.params.each do |param| %>
-        <% error = active_scaffold_error_messages_for(
-          param, object_name: param.class.model_name.human.downcase
-        ) %>
-        <% unless error.empty? %>
-            <tr class="record">
-              <td colspan="3"><%= error %></td>
-            </tr>
-        <% end %>
-
-        <% if Notification::RESERVED_PARAMS.include?(param.name) %>
-            <tr class="record">
-              <td>
-                <%= param.name %>
-                <small>(<%= param.value_type %>)</small>
-              </td>
-              <td>
-                <span><%= param.value %></span>
-              </td>
-              <td>
-                <small>(derivado de <b>data_consulta</b>)</small>
-              </td>
-            </tr>
+    <% query_params.each do |param| %>
+      <tr class="record">
+        <td>
+          <%= param.value_type %>
+        </td>
+        <td>
+          <%= param.name %>
+        </td>
+        <% if Notification::DERIVED_PARAMS.include?(param.name) %>
+          <td>
+            <span><%= param.value %></span>
+          </td>
+          <td>
+            (derivado de <b><%= Notification::DERIVED_PARAMS[param.name] %></b>)
+          </td>
         <% else %>
-            <tr class="record">
-              <td>
-                <%= param.name %>
-                <small>(<%= param.value_type %>)</small>
-              </td>
-              <td>
-
-                <% if param.type.list? || param.default_value.nil? %>
-                    <%= text_field_tag(
-                      "#{resource_name}_#{resource.id}_#{param.name}",
-                      param.value,
-                      data: {
-                        name: "#{resource_name}_params[#{param.name}]",
-                        "link-target" => "#as_#{resource_name.pluralize}-simulate-#{resource.id}-link"
-                      },
-                      id: "#{resource_name}_#{resource.id}_#{param.name}",
-                      class: "_onchange_param_field _param_field _param_type_#{param.value_type.downcase}"
-                    ) %>
-                <% else %>
-                    <%= text_field_tag(
-                      "#{resource_name}_#{resource.id}_#{param.name}",
-                      param.parsed_value,
-                      data: {
-                        name: "#{resource_name}_params[#{param.name}]",
-                        "link-target" => "#as_#{resource_name.pluralize}-simulate-#{resource.id}-link"
-                      },
-                      id: "#{resource_name}_#{resource.id}_#{param.name}",
-                      class: "_onchange_param_field _param_field _param_type_#{param.value_type.downcase}"
-                    ) %>
-                <% end %>
-
-              </td>
-              <td>
-                Defaults:
-                <small class="_default_value" data-default_value="<%= param.default_value %>">
-                  <a href="javascript:void(o)">(Consulta: <%= param.default_value %>)</a>
-                </small>
-                <small class="_default_value" data-default_value="<%= param.value %>">
-                  <a href="javascript:void(o)">(Notificação: <%= param.value %>)</a>
-                </small>
-              </td>
-            </tr>
+          <td>
+            <% if param.type.list? || param.default_value.nil? %>
+              <%= text_field_tag(
+                "#{resource_name}_#{resource.id}_#{param.name}",
+                param.value,
+                data: {
+                  name: "query_params[#{param.name}]",
+                    "link-target" => "#as_#{resource_name.pluralize}-simulate-#{resource.id}-link"
+                },
+                id: "#{resource_name}_#{resource.id}_#{param.name}",
+                class: "_onchange_param_field _param_field _param_type_#{param.value_type.downcase}"
+              ) %>
+            <% else %>
+              <%= text_field_tag(
+                "#{resource_name}_#{resource.id}_#{param.name}",
+                param.parsed_value,
+                data: {
+                  name: "query_params[#{param.name}]",
+                    "link-target" => "#as_#{resource_name.pluralize}-simulate-#{resource.id}-link"
+                },
+                id: "#{resource_name}_#{resource.id}_#{param.name}",
+                class: "_onchange_param_field _param_field _param_type_#{param.value_type.downcase}"
+              ) %>
+            <% end %>
+          </td>
+          <td>
+            Defaults:
+            <small class="_default_value" data-default_value="<%= param.default_value %>">
+              <a href="javascript:void(o)">(Consulta: <%= param.default_value %>)</a>
+            </small>
+            <small class="_default_value" data-default_value="<%= param.simulation_value %>">
+              <a href="javascript:void(o)">(Notificação: <%= param.simulation_value %>)</a>
+            </small>
+          </td>
         <% end %>
+      </tr>
     <% end %>
     </tbody>
   </table>

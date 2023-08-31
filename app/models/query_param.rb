@@ -9,9 +9,6 @@ class QueryParam < ApplicationRecord
 
   belongs_to :query, optional: false
 
-  has_many :notification_params, dependent: :destroy
-
-
   VALUE_STRING = "String"
   VALUE_INTEGER = "Integer"
   VALUE_FLOAT = "Float"

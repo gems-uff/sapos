@@ -263,10 +263,6 @@ Rails.application.routes.draw do
     concerns :active_scaffold
   end
 
-  resources :notification_params do
-    concerns :active_scaffold
-  end
-
   resources :report_configurations do
     concerns :active_scaffold
     collection do

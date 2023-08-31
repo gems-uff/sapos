@@ -10,21 +10,16 @@ class Notification < ApplicationRecord
   belongs_to :query, inverse_of: :notifications, optional: false
 
   has_many :notification_logs
-  has_many :notification_params,
-    class_name: "NotificationParam",
-    dependent: :destroy
-  has_many :params,
-    -> { where(active: true) },
-    class_name: "NotificationParam",
-    dependent: :destroy
 
-
-  RESERVED_PARAMS = [
-    "numero_ultimo_semestre",
-    "ano_ultimo_semestre",
-    "numero_semestre_atual",
-    "ano_semestre_atual"
-  ]
+  DERIVATION_DEFS = {
+    "data_consulta" => { name: "data_consulta", value_type: "Date" }
+  }
+  DERIVED_PARAMS = {
+    "numero_ultimo_semestre" => "data_consulta",
+    "ano_ultimo_semestre" => "data_consulta",
+    "numero_semestre_atual" => "data_consulta",
+    "ano_semestre_atual" => "data_consulta",
+  }
 
   ANNUAL = I18n.t("activerecord.attributes.notification.frequencies.annual")
   SEMIANNUAL = I18n.t("activerecord.attributes.notification.frequencies.semiannual")
@@ -54,7 +49,7 @@ class Notification < ApplicationRecord
     message: :offset_invalid_value
 
   validate :has_notification_offset_within_range,
-    :if => Proc.new { |o| o.errors.empty? }
+    if: Proc.new { |o| o.errors.empty? }
 
   validate :has_grades_report_pdf_attachment_requirements
 
@@ -67,12 +62,6 @@ class Notification < ApplicationRecord
   after_initialize do
     self.query_offset ||= "0"
     self.notification_offset ||= "0"
-    hammer_current_params!
-  end
-
-  before_save do
-    hammer_current_params! if self.persisted?
-    true
   end
 
   before_create do
@@ -118,45 +107,6 @@ class Notification < ApplicationRecord
          (time_delta >= 28.days && self.frequency == MONTHLY) ||
          (time_delta >= 7.days && self.frequency == WEEKLY) ||
          (time_delta >= 1.days && self.frequency == DAILY)
-  end
-
-  def query_params_ids
-    (self.query.try(:params) || []).collect(&:id)
-  end
-
-  def build_params_for_creation
-    self.query_params_ids.each do |query_param_id|
-      self.params.build(query_param_id: query_param_id, active: true)
-    end
-  end
-
-  def hammer_current_params!
-    notification_params_ids = (self.notification_params || [])
-      .collect(&:query_param_id)
-
-    new_params = query_params_ids - notification_params_ids
-
-    new_params.each do |query_param_id|
-      self.notification_params.create(
-        query_param_id: query_param_id,
-        notification_id: self.id,
-        active: true
-      )
-    end
-
-    if self.will_save_change_to_query_id?
-      cached_query_params_ids = self.query_params_ids
-      self.notification_params.each do |np|
-        np.update_attribute(
-          :active, cached_query_params_ids.include?(np.query_param_id)
-        )
-      end
-    end
-  end
-
-  def query_id=(val)
-    super
-    hammer_current_params!
   end
 
   def to_label
@@ -211,12 +161,8 @@ class Notification < ApplicationRecord
     if self.frequency != MANUAL
       next_date ||= calculate_next_notification_date
     else
-      next_date ||= self.notification_params.find do |p|
-        p.name == "data_consulta"
-      end.try(:value).try(:to_date)
-      next_date ||= self.notification_params.find do |p|
-        p.name == "data_consulta"
-      end.try(:query_param).try(:default_value).try(:to_date)
+      next_date ||= self.query.params.find { |p| p.name == "data_consulta"}
+        .try(:default_value).try(:to_date)
       next_date ||= Date.today
     end
     next_date +
@@ -224,21 +170,11 @@ class Notification < ApplicationRecord
       StringTimeDelta.parse(self.notification_offset)
   end
 
-  def set_notification_params_values(params)
-    params.each do |key, value|
-      current_param = self.params.find do |p|
-        p.query_param.name.to_s == key.to_s
-      end
-      current_param.value = value if current_param
-    end
-  end
 
   def execute(options = {})
     notifications = []
     notifications_attachments = {}
     params = prepare_params_and_derivations(options[:override_params] || {})
-
-    set_notification_params_values(params)
 
     result = self.query.execute(params)
 
@@ -252,10 +188,10 @@ class Notification < ApplicationRecord
           formatter = ErbFormatter.new(bindings)
 
           notification = {
-              notification_id: self.id,
-              to: formatter.format(self.to_template),
-              subject: formatter.format(self.subject_template),
-              body: formatter.format(self.body_template)
+            notification_id: self.id,
+            to: formatter.format(self.to_template),
+            subject: formatter.format(self.subject_template),
+            body: formatter.format(self.body_template)
           }
 
           attachments = {}
@@ -348,6 +284,6 @@ class Notification < ApplicationRecord
   end
 
   def get_simulation_query_date
-    self.params.find { |p| p.name == "data_consulta" }.simulation_value
+    self.where(active: true).find { |p| p.name == "data_consulta" }.simulation_value
   end
 end

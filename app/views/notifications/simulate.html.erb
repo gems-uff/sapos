@@ -1,6 +1,6 @@
 <h4> <%= @notification.to_label %> </h4>
 
-<%= render "notifications/params_form", resource: @notification %>
+<%= render "notifications/params_form", resource: @notification, query_params: @query_params %>
 
 <div class="actions" style="display: block; margin: 10px 0 0 0;">
   <a id="as_notifications-simulate-<%= @notification.id %>-link"
@@ -12,18 +12,18 @@
   <%= render "queries/show_sql", sql_query: @query_sql %>
 </div>
 
-<% if @messages.size.zero? && params[:notification_params].try(:[], :data_consulta).nil? %>
+<% if @messages.size.zero? && params[:query_params].try(:[], :data_consulta).nil? %>
   <div style="margin: 10px 0">Faça uma simulação</div>
 
-<% elsif @messages.size.zero? && params[:notification_params].try(:[], :data_consulta) %>
+<% elsif @messages.size.zero? && params[:query_params].try(:[], :data_consulta) %>
   <div style="margin: 10px 0">Esta consulta não retornou nenhum resultado</div>
 <% else %>
   <div class="actions" style="display: block">
     <p class="simulate_query_date">
       <span>
-      <% if params[:notification_params].try(:[], :data_consulta) %>
+      <% if params[:query_params].try(:[], :data_consulta) %>
         <%= I18n.t("active_scaffold.notification.query_date") %>:
-        <%= params[:notification_params][:data_consulta] %>
+        <%= params[:query_params][:data_consulta] %>
       <% end %>
       </span>
       &nbsp;&nbsp;&nbsp;
@@ -31,7 +31,7 @@
           data-remote="true" data-method="post" class="execute_now as_action"
           href="<%= execute_now_notification_path(
             @notification,
-            notification_params: params[:notification_params]
+            query_params: params[:query_params]
           ) %>">
         <i class="fa fa-mail-forward" title="Notificar agora"></i>Notificar agora
       </a>

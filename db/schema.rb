@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_22_203155) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_30_232435) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -320,17 +320,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_22_203155) do
     t.text "body"
     t.string "attachments_file_names"
     t.index ["notification_id"], name: "index_notification_logs_on_notification_id"
-  end
-
-  create_table "notification_params", force: :cascade do |t|
-    t.integer "notification_id"
-    t.integer "query_param_id"
-    t.string "value", limit: 255
-    t.datetime "created_at", precision: nil, null: false
-    t.datetime "updated_at", precision: nil, null: false
-    t.boolean "active", default: false, null: false
-    t.index ["notification_id"], name: "index_notification_params_on_notification_id"
-    t.index ["query_param_id"], name: "index_notification_params_on_query_param_id"
   end
 
   create_table "notifications", force: :cascade do |t|

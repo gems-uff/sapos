@@ -58,7 +58,6 @@ class Ability
       cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
       cannot [:read_pendencies], ClassEnrollmentRequest
       cannot [:destroy, :update, :create], Role
-      cannot [:destroy, :create], NotificationParam
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [
         Role, CustomVariable, ReportConfiguration
