@@ -13,6 +13,7 @@ module SharedPdfConcern
     render_to_string(
       template: "class_schedules/class_schedule_pdf",
       type: "application/pdf",
+      formats: [:pdf],
       assigns: {
         year: year,
         semester: semester,
@@ -26,6 +27,7 @@ module SharedPdfConcern
     render_to_string(
       template: "course_classes/summary_pdf",
       type: "application/pdf",
+      formats: [:pdf],
       assigns: {
         course_class: course_class
       }
@@ -43,6 +45,7 @@ module SharedPdfConcern
     render_to_string(
       template: "enrollments/academic_transcript_pdf",
       type: "application/pdf",
+      formats: [:pdf],
       assigns: {
         enrollment: enrollment,
         class_enrollments: class_enrollments,
@@ -61,6 +64,7 @@ module SharedPdfConcern
     render_to_string(
       template: "enrollments/grades_report_pdf",
       type: "application/pdf",
+      formats: [:pdf],
       assigns: {
         enrollment: enrollment,
         class_enrollments: class_enrollments,

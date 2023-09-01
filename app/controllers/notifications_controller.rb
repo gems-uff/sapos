@@ -134,7 +134,7 @@ class NotificationsController < ApplicationController
     Notification.where.not(frequency: Notification::MANUAL)
       .where(next_execution.lt(Time.now)).each do |notification|
         result = prepare_attachments(notification.execute)
-        notifications << result[:notifications]
+        notifications.concat(result[:notifications])
         notifications_attachments.merge!(result[:notifications_attachments])
       end
 

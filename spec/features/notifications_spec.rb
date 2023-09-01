@@ -17,12 +17,27 @@ RSpec.describe "Notifications features", type: :feature do
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
     @destroy_all << @user = create_confirmed_user(@role_adm)
 
+    @destroy_all << @level1 = FactoryBot.create(:level, name: "Doutorado")
+    @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
+    @destroy_all << @enrollment_status1 = FactoryBot.create(:enrollment_status, name: "Regular")
+    @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana", email: "ana.sapos@ic.uff.br")
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level2, enrollment_status: @enrollment_status1, admission_date: 3.years.ago.at_beginning_of_month.to_date)
+    @destroy_all << FactoryBot.create(:enrollment, enrollment_number: "D02", student: @student1, level: @level1, enrollment_status: @enrollment_status1, admission_date: 3.years.ago.at_beginning_of_month.to_date)
+
     @destroy_all << @query1 = FactoryBot.create(:query, name: "students", sql: "select * from students")
-    @destroy_all << @query2 = FactoryBot.create(:query, name: "queries", sql: "select name, sql from queries")
+    @query2 = FactoryBot.build(:query, name: "queries", sql: "select name, sql, :ano_semestre_atual as temp from queries")
+    @destroy_all << @query2.params.build(name: "ano_semestre_atual", value_type: "Integer", default_value: "")
+    @query2.save!
+    @destroy_all << @query3 = FactoryBot.create(:query, name: "enrollments", sql: "select id as enrollments_id from enrollments")
+
+
+    @destroy_all << @query2
 
     @destroy_all << FactoryBot.create(:notification, query: @query1, title: "saudacao", to_template: "jpimentel@ic.uff.br", subject_template: "Olá", body_template: "Corpo")
     @destroy_all << @record = FactoryBot.create(:notification, query: @query2, title: "despedida", to_template: "jpimentel@ic.uff.br", subject_template: "Tchau", body_template: "<%= var('name') %>")
-    @destroy_all << FactoryBot.create(:notification, query: @query1, title: "lembrete", to_template: "jpimentel@ic.uff.br", subject_template: "SAPOS: lembrar de etapa", body_template: "Corpo")
+    @destroy_all << @notification3 = FactoryBot.create(:notification, query: @query3, title: "lembrete", to_template: "jpimentel@ic.uff.br", subject_template: "SAPOS: lembrar de etapa", body_template: "Corpo", frequency: "Anual", has_grades_report_pdf_attachment: true, individual: true)
+    @notification3.next_execution = 5.days.ago
+    @notification3.save!
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -85,8 +100,11 @@ RSpec.describe "Notifications features", type: :feature do
 
     it "should have a codemirror to view selected query" do
       find(:select, "record_query_").find(:option, text: "queries").select_option
-      expect(page).to have_css("#record_query_container .CodeMirror-code", text: "1
-select name, sql from queries")
+      expect(page).to have_css("#record_query_container .CodeMirror-code", text: <<~TEXT.chomp
+        1
+        select name, sql, :ano_semestre_atual as temp from queries
+      TEXT
+      )
 
       click_link "SQL"
       expect(page).to have_selector("#record_query_container .CodeMirror-code", visible: false)
@@ -126,13 +144,21 @@ select name, sql from queries")
     end
 
     it "should be able to preview emails" do
-      expect(page.all("table.notification-results tbody tr").size).to eq 2
+      expect(page.all("table.notification-results tbody tr").size).to eq 3
       expect(page.all("table.notification-results thead th").map(&:text)).to eq ["Para", "Assunto", "Corpo"]
     end
 
     it "should be able to notify now" do
       click_link "Notificar agora"
       expect(page).to have_content "Notificação disparada com sucesso"
+    end
+  end
+
+  describe "notify" do
+    it "should send notifications" do
+      # ToDo: test actual emails
+      visit "/notifications/notify"
+      expect(page).to have_content "Ok"
     end
   end
 
