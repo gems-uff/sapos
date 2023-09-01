@@ -122,9 +122,7 @@ RSpec.describe "Enrollments features", type: :feature do
     end
 
     it "should have a month_year widget for admission_date" do
-      field = "admission_date"
-      expect(page.all("select#record_#{field}_2i option").map(&:text)).to eq ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
-      expect(page.all("select#record_#{field}_1i option").map(&:text)).to include(1.years.ago.year.to_s, 1.years.since.year.to_s)
+      expect_to_have_month_year_widget_i(page, "admission_date")
     end
 
     it "should have a record_select widget for research_area" do
@@ -182,9 +180,7 @@ RSpec.describe "Enrollments features", type: :feature do
     end
 
     it "should be able to search by admision_date" do
-      date = 3.years.ago.at_beginning_of_month.to_date
-      find(:select, "search_admission_date_month").find(:option, text: I18n.l(date, format: "%B")).select_option
-      find(:select, "search_admission_date_year").find(:option, text: date.year.to_s).select_option
+      select_month_year("search_admission_date", 3.years.ago.at_beginning_of_month.to_date)
       click_button "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
     end

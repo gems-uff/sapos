@@ -299,9 +299,7 @@ RSpec.describe "ClassEnrollmentRequests features", type: :feature do
     end
 
     it "should be able to search by admision_date" do
-      date = 3.years.ago.at_beginning_of_month.to_date
-      find(:select, "search_admission_date_month").find(:option, text: I18n.l(date, format: "%B")).select_option
-      find(:select, "search_admission_date_year").find(:option, text: date.year.to_s).select_option
+      select_month_year("search_admission_date", 3.years.ago.at_beginning_of_month.to_date)
       click_button "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M01 - Ana"]
     end

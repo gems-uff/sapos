@@ -70,11 +70,9 @@ RSpec.describe "Dismissal features", type: :feature do
       # Insert record
       expect(page).to have_content "Adicionar Desligamento"
       fill_record_select("enrollment_", "enrollments", "M04")
-      date = Date.today
       within("#as_#{plural_name}-create--form") do
         find(:select, "record_dismissal_reason_").find(:option, text: @dismissal_reason1.name).select_option
-        find(:select, "record_date_2i").find(:option, text: I18n.l(date, format: "%B")).select_option
-        find(:select, "record_date_1i").find(:option, text: date.year.to_s).select_option
+        select_month_year_i("record_date", Date.today)
       end
       click_button "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04")
@@ -90,9 +88,7 @@ RSpec.describe "Dismissal features", type: :feature do
     end
 
     it "should have a month_year widget for date" do
-      field = "date"
-      expect(page.all("select#record_#{field}_2i option").map(&:text)).to eq ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
-      expect(page.all("select#record_#{field}_1i option").map(&:text)).to include(1.years.ago.year.to_s, 1.years.since.year.to_s)
+      expect_to_have_month_year_widget_i(page, "date", "")
     end
 
     it "should have a record_select widget for enrollment" do

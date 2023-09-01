@@ -84,10 +84,8 @@ RSpec.describe "Deferrals features", type: :feature do
       expect(page).to have_content "Adicionar Prorrogação"
       fill_record_select("enrollment_", "enrollments", "M04")
       page.send_keys :escape
-      date = Date.today
       within("#as_#{plural_name}-create--form") do
-        find(:select, "record_approval_date_2i").find(:option, text: I18n.l(date, format: "%B")).select_option
-        find(:select, "record_approval_date_1i").find(:option, text: date.year.to_s).select_option
+        select_month_year_i("record_approval_date", Date.today)
         find(:select, "record_deferral_type_").find(:option, text: "Regular").select_option
       end
       click_button "Salvar"
@@ -108,9 +106,7 @@ RSpec.describe "Deferrals features", type: :feature do
 
     it "should have a month_year widget for approval_date" do
       page.send_keys :escape
-      field = "approval_date"
-      expect(page.all("select#record_#{field}_2i option").map(&:text)).to eq ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
-      expect(page.all("select#record_#{field}_1i option").map(&:text)).to include(1.years.ago.year.to_s, 1.years.since.year.to_s)
+      expect_to_have_month_year_widget_i(page, "approval_date", "")
     end
 
     it "should have a selection for deferral_type options" do
@@ -130,8 +126,7 @@ RSpec.describe "Deferrals features", type: :feature do
       page.send_keys :escape
       date = 3.months.from_now
       within(".as_form") do
-        find(:select, "record_approval_date_2i").find(:option, text: I18n.l(date, format: "%B")).select_option
-        find(:select, "record_approval_date_1i").find(:option, text: date.year.to_s).select_option
+        select_month_year_i("record_approval_date", date)
       end
       click_button "Atualizar"
       expect(page).to have_css("#as_#{plural_name}-list-#{@record.id}-row td.approval_date-column", text: I18n.l(date, format: "%B-%Y"))

@@ -111,23 +111,17 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
 
     it "should have a month_year widget for start_date" do
       page.send_keys :escape
-      field = "start_date"
-      expect(page.all("select#record_#{field}_2i option").map(&:text)).to eq ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
-      expect(page.all("select#record_#{field}_1i option").map(&:text)).to include(1.years.ago.year.to_s, 1.years.since.year.to_s)
+      expect_to_have_month_year_widget_i(page, "start_date")
     end
 
     it "should have an optional month_year widget for end_date" do
       page.send_keys :escape
-      field = "end_date"
-      expect(page.all("select#record_#{field}_2i option").map(&:text)).to eq ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
-      expect(page.all("select#record_#{field}_1i option").map(&:text)).to include(1.years.ago.year.to_s, 1.years.since.year.to_s)
+      expect_to_have_month_year_widget_i(page, "end_date", "")
     end
 
     it "should have an optional month_year widget for cancel_date" do
       page.send_keys :escape
-      field = "end_date"
-      expect(page.all("select#record_#{field}_2i option").map(&:text)).to eq ["", "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
-      expect(page.all("select#record_#{field}_1i option").map(&:text)).to include(1.years.ago.year.to_s, 1.years.since.year.to_s)
+      expect_to_have_month_year_widget_i(page, "cancel_date", "")
     end
   end
 
@@ -141,8 +135,7 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     it "should be able to edit record" do
       date = 3.months.from_now
       within(".as_form") do
-        find(:select, "record_end_date_2i").find(:option, text: I18n.l(date, format: "%B")).select_option
-        find(:select, "record_end_date_1i").find(:option, text: date.year.to_s).select_option
+        select_month_year_i("record_end_date", date)
       end
       click_button "Atualizar"
       expect(page).to have_css("#as_#{plural_name}-list-#{@record.id}-row td.end_date-column", text: I18n.l(date, format: "%B-%Y"))
@@ -165,25 +158,19 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     end
 
     it "should be able to search by start_date" do
-      date = 1.years.ago.at_beginning_of_month
-      find(:select, "search_start_date_month").find(:option, text: I18n.l(date, format: "%B")).select_option
-      find(:select, "search_start_date_year").find(:option, text: date.year.to_s).select_option
+      select_month_year("search_start_date", 1.years.ago.at_beginning_of_month)
       click_button "Buscar"
       expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2"]
     end
 
     it "should be able to search by end_date" do
-      date = 9.months.from_now.at_beginning_of_month
-      find(:select, "search_end_date_month").find(:option, text: I18n.l(date, format: "%B")).select_option
-      find(:select, "search_end_date_year").find(:option, text: date.year.to_s).select_option
+      select_month_year("search_end_date", 9.months.from_now.at_beginning_of_month)
       click_button "Buscar"
       expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2"]
     end
 
     it "should be able to search by cancel_date" do
-      date = 6.months.from_now.at_beginning_of_month
-      find(:select, "search_cancel_date_month").find(:option, text: I18n.l(date, format: "%B")).select_option
-      find(:select, "search_cancel_date_year").find(:option, text: date.year.to_s).select_option
+      select_month_year("search_cancel_date", 6.months.from_now.at_beginning_of_month)
       click_button "Buscar"
       expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2"]
     end

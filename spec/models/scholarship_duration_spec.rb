@@ -4,8 +4,6 @@
 
 require "spec_helper"
 
-require "./spec/support/date_helpers"
-
 RSpec.configure do |c|
   c.include DateHelpers
 end

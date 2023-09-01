@@ -20,6 +20,7 @@ require "rspec/collection_matchers"
 require "capybara/rails"
 require "capybara/rspec"
 
+require "support/date_helpers"
 require "support/user_helpers"
 require "support/place_widgets_helpers"
 require "support/record_select_helpers"
@@ -106,6 +107,7 @@ RSpec.configure do |config|
     )
   end
 
+  config.include DateHelpers
   config.include UserHelpers
   config.include PlaceWidgetsHelpers
   config.include RecordSelectHelpers

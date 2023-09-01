@@ -4,7 +4,6 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require Rails.root.join "spec/support/user_helpers.rb"
 
 # ToDo: Remember me
 # ToDo: Login fail
