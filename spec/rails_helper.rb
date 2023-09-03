@@ -7,7 +7,7 @@ require "spec_helper"
 require "simplecov"
 SimpleCov.start "rails" do
   #enable_coverage_for_eval
-end
+end unless ENV["SKIP_COVERAGE"]
 
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"

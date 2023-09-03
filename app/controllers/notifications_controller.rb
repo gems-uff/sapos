@@ -123,7 +123,7 @@ class NotificationsController < ApplicationController
   def notify
     Notifier.logger.info "Sending Registered Notifications"
 
-    Notifier.logger.info "[Notifications] #{Time.now} - Notifications from DB"
+    Notifier.logger.info "[Notifications] #{Time.now.to_fs} - Notifications from DB"
     notifications = []
     notifications_attachments = {}
 
@@ -157,7 +157,7 @@ class NotificationsController < ApplicationController
     def prepare_attachments(notification_result)
       notification_result[:notifications].each do |message|
         attachments = notification_result[:notifications_attachments][message]
-        next if attachments.empty?
+        next if attachments.blank?
         if attachments[:grades_report_pdf]
           enrollment = Enrollment.find(message[:enrollments_id])
           attachments[:grades_report_pdf][:file_contents] =

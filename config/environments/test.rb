@@ -65,5 +65,5 @@ Rails.application.configure do
   # config.action_view.annotate_rendered_view_with_filenames = true
 
   # Allow the notifier to send emails
-  config.should_send_emails = false
+  config.should_send_emails = true
 end

@@ -35,9 +35,8 @@ RSpec.describe "Notifications features", type: :feature do
 
     @destroy_all << FactoryBot.create(:notification, query: @query1, title: "saudacao", to_template: "jpimentel@ic.uff.br", subject_template: "Olá", body_template: "Corpo")
     @destroy_all << @record = FactoryBot.create(:notification, query: @query2, title: "despedida", to_template: "jpimentel@ic.uff.br", subject_template: "Tchau", body_template: "<%= var('name') %>")
-    @destroy_all << @notification3 = FactoryBot.create(:notification, query: @query3, title: "lembrete", to_template: "jpimentel@ic.uff.br", subject_template: "SAPOS: lembrar de etapa", body_template: "Corpo", frequency: "Anual", has_grades_report_pdf_attachment: true, individual: true)
-    @notification3.next_execution = 5.days.ago
-    @notification3.save!
+    @destroy_all << @notification3 = FactoryBot.create(:notification, query: @query3, title: "boletim", to_template: "jpimentel@ic.uff.br", subject_template: "SAPOS: boletim em anexo", body_template: "Corpo", frequency: "Anual", has_grades_report_pdf_attachment: true, individual: true)
+    @destroy_all << @notification4 = FactoryBot.create(:notification, query: @query3, title: "lembrete", to_template: "jpimentel@ic.uff.br", subject_template: "SAPOS: lembrar de etapa", body_template: "Corpo", frequency: "Anual", has_grades_report_pdf_attachment: false, individual: true)
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -62,7 +61,7 @@ RSpec.describe "Notifications features", type: :feature do
     end
 
     it "should not have a sorting -- show in id order" do
-      expect(page.all("tr td.title-column").map(&:text)).to eq ["saudacao", "despedida", "lembrete"]
+      expect(page.all("tr td.title-column").map(&:text)).to eq ["saudacao", "despedida", "boletim", "lembrete"]
     end
   end
 
@@ -86,12 +85,12 @@ RSpec.describe "Notifications features", type: :feature do
       expect(page).to have_css("tr:nth-child(1) td.title-column", text: "Query")
 
       # Remove inserted record
-      expect(page.all("tr td.title-column").map(&:text)).to eq ["Query", "saudacao", "despedida", "lembrete"]
+      expect(page.all("tr td.title-column").map(&:text)).to eq ["Query", "saudacao", "despedida", "boletim", "lembrete"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
       sleep(0.2)
       visit current_path
-      expect(page.all("tr td.title-column").map(&:text)).to eq ["saudacao", "despedida", "lembrete"]
+      expect(page.all("tr td.title-column").map(&:text)).to eq ["saudacao", "despedida", "boletim", "lembrete"]
     end
 
     it "should have a codemirror for body template" do
@@ -155,10 +154,20 @@ RSpec.describe "Notifications features", type: :feature do
   end
 
   describe "notify" do
-    it "should send notifications" do
-      # ToDo: test actual emails
+    it "should send notifications with attachment" do
+      @notification3.next_execution = 5.days.ago
+      @notification3.save!
       visit "/notifications/notify"
       expect(page).to have_content "Ok"
+      expect(ActionMailer::Base.deliveries.last.subject).to eq "SAPOS: boletim em anexo"
+    end
+
+    it "should send notifications without attachment" do
+      @notification4.next_execution = 5.days.ago
+      @notification4.save!
+      visit "/notifications/notify"
+      expect(page).to have_content "Ok"
+      expect(ActionMailer::Base.deliveries.last.subject).to eq "SAPOS: lembrar de etapa"
     end
   end
 
