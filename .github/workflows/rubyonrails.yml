@@ -8,6 +8,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      browser:
+        image: selenium/standalone-chrome
+        ports:
+          - "4444:4444" #for webdriver access
     env:
       RAILS_ENV: test
     steps:
