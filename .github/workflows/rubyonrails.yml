@@ -8,16 +8,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      browser:
-        image: selenium/standalone-chrome
-        ports:
-          - "4444:4444" #for webdriver access
     env:
       RAILS_ENV: test
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Setup chrome browser
+        uses: nanasess/setup-chromedriver@v2
+        run: |
+             export DISPLAY=:99
+             chromedriver --url-base=/wd/hub &
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
         with:          
