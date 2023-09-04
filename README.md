@@ -1,7 +1,5 @@
 ![Sapos Logo](https://github.com/gems-uff/sapos/raw/master/app/assets/images/logoSapos.png)
 ![Release](https://img.shields.io/github/release/gems-uff/sapos.svg)
-[![Build Status](https://travis-ci.org/gems-uff/sapos.svg?branch=master)](https://travis-ci.org/gems-uff/sapos)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/88396af531698e39bd0e/test_coverage)](https://codeclimate.com/github/gems-uff/sapos/test_coverage)
 ![MIT License](https://img.shields.io/github/license/gems-uff/sapos.svg)
 
 # About
