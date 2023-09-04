@@ -10,39 +10,6 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
-        
-    steps:
-    - name: Verify MySQL connection from host
-      run: |
-        sudo apt-get install -y mysql-client
-        mysql --host 127.0.0.1 --port 32574 -uroot -ppassword -e "SHOW DATABASES"
-
-- name: Setup MySQL
-  # You may pin to the exact commit or the version.
-  # uses: mirromutth/mysql-action@de1fba8b3f90ce8db80f663a7043be3cf3231248
-  uses: mirromutth/mysql-action@v1.1
-  with:
-    # The port of host
-    host port: # optional, default is 3306
-    # The port of container
-    container port: # optional, default is 3306
-    # --character-set-server - The character set of MySQL server
-    character set server: # optional, default is utf8mb4
-    # --collation-server - The character collation of MySQL server
-    collation server: # optional, default is utf8mb4_general_ci
-    # Version of MySQL to use
-    mysql version: # optional, default is latest
-    # MYSQL_ROOT_PASSWORD - root superuser password
-    mysql root password: # optional, default is 
-    # MYSQL_DATABASE - name for the default database that is created
-    mysql database: # optional, default is 
-    # MYSQL_USER - create the specified user with superuser power for created database
-    mysql user: # optional, default is 
-    # MYSQL_PASSWORD - specified superuser password which user is power for created database
-    mysql password: # optional, default is 
-
-    
 jobs:
   test:
     runs-on: ubuntu-latest
