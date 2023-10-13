@@ -35,8 +35,6 @@ class Admissions::AdmissionProcessesController < ApplicationController
       :admission_applications
     ]
 
-    config.nested.add_link(:admission_applications)
-
     config.actions << :duplicate
     config.duplicate.link.label = "
       <i title='#{I18n.t("active_scaffold.duplicate")}' class='fa fa-copy'></i>
