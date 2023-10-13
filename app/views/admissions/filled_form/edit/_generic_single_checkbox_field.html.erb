@@ -1,0 +1,11 @@
+<li class="form-element">
+  <dl>
+    <dt>
+      <%= field.label :value, form_field.name %>
+      <% if form_field.description.present? %>
+        <span class="filled-form-description"><%= form_field.description %></span>
+      <% end %>
+    </dt>
+    <dd> <%= field.check_box :value %> </dd>
+  </dl>
+</li>

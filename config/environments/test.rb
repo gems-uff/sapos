@@ -66,4 +66,7 @@ Rails.application.configure do
 
   # Allow the notifier to send emails
   config.should_send_emails = true
+
+  # Use ReCaptcha
+  config.should_use_recaptcha = false
 end

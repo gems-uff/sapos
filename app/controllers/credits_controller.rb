@@ -10,6 +10,7 @@ class CreditsController < ApplicationController
   require "file_utils"
 
   def show
+    @show_background = true
     @readme = FileUtils.file_content("README.md", "rt")
   end
 end

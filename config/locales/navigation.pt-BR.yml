@@ -60,6 +60,12 @@ pt-BR:
       state: Estados
       country: Países
 
+    admissions:
+      label: Seleção
+      admission_process: Editais
+      form_template: Formulários
+      new_form_template: New
+
     configurations:
       label: Configurações
       user: Usuários

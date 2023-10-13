@@ -5,3 +5,86 @@ tr.total_points{
 tr.total_points td{
     color: #ffffff !important;
 }
+
+/* Admissions show table */
+div.scrollable-table {
+  overflow: auto;
+  width: 100%;
+  max-width: 800px;
+  height: 200px;
+  border-spacing: 0;
+}
+
+.scrollable-table table, .scrollable-table th, .scrollable-table td {
+  background-clip:border-box;
+}
+
+.scrollable-wrapper {
+  position: relative;
+  overflow: auto;
+}
+
+.scrollable-table td,
+.scrollable-table th {
+  font-size: 11px !important;
+  font-weight: normal;
+}
+
+.scrollable-table table {
+  table-layout: auto;
+  width: 100%;
+}
+
+.scrollable-table .background-fix {
+  position: absolute;
+  float: left;
+  left: 0;
+  z-index: 1;
+}
+
+.scrollable-table thead {
+  background-color: #427fa4;
+}
+
+.scrollable-table tr.blue-record {
+  background-color: #E6F2FF;
+}
+
+.scrollable-table tr.even-record {
+  background-color: white;
+}
+
+.scrollable-table .fixed-col {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+
+.scrollable-table thead tr th {
+  position: sticky;
+  top: 0;
+}
+
+.blue-record, .blue-record td {
+  background-color: #E6F2FF;
+}
+
+.even-record, .even-record td {
+  background-color: white;
+}
+
+.scrollable-table td, .scrollable-table th {
+  border: none !important;
+  border-right: 1px solid #ddd !important;
+  border-bottom: 1px solid #ddd !important;
+}
+
+.scrollable-table tr td:nth-of-type(1),
+.scrollable-table tr th:nth-of-type(1) {
+  border-left: 1px solid #ddd !important;
+}
+
+.scrollable-table table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}

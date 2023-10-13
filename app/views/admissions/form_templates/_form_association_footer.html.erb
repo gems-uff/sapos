@@ -1,0 +1,11 @@
+<% if column.name == :fields %>
+  <%= render(partial: 'fields_form_association_footer', locals: {
+    parent_record: parent_record, column: column, associated: associated,
+    scope: scope
+  }) %>
+<% else %>
+  <%= render(partial: 'active_scaffold_overrides/form_association_footer', locals: {
+    parent_record: parent_record, column: column, associated: associated,
+    scope: scope
+  }) %>
+<% end %>

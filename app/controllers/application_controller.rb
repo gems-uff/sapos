@@ -17,6 +17,7 @@ class ApplicationController < ActionController::Base
   before_action :set_paper_trail_whodunnit
   before_action :set_landing
   before_action :prepare_exception_notifier
+  before_action :prepare_background
 
   clear_helpers
 
@@ -63,6 +64,10 @@ class ApplicationController < ActionController::Base
   end
 
   private
+    def prepare_background
+      @show_background = user_signed_in?
+    end
+
     def prepare_exception_notifier
       request.env["exception_notifier.exception_data"] = {
         user_id: current_user&.id,

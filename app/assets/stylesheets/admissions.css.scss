@@ -1,0 +1,74 @@
+.admission-inner {
+  padding: 1em !important;
+}
+
+.admission-inner .count {
+  padding-bottom: 1em;
+}
+
+.admission-inner .show-box {
+  padding: 1em;
+  margin-bottom: 1em;
+}
+
+.existing-admission-section {
+  margin: 1em 0 !important;
+}
+
+#recommendation_letters p {
+  font-size: 11px;
+  margin: 5px;
+}
+
+.admission-inner .field_with_errors {
+  display: inline;
+}
+
+.admission-inner .field_with_errors ~ label {
+  color: red;
+}
+
+.admission-inner.show {
+  font-size: 11px;
+}
+
+.admission-inner .field-name {
+  font-weight: bold;
+}
+
+.admission-inner span.field-name:after {
+  content: ': ';
+}
+
+.admission-inner .switch-links {
+  padding: 1em 0;
+  font-size: 11px;
+}
+
+.admission-inner #main-section li {
+  margin-bottom: 0.5em;
+}
+
+.admission-inner #main-section .links {
+  padding-bottom: 1em;
+  margin-bottom: 0.5em;
+  font-size: 11px;
+}
+
+.admissions-application-table tr .fixed-col:nth-of-type(1) {
+  left: 0;
+  min-width: 70px;
+  max-width: 70px;
+}
+
+.admissions-application-table tr .fixed-col:nth-of-type(2) {
+  left: 82px;
+  min-width: 100px;
+  max-width: 100px;
+}
+
+.admissions-application-table tr .fixed-col:nth-of-type(3) {
+  left: 193px;
+  min-width: 100px;
+  max-width: 100px;
+}

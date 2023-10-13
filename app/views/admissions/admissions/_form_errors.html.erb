@@ -1,0 +1,17 @@
+<div class="messages-container">
+  <% count = admission_application.errors.count + (flash[:alert].present? ? 1 : 0) %>
+  <% if count > 0 %>
+    <div id="errorExplanation" class="errorExplanation">
+      <h2><%= t("errors.admissions.invalid_basic", count: count) %></h2>
+      <p><%= t "errors.template.body" %></p>
+      <ul>
+        <% if flash[:alert] %>
+          <li><%= flash[:alert] %></li>
+        <% end %>
+        <% admission_application.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+</div>

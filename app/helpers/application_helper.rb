@@ -18,7 +18,7 @@ module ApplicationHelper
   end
 
   def signed_in_class
-    user_signed_in? ? "signed-in" : "signed-out"
+    @show_background ? "signed-in" : "signed-out"
   end
 
   def rescue_blank_text(texts = nil, options = {})

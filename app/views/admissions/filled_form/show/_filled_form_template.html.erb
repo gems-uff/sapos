@@ -1,0 +1,22 @@
+<%
+  filled_hash = filled_form.fields.index_by(&:form_field_id)
+  fields = form_template.fields.order(:order, :id).map do |field|
+    filled_hash[field.id]
+  end
+%>
+<table class="showtable listed-records-table">
+  <thead>
+    <tr>
+      <th><%= t "activerecord.attributes.admissions/filled_form_field.form_field" %></th>
+      <th><%= t "activerecord.attributes.admissions/filled_form_field.value" %></th>
+    </tr>
+  </thead>
+  <tbody class="records">
+    <% fields.each_with_index do |field, index| %>
+      <tr class="record <%= "even-record" if index.even? %>">
+        <%= render partial: "admissions/filled_form/show/generic_field",
+                    locals: { field: field, index: index } %>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -32,7 +32,12 @@ class Ability
     # Configurations
     User, Role, Version, Notification, EmailTemplate, Query, NotificationLog,
     CustomVariable, ReportConfiguration,
-    YearSemester
+    YearSemester,
+    # Application Process
+    Admissions::FormTemplate, Admissions::FormField,
+    Admissions::FilledForm, Admissions::FilledFormField,
+    Admissions::AdmissionProcess, Admissions::AdmissionApplication,
+    Admissions::LetterRequest,
   ]
 
 
@@ -60,7 +65,11 @@ class Ability
       cannot [:destroy, :update, :create], Role
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [
-        Role, CustomVariable, ReportConfiguration
+        Role, CustomVariable, ReportConfiguration,
+        Admissions::FormTemplate, Admissions::FormField,
+        Admissions::FilledForm, Admissions::FilledFormField,
+        Admissions::AdmissionProcess, Admissions::AdmissionApplication,
+        Admissions::LetterRequest
       ])
       cannot :update_only_photo, Student
       can :read, :pendency
@@ -70,7 +79,11 @@ class Ability
       can :read, (Ability::ALL_MODELS - [
         User, Role, CustomVariable, Query, Version,
         Notification, NotificationLog, ReportConfiguration,
-        Country, State, City, EmailTemplate
+        Country, State, City, EmailTemplate,
+        Admissions::FormTemplate, Admissions::FormField,
+        Admissions::FilledForm, Admissions::FilledFormField,
+        Admissions::AdmissionProcess, Admissions::AdmissionApplication,
+        Admissions::LetterRequest
       ])
       can :photo, Student
       can :read, :pendency
@@ -104,7 +117,11 @@ class Ability
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [
         User, Role, CustomVariable, Query, Version,
-        Notification, ReportConfiguration
+        Notification, ReportConfiguration,
+        Admissions::FormTemplate, Admissions::FormField,
+        Admissions::FilledForm, Admissions::FilledFormField,
+        Admissions::AdmissionProcess, Admissions::AdmissionApplication,
+        Admissions::LetterRequest
       ])
       cannot :update_only_photo, Student
       can :invite, User
@@ -123,7 +140,10 @@ class Ability
     end
     can :read, :landing
     can :notify, Notification
+    can :download, Admissions::FilledFormField
 
+    # Admissions
+    can :manage, ActiveScaffoldWorkaround
     # Define abilities for the passed in user here. For example:
     #
     #   user ||= User.new # guest user (not logged in)

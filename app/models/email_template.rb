@@ -30,6 +30,47 @@ class EmailTemplate < ApplicationRecord
         record: "Accomplishment"
       }
     },
+    "admissions/admissions:recover_tokens" => {
+      path: File.join("admissions", "admissions", "mailer", "recover_tokens.text.erb"),
+      subject: I18n.t("notifications.admissions.admissions.recover_tokens.subject"),
+      to: "<%= var(:email) %>",
+      variables: {
+        email: "Email",
+        admission_applications: "Admissions::AdmissionApplication",
+        url: "URL",
+      }
+    },
+    "admissions/apply:email_to_student" => {
+      path: File.join("admissions", "apply", "mailer", "email_to_student.text.erb"),
+      subject: I18n.t("notifications.admissions.apply.email_to_student.subject"),
+      to: "<%= var(:record).email %>",
+      variables: {
+        record: "Admissions::AdmissionApplication",
+        admission_process: "Admissions::AdmissionProcess",
+        admission_apply_url: "URL",
+      }
+    },
+    "admissions/apply:edit_email_to_student" => {
+      path: File.join("admissions", "apply", "mailer", "edit_email_to_student.text.erb"),
+      subject: I18n.t("notifications.admissions.apply.edit_email_to_student.subject"),
+      to: "<%= var(:record).email %>",
+      variables: {
+        record: "Admissions::AdmissionApplication",
+        admission_process: "Admissions::AdmissionProcess",
+        admission_apply_url: "URL",
+      }
+    },
+    "admissions/apply:request_letter" => {
+      path: File.join("admissions", "apply", "mailer", "request_letter.text.erb"),
+      subject: I18n.t("notifications.admissions.apply.request_letter.subject"),
+      to: "<%= var(:letter_request).email %>",
+      variables: {
+        record: "Admissions::AdmissionApplication",
+        admission_process: "Admissions::AdmissionProcess",
+        letter_request: "Admissions::LetterRequest",
+        fill_letter_url: "URL"
+      }
+    },
     "advisements:email_to_advisor" => {
       path: File.join("advisements", "mailer", "email_to_advisor.text.erb"),
       subject: I18n.t("notifications.advisement.email_to_advisor.subject"),
@@ -142,7 +183,7 @@ class EmailTemplate < ApplicationRecord
       subject: I18n.t("devise.mailer.confirmation_instructions.subject"),
       to: "<%= @resource.unconfirmed_email || @resource.email %>",
       variables: {
-        "@resourse" => "User"
+        "@resource" => "User"
       }
     },
     "devise:email_changed" => {
@@ -150,7 +191,7 @@ class EmailTemplate < ApplicationRecord
       subject: I18n.t("devise.mailer.email_changed.subject"),
       to: "<%= @resource.email %>",
       variables: {
-        "@resourse" => "User"
+        "@resource" => "User"
       }
     },
     "devise:invitation_instructions" => {
@@ -158,7 +199,7 @@ class EmailTemplate < ApplicationRecord
       subject: I18n.t("devise.mailer.invitation_instructions.subject"),
       to: "<%= @resource.email %>",
       variables: {
-        "@resourse" => "User"
+        "@resource" => "User"
       }
     },
     "devise:password_change" => {
@@ -166,7 +207,7 @@ class EmailTemplate < ApplicationRecord
       subject: I18n.t("devise.mailer.password_change.subject"),
       to: "<%= @resource.email %>",
       variables: {
-        "@resourse" => "User"
+        "@resource" => "User"
       }
     },
     "devise:reset_password_instructions" => {
@@ -174,7 +215,7 @@ class EmailTemplate < ApplicationRecord
       subject: I18n.t("devise.mailer.reset_password_instructions.subject"),
       to: "<%= @resource.email %>",
       variables: {
-        "@resourse" => "User"
+        "@resource" => "User"
       }
     },
     "devise:unlock_instructions" => {
@@ -182,7 +223,7 @@ class EmailTemplate < ApplicationRecord
       subject: I18n.t("devise.mailer.unlock_instructions.subject"),
       to: "<%= @resource.email %>",
       variables: {
-        "@resourse" => "User"
+        "@resource" => "User"
       }
     },
     "student_enrollments:email_to_student" => {

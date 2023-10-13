@@ -1,0 +1,19 @@
+
+<%
+  scope = field.object_name["record".size..]
+  column = Admissions::FilledFormFieldsController.active_scaffold_config.columns[:file]
+  options = active_scaffold_input_options(column, scope, :object => field.object)
+  options[:required] = configuration["required"] ? true : false
+%>
+<li class="form-element <%= configuration["required"] ? "required" : "" %>">
+  <dl>
+    <dt>
+      <%= field.label :file, form_field.name %>
+      <% if form_field.description.present? %>
+        <span class="filled-form-description"><%= form_field.description %></span>
+      <% end %>
+    </dt>
+    <dd><%= active_scaffold_input_carrierwave(column, options) %>
+    </dd>
+  </dl>
+</li>

@@ -1,0 +1,95 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/form_field:
+        form_template: "Modelo de formulário"
+        order: "Ordem"
+        name: "Campo"
+        description: "Descrição"
+        field_type: "Tipo"
+        sync: "Sincronizar"
+        syncs:
+          name: Nome
+          email: Email
+          telephone: Telefone (carta)
+        configuration: "Configuração"
+        field_types:
+          file: Arquivo
+          student_field: Campo de Aluno
+          collection_checkbox: Checkbox Múltiplo
+          single_checkbox: Checkbox Único
+          city: Cidade, Estado, País
+          city_fields:
+            city: Cidade
+            state: Estado
+            country: País
+          scholarity: Formações
+          group: Grupo
+          residency: Logradouro, Número
+          residency_fields:
+            street: Logradouro
+            number: Número
+          radio: Radio
+          select: Seleção
+          string: Texto
+          text: Texto longo
+        configurations:
+          show_config: "Mostrar configuração"
+          hide_config: "Esconder configuração"
+          error_exists: "Há algum problema nas configurações"
+          required: Obrigatório
+          state_required: Estado Obrigatório
+          country_required: País Obrigatório
+          number_required: Número Obrigatório
+          default: Valor padrão
+          default_blank_title: Se o valor definido não existir na lista, este campo será o texto que aparece inicialmente no componente, mas não uma opção válida.
+          placeholder: Placeholder
+          field: Campo
+          values:
+            title: Opções
+            add: Adicionar opção
+          values_use_sql: Popular opções com SQL
+          values_sql: Opções (SQL)
+          statuses:
+            title: Situações
+            add: Adicionar situação
+          statuses_use_sql: Popular situações com SQL
+          statuses_sql: Situações (SQL)
+          minselection: Quantidade mínima
+          maxselection: Quantidade máxima
+          default_values:
+            title: Opções selecionadas por padrão
+            add: Adicionar opção
+          default_values_use_sql: Popular opções selecionadas com SQL
+          default_values_sql: Opções selecionadas (SQL)
+          default_check: Valor padrão
+          special_field_notice: Este campo não possui mapeamento 1:1 para campo de aluno. Pode ser que a importação não esteja implementada ou funcione parcialmente
+          values_sql_description: Retorne um ou dois valores por tupla. Caso dois sejam retornados, o primeiro é o que aparecerá para o usuário e o segundo é o que será salvo no banco
+          statuses_sql_description: Retorne um ou dois valores por tupla. Caso dois sejam retornados, o primeiro é o que aparecerá para o usuário e o segundo é o que será salvo no banco
+          default_values_sql_description: Retorne um ou dois valores por tupla. Caso dois sejam retornados, o primeiro é o que aparecerá para o usuário e o segundo é o que será salvo no banco
+
+    errors:
+      models:
+        admissions/form_field:
+          invalid_format: deve ser um JSON válido
+          values_present_error: Pelo menos uma opção deve ser adicionada
+          values_blank_error: Nenhuma opção pode estar em branco
+          values_sql_present_error: SQL de opções não pode estar em branco
+          statuses_present_error: Pelo menos uma situação deve ser adicionada
+          statuses_blank_error: Nenhuma situação pode estar em branco
+          statuses_sql_present_error: SQL de situações não pode estar em branco
+          default_values_blank_error: Nenhuma opção selecionada por padrão pode estar em branco
+          selection_count_error: Quantidade mínima não pode ser maior do que quantidade máxima
+          field_present_error: Campo deve ser selecionado
+          sql_execution_generated_an_error: "Consulta de %{field} gerou o seguinte erro ao ser executada: %{error}"
+
+    models:
+      admissions/form_field:
+        one: "Campo"
+        other: "Campos"
+
+  active_scaffold:
+    create_form_field_label: "Criar Campo"

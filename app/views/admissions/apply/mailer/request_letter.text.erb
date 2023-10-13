@@ -1,0 +1,14 @@
+<%
+  name = var(:letter_request).name
+  candidate = var(:record).name
+  process = var(:admission_process).title
+  url = var(:fill_letter_url)
+%>
+<%= name %>,
+
+<%= candidate %> solicitou uma carta de recomendação para o edital de seleção <%= process %>.
+
+Por favor, clique no link abaixo para prosseguir:
+<%= url %>
+
+<%= CustomVariable.notification_footer %>

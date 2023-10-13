@@ -1,0 +1,45 @@
+<%
+  form_field = field.object.form_field
+  partial_locals = {
+    form_field: form_field, field: field,
+    configuration: JSON.parse(form_field.configuration || "{}")
+  }
+
+%>
+
+<%= field.hidden_field :form_field_id %>
+<%= field.hidden_field :id %>
+<% if form_field.field_type == Admissions::FormField::STRING %>
+  <%= render partial: "admissions/filled_form/edit/generic_string_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::SELECT %>
+  <%= render partial: "admissions/filled_form/edit/generic_select_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::RADIO %>
+  <%= render partial: "admissions/filled_form/edit/generic_radio_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::COLLECTION_CHECKBOX %>
+  <%= render partial: "admissions/filled_form/edit/generic_collection_checkbox_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::SINGLE_CHECKBOX %>
+  <%= render partial: "admissions/filled_form/edit/generic_single_checkbox_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::FILE %>
+  <%= render partial: "admissions/filled_form/edit/generic_file_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::TEXT %>
+  <%= render partial: "admissions/filled_form/edit/generic_text_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::STUDENT_FIELD %>
+  <%= render partial: "admissions/filled_form/edit/generic_student_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::CITY %>
+  <%= render partial: "admissions/filled_form/edit/generic_city_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::RESIDENCY %>
+  <%= render partial: "admissions/filled_form/edit/generic_residency_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::SCHOLARITY %>
+  <%= render partial: "admissions/filled_form/edit/generic_scholarity_field",
+      locals: partial_locals %>
+<% end %>

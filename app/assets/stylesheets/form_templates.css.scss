@@ -1,0 +1,34 @@
+tr.form-field-configuration td dl {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+
+tr.form-field-configuration td dt {
+  width: 15em;
+  padding: 3px 0;
+}
+
+tr.form-field-configuration td dd {
+  margin: auto;
+}
+
+tr.form-field-configuration td dt label {
+  display: inline !important;
+}
+
+.preview-view .success {
+  padding: 5px 10px;
+  background-color: #bae0d1;
+  border: 1px solid #9ab0a1;
+  width: auto;
+  display: block;
+}
+
+.form-field-config-error {
+  color: red !important;
+}
+
+.filled-form .field_with_errors {
+  display: inline-block;
+}

@@ -1,4 +1,4 @@
-#ruby=3.2.1
+# ruby=3.2.1
 # frozen_string_literal: true
 
 source "https://rubygems.org"
@@ -103,6 +103,19 @@ gem "rufus-scheduler"
 # Image
 gem "carrierwave"
 gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-activerecord.git", branch: "rails7"
+
+# Nested Forms / ApplicationProcess and FormTemplates functionalities.
+gem "cocoon"
+
+# ReCaptcha Helpers
+gem "dotenv-rails", require: "dotenv/rails-now"
+gem "recaptcha", require: "recaptcha/rails"
+
+# xlsx Spreadsheets
+gem "rubyzip"
+gem "caxlsx"
+gem "caxlsx_rails"
+gem "acts_as_xlsx"
 
 # Temporary fix of warnings
 # In the beggining of rails command executions, it shows some warnings related to these gems

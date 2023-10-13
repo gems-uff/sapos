@@ -58,3 +58,5 @@ coverage/
 nbproject/
 /nbproject/private/
 .DS_Store
+/.env
+.vscode/

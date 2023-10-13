@@ -1,0 +1,16 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/filled_form_field_scholarity:
+        filled_form_field: "Resposta"
+        level: "Nível"
+        status: "Situação"
+        date: "Data de término"
+
+    models:
+      admissions/filled_form_field_scholarity:
+        one: "Formação"
+        other: "Formações"

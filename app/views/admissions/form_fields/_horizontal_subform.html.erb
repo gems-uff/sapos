@@ -1,0 +1,6 @@
+<% associated = associated.sort_by { |f| [f.order, f.id]} %>
+<%= render(partial: 'active_scaffold_overrides/horizontal_subform', locals: {
+    parent_record: parent_record, column: column, associated: associated,
+    scope: scope, show_blank_record: show_blank_record,
+    local_assigns: local_assigns
+  }) %>

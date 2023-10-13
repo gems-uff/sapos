@@ -1,0 +1,18 @@
+<%
+  values = form_field.get_values("values")
+  options = {}
+  options[:checked] = configuration["default"] if configuration["default"].present?
+%>
+<li class="form-element <%= configuration["required"] ? "required" : "" %>">
+  <dl>
+    <dt>
+      <%= field.label :value, form_field.name %>
+      <% if form_field.description.present? %>
+        <span class="filled-form-description"><%= form_field.description %></span>
+      <% end %>
+    </dt>
+    <dd>
+      <%= field.collection_radio_buttons :value, values, :last, :first, options %>
+    </dd>
+  </dl>
+</li>

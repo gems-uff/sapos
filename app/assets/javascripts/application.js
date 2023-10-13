@@ -16,7 +16,10 @@
 //= require active_scaffold
 //= require codemirror/lib/codemirror
 //= require codemirror/mode/javascript/javascript
+//= require codemirror/mode/sql/sql
+//= require codemirror/mode/xml/xml
 //= require codemirror
+//= require cocoon
 //= require_tree .
 
 

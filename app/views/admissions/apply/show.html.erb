@@ -1,0 +1,125 @@
+<div class="content">
+  <div class="active-scaffold default-theme">
+    <div class="active-scaffold-header">
+      <h2><%= @admission_process.title %></h2>
+    </div>
+    <div class="admission-inner show">
+      <% if flash[:alert] %>
+        <div id="error_login"><%= flash[:alert] %></div>
+      <% end %>
+
+      <div>
+        <h5>
+          <%= t "admissions.apply.show.title" %>
+          <a data-show="<%= t "active_scaffold.show"%>"
+              data-hide="<%= t "active_scaffold.hide"%>"
+              data-toggable="main-section" style=""
+              class="as-js-button visibility-toggle" href="#"
+          >
+            <%= (t "active_scaffold.hide") %>
+          </a>
+        </h5>
+        <div id="main-section">
+          <ol>
+            <li>
+              <% if !@admission_application.filled_form.is_filled %>
+                <%= t "admissions.apply.show.ongoing" %>
+              <% elsif @admission_application.missing_letters? %>
+                <%= t "admissions.apply.show.finished_waiting_letters" %>
+              <% else %>
+                <%= t "admissions.apply.show.finished" %>
+              <% end %>
+            </li>
+            <%= render partial: "show_value", locals: {
+              name: t("activerecord.attributes.admissions/admission_application.token"),
+              value: @admission_application.token
+            } %>
+            <%= render partial: "show_value", locals: {
+              name: t("activerecord.attributes.admissions/admission_application.name"),
+              value: @admission_application.name
+            } %>
+            <%= render partial: "show_value", locals: {
+              name: t("activerecord.attributes.admissions/admission_application.email"),
+              value: @admission_application.email
+            } %>
+          </ol>
+          <p class="links">
+            <% if @admission_process.is_open? %>
+              <a href="<%= edit_admission_apply_path(
+                  admission_id: @admission_process.simple_id,
+                  id: @admission_application.token
+                ) %>">
+                <% if @admission_application.filled_form.is_filled %>
+                  <%= t "admissions.apply.show.edit" %>
+                <% else %>
+                  <%= t "admissions.apply.show.continue" %>
+                <% end %>
+              </a>
+            <% end %>
+          </p>
+        </div>
+      </div>
+      <div>
+        <h5>
+          <%= t "admissions.apply.show.data" %>
+          <a data-show="<%= t "active_scaffold.show"%>"
+              data-hide="<%= t "active_scaffold.hide"%>"
+              data-toggable="data-section" style=""
+              class="as-js-button visibility-toggle" href="#"
+          >
+            <%= (t "active_scaffold.hide") %>
+          </a>
+        </h5>
+        <div id="data-section">
+          <ol>
+            <li>
+              <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
+                form_template: @admission_process.form_template,
+                filled_form: @admission_application.filled_form } %>
+            </li>
+          </ol>
+        </div>
+      </div>
+      <% if @admission_process.has_letters && @admission_application.letter_requests.present? %>
+        <div>
+          <h5>
+            <%= t "admissions.apply.show.letters" %>
+            <a data-show="<%= t "active_scaffold.show"%>"
+                data-hide="<%= t "active_scaffold.hide"%>"
+                data-toggable="letters-section" style=""
+                class="as-js-button visibility-toggle" href="#"
+            >
+              <%= (t "active_scaffold.hide") %>
+            </a>
+          </h5>
+          <div id="letters-section">
+            <ol>
+              <li>
+                <table class="showtable listed-records-table">
+                  <thead>
+                    <tr>
+                      <th><%= t "activerecord.attributes.admissions/letter_request.name" %></th>
+                      <th><%= t "activerecord.attributes.admissions/letter_request.email" %></th>
+                      <th><%= t "activerecord.attributes.admissions/letter_request.telephone" %></th>
+                      <th><%= t "activerecord.attributes.admissions/letter_request.status" %></th>
+                    </tr>
+                  </thead>
+                  <tbody class="records">
+                    <% @admission_application.letter_requests.each_with_index do |letter, index| %>
+                      <tr class="record <%= "even-record" if index.even? %>">
+                        <td><%= letter.name %></td>
+                        <td><%= letter.email %></td>
+                        <td><%= letter.telephone %></td>
+                        <td><%= letter.status %></td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </li>
+            </ol>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

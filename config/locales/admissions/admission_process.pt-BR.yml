@@ -1,0 +1,61 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_process:
+        name: "Nome"
+        simple_url: "URL"
+        semester: "Semestre"
+        year: "Ano"
+        year_semester: "Semestre"
+        start_date: "Data de início"
+        end_date: "Data de fim"
+        form_template: "Modelo de Formulário"
+        letter_template: "Modelo de Carta de Recomendação"
+        min_letters: "Mínimo de Cartas"
+        max_letters: "Máximo de Cartas"
+        allow_multiple_applications: "Permitir mais de uma inscrição da mesma pessoa"
+        visible: "Visível na lista de seleções"
+        admission_applications_count: "Inscritos"
+        admission_applications: "Inscrições"
+        is_open?: Aberto
+        is_closed?: Fechado
+        simple_id: "URL"
+        require_session: Fluxo com sessão
+
+    errors:
+      models:
+        admissions/admission_process:
+          end_greater_than_start_date: "Data de encerramento deve ser após data de início"
+          max_greater_than_min_letters: "Máximo de cartas não pode ser menor que mínimo"
+          simple_url_integer: "não pode ser um número"
+          simple_url_collides_in_date_range: "já está sendo usada no mesmo intervalo por outro processo aberto"
+
+    models:
+      admissions/admission_process:
+        one: "Edital de Seleção"
+        other: "Editais de Seleção"
+
+  active_scaffold:
+    create_admission_process_label: "Criar Edital de Seleção"
+
+  xlsx_content:
+    admissions/admission_process:
+      complete_xls:
+        filename: "Relatório Completo em .xls"
+
+  pdf_content:
+    admissions/admission_process:
+      short_pdf:
+        filename: "Resumo das Inscrições"
+      complete_pdf:
+        filename: "Relatório Completo de Inscrições"
+      footer:
+        page: "Pág. nº "
+      generic:
+        title: Inscrições para %{title}
+        start: "Início: %{date}"
+        end: "Encerramento: %{date}"
+        total: "Total de Inscritos: %{count}"

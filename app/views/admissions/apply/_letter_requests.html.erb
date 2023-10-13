@@ -1,0 +1,26 @@
+<ol class="nested-fields letter_request">
+  <li class="form-element required">
+    <dl>
+      <dt><%= f.label :email %></dt>
+      <dd><%= f.email_field :email %></dd>
+    </dl>
+  </li>
+  <li class="form-element required">
+    <dl>
+      <dt><%= f.label :name %></dt>
+      <dd><%= f.text_field :name %></dd>
+    </dl>
+  </li>
+  <li class="form-element">
+    <dl>
+      <dt><%= f.label :telephone %></dt>
+      <dd><%= f.text_field :telephone %></dd>
+    </dl>
+  </li>
+  <li class="form-element remove-letter">
+    <%= link_to_remove_association (t "admissions.apply.edit.letter.remove"), f %>
+  </li>
+  <li class="form-element">
+    <br/>
+  </li>
+</ol>

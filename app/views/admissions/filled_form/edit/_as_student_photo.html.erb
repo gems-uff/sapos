@@ -1,0 +1,34 @@
+<%
+  scope = field.object_name["record".size..]
+  filled_field_mode = :file
+  column = Admissions::FilledFormFieldsController.active_scaffold_config.columns[:file]
+  options = active_scaffold_input_options(column, scope, :object => field.object)
+  options[:required] = configuration["required"] ? true : false
+  basename = options[:name][..-("file".size + 3)]
+  data_url = field.object.file.file.present? ? field.object.file.url : ""
+%>
+
+<li class="form-element <%= configuration["required"] ? "required" : "" %>">
+  <dl>
+    <dt>
+      <%= field.label :value, form_field.name %>
+      <% if form_field.description.present? %>
+        <span class="filled-form-description"><%= form_field.description %></span>
+      <% end %>
+    </dt>
+    <dd>
+      <div class="webcam-photo" data-id="<%= options[:id] %>"
+         data-url="<%= data_url %>" data-basename="<%= basename %>"
+         data-column="file" data-remove-label="Remover foto"
+      >
+        <%= active_scaffold_input_carrierwave(column, options) %>
+      </div>
+    </dd>
+  </dl>
+</li>
+
+<script>
+$(document).ready(function() {
+  carrierwave_webcam(".webcam-photo")
+});
+</script>

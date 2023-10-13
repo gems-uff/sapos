@@ -1,0 +1,82 @@
+
+<style>
+  .toggle-forgot a {
+    display: block
+  }
+</style>
+
+<%= form_with model: admission_application,
+  url: find_admissions_path,
+  method: :post,
+  class: "as_form create",
+  authenticity_token: true do |form| %>
+  <ol class="form">
+    <li class="form-element required">
+      <dl>
+        <dt><%= form.label :email %></dt>
+        <dd>
+          <%= form.email_field :email, class: "text-input", id: "recover-email" %>
+        </dd>
+      </dl>
+    </li>
+    <li class="form-element required toggle-forgot">
+      <dl>
+        <dt><%= form.label :token %></dt>
+        <dd>
+          <%= form.text_field :token, class: "text-input token-field"  %>
+          <%= form.hidden_field :token_, value: "forgot", class: "text-input recover-field"  %>
+        </dd>
+      </dl>
+    </li>
+    <li class="form-element">
+      <a href="#"
+        class="link-forgot"
+        data-forgot="<%= I18n.t "admissions.admissions.recover_form.forgot_token"%>"
+        data-token="<%= I18n.t "admissions.admissions.recover_form.use_token"%>"
+      ><%= I18n.t "admissions.admissions.recover_form.forgot_token"%></a>
+    </li>
+    <li class="form-element">
+      <% if Rails.application.config.should_use_recaptcha %>
+        <%= recaptcha_tags %>
+      <% end %>
+      <% if source.present? %>
+        <%= form.hidden_field :_source, value: source %>
+      <% end %>
+    </li>
+  </ol>
+  <p class="form-footer">
+    <%= form.submit (t "admissions.admissions.recover_form.recover_button"),
+        id: "recover" %>
+  </p>
+<% end %>
+
+<script>
+  $(document).ready(function() {
+    $("#recover").click(function(e){
+      window.onbeforeunload = null;
+    })
+
+    $("a.link-forgot").on("click", function() {
+      let token_field = $(".toggle-forgot .token-field");
+      let forgot_field = $(".toggle-forgot .recover-field");
+      let token_name = token_field.attr("name")
+      token_field.attr("name", forgot_field.attr("name"))
+      forgot_field.attr("name", token_name)
+
+      forgot_label = $(this).data("forgot")
+      token_label = $(this).data("token")
+      if ($(this).text() == forgot_label) {
+        $(this).text(token_label)
+        $(".toggle-forgot").hide()
+      } else {
+        $(this).text(forgot_label)
+        $(".toggle-forgot").show()
+      }
+
+      return false;
+    })
+    if ($(".token-field").val() == "forgot") {
+      $("a.link-forgot").click()
+    }
+  });
+</script>

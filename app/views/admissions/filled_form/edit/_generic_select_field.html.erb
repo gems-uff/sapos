@@ -1,0 +1,36 @@
+<%
+  form_field = field.object.form_field
+  values = form_field.get_values_map("values")
+  options = {}
+  other_options = {}
+  if configuration["default_check"]
+    if values[configuration["default"]].present?
+      options[:selected] = configuration["default"]
+      if !configuration["required"]
+        options[:include_blank] = true
+      else
+        options[:include_blank] = false
+      end
+    elsif configuration["default"].blank?
+      options[:include_blank] = true
+    elsif configuration["required"]
+      options[:prompt] = configuration["default"]
+      other_options[:required] = "required"
+    else
+      options[:include_blank] = configuration["default"]
+    end
+  end
+  values = values.map { |k, v| [v, k] }
+%>
+
+<li class="form-element <%= configuration["required"] ? "required" : "" %>">
+  <dl>
+    <dt>
+      <%= field.label :value, form_field.name %>
+      <% if form_field.description.present? %>
+        <span class="filled-form-description"><%= form_field.description %></span>
+      <% end %>
+    </dt>
+    <dd> <%= field.select :value, values, options, other_options %> </dd>
+  </dl>
+</li>

@@ -1,0 +1,25 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/letter_request:
+        admission_application: "Inscrição"
+        name: "Nome do Indicado"
+        email: "Email do Indicado"
+        telephone: "Telefone do Indicado"
+        access_token: "Chave de acesso"
+        is_filled: "Preenchida"
+        not_filled: "Não Preenchida"
+        filled_form: "Dados"
+        sent_email: "Email enviado"
+        status: "Situação"
+        statuses:
+          waiting: Aguardando
+          received: Recebida
+
+    models:
+      admissions/letter_request:
+        one: "Solicitação de Recomendação"
+        other: "Solicitações de Recomendação"

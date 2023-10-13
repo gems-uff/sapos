@@ -1,0 +1,29 @@
+<%
+  scope = field.object_name["record".size..]
+  column = StudentsController.active_scaffold_config.columns[student_field]
+
+  old_controller = controller
+  controller = StudentsController.new
+  filled_field_mode = :value
+  student = Student.new
+  student[student_field] = field.object[filled_field_mode]
+  options = active_scaffold_input_options(column, scope, :object => student)
+  options[:name] = options[:name][..-(student_field.to_s).size-2] + filled_field_mode.to_s + "]"
+  options[:required] = configuration["required"] ? true : false
+%>
+
+<li class="form-element <%= configuration["required"] ? "required" : "" %>">
+  <dl>
+    <dt>
+      <%= field.label :value, form_field.name %>
+      <% if form_field.description.present? %>
+        <span class="filled-form-description"><%= form_field.description %></span>
+      <% end %>
+    </dt>
+    <dd>
+      <%= active_scaffold_input_for column, scope, options %>
+    </dd>
+  </dl>
+</li>
+
+<% controller = old_controller %>

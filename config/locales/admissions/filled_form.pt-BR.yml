@@ -1,0 +1,20 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/filled_form:
+        form_template: "Formulário"
+        is_filled: "Preenchido"
+        admission_application: "Inscrição"
+        letter_request: "Carta de Recomendação"
+        fields: "Campos"
+        filled_status:
+          filled: "%{form} preenchido"
+          not_filled: "%{form} não-preenchido"
+
+    models:
+      admissions/filled_form:
+        one: "Formulário Preenchido"
+        other: "Formulário Preenchidos"

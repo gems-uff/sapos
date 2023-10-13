@@ -1,0 +1,108 @@
+<%
+  column_options = active_scaffold_input_options(column, scope, object: record)
+  record_basename = column_options[:name][0..-"[configuration]".size - 1]
+  config_view = (scope || " ").sub('][', '__')[1..-2] + '_config'
+
+  filter_out_student_columns = [
+    "address", "city", "birth_city", "birth_state", "birth_country",
+    "student_majors",
+
+  ]  # These field have custom widgets and forms that require aditional treatment
+  special_student_columns = [
+    "special_address",
+    "special_city",
+    "special_birth_city",
+    "special_majors"
+  ]
+
+  student_columns = StudentsController.active_scaffold_config
+    .create.columns.filter { |c| !filter_out_student_columns.include? c.name }
+    .collect { |x| x.name } + special_student_columns
+  student_columns = student_columns.map { |name| [name, student_t(name)] }
+%>
+<dl>
+  <dt>
+    <%= label_tag label_for(column, column_options), column.label %>
+  </dl>
+  <dd>
+    <a href="#" id="<%=config_view%>_toggle"
+      >
+      <i class='fa fa-eye'
+        title='<%= form_field_t "configurations.show_config" %>'></i>
+      <i style="display: none;" class='fa fa-eye-slash'
+        title='<%= form_field_t "configurations.hide_config" %>'></i>
+      <i style="display: none;" class='fa fa-exclamation form-field-config-error'
+        title='<%= form_field_t "configurations.error_exists" %>'></i>
+    </a>
+    <div id="<%=config_view%>_fieldbox">
+      <%= form_hidden_attribute column, record, scope %>
+    </div>
+  </dd>
+</dl>
+
+<style>
+  .admissions__form_templates-view .CodeMirror {
+    width: 400px;
+  }
+</style>
+
+<script>
+  $(document).ready(function () {
+
+    let closest = '<%= scope.nil? ? "div" : "tr" %>';
+    $(`<${closest} id="<%=config_view%>_config"
+       class="form-field-configuration" style="display:none;">
+         <td colspan=6><div id="<%= config_view %>"></div></td>
+       </${closest}>`).insertAfter(
+      $('input[name="<%= column_options[:name] %>"]').closest(closest)
+    )
+
+    let form_field = form_field_config_base({
+      baseid: "<%=config_view%>",
+      data: JSON.parse(
+        $('input[name="<%= column_options[:name] %>"]').val() || "{}"
+      ),
+      student_columns: <%= JSON.dump(student_columns).html_safe %>,
+      translation: <%= (form_field_t "configurations").to_json.html_safe %>,
+      error_translation: <%=
+        t("activerecord.errors.models.admissions/form_field").to_json.html_safe
+      %>,
+      save: (data) => {
+        $('input[name="<%= column_options[:name] %>"]').val(
+          JSON.stringify(data)
+        )
+      },
+      validate: (valid) => {
+        $("#<%=config_view%>_toggle .fa-exclamation").toggle(valid);
+      }
+    })
+
+    $("#<%=config_view%>_toggle").on("click", function() {
+      $("#<%=config_view%>_config").toggle();
+      $("#<%=config_view%>_toggle .fa-eye").toggle();
+      $("#<%=config_view%>_toggle .fa-eye-slash").toggle();
+      form_field.refresh();
+      return false;
+    })
+
+    let widget_type = {
+      "<%= Admissions::FormField::STRING %>": "string",
+      "<%= Admissions::FormField::SELECT %>": "select",
+      "<%= Admissions::FormField::RADIO %>": "radio",
+      "<%= Admissions::FormField::COLLECTION_CHECKBOX %>": "collection_checkbox",
+      "<%= Admissions::FormField::SINGLE_CHECKBOX %>": "single_checkbox",
+      "<%= Admissions::FormField::FILE %>": "requirable",
+      "<%= Admissions::FormField::TEXT %>": "text",
+      "<%= Admissions::FormField::STUDENT_FIELD %>": "student_field",
+      "<%= Admissions::FormField::CITY %>": "city",
+      "<%= Admissions::FormField::RESIDENCY %>": "residency",
+      "<%= Admissions::FormField::GROUP %>": "group",
+      "<%= Admissions::FormField::SCHOLARITY %>": "scholarity",
+    }
+
+    $('select[name="<%= record_basename %>[field_type]"]').on("change", function () {
+      form_field.select(widget_type[$('select[name="<%= record_basename %>[field_type]"]').val()]);
+    })
+    form_field.select(widget_type[$('select[name="<%= record_basename %>[field_type]"]').val()]);
+  });
+</script>

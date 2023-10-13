@@ -54,7 +54,7 @@ class Query < ApplicationRecord
   end
 
 
-  def run_read_only_query(query)
+  def self.run_read_only_query(query)
     if ApplicationRecord.connection.adapter_name == "SQLite"
       db_resource = ApplicationRecord.connection.exec_query(query)
 
@@ -85,7 +85,7 @@ class Query < ApplicationRecord
       generated_query = ::Query.parse_sql_and_params(sql, current_params)
 
       # Query the Database safely
-      db_resource = run_read_only_query(generated_query)
+      db_resource = ::Query.run_read_only_query(generated_query)
 
       # Build the notifications with the results from the query
       db_resource.merge(query: generated_query, errors: self.errors)

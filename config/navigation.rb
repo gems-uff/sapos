@@ -7,7 +7,7 @@ def get_path_from(models)
   models = models.is_a?(Array) ? models : [models]
   models.each do |model|
     if can_read?(model, false)
-      return self.send("#{model.name.underscore.pluralize.downcase}_path")
+      return self.send("#{model.name.demodulize.underscore.pluralize.downcase}_path")
     end
   end
 end
@@ -73,7 +73,7 @@ class NavigationHelper
   # Create item for a model if the user has read permission
   # Use the singular name of the model to create the key
   def modelitem(model, options = {}, &block)
-    key = model.name.underscore.singularize.downcase
+    key = model.name.demodulize.underscore.singularize.downcase
     listitem(key, model, options, &block)
   end
 
@@ -194,6 +194,15 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.modelitem City
       submenu.modelitem State
       submenu.modelitem Country
+    end
+
+    admission_models = [
+      Admissions::AdmissionProcess,
+      Admissions::FormTemplate,
+    ]
+    mainhelper.listitem :admissions, admission_models do |submenu|
+      submenu.modelitem Admissions::AdmissionProcess
+      submenu.modelitem Admissions::FormTemplate
     end
 
     config_models = [

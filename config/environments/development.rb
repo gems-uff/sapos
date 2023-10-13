@@ -64,6 +64,10 @@ Rails.application.configure do
   # Suppress logger output for asset requests.
   config.assets.quiet = true
 
+  # Debug assets
+  config.assets.debug = true
+  config.assets.compile = true
+
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 
@@ -72,6 +76,9 @@ Rails.application.configure do
 
   # Allow the notifier to send emails
   config.should_send_emails = Rails.const_defined?("Server")
+
+  # Use ReCaptcha
+  config.should_use_recaptcha = false
 
   # Only use best-standards-support built into browsers
   config.action_dispatch.best_standards_support = :builtin

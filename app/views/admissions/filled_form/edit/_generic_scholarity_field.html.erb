@@ -1,0 +1,23 @@
+<%
+  sid = "scholarity-#{Random.rand(10000)}"
+  form_field = field.object.form_field
+  local_options = {
+    configuration: configuration,
+    values: form_field.get_values("values"),
+    statuses: form_field.get_values("statuses"),
+  }
+%>
+<div id="<%= sid %>">
+  <%= field.fields_for :scholarities do |scholarity| %>
+    <%= render partial: "admissions/filled_form/edit/scholarity_item",
+      locals: local_options.merge({ f: scholarity }) %>
+  <% end %>
+</div>
+<div class="links">
+  <%= link_to_add_association (t "admissions.apply.edit.scholarity.add"),
+      field, :scholarities, partial: "admissions/filled_form/edit/scholarity_item",
+      render_options: { locals: local_options },
+      'data-association-insertion-method' => 'append',
+      'data-association-insertion-node' => "##{sid}",
+      class: 'add-scholarity' %>
+</div>

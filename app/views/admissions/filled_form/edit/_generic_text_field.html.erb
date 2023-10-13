@@ -1,0 +1,15 @@
+<%
+  options = {}
+  options[:required] = "required" if configuration["required"]
+%>
+<li class="form-element <%= configuration["required"] ? "required" : "" %>">
+  <dl>
+    <dt>
+      <%= field.label :value, form_field.name %>
+      <% if form_field.description.present? %>
+        <span class="filled-form-description"><%= form_field.description %></span>
+      <% end %>
+    </dt>
+    <dd> <%= field.text_area :value, class: "text-input", **options %> </dd>
+  </dl>
+</li>

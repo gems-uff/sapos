@@ -1,0 +1,8 @@
+<td class="field-name"><%= form_field.name %></td>
+<td class="field-value">
+  <% if field.file.blank? || field.file.file.blank? %>
+    -
+  <% else %>
+    <a href="<%= field.file.url %>"><%= field.file.filename %></a>
+  <% end %>
+</td>

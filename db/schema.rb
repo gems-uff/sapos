@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_30_232435) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_11_234143) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -20,6 +20,41 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_232435) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["enrollment_id"], name: "index_accomplishments_on_enrollment_id"
     t.index ["phase_id"], name: "index_accomplishments_on_phase_id"
+  end
+
+  create_table "active_scaffold_workarounds", force: :cascade do |t|
+  end
+
+  create_table "admission_applications", force: :cascade do |t|
+    t.integer "admission_process_id"
+    t.string "name"
+    t.string "email"
+    t.string "token"
+    t.integer "filled_form_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admission_process_id"], name: "index_admission_applications_on_admission_process_id"
+    t.index ["filled_form_id"], name: "index_admission_applications_on_filled_form_id"
+  end
+
+  create_table "admission_processes", force: :cascade do |t|
+    t.string "name"
+    t.string "simple_url"
+    t.integer "semester"
+    t.integer "year"
+    t.date "start_date"
+    t.date "end_date"
+    t.integer "form_template_id"
+    t.integer "letter_template_id"
+    t.integer "min_letters"
+    t.integer "max_letters"
+    t.boolean "allow_multiple_applications"
+    t.boolean "visible", default: true
+    t.boolean "require_session", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["form_template_id"], name: "index_admission_processes_on_form_template_id"
+    t.index ["letter_template_id"], name: "index_admission_processes_on_letter_template_id"
   end
 
   create_table "advisement_authorizations", force: :cascade do |t|
@@ -284,11 +319,76 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_30_232435) do
     t.index ["student_id"], name: "index_enrollments_on_student_id"
   end
 
+  create_table "filled_form_field_scholarities", force: :cascade do |t|
+    t.integer "filled_form_field_id"
+    t.string "level"
+    t.string "status"
+    t.date "date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["filled_form_field_id"], name: "index_filled_form_field_scholarities_on_filled_form_field_id"
+  end
+
+  create_table "filled_form_fields", force: :cascade do |t|
+    t.integer "filled_form_id"
+    t.integer "form_field_id"
+    t.text "value"
+    t.string "list"
+    t.string "file"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["filled_form_id"], name: "index_filled_form_fields_on_filled_form_id"
+    t.index ["form_field_id"], name: "index_filled_form_fields_on_form_field_id"
+  end
+
+  create_table "filled_forms", force: :cascade do |t|
+    t.integer "form_template_id"
+    t.boolean "is_filled"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["form_template_id"], name: "index_filled_forms_on_form_template_id"
+  end
+
+  create_table "form_fields", force: :cascade do |t|
+    t.integer "form_template_id"
+    t.integer "order"
+    t.string "name"
+    t.string "description"
+    t.string "field_type"
+    t.string "configuration"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "sync"
+    t.index ["form_template_id"], name: "index_form_fields_on_form_template_id"
+  end
+
+  create_table "form_templates", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.string "template_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.string "code", limit: 255
+  end
+
+  create_table "letter_requests", force: :cascade do |t|
+    t.integer "admission_application_id"
+    t.string "name"
+    t.string "email"
+    t.string "telephone"
+    t.string "access_token"
+    t.string "sent_email"
+    t.integer "filled_form_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admission_application_id"], name: "index_letter_requests_on_admission_application_id"
+    t.index ["filled_form_id"], name: "index_letter_requests_on_filled_form_id"
   end
 
   create_table "levels", force: :cascade do |t|

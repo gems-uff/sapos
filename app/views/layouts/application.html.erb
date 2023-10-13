@@ -12,7 +12,6 @@
 </head>
 <body>
   <div id='container' class='<%= signed_in_class %>'>
-    <span class="notice"><%= notice %></span>
     <div id='header'>
       <div id='logo'>
         <%= link_to root_path do %>
@@ -23,13 +22,12 @@
         Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %>
       </div>
     </div>
+    <span class="notice"><%= notice %></span>
     <div id='top_navigation' <%= display_none_if_logged_out %>>
       <%= optional_navigation level: 1 %>
     </div>
     <div id='main'>
-      <div id='sub_navigation' <%= display_none_if_logged_out %>>
-        <%= optional_navigation level: 2 %>
-      </div>
+      <div id='sub_navigation' <%= display_none_if_logged_out %>><%= optional_navigation level: 2 %></div>
       <div id='content'>
         <%= yield %>
       </div>

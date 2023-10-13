@@ -1,0 +1,35 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_application:
+        admission_process: "Edital de Seleção"
+        name: "Nome"
+        email: "Email"
+        token: "Código de Identificação"
+        filled_form: "Dados"
+        letter_requests: "Cartas de Recomendação"
+        letter_request: "Carta de Recomendação %{count}"
+        requested_letters: "Recomendações solicitadas"
+        filled_letters: "Recomendações preenchidas"
+      admissions/admission_application/letter_requests:
+        name: "Nome na indicação de carta de recomendação"
+        email: "Email na indicação de carta de recomendação"
+        filled_form: "Contate o instituto com a messagem: Formulário da indicação de carta de recomendação"
+
+    models:
+      admissions/admission_application:
+        one: "Inscrição"
+        other: "Inscrições"
+
+    errors:
+      models:
+        admissions/admission_application:
+          min_letters:
+            one: É necessário indicar ao menos uma pessoa
+            other: É necessário indicar ao menos %{count} pessoas
+          max_letters:
+            one: É permitido indicar no máximo uma pessoa
+            other: É permitido indicar no máximo %{count} pessoas

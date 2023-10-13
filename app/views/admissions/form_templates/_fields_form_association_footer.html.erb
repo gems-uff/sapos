@@ -1,0 +1,46 @@
+<%
+  remote_controller = active_scaffold_controller_for(column.association.klass)
+  show_add_new = column_show_add_new(column, associated, parent_record)
+
+  return unless show_add_new
+
+  temporary_id = generated_id(parent_record) if parent_record.new_record?
+  controller_path = active_scaffold_controller_for(parent_record.class).controller_path
+  parent_controller = (main_form_controller || controller).controller_path
+
+  url_options = {
+    controller: controller_path,
+    scope: scope,
+    id: parent_record.to_param,
+    generated_id: temporary_id,
+    parent_controller: parent_controller
+  }
+  add_new_url = params_for(url_options.merge(
+    action: "edit_associated",
+    child_association: column.name
+  ))
+  populate_url = params_for(url_options.merge(
+    action: 'populate_field',
+  ))
+
+  add_label = t("active_scaffold.admissions/form_template.add_field")
+  populate_label = t("active_scaffold.admissions/form_template.populate_student_form_fields")
+  create_another_id = "#{sub_form_id(
+      association: column.name,
+      id: parent_record.id || temporary_id || 99999999999)}-create-another"
+%>
+
+<div class="footer-wrapper">
+  <div class="footer">
+    <ol>
+      <li>
+        <%= link_to add_label, add_new_url, id: create_another_id, remote: true,
+          class: "as-js-button as_create_another", style: "display: none;" %>
+      </li>
+      <li>
+        <%= link_to populate_label, populate_url, remote: true,
+          class: "as-js-button as_create_another", style: "display: none;" %>
+      </li>
+    </ol>
+  </div>
+</div>

@@ -280,6 +280,63 @@ Rails.application.routes.draw do
     concerns :active_scaffold
   end
 
+  scope module: "admissions" do
+    resources :admission_processes do
+      concerns :active_scaffold
+      get :short_pdf, on: :member
+      get :complete_pdf, on: :member
+      get :complete_xls, on: :member
+    end
+
+    resources :admission_applications do
+      concerns :active_scaffold
+    end
+
+    resources :form_templates do
+      concerns :active_scaffold
+      get :populate_field, on: :collection
+      member do
+        get :populate_field
+        get :preview
+        post :preview
+        patch :preview
+      end
+      record_select_routes
+    end
+
+    resources :form_fields do
+      concerns :active_scaffold
+    end
+
+    resources :filled_forms do
+      concerns :active_scaffold
+    end
+
+    resources :filled_form_fields do
+      concerns :active_scaffold
+      member do
+        get "download"
+      end
+    end
+
+    resources :filled_form_field_scholarities do
+      concerns :active_scaffold
+    end
+
+    resources :letter_requests do
+      concerns :active_scaffold
+    end
+
+    resources :admissions, only: [:index, :show] do
+      post :find, on: :collection
+      post :create, on: :member
+      resources :apply, only: [:show, :new, :create, :edit, :update] do
+        post :update, on: :member
+      end
+      resources :letters, only: [:show, :update]
+    end
+  end
+
   get "landing", action: :index, controller: "landing"
   get "enrollment/:id", to: "student_enrollment#show", as: :student_enrollment
   get "enrollment/:id/enroll/:year-:semester",

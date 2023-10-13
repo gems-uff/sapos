@@ -1,0 +1,103 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  admissions:
+    admissions:
+      index:
+        title: Processos seletivos
+        recover: Recuperar inscrição em andamento
+        new_process: Iniciar novo processo
+        open_processes:
+          zero: Não há nenhum processo seletivo aberto.
+          one: Há um processo seletivo aberto.
+          other: Há %{count} processos seletivos abertos.
+        apply: Iniciar processo seletivo
+        deadline: "Prazo:"
+
+      recover_form:
+        recover_button: Buscar
+        forgot_token: Esqueci meu código de identificação
+        use_token: Usar código de identificação
+
+      show:
+        basic_info: Informações básicas
+        submit: Iniciar inscrição
+        recover: Recuperar inscrição em andamento
+        new_button: Criar nova inscrição
+        edit_button: Recuperar inscrição em andamento
+
+      find_by_email:
+        success:
+          one: Email enviado para %{email} com código de identificação
+          other: Email enviado para %{email} com códigos de identificação
+
+    apply:
+      show:
+        title: "Inscrição"
+        ongoing: "Inscrição em andamento"
+        finished: "Inscrição realizada"
+        finished_waiting_letters: "Inscrição realizada (aguardando cartas)"
+        data: "Dados"
+        letters: "Cartas de Recomendação"
+        edit: "Modificar inscrição"
+        continue: "Continuar inscrição"
+
+      edit:
+        title: "Inscrição"
+        letters: Cartas de Recomendação
+        submit: Enviar inscrição
+        letter:
+          add: Adicionar carta
+          remove: Remover carta
+          min_count: "Quantidade mínima: %{count}"
+          max_count: "Quantidade máxima: %{count}"
+        scholarity:
+          add: Adicionar formação
+          remove: Remover formação
+
+      update:
+        new_notice: "Inscrição realizada com sucesso"
+        edit_notice: "Inscrição editada com sucesso"
+
+    letters:
+      show:
+        title: "Carta de Recomendação"
+        submit: Enviar carta
+        letter_sent: Esta carta já foi enviada. O formulário abaixo pode ser usado para atualizá-la.
+        process: Processo seletivo
+        requested_by: "Preencher carta de recomendação para"
+        requested_to: "Carta solicitada a"
+      update:
+        success: "Carta enviada com sucesso!"
+
+  errors:
+    admissions:
+      invalid_process: O processo acessado não existe ou não está aberto
+      closed_process: O processo acessado está fechado
+      invalid_basic:
+        one: "Não foi possível prosseguir com a inscrição: 1 erro"
+        other: "Não foi possível prosseguir com a inscrição: %{count} erros"
+      invalid_letter_errors:
+        one: "Não foi possível prosseguir com o envio da carta: 1 erro"
+        other: "Não foi possível prosseguir com o envio da carta: %{count} erros"
+      application_exists: Já existe uma inscrição preenchida para este email. Use a opção de recuperar inscrição
+      invalid_application: A inscrição acessada é inválida ou o edital está fechado
+      application_not_found: Inscrição não encontrada
+      application_process_not_found: Inscrição não encontrada neste edital de seleção
+      invalid_letter: "A carta acessada não existe ou é de um processo fechado"
+      unauthorized_application: "Acesso não autorizado à inscrição %{token}. Por favor, use a opção de recuperar inscrição para acessá-la por este navegador."
+      invalid_captcha: "reCAPTCHA inválido"
+
+  notifications:
+    admissions:
+      admissions:
+        recover_tokens:
+          subject: Recuperação de código de inscrição
+      apply:
+        email_to_student:
+          subject: Inscrição realizada
+        edit_email_to_student:
+          subject: Inscrição em processo seletivo alterada
+        request_letter:
+          subject: Carta de recomendação solicitada

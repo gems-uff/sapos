@@ -1,0 +1,38 @@
+<%
+  collection_id = "select_#{SecureRandom.random_number(1_000_000)}"
+  default_values = form_field.get_values_map("default_values")
+  original_value = form_field.get_values_map("values")
+  values = original_value.merge(default_values).merge(original_value)
+  values = values.map { |k, v| [v, k] }
+%>
+<li id="<%= collection_id %>"
+    class="form-element <%= configuration["required"] ? "required" : "" %>">
+  <dl>
+    <dt>
+      <%= field.label :list, form_field.name %>
+      <% if form_field.description.present? %>
+        <span class="filled-form-description"><%= form_field.description %></span>
+      <% end %>
+    </dt>
+    <dd> <%= field.collection_check_boxes :list, values, :last, :first %> </dd>
+  </dl>
+</li>
+
+<% if configuration["maxselection"].to_i > 0 %>
+  <script>
+  $(document).ready(function() {
+    let check_count = function() {
+      var checkboxes = $('#<%= collection_id %> input:checkbox:checked');
+      if (checkboxes.length >= <%= configuration["maxselection"].to_i %>) {
+        $('#<%= collection_id %> input:checkbox:not(:checked)').attr("disabled", true);
+      }
+      else{
+        $('#<%= collection_id %> input:checkbox').attr("disabled", false);
+      }
+    }
+
+    $("#<%= collection_id %> input:checkbox").change(check_count)
+    check_count();
+  })
+  </script>
+<% end %>

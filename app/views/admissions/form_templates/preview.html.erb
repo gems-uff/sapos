@@ -1,0 +1,62 @@
+<div class="active-scaffold">
+  <div class="active-scaffold-header">
+    <h2><%= t "active_scaffold.admissions/form_template.preview.title" %></h2>
+  </div>
+  <div class="preview-view <%= "#{id_from_controller params[:controller]}-view" %> view">
+    <%= form_with model: @filled_form,
+          scope: :record,
+          method: :post,
+          id: element_form_id(action: "preview"),
+          data: { loading: true },
+          url: preview_form_template_path(@form_template),
+          class: "as_form preview",
+          multipart: true do |form| %>
+      <div id="<%= element_messages_id(:action => :preview) %>" class="messages-container">
+        <% if @notice.present? %>
+          <div class="success"><%= @notice %></div>
+        <% end %>
+        <% count = @filled_form.errors.count + (flash[:alert].present? ? 1 : 0) %>
+        <% if count > 0 %>
+          <div id="errorExplanation" class="errorExplanation">
+            <h2><%= t("errors.admissions.invalid_basic", count: count) %></h2>
+            <p><%= t "errors.template.body" %></p>
+            <ul>
+              <% if flash[:alert] %>
+                <li><%= flash[:alert] %></li>
+              <% end %>
+              <% @filled_form.errors.each do |error| %>
+                <li>
+                  <% if error.attribute.start_with? "fields" %>
+                    <%= error.message %>
+                  <% else %>
+                    <%= error.full_message %></li>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      </div>
+      <ol class="form filled-form">
+        <%= render partial: "admissions/filled_form/edit/filled_form_template", locals: {
+            form: form,
+            form_template: @form_template,
+            filled_form: form } %>
+      </ol>
+      <p class="form-footer">
+        <%= form.submit t("active_scaffold.admissions/form_template.preview.submit"), id: "submit", class: "submit" %>
+        <%= link_to as_(:cancel), main_path_to_return,
+          class: "as_cancel", remote: true, data: { refresh: true } %>
+        <%= loading_indicator_tag(action: :effect) %>
+      </p>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $("#submit").click(function(e){
+      window.onbeforeunload = null;
+    })
+  });
+</script>

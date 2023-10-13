@@ -1,0 +1,83 @@
+<div class="content">
+  <div class="active-scaffold default-theme">
+    <div class="active-scaffold-header">
+      <h2><%= t "admissions.letters.show.title" %></h2>
+    </div>
+    <div class="admission-inner show">
+      <%= form_with model: @letter_request,
+          scope: :record,
+          url: admission_letter_path(
+            admission_id: @admission_process.simple_id,
+            id: @letter_request.access_token
+          ),
+          method: :put,
+          class: "as_form create",
+          authenticity_token: true,
+          multipart: true do |form| %>
+        <div id="main-section">
+          <ol>
+            <li><p>
+              <% if @letter_request.filled_form.is_filled %>
+                <%= t "admissions.letters.show.letter_sent" %>
+              <% end %>
+            </p></li>
+            <li>
+              <span class="field-name"><%= t "admissions.letters.show.requested_by" %></span>
+              <span class="field-value"><%= @admission_application.name %></span>
+            </li>
+            <li>
+              <span class="field-name"><%= t "admissions.letters.show.requested_to" %></span>
+              <span class="field-value"><%= @letter_request.name %></span>
+            </li>
+            <li>
+              <span class="field-name"><%= t "admissions.letters.show.process" %></span>
+              <span class="field-value"><%= @admission_process.title %></span>
+            </li>
+          </ol>
+        </div>
+        <div class="messages-container">
+          <% count = @letter_request.errors.count + (flash[:alert].present? ? 1 : 0) %>
+          <% if count > 0 %>
+            <div id="errorExplanation" class="errorExplanation">
+              <h2><%= t("errors.admissions.invalid_letter_errors", count: count) %></h2>
+              <p><%= t "errors.template.body" %></p>
+              <ul>
+                <% if flash[:alert] %>
+                  <li><%= flash[:alert] %></li>
+                <% end %>
+                <% @letter_request.errors.each do |error| %>
+                  <li>
+                    <% if error.attribute.start_with? "filled_form.fields" %>
+                      <%= error.message %>
+                    <% else %>
+                      <%= error.full_message %></li>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+        </div>
+        <ol class="form filled-form">
+          <%= form.fields_for :filled_form do |filled_form| %>
+            <%= render partial: "admissions/filled_form/edit/filled_form_template", locals: {
+              form: form,
+              form_template: @admission_process.letter_template,
+              filled_form: filled_form } %>
+          <% end %>
+        </ol>
+        <p class="form-footer">
+          <%= form.submit (t "admissions.letters.show.submit"), id: "submit" %>
+        </p>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $("#submit").click(function(e){
+      window.onbeforeunload = null;
+    })
+  });
+</script>

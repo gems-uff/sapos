@@ -1,0 +1,63 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/form_template:
+        name: "Nome"
+        description: "Descrição"
+        template_type: "Tipo"
+        fields: "Campos do formulário"
+        admission_process_forms: "Editais que usam formulário"
+        admission_process_letters: "Editais que usam carta"
+        template_types:
+          admission_form: "Formulário"
+          recommendation_letter: "Carta de Recomendação"
+
+    models:
+      admissions/form_template:
+        one: "Modelo de Formulário"
+        other: "Modelos de Formulário"
+
+  active_scaffold:
+    create_form_template_label: "Criar Modelo de Formulário"
+    admissions/form_template:
+      preview:
+        title: Pré-visualizar
+        submit: Testar validações
+        valid: O formulário está válido
+      generate_fields:
+        cellphone: Celular
+        telephone: Telefone
+        cpf_photo: Foto do CPF
+        identity_photo: Foto da identidade
+        race_color: Raça/cor
+        race_colors:
+          not_declared: Não declarado
+          black: Preto
+          white: Branco
+          yellow: Amarelo
+          indigenous: Indígena
+        deficiency: Pessoa com deficiência
+        deficiencies:
+          yes: Sim
+          no: Não
+        contact: Contato
+        address: Endereço
+        job: Emprego
+        attachments: Anexos
+        attachments_description: Formato PDF
+        transcript: Diploma
+        grades_report: Histórico
+        scholarity: Formações
+        scholarities:
+          undergrad: Graduação
+          masters: Mestrado
+          phd: Doutorado
+          specialization: Curso
+        scholarity_statuses:
+          ongoing: Em andamento
+          finished: Concluído
+      add_field: "Adicionar campo"
+      populate_student_form_fields: "Adicionar campos SISPOS/Sucupira/Aluno"

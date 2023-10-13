@@ -1,0 +1,48 @@
+<%
+  config = tabular_admission_process_config(record)
+%>
+
+<div class="scrollable-table admissions-application-table">
+  <div class="scrollable-wrapper">
+    <table class="showtable">
+      <thead>
+        <tr>
+          <% config[:header].each_with_index do |name, index| %>
+            <th class="<%= "fixed-col" if index < 3 %>"><%= name %></th>
+          <% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% app_index = 0 %>
+        <% record.admission_applications.each do |application| %>
+          <% if application.filled_form.is_filled %>
+            <%
+              row = prepare_tabular_process_row(application, config) do |filled, field|
+                next "" if filled.blank?
+                filled.to_text(
+                  blank: "",
+                  custom: {
+                    Admissions::FormField::FILE => ->(filled_file, _) {
+                      if filled_file.file.blank? || filled_file.file.file.blank?
+                        ""
+                      else
+                        link_to filled_file.file.filename, filled_file.file.url
+                      end
+                    }
+                  }
+                )
+              end
+              tr_class = app_index.even? ? "even-record" : "blue-record"
+              app_index += 1
+            %>
+            <tr class="record <%= tr_class %>">
+              <% row.each_with_index do |value, index| %>
+                <td class="<%= "fixed-col" if index < 3 %>"><%= value %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

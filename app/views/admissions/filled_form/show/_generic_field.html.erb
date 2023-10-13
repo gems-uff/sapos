@@ -1,0 +1,26 @@
+<%
+  form_field = field.form_field
+  partial_locals = {
+    field: field,
+    form_field: form_field,
+    index: index,
+    field_type: nil
+  }
+%>
+
+<% if form_field.field_type == Admissions::FormField::FILE %>
+  <%= render partial: "admissions/filled_form/show/generic_file_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::STUDENT_FIELD %>
+  <%= render partial: "admissions/filled_form/show/generic_student_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::GROUP %>
+  <%= render partial: "admissions/filled_form/show/generic_group_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::SCHOLARITY %>
+  <%= render partial: "admissions/filled_form/show/generic_scholarity_field",
+      locals: partial_locals %>
+<% else %>
+  <%= render partial: "admissions/filled_form/show/generic_text_field",
+      locals: partial_locals %>
+<% end %>

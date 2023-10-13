@@ -27,6 +27,7 @@ pt-BR:
       too_long: "é muito longo (máximo: %{count} caracteres)"
       too_short: "é muito curto (mínimo: %{count} caracteres)"
       wrong_length: "não possui o tamanho esperado (%{count} caracteres)"
+      required: "não pode ficar em branco"
 
     template:
       header:
@@ -72,6 +73,7 @@ pt-BR:
     create_link: "Adicionar"
     create_new: "Criar Novo"
     delete_link: "Excluir"
+    remove_file: "Remover arquivo"
     delete_message: "Tem certeza que deseja excluir?"
     deleted_records: 'Registros Removidos'
     duplicate: "Duplicar"

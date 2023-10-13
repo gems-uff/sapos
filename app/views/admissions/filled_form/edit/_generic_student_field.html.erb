@@ -1,0 +1,25 @@
+<%
+  student_field = configuration["field"].to_sym
+  partial_locals = {
+    form_field: form_field, field: field,
+    configuration: configuration,
+    student_field: student_field
+  }
+%>
+
+<% if [:special_city, :special_birth_city].include? student_field %>
+  <%= render partial: "admissions/filled_form/edit/generic_city_field",
+      locals: partial_locals %>
+<% elsif [:special_address].include? student_field %>
+  <%= render partial: "admissions/filled_form/edit/generic_residency_field",
+      locals: partial_locals %>
+<% elsif [:special_majors].include? student_field %>
+  <%= render partial: "admissions/filled_form/edit/generic_scholarity_field",
+      locals: partial_locals %>
+<% elsif [:photo].include? student_field %>
+  <%= render partial: "admissions/filled_form/edit/as_student_photo",
+      locals: partial_locals %>
+<% else %>
+  <%= render partial: "admissions/filled_form/edit/as_student_field",
+      locals: partial_locals %>
+<% end %>

@@ -1,0 +1,91 @@
+<div class="content">
+  <div class="active-scaffold default-theme">
+    <div class="active-scaffold-header">
+      <h2><%= @admission_process.title %></h2>
+    </div>
+    <div class="admission-inner">
+      <div id="new-admission" style="<%= "display: none;" if @has_search_results %>">
+        <h4> <%= t "admissions.admissions.show.basic_info" %> </h4>
+        <%= render partial: "form_errors", locals: {
+            admission_application: @admission_application } %>
+        <%= form_with model: @admission_application,
+            url: admission_url(@admission_process.simple_id),
+            method: :post,
+            class: "as_form create",
+            authenticity_token: true do |form| %>
+          <ol class="form">
+            <li class="form-element required">
+              <dl>
+                <dt><%= form.label :name %></dt>
+                <dd><%= form.text_field :name, class: "text-input" %></dd>
+              </dl>
+            </li>
+            <li class="form-element required">
+              <dl>
+                <dt><%= form.label :email %></dt>
+                <dd>
+                  <%= form.email_field :email, class: "text-input", id: "new-email" %>
+                </dd>
+              </dl>
+            </li>
+            <li class="form-element">
+              <% if Rails.application.config.should_use_recaptcha %>
+                <%= recaptcha_tags %>
+              <% end %>
+            </li>
+          </ol>
+          <p class="form-footer">
+            <%= form.submit (t "admissions.admissions.show.submit"), id: "submit" %>
+          </p>
+        <% end %>
+        <p class="switch-links">
+          <a href="#" id="edit-button">
+            <%= t "admissions.admissions.show.edit_button" %>
+          </a>
+        </p>
+      </div>
+      <div id="edit-admission" style="<%= "display: none;" if !@has_search_results %>">
+        <h4> <%= t "admissions.admissions.show.recover" %> </h4>
+        <%= render partial: "form_errors", locals: {
+            admission_application: @admission_application } %>
+        <%= render partial: "recover_form", locals: {
+            admission_application: @admission_application,
+            source: @admission_process.simple_id
+          } %>
+        <p class="switch-links">
+          <a href="#" id="new-button">
+            <%= t "admissions.admissions.show.new_button" %>
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function() {
+    $("#submit").click(function(e){
+      window.onbeforeunload = null;
+    })
+
+    $("#new-email").keyup(function(){
+      $("#recover-email").val($("#new-email").val());
+    });
+
+    $("#recover-email").keyup(function(){
+      $("#new-email").val($("#recover-email").val());
+    });
+
+    $("#new-button").on("click", function(){
+      $("#edit-admission").hide();
+      $("#new-admission").show();
+      return false;
+    })
+
+    $("#edit-button").on("click", function(){
+      $("#edit-admission").show();
+      $("#new-admission").hide();
+      return false;
+    })
+  });
+</script>

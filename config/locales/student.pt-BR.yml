@@ -13,6 +13,7 @@ pt-BR:
         city: "Residência"
         civil_status: "Estado Civil"
         cpf: "CPF"
+        email: "Email"
         employer: "Empresa"
         enrollments: "Matrículas"
         enrollments_number: "Matrículas"
@@ -32,6 +33,10 @@ pt-BR:
         telephone1: "1º Telefone"
         telephone2: "2º Telefone"
         zip_code: "CEP"
+        special_address: "Logradouro*"
+        special_city: "Residência*"
+        special_birth_city: "Naturalidade*"
+        special_majors: "Cursos*"
 
     errors:
       models:

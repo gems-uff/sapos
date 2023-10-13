@@ -1,0 +1,26 @@
+<ol class="nested-fields scholarity">
+  <li class="form-element required">
+    <dl>
+      <dt><%= f.label :level %></dt>
+      <dd><%= f.select :level, values %></dd>
+    </dl>
+  </li>
+  <li class="form-element required">
+    <dl>
+      <dt><%= f.label :status %></dt>
+      <dd><%= f.select :status, statuses %></dd>
+    </dl>
+  </li>
+  <li class="form-element required">
+    <dl>
+      <dt><%= f.label :date %></dt>
+      <dd><%= f.date_field :date %></dd>
+    </dl>
+  </li>
+  <li class="form-element remove-scholarity">
+    <%= link_to_remove_association (t "admissions.apply.edit.scholarity.remove"), f %>
+  </li>
+  <li class="form-element">
+    <br/>
+  </li>
+</ol>

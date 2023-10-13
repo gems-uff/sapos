@@ -1,0 +1,15 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
+
+wb = xlsx_package.workbook
+wb.add_worksheet(name: "Edital") do |sheet|
+  config = tabular_admission_process_config(@admission_process)
+  sheet.add_row config[:header]
+  @admission_process.admission_applications.each do |application|
+    next if !application.filled_form.is_filled
+    row = prepare_tabular_process_row(application, config)
+    sheet.add_row row
+  end
+end

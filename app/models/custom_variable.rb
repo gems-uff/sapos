@@ -82,9 +82,8 @@ class CustomVariable < ApplicationRecord
       formatted_value = config.value.strip.downcase
       return formatted_value if
         (formatted_value == "yes") || (formatted_value == "yes_all_semesters")
-    else
-      "no"
     end
+    "no"
   end
 
   def self.month_year_range

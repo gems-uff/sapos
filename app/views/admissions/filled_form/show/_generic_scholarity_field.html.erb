@@ -1,0 +1,17 @@
+<td class="field-name"><%= form_field.name %></td>
+<%
+  form_field = field.form_field
+  values = form_field.get_values_map("values")
+  statuses = form_field.get_values_map("statuses")
+%>
+<td class="field-value">
+  <% if field.scholarities.blank? %>
+    -
+  <% else %>
+    <ol>
+      <% field.scholarities.each do |scholarity| %>
+        <li> <%= scholarity.to_label(values: values, statuses: statuses) %></li>
+      <% end %>
+    </ol>
+  <% end %>
+</td>

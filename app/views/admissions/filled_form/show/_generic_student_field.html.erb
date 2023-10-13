@@ -1,0 +1,19 @@
+<%
+  configuration = JSON.parse(form_field.configuration || "{}")
+  partial_locals = {
+    field: field,
+    form_field: form_field,
+    index: index,
+    field_type: nil
+  }
+%>
+<% if configuration["field"] == "special_majors" %>
+  <%= render partial: "admissions/filled_form/show/generic_scholarity_field",
+      locals: partial_locals %>
+<% elsif configuration["field"] == "photo" %>
+  <%= render partial: "admissions/filled_form/show/generic_file_field",
+      locals: partial_locals %>
+<% else %>
+  <%= render partial: "admissions/filled_form/show/generic_text_field",
+      locals: partial_locals %>
+<% end %>

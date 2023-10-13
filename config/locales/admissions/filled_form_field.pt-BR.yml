@@ -1,0 +1,34 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/filled_form_field:
+        value: "Valor"
+        file: "Arquivo"
+        list: "Lista"
+        filled_form: "Formulário"
+        form_field: "Campo"
+
+    models:
+      admissions/filled_form_field:
+        one: "Resposta"
+        other: "Respostas"
+
+    errors:
+      models:
+        admissions/filled_form_field:
+          blank: "não pode ficar em branco"
+          minselection:
+            one: "precisa ter no mínimo uma opção selecionada"
+            other: "precisa ter no mínimo %{count} opções selecionadas"
+          maxselection:
+            one: "pode ter no máximo uma opção selecionada"
+            other: "pode ter no máximo %{count} opções selecionadas"
+          multiple_filling: "não pode ter valor, arquivo e lista preenchidos ao mesmo tempo. Contate os administradores do sistema"
+          city_blank: "- Cidade não pode ficar em branco"
+          state_blank: "- Estado não pode ficar em branco"
+          country_blank: "- País não pode ficar em branco"
+          street_blank: "- Logradouro não pode ficar em branco"
+          number_blank: "- Número não pode ficar em branco"
