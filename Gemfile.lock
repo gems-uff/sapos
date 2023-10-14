@@ -241,6 +241,7 @@ GEM
       letter_opener (~> 1.7)
       railties (>= 5.2)
       rexml
+    libv8-node (18.16.0.0)
     loofah (2.21.3)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -255,6 +256,8 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.4)
+    mini_racer (0.8.0)
+      libv8-node (~> 18.16.0.0)
     minitest (5.19.0)
     msgpack (1.7.2)
     multi_json (1.15.0)
@@ -456,6 +459,8 @@ GEM
       mini_portile2 (~> 2.8.0)
     ssrf_filter (1.1.1)
     stringio (3.0.8)
+    terser (1.1.18)
+      execjs (>= 0.3.0, < 3)
     thor (1.2.2)
     tilt (2.2.0)
     timeliness (0.4.5)
@@ -465,8 +470,6 @@ GEM
       concurrent-ruby (~> 1.0)
     tzinfo-data (1.2023.3)
       tzinfo (>= 1.0.0)
-    uglifier (4.2.0)
-      execjs (>= 0.3.0, < 3)
     unicode-display_width (2.4.2)
     uri (0.12.2)
     validates_timeliness (7.0.0.beta2)
@@ -522,6 +525,7 @@ DEPENDENCIES
   kaminari
   letter_opener_web
   matrix (~> 0.4.2)
+  mini_racer
   mysql2
   net-http
   net-imap
@@ -553,8 +557,8 @@ DEPENDENCIES
   sprockets-rails
   sqlite3
   stringio
+  terser
   tzinfo-data
-  uglifier
   validates_timeliness (~> 7.0.0.beta1)
   web-console
 

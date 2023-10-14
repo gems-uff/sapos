@@ -28,8 +28,9 @@ gem "puma", "~> 5.0"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 # gem "stimulus-rails"
 
-# Use Uglifier as compressor for JavaScript assets
-gem "uglifier"
+# Use Terser as compressor for JavaScript assets
+gem "terser"
+gem "mini_racer"
 
 # Use CoffeeScript for .js.coffee assets and views
 gem "coffee-rails"
