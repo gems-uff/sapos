@@ -29,8 +29,8 @@ gem "puma", "~> 5.0"
 # gem "stimulus-rails"
 
 # Use Terser as compressor for JavaScript assets
-gem "terser"
-gem "mini_racer"
+# gem "terser"
+# gem "mini_racer"
 
 # Use CoffeeScript for .js.coffee assets and views
 gem "coffee-rails"
