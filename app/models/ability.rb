@@ -65,11 +65,7 @@ class Ability
       cannot [:destroy, :update, :create], Role
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [
-        Role, CustomVariable, ReportConfiguration,
-        Admissions::FormTemplate, Admissions::FormField,
-        Admissions::FilledForm, Admissions::FilledFormField,
-        Admissions::AdmissionProcess, Admissions::AdmissionApplication,
-        Admissions::LetterRequest
+        Role, CustomVariable, ReportConfiguration
       ])
       cannot :update_only_photo, Student
       can :read, :pendency
@@ -117,11 +113,7 @@ class Ability
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [
         User, Role, CustomVariable, Query, Version,
-        Notification, ReportConfiguration,
-        Admissions::FormTemplate, Admissions::FormField,
-        Admissions::FilledForm, Admissions::FilledFormField,
-        Admissions::AdmissionProcess, Admissions::AdmissionApplication,
-        Admissions::LetterRequest
+        Notification, ReportConfiguration
       ])
       cannot :update_only_photo, Student
       can :invite, User
