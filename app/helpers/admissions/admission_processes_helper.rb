@@ -54,7 +54,7 @@ module Admissions::AdmissionProcessesHelper
 
     letters_header = []
     applications = admission_process.admission_applications
-    max_submitted_letters = applications.collect(&:requested_letters).max
+    max_submitted_letters = applications.collect(&:requested_letters).max.to_i
     max_submitted_letters.times do |i|
       if group_column
         letters_header << applications_t("letter_request", count: i + 1)
