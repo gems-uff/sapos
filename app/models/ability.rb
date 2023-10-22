@@ -113,8 +113,10 @@ class Ability
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [
         User, Role, CustomVariable, Query, Version,
-        Notification, ReportConfiguration
+        Notification, ReportConfiguration,
+        Admissions::FormTemplate, Admissions::FormField
       ])
+      can :read, [Admissions::FormTemplate, Admissions::FormField]
       cannot :update_only_photo, Student
       can :invite, User
       can :read, :pendency
