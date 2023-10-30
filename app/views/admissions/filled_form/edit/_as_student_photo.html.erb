@@ -5,7 +5,7 @@
   options = active_scaffold_input_options(column, scope, :object => field.object)
   options[:required] = configuration["required"] ? true : false
   basename = options[:name][..-("file".size + 3)]
-  data_url = field.object.file.file.present? ? field.object.file.url : ""
+  data_url = field.object.file.file.present? ? "#{root_url}#{field.object.file.url}" : ""
 %>
 
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">

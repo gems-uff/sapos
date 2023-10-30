@@ -57,7 +57,7 @@ module Admissions::AdmissionProcessesPdfHelper
           if filled_file.file.blank? || filled_file.file.file.blank?
             ""
           else
-            "<link href='#{request.base_url}#{filled_file.file.url}'>
+            "<link href='#{root_url}#{filled_file.file.url}'>
               #{filled_file.file.filename}
             </link>"
           end
