@@ -73,6 +73,20 @@ pt-BR:
           values_sql_description: Retorne um ou dois valores por tupla. Caso dois sejam retornados, o primeiro é o que aparecerá para o usuário e o segundo é o que será salvo no banco
           statuses_sql_description: Retorne um ou dois valores por tupla. Caso dois sejam retornados, o primeiro é o que aparecerá para o usuário e o segundo é o que será salvo no banco
           default_values_sql_description: Retorne um ou dois valores por tupla. Caso dois sejam retornados, o primeiro é o que aparecerá para o usuário e o segundo é o que será salvo no banco
+          field_of: Campo de
+          fields: Campos
+          hide: Esconder
+          description: Descrição
+          field_name: Nome
+          scholarity_level: Nível
+          scholarity_status: Situação
+          scholarity_institution: Instituição
+          scholarity_course: Curso
+          scholarity_location: Cidade/Estado
+          scholarity_grade: CR do curso
+          scholarity_grade_interval: Intervalo de CR
+          scholarity_start_date: Data de Início
+          scholarity_end_date: Data de Fim
 
     errors:
       models:

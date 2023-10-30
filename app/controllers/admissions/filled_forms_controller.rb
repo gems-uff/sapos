@@ -29,7 +29,7 @@ class Admissions::FilledFormsController < ApplicationController
           ],
           scholarities_attributes: [
             :id, :level, :status, :institution, :course,
-            :location, :grade, :start_date, :end_date, :_destroy
+            :location, :grade, :grade_interval, :start_date, :end_date, :_destroy
           ],
         ]
       ]

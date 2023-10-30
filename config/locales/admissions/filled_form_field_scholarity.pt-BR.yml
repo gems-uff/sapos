@@ -8,12 +8,13 @@ pt-BR:
         filled_form_field: "Resposta"
         level: "Nível"
         status: "Situação"
-        end_date: "Data de término"
-        start_date: "Data de início"
         institution: "Instituição"
         course: "Curso"
-        grade: "CR do Curso"
         location: "Cidade/Estado"
+        grade: "CR do Curso"
+        grade_interval: "Intervalo de CR"
+        start_date: "Data de início"
+        end_date: "Data de término"
 
     models:
       admissions/filled_form_field_scholarity:

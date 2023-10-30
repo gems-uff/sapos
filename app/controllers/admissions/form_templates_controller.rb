@@ -148,7 +148,8 @@ class Admissions::FormTemplatesController < ApplicationController
         configuration: JSON.dump({
           "field": "special_majors",
           "values": I18n.t("active_scaffold.admissions/form_template.generate_fields.scholarities").values,
-          "statuses": I18n.t("active_scaffold.admissions/form_template.generate_fields.scholarity_statuses").values
+          "statuses": I18n.t("active_scaffold.admissions/form_template.generate_fields.scholarity_statuses").values,
+          "scholarity_grade_interval_description": I18n.t("active_scaffold.admissions/form_template.generate_fields.scholarity_grade_interval_description"),
         }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.job"),
         field_type: Admissions::FormField::GROUP },

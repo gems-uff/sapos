@@ -1,52 +1,48 @@
+<%
+  fields = [
+    {name: :level, type: :select, values: values},
+    {name: :status, type: :select, values: statuses},
+    {name: :institution, type: :text},
+    {name: :course, type: :text},
+    {name: :location, type: :text},
+    {name: :grade, type: :text},
+    {name: :grade_interval, type: :text},
+    {name: :start_date, type: :date},
+    {name: :end_date, type: :date},
+  ].map do |field|
+    field[:hide] = configuration["scholarity_#{field[:name]}_hide"]
+    field[:required] = configuration["scholarity_#{field[:name]}_required"]
+    field[:label] = configuration["scholarity_#{field[:name]}_name"]
+    field[:description] = configuration["scholarity_#{field[:name]}_description"]
+    field
+  end
+%>
+
 <ol class="nested-fields scholarity">
-  <li class="form-element required">
-    <dl>
-      <dt><%= f.label :level %></dt>
-      <dd><%= f.select :level, values %></dd>
-    </dl>
-  </li>
-  <li class="form-element required">
-    <dl>
-      <dt><%= f.label :status %></dt>
-      <dd><%= f.select :status, statuses %></dd>
-    </dl>
-  </li>
-  <li class="form-element required">
-    <dl>
-      <dt><%= f.label :institution %></dt>
-      <dd><%= f.text_field :institution %></dd>
-    </dl>
-  </li>
-  <li class="form-element required">
-    <dl>
-      <dt><%= f.label :course %></dt>
-      <dd><%= f.text_field :course %></dd>
-    </dl>
-  </li>
-  <li class="form-element required">
-    <dl>
-      <dt><%= f.label :location %></dt>
-      <dd><%= f.text_field :location %></dd>
-    </dl>
-  </li>
-  <li class="form-element required">
-    <dl>
-      <dt><%= f.label :grade %></dt>
-      <dd><%= f.text_field :grade %></dd>
-    </dl>
-  </li>
-  <li class="form-element required">
-    <dl>
-      <dt><%= f.label :start_date %></dt>
-      <dd><%= f.date_field :start_date %></dd>
-    </dl>
-  </li>
-  <li class="form-element required">
-    <dl>
-      <dt><%= f.label :end_date %></dt>
-      <dd><%= f.date_field :end_date %></dd>
-    </dl>
-  </li>
+  <% fields.each do |field| %>
+    <% unless field[:hide] %>
+      <li class="form-element <%= "required" if field[:required] %>">
+        <dl>
+          <dt>
+            <%= f.label field[:name], field[:label] %>
+            <% if field[:description].present? %>
+              <span class="filled-form-description">
+                <%= field[:description] %>
+              </span>
+            <% end %>
+          </dt>
+          <dd>
+            <% if field[:type] == :select %>
+              <%= f.select field[:name], field[:values] %>
+            <% elsif field[:type] == :text %>
+              <%= f.text_field field[:name] %>
+            <% elsif field[:type] == :date %>
+              <%= f.date_field field[:name] %>
+            <% end %>
+          </dd>
+      </li>
+    <% end %>
+  <% end %>
   <li class="form-element remove-scholarity">
     <%= link_to_remove_association (t "admissions.apply.edit.scholarity.remove"), f %>
   </li>

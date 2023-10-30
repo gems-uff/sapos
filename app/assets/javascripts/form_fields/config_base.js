@@ -122,6 +122,7 @@ function form_field_config_base(form_field) {
         config_form_field_values_sql(form_field, "statuses", {
           required: true, non_blank: true
         }),
+        config_form_field_scholarity(form_field),
       ]
     }
 
