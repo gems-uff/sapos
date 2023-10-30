@@ -28,29 +28,41 @@ pt-BR:
         submit: Testar validações
         valid: O formulário está válido
       generate_fields:
-        cellphone: Celular
-        telephone: Telefone
-        cpf_photo: Foto do CPF
-        identity_photo: Foto da identidade
+        personal_data: Dados Pessoais
+        name: Nome
+        birthdate: Data de nascimento
+        birth_city: Naturalidade
+        sex: Sexo
         race_color: Raça/cor
         race_colors:
           not_declared: Não declarado
-          black: Preto
-          white: Branco
-          yellow: Amarelo
+          white: Branca
+          black: Preta
+          mixed: Parda
+          yellow: Amarela
           indigenous: Indígena
         deficiency: Pessoa com deficiência
         deficiencies:
-          yes: Sim
           no: Não
+          yes: Sim
+        identity_or_passport: Número da identidade ou passaporte
+        identity_issuing_body: Órgão expeditor
+        identity_issuing_place: Local de expedição
+        identity_expedition_date: Data de expedição
+        cpf: Número do CPF
+        civil_status: Estado civil
+        mother_name: Nome da mãe
+        father_name: Nome do pai
+        address_group: Endereço
+        city: Residência
+        address: Logradouro
+        zip_code: CEP
         contact: Contato
-        address: Endereço
-        job: Emprego
-        attachments: Anexos
-        attachments_description: Formato PDF
-        transcript: Diploma
-        grades_report: Histórico
-        scholarity: Formações
+        cellphone: Celular
+        telephone: Telefone fixo
+        email: Email
+        scholarity: Formação Escolar
+        scholarity_description: A partir do 3°. Grau, inclusive.
         scholarities:
           undergrad: Graduação
           masters: Mestrado
@@ -59,5 +71,18 @@ pt-BR:
         scholarity_statuses:
           ongoing: Em andamento
           finished: Concluído
+        job: Emprego
+        employer: Empresa
+        job_position: Cargo
+        cpf_photo: Foto do CPF
+        attachments: Anexos
+        photo: Foto
+        photo_description: Formato JPEG.
+        identity_photo: Documento de identificação
+        identity_photo_description: Formato PDF. Carteira de identidade e CPF, para brasileiros, ou passaporte, para estrangeiros.
+        transcript: Diploma
+        transcript_description: Formato PDF.
+        grades_report: Histórico
+        grades_report_description: Formato PDF.
       add_field: "Adicionar campo"
       populate_student_form_fields: "Adicionar campos SISPOS/Sucupira/Aluno"
