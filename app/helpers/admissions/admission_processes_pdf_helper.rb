@@ -70,7 +70,7 @@ module Admissions::AdmissionProcessesPdfHelper
     admission_process ||= options[:admission_process]
     admission_applications = admission_process.admission_applications
     title = admission_process_pdf_title(admission_process)
-    config = tabular_admission_process_config(admission_process)
+    config = tabular_admission_process_config(admission_process, group_column: true)
     applications = admission_applications.order(:name).filter_map do |application|
       next if !application.filled_form.is_filled
       main_data = config[:main_header].zip(
@@ -83,7 +83,7 @@ module Admissions::AdmissionProcessesPdfHelper
           "<b>#{filled_field_t("value")}</b>"
         ]
       ]
-      populate_filled(app_data, application.filled_form, config[:template_fields]) do |filled, field|
+      populate_filled(app_data, application.filled_form, config[:template_fields], 0) do |filled, field, cell_index|
         [field.name, show_filled(filled, field)]
       end
 
@@ -96,7 +96,7 @@ module Admissions::AdmissionProcessesPdfHelper
           ["#{letter_request_t("status")}", "#{letter.status}"],
         ]
         if letter.filled_form.is_filled
-          populate_filled(ldata, letter.filled_form, config[:letter_fields]) do |filled, field|
+          populate_filled(ldata, letter.filled_form, config[:letter_fields], 0) do |filled, field, cell_index|
             [field.name, show_filled(filled, field)]
           end
         end

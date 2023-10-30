@@ -17,7 +17,7 @@
         <% record.admission_applications.each do |application| %>
           <% if application.filled_form.is_filled %>
             <%
-              row = prepare_tabular_process_row(application, config) do |filled, field|
+              row = prepare_tabular_process_row(application, config) do |filled, field, cell_pos|
                 next "" if filled.blank?
                 filled.to_text(
                   blank: "",

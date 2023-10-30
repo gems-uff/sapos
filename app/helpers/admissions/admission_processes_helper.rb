@@ -26,7 +26,7 @@ module Admissions::AdmissionProcessesHelper
   end
 
   def tabular_admission_process_config(
-    admission_process, group_column: true
+    admission_process, group_column: false
   )
     main_header = [
       applications_t("token"),
@@ -78,12 +78,14 @@ module Admissions::AdmissionProcessesHelper
     }
   end
 
-  def populate_filled(row, filled_form, template_fields)
+  def populate_filled(row, filled_form, template_fields, cell_index)
     filled_hash = filled_form.fields.index_by(&:form_field_id)
     template_fields.each do |field|
       filled = filled_hash[field.id]
-      row << yield(filled, field)
+      row << yield(filled, field, cell_index)
+      cell_index += 1
     end
+    cell_index
   end
 
   def prepare_process_main_values(application, config)
@@ -103,7 +105,7 @@ module Admissions::AdmissionProcessesHelper
 
   def prepare_tabular_process_row(application, config, &block)
     if block.nil?
-      block = ->(filled, field) {
+      block = ->(filled, field, cell_pos) {
         if filled.blank?
           ""
         else
@@ -124,11 +126,15 @@ module Admissions::AdmissionProcessesHelper
     end
 
     row = prepare_process_main_values(application, config)
-    populate_filled(row, application.filled_form, config[:template_fields], &block)
+    cell_index = row.size
+    cell_index = populate_filled(
+      row, application.filled_form, config[:template_fields], cell_index, &block
+    )
 
     application.letter_requests.each_with_index do |letter, i|
       if config[:group_column]
         row << i + 1
+        cell_index += 1
       end
       row += [
         letter.name,
@@ -136,11 +142,15 @@ module Admissions::AdmissionProcessesHelper
         letter.telephone,
         letter.status
       ]
-      populate_filled(row, letter.filled_form, config[:letter_fields], &block)
+      cell_index += 4
+      cell_index = populate_filled(
+        row, letter.filled_form, config[:letter_fields], cell_index, &block
+      )
     end
     (config[:max_submitted_letters] - application.letter_requests.count).times do
       if config[:group_column]
         row << ""
+        cell_index += 1
       end
       row += [
         "",
@@ -148,7 +158,10 @@ module Admissions::AdmissionProcessesHelper
         "",
         ""
       ]
-      row += config[:letter_fields].map { "" }
+      cell_index += 4
+      letter_fields = config[:letter_fields].map { "" }
+      row += letter_fields
+      cell_index += letter_fields.size
     end
 
     row

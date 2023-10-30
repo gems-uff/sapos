@@ -9,7 +9,29 @@ wb.add_worksheet(name: "Edital") do |sheet|
   sheet.add_row config[:header]
   @admission_process.admission_applications.each do |application|
     next if !application.filled_form.is_filled
-    row = prepare_tabular_process_row(application, config)
-    sheet.add_row row
+    do_not_escape = []
+    row = prepare_tabular_process_row(application, config) do |filled, field, cell_pos|
+      if filled.blank?
+        next ""
+      end
+      filled.to_text(
+        blank: "",
+        custom: {
+          Admissions::FormField::FILE => ->(filled_file, _) {
+            do_not_escape << cell_pos
+            if filled_file.file.blank? || filled_file.file.file.blank?
+              ""
+            else
+              "=HYPERLINK(\"#{root_url}#{filled_file.file.url}\",
+                          \"#{filled_file.file.filename.tr('"', "'")}\")"
+            end
+          }
+        }
+      )
+    end
+    escape_formulas = row.each_with_index.map do |v, index|
+      !do_not_escape.include? index
+    end
+    sheet.add_row row, escape_formulas: escape_formulas
   end
 end
