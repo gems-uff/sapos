@@ -8,7 +8,8 @@ class Admissions::FilledFormFieldScholaritiesController < ApplicationController
 
   active_scaffold "Admissions::FilledFormFieldScholarity" do |config|
     columns = [
-      :filled_form_field, :level, :status, :date
+      :filled_form_field, :level, :status, :institution, :course,
+      :location, :grade, :start_date, :end_date
     ]
 
     config.list.columns = columns

@@ -28,7 +28,8 @@ class Admissions::FilledFormsController < ApplicationController
             :base64_contents, :filename
           ],
           scholarities_attributes: [
-            :id, :level, :status, :date, :_destroy
+            :id, :level, :status, :institution, :course,
+            :location, :grade, :start_date, :end_date, :_destroy
           ],
         ]
       ]

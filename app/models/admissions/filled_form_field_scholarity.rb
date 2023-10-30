@@ -14,9 +14,16 @@ class Admissions::FilledFormFieldScholarity < ActiveRecord::Base
     level_label = values[self.level] unless values.nil?
     status_label = self.status
     status_label = statuses[self.status] unless statuses.nil?
-    result = level_label
-    result = "#{result} - #{status_label}" if status_label.present?
-    result = "#{result} (#{self.date})" if self.date.present?
+    result = [
+      level_label, status_label, self.institution, self.course,
+      self.location, self.grade
+    ].reject(&:blank?).join(" - ")
+
+    date = [
+      self.start_date, self.end_date
+    ].reject(&:blank?).join(" - ")
+
+    result = "#{result} (#{date})" if date.present?
     result
   end
 end

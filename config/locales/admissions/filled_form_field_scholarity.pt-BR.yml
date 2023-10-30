@@ -8,7 +8,12 @@ pt-BR:
         filled_form_field: "Resposta"
         level: "Nível"
         status: "Situação"
-        date: "Data de término"
+        end_date: "Data de término"
+        start_date: "Data de início"
+        institution: "Instituição"
+        course: "Curso"
+        grade: "CR do Curso"
+        location: "Cidade/Estado"
 
     models:
       admissions/filled_form_field_scholarity:
