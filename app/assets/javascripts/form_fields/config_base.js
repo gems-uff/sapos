@@ -96,6 +96,8 @@ function form_field_config_base(form_field) {
       form_field.widgets = [
         config_form_field_checkbox(form_field, "required"),
         config_form_field_input(form_field, "default"),
+        config_form_field_input(form_field, "rows"),
+        config_form_field_input(form_field, "cols"),
       ]
     } else if (selected_value == "student_field") {
       form_field.widgets = [

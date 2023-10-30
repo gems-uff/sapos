@@ -49,6 +49,8 @@ pt-BR:
           default_blank_title: Se o valor definido não existir na lista, este campo será o texto que aparece inicialmente no componente, mas não uma opção válida.
           placeholder: Placeholder
           field: Campo
+          rows: Linhas
+          cols: Colunas
           values:
             title: Opções
             add: Adicionar opção

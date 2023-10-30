@@ -1,6 +1,8 @@
 <%
   options = {}
   options[:required] = "required" if configuration["required"]
+  options[:rows] = configuration["rows"].present? ? configuration["rows"] : 5
+  options[:cols] = configuration["cols"].present? ? configuration["cols"] : 40
 %>
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
