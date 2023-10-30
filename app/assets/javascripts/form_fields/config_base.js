@@ -71,6 +71,7 @@ function form_field_config_base(form_field) {
     } else if (selected_value == "radio") {
       form_field.widgets = [
         config_form_field_checkbox(form_field, "required"),
+        config_form_field_checkbox(form_field, "vertical_layout"),
         config_form_field_blank(form_field, "default"),
         config_form_field_values_sql(form_field, "values", {
           required: true, non_blank: true
@@ -79,6 +80,7 @@ function form_field_config_base(form_field) {
     } else if (selected_value == "collection_checkbox") {
       form_field.widgets = [
         config_form_field_minmax(form_field, "minselection", "maxselection"),
+        config_form_field_checkbox(form_field, "vertical_layout"),
         config_form_field_values_sql(form_field, "values", {
           required: true, non_blank: true
         }),

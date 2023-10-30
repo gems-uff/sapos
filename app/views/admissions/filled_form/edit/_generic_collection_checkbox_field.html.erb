@@ -14,7 +14,15 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd> <%= field.collection_check_boxes :list, values, :last, :first %> </dd>
+    <dd>
+      <%= field.collection_check_boxes :list, values, :last, :first do |b| %>
+        <div class="form-template-checkbox-list <%= "vertical-style" if configuration["vertical_layout"].present? %>">
+          <%= b.label do %>
+            <%= b.check_box %> <%= b.text %>
+          <% end %>
+        </div>
+      <% end %>
+    </dd>
   </dl>
 </li>
 

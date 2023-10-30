@@ -12,7 +12,13 @@
       <% end %>
     </dt>
     <dd>
-      <%= field.collection_radio_buttons :value, values, :last, :first, options %>
+      <%= field.collection_radio_buttons :value, values, :last, :first, options do |b| %>
+        <div class="form-template-checkbox-list <%= "vertical-style" if configuration["vertical_layout"].present? %>">
+          <%= b.label do %>
+            <%= b.radio_button %> <%= b.text %>
+          <% end %>
+        </div>
+      <% end %>
     </dd>
   </dl>
 </li>

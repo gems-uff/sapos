@@ -41,6 +41,7 @@ pt-BR:
           hide_config: "Esconder configuração"
           error_exists: "Há algum problema nas configurações"
           required: Obrigatório
+          vertical_layout: Exibir Verticalmente
           state_required: Estado Obrigatório
           country_required: País Obrigatório
           number_required: Número Obrigatório

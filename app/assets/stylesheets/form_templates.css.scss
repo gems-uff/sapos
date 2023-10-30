@@ -32,3 +32,11 @@ tr.form-field-configuration td dt label {
 .filled-form .field_with_errors {
   display: inline-block;
 }
+
+.form-template-checkbox-list {
+  display: inline-block;
+}
+
+.form-template-checkbox-list.vertical-style {
+  display: block;
+}
