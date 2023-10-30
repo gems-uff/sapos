@@ -6,7 +6,7 @@ function config_form_field_values_sql(form_field, field, options) {
     visible: !sql_visible
   })
   values_id = values_widget.main_id;
-  let sql_widget = config_form_field_sql(form_field, `${field}_sql`, { ...options,
+  let sql_widget = config_form_field_codemirror(form_field, `${field}_sql`, "text/x-mysql", { ...options,
     visible: !!sql_visible
   })
   sql_id = sql_widget.main_id;

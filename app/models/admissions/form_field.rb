@@ -6,6 +6,7 @@
 class Admissions::FormField < ActiveRecord::Base
   has_paper_trail
 
+  HTML = I18n.t("activerecord.attributes.admissions/form_field.field_types.html")
   STRING = I18n.t("activerecord.attributes.admissions/form_field.field_types.string")
   SELECT = I18n.t("activerecord.attributes.admissions/form_field.field_types.select")
   RADIO = I18n.t("activerecord.attributes.admissions/form_field.field_types.radio")
@@ -27,7 +28,7 @@ class Admissions::FormField < ActiveRecord::Base
 
   FIELD_TYPES = [
     FILE, STUDENT_FIELD, COLLECTION_CHECKBOX, SINGLE_CHECKBOX,
-    CITY, SCHOLARITY, GROUP, RESIDENCY,
+    CITY, SCHOLARITY, GROUP, HTML, RESIDENCY,
     RADIO, SELECT, STRING, TEXT
   ]
 

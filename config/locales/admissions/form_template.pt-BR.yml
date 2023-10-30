@@ -28,6 +28,25 @@ pt-BR:
         submit: Testar validações
         valid: O formulário está válido
       generate_fields:
+        initial_text: Introdução
+        initial_text_html: >
+          <div>
+          Campos com <span style="color:red;">*</span> são obrigatórios. <br><br>
+
+          Após o envio do formulário, o candidato receberá um e-mail de confirmação.
+          Por favor, envie o formulário uma única vez.
+          Caso precise editar o formulário, acesse o e-mail de confirmação e
+          use o link de edição fornecido.
+          Caso mais de uma submissão seja feita por engano, somente a última será considerada.
+          <br><br>
+          </div>
+
+          <style>
+            .required label:after {
+              content: '*';
+              color: red;
+            }
+          </style>
         personal_data: Dados Pessoais
         name: Nome
         birthdate: Data de nascimento
@@ -73,7 +92,7 @@ pt-BR:
           ongoing: Em andamento
           finished: Concluído
         scholarity_grade_interval_description: Informe o intervalo do CR, caso seja diferente de [0, 10]
-        job: Emprego
+        job: Emprego atual (caso tenha)
         employer: Empresa
         job_position: Cargo
         cpf_photo: Foto do CPF

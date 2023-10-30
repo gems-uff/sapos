@@ -1,4 +1,5 @@
-function config_form_field_sql(form_field, field, options) {
+function config_form_field_codemirror(form_field, field, mode, options) {
+  options = options || {};
   let r = (Math.random() + 1).toString(36).substring(7);
   let visible = options["visible"] === false ? `style="display:none;"`: "";
   let main_id = `${form_field.baseid}_${field}_main_id_${r}`
@@ -23,7 +24,7 @@ function config_form_field_sql(form_field, field, options) {
     `,
     postRender: function () {
       editor = CodeMirror.fromTextArea(document.getElementById(`${id}`), {
-        mode: "text/x-mysql",
+        mode: mode,
         indentWithTabs: true,
         smartIndent: true,
         lineNumbers: true,

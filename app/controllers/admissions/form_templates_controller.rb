@@ -59,6 +59,11 @@ class Admissions::FormTemplatesController < ApplicationController
     @column = active_scaffold_config.columns[:fields]
 
     attribute_configs = [
+      { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.initial_text"),
+        field_type: Admissions::FormField::HTML,
+        configuration: JSON.dump({
+          "html": I18n.t("active_scaffold.admissions/form_template.generate_fields.initial_text_html")
+        }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.personal_data"),
         field_type: Admissions::FormField::GROUP },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.name"),
@@ -66,8 +71,8 @@ class Admissions::FormTemplatesController < ApplicationController
         sync: Admissions::FormField::SYNC_NAME,
         configuration: JSON.dump({ "field": "name", "required": true }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.birthdate"),
-          field_type: Admissions::FormField::STUDENT_FIELD,
-          configuration: JSON.dump({ "field": "birthdate", "required": true }) },
+        field_type: Admissions::FormField::STUDENT_FIELD,
+        configuration: JSON.dump({ "field": "birthdate", "required": true }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.birth_city"),
         field_type: Admissions::FormField::STUDENT_FIELD,
         configuration: JSON.dump({

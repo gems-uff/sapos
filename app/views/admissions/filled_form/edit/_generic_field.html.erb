@@ -27,6 +27,9 @@
 <% elsif form_field.field_type == Admissions::FormField::FILE %>
   <%= render partial: "admissions/filled_form/edit/generic_file_field",
       locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::HTML %>
+  <%= render partial: "admissions/filled_form/edit/generic_html_field",
+      locals: partial_locals %>
 <% elsif form_field.field_type == Admissions::FormField::TEXT %>
   <%= render partial: "admissions/filled_form/edit/generic_text_field",
       locals: partial_locals %>

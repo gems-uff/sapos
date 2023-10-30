@@ -28,6 +28,7 @@ pt-BR:
             country: País
           scholarity: Formações
           group: Grupo
+          html: HTML
           residency: Logradouro, Número
           residency_fields:
             street: Logradouro
@@ -87,6 +88,8 @@ pt-BR:
           scholarity_grade_interval: Intervalo de CR
           scholarity_start_date: Data de Início
           scholarity_end_date: Data de Fim
+          html: HTML
+          html_description: Campo usado para exibir textos adicionais no formulário.
 
     errors:
       models:

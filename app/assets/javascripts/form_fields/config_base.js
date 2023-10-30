@@ -124,6 +124,10 @@ function form_field_config_base(form_field) {
         }),
         config_form_field_scholarity(form_field),
       ]
+    } else if (selected_value == "html") {
+      form_field.widgets = [
+        config_form_field_codemirror(form_field, "html", "application/x-erb")
+      ]
     }
 
     $(`#${form_field.baseid}`).html(form_field.widgets.map((el) => el.html).join(' '));
