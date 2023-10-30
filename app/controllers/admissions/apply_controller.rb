@@ -124,8 +124,8 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       @admission_application = Admissions::AdmissionApplication
         .joins(:admission_process)
         .where('
-          "admission_processes"."simple_url" = :process_id OR
-          "admission_processes"."id" = :process_id',
+          `admission_processes`.`simple_url` = :process_id OR
+          `admission_processes`.`id` = :process_id',
           process_id: params[:admission_id]
         )
         .where(token: params[:id]).first

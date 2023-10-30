@@ -33,8 +33,8 @@ class Admissions::LettersController < Admissions::ProcessBaseController
       @letter_request = Admissions::LetterRequest
         .joins(admission_application: :admission_process)
         .where('
-          "admission_processes"."simple_url" = :process_id OR
-          "admission_processes"."id" = :process_id',
+          `admission_processes`.`simple_url` = :process_id OR
+          `admission_processes`.`id` = :process_id',
           process_id: params[:admission_id]
         )
         .where(access_token: params[:id]).first

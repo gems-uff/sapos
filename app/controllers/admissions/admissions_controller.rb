@@ -147,8 +147,8 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
         @admission_applications = @admission_applications
         .joins(:admission_process)
         .where('
-          "admission_processes"."simple_url" = :process_id OR
-          "admission_processes"."id" = :process_id',
+          `admission_processes`.`simple_url` = :process_id OR
+          `admission_processes`.`id` = :process_id',
           process_id: source
         )
 
