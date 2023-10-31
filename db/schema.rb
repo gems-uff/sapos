@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_10_30_172415) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_31_174358) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -361,7 +361,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_30_172415) do
     t.string "name"
     t.string "description"
     t.string "field_type"
-    t.string "configuration"
+    t.text "configuration"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "sync"
