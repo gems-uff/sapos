@@ -116,7 +116,7 @@ module Admissions::AdmissionProcessesHelper
                 if filled_file.file.blank? || filled_file.file.file.blank?
                   ""
                 else
-                  "#{root_url}#{filled_file.file.url}"
+                  "#{request.base_url}#{filled_file.file.url}"
                 end
               }
             }

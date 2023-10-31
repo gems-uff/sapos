@@ -3,6 +3,6 @@
   <% if field.file.blank? || field.file.file.blank? %>
     -
   <% else %>
-    <a href="<%= "#{root_url}#{field.file.url}" %>"><%= field.file.filename %></a>
+    <a href="<%= "#{request.base_url}#{field.file.url}" %>"><%= field.file.filename %></a>
   <% end %>
 </td>

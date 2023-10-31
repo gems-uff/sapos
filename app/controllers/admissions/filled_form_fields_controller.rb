@@ -16,12 +16,4 @@ class Admissions::FilledFormFieldsController < ApplicationController
 
     config.actions.exclude :deleted_records, :delete, :update, :create
   end
-
-  def download
-    record = Admissions::FilledFormField.find params[:id]
-    if record.blank? || !request.original_url.end_with?(record.file.url)
-      raise ActionController::RoutingError.new("Não encontrado")
-    end
-    send_data(record.file.read, filename: record.file.filename)
-  end
 end

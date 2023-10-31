@@ -314,9 +314,6 @@ Rails.application.routes.draw do
 
     resources :filled_form_fields do
       concerns :active_scaffold
-      member do
-        get "download"
-      end
     end
 
     resources :filled_form_field_scholarities do
@@ -334,6 +331,7 @@ Rails.application.routes.draw do
         post :update, on: :member
       end
       resources :letters, only: [:show, :update]
+      get 'files/:id', action: :download, on: :collection
     end
   end
 

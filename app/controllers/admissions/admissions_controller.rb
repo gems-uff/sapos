@@ -4,7 +4,7 @@
 # frozen_string_literal: true
 
 class Admissions::AdmissionsController < Admissions::ProcessBaseController
-  before_action except: [:index, :find] do
+  before_action except: [:index, :find, :download] do
     find_admission_process(:id)
   end
 
@@ -130,6 +130,14 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
         params: admission_application_params
       ), alert: e.message
     end
+  end
+
+  def download
+    record = Admissions::FilledFormField.find params[:id]
+    if record.blank? || !request.original_url.end_with?(record.file.url)
+      raise ActionController::RoutingError.new("Não encontrado")
+    end
+    send_data(record.file.read, filename: record.file.filename)
   end
 
   protected

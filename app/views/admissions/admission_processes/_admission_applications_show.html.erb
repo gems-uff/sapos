@@ -26,7 +26,7 @@
                       if filled_file.file.blank? || filled_file.file.file.blank?
                         ""
                       else
-                        link_to filled_file.file.filename, "#{root_url}#{filled_file.file.url}"
+                        link_to filled_file.file.filename, "#{request.base_url}#{filled_file.file.url}"
                       end
                     }
                   }
