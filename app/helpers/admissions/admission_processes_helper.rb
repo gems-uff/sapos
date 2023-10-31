@@ -21,7 +21,7 @@ module Admissions::AdmissionProcessesHelper
   end
 
   def report_template_fields(template)
-    return [] if template.blank?
+    return Admissions::FormTemplate.none if template.blank?
     template.fields.order(:order, :id).where(sync: nil)
   end
 
