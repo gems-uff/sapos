@@ -19,7 +19,7 @@ class Admissions::FilledFormFieldsController < ApplicationController
 
   def download
     record = Admissions::FilledFormField.find params[:id]
-    if record.blank? || record.file.url != request.fullpath
+    if record.blank? || !request.original_url.end_with?(record.file.url)
       raise ActionController::RoutingError.new("Não encontrado")
     end
     send_data(record.file.read, filename: record.file.filename)
