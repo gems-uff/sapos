@@ -45,9 +45,13 @@ module Admissions::AdmissionProcessesHelper
     if !group_column
       template_fields = template_fields.where.not(
         field_type: Admissions::FormField::GROUP
+      ).where.not(
+        field_type: Admissions::FormField::HTML
       )
       letter_fields = letter_fields.where.not(
         field_type: Admissions::FormField::GROUP
+      ).where.not(
+        field_type: Admissions::FormField::HTML
       )
     end
     fields_header = template_fields.map(&:name)

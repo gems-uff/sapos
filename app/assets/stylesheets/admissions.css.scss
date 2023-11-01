@@ -55,6 +55,18 @@
   font-size: 11px;
 }
 
+
+.admissions-application-table tr td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+.admissions-application-table tr td:hover {
+  word-wrap: break-word;
+  overflow: visible;
+}
+
 .admissions-application-table tr .fixed-col:nth-of-type(1) {
   left: 0;
   min-width: 70px;
