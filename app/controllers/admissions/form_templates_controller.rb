@@ -20,6 +20,12 @@ class Admissions::FormTemplatesController < ApplicationController
       options: Admissions::FormTemplate::TEMPLATE_TYPES
     }
 
+    config.actions << :duplicate
+    config.duplicate.link.label = "
+      <i title='#{I18n.t("active_scaffold.duplicate")}' class='fa fa-copy'></i>
+    ".html_safe
+    config.duplicate.link.method = :get
+    config.duplicate.link.position = :after
     config.action_links.add "preview",
       label: "<i title='#{
         I18n.t "active_scaffold.admissions/form_template.preview.title"

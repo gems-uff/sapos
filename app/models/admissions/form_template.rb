@@ -26,4 +26,9 @@ class Admissions::FormTemplate < ActiveRecord::Base
 
   validates :name, presence: true
   validates :template_type, presence: true, inclusion: { in: TEMPLATE_TYPES }
+
+  def initialize_dup(other)
+    super
+    self.fields = other.fields.map(&:dup)
+  end
 end
