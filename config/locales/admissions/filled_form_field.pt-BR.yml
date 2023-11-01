@@ -20,6 +20,7 @@ pt-BR:
       models:
         admissions/filled_form_field:
           blank: "não pode ficar em branco"
+          filesize: "não pode ser maior do que %{count}MB"
           minselection:
             one: "precisa ter no mínimo uma opção selecionada"
             other: "precisa ter no mínimo %{count} opções selecionadas"

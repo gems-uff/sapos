@@ -23,6 +23,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
 
   validate :that_either_value_or_file_is_filled
   validate :that_value_follows_configuration_rules
+  validate :size_of_file
 
   accepts_nested_attributes_for :scholarities, reject_if: :all_blank,
     allow_destroy: true
@@ -82,6 +83,15 @@ class Admissions::FilledFormField < ActiveRecord::Base
       validate_city_field(configuration)
     when Admissions::FormField::RESIDENCY
       validate_residency_field(configuration)
+    end
+  end
+
+  def size_of_file
+    return unless self.file.present?
+    size = self.file.file.size.to_f
+    if size > 15.megabytes.to_f
+      add_error(:filesize, count: 15)
+      self.file = nil
     end
   end
 
