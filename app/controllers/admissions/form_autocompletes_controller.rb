@@ -13,21 +13,21 @@ class Admissions::FormAutocompletesController < Admissions::ProcessBaseControlle
     if params[:country].present?
       @cities = @cities.joins(state: :country).where(
         "`countries`.`name` COLLATE utf8mb4_unicode_520_ci
-          LIKE ? COLLATE utf8mb4_unicode_520_ci", "%#{params[:country]}%"
+          LIKE ? COLLATE utf8_unicode_520_ci", "%#{params[:country]}%"
       )
     end
     if params[:state].present?
       @cities = @cities.where(
         "`states`.`name` COLLATE utf8mb4_unicode_520_ci
-          LIKE ? COLLATE utf8mb4_unicode_520_ci
+          LIKE ? COLLATE utf8_unicode_520_ci
          OR `states`.`code` COLLATE utf8mb4_unicode_520_ci
-         LIKE ? COLLATE utf8mb4_unicode_520_ci
+         LIKE ? COLLATE utf8_unicode_520_ci
         ", "%#{params[:state]}%", "%#{params[:state]}%"
       )
     end
     @cities = @cities.where(
       "`cities`.`name` COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8mb4_unicode_520_ci", "%#{params[:term]}%"
+        LIKE ? COLLATE utf8_unicode_520_ci", "%#{params[:term]}%"
     )
     @cities = @cities.limit(10)
     render json: @cities.map(&:name).uniq
@@ -38,14 +38,14 @@ class Admissions::FormAutocompletesController < Admissions::ProcessBaseControlle
     if params[:state].present?
       @states = @states.joins(:country).where(
         "`countries`.`name` COLLATE utf8mb4_unicode_520_ci
-          LIKE ? COLLATE utf8mb4_unicode_520_ci", "%#{params[:country]}%"
+          LIKE ? COLLATE utf8_unicode_520_ci", "%#{params[:country]}%"
       )
     end
     @states = @states.where(
       "`states`.`name` COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8mb4_unicode_520_ci
+        LIKE ? COLLATE utf8_unicode_520_ci
         OR `states`.`code` COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8mb4_unicode_520_ci
+        LIKE ? COLLATE utf8_unicode_520_ci
       ", "%#{params[:term]}%", "%#{params[:term]}%"
     )
     @states = @states.limit(10)
@@ -55,7 +55,7 @@ class Admissions::FormAutocompletesController < Admissions::ProcessBaseControlle
   def country
     @countries = Country.where(
       "name COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8mb4_unicode_520_ci", "%#{params[:term]}%"
+        LIKE ? COLLATE utf8_unicode_520_ci", "%#{params[:term]}%"
     )
     @countries = @countries.limit(10)
     render json: @countries.map(&:name).uniq
@@ -64,9 +64,9 @@ class Admissions::FormAutocompletesController < Admissions::ProcessBaseControlle
   def institution
     @institutions = Institution.where(
       "name COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8mb4_unicode_520_ci
+        LIKE ? COLLATE utf8_unicode_520_ci
        OR code COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8mb4_unicode_520_ci
+        LIKE ? COLLATE utf8_unicode_520_ci
       ", "%#{params[:term]}%", "%#{params[:term]}%"
     )
     @institutions = @institutions.limit(10)
@@ -78,22 +78,22 @@ class Admissions::FormAutocompletesController < Admissions::ProcessBaseControlle
     if params[:institution].present?
       @majors = @majors.joins(:institution).where(
         "`institutions`.`name` COLLATE utf8mb4_unicode_520_ci
-          LIKE ? COLLATE utf8mb4_unicode_520_ci
+          LIKE ? COLLATE utf8_unicode_520_ci
         OR `institutions`.`code` COLLATE utf8mb4_unicode_520_ci
-          LIKE ? COLLATE utf8mb4_unicode_520_ci
+          LIKE ? COLLATE utf8_unicode_520_ci
         ", "%#{params[:institution]}%", "%#{params[:institution]}%"
       )
     end
     @majors = @majors.where(
       "`majors`.`name` COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8mb4_unicode_520_ci", "%#{params[:term]}%"
+        LIKE ? COLLATE utf8_unicode_520_ci", "%#{params[:term]}%"
     )
     @majors = @majors.limit(10)
     result = @majors.map(&:name).uniq
     if result.empty?
       result = Major.where(
         "`majors`.`name` COLLATE utf8mb4_unicode_520_ci
-          LIKE ? COLLATE utf8mb4_unicode_520_ci", "%#{params[:term]}%"
+          LIKE ? COLLATE utf8_unicode_520_ci", "%#{params[:term]}%"
       ).limit(10).map(&:name).uniq
     end
     render json: result
