@@ -70,15 +70,15 @@ $(document).ready(function() {
   }
 
   $(`#<%= options[:id] %> input[name="city"]`).autocomplete({
-    source: search("/form_autocompletes/city")
+    source: search("<%= city_form_autocompletes_path %>")
   })
 
   $(`#<%= options[:id] %> input[name="state"]`).autocomplete({
-    source: search("/form_autocompletes/state"),
+    source: search("<%= state_form_autocompletes_path %>"),
   })
 
   $(`#<%= options[:id] %> input[name="country"]`).autocomplete({
-    source: search("/form_autocompletes/country"),
+    source: search("<%= country_form_autocompletes_path %>"),
   })
 })
 
