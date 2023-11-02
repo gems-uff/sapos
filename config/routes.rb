@@ -112,16 +112,19 @@ Rails.application.routes.draw do
 
   resources :cities do
     concerns :active_scaffold
+    get "autocomplete", on: :collection
   end
 
   resources :states do
     concerns :active_scaffold
     get "cities", on: :member
+    get "autocomplete", on: :collection
   end
 
   resources :countries do
     concerns :active_scaffold
     get "states", on: :member
+    get "autocomplete", on: :collection
   end
 
   resources :users do
@@ -332,6 +335,12 @@ Rails.application.routes.draw do
       end
       resources :letters, only: [:show, :update]
       get 'files/:id', action: :download, on: :collection
+    end
+
+    resources :form_autocompletes, only: [] do
+      get :city, on: :collection
+      get :state, on: :collection
+      get :country, on: :collection
     end
   end
 
