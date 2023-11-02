@@ -1,10 +1,11 @@
 <%
+  sid = "scholarity-item-#{Random.rand(10000)}"
   fields = [
     {name: :level, type: :select, values: values},
     {name: :status, type: :select, values: statuses},
     {name: :institution, type: :text},
     {name: :course, type: :text},
-    {name: :location, type: :text},
+    {name: :location, type: :location},
     {name: :grade, type: :text},
     {name: :grade_interval, type: :text},
     {name: :start_date, type: :date},
@@ -14,11 +15,12 @@
     field[:required] = configuration["scholarity_#{field[:name]}_required"]
     field[:label] = configuration["scholarity_#{field[:name]}_name"]
     field[:description] = configuration["scholarity_#{field[:name]}_description"]
+    field[:options] = { class: "scholarity-#{field[:name]} text-input", size: 30}
     field
   end
 %>
 
-<ol class="nested-fields scholarity">
+<ol class="nested-fields scholarity" id="<%= sid %>">
   <% fields.each do |field| %>
     <% unless field[:hide] %>
       <li class="form-element <%= "required" if field[:required] %>">
@@ -33,11 +35,28 @@
           </dt>
           <dd>
             <% if field[:type] == :select %>
-              <%= f.select field[:name], field[:values] %>
+              <%= f.select field[:name], field[:values], field[:options] %>
             <% elsif field[:type] == :text %>
-              <%= f.text_field field[:name] %>
+              <%= f.text_field field[:name], field[:options] %>
             <% elsif field[:type] == :date %>
-              <%= f.date_field field[:name] %>
+              <%= f.date_field field[:name], field[:options] %>
+            <% elsif field[:type] == :location %>
+              <div class="scholarity-location">
+                <%
+                  city_options = {size: 15, class: "text-input city-field"}
+                  city_options[:required] = "required" if field["required"]
+                  state_options = {size: 15, class: "text-input city-field"}
+                  values = (f.object[field[:name]] || "").split(", ")
+                  (2 - values.length).times { values << "" }
+                %>
+                <%= f.hidden_field field[:name], class: "hidden" %>
+                <%= text_field_tag :state, values[1], placeholder: I18n.t(
+                  "activerecord.attributes.admissions/form_field.field_types.city_fields.state"
+                ), **state_options %>
+                <%= text_field_tag :city, values[0], placeholder: I18n.t(
+                  "activerecord.attributes.admissions/form_field.field_types.city_fields.city"
+                ), **city_options %>
+              </div>
             <% end %>
           </dd>
       </li>
@@ -50,3 +69,62 @@
     <br/>
   </li>
 </ol>
+
+<script>
+
+$(document).ready(function() {
+  $(`#<%= sid %> .scholarity-location .city-field`).on("change", function() {
+    let value = $(`#<%= sid %> .scholarity-location .city-field`)
+      .map((i, el) => $(el).val()).toArray().reverse()
+      .join(", ")
+    $(`#<%= sid %> .scholarity-location .hidden`).val(value)
+  })
+
+  function search(url, set_extra) {
+    let that = this;
+    return function( request, response ) {
+      if ( that.xhr ) {
+        that.xhr.abort();
+      }
+      set_extra(request)
+
+      that.xhr = $.ajax( {
+        url: url,
+        data: request,
+        dataType: "json",
+        success: function( data ) {
+          response( data );
+        },
+        error: function() {
+          response( [] );
+        }
+      } );
+    }
+  }
+  $(`#<%= sid %> .scholarity-location input[name="city"]`).autocomplete({
+    source: search("<%= city_form_autocompletes_path %>", (request) => {
+      request.state = $(`#<%= sid %> .scholarity-location input[name="state"]`).val();
+    })
+  })
+
+  $(`#<%= sid %> .scholarity-location input[name="state"]`).autocomplete({
+    source: search("<%= state_form_autocompletes_path %>", (request) => {})
+  })
+
+
+  $(`#<%= sid %> input.scholarity-institution`).autocomplete({
+    source: search("<%= institution_form_autocompletes_path %>", (request) => {})
+  })
+
+  $(`#<%= sid %> input.scholarity-course`).autocomplete({
+    source: search("<%= course_form_autocompletes_path %>", (request) => {
+      request.institution = $(`#<%= sid %> input.scholarity-institution`).val();
+    }),
+  })
+
+  $(`#<%= sid %> input.scholarity-grade_interval`).autocomplete({
+    source: ["[0, 10]", "[0, 100]", "[0, 5]", "[0, 4]", "[F, A]", "A, B, C, D, F"],
+  })
+})
+
+</script>

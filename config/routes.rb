@@ -341,6 +341,8 @@ Rails.application.routes.draw do
       get :city, on: :collection
       get :state, on: :collection
       get :country, on: :collection
+      get :institution, on: :collection
+      get :course, on: :collection
     end
   end
 

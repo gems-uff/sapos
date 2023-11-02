@@ -40,7 +40,7 @@
 $(document).ready(function() {
   $(`#<%= options[:id] %> .city-field`).on("change", function() {
     let value = $(`#<%= options[:id] %> .city-field`)
-      .map((i, el) => $(el).val()).toArray()
+      .map((i, el) => $(el).val()).toArray().reverse()
       .join(" <$> ")
     $(`#<%= options[:id] %> .hidden`).val(value)
   })
