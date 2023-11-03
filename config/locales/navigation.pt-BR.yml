@@ -65,6 +65,7 @@ pt-BR:
       admission_process: Editais
       form_template: Formulários
       new_form_template: New
+      admission_application: Candidaturas
 
     configurations:
       label: Configurações

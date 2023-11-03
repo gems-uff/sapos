@@ -199,10 +199,12 @@ SimpleNavigation::Configuration.run do |navigation|
     admission_models = [
       Admissions::AdmissionProcess,
       Admissions::FormTemplate,
+      Admissions::AdmissionApplication,
     ]
     mainhelper.listitem :admissions, admission_models do |submenu|
       submenu.modelitem Admissions::AdmissionProcess
       submenu.modelitem Admissions::FormTemplate
+      submenu.modelitem Admissions::AdmissionApplication
     end
 
     config_models = [

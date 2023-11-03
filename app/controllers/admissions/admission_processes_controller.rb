@@ -75,6 +75,12 @@ class Admissions::AdmissionProcessesController < ApplicationController
     config.actions.exclude :deleted_records
   end
 
+  record_select(
+    per_page: 10, search_on: [:name, :year, :semester],
+    order_by: "year desc, semester desc, name", full_text_search: true,
+    model: "Admissions::AdmissionProcess"
+  )
+
   def short_pdf
     get_admission_process_pdf("short_pdf")
   end

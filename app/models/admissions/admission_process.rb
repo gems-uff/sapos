@@ -114,4 +114,8 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
     end
     self.id.to_s
   end
+
+  def to_label
+    "#{self.title}"
+  end
 end

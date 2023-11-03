@@ -1,7 +1,7 @@
 <%
   filled_hash = filled_form.fields.index_by(&:form_field_id)
-  fields = form_template.fields.order(:order, :id).map do |field|
-    filled_hash[field.id]
+  fields = form_template.fields.order(:order, :id).filter_map do |field|
+    filled_hash[field.id] || Admissions::FilledFormField.new(form_field: field)
   end
 %>
 <table class="showtable listed-records-table">

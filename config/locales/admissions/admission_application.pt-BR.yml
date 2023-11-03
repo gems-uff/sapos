@@ -14,6 +14,10 @@ pt-BR:
         letter_request: "Carta de Recomendação %{count}"
         requested_letters: "Recomendações solicitadas"
         filled_letters: "Recomendações preenchidas"
+        is_filled: "Preenchido"
+        is_filled_options:
+          true: Sim
+          false: Não
       admissions/admission_application/letter_requests:
         name: "Nome na indicação de carta de recomendação"
         email: "Email na indicação de carta de recomendação"
@@ -21,8 +25,8 @@ pt-BR:
 
     models:
       admissions/admission_application:
-        one: "Inscrição"
-        other: "Inscrições"
+        one: "Candidatura"
+        other: "Candidaturas"
 
     errors:
       models:

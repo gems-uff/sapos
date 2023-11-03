@@ -67,6 +67,10 @@ class Ability
       can :manage, (Ability::ALL_MODELS - [
         Role, CustomVariable, ReportConfiguration
       ])
+      cannot :destroy, [
+        Admissions::AdmissionApplication, Admissions::FilledForm,
+        Admissions::FilledFormField, Admissions::LetterRequest
+      ]
       cannot :update_only_photo, Student
       can :read, :pendency
       cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
@@ -114,9 +118,15 @@ class Ability
       can :manage, (Ability::ALL_MODELS - [
         User, Role, CustomVariable, Query, Version,
         Notification, ReportConfiguration,
-        Admissions::FormTemplate, Admissions::FormField
+        Admissions::FormTemplate, Admissions::FormField,
+        Admissions::AdmissionApplication, Admissions::FilledForm,
+        Admissions::FilledFormField, Admissions::LetterRequest,
       ])
-      can :read, [Admissions::FormTemplate, Admissions::FormField]
+      can :read, [
+        Admissions::FormTemplate, Admissions::FormField,
+        Admissions::AdmissionApplication, Admissions::FilledForm,
+        Admissions::FilledFormField, Admissions::LetterRequest,
+      ]
       cannot :update_only_photo, Student
       can :invite, User
       can :read, :pendency

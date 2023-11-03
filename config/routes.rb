@@ -289,6 +289,7 @@ Rails.application.routes.draw do
       get :short_pdf, on: :member
       get :complete_pdf, on: :member
       get :complete_xls, on: :member
+      record_select_routes
     end
 
     resources :admission_applications do
