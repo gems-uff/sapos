@@ -40,3 +40,29 @@ tr.form-field-configuration td dt label {
 .form-template-checkbox-list.vertical-style {
   display: block;
 }
+
+.city-fields {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+@media screen and (max-width: 962px) {
+
+  .active-scaffold .filled-form li.form-element dt {
+    width: 100%;
+  }
+
+  .city-fields {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .residency-fields {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .residency-fields input {
+    max-width: 235px;
+  }
+}

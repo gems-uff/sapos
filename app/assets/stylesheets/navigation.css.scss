@@ -38,12 +38,18 @@ body a {
 #container #header {
     display: flex;
     width: 100%;
+    flex-wrap: wrap-reverse;
 }
 
 #container #header #logo {
     padding-top: 6px;
     padding-left: 2px;
     margin-right: auto;
+}
+
+#container #header #logo img {
+    object-fit: cover;
+    width: 100%;
 }
 
 #container #header #sub {

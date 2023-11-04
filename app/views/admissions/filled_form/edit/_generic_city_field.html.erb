@@ -20,7 +20,7 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd id="<%= options[:id] %>">
+    <dd id="<%= options[:id] %>" class="city-fields">
       <%= field.hidden_field :value, class: "hidden" %>
       <%= text_field_tag :country, values[2], placeholder: I18n.t(
         "activerecord.attributes.admissions/form_field.field_types.city_fields.country"

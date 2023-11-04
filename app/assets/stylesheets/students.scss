@@ -3,8 +3,10 @@
 // You can use Sass (SCSS) here: https://sass-lang.com/
 
 .preview-image {
-  width: 400px;
-  height: 300px;
-  Object-fit: contain;
+  max-width: 400px;
+  max-height: 300px;
+  object-fit: cover;
+  width: 100%;
+  height: auto;
   background-color: #f2f1f0;
 }

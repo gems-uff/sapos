@@ -18,7 +18,7 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd id="<%= options[:id] %>">
+    <dd id="<%= options[:id] %>" class="residency-fields">
       <%= field.hidden_field :value, class: "hidden" %>
       <%= text_field_tag :city, values[0], placeholder: I18n.t(
         "activerecord.attributes.admissions/form_field.field_types.residency_fields.street"
