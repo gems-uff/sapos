@@ -37,10 +37,29 @@
       else{
         $('#<%= collection_id %> input:checkbox').attr("disabled", false);
       }
+      let input = $("#<%= collection_id %> input").get(1)
+      input.setCustomValidity("");
     }
 
     $("#<%= collection_id %> input:checkbox").change(check_count)
     check_count();
+
+    <% if configuration["minselection"].to_i >= 1 %>
+      window.customFormValidations.push(function() {
+        let checkboxes = $('#<%= collection_id %> input:checkbox:checked');
+        let input = $("#<%= collection_id %> input").get(1)
+        if (checkboxes.length < <%= configuration["minselection"].to_i %>) {
+            input.setCustomValidity(`<%= form_field.name %> <%= I18n.t(
+              "activerecord.errors.models.admissions/filled_form_field.minselection",
+              count: configuration["minselection"].to_i) %>`)
+            input.reportValidity()
+            return false;
+        } else {
+          input.setCustomValidity("");
+        }
+        return true;
+      })
+    <% end %>
   })
   </script>
 <% end %>

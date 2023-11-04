@@ -4,6 +4,7 @@
   column = Admissions::FilledFormFieldsController.active_scaffold_config.columns[:file]
   options = active_scaffold_input_options(column, scope, :object => field.object)
   options[:required] = configuration["required"] ? true : false
+  file_id = "file_#{SecureRandom.random_number(1_000_000)}"
 %>
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
@@ -13,7 +14,26 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd><%= active_scaffold_input_carrierwave(column, options) %>
+    <dd id="<%= file_id %>"><%= active_scaffold_input_carrierwave(column, options) %>
     </dd>
   </dl>
 </li>
+
+<script>
+  $(document).ready(function() {
+    window.customFormValidations.push(function() {
+      let input = $(`#<%= file_id %> input[type="file"]`).get(0)
+      if (input.files[0] && (input.files[0].size > 15 * 1024 * 1024)) {
+          input.setCustomValidity(`<%= form_field.name %> <%= I18n.t(
+            "activerecord.errors.models.admissions/filled_form_field.filesize",
+            count: 15) %>`)
+          input.reportValidity()
+          return false;
+      } else {
+        input.setCustomValidity("");
+      }
+      return true;
+    })
+
+  });
+</script>

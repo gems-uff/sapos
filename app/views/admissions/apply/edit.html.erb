@@ -121,6 +121,12 @@
 
     $("#submit").click(function(e){
       window.onbeforeunload = null;
+      for (let validation of window.customFormValidations) {
+        if (!validation()) {
+          e.preventDefault();
+          return false;
+        }
+      }
     })
   });
 </script>

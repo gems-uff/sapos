@@ -6,6 +6,7 @@
   options[:required] = configuration["required"] ? true : false
   basename = options[:name][..-("file".size + 3)]
   data_url = field.object.file.file.present? ? "#{request.base_url}#{field.object.file.url}" : ""
+  file_id = "file_#{SecureRandom.random_number(1_000_000)}"
 %>
 
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
@@ -16,7 +17,7 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd>
+    <dd id="<%= file_id %>">
       <div class="webcam-photo" data-id="<%= options[:id] %>"
          data-url="<%= data_url %>" data-basename="<%= basename %>"
          data-column="file" data-remove-label="Remover foto"
@@ -30,5 +31,19 @@
 <script>
 $(document).ready(function() {
   carrierwave_webcam(".webcam-photo")
+
+  window.customFormValidations.push(function() {
+    let input = $(`#<%= file_id %> input[type="file"]`).get(0)
+    if (input.files[0] && (input.files[0].size > 15 * 1024 * 1024)) {
+        input.setCustomValidity(`<%= form_field.name %> <%= I18n.t(
+          "activerecord.errors.models.admissions/filled_form_field.filesize",
+          count: 15) %>`)
+        input.reportValidity()
+        return false;
+    } else {
+      input.setCustomValidity("");
+    }
+    return true;
+  })
 });
 </script>
