@@ -1,5 +1,9 @@
 <%
   sid = "scholarity-item-#{Random.rand(10000)}"
+  first_year = 100.years.ago.year
+  last_year = 10.years.from_now.year
+
+  dates = []
   fields = [
     {name: :level, type: :select, values: values},
     {name: :status, type: :select, values: statuses},
@@ -15,7 +19,12 @@
     field[:required] = configuration["scholarity_#{field[:name]}_required"]
     field[:label] = configuration["scholarity_#{field[:name]}_name"]
     field[:description] = configuration["scholarity_#{field[:name]}_description"]
-    field[:options] = { class: "scholarity-#{field[:name]} text-input", size: 30}
+    field[:options] = { class: "scholarity-#{field[:name]} text-input"}
+    if field[:type] == :date
+      dates << field[:name]
+    else
+      field[:options][:size] = 30
+    end
     field
   end
 %>
@@ -39,7 +48,7 @@
             <% elsif field[:type] == :text %>
               <%= f.text_field field[:name], field[:options] %>
             <% elsif field[:type] == :date %>
-              <%= f.date_field field[:name], field[:options] %>
+              <%= f.text_field field[:name], field[:options] %>
             <% elsif field[:type] == :location %>
               <div class="scholarity-location">
                 <%
@@ -125,6 +134,12 @@ $(document).ready(function() {
   $(`#<%= sid %> input.scholarity-grade_interval`).autocomplete({
     source: ["[0, 10]", "[0, 100]", "[0, 5]", "[0, 4]", "[F, A]", "A, B, C, D, F"],
   })
+
+  <% dates.each do |field| %>
+    $(`#<%= sid %> input.scholarity-<%= field %>`).datepicker({
+      yearRange: '<%= first_year %>:<%= last_year %>'
+    })
+  <% end %>
 })
 
 </script>
