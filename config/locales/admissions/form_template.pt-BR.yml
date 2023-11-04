@@ -91,7 +91,7 @@ pt-BR:
         scholarity_statuses:
           ongoing: Em andamento
           finished: Concluído
-        scholarity_grade_interval_description: Informe o intervalo do CR, caso seja diferente de [0, 10]
+        scholarity_grade_interval_description: "Intervalo de CR ou conceitos possíveis. Ex.: [0, 10], [F, A]"
         job: Emprego atual (caso tenha)
         employer: Empresa
         job_position: Cargo

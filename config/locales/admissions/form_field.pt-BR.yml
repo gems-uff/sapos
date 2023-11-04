@@ -84,8 +84,8 @@ pt-BR:
           scholarity_institution: Instituição
           scholarity_course: Curso
           scholarity_location: Cidade/Estado
-          scholarity_grade: CR do curso
-          scholarity_grade_interval: Intervalo de CR
+          scholarity_grade: CR ou conceito obtido
+          scholarity_grade_interval: Intervalo do CR ou conceito
           scholarity_start_date: Data de Início
           scholarity_end_date: Data de Fim
           html: HTML

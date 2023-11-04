@@ -11,8 +11,8 @@ pt-BR:
         institution: "Instituição"
         course: "Curso"
         location: "Cidade/Estado"
-        grade: "CR do Curso"
-        grade_interval: "Intervalo de CR"
+        grade: "CR ou conceito obtido"
+        grade_interval: "Intervalo de CR ou conceito"
         start_date: "Data de início"
         end_date: "Data de término"
 
