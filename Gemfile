@@ -17,7 +17,7 @@ gem "sprockets-rails"
 # gem "sqlite3", "~> 1.4"
 
 # Use the Puma web server [https://github.com/puma/puma]
-gem "puma", "~> 5.0"
+gem "puma", ">= 5.0"
 
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 # gem "importmap-rails"
@@ -61,7 +61,7 @@ gem "sassc-rails"
 
 # Use jquery as the JavaScript library
 gem "jquery-rails"
-gem "jquery-ui-rails"
+gem "jquery-ui-rails", git: "https://github.com/jquery-ui-rails/jquery-ui-rails.git", tag: "v7.0.0"
 
 # Pagination
 gem "kaminari"
@@ -116,7 +116,7 @@ gem "recaptcha", require: "recaptcha/rails"
 gem "rubyzip"
 gem "caxlsx"
 gem "caxlsx_rails"
-gem "acts_as_xlsx"
+#gem "acts_as_xlsx"
 
 # Temporary fix of warnings
 # In the beggining of rails command executions, it shows some warnings related to these gems
