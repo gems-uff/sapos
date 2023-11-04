@@ -1,95 +1,44 @@
 <%
-  attributes[:text] ||= ""
-  attributes[:select_field] ||= :identity_issuing_place_select
-  attributes[:text_field] ||= :identity_issuing_place
-  attributes[:show_states_link] ||= :identity_issuing_place_widget_show_states
-  attributes[:show_text_link] ||= :identity_issuing_place_widget_show_text
-
-  value = attributes[:text]
-
-  country = CustomVariable.identity_issuing_country
-  html = "".html_safe
-  show_text = true
-
-  unless country.nil?
-    select_state_id = "widget_" + options[:id].sub(
-      "_#{attributes[:text_field]}_",
-      "_#{attributes[:select_field]}_"
-    )
-    state_name = options[:name].sub(
-      "[#{attributes[:text_field]}]",
-      "[#{attributes[:select_field]}]"
-    )
-    state_options = options_for_select(
-      [[t("helpers.city_widget.select_state"), ""]] +
-        states = country.state.collect do |s|
-          show_text = false if s.name == value
-          [s.name, s.name]
-        end,
-      value
-    )
-    show_text = false if value.empty?
-    select_style = "display: #{show_text ? "none" : "inline-block"}"
-    text_style = "display: #{show_text ? "inline-block" : "none"}"
-
-    text_id = "widget_" + options[:id]
-    text_name = options[:name]
-
-    show_states_link_id = "widget_" + options[:id].sub(
-      "_#{attributes[:text_field]}_",
-      "_#{attributes[:show_states_link]}_"
-    )
-    show_text_link_id = "widget_" + options[:id].sub(
-      "_#{attributes[:text_field]}_",
-      "_#{attributes[:show_text_link]}_"
-    )
-
-  end
+  text_name = options[:name]
+  text_id = "widget_" + options[:id]
+  value = attributes[:text] || ""
 %>
-
-<% unless country.nil? %>
-  <%= select_tag(state_name, state_options, {
-    id: select_state_id, style: select_style
-  }) %>
-<% end %>
 
 <%= text_field_tag(
   text_name, value,
-  id: text_id, class: "text-input", maxlength: 255, size: 30, style: text_style
+  id: text_id, class: "text-input", maxlength: 255, size: 30
 ) %>
 
-<% unless country.nil? %>
-  <%= link_to(
-    t("helpers.identity_issuing_place_widget.show_states",
-      country: country.name), "#",
-    id: show_states_link_id, style: text_style
-  ) %>
-  <%= link_to(
-    t("helpers.identity_issuing_place_widget.show_text"), "#",
-    id: show_text_link_id, style: select_style
-  ) %>
+<script>
+  function search(url, set_extra) {
+    let that = this;
+    return function( request, response ) {
+      if ( that.xhr ) {
+        that.xhr.abort();
+      }
+      set_extra(request)
 
-  <script>
-    $(document).ready(function() {
-      $('#<%= select_state_id %>').on("change", function() {
-        $("#<%= text_id %>").val(this.value)
-      });
+      that.xhr = $.ajax( {
+        url: url,
+        data: request,
+        dataType: "json",
+        success: function( data ) {
+          response( data );
+        },
+        error: function() {
+          response( [] );
+        }
+      } );
+    }
+  }
 
-      $('#<%= show_text_link_id %>').on("click", function() {
-        $('#<%= show_text_link_id %>').hide();
-        $('#<%= select_state_id %>').hide();
-        $('#<%= text_id %>').show();
-        $('#<%= show_states_link_id %>').show();
-        return false;
-      });
-
-      $('#<%= show_states_link_id %>').on("click", function() {
-        $('#<%= show_text_link_id %>').show();
-        $('#<%= select_state_id %>').show();
-        $('#<%= text_id %>').hide();
-        $('#<%= show_states_link_id %>').hide();
-        return false;
-      });
-    });
-  </script>
-<% end %>
+  $(document).ready(function() {
+    $(`#<%= text_id %>`).autocomplete({
+      source: search("<%= state_form_autocompletes_path %>", (request) => {
+        <% if CustomVariable.identity_issuing_country %>
+          request.country = "<%= CustomVariable.identity_issuing_country %>"
+        <% end %>
+      })
+    })
+  });
+</script>

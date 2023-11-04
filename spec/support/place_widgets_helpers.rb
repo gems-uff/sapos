@@ -43,15 +43,6 @@ module PlaceWidgetsHelpers
   end
 
   def expect_to_have_identity_issuing_place_widget(page, field)
-    expect(page).to have_selector("select#widget_record_#{field}_select_", visible: true)
-    expect(page).to have_selector("input#widget_record_#{field}_", visible: false)
-    expect(page.all("select#widget_record_#{field}_select_ option").map(&:text)).to eq ["Selecione o estado", "RJ", "SP"]
-    find(:select, "widget_record_#{field}_select_").find(:option, text: "RJ").select_option
-    click_link "Mostrar campo de texto"
-    expect(page).to have_selector("select#widget_record_#{field}_select_", visible: false)
     expect(page).to have_selector("input#widget_record_#{field}_", visible: true)
-    click_link "Mostrar estados do Brasil"
-    expect(page).to have_selector("select#widget_record_#{field}_select_", visible: true)
-    expect(page).to have_selector("input#widget_record_#{field}_", visible: false)
   end
 end

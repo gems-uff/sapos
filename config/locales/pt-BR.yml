@@ -129,10 +129,6 @@ pt-BR:
       select_country: "Selecione o país"
       select_state: "Selecione o estado"
 
-    identity_issuing_place_widget:
-      show_states: "Mostrar estados do %{country}"
-      show_text: "Mostrar campo de texto"
-
     select:
       prompt: "Por favor selecione"
 
