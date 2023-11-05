@@ -74,7 +74,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
     when Admissions::FormField::SINGLE_CHECKBOX
       nil
     when Admissions::FormField::FILE
-      validate_file_required(configuration)
+      validate_file_field(configuration)
     when Admissions::FormField::TEXT
       validate_value_required(configuration)
     when Admissions::FormField::STUDENT_FIELD
@@ -114,7 +114,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
 
   def validate_student_field(configuration)
     if configuration["field"] == "photo"
-      validate_file_required(configuration)
+      validate_file_field(configuration, is_photo: true)
     elsif ["special_city", "special_birth_city"].include? configuration["field"]
       validate_city_field(configuration)
     elsif configuration["field"] == "special_address"
@@ -157,9 +157,17 @@ class Admissions::FilledFormField < ActiveRecord::Base
     end
   end
 
-  def validate_file_required(configuration)
+  def validate_file_field(configuration, is_photo: false)
     if configuration["required"] && (self.file.blank? || self.file.file.blank?)
       add_error(:blank)
+    end
+    if configuration["values"] && !(self.file.blank? || self.file.file.blank?)
+      values = configuration["values"].dup
+      values << ".jpg" if is_photo
+      filename = self.file.filename.downcase
+      if values.none? { |ext| filename.end_with?(ext.downcase) }
+        add_error(:extension, valid: configuration["values"].join(', '))
+      end
     end
   end
 

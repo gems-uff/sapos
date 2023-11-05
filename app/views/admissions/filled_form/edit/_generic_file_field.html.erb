@@ -21,16 +21,38 @@
 
 <script>
   $(document).ready(function() {
+
+    function validateFile(file) {
+      if (!file) {
+        return "";
+      }
+      if (file.size > 15 * 1024 * 1024) {
+        return `<%= form_field.name %> <%= I18n.t(
+          "activerecord.errors.models.admissions/filled_form_field.filesize",
+          count: 15) %>`
+      }
+      <% if configuration["values"] %>
+        <%
+          extensions = configuration["values"]
+        %>
+        let filename = file.name.toLowerCase();
+        let extensions = <%= raw extensions.to_json %>;
+        if (!extensions.some((ext) => filename.endsWith(ext.toLowerCase()))) {
+          return `<%= form_field.name %> <%= I18n.t(
+            "activerecord.errors.models.admissions/filled_form_field.extension",
+            valid: configuration["values"].join(', ')) %>`
+        }
+      <% end %>
+      return "" ;
+    }
+
     window.customFormValidations.push(function() {
       let input = $(`#<%= file_id %> input[type="file"]`).get(0)
-      if (input.files[0] && (input.files[0].size > 15 * 1024 * 1024)) {
-          input.setCustomValidity(`<%= form_field.name %> <%= I18n.t(
-            "activerecord.errors.models.admissions/filled_form_field.filesize",
-            count: 15) %>`)
-          input.reportValidity()
-          return false;
-      } else {
-        input.setCustomValidity("");
+      error_msg = validateFile(input.files[0]);
+      input.setCustomValidity(error_msg);
+      if (error_msg != "") {
+        input.reportValidity()
+        return false;
       }
       return true;
     })

@@ -67,6 +67,11 @@ pt-BR:
             add: Adicionar nível
           levels_use_sql: Popular níveis com SQL
           levels_sql: Níveis (SQL)
+          extensions:
+            title: Extensões permitidas
+            add: Adicionar extensão
+          extensions_use_sql: Popular extensões permitidas com SQL
+          extensions_sql: Extensões (SQL)
           minselection: Quantidade mínima
           maxselection: Quantidade máxima
           default_values:

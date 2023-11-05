@@ -54,6 +54,13 @@ function form_field_config_base(form_field) {
       form_field.widgets = [
         config_form_field_checkbox(form_field, "required"),
       ]
+    } else if (selected_value == "file" ) {
+      form_field.widgets = [
+        config_form_field_checkbox(form_field, "required"),
+        config_form_field_values_sql(form_field, "values", { 
+          label: "extensions"
+        }),
+      ]
     } else if (selected_value == "string") {
       form_field.widgets = [
         config_form_field_checkbox(form_field, "required"),

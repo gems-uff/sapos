@@ -12,6 +12,9 @@ function config_form_field_student(form_field, field) {
         field_type = "residency"
       } else if (selected_value == "special_majors") {
         field_type = "scholarity"
+      } else if (selected_value == "photo") {
+        field_type = "file"
+        show_notice = false;
       } else {
         show_notice = false;
       }

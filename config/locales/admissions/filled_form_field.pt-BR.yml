@@ -34,3 +34,4 @@ pt-BR:
           street_blank: "- Logradouro não pode ficar em branco"
           number_blank: "- Número não pode ficar em branco"
           scholarity_blank: "- %{attr} não pode ficar em branco"
+          extension: "possui extensão inválida. Opções permitidas: %{valid}"
