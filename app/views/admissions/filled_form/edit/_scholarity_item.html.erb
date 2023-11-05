@@ -20,6 +20,7 @@
     field[:label] = configuration["scholarity_#{field[:name]}_name"]
     field[:description] = configuration["scholarity_#{field[:name]}_description"]
     field[:options] = { class: "scholarity-#{field[:name]} text-input"}
+    field[:options][:required] = field[:required]
     if field[:type] == :date
       dates << field[:name]
     else
@@ -53,7 +54,7 @@
               <div class="scholarity-location">
                 <%
                   city_options = {size: 15, class: "text-input city-field"}
-                  city_options[:required] = "required" if field["required"]
+                  city_options[:required] = "required" if field[:required]
                   state_options = {size: 15, class: "text-input city-field"}
                   values = (f.object[field[:name]] || "").split(", ")
                   (2 - values.length).times { values << "" }

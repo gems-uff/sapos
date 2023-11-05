@@ -33,3 +33,4 @@ pt-BR:
           country_blank: "- País não pode ficar em branco"
           street_blank: "- Logradouro não pode ficar em branco"
           number_blank: "- Número não pode ficar em branco"
+          scholarity_blank: "- %{attr} não pode ficar em branco"

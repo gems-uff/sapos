@@ -9,6 +9,37 @@ class Admissions::FilledFormFieldScholarity < ActiveRecord::Base
   belongs_to :filled_form_field, optional: false,
     class_name: "Admissions::FilledFormField"
 
+  validate :that_value_follows_configuration_rules
+
+
+  def that_value_follows_configuration_rules
+    return if self.filled_form_field.nil?
+    return if self.filled_form_field.form_field.nil?
+    configuration = JSON.parse(
+      self.filled_form_field.form_field.configuration || "{}"
+    )
+    #debugger
+    fields = [
+      {name: :level, type: :select},
+      {name: :status, type: :select},
+      {name: :institution, type: :text},
+      {name: :course, type: :text},
+      {name: :location, type: :location},
+      {name: :grade, type: :text},
+      {name: :grade_interval, type: :text},
+      {name: :start_date, type: :date},
+      {name: :end_date, type: :date},
+    ].map do |field|
+      if configuration["scholarity_#{field[:name]}_required"] && self[field[:name]].blank?
+        label = configuration["scholarity_#{field[:name]}_name"] || I18n.t(
+          "activerecord.attributes.admissions/filled_form_field_scholarity.#{field[:name]}"
+        )
+        self.filled_form_field.add_error(:scholarity_blank, attr: label)
+      end
+    end
+  end
+
+
   def to_label(values: nil, statuses: nil)
     level_label = self.level
     level_label = values[self.level] unless values.nil?

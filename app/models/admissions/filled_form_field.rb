@@ -234,42 +234,41 @@ class Admissions::FilledFormField < ActiveRecord::Base
     end
   end
 
-  private
-    def add_error(error, **options)
-      attribute = :value
-      if self.form_field.field_type == Admissions::FormField::FILE
-        attribute = :file
-      elsif self.form_field.field_type == Admissions::FormField::COLLECTION_CHECKBOX
-        attribute = :list
-      end
-      if self.class.respond_to?(:i18n_scope)
-        i18n_scope = self.class.i18n_scope.to_s
-        defaults = self.class.lookup_ancestors.flat_map do |klass|
-          [ :"#{i18n_scope}.errors.models.#{klass.model_name.i18n_key}.#{error}" ]
-        end
-        defaults << :"#{i18n_scope}.errors.messages.#{error}"
-
-        catch(:exception) do
-          translation = I18n.translate(defaults.first, **options.merge(default: defaults.drop(1), throw: true))
-          return self.errors.add(
-            attribute, I18n.t(
-              "activerecord.errors.full_messages.format",
-              attribute: self.form_field.name,
-              message: translation
-            )
-          ) unless translation.nil?
-        end unless options[:message]
-      else
-        defaults = []
-      end
-      defaults << :"errors.messages.#{error}"
-      key = defaults.shift
-      defaults = options.delete(:message) if options[:message]
-      options[:default] = defaults
-      self.errors.add(attribute, I18n.t(
-        "activerecord.errors.full_messages.format",
-        attribute: self.form_field.name,
-        message: I18n.translate(key, **options)
-      ))
+  def add_error(error, **options)
+    attribute = :value
+    if self.form_field.field_type == Admissions::FormField::FILE
+      attribute = :file
+    elsif self.form_field.field_type == Admissions::FormField::COLLECTION_CHECKBOX
+      attribute = :list
     end
+    if self.class.respond_to?(:i18n_scope)
+      i18n_scope = self.class.i18n_scope.to_s
+      defaults = self.class.lookup_ancestors.flat_map do |klass|
+        [ :"#{i18n_scope}.errors.models.#{klass.model_name.i18n_key}.#{error}" ]
+      end
+      defaults << :"#{i18n_scope}.errors.messages.#{error}"
+
+      catch(:exception) do
+        translation = I18n.translate(defaults.first, **options.merge(default: defaults.drop(1), throw: true))
+        return self.errors.add(
+          attribute, I18n.t(
+            "activerecord.errors.full_messages.format",
+            attribute: self.form_field.name,
+            message: translation
+          )
+        ) unless translation.nil?
+      end unless options[:message]
+    else
+      defaults = []
+    end
+    defaults << :"errors.messages.#{error}"
+    key = defaults.shift
+    defaults = options.delete(:message) if options[:message]
+    options[:default] = defaults
+    self.errors.add(attribute, I18n.t(
+      "activerecord.errors.full_messages.format",
+      attribute: self.form_field.name,
+      message: I18n.translate(key, **options)
+    ))
+  end
 end
