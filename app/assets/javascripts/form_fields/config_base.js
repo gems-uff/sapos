@@ -117,7 +117,7 @@ function form_field_config_base(form_field) {
     } else if (selected_value == "scholarity") {
       form_field.widgets = [
         config_form_field_values_sql(form_field, "values", {
-          required: true, non_blank: true
+          required: true, non_blank: true, label: "levels"
         }),
         config_form_field_values_sql(form_field, "statuses", {
           required: true, non_blank: true

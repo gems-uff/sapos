@@ -16,7 +16,8 @@ function config_form_field_values_sql(form_field, field, options) {
     sql_widget.refresh()
   }
   let checkbox_widget = config_form_field_checkbox(form_field, `${field}_use_sql`, {
-    onchange
+    onchange,
+    label: options.label
   })
   let widgets = [
     checkbox_widget,

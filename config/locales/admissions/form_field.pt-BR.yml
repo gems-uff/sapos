@@ -62,6 +62,11 @@ pt-BR:
             add: Adicionar situação
           statuses_use_sql: Popular situações com SQL
           statuses_sql: Situações (SQL)
+          levels:
+            title: Níveis
+            add: Adicionar nível
+          levels_use_sql: Popular níveis com SQL
+          levels_sql: Níveis (SQL)
           minselection: Quantidade mínima
           maxselection: Quantidade máxima
           default_values:
