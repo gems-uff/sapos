@@ -4,7 +4,7 @@ function config_form_field_values(form_field, field, options) {
   let main_id = `${form_field.baseid}_${field}_main_id_${r}`
   let div_id = `${form_field.baseid}_${field}_div_${r}`
   let add_id = `${form_field.baseid}_${field}_add_${r}`
-  let label = options.label || field;
+  let label = options?.label ?? field;
   let title = form_field.i18n(label, "title");
   let add_title = form_field.i18n(label, "add");
   let values = form_field.data[field] || [];

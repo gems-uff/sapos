@@ -3,7 +3,7 @@ function config_form_field_codemirror(form_field, field, mode, options) {
   let r = (Math.random() + 1).toString(36).substring(7);
   let visible = options["visible"] === false ? `style="display:none;"`: "";
   let main_id = `${form_field.baseid}_${field}_main_id_${r}`
-  let label = options.label == undefined ? field : options.label + "_sql";
+  let label = options?.label ?? field;
   let title = form_field.i18n(label);
   let id = `${form_field.baseid}_${field}_${r}`
   let value = form_field.data[field] || "";

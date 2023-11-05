@@ -1,5 +1,5 @@
 function config_form_field_checkbox(form_field, field, options) {
-  let label = options.label == undefined ? field : options.label + "_use_sql";
+  let label = options?.label ?? field;
   let r = (Math.random() + 1).toString(36).substring(7);
   let title = form_field.i18n(label)
   let id = `${form_field.baseid}_${field}_${r}`
