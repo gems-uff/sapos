@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_10_31_174358) do
+ActiveRecord::Schema[7.0].define(version: 2023_11_16_010343) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -96,6 +96,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_31_174358) do
     t.string "original_filename"
     t.string "content_type"
     t.integer "size"
+    t.index ["id"], name: "index_carrier_wave_files_on_id"
+    t.index ["medium_hash"], name: "index_carrier_wave_files_on_medium_hash"
   end
 
   create_table "cities", force: :cascade do |t|
