@@ -6,6 +6,10 @@
 class AddIndexesToCarrierWaveFiles < ActiveRecord::Migration[7.0]
   def change
     add_index :carrier_wave_files, :medium_hash
-    add_index :carrier_wave_files, :id
+    add_index :enrollments, :enrollment_number
+    add_index :admission_applications, :token
+    add_index :admission_processes, :simple_url
+    add_index :students, :cpf
+    add_index :professors, :cpf
   end
 end

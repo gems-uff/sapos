@@ -35,6 +35,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_16_010343) do
     t.datetime "updated_at", null: false
     t.index ["admission_process_id"], name: "index_admission_applications_on_admission_process_id"
     t.index ["filled_form_id"], name: "index_admission_applications_on_filled_form_id"
+    t.index ["token"], name: "index_admission_applications_on_token"
   end
 
   create_table "admission_processes", force: :cascade do |t|
@@ -55,6 +56,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_16_010343) do
     t.datetime "updated_at", null: false
     t.index ["form_template_id"], name: "index_admission_processes_on_form_template_id"
     t.index ["letter_template_id"], name: "index_admission_processes_on_letter_template_id"
+    t.index ["simple_url"], name: "index_admission_processes_on_simple_url"
   end
 
   create_table "advisement_authorizations", force: :cascade do |t|
@@ -96,7 +98,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_16_010343) do
     t.string "original_filename"
     t.string "content_type"
     t.integer "size"
-    t.index ["id"], name: "index_carrier_wave_files_on_id"
     t.index ["medium_hash"], name: "index_carrier_wave_files_on_medium_hash"
   end
 
@@ -315,6 +316,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_16_010343) do
     t.string "thesis_title", limit: 255
     t.date "thesis_defense_date"
     t.integer "research_area_id"
+    t.index ["enrollment_number"], name: "index_enrollments_on_enrollment_number"
     t.index ["enrollment_status_id"], name: "index_enrollments_on_enrollment_status_id"
     t.index ["level_id"], name: "index_enrollments_on_level_id"
     t.index ["research_area_id"], name: "index_enrollments_on_research_area_id"
@@ -521,6 +523,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_16_010343) do
     t.index ["academic_title_institution_id"], name: "index_professors_on_academic_title_institution_id"
     t.index ["academic_title_level_id"], name: "index_professors_on_academic_title_level_id"
     t.index ["city_id"], name: "index_professors_on_city_id"
+    t.index ["cpf"], name: "index_professors_on_cpf"
     t.index ["email"], name: "index_professors_on_email"
     t.index ["institution_id"], name: "index_professors_on_institution_id"
     t.index ["user_id"], name: "index_professors_on_user_id"
@@ -685,6 +688,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_16_010343) do
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"
     t.index ["city_id"], name: "index_students_on_city_id"
+    t.index ["cpf"], name: "index_students_on_cpf"
     t.index ["user_id"], name: "index_students_on_user_id"
   end
 
