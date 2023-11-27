@@ -64,7 +64,8 @@ pt-BR:
       label: Seleção
       admission_process: Editais
       form_template: Formulários
-      new_form_template: New
+      admission_committee: Comitês
+      admission_phase: Fases
       admission_application: Candidaturas
 
     configurations:

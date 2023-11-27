@@ -12,6 +12,10 @@ class User < ApplicationRecord
   has_one :professor
   has_one :student, dependent: :nullify
   has_many :enrollment_request_comments, dependent: :destroy
+  has_many :admission_committee_members, dependent: :destroy,
+    class_name: "Admissions::AdmissionCommitteeMember"
+  has_many :admission_phase_evaluations, dependent: :destroy,
+    class_name: "Admissions::AdmissionPhaseEvaluation"
 
   devise :invitable,
     :database_authenticatable, :recoverable, :rememberable, :registerable,

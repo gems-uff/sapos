@@ -345,6 +345,50 @@ Rails.application.routes.draw do
       get :institution, on: :collection
       get :course, on: :collection
     end
+
+    resources :form_conditions do
+      concerns :active_scaffold
+    end
+
+    resources :admission_committees do
+      concerns :active_scaffold
+      get :populate_authorized, on: :collection
+      get :populate_professors, on: :collection
+      get :populate_coordination, on: :collection
+      get :populate_secretary, on: :collection
+      member do
+        get :populate_authorized
+        get :populate_professors
+        get :populate_coordination
+        get :populate_secretary
+      end
+      record_select_routes
+    end
+
+    resources :admission_committee_members do
+      concerns :active_scaffold
+    end
+
+    resources :admission_phases do
+      concerns :active_scaffold
+      record_select_routes
+    end
+
+    resources :admission_phase_committees do
+      concerns :active_scaffold
+    end
+
+    resources :admission_process_phases do
+      concerns :active_scaffold
+    end
+
+    resources :admission_phase_results do
+      concerns :active_scaffold
+    end
+
+    resources :admission_phase_evaluations do
+      concerns :active_scaffold
+    end
   end
 
   get "landing", action: :index, controller: "landing"

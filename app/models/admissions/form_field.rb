@@ -43,11 +43,11 @@ class Admissions::FormField < ActiveRecord::Base
     SYNC_TELEPHONE => :telephone
   }
 
-  belongs_to :form_template, optional: false,
-    class_name: "Admissions::FormTemplate"
-
   has_many :filled_fields, dependent: :restrict_with_exception,
     class_name: "Admissions::FilledFormField"
+
+  belongs_to :form_template, optional: false,
+    class_name: "Admissions::FormTemplate"
 
   validates :field_type, presence: true, inclusion: { in: FIELD_TYPES }
   validates :form_template, presence: true

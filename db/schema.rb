@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_11_16_010343) do
+ActiveRecord::Schema[7.0].define(version: 2023_11_23_203752) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -36,6 +36,80 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_16_010343) do
     t.index ["admission_process_id"], name: "index_admission_applications_on_admission_process_id"
     t.index ["filled_form_id"], name: "index_admission_applications_on_filled_form_id"
     t.index ["token"], name: "index_admission_applications_on_token"
+  end
+
+  create_table "admission_committee_members", force: :cascade do |t|
+    t.integer "admission_committee_id"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admission_committee_id"], name: "index_admission_committee_members_on_admission_committee_id"
+    t.index ["user_id"], name: "index_admission_committee_members_on_user_id"
+  end
+
+  create_table "admission_committees", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "admission_phase_committees", force: :cascade do |t|
+    t.integer "admission_committee_id"
+    t.integer "admission_phase_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admission_committee_id"], name: "index_admission_phase_committees_on_admission_committee_id"
+    t.index ["admission_phase_id"], name: "index_admission_phase_committees_on_admission_phase_id"
+  end
+
+  create_table "admission_phase_evaluations", force: :cascade do |t|
+    t.integer "admission_phase_id"
+    t.integer "user_id"
+    t.integer "admission_application_id"
+    t.integer "filled_form_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admission_application_id"], name: "index_admission_phase_evaluations_on_admission_application_id"
+    t.index ["admission_phase_id"], name: "index_admission_phase_evaluations_on_admission_phase_id"
+    t.index ["filled_form_id"], name: "index_admission_phase_evaluations_on_filled_form_id"
+    t.index ["user_id"], name: "index_admission_phase_evaluations_on_user_id"
+  end
+
+  create_table "admission_phase_results", force: :cascade do |t|
+    t.integer "admission_phase_id"
+    t.integer "admission_application_id"
+    t.integer "filled_form_id"
+    t.string "type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admission_application_id"], name: "index_admission_phase_results_on_admission_application_id"
+    t.index ["admission_phase_id"], name: "index_admission_phase_results_on_admission_phase_id"
+    t.index ["filled_form_id"], name: "index_admission_phase_results_on_filled_form_id"
+  end
+
+  create_table "admission_phases", force: :cascade do |t|
+    t.string "name"
+    t.integer "member_form_id"
+    t.integer "shared_form_id"
+    t.integer "consolidation_form_id"
+    t.boolean "can_edit_candidate"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["consolidation_form_id"], name: "index_admission_phases_on_consolidation_form_id"
+    t.index ["member_form_id"], name: "index_admission_phases_on_member_form_id"
+    t.index ["shared_form_id"], name: "index_admission_phases_on_shared_form_id"
+  end
+
+  create_table "admission_process_phases", force: :cascade do |t|
+    t.integer "admission_process_id"
+    t.integer "admission_phase_id"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.integer "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admission_phase_id"], name: "index_admission_process_phases_on_admission_phase_id"
+    t.index ["admission_process_id"], name: "index_admission_process_phases_on_admission_process_id"
   end
 
   create_table "admission_processes", force: :cascade do |t|
@@ -357,6 +431,18 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_16_010343) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["form_template_id"], name: "index_filled_forms_on_form_template_id"
+  end
+
+  create_table "form_conditions", force: :cascade do |t|
+    t.string "model_type", null: false
+    t.integer "model_id", null: false
+    t.string "field"
+    t.string "condition"
+    t.string "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["field"], name: "index_form_conditions_on_field"
+    t.index ["model_type", "model_id"], name: "index_form_conditions_on_model"
   end
 
   create_table "form_fields", force: :cascade do |t|

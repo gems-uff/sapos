@@ -23,6 +23,15 @@ class Admissions::FormTemplate < ActiveRecord::Base
   has_many :admission_process_letters, dependent: :restrict_with_exception,
     class_name: "Admissions::AdmissionProcess",
     foreign_key: :letter_template_id
+  has_many :phase_member_forms, dependent: :restrict_with_exception,
+    class_name: "Admissions::AdmissionPhase",
+    foreign_key: :member_form_id
+  has_many :phase_shared_forms, dependent: :restrict_with_exception,
+    class_name: "Admissions::AdmissionPhase",
+    foreign_key: :shared_form_id
+  has_many :phase_consolidation_forms, dependent: :restrict_with_exception,
+    class_name: "Admissions::AdmissionPhase",
+    foreign_key: :consolidation_form_id
 
   validates :name, presence: true
   validates :template_type, presence: true, inclusion: { in: TEMPLATE_TYPES }

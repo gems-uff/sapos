@@ -6,13 +6,15 @@
 class Admissions::AdmissionProcess < ActiveRecord::Base
   has_paper_trail
 
+  has_many :admission_applications, dependent: :restrict_with_exception,
+    class_name: "Admissions::AdmissionApplication"
+  has_many :phases, dependent: :restrict_with_exception,
+    class_name: "Admissions::AdmissionProcessPhase"
+
   belongs_to :form_template, optional: false,
     class_name: "Admissions::FormTemplate",  foreign_key: "form_template_id"
   belongs_to :letter_template, optional: true,
     class_name: "Admissions::FormTemplate", foreign_key: "letter_template_id"
-
-  has_many :admission_applications, dependent: :restrict_with_exception,
-    class_name: "Admissions::AdmissionApplication"
 
   scope :open, -> {
     where("start_date <= :start_date AND end_date >= :end_date", {

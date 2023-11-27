@@ -14,6 +14,9 @@ pt-BR:
         template_types:
           admission_form: "Formulário"
           recommendation_letter: "Carta de Recomendação"
+        phase_member_forms: "Fases com formulário individual"
+        phase_shared_forms: "Fases com formulário compartilhado"
+        phase_consolidation_forms: "Fases com formulário de consolidação"
 
     models:
       admissions/form_template:

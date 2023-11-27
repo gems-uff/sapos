@@ -6,15 +6,19 @@
 class Admissions::FilledForm < ActiveRecord::Base
   has_paper_trail
 
-  belongs_to :form_template, optional: false,
-    class_name: "Admissions::FormTemplate"
-
   has_one :admission_application, dependent: :restrict_with_exception,
     class_name: "Admissions::AdmissionApplication"
   has_one :letter_request, dependent: :restrict_with_exception,
     class_name: "Admissions::LetterRequest"
+  has_one :admission_phase_evaluation, dependent: :destroy,
+    class_name: "Admissions::AdmissionPhaseEvaluation"
+  has_one :admission_phase_result, dependent: :destroy,
+    class_name: "Admissions::AdmissionPhaseResult"
   has_many :fields, dependent: :delete_all,
     class_name: "Admissions::FilledFormField"
+
+  belongs_to :form_template, optional: false,
+    class_name: "Admissions::FormTemplate"
 
   accepts_nested_attributes_for :fields, allow_destroy: true
 

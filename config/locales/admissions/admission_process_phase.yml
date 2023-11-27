@@ -1,0 +1,19 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_process_phase:
+        admission_process: "Edital de Seleção"
+        admission_phase: "Fase"
+        start_date: Data de início
+        end_date: Data de fim
+
+    models:
+      admissions/admission_process_phase:
+        one: "Fase de Edital de Seleção"
+        other: "Fases de Editais de Seleção"
+
+  active_scaffold:
+    create_admission_process_phase_label: "Criar fase de edital"

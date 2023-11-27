@@ -1,0 +1,19 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_phase_result:
+        admission_phase: "Fase"
+        admission_application: "Candidatura"
+        filled_form: "Preenchimento"
+        type: "Tipo"
+        types:
+          shared: "Compartilhado"
+          consolidation: "Consolidação"
+
+    models:
+      admissions/admission_phase_result:
+        one: "Resultado de Fase"
+        other: "Resultados de Fases"

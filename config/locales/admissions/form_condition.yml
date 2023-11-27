@@ -1,0 +1,17 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/form_condition:
+        field: "Campo"
+        condition: "Condição"
+        value: "Valor"
+        model: "Modelo"
+        model_type: "Tipo de Modelo"
+
+    models:
+      admissions/form_condition:
+        one: "Condição"
+        other: "Condições"

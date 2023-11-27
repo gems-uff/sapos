@@ -1,0 +1,26 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_phase:
+        name: "Nome"
+        member_form: "Formulário individual"
+        shared_form: "Formulário compartilhado"
+        consolidation_form: "Consolidação"
+        can_edit_candidate: "Comitê pode editar candidato?"
+        admission_phase_committees: Comitês
+        admission_committees: Comitês
+        form_conditions: Condições de aprovação
+        admission_phase_results: Resultados da fase
+        admission_phase_evaluations: Avaliações do comitê
+        admission_process_phases: Editais de seleção
+
+    models:
+      admissions/admission_phase:
+        one: "Fase"
+        other: "Fases"
+
+  active_scaffold:
+    create_admission_phase_label: "Criar fase"

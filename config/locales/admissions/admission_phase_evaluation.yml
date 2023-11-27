@@ -1,0 +1,16 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_phase_evaluation:
+        admission_phase: "Fase"
+        user: "Usuário"
+        admission_application: "Candidatura"
+        filled_form: "Formulário Preenchido"
+
+    models:
+      admissions/admission_phase_evaluation:
+        one: "Avaliação de Comitê"
+        other: "Avaliações de Comitê"

@@ -18,7 +18,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
     form_columns = [
       :name, :simple_url, :year, :semester, :start_date, :end_date,
       :form_template, :letter_template, :min_letters, :max_letters,
-      :allow_multiple_applications, :require_session, :visible
+      :allow_multiple_applications, :require_session, :visible, :phases
     ]
     config.create.columns = form_columns
     config.update.columns = form_columns

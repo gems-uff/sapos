@@ -24,6 +24,7 @@ pt-BR:
         is_closed?: Fechado
         simple_id: "URL"
         require_session: Fluxo com sessão
+        phases: "Fases"
 
     errors:
       models:

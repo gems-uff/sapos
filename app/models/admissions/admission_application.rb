@@ -6,14 +6,17 @@
 class Admissions::AdmissionApplication < ActiveRecord::Base
   has_paper_trail
 
-  belongs_to :admission_process, optional: false,
-    class_name: "Admissions::AdmissionProcess"
-
-  belongs_to :filled_form, optional: false,
-    class_name: "Admissions::FilledForm"
-
   has_many :letter_requests, dependent: :delete_all,
     class_name: "Admissions::LetterRequest"
+  has_many :evaluations, dependent: :destroy,
+    class_name: "Admissions::AdmissionPhaseEvaluation"
+  has_many :results, dependent: :destroy,
+    class_name: "Admissions::AdmissionPhaseResult"
+
+  belongs_to :admission_process, optional: false,
+    class_name: "Admissions::AdmissionProcess"
+  belongs_to :filled_form, optional: false,
+    class_name: "Admissions::FilledForm"
 
   accepts_nested_attributes_for :filled_form,
     allow_destroy: true

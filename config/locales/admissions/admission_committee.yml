@@ -1,0 +1,27 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_committee:
+        name: "Nome"
+        phases: "Fases"
+        members: "Membros"
+        form_conditions: "Condições"
+        admission_phase_committees: "Fases"
+        admission_phases: "Fases"
+
+    models:
+      admissions/admission_committee:
+        one: "Comitê"
+        other: "Comitês"
+
+  active_scaffold:
+    create_admission_committee_label: "Criar Comitê"
+    admissions/admission_committee:
+      add_member: "Adicionar usuário"
+      add_authorized_professors: "Adicionar todos professores credenciados"
+      add_coordination: "Adicionar toda coordenação"
+      add_secretary: "Adicionar toda secretaria"
+      add_professors: "Adicionar todos professores"
