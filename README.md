@@ -1,5 +1,6 @@
 ![Sapos Logo](https://github.com/gems-uff/sapos/raw/master/app/assets/images/logoSapos.png)
 ![Release](https://img.shields.io/github/release/gems-uff/sapos.svg)
+![Build](https://img.shields.io/github/actions/workflow/status/gems-uff/sapos/rubyonrails.yml)
 ![MIT License](https://img.shields.io/github/license/gems-uff/sapos.svg)
 
 # About
