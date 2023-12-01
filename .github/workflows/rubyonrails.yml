@@ -16,6 +16,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup geckodriver
         uses: browser-actions/setup-geckodriver@latest
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
         with:
