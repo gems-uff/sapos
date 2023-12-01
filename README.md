@@ -1,6 +1,7 @@
 ![Sapos Logo](https://github.com/gems-uff/sapos/raw/master/app/assets/images/logoSapos.png)
 ![Release](https://img.shields.io/github/release/gems-uff/sapos.svg)
 ![Build](https://img.shields.io/github/actions/workflow/status/gems-uff/sapos/rubyonrails.yml)
+![Code Climate coverage](https://img.shields.io/codeclimate/coverage/gems-uff/sapos)
 ![MIT License](https://img.shields.io/github/license/gems-uff/sapos.svg)
 
 # About
