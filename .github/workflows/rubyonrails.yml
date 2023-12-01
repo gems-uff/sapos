@@ -24,3 +24,7 @@ jobs:
         run: bundle exec rake db:test:prepare
       - name: Run tests
         run: bundle exec rspec spec
+      - name: Publish code coverage
+        uses: paambaati/codeclimate-action@v5.0.0
+        env:
+          CC_TEST_REPORTER_ID: e124d2db428c426bc2e4a984bbc007b5ecf7c0ee2533b687adac0f301048afae
