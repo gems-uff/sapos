@@ -4,27 +4,28 @@ on:
   push:
     branches: [ "master" ]
   pull_request:
-    branches: [ "master" ]    
+    branches: [ "master" ]
 jobs:
   test:
     runs-on: ubuntu-latest
     env:
       RAILS_ENV: test
+      CC_TEST_REPORTER_ID: e124d2db428c426bc2e4a984bbc007b5ecf7c0ee2533b687adac0f301048afae
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup chromedriver
-        uses: nanasess/setup-chromedriver@v2
-      - name: Start chromedriver
-        run: |
-             export DISPLAY=:99
-             chromedriver --url-base=/wd/hub &
+      - name: Setup geckodriver
+        uses: browser-actions/setup-geckodriver@latest
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
-        with:          
+        with:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 0 # Increment this number if you need to re-download cached gems
       - name: Set up database schema
-        run: rake db:test:prepare
+        run: bundle exec rake db:test:prepare
       - name: Run tests
         run: bundle exec rspec spec
+      - name: Publish code coverage
+        uses: paambaati/codeclimate-action@v5.0.0
