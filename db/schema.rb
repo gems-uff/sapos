@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_11_23_203752) do
+ActiveRecord::Schema[7.0].define(version: 2023_11_28_014345) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -33,6 +33,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_23_203752) do
     t.integer "filled_form_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "admission_phase_id"
+    t.string "status"
+    t.index ["admission_phase_id"], name: "index_admission_applications_on_admission_phase_id"
     t.index ["admission_process_id"], name: "index_admission_applications_on_admission_process_id"
     t.index ["filled_form_id"], name: "index_admission_applications_on_filled_form_id"
     t.index ["token"], name: "index_admission_applications_on_token"
@@ -128,6 +131,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_23_203752) do
     t.boolean "require_session", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "admission_phase_id"
+    t.index ["admission_phase_id"], name: "index_admission_processes_on_admission_phase_id"
     t.index ["form_template_id"], name: "index_admission_processes_on_form_template_id"
     t.index ["letter_template_id"], name: "index_admission_processes_on_letter_template_id"
     t.index ["simple_url"], name: "index_admission_processes_on_simple_url"

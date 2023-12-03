@@ -71,6 +71,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
     config.columns[:letter_template].options[:params] = {
       template_type: Admissions::FormTemplate::RECOMMENDATION_LETTER
     }
+    config.columns[:phases].show_blank_record = false
 
     config.actions.exclude :deleted_records
   end

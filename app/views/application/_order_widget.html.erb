@@ -1,0 +1,81 @@
+<% if valid_controllers.include? controller.class.name %>
+  <%
+    options = active_scaffold_input_options(column, scope)
+  %>
+  <div class="order-control" data-name="<%= options[:name] %>" data-updated="0">
+    <a href="#" class="move-up">
+      <i title='#{I18n.t("active_scaffold.up")}' class='fa fa-arrow-up'></i>
+    </a>
+    <a href="#" class="move-down" data-name="<%= options[:name] %>">
+      <i title='#{I18n.t("active_scaffold.down")}' class='fa fa-arrow-down'></i>
+    </a>
+    <%= form_hidden_attribute(column, record, scope) %>
+  </div>
+  <script>
+
+    function update_row_order(row) {
+      let index = row.index()
+      let name = row.find(".order-control").data("name")
+
+      row.find(`input[name="${name}"]`).val(index)
+      if (index <= 1) {
+        row.find(".move-up").addClass("disabled")
+      } else {
+        row.find(".move-up").removeClass("disabled")
+      }
+      if (index >= row.parent().children().length - 2) {
+        row.find(".move-down").addClass("disabled")
+      } else {
+        row.find(".move-down").removeClass("disabled")
+      }
+    }
+
+    $(document).ready(function() {
+      $(".move-up").off("click");
+      $(".move-down").off("click");
+      $(".move-up").on("click", function() {
+        let row = $(this).closest("tbody")
+        let prev_row = row.prev()
+        row.effect("highlight", {}, 3000);
+        row.insertBefore(prev_row);
+        update_row_order(row)
+        update_row_order(row.next())
+        return false;
+      })
+      $(".move-down").on("click", function() {
+        let row = $(this).closest("tbody")
+        let next_row = row.next()
+        row.effect("highlight", {}, 3000);
+        row.insertAfter(next_row);
+        update_row_order(row)
+        update_row_order(row.prev())
+        return false;
+      })
+
+      // Update last two rows
+      let last = $(`.order-control[data-name="<%= options[:name] %>"][data-updated="0"]`)
+      if (last) {
+        let new_row = last.closest("tbody")
+        update_row_order(new_row);
+        let previous_row = new_row.prev()
+        if (previous_row.prop("tagName") == "TBODY") {
+          update_row_order(previous_row);
+        }
+        last.attr("data-updated", 1)
+      }
+    })
+</script>
+<% else %>
+  <%= form_attribute(column, record, scope, only_value, col_class) %>
+<% end %>
+
+<style>
+  .order-input {
+    width: 50px;
+  }
+  .disabled {
+    color: grey;
+    pointer-events: none;
+    cursor: default;
+  }
+</style>

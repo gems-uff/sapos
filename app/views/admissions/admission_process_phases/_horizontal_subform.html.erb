@@ -1,5 +1,5 @@
 <%
-  if ["Admissions::FormTemplatesController"].include? controller.class.name
+  if ["Admissions::AdmissionProcessesController"].include? controller.class.name
    associated = associated.sort_by { |f| [f.order, f.id]}
   end
 %>
