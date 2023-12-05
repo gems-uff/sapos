@@ -1,0 +1,44 @@
+<%
+  subid = "as_admissions__admission_processes-#{@admission_process.id}-consolidate-phase-div"
+%>
+<h4><%= active_scaffold_config.show.label(h(@admission_process.to_label)) %> - <%= @message %></h4>
+
+<div class="admissions-table show-view">
+  <%= render partial: "applications_result_table", locals: {
+    title: t("active_scaffold.admissions/admission_process.consolidate_phase.errors",
+             count: @errors.size),
+    subtext: "Verifique o formulário de homologação da fase",
+    candidates: @errors,
+    subid: "#{subid}-errors",
+    show_status: true,
+    visible: true
+  }%>
+  <%= render partial: "applications_result_table", locals: {
+    title: t("active_scaffold.admissions/admission_process.consolidate_phase.missing_committee",
+             count: @missing_committee.size),
+    subtext: "Nenhum comitê satisfaz condições para avaliar os seguintes candidatos",
+    candidates: @missing_committee,
+    subid: "#{subid}-missing-committee",
+    show_status: false,
+    visible: true
+  }%>
+  <%= render partial: "applications_result_table", locals: {
+    title: t("active_scaffold.admissions/admission_process.consolidate_phase.reproved",
+             count: @reproved.size),
+    subtext: nil,
+    candidates: @reproved,
+    subid: "#{subid}-reproved",
+    show_status: false,
+    visible: false
+  }%>
+  <%= render partial: "applications_result_table", locals: {
+    title: t("active_scaffold.admissions/admission_process.consolidate_phase.approved",
+             count: @approved.size),
+    subtext: nil,
+    candidates: @approved,
+    subid: "#{subid}-approved",
+    show_status: false,
+    visible: false
+  }%>
+
+</div>

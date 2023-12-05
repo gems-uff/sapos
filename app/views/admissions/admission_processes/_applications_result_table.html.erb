@@ -1,0 +1,37 @@
+<% if candidates.present? %>
+  <div>
+    <h5> <%= title %> <a data-show="Mostrar" data-hide="Ocultar"
+          data-toggable="<%= subid %>" style=""
+          class="as-js-button visibility-toggle" href="#"><%= visible ? "Ocultar" : "Mostrar" %></a></h5>
+    <div id="<%= subid %>" style="<%= "display:none;" if !visible %>" >
+      <% if subtext.present? %>
+        <p> <%= subtext %> </p>
+      <% end %>
+      <table class="showtable">
+        <thead>
+          <tr>
+            <th><%= I18n.t("activerecord.attributes.admissions/admission_application.token") %></th>
+            <th><%= I18n.t("activerecord.attributes.admissions/admission_application.name") %></th>
+            <% if show_status %>
+              <th><%= I18n.t("activerecord.attributes.admissions/admission_application.status") %></th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody class="records">
+          <% count = 0 %>
+          <% candidates.each do |candidate| %>
+            <% count += 1 %>
+            <% tr_class = count.even? ? "even-record" : "blue-record" %>
+            <tr class="record <%= tr_class %>">
+              <td><%= candidate.token %></td>
+              <td><%= candidate.name %></td>
+              <% if show_status %>
+                <td><%= candidate.status %></td>
+              <% end %>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>

@@ -6,35 +6,34 @@
 class Admissions::FormField < ActiveRecord::Base
   has_paper_trail
 
-  HTML = I18n.t("activerecord.attributes.admissions/form_field.field_types.html")
-  STRING = I18n.t("activerecord.attributes.admissions/form_field.field_types.string")
-  SELECT = I18n.t("activerecord.attributes.admissions/form_field.field_types.select")
-  RADIO = I18n.t("activerecord.attributes.admissions/form_field.field_types.radio")
-  COLLECTION_CHECKBOX = I18n.t(
-    "activerecord.attributes.admissions/form_field.field_types.collection_checkbox"
-  )
-  SINGLE_CHECKBOX = I18n.t(
-    "activerecord.attributes.admissions/form_field.field_types.single_checkbox"
-  )
-  STUDENT_FIELD = I18n.t(
-    "activerecord.attributes.admissions/form_field.field_types.student_field"
-  )
-  FILE = I18n.t("activerecord.attributes.admissions/form_field.field_types.file")
-  TEXT = I18n.t("activerecord.attributes.admissions/form_field.field_types.text")
-  CITY = I18n.t("activerecord.attributes.admissions/form_field.field_types.city")
-  GROUP = I18n.t("activerecord.attributes.admissions/form_field.field_types.group")
-  SCHOLARITY = I18n.t("activerecord.attributes.admissions/form_field.field_types.scholarity")
-  RESIDENCY = I18n.t("activerecord.attributes.admissions/form_field.field_types.residency")
+  HTML = record_i18n_attr("field_types.html")
+  STRING = record_i18n_attr("field_types.string")
+  NUMBER = record_i18n_attr("field_types.number")
+  SELECT = record_i18n_attr("field_types.select")
+  RADIO = record_i18n_attr("field_types.radio")
+  COLLECTION_CHECKBOX = record_i18n_attr("field_types.collection_checkbox")
+  SINGLE_CHECKBOX = record_i18n_attr("field_types.single_checkbox")
+  STUDENT_FIELD = record_i18n_attr("field_types.student_field")
+  FILE = record_i18n_attr("field_types.file")
+  TEXT = record_i18n_attr("field_types.text")
+  CITY = record_i18n_attr("field_types.city")
+  GROUP = record_i18n_attr("field_types.group")
+  SCHOLARITY = record_i18n_attr("field_types.scholarity")
+  RESIDENCY = record_i18n_attr("field_types.residency")
+
+  SEP = record_i18n_attr("field_types.sep")
+
+  CODE = record_i18n_attr("field_types.code")
 
   FIELD_TYPES = [
     FILE, STUDENT_FIELD, COLLECTION_CHECKBOX, SINGLE_CHECKBOX,
-    CITY, SCHOLARITY, GROUP, HTML, RESIDENCY,
-    RADIO, SELECT, STRING, TEXT
+    CITY, SCHOLARITY, GROUP, HTML, NUMBER, RESIDENCY,
+    RADIO, SELECT, STRING, TEXT, SEP, CODE
   ]
 
-  SYNC_NAME = I18n.t("activerecord.attributes.admissions/form_field.syncs.name")
-  SYNC_EMAIL = I18n.t("activerecord.attributes.admissions/form_field.syncs.email")
-  SYNC_TELEPHONE = I18n.t("activerecord.attributes.admissions/form_field.syncs.telephone")
+  SYNC_NAME = record_i18n_attr("syncs.name")
+  SYNC_EMAIL = record_i18n_attr("syncs.email")
+  SYNC_TELEPHONE = record_i18n_attr("syncs.telephone")
   SYNCS = [SYNC_NAME, SYNC_EMAIL, SYNC_TELEPHONE]
   SYNCS_APPLICATION = [SYNC_NAME, SYNC_EMAIL]
   SYNCS_MAP = {
@@ -49,7 +48,7 @@ class Admissions::FormField < ActiveRecord::Base
   belongs_to :form_template, optional: false,
     class_name: "Admissions::FormTemplate"
 
-  validates :field_type, presence: true, inclusion: { in: FIELD_TYPES }
+  validates :field_type, presence: true
   validates :form_template, presence: true
   validates :sync, uniqueness: { scope: :form_template_id, allow_blank: true }
   validates :sync, inclusion: { in: SYNCS, allow_blank: true },
@@ -61,6 +60,17 @@ class Admissions::FormField < ActiveRecord::Base
     if: ->(field) {
       field.try(:form_template).try(:template_type) ==
         Admissions::FormTemplate::ADMISSION_FORM
+    }
+  validates :field_type, inclusion: { in: FIELD_TYPES - [SEP, CODE] },
+    if: ->(field) {
+      template_type = field.try(:form_template).try(:template_type)
+      template_type == Admissions::FormTemplate::ADMISSION_FORM ||
+        Admissions::FormTemplate::RECOMMENDATION_LETTER
+    }
+  validates :field_type, inclusion: { in: [CODE] },
+    if: ->(field) {
+      field.try(:form_template).try(:template_type) ==
+        Admissions::FormTemplate::CONSOLIDATION_FORM
     }
 
   validates :name, presence: true
@@ -112,7 +122,7 @@ class Admissions::FormField < ActiveRecord::Base
         self.execute_sql(field, config: config)
       rescue Exception => e
         self.errors.add(:base, :sql_execution_generated_an_error,
-          field: I18n.t("activerecord.attributes.admissions/form_field.configurations.#{field_name}"),
+          field: record_i18n_attr("configurations.#{field_name}"),
           error: e.message
         )
       end

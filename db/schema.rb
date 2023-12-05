@@ -131,8 +131,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_28_014345) do
     t.boolean "require_session", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "admission_phase_id"
-    t.index ["admission_phase_id"], name: "index_admission_processes_on_admission_phase_id"
     t.index ["form_template_id"], name: "index_admission_processes_on_form_template_id"
     t.index ["letter_template_id"], name: "index_admission_processes_on_letter_template_id"
     t.index ["simple_url"], name: "index_admission_processes_on_simple_url"

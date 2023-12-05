@@ -29,7 +29,7 @@ class Admissions::AdmissionPhasesController < ApplicationController
 
     config.columns[:consolidation_form].form_ui = :record_select
     config.columns[:consolidation_form].options[:params] = {
-      template_type: Admissions::FormTemplate::ADMISSION_FORM
+      template_type: Admissions::FormTemplate::CONSOLIDATION_FORM
     }
 
     config.actions.exclude :deleted_records

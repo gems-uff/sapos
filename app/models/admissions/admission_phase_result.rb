@@ -15,12 +15,8 @@ class Admissions::AdmissionPhaseResult < ActiveRecord::Base
 
   accepts_nested_attributes_for :filled_form, allow_destroy: true
 
-  SHARED = I18n.t(
-    "activerecord.attributes.admissions/admission_phase_result.types.shared"
-  )
-  CONSOLIDATION = I18n.t(
-    "activerecord.attributes.admissions/admission_phase_result.types.consolidation"
-  )
+  SHARED = record_i18n_attr("types.shared")
+  CONSOLIDATION = record_i18n_attr("types.consolidation")
 
   RESULT_TYPES = [
     SHARED, CONSOLIDATION

@@ -31,4 +31,11 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
   def to_label
     "#{self.name}"
   end
+
+  def has_committee_for_candidate(candidate)
+    committees = self.admission_committees
+    committees.any? do |committee|
+      candidate.satisfies_conditions(committee.form_conditions)
+    end || committees.empty?
+  end
 end

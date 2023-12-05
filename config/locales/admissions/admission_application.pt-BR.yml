@@ -18,6 +18,15 @@ pt-BR:
         is_filled_options:
           true: Sim
           false: Não
+        status: Situação
+        statuses:
+          approved: Aprovado
+          reproved: Reprovado
+          error: Erro
+        pendency: "Pendência de comitê"
+        pendency_options:
+          true: Sim
+          false: Não
       admissions/admission_application/letter_requests:
         name: "Nome na indicação de carta de recomendação"
         email: "Email na indicação de carta de recomendação"

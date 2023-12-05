@@ -6,8 +6,8 @@
 class Admissions::LetterRequest < ActiveRecord::Base
   has_paper_trail
 
-  WAITING = I18n.t("activerecord.attributes.admissions/letter_request.statuses.waiting")
-  RECEIVED = I18n.t("activerecord.attributes.admissions/letter_request.statuses.received")
+  WAITING = record_i18n_attr("statuses.waiting")
+  RECEIVED = record_i18n_attr("statuses.received")
 
   belongs_to :admission_application, optional: false,
     class_name: "Admissions::AdmissionApplication"

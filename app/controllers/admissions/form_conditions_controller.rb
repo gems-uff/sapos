@@ -14,20 +14,7 @@ class Admissions::FormConditionsController < ApplicationController
 
     config.columns[:condition].form_ui = :select
     config.columns[:condition].options = {
-      options: [
-        "Contem",
-        "Começa com",
-        "Termina com",
-        "=",
-        ">=",
-        "<=",
-        ">",
-        "<",
-        "!=",
-        "Entre",
-        "Nulo",
-        "Não nulo",
-      ]
+      options: Admissions::FormCondition::OPTIONS.keys
     }
 
     config.actions.exclude :deleted_records, :create, :update

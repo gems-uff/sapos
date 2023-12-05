@@ -6,6 +6,10 @@
 class Admissions::AdmissionApplication < ActiveRecord::Base
   has_paper_trail
 
+  APPROVED = record_i18n_attr("statuses.approved")
+  REPROVED = record_i18n_attr("statuses.reproved")
+  ERROR = record_i18n_attr("statuses.error")
+
   has_many :letter_requests, dependent: :delete_all,
     class_name: "Admissions::LetterRequest"
   has_many :evaluations, dependent: :destroy,
@@ -86,7 +90,105 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   end
 
+  def satisfies_conditions(form_conditions)
+    form_conditions.all? do |condition|
+      field = (
+        Admissions::FilledFormField.includes(:form_field)
+          .includes(filled_form: :admission_phase_result)
+          .where(
+            filled_form: { admission_phase_results: {
+              admission_application_id: self.id
+            } },
+            form_field: { name: condition.field }
+          ).order(updated_at: :desc, id: :desc).first ||
+        Admissions::FilledFormField.includes(:form_field)
+          .includes(filled_form: :admission_application)
+          .where(
+            filled_form: { admission_applications: { id: self.id } },
+            form_field: { name: condition.field }
+          ).first
+      )
+      next false if field.blank?
+      func = Admissions::FormCondition::OPTIONS[condition.condition]
+      if field.file.present?
+        func.call(field.file, condition.value)
+      elsif field.list.present?
+        field.list.any? do |element|
+          func.call(element, condition.value)
+        end
+      else
+        func.call(field.value, condition.value)
+      end
+    end
+  end
+
+  def consolidate_phase(phase)
+    if phase.nil?
+      return record_i18n_attr("statuses.approved")
+    end
+    if phase.consolidation_form.present?
+      fields = self.filled_form.to_fields_hash
+      self.results.each do |result|
+        result.filled_form.to_fields_hash(fields)
+      end
+      committees = self.evaluations.where(admission_phase_id: phase.id).map do |ev|
+        ev.filled_form.to_fields_hash
+      end
+      phase_result = Admissions::AdmissionPhaseResult.find_or_create_by(
+        admission_phase_id: phase.id,
+        admission_application: self,
+        type: Admissions::AdmissionPhaseResult::CONSOLIDATION
+      )
+      cfields = phase_result.filled_form.form_template.fields.order(:order)
+      cfield_hash = cfields.index_by(&:id)
+      field_ids = cfields.map(&:id)
+      filled_field_ids = phase_result.filled_form.fields.map(&:form_field_id)
+
+      new_filled_fields = field_ids - filled_field_ids
+      new_filled_fields.each do |field_id|
+        form_field = cfield_hash[field_id]
+        configuration = JSON.parse(form_field.configuration || "{}")
+        if form_field.field_type == Admissions::FormField::CODE
+          begin
+            value = self.evaluate_code(
+              configuration["code"],
+              process: self.admission_process,
+              application: self,
+              fields: fields,
+              committees: committees,
+            )
+            phase_result.filled_form.fields.new(
+              form_field_id: field_id, value: value
+            )
+          rescue => err
+            phase_result.save!
+            return "#{record_i18n_attr("statuses.error")}: #{err}"
+          end
+        end
+      end
+    end
+    phase_result.save!
+    if self.satisfies_conditions(phase.form_conditions)
+      record_i18n_attr("statuses.approved")
+    else
+      record_i18n_attr("statuses.reproved")
+    end
+  end
+
+  def consolidate_phase!(phase)
+    result = self.consolidate_phase(phase)
+    self.update!(status: result)
+    result
+  end
+
   private
+    def evaluate_code(formula, **bindings)
+      b = binding
+      bindings.each do |var, val| b.local_variable_set(var, val) end
+
+      b.eval(formula)
+    end
+
     def generate_token
       18.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }
         .insert(6, "-").insert(13, "-").join("")

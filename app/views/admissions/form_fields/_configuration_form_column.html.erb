@@ -87,6 +87,7 @@
 
     let widget_type = {
       "<%= Admissions::FormField::STRING %>": "string",
+      "<%= Admissions::FormField::NUMBER %>": "string",
       "<%= Admissions::FormField::SELECT %>": "select",
       "<%= Admissions::FormField::RADIO %>": "radio",
       "<%= Admissions::FormField::COLLECTION_CHECKBOX %>": "collection_checkbox",
@@ -99,6 +100,8 @@
       "<%= Admissions::FormField::GROUP %>": "group",
       "<%= Admissions::FormField::SCHOLARITY %>": "scholarity",
       "<%= Admissions::FormField::HTML %>": "html",
+      "<%= Admissions::FormField::SEP %>": "invalid",
+      "<%= Admissions::FormField::CODE %>": "code",
     }
 
     $('select[name="<%= record_basename %>[field_type]"]').on("change", function () {

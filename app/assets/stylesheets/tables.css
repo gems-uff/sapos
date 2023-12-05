@@ -16,7 +16,7 @@ div.scrollable-table {
 }
 
 .scrollable-table table, .scrollable-table th, .scrollable-table td {
-  background-clip:border-box;
+  background-clip: border-box;
 }
 
 .scrollable-wrapper {
@@ -24,6 +24,8 @@ div.scrollable-table {
   overflow: auto;
 }
 
+.admissions-table td,
+.admissions-table th,
 .scrollable-table td,
 .scrollable-table th {
   font-size: 11px !important;
@@ -42,16 +44,21 @@ div.scrollable-table {
   z-index: 1;
 }
 
+.admissions-table thead,
 .scrollable-table thead {
-  background-color: #427fa4;
+  background-color: #427fa4 !important;
 }
 
+.admissions-table tr.blue-record td,
+.admissions-table tr.blue-record,
 .scrollable-table tr.blue-record {
-  background-color: #E6F2FF;
+  background-color: #E6F2FF !important;
 }
 
+.admissions-table tr.even-record td,
+.admissions-table tr.even-record,
 .scrollable-table tr.even-record {
-  background-color: white;
+  background-color: white !important;
 }
 
 .scrollable-table .fixed-col {

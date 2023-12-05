@@ -6,14 +6,11 @@
 class Admissions::FormTemplate < ActiveRecord::Base
   has_paper_trail
 
-  ADMISSION_FORM = I18n.t(
-    "activerecord.attributes.admissions/form_template.template_types.admission_form"
-  )
-  RECOMMENDATION_LETTER = I18n.t(
-    "activerecord.attributes.admissions/form_template.template_types.recommendation_letter"
-  )
+  ADMISSION_FORM = record_i18n_attr("template_types.admission_form")
+  RECOMMENDATION_LETTER = record_i18n_attr("template_types.recommendation_letter")
+  CONSOLIDATION_FORM = record_i18n_attr("template_types.consolidation_form")
 
-  TEMPLATE_TYPES = [ADMISSION_FORM, RECOMMENDATION_LETTER]
+  TEMPLATE_TYPES = [ADMISSION_FORM, RECOMMENDATION_LETTER, CONSOLIDATION_FORM]
 
   has_many :fields, dependent: :destroy,
     class_name: "Admissions::FormField"

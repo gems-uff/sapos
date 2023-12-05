@@ -28,11 +28,17 @@ class Admissions::FilledForm < ActiveRecord::Base
     I18n.t(key, form: self.form_template.to_label)
   end
 
+  def to_fields_hash(result=nil)
+    result ||= {}
+    self.fields.each do |field|
+      result[field.form_field.name] = field.file || field.list || field.value
+    end
+    result
+  end
+
   def prepare_missing_fields
     field_ids = self.form_template.fields.map(&:id)
-    filled_field_ids = self.fields.map(
-      &:form_field_id
-    )
+    filled_field_ids = self.fields.map(&:form_field_id)
 
     new_filled_fields = field_ids - filled_field_ids
     new_filled_fields.each do |field_id|

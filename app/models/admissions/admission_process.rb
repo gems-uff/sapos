@@ -101,20 +101,77 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
 
   def simple_id(closed_behavior: :ignore)
     if self.simple_url.present?
-      return self.simple_url if closed_behavior == :ignore
-      return "#{self.simple_url} (#{
-        self.is_open? ? I18n.t("activerecord.attributes.admissions/admission_process.is_open?") :
-          I18n.t("activerecord.attributes.admissions/admission_process.is_closed?")
-      })" if closed_behavior == :show
-      if closed_behavior == :optional_show
-        result = self.simple_url
-        if !self.is_open?
-          result += " (#{I18n.t("activerecord.attributes.admissions/admission_process.is_closed?")})"
-        end
-        return result
+      result = self.simple_url
+    else
+      result = self.id.to_s
+    end
+    return result if closed_behavior == :ignore
+    return "#{result} (#{
+      self.is_open? ? record_i18n_attr("is_open?") :
+        record_i18n_attr("is_closed?")
+    })" if closed_behavior == :show
+    if closed_behavior == :optional_show
+      if !self.is_open?
+        result += " (#{record_i18n_attr("is_closed?")})"
       end
     end
-    self.id.to_s
+    result
+  end
+
+  def current_phase(options = {})
+    time = options[:time]
+    time ||= Time.now
+    result = nil
+    self.phases.order(:order).each do |p|
+      if p.start_date.present? && p.start_date <= time
+        result = p.admission_phase
+      end
+    end
+    result
+  end
+
+  def eligible_candidates_at_phase(phase)
+    candidates = self.admission_applications
+      .where(admission_phase_id: phase.try(:id))
+      .where(status: nil)
+      .or(self.admission_applications.where("`admission_applications`.`status` like ?", "#{
+        I18n.t("activerecord.attributes.admissions/admission_application.statuses.error")}%"
+      ))
+
+    if phase.nil?
+      return candidates.includes(:filled_form)
+        .where(filled_form: { is_filled: true })
+    end
+
+    if phase.shared_form.present?
+      candidates = candidates.includes(results: :filled_form)
+        .where(results: {
+          filled_forms: { is_filled: true },
+          type: Admissions::AdmissionPhaseResult::SHARED
+        })
+    end
+
+    if phase.member_form.present?
+      committees = phase.admission_committees
+      candidates = candidates.filter do |candidate|
+        committees.all? do |committee|
+          if candidate.satisfies_conditions(committee.form_conditions)
+            committee.members.all? do |member|
+              Admissions::AdmissionPhaseEvaluation.includes(:filled_form)
+                .where(
+                  filled_form: { is_filled: true },
+                  admission_phase_id: phase.id,
+                  user_id: member.user_id,
+                  admission_application_id: candidate.id
+                ).present?
+            end
+          else
+            true
+          end
+        end
+      end
+    end
+    candidates
   end
 
   def to_label

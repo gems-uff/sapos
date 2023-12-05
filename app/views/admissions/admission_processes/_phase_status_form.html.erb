@@ -1,0 +1,178 @@
+<%
+  url_options ||= params_for(action: :consolidate_phase)
+  xhr = request.xhr? if xhr.nil?
+  cancel_link = true if cancel_link.nil?
+  body_partial ||= 'form'
+  form_id = element_form_id(action: :consolidate_phase, id: @record&.id)
+  options = {
+    id: form_id,
+    class: "as_form consolidate_phase",
+    method: :post,
+    data: { loading: true },
+    #'data-loading' => defined?(loading) ? loading : true
+  }
+  cancel_options = {class: 'as_cancel'}
+
+  if xhr
+    cancel_options[:remote] = true
+    options[:remote] = true
+  end
+  subid = "as_admissions__admission_processes-#{@admission_process.id}-phase-status-div"
+  current_phase = @admission_process.current_phase
+%>
+<%= form_tag url_options, options do %>
+  <h4><%= active_scaffold_config.show.label(h(@admission_process.to_label)) %></h4>
+
+  <div id="<%= element_messages_id(action: :consolidate_phase) %>" class="messages-container">
+    <% unless xhr %>
+      <p class="error-message message server-error" style="display:none;">
+        <%= as_(:internal_error).html_safe %>
+        <a href="#" class="close" title="<%= as_(:close).html_safe %>"><%= as_(:close).html_safe %></a>
+      </p>
+    <% end %>
+    <%= render partial: 'messages' unless request.xhr? %>
+  </div>
+
+  <ol class="form">
+    <li class="form-element required">
+      <dl>
+        <dt>
+          <%= label_tag :consolidate_phase_id do %>Fase<% end%>
+        </dt>
+        <dd>
+          <%= select_tag(:consolidate_phase_id, options_for_select(
+            [["Cadidatura", nil]] +
+            @admission_process.phases.order(:order).map do |p|
+              [p.admission_phase.name, p.admission_phase.id]
+            end, current_phase.try(:id)
+          ))%>
+        </dd>
+      </dl>
+    </li>
+    <li class="form-element required">
+      <dl>
+        <dt>
+          <%= label_tag :show_summary do %>Mostrar alterações<% end%>
+        </dt>
+        <dd>
+          <%= check_box_tag :show_summary %>
+        </dd>
+      </dl>
+    </li>
+    <li class="form">
+      <div style="clear: both;">
+        <h5> Resumo <a data-show="Mostrar" data-hide="Ocultar"
+          data-toggable="<%= subid %>" style=""
+          class="as-js-button visibility-toggle" href="#">Ocultar</a></h5>
+        <div id="<%= subid %>">
+          <% ([nil] + @admission_process.phases).each do |p| %>
+            <%
+              if p.nil?
+                phase = nil
+                phase_name = "Candidatura"
+                ol_id = "#{subid}-"
+              else
+                phase = p.admission_phase
+                phase_name = phase.to_label
+                ol_id = "#{subid}-#{phase.id}"
+              end
+              candidates = @admission_process.admission_applications.where(
+                admission_phase_id: phase.try(:id)
+              )
+              prefix = "activerecord.attributes.admissions/admission_application"
+              approved = candidates.where(status: I18n.t("#{prefix}.statuses.approved"))
+              reproved = candidates.where(status: I18n.t("#{prefix}.statuses.reproved"))
+              errors = candidates.where("status LIKE ?", "#{I18n.t("#{prefix}.statuses.error")}:%")
+              eligible = @admission_process.eligible_candidates_at_phase(phase)
+              eligible_ids = eligible.map(&:id)
+              missing_committee_ids = phase.nil? ? [] : candidates.filter_map do |candidate|
+                candidate.id if !phase.has_committee_for_candidate(candidate)
+              end
+              style = "display:none;"
+              if p.try(:admission_phase_id) == current_phase.try(:id)
+                style = ""
+              end
+            %>
+            <ol class="form phase-summary" id="<%= ol_id %>" style="<%= style %>">
+              <li class="form-element"><dl>
+                <dt>Fase</dt><dd><%= phase_name %></dd>
+              </dl></li>
+              <li class="form-element"><dl>
+                <dt>Candidatos</dt><dd><%= candidates.count %></dd>
+              </dl></li>
+              <li class="form-element"><dl>
+                <dt>Aprovados</dt><dd><%= approved.count %></dd>
+              </dl></li>
+              <li class="form-element"><dl>
+                <dt>Reprovados</dt><dd><%= reproved.count %></dd>
+              </dl></li>
+              <li class="form-element"><dl>
+                <dt>Com erro</dt><dd><%= errors.count %></dd>
+              </dl></li>
+              <li class="form-element"><dl>
+                <dt>Comitê incompleto</dt><dd><%= missing_committee_ids.count %></dd>
+              </dl></li>
+              <li class="form-element required"><dl>
+                <dt><b>Prontos</b></dt><dd><%= eligible.size %></dd>
+              </dl></li>
+              <li class="admissions-table show-view">
+                <table class="showtable">
+                  <thead>
+                    <tr>
+                      <th><%= I18n.t("activerecord.attributes.admissions/admission_application.token") %></th>
+                      <th><%= I18n.t("activerecord.attributes.admissions/admission_application.name") %></th>
+                      <th><%= I18n.t("activerecord.attributes.admissions/admission_application.status") %></th>
+                    </tr>
+                  </thead>
+                  <tbody class="records">
+                    <% count = 0 %>
+                    <% candidates.each do |candidate| %>
+                      <%
+                        count += 1
+                        status = candidate.status
+                        if status.blank?
+                          status = "Incompleto"
+                          if eligible_ids.include?(candidate.id)
+                            status = "Pronto"
+                          end
+                          if missing_committee_ids.include?(candidate.id)
+                            status = "Sem comitê válido"
+                          end
+                        end
+                      %>
+                      <% tr_class = count.even? ? "even-record" : "blue-record" %>
+                      <tr class="record <%= tr_class %>">
+                        <td><%= candidate.token %></td>
+                        <td><%= candidate.name %></td>
+                        <td><%= status %></td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </li>
+            </ol>
+          <% end %>
+      </div>
+    </div>
+    </li>
+
+  </ol>
+
+  <p class="form-footer">
+    <%= submit_tag "Consolidar fase", class: "submit" %>
+    <%= link_to(as_(:cancel), main_path_to_return, cancel_options) if cancel_link %>
+    <%= loading_indicator_tag(action: :consolidate_phase, id: @record&.id) %>
+  </p>
+
+<% end %>
+
+<script>
+
+$(document).ready(function() {
+  $(`#<%= form_id %> select[name="consolidate_phase_id"]`).on("change", function() {
+    $("#<%= form_id %> .phase-summary").hide();
+    $(`#<%= subid %>-${$(this).val()}`).show();
+  })
+});
+
+</script>

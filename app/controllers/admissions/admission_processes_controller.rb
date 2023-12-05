@@ -41,6 +41,11 @@ class Admissions::AdmissionProcessesController < ApplicationController
     ".html_safe
     config.duplicate.link.method = :get
     config.duplicate.link.position = :after
+    config.action_links.add "phase_status",
+      label: "<i title='#{
+        I18n.t "active_scaffold.admissions/admission_process.phase_status.title"
+      }' class='fa fa-play'></i>".html_safe,
+      type: :member
     config.action_links.add "short_pdf",
       label: "<i title='#{
         I18n.t "pdf_content.admissions/admission_process.short_pdf.filename"
@@ -96,6 +101,106 @@ class Admissions::AdmissionProcessesController < ApplicationController
       format.xlsx
     end
   end
+
+  def phase_status
+    @admission_process = Admissions::AdmissionProcess.find(params[:id])
+  end
+
+  def consolidate_phase
+    i18n_prefix = "active_scaffold.admissions/admission_process.consolidate_phase"
+    @admission_process = Admissions::AdmissionProcess.find(params[:id])
+    @show_page = params[:show_summary]
+    phase_id = params[:consolidate_phase_id].to_i
+    phase_id = nil if phase_id == 0
+    phases = [nil] + @admission_process.phases.order(:order).map do |p|
+      p.admission_phase.id
+    end
+    index = phases.find_index(phase_id)
+    @phase = phase_id.nil? ? nil : Admissions::AdmissionPhase.find(phases[index])
+    @phase_name = @phase.nil? ? "Candidatura" : @phase.name
+    @message = I18n.t("#{i18n_prefix}.title", phase: @phase_name)
+    candidates = @admission_process.eligible_candidates_at_phase(@phase)
+    @approved = []
+    @reproved = []
+    @errors = []
+    @missing_committee = []
+
+    candidates.each do |candidate|
+      case candidate.consolidate_phase!(@phase)
+      when I18n.t("activerecord.attributes.admissions/admission_application.statuses.approved")
+        @approved << candidate
+      when I18n.t("activerecord.attributes.admissions/admission_application.statuses.reproved")
+        @reproved << candidate
+      else
+        @errors << candidate
+      end
+    end
+
+    if index < phases.size - 1
+      next_phase_id = phases[index + 1]
+      next_phase = Admissions::AdmissionPhase.find(next_phase_id)
+      # Query again insted of using the approved variable to allow the
+      # posterior addition of phases
+      change_phase_candidates = @admission_process.admission_applications
+        .where(admission_phase_id: @phase.try(:id))
+        .where(status: I18n.t(
+          "activerecord.attributes.admissions/admission_application.statuses.approved"
+        ))
+      change_phase_candidates.each do |candidate|
+        candidate.update!(
+          admission_phase_id: next_phase_id,
+          status: nil
+        )
+        if !next_phase.has_committee_for_candidate(candidate)
+          @missing_committee << candidate
+        end
+      end
+    end
+
+    if !@show_page
+      if @errors.present?
+        @message += ". #{I18n.t("#{i18n_prefix}.errors", count: @errors.count)}"
+      end
+      if @missing_committee.present?
+        @message += ". #{I18n.t("#{i18n_prefix}.missing_committee", count: @missing_committee.count)}"
+      end
+      if @reproved.present?
+        @message += ". #{I18n.t("#{i18n_prefix}.reproved", count: @reproved.count)}"
+      end
+      if @approved.present?
+        @message += ". #{I18n.t("#{i18n_prefix}.approved", count: @approved.count)}"
+      end
+    end
+
+
+    params.each_key do |key|
+      if !["authenticity_token", "controller", "action"].include? key
+        params.delete key
+      end
+    end
+    do_refresh_list
+    respond_to_action(:consolidate_phase)
+  end
+
+  protected
+    def consolidate_phase_respond_on_iframe
+      flash[:info] = @message
+      responds_to_parent do
+        render action: "on_consolidate_phase", formats: [:js], layout: false
+      end
+    end
+
+    def consolidate_phase_respond_to_html
+      flash[:info] = @message
+      return_to_main
+    end
+
+    def consolidate_phase_respond_to_js
+      flash.now[:info] = @message
+      do_refresh_list
+      @popstate = true
+      render action: "on_consolidate_phase", formats: [:js]
+    end
 
   private
     def get_admission_process_pdf(type)

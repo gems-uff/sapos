@@ -286,9 +286,14 @@ Rails.application.routes.draw do
   scope module: "admissions" do
     resources :admission_processes do
       concerns :active_scaffold
-      get :short_pdf, on: :member
-      get :complete_pdf, on: :member
-      get :complete_xls, on: :member
+      member do
+        get :short_pdf
+        get :complete_pdf
+        get :complete_xls
+
+        get :phase_status
+        post :consolidate_phase
+      end
       record_select_routes
     end
 
@@ -335,7 +340,7 @@ Rails.application.routes.draw do
         post :update, on: :member
       end
       resources :letters, only: [:show, :update]
-      get 'files/:id', action: :download, on: :collection
+      get "files/:id", action: :download, on: :collection
     end
 
     resources :form_autocompletes, only: [] do

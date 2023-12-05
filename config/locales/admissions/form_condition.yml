@@ -7,6 +7,19 @@ pt-BR:
       admissions/form_condition:
         field: "Campo"
         condition: "Condição"
+        conditions:
+          contains: "Contém"
+          starts_with: "Começa com"
+          ends_with: "Termina com"
+          equals: "="
+          ge: ">="
+          le: "<="
+          gt: ">"
+          lt: "<"
+          neq: "!="
+          is_null: "Nulo"
+          not_null: "Não nulo"
+
         value: "Valor"
         model: "Modelo"
         model_type: "Tipo de Modelo"

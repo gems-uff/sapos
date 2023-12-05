@@ -135,6 +135,14 @@ function form_field_config_base(form_field) {
       form_field.widgets = [
         config_form_field_codemirror(form_field, "html", "application/x-erb")
       ]
+    } else if (selected_value == "code") {
+      form_field.widgets = [
+        config_form_field_codemirror(form_field, "code", "text/x-ruby")
+      ]
+    } else if (selected_value == "invalid") {
+      form_field.widgets = [
+        config_form_field_error(form_field, form_field.i18n_error("invalid_field"))
+      ]
     }
 
     $(`#${form_field.baseid}`).html(form_field.widgets.map((el) => el.html).join(' '));

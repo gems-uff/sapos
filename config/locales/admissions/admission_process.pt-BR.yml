@@ -41,6 +41,21 @@ pt-BR:
 
   active_scaffold:
     create_admission_process_label: "Criar Edital de Seleção"
+    admissions/admission_process:
+      phase_status:
+        title: "Gerenciar Fases"
+      consolidate_phase:
+        title: "Consolidação da fase: %{phase}"
+        approved:
+          one: "Aprovado: %{count}"
+          other: "Aprovados: %{count}"
+        reproved:
+          one: "Reprovado: %{count}"
+          other: "Reprovados: %{count}"
+        errors:
+          one: "Erro na consolidação: %{count}"
+          other: "Erros na consolidação: %{count}"
+        missing_committee: "Comitê incompleto: %{count}"
 
   xlsx_content:
     admissions/admission_process:
