@@ -8,8 +8,8 @@ pt-BR:
         admission_phase: "Fase"
         admission_application: "Candidatura"
         filled_form: "Preenchimento"
-        type: "Tipo"
-        types:
+        mode: "Tipo"
+        modes:
           shared: "Compartilhado"
           consolidation: "Consolidação"
 

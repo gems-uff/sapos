@@ -15,19 +15,22 @@ class Admissions::AdmissionPhaseResult < ActiveRecord::Base
 
   accepts_nested_attributes_for :filled_form, allow_destroy: true
 
-  SHARED = record_i18n_attr("types.shared")
-  CONSOLIDATION = record_i18n_attr("types.consolidation")
+  validates :admission_phase_id, uniqueness: { scope: [
+    :admission_application_id, :mode ] }
 
-  RESULT_TYPES = [
+  SHARED = record_i18n_attr("modes.shared")
+  CONSOLIDATION = record_i18n_attr("modes.consolidation")
+
+  RESULT_MODES = [
     SHARED, CONSOLIDATION
   ]
 
-  validates :type, presence: true, inclusion: { in: RESULT_TYPES }
+  validates :mode, presence: true, inclusion: { in: RESULT_MODES }
 
   after_initialize :initialize_filled_form
 
   def initialize_filled_form
-    if self.type == SHARED
+    if self.mode == SHARED
       template = self.admission_phase.shared_form
     else
       template = self.admission_phase.consolidation_form
@@ -39,6 +42,6 @@ class Admissions::AdmissionPhaseResult < ActiveRecord::Base
   end
 
   def to_label
-    "#{self.admission_application.to_label} - #{self.committee_consolidation.to_label}"
+    "#{self.admission_application.to_label} - #{self.admission_phase.to_label}"
   end
 end

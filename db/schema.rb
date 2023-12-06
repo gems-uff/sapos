@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_11_28_014345) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_05_232736) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -82,7 +82,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_28_014345) do
     t.integer "admission_phase_id"
     t.integer "admission_application_id"
     t.integer "filled_form_id"
-    t.string "type"
+    t.string "mode"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["admission_application_id"], name: "index_admission_phase_results_on_admission_application_id"

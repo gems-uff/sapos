@@ -11,7 +11,9 @@ class Admissions::AdmissionApplicationsController < ApplicationController
   active_scaffold "Admissions::AdmissionApplication" do |config|
     columns = [
       :admission_process, :token, :name, :email,
-      :requested_letters, :filled_letters, :letter_requests, :filled_form
+      :letter_requests, :filled_form,
+      :admission_phase, :status
+      # :results, 
     ]
 
     config.list.columns = columns
@@ -20,6 +22,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     config.list.sorting = { admission_process: "DESC", name: "ASC" }
 
     config.columns.add :is_filled
+    config.columns.add :custom_forms
 
     config.columns[:admission_process].search_ui = :record_select
     config.columns[:is_filled].search_sql = ""
@@ -28,6 +31,10 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       options: I18n.t("#{I18N_BASE}.is_filled_options").values,
       include_blank: I18n.t("active_scaffold._select_")
     }
+    config.columns[:admission_phase].actions_for_association_links = [:show]
+
+    config.update.columns = [:custom_forms]
+    config.update.multipart = true
 
     config.actions.swap :search, :field_search
     config.field_search.columns = [
@@ -37,7 +44,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       :email,
       :is_filled,
     ]
-    config.actions.exclude :deleted_records, :update, :create
+    config.actions.exclude :deleted_records, :create
   end
 
   def self.condition_for_is_filled_column(column, value, like_pattern)
@@ -54,4 +61,63 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       ""
     end
   end
+
+  def update_authorized?(record = nil, column = nil)
+    return super if record.nil?
+    phase = record.admission_phase
+    return false if phase.nil?
+    return false if record.status == Admissions::AdmissionApplication::APPROVED
+    return false if record.status == Admissions::AdmissionApplication::REPROVED
+
+    phase.admission_committees.any? do |committee|
+      committee.members.where(user_id: current_user.id).first.present?
+    end && super
+  end
+
+  protected
+    def before_update_save(record)
+      record.filled_form.prepare_missing_fields
+      phase = record.admission_phase
+      record.assign_attributes(admission_application_params)
+      if phase.present?
+        phase_forms = phase.prepare_application_forms(record, current_user, false)
+        phase_forms.each do |phase_form|
+          phase_form[:was_filled] = phase_form[:object].filled_form.is_filled
+          phase_form[:object].filled_form.is_filled = true
+        end
+      else
+        phase_forms = []
+      end
+      record.filled_form.sync_fields_after(record)
+      was_filled = record.filled_form.is_filled
+      record.filled_form.is_filled = true
+      if !record.valid?
+        record.filled_form.is_filled = was_filled
+        phase_forms.each do |phase_form|
+          phase_form[:object].filled_form.is_filled = phase_form[:was_filled]
+        end
+      end
+    end
+
+    def admission_application_params
+      params.require(:record).permit(
+        :name, :email,
+        filled_form_attributes:
+          Admissions::FilledFormsController.filled_form_params_definition,
+        letter_requests_attributes: [
+          :id, :email, :name, :telephone,
+          :_destroy
+        ],
+        results_attributes: [
+          :id, :mode, :admission_phase_id,
+          filled_form_attributes:
+            Admissions::FilledFormsController.filled_form_params_definition,
+        ],
+        evaluations_attributes: [
+          :id, :user_id, :admission_phase_id,
+          filled_form_attributes:
+            Admissions::FilledFormsController.filled_form_params_definition,
+        ]
+      )
+    end
 end

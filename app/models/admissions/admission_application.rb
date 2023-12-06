@@ -21,12 +21,15 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     class_name: "Admissions::AdmissionProcess"
   belongs_to :filled_form, optional: false,
     class_name: "Admissions::FilledForm"
+  belongs_to :admission_phase, optional: true,
+    class_name: "Admissions::AdmissionPhase"
 
   accepts_nested_attributes_for :filled_form,
     allow_destroy: true
-
   accepts_nested_attributes_for :letter_requests, reject_if: :all_blank,
     allow_destroy: true
+  accepts_nested_attributes_for :evaluations
+  accepts_nested_attributes_for :results
 
   validates :name, presence: true
   validates :email, presence: true
@@ -137,7 +140,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       phase_result = Admissions::AdmissionPhaseResult.find_or_create_by(
         admission_phase_id: phase.id,
         admission_application: self,
-        type: Admissions::AdmissionPhaseResult::CONSOLIDATION
+        mode: Admissions::AdmissionPhaseResult::CONSOLIDATION
       )
       cfields = phase_result.filled_form.form_template.fields.order(:order)
       cfield_hash = cfields.index_by(&:id)

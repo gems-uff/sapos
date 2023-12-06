@@ -131,4 +131,21 @@ module ApplicationHelper
     )#{set_size_str};
     </script>".html_safe
   end
+
+  def active_scaffold_input_carrierwave_fix(column, options)
+    # Based on https://github.com/activescaffold/active_scaffold/blob/master/lib/active_scaffold/bridges/carrierwave/form_ui.rb
+    record = options[:object]
+    carrierwave = record.send(column.name.to_s)
+    content = get_column_value(record, column) if carrierwave.file.present?
+    active_scaffold_file_with_remove_link(column, options, content, 'remove_', 'carrierwave_controls') do
+      cache_field_options = {
+      name: options[:name].gsub(/\[#{column.name}\]$/, "[#{column.name}_cache]"),
+      id: options[:id] + '_cache',
+      # Change >
+      object: record
+      # < Change
+      }
+      hidden_field(:record, "#{column.name}_cache", cache_field_options)
+    end
+  end
 end

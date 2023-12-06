@@ -122,6 +122,9 @@ pt-BR:
           sql_execution_generated_an_error: "Consulta de %{field} gerou o seguinte erro ao ser executada: %{error}"
           invalid_field: Campo não permitido
 
+          invalid_consolidation_field: Campo %{name} não possui tipo válido para formulário de consolidação
+          invalid_inputform_field: Campo %{name} não possui tipo válido para formulário
+
     models:
       admissions/form_field:
         one: "Campo"

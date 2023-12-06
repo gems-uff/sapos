@@ -17,6 +17,9 @@ class Admissions::AdmissionPhaseEvaluation < ActiveRecord::Base
 
   accepts_nested_attributes_for :filled_form, allow_destroy: true
 
+  validates :admission_phase_id, uniqueness: { scope: [
+    :admission_application_id, :user_id ] }
+
   after_initialize :initialize_filled_form
 
   def initialize_filled_form

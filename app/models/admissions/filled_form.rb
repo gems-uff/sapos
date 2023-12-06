@@ -31,7 +31,13 @@ class Admissions::FilledForm < ActiveRecord::Base
   def to_fields_hash(result=nil)
     result ||= {}
     self.fields.each do |field|
-      result[field.form_field.name] = field.file || field.list || field.value
+      if field.file.present? && field.file.file.present?
+        result[field.form_field.name] = field.file
+      elsif !field.list.nil?
+        result[field.form_field.name] = field.list
+      else
+        result[field.form_field.name] = field.value
+      end
     end
     result
   end

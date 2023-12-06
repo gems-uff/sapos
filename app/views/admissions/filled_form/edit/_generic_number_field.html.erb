@@ -1,6 +1,7 @@
 <%
   options = {size: 30}
   options[:required] = "required" if configuration["required"]
+  options[:step] = "any"
 %>
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>

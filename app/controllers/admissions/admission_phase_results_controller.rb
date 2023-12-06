@@ -8,7 +8,7 @@ class Admissions::AdmissionPhaseResultsController < ApplicationController
 
   active_scaffold "Admissions::AdmissionPhaseResult" do |config|
     columns = [
-      :admission_phase, :admission_application, :filled_form, :type
+      :admission_phase, :admission_application, :filled_form, :mode
     ]
 
     config.columns = columns

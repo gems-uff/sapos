@@ -35,63 +35,12 @@
             </div>
           <% end %>
         </div>
-        <ol class="form filled-form">
-          <% if @show_name %>
-            <li class="form-element required">
-              <dl>
-                <dt><%= form.label :name %></dt>
-                <dd><%= form.text_field :name, class: "text-input", size: 30, required: "required" %></dd>
-              </dl>
-            </li>
-          <% end %>
-          <% if @show_email %>
-            <li class="form-element required">
-              <dl>
-                <dt><%= form.label :email %></dt>
-                <dd><%= form.email_field :email, class: "text-input", size: 30, required: "required" %></dd>
-              </dl>
-            </li>
-          <% end %>
-          <%= form.fields_for :filled_form do |filled_form| %>
-            <%= render partial: "admissions/filled_form/edit/filled_form_template", locals: {
-              form: form,
-              form_template: @admission_process.form_template,
-              filled_form: filled_form } %>
-          <% end %>
-          <% if @admission_process.has_letters %>
-            <li class="sub-form">
-              <h5>
-                <%= t "admissions.apply.edit.letters" %>
-                <a data-show="Mostrar" data-hide="Ocultar"
-                data-toggable="recommendation_letters" style=""
-                class="as-js-button visibility-toggle" href="#">Ocultar</a>
-              </h5>
-              <div id="recommendation_letters">
-                <% if @admission_process.min_letters.to_i > 0 %>
-                  <p><%= t("admissions.apply.edit.letter.min_count",
-                           count: @admission_process.min_letters.to_i) %></p>
-                <% end %>
-                <% if @admission_process.max_letters.to_i > 0 %>
-                  <p><%= t("admissions.apply.edit.letter.max_count",
-                           count: @admission_process.max_letters.to_i) %></p>
-                <% end %>
-                <div id="letters">
-                  <%= form.fields_for :letter_requests do |letter| %>
-                    <%= render partial: 'letter_requests', locals: { f: letter } %>
-                  <% end %>
-                </div>
-                <div class="links">
-                  <%= link_to_add_association (t "admissions.apply.edit.letter.add"),
-                      form, :letter_requests, partial: 'letter_requests',
-                      render_options: { locals: { } },
-                      'data-association-insertion-method' => 'append',
-                      'data-association-insertion-node' => '#letters',
-                      class: 'add-letter' %>
-                </div>
-              </div>
-            </li>
-          <% end %>
-        </ol>
+        <%= render partial: "admissions/filled_form/edit/form_with_letters", locals: {
+          form: form,
+          admission_process: @admission_process,
+          admission_application: @admission_application,
+          show_name: @show_name,
+          show_email: @show_email } %>
         <p class="form-footer">
           <%= form.submit (t "admissions.apply.edit.submit"), id: "submit" %>
         </p>
@@ -102,23 +51,6 @@
 
 <script>
   $(document).ready(function() {
-    let update_letter_request_visibility = function() {
-      let length = $(".letter_request").length
-      <% if @admission_process.min_letters.to_i > 0 %>
-        $(".remove-letter").toggle(
-          length > <%= @admission_process.min_letters.to_i %>
-        )
-      <% end %>
-      <% if @admission_process.max_letters.to_i > 0 %>
-        $(".add-letter").toggle(
-          length < <%= @admission_process.max_letters.to_i %>
-        )
-      <% end %>
-    }
-    $(document).on("cocoon:after-insert", update_letter_request_visibility)
-    $(document).on("cocoon:after-remove", update_letter_request_visibility)
-    update_letter_request_visibility();
-
     $("#submit").click(function(e){
       window.onbeforeunload = null;
       for (let validation of window.customFormValidations) {

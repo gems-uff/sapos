@@ -19,7 +19,9 @@
   end
 %>
 <script>
-  window.customFormValidations = []
+  if (!window.customFormValidations) {
+    window.customFormValidations = []
+  }
 </script>
 
 <% groups.each do |gfield, gtag, fields| %>

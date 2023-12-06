@@ -1,0 +1,109 @@
+<%
+  return "Acesso inválido" if !controller.update_authorized?(record)
+  admission_process = record.admission_process
+  current_phase = record.admission_phase
+  visible = true # current_phase.nil? ? true : current_phase.can_edit_candidate
+  subid = "as_admissions__admission_applications-#{record.id}-edit-div"
+  record.filled_form.prepare_missing_fields
+  record.prepare_missing_letters
+  record.filled_form.sync_fields_before(record)
+  show_name = admission_process.form_template.fields
+    .where(sync: Admissions::FormField::SYNC_NAME).first.blank?
+  show_email = admission_process.form_template.fields
+    .where(sync: Admissions::FormField::SYNC_EMAIL).first.blank?
+%>
+<%= fields_for :record, record, multipart: true do |form| %>
+  <div id="<%= subid %>">
+    <div>
+      <h5> Candidatura <a data-show="Mostrar" data-hide="Ocultar"
+          data-toggable="<%= subid %>-" style=""
+          class="as-js-button visibility-toggle" href="#"><%= visible ? "Ocultar" : "Mostrar" %></a></h5>
+      <div id="<%= subid %>-" style="<%= "display:none;" if !visible %>" >
+        <% if current_phase.nil? || current_phase.can_edit_candidate %>
+          <%= render partial: "admissions/filled_form/edit/form_with_letters", locals: {
+            form: form,
+            admission_process: admission_process,
+            admission_application: record,
+            show_name: show_name,
+            show_email: show_email } %>
+        <% else %>
+          <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
+                        form_template: record.filled_form.form_template,
+                        filled_form: record.filled_form} %>
+        <% end %>
+      </div>
+    </div>
+    <% # ToDo: Carta de recomendacao %>
+
+    <% if current_phase.present? %>
+      <% admission_process.phases.order(:order).each do |p| %>
+        <%
+          phase = p.admission_phase
+          latest_available_phase = phase.id == current_phase.id
+          phase_visible = latest_available_phase
+          during_latest_phase = (
+            latest_available_phase &&
+            record.status != Admissions::AdmissionApplication::APPROVED &&
+            record.status != Admissions::AdmissionApplication::REPROVED
+          )
+          can_edit_phase = during_latest_phase
+          phase_subid = "#{subid}-#{phase.id}"
+          phase_forms = phase.prepare_application_forms(
+            record, current_user, !during_latest_phase
+          )
+        %>
+        <% phase_forms.each do |phase_form| %>
+          <div>
+            <h5> <%= phase.name %> (<%= phase_form[:name] %>) <a data-show="Mostrar" data-hide="Ocultar"
+              data-toggable="<%= phase_subid %>" style=""
+              class="as-js-button visibility-toggle" href="#"><%= phase_visible ? "Ocultar" : "Mostrar" %></a></h5>
+            <div id="<%= phase_subid %>" style="<%= "display:none;" if !phase_visible %>" >
+              <% if can_edit_phase %>
+                <ol class="form filled-form">
+                  <%= form.fields_for phase_form[:field], [phase_form[:object]] do |phase_form_object| %>
+                    <% phase_form[:hidden].each do |hidden| %>
+                      <%= phase_form_object.hidden_field hidden %>
+                    <% end %>
+                    <%= phase_form_object.fields_for :filled_form do |filled_form| %>
+                      <%= filled_form.hidden_field :id %>
+                      <%= filled_form.hidden_field :form_template_id %>
+                      <%= filled_form.hidden_field :is_filled %>
+                      <%= render partial: "admissions/filled_form/edit/filled_form_template", locals: {
+                        form: form,
+                        form_template: phase_form[:form_template],
+                        filled_form: filled_form } %>
+                    <% end %>
+                  <% end %>
+                </ol>
+              <% else %>
+                <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
+                          form_template: phase_form[:form_template],
+                          filled_form: phase_form[:object].filled_form} %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+        <% break if latest_available_phase %>
+      <% end%>
+    <% end%>
+  </div>
+<% end%>
+
+
+<script>
+  $(document).ready(function() {
+    $(`.submit`).click(function(e){
+      window.onbeforeunload = null;
+      for (let validation of window.customFormValidations) {
+        try {
+          if (!validation()) {
+            e.preventDefault();
+            return false;
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      }
+    })
+  });
+</script>

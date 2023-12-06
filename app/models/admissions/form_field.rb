@@ -61,20 +61,11 @@ class Admissions::FormField < ActiveRecord::Base
       field.try(:form_template).try(:template_type) ==
         Admissions::FormTemplate::ADMISSION_FORM
     }
-  validates :field_type, inclusion: { in: FIELD_TYPES - [SEP, CODE] },
-    if: ->(field) {
-      template_type = field.try(:form_template).try(:template_type)
-      template_type == Admissions::FormTemplate::ADMISSION_FORM ||
-        Admissions::FormTemplate::RECOMMENDATION_LETTER
-    }
-  validates :field_type, inclusion: { in: [CODE] },
-    if: ->(field) {
-      field.try(:form_template).try(:template_type) ==
-        Admissions::FormTemplate::CONSOLIDATION_FORM
-    }
+  validates :field_type, inclusion: { in: FIELD_TYPES }
 
   validates :name, presence: true
   validate :that_configuration_is_valid
+  validate :that_field_type_is_valid_for_template
 
   def that_configuration_is_valid
     config = JSON.parse(self.configuration || "{}")
@@ -98,6 +89,21 @@ class Admissions::FormField < ActiveRecord::Base
       end
     when Admissions::FormField::SCHOLARITY
       validate_scholarity(config)
+    end
+  end
+
+  def that_field_type_is_valid_for_template
+    template_type = self.try(:form_template).try(:template_type)
+    return if template_type.nil?
+    if template_type == Admissions::FormTemplate::CONSOLIDATION_FORM
+      if ![CODE].include? self.field_type
+        self.errors.add(:base, :invalid_consolidation_field, name: self.name)
+      end
+    else  # input forms
+      valid_fields = FIELD_TYPES - [SEP, CODE]
+      if !valid_fields.include? self.field_type
+        self.errors.add(:base, :invalid_inputform_field, name: self.name)
+      end
     end
   end
 

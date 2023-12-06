@@ -147,7 +147,7 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
       candidates = candidates.includes(results: :filled_form)
         .where(results: {
           filled_forms: { is_filled: true },
-          type: Admissions::AdmissionPhaseResult::SHARED
+          mode: Admissions::AdmissionPhaseResult::SHARED
         })
     end
 
