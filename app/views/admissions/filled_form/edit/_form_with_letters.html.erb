@@ -40,7 +40,7 @@
         <% end %>
         <div id="letters">
           <%= form.fields_for :letter_requests do |letter| %>
-            <%= render partial: 'letter_requests', locals: { f: letter } %>
+            <%= render partial: 'admissions/filled_form/edit/letter_requests', locals: { f: letter } %>
           <% end %>
         </div>
         <div class="links">

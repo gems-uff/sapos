@@ -13,6 +13,8 @@ class Admissions::AdmissionPhaseEvaluationsController < ApplicationController
     ]
 
     config.columns = columns
+    config.columns[:admission_phase].actions_for_association_links = [:show]
+    config.columns[:user].actions_for_association_links = [:show]
 
     config.actions.exclude :deleted_records, :create
   end

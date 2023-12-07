@@ -28,6 +28,8 @@ pt-BR:
           true: Sim
           false: Não
         admission_phase: Fase
+        results: Resultados
+        evaluations: Avaliações de comitê
       admissions/admission_application/letter_requests:
         name: "Nome na indicação de carta de recomendação"
         email: "Email na indicação de carta de recomendação"

@@ -42,6 +42,6 @@ class Admissions::AdmissionPhaseResult < ActiveRecord::Base
   end
 
   def to_label
-    "#{self.admission_application.to_label} - #{self.admission_phase.to_label}"
+    "#{self.admission_phase.to_label} / #{self.admission_application.to_label} / #{self.mode}"
   end
 end

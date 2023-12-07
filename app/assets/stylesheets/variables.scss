@@ -1,6 +1,11 @@
 $showwidth: 678px;
 $show_border_color: #C5DBF7;
 
+/*
+Check active scaffold override colors here: https://github.com/activescaffold/active_scaffold/blob/master/app/assets/stylesheets/active_scaffold_colors.scss
+*/
+
+
 $header_color: #656464;
 
 $column_header_bg: #427fa4;
@@ -12,9 +17,10 @@ $column_header_sorted_bg: #33506d;
 
 $nested_bg: #FFF;
 $nested_border_color: #c8c6c6;
+$nested_column_bg: #E6F2FF;
 $second_nested_bg: #FFF;
 $second_nested_border_color: #c8c6c6;
-$third_nested_bg: #DAFFCD;
+$third_nested_bg: #FFF;
 
 $msg_error_bg: #fcc;
 

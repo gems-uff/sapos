@@ -9,14 +9,17 @@ class Admissions::AdmissionApplicationsController < ApplicationController
   I18N_BASE = "activerecord.attributes.admissions/admission_application"
 
   active_scaffold "Admissions::AdmissionApplication" do |config|
-    columns = [
+    config.list.columns = [
       :admission_process, :token, :name, :email,
       :letter_requests, :filled_form,
-      :admission_phase, :status
+      :admission_phase, :status,
     ]
-
-    config.list.columns = columns
-    config.show.columns = columns
+    config.show.columns = [
+      :admission_process, :token, :name, :email,
+      :admission_phase, :status,
+      :filled_form, :letter_requests,
+      :results, :evaluations
+    ]
 
     config.list.sorting = { admission_process: "DESC", name: "ASC" }
 

@@ -1,0 +1,14 @@
+<%
+  subid = "as_admissions__admission_applications-#{record.id}-show-filled-form-div"
+  visible = false
+%>
+<div>
+  <h5> <%= record.filled_form.to_label %> <a data-show="Mostrar" data-hide="Ocultar"
+      data-toggable="<%= subid %>" style=""
+      class="as-js-button visibility-toggle" href="#"><%= visible ? "Ocultar" : "Mostrar" %></a></h5>
+  <div id="<%= subid %>" style="<%= "display:none;" if !visible %>" >
+    <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
+              form_template: record.filled_form.form_template,
+              filled_form: record.filled_form} %>
+  </div>
+</div>

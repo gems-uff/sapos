@@ -128,17 +128,29 @@ class Ability
             semester: YearSemester.current.semester
         end
         application_condition = {
-          admission_phase: {
-            admission_committees: {
-              members: {
-                user: user
-              }
-            }
+          pendencies: {
+            user_id: user.id
           }
         }
         can :read_pendencies, Admissions::AdmissionApplication
         can :read, Admissions::AdmissionApplication, application_condition
         can :update, Admissions::AdmissionApplication, application_condition
+        can :read, Admissions::AdmissionPhaseEvaluation, user: user
+        can :read, Admissions::LetterRequest,
+          admission_application: application_condition
+        can :read, Admissions::AdmissionPhaseResult,
+          admission_application: application_condition
+        can :read, Admissions::FilledForm, admission_phase_evaluation: {
+          user: user
+        }
+        can :read, Admissions::FilledForm, admission_phase_result: {
+          admission_application: application_condition
+        }
+        can :read, Admissions::FilledForm, letter_request: {
+          admission_application: application_condition
+        }
+        can :read, Admissions::FilledForm,
+          admission_application: application_condition
       end
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [

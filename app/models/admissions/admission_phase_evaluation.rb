@@ -28,4 +28,8 @@ class Admissions::AdmissionPhaseEvaluation < ActiveRecord::Base
       form_template: self.admission_phase.member_form
     )
   end
+
+  def to_label
+    "#{self.admission_phase.to_label} / #{self.admission_application.to_label} / #{self.user.to_label}"
+  end
 end
