@@ -104,10 +104,31 @@ module Admissions::AdmissionProcessesPdfHelper
           data: ldata
         }
       end
+
+      phases = []
+      config[:phase_results].each do |phase_result|
+        result = application.results.where(
+          admission_phase_id: phase_result[:admission_phase_id],
+          mode: phase_result[:result_type]
+        ).first
+        if result.present?
+          pdata = [
+            ["<b>#{phase_result[:result_type]}</b>", ""],
+          ]
+          populate_filled(pdata, result.filled_form, phase_result[:phase_fields], 0) do |filled, field, cell_index|
+            [field.name, show_filled(filled, field)]
+          end
+          phases << {
+            data: pdata
+          }
+        end
+      end
+
       {
         title: app_title,
         data: app_data,
-        letters: letters
+        letters: letters,
+        phases: phases,
       }
     end
 
@@ -122,6 +143,9 @@ module Admissions::AdmissionProcessesPdfHelper
         )
         application[:letters].each do |letter|
           simple_pdf_table(pdf, widths, "", letter[:data], width: 560)
+        end
+        application[:phases].each do |phase|
+          simple_pdf_table(pdf, widths, "", phase[:data], width: 560)
         end
       end
     end

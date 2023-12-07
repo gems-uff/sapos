@@ -42,6 +42,9 @@ class Admissions::FormField < ActiveRecord::Base
     SYNC_TELEPHONE => :telephone
   }
 
+  scope :no_group, -> { where.not( field_type: GROUP ) }
+  scope :no_html, -> { where.not( field_type: HTML ) }
+
   has_many :filled_fields, dependent: :restrict_with_exception,
     class_name: "Admissions::FilledFormField"
 

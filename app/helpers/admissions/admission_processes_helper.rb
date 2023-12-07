@@ -21,12 +21,12 @@ module Admissions::AdmissionProcessesHelper
   end
 
   def report_template_fields(template)
-    return Admissions::FormTemplate.none if template.blank?
+    return Admissions::FormField.none if template.blank?
     template.fields.order(:order, :id).where(sync: nil)
   end
 
   def tabular_admission_process_config(
-    admission_process, group_column: false
+    admission_process, group_column: false, show_phase_results: true
   )
     main_header = [
       applications_t("token"),
@@ -43,17 +43,11 @@ module Admissions::AdmissionProcessesHelper
     template_fields = report_template_fields(admission_process.form_template)
     letter_fields = report_template_fields(admission_process.letter_template)
     if !group_column
-      template_fields = template_fields.where.not(
-        field_type: Admissions::FormField::GROUP
-      ).where.not(
-        field_type: Admissions::FormField::HTML
-      )
-      letter_fields = letter_fields.where.not(
-        field_type: Admissions::FormField::GROUP
-      ).where.not(
-        field_type: Admissions::FormField::HTML
-      )
+      template_fields = template_fields.no_group
+      letter_fields = letter_fields.no_group
     end
+    template_fields = template_fields.no_html
+    letter_fields = letter_fields.no_html
     fields_header = template_fields.map(&:name)
 
     letters_header = []
@@ -72,13 +66,57 @@ module Admissions::AdmissionProcessesHelper
       letters_header += letter_fields.map(&:name)
     end
 
+    phase_results = []
+    all_phase_headers = []
+    if show_phase_results
+      admission_process.phases.order(:order).each do |p|
+        phase = p.admission_phase
+        if phase.shared_form.present?
+          phase_header = []
+          phase_fields = report_template_fields(phase.shared_form)
+          if group_column
+            phase_fields = phase_fields.no_group
+            phase_header << "#{phase.name} - #{Admissions::AdmissionPhaseResult::SHARED}"
+          end
+          phase_fields = phase_fields.no_html
+          phase_header += phase_fields.map(&:name)
+          phase_results << {
+            result_type: Admissions::AdmissionPhaseResult::SHARED,
+            admission_phase_id: phase.id,
+            header: phase_header,
+            phase_fields: phase_fields
+          }
+          all_phase_headers += phase_header
+        end
+        if phase.consolidation_form.present?
+          phase_header = []
+          phase_fields = report_template_fields(phase.consolidation_form)
+          if group_column
+            phase_fields = phase_fields.no_group
+            phase_header << "#{phase.name} - #{Admissions::AdmissionPhaseResult::CONSOLIDATION}"
+          end
+          phase_fields = phase_fields.no_html
+          phase_header += phase_fields.map(&:name)
+          phase_results << {
+            result_type: Admissions::AdmissionPhaseResult::CONSOLIDATION,
+            admission_phase_id: phase.id,
+            header: phase_header,
+            phase_fields: phase_fields
+          }
+          all_phase_headers += phase_header
+        end
+      end
+    end
+
     {
       main_header: main_header,
-      header: main_header + fields_header + letters_header,
+      header: main_header + fields_header + letters_header + all_phase_headers,
       template_fields: template_fields,
       letter_fields: letter_fields,
       group_column: group_column,
+      show_phase_results: show_phase_results,
       max_submitted_letters: max_submitted_letters,
+      phase_results: phase_results
     }
   end
 
@@ -166,6 +204,28 @@ module Admissions::AdmissionProcessesHelper
       letter_fields = config[:letter_fields].map { "" }
       row += letter_fields
       cell_index += letter_fields.size
+    end
+
+    config[:phase_results].each do |phase_result|
+      old_cell_index = cell_index
+      if config[:group_column]
+        row << phase_result[:result_type]
+        cell_index += 1
+      end
+      result = application.results.where(
+        admission_phase_id: phase_result[:admission_phase_id],
+        mode: phase_result[:result_type]
+      ).first
+      if result.present?
+        cell_index = populate_filled(
+          row, result.filled_form, phase_result[:phase_fields], cell_index, &block
+        )
+      end
+      missing_count = phase_result[:header].size - (cell_index - old_cell_index)
+      missing_count.times do
+        row << ""
+        cell_index += 1
+      end
     end
 
     row
