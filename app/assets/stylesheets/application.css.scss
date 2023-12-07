@@ -9,18 +9,20 @@
  * compiled file so the styles you add here take precedence over styles defined in any other CSS
  *
  *= require_self
- *= require variables
- *= require active_scaffold_layout
- *= require active_scaffold_images
- *= require active_scaffold_extensions
- *= require active_scaffold_colors
- *= require jquery-ui
- *= require jquery-ui/datepicker
- *= require codemirror/lib/codemirror
- *= require codemirror
- *= require_tree .
- *= require active_scaffold_overrides
- *= require font-awesome
- *= require glyphicon
- *= require chronoline_override
  */
+@import 'variables';
+@import "active_scaffold_layout";
+@import "active_scaffold_images";
+@import "active_scaffold_extensions";
+@import "active_scaffold_colors";
+@import "jquery-ui.css";
+@import "jquery-ui/datepicker.css";
+@import 'blue-theme';
+@import 'codemirror/lib/codemirror.css';
+@import 'codemirror.css';
+@import 'custom/*';
+@import 'active_scaffold_overrides';
+@import "font-awesome";
+@import "glyphicon";
+@import 'chronoline/chronoline.css';
+@import 'chronoline_override';

@@ -22,7 +22,6 @@
 .chronoline-left,
 .chronoline-right {
     display: none;
-    *display: block;
     top: 0;
     position: absolute;
     width: 20px;

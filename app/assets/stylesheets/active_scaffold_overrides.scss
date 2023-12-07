@@ -1,0 +1,320 @@
+$input_border_color: #a4c7d0 !default;
+$input_focus_bg: #d3e5ea !default;
+$form_title_color: #427fa4 !default;
+
+h1 {
+    font-size: 18px;
+    font-family: sans-serif;
+}
+
+td {
+    font-size: 14px;
+    font-family: sans-serif;
+}
+
+a {
+    color: #06c;
+    text-decoration: none;
+}
+
+.active-scaffold a.disabled,
+.active-scaffold-header div.actions a.disabled,
+.active-scaffold-header div.actions a.disabled:hover,
+a.disabled {
+    color: #666;
+    opacity: 1;
+}
+
+.active-scaffold div.actions a.disabled:hover {
+    background-color: #fff;
+}
+
+.active-scaffold a:hover, .active-scaffold div.hover, .active-scaffold td span.hover {
+    background-color: #c4e7f0;
+}
+
+.active-scaffold {
+    margin: 0;
+}
+
+.as_content > table:first-child > thead th {
+    border-right: 1px solid #C5DBF7;
+}
+
+
+/* Header
+   ======================== */
+
+.active-scaffold-header h2 {
+    padding-left: 6px;
+    text-shadow: -1px 1px 1px #FFFFFF;
+    background-color: #bad1e0;
+}
+
+.view .active-scaffold-header div.actions a,
+.view .active-scaffold-header div.actions div,
+.view .active-scaffold-header div.actions div.action_group {
+    float: left;
+}
+
+.active-scaffold-header div.actions a.new,
+.active-scaffold-header div.actions a.new_existing,
+.active-scaffold-header div.actions a.show_search,
+.active-scaffold-header div.actions a.to_pdf,
+.active-scaffold-header div.actions a.new_users,
+.active-scaffold-header div.actions a.show_effect,
+.active-scaffold-header div.actions a.help,
+.active-scaffold-header div.actions a.preview,
+.active-scaffold-header div.actions a.class_schedule_pdf,
+.active-scaffold-header div.actions a.show_config_list,
+.active-scaffold-header div.actions div.action_group div {
+    margin: 0;
+    padding: 5px 5px 5px 25px;
+    background-position: 5px 50%;
+    background-repeat: no-repeat;
+
+    background-color: #FFFFFF;
+
+    border-left: 1px solid #c8c6c6;
+    border-right: 1px solid #c8c6c6;
+    border-top: 1px solid #c8c6c6;
+
+    /*border radius*/
+    -webkit-border-top-left-radius: 10px;
+    -webkit-border-top-right-radius: 10px;
+    -moz-border-radius-topleft: 10px;
+    -moz-border-radius-topright: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.active-scaffold-header div.actions a.new_users {
+    position: relative;
+}
+
+.active-scaffold-header div.actions a.new_users:before {
+    content: "\f007";  /* this is your text. You can also use UTF-8 character codes as I do here */
+    font-family: FontAwesome;
+    left: 8px;
+    position: absolute;
+    top: 25%;
+}
+
+.active-scaffold-header div.actions a.show_effect {
+    position: relative;
+}
+
+.active-scaffold-header div.actions a.show_effect:before {
+    content: "\f055";  /* this is your text. You can also use UTF-8 character codes as I do here */
+    font-family: FontAwesome;
+    left: 8px;
+    position: absolute;
+    top: 25%;
+}
+
+.active-scaffold-header div.actions a.help {
+    position: relative;
+}
+
+.active-scaffold-header div.actions a.help:before {
+    content: "\f05a";  /* this is your text. You can also use UTF-8 character codes as I do here */
+    font-family: FontAwesome;
+    left:8px;
+    position:absolute;
+    top:25%;
+}
+
+.active-scaffold-header div.actions a.to_pdf,
+.active-scaffold-header div.actions a.class_schedule_pdf {
+    background-image: url("pdfIcon.gif");
+}
+
+.active-scaffold-header div.actions a.preview:before {
+    content: "\f05a";
+    font-family: FontAwesome;
+    margin-left: -17px;
+    margin-right: 8px;
+}
+
+.active-scaffold-header div.actions a.disabled {
+    height: 21px;
+    margin-top: -4px;
+}
+
+.active-scaffold-header div.actions {
+    position: absolute;
+    right: -2px;
+    top: 4px;
+    text-align: right;
+}
+
+/* Table :: Actions (Edit, Delete)
+   ============================= */
+
+.active-scaffold .actions .action_group ul {
+    width: 150px;
+}
+
+.active-scaffold .actions .action_group ul li {
+    z-index: 2;
+}
+
+/* Table :: Inline Adapter
+   ============================= */
+
+.active-scaffold a.inline-adapter-close {
+    background: url("closeBlueIcon.jpg") 0 0 no-repeat;
+}
+
+/* Nested
+   ======================== */
+
+.active-scaffold .active-scaffold .active-scaffold-header {
+    margin-right: 15px;
+}
+
+.active-scaffold .active-scaffold .active-scaffold-footer {
+    color: #444;
+}
+
+/* Footer
+   ========================== */
+
+.active-scaffold .active-scaffold-footer {
+    padding: 3px 0 2px 10px;
+}
+
+/* Messages
+   ========================= */
+
+.active-scaffold .empty-message, .active-scaffold .filtered-message {
+    padding: 2px 4px 6px 4px;
+    text-align: right;
+    .reset {
+        position: relative;
+        z-index: 2;
+        right: 0;
+    }
+}
+
+.active-scaffold .empty-message {
+    font-weight: bold;
+    text-align: left;
+    z-index: 1;
+}
+
+/* Error Styling
+   ========================== */
+
+.active-scaffold .errorExplanation {
+    margin: 2px 0;
+}
+
+/* Loading Indicators
+   ============================== */
+
+.active-scaffold .loading-indicator {
+    vertical-align: middle;
+}
+
+.active-scaffold .active-scaffold-header .loading-indicator {
+    margin: 0 6px -6px 0;
+}
+
+/* Form :: Fields
+   ============================== */
+
+   .active-scaffold .description, .filled-form-description {
+    width: 185px;
+
+    ul {
+      width: 180px
+    }
+}
+
+.filled-form-description {
+    display: block;
+}
+
+.active-scaffold label.example {
+    font-size: 12px;
+    font-weight: bold;
+    color: #888;
+}
+
+.active-scaffold input.text-input,
+.active-scaffold select {
+    font-size: 12px;
+}
+
+.active-scaffold input.recordselect {
+    padding: 2px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: -1px;
+    border: solid 1px;
+    border-color: $input_border_color;
+}
+
+.active-scaffold input.recordselect:focus {
+    background-color: $input_focus_bg;
+}
+
+/* Form :: Association Sub-Forms
+   ============================== */
+
+.active-scaffold .sub-form .checkbox-list {
+    border-color: #1F7F00;
+}
+
+.active-scaffold .sub-form input.recordselect {
+    letter-spacing: 0;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.record-select-list a.remove {
+    display: block;
+    width: 0px;
+    height: 16px;
+    padding-left: 16px;
+    background: url("active_scaffold/cross.png") 0 0 no-repeat;
+    overflow: hidden;
+    float: left;
+    margin-right: 5px;
+}
+
+/* For listed_* attributes
+   ========================== */
+
+.listed-records-table {
+  border-collapse: collapse !important;
+}
+
+.listed-records-table thead {
+  color: white;
+  font-size: 12px;
+  background-color: $form_title_color;
+}
+
+.listed-records-table thead tr th {
+  padding-right: 15px;
+}
+
+.active-scaffold-footer {
+    padding-bottom: 10px !important;
+}
+
+
+small._default_value {
+  cursor: pointer;
+}
+
+#main_content .menu {
+  width: auto;
+  max-width: 1075px;
+}
+
+.active-scaffold li.form-element dt {
+  width: 15em;
+}
