@@ -55,9 +55,9 @@
         <% phase_forms.each do |phase_form| %>
           <div>
             <h5> <%= phase.name %> (<%= phase_form[:name] %>) <a data-show="Mostrar" data-hide="Ocultar"
-              data-toggable="<%= phase_subid %>" style=""
+              data-toggable="<%= "#{phase_subid}-#{phase_form[:name]}" %>" style=""
               class="as-js-button visibility-toggle" href="#"><%= phase_visible ? "Ocultar" : "Mostrar" %></a></h5>
-            <div id="<%= phase_subid %>" style="<%= "display:none;" if !phase_visible %>" >
+            <div id="<%= "#{phase_subid}-#{phase_form[:name]}" %>" style="<%= "display:none;" if !phase_visible %>" >
               <% if can_edit_phase %>
                 <ol class="form filled-form">
                   <%= form.fields_for phase_form[:field], [phase_form[:object]] do |phase_form_object| %>

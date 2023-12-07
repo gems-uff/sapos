@@ -184,7 +184,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
   def consolidate_phase(phase)
     if phase.nil?
-      return record_i18n_attr("statuses.approved")
+      return APPROVED
     end
     if phase.consolidation_form.present?
       fields = self.filled_form.to_fields_hash
@@ -199,18 +199,19 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
         admission_application: self,
         mode: Admissions::AdmissionPhaseResult::CONSOLIDATION
       )
-      cfields = phase_result.filled_form.form_template.fields.order(:order)
-      cfield_hash = cfields.index_by(&:id)
+      cfields = phase.consolidation_form.fields.order(:order)
       field_ids = cfields.map(&:id)
       filled_field_ids = phase_result.filled_form.fields.map(&:form_field_id)
 
+      old_fields = filled_field_ids - field_ids
+      phase_result.filled_form.fields.where(form_field_id: old_fields).delete_all
       new_filled_fields = field_ids - filled_field_ids
-      new_filled_fields.each do |field_id|
-        form_field = cfield_hash[field_id]
+      cfields.each do |form_field|
+        next if !new_filled_fields.include? form_field.id
         configuration = JSON.parse(form_field.configuration || "{}")
         if form_field.field_type == Admissions::FormField::CODE
           begin
-            value = self.evaluate_code(
+            value = CodeEvaluator.evaluate_code(
               configuration["code"],
               process: self.admission_process,
               application: self,
@@ -218,21 +219,17 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
               committees: committees,
             )
             phase_result.filled_form.fields.new(
-              form_field_id: field_id, value: value
+              form_field_id: form_field.id, value: value
             )
           rescue => err
             phase_result.save!
-            return "#{record_i18n_attr("statuses.error")}: #{err}"
+            return "#{ERROR}: #{err}"
           end
         end
       end
     end
     phase_result.save!
-    if self.satisfies_conditions(phase.form_conditions)
-      record_i18n_attr("statuses.approved")
-    else
-      record_i18n_attr("statuses.reproved")
-    end
+    self.satisfies_conditions(phase.form_conditions) ? APPROVED : REPROVED
   end
 
   def consolidate_phase!(phase)
@@ -268,13 +265,6 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
 
   private
-    def evaluate_code(formula, **bindings)
-      b = binding
-      bindings.each do |var, val| b.local_variable_set(var, val) end
-
-      b.eval(formula)
-    end
-
     def generate_token
       18.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }
         .insert(6, "-").insert(13, "-").join("")
