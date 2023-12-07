@@ -394,6 +394,10 @@ Rails.application.routes.draw do
     resources :admission_phase_evaluations do
       concerns :active_scaffold
     end
+
+    resources :admission_pendencies do
+      concerns :active_scaffold
+    end
   end
 
   get "landing", action: :index, controller: "landing"

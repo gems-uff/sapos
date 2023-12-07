@@ -16,6 +16,8 @@ class User < ApplicationRecord
     class_name: "Admissions::AdmissionCommitteeMember"
   has_many :admission_phase_evaluations, dependent: :destroy,
     class_name: "Admissions::AdmissionPhaseEvaluation"
+  has_many :admission_pendencies, dependent: :destroy,
+    class_name: "Admissions::AdmissionPendency"
 
   devise :invitable,
     :database_authenticatable, :recoverable, :rememberable, :registerable,

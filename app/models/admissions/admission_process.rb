@@ -130,50 +130,6 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
     result
   end
 
-  def eligible_candidates_at_phase(phase)
-    candidates = self.admission_applications
-      .where(admission_phase_id: phase.try(:id))
-      .where(status: nil)
-      .or(self.admission_applications.where("`admission_applications`.`status` like ?", "#{
-        I18n.t("activerecord.attributes.admissions/admission_application.statuses.error")}%"
-      ))
-
-    if phase.nil?
-      return candidates.includes(:filled_form)
-        .where(filled_form: { is_filled: true })
-    end
-
-    if phase.shared_form.present?
-      candidates = candidates.includes(results: :filled_form)
-        .where(results: {
-          filled_forms: { is_filled: true },
-          mode: Admissions::AdmissionPhaseResult::SHARED
-        })
-    end
-
-    if phase.member_form.present?
-      committees = phase.admission_committees
-      candidates = candidates.filter do |candidate|
-        committees.all? do |committee|
-          if candidate.satisfies_conditions(committee.form_conditions)
-            committee.members.all? do |member|
-              Admissions::AdmissionPhaseEvaluation.includes(:filled_form)
-                .where(
-                  filled_form: { is_filled: true },
-                  admission_phase_id: phase.id,
-                  user_id: member.user_id,
-                  admission_application_id: candidate.id
-                ).present?
-            end
-          else
-            true
-          end
-        end
-      end
-    end
-    candidates
-  end
-
   def to_label
     "#{self.title}"
   end

@@ -1,0 +1,8 @@
+<div class="pendency-type-box">
+  <%= render active_scaffold: "admissions/admission_applications", conditions: conditions %>
+
+  <span class="pendency-description">
+    Essa lista de pendências exibe apenas candidaturas não avaliadas. <br>
+    Para ver a lista completa de candidaturas, acesse <%= link_to "Seleção > Candidaturas", admission_applications_path %>
+  </span>
+</div>

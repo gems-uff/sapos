@@ -10,12 +10,54 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   REPROVED = record_i18n_attr("statuses.reproved")
   ERROR = record_i18n_attr("statuses.error")
 
+  scope :non_consolidated, -> {
+    where(
+      arel_table[:status].eq(nil).or(
+        arel_table[:status].matches("#{ERROR}%")
+      )
+    )
+  }
+
+  scope :ready_for_consolidation, ->(phase_id, user_id = nil) {
+    if phase_id.nil?
+      non_consolidated.includes(:filled_form)
+      .where(filled_form: { is_filled: true })
+    else
+      non_consolidated.where.not(
+        id: Admissions::AdmissionPendency.pendencies(phase_id, user_id)
+          .select(:admission_application_id)
+      )
+    end
+  }
+
+  scope :with_pendencies, ->(phase_id, user_id = nil) {
+    if phase_id.nil?
+      non_consolidated.includes(:filled_form)
+      .where(filled_form: { is_filled: false })
+    else
+      non_consolidated.where(
+        id: Admissions::AdmissionPendency.pendencies(phase_id, user_id)
+          .select(:admission_application_id)
+      )
+    end
+  }
+
+  scope :without_committee, ->(phase_id) {
+    where(
+      id: Admissions::AdmissionPendency
+        .missing_committee(phase_id)
+        .select(:admission_application_id)
+    )
+  }
+
   has_many :letter_requests, dependent: :delete_all,
     class_name: "Admissions::LetterRequest"
   has_many :evaluations, dependent: :destroy,
     class_name: "Admissions::AdmissionPhaseEvaluation"
   has_many :results, dependent: :destroy,
     class_name: "Admissions::AdmissionPhaseResult"
+  has_many :pendencies, dependent: :destroy,
+    class_name: "Admissions::AdmissionPendency"
 
   belongs_to :admission_process, optional: false,
     class_name: "Admissions::AdmissionProcess"
@@ -41,6 +83,21 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   validate :number_of_letters_in_filled_form
 
   before_save :set_token
+
+  def self.pendency_condition(user = nil)
+    user ||= current_user
+    return ["0 = -1"] if user.blank?
+    return ["0 = -1"] if user.cannot?(:read_pendencies, Admissions::AdmissionApplication)
+
+    candidate_arel = Admissions::AdmissionApplication.arel_table
+    pendency_arel = Admissions::AdmissionPendency.arel_table
+    pendencies_query = pendency_arel.where(
+      pendency_arel[:status].eq(Admissions::AdmissionPendency::PENDENT)
+      .and(pendency_arel[:admission_phase_id].eq(candidate_arel[:admission_phase_id]))
+      .and(pendency_arel[:user_id].eq(user.id))
+    ).project(pendency_arel[:admission_application_id])
+    [candidate_arel[:id].in(pendencies_query).to_sql]
+  end
 
   def number_of_letters_in_filled_form
     return if self.filled_form.blank?
@@ -183,6 +240,32 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     self.update!(status: result)
     result
   end
+
+  def descriptive_status
+    return self.status if self.status.present?
+    return "Sem comitê válido" if self.pendencies.where(
+      admission_phase_id: self.admission_phase_id,
+      user_id: nil
+    ).first.present?
+    pendencies = []
+    if self.pendencies.where(
+      admission_phase_id: self.admission_phase_id,
+      mode: Admissions::AdmissionPendency::SHARED,
+      status: Admissions::AdmissionPendency::PENDENT
+    ).first.present?
+      pendencies << "Compartilhado"
+    end
+    self.pendencies.where(
+      admission_phase_id: self.admission_phase_id,
+      mode: Admissions::AdmissionPendency::MEMBER,
+      status: Admissions::AdmissionPendency::PENDENT
+    ).each do |pendency|
+      pendencies << pendency.user.name
+    end
+    return "Pendente: #{pendencies.join(", ")}" if pendencies.present?
+    "Pronto para consolidação"
+  end
+
 
   private
     def evaluate_code(formula, **bindings)

@@ -119,7 +119,9 @@ class Admissions::AdmissionProcessesController < ApplicationController
     @phase = phase_id.nil? ? nil : Admissions::AdmissionPhase.find(phases[index])
     @phase_name = @phase.nil? ? "Candidatura" : @phase.name
     @message = I18n.t("#{i18n_prefix}.title", phase: @phase_name)
-    candidates = @admission_process.eligible_candidates_at_phase(@phase)
+    candidates = @admission_process.admission_applications
+      .where(admission_phase_id: phase_id)
+      .ready_for_consolidation(phase_id)
     @approved = []
     @reproved = []
     @errors = []
@@ -151,7 +153,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
           admission_phase_id: next_phase_id,
           status: nil
         )
-        if !next_phase.has_committee_for_candidate(candidate)
+        if !next_phase.create_pendencies_for_candidate(candidate)
           @missing_committee << candidate
         end
       end

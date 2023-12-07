@@ -36,6 +36,21 @@ class Admissions::FormCondition < ActiveRecord::Base
     NOT_NULL => ->(f, v) { !f.nil? },
   }
 
+  after_commit :update_pendencies
+
+  def update_pendencies
+    return if model_type != "Admissions::AdmissionCommitee"
+    self.model.admission_phase_committees.each do |pc|
+      pc.update_pendencies
+    end
+    old = previous_changes.try(:model).try(:[], 0)
+    if old.present?
+      old.admission_phase_committees.each do |pc|
+        pc.update_pendencies
+      end
+    end
+  end
+
   def to_label
     "#{self.field} #{self.condition} #{self.value}"
   end

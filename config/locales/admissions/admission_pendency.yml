@@ -1,0 +1,23 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_pendency:
+        user: "Usuário"
+        admission_phase: "Fase"
+        admission_application: "Candidatura"
+        mode: "Modo"
+        modes:
+          member: "Individual"
+          shared: "Compartilhado"
+        status: "Situação"
+        statuses:
+          pendent: "Pendente"
+          ok: "Realizado"
+
+    models:
+      admissions/admission_pendency:
+        one: "Pendência de Comitê"
+        other: "Pendências de Comitês"

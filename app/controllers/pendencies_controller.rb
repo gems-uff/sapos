@@ -29,6 +29,15 @@ class PendenciesController < ApplicationController
       ]
     end
 
+    admission_application_condition = Admissions::AdmissionApplication.pendency_condition
+    candidates = Admissions::AdmissionApplication.where(admission_application_condition)
+    unless candidates.empty?
+      @partials << [
+        "pendencies/admission_applications",
+        { conditions: admission_application_condition }
+      ]
+    end
+
     render :index
   end
 end

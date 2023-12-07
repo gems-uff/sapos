@@ -13,7 +13,6 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       :admission_process, :token, :name, :email,
       :letter_requests, :filled_form,
       :admission_phase, :status
-      # :results, 
     ]
 
     config.list.columns = columns
@@ -22,6 +21,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     config.list.sorting = { admission_process: "DESC", name: "ASC" }
 
     config.columns.add :is_filled
+    config.columns.add :pendency
     config.columns.add :custom_forms
 
     config.columns[:admission_process].search_ui = :record_select
@@ -29,6 +29,12 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     config.columns[:is_filled].search_ui = :select
     config.columns[:is_filled].options = {
       options: I18n.t("#{I18N_BASE}.is_filled_options").values,
+      include_blank: I18n.t("active_scaffold._select_")
+    }
+    config.columns[:pendency].search_sql = ""
+    config.columns[:pendency].search_ui = :select
+    config.columns[:pendency].options = {
+      options: I18n.t("#{I18N_BASE}.pendency_options").values,
       include_blank: I18n.t("active_scaffold._select_")
     }
     config.columns[:admission_phase].actions_for_association_links = [:show]
@@ -43,20 +49,38 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       :name,
       :email,
       :is_filled,
+      :pendency
     ]
     config.actions.exclude :deleted_records, :create
   end
 
   def self.condition_for_is_filled_column(column, value, like_pattern)
     filled_form = "
-      select ff.id from filled_forms ff
-      where ff.is_filled = 1
+      select `ff`.`id` from filled_forms `ff`
+      where `ff`.`is_filled` = 1
     "
     case value
     when I18n.t("#{I18N_BASE}.is_filled_options.true")
-      ["admission_applications.filled_form_id in (#{filled_form})"]
+      ["`admission_applications`.`filled_form_id` in (#{filled_form})"]
     when I18n.t("#{I18N_BASE}.is_filled_options.false")
-      ["admission_applications.filled_form_id not in (#{filled_form})"]
+      ["`admission_applications`.`filled_form_id` not in (#{filled_form})"]
+    else
+      ""
+    end
+  end
+
+  def self.condition_for_pendency_column(column, value, like_pattern)
+    candidate_arel = Admissions::AdmissionApplication.arel_table
+    pendency_arel = Admissions::AdmissionPendency.arel_table
+    pendencies_query = pendency_arel.where(
+      pendency_arel[:status].eq(Admissions::AdmissionPendency::PENDENT)
+      .and(pendency_arel[:admission_phase_id].eq(candidate_arel[:admission_phase_id]))
+    ).project(pendency_arel[:admission_application_id])
+    case value
+    when I18n.t("#{I18N_BASE}.pendency_options.true")
+      [candidate_arel[:id].in(pendencies_query).to_sql]
+    when I18n.t("#{I18N_BASE}.pendency_options.false")
+      [candidate_arel[:id].not_in(pendencies_query).to_sql]
     else
       ""
     end
@@ -70,7 +94,9 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     return false if record.status == Admissions::AdmissionApplication::REPROVED
 
     phase.admission_committees.any? do |committee|
-      committee.members.where(user_id: current_user.id).first.present?
+      if record.satisfies_conditions(committee.form_conditions)
+        committee.members.where(user_id: current_user.id).first.present?
+      end
     end && super
   end
 
@@ -91,7 +117,16 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       record.filled_form.sync_fields_after(record)
       was_filled = record.filled_form.is_filled
       record.filled_form.is_filled = true
-      if !record.valid?
+      if record.valid?
+        phase_forms.each do |phase_form|
+          pendency_success = phase_form[:pendency_success]
+          if pendency_success.present?
+            Admissions::AdmissionPendency.where(pendency_success).update_all(
+              status: Admissions::AdmissionPendency::OK
+            )
+          end
+        end
+      else
         record.filled_form.is_filled = was_filled
         phase_forms.each do |phase_form|
           phase_form[:object].filled_form.is_filled = phase_form[:was_filled]

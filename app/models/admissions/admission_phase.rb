@@ -20,6 +20,8 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
     class_name: "Admissions::AdmissionProcessPhase"
   has_many :admission_applications, dependent: :destroy,
     class_name: "Admissions::AdmissionApplication"
+  has_many :admission_pendencies, dependent: :destroy,
+    class_name: "Admissions::AdmissionPendency"
 
   belongs_to :member_form, optional: true,
     class_name: "Admissions::FormTemplate", foreign_key: "member_form_id"
@@ -29,16 +31,76 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
     class_name: "Admissions::FormTemplate", foreign_key: "consolidation_form_id"
 
   validates :name, presence: true
+  after_commit :update_pendencies
 
   def to_label
     "#{self.name}"
   end
 
-  def has_committee_for_candidate(candidate)
-    committees = self.admission_committees
-    committees.any? do |committee|
-      candidate.satisfies_conditions(committee.form_conditions)
-    end || committees.empty?
+  def committee_users_for_candidate(candidate)
+    users = {}
+    self.admission_committees.each do |committee|
+      if candidate.satisfies_conditions(committee.form_conditions)
+        committee.users.each { |user| users[user.id] = user }
+      end
+    end
+    users
+  end
+
+  def update_pendencies
+    self.admission_applications.non_consolidated.each do |candidate|
+      create_pendencies_for_candidate(candidate)
+    end
+  end
+
+  def create_pendencies_for_candidate(candidate)
+    users = self.committee_users_for_candidate(candidate)
+    pendency_arel = Admissions::AdmissionPendency.arel_table
+    # Remove pendencies from users that are not valid for candidate
+    Admissions::AdmissionPendency.where(
+      pendency_arel[:admission_application_id].eq(candidate.id)
+      .and(pendency_arel[:admission_phase_id].eq(self.id))
+      .and(pendency_arel[:user_id].not_in(users.keys))
+    ).delete_all
+
+    # Prepare create commands
+    create_commands = []
+    base_command = {
+      admission_application_id: candidate.id,
+      admission_phase_id: self.id,
+    }
+    share_command = base_command.merge(mode: Admissions::AdmissionPendency::SHARED)
+    member_command = base_command.merge(mode: Admissions::AdmissionPendency::MEMBER)
+    if self.shared_form.present?
+      create_commands << share_command
+    else
+      Admissions::AdmissionPendency.where(share_command).delete_all
+    end
+    if self.member_form.present?
+      create_commands << member_command
+    else
+      Admissions::AdmissionPendency.where(member_command).delete_all
+    end
+
+    # Create pendencies for users
+    if users.empty?
+      create_commands.each do |cmd|
+        Admissions::AdmissionPendency.find_or_create_by(cmd.merge(user_id: nil))
+      end
+      return false  # No committee for user
+    end
+    Admissions::AdmissionPendency.where(
+      pendency_arel[:admission_application_id].eq(candidate.id)
+      .and(pendency_arel[:admission_phase_id].eq(self.id))
+      .and(pendency_arel[:user_id].eq(nil))
+    ).delete_all
+
+    users.each do |uid, user|
+      create_commands.each do |cmd|
+        Admissions::AdmissionPendency.find_or_create_by(cmd.merge(user_id: uid))
+      end
+    end
+    true
   end
 
   def prepare_application_forms(admission_application, user, create_consolidation)
@@ -53,11 +115,16 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
       )
       object.filled_form.prepare_missing_fields
       phase_forms << {
-        name: "Compartilhado",
+        name: Admissions::AdmissionPendency::SHARED,
         object: object,
         field: :results,
         form_template: self.shared_form,
         hidden: [:id, :admission_phase_id, :mode],
+        pendency_success: {
+          admission_application_id: admission_application.id,
+          admission_phase_id: self.id,
+          mode: Admissions::AdmissionPendency::SHARED,
+        },
       }
     end
     if self.member_form.present?
@@ -74,11 +141,17 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
         )
         object.filled_form.prepare_missing_fields
         phase_forms << {
-          name: "Individual",
+          name: Admissions::AdmissionPendency::MEMBER,
           object: object,
           field: :evaluations,
           form_template: self.member_form,
           hidden: [:id, :admission_phase_id, :user_id],
+          pendency_success: {
+            admission_application_id: admission_application.id,
+            admission_phase_id: self.id,
+            mode: Admissions::AdmissionPendency::MEMBER,
+            user_id: user.id,
+          },
         }
       end
     end
@@ -92,11 +165,12 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
       )
       object.filled_form.prepare_missing_fields
       phase_forms << {
-        name: "Consolidação",
+        name: Admissions::AdmissionPhaseResult::CONSOLIDATION,
         object: object,
         field: :results,
         form_template: self.consolidation_form,
         hidden: [:id, :admission_phase_id, :mode],
+        pendency_success: nil,
       }
     end
     phase_forms

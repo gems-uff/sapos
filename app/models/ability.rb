@@ -36,8 +36,15 @@ class Ability
     # Application Process
     Admissions::FormTemplate, Admissions::FormField,
     Admissions::FilledForm, Admissions::FilledFormField,
+    Admissions::FilledFormFieldScholarity,
     Admissions::AdmissionProcess, Admissions::AdmissionApplication,
     Admissions::LetterRequest,
+
+    Admissions::AdmissionCommitteeMember, Admissions::AdmissionCommittee,
+    Admissions::AdmissionPendency, Admissions::AdmissionPhaseCommittee,
+    Admissions::AdmissionPhaseEvaluation, Admissions::AdmissionPhaseResult,
+    Admissions::AdmissionPhase, Admissions::AdmissionProcessPhase,
+    Admissions::FormCondition
   ]
 
 
@@ -69,7 +76,8 @@ class Ability
       ])
       cannot :destroy, [
         Admissions::AdmissionApplication, Admissions::FilledForm,
-        Admissions::FilledFormField, Admissions::LetterRequest
+        Admissions::FilledFormField, Admissions::FilledFormFieldScholarity,
+        Admissions::LetterRequest
       ]
       cannot :update_only_photo, Student
       can :read, :pendency
@@ -82,8 +90,14 @@ class Ability
         Country, State, City, EmailTemplate,
         Admissions::FormTemplate, Admissions::FormField,
         Admissions::FilledForm, Admissions::FilledFormField,
+        Admissions::FilledFormFieldScholarity,
         Admissions::AdmissionProcess, Admissions::AdmissionApplication,
-        Admissions::LetterRequest
+        Admissions::LetterRequest,
+        Admissions::AdmissionCommitteeMember, Admissions::AdmissionCommittee,
+        Admissions::AdmissionPendency, Admissions::AdmissionPhaseCommittee,
+        Admissions::AdmissionPhaseEvaluation, Admissions::AdmissionPhaseResult,
+        Admissions::AdmissionPhase, Admissions::AdmissionProcessPhase,
+        Admissions::FormCondition
       ])
       can :photo, Student
       can :read, :pendency
@@ -113,6 +127,18 @@ class Ability
             year: YearSemester.current.year,
             semester: YearSemester.current.semester
         end
+        application_condition = {
+          admission_phase: {
+            admission_committees: {
+              members: {
+                user: user
+              }
+            }
+          }
+        }
+        can :read_pendencies, Admissions::AdmissionApplication
+        can :read, Admissions::AdmissionApplication, application_condition
+        can :update, Admissions::AdmissionApplication, application_condition
       end
     elsif role_id == Role::ROLE_SECRETARIA
       can :manage, (Ability::ALL_MODELS - [
@@ -120,11 +146,13 @@ class Ability
         Notification, ReportConfiguration,
         Admissions::FormTemplate, Admissions::FormField,
         Admissions::AdmissionApplication, Admissions::FilledForm,
+        Admissions::FilledFormFieldScholarity,
         Admissions::FilledFormField, Admissions::LetterRequest,
       ])
       can :read, [
         Admissions::FormTemplate, Admissions::FormField,
         Admissions::AdmissionApplication, Admissions::FilledForm,
+        Admissions::FilledFormFieldScholarity,
         Admissions::FilledFormField, Admissions::LetterRequest,
       ]
       cannot :update_only_photo, Student
