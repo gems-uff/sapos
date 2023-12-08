@@ -41,6 +41,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       include_blank: I18n.t("active_scaffold._select_")
     }
     config.columns[:admission_phase].actions_for_association_links = [:show]
+    config.columns[:admission_phase].search_ui = :record_select
 
     config.update.columns = [:custom_forms]
     config.update.multipart = true
@@ -52,7 +53,8 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       :name,
       :email,
       :is_filled,
-      :pendency
+      :pendency,
+      :admission_phase
     ]
     config.actions.exclude :deleted_records, :create
   end
