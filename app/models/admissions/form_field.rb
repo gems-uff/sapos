@@ -21,15 +21,15 @@ class Admissions::FormField < ActiveRecord::Base
   SCHOLARITY = record_i18n_attr("field_types.scholarity")
   RESIDENCY = record_i18n_attr("field_types.residency")
 
-  SEP = record_i18n_attr("field_types.sep")
-
   CODE = record_i18n_attr("field_types.code")
 
-  FIELD_TYPES = [
+  INPUT_FIELDS = [
     FILE, STUDENT_FIELD, COLLECTION_CHECKBOX, SINGLE_CHECKBOX,
     CITY, SCHOLARITY, GROUP, HTML, NUMBER, RESIDENCY,
-    RADIO, SELECT, STRING, TEXT, SEP, CODE
+    RADIO, SELECT, STRING, TEXT
   ]
+
+  FIELD_TYPES = INPUT_FIELDS + [CODE]
 
   SYNC_NAME = record_i18n_attr("syncs.name")
   SYNC_EMAIL = record_i18n_attr("syncs.email")
@@ -103,7 +103,7 @@ class Admissions::FormField < ActiveRecord::Base
         self.errors.add(:base, :invalid_consolidation_field, name: self.name)
       end
     else  # input forms
-      valid_fields = FIELD_TYPES - [SEP, CODE]
+      valid_fields = FIELD_TYPES - [CODE]
       if !valid_fields.include? self.field_type
         self.errors.add(:base, :invalid_inputform_field, name: self.name)
       end

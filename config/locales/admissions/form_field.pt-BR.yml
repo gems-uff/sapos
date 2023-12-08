@@ -38,7 +38,6 @@ pt-BR:
           select: Seleção
           string: Texto
           text: Texto longo
-          sep: "---------"
           code: Consolidação
         configurations:
           show_config: "Mostrar configuração"

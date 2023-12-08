@@ -313,7 +313,15 @@ Rails.application.routes.draw do
       record_select_routes
     end
 
+    resources :consolidation_templates do
+      concerns :active_scaffold
+    end
+
     resources :form_fields do
+      concerns :active_scaffold
+    end
+
+    resources :consolidation_form_fields do
       concerns :active_scaffold
     end
 

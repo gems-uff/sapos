@@ -3,8 +3,9 @@
 
 # frozen_string_literal: true
 
-class Admissions::FormFieldsController < ApplicationController
-  authorize_resource
+class Admissions::ConsolidationFormFieldsController < ApplicationController
+  authorize_resource :form_field
+  helper "admissions/form_fields"
 
   active_scaffold "Admissions::FormField" do |config|
     config.list.sorting = { name: "ASC" }
@@ -12,20 +13,13 @@ class Admissions::FormFieldsController < ApplicationController
 
 
     config.columns = [
-      :form_template, :order, :name, :description, :field_type, :sync,
+      :form_template, :order, :name, :description, :field_type,
       :configuration
     ]
     config.columns[:field_type].form_ui = :select
     config.columns[:field_type].options = {
-      options: Admissions::FormField::INPUT_FIELDS,
+      options: [Admissions::FormField::CODE],
       include_blank: I18n.t("active_scaffold._select_"),
-      default: nil
-    }
-
-    config.columns[:sync].form_ui = :select
-    config.columns[:sync].options = {
-      options: Admissions::FormField::SYNCS,
-      include_blank: true,
       default: nil
     }
 

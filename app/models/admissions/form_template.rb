@@ -12,6 +12,12 @@ class Admissions::FormTemplate < ActiveRecord::Base
 
   TEMPLATE_TYPES = [ADMISSION_FORM, RECOMMENDATION_LETTER, CONSOLIDATION_FORM]
 
+  scope :consolidation, -> { where(template_type: CONSOLIDATION_FORM) }
+  scope :input_form, -> {
+    where(template_type: ADMISSION_FORM)
+    .or(where(template_type: RECOMMENDATION_LETTER))
+  }
+
   has_many :fields, dependent: :destroy,
     class_name: "Admissions::FormField"
   has_many :admission_process_forms, dependent: :restrict_with_exception,

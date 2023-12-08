@@ -21,16 +21,19 @@ class Admissions::AdmissionPhasesController < ApplicationController
     config.columns[:member_form].options[:params] = {
       template_type: Admissions::FormTemplate::ADMISSION_FORM
     }
+    config.columns[:member_form].clear_link
 
     config.columns[:shared_form].form_ui = :record_select
     config.columns[:shared_form].options[:params] = {
       template_type: Admissions::FormTemplate::ADMISSION_FORM
     }
+    config.columns[:shared_form].clear_link
 
     config.columns[:consolidation_form].form_ui = :record_select
     config.columns[:consolidation_form].options[:params] = {
       template_type: Admissions::FormTemplate::CONSOLIDATION_FORM
     }
+    config.columns[:consolidation_form].clear_link
 
     config.actions.exclude :deleted_records
   end

@@ -17,7 +17,10 @@ class Admissions::FormTemplatesController < ApplicationController
     config.columns[:fields].show_blank_record = false
     config.columns[:template_type].form_ui = :select
     config.columns[:template_type].options = {
-      options: Admissions::FormTemplate::TEMPLATE_TYPES
+      options: [
+        Admissions::FormTemplate::ADMISSION_FORM,
+        Admissions::FormTemplate::RECOMMENDATION_LETTER,
+      ]
     }
 
     config.actions << :duplicate
@@ -37,6 +40,10 @@ class Admissions::FormTemplatesController < ApplicationController
     per_page: 10, search_on: [:name], order_by: "name", full_text_search: true,
     model: "Admissions::FormTemplate"
   )
+
+  def beginning_of_chain
+    super.input_form
+  end
 
   def preview
     @form_template = Admissions::FormTemplate.find(params[:id])
