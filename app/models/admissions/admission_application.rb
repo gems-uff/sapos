@@ -209,18 +209,39 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       cfields.each do |form_field|
         next if !new_filled_fields.include? form_field.id
         configuration = JSON.parse(form_field.configuration || "{}")
-        if form_field.field_type == Admissions::FormField::CODE
+        vars = {
+          process: self.admission_process,
+          application: self,
+          fields: fields,
+          committees: committees,
+        }
+        case form_field.field_type
+        when Admissions::FormField::CODE
           begin
-            value = CodeEvaluator.evaluate_code(
-              configuration["code"],
-              process: self.admission_process,
-              application: self,
-              fields: fields,
-              committees: committees,
-            )
+            value = CodeEvaluator.evaluate_code(configuration["code"], **vars)
             phase_result.filled_form.fields.new(
               form_field_id: form_field.id, value: value
             )
+            fields[form_field.name] = value
+          rescue => err
+            phase_result.save!
+            return "#{ERROR}: #{err}"
+          end
+        when Admissions::FormField::EMAIL
+          begin
+            formatter = ErbFormatter.new(vars)
+            notification = {
+              to: formatter.format(configuration["to"]),
+              subject: formatter.format(configuration["subject"]),
+              body: formatter.format(configuration["body"])
+            }
+            Notifier.send_emails(notifications: [notification])
+            value = "Para: #{notification[:to]}\nAssunto: #{
+              notification[:subject]}\nCorpo:\n#{notification[:body]}"
+            phase_result.filled_form.fields.new(
+              form_field_id: form_field.id, value: value
+            )
+            fields[form_field.name] = value
           rescue => err
             phase_result.save!
             return "#{ERROR}: #{err}"

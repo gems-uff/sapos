@@ -18,7 +18,7 @@ class Admissions::ConsolidationFormFieldsController < ApplicationController
     ]
     config.columns[:field_type].form_ui = :select
     config.columns[:field_type].options = {
-      options: [Admissions::FormField::CODE],
+      options: Admissions::FormField::CONSOLIDATION_FIELDS,
       include_blank: I18n.t("active_scaffold._select_"),
       default: nil
     }

@@ -22,14 +22,18 @@ class Admissions::FormField < ActiveRecord::Base
   RESIDENCY = record_i18n_attr("field_types.residency")
 
   CODE = record_i18n_attr("field_types.code")
+  EMAIL = record_i18n_attr("field_types.email")
 
   INPUT_FIELDS = [
     FILE, STUDENT_FIELD, COLLECTION_CHECKBOX, SINGLE_CHECKBOX,
     CITY, SCHOLARITY, GROUP, HTML, NUMBER, RESIDENCY,
     RADIO, SELECT, STRING, TEXT
   ]
+  CONSOLIDATION_FIELDS = [
+    CODE, EMAIL
+  ]
 
-  FIELD_TYPES = INPUT_FIELDS + [CODE]
+  FIELD_TYPES = INPUT_FIELDS + CONSOLIDATION_FIELDS
 
   SYNC_NAME = record_i18n_attr("syncs.name")
   SYNC_EMAIL = record_i18n_attr("syncs.email")
@@ -42,8 +46,8 @@ class Admissions::FormField < ActiveRecord::Base
     SYNC_TELEPHONE => :telephone
   }
 
-  scope :no_group, -> { where.not( field_type: GROUP ) }
-  scope :no_html, -> { where.not( field_type: HTML ) }
+  scope :no_group, -> { where.not(field_type: GROUP) }
+  scope :no_html, -> { where.not(field_type: HTML) }
 
   has_many :filled_fields, dependent: :restrict_with_exception,
     class_name: "Admissions::FilledFormField"
@@ -92,6 +96,10 @@ class Admissions::FormField < ActiveRecord::Base
       end
     when Admissions::FormField::SCHOLARITY
       validate_scholarity(config)
+    when Admissions::FormField::EMAIL
+      validate_presence(config, "to")
+      validate_presence(config, "subject")
+      validate_presence(config, "body")
     end
   end
 
@@ -99,14 +107,11 @@ class Admissions::FormField < ActiveRecord::Base
     template_type = self.try(:form_template).try(:template_type)
     return if template_type.nil?
     if template_type == Admissions::FormTemplate::CONSOLIDATION_FORM
-      if ![CODE].include? self.field_type
+      if !CONSOLIDATION_FIELDS.include? self.field_type
         self.errors.add(:base, :invalid_consolidation_field, name: self.name)
       end
-    else  # input forms
-      valid_fields = FIELD_TYPES - [CODE]
-      if !valid_fields.include? self.field_type
-        self.errors.add(:base, :invalid_inputform_field, name: self.name)
-      end
+    elsif !INPUT_FIELDS.include? self.field_type
+      self.errors.add(:base, :invalid_inputform_field, name: self.name)
     end
   end
 

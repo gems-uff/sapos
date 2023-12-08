@@ -139,6 +139,14 @@ function form_field_config_base(form_field) {
       form_field.widgets = [
         config_form_field_codemirror(form_field, "code", "text/x-ruby")
       ]
+    } else if (selected_value == "email") {
+      form_field.widgets = [
+        config_form_field_input(form_field, "to", "text", {
+          required: true, default: "<%= var(:application).email %>"
+        }),
+        config_form_field_input(form_field, "subject", "text", { required: true }),
+        config_form_field_codemirror(form_field, "body", "application/x-erb", { required: true })
+      ]
     } else if (selected_value == "invalid") {
       form_field.widgets = [
         config_form_field_error(form_field, form_field.i18n_error("invalid_field"))

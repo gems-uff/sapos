@@ -39,6 +39,7 @@ pt-BR:
           string: Texto
           text: Texto longo
           code: Consolidação
+          email: Email
         configurations:
           show_config: "Mostrar configuração"
           hide_config: "Esconder configuração"
@@ -103,8 +104,89 @@ pt-BR:
           html: HTML
           html_description: Campo usado para exibir textos adicionais no formulário.
           code: Código
-          code_description: "Código em Ruby usado para consolidação. Variáveis disponíveis: process - AdmissionProcess (Edital); application - AdmissionApplication (Candidatura); fields - Hash (Mapa de nome -> valor para cada campo de candidatura, incluindo consolidados); committees - List[Hash] (lista de preenchimentos de campos por membros do comitê)"
-
+          code_description: >
+            <span class="description">
+              <span class="desc-title"> Código em Ruby usado para consolidação. A última linha será salva </span>
+              <span class="desc-title"> Variáveis: </span>
+              <ul>
+                <li>
+                  <strong>process</strong><br>
+                  Representa um Edital de Seleção (Modelo: AdmissionProcess)
+                </li>
+                <li>
+                  <strong>application</strong><br>
+                  Representa uma Candidatura (Modelo: AdmissionApplication)
+                </li>
+                <li>
+                  <strong>fields</strong><br>
+                  Hash de nome -> valor para cada campo de candidatura, incluindo consolidados. <br>
+                  Os valores são string e o nome é case-sensitive.
+                </li>
+                <li>
+                  <strong>committees</strong><br>
+                  Lista de Hash (nome -> valor) com resultados de formulários individuais na fase. <br>
+                  Cada elemento da lista representa um formulário de um membro do comitê.
+                </li>
+              </ul>
+              <span class="desc-title">Exemplos: </span>
+              <ul>
+                <li>
+                  <strong>Média</strong>
+              <pre>  grades = committees.map{ |x| x["Nota"].to_f }
+              grades.sum / grades.size</pre>
+                </li>
+                <li>
+                  <strong>Mediana</strong>
+              <pre>  grades = committees.map{ |x| x["Nota"].to_f }
+              sorted = committees.sort
+              length = committees.length
+              (sorted[(length - 1) / 2] + sorted[length / 2]) / 2.0</pre>
+                </li>
+              </ul>
+            </span>
+          to: Template do Destinatário
+          subject: Template do Assunto
+          body: Template do Corpo
+          body_description: >
+            <span class="description">
+              <span class="desc-title">Os campos de template utilizam linguagem ERB. <a href="http://stackoverflow.com/questions/7996695/rails-erb-syntax"> Ver detalhes </a>.</span>
+              <span class="desc-title"> Variáveis: <strong>&lt;%= var(:variavel) %&gt;</strong> </span>
+              <ul>
+                <li>
+                  <strong>&lt;%= var(:process) %&gt;</strong><br>
+                  Representa um Edital de Seleção (Modelo: AdmissionProcess)
+                </li>
+                <li>
+                  <strong>&lt;%= var(:application) %&gt;</strong><br>
+                  Representa uma Candidatura (Modelo: AdmissionApplication)
+                </li>
+                <li>
+                  <strong>&lt;%= var(:fields) %&gt;</strong><br>
+                  Hash de nome -> valor para cada campo de candidatura, incluindo consolidados. <br>
+                  Os valores são string e o nome é case-sensitive.
+                </li>
+                <li>
+                  <strong>&lt;%= var(:committees) %&gt;</strong><br>
+                  Lista de Hash (nome -> valor) com resultados de formulários individuais na fase. <br>
+                  Cada elemento da lista representa um formulário de um membro do comitê.
+                </li>
+              </ul>
+              <span class="desc-title">Exemplos: </span>
+              <ul>
+                <li>
+                  <strong>Acessar nome do candidato</strong>
+            <pre>&lt;%= var(:application).name %&gt;</pre>
+                </li>
+                <li>
+                  <strong>Acessar média do candidato calculada alteriormente</strong>
+            <pre>&lt;%= var(:fields)["Média"] %&gt;</pre>
+                </li>
+                <li>
+                  <strong>Acessar nome do edital com ano/semestre</strong>
+            <pre>&lt;%= var(:process).title %&gt;</pre>
+                </li>
+              </ul>
+            </span>
     errors:
       models:
         admissions/form_field:
@@ -120,7 +202,9 @@ pt-BR:
           field_present_error: Campo deve ser selecionado
           sql_execution_generated_an_error: "Consulta de %{field} gerou o seguinte erro ao ser executada: %{error}"
           invalid_field: Campo não permitido
-
+          to_present_error: Template do Destinatário não pode estar em branco
+          subject_present_error: Template do Assunto não pode estar em branco
+          body_present_error: Template do Corpo não pode estar em branco
           invalid_consolidation_field: Campo %{name} não possui tipo válido para formulário de consolidação
           invalid_inputform_field: Campo %{name} não possui tipo válido para formulário
 
