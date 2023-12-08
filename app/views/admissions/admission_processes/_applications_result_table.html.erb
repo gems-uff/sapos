@@ -12,6 +12,7 @@
           <tr>
             <th><%= I18n.t("activerecord.attributes.admissions/admission_application.token") %></th>
             <th><%= I18n.t("activerecord.attributes.admissions/admission_application.name") %></th>
+            <th><%= I18n.t("activerecord.attributes.admissions/admission_application.email") %></th>
             <% if show_status %>
               <th><%= I18n.t("activerecord.attributes.admissions/admission_application.status") %></th>
             <% end %>
@@ -25,6 +26,7 @@
             <tr class="record <%= tr_class %>">
               <td><%= candidate.token %></td>
               <td><%= candidate.name %></td>
+              <td><%= candidate.email %></td>
               <% if show_status %>
                 <td><%= candidate.status %></td>
               <% end %>
