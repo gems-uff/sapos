@@ -23,7 +23,7 @@ wb.add_worksheet(name: "Edital") do |sheet|
               ""
             else
               "=HYPERLINK(\"#{request.base_url}#{filled_file.file.url}\",
-                          \"#{filled_file.file.filename.tr('"', "'")}\")"
+                          \"#{request.base_url}#{filled_file.file.url}\")"
             end
           }
         }
