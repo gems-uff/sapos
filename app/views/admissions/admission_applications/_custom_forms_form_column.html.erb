@@ -12,6 +12,22 @@
   show_email = admission_process.form_template.fields
     .where(sync: Admissions::FormField::SYNC_EMAIL).first.blank?
 %>
+<ol>
+<% if current_phase.nil? %>
+  <li class="form-element"><dt>Fase atual</dt><dd>Candidatura</dd></dl>
+  <li class="form-element"><dl><dt>Data de início</dt><dd><%= admission_process.start_date %></dd></dl>
+  <li class="form-element"><dl><dt>Data de fim</dt><dd><%= admission_process.start_date %></dd></dl>
+<% else %>
+  <% process_phase = admission_process.phases.where(admission_phase_id: current_phase.id).first %>
+  <li class="form-element"><dl><dt>Fase atual</dt><dd><%= current_phase.name %></dd></dl>
+  <% if process_phase.start_date.present? %>
+    <li class="form-element"><dl><dt>Data de início</dt><dd><%= admission_process.start_date %></dd></dl>
+  <% end %>
+  <% if process_phase.end_date.present? %>
+    <li class="form-element"><dl><dt>Data de fim</dt><dd><%= admission_process.end_date %></dd></dl>
+  <% end %>
+<% end %>
+</ol>
 <%= fields_for :record, record, multipart: true do |form| %>
   <div id="<%= subid %>">
     <div>
