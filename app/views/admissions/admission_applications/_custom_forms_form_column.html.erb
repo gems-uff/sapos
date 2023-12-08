@@ -33,8 +33,31 @@
         <% end %>
       </div>
     </div>
-    <% # ToDo: Carta de recomendacao %>
-
+    <% record.letter_requests.each do |letter_request| %>
+      <div>
+        <h5> Carta de <%= letter_request.name %> <a data-show="Mostrar" data-hide="Ocultar"
+            data-toggable="<%= subid %>-letter-<%= letter_request.id %>" style=""
+            class="as-js-button visibility-toggle" href="#"><%= visible ? "Ocultar" : "Mostrar" %></a></h5>
+        <div id="<%= subid %>-letter-<%= letter_request.id %>" style="<%= "display:none;" if !visible %>" >
+          <% if current_phase.nil? || current_phase.can_edit_candidate %>
+            <ol class="form filled-form">
+              <%= form.fields_for :letter_requests, [letter_request] do |letter_form| %>
+                <%= letter_form.fields_for :filled_form do |filled_form| %>
+                  <%= render partial: "admissions/filled_form/edit/filled_form_template", locals: {
+                    form: form,
+                    form_template: admission_process.letter_template,
+                    filled_form: filled_form } %>
+                <% end %>
+              <% end %>
+            </ol>
+          <% else %>
+            <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
+                          form_template: letter_request.filled_form.form_template,
+                          filled_form: letter_request.filled_form} %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
     <% if current_phase.present? %>
       <% admission_process.phases.order(:order).each do |p| %>
         <%

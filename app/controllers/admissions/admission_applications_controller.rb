@@ -108,6 +108,9 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       record.filled_form.prepare_missing_fields
       phase = record.admission_phase
       record.assign_attributes(admission_application_params)
+      record.letter_requests.each do |letter_request|
+        letter_request.filled_form.sync_fields_after(letter_request)
+      end
       if phase.present?
         phase_forms = phase.prepare_application_forms(record, current_user, false)
         phase_forms.each do |phase_form|
@@ -144,7 +147,9 @@ class Admissions::AdmissionApplicationsController < ApplicationController
           Admissions::FilledFormsController.filled_form_params_definition,
         letter_requests_attributes: [
           :id, :email, :name, :telephone,
-          :_destroy
+          :_destroy,
+          filled_form_attributes:
+            Admissions::FilledFormsController.filled_form_params_definition,
         ],
         results_attributes: [
           :id, :mode, :admission_phase_id,
