@@ -8,7 +8,8 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
     find_admission_process(:admission_id)
   end
   before_action :find_admission_application, only: [:show, :edit, :update]
-  before_action :check_if_process_is_open, only: [:new, :create, :edit, :update]
+  before_action :check_if_process_is_open_to_new, only: [:new, :create]
+  before_action :check_if_process_is_open_to_edit, only: [:edit, :update]
   before_action :prepare_new_admission_application, only: [:new, :create]
 
   active_scaffold :active_scaffold_workaround # Load helpers
@@ -143,8 +144,17 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       end
     end
 
-    def check_if_process_is_open
+    def check_if_process_is_open_to_new
       if !@admission_process.is_open?
+        redirect_to admission_apply_path(
+          admission_id: @admission_process.simple_id,
+          id: @admission_application.token
+        ), alert: I18n.t("errors.admissions.closed_process")
+      end
+    end
+
+    def check_if_process_is_open_to_edit
+      if !@admission_application.candidate_can_edit?
         redirect_to admission_apply_path(
           admission_id: @admission_process.simple_id,
           id: @admission_application.token

@@ -16,7 +16,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
     config.columns.add :year_semester
 
     form_columns = [
-      :name, :simple_url, :year, :semester, :start_date, :end_date,
+      :name, :simple_url, :year, :semester, :start_date, :end_date, :edit_date,
       :form_template, :letter_template, :min_letters, :max_letters,
       :allow_multiple_applications, :require_session, :visible, :phases
     ]
@@ -24,7 +24,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
     config.update.columns = form_columns
     config.list.columns = [
       :year, :semester, :name, :simple_id,
-      :start_date, :end_date,
+      :start_date, :end_date, :edit_date,
       :admission_applications_count, :is_open?
     ]
     config.show.columns = [

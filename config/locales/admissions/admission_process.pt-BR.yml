@@ -12,6 +12,8 @@ pt-BR:
         year_semester: "Semestre"
         start_date: "Data de início"
         end_date: "Data de fim"
+        edit_date: "Data limite de edição"
+        max_edit_date: "Data limite de edição"
         form_template: "Modelo de Formulário"
         letter_template: "Modelo de Carta de Recomendação"
         min_letters: "Mínimo de Cartas"
@@ -25,6 +27,9 @@ pt-BR:
         simple_id: "URL"
         require_session: Fluxo com sessão
         phases: "Fases"
+    description:
+      admissions/admission_process:
+        edit_date: "Se ficar em branco, limite é data de fim"
 
     errors:
       models:

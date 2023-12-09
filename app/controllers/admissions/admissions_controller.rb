@@ -162,10 +162,10 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
 
         if source.to_i.to_s == source
           @admission_applications = @admission_applications.filter do |x|
-            x.admission_process.is_open?
+            x.admission_process.is_open? || x.admission_process.is_open_to_edit?
           end
         end
-        # sdasd@asdasd.com
+
         if @admission_applications.blank?
           raise FindException.new I18n.t("errors.admissions.application_process_not_found")
         end

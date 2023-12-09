@@ -39,6 +39,11 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
   validate :max_greater_than_min_letters
   validate :simple_url_is_unique_while_open
 
+  def max_edit_date
+    return self.end_date if self.edit_date.nil?
+    self.edit_date
+  end
+
   def end_greater_than_start_date
     if self.end_date < self.start_date
       self.errors.add(:base, :end_greater_than_start_date)
@@ -83,6 +88,10 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
 
   def is_open?
     self.start_date <= Date.today && self.end_date >= Date.today
+  end
+
+  def is_open_to_edit?
+    self.start_date <= Date.today && self.max_edit_date >= Date.today
   end
 
   def admission_applications_count

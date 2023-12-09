@@ -44,7 +44,7 @@
             } %>
           </ol>
           <p class="links">
-            <% if @admission_process.is_open? %>
+            <% if @admission_application.candidate_can_edit? %>
               <a href="<%= edit_admission_apply_path(
                   admission_id: @admission_process.simple_id,
                   id: @admission_application.token
