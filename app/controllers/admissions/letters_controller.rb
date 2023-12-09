@@ -47,7 +47,7 @@ class Admissions::LettersController < Admissions::ProcessBaseController
     end
 
     def check_if_process_is_open
-      if !@admission_process.is_open?
+      if !@admission_process.is_open? && !@admission_process.is_open_to_edit?
         redirect_to admissions_path,
           alert: I18n.t("errors.admissions.closed_process")
       end

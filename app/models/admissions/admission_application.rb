@@ -83,6 +83,11 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   end
 
+  def candidate_can_edit?
+    return self.admission_process.is_open? if !self.filled_form.is_filled
+    self.admission_process.is_open_to_edit?
+  end
+
   private
     def generate_token
       18.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }

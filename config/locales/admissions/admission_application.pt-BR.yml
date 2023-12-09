@@ -6,7 +6,7 @@ pt-BR:
     attributes:
       admissions/admission_application:
         admission_process: "Edital de Seleção"
-        name: "Nome"
+        name: "Nome Completo"
         email: "Email"
         token: "Código de Identificação"
         filled_form: "Dados"

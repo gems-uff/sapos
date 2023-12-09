@@ -180,6 +180,10 @@ module Admissions::AdmissionProcessesHelper
     record.year.to_s
   end
 
+  def edit_date_column(record, column)
+    record.max_edit_date
+  end
+
   def admission_applications_show_column(record, column)
     render partial: "admission_applications_show", locals: {
       record: record, column: column
