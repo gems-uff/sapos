@@ -23,6 +23,22 @@ class Admissions::AdmissionApplicationsController < ApplicationController
 
     config.list.sorting = { admission_process: "DESC", name: "ASC" }
 
+    config.action_links.add "undo_consolidation",
+      label: "<i title='#{
+        I18n.t "active_scaffold.admissions/admission_application.undo_consolidation.title"
+      }' class='fa fa-undo'></i>".html_safe,
+      type: :member,
+      keep_open: false,
+      position: false,
+      crud_type: :update,
+      method: :put,
+      refresh_list: true,
+      ignore_method: :hide_undo_consolidation?,
+      security_method: :undo_consolidation_security_method,
+      confirm: I18n.t(
+        "active_scaffold.admissions/admission_application.undo_consolidation.confirm"
+      )
+
     config.columns.add :is_filled
     config.columns.add :pendency
     config.columns.add :custom_forms
@@ -105,6 +121,52 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     end && super
   end
 
+  def hide_undo_consolidation?(record)
+    record.admission_phase_id.nil? || cannot?(:undo_consolidation, record)
+  end
+
+  def undo_consolidation_security_method(record)
+    can?(:undo_consolidation, record)
+  end
+
+  def undo_consolidation
+    raise CanCan::AccessDenied.new if cannot? :undo_consolidation, Admissions::AdmissionApplication
+    process_action_link_action(:undo_consolidation) do |record|
+      next if record.admission_phase_id.nil?
+      end_of_phase_statuses = [
+        Admissions::AdmissionApplication::APPROVED,
+        Admissions::AdmissionApplication::REPROVED,
+      ]
+      if end_of_phase_statuses.include?(record.status)
+        set_phase_id = record.admission_phase_id
+      else
+        phases = [nil] + record.admission_process.phases.order(:order).map do |p|
+          p.admission_phase.id
+        end
+        index = phases.find_index(record.admission_phase_id)
+        set_phase_id = phases[index - 1]
+      end
+      record.pendencies.where(
+        status: Admissions::AdmissionPendency::PENDENT,
+        admission_phase_id: record.admission_phase_id
+      ).delete_all
+      record.update!(admission_phase_id: set_phase_id, status: nil)
+      if set_phase_id.present?
+        record.results.where(
+          mode: Admissions::AdmissionPhaseResult::CONSOLIDATION,
+          admission_phase_id: set_phase_id
+        ).delete_all
+        prev_phase = Admissions::AdmissionPhase.find(set_phase_id)
+        prev_phase.update_pendencies
+        prev_phase_name = prev_phase.name
+      else
+        prev_phase_name = "Candidatura"
+      end
+      self.successful = true
+      flash[:info] = I18n.t("active_scaffold.admissions/admission_application.undo_consolidation.success", name: prev_phase_name)
+    end
+  end
+
   protected
     def before_update_save(record)
       record.filled_form.prepare_missing_fields
@@ -164,5 +226,22 @@ class Admissions::AdmissionApplicationsController < ApplicationController
             Admissions::FilledFormsController.filled_form_params_definition,
         ]
       )
+    end
+
+    def undo_consolidation_respond_to_html
+      return_to_main
+    end
+
+    def undo_consolidation_respond_to_js
+      do_refresh_list if !render_parent?
+      @popstate = true
+      render(action: "on_undo_consolidation")
+    end
+
+    def undo_consolidation_respond_on_iframe
+      do_refresh_list if !render_parent?
+      responds_to_parent do
+        render action: "on_undo_consolidation", formats: [:js], layout: false
+      end
     end
 end

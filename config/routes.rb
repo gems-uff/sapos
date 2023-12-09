@@ -299,6 +299,9 @@ Rails.application.routes.draw do
 
     resources :admission_applications do
       concerns :active_scaffold
+      member do
+        put :undo_consolidation
+      end
     end
 
     resources :form_templates do

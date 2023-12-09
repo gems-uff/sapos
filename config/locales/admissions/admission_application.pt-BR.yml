@@ -49,3 +49,10 @@ pt-BR:
           max_letters:
             one: É permitido indicar no máximo uma pessoa
             other: É permitido indicar no máximo %{count} pessoas
+
+  active_scaffold:
+    admissions/admission_application:
+      undo_consolidation:
+        title: Desfazer última consolidação
+        confirm: Você tem certeza que deseja desfazer a última consolidação do candidato? Algumas operações podem não ser reversíveis
+        success: Fase alterada para %{name}

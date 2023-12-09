@@ -70,6 +70,7 @@ class Ability
       cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
       cannot [:read_pendencies], ClassEnrollmentRequest
       cannot [:destroy, :update, :create], Role
+      can :undo_consolidation, Admissions::AdmissionApplication
     elsif role_id == Role::ROLE_COORDENACAO
       can :manage, (Ability::ALL_MODELS - [
         Role, CustomVariable, ReportConfiguration
@@ -83,6 +84,7 @@ class Ability
       can :read, :pendency
       cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
       can :read, (Role)
+      can :undo_consolidation, Admissions::AdmissionApplication
     elsif role_id == Role::ROLE_PROFESSOR
       can :read, (Ability::ALL_MODELS - [
         User, Role, CustomVariable, Query, Version,
@@ -172,6 +174,7 @@ class Ability
       can :read, :pendency
       cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
       can [:read, :execute], (Query)
+      can :undo_consolidation, Admissions::AdmissionApplication
     elsif role_id == Role::ROLE_SUPORTE
       can [:read, :update, :update_only_photo], (Student)
       can :read, :pendency
