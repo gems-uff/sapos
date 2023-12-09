@@ -16,7 +16,7 @@ module Admissions::AdmissionApplicationsHelper
 
   def status_column(record, column)
     if record.status.present?
-      record.status
+      return record.status
     elsif current_user.present? && record.pendencies.where(
         user_id: current_user.id,
         status: Admissions::AdmissionPendency::PENDENT

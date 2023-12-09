@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_07_014736) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_09_053608) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -144,6 +144,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_07_014736) do
     t.boolean "require_session", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.date "edit_date"
+    t.boolean "staff_can_edit"
+    t.boolean "staff_can_undo"
     t.index ["form_template_id"], name: "index_admission_processes_on_form_template_id"
     t.index ["letter_template_id"], name: "index_admission_processes_on_letter_template_id"
     t.index ["simple_url"], name: "index_admission_processes_on_simple_url"

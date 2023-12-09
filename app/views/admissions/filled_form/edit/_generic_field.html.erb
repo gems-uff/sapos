@@ -48,4 +48,10 @@
 <% elsif form_field.field_type == Admissions::FormField::SCHOLARITY %>
   <%= render partial: "admissions/filled_form/edit/generic_scholarity_field",
       locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::CODE %>
+  <%= render partial: "admissions/filled_form/edit/generic_string_field",
+      locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::EMAIL %>
+  <%= render partial: "admissions/filled_form/edit/generic_text_field",
+      locals: partial_locals %>
 <% end %>

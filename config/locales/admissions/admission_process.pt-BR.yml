@@ -20,6 +20,8 @@ pt-BR:
         max_letters: "Máximo de Cartas"
         allow_multiple_applications: "Permitir mais de uma inscrição da mesma pessoa"
         visible: "Visível na lista de seleções"
+        staff_can_edit: "Equipe pode editar"
+        staff_can_undo: "Equipe pode desfazer consolidação"
         admission_applications_count: "Inscritos"
         admission_applications: "Inscrições"
         is_open?: Aberto
@@ -30,6 +32,7 @@ pt-BR:
     description:
       admissions/admission_process:
         edit_date: "Se ficar em branco, limite é data de fim"
+        staff_can_edit: "Secretaria, Coordenação, Administração"
 
     errors:
       models:

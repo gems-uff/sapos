@@ -248,8 +248,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
           end
         end
       end
+      phase_result.save!
     end
-    phase_result.save!
     self.satisfies_conditions(phase.form_conditions) ? APPROVED : REPROVED
   end
 

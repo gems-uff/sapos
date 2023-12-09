@@ -109,6 +109,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
 
   def update_authorized?(record = nil, column = nil)
     return super if record.nil?
+    return true if can?(:override, record) && record.admission_process.staff_can_edit
     phase = record.admission_phase
     return false if phase.nil?
     return false if record.status == Admissions::AdmissionApplication::APPROVED
@@ -122,7 +123,8 @@ class Admissions::AdmissionApplicationsController < ApplicationController
   end
 
   def hide_undo_consolidation?(record)
-    record.admission_phase_id.nil? || cannot?(:undo_consolidation, record)
+    record.admission_phase_id.nil? || cannot?(:undo_consolidation, record) ||
+      !record.admission_process.staff_can_undo
   end
 
   def undo_consolidation_security_method(record)
