@@ -10,6 +10,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   REPROVED = record_i18n_attr("statuses.reproved")
   ERROR = record_i18n_attr("statuses.error")
 
+  END_OF_PHASE_STATUSES = [APPROVED, REPROVED]
+
   scope :non_consolidated, -> {
     where(
       arel_table[:status].eq(nil).or(

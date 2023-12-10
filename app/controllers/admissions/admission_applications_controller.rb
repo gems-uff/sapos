@@ -123,7 +123,9 @@ class Admissions::AdmissionApplicationsController < ApplicationController
   end
 
   def hide_undo_consolidation?(record)
-    record.admission_phase_id.nil? || cannot?(:undo_consolidation, record) ||
+    eop = Admissions::AdmissionApplication::END_OF_PHASE_STATUSES
+    (record.admission_phase_id.nil? && !eop.include?(record.status)) ||
+      cannot?(:undo_consolidation, record) ||
       !record.admission_process.staff_can_undo
   end
 
@@ -134,12 +136,9 @@ class Admissions::AdmissionApplicationsController < ApplicationController
   def undo_consolidation
     raise CanCan::AccessDenied.new if cannot? :undo_consolidation, Admissions::AdmissionApplication
     process_action_link_action(:undo_consolidation) do |record|
-      next if record.admission_phase_id.nil?
-      end_of_phase_statuses = [
-        Admissions::AdmissionApplication::APPROVED,
-        Admissions::AdmissionApplication::REPROVED,
-      ]
-      if end_of_phase_statuses.include?(record.status)
+      next if hide_undo_consolidation?(record)
+      eop = Admissions::AdmissionApplication::END_OF_PHASE_STATUSES
+      if eop.include?(record.status)
         set_phase_id = record.admission_phase_id
       else
         phases = [nil] + record.admission_process.phases.order(:order).map do |p|
