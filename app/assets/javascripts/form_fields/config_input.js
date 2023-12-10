@@ -3,7 +3,7 @@ function config_form_field_input(form_field, field, type, options) {
   type = type || "text";
   let title = form_field.i18n(field);
   let id = `${form_field.baseid}_${field}_${r}`
-  if (!form_field.data[field] && (options["default"] != "")) {
+  if (!form_field.data[field] && options && (options["default"] != "")) {
     form_field.data[field] =  options["default"]
   }
   let value = form_field.data[field] || "";
@@ -25,7 +25,7 @@ function config_form_field_input(form_field, field, type, options) {
     },
     validate: () => {
       let result = true;
-      if (options["required"] && !form_field.data[field]) {
+      if (options && options["required"] && !form_field.data[field]) {
         let present_error = form_field.i18n_error(field + "_present_error");
         $(`#${id}_error`).text(present_error)
         $(`#${id}_error`).show();
