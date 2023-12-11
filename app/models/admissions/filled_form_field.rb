@@ -242,6 +242,16 @@ class Admissions::FilledFormField < ActiveRecord::Base
     end
   end
 
+  def simple_value
+    if self.file.present? && self.file.file.present?
+      self.file
+    elsif !self.list.nil?
+      self.list
+    else
+      self.value
+    end
+  end
+
   def add_error(error, **options)
     attribute = :value
     if self.form_field.field_type == Admissions::FormField::FILE

@@ -54,4 +54,34 @@ class Admissions::FormCondition < ActiveRecord::Base
   def to_label
     "#{self.field} #{self.condition} #{self.value}"
   end
+
+  def self.check_conditions(form_conditions, should_raise: false, &block)
+    form_conditions.all? do |condition|
+      field = yield condition
+      if field.blank?
+        raise MissingFieldException.new(I18n.t(
+          "errors.admissions/admission_application.field_not_found",
+          field: condition.field
+        )) if should_raise
+        next false
+      end
+      func = Admissions::FormCondition::OPTIONS[condition.condition]
+      if field.file.present?
+        func.call(field.file, condition.value)
+      elsif field.list.present?
+        field.list.any? do |element|
+          func.call(element, condition.value)
+        end
+      else
+        func.call(field.value, condition.value)
+      end
+    end
+  end
+end
+
+class MissingFieldException < StandardError
+  def initialize(msg, exception_type = "missing_field")
+    @exception_type = exception_type
+    super(msg)
+  end
 end

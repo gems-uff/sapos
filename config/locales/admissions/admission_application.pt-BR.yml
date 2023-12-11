@@ -56,3 +56,7 @@ pt-BR:
         title: Desfazer última consolidação
         confirm: Você tem certeza que deseja desfazer a última consolidação do candidato? Algumas operações podem não ser reversíveis
         success: Fase alterada para %{name}
+
+  errors:
+    admissions/admission_application:
+      field_not_found: Campo "%{field}" usado em condição não existe

@@ -152,9 +152,12 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   end
 
-  def satisfies_conditions(form_conditions)
-    form_conditions.all? do |condition|
-      field = (
+  def satisfies_conditions(form_conditions, fields: nil, should_raise: false)
+    Admissions::FormCondition.check_conditions(
+      form_conditions, should_raise: should_raise
+    ) do |condition|
+      next fields[condition.field] if fields.present?
+      (
         Admissions::FilledFormField.includes(:form_field)
           .includes(filled_form: :admission_phase_result)
           .where(
@@ -170,17 +173,6 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
             form_field: { name: condition.field }
           ).first
       )
-      next false if field.blank?
-      func = Admissions::FormCondition::OPTIONS[condition.condition]
-      if field.file.present?
-        func.call(field.file, condition.value)
-      elsif field.list.present?
-        field.list.any? do |element|
-          func.call(element, condition.value)
-        end
-      else
-        func.call(field.value, condition.value)
-      end
     end
   end
 
@@ -188,71 +180,44 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     if phase.nil?
       return APPROVED
     end
+    field_objects = nil
     if phase.consolidation_form.present?
-      fields = self.filled_form.to_fields_hash
+      field_objects = self.filled_form.to_fields_hash
       self.results.each do |result|
-        result.filled_form.to_fields_hash(fields)
+        result.filled_form.to_fields_hash(field_objects)
       end
       committees = self.evaluations.where(admission_phase_id: phase.id).map do |ev|
-        ev.filled_form.to_fields_hash
+        ev.filled_form.to_fields_hash.map(&:simple_value)
       end
+      vars = {
+        process: self.admission_process,
+        application: self,
+        committees: committees,
+      }
       phase_result = Admissions::AdmissionPhaseResult.find_or_create_by(
         admission_phase_id: phase.id,
         admission_application: self,
         mode: Admissions::AdmissionPhaseResult::CONSOLIDATION
       )
-      cfields = phase.consolidation_form.fields.order(:order)
-      field_ids = cfields.map(&:id)
-      filled_field_ids = phase_result.filled_form.fields.map(&:form_field_id)
-
-      old_fields = filled_field_ids - field_ids
-      phase_result.filled_form.fields.where(form_field_id: old_fields).delete_all
-      new_filled_fields = field_ids - filled_field_ids
-      cfields.each do |form_field|
-        next if !new_filled_fields.include? form_field.id
-        configuration = JSON.parse(form_field.configuration || "{}")
-        vars = {
-          process: self.admission_process,
-          application: self,
-          fields: fields,
-          committees: committees,
-        }
-        case form_field.field_type
-        when Admissions::FormField::CODE
-          begin
-            value = CodeEvaluator.evaluate_code(configuration["code"], **vars)
-            phase_result.filled_form.fields.new(
-              form_field_id: form_field.id, value: value
-            )
-            fields[form_field.name] = value
-          rescue => err
-            phase_result.save!
-            return "#{ERROR}: #{err}"
-          end
-        when Admissions::FormField::EMAIL
-          begin
-            formatter = ErbFormatter.new(vars)
-            notification = {
-              to: formatter.format(configuration["to"]),
-              subject: formatter.format(configuration["subject"]),
-              body: formatter.format(configuration["body"])
-            }
-            Notifier.send_emails(notifications: [notification])
-            value = "Para: #{notification[:to]}\nAssunto: #{
-              notification[:subject]}\nCorpo:\n#{notification[:body]}"
-            phase_result.filled_form.fields.new(
-              form_field_id: form_field.id, value: value
-            )
-            fields[form_field.name] = value
-          rescue => err
-            phase_result.save!
-            return "#{ERROR}: #{err}"
-          end
-        end
+      begin
+        phase_result.filled_form.consolidate(
+          field_objects: field_objects,
+          vars: vars
+        )
+        phase_result.filled_form.is_filled = true
+      rescue => err
+        return "#{ERROR}: #{err}"
+      ensure
+        phase_result.save!
       end
-      phase_result.save!
     end
-    self.satisfies_conditions(phase.form_conditions) ? APPROVED : REPROVED
+    begin
+      self.satisfies_conditions(
+        phase.form_conditions, fields: field_objects, should_raise: true
+      ) ? APPROVED : REPROVED
+    rescue => err
+      "#{ERROR}: #{err}"
+    end
   end
 
   def consolidate_phase!(phase)

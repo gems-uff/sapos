@@ -96,10 +96,13 @@ class Admissions::FormField < ActiveRecord::Base
       end
     when Admissions::FormField::SCHOLARITY
       validate_scholarity(config)
+    when Admissions::FormField::CODE
+      validate_conditions(config, "conditions")
     when Admissions::FormField::EMAIL
       validate_presence(config, "to")
       validate_presence(config, "subject")
       validate_presence(config, "body")
+      validate_conditions(config, "conditions")
     end
   end
 
@@ -156,6 +159,18 @@ class Admissions::FormField < ActiveRecord::Base
   def validate_presence(config, field)
     if config[field].blank?
       self.errors.add(:base, :"#{field}_present_error")
+    end
+  end
+
+  def validate_conditions(config, field)
+    return if config[field].blank?
+    config[field].each do |condition|
+      if condition["field"].strip == ""
+        self.errors.add(:base, :"#{field}_blank_field_error")
+      end
+      if Admissions::FormCondition::OPTIONS[condition["condition"].strip].blank?
+        self.errors.add(:base, :"#{field}_invalid_condition_error")
+      end
     end
   end
 

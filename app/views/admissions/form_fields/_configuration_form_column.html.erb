@@ -74,7 +74,8 @@
       },
       validate: (valid) => {
         $("#<%=config_view%>_toggle .fa-exclamation").toggle(valid);
-      }
+      },
+      condition_options: <%= JSON.dump(Admissions::FormCondition::OPTIONS.keys).html_safe %>,
     })
 
     $("#<%=config_view%>_toggle").on("click", function() {

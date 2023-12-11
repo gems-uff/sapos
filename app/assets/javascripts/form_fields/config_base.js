@@ -57,7 +57,7 @@ function form_field_config_base(form_field) {
     } else if (selected_value == "file" ) {
       form_field.widgets = [
         config_form_field_checkbox(form_field, "required"),
-        config_form_field_values_sql(form_field, "values", { 
+        config_form_field_values_sql(form_field, "values", {
           label: "extensions"
         }),
       ]
@@ -137,7 +137,10 @@ function form_field_config_base(form_field) {
       ]
     } else if (selected_value == "code") {
       form_field.widgets = [
-        config_form_field_codemirror(form_field, "code", "text/x-ruby")
+        config_form_field_codemirror(form_field, "code", "text/x-ruby"),
+        config_form_field_conditions(form_field, "conditions", form_field.condition_options, {
+          non_blank: true
+        })
       ]
     } else if (selected_value == "email") {
       form_field.widgets = [
@@ -145,7 +148,10 @@ function form_field_config_base(form_field) {
           required: true, default: "<%= var(:application).email %>"
         }),
         config_form_field_input(form_field, "subject", "text", { required: true }),
-        config_form_field_codemirror(form_field, "body", "application/x-erb", { required: true })
+        config_form_field_codemirror(form_field, "body", "application/x-erb", { required: true }),
+        config_form_field_conditions(form_field, "conditions", form_field.condition_options, {
+          non_blank: true
+        })
       ]
     } else if (selected_value == "invalid") {
       form_field.widgets = [

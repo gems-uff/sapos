@@ -28,16 +28,10 @@ class Admissions::FilledForm < ActiveRecord::Base
     I18n.t(key, form: self.form_template.to_label)
   end
 
-  def to_fields_hash(result=nil)
+  def to_fields_hash(result = nil)
     result ||= {}
     self.fields.each do |field|
-      if field.file.present? && field.file.file.present?
-        result[field.form_field.name] = field.file
-      elsif !field.list.nil?
-        result[field.form_field.name] = field.list
-      else
-        result[field.form_field.name] = field.value
-      end
+      result[field.form_field.name] = field
     end
     result
   end
@@ -72,6 +66,76 @@ class Admissions::FilledForm < ActiveRecord::Base
     self.fields.each do |field|
       if syncs[field.form_field_id].present?
         obj[syncs[field.form_field_id]] = field.value
+      end
+    end
+  end
+
+  def consolidate(field_objects: nil, vars: nil)
+    # It may raise an exception during the evaluation of consolidations.
+    # Please, catch it on caller
+    field_objects ||= {}
+    vars ||= {}
+    fields = {}
+    field_objects.each do |name, filled_field|
+      fields[name] = filled_field.simple_value
+    end
+    vars[:fields] = fields
+
+    cfields = self.form_template.fields.order(:order)
+    field_ids = cfields.map(&:id)
+    filled_field_map = self.fields.index_by(&:form_field_id)
+    filled_field_ids = filled_field_map.keys
+
+    old_fields = filled_field_ids - field_ids
+    self.fields.where(form_field_id: old_fields).delete_all
+    new_filled_fields = field_ids - filled_field_ids
+    cfields.each do |form_field|
+      if !new_filled_fields.include? form_field.id
+        field_objects[form_field.name] = filled_field_map[form_field.id]
+        fields[form_field.name] = filled_field_map[form_field.id].simple_value
+        next
+      end
+      configuration = JSON.parse(form_field.configuration || "{}")
+      conditions = (configuration["conditions"] || []).map do |condition|
+        Admissions::FormCondition.new(condition)
+      end
+      skip = !Admissions::FormCondition.check_conditions(
+        conditions, should_raise: true
+      ) do |condition|
+        field_objects[condition.field]
+      end
+      if skip
+        value = I18n.t(
+          "activerecord.errors.models.admissions/filled_form_field.consolidation.skip"
+        )
+        field_objects[form_field.name] = self.fields.new(
+          form_field_id: form_field.id, value: value
+        )
+        fields[form_field.name] = value
+        next
+      end
+
+      case form_field.field_type
+      when Admissions::FormField::CODE
+        value = CodeEvaluator.evaluate_code(configuration["code"], **vars)
+        field_objects[form_field.name] = self.fields.new(
+          form_field_id: form_field.id, value: value
+        )
+        fields[form_field.name] = value
+      when Admissions::FormField::EMAIL
+        formatter = ErbFormatter.new(vars)
+        notification = {
+          to: formatter.format(configuration["to"]),
+          subject: formatter.format(configuration["subject"]),
+          body: formatter.format(configuration["body"])
+        }
+        Notifier.send_emails(notifications: [notification])
+        value = "Para: #{notification[:to]}\nAssunto: #{
+          notification[:subject]}\nCorpo:\n#{notification[:body]}"
+        field_objects[form_field.name] = self.fields.new(
+          form_field_id: form_field.id, value: value
+        )
+        fields[form_field.name] = value
       end
     end
   end

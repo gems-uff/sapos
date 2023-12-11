@@ -35,3 +35,5 @@ pt-BR:
           number_blank: "- Número não pode ficar em branco"
           scholarity_blank: "- %{attr} não pode ficar em branco"
           extension: "possui extensão inválida. Opções permitidas: %{valid}"
+          consolidation:
+            skip: "[Pulou]"
