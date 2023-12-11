@@ -151,7 +151,11 @@ class Admissions::AdmissionApplicationsController < ApplicationController
         status: Admissions::AdmissionPendency::PENDENT,
         admission_phase_id: record.admission_phase_id
       ).delete_all
-      record.update!(admission_phase_id: set_phase_id, status: nil)
+      record.update!(
+        admission_phase_id: set_phase_id,
+        status: nil,
+        status_message: nil,
+      )
       if set_phase_id.present?
         record.results.where(
           mode: Admissions::AdmissionPhaseResult::CONSOLIDATION,

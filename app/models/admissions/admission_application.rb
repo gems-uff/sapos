@@ -15,7 +15,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   scope :non_consolidated, -> {
     where(
       arel_table[:status].eq(nil).or(
-        arel_table[:status].matches("#{ERROR}%")
+        arel_table[:status].eq(ERROR)
       )
     )
   }
@@ -178,7 +178,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
   def consolidate_phase(phase)
     if phase.nil?
-      return APPROVED
+      return { status: APPROVED, status_message: nil }
     end
     field_objects = nil
     if phase.consolidation_form.present?
@@ -206,29 +206,36 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
         )
         phase_result.filled_form.is_filled = true
       rescue => err
-        return "#{ERROR}: #{err}"
+        return { status: ERROR, status_message: err }
       ensure
         phase_result.save!
       end
     end
     begin
-      self.satisfies_conditions(
+      if self.satisfies_conditions(
         phase.form_conditions, fields: field_objects,
         should_raise: Admissions::FormCondition::RAISE_PHASE
-      ) ? APPROVED : REPROVED
+      )
+        { status: APPROVED, status_message: nil }
+      else
+        { status: REPROVED, status_message: nil }
+      end
     rescue => err
-      "#{ERROR}: #{err}"
+      { status: ERROR, status_message: err }
     end
   end
 
   def consolidate_phase!(phase)
     result = self.consolidate_phase(phase)
-    self.update!(status: result)
-    result
+    self.update!(result)
+    result[:status]
   end
 
   def descriptive_status
-    return self.status if self.status.present?
+    if self.status.present?
+      return self.status if self.status_message.blank?
+      return "#{self.status}: #{self.status_message}"
+    end
     return "Sem comitê válido" if self.pendencies.where(
       admission_phase_id: self.admission_phase_id,
       user_id: nil

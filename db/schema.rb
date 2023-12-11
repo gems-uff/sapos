@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_11_052940) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_11_175407) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -35,6 +35,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_11_052940) do
     t.datetime "updated_at", null: false
     t.integer "admission_phase_id"
     t.string "status"
+    t.text "status_message"
     t.index ["admission_phase_id"], name: "index_admission_applications_on_admission_phase_id"
     t.index ["admission_process_id"], name: "index_admission_applications_on_admission_process_id"
     t.index ["filled_form_id"], name: "index_admission_applications_on_filled_form_id"

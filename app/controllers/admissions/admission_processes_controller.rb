@@ -155,13 +155,15 @@ class Admissions::AdmissionProcessesController < ApplicationController
         end
         candidate.update!(
           admission_phase_id: next_phase_id,
-          status: nil
+          status: nil,
+          status_message: nil
         )
       rescue => err
         @errors << candidate
         @approved.delete(candidate)
         candidate.update!(
-          status: "#{Admissions::AdmissionApplication::ERROR}: #{err}"
+          status: Admissions::AdmissionApplication::ERROR,
+          status_message: err
         )
       end
     end

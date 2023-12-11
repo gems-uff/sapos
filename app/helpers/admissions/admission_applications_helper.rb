@@ -15,15 +15,21 @@ module Admissions::AdmissionApplicationsHelper
   end
 
   def status_column(record, column)
+    result = ""
     if record.status.present?
-      return record.status
+      result += record.status
     elsif current_user.present? && record.pendencies.where(
         user_id: current_user.id,
         status: Admissions::AdmissionPendency::PENDENT
       ).first.present?
-      return Admissions::AdmissionPendency::PENDENT
+      result += Admissions::AdmissionPendency::PENDENT
+    else
+      result += active_scaffold_config.list.empty_field_text
     end
-    active_scaffold_config.list.empty_field_text
+    if record.status_message.present?
+      result += ": #{record.status_message}"
+    end
+    result
   end
 
   def filled_form_show_column(record, column)

@@ -23,6 +23,7 @@ pt-BR:
           approved: Aprovado
           reproved: Reprovado
           error: Erro
+        status_message: Razão
         pendency: "Pendência de comitê"
         pendency_options:
           true: Sim
