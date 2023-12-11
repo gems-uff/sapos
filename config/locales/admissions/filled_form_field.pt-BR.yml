@@ -35,5 +35,7 @@ pt-BR:
           number_blank: "- Número não pode ficar em branco"
           scholarity_blank: "- %{attr} não pode ficar em branco"
           extension: "possui extensão inválida. Opções permitidas: %{valid}"
+          invalid_number: "não é um número"
+          invalid_date: "possui formato errado de data. Use DD/MM/YYYY"
           consolidation:
             skip: "[Pulou]"

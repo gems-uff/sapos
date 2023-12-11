@@ -20,3 +20,8 @@ pt-BR:
       admissions/filled_form_field_scholarity:
         one: "Formação"
         other: "Formações"
+
+    errors:
+      models:
+        admissions/filled_form_field_scholarity:
+          invalid_date: "Formato de data inválido. Use DD/MM/YYYY"

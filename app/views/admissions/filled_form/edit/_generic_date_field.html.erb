@@ -1,17 +1,12 @@
 <%
-  scope = field.object_name["record".size..]
-  column = StudentsController.active_scaffold_config.columns[student_field]
+  options = {size: 30}
+  options[:required] = "required" if configuration["required"]
 
-  old_controller = controller
-  controller = StudentsController.new
-  filled_field_mode = :value
-  student = Student.new
-  student[student_field] = field.object[filled_field_mode]
-  options = active_scaffold_input_options(column, scope, :object => student)
-  options[:name] = options[:name][..-(student_field.to_s).size-2] + filled_field_mode.to_s + "]"
-  options[:required] = configuration["required"] ? true : false
+  first_year = 100.years.ago.year
+  last_year = 10.years.from_now.year
+
+  field_id = "date_#{SecureRandom.random_number(1_000_000)}"
 %>
-
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
     <dt>
@@ -20,18 +15,14 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd>
-      <%= active_scaffold_input_for column, scope, options %>
-    </dd>
+    <dd id="<%= field_id %>"> <%= field.text_field :value, class: "text-input",
+             placeholder: configuration["placeholder"], **options %> </dd>
   </dl>
 </li>
 
-<% controller = old_controller %>
-
 <script>
-$(document).ready(function() {
+  $(document).ready(function() {
 
-  <% if column.form_ui == :date_picker %>
     function validateDateField(value) {
       if (!value) {
         return "";
@@ -47,7 +38,7 @@ $(document).ready(function() {
     }
 
     window.customFormValidations.push(function() {
-      let input = $(`#<%= options[:id] %>`).get(0);
+      let input = $(`#<%= field_id %> input`).get(0)
       error_msg = validateDateField($(input).val());
       input.setCustomValidity(error_msg);
       if (error_msg != "") {
@@ -56,7 +47,10 @@ $(document).ready(function() {
       }
       return true;
     })
-  <% end %>
 
-});
+    $(`#<%= field_id %> input`).datepicker({
+      yearRange: '<%= first_year %>:<%= last_year %>'
+    })
+
+  });
 </script>

@@ -9,6 +9,9 @@ class Admissions::FilledFormFieldScholarity < ActiveRecord::Base
   belongs_to :filled_form_field, optional: false,
     class_name: "Admissions::FilledFormField"
 
+
+  validates_date :start_date, allow_blank: true
+  validates_date :end_date, allow_blank: true
   validate :that_value_follows_configuration_rules
 
 
@@ -18,18 +21,17 @@ class Admissions::FilledFormFieldScholarity < ActiveRecord::Base
     configuration = JSON.parse(
       self.filled_form_field.form_field.configuration || "{}"
     )
-    #debugger
-    fields = [
-      {name: :level, type: :select},
-      {name: :status, type: :select},
-      {name: :institution, type: :text},
-      {name: :course, type: :text},
-      {name: :location, type: :location},
-      {name: :grade, type: :text},
-      {name: :grade_interval, type: :text},
-      {name: :start_date, type: :date},
-      {name: :end_date, type: :date},
-    ].map do |field|
+    [
+      { name: :level, type: :select },
+      { name: :status, type: :select },
+      { name: :institution, type: :text },
+      { name: :course, type: :text },
+      { name: :location, type: :location },
+      { name: :grade, type: :text },
+      { name: :grade_interval, type: :text },
+      { name: :start_date, type: :date },
+      { name: :end_date, type: :date },
+    ].each do |field|
       if configuration["scholarity_#{field[:name]}_required"] && self[field[:name]].blank?
         label = configuration["scholarity_#{field[:name]}_name"] || I18n.t(
           "activerecord.attributes.admissions/filled_form_field_scholarity.#{field[:name]}"

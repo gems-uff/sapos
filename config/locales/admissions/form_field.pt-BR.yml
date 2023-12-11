@@ -40,6 +40,7 @@ pt-BR:
           text: Texto longo
           code: Consolidação
           email: Email
+          date: Data
         configurations:
           show_config: "Mostrar configuração"
           hide_config: "Esconder configuração"

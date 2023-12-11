@@ -47,7 +47,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
         self.form_field.get_values_map("values")[configuration["default"]].present?
     when Admissions::FormField::SINGLE_CHECKBOX
       self.value = configuration["default_check"] ? "1" : "0" if self.value.nil?
-    when Admissions::FormField::TEXT
+    when Admissions::FormField::TEXT, Admissions::FormField::NUMBER, Admissions::FormField::DATE
       self.value = configuration["default"] if self.value.nil?
     end
   end
@@ -83,6 +83,10 @@ class Admissions::FilledFormField < ActiveRecord::Base
       validate_city_field(configuration)
     when Admissions::FormField::RESIDENCY
       validate_residency_field(configuration)
+    when Admissions::FormField::NUMBER
+      validate_number_field(configuration)
+    when Admissions::FormField::DATE
+      validate_date_field(configuration)
     end
   end
 
@@ -122,6 +126,9 @@ class Admissions::FilledFormField < ActiveRecord::Base
     else
       validate_value_required(configuration)
     end
+    if ["birthdate", "identity_expedition_date"].include? configuration["field"]
+      validate_date_field(configuration)
+    end
   end
 
   def validate_city_field(configuration)
@@ -154,6 +161,21 @@ class Admissions::FilledFormField < ActiveRecord::Base
   def validate_value_required(configuration)
     if configuration["required"] && self.value.blank?
       add_error(:blank)
+    end
+  end
+
+  def validate_number_field(configuration)
+    !!Float(self.value)
+  rescue
+    add_error(:invalid_number)
+  end
+
+  def validate_date_field(configuration)
+    return if self.value.blank?
+    format_ok = self.value.match(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/)
+    parseable = Date.strptime(self.value, "%d/%m/%Y") rescue false
+    if !format_ok || !parseable
+      add_error(:invalid_date)
     end
   end
 

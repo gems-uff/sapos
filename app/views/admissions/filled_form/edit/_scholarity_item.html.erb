@@ -22,7 +22,7 @@
     field[:options] = { class: "scholarity-#{field[:name]} text-input"}
     field[:options][:required] = field[:required]
     if field[:type] == :date
-      dates << field[:name]
+      dates << field
     else
       field[:options][:size] = 30
     end
@@ -136,10 +136,38 @@ $(document).ready(function() {
     source: ["[0, 10]", "[0, 100]", "[0, 5]", "[0, 4]", "[F, A]", "A, B, C, D, F"],
   })
 
+  function validateScholarityDateField(field, value) {
+    if (!value) {
+      return "";
+    }
+    const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/;
+    groups = value.match(regex)
+    if (!groups || isNaN(Date.parse(`${groups[3]}-${groups[2]}-${groups[1]}`))) {
+      return `${field} <%= I18n.t(
+        "activerecord.errors.models.admissions/filled_form_field.invalid_date",
+      ) %>`
+    }
+    return "" ;
+  }
+
+
   <% dates.each do |field| %>
-    $(`#<%= sid %> input.scholarity-<%= field %>`).datepicker({
+    $(`#<%= sid %> input.scholarity-<%= field[:name] %>`).datepicker({
       yearRange: '<%= first_year %>:<%= last_year %>'
     })
+
+    window.customFormValidations.push(function() {
+      let input = $(`#<%= sid %> input.scholarity-<%= field[:name] %>`).get(0)
+      let label = $("label[for='" + $(input).attr('id') + "']");
+      error_msg = validateScholarityDateField(label.text(), $(input).val());
+      input.setCustomValidity(error_msg);
+      if (error_msg != "") {
+        input.reportValidity()
+        return false;
+      }
+      return true;
+    })
+
   <% end %>
 })
 

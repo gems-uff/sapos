@@ -15,6 +15,9 @@
 <% elsif form_field.field_type == Admissions::FormField::NUMBER %>
   <%= render partial: "admissions/filled_form/edit/generic_number_field",
       locals: partial_locals %>
+<% elsif form_field.field_type == Admissions::FormField::DATE %>
+  <%= render partial: "admissions/filled_form/edit/generic_date_field",
+      locals: partial_locals %>
 <% elsif form_field.field_type == Admissions::FormField::SELECT %>
   <%= render partial: "admissions/filled_form/edit/generic_select_field",
       locals: partial_locals %>

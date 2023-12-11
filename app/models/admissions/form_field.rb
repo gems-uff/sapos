@@ -20,13 +20,14 @@ class Admissions::FormField < ActiveRecord::Base
   GROUP = record_i18n_attr("field_types.group")
   SCHOLARITY = record_i18n_attr("field_types.scholarity")
   RESIDENCY = record_i18n_attr("field_types.residency")
+  DATE = record_i18n_attr("field_types.date")
 
   CODE = record_i18n_attr("field_types.code")
   EMAIL = record_i18n_attr("field_types.email")
 
   INPUT_FIELDS = [
     FILE, STUDENT_FIELD, COLLECTION_CHECKBOX, SINGLE_CHECKBOX,
-    CITY, SCHOLARITY, GROUP, HTML, NUMBER, RESIDENCY,
+    CITY, DATE, SCHOLARITY, GROUP, HTML, NUMBER, RESIDENCY,
     RADIO, SELECT, STRING, TEXT
   ]
   CONSOLIDATION_FIELDS = [
