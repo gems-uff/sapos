@@ -37,6 +37,12 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
     "#{self.name}"
   end
 
+  def initialize_dup(other)
+    super
+    self.admission_phase_committees = other.admission_phase_committees.map(&:dup)
+    self.form_conditions = other.form_conditions.map(&:dup)
+  end
+
   def committee_users_for_candidate(candidate, should_raise: nil)
     users = {}
     self.admission_committees.each do |committee|

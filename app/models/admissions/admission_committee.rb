@@ -22,4 +22,10 @@ class Admissions::AdmissionCommittee < ActiveRecord::Base
   def to_label
     self.name
   end
+
+  def initialize_dup(other)
+    super
+    self.members = other.members.map(&:dup)
+    self.form_conditions = other.form_conditions.map(&:dup)
+  end
 end

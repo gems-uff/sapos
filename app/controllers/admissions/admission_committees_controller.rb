@@ -26,6 +26,12 @@ class Admissions::AdmissionCommitteesController < ApplicationController
     config.columns[:members].show_blank_record = false
     config.columns[:form_conditions].show_blank_record = false
 
+    config.actions << :duplicate
+    config.duplicate.link.label = "
+      <i title='#{I18n.t("active_scaffold.duplicate")}' class='fa fa-copy'></i>
+    ".html_safe
+    config.duplicate.link.method = :get
+    config.duplicate.link.position = :after
     config.actions.exclude :deleted_records
   end
   record_select(

@@ -35,6 +35,12 @@ class Admissions::AdmissionPhasesController < ApplicationController
     }
     config.columns[:consolidation_form].clear_link
 
+    config.actions << :duplicate
+    config.duplicate.link.label = "
+      <i title='#{I18n.t("active_scaffold.duplicate")}' class='fa fa-copy'></i>
+    ".html_safe
+    config.duplicate.link.method = :get
+    config.duplicate.link.position = :after
     config.actions.exclude :deleted_records
   end
   record_select(

@@ -39,6 +39,11 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
   validate :max_greater_than_min_letters
   validate :simple_url_is_unique_while_open
 
+  def initialize_dup(other)
+    super
+    self.phases = other.phases.map(&:dup)
+  end
+
   def max_edit_date
     return self.end_date if self.edit_date.nil?
     self.edit_date
