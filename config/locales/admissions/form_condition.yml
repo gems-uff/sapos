@@ -19,6 +19,10 @@ pt-BR:
           neq: "!="
           is_null: "Nulo"
           not_null: "Não nulo"
+        raises:
+          phase: "Fase"
+          committee: "Comitê"
+          form_field: "Formulário"
 
         value: "Valor"
         model: "Modelo"

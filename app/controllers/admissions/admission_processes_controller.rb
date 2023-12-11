@@ -130,9 +130,9 @@ class Admissions::AdmissionProcessesController < ApplicationController
 
     candidates.each do |candidate|
       case candidate.consolidate_phase!(@phase)
-      when I18n.t("activerecord.attributes.admissions/admission_application.statuses.approved")
+      when Admissions::AdmissionApplication::APPROVED
         @approved << candidate
-      when I18n.t("activerecord.attributes.admissions/admission_application.statuses.reproved")
+      when Admissions::AdmissionApplication::REPROVED
         @reproved << candidate
       else
         @errors << candidate
@@ -146,17 +146,23 @@ class Admissions::AdmissionProcessesController < ApplicationController
       # posterior addition of phases
       change_phase_candidates = @admission_process.admission_applications
         .where(admission_phase_id: @phase.try(:id))
-        .where(status: I18n.t(
-          "activerecord.attributes.admissions/admission_application.statuses.approved"
-        ))
+        .where(status: Admissions::AdmissionApplication::APPROVED)
       change_phase_candidates.each do |candidate|
+        if !next_phase.create_pendencies_for_candidate(
+          candidate, should_raise: Admissions::FormCondition::RAISE_COMMITTEE
+        )
+          @missing_committee << candidate
+        end
         candidate.update!(
           admission_phase_id: next_phase_id,
           status: nil
         )
-        if !next_phase.create_pendencies_for_candidate(candidate)
-          @missing_committee << candidate
-        end
+      rescue => err
+        @errors << candidate
+        @approved.delete(candidate)
+        candidate.update!(
+          status: "#{Admissions::AdmissionApplication::ERROR}: #{err}"
+        )
       end
     end
 

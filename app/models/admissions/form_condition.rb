@@ -36,6 +36,10 @@ class Admissions::FormCondition < ActiveRecord::Base
     NOT_NULL => ->(f, v) { !f.nil? },
   }
 
+  RAISE_COMMITTEE = record_i18n_attr("raises.committee")
+  RAISE_PHASE = record_i18n_attr("raises.phase")
+  RAISE_FORM_FIELD = record_i18n_attr("raises.form_field")
+
   after_commit :update_pendencies
 
   def update_pendencies
@@ -55,14 +59,14 @@ class Admissions::FormCondition < ActiveRecord::Base
     "#{self.field} #{self.condition} #{self.value}"
   end
 
-  def self.check_conditions(form_conditions, should_raise: false, &block)
+  def self.check_conditions(form_conditions, should_raise: nil, &block)
     form_conditions.all? do |condition|
       field = yield condition
       if field.blank?
         raise MissingFieldException.new(I18n.t(
           "errors.admissions/admission_application.field_not_found",
-          field: condition.field
-        )) if should_raise
+          field: condition.field, source: should_raise
+        )) if should_raise.present?
         next false
       end
       func = Admissions::FormCondition::OPTIONS[condition.condition]

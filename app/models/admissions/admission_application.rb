@@ -152,7 +152,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   end
 
-  def satisfies_conditions(form_conditions, fields: nil, should_raise: false)
+  def satisfies_conditions(form_conditions, fields: nil, should_raise: nil)
     Admissions::FormCondition.check_conditions(
       form_conditions, should_raise: should_raise
     ) do |condition|
@@ -213,7 +213,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
     begin
       self.satisfies_conditions(
-        phase.form_conditions, fields: field_objects, should_raise: true
+        phase.form_conditions, fields: field_objects,
+        should_raise: Admissions::FormCondition::RAISE_PHASE
       ) ? APPROVED : REPROVED
     rescue => err
       "#{ERROR}: #{err}"

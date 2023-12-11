@@ -37,10 +37,10 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
     "#{self.name}"
   end
 
-  def committee_users_for_candidate(candidate)
+  def committee_users_for_candidate(candidate, should_raise: nil)
     users = {}
     self.admission_committees.each do |committee|
-      if candidate.satisfies_conditions(committee.form_conditions)
+      if candidate.satisfies_conditions(committee.form_conditions, should_raise: should_raise)
         committee.users.each { |user| users[user.id] = user }
       end
     end
@@ -53,8 +53,8 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
     end
   end
 
-  def create_pendencies_for_candidate(candidate)
-    users = self.committee_users_for_candidate(candidate)
+  def create_pendencies_for_candidate(candidate, should_raise: nil)
+    users = self.committee_users_for_candidate(candidate, should_raise: should_raise)
     pendency_arel = Admissions::AdmissionPendency.arel_table
     # Remove pendencies from users that are not valid for candidate
     Admissions::AdmissionPendency.where(

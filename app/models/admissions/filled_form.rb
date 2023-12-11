@@ -100,7 +100,7 @@ class Admissions::FilledForm < ActiveRecord::Base
         Admissions::FormCondition.new(condition)
       end
       skip = !Admissions::FormCondition.check_conditions(
-        conditions, should_raise: true
+        conditions, should_raise: Admissions::FormCondition::RAISE_FORM_FIELD
       ) do |condition|
         field_objects[condition.field]
       end

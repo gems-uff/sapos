@@ -59,4 +59,4 @@ pt-BR:
 
   errors:
     admissions/admission_application:
-      field_not_found: Campo "%{field}" usado em condição não existe
+      field_not_found: Campo "%{field}" usado em condição de %{source} não existe
