@@ -31,6 +31,7 @@ pt-BR:
         admission_phase: Fase
         results: Resultados
         evaluations: Avaliações de comitê
+        updated_at: "Última alteração"
       admissions/admission_application/letter_requests:
         name: "Nome na indicação de carta de recomendação"
         email: "Email na indicação de carta de recomendação"
