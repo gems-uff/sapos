@@ -160,16 +160,15 @@ class Ability
       can :manage, (Ability::ALL_MODELS - [
         User, Role, CustomVariable, Query, Version,
         Notification, ReportConfiguration,
-        Admissions::FormTemplate, Admissions::FormField,
-        Admissions::AdmissionApplication, Admissions::FilledForm,
-        Admissions::FilledFormFieldScholarity,
-        Admissions::FilledFormField, Admissions::LetterRequest,
+        Admissions::FormTemplate, Admissions::FormField
       ])
+      cannot :destroy, [
+        Admissions::AdmissionApplication, Admissions::FilledForm,
+        Admissions::FilledFormField, Admissions::FilledFormFieldScholarity,
+        Admissions::LetterRequest
+      ]
       can :read, [
         Admissions::FormTemplate, Admissions::FormField,
-        Admissions::AdmissionApplication, Admissions::FilledForm,
-        Admissions::FilledFormFieldScholarity,
-        Admissions::FilledFormField, Admissions::LetterRequest,
       ]
       cannot :update_only_photo, Student
       can :invite, User
