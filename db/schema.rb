@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_11_175407) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_12_135710) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -122,8 +122,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_11_175407) do
   create_table "admission_process_phases", force: :cascade do |t|
     t.integer "admission_process_id"
     t.integer "admission_phase_id"
-    t.datetime "start_date"
-    t.datetime "end_date"
+    t.date "start_date"
+    t.date "end_date"
     t.integer "order"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

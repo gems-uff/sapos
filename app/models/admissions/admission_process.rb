@@ -133,11 +133,11 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
   end
 
   def current_phase(options = {})
-    time = options[:time]
-    time ||= Time.now
+    date = options[:date]
+    date ||= Date.today
     result = nil
     self.phases.order(:order).each do |p|
-      if p.start_date.present? && p.start_date <= time
+      if p.start_date.present? && p.start_date <= date
         result = p.admission_phase
       end
     end

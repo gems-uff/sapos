@@ -1,8 +1,7 @@
-<%
-  if ["Admissions::AdmissionProcessesController"].include? controller.class.name
-   associated = associated.sort_by { |f| [f.order, f.id]}
-  end
-%>
+<% if ["Admissions::AdmissionProcessesController"].include? controller.class.name %>
+  <% associated = associated.sort_by { |f| [f.order, f.id]} %>
+  <span style="font-size: 11px;">* Datas de fases são usadas para mero controle. Elas não interferem na consolidação.</span>
+<% end %>
 <%= render(partial: 'active_scaffold_overrides/horizontal_subform', locals: {
     parent_record: parent_record, column: column, associated: associated,
     scope: scope, show_blank_record: show_blank_record,
