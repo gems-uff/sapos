@@ -3,6 +3,7 @@
   options = {}
   options[:checked] = configuration["default"] if configuration["default"].present?
   values = values.map { |k, v| [v, k] }
+  field_id = "radio_#{SecureRandom.random_number(1_000_000)}"
 %>
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
@@ -12,7 +13,7 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd>
+    <dd id="<%= field_id %>">
       <%= field.collection_radio_buttons :value, values, :last, :first, options do |b| %>
         <div class="form-template-checkbox-list <%= "vertical-style" if configuration["vertical_layout"].present? %>">
           <%= b.label do %>
@@ -23,3 +24,26 @@
     </dd>
   </dl>
 </li>
+
+
+<script>
+$(document).ready(function() {
+  <% if configuration["required"] %>
+    window.customFormValidations.push(function() {
+      let error_msg = "";
+      if (!$(`#<%= field_id %> input:checked`).get(0)) {
+        error_msg = `<%= form_field.name %> <%= I18n.t(
+          "activerecord.errors.models.admissions/filled_form_field.blank",
+        ) %>`
+      }
+      let input = $(`#<%= field_id %> input`).get(1);
+      input.setCustomValidity(error_msg);
+      if (error_msg != "") {
+        input.reportValidity()
+        return false;
+      }
+      return true;
+    })
+  <% end %>
+});
+</script>
