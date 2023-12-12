@@ -1,7 +1,8 @@
 <%
-  values = form_field.get_values("values")
+  values = form_field.get_values_map("values")
   options = {}
   options[:checked] = configuration["default"] if configuration["default"].present?
+  values = values.map { |k, v| [v, k] }
 %>
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
