@@ -15,6 +15,7 @@ module Admissions::AdmissionApplicationsHelper
   end
 
   def status_column(record, column)
+    return record.descriptive_status if params[:simple_view].present?
     result = ""
     if record.status.present?
       result += record.status

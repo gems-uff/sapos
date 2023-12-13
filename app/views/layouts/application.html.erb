@@ -11,27 +11,50 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-  <div id='container' class='<%= signed_in_class %>'>
-    <div id='header'>
-      <div id='logo'>
-        <%= link_to root_path do %>
-          <%= image_tag 'logoSapos.png' %>
-        <% end %>
+  <% if @simple_view %>
+    <script type="text/javascript">
+      //Don't run unless in an iframe
+      if (self !== top) {
+        var rootHeight;
+        setInterval(function () {
+          var rootElement = document.documentElement;
+          if (rootElement) {
+            rootElement.style.overflow = "hidden"
+            var currentRootHeight = rootElement.offsetHeight;
+            //Only send values if height has changed since last time
+            if (rootHeight !== currentRootHeight) {
+              //postMessage to set iframe height
+              window.parent.postMessage({ "type": "frame-resized", "value": currentRootHeight }, '*');
+              rootHeight = currentRootHeight;
+            }
+          }
+        }, 1000);
+      }
+    </script>
+    <%= yield %>
+  <% else %>
+    <div id='container' class='<%= signed_in_class %>'>
+      <div id='header'>
+        <div id='logo'>
+          <%= link_to root_path do %>
+            <%= image_tag 'logoSapos.png' %>
+          <% end %>
+        </div>
+        <div id="sub">
+          Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %>
+        </div>
       </div>
-      <div id="sub">
-        Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %>
+      <span class="notice"><%= notice %></span>
+      <div id='top_navigation' <%= display_none_if_logged_out %>>
+        <%= optional_navigation level: 1 %>
+      </div>
+      <div id='main'>
+        <div id='sub_navigation' <%= display_none_if_logged_out %>><%= optional_navigation level: 2 %></div>
+        <div id='content'>
+          <%= yield %>
+        </div>
       </div>
     </div>
-    <span class="notice"><%= notice %></span>
-    <div id='top_navigation' <%= display_none_if_logged_out %>>
-      <%= optional_navigation level: 1 %>
-    </div>
-    <div id='main'>
-      <div id='sub_navigation' <%= display_none_if_logged_out %>><%= optional_navigation level: 2 %></div>
-      <div id='content'>
-        <%= yield %>
-      </div>
-    </div>
-  </div>
+  <% end %>
 </body>
 </html>

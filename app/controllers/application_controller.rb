@@ -65,6 +65,7 @@ class ApplicationController < ActionController::Base
 
   private
     def prepare_background
+      @simple_view = params[:simple_view].present?
       @show_background = user_signed_in?
     end
 

@@ -101,6 +101,11 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     [candidate_arel[:id].in(pendencies_query).to_sql]
   end
 
+  def self.phase_condition(phase_id = nil)
+    candidate_arel = Admissions::AdmissionApplication.arel_table
+    [candidate_arel[:admission_phase_id].eq(phase_id).to_sql]
+  end
+
   def number_of_letters_in_filled_form
     return if self.filled_form.blank?
     return if self.admission_process.blank?
@@ -256,6 +261,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       pendencies << pendency.user.name
     end
     return "Pendente: #{pendencies.join(", ")}" if pendencies.present?
+    return "Pendente" if self.admission_phase_id.nil? && !self.filled_form.is_filled
     "Pronto para consolidação"
   end
 
