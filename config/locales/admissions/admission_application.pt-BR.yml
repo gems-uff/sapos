@@ -32,6 +32,7 @@ pt-BR:
         results: Resultados
         evaluations: Avaliações de comitê
         updated_at: "Última alteração"
+        submission_time: "Data de inscrição"
       admissions/admission_application/letter_requests:
         name: "Nome na indicação de carta de recomendação"
         email: "Email na indicação de carta de recomendação"

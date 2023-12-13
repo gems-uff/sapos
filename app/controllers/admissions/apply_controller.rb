@@ -37,6 +37,9 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
     @admission_application.assign_attributes(admission_application_params)
     @admission_application.filled_form.sync_fields_after(@admission_application)
     was_filled = @admission_application.filled_form.is_filled
+    if !was_filled
+      @admission_application.submission_time = Time.current
+    end
     @admission_application.filled_form.is_filled = true
     if @admission_application.save
       emails = [EmailTemplate.load_template(
@@ -80,6 +83,9 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
         id: @admission_application.token
       ), notice: notice
     else
+      if !was_filled
+        @admission_application.submission_time = nil
+      end
       @admission_application.filled_form.is_filled = was_filled
       prepare_admission_application_fields
       render :edit
