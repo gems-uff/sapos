@@ -137,7 +137,7 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
     if record.blank? || !request.original_url.end_with?(record.file.url)
       raise ActionController::RoutingError.new("Não encontrado")
     end
-    send_data(record.file.read, filename: record.file.filename)
+    send_data(record.file.read, filename: record.file.filename, disposition: :inline)
   end
 
   protected
