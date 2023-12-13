@@ -11,6 +11,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   ERROR = record_i18n_attr("statuses.error")
 
   END_OF_PHASE_STATUSES = [APPROVED, REPROVED]
+  STATUSES = [APPROVED, REPROVED, ERROR]
 
   scope :non_consolidated, -> {
     where(

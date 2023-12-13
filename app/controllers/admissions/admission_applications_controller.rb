@@ -5,6 +5,7 @@
 
 class Admissions::AdmissionApplicationsController < ApplicationController
   authorize_resource
+  before_action :update_table_config
 
   I18N_BASE = "activerecord.attributes.admissions/admission_application"
 
@@ -58,9 +59,14 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     }
     config.columns[:admission_phase].actions_for_association_links = [:show]
     config.columns[:admission_phase].search_ui = :record_select
+    config.columns[:admission_phase].sort_by sql: [:admission_phase_id]
+
+    config.columns[:status].search_sql = ""
+    config.columns[:status].search_ui = :select
 
     config.update.columns = [:custom_forms]
     config.update.multipart = true
+
 
     config.actions.swap :search, :field_search
     config.field_search.columns = [
@@ -70,9 +76,37 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       :email,
       :is_filled,
       :pendency,
-      :admission_phase
+      :admission_phase,
+      :status
     ]
     config.actions.exclude :deleted_records, :create
+  end
+
+  def update_table_config
+    if current_user
+      active_scaffold_config.columns[:status].sort_by sql: Arel.sql("
+        CASE
+          WHEN `admission_applications`.`status` IS NOT NULL THEN `admission_applications`.`status`
+          WHEN `admission_applications`.`id` IN (
+            SELECT `admission_application_id`
+            FROM `admission_pendencies`
+            WHERE `admission_pendencies`.`status`=\"#{Admissions::AdmissionPendency::PENDENT}\"
+            AND (
+              (
+                `admission_pendencies`.`admission_phase_id` IS NULL AND
+                `admission_applications`.`admission_phase_id` IS NULL
+              ) OR (
+                `admission_pendencies`.`admission_phase_id` = `admission_applications`.`admission_phase_id`
+              )
+            )
+            AND `admission_pendencies`.`user_id`=#{current_user.id}
+          ) THEN \"#{Admissions::AdmissionPendency::PENDENT}\"
+          ELSE \"-\"
+        END
+      ")
+    else
+      active_scaffold_config.columns[:status].sort_by sql: "status"
+    end
   end
 
   def self.condition_for_is_filled_column(column, value, like_pattern)
@@ -104,6 +138,29 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       [candidate_arel[:id].not_in(pendencies_query).to_sql]
     else
       ""
+    end
+  end
+
+  def self.condition_for_status_column(column, value, like_pattern)
+    candidate_arel = Admissions::AdmissionApplication.arel_table
+    return "" if value.blank?
+    if value.to_i.to_s == value
+      value = value.to_i
+      user_id = value.abs
+      pendency_arel = Admissions::AdmissionPendency.arel_table
+      pendencies_query = pendency_arel.where(
+        pendency_arel[:status].eq(Admissions::AdmissionPendency::PENDENT)
+        .and(pendency_arel[:admission_phase_id].eq(candidate_arel[:admission_phase_id]))
+        .and(pendency_arel[:user_id].eq(user_id))
+      ).project(pendency_arel[:admission_application_id])
+      result = candidate_arel[:status].eq(nil)
+      if value < 0
+        [result.and(candidate_arel[:id].not_in(pendencies_query)).to_sql]
+      else
+        [result.and(candidate_arel[:id].in(pendencies_query)).to_sql]
+      end
+    else
+      [candidate_arel[:status].eq(value).to_sql]
     end
   end
 

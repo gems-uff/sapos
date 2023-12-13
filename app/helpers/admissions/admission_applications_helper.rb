@@ -21,7 +21,8 @@ module Admissions::AdmissionApplicationsHelper
       result += record.status
     elsif current_user.present? && record.pendencies.where(
         user_id: current_user.id,
-        status: Admissions::AdmissionPendency::PENDENT
+        status: Admissions::AdmissionPendency::PENDENT,
+        admission_phase_id: record.admission_phase_id
       ).first.present?
       result += Admissions::AdmissionPendency::PENDENT
     else
@@ -62,5 +63,15 @@ module Admissions::AdmissionApplicationsHelper
       admission_application_id: record.id,
       association: "evaluations"
     }
+  end
+
+  def status_search_column(record, options)
+    select(record, :status, [
+      [I18n.t("active_scaffold._select_"), nil],
+      ["-", -current_user.id],
+      [Admissions::AdmissionPendency::PENDENT, current_user.id]
+    ] +Admissions::AdmissionApplication::STATUSES.map do |status|
+      [status, status]
+    end, options, options)
   end
 end
