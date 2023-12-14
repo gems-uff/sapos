@@ -1,0 +1,17 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/ranking_machine:
+        name: Nome
+        form_conditions: Condições
+
+    models:
+      admissions/ranking_machine:
+        one: "Seletor de Ranking"
+        other: "Seletores de Ranking"
+
+  active_scaffold:
+    create_ranking_machine_label: "Criar Seletor de Ranking"

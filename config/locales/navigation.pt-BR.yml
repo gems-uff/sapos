@@ -67,6 +67,8 @@ pt-BR:
       consolidation_template: Consolidações
       admission_committee: Comitês
       admission_phase: Fases
+      ranking_config: Configurações de Ranking
+      ranking_machine: Seletor de Ranking
       admission_application: Candidaturas
 
     configurations:

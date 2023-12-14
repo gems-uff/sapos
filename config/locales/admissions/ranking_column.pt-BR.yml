@@ -1,0 +1,20 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/ranking_column:
+        name: Nome
+        order: Ordem
+        orders:
+          asc: ASC
+          desc: DESC
+
+    models:
+      admissions/ranking_column:
+        one: "Ordenação para Ranking"
+        other: "Ordenações para Ranking"
+
+  active_scaffold:
+    create_ranking_column_label: "Criar Ordenação para Ranking"

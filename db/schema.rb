@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_13_023109) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_14_172138) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -654,6 +654,55 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_13_023109) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["query_id"], name: "index_query_params_on_query_id"
+  end
+
+  create_table "ranking_columns", force: :cascade do |t|
+    t.integer "ranking_config_id"
+    t.string "name"
+    t.string "order"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ranking_config_id"], name: "index_ranking_columns_on_ranking_config_id"
+  end
+
+  create_table "ranking_configs", force: :cascade do |t|
+    t.string "name"
+    t.integer "form_template_id"
+    t.integer "position_field_id"
+    t.integer "machine_field_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["form_template_id"], name: "index_ranking_configs_on_form_template_id"
+    t.index ["machine_field_id"], name: "index_ranking_configs_on_machine_field_id"
+    t.index ["position_field_id"], name: "index_ranking_configs_on_position_field_id"
+  end
+
+  create_table "ranking_groups", force: :cascade do |t|
+    t.integer "ranking_config_id"
+    t.string "name"
+    t.integer "vacancies"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ranking_config_id"], name: "index_ranking_groups_on_ranking_config_id"
+  end
+
+  create_table "ranking_machines", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "ranking_processes", force: :cascade do |t|
+    t.integer "ranking_config_id"
+    t.integer "order"
+    t.integer "vacancies"
+    t.string "group"
+    t.integer "ranking_machine_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "step", default: 1
+    t.index ["ranking_config_id"], name: "index_ranking_processes_on_ranking_config_id"
+    t.index ["ranking_machine_id"], name: "index_ranking_processes_on_ranking_machine_id"
   end
 
   create_table "report_configurations", force: :cascade do |t|

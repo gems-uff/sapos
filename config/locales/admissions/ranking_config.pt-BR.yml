@@ -1,0 +1,23 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/ranking_config:
+        ranking_config: Configuração de Ranking
+        name: Nome
+        form_template: Formulário
+        position_field: Campo de Posição
+        machine_filed: Campo de Seletor
+        ranking_columns: Colunas de ordenação
+        ranking_groups: Grupos de vagas
+        ranking_processes: Processo
+
+    models:
+      admissions/ranking_config:
+        one: "Configuração de Ranking"
+        other: "Configurações de Ranking"
+
+  active_scaffold:
+    create_ranking_config_label: "Criar Configuração de Ranking"

@@ -201,6 +201,8 @@ SimpleNavigation::Configuration.run do |navigation|
       Admissions::FormTemplate,
       Admissions::AdmissionCommittee,
       Admissions::AdmissionPhase,
+      Admissions::RankingConfig,
+      Admissions::RankingMachine,
       Admissions::AdmissionApplication,
     ]
     mainhelper.listitem :admissions, admission_models do |submenu|
@@ -209,6 +211,8 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.item(:consolidation_template, consolidation_templates_path)
       submenu.modelitem Admissions::AdmissionCommittee
       submenu.modelitem Admissions::AdmissionPhase
+      submenu.modelitem Admissions::RankingConfig
+      submenu.modelitem Admissions::RankingMachine
       submenu.modelitem Admissions::AdmissionApplication
     end
 

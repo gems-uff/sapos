@@ -1,0 +1,10 @@
+<% if ["Admissions::RankingConfigsController"].include? controller.class.name %>
+  <% associated = associated.sort_by { |f| [f.order, f.id]} %>
+  <div style="font-size: 11px;">* Se o campo de vagas ficar em branco, vagas serão consumidas do que estiver especificado em grupo.</div>
+  <div style="font-size: 11px;">* Se o campo de grupo ficar em branco, vagas do processo são independentes.</div>
+<% end %>
+<%= render(partial: 'active_scaffold_overrides/horizontal_subform', locals: {
+    parent_record: parent_record, column: column, associated: associated,
+    scope: scope, show_blank_record: show_blank_record,
+    local_assigns: local_assigns
+  }) %>

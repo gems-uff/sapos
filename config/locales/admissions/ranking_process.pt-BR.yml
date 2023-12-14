@@ -1,0 +1,21 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/ranking_process:
+        ranking_config: Configuração de Ranking
+        order: Ordem
+        vacancies: Vagas
+        group: Grupo
+        ranking_machine: Seletor de Ranking
+        step: Passada
+
+    models:
+      admissions/ranking_process:
+        one: "Processo de Ranking"
+        other: "Processos de Ranking"
+
+  active_scaffold:
+    create_ranking_process_label: "Criar Processo de Ranking"

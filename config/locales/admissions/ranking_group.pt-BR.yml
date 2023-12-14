@@ -1,0 +1,18 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/ranking_group:
+        ranking_config: Configuração de Ranking
+        name: Nome
+        vacancies: Vagas
+
+    models:
+      admissions/ranking_group:
+        one: "Grupo de Vaga"
+        other: "Grupos de Vagas"
+
+  active_scaffold:
+    create_ranking_group_label: "Criar Grupo de Vaga"

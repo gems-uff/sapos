@@ -409,6 +409,28 @@ Rails.application.routes.draw do
     resources :admission_pendencies do
       concerns :active_scaffold
     end
+
+    resources :ranking_machines do
+      concerns :active_scaffold
+      record_select_routes
+    end
+
+    resources :ranking_configs do
+      concerns :active_scaffold
+      record_select_routes
+    end
+
+    resources :ranking_columns do
+      concerns :active_scaffold
+    end
+
+    resources :ranking_groups do
+      concerns :active_scaffold
+    end
+
+    resources :ranking_processes do
+      concerns :active_scaffold
+    end
   end
 
   get "landing", action: :index, controller: "landing"

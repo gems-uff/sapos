@@ -15,9 +15,11 @@ pt-BR:
           admission_form: "Formulário"
           recommendation_letter: "Carta de Recomendação"
           consolidation_form: "Consolidação"
+          ranking: "Ranking"
         phase_member_forms: "Fases com formulário individual"
         phase_shared_forms: "Fases com formulário compartilhado"
         phase_consolidation_forms: "Fases com formulário de consolidação"
+        ranking_config: "Configuração de Ranking"
 
     models:
       admissions/form_template:

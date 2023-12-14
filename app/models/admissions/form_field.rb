@@ -52,6 +52,12 @@ class Admissions::FormField < ActiveRecord::Base
 
   has_many :filled_fields, dependent: :restrict_with_exception,
     class_name: "Admissions::FilledFormField"
+  has_one :ranking_config_as_position, dependent: :destroy,
+    class_name: "Admissions::RankingConfig",
+    foreign_key: :position_field_id
+  has_one :ranking_config_as_machine, dependent: :destroy,
+    class_name: "Admissions::RankingConfig",
+    foreign_key: :machine_field_id
 
   belongs_to :form_template, optional: false,
     class_name: "Admissions::FormTemplate"
