@@ -32,7 +32,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
 
   def set_default_values
     return if self.form_field.nil?
-    configuration = JSON.parse(self.form_field.configuration || "{}")
+    configuration = self.form_field.config_hash
     case self.form_field.field_type
     when Admissions::FormField::STRING
       self.value = configuration["default"] if self.value.nil?
@@ -61,7 +61,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
 
   def that_value_follows_configuration_rules
     return if self.form_field.nil?
-    configuration = JSON.parse(self.form_field.configuration || "{}")
+    configuration = self.form_field.config_hash
     case self.form_field.field_type
     when Admissions::FormField::STRING
       validate_value_required(configuration)
@@ -225,7 +225,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
       return blank if self.file.blank? || self.file.file.blank?
       self.file.url
     when Admissions::FormField::STUDENT_FIELD
-      configuration = JSON.parse(self.form_field.configuration || "{}")
+      configuration = self.form_field.config_hash
       if ["special_city", "special_birth_city"].include? configuration["field"]
         self.to_text(
           blank: blank, field_type: Admissions::FormField::CITY, custom: custom)

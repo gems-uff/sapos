@@ -18,9 +18,7 @@ class Admissions::FilledFormFieldScholarity < ActiveRecord::Base
   def that_value_follows_configuration_rules
     return if self.filled_form_field.nil?
     return if self.filled_form_field.form_field.nil?
-    configuration = JSON.parse(
-      self.filled_form_field.form_field.configuration || "{}"
-    )
+    configuration = self.filled_form_field.form_field.config_hash
     [
       { name: :level, type: :select },
       { name: :status, type: :select },

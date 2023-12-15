@@ -182,16 +182,21 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   end
 
+  def fields_hash
+    field_objects = self.filled_form.to_fields_hash
+    self.results.each do |result|
+      result.filled_form.to_fields_hash(field_objects)
+    end
+    field_objects
+  end
+
   def consolidate_phase(phase)
     if phase.nil?
       return { status: APPROVED, status_message: nil }
     end
     field_objects = nil
     if phase.consolidation_form.present?
-      field_objects = self.filled_form.to_fields_hash
-      self.results.each do |result|
-        result.filled_form.to_fields_hash(field_objects)
-      end
+      field_objects = self.fields_hash
       committees = self.evaluations.where(admission_phase_id: phase.id).map do |ev|
         ev.filled_form.to_fields_hash.map(&:simple_value)
       end

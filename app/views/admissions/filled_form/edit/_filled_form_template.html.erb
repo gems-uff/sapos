@@ -9,7 +9,7 @@
     elsif (
       field.field_type == Admissions::FormField::SCHOLARITY || (
         field.field_type == Admissions::FormField::STUDENT_FIELD &&
-        JSON.parse(field.configuration || "{}")["field"] == "special_majors"
+        field.config_hash["field"] == "special_majors"
       )
     )
       groups << [field, :div, [filled_hash[field.id]]]

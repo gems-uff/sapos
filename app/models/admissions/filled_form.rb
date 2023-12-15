@@ -95,7 +95,7 @@ class Admissions::FilledForm < ActiveRecord::Base
         fields[form_field.name] = filled_field_map[form_field.id].simple_value
         next
       end
-      configuration = JSON.parse(form_field.configuration || "{}")
+      configuration = form_field.config_hash
       conditions = (configuration["conditions"] || []).map do |condition|
         Admissions::FormCondition.new(condition)
       end

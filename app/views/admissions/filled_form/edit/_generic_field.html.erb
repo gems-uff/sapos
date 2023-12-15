@@ -2,7 +2,7 @@
   form_field = field.object.form_field
   partial_locals = {
     form_field: form_field, field: field,
-    configuration: JSON.parse(form_field.configuration || "{}")
+    configuration: form_field.config_hash
   }
 
 %>

@@ -81,8 +81,12 @@ class Admissions::FormField < ActiveRecord::Base
   validate :that_configuration_is_valid
   validate :that_field_type_is_valid_for_template
 
+  def config_hash
+    JSON.parse(self.configuration || "{}")
+  end
+
   def that_configuration_is_valid
-    config = JSON.parse(self.configuration || "{}")
+    config = self.config_hash
   rescue JSON::ParserError, TypeError
     self.errors.add(:configuration, :invalid_format)
   else
@@ -183,14 +187,14 @@ class Admissions::FormField < ActiveRecord::Base
 
   def execute_sql(option, config: nil)
     return [] if config["#{option}_sql"].blank?
-    config = JSON.parse(self.configuration || "{}") if config.nil?
+    config = self.config_hash if config.nil?
     generated_query = ::Query.parse_sql_and_params(config["#{option}_sql"], {})
     db_resource = ::Query.run_read_only_query(generated_query)
     (db_resource[:rows] || []).collect { |x| x[0..1].map(&:to_s) }
   end
 
   def get_values(option)
-    config = JSON.parse(self.configuration || "{}")
+    config = self.config_hash
   rescue JSON::ParserError, TypeError
     []
   else
