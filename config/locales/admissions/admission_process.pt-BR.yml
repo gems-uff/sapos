@@ -64,6 +64,13 @@ pt-BR:
           one: "Erro na consolidação: %{count}"
           other: "Erros na consolidação: %{count}"
         missing_committee: "Comitê incompleto: %{count}"
+        open_process_error: "Consolidação não-parcial impedida: edital ainda está aberto e novos candidatos podem se inscrever"
+        non_consolidated_error:
+          one: "Consolidação não-parcial impedida: há %{count} candidato não consolidado na fase anterior %{phase_name}"
+          other: "Consolidação não-parcial impedida: há %{count} candidatos não consolidados na fase anterior %{phase_name}"
+        pendencies_in_current_error:
+          one: "Consolidação não-parcial impedida: há %{count} candidato com pendencias nesta fase (%{phase_name})"
+          other: "Consolidação não-parcial impedida: há %{count} candidatos com pendencias nesta fase (%{phase_name})"
       rankings:
         title: "Rankings"
 

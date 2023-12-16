@@ -119,6 +119,10 @@ class Admissions::AdmissionProcessesController < ApplicationController
     @show_page = params[:show_summary]
     phase_id = params[:consolidate_phase_id].to_i
     phase_id = nil if phase_id == 0
+
+    @exception = @admission_process.check_partial_consolidation_conditions(phase_id)
+    return if @exception.present?
+
     phases = [nil] + @admission_process.phases.order(:order).map do |p|
       p.admission_phase.id
     end
@@ -168,8 +172,8 @@ class Admissions::AdmissionProcessesController < ApplicationController
           status: nil,
           status_message: nil
         )
-        @errors << candidate
       rescue => err
+        @errors << candidate
         @approved.delete(candidate)
         candidate.update!(
           status: Admissions::AdmissionApplication::ERROR,

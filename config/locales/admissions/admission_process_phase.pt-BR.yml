@@ -9,6 +9,8 @@ pt-BR:
         admission_phase: "Fase"
         start_date: Data de início
         end_date: Data de fim
+        partial_consolidation: Permitir parcial?
+        order: Ordem
 
     models:
       admissions/admission_process_phase:

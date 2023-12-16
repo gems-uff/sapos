@@ -9,7 +9,8 @@ class Admissions::AdmissionProcessPhasesController < ApplicationController
   active_scaffold "Admissions::AdmissionProcessPhase" do |config|
     config.create.label = :create_admission_process_phase_label
     columns = [
-      :order, :admission_process, :admission_phase, :start_date, :end_date
+      :order, :admission_process, :admission_phase, :start_date, :end_date,
+      :partial_consolidation
     ]
     config.columns = columns
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_15_221042) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_16_030358) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -128,6 +128,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_15_221042) do
     t.integer "order"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "partial_consolidation", default: true
     t.index ["admission_phase_id"], name: "index_admission_process_phases_on_admission_phase_id"
     t.index ["admission_process_id"], name: "index_admission_process_phases_on_admission_process_id"
   end
