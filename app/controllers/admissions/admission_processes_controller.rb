@@ -145,6 +145,10 @@ class Admissions::AdmissionProcessesController < ApplicationController
       end
     end
 
+    @admission_process.rankings
+      .where(admission_phase_id: params[:consolidate_phase_id].to_i)
+      .each(&:generate_ranking)
+
     if index < phases.size - 1
       next_phase_id = phases[index + 1]
       next_phase = Admissions::AdmissionPhase.find(next_phase_id)
@@ -189,7 +193,9 @@ class Admissions::AdmissionProcessesController < ApplicationController
       end
     end
 
-
+  rescue => err
+    @exception = err
+  ensure
     params.each_key do |key|
       if !["authenticity_token", "controller", "action"].include? key
         params.delete key
@@ -224,6 +230,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
   protected
     def consolidate_phase_respond_on_iframe
       flash[:info] = @message
+      flash[:error] = @exception
       responds_to_parent do
         render action: "on_consolidate_phase", formats: [:js], layout: false
       end
@@ -231,11 +238,13 @@ class Admissions::AdmissionProcessesController < ApplicationController
 
     def consolidate_phase_respond_to_html
       flash[:info] = @message
+      flash[:error] = @exception
       return_to_main
     end
 
     def consolidate_phase_respond_to_js
       flash.now[:info] = @message
+      flash.now[:error] = @exception
       do_refresh_list
       @popstate = true
       render action: "on_consolidate_phase", formats: [:js]
