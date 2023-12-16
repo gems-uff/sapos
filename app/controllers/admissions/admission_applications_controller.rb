@@ -19,7 +19,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       :admission_process, :token, :name, :email,
       :admission_phase, :status,
       :filled_form, :letter_requests,
-      :results, :evaluations
+      :results, :evaluations, :rankings
     ]
 
     config.list.sorting = { admission_process: "DESC", name: "ASC" }

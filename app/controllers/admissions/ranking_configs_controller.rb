@@ -18,6 +18,13 @@ class Admissions::RankingConfigsController < ApplicationController
     config.columns[:ranking_groups].show_blank_record = false
     config.columns[:ranking_processes].show_blank_record = false
 
+    config.actions << :duplicate
+    config.duplicate.link.label = "
+      <i title='#{I18n.t("active_scaffold.duplicate")}' class='fa fa-copy'></i>
+    ".html_safe
+    config.duplicate.link.method = :get
+    config.duplicate.link.position = :after
+
     config.actions.exclude :deleted_records
   end
   record_select(

@@ -65,6 +65,14 @@ module Admissions::AdmissionApplicationsHelper
     }
   end
 
+  def rankings_show_column(record, column)
+    render active_scaffold: "admissions/admission_ranking_results", params: {
+      parent_scaffold: "admissions/admission_applications",
+      admission_application_id: record.id,
+      association: "rankings"
+    }
+  end
+
   def status_search_column(record, options)
     select(record, :status, [
       [I18n.t("active_scaffold._select_"), nil],

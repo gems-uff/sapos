@@ -1,0 +1,23 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_process_ranking:
+        ranking_config: Configuração de Ranking
+        admission_process: Edital de Seleção
+        admission_phase: Calcular durante consolidação de fase
+
+    models:
+      admissions/admission_process_ranking:
+        one: "Ranking de Edital"
+        other: "Rankings de Editais"
+
+    errors:
+      models:
+        admissions/admission_process_ranking:
+          phase_not_in_process: Fase deve fazer parte de edital
+
+  active_scaffold:
+    create_admission_process_ranking_label: "Criar Ranking de Edital"

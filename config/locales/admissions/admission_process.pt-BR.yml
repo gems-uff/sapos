@@ -64,6 +64,8 @@ pt-BR:
           one: "Erro na consolidação: %{count}"
           other: "Erros na consolidação: %{count}"
         missing_committee: "Comitê incompleto: %{count}"
+      rankings:
+        title: "Rankings"
 
   xlsx_content:
     admissions/admission_process:

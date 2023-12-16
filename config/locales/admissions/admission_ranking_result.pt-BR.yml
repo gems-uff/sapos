@@ -1,0 +1,15 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_ranking_result:
+        ranking_config: "Ranking"
+        admission_application: "Candidatura"
+        filled_form: "Preenchimento"
+
+    models:
+      admissions/admission_ranking_result:
+        one: "Resultado de Ranking"
+        other: "Resultados de Rankings"

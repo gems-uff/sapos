@@ -14,4 +14,9 @@ class Admissions::RankingGroup < ActiveRecord::Base
   def to_label
     "#{self.name} #{self.vacancies}"
   end
+
+  def total_vacancies
+    return Float::INFINITY if self.vacancies.nil?
+    self.vacancies
+  end
 end

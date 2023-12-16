@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_14_172138) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_15_221042) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -132,6 +132,17 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_14_172138) do
     t.index ["admission_process_id"], name: "index_admission_process_phases_on_admission_process_id"
   end
 
+  create_table "admission_process_rankings", force: :cascade do |t|
+    t.integer "ranking_config_id"
+    t.integer "admission_process_id"
+    t.integer "admission_phase_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admission_phase_id"], name: "index_admission_process_rankings_on_admission_phase_id"
+    t.index ["admission_process_id"], name: "index_admission_process_rankings_on_admission_process_id"
+    t.index ["ranking_config_id"], name: "index_admission_process_rankings_on_ranking_config_id"
+  end
+
   create_table "admission_processes", force: :cascade do |t|
     t.string "name"
     t.string "simple_url"
@@ -154,6 +165,17 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_14_172138) do
     t.index ["form_template_id"], name: "index_admission_processes_on_form_template_id"
     t.index ["letter_template_id"], name: "index_admission_processes_on_letter_template_id"
     t.index ["simple_url"], name: "index_admission_processes_on_simple_url"
+  end
+
+  create_table "admission_ranking_results", force: :cascade do |t|
+    t.integer "ranking_config_id"
+    t.integer "admission_application_id"
+    t.integer "filled_form_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admission_application_id"], name: "index_admission_ranking_results_on_admission_application_id"
+    t.index ["filled_form_id"], name: "index_admission_ranking_results_on_filled_form_id"
+    t.index ["ranking_config_id"], name: "index_admission_ranking_results_on_ranking_config_id"
   end
 
   create_table "advisement_authorizations", force: :cascade do |t|

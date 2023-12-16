@@ -10,6 +10,8 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
     class_name: "Admissions::AdmissionApplication"
   has_many :phases, dependent: :restrict_with_exception,
     class_name: "Admissions::AdmissionProcessPhase"
+  has_many :rankings, dependent: :destroy,
+    class_name: "Admissions::AdmissionProcessRanking"
 
   belongs_to :form_template, optional: false,
     class_name: "Admissions::FormTemplate",  foreign_key: "form_template_id"
@@ -42,6 +44,7 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
   def initialize_dup(other)
     super
     self.phases = other.phases.map(&:dup)
+    self.rankings = other.rankings.map(&:dup)
   end
 
   def max_edit_date

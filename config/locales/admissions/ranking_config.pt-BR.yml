@@ -13,6 +13,8 @@ pt-BR:
         ranking_columns: Colunas de ordenação
         ranking_groups: Grupos de vagas
         ranking_processes: Processo
+        position: Posição
+        machine: Seletor
 
     models:
       admissions/ranking_config:

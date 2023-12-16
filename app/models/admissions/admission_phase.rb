@@ -22,6 +22,8 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
     class_name: "Admissions::AdmissionApplication"
   has_many :admission_pendencies, dependent: :destroy,
     class_name: "Admissions::AdmissionPendency"
+  has_many :admission_process_rankings, dependent: :nullify,
+    class_name: "Admissions::AdmissionProcessRanking"
 
   belongs_to :member_form, optional: true,
     class_name: "Admissions::FormTemplate", foreign_key: "member_form_id"

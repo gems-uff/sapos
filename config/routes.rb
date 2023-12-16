@@ -293,6 +293,8 @@ Rails.application.routes.draw do
 
         get :phase_status
         post :consolidate_phase
+        get :rankings
+        post :calculate_ranking
       end
       record_select_routes
     end
@@ -429,6 +431,14 @@ Rails.application.routes.draw do
     end
 
     resources :ranking_processes do
+      concerns :active_scaffold
+    end
+
+    resources :admission_process_rankings do
+      concerns :active_scaffold
+    end
+
+    resources :admission_ranking_results do
       concerns :active_scaffold
     end
   end

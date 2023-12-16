@@ -1,0 +1,12 @@
+try {
+  <% form_selector ||= "#{element_form_id(
+    action: :calculate_ranking, id: @admission_process&.id || params[:id])}" %>
+  var action_link = ActiveScaffold.find_action_link('<%= form_selector %>');
+  <% if @errors.nil? %>
+    ActiveScaffold.replace('<%= form_selector %>', '<%= escape_javascript(render(:partial => 'calculate_ranking', :locals => {:xhr => true})) %>');
+    ActiveScaffold.scroll_to('<%= form_selector %>', true);
+  <% else %>
+    if (action_link) action_link.close();
+    <%= render partial: "refresh_list", no_history: true %>
+  <% end %>
+} catch (e) { alert('RJS error:\n\n' + e.toString());}

@@ -14,6 +14,8 @@ class Admissions::FilledForm < ActiveRecord::Base
     class_name: "Admissions::AdmissionPhaseEvaluation"
   has_one :admission_phase_result, dependent: :destroy,
     class_name: "Admissions::AdmissionPhaseResult"
+  has_one :admission_ranking_result, dependent: :destroy,
+    class_name: "Admissions::AdmissionRankingResult"
   has_many :fields, dependent: :delete_all,
     class_name: "Admissions::FilledFormField"
 

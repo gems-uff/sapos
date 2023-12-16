@@ -1,0 +1,33 @@
+<%
+  subid = "as_admissions__admission_processes-#{@admission_process.id}-calculate-ranking-div"
+%>
+<h4><%= active_scaffold_config.show.label(h(@admission_process.to_label)) %> - <%= @ranking.ranking_config.name %></h4>
+<div class="admissions-table show-view">
+  <table class="showtable">
+    <thead>
+      <tr>
+        <th><%= I18n.t("activerecord.attributes.admissions/admission_application.token") %></th>
+        <th><%= I18n.t("activerecord.attributes.admissions/admission_application.name") %></th>
+        <th><%= I18n.t("activerecord.attributes.admissions/admission_application.email") %></th>
+        <th><%= I18n.t("activerecord.attributes.admissions/ranking_config.position") %></th>
+        <th><%= I18n.t("activerecord.attributes.admissions/ranking_config.machine") %></th>
+      </tr>
+    </thead>
+    <tbody class="records">
+      <% count = 0 %>
+      <% @candidates.each do |candidate| %>
+        <% next if candidate[:__position].nil? %>
+        <% count += 1 %>
+        <% tr_class = count.even? ? "even-record" : "blue-record" %>
+        <tr class="record <%= tr_class %>">
+          <td><%= candidate[:__candidate].token %></td>
+          <td><%= candidate[:__candidate].name %></td>
+          <td><%= candidate[:__candidate].email %></td>
+          <td><%= candidate[:__position] %></td>
+          <td><%= candidate[:__machine] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+</div>

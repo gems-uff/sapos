@@ -12,6 +12,10 @@ class Admissions::RankingConfig < ActiveRecord::Base
     class_name: "Admissions::RankingGroup"
   has_many :ranking_processes, dependent: :destroy,
     class_name: "Admissions::RankingProcess"
+  has_many :admission_process_rankings, dependent: :restrict_with_exception,
+    class_name: "Admissions::AdmissionProcessRanking"
+  has_many :admission_ranking_results, dependent: :destroy,
+    class_name: "Admissions::AdmissionRankingResult"
 
   belongs_to :form_template, optional: true,
     class_name: "Admissions::FormTemplate"
@@ -24,7 +28,11 @@ class Admissions::RankingConfig < ActiveRecord::Base
   validates :ranking_columns, length: { minimum: 1 }
   validates :ranking_processes, length: { minimum: 1 }
 
-  before_save :create_form_template
+  accepts_nested_attributes_for :form_template, allow_destroy: false
+  accepts_nested_attributes_for :position_field, allow_destroy: false
+  accepts_nested_attributes_for :machine_field, allow_destroy: false
+
+  before_validation :create_form_template
 
   def create_form_template
     if self.form_template.blank?
@@ -39,11 +47,21 @@ class Admissions::RankingConfig < ActiveRecord::Base
         field_type: Admissions::FormField::STRING
       )
     end
-    self.position_field.name = "Posição/#{self.name}"
-    self.machine_field.name = "Seletor/#{self.name}"
+    self.form_template.name = self.name
+    self.position_field.name = "#{record_i18n_attr("position")}/#{self.name}"
+    self.machine_field.name = "#{record_i18n_attr("machine")}/#{self.name}"
   end
 
   def to_label
     "#{self.name}"
+  end
+
+  def initialize_dup(other)
+    super
+    self.ranking_columns = other.ranking_columns.map(&:dup)
+    self.ranking_groups = other.ranking_groups.map(&:dup)
+    self.ranking_processes = other.ranking_processes.map(&:dup)
+    self.form_template = nil
+    self.create_form_template
   end
 end

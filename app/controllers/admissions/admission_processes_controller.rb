@@ -19,7 +19,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
       :name, :simple_url, :year, :semester, :start_date, :end_date, :edit_date,
       :form_template, :letter_template, :min_letters, :max_letters,
       :allow_multiple_applications, :require_session, :visible,
-      :staff_can_edit, :staff_can_undo, :phases
+      :staff_can_edit, :staff_can_undo, :phases, :rankings
     ]
     config.create.columns = form_columns
     config.update.columns = form_columns
@@ -46,6 +46,11 @@ class Admissions::AdmissionProcessesController < ApplicationController
       label: "<i title='#{
         I18n.t "active_scaffold.admissions/admission_process.phase_status.title"
       }' class='fa fa-play'></i>".html_safe,
+      type: :member
+    config.action_links.add "rankings",
+      label: "<i title='#{
+        I18n.t "active_scaffold.admissions/admission_process.rankings.title"
+      }' class='fa fa-sort'></i>".html_safe,
       type: :member
     config.action_links.add "short_pdf",
       label: "<i title='#{
@@ -78,6 +83,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
       template_type: Admissions::FormTemplate::RECOMMENDATION_LETTER
     }
     config.columns[:phases].show_blank_record = false
+    config.columns[:rankings].show_blank_record = false
 
     config.actions.exclude :deleted_records
   end
@@ -158,8 +164,8 @@ class Admissions::AdmissionProcessesController < ApplicationController
           status: nil,
           status_message: nil
         )
-      rescue => err
         @errors << candidate
+      rescue => err
         @approved.delete(candidate)
         candidate.update!(
           status: Admissions::AdmissionApplication::ERROR,
@@ -193,6 +199,28 @@ class Admissions::AdmissionProcessesController < ApplicationController
     respond_to_action(:consolidate_phase)
   end
 
+  def rankings
+    @admission_process = Admissions::AdmissionProcess.find(params[:id])
+  end
+
+  def calculate_ranking
+    @admission_process = Admissions::AdmissionProcess.find(params[:id])
+    begin
+      @errors = nil
+      @ranking = @admission_process.rankings.where(id: params[:admission_process_ranking_id]).first
+      @candidates = @ranking.generate_ranking
+    rescue => exception
+      @errors = exception
+    end
+
+    params.each_key do |key|
+      if !["authenticity_token", "controller", "action"].include? key
+        params.delete key
+      end
+    end
+    respond_to_action(:calculate_ranking)
+  end
+
   protected
     def consolidate_phase_respond_on_iframe
       flash[:info] = @message
@@ -211,6 +239,25 @@ class Admissions::AdmissionProcessesController < ApplicationController
       do_refresh_list
       @popstate = true
       render action: "on_consolidate_phase", formats: [:js]
+    end
+
+    def calculate_ranking_respond_on_iframe
+      flash[:error] = @errors
+      responds_to_parent do
+        render action: "on_calculate_ranking", formats: [:js], layout: false
+      end
+    end
+
+    def calculate_ranking_respond_to_html
+      flash[:error] = @errors
+      return_to_main
+    end
+
+    def calculate_ranking_respond_to_js
+      flash.now[:error] = @errors
+      do_refresh_list
+      @popstate = true
+      render action: "on_calculate_ranking", formats: [:js]
     end
 
   private

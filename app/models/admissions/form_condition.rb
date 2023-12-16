@@ -31,7 +31,7 @@ class Admissions::FormCondition < ActiveRecord::Base
     LE => ->(f, v) { f.to_f <= v.to_f },
     GT => ->(f, v) { f.to_f > v.to_f },
     LT => ->(f, v) { f.to_f < v.to_f },
-    NEQ => ->(f, v) { f.to_f != v.to_f },
+    NEQ => ->(f, v) { f != v },
     NULL => ->(f, v) { f.nil? },
     NOT_NULL => ->(f, v) { !f.nil? },
   }

@@ -59,6 +59,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     class_name: "Admissions::AdmissionPhaseEvaluation"
   has_many :results, dependent: :destroy,
     class_name: "Admissions::AdmissionPhaseResult"
+  has_many :rankings, dependent: :destroy,
+    class_name: "Admissions::AdmissionRankingResult"
   has_many :pendencies, dependent: :destroy,
     class_name: "Admissions::AdmissionPendency"
 
