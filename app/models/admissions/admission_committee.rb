@@ -24,6 +24,14 @@ class Admissions::AdmissionCommittee < ActiveRecord::Base
     reject_if: :all_blank,
     allow_destroy: true
 
+  after_commit :update_pendencies
+
+  def update_pendencies
+    self.admission_phase_committees.each do |pc|
+      pc.update_pendencies
+    end
+  end
+
   def to_label
     self.name
   end

@@ -30,8 +30,6 @@ pt-BR:
           form_field: "Formulário"
 
         value: "Valor"
-        model: "Modelo"
-        model_type: "Tipo de Modelo"
 
     models:
       admissions/form_condition:

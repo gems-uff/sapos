@@ -10,6 +10,10 @@ class Admissions::FormCondition < ActiveRecord::Base
     class_name: "Admissions::FormCondition", foreign_key: :parent_id
   has_many :form_conditions, dependent: :destroy,
     class_name: "Admissions::FormCondition", foreign_key: :parent_id
+  has_many :admission_phases_as_approval, dependent: :destroy,
+    class_name: "Admissions::AdmissionPhase", foreign_key: :approval_condition_id
+  has_many :admission_committees, dependent: :destroy,
+    class_name: "Admissions::AdmissionCommittee"
 
   AND = record_i18n_attr("modes.and")
   OR = record_i18n_attr("modes.or")
@@ -56,16 +60,10 @@ class Admissions::FormCondition < ActiveRecord::Base
   after_commit :update_pendencies
 
   def update_pendencies
-    return if model_type != "Admissions::AdmissionCommitee"
-    self.model.admission_phase_committees.each do |pc|
-      pc.update_pendencies
+    self.admission_committees.each do |committee|
+      committee.update_pendencies
     end
-    old = previous_changes.try(:model).try(:[], 0)
-    if old.present?
-      old.admission_phase_committees.each do |pc|
-        pc.update_pendencies
-      end
-    end
+    self.parent.update_pendencies if self.parent.present?
   end
 
   def to_label
