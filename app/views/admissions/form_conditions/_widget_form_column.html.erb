@@ -1,0 +1,9 @@
+<%
+  options = active_scaffold_input_options(column, scope, object: record) 
+  options[:name] = options[:name][..-9]
+%>
+<%= render(partial: "admissions/form_conditions/association_widget", locals: {
+  record: record,
+  options: options,
+  form_condition: record
+}) %>

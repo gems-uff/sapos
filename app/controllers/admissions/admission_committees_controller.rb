@@ -10,21 +10,20 @@ class Admissions::AdmissionCommitteesController < ApplicationController
     config.create.label = :create_admission_committee_label
 
     columns = [
-      :name, :members, :form_conditions, :admission_phases
+      :name, :members, :form_condition, :admission_phases
     ]
 
     config.list.columns = columns
     config.show.columns = columns
 
     form_columns = [
-      :name, :members, :form_conditions
+      :name, :form_condition, :members,
     ]
 
     config.create.columns = form_columns
     config.update.columns = form_columns
 
     config.columns[:members].show_blank_record = false
-    config.columns[:form_conditions].show_blank_record = false
 
     config.actions << :duplicate
     config.duplicate.link.label = "

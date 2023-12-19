@@ -160,11 +160,11 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   end
 
-  def satisfies_conditions(form_conditions, fields: nil, should_raise: nil)
-    Admissions::FormCondition.check_conditions(
-      form_conditions, should_raise: should_raise
-    ) do |condition|
-      next fields[condition.field] if fields.present?
+  def satisfies_condition(form_condition, fields: nil, should_raise: nil)
+    Admissions::FormCondition.check_truth(
+      form_condition, should_raise: should_raise
+    ) do |name|
+      next fields[name] if fields.present?
       (
         Admissions::FilledFormField.includes(:form_field)
           .includes(filled_form: :admission_phase_result)
@@ -172,13 +172,13 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
             filled_form: { admission_phase_results: {
               admission_application_id: self.id
             } },
-            form_field: { name: condition.field }
+            form_field: { name: name }
           ).order(updated_at: :desc, id: :desc).first ||
         Admissions::FilledFormField.includes(:form_field)
           .includes(filled_form: :admission_application)
           .where(
             filled_form: { admission_applications: { id: self.id } },
-            form_field: { name: condition.field }
+            form_field: { name: name }
           ).first
       )
     end
@@ -225,8 +225,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       end
     end
     begin
-      if self.satisfies_conditions(
-        phase.form_conditions, fields: field_objects,
+      if self.satisfies_condition(
+        phase.approval_condition, fields: field_objects,
         should_raise: Admissions::FormCondition::RAISE_PHASE
       )
         { status: APPROVED, status_message: nil }

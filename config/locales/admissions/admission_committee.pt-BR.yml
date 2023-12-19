@@ -8,7 +8,7 @@ pt-BR:
         name: "Nome"
         phases: "Fases"
         members: "Membros"
-        form_conditions: "Condições"
+        form_condition: "Condições"
         admission_phase_committees: "Fases"
         admission_phases: "Fases"
 

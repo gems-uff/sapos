@@ -6,7 +6,7 @@ pt-BR:
     attributes:
       admissions/ranking_machine:
         name: Nome
-        form_conditions: Condições
+        form_condition: Condição
 
     models:
       admissions/ranking_machine:

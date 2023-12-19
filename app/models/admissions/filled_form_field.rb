@@ -311,4 +311,54 @@ class Admissions::FilledFormField < ActiveRecord::Base
       message: I18n.translate(key, **options)
     ))
   end
+
+  def get_type
+    case self.form_field.field_type
+    when Admissions::FormField::NUMBER
+      "number"
+    when Admissions::FormField::DATE
+      "date"
+    when Admissions::FormField::STUDENT_FIELD
+      configuration = self.form_field.config_hash
+      case configuration["field"]
+      when "birthdate", "identity_expedition_date"
+        "date"
+      else
+        "string"
+      end
+    else
+      "string"
+    end
+  end
+
+  def self.convert_value(value, type)
+    case type
+    when "number"
+      self.convert_number(value)
+    when "string"
+      self.convert_string(value)
+    when "date"
+      self.convert_date(value)
+    else
+      value
+    end
+  end
+
+  def self.convert_string(value)
+    value.to_s
+  rescue
+    nil
+  end
+
+  def self.convert_number(value)
+    value.to_f
+  rescue
+    nil
+  end
+
+  def self.convert_date(value)
+    Date.strptime(value, "%d/%m/%Y")
+  rescue
+    nil
+  end
 end

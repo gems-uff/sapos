@@ -1,0 +1,22 @@
+<%
+  text_id = "widget_" + options[:id]
+  value = form_condition.nil? ? {} : form_condition.to_hash
+%>
+
+<%= text_field_tag(
+  options[:name], value.to_json,
+  id: text_id, class: "text-input"
+) %>
+
+<script>
+
+$(document).ready(function(){
+  create_form_condition({
+    id: "<%= text_id %>",
+    condition_options: <%= JSON.dump(
+      Admissions::FormCondition::OPTIONS.map { |k, v| [k, v[:values]] }
+    ).html_safe %>
+  })
+});
+
+</script>

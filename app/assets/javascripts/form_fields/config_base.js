@@ -138,9 +138,7 @@ function form_field_config_base(form_field) {
     } else if (selected_value == "code") {
       form_field.widgets = [
         config_form_field_codemirror(form_field, "code", "text/x-ruby"),
-        config_form_field_conditions(form_field, "conditions", form_field.condition_options, {
-          non_blank: true
-        })
+        config_form_field_condition(form_field, "condition", form_field.condition_options)
       ]
     } else if (selected_value == "email") {
       form_field.widgets = [
@@ -149,9 +147,7 @@ function form_field_config_base(form_field) {
         }),
         config_form_field_input(form_field, "subject", "text", { required: true }),
         config_form_field_codemirror(form_field, "body", "application/x-erb", { required: true }),
-        config_form_field_conditions(form_field, "conditions", form_field.condition_options, {
-          non_blank: true
-        })
+        config_form_field_condition(form_field, "condition", form_field.condition_options)
       ]
     } else if (selected_value == "invalid") {
       form_field.widgets = [

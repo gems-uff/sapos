@@ -103,6 +103,10 @@ $(document).ready(function () {
   $.timepicker.regional['pt-BR'].timeFormat = 'dd M yy HH:mm:ss';
   $.timepicker.setDefaults($.datepicker.regional['pt-BR'] );
 
+  $.fn.outerHTML = function() {
+    return $('<div />').append(this.eq(0).clone()).html();
+  };
+
   window.onbeforeunload = confirmOnPageExit;
 });
 

@@ -1,0 +1,26 @@
+.form-condition-widget {
+  display: flex;
+}
+
+.form-condition-widget .mode {
+  flex: 1;
+  flex-grow: 0;
+}
+
+.form-condition-widget .sub {
+  display: inline-block;
+  flex: 1;
+  flex-grow: 1;
+
+}
+
+.form-condition-widget .destroy {
+  font-weight: bold;
+  height: 16px;
+  padding: 0;
+  width: 16px;
+  text-indent: -4000px;
+  display: inline-block;
+  background: 0 0 no-repeat;
+  background-image: image-url('active_scaffold/cross.png');
+}

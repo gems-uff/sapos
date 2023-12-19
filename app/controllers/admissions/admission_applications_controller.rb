@@ -173,7 +173,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     return false if record.status == Admissions::AdmissionApplication::REPROVED
 
     phase.admission_committees.any? do |committee|
-      if record.satisfies_conditions(committee.form_conditions)
+      if record.satisfies_condition(committee.form_condition)
         committee.members.where(user_id: current_user.id).first.present?
       end
     end && super

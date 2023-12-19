@@ -47,8 +47,8 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
       candidates.each do |candidate|
         next if !candidate[:__position].nil?
         processes.each do |process|
-          if candidate[:__candidate].satisfies_conditions(
-            process.ranking_machine.form_conditions,
+          if candidate[:__candidate].satisfies_condition(
+            process.ranking_machine.form_condition,
             fields: candidate[:__fields]
           )
             machine = process.ranking_machine.name

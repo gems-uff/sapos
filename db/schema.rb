@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_16_030358) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_19_060355) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -56,6 +56,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_16_030358) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "form_condition_id"
+    t.index ["form_condition_id"], name: "index_admission_committees_on_form_condition_id"
   end
 
   create_table "admission_pendencies", force: :cascade do |t|
@@ -115,6 +117,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_16_030358) do
     t.boolean "can_edit_candidate"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "approval_condition_id"
+    t.index "\"ranking_config_id\"", name: "index_admission_phases_on_ranking_config_id"
     t.index ["consolidation_form_id"], name: "index_admission_phases_on_consolidation_form_id"
     t.index ["member_form_id"], name: "index_admission_phases_on_member_form_id"
     t.index ["shared_form_id"], name: "index_admission_phases_on_shared_form_id"
@@ -480,15 +484,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_16_030358) do
   end
 
   create_table "form_conditions", force: :cascade do |t|
-    t.string "model_type", null: false
-    t.integer "model_id", null: false
     t.string "field"
     t.string "condition"
     t.string "value"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "mode", default: "Condição"
+    t.integer "parent_id"
     t.index ["field"], name: "index_form_conditions_on_field"
-    t.index ["model_type", "model_id"], name: "index_form_conditions_on_model"
+    t.index ["parent_id"], name: "index_form_conditions_on_parent_id"
   end
 
   create_table "form_fields", force: :cascade do |t|
@@ -713,6 +717,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_16_030358) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "form_condition_id"
+    t.index ["form_condition_id"], name: "index_ranking_machines_on_form_condition_id"
   end
 
   create_table "ranking_processes", force: :cascade do |t|

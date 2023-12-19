@@ -12,7 +12,7 @@ pt-BR:
         can_edit_candidate: "Comitê pode editar candidato?"
         admission_phase_committees: Comitês
         admission_committees: Comitês
-        form_conditions: Condições de aprovação
+        approval_condition: Condição de aprovação
         admission_phase_results: Resultados da fase
         admission_phase_evaluations: Avaliações do comitê
         admission_process_phases: Editais de seleção

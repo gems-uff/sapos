@@ -10,11 +10,10 @@ class Admissions::RankingMachinesController < ApplicationController
     config.list.sorting = { name: "ASC" }
     config.create.label = :create_ranking_machine_label
     columns = [
-      :name, :form_conditions
+      :name, :form_condition
     ]
 
     config.columns = columns
-    config.columns[:form_conditions].show_blank_record = false
 
     config.actions.exclude :deleted_records
   end

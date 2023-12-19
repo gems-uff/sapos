@@ -10,14 +10,19 @@ class Admissions::AdmissionCommittee < ActiveRecord::Base
     class_name: "Admissions::AdmissionCommitteeMember"
   has_many :users, through: :members,
     class_name: "User"
-  has_many :form_conditions, as: :model, dependent: :destroy,
-    class_name: "Admissions::FormCondition"
   has_many :admission_phase_committees, dependent: :destroy,
     class_name: "Admissions::AdmissionPhaseCommittee"
   has_many :admission_phases, through: :admission_phase_committees,
     class_name: "Admissions::AdmissionPhase"
 
+  belongs_to :form_condition, optional:true,
+    class_name: "Admissions::FormCondition"
+
   validates :name, presence: true
+
+  accepts_nested_attributes_for :form_condition,
+    reject_if: :all_blank,
+    allow_destroy: true
 
   def to_label
     self.name
@@ -26,6 +31,6 @@ class Admissions::AdmissionCommittee < ActiveRecord::Base
   def initialize_dup(other)
     super
     self.members = other.members.map(&:dup)
-    self.form_conditions = other.form_conditions.map(&:dup)
+    self.form_condition = other.form_condition.dup
   end
 end

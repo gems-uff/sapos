@@ -35,48 +35,9 @@ class Admissions::RankingColumn < ActiveRecord::Base
 
   def convert(field)
     return nil if field.nil?
-    case @conversion
-    when "string"
-      self.convert_string(field.simple_value)
-    when "number"
-      self.convert_number(field.simple_value)
-    when "date"
-      self.convert_date(field.simple_value)
-    else
-      case field.form_field.field_type
-      when Admissions::FormField::NUMBER
-        @conversion = "number"
-      when Admissions::FormField::DATE
-        @conversion = "date"
-      when Admissions::FormField::STUDENT_FIELD
-        case config["field"]
-        when "birthdate", "identity_expedition_date"
-          @conversion = "date"
-        else
-          @conversion = "string"
-        end
-      else
-        @conversion = "string"
-      end
-      self.convert(field)
+    if @conversion.nil?
+      @conversion = field.get_type
     end
-  end
-
-  def convert_string(field)
-    field.to_s
-  rescue
-    nil
-  end
-
-  def convert_number(field)
-    field.to_f
-  rescue
-    nil
-  end
-
-  def convert_date(field)
-    Date.strptime(self.value, "%d/%m/%Y")
-  rescue
-    nil
+    Admissions::FilledFormField.convert_value(field.simple_value, @conversion)
   end
 end

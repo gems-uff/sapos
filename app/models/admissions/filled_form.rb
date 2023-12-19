@@ -98,13 +98,11 @@ class Admissions::FilledForm < ActiveRecord::Base
         next
       end
       configuration = form_field.config_hash
-      conditions = (configuration["conditions"] || []).map do |condition|
-        Admissions::FormCondition.new(condition)
-      end
-      skip = !Admissions::FormCondition.check_conditions(
-        conditions, should_raise: Admissions::FormCondition::RAISE_FORM_FIELD
-      ) do |condition|
-        field_objects[condition.field]
+      condition = Admissions::FormCondition.new_from_hash(configuration["condition"])
+      skip = !Admissions::FormCondition.check_truth(
+        condition, should_raise: Admissions::FormCondition::RAISE_FORM_FIELD
+      ) do |name|
+        field_objects[name]
       end
       if skip
         value = I18n.t(

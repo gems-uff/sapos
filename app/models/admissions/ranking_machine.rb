@@ -8,12 +8,22 @@ class Admissions::RankingMachine < ActiveRecord::Base
 
   has_many :ranking_processes, dependent: :destroy,
     class_name: "Admissions::RankingProcess"
-  has_many :form_conditions, as: :model, dependent: :destroy,
+
+  belongs_to :form_condition, optional:true,
     class_name: "Admissions::FormCondition"
 
   validates :name, presence: true
 
+  accepts_nested_attributes_for :form_condition,
+    reject_if: :all_blank,
+    allow_destroy: true
+
   def to_label
     "#{self.name}"
+  end
+
+  def initialize_dup(other)
+    super
+    self.form_condition = other.form_condition.dup
   end
 end

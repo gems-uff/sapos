@@ -11,11 +11,10 @@ class Admissions::AdmissionPhasesController < ApplicationController
 
     columns = [
       :name, :member_form, :shared_form, :consolidation_form, :can_edit_candidate,
-      :admission_phase_committees, :form_conditions
+      :approval_condition, :admission_phase_committees,
     ]
 
     config.columns = columns
-    config.columns[:form_conditions].show_blank_record = false
 
     config.columns[:member_form].form_ui = :record_select
     config.columns[:member_form].options[:params] = {

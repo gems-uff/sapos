@@ -6,6 +6,11 @@ pt-BR:
     attributes:
       admissions/form_condition:
         field: "Campo"
+        mode: "Modo"
+        modes:
+          and: E
+          or: Ou
+          condition: Condição
         condition: "Condição"
         conditions:
           contains: "Contém"

@@ -190,12 +190,7 @@ pt-BR:
                 </li>
               </ul>
             </span>
-          conditions:
-            title: Condições
-            add: Adicionar condição
-            field: Campo
-            condition: Condição
-            value: Valor
+          condition: Condição
     errors:
       models:
         admissions/form_field:
@@ -216,9 +211,6 @@ pt-BR:
           body_present_error: Template do Corpo não pode estar em branco
           invalid_consolidation_field: Campo %{name} não possui tipo válido para formulário de consolidação
           invalid_inputform_field: Campo %{name} não possui tipo válido para formulário
-          conditions_blank_error: Não pode estar em branco
-          conditions_blank_field_error: Campo de condições não pode estar em branco
-          conditions_invalid_condition_error: Tipo de condição inválido
 
     models:
       admissions/form_field:

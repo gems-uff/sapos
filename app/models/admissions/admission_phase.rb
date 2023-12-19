@@ -10,8 +10,6 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
     class_name: "Admissions::AdmissionPhaseCommittee"
   has_many :admission_committees, through: :admission_phase_committees,
     class_name: "Admissions::AdmissionCommittee"
-  has_many :form_conditions, as: :model, dependent: :destroy,
-    class_name: "Admissions::FormCondition"
   has_many :admission_phase_results, dependent: :destroy,
     class_name: "Admissions::AdmissionPhaseResult"
   has_many :admission_phase_evaluations, dependent: :destroy,
@@ -25,6 +23,8 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
   has_many :admission_process_rankings, dependent: :nullify,
     class_name: "Admissions::AdmissionProcessRanking"
 
+  belongs_to :approval_condition, optional:true,
+    class_name: "Admissions::FormCondition", foreign_key: "approval_condition_id"
   belongs_to :member_form, optional: true,
     class_name: "Admissions::FormTemplate", foreign_key: "member_form_id"
   belongs_to :shared_form, optional: true,
@@ -35,6 +35,11 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
   validates :name, presence: true
   after_commit :update_pendencies
 
+  accepts_nested_attributes_for :approval_condition,
+    reject_if: :all_blank,
+    allow_destroy: true
+
+
   def to_label
     "#{self.name}"
   end
@@ -42,13 +47,13 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
   def initialize_dup(other)
     super
     self.admission_phase_committees = other.admission_phase_committees.map(&:dup)
-    self.form_conditions = other.form_conditions.map(&:dup)
+    self.approval_condition = other.approval_condition.dup
   end
 
   def committee_users_for_candidate(candidate, should_raise: nil)
     users = {}
     self.admission_committees.each do |committee|
-      if candidate.satisfies_conditions(committee.form_conditions, should_raise: should_raise)
+      if candidate.satisfies_condition(committee.form_condition, should_raise: should_raise)
         committee.users.each { |user| users[user.id] = user }
       end
     end
