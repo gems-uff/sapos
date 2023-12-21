@@ -7,6 +7,10 @@
 class User < ApplicationRecord
   has_paper_trail
 
+  scope :professors, -> { where(role_id: Role::ROLE_PROFESSOR) }
+  scope :coordination, -> { where(role_id: Role::ROLE_COORDENACAO) }
+  scope :secretary, -> { where(role_id: Role::ROLE_SECRETARIA) }
+
   belongs_to :role, optional: false
 
   has_one :professor
@@ -45,6 +49,14 @@ class User < ApplicationRecord
     @ability ||= Ability.new(self)
   end
 
+  def is_professor?
+    self.role_id == Role::ROLE_PROFESSOR
+  end
+
+  def is_student?
+    self.role_id == Role::ROLE_ALUNO
+  end
+
   def to_label
     "#{self.name}"
   end
@@ -78,13 +90,13 @@ class User < ApplicationRecord
   end
 
   def role_is_professor_if_the_professor_field_is_filled
-    if professor && (role.id != Role::ROLE_PROFESSOR)
+    if professor && !self.is_professor?
       errors.add(:professor, :selected_role_was_not_professor)
     end
   end
 
   def role_is_student_if_the_student_field_is_filled
-    if student && (role.id != Role::ROLE_ALUNO)
+    if student && !self.is_student?
       errors.add(:student, :selected_role_was_not_student)
     end
   end

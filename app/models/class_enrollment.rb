@@ -38,7 +38,7 @@ class ClassEnrollment < ApplicationRecord
   validate :disapproved_by_absence_for_situation
   validate :check_multiple_class_enrollment_allowed
   validate :professor_changed_only_valid_fields,
-    if: -> { current_user && (current_user.role_id == Role::ROLE_PROFESSOR) }
+    if: -> { can?(:post_grades, self) && cannot?(:update_all_fields, self) }
 
   after_save :notify_student_and_advisor
   after_save :class_enrollment_request_cascade
@@ -229,7 +229,7 @@ class ClassEnrollment < ApplicationRecord
         next if (campo_modificado == "justification_grade_not_count_in_gpr") &&
           (justification_grade_not_count_in_gpr_change == ["", nil])
 
-        errors.add(:class_enrollment, I18n.t(:changes_to_disallowed_fields))
+        errors.add(:base, I18n.t(:changes_to_disallowed_fields))
         break
       end
     end
@@ -266,5 +266,11 @@ class ClassEnrollment < ApplicationRecord
           request.save
         end
       end
+    end
+
+    delegate :can?, :cannot?, to: :ability
+
+    def ability
+      @ability ||= Ability.new(current_user)
     end
 end

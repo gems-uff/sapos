@@ -23,7 +23,8 @@ class CourseClass < ApplicationRecord
     presence: true,
     inclusion: { in: YearSemester::SEMESTERS }
   validate :professor_changed_only_valid_fields,
-    if: -> { current_user && (current_user.role_id == Role::ROLE_PROFESSOR) }
+    if: -> { can?(:post_grades, self) && cannot?(:update_all_fields, self) }
+
 
   attr_reader :changed_from_course_class
   before_save :set_changed_from_course_class
@@ -72,8 +73,14 @@ class CourseClass < ApplicationRecord
 
       campos_modificados.each do |campo_modificado|
         if !campos_modificaveis.include?(campo_modificado)
-          errors.add(:course_class, :changes_to_disallowed_fields)
+          errors.add(:base, :changes_to_disallowed_fields)
         end
       end
+    end
+
+    delegate :can?, :cannot?, to: :ability
+
+    def ability
+      @ability ||= Ability.new(current_user)
     end
 end
