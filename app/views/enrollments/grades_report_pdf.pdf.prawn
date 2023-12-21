@@ -7,7 +7,9 @@ new_document(
   "grades_report.pdf",
   I18n.t("pdf_content.enrollment.grades_report.title"),
   watermark: (
-    current_user.nil? ? false : (current_user.role_id == Role::ROLE_PROFESSOR)
+    current_user.nil? ? false : cannot?(
+      :generate_report_without_watermark, @enrollment
+    )
   ),
   pdf_type: :grades_report
 ) do |pdf|

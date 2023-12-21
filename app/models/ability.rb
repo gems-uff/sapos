@@ -5,48 +5,49 @@
 
 class Ability
   include CanCan::Ability
+  include Admissions::Ability
 
-  ALL_MODELS = [
-    # Students
+  STUDENT_MODELS = [
     Student, Dismissal, Enrollment, EnrollmentHold, Level, DismissalReason,
     EnrollmentStatus,
-    StudentMajor,
-    # Professors
+    StudentMajor
+  ]
+
+  PROFESSOR_MODELS = [
     Professor, Advisement, AdvisementAuthorization,
     ThesisDefenseCommitteeParticipation,
     ProfessorResearchArea,
-    # Scholarships
+  ]
+
+  SCHOLARSHIP_MODELS = [
     Sponsor, ScholarshipDuration, Scholarship, ScholarshipType,
     ScholarshipSuspension,
-    # Phases
+  ]
+
+  PHASE_MODELS = [
     Deferral, Accomplishment, Phase, DeferralType,
     PhaseCompletion, PhaseDuration,
-    # Courses
+  ]
+
+  COURSE_MODELS = [
     ResearchArea, Course, CourseType, CourseClass, ClassSchedule,
     ClassEnrollment, Allocation, EnrollmentRequest, ClassEnrollmentRequest,
     EnrollmentRequestComment,
-    # Educations
-    Major, Institution,
-    # Places
-    City, State, Country,
-    # Configurations
-    User, Role, Version, Notification, EmailTemplate, Query, NotificationLog,
-    CustomVariable, ReportConfiguration,
-    YearSemester,
-    # Application Process
-    Admissions::FormTemplate, Admissions::FormField,
-    Admissions::FilledForm, Admissions::FilledFormField,
-    Admissions::FilledFormFieldScholarity,
-    Admissions::AdmissionProcess, Admissions::AdmissionApplication,
-    Admissions::LetterRequest,
-
-    Admissions::AdmissionCommitteeMember, Admissions::AdmissionCommittee,
-    Admissions::AdmissionPendency, Admissions::AdmissionPhaseCommittee,
-    Admissions::AdmissionPhaseEvaluation, Admissions::AdmissionPhaseResult,
-    Admissions::AdmissionPhase, Admissions::AdmissionProcessPhase,
-    Admissions::FormCondition
   ]
 
+  EDUCATION_MODELS = [
+    Major, Institution,
+  ]
+
+  PLACE_MODELS = [
+    City, State, Country,
+  ]
+
+  CONFIGURATION_MODELS = [
+    User, Role, Version, Notification, EmailTemplate, Query, NotificationLog,
+    CustomVariable, ReportConfiguration,
+    YearSemester
+  ]
 
   def initialize(user)
     alias_action :list, :row, :show_search, :render_field, :class_schedule_pdf,
@@ -54,145 +55,39 @@ class Ability
       :browse, :simulate, :set_query_date, :cities, :states,
       :preview, :builtin, :help, to: :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing,
-      :execute_now, :execute_now, :notify, :duplicate, to: :update
+      :duplicate, to: :update
     alias_action :delete, :destroy_existing, to: :destroy
-    alias_action :set_invalid, :set_requested, :set_valid, to: :update
-    alias_action :ser_effected, :show_effect, to: :effect
 
     user ||= User.new
 
     role_id = user.role_id
+    roles = { role_id => true }
+    roles[:manager] = (
+      roles[Role::ROLE_ADMINISTRADOR] ||
+      roles[Role::ROLE_COORDENACAO] ||
+      roles[Role::ROLE_SECRETARIA]
+    )
 
-    if role_id == Role::ROLE_ADMINISTRADOR
+    if roles[Role::ROLE_ADMINISTRADOR]
       can :manage, :all
-      cannot :update_only_photo, Student
-      cannot [:show, :enroll, :save_enroll], :student_enrollment
-      cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
-      cannot [:read_pendencies], ClassEnrollmentRequest
-      cannot [:destroy, :update, :create], Role
-      can :undo_consolidation, Admissions::AdmissionApplication
-      can :override, Admissions::AdmissionApplication
-    elsif role_id == Role::ROLE_COORDENACAO
-      can :manage, (Ability::ALL_MODELS - [
-        Role, CustomVariable, ReportConfiguration
-      ])
-      cannot :destroy, [
-        Admissions::AdmissionApplication, Admissions::FilledForm,
-        Admissions::FilledFormField, Admissions::FilledFormFieldScholarity,
-        Admissions::LetterRequest
-      ]
-      cannot :update_only_photo, Student
-      can :read, :pendency
-      cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
-      can :read, (Role)
-      can :undo_consolidation, Admissions::AdmissionApplication
-      can :override, Admissions::AdmissionApplication
-    elsif role_id == Role::ROLE_PROFESSOR
-      can :read, (Ability::ALL_MODELS - [
-        User, Role, CustomVariable, Query, Version,
-        Notification, NotificationLog, ReportConfiguration,
-        Country, State, City, EmailTemplate,
-        Admissions::FormTemplate, Admissions::FormField,
-        Admissions::FilledForm, Admissions::FilledFormField,
-        Admissions::FilledFormFieldScholarity,
-        Admissions::AdmissionProcess, Admissions::AdmissionApplication,
-        Admissions::LetterRequest,
-        Admissions::AdmissionCommitteeMember, Admissions::AdmissionCommittee,
-        Admissions::AdmissionPendency, Admissions::AdmissionPhaseCommittee,
-        Admissions::AdmissionPhaseEvaluation, Admissions::AdmissionPhaseResult,
-        Admissions::AdmissionPhase, Admissions::AdmissionProcessPhase,
-        Admissions::FormCondition
-      ])
-      can :photo, Student
-      can :read, :pendency
-      if user.professor
-        can :read_advisement_pendencies, EnrollmentRequest
-        can :update, EnrollmentRequest, enrollment: {
-          advisements: { professor: user.professor }
-        }
-        can :update, ClassEnrollmentRequest, enrollment_request: {
-          enrollment: { advisements: { professor: user.professor } }
-        }
-        cannot :update, ClassEnrollmentRequest,
-          status: ClassEnrollmentRequest::EFFECTED
-        if CustomVariable.professor_login_can_post_grades == "yes_all_semesters"
-          can :update, ClassEnrollment, course_class: {
-            professor: user.professor
-          }
-          can :update, CourseClass, professor: user.professor
-        elsif CustomVariable.professor_login_can_post_grades == "yes"
-          can :update, ClassEnrollment, course_class: {
-            professor: user.professor,
-            year: YearSemester.current.year,
-            semester: YearSemester.current.semester
-          }
-          can :update, CourseClass,
-            professor: user.professor,
-            year: YearSemester.current.year,
-            semester: YearSemester.current.semester
-        end
-        application_condition = {
-          pendencies: {
-            user_id: user.id
-          }
-        }
-        can :read_pendencies, Admissions::AdmissionApplication
-        can :read, Admissions::AdmissionApplication, application_condition
-        can :update, Admissions::AdmissionApplication, application_condition
-        can :read, Admissions::AdmissionPhaseEvaluation, user: user
-        can :read, Admissions::LetterRequest,
-          admission_application: application_condition
-        can :read, Admissions::AdmissionPhaseResult,
-          admission_application: application_condition
-        can :read, Admissions::FilledForm, admission_phase_evaluation: {
-          user: user
-        }
-        can :read, Admissions::FilledForm, admission_phase_result: {
-          admission_application: application_condition
-        }
-        can :read, Admissions::FilledForm, letter_request: {
-          admission_application: application_condition
-        }
-        can :read, Admissions::FilledForm,
-          admission_application: application_condition
-      end
-    elsif role_id == Role::ROLE_SECRETARIA
-      can :manage, (Ability::ALL_MODELS - [
-        User, Role, CustomVariable, Query, Version,
-        Notification, ReportConfiguration,
-        Admissions::FormTemplate, Admissions::FormField
-      ])
-      cannot :destroy, [
-        Admissions::AdmissionApplication, Admissions::FilledForm,
-        Admissions::FilledFormField, Admissions::FilledFormFieldScholarity,
-        Admissions::LetterRequest
-      ]
-      can :read, [
-        Admissions::FormTemplate, Admissions::FormField,
-      ]
-      cannot :update_only_photo, Student
-      can :invite, User
-      can :read, :pendency
-      cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
-      can [:read, :execute], (Query)
-      can :undo_consolidation, Admissions::AdmissionApplication
-      can :override, Admissions::AdmissionApplication
-    elsif role_id == Role::ROLE_SUPORTE
-      can [:read, :update, :update_only_photo], (Student)
-      can :read, :pendency
-    elsif role_id == Role::ROLE_ALUNO
-      can :manage, []
-      can [:show, :enroll, :save_enroll], :student_enrollment if
-        user.present? && user.student.present?
-    elsif role_id == Role::ROLE_DESCONHECIDO
-      can :manage, []
     end
+    if roles[:manager] || roles[Role::ROLE_PROFESSOR] || roles[Role::ROLE_SUPORTE]
+      can :read, :pendency
+    end
+
+    initialize_students(user, roles)
+    initialize_professors(user, roles)
+    initialize_scholarships(user, roles)
+    initialize_phases(user, roles)
+    initialize_courses(user, roles)
+    initialize_education(user, roles)
+    initialize_places(user, roles)
+    initialize_admissions(user, roles)
+    initialize_configurations(user, roles)
+    initialize_student_pages(user, roles)
+
     can :read, :landing
     can :notify, Notification
-    can :download, Admissions::FilledFormField
-
-    # Admissions
-    can :manage, ActiveScaffoldWorkaround
     # Define abilities for the passed in user here. For example:
     #
     #   user ||= User.new # guest user (not logged in)
@@ -219,5 +114,137 @@ class Ability
     #
     # See the wiki for details:
     # https://github.com/ryanb/cancan/wiki/Defining-Abilities
+  end
+
+  def initialize_students(user, roles)
+    if roles[:manager]
+      can :manage, Ability::STUDENT_MODELS
+      can :update_all_fields, Student
+      can :read_all_fields, Student
+      can :generate_report_without_watermark, Enrollment
+      can :invite, User
+    end
+    if roles[Role::ROLE_PROFESSOR]
+      can :read, Ability::STUDENT_MODELS
+      can :read_all_fields, Student
+      can :photo, Student
+    end
+    if roles[Role::ROLE_SUPORTE]
+      can [:read, :update, :update_only_photo], (Student)
+    end
+  end
+
+  def initialize_professors(user, roles)
+    if roles[:manager]
+      can :manage, Ability::PROFESSOR_MODELS
+    end
+    if roles[Role::ROLE_PROFESSOR]
+      can :read, Ability::PROFESSOR_MODELS
+    end
+  end
+
+  def initialize_scholarships(user, roles)
+    if roles[:manager]
+      can :manage, Ability::SCHOLARSHIP_MODELS
+    end
+    if roles[Role::ROLE_PROFESSOR]
+      can :read, Ability::SCHOLARSHIP_MODELS
+    end
+  end
+
+  def initialize_phases(user, roles)
+    if roles[:manager]
+      can :manage, Ability::PHASE_MODELS
+    end
+    if roles[Role::ROLE_PROFESSOR]
+      can :read, Ability::PHASE_MODELS
+    end
+  end
+
+  def initialize_courses(user, roles)
+    alias_action :set_invalid, :set_requested, :set_valid, to: :update
+    alias_action :set_effected, :show_effect, to: :effect
+    if roles[:manager]
+      can :manage, Ability::COURSE_MODELS
+      can :update_all_fields, ClassEnrollment
+      can :update_all_fields, CourseClass
+      if !roles[Role::ROLE_COORDENACAO] && !roles[Role::ROLE_SECRETARIA]
+        cannot :read_pendencies, ClassEnrollmentRequest
+      end
+    end
+    if roles[Role::ROLE_PROFESSOR]
+      can :read, Ability::COURSE_MODELS
+      if user.professor.present?
+        can :read_advisement_pendencies, EnrollmentRequest
+        can :update, EnrollmentRequest, enrollment: {
+          advisements: { professor: user.professor }
+        }
+        can :update, ClassEnrollmentRequest, enrollment_request: {
+          enrollment: { advisements: { professor: user.professor } }
+        }
+        cannot :update, ClassEnrollmentRequest,
+          status: ClassEnrollmentRequest::EFFECTED if !roles[:manager]
+
+        if CustomVariable.professor_login_can_post_grades == "yes_all_semesters"
+          can [:update, :post_grades], ClassEnrollment, course_class: {
+            professor: user.professor
+          }
+          can [:update, :post_grades], CourseClass, professor: user.professor
+        elsif CustomVariable.professor_login_can_post_grades == "yes"
+          can [:update, :post_grades], ClassEnrollment, course_class: {
+            professor: user.professor,
+            year: YearSemester.current.year,
+            semester: YearSemester.current.semester
+          }
+          can [:update, :post_grades], CourseClass,
+            professor: user.professor,
+            year: YearSemester.current.year,
+            semester: YearSemester.current.semester
+        end
+      end
+    else
+      cannot [:read_advisement_pendencies, :read_pendencies], EnrollmentRequest
+    end
+    cannot [:create, :destroy], EnrollmentRequest
+    cannot [:create, :destroy], ClassEnrollmentRequest
+  end
+
+  def initialize_education(user, roles)
+    if roles[:manager]
+      can :manage, Ability::EDUCATION_MODELS
+    end
+    if roles[Role::ROLE_PROFESSOR]
+      can :read, Ability::EDUCATION_MODELS
+    end
+  end
+
+  def initialize_places(user, roles)
+    if roles[:manager]
+      can :manage, Ability::PLACE_MODELS
+    end
+  end
+
+  def initialize_configurations(user, roles)
+    alias_action :execute_now, :execute_now, :notify, to: :update
+    if roles[Role::ROLE_COORDENACAO]
+      can :manage, (Ability::CONFIGURATION_MODELS - [
+        CustomVariable, ReportConfiguration
+      ])
+    end
+    if roles[Role::ROLE_SECRETARIA]
+      can :read, [Query, Version, NotificationLog]
+      can :execute, (Query)
+    end
+    cannot [:destroy, :update, :create], Role
+    cannot [:destroy, :update, :create], NotificationLog
+    cannot [:destroy, :update, :create], Version
+  end
+
+  def initialize_student_pages(user, roles)
+    if roles.include?(Role::ROLE_ALUNO) && user.student.present?
+      can [:show, :enroll, :save_enroll], :student_enrollment
+    else
+      cannot [:show, :enroll, :save_enroll], :student_enrollment
+    end
   end
 end

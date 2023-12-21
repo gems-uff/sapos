@@ -5,7 +5,9 @@
 
 module ClassEnrollmentHelperConcern
   def custom_enrollment_form_column(record, options)
-    options[:disabled] = true if current_user.role_id == Role::ROLE_PROFESSOR
+    if can?(:post_grades, record) && cannot?(:update_all_fields, record)
+      options[:disabled] = true
+    end
     options[:style] = "width:320px; background-image:none !important;
                        color:#000000 !important;"
     record_select_field(
@@ -14,7 +16,9 @@ module ClassEnrollmentHelperConcern
   end
 
   def custom_course_class_form_column(record, options)
-    options[:disabled] = true if current_user.role_id == Role::ROLE_PROFESSOR
+    if can?(:post_grades, record) && cannot?(:update_all_fields, record)
+      options[:disabled] = true
+    end
     record_select_field(
       :course_class, record.course_class || CourseClass.new, options
     )
@@ -114,9 +118,9 @@ module ClassEnrollmentHelperConcern
     )
 
     return if column.name != :grade_not_count_in_gpr
-    return { style: "display:none;" } if current_user && (
-      current_user.role_id == Role::ROLE_PROFESSOR
-    )
+    if can?(:post_grades, record) && cannot?(:update_all_fields, record)
+      return { style: "display:none;" }
+    end
     return { style: "width: 190px;" } if controller_name != "class_enrollments"
   end
 end

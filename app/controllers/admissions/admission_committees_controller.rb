@@ -72,14 +72,14 @@ class Admissions::AdmissionCommitteesController < ApplicationController
   end
 
   def populate_professors
-    populate_members(User.where(role_id: Role::ROLE_PROFESSOR))
+    populate_members(User.professors)
   end
 
   def populate_coordination
-    populate_members(User.where(role_id: Role::ROLE_COORDENACAO))
+    populate_members(User.coordination)
   end
 
   def populate_secretary
-    populate_members(User.where(role_id: Role::ROLE_SECRETARIA))
+    populate_members(User.secretary)
   end
 end

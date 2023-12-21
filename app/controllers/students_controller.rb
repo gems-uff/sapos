@@ -8,6 +8,15 @@ class StudentsController < ApplicationController
 
   helper :student_majors
 
+  UPDATE_FIELDS = [
+    :name, :photo, :sex, :civil_status, :birthdate, :city, :neighborhood,
+    :address, :zip_code, :telephone1, :telephone2, :email, :employer,
+    :job_position, :cpf, :identity_number, :identity_issuing_body,
+    :identity_issuing_place, :identity_expedition_date, :birth_country,
+    :birth_state, :birth_city, :father_name, :mother_name, :obs,
+    :student_majors
+  ]
+
   before_action :check_current_user
 
   active_scaffold :student do |config|
@@ -38,14 +47,7 @@ class StudentsController < ApplicationController
 
     config.columns[:student_majors].includes = [:majors, :student_majors]
 
-    config.columns = [
-      :name, :photo, :sex, :civil_status, :birthdate, :city, :neighborhood,
-      :address, :zip_code, :telephone1, :telephone2, :email, :employer,
-      :job_position, :cpf, :identity_number, :identity_issuing_body,
-      :identity_issuing_place, :identity_expedition_date, :birth_country,
-      :birth_state, :birth_city, :father_name, :mother_name, :obs,
-      :student_majors
-    ]
+    config.columns = UPDATE_FIELDS
 
     config.actions.exclude :deleted_records
   end
@@ -61,9 +63,15 @@ class StudentsController < ApplicationController
 
   private
     def check_current_user
-      if can? :update_only_photo, Student
+      if can? :update_all_fields, Student
+        active_scaffold_config.update.columns = UPDATE_FIELDS
+      elsif can? :update_only_photo, Student
         active_scaffold_config.update.columns = [:photo, :email]
-        active_scaffold_config.show.columns = [:photo, :email]
+      end
+      if can? :read_all_fields, Student
+        active_scaffold_config.show.columns = UPDATE_FIELDS
+      elsif can? :update_only_photo, Student
+        active_scaffold_config.update.columns = [:photo, :email]
       end
     end
 end
