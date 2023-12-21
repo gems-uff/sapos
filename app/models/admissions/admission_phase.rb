@@ -25,6 +25,8 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
 
   belongs_to :approval_condition, optional:true,
     class_name: "Admissions::FormCondition", foreign_key: "approval_condition_id"
+  belongs_to :keep_in_phase_condition, optional:true,
+    class_name: "Admissions::FormCondition", foreign_key: "keep_in_phase_condition_id"
   belongs_to :member_form, optional: true,
     class_name: "Admissions::FormTemplate", foreign_key: "member_form_id"
   belongs_to :shared_form, optional: true,

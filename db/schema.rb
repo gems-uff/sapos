@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_19_060355) do
+ActiveRecord::Schema[7.0].define(version: 2023_12_21_221124) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -118,8 +118,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_19_060355) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "approval_condition_id"
+    t.integer "keep_in_phase_condition_id"
     t.index "\"ranking_config_id\"", name: "index_admission_phases_on_ranking_config_id"
     t.index ["consolidation_form_id"], name: "index_admission_phases_on_consolidation_form_id"
+    t.index ["keep_in_phase_condition_id"], name: "index_admission_phases_on_keep_in_phase_condition_id"
     t.index ["member_form_id"], name: "index_admission_phases_on_member_form_id"
     t.index ["shared_form_id"], name: "index_admission_phases_on_shared_form_id"
   end

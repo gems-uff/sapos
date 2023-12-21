@@ -13,6 +13,7 @@ pt-BR:
         admission_phase_committees: Comitês
         admission_committees: Comitês
         approval_condition: Condição de aprovação
+        keep_in_phase_condition: Condição de não-reprovação
         admission_phase_results: Resultados da fase
         admission_phase_evaluations: Avaliações do comitê
         admission_process_phases: Editais de seleção

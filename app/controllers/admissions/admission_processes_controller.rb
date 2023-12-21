@@ -135,6 +135,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
       .ready_for_consolidation(phase_id)
     @approved = []
     @reproved = []
+    @not_approved = []
     @errors = []
     @missing_committee = []
 
@@ -144,6 +145,8 @@ class Admissions::AdmissionProcessesController < ApplicationController
         @approved << candidate
       when Admissions::AdmissionApplication::REPROVED
         @reproved << candidate
+      when nil
+        @not_approved << candidate
       else
         @errors << candidate
       end
@@ -194,6 +197,9 @@ class Admissions::AdmissionProcessesController < ApplicationController
       end
       if @approved.present?
         @message += ". #{I18n.t("#{i18n_prefix}.approved", count: @approved.count)}"
+      end
+      if @not_approved.present?
+        @message += ". #{I18n.t("#{i18n_prefix}.not_approved", count: @not_approved.count)}"
       end
     end
 

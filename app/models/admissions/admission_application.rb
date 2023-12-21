@@ -160,9 +160,9 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   end
 
-  def satisfies_condition(form_condition, fields: nil, should_raise: nil)
+  def satisfies_condition(form_condition, fields: nil, should_raise: nil, default: true)
     Admissions::FormCondition.check_truth(
-      form_condition, should_raise: should_raise
+      form_condition, should_raise: should_raise, default: default
     ) do |name|
       next fields[name] if fields.present?
       (
@@ -230,6 +230,12 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
         should_raise: Admissions::FormCondition::RAISE_PHASE
       )
         { status: APPROVED, status_message: nil }
+      elsif self.satisfies_condition(
+        phase.keep_in_phase_condition, fields: field_objects,
+        should_raise: Admissions::FormCondition::RAISE_PHASE,
+        default: false
+      )
+        { }
       else
         { status: REPROVED, status_message: nil }
       end

@@ -23,6 +23,15 @@
     visible: true
   }%>
   <%= render partial: "applications_result_table", locals: {
+    title: t("active_scaffold.admissions/admission_process.consolidate_phase.not_approved",
+             count: @not_approved.size),
+    subtext: nil,
+    candidates: @not_approved,
+    subid: "#{subid}-not-approved",
+    show_status: false,
+    visible: false
+  }%>
+  <%= render partial: "applications_result_table", locals: {
     title: t("active_scaffold.admissions/admission_process.consolidate_phase.reproved",
              count: @reproved.size),
     subtext: nil,

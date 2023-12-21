@@ -63,6 +63,9 @@ pt-BR:
         errors:
           one: "Erro na consolidação: %{count}"
           other: "Erros na consolidação: %{count}"
+        not_approved:
+          one: "Continuou na mesma fase: %{count}"
+          other: "Continuaram na mesma fase: %{count}"
         missing_committee: "Comitê incompleto: %{count}"
         open_process_error: "Consolidação não-parcial impedida: edital ainda está aberto e novos candidatos podem se inscrever"
         non_consolidated_error:
