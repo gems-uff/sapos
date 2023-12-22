@@ -22,6 +22,7 @@ pt-BR:
         statuses:
           approved: Aprovado
           reproved: Reprovado
+          canceled: Cancelado
           error: Erro
         status_message: Razão
         pendency: "Pendência de comitê"
@@ -59,6 +60,14 @@ pt-BR:
         title: Desfazer última consolidação
         confirm: Você tem certeza que deseja desfazer a última consolidação do candidato? Algumas operações podem não ser reversíveis
         success: Fase alterada para %{name}
+      cancel:
+        title: Cancelar candidatura
+        confirm: Você tem certeza que deseja cancelar a candidatura?
+        success: Candidatura cancelada
+      edit_override:
+        title: Editar especial
+      configuration:
+        title: Avançado
 
   errors:
     admissions/admission_application:

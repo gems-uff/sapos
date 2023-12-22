@@ -24,6 +24,26 @@ class Admissions::AdmissionApplicationsController < ApplicationController
 
     config.list.sorting = { admission_process: "DESC", name: "ASC" }
 
+    config.delete.link.weight = -1
+    config.delete.link.html_options = { style: "display: none;" }
+
+    config.action_links.add "cancel",
+      label: "<i title='#{
+        I18n.t "active_scaffold.admissions/admission_application.cancel.title"
+      }' class='fa fa-remove'></i>".html_safe,
+      type: :member,
+      keep_open: false,
+      position: false,
+      crud_type: :update,
+      method: :put,
+      html_options: { style: "display: none;" },
+      refresh_list: true,
+      ignore_method: :cancel_ignore?,
+      security_method: :cancel_authorized?,
+      confirm: I18n.t(
+        "active_scaffold.admissions/admission_application.cancel.confirm"
+      )
+
     config.action_links.add "undo_consolidation",
       label: "<i title='#{
         I18n.t "active_scaffold.admissions/admission_application.undo_consolidation.title"
@@ -33,12 +53,35 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       position: false,
       crud_type: :update,
       method: :put,
+      html_options: { style: "display: none;" },
       refresh_list: true,
-      ignore_method: :hide_undo_consolidation?,
-      security_method: :undo_consolidation_security_method,
+      ignore_method: :undo_consolidation_ignore?,
+      security_method: :undo_consolidation_authorized?,
       confirm: I18n.t(
         "active_scaffold.admissions/admission_application.undo_consolidation.confirm"
       )
+
+    config.action_links.add "edit_override",
+      label: "<i title='#{
+        I18n.t "active_scaffold.admissions/admission_application.edit_override.title"
+      }' class='fa fa-pencil-square edit-override'></i>".html_safe,
+      type: :member,
+      ignore_method: :override_ignore?,
+      security_method: :override_authorized?,
+      html_options: { style: "display: none;" },
+      action: :edit,
+      parameters: {
+        override: true
+      }
+
+    config.action_links.add "configuration",
+      label: "<i title='#{
+        I18n.t "active_scaffold.admissions/admission_application.configuration.title"
+      }' class='fa fa-cog advanced-config'></i>".html_safe,
+      type: :member,
+      security_method: :configuration_authorized?,
+      ignore_method: :configuration_ignore?,
+      position: false
 
     config.columns.add :is_filled
     config.columns.add :pendency
@@ -166,11 +209,11 @@ class Admissions::AdmissionApplicationsController < ApplicationController
 
   def update_authorized?(record = nil, column = nil)
     return super if record.nil?
-    return true if can?(:override, record) && record.admission_process.staff_can_edit
     phase = record.admission_phase
     return false if phase.nil?
-    return false if record.status == Admissions::AdmissionApplication::APPROVED
-    return false if record.status == Admissions::AdmissionApplication::REPROVED
+    return false if Admissions::AdmissionApplication::END_OF_PHASE_STATUSES.include?(
+      record.status
+    )
 
     phase.admission_committees.any? do |committee|
       if record.satisfies_condition(committee.form_condition)
@@ -179,21 +222,45 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     end && super
   end
 
-  def hide_undo_consolidation?(record)
+  def cancel_ignore?(record)
+    (
+      (record.status == Admissions::AdmissionApplication::CANCELED) ||
+      cannot?(:cancel, record)
+    )
+  end
+
+  def cancel_authorized?(record = nil, column = nil)
+    can?(:cancel, record)
+  end
+
+  def cancel
+    raise CanCan::AccessDenied.new if cannot? :cancel, Admissions::AdmissionApplication
+    process_action_link_action(:cancel) do |record|
+      next if cancel_ignore?(record)
+      record.update!(
+        status: Admissions::AdmissionApplication::CANCELED,
+        status_message: nil,
+      )
+      self.successful = true
+      flash[:info] = I18n.t("active_scaffold.admissions/admission_application.cancel.success")
+    end
+  end
+
+  def undo_consolidation_ignore?(record)
     eop = Admissions::AdmissionApplication::END_OF_PHASE_STATUSES
     (record.admission_phase_id.nil? && !eop.include?(record.status)) ||
       cannot?(:undo_consolidation, record) ||
       !record.admission_process.staff_can_undo
   end
 
-  def undo_consolidation_security_method(record)
+  def undo_consolidation_authorized?(record = nil, column = nil)
     can?(:undo_consolidation, record)
   end
 
   def undo_consolidation
     raise CanCan::AccessDenied.new if cannot? :undo_consolidation, Admissions::AdmissionApplication
     process_action_link_action(:undo_consolidation) do |record|
-      next if hide_undo_consolidation?(record)
+      next if undo_consolidation_ignore?(record)
       eop = Admissions::AdmissionApplication::END_OF_PHASE_STATUSES
       if eop.include?(record.status)
         set_phase_id = record.admission_phase_id
@@ -227,6 +294,35 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       self.successful = true
       flash[:info] = I18n.t("active_scaffold.admissions/admission_application.undo_consolidation.success", name: prev_phase_name)
     end
+  end
+
+  def override_authorized?(record = nil, column = nil)
+    return super if record.nil?
+    can?(:override, record) && record.admission_process.staff_can_edit
+  end
+
+  def override_ignore?(record)
+    cannot?(:override, record) || !record.admission_process.staff_can_edit
+  end
+
+  def configuration_ignore?(record)
+    !(
+      !cannot?(:destroy, record) ||
+      !cancel_ignore?(record) ||
+      !undo_consolidation_ignore?(record) ||
+      !override_ignore?(record)
+    )
+  end
+
+  def configuration_authorized?(record = nil, column = nil)
+    can?(:destroy, record) ||
+    cancel_authorized?(record) ||
+    undo_consolidation_authorized?(record) ||
+    override_authorized?(record)
+  end
+
+  def configuration
+    @record = find_if_allowed(params[:id], :read)
   end
 
   protected
@@ -304,6 +400,23 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       do_refresh_list if !render_parent?
       responds_to_parent do
         render action: "on_undo_consolidation", formats: [:js], layout: false
+      end
+    end
+
+    def cancel_respond_to_html
+      return_to_main
+    end
+
+    def cancel_respond_to_js
+      do_refresh_list if !render_parent?
+      @popstate = true
+      render(action: "on_cancel")
+    end
+
+    def cancel_respond_on_iframe
+      do_refresh_list if !render_parent?
+      responds_to_parent do
+        render action: "on_cancel", formats: [:js], layout: false
       end
     end
 end

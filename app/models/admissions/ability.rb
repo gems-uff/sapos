@@ -50,6 +50,8 @@ module Admissions::Ability
     if roles[:manager]
       can :undo_consolidation, Admissions::AdmissionApplication
       can :override, Admissions::AdmissionApplication
+      can :cancel, Admissions::AdmissionApplication
+      can :configuration, Admissions::AdmissionApplication
     end
     if roles[Role::ROLE_ADMINISTRADOR] || roles[Role::ROLE_COORDENACAO]
       can :manage, ADMISSION_MODELS

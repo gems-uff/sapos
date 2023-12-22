@@ -8,10 +8,11 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
   APPROVED = record_i18n_attr("statuses.approved")
   REPROVED = record_i18n_attr("statuses.reproved")
+  CANCELED = record_i18n_attr("statuses.canceled")
   ERROR = record_i18n_attr("statuses.error")
 
-  END_OF_PHASE_STATUSES = [APPROVED, REPROVED]
-  STATUSES = [APPROVED, REPROVED, ERROR]
+  END_OF_PHASE_STATUSES = [APPROVED, REPROVED, CANCELED]
+  STATUSES = [APPROVED, REPROVED, CANCELED, ERROR]
 
   scope :non_consolidated, -> {
     where(

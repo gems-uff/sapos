@@ -1,5 +1,9 @@
 <%
-  return "Acesso inválido" if !controller.update_authorized?(record)
+  if params[:override]
+    return "Acesso inválido" if !controller.override_authorized?(record)
+  else
+    return "Acesso inválido" if !controller.update_authorized?(record)
+  end
   admission_process = record.admission_process
   current_phase = record.admission_phase
   visible = true # current_phase.nil? ? true : current_phase.can_edit_candidate
@@ -12,7 +16,7 @@
   show_email = admission_process.form_template.fields
     .where(sync: Admissions::FormField::SYNC_EMAIL).first.blank?
 
-  can_edit_override = can?(:override, record) && admission_process.staff_can_edit
+  can_edit_override = can?(:override, record) && admission_process.staff_can_edit && params[:override]
   can_edit_main = can_edit_override || current_phase.try(:can_edit_candidate)
 %>
 <ol>
@@ -83,10 +87,10 @@
           phase = p.admission_phase
           latest_available_phase = phase.id == current_phase.id
           phase_visible = latest_available_phase
+          end_status = Admissions::AdmissionApplication::END_OF_PHASE_STATUSES
           during_latest_phase = (
             latest_available_phase &&
-            record.status != Admissions::AdmissionApplication::APPROVED &&
-            record.status != Admissions::AdmissionApplication::REPROVED
+            !end_status.include?(record.status)
           )
           can_edit_phase = can_edit_override || during_latest_phase
           phase_subid = "#{subid}-#{phase.id}"
