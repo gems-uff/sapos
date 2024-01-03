@@ -203,8 +203,6 @@ class Admissions::AdmissionProcessesController < ApplicationController
       end
     end
 
-  rescue => err
-    @exception = err
   ensure
     params.each_key do |key|
       if !["authenticity_token", "controller", "action"].include? key
