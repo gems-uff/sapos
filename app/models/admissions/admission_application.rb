@@ -201,7 +201,9 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     if phase.consolidation_form.present?
       field_objects = self.fields_hash
       committees = self.evaluations.where(admission_phase_id: phase.id).map do |ev|
-        ev.filled_form.to_fields_hash.map(&:simple_value)
+        ev.filled_form.to_fields_hash.map do |k, v|
+          [k, v.simple_value]
+        end.to_h
       end
       vars = {
         process: self.admission_process,

@@ -18,7 +18,8 @@ class Admissions::FormCondition < ActiveRecord::Base
   AND = record_i18n_attr("modes.and")
   OR = record_i18n_attr("modes.or")
   CONDITION = record_i18n_attr("modes.condition")
-  MODES = [AND, OR, CONDITION]
+  NONE = record_i18n_attr("modes.none")
+  MODES = [AND, OR, CONDITION, NONE]
 
   CONTAINS = record_i18n_attr("conditions.contains")
   STARTS_WITH = record_i18n_attr("conditions.starts_with")
@@ -116,6 +117,7 @@ class Admissions::FormCondition < ActiveRecord::Base
 
   def self.check_truth(condition, should_raise: nil, default: true, &block)
     return default if condition.nil?
+    return default if condition.mode == NONE
     case condition.mode
     when AND
        condition.form_conditions.all? do |child|
