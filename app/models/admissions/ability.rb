@@ -52,6 +52,7 @@ module Admissions::Ability
       can :override, Admissions::AdmissionApplication
       can :cancel, Admissions::AdmissionApplication
       can :configuration, Admissions::AdmissionApplication
+      can :read_all, Admissions::AdmissionApplication
     end
     if roles[Role::ROLE_ADMINISTRADOR] || roles[Role::ROLE_COORDENACAO]
       can :manage, ADMISSION_MODELS

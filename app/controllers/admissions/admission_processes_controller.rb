@@ -202,7 +202,9 @@ class Admissions::AdmissionProcessesController < ApplicationController
         @message += ". #{I18n.t("#{i18n_prefix}.not_approved", count: @not_approved.count)}"
       end
     end
-
+  rescue => err
+    ExceptionNotifier.notify_exception(err)
+    @exception = "Erro ao consolidar fase: #{err}"
   ensure
     params.each_key do |key|
       if !["authenticity_token", "controller", "action"].include? key
@@ -224,7 +226,8 @@ class Admissions::AdmissionProcessesController < ApplicationController
       @ranking = @admission_process.rankings.where(id: params[:admission_process_ranking_id]).first
       @candidates = @ranking.generate_ranking
     rescue => exception
-      @errors = exception
+      ExceptionNotifier.notify_exception(exception)
+      @errors = "Erro ao calcular ranking: #{exception}"
     end
 
     params.each_key do |key|

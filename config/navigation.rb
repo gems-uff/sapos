@@ -205,7 +205,18 @@ SimpleNavigation::Configuration.run do |navigation|
       Admissions::RankingMachine,
       Admissions::AdmissionApplication,
     ]
-    mainhelper.listitem :admissions, admission_models do |submenu|
+    check_admission_application = -> {
+      return true if can?(:read_all, Admissions::AdmissionApplication)
+      return false if !can?(:read, Admissions::AdmissionApplication)
+      applications = Admissions::AdmissionApplication.includes(:pendencies)
+        .where(pendencies: { user_id: current_user.id })
+      applications.size > 0
+    }
+    admissions_if = -> { can_read?(
+      admission_models - [Admissions::AdmissionApplication]
+    ).call || check_admission_application.call }
+
+    mainhelper.listitem :admissions, admission_models, if: admissions_if do |submenu|
       submenu.modelitem Admissions::AdmissionProcess
       submenu.modelitem Admissions::FormTemplate
       submenu.item(:consolidation_template, consolidation_templates_path,
@@ -214,7 +225,8 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.modelitem Admissions::AdmissionPhase
       submenu.modelitem Admissions::RankingConfig
       submenu.modelitem Admissions::RankingMachine
-      submenu.modelitem Admissions::AdmissionApplication
+      submenu.modelitem(Admissions::AdmissionApplication,
+        if: check_admission_application)
     end
 
     config_models = [
