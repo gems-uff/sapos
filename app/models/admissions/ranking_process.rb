@@ -29,10 +29,10 @@ class Admissions::RankingProcess < ActiveRecord::Base
   def decrease_vacancies_and_check_remaining!(groups, process_vacancies)
     remaining = true
     process_vacancies[self.id] -= 1
-    remaining = false if process_vacancies[self.id] == 0
+    remaining = false if process_vacancies[self.id] <= 0
     if self.group.present? && !groups[self.group].nil?
       groups[self.group] -= 1
-      remaining = false if groups[self.group] == 0
+      remaining = false if groups[self.group] <= 0
     end
     remaining
   end
