@@ -30,19 +30,22 @@ class Admissions::AdmissionReportGroupMain < Admissions::AdmissionReportGroupBas
           mode: :application,
           field: :token,
           width: 130,
-          fixed_width: true
+          fixed_width: true,
+          html_class: "fixed-col"
         },
         "name" => {
           header: applications_t("name"),
           mode: :application,
           field: :name,
-          width: 150
+          width: 150,
+          html_class: "fixed-col"
         },
         "email" => {
           header: applications_t("email"),
           mode: :application,
           field: :email,
-          width: 120
+          width: 120,
+          html_class: "fixed-col"
         }
       }
       result[result["token"][:header]] = result["token"]

@@ -6,6 +6,13 @@
 class Admissions::AdmissionReportConfig < ActiveRecord::Base
   has_paper_trail
 
+  COLUMN = record_i18n_attr("group_column_tabulars.column")
+  MERGE = record_i18n_attr("group_column_tabulars.merge")
+  NONE = record_i18n_attr("group_column_tabulars.none")
+
+  GROUP_COLUMNS = [MERGE, COLUMN, NONE]
+
+
   has_many :groups, dependent: :destroy,
     class_name: "Admissions::AdmissionReportGroup"
   has_many :ranking_columns, dependent: :destroy,
@@ -17,6 +24,7 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
     class_name: "Admissions::FormCondition"
 
   validates :name, presence: true
+  validates :group_column_tabular, presence: true, inclusion: { in: GROUP_COLUMNS }
 
   accepts_nested_attributes_for :form_condition,
     reject_if: :all_blank,
@@ -27,6 +35,7 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
   end
 
   def init_default
+    self.group_column_tabular = MERGE
     self.groups.build(
       order: 1,
       mode: Admissions::AdmissionReportGroup::MAIN,
@@ -153,7 +162,7 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
     }
     self.groups.each do |group|
       group_config = group.tabular_config(self, admission_process, applications)
-      config[:header] += group_config.header.map { |x| x[:header] }
+      config[:header] += group_config.header
       config[:groups] << group_config
     end
     config

@@ -17,7 +17,7 @@ class Admissions::AdmissionReportGroupPhase < Admissions::AdmissionReportGroupBa
         if mode_columns[:result_type].present?
           @sections << {
             title: "#{phase_columns[:phase].name} - #{mode_columns[:result_type]}",
-            columns: mode_columns[:columns],
+            columns: mode_columns[:columns].map(&:dup),
             result_type: mode_columns[:result_type],
             phase: mode_columns[:phase],
             mode: mode
@@ -35,7 +35,7 @@ class Admissions::AdmissionReportGroupPhase < Admissions::AdmissionReportGroupBa
           mode_columns[:members].each do |member|
             @sections << {
               title: "#{phase_columns[:phase].name} - #{member.name}",
-              columns: mode_columns[:columns],
+              columns: mode_columns[:columns].map(&:dup),
               result_type: nil,
               phase: mode_columns[:phase],
               mode: mode,
@@ -72,9 +72,7 @@ class Admissions::AdmissionReportGroupPhase < Admissions::AdmissionReportGroupBa
   private
     def flat_form(column_map, columns, phase, phase_num, mode, template)
       phase_fields = report_template_fields(template)
-      if !@config.group_column
-        phase_fields = phase_fields.no_group
-      end
+      phase_fields = phase_fields.no_group
       phase_fields = phase_fields.no_html
       phase_fields.each do |field|
         names = [

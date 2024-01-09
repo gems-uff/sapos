@@ -12,7 +12,7 @@ class Admissions::AdmissionReportGroupLetter < Admissions::AdmissionReportGroupB
     @max_submitted_letters.times do |i|
       @sections << {
         title: applications_t("letter_request", count: i + 1),
-        columns: @columns,
+        columns: @columns.map(&:dup),
         i: i + 1
       }
     end
@@ -79,9 +79,7 @@ class Admissions::AdmissionReportGroupLetter < Admissions::AdmissionReportGroupB
 
     def flat_columns(column_map)
       letter_fields = report_template_fields(@admission_process.letter_template)
-      if !@config.group_column
-        letter_fields = letter_fields.no_group
-      end
+      letter_fields = letter_fields.no_group
       letter_fields = letter_fields.no_html
 
       letter_fields.each do |field|

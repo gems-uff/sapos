@@ -9,7 +9,7 @@ class Admissions::AdmissionReportGroupRanking < Admissions::AdmissionReportGroup
     columns.each do |ranking_columns|
       @sections << {
         title: "#{ranking_columns[:ranking_config].name}",
-        columns: ranking_columns[:columns],
+        columns: ranking_columns[:columns].map(&:dup),
         ranking_config: ranking_columns[:ranking_config]
       }
     end
@@ -34,9 +34,7 @@ class Admissions::AdmissionReportGroupRanking < Admissions::AdmissionReportGroup
         ranking_num = index + 1
 
         ranking_fields = report_template_fields(ranking.form_template)
-        if !@config.group_column
-          ranking_fields = ranking_fields.no_group
-        end
+        ranking_fields = ranking_fields.no_group
         ranking_fields = ranking_fields.no_html
         ranking_fields.each do |field|
           names = [

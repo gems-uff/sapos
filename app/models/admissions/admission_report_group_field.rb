@@ -21,9 +21,7 @@ class Admissions::AdmissionReportGroupField < Admissions::AdmissionReportGroupBa
   private
     def flat_columns(column_map)
       template_fields = report_template_fields(admission_process.form_template)
-      if !@config.group_column
-        template_fields = template_fields.no_group
-      end
+      template_fields = template_fields.no_group
       template_fields = template_fields.no_html
 
       template_fields.each do |field|

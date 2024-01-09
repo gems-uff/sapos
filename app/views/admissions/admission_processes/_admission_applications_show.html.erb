@@ -8,9 +8,22 @@
   <div class="scrollable-wrapper">
     <table class="showtable">
       <thead>
+        <% if admission_report_config.group_column_tabular == Admissions::AdmissionReportConfig::MERGE %>
+          <tr>
+            <%
+              main_sections = config[:header].map { |column| column[:section][:title] }
+              groups = main_sections.slice_when { |prev, curr| curr != prev }
+              index = 0
+            %>
+            <% groups.each do |group| %>
+              <th colspan="<%=group.size%>" class="<%= config[:header][index][:html_class] %>"><%= group[0] %></th>
+              <% index += group.size %>
+            <% end %>
+          </tr>
+        <% end %>
         <tr>
-          <% config[:header].each_with_index do |name, index| %>
-            <th class="<%= "fixed-col" if index < 3 %>"><%= name %></th>
+          <% config[:header].each_with_index do |column, index| %>
+            <th class="<%= column[:html_class] %>"><%= column[:header] %></th>
           <% end %>
         </tr>
       </thead>
@@ -24,7 +37,7 @@
           %>
           <tr class="record <%= tr_class %>">
             <% row.each_with_index do |element, index| %>
-              <td class="<%= "fixed-col" if index < 3 %>"><%= element[:value] %></td>
+              <td class="<%= element[:column][:html_class] %>"><%= element[:value] %></td>
             <% end %>
           </tr>
         <% end %>

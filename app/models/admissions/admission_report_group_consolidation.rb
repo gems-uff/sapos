@@ -24,9 +24,7 @@ class Admissions::AdmissionReportGroupConsolidation < Admissions::AdmissionRepor
   private
     def flat_columns(column_map)
       template_fields = report_template_fields(@config.form_template)
-      if !@config.group_column
-        template_fields = template_fields.no_group
-      end
+      template_fields = template_fields.no_group
       template_fields = template_fields.no_html
 
       all_flat = []

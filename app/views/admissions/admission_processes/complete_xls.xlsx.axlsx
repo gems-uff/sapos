@@ -7,7 +7,20 @@ wb = xlsx_package.workbook
 wb.add_worksheet(name: "Edital") do |sheet|
   config = @admission_report_config.prepare_table(@admission_process)
   config[:base_url] = request.base_url
-  sheet.add_row config[:header]
+  if @admission_report_config.group_column_tabular == Admissions::AdmissionReportConfig::MERGE
+    main_sections = config[:header].map { |column| column[:section][:title] }
+    cells = sheet.add_row main_sections
+    groups = main_sections.slice_when { |prev, curr| curr != prev }
+    index = 0
+    groups.each do |group|
+      if group.size > 1
+        sheet.merge_cells cells[index..(index + group.size - 1)]
+      end
+      index += group.size
+    end
+  end
+  header = config[:header].map { |column| column[:header] }
+  sheet.add_row header
   config[:applications].each do |application|
     row_result = @admission_report_config.prepare_excel_row(config, application)
     sheet.add_row row_result[:row], escape_formulas: row_result[:escape_formulas]

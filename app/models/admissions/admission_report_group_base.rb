@@ -42,14 +42,16 @@ class Admissions::AdmissionReportGroupBase
   def header
     row = []
     @sections.each do |section|
-      if @config.group_column && !section[:disallow_group]
+      if has_separator(section)
         row << {
+          section: section,
           header: section[:title],
           mode: :group_column
         }
       end
       section[:columns].each do |column|
-        row << column
+        column[:section] = section
+        row << column.dup
       end
     end
     row
@@ -59,7 +61,7 @@ class Admissions::AdmissionReportGroupBase
     self.application_sections(application, &block)
     row = []
     @sections.each do |section|
-      if @config.group_column && !section[:disallow_group]
+      if has_separator(section)
         row << {
           value: "",
           column: {
@@ -74,6 +76,11 @@ class Admissions::AdmissionReportGroupBase
   end
 
   protected
+    def has_separator(section)
+      return false if @config.group_column_tabular != Admissions::AdmissionReportConfig::COLUMN
+      !section[:disallow_group]
+    end
+
     def include_filtered(columns, colmap, report_columns, name)
       return if report_columns.include?(name)
       result = colmap[name]
