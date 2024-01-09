@@ -355,7 +355,7 @@ Rails.application.routes.draw do
         post :update, on: :member
       end
       resources :letters, only: [:show, :update]
-      get "files/:id", action: :download, on: :collection
+      get "files/:medium_hash", action: :download, on: :collection
     end
 
     resources :form_autocompletes, only: [] do
