@@ -3,16 +3,18 @@
 
 # frozen_string_literal: true
 
-class Admissions::AdmissionReportGroupMain < Admissions::AdmissionReportGroupBase
+class Admissions::AdmissionReportGroupMainLetter < Admissions::AdmissionReportGroupBase
   def prepare_config
+    return if !@admission_process.has_letters
     @sections << {
-      title: Admissions::AdmissionReportGroup::MAIN,
+      title: Admissions::AdmissionReportGroup::MAIN_LETTER,
       columns: self.flat_columns(self.column_map()),
-      disallow_group: true
+      disallow_group: true,
     }
   end
 
   def application_sections(application, &block)
+    return if @sections.empty?
     section = @sections[0]
     section[:application_columns] = section[:columns].map do |column|
       {
@@ -25,29 +27,19 @@ class Admissions::AdmissionReportGroupMain < Admissions::AdmissionReportGroupBas
   private
     def column_map
       result = {
-        "token" => {
-          header: applications_t("token"),
+        "requested_letters" => {
+          header: applications_t("requested_letters"),
           mode: :application,
-          field: :token,
-          width: 130,
-          fixed_width: true
+          field: :requested_letters
         },
-        "name" => {
-          header: applications_t("name"),
+        "filled_letters" => {
+          header: applications_t("filled_letters"),
           mode: :application,
-          field: :name,
-          width: 150
-        },
-        "email" => {
-          header: applications_t("email"),
-          mode: :application,
-          field: :email,
-          width: 120
+          field: :filled_letters
         }
       }
-      result[result["token"][:header]] = result["token"]
-      result[result["name"][:header]] = result["name"]
-      result[result["email"][:header]] = result["email"]
+      result[result["requested_letters"][:header]] = result["requested_letters"]
+      result[result["filled_letters"][:header]] = result["filled_letters"]
       result
     end
 
@@ -61,9 +53,8 @@ class Admissions::AdmissionReportGroupMain < Admissions::AdmissionReportGroupBas
         end
       else
         result = []
-        include_filtered(result, column_map, report_columns, "token")
-        include_filtered(result, column_map, report_columns, "name")
-        include_filtered(result, column_map, report_columns, "email")
+        include_filtered(result, column_map, report_columns, "requested_letters")
+        include_filtered(result, column_map, report_columns, "filled_letters")
       end
       result
     end

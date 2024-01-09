@@ -5,7 +5,7 @@
 
 class Admissions::AdmissionReportGroupBase
   attr_accessor :config, :group, :admission_process, :applications, :extra
-  attr_accessor :columns, :header
+  attr_accessor :sections
 
   def initialize(config, group, admission_process, applications, extra)
     @config = config
@@ -13,19 +13,64 @@ class Admissions::AdmissionReportGroupBase
     @admission_process = admission_process
     @applications = applications
     @extra = extra
-    @columns = []
-    @header = []
+    @sections = []
   end
 
   def prepare_config
     self.prepare_header
   end
 
-  def prepare_header
-    @columns.each do |column|
-      @header << column[:header]
+  def application_sections(application, &block)
+  end
+
+  def section_to_row(section)
+    row = []
+    if section[:application_columns].nil?
+      section[:application_columns] = section[:columns].map do |column|
+        {
+          value: "",
+          column: column
+        }
+      end
     end
-    self
+    section[:application_columns].each do |column|
+      row << column
+    end
+    row
+  end
+
+  def header
+    row = []
+    @sections.each do |section|
+      if @config.group_column && !section[:disallow_group]
+        row << {
+          header: section[:title],
+          mode: :group_column
+        }
+      end
+      section[:columns].each do |column|
+        row << column
+      end
+    end
+    row
+  end
+
+  def prepare_group_row(application, &block)
+    self.application_sections(application, &block)
+    row = []
+    @sections.each do |section|
+      if @config.group_column && !section[:disallow_group]
+        row << {
+          value: "",
+          column: {
+            header: section[:title],
+            mode: :group_column
+          }
+        }
+      end
+      row += self.section_to_row(section)
+    end
+    row
   end
 
   protected
@@ -53,24 +98,25 @@ class Admissions::AdmissionReportGroupBase
     end
 
     def populate_filled(
-      row, cell_index, filled_form, columns,
-      form_field_id: :form_field_id, field_id: :id
+      filled_form, columns, form_field_id: :form_field_id, field_id: :id
     )
       if filled_form.blank?
         filled_hash = {}
       else
         filled_hash = filled_form.fields.index_by(&form_field_id)
       end
-      columns.each do |column|
+      columns.map do |column|
         field = column[:field]
         filled = filled_hash[field.send(field_id)]
+        element = {
+          column: column
+        }
         if filled.blank?
-          row << ""
+          element[:value] = ""
         else
-          row << yield(filled, field, cell_index)
+          element[:value] = yield(filled, field, element)
         end
-        cell_index += 1
+        element
       end
-      cell_index
     end
 end

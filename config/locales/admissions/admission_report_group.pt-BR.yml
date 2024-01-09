@@ -9,6 +9,7 @@ pt-BR:
         mode: Tipo
         modes:
           main: Principal
+          main_letter: Carta Principal
           field: Candidato
           letter: Carta
           phase: Fase
@@ -21,6 +22,10 @@ pt-BR:
         operations:
           include: Incluir
           exclude: Excluir
+        pdf_format: Formato no PDF
+        pdf_formats:
+          list: Lista
+          table: Tabela
         columns: Colunas
         group_column: Coluna separadora
     models:

@@ -7,83 +7,48 @@ class Admissions::AdmissionReportGroupLetter < Admissions::AdmissionReportGroupB
   def prepare_config
     return if !@admission_process.has_letters
     column_map = self.column_map()
-    flat_columns = self.flat_columns(column_map)
-    @columns = self.group_columns(flat_columns)
+    @columns = self.flat_columns(column_map)
     @max_submitted_letters = @applications.collect(&:requested_letters).max.to_i
-    self.prepare_header
+    @max_submitted_letters.times do |i|
+      @sections << {
+        title: applications_t("letter_request", count: i + 1),
+        columns: @columns,
+        i: i + 1
+      }
+    end
   end
 
-  def prepare_header
-    @columns.each do |column|
-      if column[:mode] == :letters
-        @max_submitted_letters.times do |i|
-          if @config.group_column
-            @header << applications_t("letter_request", count: i + 1)
+  def application_sections(application, &block)
+    @sections.zip(application.letter_requests) do |section, letter|
+      if letter.present?
+        filled_hash = letter.filled_form.fields.index_by(&:form_field_id)
+        section[:application_columns] = section[:columns].map do |column|
+          element = {
+            column: column
+          }
+          element[:value] = if column[:mode] == :letter
+            letter.send(column[:field])
+          else
+            field = column[:field]
+            filled = filled_hash[field.id]
+            yield(filled, field, element)
           end
-          column[:columns].each do |sub_column|
-            @header << sub_column[:header]
-          end
+          element
         end
       else
-        @header << column[:header]
+        section[:application_columns] = section[:columns].map do |column|
+          {
+            column: column,
+            value: ""
+          }
+        end
       end
     end
-    self
-  end
-
-  def prepare_group_row(row, cell_index, application, &block)
-    return cell_index if !@admission_process.has_letters
-    @columns.each do |column|
-      if column[:mode] == :letters
-        application.letter_requests.each_with_index do |letter, i|
-          if @config.group_column
-            row << i + 1
-            cell_index += 1
-          end
-          filled_hash = letter.filled_form.fields.index_by(&:form_field_id)
-          column[:columns].each do |sub_column|
-            if sub_column[:mode] == :letter
-              row << letter.send(sub_column[:field])
-            else
-              field = sub_column[:field]
-              filled = filled_hash[field.id]
-              row << yield(filled, field, cell_index)
-            end
-            cell_index += 1
-          end
-        end
-
-        (@max_submitted_letters - application.letter_requests.count).times do
-          if @config.group_column
-            row << ""
-            cell_index += 1
-          end
-          column[:columns].each do |sub_column|
-            row << ""
-            cell_index += 1
-          end
-        end
-      else
-        row << application.send(column[:field])
-        cell_index += 1
-      end
-    end
-    cell_index
   end
 
   private
     def column_map
       result = {
-        "requested_letters" => {
-          header: applications_t("requested_letters"),
-          mode: :application,
-          field: :requested_letters
-        },
-        "filled_letters" => {
-          header: applications_t("filled_letters"),
-          mode: :application,
-          field: :filled_letters
-        },
         "name" => {
           header: letter_request_t("name"),
           mode: :letter,
@@ -105,8 +70,6 @@ class Admissions::AdmissionReportGroupLetter < Admissions::AdmissionReportGroupB
           field: :status
         }
       }
-      result[result["requested_letters"][:header]] = result["requested_letters"]
-      result[result["filled_letters"][:header]] = result["filled_letters"]
       result[result["name"][:header]] = result["name"]
       result[result["email"][:header]] = result["email"]
       result[result["telephone"][:header]] = result["telephone"]
@@ -138,8 +101,6 @@ class Admissions::AdmissionReportGroupLetter < Admissions::AdmissionReportGroupB
         end
       else
         result = []
-        include_filtered(result, column_map, report_columns, "requested_letters")
-        include_filtered(result, column_map, report_columns, "filled_letters")
         include_filtered(result, column_map, report_columns, "name")
         include_filtered(result, column_map, report_columns, "email")
         include_filtered(result, column_map, report_columns, "telephone")
@@ -149,24 +110,5 @@ class Admissions::AdmissionReportGroupLetter < Admissions::AdmissionReportGroupB
         end
       end
       result
-    end
-
-    def group_columns(flat_columns)
-      columns = []
-      grouped = nil
-      flat_columns.each do |column|
-        if column[:mode] == :application
-          columns << column
-        elsif grouped.nil?
-          grouped = {
-            columns: [column],
-            mode: :letters
-          }
-          columns << grouped
-        else
-          grouped[:columns] << column
-        end
-      end
-      columns
     end
 end

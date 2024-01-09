@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_08_025154) do
+ActiveRecord::Schema[7.0].define(version: 2024_01_09_144424) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -199,8 +199,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_08_025154) do
     t.integer "form_template_id"
     t.integer "form_condition_id"
     t.string "group_column_tabular"
-    t.string "group_column_simple_pdf"
-    t.string "group_column_complete_pdf"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["form_condition_id"], name: "index_admission_report_configs_on_form_condition_id"
@@ -215,6 +213,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_08_025154) do
     t.string "committee"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "in_simple"
+    t.string "pdf_format"
     t.index ["admission_report_config_id"], name: "index_admission_report_groups_on_admission_report_config_id"
   end
 

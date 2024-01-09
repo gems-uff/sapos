@@ -23,8 +23,8 @@
             app_index += 1
           %>
           <tr class="record <%= tr_class %>">
-            <% row.each_with_index do |value, index| %>
-              <td class="<%= "fixed-col" if index < 3 %>"><%= value %></td>
+            <% row.each_with_index do |element, index| %>
+              <td class="<%= "fixed-col" if index < 3 %>"><%= element[:value] %></td>
             <% end %>
           </tr>
         <% end %>

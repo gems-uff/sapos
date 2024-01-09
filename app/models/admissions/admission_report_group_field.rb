@@ -5,14 +5,16 @@
 
 class Admissions::AdmissionReportGroupField < Admissions::AdmissionReportGroupBase
   def prepare_config
-    @columns = self.flat_columns({})
-    self.prepare_header
+    @sections << {
+      title: Admissions::AdmissionReportGroup::FIELD,
+      columns: self.flat_columns({})
+    }
   end
 
-  def prepare_group_row(row, cell_index, application, &block)
-    populate_filled(
-      row, cell_index, application.try(:filled_form),
-      @columns, &block
+  def application_sections(application, &block)
+    section = @sections[0]
+    section[:application_columns] = populate_filled(
+      application.try(:filled_form), section[:columns], &block
     )
   end
 
@@ -32,7 +34,7 @@ class Admissions::AdmissionReportGroupField < Admissions::AdmissionReportGroupBa
         }
       end
 
-      report_columns = @group.columns.order(:order).map(&:name)
+      report_columns = @group.columns.sort_by(&:order).map(&:name)
       if @group.operation == Admissions::AdmissionReportGroup::INCLUDE
         result = report_columns.filter_map do |name|
           column = column_map[name]

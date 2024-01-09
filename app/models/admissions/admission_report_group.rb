@@ -7,6 +7,7 @@ class Admissions::AdmissionReportGroup < ActiveRecord::Base
   has_paper_trail
 
   MAIN = record_i18n_attr("modes.main")
+  MAIN_LETTER = record_i18n_attr("modes.main_letter")
   FIELD = record_i18n_attr("modes.field")
   LETTER = record_i18n_attr("modes.letter")
   PHASE = record_i18n_attr("modes.phase")
@@ -26,6 +27,12 @@ class Admissions::AdmissionReportGroup < ActiveRecord::Base
 
   OPERATIONS = [INCLUDE, EXCLUDE]
 
+
+  LIST = record_i18n_attr("pdf_formats.list")
+  TABLE = record_i18n_attr("pdf_formats.table")
+
+  PDF_FORMATS = [LIST, TABLE]
+
   has_many :columns, dependent: :destroy,
     class_name: "Admissions::AdmissionReportColumn"
 
@@ -33,6 +40,7 @@ class Admissions::AdmissionReportGroup < ActiveRecord::Base
     class_name: "Admissions::AdmissionReportConfig"
 
   validates :mode, presence: true, inclusion: { in: MODES }
+  validates :pdf_format, presence: true, inclusion: { in: PDF_FORMATS }
   validates :operation, presence: true, inclusion: { in: OPERATIONS }
 
   def to_label
@@ -44,6 +52,8 @@ class Admissions::AdmissionReportGroup < ActiveRecord::Base
     case mode
     when MAIN
       cls = Admissions::AdmissionReportGroupMain
+    when MAIN_LETTER
+      cls = Admissions::AdmissionReportGroupMainLetter
     when FIELD
       cls = Admissions::AdmissionReportGroupField
     when LETTER

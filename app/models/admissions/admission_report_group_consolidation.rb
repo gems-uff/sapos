@@ -6,15 +6,18 @@
 class Admissions::AdmissionReportGroupConsolidation < Admissions::AdmissionReportGroupBase
   def prepare_config
     return if @config.form_template.nil?
-    @columns = self.flat_columns({})
-    self.prepare_header
+    @sections << {
+      title: @config.form_template.name,
+      columns: self.flat_columns({})
+    }
   end
 
-  def prepare_group_row(row, cell_index, application, &block)
-    return cell_index if @config.form_template.nil?
-    populate_filled(
-      row, cell_index, application.try(:non_persistent).try(:[], :filled_form),
-      @columns, form_field_id: :form_field, field_id: :itself, &block
+  def application_sections(application, &block)
+    return if @sections.empty?
+    section = @sections[0]
+    section[:application_columns] = populate_filled(
+      application.try(:non_persistent).try(:[], :filled_form),
+      section[:columns], form_field_id: :form_field, field_id: :itself, &block
     )
   end
 
@@ -37,7 +40,7 @@ class Admissions::AdmissionReportGroupConsolidation < Admissions::AdmissionRepor
         (column_map[field.name] ||= []) << column
         all_flat << column
       end
-      report_columns = @group.columns.order(:order).map(&:name)
+      report_columns = @group.columns.sort_by(&:order).map(&:name)
       result = []
       if @group.operation == Admissions::AdmissionReportGroup::INCLUDE
         report_columns.each do |name|

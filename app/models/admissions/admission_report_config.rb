@@ -30,32 +30,46 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
     self.groups.build(
       order: 1,
       mode: Admissions::AdmissionReportGroup::MAIN,
-      operation: Admissions::AdmissionReportGroup::EXCLUDE
+      operation: Admissions::AdmissionReportGroup::EXCLUDE,
+      in_simple: true,
+      pdf_format: Admissions::AdmissionReportGroup::LIST,
     )
     self.groups.build(
       order: 2,
-      mode: Admissions::AdmissionReportGroup::CONSOLIDATION,
-      operation: Admissions::AdmissionReportGroup::EXCLUDE
+      mode: Admissions::AdmissionReportGroup::MAIN_LETTER,
+      operation: Admissions::AdmissionReportGroup::EXCLUDE,
+      in_simple: true,
+      pdf_format: Admissions::AdmissionReportGroup::LIST,
     )
     self.groups.build(
       order: 3,
-      mode: Admissions::AdmissionReportGroup::RANKING,
-      operation: Admissions::AdmissionReportGroup::EXCLUDE
+      mode: Admissions::AdmissionReportGroup::CONSOLIDATION,
+      operation: Admissions::AdmissionReportGroup::EXCLUDE,
+      pdf_format: Admissions::AdmissionReportGroup::TABLE,
     )
     self.groups.build(
       order: 4,
-      mode: Admissions::AdmissionReportGroup::PHASE_REVERSE,
-      operation: Admissions::AdmissionReportGroup::EXCLUDE
+      mode: Admissions::AdmissionReportGroup::RANKING,
+      operation: Admissions::AdmissionReportGroup::EXCLUDE,
+      pdf_format: Admissions::AdmissionReportGroup::TABLE,
     )
     self.groups.build(
       order: 5,
-      mode: Admissions::AdmissionReportGroup::FIELD,
-      operation: Admissions::AdmissionReportGroup::EXCLUDE
+      mode: Admissions::AdmissionReportGroup::PHASE_REVERSE,
+      operation: Admissions::AdmissionReportGroup::EXCLUDE,
+      pdf_format: Admissions::AdmissionReportGroup::TABLE,
     )
     self.groups.build(
       order: 6,
+      mode: Admissions::AdmissionReportGroup::FIELD,
+      operation: Admissions::AdmissionReportGroup::EXCLUDE,
+      pdf_format: Admissions::AdmissionReportGroup::TABLE,
+    )
+    self.groups.build(
+      order: 7,
       mode: Admissions::AdmissionReportGroup::LETTER,
-      operation: Admissions::AdmissionReportGroup::EXCLUDE
+      operation: Admissions::AdmissionReportGroup::EXCLUDE,
+      pdf_format: Admissions::AdmissionReportGroup::TABLE,
     )
     self.ranking_columns.build(
       name: "name",
@@ -70,18 +84,10 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
       mode: Admissions::AdmissionReportGroup::MAIN,
       operation: Admissions::AdmissionReportGroup::EXCLUDE
     )
-    letter = self.groups.build(
+    self.groups.build(
       order: 2,
-      mode: Admissions::AdmissionReportGroup::LETTER,
-      operation: Admissions::AdmissionReportGroup::INCLUDE
-    )
-    letter.columns.build(
-      name: "requested_letters",
-      order: 1
-    )
-    letter.columns.build(
-      name: "filled_letters",
-      order: 2
+      mode: Admissions::AdmissionReportGroup::MAIN_LETTER,
+      operation: Admissions::AdmissionReportGroup::EXCLUDE
     )
     self.ranking_columns.build(
       name: "name",
@@ -147,15 +153,15 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
     }
     self.groups.each do |group|
       group_config = group.tabular_config(self, admission_process, applications)
-      config[:header] += group_config.header
+      config[:header] += group_config.header.map { |x| x[:header] }
       config[:groups] << group_config
     end
     config
   end
 
-  def prepare_row(config, application, &block)
+  def prepare_row(config, application, simple: false, &block)
     if block.nil?
-      block = ->(filled, field, cell_pos) {
+      block = ->(filled, field, element) {
         if filled.blank?
           ""
         else
@@ -166,7 +172,7 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
                 if filled_file.file.blank? || filled_file.file.file.blank?
                   ""
                 else
-                  "#{request.base_url}#{filled_file.file.url}"
+                  "#{config[:base_url]}#{filled_file.file.url}"
                 end
               }
             }
@@ -175,17 +181,16 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
       }
     end
     row = []
-    cell_index = 0
     config[:groups].each do |group|
-      cell_index = group.prepare_group_row(row, cell_index, application, &block)
+      next if simple && !group.group.in_simple
+      row += group.prepare_group_row(application, &block)
     end
     row
   end
 
   def prepare_excel_row(config, application, &block)
-    do_not_escape = []
     if block.nil?
-      block = ->(filled, field, cell_pos) {
+      block = ->(filled, field, element) {
         if filled.blank?
           next ""
         end
@@ -193,7 +198,7 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
           blank: "",
           custom: {
             Admissions::FormField::FILE => ->(filled_file, _) {
-              do_not_escape << cell_pos
+              element[:do_not_escape] = true
               if filled_file.file.blank? || filled_file.file.file.blank?
                 ""
               else
@@ -206,18 +211,19 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
       }
     end
     row = self.prepare_row(config, application, &block)
-    escape_formulas = row.each_with_index.map do |v, index|
-      !do_not_escape.include? index
+    escape_formulas = row.map do |element|
+      !element[:do_not_escape]
     end
+    row_values = row.map { |element| element[:value] }
     {
-      row: row,
+      row: row_values,
       escape_formulas: escape_formulas
     }
   end
 
   def prepare_html_row(config, application, &block)
     if block.nil?
-      block = ->(filled, field, cell_pos) {
+      block = ->(filled, field, element) {
         next "" if filled.blank?
         filled.to_text(
           blank: "",

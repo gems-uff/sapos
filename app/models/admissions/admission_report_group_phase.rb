@@ -5,27 +5,23 @@
 
 class Admissions::AdmissionReportGroupPhase < Admissions::AdmissionReportGroupBase
   def prepare_config
-    flat_columns = self.flat_columns({})
-    @columns = self.group_columns(flat_columns)
-    self.prepare_header
-  end
-
-  def prepare_header
+    columns = self.group_columns(self.flat_columns({}))
     mode_names = {
       shared: Admissions::AdmissionPhaseResult::SHARED,
       consolidation: Admissions::AdmissionPhaseResult::CONSOLIDATION
     }
-    @columns.each do |phase_columns|
+    columns.each do |phase_columns|
       phase_columns[:columns].each do |mode_columns|
         mode = mode_columns[:mode]
         mode_columns[:result_type] = mode_names[mode]
         if mode_columns[:result_type].present?
-          if @config.group_column
-            @header << "#{phase_columns[:phase].name} - #{mode_columns[:result_type]}"
-          end
-          mode_columns[:columns].each do |column|
-            @header << column[:header]
-          end
+          @sections << {
+            title: "#{phase_columns[:phase].name} - #{mode_columns[:result_type]}",
+            columns: mode_columns[:columns],
+            result_type: mode_columns[:result_type],
+            phase: mode_columns[:phase],
+            mode: mode
+          }
         else
           member_ids = []
           @applications.each do |application|
@@ -37,54 +33,40 @@ class Admissions::AdmissionReportGroupPhase < Admissions::AdmissionReportGroupBa
           end
           mode_columns[:members] = User.where(id: member_ids).order(:name)
           mode_columns[:members].each do |member|
-            if @config.group_column
-              @header << "#{phase_columns[:phase].name} - #{member.name}"
-            end
-            mode_columns[:columns].each do |column|
-              @header << column[:header]
-            end
+            @sections << {
+              title: "#{phase_columns[:phase].name} - #{member.name}",
+              columns: mode_columns[:columns],
+              result_type: nil,
+              phase: mode_columns[:phase],
+              mode: mode,
+              member: member
+            }
           end
         end
       end
     end
-    self
   end
 
-  def prepare_group_row(row, cell_index, application, &block)
-    @columns.each do |phase_columns|
-      phase_columns[:columns].each do |mode_columns|
-        if mode_columns[:result_type].present?
-          if @config.group_column
-            row << mode_columns[:result_type]
-            cell_index += 1
-          end
-          result = application.results.where(
-            admission_phase_id: mode_columns[:phase].id,
-            mode: mode_columns[:result_type]
-          ).first
-          cell_index = populate_filled(
-            row, cell_index, result.try(:filled_form),
-            mode_columns[:columns], &block
-          )
-        else
-          mode_columns[:members].each do |member|
-            if @config.group_column
-              row << member.name
-              cell_index += 1
-            end
-            evaluation = application.evaluations.where(
-              admission_phase_id: mode_columns[:phase].id,
-              user_id: member.id
-            ).first
-            cell_index = populate_filled(
-              row, cell_index, evaluation.try(:filled_form),
-              mode_columns[:columns], &block
-            )
-          end
-        end
+  def application_sections(application, &block)
+    @sections.each do |section|
+      if section[:result_type].present?
+        result = application.results.where(
+          admission_phase_id: section[:phase].id,
+          mode: section[:result_type]
+        ).first
+        section[:application_columns] = populate_filled(
+          result.try(:filled_form), section[:columns], &block
+        )
+      else
+        evaluation = application.evaluations.where(
+          admission_phase_id: section[:phase].id,
+          user_id: section[:member].id
+        ).first
+        section[:application_columns] = populate_filled(
+          evaluation.try(:filled_form), section[:columns], &block
+        )
       end
     end
-    cell_index
   end
 
   private
@@ -135,7 +117,7 @@ class Admissions::AdmissionReportGroupPhase < Admissions::AdmissionReportGroupBa
         end
       end
 
-      report_columns = @group.columns.order(:order).map(&:name)
+      report_columns = @group.columns.sort_by(&:order).map(&:name)
       result = []
       if @group.operation == Admissions::AdmissionReportGroup::INCLUDE
         report_columns.each do |name|

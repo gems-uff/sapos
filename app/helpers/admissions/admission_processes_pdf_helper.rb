@@ -27,21 +27,56 @@ module Admissions::AdmissionProcessesPdfHelper
     ]
   end
 
+  def add_width(remaining_width, target, widths)
+    remaining_part = remaining_width / target.size
+    target.each do |index|
+      widths[index] += remaining_part
+    end
+    (remaining_width % target.size).times do |i|
+      widths[target[i]] += 1
+    end
+  end
+
   def admission_applications_table(curr_pdf, options = {})
     admission_process ||= options[:admission_process]
-    admission_report_config = Admissions::AdmissionReportConfig.new.init_simple
+    admission_report_config = Admissions::AdmissionReportConfig.new.init_default
     title = admission_process_pdf_title(admission_process)
     config = admission_report_config.prepare_table(admission_process)
-    header = [config[:header].map { |x| "<b>#{x}</b>" }]
+    config[:base_url] = request.base_url
+    header = [[]]
+    widths = []
+    current_width = 0
+    available_resize = []
+    missing_width = []
+
+    index = 0
+    config[:groups].each do |group|
+      next if !group.group.in_simple
+      group.header.each do |column|
+        width = column[:width]
+        widths << (width.nil? ? 0 : width)
+        missing_width << index if width.nil?
+        available_resize << index if !column[:fixed_width]
+        current_width += width if width.present?
+        header[0] << "<b>#{column[:header]}</b>"
+        index += 1
+      end
+    end
     data = config[:applications].map do |application|
-      admission_report_config.prepare_row(config, application)
+      row = admission_report_config.prepare_row(config, application, simple: true)
+      row.map { |element| element[:value] }
     end
 
-    if header[0].length == 3
-      widths = [130, 230, 200]
-    else
-      widths = [130, 150, 120, 80, 80]
+    remaining_width = 560 - current_width
+    if missing_width.present?
+      add_width(remaining_width, missing_width, widths)
+    elsif available_resize.present?
+      add_width(remaining_width, available_resize, widths)
+    elsif remaining_width != 0
+      total = widths.sum
+      widths = widths.map { |x| x * 560.0 / total }
     end
+
     curr_pdf.group do |pdf|
       pdf_table_with_title(pdf, widths, title, header, data, width: 560)
     end
@@ -66,86 +101,64 @@ module Admissions::AdmissionProcessesPdfHelper
   end
 
   def admission_applications_complete_table(curr_pdf, options = {})
-    # ToDo: convert to new report system
     admission_process ||= options[:admission_process]
-    admission_applications = admission_process.admission_applications
+    admission_report_config = Admissions::AdmissionReportConfig.new.init_default
     title = admission_process_pdf_title(admission_process)
-    config = tabular_admission_process_config(admission_process, group_column: true)
-    applications = admission_applications.order(:name).filter_map do |application|
-      next if !application.filled_form.is_filled
-      main_data = config[:main_header].zip(
-        prepare_process_main_values(application, config)
-      )
-      app_title = [[main_data.map { |h, v| ["<b>#{h}: #{v}</b>"] }.join("\n")]]
-      app_data = [
-        [
-          "<b>#{form_field_t("name")}</b>",
-          "<b>#{filled_field_t("value")}</b>"
-        ]
-      ]
-      populate_filled(app_data, application.filled_form, config[:template_fields], 0) do |filled, field, cell_index|
-        [field.name, show_filled(filled, field)]
-      end
-
-      letters = application.letter_requests.map.with_index do |letter, i|
-        ldata = [
-          ["<b>#{applications_t("letter_request", count: i + 1)}</b>", ""],
-          ["#{letter_request_t("name")}", "#{letter.name}"],
-          ["#{letter_request_t("email")}", "#{letter.email}"],
-          ["#{letter_request_t("telephone")}", "#{letter.telephone}"],
-          ["#{letter_request_t("status")}", "#{letter.status}"],
-        ]
-        if letter.filled_form.is_filled
-          populate_filled(ldata, letter.filled_form, config[:letter_fields], 0) do |filled, field, cell_index|
-            [field.name, show_filled(filled, field)]
+    config = admission_report_config.prepare_table(admission_process)
+    applications = config[:applications].map do |application|
+      pdf_sections = []
+      last_was_table = false
+      config[:groups].each do |group|
+        group.application_sections(application) do |filled, field, element|
+          show_filled(filled, field)
+        end
+        group.sections.each do |section|
+          section_data = group.section_to_row(section)
+          if group.group.pdf_format == Admissions::AdmissionReportGroup::LIST
+            pdf_sections << {
+              mode: :list,
+              data: [[
+                section_data.map do |cell|
+                  "<b>#{cell[:column][:header]}: #{cell[:value]}</b>"
+                end.join("\n")
+              ]]
+            }
+            last_was_table = false
+          else
+            data = []
+            if !last_was_table
+              last_was_table = true
+              data << [
+                "<b>#{form_field_t("name")}</b>",
+                "<b>#{filled_field_t("value")}</b>"
+              ]
+            end
+            data << ["<b>#{section[:title]}</b>", ""]
+            section_data.each do |cell|
+              data << [cell[:column][:header], cell[:value]]
+            end
+            pdf_sections << {
+              mode: :table,
+              data: data
+            }
           end
         end
-        {
-          data: ldata
-        }
       end
-
-      phases = []
-      config[:phase_results].each do |phase_result|
-        result = application.results.where(
-          admission_phase_id: phase_result[:admission_phase_id],
-          mode: phase_result[:result_type]
-        ).first
-        if result.present?
-          pdata = [
-            ["<b>#{phase_result[:result_type]}</b>", ""],
-          ]
-          populate_filled(pdata, result.filled_form, phase_result[:phase_fields], 0) do |filled, field, cell_index|
-            [field.name, show_filled(filled, field)]
-          end
-          phases << {
-            data: pdata
-          }
-        end
-      end
-
-      {
-        title: app_title,
-        data: app_data,
-        letters: letters,
-        phases: phases,
-      }
+      pdf_sections
     end
 
     curr_pdf.group do |pdf|
       widths = [160, 400]
       pdf_table_with_title(pdf, widths, title, "", [], width: 560)
 
-      applications.each_with_index do |application, index|
+      applications.each_with_index do |pdf_sections, index|
         pdf.start_new_page if index != 0
-        pdf_table_with_title(
-          pdf, widths, application[:title], "", application[:data], width: 560
-        )
-        application[:letters].each do |letter|
-          simple_pdf_table(pdf, widths, "", letter[:data], width: 560)
-        end
-        application[:phases].each do |phase|
-          simple_pdf_table(pdf, widths, "", phase[:data], width: 560)
+        pdf_sections.each do |pdf_section|
+          if pdf_section[:mode] == :list
+            pdf_table_with_title(pdf, widths, pdf_section[:data], "", [], width: 560)
+          else
+            simple_pdf_table(pdf, widths, "", pdf_section[:data], width: 560)
+          end
         end
       end
     end

@@ -5,38 +5,25 @@
 
 class Admissions::AdmissionReportGroupRanking < Admissions::AdmissionReportGroupBase
   def prepare_config
-    flat_columns = self.flat_columns({})
-    @columns = self.group_columns(flat_columns)
-    self.prepare_header
-  end
-
-  def prepare_header
-    @columns.each do |ranking_columns|
-      if @config.group_column
-        @header << "#{ranking_columns[:ranking_config].name}"
-      end
-      ranking_columns[:columns].each do |column|
-        @header << column[:header]
-      end
+    columns = self.group_columns(self.flat_columns({}))
+    columns.each do |ranking_columns|
+      @sections << {
+        title: "#{ranking_columns[:ranking_config].name}",
+        columns: ranking_columns[:columns],
+        ranking_config: ranking_columns[:ranking_config]
+      }
     end
-    self
   end
 
-  def prepare_group_row(row, cell_index, application, &block)
-    @columns.each do |ranking_columns|
-      if @config.group_column
-        row << "#{ranking_columns[:ranking_config].name}"
-        cell_index += 1
-      end
+  def application_sections(application, &block)
+    @sections.each do |section|
       ranking = application.rankings.where(
-        ranking_config_id: ranking_columns[:ranking_config].id
+        ranking_config_id: section[:ranking_config].id
       ).first
-      cell_index = populate_filled(
-        row, cell_index, ranking.try(:filled_form),
-        ranking_columns[:columns], &block
+      section[:application_columns] = populate_filled(
+        ranking.try(:filled_form), section[:columns], &block
       )
     end
-    cell_index
   end
 
   private
@@ -85,7 +72,7 @@ class Admissions::AdmissionReportGroupRanking < Admissions::AdmissionReportGroup
         end
       end
 
-      report_columns = @group.columns.order(:order).map(&:name)
+      report_columns = @group.columns.sort_by(&:order).map(&:name)
       result = []
       if @group.operation == Admissions::AdmissionReportGroup::INCLUDE
         report_columns.each do |name|
