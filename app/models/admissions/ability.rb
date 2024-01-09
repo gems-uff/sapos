@@ -38,12 +38,34 @@ module Admissions::Ability
     Admissions::AdmissionApplication, Admissions::AdmissionPendency
   ] + ADMISSION_FILLED_MODELS + ADMISSION_FORM_EVALUATION
 
+  ADMISSION_RANKING = [
+    Admissions::RankingConfig,
+    Admissions::RankingColumn,
+    Admissions::RankingGroup,
+    Admissions::RankingMachine,
+    Admissions::RankingProcess,
+    Admissions::AdmissionProcessRanking,
+  ]
+
+  ADMISSION_RANKING_RESULT = [
+    Admissions::AdmissionRankingResult,
+  ]
+
+  ADMISSION_REPORT = [
+    Admissions::AdmissionReportConfig,
+    Admissions::AdmissionReportGroup,
+    Admissions::AdmissionReportColumn,
+  ]
+
   ADMISSION_MODELS = (
     ADMISSION_PROCESS_CONFIG +
     ADMISSION_FORM_CONFIG +
     ADMISSION_COMMITTEE +
     ADMISSION_PHASE +
-    ADMISSION_APPLICATION
+    ADMISSION_APPLICATION +
+    ADMISSION_RANKING +
+    ADMISSION_RANKING_RESULT +
+    ADMISSION_REPORT
   )
 
   def initialize_admissions(user, roles)
@@ -64,8 +86,15 @@ module Admissions::Ability
       can [:read, :update], Admissions::AdmissionApplication
       can :read, ADMISSION_FILLED_MODELS
       can [:read, :destroy], ADMISSION_FORM_EVALUATION
+      can :manage, ADMISSION_RANKING
+      can [:read, :destroy], ADMISSION_RANKING_RESULT
+      can :manage, ADMISSION_REPORT
     end
     if roles[Role::ROLE_PROFESSOR]
+      can :browse, Admissions::AdmissionProcess
+      can :browse, Admissions::AdmissionPhase
+      can :browse, Admissions::AdmissionReportConfig
+
       application_condition = {
         pendencies: {
           user_id: user.id
@@ -74,22 +103,27 @@ module Admissions::Ability
       can :read_pendencies, Admissions::AdmissionApplication
       can :read, Admissions::AdmissionApplication, application_condition
       can :update, Admissions::AdmissionApplication, application_condition
-      can :read, Admissions::AdmissionPhaseEvaluation, user: user
+      can :read, Admissions::FilledForm,
+        admission_application: application_condition
       can :read, Admissions::LetterRequest,
         admission_application: application_condition
-      can :read, Admissions::AdmissionPhaseResult,
-        admission_application: application_condition
-      can :read, Admissions::FilledForm, admission_phase_evaluation: {
-        user: user
-      }
-      can :read, Admissions::FilledForm, admission_phase_result: {
-        admission_application: application_condition
-      }
       can :read, Admissions::FilledForm, letter_request: {
         admission_application: application_condition
       }
-      can :read, Admissions::FilledForm,
+      can :read, Admissions::AdmissionPhaseEvaluation, user: user
+      can :read, Admissions::FilledForm, admission_phase_evaluation: {
+        user: user
+      }
+      can :read, Admissions::AdmissionPhaseResult,
         admission_application: application_condition
+      can :read, Admissions::FilledForm, admission_phase_result: {
+        admission_application: application_condition
+      }
+      can :read, Admissions::AdmissionRankingResult,
+        admission_application: application_condition
+      can :read, Admissions::FilledForm, admission_ranking_result: {
+        admission_application: application_condition
+      }
     end
 
     cannot :create, Admissions::AdmissionApplication
