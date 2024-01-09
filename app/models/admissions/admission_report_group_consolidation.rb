@@ -6,6 +6,9 @@
 class Admissions::AdmissionReportGroupConsolidation < Admissions::AdmissionReportGroupBase
   def prepare_config
     return if @config.form_template.nil?
+    return if @config.hide_empty_sections && @applications.none? do |application|
+      application.try(:non_persistent).try(:[], :filled_form).present?
+    end
     @sections << {
       title: @config.form_template.name,
       columns: self.flat_columns({})

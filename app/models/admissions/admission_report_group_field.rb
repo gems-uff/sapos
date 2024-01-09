@@ -5,6 +5,9 @@
 
 class Admissions::AdmissionReportGroupField < Admissions::AdmissionReportGroupBase
   def prepare_config
+    return if @config.hide_empty_sections && @applications.none? do |application|
+      application.try(:filled_form).try(:is_filled)
+    end
     @sections << {
       title: Admissions::AdmissionReportGroup::FIELD,
       columns: self.flat_columns({})
@@ -12,6 +15,7 @@ class Admissions::AdmissionReportGroupField < Admissions::AdmissionReportGroupBa
   end
 
   def application_sections(application, &block)
+    return if @sections.empty?
     section = @sections[0]
     section[:application_columns] = populate_filled(
       application.try(:filled_form), section[:columns], &block

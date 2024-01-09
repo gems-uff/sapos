@@ -36,6 +36,8 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
 
   def init_default
     self.group_column_tabular = MERGE
+    self.hide_empty_sections = true
+    self.show_partial_candidates = false
     self.groups.build(
       order: 1,
       mode: Admissions::AdmissionReportGroup::MAIN,
@@ -107,7 +109,7 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
 
   def prepare_table(admission_process)
     applications = admission_process.admission_applications.filter do |application|
-      next false if !application.filled_form.is_filled
+      next false if !self.show_partial_candidates && !application.filled_form.is_filled
       # Consolidate
       field_objects = nil
       if self.form_template.present?

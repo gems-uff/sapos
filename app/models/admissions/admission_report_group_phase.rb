@@ -15,6 +15,14 @@ class Admissions::AdmissionReportGroupPhase < Admissions::AdmissionReportGroupBa
         mode = mode_columns[:mode]
         mode_columns[:result_type] = mode_names[mode]
         if mode_columns[:result_type].present?
+          next if @config.hide_empty_sections && Admissions::AdmissionPhaseResult.includes(
+            :admission_application, :filled_form
+          ).where(
+            admission_application: { admission_process_id: @admission_process.id },
+            admission_phase_id: mode_columns[:phase].id,
+            mode: mode_columns[:result_type],
+            filled_form: { is_filled: true }
+          ).blank?
           @sections << {
             title: "#{phase_columns[:phase].name} - #{mode_columns[:result_type]}",
             columns: mode_columns[:columns].map(&:dup),
@@ -33,6 +41,14 @@ class Admissions::AdmissionReportGroupPhase < Admissions::AdmissionReportGroupBa
           end
           mode_columns[:members] = User.where(id: member_ids).order(:name)
           mode_columns[:members].each do |member|
+            next if @config.hide_empty_sections && Admissions::AdmissionPhaseEvaluation.includes(
+              :admission_application, :filled_form
+            ).where(
+              admission_application: { admission_process_id: @admission_process.id },
+              admission_phase_id: mode_columns[:phase].id,
+              user_id: member.id,
+              filled_form: { is_filled: true }
+            ).blank?
             @sections << {
               title: "#{phase_columns[:phase].name} - #{member.name}",
               columns: mode_columns[:columns].map(&:dup),

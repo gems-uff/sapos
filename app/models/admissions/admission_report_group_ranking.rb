@@ -7,6 +7,12 @@ class Admissions::AdmissionReportGroupRanking < Admissions::AdmissionReportGroup
   def prepare_config
     columns = self.group_columns(self.flat_columns({}))
     columns.each do |ranking_columns|
+      next if @config.hide_empty_sections && Admissions::AdmissionRankingResult.includes(
+        :admission_application
+      ).where(
+        admission_application: { admission_process_id: @admission_process.id },
+        ranking_config_id: ranking_columns[:ranking_config].id
+      ).blank?
       @sections << {
         title: "#{ranking_columns[:ranking_config].name}",
         columns: ranking_columns[:columns].map(&:dup),
