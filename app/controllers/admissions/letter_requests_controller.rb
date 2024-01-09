@@ -15,6 +15,6 @@ class Admissions::LetterRequestsController < ApplicationController
     config.list.columns = columns
     config.show.columns = columns
 
-    config.actions.exclude :deleted_records, :delete, :update, :create
+    config.actions.exclude :deleted_records, :delete, :update, :create, :show
   end
 end

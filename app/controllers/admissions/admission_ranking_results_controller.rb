@@ -14,6 +14,6 @@ class Admissions::AdmissionRankingResultsController < ApplicationController
     config.columns = columns
     config.columns[:ranking_config].actions_for_association_links = [:show]
 
-    config.actions.exclude :deleted_records, :create, :update
+    config.actions.exclude :deleted_records, :create, :update, :show, :delete
   end
 end
