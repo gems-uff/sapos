@@ -23,9 +23,9 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
   has_many :admission_process_rankings, dependent: :nullify,
     class_name: "Admissions::AdmissionProcessRanking"
 
-  belongs_to :approval_condition, optional:true,
+  belongs_to :approval_condition, optional: true,
     class_name: "Admissions::FormCondition", foreign_key: "approval_condition_id"
-  belongs_to :keep_in_phase_condition, optional:true,
+  belongs_to :keep_in_phase_condition, optional: true,
     class_name: "Admissions::FormCondition", foreign_key: "keep_in_phase_condition_id"
   belongs_to :member_form, optional: true,
     class_name: "Admissions::FormTemplate", foreign_key: "member_form_id"

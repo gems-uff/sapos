@@ -6,6 +6,8 @@
 class Admissions::AdmissionApplication < ActiveRecord::Base
   has_paper_trail
 
+  attr_accessor :non_persistent
+
   APPROVED = record_i18n_attr("statuses.approved")
   REPROVED = record_i18n_attr("statuses.reproved")
   CANCELED = record_i18n_attr("statuses.canceled")
@@ -186,7 +188,20 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   end
 
   def fields_hash
-    field_objects = self.filled_form.to_fields_hash
+    field_objects = {}
+    self.filled_form.to_fields_hash
+    [:name, :token, :email].each do |attrib|
+      [attrib.to_s, record_i18n_attr(attrib)].each do |attrib_name|
+        field_objects[attrib_name] = Admissions::FilledFormField.new(
+          value: self.send(attrib),
+          form_field: Admissions::FormField.new(
+            name: attrib_name,
+            field_type: Admissions::FormField::STRING
+          )
+        )
+      end
+    end
+    field_objects = self.filled_form.to_fields_hash(field_objects)
     self.results.each do |result|
       result.filled_form.to_fields_hash(field_objects)
     end

@@ -11,11 +11,17 @@ class Admissions::RankingColumn < ActiveRecord::Base
 
   ORDERS = [DESC, ASC]
 
-  belongs_to :ranking_config, optional: false,
+  belongs_to :ranking_config, optional: true,
     class_name: "Admissions::RankingConfig"
+  belongs_to :admission_report_config, optional: true,
+    class_name: "Admissions::AdmissionReportConfig"
 
   validates :name, presence: true
   validates :order, presence: true, inclusion: { in: ORDERS }
+  validates :ranking_config, presence: true,
+    unless: ->(rc) { rc.admission_report_config_id.present? }
+  validates :admission_report_config, presence: true,
+    unless: ->(rc) { rc.ranking_config_id.present? }
 
   after_initialize :initialize_conversion
 

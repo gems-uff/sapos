@@ -40,6 +40,9 @@ class Admissions::FormTemplate < ActiveRecord::Base
     foreign_key: :consolidation_form_id
   has_one :ranking_config, dependent: :destroy,
     class_name: "Admissions::RankingConfig"
+  has_many :admission_report_configs, dependent: :restrict_with_exception,
+    class_name: "Admissions::AdmissionReportConfig",
+    foreign_key: :form_template_id
 
   validates :name, presence: true
   validates :template_type, presence: true, inclusion: { in: TEMPLATE_TYPES }

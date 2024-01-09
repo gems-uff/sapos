@@ -1,0 +1,20 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_report_config:
+        name: Nome
+        form_template: Consolidação
+        groups: Grupos de campos
+        order: Ordem
+        form_condition: Condição de seleção
+
+    models:
+      admissions/admission_report_config:
+        one: "Configuração de Relatório"
+        other: "Configurações de Relatórios"
+
+  active_scaffold:
+    create_admission_report_config_label: "Criar Configuração de Relatório"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_12_21_221124) do
+ActiveRecord::Schema[7.0].define(version: 2024_01_08_025154) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -183,6 +183,39 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_21_221124) do
     t.index ["admission_application_id"], name: "index_admission_ranking_results_on_admission_application_id"
     t.index ["filled_form_id"], name: "index_admission_ranking_results_on_filled_form_id"
     t.index ["ranking_config_id"], name: "index_admission_ranking_results_on_ranking_config_id"
+  end
+
+  create_table "admission_report_columns", force: :cascade do |t|
+    t.integer "admission_report_group_id"
+    t.integer "order"
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admission_report_group_id"], name: "index_admission_report_columns_on_admission_report_group_id"
+  end
+
+  create_table "admission_report_configs", force: :cascade do |t|
+    t.string "name"
+    t.integer "form_template_id"
+    t.integer "form_condition_id"
+    t.string "group_column_tabular"
+    t.string "group_column_simple_pdf"
+    t.string "group_column_complete_pdf"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["form_condition_id"], name: "index_admission_report_configs_on_form_condition_id"
+    t.index ["form_template_id"], name: "index_admission_report_configs_on_form_template_id"
+  end
+
+  create_table "admission_report_groups", force: :cascade do |t|
+    t.integer "admission_report_config_id"
+    t.integer "order"
+    t.string "mode"
+    t.string "operation"
+    t.string "committee"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["admission_report_config_id"], name: "index_admission_report_groups_on_admission_report_config_id"
   end
 
   create_table "advisement_authorizations", force: :cascade do |t|
@@ -691,6 +724,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_12_21_221124) do
     t.string "order"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "admission_report_config_id"
+    t.index ["admission_report_config_id"], name: "index_ranking_columns_on_admission_report_config_id"
     t.index ["ranking_config_id"], name: "index_ranking_columns_on_ranking_config_id"
   end
 

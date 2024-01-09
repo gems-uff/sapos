@@ -443,6 +443,18 @@ Rails.application.routes.draw do
     resources :admission_ranking_results do
       concerns :active_scaffold
     end
+
+    resources :admission_report_configs do
+      concerns :active_scaffold
+    end
+
+    resources :admission_report_groups do
+      concerns :active_scaffold
+    end
+
+    resources :admission_report_columns do
+      concerns :active_scaffold
+    end
   end
 
   get "landing", action: :index, controller: "landing"

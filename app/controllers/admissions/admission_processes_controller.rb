@@ -104,6 +104,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
 
   def complete_xls
     @admission_process = Admissions::AdmissionProcess.find(params[:id])
+    @admission_report_config = Admissions::AdmissionReportConfig.new.init_default
     respond_to do |format|
       format.xlsx
     end

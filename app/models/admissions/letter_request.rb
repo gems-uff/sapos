@@ -37,6 +37,11 @@ class Admissions::LetterRequest < ActiveRecord::Base
     RECEIVED
   end
 
+  def is_filled
+    return false if self.filled_form.blank?
+    self.filled_form.is_filled
+  end
+
   private
     def generate_access_token
       token = SecureRandom.urlsafe_base64

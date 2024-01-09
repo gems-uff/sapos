@@ -5,33 +5,11 @@
 
 wb = xlsx_package.workbook
 wb.add_worksheet(name: "Edital") do |sheet|
-  config = tabular_admission_process_config(@admission_process)
+  config = @admission_report_config.prepare_table(@admission_process)
+  config[:base_url] = request.base_url
   sheet.add_row config[:header]
-  @admission_process.admission_applications.each do |application|
-    next if !application.filled_form.is_filled
-    do_not_escape = []
-    row = prepare_tabular_process_row(application, config) do |filled, field, cell_pos|
-      if filled.blank?
-        next ""
-      end
-      filled.to_text(
-        blank: "",
-        custom: {
-          Admissions::FormField::FILE => ->(filled_file, _) {
-            do_not_escape << cell_pos
-            if filled_file.file.blank? || filled_file.file.file.blank?
-              ""
-            else
-              "=HYPERLINK(\"#{request.base_url}#{filled_file.file.url}\",
-                          \"#{request.base_url}#{filled_file.file.url}\")"
-            end
-          }
-        }
-      )
-    end
-    escape_formulas = row.each_with_index.map do |v, index|
-      !do_not_escape.include? index
-    end
-    sheet.add_row row, escape_formulas: escape_formulas
+  config[:applications].each do |application|
+    row_result = @admission_report_config.prepare_excel_row(config, application)
+    sheet.add_row row_result[:row], escape_formulas: row_result[:escape_formulas]
   end
 end

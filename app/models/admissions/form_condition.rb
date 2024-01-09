@@ -14,6 +14,8 @@ class Admissions::FormCondition < ActiveRecord::Base
     class_name: "Admissions::AdmissionPhase", foreign_key: :approval_condition_id
   has_many :admission_committees, dependent: :destroy,
     class_name: "Admissions::AdmissionCommittee"
+  has_many :admission_report_configs, dependent: :destroy,
+    class_name: "Admissions::AdmissionReportConfig"
 
   AND = record_i18n_attr("modes.and")
   OR = record_i18n_attr("modes.or")
@@ -120,7 +122,7 @@ class Admissions::FormCondition < ActiveRecord::Base
     return default if condition.mode == NONE
     case condition.mode
     when AND
-       condition.form_conditions.all? do |child|
+      condition.form_conditions.all? do |child|
         self.check_truth(child, should_raise: should_raise, &block)
       end
     when OR

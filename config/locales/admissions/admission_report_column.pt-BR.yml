@@ -1,0 +1,17 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_report_column:
+        name: Nome
+        order: Ordem
+
+    models:
+      admissions/admission_report_column:
+        one: "Coluna de Relatório"
+        other: "Colunas de Relatórios"
+
+  active_scaffold:
+    create_admission_report_column_label: "Criar Coluna de Relatório"

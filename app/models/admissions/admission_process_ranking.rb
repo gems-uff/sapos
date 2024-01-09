@@ -135,11 +135,11 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
       )
       result
     end.sort do |first, second|
-      compare_candidates(columns, first, second)
+      self.compare_candidates(columns, first, second)
     end
   end
 
-  def compare_candidates(columns, first, second)
+  def self.compare_candidates(columns, first, second)
     comparision = 0
     columns.each_with_index do |column, i|
       break if comparision != 0 && i != 0

@@ -1,0 +1,32 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      admissions/admission_report_group:
+        order: Ordem
+        mode: Tipo
+        modes:
+          main: Principal
+          field: Candidato
+          letter: Carta
+          phase: Fase
+          phase_without_committee: Fase sem comitês
+          phase_reverse: Fase (última para a primeira)
+          phase_without_committee_reverse: Fase sem comitês (última para a primeira)
+          ranking: Ranking
+          consolidation: Consolidação
+        operation: Operação
+        operations:
+          include: Incluir
+          exclude: Excluir
+        columns: Colunas
+        group_column: Coluna separadora
+    models:
+      admissions/admission_report_group:
+        one: "Grupo em Relatório"
+        other: "Grupos em Relatório"
+
+  active_scaffold:
+    create_admission_report_group_label: "Criar Grupo em Relatório"

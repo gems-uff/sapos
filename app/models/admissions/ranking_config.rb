@@ -6,6 +6,9 @@
 class Admissions::RankingConfig < ActiveRecord::Base
   has_paper_trail
 
+  POSITION = record_i18n_attr("position")
+  MACHINE = record_i18n_attr("machine")
+
   has_many :ranking_columns, dependent: :destroy,
     class_name: "Admissions::RankingColumn"
   has_many :ranking_groups, dependent: :destroy,
@@ -48,8 +51,8 @@ class Admissions::RankingConfig < ActiveRecord::Base
       )
     end
     self.form_template.name = self.name
-    self.position_field.name = "#{record_i18n_attr("position")}/#{self.name}"
-    self.machine_field.name = "#{record_i18n_attr("machine")}/#{self.name}"
+    self.position_field.name = "#{POSITION}/#{self.name}"
+    self.machine_field.name = "#{MACHINE}/#{self.name}"
   end
 
   def to_label

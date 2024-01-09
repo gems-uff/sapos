@@ -1,5 +1,7 @@
 <%
-  config = tabular_admission_process_config(record)
+  admission_report_config = Admissions::AdmissionReportConfig.new.init_default
+  config = admission_report_config.prepare_table(record)
+  config[:base_url] = request.base_url
 %>
 
 <div class="scrollable-table admissions-application-table">
@@ -14,33 +16,17 @@
       </thead>
       <tbody>
         <% app_index = 0 %>
-        <% record.admission_applications.each do |application| %>
-          <% if application.filled_form.is_filled %>
-            <%
-              row = prepare_tabular_process_row(application, config) do |filled, field, cell_pos|
-                next "" if filled.blank?
-                filled.to_text(
-                  blank: "",
-                  custom: {
-                    Admissions::FormField::FILE => ->(filled_file, _) {
-                      if filled_file.file.blank? || filled_file.file.file.blank?
-                        ""
-                      else
-                        link_to filled_file.file.filename, "#{request.base_url}#{filled_file.file.url}"
-                      end
-                    }
-                  }
-                )
-              end
-              tr_class = app_index.even? ? "even-record" : "blue-record"
-              app_index += 1
-            %>
-            <tr class="record <%= tr_class %>">
-              <% row.each_with_index do |value, index| %>
-                <td class="<%= "fixed-col" if index < 3 %>"><%= value %></td>
-              <% end %>
-            </tr>
-          <% end %>
+        <% config[:applications].each do |application| %>
+          <%
+            row = admission_report_config.prepare_html_row(config, application)
+            tr_class = app_index.even? ? "even-record" : "blue-record"
+            app_index += 1
+          %>
+          <tr class="record <%= tr_class %>">
+            <% row.each_with_index do |value, index| %>
+              <td class="<%= "fixed-col" if index < 3 %>"><%= value %></td>
+            <% end %>
+          </tr>
         <% end %>
       </tbody>
     </table>

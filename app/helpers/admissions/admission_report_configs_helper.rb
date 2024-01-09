@@ -3,7 +3,7 @@
 
 # frozen_string_literal: true
 
-module Admissions::AdmissionCommitteesHelper
+module Admissions::AdmissionReportConfigsHelper
   def form_condition_form_column(record, options)
     render(partial: "admissions/form_conditions/association_widget", locals: {
       record: record,

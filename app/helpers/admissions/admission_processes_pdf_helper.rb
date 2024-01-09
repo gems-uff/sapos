@@ -29,13 +29,12 @@ module Admissions::AdmissionProcessesPdfHelper
 
   def admission_applications_table(curr_pdf, options = {})
     admission_process ||= options[:admission_process]
-    admission_applications = admission_process.admission_applications
+    admission_report_config = Admissions::AdmissionReportConfig.new.init_simple
     title = admission_process_pdf_title(admission_process)
-    config = tabular_admission_process_config(admission_process)
-    header = [config[:main_header].map { |x| "<b>#{x}</b>" }]
-    data = admission_applications.order(:name).filter_map do |application|
-      next if !application.filled_form.is_filled
-      prepare_process_main_values(application, config).map(&:to_s)
+    config = admission_report_config.prepare_table(admission_process)
+    header = [config[:header].map { |x| "<b>#{x}</b>" }]
+    data = config[:applications].map do |application|
+      admission_report_config.prepare_row(config, application)
     end
 
     if header[0].length == 3
@@ -67,6 +66,7 @@ module Admissions::AdmissionProcessesPdfHelper
   end
 
   def admission_applications_complete_table(curr_pdf, options = {})
+    # ToDo: convert to new report system
     admission_process ||= options[:admission_process]
     admission_applications = admission_process.admission_applications
     title = admission_process_pdf_title(admission_process)
