@@ -71,7 +71,9 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
                 process.ranking_machine.form_condition,
                 fields: next_candidate[:__fields]
               )
-                break if compare_candidates(columns, candidate, next_candidate) != 0
+                break if Admissions::AdmissionProcessRanking.compare_candidates(
+                  columns, candidate, next_candidate
+                ) != 0
                 self.set_candidate_position(next_candidate, process, candidate_position, machine)
                 position += 1
                 ngroups = groups
@@ -135,7 +137,7 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
       )
       result
     end.sort do |first, second|
-      self.compare_candidates(columns, first, second)
+      Admissions::AdmissionProcessRanking.compare_candidates(columns, first, second)
     end
   end
 
