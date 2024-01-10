@@ -194,7 +194,8 @@ class ClassEnrollment < ApplicationRecord
     end
 
     def notify_student_and_advisor
-      return if grade.nil?
+      new_record = id_changed? || id_previously_changed?
+      return if new_record
       return if !(
         saved_change_to_grade? ||
         saved_change_to_situation? ||
