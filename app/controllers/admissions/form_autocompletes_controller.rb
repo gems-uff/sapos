@@ -12,22 +12,24 @@ class Admissions::FormAutocompletesController < Admissions::ProcessBaseControlle
     end
     if params[:country].present?
       @cities = @cities.joins(state: :country).where(
-        "`countries`.`name` COLLATE utf8mb4_unicode_520_ci
-          LIKE ? COLLATE utf8_unicode_520_ci", "%#{params[:country]}%"
+        "`countries`.`name` COLLATE :db_collation
+          LIKE :country COLLATE :value_collation
+        ", Collation.collations.merge(country: "%#{params[:country]}%")
       )
     end
     if params[:state].present?
       @cities = @cities.where(
-        "`states`.`name` COLLATE utf8mb4_unicode_520_ci
-          LIKE ? COLLATE utf8_unicode_520_ci
-         OR `states`.`code` COLLATE utf8mb4_unicode_520_ci
-         LIKE ? COLLATE utf8_unicode_520_ci
-        ", "%#{params[:state]}%", "%#{params[:state]}%"
+        "`states`.`name` COLLATE :db_collation
+          LIKE :state COLLATE :value_collation
+         OR `states`.`code` COLLATE :db_collation
+         LIKE :state COLLATE :value_collation
+        ", Collation.collations.merge(state: "%#{params[:state]}%")
       )
     end
     @cities = @cities.where(
-      "`cities`.`name` COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8_unicode_520_ci", "%#{params[:term]}%"
+      "`cities`.`name` COLLATE :db_collation
+        LIKE :city COLLATE :value_collation
+      ", Collation.collations.merge(city: "%#{params[:term]}%")
     )
     @cities = @cities.limit(10)
     render json: @cities.map(&:name).uniq
@@ -37,16 +39,17 @@ class Admissions::FormAutocompletesController < Admissions::ProcessBaseControlle
     @states = State
     if params[:state].present?
       @states = @states.joins(:country).where(
-        "`countries`.`name` COLLATE utf8mb4_unicode_520_ci
-          LIKE ? COLLATE utf8_unicode_520_ci", "%#{params[:country]}%"
+        "`countries`.`name` COLLATE :db_collation
+          LIKE :country COLLATE :value_collation
+        ", Collation.collations.merge(country: "%#{params[:country]}%")
       )
     end
     @states = @states.where(
-      "`states`.`name` COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8_unicode_520_ci
-        OR `states`.`code` COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8_unicode_520_ci
-      ", "%#{params[:term]}%", "%#{params[:term]}%"
+      "`states`.`name` COLLATE :db_collation
+        LIKE :state COLLATE :value_collation
+        OR `states`.`code` COLLATE :db_collation
+        LIKE :state COLLATE :value_collation
+      ", Collation.collations.merge(state: "%#{params[:term]}%")
     )
     @states = @states.limit(10)
     render json: @states.map(&:name).uniq
@@ -54,8 +57,9 @@ class Admissions::FormAutocompletesController < Admissions::ProcessBaseControlle
 
   def country
     @countries = Country.where(
-      "name COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8_unicode_520_ci", "%#{params[:term]}%"
+      "name COLLATE :db_collation
+        LIKE :country COLLATE :value_collation
+      ", Collation.collations.merge(country: "%#{params[:term]}%")
     )
     @countries = @countries.limit(10)
     render json: @countries.map(&:name).uniq
@@ -63,11 +67,11 @@ class Admissions::FormAutocompletesController < Admissions::ProcessBaseControlle
 
   def institution
     @institutions = Institution.where(
-      "name COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8_unicode_520_ci
-       OR code COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8_unicode_520_ci
-      ", "%#{params[:term]}%", "%#{params[:term]}%"
+      "name COLLATE :db_collation
+        LIKE :institution COLLATE :value_collation
+       OR code COLLATE :db_collation
+        LIKE :institution COLLATE :value_collation
+      ", Collation.collations.merge(institution: "%#{params[:term]}%")
     )
     @institutions = @institutions.limit(10)
     render json: @institutions.map(&:name).uniq
@@ -77,23 +81,25 @@ class Admissions::FormAutocompletesController < Admissions::ProcessBaseControlle
     @majors = Major
     if params[:institution].present?
       @majors = @majors.joins(:institution).where(
-        "`institutions`.`name` COLLATE utf8mb4_unicode_520_ci
-          LIKE ? COLLATE utf8_unicode_520_ci
-        OR `institutions`.`code` COLLATE utf8mb4_unicode_520_ci
-          LIKE ? COLLATE utf8_unicode_520_ci
-        ", "%#{params[:institution]}%", "%#{params[:institution]}%"
+        "`institutions`.`name` COLLATE :db_collation
+          LIKE :institution COLLATE :value_collation
+        OR `institutions`.`code` COLLATE :db_collation
+          LIKE :institution COLLATE :value_collation
+        ", Collation.collations.merge(institution: "%#{params[:institution]}%")
       )
     end
     @majors = @majors.where(
-      "`majors`.`name` COLLATE utf8mb4_unicode_520_ci
-        LIKE ? COLLATE utf8_unicode_520_ci", "%#{params[:term]}%"
+      "`majors`.`name` COLLATE :db_collation
+        LIKE :major COLLATE :value_collation
+      ", Collation.collations.merge(major: "%#{params[:term]}%")
     )
     @majors = @majors.limit(10)
     result = @majors.map(&:name).uniq
     if result.empty?
       result = Major.where(
-        "`majors`.`name` COLLATE utf8mb4_unicode_520_ci
-          LIKE ? COLLATE utf8_unicode_520_ci", "%#{params[:term]}%"
+        "`majors`.`name` COLLATE :db_collation
+          LIKE :major COLLATE :value_collation
+        ", Collation.collations.merge(major: "%#{params[:term]}%")
       ).limit(10).map(&:name).uniq
     end
     render json: result
