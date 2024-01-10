@@ -302,6 +302,40 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     self.admission_process.is_open_to_edit?
   end
 
+  def students_by_cpf
+    cpf = self.filled_form.try(:find_cpf_field).try(:value)
+    return Student.none if cpf.blank?
+    cpf = cpf.delete(".").delete("-").strip
+    Student.where('
+      TRIM(REPLACE(
+        REPLACE(`students`.`cpf` COLLATE :db_collation, ".", ""),
+        "-", ""
+      )) = :cpf COLLATE :value_collation
+    ', Collation.collations.merge(cpf:))
+  end
+
+  def students_by_email
+    email = self.email.strip.downcase
+    Student.where('
+      TRIM(
+        LOWER(`students`.`email` COLLATE :db_collation)
+      ) = :email COLLATE :value_collation
+    ', Collation.collations.merge(email:))
+  end
+
+  def students
+    by_cpf = self.students_by_cpf.all
+    by_email = self.students_by_email.all
+    by_cpf_and_email = by_cpf & by_email
+    by_cpf = by_cpf - by_cpf_and_email
+    by_email = by_email - by_cpf_and_email
+    result = {}
+    result[:cpf_and_email] = by_cpf_and_email if by_cpf_and_email.present?
+    result[:cpf] = by_cpf if by_cpf.present?
+    result[:email] = by_email if by_email.present?
+    result
+  end
+
   private
     def generate_token
       18.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }

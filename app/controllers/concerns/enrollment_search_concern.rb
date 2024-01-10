@@ -58,8 +58,8 @@ module EnrollmentSearchConcern
     end
 
     def custom_condition_for_admission_date_column(column, value, like_pattern)
-      month = value[:month].empty? ? 1 : value[:month]
-      year = value[:year].empty? ? 1 : value[:year]
+      month = value[:month].blank? ? 1 : value[:month]
+      year = value[:year].blank? ? 1 : value[:year]
 
       if year != 1
         date1 = Date.new(year.to_i, month.to_i)

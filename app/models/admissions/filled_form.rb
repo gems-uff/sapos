@@ -139,4 +139,15 @@ class Admissions::FilledForm < ActiveRecord::Base
       end
     end
   end
+
+  def find_cpf_field
+    self.fields.includes(:form_field).where(
+      form_field: { field_type: Admissions::FormField::STUDENT_FIELD }
+    ).each do |filled_field|
+      if filled_field.form_field.config_hash["field"] == "cpf"
+        return filled_field
+      end
+    end
+    nil
+  end
 end

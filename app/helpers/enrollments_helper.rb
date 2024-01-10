@@ -317,7 +317,7 @@ module EnrollmentsHelper
       return result
     end
     columns ||= list_columns
-    if search[:delayed_phase][:phase] == "all"
+    if search[:delayed_phase].present? && search[:delayed_phase][:phase] == "all"
       phase_date = Date.new(
         search[:delayed_phase][:year].to_i,
         search[:delayed_phase][:month].to_i,

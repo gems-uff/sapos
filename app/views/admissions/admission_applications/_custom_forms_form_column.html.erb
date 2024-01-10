@@ -18,10 +18,16 @@
 
   can_edit_override = can?(:override, record) && admission_process.staff_can_edit && params[:override]
   can_edit_main = can_edit_override || current_phase.try(:can_edit_candidate)
+  students = record.students
+  student_map = {
+    cpf: "CPF",
+    email: "email",
+    cpf_and_email: "CPF e email"
+  }
 %>
 <ol>
 <% if current_phase.nil? %>
-  <li class="form-element"><dt>Fase atual</dt><dd>Candidatura</dd></dl>
+  <li class="form-element"><dl><dt>Fase atual</dt><dd>Candidatura</dd></dl>
   <li class="form-element"><dl><dt>Data de início</dt><dd><%= admission_process.start_date %></dd></dl>
   <li class="form-element"><dl><dt>Data de fim</dt><dd><%= admission_process.start_date %></dd></dl>
 <% else %>
@@ -32,6 +38,27 @@
   <% end %>
   <% if process_phase.end_date.present? %>
     <li class="form-element"><dl><dt>Data de fim</dt><dd><%= admission_process.end_date %></dd></dl>
+  <% end %>
+<% end %>
+<% students.each do |key, values| %>
+  <% values.each do |student| %>
+    <li class="form-element">
+      <dl>
+        <dt>
+          Aluno(a) encontrado(a) por <%= student_map[key] %>
+        </dt>
+        <dd>
+          <%= link_to student.name, students_url(id: student.id), target: :_blank %>
+          <% if student.enrollments.present? %>
+            (<%= link_to student.enrollments.map(&:enrollment_number).join(', '),
+                enrollments_url("search[student]" => student.id), target: :_blank
+            %>)
+          <% else %>
+            (Sem matrícula)
+          <% end %>
+        </dd>
+      </dl>
+    </li>
   <% end %>
 <% end %>
 </ol>
