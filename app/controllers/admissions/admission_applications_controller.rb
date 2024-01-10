@@ -25,7 +25,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     config.list.sorting = { admission_process: "DESC", name: "ASC" }
 
     config.delete.link.weight = -1
-    config.delete.link.html_options = { style: "display: none;" }
+    config.delete.link.html_options = { class: "advanced-config-item" }
 
     config.action_links.add "cancel",
       label: "<i title='#{
@@ -36,7 +36,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       position: false,
       crud_type: :update,
       method: :put,
-      html_options: { style: "display: none;" },
+      html_options: { class: "advanced-config-item" },
       refresh_list: true,
       ignore_method: :cancel_ignore?,
       security_method: :cancel_authorized?,
@@ -53,7 +53,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       position: false,
       crud_type: :update,
       method: :put,
-      html_options: { style: "display: none;" },
+      html_options: { class: "advanced-config-item" },
       refresh_list: true,
       ignore_method: :undo_consolidation_ignore?,
       security_method: :undo_consolidation_authorized?,
@@ -68,7 +68,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       type: :member,
       ignore_method: :override_ignore?,
       security_method: :override_authorized?,
-      html_options: { style: "display: none;" },
+      html_options: { class: "advanced-config-item" },
       action: :edit,
       parameters: {
         override: true
@@ -81,6 +81,13 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       type: :member,
       security_method: :configuration_authorized?,
       ignore_method: :configuration_ignore?,
+      position: false
+
+    config.action_links.add "configure_all",
+      label: I18n.t("active_scaffold.admissions/admission_application.configure_all.title"),
+      type: :collection,
+      security_method: :configure_all_authorized?,
+      ignore_method: :configure_all_ignore?,
       position: false
 
     config.columns.add :is_filled
@@ -325,6 +332,26 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     @record = find_if_allowed(params[:id], :read)
   end
 
+  def configure_all_ignore?
+    !(
+      !cannot?(:destroy, Admissions::AdmissionApplication) ||
+      !cannot?(:cancel, Admissions::AdmissionApplication) ||
+      !cannot?(:undo, Admissions::AdmissionApplication) ||
+      !cannot?(:override, Admissions::AdmissionApplication)
+    )
+  end
+
+  def configure_all_authorized?(record = nil, column = nil)
+    can?(:destroy, record || Admissions::AdmissionApplication) ||
+    can?(:cancel, record || Admissions::AdmissionApplication) ||
+    can?(:undo, record || Admissions::AdmissionApplication) ||
+    can?(:override, record || Admissions::AdmissionApplication)
+  end
+
+  def configure_all
+    respond_to_action(:configure_all)
+  end
+
   protected
     def before_update_save(record)
       record.filled_form.prepare_missing_fields
@@ -418,5 +445,11 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       responds_to_parent do
         render action: "on_cancel", formats: [:js], layout: false
       end
+    end
+
+    def configure_all_respond_to_js
+      do_refresh_list if !render_parent?
+      @popstate = true
+      render(action: "configure_all")
     end
 end

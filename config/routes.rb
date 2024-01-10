@@ -301,6 +301,9 @@ Rails.application.routes.draw do
 
     resources :admission_applications do
       concerns :active_scaffold
+      collection do
+        get :configure_all
+      end
       member do
         get :configuration
         put :undo_consolidation

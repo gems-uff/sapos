@@ -68,6 +68,8 @@ pt-BR:
         title: Editar especial
       configuration:
         title: Avançado
+      configure_all:
+        title: Exibir ações avançadas
 
   errors:
     admissions/admission_application:

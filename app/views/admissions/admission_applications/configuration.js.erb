@@ -3,10 +3,7 @@
   row_id ||= element_row_id(:action => :list, :id => @record.id)
 %>
 
-$("#<%= row_id %> .cancel").toggle()
-$("#<%= row_id %> .destroy").toggle()
-$("#<%= row_id %> .undo_consolidation").toggle()
-$("#<%= row_id %> .edit-override").parent().toggle()
+$("#<%= row_id %> .advanced-config-item").toggle()
 
 let config = $("#<%= row_id %> .advanced-config");
 config.toggleClass("fa-cog")
