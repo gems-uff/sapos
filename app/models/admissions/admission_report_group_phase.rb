@@ -120,14 +120,13 @@ class Admissions::AdmissionReportGroupPhase < Admissions::AdmissionReportGroupBa
       @admission_process.phases.order(order: order).each_with_index do |p, index|
         phase = p.admission_phase
         phase_num = @extra[:reverse] ? (size - index) : (index + 1)
-        if phase.shared_form.present?
-          flat_form(column_map, all_flat, phase, phase_num, :shared, phase.shared_form)
-        end
-        if phase.member_form.present? && !@extra[:hide_committee]
-          flat_form(column_map, all_flat, phase, phase_num, :member, phase.member_form)
-        end
-        if phase.consolidation_form.present?
-          flat_form(column_map, all_flat, phase, phase_num, :consolidation, phase.consolidation_form)
+        forms = [[phase.shared_form, :shared]]
+        forms << [phase.member_form, :member] if !@extra[:hide_committee]
+        forms << [phase.consolidation_form, :consolidation]
+        forms = forms.reverse if @extra[:reverse]
+        forms.each do |form, mode|
+          next if !form.present?
+          flat_form(column_map, all_flat, phase, phase_num, mode, form)
         end
       end
 

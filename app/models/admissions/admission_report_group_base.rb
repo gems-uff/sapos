@@ -118,8 +118,8 @@ class Admissions::AdmissionReportGroupBase
         element = {
           column: column
         }
-        if filled.blank?
-          element[:value] = ""
+        if filled.nil?
+          element[:value] = "<não encontrado>"
         else
           element[:value] = yield(filled, field, element)
         end
