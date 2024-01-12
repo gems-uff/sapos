@@ -381,30 +381,44 @@ class Admissions::AdmissionApplicationsController < ApplicationController
 
   protected
     def do_map_student_form(options = {})
+      @do_not_create_enrollment ||= params[:do_not_create_enrollment]
       @record = @admission_application = find_if_allowed(params[:id], :map_student)
       @student ||= @admission_application.student
       @enrollment ||= @admission_application.enrollment
+
+      @student_operation = :new
+      @enrollment_operation = :new
       @student_operation = :edit if @admission_application.student.present?
       @enrollment_operation = :edit if @admission_application.enrollment.present?
-      @do_not_create_enrollment ||= params[:do_not_create_enrollment]
 
-      if !options[:do_not_initialize_new]
+      @creating_student = false
+      @creating_enrollment = false
+      if @student.nil?
+        find_student = Student.find_by(id: params[:student_id])
+        if find_student.present?
+          @student_operation = :link
+          @student = find_student
+        else
+          @student = Student.new
+          @creating_student = true
+        end
+      end
+      if @enrollment.nil?
+        @enrollment = Enrollment.new
+        @creating_enrollment = true
+      end
+
+      if !options[:do_not_set_attributes]
         field_objects = @admission_application.fields_hash
-        if @student.nil?
-          find_student = Student.find_by(id: params[:student_id])
-          if find_student.present?
-            @student_operation = :link
-            @student = find_student
-          else
-            @student = Student.new
-          end
+        if @student_operation != :edit
           @admission_application.update_student(@student, field_objects:)
           apply_constraints_to_record(@student)
           # create_association_with_parent(@record) if nested?
         end
-        if @enrollment.nil?
+        if @enrollment_operation != :edit
           process = @admission_application.admission_process
           @enrollment = Enrollment.new
+          @creating_enrollment = true
           @enrollment.student = @student
           @enrollment.level = process.level
           @enrollment.enrollment_status = process.enrollment_status
@@ -419,13 +433,12 @@ class Admissions::AdmissionApplicationsController < ApplicationController
           apply_constraints_to_record(@enrollment)
         end
       else
-        if @student.nil?
-          @student = Student.find_by(id: params[:student_id])
-          @student_operation = :link if @student.present?
+        if @student_operation != :edit && !params[:record_student][:photo].present?
+          @admission_application.update_student(@student, only_photo: true)
         end
       end
-      @student_operation ||= :new
-      @enrollment_operation ||= :new
+      @original_student = @student
+      @original_enrollment = @enrollment
     ensure
       # Prevent param propagation in params_for helper
       params.delete :student_id if params.include? :student_id
@@ -436,11 +449,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       # Based on do_create and do_update
       # https://github.com/activescaffold/active_scaffold/blob/51e9ff6a29ec538455e2120665e075c7ff087c11/lib/active_scaffold/actions/create.rb#L93
       # https://github.com/activescaffold/active_scaffold/blob/51e9ff6a29ec538455e2120665e075c7ff087c11/lib/active_scaffold/actions/update.rb#L106
-      do_map_student_form(do_not_initialize_new: true)
-      creating_student = @student.nil?
-      @student ||= Student.new
-      creating_enrollment = @enrollment.nil?
-      @enrollment ||= Enrollment.new
+      do_map_student_form(do_not_set_attributes: true)
       student_controller = StudentsController.new
       enrollment_controller = EnrollmentsController.new
       ActiveRecord::Base.transaction do
@@ -450,7 +459,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
           StudentsController.active_scaffold_config.create.columns,
           params[:record_student]
         )
-        if creating_student
+        if @creating_student
           apply_constraints_to_record(@student, allow_autosave: true)
           # create_association_with_parent(@record) if nested?
           student_controller.send(:before_create_save, @student)
@@ -472,7 +481,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
             params[:record_enrollment]
           )
           @enrollment.student = @student
-          if creating_enrollment
+          if @creating_enrollment
             apply_constraints_to_record(@enrollment, allow_autosave: true)
             # create_association_with_parent(@record) if nested?
             enrollment_controller.send(:before_create_save, @enrollment)
@@ -498,13 +507,13 @@ class Admissions::AdmissionApplicationsController < ApplicationController
         end
         @admission_application.save!
 
-        if creating_student
+        if @creating_student
           student_controller.send(:after_create_save, @student)
         else
           student_controller.send(:after_update_save, @student)
         end
         if !@do_not_create_enrollment
-          if creating_enrollment
+          if @creating_enrollment
             enrollment_controller.send(:after_create_save, @enrollment)
           else
             enrollment_controller.send(:after_update_save, @enrollment)
@@ -512,11 +521,13 @@ class Admissions::AdmissionApplicationsController < ApplicationController
         end
       end
     rescue ActiveRecord::StaleObjectError
-      do_map_student_form # ensure records exist or display form will fail
+      @student = @original_student
+      @enrollment = @original_enrollment
       @student.errors.add(:base, as_(:version_inconsistency))
       self.successful = false
     rescue ActiveRecord::RecordNotSaved => exception
-      do_map_student_form # ensure records exist or display form will fail
+      @student = @original_student
+      @enrollment = @original_enrollment
       logger.warn do
         "\n\n#{exception.class} (#{exception.message}):\n    " +
           Rails.backtrace_cleaner.clean(exception.backtrace).join("\n    ") +
@@ -527,7 +538,8 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     rescue ActiveRecord::ActiveRecordError => ex
       flash[:error] = ex.message
       self.successful = false
-      do_map_student_form # ensure records exist or display form will fail
+      @student = @original_student
+      @enrollment = @original_enrollment
     ensure
       # Prevent param propagation in params_for helper
       params.delete :record_enrollment if params.include? :record_enrollment

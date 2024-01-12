@@ -26,4 +26,19 @@ class LandingController < ApplicationController
     end
     render :index
   end
+
+  def download
+    medium_hash = params[:hash]
+    if medium_hash.nil?
+      medium_hash = params[:medium_hash]
+      medium_hash = "#{medium_hash}.#{params[:format]}" if params[:format].present?
+    end
+    record = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.where(
+      medium_hash: medium_hash
+    ).first
+    if record.blank?
+      raise ActionController::RoutingError.new("Não encontrado")
+    end
+    send_data(record.read, filename: record.original_filename, disposition: :inline)
+  end
 end

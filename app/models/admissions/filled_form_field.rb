@@ -223,7 +223,10 @@ class Admissions::FilledFormField < ActiveRecord::Base
       values[self.value]
     when Admissions::FormField::FILE
       return blank if self.file.blank? || self.file.file.blank?
-      self.file.url
+      Rails.application.routes.url_helpers.download_url(
+        self.file.medium_hash,
+        host: ENV["RAILS_RELATIVE_URL_ROOT"]
+      )
     when Admissions::FormField::STUDENT_FIELD
       configuration = self.form_field.config_hash
       if ["special_city", "special_birth_city"].include? configuration["field"]

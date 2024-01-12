@@ -160,7 +160,7 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
       groups: [],
       applications: applications,
       admission_process: admission_process,
-      base_url: ""
+      base_url: ENV["RAILS_RELATIVE_URL_ROOT"] || ""
     }
     self.groups.each do |group|
       group_config = group.tabular_config(self, admission_process, applications)
@@ -183,7 +183,11 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
                 if filled_file.file.blank? || filled_file.file.file.blank?
                   ""
                 else
-                  "#{config[:base_url]}#{filled_file.file.url}"
+                  url = Rails.application.routes.url_helpers.download_url(
+                    filled_file.file.medium_hash,
+                    host: config[:base_url]
+                  )
+                  url
                 end
               }
             }
@@ -213,8 +217,11 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
               if filled_file.file.blank? || filled_file.file.file.blank?
                 ""
               else
-                "=HYPERLINK(\"#{config[:base_url]}#{filled_file.file.url}\",
-                            \"#{config[:base_url]}#{filled_file.file.url}\")"
+                url = Rails.application.routes.url_helpers.download_url(
+                  filled_file.file.medium_hash,
+                  host: config[:base_url]
+                )
+                "=HYPERLINK(\"#{url}\", \"#{url}\")"
               end
             }
           }
@@ -243,7 +250,11 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
               if filled_file.file.blank? || filled_file.file.file.blank?
                 ""
               else
-                "<a href=\"#{config[:base_url]}#{filled_file.file.url}\">
+                url = Rails.application.routes.url_helpers.download_url(
+                  filled_file.file.medium_hash,
+                  host: config[:base_url]
+                )
+                "<a href=\"#{url}\">
                   #{CGI.escapeHTML(filled_file.file.filename)}
                 </a>".html_safe
               end

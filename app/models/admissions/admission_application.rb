@@ -260,7 +260,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
         should_raise: Admissions::FormCondition::RAISE_PHASE,
         default: false
       )
-        { }
+        {}
       else
         { status: REPROVED, status_message: nil }
       end
@@ -343,8 +343,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     result
   end
 
-  def update_student(student, field_objects: nil)
-    field_objects ||= @admission_application.fields_hash
+  def update_student(student, field_objects: nil, only_photo: false)
+    field_objects ||= self.fields_hash
     sync_name = nil
     sync_email = nil
     update_log = []
@@ -355,9 +355,20 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       next if form_field.field_type != Admissions::FormField::STUDENT_FIELD
       config = form_field.config_hash
       student_field = config["field"]
+      next if only_photo && student_field != "photo"
       sync_name = false if student_field == "name"
       sync_email = false if student_field == "email"
-      if student.has_attribute?(student_field)
+      if student_field == "photo"
+        if filled_field.file.present? && filled_field.file.file.present?
+          if student.photo.file.present? && filled_field.file.identifier != student.photo.identifier
+            old_url = Rails.application.routes.url_helpers.download_path(
+              student.photo.medium_hash,
+            )
+            update_log << "#{form_field.name}/Foto alterada. Foto anterior: #{old_url}"
+          end
+          student.photo.retrieve_from_store!(filled_field.file.identifier)
+        end
+      elsif student.has_attribute?(student_field)
         filled_field.set_model_field(update_log, student, student_field)
       elsif student_field == "special_address"
         simple = filled_field.simple_value.split(" <$> ").join(", ")
@@ -412,12 +423,15 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
         )
       end
     end
+    return if only_photo
     sync_name = self.attribute_as_field(:name) if sync_name.nil?
     sync_email = self.attribute_as_field(:email) if sync_email.nil?
     sync_name.set_model_field(update_log, student, "name") if sync_name
     sync_email.set_model_field(update_log, student, "email") if sync_email
     if update_log.present?
-      student.obs += "\nCandidatura #{self.to_label}: \n-#{update_log.join("\n-")}"
+      student.obs = "" if student.obs.nil?
+      student.obs += "\n" if student.obs.present?
+      student.obs += "Candidatura #{self.to_label}: \n-#{update_log.join("\n-")}"
     end
   end
 

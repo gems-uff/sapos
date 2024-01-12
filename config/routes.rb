@@ -198,9 +198,6 @@ Rails.application.routes.draw do
   resources :students do
     concerns :active_scaffold
     record_select_routes
-    member do
-      get "photo"
-    end
   end
 
   resources :majors do
@@ -360,7 +357,6 @@ Rails.application.routes.draw do
         post :update, on: :member
       end
       resources :letters, only: [:show, :update]
-      get "files/:medium_hash", action: :download, on: :collection
     end
 
     resources :form_autocompletes, only: [] do
@@ -463,6 +459,8 @@ Rails.application.routes.draw do
   end
 
   get "landing", action: :index, controller: "landing"
+  get "files/:medium_hash", action: :download, controller: "files", as: :download
+  get "admissions/files/:medium_hash", action: :download, controller: "files"
   get "enrollment/:id", to: "student_enrollment#show", as: :student_enrollment
   get "enrollment/:id/enroll/:year-:semester",
     to: "student_enrollment#enroll", as: :student_enroll

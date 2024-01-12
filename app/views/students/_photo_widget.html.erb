@@ -1,6 +1,6 @@
 <%
   basename = options[:name][..-(column.name.size + 3)]
-  data_url = record.present? && record.photo.present? ? record.photo.url : ""
+  data_url = record.present? && record.photo.present? ? download_path(record.photo.medium_hash) : ""
 %>
 
 <div

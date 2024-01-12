@@ -16,7 +16,7 @@ class FormFileUploader < CarrierWave::Uploader::Base
   # Override the directory where uploaded files will be stored.
   # This is a sensible default for uploaders that are meant to be mounted:
   def url
-    "#{ENV['RAILS_RELATIVE_URL_ROOT']}/admissions/files/#{model.file_before_type_cast}"
+    "#{ENV['RAILS_RELATIVE_URL_ROOT']}/files/#{model.file_before_type_cast}"
   end
 
   configure do |config|
@@ -81,5 +81,9 @@ class FormFileUploader < CarrierWave::Uploader::Base
   # Avoid using model.id or version_name here, see uploader/store.rb for details.
   def filename
     file.original_filename
+  end
+
+  def medium_hash
+    file.file.medium_hash
   end
 end

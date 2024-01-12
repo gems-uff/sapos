@@ -91,7 +91,8 @@ module Admissions::AdmissionProcessesPdfHelper
           if filled_file.file.blank? || filled_file.file.file.blank?
             ""
           else
-            "<link href='#{request.base_url}#{filled_file.file.url}'>
+            url = download_url(filled_file.file.medium_hash)
+            "<link href='#{url}'>
               #{filled_file.file.filename}
             </link>"
           end

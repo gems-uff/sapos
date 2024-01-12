@@ -35,6 +35,8 @@ class Student < ApplicationRecord
   validates :cpf, presence: true, uniqueness: true
   validate :changed_to_different_user
 
+  accepts_nested_attributes_for :student_majors, allow_destroy: true
+
   before_save :set_birth_state_by_birth_city
 
   def has_user?
