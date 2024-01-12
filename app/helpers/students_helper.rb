@@ -4,47 +4,28 @@
 # frozen_string_literal: true
 
 module StudentsHelper
+  include StudentHelperConcern
+
+  # StudentHelperConcern
+  alias_method(
+    :city_form_column,
+    :custom_city_form_column
+  )
+  alias_method(
+    :birth_city_form_column,
+    :custom_birth_city_form_column
+  )
+  alias_method(
+    :identity_issuing_place_form_column,
+    :custom_identity_issuing_place_form_column
+  )
+  alias_method(
+    :photo_form_column,
+    :custom_photo_form_column
+  )
+
   def enrollments_column(record, column)
     record.enrollments_number
-  end
-
-  def city_form_column(record, options)
-    city_widget(
-      record, options,
-      country: :address_country, state: :address_state, city: :city,
-      selected_city: record.city
-    )
-  end
-
-  def birth_city_form_column(record, options)
-    city = record.birth_city
-    state = (city.nil? ? nil : city.state) || record.birth_state
-    country = (state.nil? ? nil : state.country) || record.birth_country
-
-    city_widget(
-      record, options,
-      country: :birth_country, state: :birth_state, city: :birth_city,
-      selected_country: country,
-      selected_state: state,
-      selected_city: city
-    )
-  end
-
-  def identity_issuing_place_form_column(record, options)
-    identity_issuing_place_widget(
-      record, options,
-      text: record.identity_issuing_place
-    )
-  end
-
-  def photo_form_column(record, options)
-    config = ActiveScaffold::Config::Core.new(:student)
-    render(partial: "students/photo_widget", locals: {
-      config: config,
-      record: record,
-      options: options,
-      column: config.columns[:photo],
-    })
   end
 
   def photo_show_column(record, column)

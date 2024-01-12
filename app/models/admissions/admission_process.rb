@@ -17,6 +17,8 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
     class_name: "Admissions::FormTemplate",  foreign_key: "form_template_id"
   belongs_to :letter_template, optional: true,
     class_name: "Admissions::FormTemplate", foreign_key: "letter_template_id"
+  belongs_to :level, optional: true
+  belongs_to :enrollment_status, optional: true
 
   scope :open, -> {
     where("start_date <= :start_date AND end_date >= :end_date", {

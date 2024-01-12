@@ -8,7 +8,30 @@ module EnrollmentsHelper
   include PdfHelper
   include EnrollmentsPdfHelper
 
+  include EnrollmentHelperConcern
   include ClassEnrollmentHelperConcern
+
+  # EnrollmentHelperConcern
+  alias_method(
+    :deferral_approval_date_form_column,
+    :custom_deferral_approval_date_form_column
+  )
+  alias_method(
+    :accomplishment_conclusion_date_form_column,
+    :custom_accomplishment_conclusion_date_form_column
+  )
+  alias_method(
+    :dismissal_date_form_column,
+    :custom_dismissal_date_form_column
+  )
+  alias_method(
+    :admission_date_form_column,
+    :custom_admission_date_form_column
+  )
+  alias_method(
+    :level_form_column,
+    :custom_level_form_column
+  )
 
   # ClassEnrollmentHelperConcern
   alias_method(
@@ -183,50 +206,6 @@ module EnrollmentsHelper
     )
   end
 
-  def deferral_approval_date_form_column(record, options)
-    month_year_widget(
-      record, options, :approval_date, required: false
-    )
-  end
-
-  def accomplishment_conclusion_date_form_column(record, options)
-    month_year_widget(
-      record, options, :conclusion_date, required: false
-    )
-  end
-
-  def dismissal_date_form_column(record, options)
-    month_year_widget(record, options, :date, required: false)
-  end
-
-  def admission_date_form_column(record, options)
-    month_year_widget(record, options, :admission_date)
-  end
-
-  def level_form_column(record, options)
-    fixed_level = (
-      record.dismissal ||
-      record.accomplishments.count > 0 ||
-      record.deferrals.count > 0
-    ) && record.level
-    if fixed_level
-      return html_escape(record.level.name)
-    end
-    column = active_scaffold_config.columns[:level]
-    active_scaffold_input_select column, options
-  end
-
-  # TODO: remove current accomplishments and current deferral_type if level was changed
-  def options_for_association_conditions(association, record)
-    if association.name == :phase
-      Phase.find_all_for_enrollment(record.enrollment)
-    elsif association.name == :deferral_type
-      DeferralType.find_all_for_enrollment(record.enrollment)
-    else
-      super
-    end
-  end
-
   def enrollment_admission_date_show_column(record, column)
     I18n.localize(record.admission_date, format: :monthyear)
   end
@@ -349,6 +328,12 @@ module EnrollmentsHelper
     end
 
     result
+  end
+
+  def options_for_association_conditions(association, record)
+    result = enrollment_options_for_association_conditions(association, record)
+    return result if result != "<not found>"
+    super
   end
 
   def permit_rs_browse_params

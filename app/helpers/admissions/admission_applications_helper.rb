@@ -4,6 +4,80 @@
 # frozen_string_literal: true
 
 module Admissions::AdmissionApplicationsHelper
+  include StudentHelperConcern
+  include EnrollmentHelperConcern
+  include ClassEnrollmentHelperConcern
+
+  # StudentHelperConcern
+  alias_method(
+    :student_city_form_column,
+    :custom_city_form_column
+  )
+  alias_method(
+    :student_birth_city_form_column,
+    :custom_birth_city_form_column
+  )
+  alias_method(
+    :student_identity_issuing_place_form_column,
+    :custom_identity_issuing_place_form_column
+  )
+  alias_method(
+    :student_photo_form_column,
+    :custom_photo_form_column
+  )
+
+  # EnrollmentHelperConcern
+  alias_method(
+    :enrollment_deferral_approval_date_form_column,
+    :custom_deferral_approval_date_form_column
+  )
+  alias_method(
+    :enrollment_accomplishment_conclusion_date_form_column,
+    :custom_accomplishment_conclusion_date_form_column
+  )
+  alias_method(
+    :enrollment_dismissal_date_form_column,
+    :custom_dismissal_date_form_column
+  )
+  alias_method(
+    :enrollment_admission_date_form_column,
+    :custom_admission_date_form_column
+  )
+  alias_method(
+    :enrollment_level_form_column,
+    :custom_level_form_column
+  )
+
+  # ClassEnrollmentHelperConcern
+  alias_method(
+    :class_enrollment_course_class_form_column,
+    :custom_course_class_form_column
+  )
+  alias_method(
+    :class_enrollment_disapproved_by_absence_form_column,
+    :custom_disapproved_by_absence_form_column
+  )
+  alias_method(
+    :class_enrollment_grade_form_column,
+    :custom_grade_form_column
+  )
+  alias_method(
+    :class_enrollment_grade_not_count_in_gpr_form_column,
+    :custom_grade_not_count_in_gpr_form_column
+  )
+  alias_method(
+    :class_enrollment_obs_form_column,
+    :custom_obs_form_column
+  )
+  alias_method(
+    :class_enrollment_justification_grade_not_count_in_gpr_form_column,
+    :custom_justification_grade_not_count_in_gpr_form_column
+  )
+  alias_method(
+    :field_attributes,
+    :custom_field_attributes
+  )
+
   def letter_requests_column(record, column)
     if record.letter_requests.any?
       "#{record.letter_requests.first(3).filter_map do |letter|
@@ -82,4 +156,11 @@ module Admissions::AdmissionApplicationsHelper
       [status, status]
     end, options, options)
   end
+
+  def options_for_association_conditions(association, record)
+    result = enrollment_options_for_association_conditions(association, record)
+    return result if result != "<not found>"
+    super
+  end
+
 end

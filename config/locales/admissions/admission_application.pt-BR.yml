@@ -34,6 +34,8 @@ pt-BR:
         evaluations: Avaliações de comitê
         updated_at: "Última alteração"
         submission_time: "Data de inscrição"
+        student: "Aluno materializado"
+        enrollment: "Matrícula materializada"
       admissions/admission_application/letter_requests:
         name: "Nome na indicação de carta de recomendação"
         email: "Email na indicação de carta de recomendação"

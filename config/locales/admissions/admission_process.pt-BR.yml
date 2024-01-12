@@ -29,6 +29,11 @@ pt-BR:
         simple_id: "URL"
         require_session: Fluxo com sessão
         phases: "Fases"
+        level: "Nível da matrícula"
+        enrollment_status: "Tipo da matrícula"
+        enrollment_number_field: "Campo de número da matrícula"
+        admission_date: "Data de admissão da matrícula"
+
     description:
       admissions/admission_process:
         edit_date: "Se ficar em branco, limite é data de fim"

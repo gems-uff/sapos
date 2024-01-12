@@ -15,6 +15,7 @@ pt-BR:
         scholarships: "Bolsas"
         show_advisements_points_in_list: "Mostrar pts por orientacao na lista"
         short_name_showed_in_list_header: "Título da coluna pts por orientação"
+        application_processes: "Editais de Seleção"
 
     models:
       level:

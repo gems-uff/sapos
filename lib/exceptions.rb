@@ -5,4 +5,11 @@
 
 module Exceptions
   class VariableException < StandardError; end
+  class InvalidStudentFieldException < StandardError; end
+  class MissingFieldException < StandardError
+    def initialize(msg, exception_type = "missing_field")
+      @exception_type = exception_type
+      super(msg)
+    end
+  end
 end

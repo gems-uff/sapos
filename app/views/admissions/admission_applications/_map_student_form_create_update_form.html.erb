@@ -1,0 +1,114 @@
+<%
+
+  form_action ||= :map_student_form_create_update
+
+  scope ||= nil
+  url_options ||= params_for(:action => form_action)
+  xhr = request.xhr? if xhr.nil?
+
+  student_action_config = StudentsController.active_scaffold_config.create
+  enrollment_action_config = EnrollmentsController.active_scaffold_config.create
+  multipart ||= student_action_config.multipart? || enrollment_action_config.multipart?
+  student_columns ||= student_action_config.columns
+  enrollment_columns ||= enrollment_action_config.columns
+  enrollment_columns.constraint_columns << :student
+  persistent ||= false
+  floating_footer ||= false
+  method ||= :post
+  cancel_link = true if cancel_link.nil?
+  submit_text ||= form_action
+  apply_text ||= :"#{form_action}_apply"
+  body_partial ||= 'form'
+  form_id = element_form_id(action: form_action, id: @record&.id)
+  student_label = {
+    edit: "Editar aluno associado",
+    link: "Associar aluno existente",
+    new: "Criar novo aluno"
+  }[@student_operation]
+  student_visible = true
+  student_div_id = "#{form_id}-student"
+
+  enrollment_label = {
+    edit: "Editar matrícula associada",
+    new: "Criar nova matrícula"
+  }[@enrollment_operation]
+  enrollment_visible = true
+  enrollment_div_id = "#{form_id}-enrollment"
+%>
+<%=
+options = {:id => form_id,
+           :multipart => multipart,
+           :class => "as_form #{form_action.to_s}",
+           :method => method,
+           'data-loading' => defined?(loading) ? loading : true}
+cancel_options = {:class => 'as_cancel'}
+options[:class] << ' floating-footer' if floating_footer
+cancel_options[:remote] = true if xhr #cancel link does nt have to care about multipart forms
+if xhr && multipart # file_uploads
+  form_remote_upload_tag url_options.merge({:iframe => true}), options
+else
+  options[:remote] = true if xhr && !multipart
+  form_tag url_options, options
+end
+-%>
+  <h4>Mapeamento de <%= @record.to_label %></h4>
+
+  <div id="<%= element_messages_id(:action => form_action) %>" class="messages-container">
+    <% unless xhr %>
+      <p class="error-message message server-error" style="display:none;">
+        <%= as_(:internal_error).html_safe %>
+        <a href="#" class="close" title="<%= as_(:close).html_safe %>"><%= as_(:close).html_safe %></a>
+      </p>
+    <% end %>
+    <%= render :partial => 'map_student_form_messages' %>
+  </div>
+
+  <h5> <%= student_label %> <a data-show="Mostrar" data-hide="Ocultar"
+          data-toggable="<%= student_div_id %>" style=""
+          class="as-js-button visibility-toggle" href="#"><%= student_visible ? "Ocultar" : "Mostrar" %></a></h5>
+  <div id="<%= student_div_id %>" style="<%= "display:none;" if !student_visible %>" >
+    <% @record = @student %>
+    <%= render :partial => body_partial, :locals => { :columns => student_columns, :form_action => form_action, :scope => "_student" } %>
+  </div>
+
+  <% if @enrollment_operation == :new %>
+    <ol>
+      <li class="form-element"><dl>
+        <dt><label for="<%= form_id %>-do-not-create-enrollment"> Não criar matrícula </label></dt>
+        <dd><input type="checkbox" id="<%= form_id %>-do-not-create-enrollment"
+                   name="do_not_create_enrollment"
+                   <%= "checked" if @do_not_create_enrollment %>></dd>
+      </dl></li>
+    </ol>
+  <% end %>
+  <div id="<%= enrollment_div_id %>-parent" style="<%= "display:none;" if @do_not_create_enrollment %>">
+    <h5> <%= enrollment_label %> <a data-show="Mostrar" data-hide="Ocultar"
+            data-toggable="<%= enrollment_div_id %>" style=""
+            class="as-js-button visibility-toggle" href="#"><%= enrollment_visible ? "Ocultar" : "Mostrar" %></a></h5>
+    <div id="<%= enrollment_div_id %>" style="<%= "display:none;" if !enrollment_visible %>" >
+      <% @record = @enrollment %>
+      <%= render :partial => body_partial, :locals => { :columns => enrollment_columns, :form_action => form_action, :scope => "_enrollment" } %>
+    </div>
+  </div>
+
+  <p class="form-footer">
+    <%= submit_tag as_(submit_text), :class => "submit" %>
+    <%= link_to(as_(:cancel), main_path_to_return, cancel_options) if cancel_link %>
+    <%= loading_indicator_tag(action: form_action, id: @admission_application&.id) %>
+  </p>
+
+</form>
+
+<script>
+
+   $(document).ready(function() {
+    if ($(`#<%= form_id %>-do-not-create-enrollment`).is(":checked")) {
+      $("#<%= enrollment_div_id %>-parent :input").prop('disabled', true);
+    }
+    $(`#<%= form_id %>-do-not-create-enrollment`).on("change", function(e){
+      $("#<%= enrollment_div_id %>-parent").toggle(!this.checked)
+      $("#<%= enrollment_div_id %>-parent :input").prop('disabled', this.checked);
+    })
+  });
+
+</script>

@@ -73,6 +73,9 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     class_name: "Admissions::FilledForm"
   belongs_to :admission_phase, optional: true,
     class_name: "Admissions::AdmissionPhase"
+  belongs_to :student, optional: true
+  belongs_to :enrollment, optional: true
+
 
   accepts_nested_attributes_for :filled_form,
     allow_destroy: true

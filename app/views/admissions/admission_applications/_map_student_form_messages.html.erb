@@ -1,0 +1,8 @@
+<%= render :partial => 'messages' unless request.xhr? %>
+
+<% unless @student.nil? %>
+  <%= active_scaffold_error_messages_for :student, :object_name => @student.class.model_name.human.downcase %>
+<% end %>
+<% unless @enrollment.nil? %>
+  <%= active_scaffold_error_messages_for :enrollment, :object_name => @enrollment.class.model_name.human.downcase %>
+<% end %>

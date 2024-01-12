@@ -31,6 +31,8 @@ class Enrollment < ApplicationRecord
     source: :professor,
     through: :thesis_defense_committee_participations
   has_many :phase_completions, dependent: :destroy
+  has_many :admission_applications, dependent: :nullify,
+    class_name: "Admissions::AdmissionApplication"
 
   validates :enrollment_number, presence: true, uniqueness: true
   validates :admission_date, presence: true

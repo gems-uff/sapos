@@ -8,6 +8,7 @@ pt-BR:
         name: "Nome"
         user: "Com usuário"
         enrollments: "Matrículas"
+        application_processes: "Editais de Seleção"
 
     models:
       enrollment_status:

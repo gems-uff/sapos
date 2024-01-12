@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_09_212533) do
+ActiveRecord::Schema[7.0].define(version: 2024_01_11_211139) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -37,9 +37,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_09_212533) do
     t.string "status"
     t.text "status_message"
     t.datetime "submission_time"
+    t.integer "student_id"
+    t.integer "enrollment_id"
     t.index ["admission_phase_id"], name: "index_admission_applications_on_admission_phase_id"
     t.index ["admission_process_id"], name: "index_admission_applications_on_admission_process_id"
+    t.index ["enrollment_id"], name: "index_admission_applications_on_enrollment_id"
     t.index ["filled_form_id"], name: "index_admission_applications_on_filled_form_id"
+    t.index ["student_id"], name: "index_admission_applications_on_student_id"
     t.index ["token"], name: "index_admission_applications_on_token"
   end
 
@@ -169,8 +173,14 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_09_212533) do
     t.date "edit_date"
     t.boolean "staff_can_edit"
     t.boolean "staff_can_undo"
+    t.integer "level_id"
+    t.integer "enrollment_status_id"
+    t.string "enrollment_number_field"
+    t.date "admission_date"
+    t.index ["enrollment_status_id"], name: "index_admission_processes_on_enrollment_status_id"
     t.index ["form_template_id"], name: "index_admission_processes_on_form_template_id"
     t.index ["letter_template_id"], name: "index_admission_processes_on_letter_template_id"
+    t.index ["level_id"], name: "index_admission_processes_on_level_id"
     t.index ["simple_url"], name: "index_admission_processes_on_simple_url"
   end
 

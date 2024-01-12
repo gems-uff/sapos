@@ -132,7 +132,7 @@ class Admissions::FormCondition < ActiveRecord::Base
     else
       field = yield condition.field
       if field.blank?
-        raise MissingFieldException.new(I18n.t(
+        raise Exceptions::MissingFieldException.new(I18n.t(
           "errors.admissions/admission_application.field_not_found",
           field: condition.field, source: should_raise
         )) if should_raise.present?
@@ -176,13 +176,5 @@ class Admissions::FormCondition < ActiveRecord::Base
     self.to_label
   end
   def widget=(value)
-  end
-
-end
-
-class MissingFieldException < StandardError
-  def initialize(msg, exception_type = "missing_field")
-    @exception_type = exception_type
-    super(msg)
   end
 end

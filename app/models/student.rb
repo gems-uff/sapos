@@ -28,6 +28,8 @@ class Student < ApplicationRecord
   has_many :majors, through: :student_majors
 
   has_many :enrollments, dependent: :restrict_with_exception
+  has_many :admission_applications, dependent: :nullify,
+    class_name: "Admissions::AdmissionApplication"
 
   validates :name, presence: true
   validates :cpf, presence: true, uniqueness: true

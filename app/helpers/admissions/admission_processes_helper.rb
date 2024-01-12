@@ -20,6 +20,10 @@ module Admissions::AdmissionProcessesHelper
     I18n.t("activerecord.attributes.admissions/letter_request.#{key}", *args)
   end
 
+  def admission_date_form_column(record, options)
+    month_year_widget(record, options, :admission_date)
+  end
+
   def simple_id_column(record, column)
     link_to record.simple_id(closed_behavior: :optional_show),
       admission_url(record.simple_id)

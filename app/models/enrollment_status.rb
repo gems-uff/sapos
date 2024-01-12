@@ -8,6 +8,8 @@ class EnrollmentStatus < ApplicationRecord
   has_paper_trail
 
   has_many :enrollments, dependent: :restrict_with_exception
+  has_many :application_processes, dependent: :nullify,
+    class_name: "Admissions::AdmissionProcess"
 
   validates :name, presence: true, uniqueness: true
 

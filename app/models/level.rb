@@ -12,6 +12,8 @@ class Level < ApplicationRecord
   has_many :majors, dependent: :restrict_with_exception
   has_many :phase_durations, dependent: :restrict_with_exception
   has_many :scholarships, dependent: :restrict_with_exception
+  has_many :application_processes, dependent: :nullify,
+    class_name: "Admissions::AdmissionProcess"
 
   validates :name, presence: true, uniqueness: true
   validates :default_duration, presence: true

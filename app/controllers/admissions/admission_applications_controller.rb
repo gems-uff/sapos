@@ -13,7 +13,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     config.list.columns = [
       :admission_process, :token, :name, :email, :submission_time,
       :letter_requests, :filled_form,
-      :admission_phase, :status,
+      :admission_phase, :status
     ]
     config.show.columns = [
       :admission_process, :token, :name, :email,
@@ -89,6 +89,14 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       security_method: :configure_all_authorized?,
       ignore_method: :configure_all_ignore?,
       position: false
+
+    config.action_links.add "map_student_form",
+      label: "<i title='#{
+        I18n.t "active_scaffold.admissions/admission_application.map_student_form.title"
+      }' class='fa fa-user-o'></i>".html_safe,
+      type: :member,
+      security_method: :map_student_form_authorized?,
+      ignore_method: :map_student_form_ignore?
 
     config.columns.add :is_filled
     config.columns.add :pendency
@@ -352,7 +360,198 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     respond_to_action(:configure_all)
   end
 
+  def map_student_form_authorized?(record = nil, column = nil)
+    return super if record.nil?
+    can?(:map_student, record)
+  end
+
+  def map_student_form_ignore?(record)
+    cannot?(:map_student, record)
+  end
+
+  def map_student_form
+    do_map_student_form
+    respond_to_action(:map_student_form)
+  end
+
+  def map_student_form_create_update
+    do_map_student_form_create_update
+    respond_to_action(:map_student_form_create_update)
+  end
+
   protected
+    def do_map_student_form(options = {})
+      @record = @admission_application = find_if_allowed(params[:id], :map_student)
+      @student ||= @admission_application.student
+      @enrollment ||= @admission_application.enrollment
+      @student_operation = :edit if @admission_application.student.present?
+      @enrollment_operation = :edit if @admission_application.enrollment.present?
+      @do_not_create_enrollment ||= params[:do_not_create_enrollment]
+
+      if !options[:do_not_initialize_new]
+        field_objects = @admission_application.fields_hash
+        if @student.nil?
+          find_student = Student.find_by(id: params[:student_id])
+          if find_student.present?
+            @student_operation = :link
+            @student = find_student
+          else
+            @student = Student.new
+          end
+          field_objects.each do |key, filled_field|
+            form_field = filled_field.form_field
+            next if form_field.field_type != Admissions::FormField::STUDENT_FIELD
+            config = form_field.config_hash
+            student_field = config["field"]
+            if @student.has_attribute?(student_field)
+              value = @student.public_send(student_field)
+              if value.present? && value != filled_field.simple_value
+                @student.obs += "\n#{student_field} anterior: #{value}"
+              end
+              @student.assign_attributes(student_field => filled_field.simple_value)
+            elsif student_field.start_with?("special_")
+              # ToDo: consider special attributes
+            else
+              raise Exceptions::InvalidStudentFieldException.new(
+                "Campo de Aluno não encontrado: #{student_field}"
+              )
+            end
+          end
+          apply_constraints_to_record(@student)
+          # create_association_with_parent(@record) if nested?
+        end
+        if @enrollment.nil?
+          process = @admission_application.admission_process
+          @enrollment = Enrollment.new
+          @enrollment.student = @student
+          @enrollment.level = process.level
+          @enrollment.enrollment_status = process.enrollment_status
+          @enrollment.admission_date = process.admission_date
+          if process.enrollment_number_field.present?
+            filled_field = field_objects[process.enrollment_number_field]
+            raise Exceptions::MissingFieldException.new(
+              "Campo de Formulário não encontrado: #{process.enrollment_number_field}"
+            ) if filled_field.blank?
+            @enrollment.enrollment_number = filled_field.simple_value
+          end
+          apply_constraints_to_record(@enrollment)
+        end
+      else
+        if @student.nil?
+          @student = Student.find_by(id: params[:student_id])
+          @student_operation = :link if @student.present?
+        end
+      end
+      @student_operation ||= :new
+      @enrollment_operation ||= :new
+    ensure
+      # Prevent param propagation in params_for helper
+      params.delete :student_id if params.include? :student_id
+      params.delete :do_not_create_enrollment if params.include? :do_not_create_enrollment
+    end
+
+    def do_map_student_form_create_update
+      # Based on do_create and do_update
+      # https://github.com/activescaffold/active_scaffold/blob/51e9ff6a29ec538455e2120665e075c7ff087c11/lib/active_scaffold/actions/create.rb#L93
+      # https://github.com/activescaffold/active_scaffold/blob/51e9ff6a29ec538455e2120665e075c7ff087c11/lib/active_scaffold/actions/update.rb#L106
+      do_map_student_form(do_not_initialize_new: true)
+      creating_student = @student.nil?
+      @student ||= Student.new
+      creating_enrollment = @enrollment.nil?
+      @enrollment ||= Enrollment.new
+      student_controller = StudentsController.new
+      enrollment_controller = EnrollmentsController.new
+      ActiveRecord::Base.transaction do
+        self.successful = true
+        @student = update_record_from_params(
+          @student,
+          StudentsController.active_scaffold_config.create.columns,
+          params[:record_student]
+        )
+        if creating_student
+          apply_constraints_to_record(@student, allow_autosave: true)
+          # create_association_with_parent(@record) if nested?
+          student_controller.send(:before_create_save, @student)
+        else
+          student_controller.send(:before_update_save, @student)
+        end
+        # errors to @record can be added by update_record_from_params when association fails
+        # to set and ActiveRecord::RecordNotSaved is raised
+        # this syntax avoids a short-circuit, so we run validations on record and associations
+        self.successful = successful? || [
+          @student.keeping_errors { @student.valid? },
+          @student.associated_valid?
+        ].all? # this syntax avoids a short-circuit
+
+        if !@do_not_create_enrollment
+          @enrollment = update_record_from_params(
+            @enrollment,
+            EnrollmentsController.active_scaffold_config.create.columns,
+            params[:record_enrollment]
+          )
+          @enrollment.student = @student
+          if creating_enrollment
+            apply_constraints_to_record(@enrollment, allow_autosave: true)
+            # create_association_with_parent(@record) if nested?
+            enrollment_controller.send(:before_create_save, @enrollment)
+          else
+            enrollment_controller.send(:before_update_save, @enrollment)
+          end
+          self.successful = successful? || [
+            @enrollment.keeping_errors { @enrollment.valid? },
+            @enrollment.associated_valid?
+          ].all? # this syntax avoids a short-circuit
+        end
+
+        unless successful?
+          # some associations such as habtm are saved before saved is called on parent object
+          # we have to revert these changes if validation fails
+          raise ActiveRecord::Rollback, "don't save habtm associations unless record is valid"
+        end
+        @admission_application.student = @student
+        @student.save! && @student.save_associated!
+        if !@do_not_create_enrollment
+          @admission_application.enrollment = @enrollment
+          @enrollment.save! && @enrollment.save_associated!
+        end
+        @admission_application.save!
+
+        if creating_student
+          student_controller.send(:after_create_save, @student)
+        else
+          student_controller.send(:after_update_save, @student)
+        end
+        if !@do_not_create_enrollment
+          if creating_enrollment
+            enrollment_controller.send(:after_create_save, @enrollment)
+          else
+            enrollment_controller.send(:after_update_save, @enrollment)
+          end
+        end
+      end
+    rescue ActiveRecord::StaleObjectError
+      do_map_student_form # ensure records exist or display form will fail
+      @student.errors.add(:base, as_(:version_inconsistency))
+      self.successful = false
+    rescue ActiveRecord::RecordNotSaved => exception
+      do_map_student_form # ensure records exist or display form will fail
+      logger.warn do
+        "\n\n#{exception.class} (#{exception.message}):\n    " +
+          Rails.backtrace_cleaner.clean(exception.backtrace).join("\n    ") +
+          "\n\n"
+      end
+      @student.errors.add(:base, as_(:record_not_saved)) if @student.errors.empty?
+      self.successful = false
+    rescue ActiveRecord::ActiveRecordError => ex
+      flash[:error] = ex.message
+      self.successful = false
+      do_map_student_form # ensure records exist or display form will fail
+    ensure
+      # Prevent param propagation in params_for helper
+      params.delete :record_enrollment if params.include? :record_enrollment
+      params.delete :record_student if params.include? :record_student
+    end
+
     def before_update_save(record)
       record.filled_form.prepare_missing_fields
       phase = record.admission_phase
@@ -451,5 +650,52 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       do_refresh_list if !render_parent?
       @popstate = true
       render(action: "configure_all")
+    end
+
+    def map_student_form_respond_to_html
+      if successful?
+        render(action: "map_student_form_create_update")
+      else
+        return_to_main
+      end
+    end
+
+    def map_student_form_respond_to_js
+      render(partial: "map_student_form_create_update_form")
+    end
+
+    def map_student_form_create_update_respond_on_iframe
+      # do_refresh_list if successful? && !render_parent?
+      responds_to_parent do
+        render action: "on_map_student_form_create_update", formats: [:js], layout: false
+      end
+    end
+
+    def map_student_form_create_update_respond_to_html
+      if successful?
+        message = "Candidatura mapeada" # ToDo: improve message
+        # as_(:created_model, :model => ERB::Util.h(@record.to_label))
+        if params[:dont_close]
+          flash.now[:info] = message
+          render(action: "map_student_form_create_update")
+        else
+          flash[:info] = message
+          return_to_main
+        end
+      else
+        render(action: "map_student_form_create_update")
+      end
+    end
+
+    def map_student_form_create_update_respond_to_js
+      if successful? && !render_parent?
+        #if active_scaffold_config.create.refresh_list
+        #  do_refresh_list
+        #else
+          @record = find_if_allowed(params[:id], :map_student)
+          reload_record_on_update
+        #end
+      end
+      render action: "on_map_student_form_create_update"
     end
 end

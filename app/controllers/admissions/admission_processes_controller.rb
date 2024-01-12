@@ -19,7 +19,9 @@ class Admissions::AdmissionProcessesController < ApplicationController
       :name, :simple_url, :year, :semester, :start_date, :end_date, :edit_date,
       :form_template, :letter_template, :min_letters, :max_letters,
       :allow_multiple_applications, :require_session, :visible,
-      :staff_can_edit, :staff_can_undo, :phases, :rankings
+      :staff_can_edit, :staff_can_undo,
+      :level, :enrollment_status, :enrollment_number_field, :admission_date,
+      :phases, :rankings
     ]
     config.create.columns = form_columns
     config.update.columns = form_columns
@@ -84,6 +86,15 @@ class Admissions::AdmissionProcessesController < ApplicationController
     }
     config.columns[:phases].show_blank_record = false
     config.columns[:rankings].show_blank_record = false
+    config.columns[:enrollment_status].clear_link
+    config.columns[:enrollment_status].form_ui = :select
+    config.columns[:enrollment_status].search_sql = "enrollment_statuses.id"
+    config.columns[:enrollment_status].search_ui = :select
+    config.columns[:level].clear_link
+    config.columns[:level].form_ui = :select
+    config.columns[:level].search_sql = "levels.id"
+    config.columns[:level].search_ui = :select
+    config.columns[:admission_date].options = { format: :monthyear }
 
     config.actions.exclude :deleted_records
   end
