@@ -312,6 +312,32 @@ class Admissions::FilledFormField < ActiveRecord::Base
     ))
   end
 
+  def set_model_field(
+    update_log, model, model_attribute, simple: nil, to_string: :to_s)
+    value = model.public_send(model_attribute)
+    simple ||= self.simple_value
+    if value.present? && (value_s = value.send(to_string)) != simple.send(to_string)
+      message = "#{model.class.record_i18n_attr(model_attribute)} alterado."
+      message += " Valor anterior: #{value_s}" if value_s.size < 5000
+      update_log << message
+    end
+    model.assign_attributes(model_attribute => simple) if simple.present?
+  end
+
+  def set_model_place_field(
+    place_cls, place, update_log, model, model_attribute, not_found, args
+  )
+    place ||= place_cls.search_name(**args).first
+    if place.nil?
+      update_log << not_found
+    else
+      self.set_model_field(
+        update_log, model, model_attribute, simple: place,
+        to_string: :full_name
+      )
+    end
+  end
+
   def get_type
     case self.form_field.field_type
     when Admissions::FormField::NUMBER

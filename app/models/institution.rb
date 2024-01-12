@@ -15,4 +15,15 @@ class Institution < ApplicationRecord
   def to_label
     "#{self.name}"
   end
+
+  def self.search_name(institution: nil, substring: false)
+    institution = "%#{institution}%" if institution.present? && substring
+    Institution.where(
+      "name COLLATE :db_collation
+        LIKE :institution COLLATE :value_collation
+       OR code COLLATE :db_collation
+        LIKE :institution COLLATE :value_collation
+      ", Collation.collations.merge(institution:)
+    )
+  end
 end

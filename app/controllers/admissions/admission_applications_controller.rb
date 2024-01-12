@@ -398,25 +398,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
           else
             @student = Student.new
           end
-          field_objects.each do |key, filled_field|
-            form_field = filled_field.form_field
-            next if form_field.field_type != Admissions::FormField::STUDENT_FIELD
-            config = form_field.config_hash
-            student_field = config["field"]
-            if @student.has_attribute?(student_field)
-              value = @student.public_send(student_field)
-              if value.present? && value != filled_field.simple_value
-                @student.obs += "\n#{student_field} anterior: #{value}"
-              end
-              @student.assign_attributes(student_field => filled_field.simple_value)
-            elsif student_field.start_with?("special_")
-              # ToDo: consider special attributes
-            else
-              raise Exceptions::InvalidStudentFieldException.new(
-                "Campo de Aluno não encontrado: #{student_field}"
-              )
-            end
-          end
+          @admission_application.update_student(@student, field_objects:)
           apply_constraints_to_record(@student)
           # create_association_with_parent(@record) if nested?
         end

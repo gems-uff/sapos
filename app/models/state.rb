@@ -22,4 +22,26 @@ class State < ApplicationRecord
   def to_label
     "#{self.name}"
   end
+
+  def self.search_name(state: nil, country: nil, substring: false)
+    state = "%#{state}%" if state.present? && substring
+    country = "%#{country}%" if country.present? && substring
+    states = State
+    states = states.joins(:country).where(
+      "`countries`.`name` COLLATE :db_collation
+        LIKE :country COLLATE :value_collation
+      ", Collation.collations.merge(country:)
+    ) if country.present?
+    states.where(
+      "`states`.`name` COLLATE :db_collation
+        LIKE :state COLLATE :value_collation
+        OR `states`.`code` COLLATE :db_collation
+        LIKE :state COLLATE :value_collation
+      ", Collation.collations.merge(state:)
+    )
+  end
+
+  def full_name
+    "#{self.name}, #{self.country.name}"
+  end
 end

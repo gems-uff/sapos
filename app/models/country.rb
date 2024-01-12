@@ -18,4 +18,17 @@ class Country < ApplicationRecord
   def to_label
     "#{self.name}"
   end
+
+  def self.search_name(country: nil, substring: false)
+    country = "%#{country}%" if country.present? && substring
+    Country.where(
+      "name COLLATE :db_collation
+        LIKE :country COLLATE :value_collation
+      ", Collation.collations.merge(country:)
+    )
+  end
+
+  def full_name
+    "#{self.name}"
+  end
 end

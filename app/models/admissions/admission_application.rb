@@ -190,18 +190,22 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   end
 
+  def attribute_as_field(attrib, attrib_name: nil)
+    attrib_name ||= record_i18n_attr(attrib)
+    Admissions::FilledFormField.new(
+      value: self.send(attrib),
+      form_field: Admissions::FormField.new(
+        name: attrib_name,
+        field_type: Admissions::FormField::STRING
+      )
+    )
+  end
+
   def fields_hash
     field_objects = {}
-    self.filled_form.to_fields_hash
     [:name, :token, :email].each do |attrib|
       [attrib.to_s, record_i18n_attr(attrib)].each do |attrib_name|
-        field_objects[attrib_name] = Admissions::FilledFormField.new(
-          value: self.send(attrib),
-          form_field: Admissions::FormField.new(
-            name: attrib_name,
-            field_type: Admissions::FormField::STRING
-          )
-        )
+        field_objects[attrib_name] = self.attribute_as_field(attrib, attrib_name:)
       end
     end
     field_objects = self.filled_form.to_fields_hash(field_objects)
@@ -337,6 +341,84 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     result[:cpf] = by_cpf if by_cpf.present?
     result[:email] = by_email if by_email.present?
     result
+  end
+
+  def update_student(student, field_objects: nil)
+    field_objects ||= @admission_application.fields_hash
+    sync_name = nil
+    sync_email = nil
+    update_log = []
+    field_objects.each do |key, filled_field|
+      form_field = filled_field.form_field
+      sync_name = filled_field if form_field.sync == Admissions::FormField::SYNC_NAME
+      sync_email = filled_field if form_field.sync == Admissions::FormField::SYNC_EMAIL
+      next if form_field.field_type != Admissions::FormField::STUDENT_FIELD
+      config = form_field.config_hash
+      student_field = config["field"]
+      sync_name = false if student_field == "name"
+      sync_email = false if student_field == "email"
+      if student.has_attribute?(student_field)
+        filled_field.set_model_field(update_log, student, student_field)
+      elsif student_field == "special_address"
+        simple = filled_field.simple_value.split(" <$> ").join(", ")
+        filled_field.set_model_field(update_log, student, "address", simple:)
+      elsif student_field == "special_city"
+        values = (filled_field.value || "").split(" <$> ")
+        (3 - values.length).times { values << "" }
+        if values.any? { |x| x.present? }
+          filled_field.set_model_place_field(
+            City, nil, update_log, student, "city",
+            "#{form_field.name}/Cidade de candidatura não encontrada: #{values.join(", ")}",
+            city: values[0], state: values[1], country: values[2]
+          )
+        end
+      elsif student_field == "special_birth_city"
+        values = (filled_field.value || "").split(" <$> ")
+        (3 - values.length).times { values << "" }
+        if values.any? { |x| x.present? }
+          city = filled_field.set_model_place_field(
+            City, nil, update_log, student, "birth_city",
+            "#{form_field.name}/Cidade de candidatura não encontrada: #{values.join(", ")}",
+            city: values[0], state: values[1], country: values[2]
+          )
+          state = filled_field.set_model_place_field(
+            State, city.try(:state), update_log, student, "birth_state",
+            "#{form_field.name}/Estado de candidatura não encontrado: #{values[1..].join(", ")}",
+            state: values[1], country: values[2]
+          )
+          filled_field.set_model_place_field(
+            Country, state.try(:country), update_log, student, "birth_country",
+            "#{form_field.name}/País de candidatura não encontrado: #{values[2]}",
+            country: values[2]
+          )
+        end
+      elsif student_field == "special_majors"
+        student_majors = student.majors
+        filled_field.scholarities.each do |scholarity|
+          major = Major.search_name(
+            major: scholarity.course,
+            institution: scholarity.institution,
+            level: scholarity.level
+          ).first
+          if major.nil?
+            update_log << "#{form_field.name}/Curso não encontrado: #{scholarity.to_label}"
+          elsif !student_majors.include? major
+            student.student_majors.build(major:)
+          end
+        end
+      else
+        raise Exceptions::InvalidStudentFieldException.new(
+          "Campo de Aluno não encontrado: #{student_field}"
+        )
+      end
+    end
+    sync_name = self.attribute_as_field(:name) if sync_name.nil?
+    sync_email = self.attribute_as_field(:email) if sync_email.nil?
+    sync_name.set_model_field(update_log, student, "name") if sync_name
+    sync_email.set_model_field(update_log, student, "email") if sync_email
+    if update_log.present?
+      student.obs += "\nCandidatura #{self.to_label}: \n-#{update_log.join("\n-")}"
+    end
   end
 
   private
