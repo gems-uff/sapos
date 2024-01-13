@@ -32,6 +32,11 @@ pt-BR:
 
         value: "Valor"
 
+    errors:
+      models:
+        admissions/form_condition:
+          field_not_found: "Campo não encontrado: %{field}"
+
     models:
       admissions/form_condition:
         one: "Condição"

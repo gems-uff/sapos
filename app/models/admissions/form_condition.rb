@@ -55,12 +55,36 @@ class Admissions::FormCondition < ActiveRecord::Base
 
   validates :mode, presence: true
   validates :field, presence: true, if: -> { mode == CONDITION }
+  validate :that_field_name_exists, if: -> { mode == CONDITION }
 
   accepts_nested_attributes_for :form_conditions,
     reject_if: :all_blank,
     allow_destroy: true
 
   after_commit :update_pendencies
+
+  def that_field_name_exists
+    return if self.field.blank?
+    return if Admissions::FormField.field_name_exists?(self.field)
+    self.errors.add(:base, :field_not_found, field: self.field)
+  end
+
+  def recursive_simple_validation(errors: nil)
+    # Used for form fields
+    errors ||= []
+    errors << [:blank_mode_error, {}] if self.mode.blank?
+    if self.mode == CONDITION
+      if self.field.blank?
+        errors << [:blank_field_error, {}]
+      else
+        errors << [:invalid_name_error, field: self.field] if !Admissions::FormField.field_name_exists?(self.field)
+      end
+    else
+      self.form_conditions.each do |subcondition|
+        subcondition.recursive_simple_validation(errors:)
+      end
+    end
+  end
 
   def update_pendencies
     self.admission_committees.each do |committee|
@@ -153,7 +177,7 @@ class Admissions::FormCondition < ActiveRecord::Base
   def self.new_from_hash(hash)
     return nil if hash.nil?
     form_conditions = hash["form_conditions"] || []
-    condition = Admissions::FormCondition.new(hash.except("form_conditions"))
+    condition = Admissions::FormCondition.new(hash.except("form_conditions", "temp_id"))
     form_conditions.each do |child|
       condition.form_conditions << self.new_from_hash(child)
     end

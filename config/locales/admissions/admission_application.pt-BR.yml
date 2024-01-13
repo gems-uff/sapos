@@ -37,6 +37,8 @@ pt-BR:
         submission_time: "Data de inscrição"
         student: "Aluno materializado"
         enrollment: "Matrícula materializada"
+        phase_name: "Fase"
+        identifier: "Identificador"
       admissions/admission_application/letter_requests:
         name: "Nome na indicação de carta de recomendação"
         email: "Email na indicação de carta de recomendação"

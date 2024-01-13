@@ -57,7 +57,7 @@
         </dt>
         <dd>
           <%= select_tag(:consolidate_phase_id, options_for_select(
-            [["Cadidatura", nil]] +
+            [["Candidatura", nil]] +
             @admission_process.phases.order(:order).map do |p|
               [p.admission_phase.name, p.admission_phase.id]
             end, current_phase.try(:id)

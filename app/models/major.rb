@@ -55,5 +55,4 @@ class Major < ApplicationRecord
     end
     majors
   end
-
 end

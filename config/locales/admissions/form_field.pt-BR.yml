@@ -211,6 +211,9 @@ pt-BR:
           body_present_error: Template do Corpo não pode estar em branco
           invalid_consolidation_field: Campo %{name} não possui tipo válido para formulário de consolidação
           invalid_inputform_field: Campo %{name} não possui tipo válido para formulário
+          condition_blank_field_error: "Campo de condição não pode ficar em branco"
+          condition_blank_modo_error: "Modo de condição não pode ficar em branco"
+          condition_invalid_name_error: "Campo de condição não encontrado: %{field}"
 
     models:
       admissions/form_field:

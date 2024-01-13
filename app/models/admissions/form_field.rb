@@ -108,12 +108,12 @@ class Admissions::FormField < ActiveRecord::Base
     when Admissions::FormField::SCHOLARITY
       validate_scholarity(config)
     when Admissions::FormField::CODE
-      validate_conditions(config, "conditions")
+      validate_conditions(config, "condition")
     when Admissions::FormField::EMAIL
       validate_presence(config, "to")
       validate_presence(config, "subject")
       validate_presence(config, "body")
-      validate_conditions(config, "conditions")
+      validate_conditions(config, "condition")
     end
   end
 
@@ -175,13 +175,11 @@ class Admissions::FormField < ActiveRecord::Base
 
   def validate_conditions(config, field)
     return if config[field].blank?
-    config[field].each do |condition|
-      if condition["field"].strip == ""
-        self.errors.add(:base, :"#{field}_blank_field_error")
-      end
-      if Admissions::FormCondition::OPTIONS[condition["condition"].strip].blank?
-        self.errors.add(:base, :"#{field}_invalid_condition_error")
-      end
+    condition = Admissions::FormCondition.new_from_hash(config[field])
+    errors = []
+    condition.recursive_simple_validation(errors:)
+    errors.each do |error, param|
+      self.errors.add(:base, :"#{field}_#{error}", **param)
     end
   end
 
@@ -213,5 +211,20 @@ class Admissions::FormField < ActiveRecord::Base
       end
     end
     result
+  end
+
+  def self.search_name(field: nil, substring: false)
+    field = "%#{field}%" if field.present? && substring
+    Admissions::FormField.where(
+      "name COLLATE :db_collation
+        LIKE :field COLLATE :value_collation
+      ", Collation.collations.merge(field:)
+    )
+  end
+
+  def self.field_name_exists?(field)
+    return true if Admissions::AdmissionApplication::SHADOW_FIELDS_MAP[field].present?
+    return true if Admissions::AdmissionApplication::SHADOW_FIELDS.include? field
+    self.search_name(field:).present?
   end
 end

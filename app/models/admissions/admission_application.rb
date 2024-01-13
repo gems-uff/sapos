@@ -13,6 +13,13 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   CANCELED = record_i18n_attr("statuses.canceled")
   ERROR = record_i18n_attr("statuses.error")
 
+  SHADOW_FIELDS = Set[
+    "name", "token", "email", "status", "identifier", "phase_name"
+  ]
+  SHADOW_FIELDS_MAP = SHADOW_FIELDS.index_by do |field|
+    record_i18n_attr(field)
+  end
+
   END_OF_PHASE_STATUSES = [APPROVED, REPROVED, CANCELED]
   STATUSES = [APPROVED, REPROVED, CANCELED, ERROR]
 
@@ -185,12 +192,15 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
           .where(
             filled_form: { admission_applications: { id: self.id } },
             form_field: { name: name }
-          ).first
+          ).first ||
+        self.attribute_as_field(name)
       )
     end
   end
 
   def attribute_as_field(attrib, attrib_name: nil)
+    attrib = SHADOW_FIELDS_MAP[attrib] || attrib
+    return nil if !SHADOW_FIELDS.include? attrib
     attrib_name ||= record_i18n_attr(attrib)
     Admissions::FilledFormField.new(
       value: self.send(attrib),
@@ -203,7 +213,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
   def fields_hash
     field_objects = {}
-    [:name, :token, :email].each do |attrib|
+    SHADOW_FIELDS.each do |attrib|
       [attrib.to_s, record_i18n_attr(attrib)].each do |attrib_name|
         field_objects[attrib_name] = self.attribute_as_field(attrib, attrib_name:)
       end
@@ -463,6 +473,14 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       enrollment.obs += "\n" if enrollment.obs.present?
       enrollment.obs += "Candidatura #{self.to_label}: \n- #{update_log.join("\n- ")}"
     end
+  end
+
+  def phase_name
+    self.admission_phase.name
+  end
+
+  def identifier
+    self.token[..6]
   end
 
   private

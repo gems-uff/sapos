@@ -69,12 +69,14 @@ module Admissions::Ability
   )
 
   def initialize_admissions(user, roles)
+    alias_action :map_student_form, :map_student_form_create_update, to: :map_student
     if roles[:manager]
       can :undo_consolidation, Admissions::AdmissionApplication
       can :override, Admissions::AdmissionApplication
       can :cancel, Admissions::AdmissionApplication
       can :configuration, Admissions::AdmissionApplication
       can :read_all, Admissions::AdmissionApplication
+      can :map_student, Admissions::AdmissionApplication
     end
     if roles[Role::ROLE_ADMINISTRADOR] || roles[Role::ROLE_COORDENACAO]
       can :manage, ADMISSION_MODELS
