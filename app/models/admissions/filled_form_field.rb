@@ -165,6 +165,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
   end
 
   def validate_number_field(configuration)
+    return true if self.value.blank?
     !!Float(self.value)
   rescue
     add_error(:invalid_number)
