@@ -15,6 +15,17 @@ pt-BR:
         ranking_processes: Processo
         position: Posição
         machine: Seletor
+        form_condition: Precondição
+        behavior_on_invalid_condition: Em caso de condição inválida
+        behavior_on_invalid_conditions:
+          ignore: Ignorar
+          exception: Erro - seletores e precondição
+          exception_on_machine: Erro - apenas em seletores
+          exception_on_precondition: Erro - apenas em precondição
+        behavior_on_invalid_ranking: Em caso de coluna de ranking inexistente
+        behavior_on_invalid_rankings:
+          ignore: Ignorar
+          exception: Erro
 
     models:
       admissions/ranking_config:

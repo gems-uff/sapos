@@ -29,6 +29,9 @@ pt-BR:
           phase: "Fase"
           committee: "Comitê"
           form_field: "Formulário"
+          precondition: "Precondição"
+          machine: "Seletor"
+          ranking: "Coluna de Ranking"
 
         value: "Valor"
 

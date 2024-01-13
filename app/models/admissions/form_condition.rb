@@ -10,12 +10,14 @@ class Admissions::FormCondition < ActiveRecord::Base
     class_name: "Admissions::FormCondition", foreign_key: :parent_id
   has_many :form_conditions, dependent: :destroy,
     class_name: "Admissions::FormCondition", foreign_key: :parent_id
-  has_many :admission_phases_as_approval, dependent: :destroy,
+  has_many :admission_phases_as_approval, dependent: :nullify,
     class_name: "Admissions::AdmissionPhase", foreign_key: :approval_condition_id
-  has_many :admission_committees, dependent: :destroy,
+  has_many :admission_committees, dependent: :nullify,
     class_name: "Admissions::AdmissionCommittee"
-  has_many :admission_report_configs, dependent: :destroy,
+  has_many :admission_report_configs, dependent: :nullify,
     class_name: "Admissions::AdmissionReportConfig"
+  has_many :ranking_configs, dependent: :nullify,
+    class_name: "Admissions::RankingConfig"
 
   AND = record_i18n_attr("modes.and")
   OR = record_i18n_attr("modes.or")
@@ -52,6 +54,9 @@ class Admissions::FormCondition < ActiveRecord::Base
   RAISE_COMMITTEE = record_i18n_attr("raises.committee")
   RAISE_PHASE = record_i18n_attr("raises.phase")
   RAISE_FORM_FIELD = record_i18n_attr("raises.form_field")
+  RAISE_PRECONDITION = record_i18n_attr("raises.precondition")
+  RAISE_MACHINE = record_i18n_attr("raises.machine")
+  RAISE_RANKING = record_i18n_attr("raises.ranking")
 
   validates :mode, presence: true
   validates :field, presence: true, if: -> { mode == CONDITION }

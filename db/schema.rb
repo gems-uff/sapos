@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_11_211139) do
+ActiveRecord::Schema[7.0].define(version: 2024_01_13_052547) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -748,6 +748,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_11_211139) do
     t.integer "machine_field_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "form_condition_id"
+    t.string "behavior_on_invalid_condition", default: "Erro - apenas em seletores"
+    t.string "behavior_on_invalid_ranking", default: "Erro"
+    t.index ["form_condition_id"], name: "index_ranking_configs_on_form_condition_id"
     t.index ["form_template_id"], name: "index_ranking_configs_on_form_template_id"
     t.index ["machine_field_id"], name: "index_ranking_configs_on_machine_field_id"
     t.index ["position_field_id"], name: "index_ranking_configs_on_position_field_id"

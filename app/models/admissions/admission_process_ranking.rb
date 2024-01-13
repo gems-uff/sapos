@@ -41,6 +41,13 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
       groups[g.name] = g.total_vacancies
       readjust_groups[g.name] = 0
     end
+
+    machine_should_raise = [
+      Admissions::RankingConfig::EXCEPTION_CONDITION,
+      Admissions::RankingConfig::EXCEPTION_ON_MACHINE,
+    ].include?(self.ranking_config.behavior_on_invalid_condition) ?
+      Admissions::FormCondition::RAISE_MACHINE : nil
+
     steps = rconfig.ranking_processes.distinct.pluck(:step).sort
     steps.each do |step|
       processes = rconfig.ranking_processes.where(step: step).order(:order).select do |process|
@@ -54,7 +61,8 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
         processes.each do |process|
           if candidate[:__candidate].satisfies_condition(
             process.ranking_machine.form_condition,
-            fields: candidate[:__fields]
+            fields: candidate[:__fields],
+            should_raise: machine_should_raise
           )
             machine = process.ranking_machine.name
             machine = "#{machine}/#{step}" if step != 1
@@ -69,7 +77,8 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
               next_candidate = candidates[next_index]
               if next_candidate[:__candidate].satisfies_condition(
                 process.ranking_machine.form_condition,
-                fields: next_candidate[:__fields]
+                fields: next_candidate[:__fields],
+                should_raise: machine_should_raise
               )
                 break if Admissions::AdmissionProcessRanking.compare_candidates(
                   columns, candidate, next_candidate
@@ -112,8 +121,24 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
   end
 
   def filter_sort_candidates(columns, admission_applications)
+    form_condition = self.ranking_config.form_condition
+    form_condition_should_raise = [
+      Admissions::RankingConfig::EXCEPTION_CONDITION,
+      Admissions::RankingConfig::EXCEPTION_ON_PRECONDITION,
+    ].include?(self.ranking_config.behavior_on_invalid_condition) ?
+      Admissions::FormCondition::RAISE_PRECONDITION : nil
+
+    ranking_should_raise = (
+      self.ranking_config.behavior_on_invalid_ranking ==
+        Admissions::RankingConfig::EXCEPTION_RANKING
+    ) ? Admissions::FormCondition::RAISE_RANKING : nil
+
     admission_applications.filter_map do |candidate|
       fields = candidate.fields_hash
+
+      next if !candidate.satisfies_condition(
+        form_condition, fields:, should_raise: form_condition_should_raise
+      )
       result = {
         __position: nil,
         __machine: nil,
@@ -125,6 +150,10 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
       columns.each do |column|
         field = column.convert(fields[column.name])
         if field.nil?
+          raise Exceptions::MissingFieldException.new(I18n.t(
+            "errors.admissions/admission_process_ranking.field_not_found",
+            field: column.name, source: ranking_should_raise
+          )) if ranking_should_raise.present?
           skip = true
           break
         end

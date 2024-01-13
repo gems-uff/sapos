@@ -21,3 +21,7 @@ pt-BR:
 
   active_scaffold:
     create_admission_process_ranking_label: "Criar Ranking de Edital"
+
+  errors:
+    admissions/admission_process_ranking:
+      field_not_found: Campo "%{field}" usado em %{source} não existe
