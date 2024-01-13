@@ -22,8 +22,15 @@ class Admissions::RankingColumn < ActiveRecord::Base
     unless: ->(rc) { rc.admission_report_config_id.present? }
   validates :admission_report_config, presence: true,
     unless: ->(rc) { rc.ranking_config_id.present? }
+  validate :that_field_name_exists
 
   after_initialize :initialize_conversion
+
+  def that_field_name_exists
+    return if self.name.blank?
+    return if Admissions::FormField.field_name_exists?(self.name)
+    self.errors.add(:base, :field_not_found, field: self.name)
+  end
 
   def to_label
     "#{self.name} #{self.order}"

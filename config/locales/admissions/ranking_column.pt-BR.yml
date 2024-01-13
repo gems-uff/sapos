@@ -16,5 +16,10 @@ pt-BR:
         one: "Ordenação para Ranking"
         other: "Ordenações para Ranking"
 
+    errors:
+      models:
+        admissions/ranking_column:
+          field_not_found: "Campo não encontrado: %{field}"
+
   active_scaffold:
     create_ranking_column_label: "Criar Ordenação para Ranking"
