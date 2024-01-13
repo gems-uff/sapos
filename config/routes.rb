@@ -305,7 +305,8 @@ Rails.application.routes.draw do
         get :configuration
         put :undo_consolidation
         put :cancel
-        get :map_student_form
+        get :map_student
+        post :map_student_form
         post :map_student_form_create_update
       end
     end

@@ -1,0 +1,86 @@
+<%
+
+  form_action ||= :map_student_form
+
+  scope ||= nil
+  multipart ||= false
+  url_options ||= params_for(:action => form_action)
+  xhr = request.xhr? if xhr.nil?
+  method ||= :post
+  cancel_link = true if cancel_link.nil?
+  submit_text ||= form_action
+  form_id = element_form_id(action: form_action, id: @record&.id)
+
+  students = @record.students
+  student_map = {
+    cpf: "CPF",
+    email: "email",
+    cpf_and_email: "CPF e email"
+  }
+  process = @record.admission_process
+  do_not_create_enrollment = [
+    :level, :enrollment_status, :admission_date,
+    :enrollment_number_field
+  ].all?(&:blank?)
+%>
+<%=
+options = {:id => form_id,
+           :multipart => multipart,
+           :class => "as_form #{form_action.to_s}",
+           :method => method,
+           'data-loading' => defined?(loading) ? loading : true}
+cancel_options = {:class => 'as_cancel'}
+cancel_options[:remote] = true if xhr #cancel link does nt have to care about multipart forms
+if xhr && multipart # file_uploads
+  form_remote_upload_tag url_options.merge({:iframe => true}), options
+else
+  options[:remote] = true if xhr && !multipart
+  form_tag url_options, options
+end
+-%>
+  <h4>Mapeamento de <%= @record.to_label %></h4>
+
+  <ol>
+    <li class="form-element"><dl>
+      <dt><label>Associar aluno(a)</label></dt>
+      <dd>
+        <% first = true %>
+        <% students.each do |key, values| %>
+          <% values.each do |student| %>
+            <div class="form-template-checkbox-list vertical-style">
+              <label><input value="<%= student.id %>" type="radio" name="student_id" <%= "checked" if first %>>
+                Encontrado(a) por <%= student_map[key] %>: <%= link_to student.name, students_url(id: student.id), target: :_blank %>
+                <% if student.enrollments.present? %>
+                  (<%= link_to student.enrollments.map(&:enrollment_number).join(', '),
+                      enrollments_url("search[student]" => student.id), target: :_blank
+                  %>)
+                <% else %>
+                  (Sem matrícula)
+                <% end %>
+              </label>
+            </div>
+            <% first = false %>
+          <% end %>
+        <% end %>
+        <div class="form-template-checkbox-list vertical-style">
+          <label><input type="radio" name="student_id" <%= "checked" if first %>>
+            Novo aluno
+          </label>
+        </div>
+      </dd>
+    </dl></li>
+    <li class="form-element"><dl>
+      <dt><label for="<%= form_id %>-do-not-create-enrollment"> Não criar matrícula </label></dt>
+      <dd><input type="checkbox" id="<%= form_id %>-do-not-create-enrollment"
+                  name="do_not_create_enrollment"
+                  <%= "checked" if @do_not_create_enrollment %>></dd>
+    </dl></li>
+  </ol>
+
+  <p class="form-footer">
+    <%= submit_tag "Abrir formulário de mapeamento", :class => "submit" %>
+    <%= link_to(as_(:cancel), main_path_to_return, cancel_options) if cancel_link %>
+    <%= loading_indicator_tag(action: form_action, id: @admission_application&.id) %>
+  </p>
+
+</form>

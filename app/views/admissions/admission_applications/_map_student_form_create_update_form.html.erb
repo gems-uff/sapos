@@ -63,36 +63,48 @@ end
     <%= render :partial => 'map_student_form_messages' %>
   </div>
 
-  <h5> <%= student_label %> <a data-show="Mostrar" data-hide="Ocultar"
+  <h4> <%= student_label %> <a data-show="Mostrar" data-hide="Ocultar"
           data-toggable="<%= student_div_id %>" style=""
-          class="as-js-button visibility-toggle" href="#"><%= student_visible ? "Ocultar" : "Mostrar" %></a></h5>
+          class="as-js-button visibility-toggle" href="#"><%= student_visible ? "Ocultar" : "Mostrar" %></a></h4>
+
   <div id="<%= student_div_id %>" style="<%= "display:none;" if !student_visible %>" >
+    <% if @student_operation != :new %>
+    <ol class="form">
+      <li class="form-element"><dl>
+        <dt><label>Aluno</label></dt>
+        <dd><%= link_to @student.name, students_url(id: @student.id), target: :_blank %></dd>
+      </dl></li>
+    </ol>
+    <% end %>
     <% @record = @student %>
     <%= render :partial => body_partial, :locals => { :columns => student_columns, :form_action => form_action, :scope => "_student" } %>
   </div>
 
-  <% if @enrollment_operation == :new %>
-    <ol>
+  <h4> <%= enrollment_label %> <a data-show="Mostrar" data-hide="Ocultar"
+          data-toggable="<%= enrollment_div_id %>" style=""
+          class="as-js-button visibility-toggle" href="#"><%= enrollment_visible ? "Ocultar" : "Mostrar" %></a></h4>
+  <div id="<%= enrollment_div_id %>" style="<%= "display:none;" if !enrollment_visible %>" >
+    <ol class="form">
       <li class="form-element"><dl>
-        <dt><label for="<%= form_id %>-do-not-create-enrollment"> Não criar matrícula </label></dt>
-        <dd><input type="checkbox" id="<%= form_id %>-do-not-create-enrollment"
-                   name="do_not_create_enrollment"
-                   <%= "checked" if @do_not_create_enrollment %>></dd>
+        <% if @enrollment_operation == :new %>
+          <dt><label for="<%= form_id %>-do-not-create-enrollment"> Não criar matrícula </label></dt>
+          <dd><input type="checkbox" id="<%= form_id %>-do-not-create-enrollment"
+                    name="do_not_create_enrollment"
+                    <%= "checked" if @do_not_create_enrollment %>></dd>
+        <% else %>
+          <dt><label>Matrícula</label></dt>
+          <dd><%= link_to @enrollment.to_label, enrollments_url(id: @enrollment.id), target: :_blank %></dd>
+        <% end %>
       </dl></li>
     </ol>
-  <% end %>
-  <div id="<%= enrollment_div_id %>-parent" style="<%= "display:none;" if @do_not_create_enrollment %>">
-    <h5> <%= enrollment_label %> <a data-show="Mostrar" data-hide="Ocultar"
-            data-toggable="<%= enrollment_div_id %>" style=""
-            class="as-js-button visibility-toggle" href="#"><%= enrollment_visible ? "Ocultar" : "Mostrar" %></a></h5>
-    <div id="<%= enrollment_div_id %>" style="<%= "display:none;" if !enrollment_visible %>" >
-      <% @record = @enrollment %>
+    <% @record = @enrollment %>
+    <div id="<%= enrollment_div_id %>-parent" style="<%= "display:none;" if @do_not_create_enrollment %>">
       <%= render :partial => body_partial, :locals => { :columns => enrollment_columns, :form_action => form_action, :scope => "_enrollment" } %>
     </div>
   </div>
 
   <p class="form-footer">
-    <%= submit_tag as_(submit_text), :class => "submit" %>
+    <%= submit_tag "Salvar", :class => "submit" %>
     <%= link_to(as_(:cancel), main_path_to_return, cancel_options) if cancel_link %>
     <%= loading_indicator_tag(action: form_action, id: @admission_application&.id) %>
   </p>

@@ -1,0 +1,9 @@
+try {
+<%
+  form_selector ||= "#{element_form_id(:action => :map_student_form, :id => @admission_application&.id || params[:id])}"
+-%>
+var action_link = ActiveScaffold.find_action_link('<%= form_selector %>');
+if (action_link) action_link.update_flash_messages('<%= escape_javascript(render(:partial => 'messages')) %>');
+ActiveScaffold.replace('<%= form_selector %>', '<%= escape_javascript(render(:partial => 'map_student_form_create_update_form', :locals => {:xhr => true})) %>');
+ActiveScaffold.scroll_to('<%= form_selector %>', true);
+} catch (e) { alert('RJS error:\n\n' + e.toString());}

@@ -90,13 +90,13 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       ignore_method: :configure_all_ignore?,
       position: false
 
-    config.action_links.add "map_student_form",
+    config.action_links.add "map_student",
       label: "<i title='#{
-        I18n.t "active_scaffold.admissions/admission_application.map_student_form.title"
+        I18n.t "active_scaffold.admissions/admission_application.map_student.title"
       }' class='fa fa-user-o'></i>".html_safe,
       type: :member,
-      security_method: :map_student_form_authorized?,
-      ignore_method: :map_student_form_ignore?
+      security_method: :map_student_authorized?,
+      ignore_method: :map_student_ignore?
 
     config.columns.add :is_filled
     config.columns.add :pendency
@@ -360,16 +360,27 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     respond_to_action(:configure_all)
   end
 
-  def map_student_form_authorized?(record = nil, column = nil)
+  def map_student_authorized?(record = nil, column = nil)
     return super if record.nil?
     can?(:map_student, record)
   end
 
-  def map_student_form_ignore?(record)
+  def map_student_ignore?(record)
     cannot?(:map_student, record)
   end
 
+  def map_student
+    @record = find_if_allowed(params[:id], :map_student)
+    if @record.student.present?
+      @from_initial = true
+      map_student_form
+    else
+      respond_to_action(:map_student)
+    end
+  end
+
   def map_student_form
+    @from_initial ||= false
     do_map_student_form
     respond_to_action(:map_student_form)
   end
@@ -644,6 +655,24 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       render(action: "configure_all")
     end
 
+    def map_student_respond_to_html
+      if successful?
+        render(action: "map_student_initial")
+      else
+        return_to_main
+      end
+    end
+
+    def map_student_respond_to_js
+      render(partial: "map_student_initial_form")
+    end
+
+    def map_student_form_respond_on_iframe
+      responds_to_parent do
+        render action: "on_map_student_form", formats: [:js], layout: false
+      end
+    end
+
     def map_student_form_respond_to_html
       if successful?
         render(action: "map_student_form_create_update")
@@ -653,7 +682,11 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     end
 
     def map_student_form_respond_to_js
-      render(partial: "map_student_form_create_update_form")
+      if @from_initial
+        render(partial: "map_student_form_create_update_form")
+      else
+        render action: "on_map_student_form"
+      end
     end
 
     def map_student_form_create_update_respond_on_iframe
