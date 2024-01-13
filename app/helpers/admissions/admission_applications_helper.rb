@@ -99,12 +99,16 @@ module Admissions::AdmissionApplicationsHelper
         admission_phase_id: record.admission_phase_id
       ).first.present?
       result += Admissions::AdmissionPendency::PENDENT
-    else
-      result += active_scaffold_config.list.empty_field_text
     end
     if record.status_message.present?
-      result += ": #{record.status_message}"
+      result = [result, record.status_message].reject(&:empty?).join(": ")
     end
+    if record.enrollment.present?
+      result = [result, "Com matrícula"].reject(&:empty?).join(" - ")
+    elsif record.student.present?
+      result = [result, "Com aluno"].reject(&:empty?).join(" - ")
+    end
+    result = active_scaffold_config.list.empty_field_text if result.empty?
     result
   end
 
@@ -152,9 +156,18 @@ module Admissions::AdmissionApplicationsHelper
       [I18n.t("active_scaffold._select_"), nil],
       ["-", -current_user.id],
       [Admissions::AdmissionPendency::PENDENT, current_user.id]
-    ] +Admissions::AdmissionApplication::STATUSES.map do |status|
+    ] + Admissions::AdmissionApplication::STATUSES.map do |status|
       [status, status]
     end, options, options)
+  end
+
+  def mapping_search_column(record, options)
+    select(record, :status, [
+      [I18n.t("active_scaffold._select_"), nil],
+      ["Com aluno", :student],
+      ["Com matrícula", :enrollment],
+      ["Com aluno sem matrícula", :student_no_enrollment],
+    ], options, options)
   end
 
   def options_for_association_conditions(association, record)

@@ -24,6 +24,7 @@ pt-BR:
           reproved: Reprovado
           canceled: Cancelado
           error: Erro
+        mapping: Mapeamento
         status_message: Razão
         pendency: "Pendência de comitê"
         pendency_options:
