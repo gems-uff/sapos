@@ -431,7 +431,37 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     if update_log.present?
       student.obs = "" if student.obs.nil?
       student.obs += "\n" if student.obs.present?
-      student.obs += "Candidatura #{self.to_label}: \n-#{update_log.join("\n-")}"
+      student.obs += "Candidatura #{self.to_label}: \n- #{update_log.join("\n- ")}"
+    end
+  end
+
+  def update_enrollment(enrollment, field_objects: nil)
+    process = self.admission_process
+    update_log = []
+    [:level, :enrollment_status, :admission_date].each do |attrib|
+      process_value = process.send(attrib)
+      next if process_value.blank?
+      enrollment_value = enrollment.send(attrib)
+      if enrollment_value.present? && process_value != enrollment_value
+        message = "#{enrollment.class.record_i18n_attr(attrib)} alterado."
+        value_s = attrib != :admission_date ? enrollment_value.to_label : enrollment_value.to_s
+        message += " Valor anterior: #{value_s}"
+        update_log << message
+      end
+      enrollment.assign_attributes(attrib => process_value)
+    end
+    if process.enrollment_number_field.present?
+      field_objects ||= self.fields_hash
+      filled_field = field_objects[process.enrollment_number_field]
+      raise Exceptions::MissingFieldException.new(
+        "Campo de número da matrícula definido no edital não encontrado em candidato: #{process.enrollment_number_field}"
+      ) if filled_field.blank?
+      filled_field.set_model_field(update_log, enrollment, :enrollment_number)
+    end
+    if update_log.present?
+      enrollment.obs = "" if enrollment.obs.nil?
+      enrollment.obs += "\n" if enrollment.obs.present?
+      enrollment.obs += "Candidatura #{self.to_label}: \n- #{update_log.join("\n- ")}"
     end
   end
 

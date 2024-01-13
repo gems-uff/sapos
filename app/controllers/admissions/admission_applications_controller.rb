@@ -380,7 +380,14 @@ class Admissions::AdmissionApplicationsController < ApplicationController
   end
 
   protected
-    def do_map_student_form(options = {})
+    def do_map_student_form
+      prepare_map_student
+    rescue Exceptions::MissingFieldException, Exceptions::InvalidStudentFieldException => ex
+      flash[:error] = ex.message
+      self.successful = false
+    end
+
+    def prepare_map_student(options = {})
       @do_not_create_enrollment ||= params[:do_not_create_enrollment]
       @record = @admission_application = find_if_allowed(params[:id], :map_student)
       @student ||= @admission_application.student
@@ -416,20 +423,10 @@ class Admissions::AdmissionApplicationsController < ApplicationController
           # create_association_with_parent(@record) if nested?
         end
         if @enrollment_operation != :edit
-          process = @admission_application.admission_process
           @enrollment = Enrollment.new
           @creating_enrollment = true
           @enrollment.student = @student
-          @enrollment.level = process.level
-          @enrollment.enrollment_status = process.enrollment_status
-          @enrollment.admission_date = process.admission_date
-          if process.enrollment_number_field.present?
-            filled_field = field_objects[process.enrollment_number_field]
-            raise Exceptions::MissingFieldException.new(
-              "Campo de Formulário não encontrado: #{process.enrollment_number_field}"
-            ) if filled_field.blank?
-            @enrollment.enrollment_number = filled_field.simple_value
-          end
+          @admission_application.update_enrollment(@enrollment, field_objects:)
           apply_constraints_to_record(@enrollment)
         end
       else
@@ -449,7 +446,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       # Based on do_create and do_update
       # https://github.com/activescaffold/active_scaffold/blob/51e9ff6a29ec538455e2120665e075c7ff087c11/lib/active_scaffold/actions/create.rb#L93
       # https://github.com/activescaffold/active_scaffold/blob/51e9ff6a29ec538455e2120665e075c7ff087c11/lib/active_scaffold/actions/update.rb#L106
-      do_map_student_form(do_not_set_attributes: true)
+      prepare_map_student(do_not_set_attributes: true)
       student_controller = StudentsController.new
       enrollment_controller = EnrollmentsController.new
       ActiveRecord::Base.transaction do
@@ -535,7 +532,8 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       end
       @student.errors.add(:base, as_(:record_not_saved)) if @student.errors.empty?
       self.successful = false
-    rescue ActiveRecord::ActiveRecordError => ex
+    rescue ActiveRecord::ActiveRecordError, Exceptions::MissingFieldException,
+      Exceptions::InvalidStudentFieldException => ex
       flash[:error] = ex.message
       self.successful = false
       @student = @original_student
@@ -669,13 +667,8 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       if successful?
         message = "Candidatura mapeada" # ToDo: improve message
         # as_(:created_model, :model => ERB::Util.h(@record.to_label))
-        if params[:dont_close]
-          flash.now[:info] = message
-          render(action: "map_student_form_create_update")
-        else
-          flash[:info] = message
-          return_to_main
-        end
+        flash[:info] = message
+        return_to_main
       else
         render(action: "map_student_form_create_update")
       end
@@ -683,12 +676,8 @@ class Admissions::AdmissionApplicationsController < ApplicationController
 
     def map_student_form_create_update_respond_to_js
       if successful? && !render_parent?
-        #if active_scaffold_config.create.refresh_list
-        #  do_refresh_list
-        #else
-          @record = find_if_allowed(params[:id], :map_student)
-          reload_record_on_update
-        #end
+        @record = find_if_allowed(params[:id], :map_student)
+        reload_record_on_update
       end
       render action: "on_map_student_form_create_update"
     end
