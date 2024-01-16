@@ -194,7 +194,15 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
             filled_form: { admission_applications: { id: self.id } },
             form_field: { name: name }
           ).first ||
-        self.attribute_as_field(name)
+        Admissions::FilledFormField.includes(:form_field)
+          .includes(filled_form: :admission_ranking_result)
+          .where(
+            filled_form: { admission_ranking_results: {
+              admission_application_id: self.id
+            } },
+            form_field: { name: name }
+          ).order(updated_at: :desc, id: :desc).first ||
+        self.attribute_as_field(name.to_s)
       )
     end
   end
@@ -219,9 +227,12 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
         field_objects[attrib_name] = self.attribute_as_field(attrib, attrib_name:)
       end
     end
-    field_objects = self.filled_form.to_fields_hash(field_objects)
+    self.filled_form.to_fields_hash(field_objects)
     self.results.each do |result|
       result.filled_form.to_fields_hash(field_objects)
+    end
+    self.rankings.each do |ranking|
+      ranking.filled_form.to_fields_hash(field_objects)
     end
     field_objects
   end
@@ -550,8 +561,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       end
     end
     return if only_photo
-    sync_name = self.attribute_as_field(:name) if sync_name.nil?
-    sync_email = self.attribute_as_field(:email) if sync_email.nil?
+    sync_name = self.attribute_as_field("name") if sync_name.nil?
+    sync_email = self.attribute_as_field("email") if sync_email.nil?
     sync_name.set_model_field(update_log, student, "name") if sync_name
     sync_email.set_model_field(update_log, student, "email") if sync_email
     if update_log.present?
