@@ -402,6 +402,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     end
 
     def prepare_map_student(options = {})
+      @student_id = params[:student_id]
       @do_not_create_enrollment ||= params[:do_not_create_enrollment]
       @record = @admission_application = find_if_allowed(params[:id], :map_student)
       @student ||= @admission_application.student
@@ -415,7 +416,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       @creating_student = false
       @creating_enrollment = false
       if @student.nil?
-        find_student = Student.find_by(id: params[:student_id])
+        find_student = Student.find_by(id: @student_id)
         if find_student.present?
           @student_operation = :link
           @student = find_student

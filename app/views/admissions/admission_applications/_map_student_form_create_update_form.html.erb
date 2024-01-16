@@ -52,7 +52,8 @@ else
 end
 -%>
   <h4>Mapeamento de <%= @record.to_label %></h4>
-
+  <%= @student_id %>
+ <%= hidden_field_tag :student_id, @student_id %>
   <div id="<%= element_messages_id(:action => form_action) %>" class="messages-container">
     <% unless xhr %>
       <p class="error-message message server-error" style="display:none;">
