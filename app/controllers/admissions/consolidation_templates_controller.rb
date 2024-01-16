@@ -8,7 +8,8 @@ class Admissions::ConsolidationTemplatesController < ApplicationController
 
   active_scaffold "Admissions::FormTemplate" do |config|
     config.list.sorting = { name: "ASC" }
-    config.create.label = :create_form_template_label
+    config.create.label = :create_consolidation_template_label
+    config.list.label = :consolidation_template_label
 
     config.list.columns = [:name, :description, :template_type]
     config.create.columns = [:name, :description, :template_type, :fields]

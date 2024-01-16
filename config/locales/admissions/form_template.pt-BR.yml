@@ -28,6 +28,10 @@ pt-BR:
 
   active_scaffold:
     create_form_template_label: "Criar Modelo de Formulário"
+    create_consolidation_template_label: "Criar Modelo de Consolidação"
+    consolidation_template_label:
+      one: "Modelo de Consolidação"
+      other: "Modelos de Consolidação"
     admissions/form_template:
       preview:
         title: Pré-visualizar

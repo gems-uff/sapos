@@ -75,6 +75,9 @@ pt-BR:
         title: Avançado
       configure_all:
         title: Exibir ações avançadas
+      map_student:
+        title: Mapear para estudante/matrícula
+        success: Candidatura mapeada - %{student_label}
 
   errors:
     admissions/admission_application:

@@ -691,8 +691,10 @@ class Admissions::AdmissionApplicationsController < ApplicationController
 
     def map_student_form_create_update_respond_to_html
       if successful?
-        message = "Candidatura mapeada" # ToDo: improve message
-        # as_(:created_model, :model => ERB::Util.h(@record.to_label))
+        message = I18n.translate(
+          "active_scaffold.admissions/admission_application.map_student.success",
+          student_label: @student.to_label
+        )
         flash[:info] = message
         return_to_main
       else
