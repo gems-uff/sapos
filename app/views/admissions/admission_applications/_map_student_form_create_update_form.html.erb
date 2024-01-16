@@ -51,8 +51,7 @@ else
   form_tag url_options, options
 end
 -%>
-  <h4>Mapeamento de <%= @record.to_label %></h4>
-  <%= @student_id %>
+ <h4>Mapeamento de <%= @record.to_label %></h4>
  <%= hidden_field_tag :student_id, @student_id %>
   <div id="<%= element_messages_id(:action => form_action) %>" class="messages-container">
     <% unless xhr %>

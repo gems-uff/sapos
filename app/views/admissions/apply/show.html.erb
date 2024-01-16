@@ -30,18 +30,12 @@
                 <%= t "admissions.apply.show.finished" %>
               <% end %>
             </li>
-            <%= render partial: "show_value", locals: {
-              name: t("activerecord.attributes.admissions/admission_application.token"),
-              value: @admission_application.token
-            } %>
-            <%= render partial: "show_value", locals: {
-              name: t("activerecord.attributes.admissions/admission_application.name"),
-              value: @admission_application.name
-            } %>
-            <%= render partial: "show_value", locals: {
-              name: t("activerecord.attributes.admissions/admission_application.email"),
-              value: @admission_application.email
-            } %>
+            <% [:token, :name, :email].each do |attr| %>
+              <%= render partial: "show_value", locals: {
+                name: t("activerecord.attributes.admissions/admission_application.#{attr}"),
+                value: @admission_application.send(attr)
+              } %>
+            <% end %>
           </ol>
           <p class="links">
             <% can_edit = @admission_application.candidate_can_edit %>
@@ -56,18 +50,53 @@
           </p>
         </div>
       </div>
+      <% @admission_application.rankings.reverse.each do |ranking| %>
+        <% next if !ranking.filled_form.is_filled %>
+        <% next if !ranking.ranking_config.candidate_can_see %>
+        <div>
+          <%= toggable_area(ranking.ranking_config.name, id: "ranking-#{ranking.id}") do %>
+            <ol>
+              <li>
+                <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
+                  form_template: ranking.filled_form.form_template,
+                  filled_form: ranking.filled_form } %>
+              </li>
+            </ol>
+          <% end %>
+        </div>
+      <% end %>
+      <%
+        disabled = false
+        phases = @admission_process.phases.order(:order).filter_map do |p|
+          next if disabled
+          phase = p.admission_phase
+          app_forms = phase.prepare_application_forms(
+            @admission_application,
+            can_edit_override: false,
+            check_candidate_permission: true,
+            committee_permission_user: nil,
+          )
+          disabled = app_forms[:latest_available_phase]
+          { phase:, app_forms: }
+        end
+      %>
+      <% phases.reverse.each do |phase_obj| %>
+        <div>
+          <% phase_obj[:app_forms][:phase_forms].reverse.each do |phase_form| %>
+            <%= toggable_area("#{phase_obj[:phase].name} (#{phase_form[:name]})", id: "#{phase_obj[:phase].id}-#{phase_form[:name]}") do %>
+              <ol>
+                <li>
+                  <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
+                    form_template: phase_form[:object].filled_form.form_template,
+                    filled_form: phase_form[:object].filled_form } %>
+                </li>
+              </ol>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
       <div>
-        <h5>
-          <%= t "admissions.apply.show.data" %>
-          <a data-show="<%= t "active_scaffold.show"%>"
-              data-hide="<%= t "active_scaffold.hide"%>"
-              data-toggable="data-section" style=""
-              class="as-js-button visibility-toggle" href="#"
-          >
-            <%= (t "active_scaffold.hide") %>
-          </a>
-        </h5>
-        <div id="data-section">
+        <%= toggable_area(t("admissions.apply.show.data"), id: "data-section") do %>
           <ol>
             <li>
               <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
@@ -75,21 +104,11 @@
                 filled_form: @admission_application.filled_form } %>
             </li>
           </ol>
-        </div>
+        <% end %>
       </div>
       <% if @admission_process.has_letters && @admission_application.letter_requests.present? %>
         <div>
-          <h5>
-            <%= t "admissions.apply.show.letters" %>
-            <a data-show="<%= t "active_scaffold.show"%>"
-                data-hide="<%= t "active_scaffold.hide"%>"
-                data-toggable="letters-section" style=""
-                class="as-js-button visibility-toggle" href="#"
-            >
-              <%= (t "active_scaffold.hide") %>
-            </a>
-          </h5>
-          <div id="letters-section">
+          <%= toggable_area(t("admissions.apply.show.letters"), id: "letters-section") do %>
             <ol>
               <li>
                 <table class="showtable listed-records-table">
@@ -114,7 +133,7 @@
                 </table>
               </li>
             </ol>
-          </div>
+          <% end %>
         </div>
       <% end %>
     </div>
