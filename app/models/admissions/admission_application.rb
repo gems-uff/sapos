@@ -625,7 +625,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   end
 
   def phase_name
-    self.admission_phase.name
+    self.admission_phase.try(:name)
   end
 
   def identifier
