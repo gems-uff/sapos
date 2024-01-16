@@ -13,6 +13,7 @@ class Admissions::RankingConfigsController < ApplicationController
       :name, :form_condition,
       :behavior_on_invalid_condition,
       :behavior_on_invalid_ranking,
+      :candidate_can_see,
       :ranking_columns, :ranking_groups, :ranking_processes
     ]
 

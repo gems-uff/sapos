@@ -26,6 +26,7 @@ pt-BR:
         behavior_on_invalid_rankings:
           ignore: Ignorar
           exception: Erro
+        candidate_can_see: Candidato pode ver posição
 
     models:
       admissions/ranking_config:

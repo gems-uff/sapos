@@ -2,13 +2,14 @@
   form_field = field.object.form_field
   partial_locals = {
     form_field: form_field, field: field,
-    configuration: form_field.config_hash
+    configuration: form_field.config_hash,
+    filled_class: filled_class
   }
 
 %>
 
-<%= field.hidden_field :form_field_id %>
-<%= field.hidden_field :id %>
+<%= field.hidden_field :form_field_id, class: filled_class %>
+<%= field.hidden_field :id, class: filled_class %>
 <% if form_field.field_type == Admissions::FormField::STRING %>
   <%= render partial: "admissions/filled_form/edit/generic_string_field",
       locals: partial_locals %>

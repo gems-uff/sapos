@@ -5,11 +5,12 @@
   options = active_scaffold_input_options(column, scope, :object => field.object)
   options[:required] = configuration["required"] ? true : false
   file_id = "file_#{SecureRandom.random_number(1_000_000)}"
+  options[:class] = filled_class
 %>
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
     <dt>
-      <%= field.label :file, form_field.name %>
+      <%= field.label :file, form_field.name, for: options[:id] %>
       <% if form_field.description.present? %>
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
@@ -21,6 +22,7 @@
 
 <script>
   $(document).ready(function() {
+    $(`#<%= file_id %> .carrierwave_controls input`).addClass("<%= filled_class %>");
 
     function validateFile(file) {
       if (!file) {
@@ -46,8 +48,11 @@
       return "" ;
     }
 
-    window.customFormValidations.push(function() {
+    window.customFormValidations["<%= filled_class %>"].push(function() {
       let input = $(`#<%= file_id %> input[type="file"]`).get(0)
+      if (input.disabled) {
+        return true;
+      }
       error_msg = validateFile(input.files[0]);
       input.setCustomValidity(error_msg);
       if (error_msg != "") {

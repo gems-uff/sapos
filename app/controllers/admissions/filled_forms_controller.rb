@@ -20,7 +20,7 @@ class Admissions::FilledFormsController < ApplicationController
   protected
     def self.filled_form_params_definition
       [
-        :id, :is_filled, :form_template_id,
+        :id, :is_filled, :form_template_id, :disable_submission,
         fields_attributes: [
           :id, :form_field_id, :value, :_destroy, :remove_file, :file,
           list: [],

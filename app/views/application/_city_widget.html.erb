@@ -45,7 +45,7 @@
   )
   states_path = states_country_path("*")
 
-  select_city_id = "widget_" + options[:id]
+  select_city_id = options[:id]
   city_name = options[:name]
   city_options = options_for_select(
     [[t("helpers.city_widget.select_city"), ""]] +

@@ -12,6 +12,7 @@ pt-BR:
         modes:
           shared: "Compartilhado"
           consolidation: "Consolidação"
+          candidate: "Candidate"
 
     models:
       admissions/admission_phase_result:

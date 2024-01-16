@@ -34,9 +34,16 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
 
   def update(creating: false)
     prepare_edit_update_application(creating: creating)
-    @admission_application.assign_attributes(admission_application_params)
-    @admission_application.filled_form.sync_fields_after(@admission_application)
     was_filled = @admission_application.filled_form.is_filled
+    @admission_application.assign_form(
+      admission_application_params,
+      has_letter_forms: false,
+      has_phases: @admission_application.admission_phase.present?,
+      has_rankings: true,
+      can_edit_override: false,
+      check_candidate_permission: true,
+      committee_permission_user: nil
+    )
     if !was_filled
       @admission_application.submission_time = Time.current
     end
@@ -160,7 +167,7 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
     end
 
     def check_if_process_is_open_to_edit
-      if !@admission_application.candidate_can_edit?
+      if @admission_application.candidate_can_edit.blank?
         redirect_to admission_apply_path(
           admission_id: @admission_process.simple_id,
           id: @admission_application.token
@@ -183,6 +190,11 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
         letter_requests_attributes: [
           :id, :email, :name, :telephone,
           :_destroy
+        ],
+        results_attributes: [
+          :id, :mode, :admission_phase_id,
+          filled_form_attributes:
+            Admissions::FilledFormsController.filled_form_params_definition,
         ]
       )
     end

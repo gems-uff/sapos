@@ -1,4 +1,7 @@
-<li class="form-element">
+<%
+  field_id = "checkbox_#{SecureRandom.random_number(1_000_000)}"
+%>
+<li class="form-element" id="<%= field_id %>">
   <dl>
     <dt>
       <%= field.label :value, form_field.name %>
@@ -6,6 +9,12 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd> <%= field.check_box :value %> </dd>
+    <dd> <%= field.check_box :value, class: filled_class %> </dd>
   </dl>
 </li>
+
+<script>
+$(document).ready(function() {
+  $(`#<%= field_id %> input[type=hidden]`).addClass("<%= filled_class %>");
+})
+</script>

@@ -4,6 +4,7 @@ function carrierwave_webcam(div) {
   let basename = $(div).data("basename");
   let column = $(div).data("column");
   let remove_label = $(div).data("remove-label");
+  let input_class = $(div).data("input-class") || "";
   let input_name = `${basename}[${column}]`;
   let alt_name =`${basename}[${column}_]`;
   let remove_name = `${basename}[remove_${column}]`
@@ -19,11 +20,11 @@ function carrierwave_webcam(div) {
     > Arquivo </a>
     <div style="display:none; margin-left: 2px;" id="${id}_camera_inputs">
       <input
-        autocomplete="off" class="photo-input text-input"
+        autocomplete="off" class="photo-input text-input ${input_class}"
         id="${id}_" name="${alt_name}[base64_contents]"
         type="hidden">
       <input
-        autocomplete="off" class="photo-input text-input"
+        autocomplete="off" class="photo-input text-input ${input_class}"
         id="${id}_filename" name="${alt_name}[filename]"
         type="hidden" value="camera.jpg">
       <div

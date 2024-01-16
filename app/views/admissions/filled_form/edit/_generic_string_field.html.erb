@@ -10,7 +10,7 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd> <%= field.text_field :value, class: "text-input",
+    <dd> <%= field.text_field :value, class: ["text-input", filled_class],
              placeholder: configuration["placeholder"], **options %> </dd>
   </dl>
 </li>

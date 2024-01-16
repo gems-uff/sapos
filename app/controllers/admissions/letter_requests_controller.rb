@@ -9,7 +9,7 @@ class Admissions::LetterRequestsController < ApplicationController
   active_scaffold "Admissions::LetterRequest" do |config|
     config.columns.add :status
     columns = [
-      :admission_application, :name, :email, :telephone, :status, :filled_form
+      :access_token, :admission_application, :name, :email, :telephone, :status, :filled_form
     ]
 
     config.list.columns = columns

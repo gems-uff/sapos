@@ -12,6 +12,7 @@ pt-BR:
         modes:
           member: "Individual"
           shared: "Compartilhado"
+          candidate: "Candidato"
         status: "Situação"
         statuses:
           pendent: "Pendente"

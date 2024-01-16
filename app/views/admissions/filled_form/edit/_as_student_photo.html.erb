@@ -7,12 +7,13 @@
   basename = options[:name][..-("file".size + 3)]
   data_url = field.object.file.file.present? ? download_url(field.object.file.medium_hash) : ""
   file_id = "file_#{SecureRandom.random_number(1_000_000)}"
+  options[:class] = filled_class
 %>
 
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
     <dt>
-      <%= field.label :value, form_field.name %>
+      <%= field.label :value, form_field.name, for: options[:id] %>
       <% if form_field.description.present? %>
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
@@ -21,6 +22,7 @@
       <div class="webcam-photo" data-id="<%= options[:id] %>"
          data-url="<%= data_url %>" data-basename="<%= basename %>"
          data-column="file" data-remove-label="Remover foto"
+         data-input-class="<%= filled_class %>"
       >
         <%= active_scaffold_input_carrierwave_fix(column, options) %>
       </div>
@@ -30,6 +32,7 @@
 
 <script>
 $(document).ready(function() {
+  $(`#<%= file_id %> .carrierwave_controls input`).addClass("<%= filled_class %>");
   carrierwave_webcam(".webcam-photo")
 
   function validateFile(file) {
@@ -57,8 +60,11 @@ $(document).ready(function() {
     return "" ;
   }
 
-  window.customFormValidations.push(function() {
+  window.customFormValidations["<%= filled_class %>"].push(function() {
     let input = $(`#<%= file_id %> input[type="file"]`).get(0)
+    if (input.disabled) {
+      return true;
+    }
     error_msg = validateFile(input.files[0]);
     input.setCustomValidity(error_msg);
     if (error_msg != "") {

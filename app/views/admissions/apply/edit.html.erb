@@ -1,3 +1,12 @@
+<%
+  record = @admission_application
+  no_phase = @admission_application.admission_phase_id.nil?
+  show_groups = !no_phase
+  can_edit = @admission_application.candidate_can_edit
+  can_edit_main = no_phase || @admission_application.admission_phase.candidate_can_edit
+  form_id = "apply_form"
+%>
+
 <div class="content">
   <div class="active-scaffold default-theme">
     <div class="active-scaffold-header">
@@ -7,6 +16,7 @@
       <%= form_with model: @admission_application,
           scope: :record,
           url: @submission_url,
+          id: form_id,
           method: @submission_method,
           class: "as_form create",
           authenticity_token: true,
@@ -35,14 +45,25 @@
             </div>
           <% end %>
         </div>
-        <%= render partial: "admissions/filled_form/edit/form_with_letters", locals: {
+        <%= render partial: "admissions/filled_form/candidate_forms", locals: {
           form: form,
           admission_process: @admission_process,
           admission_application: @admission_application,
           show_name: @show_name,
-          show_email: @show_email } %>
+          show_email: @show_email,
+          show_groups:,
+          can_edit_main:,
+          main_visible: true,
+          show_letter_forms: false,
+          show_phases: show_groups,
+          show_rankings: true,
+          can_edit_override: false,
+          check_candidate_permission: true,
+          committee_permission_user: nil,
+          can_disable_submission: false,
+        } %>
         <p class="form-footer">
-          <%= form.submit (t "admissions.apply.edit.submit"), id: "submit" %>
+          <%= form.submit t("admissions.apply.edit.#{can_edit[0]}", **can_edit[1]), id: "submit" %>
         </p>
       <% end %>
     </div>
@@ -53,10 +74,17 @@
   $(document).ready(function() {
     $("#submit").click(function(e){
       window.onbeforeunload = null;
-      for (let validation of window.customFormValidations) {
-        if (!validation()) {
-          e.preventDefault();
-          return false;
+      for (let filled_id_def of $("#<%= form_id %> .filled-form-html-id")) {
+        let filled_id = $(filled_id_def).text().trim()
+        for (let validation of window.customFormValidations[filled_id]) {
+          try {
+            if (!validation()) {
+              e.preventDefault();
+              return false;
+            }
+          } catch (error) {
+            console.error(error)
+          }
         }
       }
     })

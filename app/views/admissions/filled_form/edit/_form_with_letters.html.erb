@@ -17,9 +17,8 @@
   <% end %>
   <%= form.fields_for :filled_form do |filled_form| %>
     <%= render partial: "admissions/filled_form/edit/filled_form_template", locals: {
-      form: form,
       form_template: admission_process.form_template,
-      filled_form: filled_form } %>
+      form:, filled_form:, can_disable_submission: } %>
   <% end %>
   <% if admission_process.has_letters %>
     <li class="sub-form">

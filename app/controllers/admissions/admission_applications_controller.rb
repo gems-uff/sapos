@@ -144,6 +144,11 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     ]
     config.actions.exclude :deleted_records, :create
   end
+  record_select(
+    per_page: 10, search_on: [:name, :token],
+    order_by: "submission_time desc", full_text_search: true,
+    model: "Admissions::AdmissionApplication"
+  )
 
   def update_table_config
     if current_user
@@ -304,36 +309,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     raise CanCan::AccessDenied.new if cannot? :undo_consolidation, Admissions::AdmissionApplication
     process_action_link_action(:undo_consolidation) do |record|
       next if undo_consolidation_ignore?(record)
-      eop = Admissions::AdmissionApplication::END_OF_PHASE_STATUSES
-      if eop.include?(record.status)
-        set_phase_id = record.admission_phase_id
-      else
-        phases = [nil] + record.admission_process.phases.order(:order).map do |p|
-          p.admission_phase.id
-        end
-        index = phases.find_index(record.admission_phase_id)
-        set_phase_id = phases[index - 1]
-      end
-      record.pendencies.where(
-        status: Admissions::AdmissionPendency::PENDENT,
-        admission_phase_id: record.admission_phase_id
-      ).delete_all
-      record.update!(
-        admission_phase_id: set_phase_id,
-        status: nil,
-        status_message: nil,
-      )
-      if set_phase_id.present?
-        record.results.where(
-          mode: Admissions::AdmissionPhaseResult::CONSOLIDATION,
-          admission_phase_id: set_phase_id
-        ).delete_all
-        prev_phase = Admissions::AdmissionPhase.find(set_phase_id)
-        prev_phase.update_pendencies
-        prev_phase_name = prev_phase.name
-      else
-        prev_phase_name = "Candidatura"
-      end
+      prev_phase_name = record.undo_consolidation
       self.successful = true
       flash[:info] = I18n.t("active_scaffold.admissions/admission_application.undo_consolidation.success", name: prev_phase_name)
     end
@@ -583,40 +559,26 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       params.delete :record_student if params.include? :record_student
     end
 
+    def do_edit
+      @record = find_if_allowed(params[:id], :update)
+      @override = params[:override]
+    ensure
+      params.delete :override if params.include? :override
+    end
+
     def before_update_save(record)
-      record.filled_form.prepare_missing_fields
-      phase = record.admission_phase
-      record.assign_attributes(admission_application_params)
-      record.letter_requests.each do |letter_request|
-        letter_request.filled_form.sync_fields_after(letter_request)
-      end
-      if phase.present?
-        phase_forms = phase.prepare_application_forms(record, current_user, false)
-        phase_forms.each do |phase_form|
-          phase_form[:was_filled] = phase_form[:object].filled_form.is_filled
-          phase_form[:object].filled_form.is_filled = true
-        end
-      else
-        phase_forms = []
-      end
-      record.filled_form.sync_fields_after(record)
-      was_filled = record.filled_form.is_filled
-      record.filled_form.is_filled = true
-      if record.valid?
-        phase_forms.each do |phase_form|
-          pendency_success = phase_form[:pendency_success]
-          if pendency_success.present?
-            Admissions::AdmissionPendency.where(pendency_success).update_all(
-              status: Admissions::AdmissionPendency::OK
-            )
-          end
-        end
-      else
-        record.filled_form.is_filled = was_filled
-        phase_forms.each do |phase_form|
-          phase_form[:object].filled_form.is_filled = phase_form[:was_filled]
-        end
-      end
+      can_edit_override = params[:can_edit_override]
+      record.assign_form(
+        admission_application_params,
+        has_letter_forms: true,
+        has_phases: record.admission_phase.present?,
+        has_rankings: true,
+        can_edit_override:,
+        check_candidate_permission: false,
+        committee_permission_user: can_edit_override ? nil : current_user
+      )
+    ensure
+      params.delete :can_edit_override if params.include? :can_edit_override
     end
 
     def admission_application_params
@@ -638,6 +600,10 @@ class Admissions::AdmissionApplicationsController < ApplicationController
         evaluations_attributes: [
           :id, :user_id, :admission_phase_id,
           filled_form_attributes:
+            Admissions::FilledFormsController.filled_form_params_definition,
+        ],
+        rankings_attributes: [
+          :id, filled_form_attributes:
             Admissions::FilledFormsController.filled_form_params_definition,
         ]
       )

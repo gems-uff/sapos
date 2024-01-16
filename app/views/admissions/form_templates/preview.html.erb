@@ -1,3 +1,4 @@
+<% form_id = element_form_id(action: "preview") %>
 <div class="active-scaffold">
   <div class="active-scaffold-header">
     <h2><%= t "active_scaffold.admissions/form_template.preview.title" %></h2>
@@ -6,7 +7,7 @@
     <%= form_with model: @filled_form,
           scope: :record,
           method: :post,
-          id: element_form_id(action: "preview"),
+          id: form_id,
           data: { loading: true },
           url: preview_form_template_path(@form_template),
           class: "as_form preview",
@@ -41,7 +42,8 @@
         <%= render partial: "admissions/filled_form/edit/filled_form_template", locals: {
             form: form,
             form_template: @form_template,
-            filled_form: form } %>
+            filled_form: form,
+            can_disable_submission: true } %>
       </ol>
       <p class="form-footer">
         <%= form.submit t("active_scaffold.admissions/form_template.preview.submit"), id: "submit", class: "submit" %>
@@ -57,10 +59,17 @@
   $(document).ready(function() {
     $("#submit").click(function(e){
       window.onbeforeunload = null;
-      for (let validation of window.customFormValidations) {
-        if (!validation()) {
-          e.preventDefault();
-          return false;
+      for (let filled_id_def of $("#<%= form_id %> .filled-form-html-id")) {
+        let filled_id = $(filled_id_def).text().trim()
+        for (let validation of window.customFormValidations[filled_id]) {
+          try {
+            if (!validation()) {
+              e.preventDefault();
+              return false;
+            }
+          } catch (error) {
+            console.error(error)
+          }
         }
       }
     })

@@ -66,3 +66,8 @@ tr.form-field-configuration td dt label {
     max-width: 235px;
   }
 }
+
+.disabled-links a {
+  color: grey;
+  cursor: not-allowed;
+}

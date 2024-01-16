@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_13_052547) do
+ActiveRecord::Schema[7.0].define(version: 2024_01_13_145707) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -123,7 +123,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_13_052547) do
     t.datetime "updated_at", null: false
     t.integer "approval_condition_id"
     t.integer "keep_in_phase_condition_id"
+    t.integer "candidate_form_id"
+    t.boolean "candidate_can_edit"
+    t.boolean "candidate_can_see_member"
+    t.boolean "candidate_can_see_shared"
+    t.boolean "candidate_can_see_consolidation"
     t.index "\"ranking_config_id\"", name: "index_admission_phases_on_ranking_config_id"
+    t.index ["candidate_form_id"], name: "index_admission_phases_on_candidate_form_id"
     t.index ["consolidation_form_id"], name: "index_admission_phases_on_consolidation_form_id"
     t.index ["keep_in_phase_condition_id"], name: "index_admission_phases_on_keep_in_phase_condition_id"
     t.index ["member_form_id"], name: "index_admission_phases_on_member_form_id"
@@ -751,6 +757,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_13_052547) do
     t.integer "form_condition_id"
     t.string "behavior_on_invalid_condition", default: "Erro - apenas em seletores"
     t.string "behavior_on_invalid_ranking", default: "Erro"
+    t.boolean "candidate_can_see"
     t.index ["form_condition_id"], name: "index_ranking_configs_on_form_condition_id"
     t.index ["form_template_id"], name: "index_ranking_configs_on_form_template_id"
     t.index ["machine_field_id"], name: "index_ranking_configs_on_machine_field_id"

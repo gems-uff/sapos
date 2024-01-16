@@ -5,19 +5,35 @@
     configuration: configuration,
     values: form_field.get_values("values"),
     statuses: form_field.get_values("statuses"),
+    filled_class: filled_class
   }
 %>
-<div id="<%= sid %>">
-  <%= field.fields_for :scholarities do |scholarity| %>
-    <%= render partial: "admissions/filled_form/edit/scholarity_item",
-      locals: local_options.merge({ f: scholarity }) %>
-  <% end %>
+<div id="<%= sid %>-links" class="<%= filled_class %>-link">
+  <div id="<%= sid %>">
+    <%= field.fields_for :scholarities do |scholarity| %>
+      <%= render partial: "admissions/filled_form/edit/scholarity_item",
+        locals: local_options.merge({ f: scholarity }) %>
+    <% end %>
+  </div>
+  <div class="links">
+    <%= link_to_add_association (t "admissions.apply.edit.scholarity.add"),
+        field, :scholarities, partial: "admissions/filled_form/edit/scholarity_item",
+        render_options: { locals: local_options },
+        'data-association-insertion-method' => 'append',
+        'data-association-insertion-node' => "##{sid}",
+        class: 'add-scholarity' %>
+  </div>
 </div>
-<div class="links">
-  <%= link_to_add_association (t "admissions.apply.edit.scholarity.add"),
-      field, :scholarities, partial: "admissions/filled_form/edit/scholarity_item",
-      render_options: { locals: local_options },
-      'data-association-insertion-method' => 'append',
-      'data-association-insertion-node' => "##{sid}",
-      class: 'add-scholarity' %>
-</div>
+
+<script>
+  $(`#<%= sid %> > input[type=hidden]`).addClass("<%= filled_class %>");
+  $(document).ready(function() {
+    let check_disabled = function(event) {
+      if ($("#<%= sid %>-links").hasClass("disabled-links")) {
+        event.preventDefault();
+      }
+    };
+    $("#<%= sid %>-links").on("cocoon:before-insert", check_disabled);
+    $("#<%= sid %>-links").on("cocoon:before-remove", check_disabled);
+  })
+</script>

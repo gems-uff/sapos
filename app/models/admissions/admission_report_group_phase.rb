@@ -8,7 +8,8 @@ class Admissions::AdmissionReportGroupPhase < Admissions::AdmissionReportGroupBa
     columns = self.group_columns(self.flat_columns({}))
     mode_names = {
       shared: Admissions::AdmissionPhaseResult::SHARED,
-      consolidation: Admissions::AdmissionPhaseResult::CONSOLIDATION
+      consolidation: Admissions::AdmissionPhaseResult::CONSOLIDATION,
+      candidate: Admissions::AdmissionPhaseResult::CANDIDATE
     }
     columns.each do |phase_columns|
       phase_columns[:columns].each do |mode_columns|
@@ -122,6 +123,7 @@ class Admissions::AdmissionReportGroupPhase < Admissions::AdmissionReportGroupBa
         phase_num = @extra[:reverse] ? (size - index) : (index + 1)
         forms = [[phase.shared_form, :shared]]
         forms << [phase.member_form, :member] if !@extra[:hide_committee]
+        forms << [phase.candidate_form, :candidate]
         forms << [phase.consolidation_form, :consolidation]
         forms = forms.reverse if @extra[:reverse]
         forms.each do |form, mode|

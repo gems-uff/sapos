@@ -44,16 +44,13 @@
             } %>
           </ol>
           <p class="links">
-            <% if @admission_application.candidate_can_edit? %>
+            <% can_edit = @admission_application.candidate_can_edit %>
+            <% if can_edit.present? %>
               <a href="<%= edit_admission_apply_path(
                   admission_id: @admission_process.simple_id,
                   id: @admission_application.token
                 ) %>">
-                <% if @admission_application.filled_form.is_filled %>
-                  <%= t "admissions.apply.show.edit" %>
-                <% else %>
-                  <%= t "admissions.apply.show.continue" %>
-                <% end %>
+                <%= t("admissions.apply.show.#{can_edit[0]}", **can_edit[1]) %>
               </a>
             <% end %>
           </p>

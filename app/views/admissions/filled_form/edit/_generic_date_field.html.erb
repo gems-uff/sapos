@@ -15,7 +15,8 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd id="<%= field_id %>"> <%= field.text_field :value, class: "text-input",
+    <dd id="<%= field_id %>"> <%= field.text_field :value,
+             class: ["text-input", filled_class],
              placeholder: configuration["placeholder"], **options %> </dd>
   </dl>
 </li>
@@ -37,8 +38,11 @@
       return "" ;
     }
 
-    window.customFormValidations.push(function() {
-      let input = $(`#<%= field_id %> input`).get(0)
+    window.customFormValidations["<%= filled_class %>"].push(function() {
+      let input = $(`#<%= field_id %> input`).get(0);
+      if (input.disabled) {
+        return true;
+      }
       error_msg = validateDateField($(input).val());
       input.setCustomValidity(error_msg);
       if (error_msg != "") {

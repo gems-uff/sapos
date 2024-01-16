@@ -9,7 +9,7 @@
     class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
     <dt>
-      <%= field.label :list, form_field.name %>
+      <label><%= form_field.name %></label>
       <% if form_field.description.present? %>
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
@@ -18,7 +18,7 @@
       <%= field.collection_check_boxes :list, values, :last, :first do |b| %>
         <div class="form-template-checkbox-list <%= "vertical-style" if configuration["vertical_layout"].present? %>">
           <%= b.label do %>
-            <%= b.check_box %> <%= b.text %>
+            <%= b.check_box class: filled_class %> <%= b.text %>
           <% end %>
         </div>
       <% end %>
@@ -26,9 +26,11 @@
   </dl>
 </li>
 
-<% if configuration["maxselection"].to_i > 0 %>
-  <script>
-  $(document).ready(function() {
+
+<script>
+$(document).ready(function() {
+  $(`#<%= collection_id %> input[type=hidden]`).addClass("<%= filled_class %>");
+  <% if configuration["maxselection"].to_i > 0 %>
     let check_count = function() {
       var checkboxes = $('#<%= collection_id %> input:checkbox:checked');
       if (checkboxes.length >= <%= configuration["maxselection"].to_i %>) {
@@ -45,7 +47,11 @@
     check_count();
 
     <% if configuration["minselection"].to_i >= 1 %>
-      window.customFormValidations.push(function() {
+      window.customFormValidations["<%= filled_class %>"].push(function() {
+        let hidden_input = $("#<%= collection_id %> input[type=hidden]").get(0)
+        if (hidden_input.disabled) {
+          return true
+        }
         let checkboxes = $('#<%= collection_id %> input:checkbox:checked');
         let input = $("#<%= collection_id %> input").get(1)
         if (checkboxes.length < <%= configuration["minselection"].to_i %>) {
@@ -60,6 +66,6 @@
         return true;
       })
     <% end %>
-  })
-  </script>
-<% end %>
+  <% end %>
+})
+</script>

@@ -149,6 +149,7 @@ class EnrollmentsController < ApplicationController
   record_select(
     per_page: 10,
     search_on: [:enrollment_number],
+    include: ["student"],
     order_by: "enrollment_number",
     full_text_search: true
   )

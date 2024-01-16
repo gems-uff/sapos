@@ -41,7 +41,9 @@ pt-BR:
         data: "Dados"
         letters: "Cartas de Recomendação"
         edit: "Modificar inscrição"
-        continue: "Continuar inscrição"
+        new: "Continuar inscrição"
+        new_phase: "Preencher formulário de %{phase}"
+        edit_phase: "Editar formulário de %{phase}"
 
       edit:
         title: "Inscrição"
@@ -55,6 +57,10 @@ pt-BR:
         scholarity:
           add: Adicionar formação
           remove: Remover formação
+        edit: "Modificar inscrição"
+        new: "Enviar inscrição"
+        new_phase: "Enviar %{phase}"
+        edit_phase: "Modificar %{phase}"
 
       update:
         new_notice: "Inscrição realizada com sucesso"

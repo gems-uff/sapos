@@ -2,7 +2,7 @@
   form_field = field.object.form_field
   values = form_field.get_values_map("values")
   options = {}
-  other_options = {}
+  other_options = { class: filled_class }
   if configuration["default_check"]
     if values[configuration["default"]].present?
       options[:selected] = configuration["default"]

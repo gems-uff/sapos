@@ -46,7 +46,7 @@ class CustomVariable < ApplicationRecord
 
   def self.identity_issuing_country
     config = CustomVariable.find_by_variable(:identity_issuing_country)
-    Country.find_by_name(config.blank? ? "Brasil" : config.value)
+    config.blank? ? "" : config.value
   end
 
   def self.class_schedule_text

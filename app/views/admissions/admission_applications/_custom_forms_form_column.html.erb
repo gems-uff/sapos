@@ -1,5 +1,5 @@
 <%
-  if params[:override]
+  if @override
     return "Acesso inválido" if !controller.override_authorized?(record)
   else
     return "Acesso inválido" if !controller.update_authorized?(record)
@@ -16,7 +16,7 @@
   show_email = admission_process.form_template.fields
     .where(sync: Admissions::FormField::SYNC_EMAIL).first.blank?
 
-  can_edit_override = can?(:override, record) && admission_process.staff_can_edit && params[:override]
+  can_edit_override = can?(:override, record) && admission_process.staff_can_edit && @override
   can_edit_main = can_edit_override || current_phase.try(:can_edit_candidate)
   students = record.students
   student_map = {
@@ -62,103 +62,28 @@
   <% end %>
 <% end %>
 </ol>
+<input type="hidden" name="can_edit_override" value="<%= 1 if can_edit_override %>"/>
+
 <%= fields_for :record, record, multipart: true do |form| %>
   <div id="<%= subid %>">
-    <div>
-      <h5> Candidatura <a data-show="Mostrar" data-hide="Ocultar"
-          data-toggable="<%= subid %>-" style=""
-          class="as-js-button visibility-toggle" href="#"><%= visible ? "Ocultar" : "Mostrar" %></a></h5>
-      <div id="<%= subid %>-" style="<%= "display:none;" if !visible %>" >
-        <% if can_edit_main %>
-          <%= render partial: "admissions/filled_form/edit/form_with_letters", locals: {
-            form: form,
-            admission_process: admission_process,
-            admission_application: record,
-            show_name: show_name,
-            show_email: show_email } %>
-        <% else %>
-          <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
-                        form_template: record.filled_form.form_template,
-                        filled_form: record.filled_form} %>
-        <% end %>
-      </div>
-    </div>
-    <% record.letter_requests.each do |letter_request| %>
-      <div>
-        <h5> Carta de <%= letter_request.name %> <a data-show="Mostrar" data-hide="Ocultar"
-            data-toggable="<%= subid %>-letter-<%= letter_request.id %>" style=""
-            class="as-js-button visibility-toggle" href="#"><%= visible ? "Ocultar" : "Mostrar" %></a></h5>
-        <div id="<%= subid %>-letter-<%= letter_request.id %>" style="<%= "display:none;" if !visible %>" >
-          <% if can_edit_main %>
-            <ol class="form filled-form">
-              <%= form.fields_for :letter_requests, [letter_request] do |letter_form| %>
-                <%= letter_form.fields_for :filled_form do |filled_form| %>
-                  <%= render partial: "admissions/filled_form/edit/filled_form_template", locals: {
-                    form: form,
-                    form_template: admission_process.letter_template,
-                    filled_form: filled_form } %>
-                <% end %>
-              <% end %>
-            </ol>
-          <% else %>
-            <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
-                          form_template: letter_request.filled_form.form_template,
-                          filled_form: letter_request.filled_form} %>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-    <% if current_phase.present? %>
-      <% admission_process.phases.order(:order).each do |p| %>
-        <%
-          phase = p.admission_phase
-          latest_available_phase = phase.id == current_phase.id
-          phase_visible = latest_available_phase
-          end_status = Admissions::AdmissionApplication::END_OF_PHASE_STATUSES
-          during_latest_phase = (
-            latest_available_phase &&
-            !end_status.include?(record.status)
-          )
-          can_edit_phase = can_edit_override || during_latest_phase
-          phase_subid = "#{subid}-#{phase.id}"
-          phase_forms = phase.prepare_application_forms(
-            record, current_user, !during_latest_phase
-          )
-        %>
-        <% phase_forms.each do |phase_form| %>
-          <div>
-            <h5> <%= phase.name %> (<%= phase_form[:name] %>) <a data-show="Mostrar" data-hide="Ocultar"
-              data-toggable="<%= "#{phase_subid}-#{phase_form[:name]}" %>" style=""
-              class="as-js-button visibility-toggle" href="#"><%= phase_visible ? "Ocultar" : "Mostrar" %></a></h5>
-            <div id="<%= "#{phase_subid}-#{phase_form[:name]}" %>" style="<%= "display:none;" if !phase_visible %>" >
-              <% if can_edit_phase %>
-                <ol class="form filled-form">
-                  <%= form.fields_for phase_form[:field], [phase_form[:object]] do |phase_form_object| %>
-                    <% phase_form[:hidden].each do |hidden| %>
-                      <%= phase_form_object.hidden_field hidden %>
-                    <% end %>
-                    <%= phase_form_object.fields_for :filled_form do |filled_form| %>
-                      <%= filled_form.hidden_field :id %>
-                      <%= filled_form.hidden_field :form_template_id %>
-                      <%= filled_form.hidden_field :is_filled %>
-                      <%= render partial: "admissions/filled_form/edit/filled_form_template", locals: {
-                        form: form,
-                        form_template: phase_form[:form_template],
-                        filled_form: filled_form } %>
-                    <% end %>
-                  <% end %>
-                </ol>
-              <% else %>
-                <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
-                          form_template: phase_form[:form_template],
-                          filled_form: phase_form[:object].filled_form} %>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-        <% break if latest_available_phase %>
-      <% end%>
-    <% end%>
+    <%= render partial: "admissions/filled_form/candidate_forms", locals: {
+      subid:,
+      form: form,
+      admission_process: admission_process,
+      admission_application: record,
+      show_name: show_name,
+      show_email: show_email,
+      show_groups: true,
+      can_edit_main:,
+      main_visible: visible,
+      show_letter_forms: true,
+      show_phases: current_phase.present?,
+      show_rankings: true,
+      can_edit_override:,
+      check_candidate_permission: false,
+      committee_permission_user: can_edit_override ? nil : current_user,
+      can_disable_submission: can_edit_override,
+    } %>
   </div>
 <% end%>
 
@@ -167,14 +92,17 @@
   $(document).ready(function() {
     $(`.submit`).click(function(e){
       window.onbeforeunload = null;
-      for (let validation of window.customFormValidations) {
-        try {
-          if (!validation()) {
-            e.preventDefault();
-            return false;
+      for (let filled_id_def of $("#<%= subid %> .filled-form-html-id")) {
+        let filled_id = $(filled_id_def).text().trim()
+        for (let validation of window.customFormValidations[filled_id]) {
+          try {
+            if (!validation()) {
+              e.preventDefault();
+              return false;
+            }
+          } catch (error) {
+            console.error(error)
           }
-        } catch (error) {
-          console.error(error)
         }
       }
     })

@@ -17,7 +17,11 @@ pt-BR:
         admission_phase_results: Resultados da fase
         admission_phase_evaluations: Avaliações do comitê
         admission_process_phases: Editais de seleção
-
+        candidate_form: "Formulário de candidato"
+        candidate_can_edit: "Candidato pode editar"
+        candidate_can_see_member: "Candidato pode ver preenchimento de formulário individual"
+        candidate_can_see_shared: "Candidato pode ver preenchimento de formulário compartilhado"
+        candidate_can_see_consolidation: "Candidato pode ver preenchimento de consolidação"
     models:
       admissions/admission_phase:
         one: "Fase"

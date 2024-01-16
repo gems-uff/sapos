@@ -1,4 +1,5 @@
 <%
+  can_disable_submission ||= false
   filled_hash = filled_form.object.fields.index_by(&:form_field_id)
   current_group = []
   groups = [[nil, nil, current_group]]
@@ -17,37 +18,60 @@
       current_group << filled_hash[field.id]
     end
   end
+  filled_class = "filledform-#{Random.rand(10000)}"
 %>
 <script>
   if (!window.customFormValidations) {
-    window.customFormValidations = []
+    window.customFormValidations = {}
   }
+  window.customFormValidations["<%= filled_class %>"] = []
 </script>
 
+<div style="display: none;" class="filled-form-html-id"><%= filled_class %></div>
+<% if can_disable_submission %>
+  <li class="form-element">
+    <dl>
+      <dt>
+        <%= filled_form.label :disable_submission, "Desabilitar formulário nesta submissão", style: "color:red;",
+          for: "#{filled_class}-toggle",
+          title: "Desabilita parte do formulário com suas validações e resolução de pendências. Desabilita apenas para esta submissão" %>
+      </dt>
+      <dd> <%= filled_form.check_box :disable_submission, checked: true, data: { filled_class: }, id: "#{filled_class}-toggle" %> </dd>
+    </dl>
+  </li>
+<% end %>
 <% groups.each do |gfield, gtag, fields| %>
   <% if gfield.present? %>
-    <% gid = "group-#{Random.rand(10000)}" %>
     <li class="sub-form">
-      <h5>
-        <%= gfield.name %>
-        <a data-show="Mostrar" data-hide="Ocultar"
-        data-toggable="<%= gid %>" style=""
-        class="as-js-button visibility-toggle" href="#">Ocultar</a>
-      </h5>
-      <%= content_tag(gtag, id: gid, class: "form") do %>
+      <%= toggable_area(gfield.name, group_tag: gtag, group_options: { class: "form" }) do %>
         <% if gfield.description.present? %>
           <span class="filled-form-description"><%= gfield.description %></span>
         <% end %>
         <%= filled_form.fields_for :fields, fields do |field| %>
           <%= render partial: "admissions/filled_form/edit/generic_field",
-                    locals: { field: field } %>
+                    locals: { field: field, filled_class: } %>
         <% end %>
       <% end %>
     </li>
   <% else %>
     <%= filled_form.fields_for :fields, fields do |field| %>
       <%= render partial: "admissions/filled_form/edit/generic_field",
-                locals: { field: field } %>
+                locals: { field: field, filled_class: } %>
     <% end %>
   <% end %>
 <% end %>
+
+<script>
+$(document).ready(function() {
+  <% if can_disable_submission %>
+    if ($(`#<%= filled_class %>-toggle`).is(":checked")) {
+      $(".<%= filled_class %>:input").prop('disabled', true);
+      $(".<%= filled_class %>-link").addClass("disabled-links")
+    }
+    $(`#<%= filled_class %>-toggle`).on("change", function(e){
+      $(".<%= filled_class %>:input").prop('disabled', this.checked);
+      $(".<%= filled_class %>-link").toggleClass("disabled-links")
+    })
+  <% end %>
+})
+</script>

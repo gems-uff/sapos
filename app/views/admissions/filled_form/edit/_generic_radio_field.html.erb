@@ -8,7 +8,7 @@
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
     <dt>
-      <%= field.label :value, form_field.name %>
+      <label><%= form_field.name %></label>
       <% if form_field.description.present? %>
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
@@ -17,7 +17,7 @@
       <%= field.collection_radio_buttons :value, values, :last, :first, options do |b| %>
         <div class="form-template-checkbox-list <%= "vertical-style" if configuration["vertical_layout"].present? %>">
           <%= b.label do %>
-            <%= b.radio_button %> <%= b.text %>
+            <%= b.radio_button class: filled_class %> <%= b.text %>
           <% end %>
         </div>
       <% end %>
@@ -28,15 +28,19 @@
 
 <script>
 $(document).ready(function() {
+  $(`#<%= field_id %> input[type=hidden]`).addClass("<%= filled_class %>")
   <% if configuration["required"] %>
-    window.customFormValidations.push(function() {
+    window.customFormValidations["<%= filled_class %>"].push(function() {
+      let input = $(`#<%= field_id %> input`).get(1);
+      if (input.disabled) {
+        return true;
+      }
       let error_msg = "";
       if (!$(`#<%= field_id %> input:checked`).get(0)) {
         error_msg = `<%= form_field.name %> <%= I18n.t(
           "activerecord.errors.models.admissions/filled_form_field.blank",
         ) %>`
       }
-      let input = $(`#<%= field_id %> input`).get(1);
       input.setCustomValidity(error_msg);
       if (error_msg != "") {
         input.reportValidity()

@@ -20,9 +20,10 @@ class Admissions::AdmissionPhaseResult < ActiveRecord::Base
 
   SHARED = record_i18n_attr("modes.shared")
   CONSOLIDATION = record_i18n_attr("modes.consolidation")
+  CANDIDATE = record_i18n_attr("modes.candidate")
 
   RESULT_MODES = [
-    SHARED, CONSOLIDATION
+    SHARED, CONSOLIDATION, CANDIDATE
   ]
 
   validates :mode, presence: true, inclusion: { in: RESULT_MODES }
@@ -30,10 +31,13 @@ class Admissions::AdmissionPhaseResult < ActiveRecord::Base
   after_initialize :initialize_filled_form
 
   def initialize_filled_form
-    if self.mode == SHARED
+    case self.mode
+    when SHARED
       template = self.admission_phase.shared_form
-    else
+    when CONSOLIDATION
       template = self.admission_phase.consolidation_form
+    when CANDIDATE
+      template = self.admission_phase.candidate_form
     end
     self.filled_form ||= Admissions::FilledForm.new(
       is_filled: false,

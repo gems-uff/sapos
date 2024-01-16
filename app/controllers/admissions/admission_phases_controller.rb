@@ -9,12 +9,21 @@ class Admissions::AdmissionPhasesController < ApplicationController
   active_scaffold "Admissions::AdmissionPhase" do |config|
     config.create.label = :create_admission_phase_label
 
-    columns = [
-      :name, :member_form, :shared_form, :consolidation_form, :can_edit_candidate,
+    list_columns = [
+      :name, :member_form, :shared_form, :consolidation_form, :candidate_form, :can_edit_candidate,
       :approval_condition, :keep_in_phase_condition, :admission_phase_committees,
     ]
 
-    config.columns = columns
+    form_columns = [
+      :name, :member_form, :shared_form, :consolidation_form, :candidate_form, :can_edit_candidate,
+      :candidate_can_edit, :candidate_can_see_member, :candidate_can_see_shared,
+      :candidate_can_see_consolidation,
+      :approval_condition, :keep_in_phase_condition, :admission_phase_committees,
+    ]
+
+    config.columns = list_columns
+    config.create.columns = form_columns
+    config.update.columns = form_columns
 
     config.columns[:member_form].form_ui = :record_select
     config.columns[:member_form].options[:params] = {
@@ -33,6 +42,12 @@ class Admissions::AdmissionPhasesController < ApplicationController
       template_type: Admissions::FormTemplate::CONSOLIDATION_FORM
     }
     config.columns[:consolidation_form].clear_link
+
+    config.columns[:candidate_form].form_ui = :record_select
+    config.columns[:candidate_form].options[:params] = {
+      template_type: Admissions::FormTemplate::ADMISSION_FORM
+    }
+    config.columns[:candidate_form].clear_link
 
     config.actions << :duplicate
     config.duplicate.link.label = "

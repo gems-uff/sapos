@@ -12,6 +12,6 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd> <%= field.text_area :value, class: "text-input", **options %> </dd>
+    <dd> <%= field.text_area :value, class: ["text-input", filled_class], **options %> </dd>
   </dl>
 </li>

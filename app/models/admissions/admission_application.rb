@@ -90,6 +90,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     allow_destroy: true
   accepts_nested_attributes_for :evaluations
   accepts_nested_attributes_for :results
+  accepts_nested_attributes_for :rankings
 
   validates :name, presence: true
   validates :email, presence: true
@@ -290,33 +291,59 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       return self.status if self.status_message.blank?
       return "#{self.status}: #{self.status_message}"
     end
-    return "Sem comitê válido" if self.pendencies.where(
-      admission_phase_id: self.admission_phase_id,
-      user_id: nil
-    ).first.present?
     pendencies = []
+    [
+      Admissions::AdmissionPendency::SHARED,
+      Admissions::AdmissionPendency::CANDIDATE,
+    ].each do |pendency_mode|
+      if self.pendencies.where(
+        admission_phase_id: self.admission_phase_id,
+        mode: pendency_mode,
+        status: Admissions::AdmissionPendency::PENDENT
+      ).first.present?
+        pendencies << pendency_mode
+      end
+    end
     if self.pendencies.where(
       admission_phase_id: self.admission_phase_id,
-      mode: Admissions::AdmissionPendency::SHARED,
-      status: Admissions::AdmissionPendency::PENDENT
+      user_id: nil,
+      mode: Admissions::AdmissionPendency::MEMBER
     ).first.present?
-      pendencies << "Compartilhado"
-    end
-    self.pendencies.where(
-      admission_phase_id: self.admission_phase_id,
-      mode: Admissions::AdmissionPendency::MEMBER,
-      status: Admissions::AdmissionPendency::PENDENT
-    ).each do |pendency|
-      pendencies << pendency.user.name
+      pendencies << "Sem comitê válido"
+    else
+      self.pendencies.where(
+        admission_phase_id: self.admission_phase_id,
+        mode: Admissions::AdmissionPendency::MEMBER,
+        status: Admissions::AdmissionPendency::PENDENT
+      ).each do |pendency|
+        pendencies << pendency.user.name
+      end
     end
     return "Pendente: #{pendencies.join(", ")}" if pendencies.present?
     return "Pendente" if self.admission_phase_id.nil? && !self.filled_form.is_filled
     "Pronto para consolidação"
   end
 
-  def candidate_can_edit?
-    return self.admission_process.is_open? if !self.filled_form.is_filled
-    self.admission_process.is_open_to_edit?
+  def candidate_can_edit
+    if !self.filled_form.is_filled
+      return nil if !self.admission_process.is_open?
+      return [:new, {}]
+    end
+    candidate_form = self.admission_phase.try(:candidate_form)
+    if candidate_form.present?
+      existing = self.results.where(
+        admission_phase_id: self.admission_phase_id,
+        mode: Admissions::AdmissionPhaseResult::CANDIDATE
+      ).first
+      if existing.blank? || !existing.filled_form.is_filled
+        return [:new_phase, phase: self.phase_name]
+      else
+        return [:edit_phase, phase: self.phase_name]
+      end
+    end
+    return [:edit, {}] if self.admission_process.is_open_to_edit?
+    # ToDo: :edit if edit is enabled for candidate
+    nil
   end
 
   def students_by_cpf
@@ -351,6 +378,95 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     result[:cpf] = by_cpf if by_cpf.present?
     result[:email] = by_email if by_email.present?
     result
+  end
+
+  def assign_form(
+    params,
+    has_letter_forms: false,
+    has_phases: false,
+    has_rankings: false,
+    can_edit_override: false,
+    check_candidate_permission: false,
+    committee_permission_user: nil
+  )
+    self.assign_attributes(params)
+    all_forms = []
+    all_phase_forms = []
+    if self.filled_form.try(:disable_submission) != "1"
+      self.filled_form.prepare_missing_fields
+      self.filled_form.sync_fields_after(self)
+      all_forms << {
+        was_filled: self.filled_form.is_filled,
+        mode: :main,
+        object: self
+      }
+      self.filled_form.is_filled = true
+    end
+    if has_letter_forms
+      self.letter_requests.each do |letter_request|
+        if letter_request.filled_form.try(:disable_submission) != "1"
+          letter_request.filled_form.sync_fields_after(letter_request)
+          all_forms << {
+            was_filled: letter_request.filled_form.is_filled,
+            mode: :letter,
+            object: letter_request
+          }
+          letter_request.filled_form.is_filled = true
+        end
+      end
+    end
+    if has_phases
+      self.admission_process.phases.order(:order).each do |p|
+        phase = p.admission_phase
+        app_forms = phase.prepare_application_forms(
+          self,
+          can_edit_override:,
+          check_candidate_permission:,
+          committee_permission_user:
+        )
+        app_forms[:phase_forms].each do |phase_form|
+          # Do not solve pendency if form was not available to user
+          next if !phase_form[:can_edit_form]
+          # Do not solve pendency if it was not created by assign_attributes
+          next if phase_form[:from_build]
+          # Do not solve pendency if form submission was disabled
+          next if phase_form[:object].filled_form.try(:disable_submission) == "1"
+          phase_form[:was_filled] = phase_form[:object].filled_form.is_filled
+          phase_form[:object].filled_form.is_filled = true
+          all_phase_forms << phase_form
+          all_forms << phase_form
+        end
+        break if app_forms[:latest_available_phase]
+      end
+    end
+    if has_rankings
+      self.rankings.each do |ranking|
+        next if !ranking.filled_form.is_filled
+        next if !can_edit_override
+        next if ranking.filled_form.try(:disable_submission) == "1"
+        ranking.filled_form.prepare_missing_fields
+        all_forms << {
+          was_filled: ranking.filled_form.is_filled,
+          mode: :ranking,
+          object: ranking
+        }
+        ranking.filled_form.is_filled = true
+      end
+    end
+
+    if self.valid?
+      all_phase_forms.each do |phase_form|
+        pendency_success = phase_form[:pendency_success]
+        next if pendency_success.blank?
+        Admissions::AdmissionPendency.where(pendency_success).update_all(
+          status: Admissions::AdmissionPendency::OK
+        )
+      end
+    else
+      all_forms.each do |form|
+        form[:object].filled_form.is_filled = form[:was_filled]
+      end
+    end
   end
 
   def update_student(student, field_objects: nil, only_photo: false)
@@ -475,12 +591,51 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   end
 
+  def undo_consolidation
+    if END_OF_PHASE_STATUSES.include?(self.status)
+      set_phase_id = self.admission_phase_id
+    else
+      phases = [nil] + self.admission_process.phases.order(:order).map do |p|
+        p.admission_phase.id
+      end
+      index = phases.find_index(self.admission_phase_id)
+      set_phase_id = phases[index - 1]
+    end
+    self.pendencies.where(
+      status: Admissions::AdmissionPendency::PENDENT,
+      admission_phase_id: self.admission_phase_id
+    ).delete_all
+    self.update!(
+      admission_phase_id: set_phase_id,
+      status: nil,
+      status_message: nil,
+    )
+    if set_phase_id.present?
+      self.results.where(
+        mode: Admissions::AdmissionPhaseResult::CONSOLIDATION,
+        admission_phase_id: set_phase_id
+      ).delete_all
+      prev_phase = Admissions::AdmissionPhase.find(set_phase_id)
+      prev_phase.update_pendencies
+      prev_phase_name = prev_phase.name
+    else
+      prev_phase_name = "Candidatura"
+    end
+    prev_phase_name
+  end
+
   def phase_name
     self.admission_phase.name
   end
 
   def identifier
     self.token[..6]
+  end
+
+  def can_edit_itself
+    return true if self.admission_phase_id.nil?
+    return false if !self.admission_phase.candidate_can_edit
+    !END_OF_PHASE_STATUSES.include?(self.status)
   end
 
   private

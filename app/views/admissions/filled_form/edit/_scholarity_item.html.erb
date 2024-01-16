@@ -19,12 +19,18 @@
     field[:required] = configuration["scholarity_#{field[:name]}_required"]
     field[:label] = configuration["scholarity_#{field[:name]}_name"]
     field[:description] = configuration["scholarity_#{field[:name]}_description"]
-    field[:options] = { class: "scholarity-#{field[:name]} text-input"}
-    field[:options][:required] = field[:required]
+    field[:options] = {
+      class: ["scholarity-#{field[:name]}", "text-input", filled_class],
+      required: field[:required],
+      id: "#{sid}-#{field[:name]}"
+    }
     if field[:type] == :date
       dates << field
     else
-      field[:options][:size] = 30
+      if field[:type] == :select
+        field[:html_options] = field[:options]
+      end
+      field[:options] = field[:options].merge(size: 30)
     end
     field
   end
@@ -36,7 +42,7 @@
       <li class="form-element <%= "required" if field[:required] %>">
         <dl>
           <dt>
-            <%= f.label field[:name], field[:label] %>
+            <%= f.label field[:name], field[:label], for: field[:options][:id] %>
             <% if field[:description].present? %>
               <span class="filled-form-description">
                 <%= field[:description] %>
@@ -45,7 +51,7 @@
           </dt>
           <dd>
             <% if field[:type] == :select %>
-              <%= f.select field[:name], field[:values], field[:options] %>
+              <%= f.select field[:name], field[:values], field[:options], field[:html_options] %>
             <% elsif field[:type] == :text %>
               <%= f.text_field field[:name], field[:options] %>
             <% elsif field[:type] == :date %>
@@ -53,13 +59,15 @@
             <% elsif field[:type] == :location %>
               <div class="scholarity-location">
                 <%
-                  city_options = {size: 15, class: "text-input city-field"}
+                  city_options = {size: 15, class: ["text-input", "city-field", filled_class]}
                   city_options[:required] = "required" if field[:required]
-                  state_options = {size: 15, class: "text-input city-field"}
+                  city_options[:id] = "#{sid}-city"
+                  state_options = {size: 15, class: ["text-input", "city-field", filled_class]}
+                  state_options[:id] = field[:options][:id]
                   values = (f.object[field[:name]] || "").split(", ")
                   (2 - values.length).times { values << "" }
                 %>
-                <%= f.hidden_field field[:name], class: "hidden" %>
+                <%= f.hidden_field field[:name], class: ["hidden", filled_class] %>
                 <%= text_field_tag :state, values[1], placeholder: I18n.t(
                   "activerecord.attributes.admissions/form_field.field_types.city_fields.state"
                 ), **state_options %>
@@ -83,6 +91,7 @@
 <script>
 
 $(document).ready(function() {
+  $(`#<%= sid %> .remove-scholarity input[type=hidden]`).addClass("<%= filled_class %>");
   $(`#<%= sid %> .scholarity-location .city-field`).on("change", function() {
     let value = $(`#<%= sid %> .scholarity-location .city-field`)
       .map((i, el) => $(el).val()).toArray().reverse()
@@ -156,8 +165,11 @@ $(document).ready(function() {
       yearRange: '<%= first_year %>:<%= last_year %>'
     })
 
-    window.customFormValidations.push(function() {
+    window.customFormValidations["<%= filled_class %>"].push(function() {
       let input = $(`#<%= sid %> input.scholarity-<%= field[:name] %>`).get(0)
+      if (input.disabled) {
+        return true;
+      }
       let label = $("label[for='" + $(input).attr('id') + "']");
       error_msg = validateScholarityDateField(label.text(), $(input).val());
       input.setCustomValidity(error_msg);

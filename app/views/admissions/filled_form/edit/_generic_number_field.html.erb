@@ -1,7 +1,9 @@
 <%
-  options = {size: 30}
+  options = {
+    size: 30,
+    step: "any"
+  }
   options[:required] = "required" if configuration["required"]
-  options[:step] = "any"
 %>
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
@@ -11,7 +13,7 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd> <%= field.number_field :value, class: "text-input",
+    <dd> <%= field.number_field :value, class: ["text-input", filled_class],
              placeholder: configuration["placeholder"], **options %> </dd>
   </dl>
 </li>

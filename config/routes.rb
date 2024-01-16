@@ -309,6 +309,7 @@ Rails.application.routes.draw do
         post :map_student_form
         post :map_student_form_create_update
       end
+      record_select_routes
     end
 
     resources :form_templates do

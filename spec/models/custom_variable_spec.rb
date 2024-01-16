@@ -78,42 +78,19 @@ RSpec.describe CustomVariable, type: :model do
     end
 
     context "identity_issuing_country" do
-      it "should return nil when there is no variable defined and no country named Brasil" do
-        country = Country.find_by_name("Brasil")
-        country.delete unless country.nil?
-
+      it "should return '' when there is no variable defined" do
         config = CustomVariable.find_by_variable(:identity_issuing_country)
         config.delete unless config.nil?
 
-        expect(CustomVariable.identity_issuing_country).to eq(nil)
+        expect(CustomVariable.identity_issuing_country).to eq("")
       end
 
-      it "should return Brasil when there is no variable, but there is a country named Brasil" do
-        country = Country.find_by_name("Brasil")
-        country.delete unless country.nil?
-        @destroy_later << country = FactoryBot.create(:country, name: "Brasil")
-
+      it "should return 'Brasil' when it is defined to bla" do
         config = CustomVariable.find_by_variable(:identity_issuing_country)
         config.delete unless config.nil?
+        @destroy_later << CustomVariable.create(variable: :identity_issuing_country, value: "Brasil")
 
-        expect(CustomVariable.identity_issuing_country).to eq(country)
-      end
-
-      it "should return England it is defined to England" do
-        brasil = Country.find_by_name("Brasil")
-        brasil.delete unless brasil.nil?
-        @destroy_later << FactoryBot.create(:country, name: "Brasil")
-
-        england = Country.find_by_name("England")
-        england.delete unless england.nil?
-        @destroy_later << england = FactoryBot.create(:country, name: "England")
-
-        config = CustomVariable.find_by_variable(:identity_issuing_country)
-        config.delete unless config.nil?
-
-        @destroy_later << CustomVariable.create(variable: :identity_issuing_country, value: "England")
-
-        expect(CustomVariable.identity_issuing_country).to eq(england)
+        expect(CustomVariable.identity_issuing_country).to eq("Brasil")
       end
     end
 

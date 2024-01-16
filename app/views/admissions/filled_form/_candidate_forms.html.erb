@@ -1,0 +1,93 @@
+<%
+  record = admission_application
+  subid ||= "group_#{SecureRandom.random_number(1_000_000)}"
+
+%>
+<div>
+  <%= toggable_area("Candidatura", enabled: show_groups, visible: main_visible, id: "#{subid}-") do %>
+    <% if can_edit_main %>
+      <%= render partial: "admissions/filled_form/edit/form_with_letters", locals: {
+        form: form,
+        admission_process: admission_process,
+        admission_application: admission_application,
+        show_name: show_name,
+        show_email: show_email,
+        can_disable_submission: } %>
+    <% else %>
+      <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
+                    form_template: admission_application.filled_form.form_template,
+                    filled_form: admission_application.filled_form} %>
+    <% end %>
+  <% end %>
+</div>
+
+<% if show_letter_forms %>
+  <% admission_application.letter_requests.each do |letter_request| %>
+    <% letter_request.filled_form.prepare_missing_fields %>
+    <% letter_request.filled_form.sync_fields_before(letter_request) %>
+    <%= render partial: "admissions/filled_form/show_or_edit_filled_form", locals: {
+        form: form,
+        name: "Carta de #{letter_request.name}",
+        id: "#{subid}-letter-#{letter_request.id}",
+        visible: main_visible,
+        can_edit: can_edit_main,
+        field: :letter_requests,
+        object: letter_request,
+        hidden_fields: [],
+        filled_form_hidden: [],
+        can_disable_submission:,
+      } %>
+  <% end %>
+<% end %>
+
+<% if show_phases %>
+  <% admission_process.phases.order(:order).each do |p| %>
+    <%
+      phase = p.admission_phase
+      app_forms = phase.prepare_application_forms(
+        admission_application,
+        can_edit_override:,
+        check_candidate_permission:,
+        committee_permission_user:,
+      )
+      phase_visible = app_forms[:latest_available_phase]
+      phase_subid = "#{subid}-#{phase.id}"
+    %>
+    <% app_forms[:phase_forms].each do |phase_form| %>
+      <%= render partial: "admissions/filled_form/show_or_edit_filled_form", locals: {
+        form: form,
+        name: "#{phase.name} (#{phase_form[:name]})",
+        id: "#{phase_subid}-#{phase_form[:name]}",
+        visible: phase_visible,
+        can_edit: phase_form[:can_edit_form],
+        field: phase_form[:field],
+        object: phase_form[:object],
+        hidden_fields: phase_form[:hidden],
+        filled_form_hidden: [:id, :form_template_id, :is_filled],
+        can_disable_submission:,
+      } %>
+    <% end %>
+    <% break if app_forms[:latest_available_phase] %>
+  <% end%>
+<% end%>
+
+<% if show_rankings %>
+  <% admission_application.rankings.each do |ranking| %>
+    <% next if !ranking.filled_form.is_filled %>
+    <% next if check_candidate_permission && !ranking.ranking_config.candidate_can_see %>
+    <% ranking.filled_form.prepare_missing_fields %>
+    <%= render partial: "admissions/filled_form/show_or_edit_filled_form", locals: {
+        form: form,
+        name: ranking.ranking_config.name,
+        id: "ranking-#{ranking.id}",
+        visible: false,
+        can_edit: can_edit_override,
+        field: :rankings,
+        object: ranking,
+        hidden_fields: [:id],
+        filled_form_hidden: [],
+        can_disable_submission:,
+      } %>
+  <% end %>
+<% end %>
+

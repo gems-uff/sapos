@@ -1,12 +1,14 @@
 <%
   text_name = options[:name]
-  text_id = "widget_" + options[:id]
+  text_id = options[:id]
   value = attributes[:text] || ""
+  classnames = Array(options[:class] || [])
+  classnames << "text-input" if !classnames.include? "text-input"
 %>
 
 <%= text_field_tag(
   text_name, value,
-  id: text_id, class: "text-input", maxlength: 255, size: 30
+  id: text_id, class: classnames, maxlength: 255, size: 30
 ) %>
 
 <script>

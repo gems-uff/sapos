@@ -63,7 +63,8 @@
             <%= render partial: "admissions/filled_form/edit/filled_form_template", locals: {
               form: form,
               form_template: @admission_process.letter_template,
-              filled_form: filled_form } %>
+              filled_form: filled_form,
+              can_disable_submission: false } %>
           <% end %>
         </ol>
         <p class="form-footer">

@@ -3,23 +3,33 @@
   column = Admissions::FilledFormFieldsController.active_scaffold_config.columns[:value]
   options = active_scaffold_input_options(column, scope, :object => field.object)
 
-  street_options = {size: 45, class: "text-input residency-field"}
+  street_options = {
+    size: 45,
+    class: ["text-input", "residency-field", filled_class]
+    id: "#{options[:id]}-street"
+  }
   street_options[:required] = "required" if configuration["required"]
-  number_options = {size: 5, class: "text-input residency-field"}
+
+  number_options = {
+    size: 5,
+    class: ["text-input", "residency-field", filled_class],
+    id: "#{options[:id]}-number"
+  }
   number_options[:required] = "required" if configuration["number_required"]
+
   values = (field.object.value || "").split(" <$> ")
   (2 - values.length).times { values << "" }
 %>
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
     <dt>
-      <%= field.label :value, form_field.name %>
+      <%= field.label :value, form_field.name, for: street_options[:id] %>
       <% if form_field.description.present? %>
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
     <dd id="<%= options[:id] %>" class="residency-fields">
-      <%= field.hidden_field :value, class: "hidden" %>
+      <%= field.hidden_field :value, class: ["hidden", filled_class] %>
       <%= text_field_tag :city, values[0], placeholder: I18n.t(
         "activerecord.attributes.admissions/form_field.field_types.residency_fields.street"
       ), **street_options %>
