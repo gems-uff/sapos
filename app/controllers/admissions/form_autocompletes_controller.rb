@@ -49,4 +49,13 @@ class Admissions::FormAutocompletesController < Admissions::ProcessBaseControlle
     result = @majors.map(&:name).uniq
     render json: result
   end
+
+  def form_field
+    @form_fields = Admissions::FormField.full_search_name(
+      field: params[:term],
+      substring: true,
+      limit: 10
+    )
+    render json: @form_fields.uniq
+  end
 end

@@ -14,11 +14,7 @@
 <script>
   $(document).ready(function() {
     $(`#<%= text_id %>`).autocomplete({
-      source: autocomplete_search("<%= state_form_autocompletes_path %>", (request) => {
-        <% if CustomVariable.identity_issuing_country %>
-          request.country = "<%= CustomVariable.identity_issuing_country %>"
-        <% end %>
-      })
+      source: autocomplete_search("<%= form_field_form_autocompletes_path %>")
     })
   });
 </script>

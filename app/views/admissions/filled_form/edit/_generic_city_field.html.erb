@@ -57,40 +57,28 @@ $(document).ready(function() {
     $(`#<%= options[:id] %> .hidden`).val(value)
   })
 
-  function search(url) {
-    let that = this;
-    return function( request, response ) {
-      if ( that.xhr ) {
-        that.xhr.abort();
-      }
+  $(`#<%= options[:id] %> input[name="city"]`).autocomplete({
+    source: autocomplete_search("<%= city_form_autocompletes_path %>", (request) => {
       request.city = $(`#<%= options[:id] %> input[name="city"]`).val();
       request.state = $(`#<%= options[:id] %> input[name="state"]`).val();
       request.country = $(`#<%= options[:id] %> input[name="country"]`).val();
-
-      that.xhr = $.ajax( {
-        url: url,
-        data: request,
-        dataType: "json",
-        success: function( data ) {
-          response( data );
-        },
-        error: function() {
-          response( [] );
-        }
-      } );
-    }
-  }
-
-  $(`#<%= options[:id] %> input[name="city"]`).autocomplete({
-    source: search("<%= city_form_autocompletes_path %>")
+    })
   })
 
   $(`#<%= options[:id] %> input[name="state"]`).autocomplete({
-    source: search("<%= state_form_autocompletes_path %>"),
+    source: autocomplete_search("<%= state_form_autocompletes_path %>", (request) => {
+      request.city = $(`#<%= options[:id] %> input[name="city"]`).val();
+      request.state = $(`#<%= options[:id] %> input[name="state"]`).val();
+      request.country = $(`#<%= options[:id] %> input[name="country"]`).val();
+    }),
   })
 
   $(`#<%= options[:id] %> input[name="country"]`).autocomplete({
-    source: search("<%= country_form_autocompletes_path %>"),
+    source: autocomplete_search("<%= country_form_autocompletes_path %>", (request) => {
+      request.city = $(`#<%= options[:id] %> input[name="city"]`).val();
+      request.state = $(`#<%= options[:id] %> input[name="state"]`).val();
+      request.country = $(`#<%= options[:id] %> input[name="country"]`).val();
+    }),
   })
 })
 

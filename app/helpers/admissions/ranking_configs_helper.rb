@@ -11,4 +11,8 @@ module Admissions::RankingConfigsHelper
       form_condition: record.form_condition
     })
   end
+
+  def admissions_ranking_column_name_form_column(record, options)
+    form_field_name_widget(record, options, text: record.name)
+  end
 end

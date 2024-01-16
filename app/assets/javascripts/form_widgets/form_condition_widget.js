@@ -107,7 +107,9 @@ function create_form_condition(options) {
           ${remove_item}
           ${error_report}
         `)
-
+        $(`#${id} > .sub > .field-input`).autocomplete({
+          source: autocomplete_search("/form_autocompletes/form_field")
+        })
         let on_change = function(inputfield, validate) {
           $(`#${id} > .sub > .${inputfield}-input`).on("change", function() {
             let val = $(this).val()

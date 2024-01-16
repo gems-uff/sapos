@@ -222,6 +222,22 @@ class Admissions::FormField < ActiveRecord::Base
     )
   end
 
+  def self.full_search_name(field: nil, substring: false, limit: 10)
+    (
+      self.search_name(field:, substring:).limit(limit).map(&:name) +
+      Admissions::AdmissionApplication::SHADOW_FIELDS_MAP.filter_map do |name, _|
+        next if !substring && name != field
+        next if !name.include? field
+        name
+      end +
+      Admissions::AdmissionApplication::SHADOW_FIELDS.filter_map do |name|
+        next if !substring && name != field
+        next if !name.include? field
+        name
+      end
+    )[..limit - 1]
+  end
+
   def self.field_name_exists?(field)
     return true if Admissions::AdmissionApplication::SHADOW_FIELDS_MAP[field].present?
     return true if Admissions::AdmissionApplication::SHADOW_FIELDS.include? field

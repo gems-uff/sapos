@@ -62,6 +62,13 @@ module ApplicationHelper
     })
   end
 
+  def form_field_name_widget(record, options, attributes = {})
+    render(partial: "application/form_field_name_widget", locals: {
+      options: options,
+      attributes: attributes,
+    })
+  end
+
   def month_year_widget(record, options, attribute, extra = {})
     config = ActiveScaffold::Config::Core.new(record.class)
     extra[:date_options] ||= {}

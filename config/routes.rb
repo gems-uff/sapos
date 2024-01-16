@@ -367,6 +367,7 @@ Rails.application.routes.draw do
       get :country, on: :collection
       get :institution, on: :collection
       get :course, on: :collection
+      get :form_field, on: :collection
     end
 
     resources :form_conditions do
