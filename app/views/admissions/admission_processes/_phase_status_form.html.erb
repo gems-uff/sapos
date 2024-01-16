@@ -77,10 +77,7 @@
     </li>
     <li class="form">
       <div style="clear: both;">
-        <h5> Resumo <a data-show="Mostrar" data-hide="Ocultar"
-          data-toggable="<%= subid %>" style=""
-          class="as-js-button visibility-toggle" href="#">Ocultar</a></h5>
-        <div id="<%= subid %>">
+        <%= toggable_area("Resumo", id: subid) do %>
           <% ([nil] + @admission_process.phases).each do |p| %>
             <%
               if p.nil?
@@ -128,10 +125,7 @@
               <li class="admissions-table show-view">
                 <div style="clear:both; display: block; width: 100%; height: 100%">
                   <% visible = true %>
-                  <h5> Candidaturas <a data-show="Mostrar" data-hide="Ocultar"
-                        data-toggable="<%= "#{subid}-#{phase_id}-summary" %>" style=""
-                        class="as-js-button visibility-toggle" href="#"><%= visible ? "Ocultar" : "Mostrar" %></a></h5>
-                  <div class="active-scaffold-component" id="<%= "#{subid}-#{phase_id}-summary" %>" style="<%= "display:none;" if !visible %>" >
+                  <%= toggable_area("Candidaturas", id: "#{subid}-#{phase_id}-summary", visible:, group_options: { class: "active-scaffold-component" }) do %>
                     <iframe
                       onLoad="autoResize();" marginheight="0" frameborder="0"
                       frameborder="0" style="overflow:hidden;height:100%;width:100%"
@@ -140,13 +134,13 @@
                       admission_phase_id: phase_id.nil? ? "" : phase_id,
                       simple_view: "1",
                     ) %>"></iframe>
-                  </div>
+                  <% end %>
                 </div>
               </li>
             </ol>
           <% end %>
+        <% end %>
       </div>
-    </div>
     </li>
 
   </ol>

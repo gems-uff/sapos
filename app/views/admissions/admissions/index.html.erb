@@ -27,24 +27,12 @@
         <% end %>
       </div>
       <div class="existing-admission-section">
-        <h5>
-          <%= t "admissions.admissions.index.recover" %>
-          <a data-show="<%= t "active_scaffold.show"%>"
-              data-hide="<%= t "active_scaffold.hide"%>"
-              data-toggable="existing-admission" style=""
-              class="as-js-button visibility-toggle" href="#"
-          >
-          <%= @has_search_results ? (t "active_scaffold.hide") :
-              (t "active_scaffold.show")
-          %>
-          </a>
-        </h5>
-        <div id="existing-admission" style="<%= 'display:none;' if !@has_search_results %>">
+        <%= toggable_area(t("admissions.admissions.index.recover"), id: "existing-admission", visible: @has_search_results) do %>
           <%= render partial: "recover_form", locals: {
             admission_application: @admission_application,
             source: ""
           } %>
-        </div>
+        <% end %>
       </div>
     </div>
   </div>

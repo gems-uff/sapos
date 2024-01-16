@@ -1,9 +1,6 @@
 <% if candidates.present? %>
   <div>
-    <h5> <%= title %> <a data-show="Mostrar" data-hide="Ocultar"
-          data-toggable="<%= subid %>" style=""
-          class="as-js-button visibility-toggle" href="#"><%= visible ? "Ocultar" : "Mostrar" %></a></h5>
-    <div id="<%= subid %>" style="<%= "display:none;" if !visible %>" >
+    <%= toggable_area(title, id: subid, visible:) do %>
       <% if subtext.present? %>
         <p> <%= subtext %> </p>
       <% end %>
@@ -34,6 +31,6 @@
           <% end %>
         </tbody>
       </table>
-    </div>
+    <% end %>
   </div>
 <% end %>

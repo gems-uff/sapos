@@ -9,17 +9,7 @@
       <% end %>
 
       <div>
-        <h5>
-          <%= t "admissions.apply.show.title" %>
-          <a data-show="<%= t "active_scaffold.show"%>"
-              data-hide="<%= t "active_scaffold.hide"%>"
-              data-toggable="main-section" style=""
-              class="as-js-button visibility-toggle" href="#"
-          >
-            <%= (t "active_scaffold.hide") %>
-          </a>
-        </h5>
-        <div id="main-section">
+        <%= toggable_area(t("admissions.apply.show.title"), id: "main-section") do %>
           <ol>
             <li>
               <% if !@admission_application.filled_form.is_filled %>
@@ -48,7 +38,7 @@
               </a>
             <% end %>
           </p>
-        </div>
+        <% end %>
       </div>
       <% @admission_application.rankings.reverse.each do |ranking| %>
         <% next if !ranking.filled_form.is_filled %>

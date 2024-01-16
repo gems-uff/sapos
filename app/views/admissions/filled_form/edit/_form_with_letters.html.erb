@@ -22,13 +22,7 @@
   <% end %>
   <% if admission_process.has_letters %>
     <li class="sub-form">
-      <h5>
-        <%= t "admissions.apply.edit.letters" %>
-        <a data-show="Mostrar" data-hide="Ocultar"
-        data-toggable="recommendation_letters" style=""
-        class="as-js-button visibility-toggle" href="#">Ocultar</a>
-      </h5>
-      <div id="recommendation_letters">
+      <%= toggable_area(t("admissions.apply.edit.letters"), id: "recommendation_letters") do %>
         <% if admission_process.min_letters.to_i > 0 %>
           <p><%= t("admissions.apply.edit.letter.min_count",
                     count: admission_process.min_letters.to_i) %></p>
@@ -50,7 +44,7 @@
               'data-association-insertion-node' => '#letters',
               class: 'add-letter' %>
         </div>
-      </div>
+      <% end %>
     </li>
   <% end %>
 </ol>

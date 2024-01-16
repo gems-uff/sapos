@@ -63,11 +63,7 @@ end
     <%= render :partial => 'map_student_form_messages' %>
   </div>
 
-  <h4> <%= student_label %> <a data-show="Mostrar" data-hide="Ocultar"
-          data-toggable="<%= student_div_id %>" style=""
-          class="as-js-button visibility-toggle" href="#"><%= student_visible ? "Ocultar" : "Mostrar" %></a></h4>
-
-  <div id="<%= student_div_id %>" style="<%= "display:none;" if !student_visible %>" >
+  <%= toggable_area(student_label, title_tag: :h4, id: student_div_id, visible: student_visible) do %>
     <% if @student_operation != :new %>
     <ol class="form">
       <li class="form-element"><dl>
@@ -78,12 +74,9 @@ end
     <% end %>
     <% @record = @student %>
     <%= render :partial => body_partial, :locals => { :columns => student_columns, :form_action => form_action, :scope => "_student" } %>
-  </div>
+  <% end %>
 
-  <h4> <%= enrollment_label %> <a data-show="Mostrar" data-hide="Ocultar"
-          data-toggable="<%= enrollment_div_id %>" style=""
-          class="as-js-button visibility-toggle" href="#"><%= enrollment_visible ? "Ocultar" : "Mostrar" %></a></h4>
-  <div id="<%= enrollment_div_id %>" style="<%= "display:none;" if !enrollment_visible %>" >
+  <%= toggable_area(enrollment_label, title_tag: :h4, id: enrollment_div_id, visible: enrollment_visible) do %>
     <ol class="form">
       <li class="form-element"><dl>
         <% if @enrollment_operation == :new %>
@@ -101,7 +94,7 @@ end
     <div id="<%= enrollment_div_id %>-parent" style="<%= "display:none;" if @do_not_create_enrollment %>">
       <%= render :partial => body_partial, :locals => { :columns => enrollment_columns, :form_action => form_action, :scope => "_enrollment" } %>
     </div>
-  </div>
+  <% end %>
 
   <p class="form-footer">
     <%= submit_tag "Salvar", :class => "submit" %>

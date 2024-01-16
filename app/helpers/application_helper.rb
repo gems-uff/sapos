@@ -158,26 +158,22 @@ module ApplicationHelper
 
   def toggable_area(
     title, title_tag: :h5, enabled: true, visible: true, id: nil,
-    group_tag: :div, group_options: {}
+    group_tag: :div, group_options: {}, &block
   )
     id ||= "group_#{SecureRandom.random_number(1_000_000)}"
-    return tag.div(id:) do
-      yield.html_safe
-    end if !enabled
+    return tag.div(id:, &block) if !enabled
     style = visible ? "" : "display:none;"
     title_part = tag.send(title_tag) do
       concat title.to_s
       concat " "
       concat content_tag(:a, (visible ? "Ocultar" : "Mostrar"),
-        href: "#", class:"as-js-button visibility-toggle",
+        href: "#", class: "as-js-button visibility-toggle",
         "data-toggable" => id,
         "data-show" => "Mostrar",
         "data-hide" => "Ocultar"
       )
     end
-    body_part = content_tag(group_tag, **group_options.merge(id:, style:)) do
-      yield.html_safe
-    end
+    body_part = content_tag(group_tag, **group_options.merge(id:, style:), &block)
     title_part + body_part
   end
 end
