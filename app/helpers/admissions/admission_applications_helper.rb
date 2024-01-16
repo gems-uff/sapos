@@ -88,6 +88,12 @@ module Admissions::AdmissionApplicationsHelper
     end
   end
 
+  def admission_phase_column(record, column)
+    return record.phase_name if record.admission_phase.present?
+    return "Candidatura" if record.filled_form.is_filled
+    "Pré-candidatura"
+  end
+
   def status_column(record, column)
     return record.descriptive_status if params[:simple_view].present?
     result = ""

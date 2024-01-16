@@ -12,8 +12,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
   active_scaffold "Admissions::AdmissionApplication" do |config|
     config.list.columns = [
       :admission_process, :token, :name, :email, :submission_time,
-      :letter_requests, :filled_form,
-      :admission_phase, :status
+      :letter_requests, :admission_phase, :status
     ]
     config.show.columns = [
       :admission_process, :token, :name, :email,
