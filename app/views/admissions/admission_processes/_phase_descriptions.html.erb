@@ -1,0 +1,8 @@
+<% phase_values.each do |phase_hash| %>
+  <span class="description phase-summary <%= phase_hash[:phase_class] %>"
+    style="<%= phase_hash[:style] %>"
+  >
+    <%= phase_hash[key] %>
+    <%= "candidato".pluralize(phase_hash[key]) %>
+  </span>
+<% end %>

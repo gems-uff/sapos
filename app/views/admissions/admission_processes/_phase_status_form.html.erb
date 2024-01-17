@@ -18,18 +18,83 @@
   end
   subid = "as_admissions__admission_processes-#{@admission_process.id}-phase-status-div"
   current_phase = @admission_process.current_phase
+  pendency_select_options = {
+    "Manter na fase" => :keep,
+    "Consolidar mesmo assim" => :consolidate,
+    "Reprovar candidatura na fase" => :reprove,
+    "Cancelar candidatura" => :cancel
+  }
+
+  fields = {
+    fill_pendency: {
+      label: "Formulário não preenchido",
+      classes: [],
+      hide: false,
+      in_fixed_phase: true,
+    },
+  }
+  Admissions::AdmissionPendency::PENDENCY_QUERIES.each do |key, label|
+    fields[key] = {
+      label:,
+      classes: [],
+      hide: false,
+      in_fixed_phase: false,
+    }
+  end
+
+  phase_values = ([nil] + @admission_process.phases.order(:order)).map do |p|
+    if p.nil?
+      phase = nil
+      phase_id = nil
+      phase_name = "Candidatura"
+      phase_class = "#{subid}-phase-"
+    else
+      phase = p.admission_phase
+      phase_id = phase.id
+      phase_name = phase.to_label
+      phase_class = "#{subid}-phase-#{phase.id}"
+    end
+    candidates = @admission_process.admission_applications.where(
+      admission_phase_id: phase_id
+    )
+    groups = candidates.group(:status).count
+    groups.delete(nil)
+    groups = groups.keys.sort.map { |key| ["#{key}".pluralize(groups[key]), groups[key]] }.to_h
+    elligible = candidates.ready_for_consolidation(phase_id).size
+    groups["<b>#{"Pronto".pluralize(elligible)} para consolidação</b>"] = elligible
+    candidate_count = candidates.count
+    is_current = p.try(:admission_phase_id) == current_phase.try(:id)
+    result = {
+      phase_name:, phase_class:, is_current:, phase_id:,
+      info: groups,
+      candidate_count: candidates.count,
+      style: is_current ? "" : "display:none;",
+    }
+    fields.each do |key, field_hash|
+      if field_hash[:in_fixed_phase] != phase_id.nil?
+        field_hash[:hide] = true if is_current
+        next
+      end
+      pendency = candidates.send(key, phase_id).count
+      result[key] = pendency
+      if pendency > 0
+        field_hash[:classes] << phase_class
+      elsif is_current
+        field_hash[:hide] = true
+      end
+    end
+    result
+  end
 %>
 
 <script type="text/javascript">
   function autoResize(){
     $('iframe').each(function(iFrame) {
-      console.log(iFrame)
       $(this).height(this.contentWindow.document.body.scrollHeight + 5);
     })
   }
 
   window.addEventListener('message', function (evt) {
-    console.log("Got message: " + JSON.stringify(evt.data) + " from origin: " + evt.origin);
     if (evt.data.type === "frame-resized") {
       autoResize()
     }
@@ -53,96 +118,70 @@
     <li class="form-element required">
       <dl>
         <dt>
-          <%= label_tag :consolidate_phase_id do %>Fase<% end%>
+          <%= label_tag :consolidate_phase_id, "Fase" %>
         </dt>
         <dd>
           <%= select_tag(:consolidate_phase_id, options_for_select(
-            [["Candidatura", nil]] +
-            @admission_process.phases.order(:order).map do |p|
-              [p.admission_phase.name, p.admission_phase.id]
-            end, current_phase.try(:id)
+            phase_values.map { |p| [p[:phase_name], p[:phase_id]] },
+            current_phase.try(:id)
           ))%>
+          <%= render partial: "phase_descriptions", locals: {
+            phase_values:, key: :candidate_count } %>
         </dd>
       </dl>
     </li>
     <li class="form-element required">
       <dl>
         <dt>
-          <%= label_tag :show_summary do %>Mostrar alterações<% end%>
+          <%= label_tag :show_summary, "Mostrar alterações" %>
         </dt>
         <dd>
           <%= check_box_tag :show_summary %>
         </dd>
       </dl>
     </li>
-    <li class="form">
-      <div style="clear: both;">
-        <%= toggable_area("Resumo", id: subid) do %>
-          <% ([nil] + @admission_process.phases).each do |p| %>
-            <%
-              if p.nil?
-                phase = nil
-                phase_id = nil
-                phase_name = "Candidatura"
-                ol_id = "#{subid}-"
-              else
-                phase = p.admission_phase
-                phase_id = phase.id
-                phase_name = phase.to_label
-                ol_id = "#{subid}-#{phase.id}"
-              end
-              candidates = @admission_process.admission_applications.where(
-                admission_phase_id: phase_id
-              )
-              groups = candidates.group(:status).count
-              groups.delete(nil)
-              groups = groups.keys.sort.map { |key| ["#{key}".pluralize(groups[key]), groups[key]] }.to_h
-              missing_committee = candidates.without_committee(phase_id).count
-              pendent = candidates.with_pendencies(phase_id).size
-              elligible = candidates.ready_for_consolidation(phase_id).size
-              groups["Com comitê incompleto"] = missing_committee if missing_committee > 0
-              groups["Pendente".pluralize(pendent)] = pendent if pendent > 0
-              groups["<b>#{"Pronto".pluralize(elligible)} para consolidação</b>"] = elligible
-              candidate_count = candidates.count
-
-              style = "display:none;"
-              if p.try(:admission_phase_id) == current_phase.try(:id)
-                style = ""
-              end
-            %>
-            <ol class="form phase-summary" id="<%= ol_id %>" style="<%= style %>">
-              <li class="form-element"><dl>
-                <dt>Fase</dt><dd><%= phase_name %></dd>
-              </dl></li>
-              <li class="form-element"><dl>
-                <dt><%= "Candidato".pluralize(candidate_count) %></dt><dd><%= candidate_count %></dd>
-              </dl></li>
-              <% groups.each do |key, value| %>
-                <li class="form-element"><dl>
-                  <dt><%= key.html_safe %></dt><dd><%= value %></dd>
-                </dl></li>
-              <% end %>
-              <li class="admissions-table show-view">
-                <div style="clear:both; display: block; width: 100%; height: 100%">
-                  <% visible = true %>
-                  <%= toggable_area("Candidaturas", id: "#{subid}-#{phase_id}-summary", visible:, group_options: { class: "active-scaffold-component" }) do %>
-                    <iframe
-                      onLoad="autoResize();" marginheight="0" frameborder="0"
-                      frameborder="0" style="overflow:hidden;height:100%;width:100%"
-                      src="<%= admission_applications_url(
-                      admission_process_id: @admission_process.id,
-                      admission_phase_id: phase_id.nil? ? "" : phase_id,
-                      simple_view: "1",
-                    ) %>"></iframe>
-                  <% end %>
-                </div>
-              </li>
-            </ol>
+    <% fields.each do |key, field_hash| %>
+      <li class="form-element required phase-summary <%= field_hash[:classes].join(' ') %>"
+          style="<%= "display:none;" if field_hash[:hide] %>">
+        <dl>
+          <dt>
+            <%= label_tag key, field_hash[:label] %>
+          </dt>
+          <dd>
+            <%= select_tag key, options_for_select(pendency_select_options, :keep) %>
+            <%= render partial: "phase_descriptions", locals: { phase_values:, key: } %>
+          </dd>
+        </dl>
+      </li>
+    <% end %>
+    <% phase_values.each do |phase_hash| %>
+      <% phase_hash[:info].each do |key, value| %>
+        <li class="form-element phase-summary <%= phase_hash[:phase_class] %>"
+            style="<%= phase_hash[:style] %>">
+          <dl>
+            <dt><label><%= key.html_safe %></label></dt>
+            <dd><span class="description">
+              <%= value %> <%= "candidato".pluralize(value) %>
+            </span></dd>
+          </dl>
+        </li>
+      <% end %>
+      <li class="admissions-table show-view phase-summary <%= phase_hash[:phase_class] %>"
+            style="<%= phase_hash[:style] %>">
+        <div style="clear:both; display: block; width: 100%; height: 100%">
+          <%= toggable_area("Candidaturas", group_options: { class: "active-scaffold-component" }) do %>
+            <iframe
+              onLoad="autoResize();" marginheight="0" frameborder="0"
+              frameborder="0" style="overflow:hidden;height:100%;width:100%"
+              src="<%= admission_applications_url(
+                admission_process_id: @admission_process.id,
+                admission_phase_id: phase_hash[:phase_id] || "",
+                simple_view: "1",
+              ) %>"></iframe>
           <% end %>
-        <% end %>
-      </div>
-    </li>
-
+        </div>
+      </li>
+    <% end %>
   </ol>
 
   <p class="form-footer">
@@ -157,7 +196,7 @@
 $(document).ready(function() {
   $(`#<%= form_id %> select[name="consolidate_phase_id"]`).on("change", function() {
     $("#<%= form_id %> .phase-summary").hide();
-    $(`#<%= subid %>-${$(this).val()}`).show();
+    $(`.<%= subid %>-phase-${$(this).val()}`).show();
   })
 });
 

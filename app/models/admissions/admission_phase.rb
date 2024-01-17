@@ -74,7 +74,7 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
     users = self.committee_users_for_candidate(candidate, should_raise: should_raise)
 
     pendencies = []
-    pendencies = pendencies.concat(Admissions::AdmissionPendency.candidate_pendency(
+    pendencies = pendencies.concat(Admissions::AdmissionPendency.candidate_pendencies(
       self, candidate
     )) if self.candidate_form.present?
     pendencies = pendencies.concat(Admissions::AdmissionPendency.member_pendencies(

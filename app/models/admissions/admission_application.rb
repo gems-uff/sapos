@@ -43,25 +43,31 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   }
 
-  scope :with_pendencies, ->(phase_id, user_id = nil) {
-    if phase_id.nil?
-      non_consolidated.includes(:filled_form)
+  # The following scopes are used dinamically by _phase_status_form.html.erb
+  scope :fill_pendency, ->(phase_id) {
+    non_consolidated.includes(:filled_form)
       .where(filled_form: { is_filled: false })
-    else
-      non_consolidated.where(
-        id: Admissions::AdmissionPendency.pendencies(phase_id, user_id)
-          .select(:admission_application_id)
-      )
-    end
   }
 
-  scope :without_committee, ->(phase_id) {
-    where(
-      id: Admissions::AdmissionPendency
-        .missing_committee(phase_id)
-        .select(:admission_application_id)
-    )
-  }
+  scope :missing_committee, ->(phase_id) { non_consolidated.where(
+    id: Admissions::AdmissionPendency.missing_committee(phase_id)
+      .select(:admission_application_id)
+  )}
+
+  scope :member_pendency, ->(phase_id) { non_consolidated.where(
+    id: Admissions::AdmissionPendency.member_pendency(phase_id)
+      .select(:admission_application_id)
+  )}
+
+  scope :shared_pendency, ->(phase_id) { non_consolidated.where(
+    id: Admissions::AdmissionPendency.shared_pendency(phase_id)
+      .select(:admission_application_id)
+  )}
+
+  scope :candidate_pendency, ->(phase_id) { non_consolidated.where(
+    id: Admissions::AdmissionPendency.candidate_pendency(phase_id)
+      .select(:admission_application_id)
+  )}
 
   has_many :letter_requests, dependent: :delete_all,
     class_name: "Admissions::LetterRequest"
@@ -244,10 +250,11 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     field_objects = nil
     if phase.consolidation_form.present?
       field_objects = self.fields_hash
-      committees = self.evaluations.where(admission_phase_id: phase.id).map do |ev|
-        ev.filled_form.to_fields_hash.map do |k, v|
-          [k, v.simple_value]
-        end.to_h
+      committees = self.evaluations.where(admission_phase_id: phase.id).filter_map do |ev|
+        next if !ev.filled_form.is_filled
+        ev.filled_form.to_fields_hash.transform_values do |v|
+          v.simple_value
+        end
       end
       vars = {
         process: self.admission_process,

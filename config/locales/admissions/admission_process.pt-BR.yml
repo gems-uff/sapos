@@ -65,6 +65,9 @@ pt-BR:
         reproved:
           one: "Reprovado: %{count}"
           other: "Reprovados: %{count}"
+        canceled:
+          one: "Cancelado: %{count}"
+          other: "Cancelados: %{count}"
         errors:
           one: "Erro na consolidação: %{count}"
           other: "Erros na consolidação: %{count}"

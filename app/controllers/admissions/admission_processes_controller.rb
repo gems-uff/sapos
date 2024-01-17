@@ -132,9 +132,6 @@ class Admissions::AdmissionProcessesController < ApplicationController
     phase_id = params[:consolidate_phase_id].to_i
     phase_id = nil if phase_id == 0
 
-    @exception = @admission_process.check_partial_consolidation_conditions(phase_id)
-    return if @exception.present?
-
     phases = [nil] + @admission_process.phases.order(:order).map do |p|
       p.admission_phase.id
     end
@@ -142,25 +139,63 @@ class Admissions::AdmissionProcessesController < ApplicationController
     @phase = phase_id.nil? ? nil : Admissions::AdmissionPhase.find(phases[index])
     @phase_name = @phase.nil? ? "Candidatura" : @phase.name
     @message = I18n.t("#{i18n_prefix}.title", phase: @phase_name)
+
+    @buckets = {
+      errors: {
+        candidates: [],
+        subtext: "Verifique o formulário de homologação da fase",
+        visible: true,
+        show_status: true
+      },
+      missing_committee: {
+        candidates: [],
+        subtext: "Nenhum comitê satisfaz condições para avaliar os seguintes candidatos",
+        visible: true
+      },
+      not_approved: { candidates: [] },
+      reproved: { candidates: [] },
+      canceled: { candidates: [] },
+      approved: { candidates: [] },
+    }
+
+    @has_pendency = 0
     candidates = @admission_process.admission_applications
       .where(admission_phase_id: phase_id)
-      .ready_for_consolidation(phase_id)
-    @approved = []
-    @reproved = []
-    @not_approved = []
-    @errors = []
-    @missing_committee = []
+      .non_consolidated
+      .filter do |candidate|
+        if phase_id.nil?
+          next true if candidate.filled_form.try(:is_filled)
+          consolidate_despite_pendency?(candidate, params[:fill_pendency])
+        else
+          Admissions::AdmissionPendency::PENDENCY_QUERIES.all? do |key|
+            next true if candidate.pendencies.send(key, phase_id).blank?
+            consolidate_despite_pendency?(candidate, params[key])
+          end
+        end
+      end
+
+    @exception = @admission_process.check_partial_consolidation_conditions(
+      phase_id, @has_pendency
+    )
+    return if @exception.present?
+
+    @buckets[:reproved][:candidates].each do |candidate|
+      candidate.update!(status: Admissions::AdmissionApplication::REPROVED)
+    end
+    @buckets[:canceled][:candidates].each do |candidate|
+      candidate.update!(status: Admissions::AdmissionApplication::CANCELED)
+    end
 
     candidates.each do |candidate|
       case candidate.consolidate_phase!(@phase)
       when Admissions::AdmissionApplication::APPROVED
-        @approved << candidate
+        @buckets[:approved][:candidates] << candidate
       when Admissions::AdmissionApplication::REPROVED
-        @reproved << candidate
+        @buckets[:reproved][:candidates] << candidate
       when nil
-        @not_approved << candidate
+        @buckets[:not_approved][:candidates] << candidate
       else
-        @errors << candidate
+        @buckets[:errors][:candidates] << candidate
       end
     end
 
@@ -180,7 +215,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
         if !next_phase.create_pendencies_for_candidate(
           candidate, should_raise: Admissions::FormCondition::RAISE_COMMITTEE
         )
-          @missing_committee << candidate
+          @buckets[:missing_committee][:candidates] << candidate
         end
         candidate.update!(
           admission_phase_id: next_phase_id,
@@ -188,8 +223,8 @@ class Admissions::AdmissionProcessesController < ApplicationController
           status_message: nil
         )
       rescue => err
-        @errors << candidate
-        @approved.delete(candidate)
+        @buckets[:errors][:candidates] << candidate
+        @buckets[:approved][:candidates].delete(candidate)
         candidate.update!(
           status: Admissions::AdmissionApplication::ERROR,
           status_message: err
@@ -197,21 +232,15 @@ class Admissions::AdmissionProcessesController < ApplicationController
       end
     end
 
+    @buckets.each do |key, bucket|
+      bucket[:title] = I18n.t("#{i18n_prefix}.#{key}", count: bucket[:candidates].count)
+    end
+
     if !@show_page
-      if @errors.present?
-        @message += ". #{I18n.t("#{i18n_prefix}.errors", count: @errors.count)}"
-      end
-      if @missing_committee.present?
-        @message += ". #{I18n.t("#{i18n_prefix}.missing_committee", count: @missing_committee.count)}"
-      end
-      if @reproved.present?
-        @message += ". #{I18n.t("#{i18n_prefix}.reproved", count: @reproved.count)}"
-      end
-      if @approved.present?
-        @message += ". #{I18n.t("#{i18n_prefix}.approved", count: @approved.count)}"
-      end
-      if @not_approved.present?
-        @message += ". #{I18n.t("#{i18n_prefix}.not_approved", count: @not_approved.count)}"
+      @buckets.each do |key, bucket|
+        if bucket[:candidates].present?
+          @message += ". #{bucket[:title]}"
+        end
       end
     end
   rescue => err
@@ -304,6 +333,22 @@ class Admissions::AdmissionProcessesController < ApplicationController
             filename: "#{filename} - #{@admission_process.title}.pdf",
             type: "application/pdf"
         end
+      end
+    end
+
+    def consolidate_despite_pendency?(candidate, behavior)
+      case behavior
+      when "consolidate"
+        true
+      when "reprove"
+        @buckets[:reproved][:candidates] << candidate
+        false
+      when "cancel"
+        @buckets[:canceled][:candidates] << candidate
+        false
+      else # keep/nil
+        @has_pendency += 1
+        false
       end
     end
 end

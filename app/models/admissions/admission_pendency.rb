@@ -18,17 +18,52 @@ class Admissions::AdmissionPendency < ActiveRecord::Base
   scope :missing_committee, ->(phase_id) {
     where(
       admission_phase_id: phase_id,
+      mode: MEMBER,
+      status: PENDENT,
       user_id: nil
     )
   }
+  scope :member_pendency, ->(phase_id) {
+    where(
+      admission_phase_id: phase_id,
+      mode: MEMBER,
+      status: PENDENT,
+    ).where.not(
+      user_id: nil
+    )
+  }
+  scope :shared_pendency, ->(phase_id) {
+    where(
+      admission_phase_id: phase_id,
+      mode: SHARED,
+      status: PENDENT,
+    )
+  }
+  scope :candidate_pendency, ->(phase_id) {
+    where(
+      admission_phase_id: phase_id,
+      mode: CANDIDATE,
+      status: PENDENT,
+    )
+  }
 
-  scope :pendencies, ->(phase_id, user_id = nil) {
+  PENDENCY_QUERIES = {
+    member_pendency: "Pendência individual de comitê",
+    shared_pendency: "Pendência compartilhada de comitê",
+    candidate_pendency: "Pendência de candidato",
+    missing_committee: "Com comitê incompleto"
+  }
+
+  scope :pendencies, ->(phase_id, user_id = nil, mode = nil) {
     conditions = {
       admission_phase_id: phase_id,
       status: PENDENT
     }
     if user_id.present?
       conditions[:user_id] = user_id
+    end
+    if mode.present?
+      conditions[:mode] = mode
     end
     where(conditions)
   }
@@ -51,7 +86,7 @@ class Admissions::AdmissionPendency < ActiveRecord::Base
     is_filled ? OK : PENDENT
   end
 
-  def self.candidate_pendency(phase, candidate)
+  def self.candidate_pendencies(phase, candidate)
     pendency = self.find_or_create_by(
       admission_application_id: candidate.id,
       admission_phase_id: phase.id,
@@ -113,5 +148,4 @@ class Admissions::AdmissionPendency < ActiveRecord::Base
     end
     result
   end
-
 end

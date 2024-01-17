@@ -153,13 +153,12 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
     "#{self.title}"
   end
 
-  def check_partial_consolidation_conditions(phase_id)
+  def check_partial_consolidation_conditions(phase_id, pendencies_in_current)
     i18n_prefix = "active_scaffold.admissions/admission_process.consolidate_phase"
     admission_process_phase = self.phases.where(
       admission_phase_id: phase_id
     ).first
-    before_phase = !phase_id.nil?
-    return if !before_phase || admission_process_phase.partial_consolidation
+    return if phase_id.nil? || admission_process_phase.partial_consolidation
 
     if self.end_date >= Date.today
       return I18n.t("#{i18n_prefix}.open_process_error")
@@ -179,9 +178,6 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
 
     self.phases.order(:order).each do |p|
       if p.admission_phase_id == phase_id
-        pendencies_in_current = self.admission_applications
-          .where(admission_phase_id: p.admission_phase_id)
-          .with_pendencies(p.admission_phase_id).size
         if pendencies_in_current > 0
           return I18n.t(
             "#{i18n_prefix}.pendencies_in_current_error",
@@ -201,7 +197,6 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
           count: non_consolidate_in_phase,
           phase_name: p.admission_phase.name
         )
-        return
       end
     end
   end
