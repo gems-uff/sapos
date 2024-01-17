@@ -167,7 +167,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
           next true if candidate.filled_form.try(:is_filled)
           consolidate_despite_pendency?(candidate, params[:fill_pendency])
         else
-          Admissions::AdmissionPendency::PENDENCY_QUERIES.all? do |key|
+          Admissions::AdmissionPendency::PENDENCY_QUERIES.all? do |key, label|
             next true if candidate.pendencies.send(key, phase_id).blank?
             consolidate_despite_pendency?(candidate, params[key])
           end
