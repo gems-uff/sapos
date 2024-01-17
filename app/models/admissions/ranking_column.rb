@@ -18,10 +18,10 @@ class Admissions::RankingColumn < ActiveRecord::Base
 
   validates :name, presence: true
   validates :order, presence: true, inclusion: { in: ORDERS }
-  validates :ranking_config, presence: true,
-    unless: ->(rc) { rc.admission_report_config_id.present? }
-  validates :admission_report_config, presence: true,
-    unless: ->(rc) { rc.ranking_config_id.present? }
+  validates :ranking_config, presence: true
+
+  # ToDo: validate presence of either ranking_config or admission_report_config
+
   validate :that_field_name_exists
 
   after_initialize :initialize_conversion
