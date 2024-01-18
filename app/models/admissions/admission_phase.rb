@@ -52,6 +52,7 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
     super
     self.admission_phase_committees = other.admission_phase_committees.map(&:dup)
     self.approval_condition = other.approval_condition.dup
+    self.keep_in_phase_condition = other.keep_in_phase_condition.dup
   end
 
   def committee_users_for_candidate(candidate, should_raise: nil)

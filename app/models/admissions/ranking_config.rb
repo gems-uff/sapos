@@ -87,6 +87,7 @@ class Admissions::RankingConfig < ActiveRecord::Base
     self.ranking_columns = other.ranking_columns.map(&:dup)
     self.ranking_groups = other.ranking_groups.map(&:dup)
     self.ranking_processes = other.ranking_processes.map(&:dup)
+    self.form_condition = other.form_condition.dup
     self.form_template = nil
     self.create_form_template
   end
