@@ -5,14 +5,16 @@
 
 class Admissions::AdmissionReportGroupMain < Admissions::AdmissionReportGroupBase
   def prepare_config
+    return if @extra[:mode] == :letter && !@admission_process.has_letters
     @sections << {
-      title: Admissions::AdmissionReportGroup::MAIN,
+      title: @extra[:title] || Admissions::AdmissionReportGroup::MAIN,
       columns: self.flat_columns(self.column_map()),
       disallow_group: true
     }
   end
 
   def application_sections(application, &block)
+    return if @sections.empty?
     section = @sections[0]
     section[:application_columns] = section[:columns].map do |column|
       {
@@ -24,33 +26,19 @@ class Admissions::AdmissionReportGroupMain < Admissions::AdmissionReportGroupBas
 
   private
     def column_map
-      result = {
-        "token" => {
-          header: applications_t("token"),
+      result = {}
+      Admissions::AdmissionApplication::SHADOW_FIELDS_MAP.each do |header, field|
+        result[field] = {
+          header:,
           mode: :application,
-          field: :token,
-          width: 130,
-          fixed_width: true,
-          html_class: "fixed-col"
-        },
-        "name" => {
-          header: applications_t("name"),
-          mode: :application,
-          field: :name,
-          width: 150,
-          html_class: "fixed-col"
-        },
-        "email" => {
-          header: applications_t("email"),
-          mode: :application,
-          field: :email,
-          width: 120,
-          html_class: "fixed-col"
+          field:,
         }
-      }
-      result[result["token"][:header]] = result["token"]
-      result[result["name"][:header]] = result["name"]
-      result[result["email"][:header]] = result["email"]
+        result[field][:html_class] = "fixed-col" if @extra[:fixed]
+        result[header] = result[field]
+      end
+      result["token"].update(width: 130, fixed_width: true)
+      result["name"].update(width: 150)
+      result["email"].update(width: 120)
       result
     end
 
@@ -64,9 +52,17 @@ class Admissions::AdmissionReportGroupMain < Admissions::AdmissionReportGroupBas
         end
       else
         result = []
-        include_filtered(result, column_map, report_columns, "token")
-        include_filtered(result, column_map, report_columns, "name")
-        include_filtered(result, column_map, report_columns, "email")
+        case @extra[:mode]
+        when :letter
+          include_filtered(result, column_map, report_columns, "requested_letters")
+          include_filtered(result, column_map, report_columns, "filled_letters")
+        when :anonymous
+          include_filtered(result, column_map, report_columns, "identifier")
+        else
+          include_filtered(result, column_map, report_columns, "token")
+          include_filtered(result, column_map, report_columns, "name")
+          include_filtered(result, column_map, report_columns, "email")
+        end
       end
       result
     end

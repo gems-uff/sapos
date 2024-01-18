@@ -14,7 +14,7 @@ pt-BR:
         not_filled: "Não Preenchida"
         filled_form: "Dados"
         sent_email: "Email enviado"
-        status: "Situação"
+        status: "Preenchida"
         statuses:
           waiting: Aguardando
           received: Recebida

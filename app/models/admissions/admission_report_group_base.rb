@@ -95,10 +95,6 @@ class Admissions::AdmissionReportGroupBase
       I18n.t(key, **args)
     end
 
-    def letter_request_t(key, *args)
-      I18n.t("activerecord.attributes.admissions/letter_request.#{key}", *args)
-    end
-
     def report_template_fields(template)
       return Admissions::FormField.none if template.blank?
       template.fields.order(:order, :id).where(sync: nil)

@@ -10,7 +10,7 @@ class Admissions::RankingColumnsController < ApplicationController
     config.list.sorting = { name: "ASC" }
     config.create.label = :create_ranking_column_label
     columns = [
-      :ranking_config, :name, :order
+      :name, :order
     ]
 
     config.columns[:order].form_ui = :select

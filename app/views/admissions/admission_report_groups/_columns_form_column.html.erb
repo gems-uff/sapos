@@ -1,0 +1,72 @@
+<%
+  valid_controllers = [
+    "Admissions::AdmissionReportConfigsController",
+  ]
+  if !valid_controllers.include?(controller.class.name)
+    return render :partial => 'form_association', :locals => {:column => column, :scope => scope, :parent_record => record}
+  end
+%>
+<%
+  column_options = active_scaffold_input_options(column, scope, object: record)
+  record_basename = column_options[:name][0..-"[configuration]".size - 1]
+  config_view = (scope || " ").sub('][', '__')[1..-2] + '_config'
+%>
+<dl>
+  <dt>
+    <%= label_tag label_for(column, column_options), column.label %>
+  </dl>
+  <dd>
+    <a href="#" id="<%=config_view%>_toggle"
+      >
+      <i class='fa fa-eye'
+        title='<%= admission_report_group_t "configurations.show_config" %>'></i>
+      <i style="display: none;" class='fa fa-eye-slash'
+        title='<%= admission_report_group_t "configurations.hide_config" %>'></i>
+      <i style="display: none;" class='fa fa-exclamation form-field-config-error'
+        title='<%= admission_report_group_t "configurations.error_exists" %>'></i>
+    </a>
+    <div id="<%=config_view%>_fieldbox">
+    </div>
+  </dd>
+</dl>
+
+<div id="<%=config_view%>_thefield">
+  <ol>
+    <li class="form-element operation required"></li>
+    <% column_css_class = nil %>
+    <%= content_tag :li, active_scaffold_subform_attributes(column, column_css_class) do %>
+      <%= render partial: 'form_association', locals: {
+        column:, scope:, parent_record: record } %>
+    <% end %>
+  </ol>
+</div>
+
+<script>
+  $(document).ready(function () {
+    let closest = '<%= scope.nil? ? "div" : "tr" %>';
+    $(`<${closest} id="<%=config_view%>_config"
+       class="report-column-configuration" style="display:none;">
+         <td colspan=4><div id="<%= config_view %>"></div></td>
+       </${closest}>`).insertAfter(
+      $('#<%=config_view%>_fieldbox').closest(closest)
+    )
+
+    $("#<%=config_view%>_thefield").detach().appendTo("#<%=config_view%>")
+
+    $("#<%=config_view%>_toggle").on("click", function() {
+      $("#<%=config_view%>_config").toggle();
+      $("#<%=config_view%>_toggle .fa-eye").toggle();
+      $("#<%=config_view%>_toggle .fa-eye-slash").toggle();
+      return false;
+    })
+
+    let operation_dl = $("#<%= "record_operation#{column_options[:id]["record_columns".size..]}" %>").closest('dl')
+    let operation_td = operation_dl.closest('td')
+    operation_td.detach();
+    operation_dl.appendTo("#<%=config_view%>_thefield > ol li.operation")
+
+    if ($("#<%=config_view%>_thefield .errorExplanation").length) {
+      $("#<%=config_view%>_toggle").click()
+    }
+  })
+</script>

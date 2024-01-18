@@ -14,7 +14,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   ERROR = record_i18n_attr("statuses.error")
 
   SHADOW_FIELDS = Set[
-    "name", "token", "email", "status", "identifier", "phase_name"
+    "name", "token", "email", "status", "identifier", "phase_name",
+    "requested_letters", "filled_letters"
   ]
   SHADOW_FIELDS_MAP = SHADOW_FIELDS.index_by do |field|
     record_i18n_attr(field)

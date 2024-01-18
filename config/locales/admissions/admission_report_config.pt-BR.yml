@@ -8,14 +8,13 @@ pt-BR:
         name: Nome
         form_template: Consolidação
         groups: Grupos de campos
-        order: Ordem
+        ranking_columns: Ordenar por
         form_condition: Condição de seleção
         group_column_tabular: Identificador de grupo
         group_column_tabulars:
           merge: Título mesclado
           column: Coluna
           none: Nenhum
-
 
     models:
       admissions/admission_report_config:

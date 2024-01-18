@@ -19,6 +19,7 @@ class Admissions::RankingConfigsController < ApplicationController
 
     config.columns = columns
     config.columns[:ranking_columns].show_blank_record = false
+    config.columns[:ranking_columns].allow_add_existing = false
     config.columns[:ranking_groups].show_blank_record = false
     config.columns[:ranking_processes].show_blank_record = false
 
@@ -32,6 +33,7 @@ class Admissions::RankingConfigsController < ApplicationController
       options: Admissions::RankingConfig::BEHAVIOR_ON_INVALID_RANKINGS,
       include_blank: I18n.t("active_scaffold._select_")
     }
+
 
     config.actions << :duplicate
     config.duplicate.link.label = "

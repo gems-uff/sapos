@@ -5,11 +5,13 @@ pt-BR:
   activerecord:
     attributes:
       admissions/admission_report_group:
+        admission_report_config: Configuração de relatório
         order: Ordem
         mode: Tipo
         modes:
           main: Principal
           main_letter: Carta Principal
+          main_anonymous: Principal (sem identificar candidato)
           field: Candidato
           letter: Carta
           phase: Fase
@@ -17,7 +19,7 @@ pt-BR:
           phase_reverse: Fase (última para a primeira)
           phase_without_committee_reverse: Fase sem comitês (última para a primeira)
           ranking: Ranking
-          consolidation: Consolidação
+          consolidation: Consolidação do Relatório
         operation: Operação
         operations:
           include: Incluir
@@ -28,6 +30,10 @@ pt-BR:
           table: Tabela
         columns: Colunas
         group_column: Coluna separadora
+        configurations:
+          show_config: "Mostrar configuração"
+          hide_config: "Esconder configuração"
+          error_exists: "Há algum problema nas configurações"
     models:
       admissions/admission_report_group:
         one: "Grupo em Relatório"

@@ -48,32 +48,15 @@ class Admissions::AdmissionReportGroupLetter < Admissions::AdmissionReportGroupB
 
   private
     def column_map
-      result = {
-        "name" => {
-          header: letter_request_t("name"),
+      result = {}
+      Admissions::LetterRequest::SHADOW_FIELDS_MAP.each do |header, field|
+        result[field] = {
+          header:,
           mode: :letter,
-          field: :name
-        },
-        "email" => {
-          header: letter_request_t("email"),
-          mode: :letter,
-          field: :email
-        },
-        "telephone" => {
-          header: letter_request_t("telephone"),
-          mode: :letter,
-          field: :telephone
-        },
-        "is_filled" => {
-          header: letter_request_t("is_filled"),
-          mode: :letter,
-          field: :status
+          field:,
         }
-      }
-      result[result["name"][:header]] = result["name"]
-      result[result["email"][:header]] = result["email"]
-      result[result["telephone"][:header]] = result["telephone"]
-      result[result["is_filled"][:header]] = result["is_filled"]
+        result[header] = result[field]
+      end
       result
     end
 

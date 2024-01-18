@@ -450,6 +450,7 @@ Rails.application.routes.draw do
 
     resources :admission_report_configs do
       concerns :active_scaffold
+      record_select_routes
     end
 
     resources :admission_report_groups do

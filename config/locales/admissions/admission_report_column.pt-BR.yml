@@ -13,5 +13,11 @@ pt-BR:
         one: "Coluna de Relatório"
         other: "Colunas de Relatórios"
 
+    errors:
+      models:
+        admissions/admission_report_column:
+          field_not_found: "Campo não encontrado: %{field}"
+
+
   active_scaffold:
     create_admission_report_column_label: "Criar Coluna de Relatório"

@@ -8,6 +8,7 @@ class Admissions::AdmissionReportGroup < ActiveRecord::Base
 
   MAIN = record_i18n_attr("modes.main")
   MAIN_LETTER = record_i18n_attr("modes.main_letter")
+  MAIN_ANONYMOUS = record_i18n_attr("modes.main_anonymous")
   FIELD = record_i18n_attr("modes.field")
   LETTER = record_i18n_attr("modes.letter")
   PHASE = record_i18n_attr("modes.phase")
@@ -18,8 +19,9 @@ class Admissions::AdmissionReportGroup < ActiveRecord::Base
   CONSOLIDATION = record_i18n_attr("modes.consolidation")
 
   MODES = [
-    MAIN, FIELD, LETTER, PHASE, PHASE_WITHOUT_COMMITTEE,
-    PHASE_REVERSE, PHASE_WITHOUT_COMMITTEE_REVERSE, RANKING, CONSOLIDATION
+    MAIN, MAIN_LETTER, MAIN_ANONYMOUS, FIELD, LETTER,
+    PHASE, PHASE_WITHOUT_COMMITTEE, PHASE_REVERSE, PHASE_WITHOUT_COMMITTEE_REVERSE,
+    RANKING, CONSOLIDATION
   ]
 
   INCLUDE = record_i18n_attr("operations.include")
@@ -36,7 +38,7 @@ class Admissions::AdmissionReportGroup < ActiveRecord::Base
   has_many :columns, dependent: :destroy,
     class_name: "Admissions::AdmissionReportColumn"
 
-  belongs_to :config, optional: false,
+  belongs_to :admission_report_config, optional: false,
     class_name: "Admissions::AdmissionReportConfig"
 
   validates :mode, presence: true, inclusion: { in: MODES }
@@ -52,8 +54,13 @@ class Admissions::AdmissionReportGroup < ActiveRecord::Base
     case mode
     when MAIN
       cls = Admissions::AdmissionReportGroupMain
+      extra = { fixed: true }
     when MAIN_LETTER
-      cls = Admissions::AdmissionReportGroupMainLetter
+      cls = Admissions::AdmissionReportGroupMain
+      extra = { mode: :letter, title: MAIN_LETTER }
+    when MAIN_ANONYMOUS
+      cls = Admissions::AdmissionReportGroupMain
+      extra = { fixed: true, mode: :anonymous, title: MAIN_ANONYMOUS }
     when FIELD
       cls = Admissions::AdmissionReportGroupField
     when LETTER

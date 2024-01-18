@@ -20,6 +20,7 @@ pt-BR:
       models:
         admissions/ranking_column:
           field_not_found: "Campo não encontrado: %{field}"
+          at_least_one_relationship: "Deve estar relacionado a configuração de ranking ou de relatório"
 
   active_scaffold:
     create_ranking_column_label: "Criar Ordenação para Ranking"

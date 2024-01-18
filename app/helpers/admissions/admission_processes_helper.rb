@@ -7,19 +7,6 @@ module Admissions::AdmissionProcessesHelper
   include PdfHelper
   include Admissions::AdmissionProcessesPdfHelper
 
-  def admission_process_t(key, **args)
-    t("activerecord.attributes.admissions/admission_process.#{key}", **args)
-  end
-
-  def applications_t(key, **args)
-    key = "activerecord.attributes.admissions/admission_application.#{key}"
-    I18n.t(key, **args)
-  end
-
-  def letter_request_t(key, *args)
-    I18n.t("activerecord.attributes.admissions/letter_request.#{key}", *args)
-  end
-
   def admission_date_form_column(record, options)
     month_year_widget(record, options, :admission_date)
   end

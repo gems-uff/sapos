@@ -19,14 +19,14 @@
 
       row.find(`input[name="${name}"]`).val(index)
       if (index <= 1) {
-        row.find(".move-up").addClass("disabled")
+        row.find(`div[data-name="${name}"] .move-up`).addClass("disabled")
       } else {
-        row.find(".move-up").removeClass("disabled")
+        row.find(`div[data-name="${name}"] .move-up`).removeClass("disabled")
       }
       if (index >= row.parent().children().length - 2) {
-        row.find(".move-down").addClass("disabled")
+        row.find(`div[data-name="${name}"] .move-down`).addClass("disabled")
       } else {
-        row.find(".move-down").removeClass("disabled")
+        row.find(`div[data-name="${name}"] .move-down`).removeClass("disabled")
       }
     }
 

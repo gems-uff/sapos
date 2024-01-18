@@ -9,6 +9,13 @@ class Admissions::LetterRequest < ActiveRecord::Base
   WAITING = record_i18n_attr("statuses.waiting")
   RECEIVED = record_i18n_attr("statuses.received")
 
+  SHADOW_FIELDS = Set[
+    "name", "email", "telephone", "status"
+  ]
+  SHADOW_FIELDS_MAP = SHADOW_FIELDS.index_by do |field|
+    record_i18n_attr(field)
+  end
+
   belongs_to :admission_application, optional: false,
     class_name: "Admissions::AdmissionApplication"
 

@@ -222,25 +222,30 @@ class Admissions::FormField < ActiveRecord::Base
     )
   end
 
-  def self.full_search_name(field: nil, substring: false, limit: 10)
-    (
-      self.search_name(field:, substring:).limit(limit).map(&:name) +
-      Admissions::AdmissionApplication::SHADOW_FIELDS_MAP.filter_map do |name, _|
-        next if !substring && name != field
-        next if !name.include? field
-        name
-      end +
-      Admissions::AdmissionApplication::SHADOW_FIELDS.filter_map do |name|
-        next if !substring && name != field
-        next if !name.include? field
-        name
+  def self.full_search_name(
+    field: nil, substring: false, limit: 10,
+    in_main: true, in_letter: false
+  )
+    result = self.search_name(field:, substring:).limit(limit).map(&:name)
+    block = -> (param) {
+      label = param[0]
+      name = param[1]
+      break if result.size >= limit
+      if substring
+        result << name if name.include?(field)
+        result << label if label.include?(field) if result.size < limit
+      else
+        result << name if name == field
+        result << label if label == field if result.size < limit
       end
-    )[..limit - 1]
+    }
+    Admissions::AdmissionApplication::SHADOW_FIELDS_MAP.each(&block) if in_main
+    Admissions::LetterRequest::SHADOW_FIELDS_MAP.each(&block) if in_letter
+
+    result
   end
 
-  def self.field_name_exists?(field)
-    return true if Admissions::AdmissionApplication::SHADOW_FIELDS_MAP[field].present?
-    return true if Admissions::AdmissionApplication::SHADOW_FIELDS.include? field
-    self.search_name(field:).present?
+  def self.field_name_exists?(field, in_main: true, in_letter: false)
+    self.full_search_name(field:, limit: 1, in_main:, in_letter:).present?
   end
 end

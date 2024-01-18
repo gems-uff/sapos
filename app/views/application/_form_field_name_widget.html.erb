@@ -4,6 +4,7 @@
   value = attributes[:text] || ""
   classnames = Array(options[:class] || [])
   classnames << "text-input" if !classnames.include? "text-input"
+  query_options = attributes[:query_options] || {}
 %>
 
 <%= text_field_tag(
@@ -14,7 +15,11 @@
 <script>
   $(document).ready(function() {
     $(`#<%= text_id %>`).autocomplete({
-      source: autocomplete_search("<%= form_field_form_autocompletes_path %>")
+      source: autocomplete_search("<%= form_field_form_autocompletes_path %>", (request) => {
+        <% query_options.each do |opt, value| %>
+          request.<%= opt.to_s %> = <%= value %>
+        <% end %>
+      })
     })
   });
 </script>

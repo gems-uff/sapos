@@ -1,0 +1,24 @@
+<%
+  valid_controllers = [
+    "Admissions::AdmissionReportConfigsController",
+  ]
+  if valid_controllers.include? controller.class.name
+   associated = associated.sort_by { |f| [f.order, f.id]}
+  end
+  div_id = "#{sub_form_list_id(association: column.name, id: parent_record&.id || generated_id(parent_record) || 99999999999)}-parent"
+%>
+<div id="<%= div_id %>">
+<%= render(partial: 'active_scaffold_overrides/horizontal_subform', locals: {
+    parent_record: parent_record, column: column, associated: associated,
+    scope: scope, show_blank_record: show_blank_record,
+    local_assigns: local_assigns
+  }) %>
+</div>
+
+<% if valid_controllers.include? controller.class.name %>
+<script>
+  $(document).ready(function () {
+    $("#<%= div_id %> > table > thead > tr > th.operation-column").detach()
+  });
+</script>
+<% end %>

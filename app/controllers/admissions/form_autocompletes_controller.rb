@@ -53,6 +53,7 @@ class Admissions::FormAutocompletesController < Admissions::ProcessBaseControlle
   def form_field
     @form_fields = Admissions::FormField.full_search_name(
       field: params[:term],
+      in_letter: params[:in_letter] || false,
       substring: true,
       limit: 10
     )

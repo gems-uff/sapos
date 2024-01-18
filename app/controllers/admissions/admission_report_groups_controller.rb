@@ -9,10 +9,12 @@ class Admissions::AdmissionReportGroupsController < ApplicationController
   active_scaffold "Admissions::AdmissionReportGroup" do |config|
     config.create.label = :create_admission_report_group_label
     columns = [
-      :order, :mode, :operation, :columns
+      :admission_report_config, :order, :mode, :pdf_format, :operation, :columns
     ]
 
     config.columns = columns
+
+    config.columns[:admission_report_config].form_ui = :record_select
 
     config.columns[:mode].form_ui = :select
     config.columns[:mode].options = {
@@ -23,6 +25,13 @@ class Admissions::AdmissionReportGroupsController < ApplicationController
     config.columns[:operation].options = {
       options: Admissions::AdmissionReportGroup::OPERATIONS
     }
+
+    config.columns[:pdf_format].form_ui = :select
+    config.columns[:pdf_format].options = {
+      options: Admissions::AdmissionReportGroup::PDF_FORMATS
+    }
+
+    config.columns[:columns].show_blank_record = false
 
     config.actions.exclude :deleted_records
   end
