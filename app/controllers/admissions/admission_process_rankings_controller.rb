@@ -9,7 +9,7 @@ class Admissions::AdmissionProcessRankingsController < ApplicationController
   active_scaffold "Admissions::AdmissionProcessRanking" do |config|
     config.create.label = :create_admission_process_ranking_label
     columns = [
-      :ranking_config, :admission_process, :admission_phase,
+      :order, :ranking_config, :admission_process, :admission_phase,
     ]
     config.columns = columns
 

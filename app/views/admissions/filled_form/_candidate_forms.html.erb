@@ -72,7 +72,7 @@
 <% end%>
 
 <% if show_rankings %>
-  <% admission_application.rankings.each do |ranking| %>
+  <% admission_application.ordered_rankings.each do |ranking| %>
     <% next if !ranking.filled_form.is_filled %>
     <% next if check_candidate_permission && !ranking.ranking_config.candidate_can_see %>
     <% ranking.filled_form.prepare_missing_fields %>

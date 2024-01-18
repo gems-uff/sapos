@@ -201,6 +201,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
 
     @admission_process.rankings
       .where(admission_phase_id: params[:consolidate_phase_id].to_i)
+      .order(:order)
       .each(&:generate_ranking)
 
     if index < phases.size - 1

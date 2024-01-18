@@ -40,7 +40,7 @@
           </p>
         <% end %>
       </div>
-      <% @admission_application.rankings.reverse.each do |ranking| %>
+      <% @admission_application.ordered_rankings.reverse.each do |ranking| %>
         <% next if !ranking.filled_form.is_filled %>
         <% next if !ranking.ranking_config.candidate_can_see %>
         <div>

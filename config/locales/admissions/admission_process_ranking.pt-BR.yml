@@ -6,6 +6,7 @@ pt-BR:
     attributes:
       admissions/admission_process_ranking:
         ranking_config: Configuração de Ranking
+        order: Ordem
         admission_process: Edital de Seleção
         admission_phase: Calcular durante consolidação de fase
 

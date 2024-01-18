@@ -238,7 +238,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     self.results.each do |result|
       result.filled_form.to_fields_hash(field_objects)
     end
-    self.rankings.each do |ranking|
+    self.ordered_rankings.each do |ranking|
       ranking.filled_form.to_fields_hash(field_objects)
     end
     field_objects
@@ -459,7 +459,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       end
     end
     if has_rankings
-      self.rankings.each do |ranking|
+      self.ordered_rankings.each do |ranking|
         next if !ranking.filled_form.is_filled
         next if !can_edit_override
         next if ranking.filled_form.try(:disable_submission) == "1"
@@ -655,6 +655,15 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     return true if self.admission_phase_id.nil?
     return false if !self.admission_phase.candidate_can_edit
     !END_OF_PHASE_STATUSES.include?(self.status)
+  end
+
+  def ordered_rankings
+    self.rankings.joins(admission_application: { admission_process: :rankings })
+      .where("
+        `admission_process_rankings`.`ranking_config_id` =
+        `admission_ranking_results`.`ranking_config_id`
+      ")
+      .order(Arel.sql("`admission_process_rankings`.`order` ASC"))
   end
 
   private

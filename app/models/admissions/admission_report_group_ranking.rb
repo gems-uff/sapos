@@ -35,7 +35,7 @@ class Admissions::AdmissionReportGroupRanking < Admissions::AdmissionReportGroup
   private
     def flat_columns(column_map)
       all_flat = []
-      @admission_process.rankings.each_with_index do |apr, index|
+      @admission_process.rankings.order(order: :desc).each_with_index do |apr, index|
         ranking = apr.ranking_config
         ranking_num = index + 1
 

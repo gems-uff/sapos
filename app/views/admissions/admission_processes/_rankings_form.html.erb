@@ -40,7 +40,7 @@
         </dt>
         <dd>
           <%= select_tag(:admission_process_ranking_id, options_for_select(
-            @admission_process.rankings.map do |p|
+            @admission_process.rankings.order(:order).map do |p|
               [p.ranking_config.name, p.id]
             end
           ))%>
