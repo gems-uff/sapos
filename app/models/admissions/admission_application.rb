@@ -648,7 +648,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   end
 
   def identifier
-    self.token[..6]
+    self.token[..5]
   end
 
   def can_edit_itself

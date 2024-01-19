@@ -9,7 +9,7 @@ class Admissions::AdmissionReportGroupsController < ApplicationController
   active_scaffold "Admissions::AdmissionReportGroup" do |config|
     config.create.label = :create_admission_report_group_label
     columns = [
-      :admission_report_config, :order, :mode, :pdf_format, :operation, :columns
+      :admission_report_config, :order, :mode, :pdf_format, :in_simple, :operation, :columns
     ]
 
     config.columns = columns

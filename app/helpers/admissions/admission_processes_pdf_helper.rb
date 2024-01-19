@@ -39,7 +39,7 @@ module Admissions::AdmissionProcessesPdfHelper
 
   def admission_applications_table(curr_pdf, options = {})
     admission_process ||= options[:admission_process]
-    admission_report_config = Admissions::AdmissionReportConfig.new.init_default
+    admission_report_config = @admission_report_config || Admissions::AdmissionReportConfig.new.init_default
     title = admission_process_pdf_title(admission_process)
     config = admission_report_config.prepare_table(admission_process)
     config[:base_url] = request.base_url
@@ -103,7 +103,7 @@ module Admissions::AdmissionProcessesPdfHelper
 
   def admission_applications_complete_table(curr_pdf, options = {})
     admission_process ||= options[:admission_process]
-    admission_report_config = Admissions::AdmissionReportConfig.new.init_default
+    admission_report_config = @admission_report_config || Admissions::AdmissionReportConfig.new.init_default
     title = admission_process_pdf_title(admission_process)
     config = admission_report_config.prepare_table(admission_process)
     applications = config[:applications].map do |application|

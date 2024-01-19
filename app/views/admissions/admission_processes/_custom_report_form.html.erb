@@ -1,0 +1,61 @@
+<%
+
+  form_action ||= :custom_report_generate
+
+  scope ||= nil
+  url_options ||= params_for(:action => form_action)
+  xhr = request.xhr? if xhr.nil?
+
+  report_action_config = Admissions::AdmissionReportConfigsController.active_scaffold_config.create
+  multipart ||= report_action_config.multipart?
+  report_columns ||= report_action_config.columns
+  report_columns.constraint_columns << :name
+
+  persistent ||= false
+  floating_footer ||= false
+  method ||= :post
+  cancel_link = true if cancel_link.nil?
+  submit_text ||= form_action
+  apply_text ||= :"#{form_action}_apply"
+  body_partial ||= 'form'
+  form_id = element_form_id(action: form_action, id: "custom_report_definition")
+%>
+<%=
+options = {:id => form_id,
+           :multipart => multipart,
+           :class => "as_form #{form_action.to_s}",
+           :method => :post,
+           'data-loading' => defined?(loading) ? loading : true}
+cancel_options = {:class => 'as_cancel'}
+options[:class] << ' floating-footer' if floating_footer
+cancel_options[:remote] = true if xhr #cancel link does nt have to care about multipart forms
+if xhr && multipart # file_uploads
+  form_remote_upload_tag url_options.merge({:iframe => true}), options
+else
+  options[:remote] = true if xhr && !multipart
+  form_tag url_options, options
+end
+-%>
+ <h4> <%= t("active_scaffold.admissions/admission_process.custom_report.title") %> </h4>
+  <div id="<%= element_messages_id(:action => form_action) %>" class="messages-container">
+    <% unless xhr %>
+      <p class="error-message message server-error" style="display:none;">
+        <%= as_(:internal_error).html_safe %>
+        <a href="#" class="close" title="<%= as_(:close).html_safe %>"><%= as_(:close).html_safe %></a>
+      </p>
+    <% end %>
+    <%= render :partial => 'form_messages' %>
+  </div>
+
+
+  <% @record = @admission_report_config %>
+  <%= render :partial => body_partial, :locals => { :columns => report_columns, :form_action => form_action, :scope => nil } %>
+
+  <p class="form-footer">
+    <%= submit_tag "Usar configuração", name: "dont_close", :class => "submit" %>
+    <%= submit_tag "Resetar", name: "dont_close", formaction: url_for(params_for(action: :reset_report)), :class => "submit" %>
+    <%= link_to(as_(:cancel), main_path_to_return, cancel_options) if cancel_link %>
+    <%= loading_indicator_tag(action: form_action, id: "custom_report_definition") %>
+  </p>
+
+</form>

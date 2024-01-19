@@ -70,6 +70,7 @@ module Admissions::Ability
 
   def initialize_admissions(user, roles)
     alias_action :map_student_form, :map_student_form_create_update, to: :map_student
+    alias_action :custom_report_generate, :reset_report, to: :custom_report
     if roles[:manager]
       can :undo_consolidation, Admissions::AdmissionApplication
       can :override, Admissions::AdmissionApplication
@@ -77,6 +78,7 @@ module Admissions::Ability
       can :configuration, Admissions::AdmissionApplication
       can :read_all, Admissions::AdmissionApplication
       can :map_student, Admissions::AdmissionApplication
+      can :custom_report, Admissions::AdmissionProcess
     end
     if roles[Role::ROLE_ADMINISTRADOR] || roles[Role::ROLE_COORDENACAO]
       can :manage, ADMISSION_MODELS

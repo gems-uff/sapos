@@ -1,0 +1,11 @@
+try {
+<% form_selector ||= "#{element_form_id(:action => :custom_report_generate, :id => "custom_report_definition")}" %>
+var action_link = ActiveScaffold.find_action_link('<%= form_selector %>');
+if (action_link) action_link.update_flash_messages('<%= escape_javascript(render(:partial => 'messages')) %>');
+<% if !params[:dont_close] && successful?  %>
+    if (action_link) action_link.close();
+<% end %>
+ActiveScaffold.replace('<%= form_selector %>', '<%= escape_javascript(render(:partial => 'custom_report_form', :locals => {:xhr => true})) %>');
+ActiveScaffold.scroll_to('<%= form_selector %>', true);
+$("#admission-report-config-notice").toggle(<%= session.include? :admission_report_config  %>)
+} catch (e) { alert('RJS error:\n\n' + e.toString());}

@@ -84,6 +84,9 @@ pt-BR:
           other: "Consolidação não-parcial impedida: há %{count} candidatos com pendencias nesta fase (%{phase_name})"
       rankings:
         title: "Rankings"
+      custom_report:
+        title: "Configurar relatórios"
+        notice: Usando relatório customizado. A customização escolhida pode não ser compatível com todos os editais. Clique aqui para desativar
 
   xlsx_content:
     admissions/admission_process:

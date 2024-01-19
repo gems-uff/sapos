@@ -7,6 +7,7 @@ pt-BR:
       admissions/admission_report_group:
         admission_report_config: Configuração de relatório
         order: Ordem
+        in_simple: No resumo
         mode: Tipo
         modes:
           main: Principal

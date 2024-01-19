@@ -68,6 +68,7 @@ a.disabled {
 .active-scaffold-header div.actions a.class_schedule_pdf,
 .active-scaffold-header div.actions a.show_config_list,
 .active-scaffold-header div.actions a.configure_all,
+.active-scaffold-header div.actions a.custom_report,
 .active-scaffold-header div.actions div.action_group div {
     margin: 0;
     padding: 5px 5px 5px 25px;
@@ -131,6 +132,18 @@ a.disabled {
 
 .active-scaffold-header div.actions a.configure_all:before {
     content: "\f013";  /* this is your text. You can also use UTF-8 character codes as I do here */
+    font-family: FontAwesome;
+    left: 8px;
+    position: absolute;
+    top: 25%;
+}
+
+.active-scaffold-header div.actions a.custom_report {
+    position: relative;
+}
+
+.active-scaffold-header div.actions a.custom_report:before {
+    content: "\f1c9";  /* this is your text. You can also use UTF-8 character codes as I do here */
     font-family: FontAwesome;
     left: 8px;
     position: absolute;

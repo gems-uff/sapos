@@ -293,6 +293,11 @@ Rails.application.routes.draw do
         get :rankings
         post :calculate_ranking
       end
+      collection do
+        get :custom_report
+        match :reset_report, via: [:get, :post]
+        post :custom_report_generate
+      end
       record_select_routes
     end
 

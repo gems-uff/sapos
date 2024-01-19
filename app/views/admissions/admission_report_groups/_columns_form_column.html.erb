@@ -1,6 +1,7 @@
 <%
   valid_controllers = [
     "Admissions::AdmissionReportConfigsController",
+    "Admissions::AdmissionProcessesController",
   ]
   if !valid_controllers.include?(controller.class.name)
     return render :partial => 'form_association', :locals => {:column => column, :scope => scope, :parent_record => record}

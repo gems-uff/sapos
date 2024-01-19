@@ -75,6 +75,9 @@ class Admissions::AdmissionProcessesController < ApplicationController
       page: true,
       type: :member,
       parameters: { format: :xlsx }
+    config.action_links.add "custom_report",
+      label: I18n.t("active_scaffold.admissions/admission_process.custom_report.title"),
+      type: :collection
 
     config.columns[:form_template].form_ui = :record_select
     config.columns[:form_template].options[:params] = {
@@ -106,16 +109,19 @@ class Admissions::AdmissionProcessesController < ApplicationController
   )
 
   def short_pdf
+    load_admission_report_config
     get_admission_process_pdf("short_pdf")
   end
 
   def complete_pdf
+    load_admission_report_config
     get_admission_process_pdf("complete_pdf")
   end
 
   def complete_xls
     @admission_process = Admissions::AdmissionProcess.find(params[:id])
-    @admission_report_config = Admissions::AdmissionReportConfig.new.init_default
+    load_admission_report_config
+
     respond_to do |format|
       format.xlsx
     end
@@ -280,7 +286,66 @@ class Admissions::AdmissionProcessesController < ApplicationController
     respond_to_action(:calculate_ranking)
   end
 
+  def custom_report
+    do_custom_report
+    respond_to_action(:custom_report)
+  end
+
+  def custom_report_generate
+    do_custom_report_generate
+    respond_to_action(:custom_report_generate)
+  end
+
+  def reset_report
+    session.delete(:admission_report_config) if session.include? :admission_report_config
+    load_admission_report_config
+    @on_form = params[:on_form]
+    respond_to_action(:reset_report)
+  ensure
+    params.delete :on_form if params.include? :on_form
+  end
+
   protected
+    def load_admission_report_config
+      @admission_report_config = Admissions::AdmissionReportConfig.new.init_default
+      if session[:admission_report_config].present?
+        update_record_from_params(
+          @admission_report_config,
+          Admissions::AdmissionReportConfigsController.active_scaffold_config.create.columns,
+          session[:admission_report_config]
+        )
+      end
+    end
+
+    def do_show
+      load_admission_report_config
+      super
+    end
+
+    def do_custom_report
+      load_admission_report_config
+    end
+
+    def do_custom_report_generate
+      do_custom_report
+      self.successful = false
+      update_record_from_params(
+        @admission_report_config,
+        Admissions::AdmissionReportConfigsController.active_scaffold_config.create.columns,
+        params[:record]
+      )
+      old_name = @admission_report_config.name
+      @admission_report_config.name = "Dinamico"
+      self.successful = successful? || [
+        @admission_report_config.keeping_errors { @admission_report_config.valid? },
+        @admission_report_config.associated_valid?
+      ].all? # this syntax avoids a short-circuit
+      @admission_report_config.name = old_name
+      if successful?
+        session[:admission_report_config] = params.require(:record).permit!.to_h
+      end
+    end
+
     def consolidate_phase_respond_on_iframe
       flash[:info] = @message
       flash[:error] = @exception
@@ -320,6 +385,61 @@ class Admissions::AdmissionProcessesController < ApplicationController
       do_refresh_list
       @popstate = true
       render action: "on_calculate_ranking", formats: [:js]
+    end
+
+    def custom_report_respond_to_html
+      if successful?
+        render(action: "custom_report")
+      else
+        return_to_main
+      end
+    end
+
+    def custom_report_respond_to_js
+      render(partial: "custom_report_form")
+    end
+
+    def custom_report_generate_respond_on_iframe
+      responds_to_parent do
+        render action: "on_custom_report", formats: [:js], layout: false
+      end
+    end
+
+    def custom_report_generate_respond_to_html
+      if successful? # just a regular post
+        message = "Relatório configurado"
+        if params[:dont_close]
+          flash.now[:info] = message
+          render(action: "custom_report")
+        else
+          flash[:info] = message
+          return_to_main
+        end
+      else
+        render(action: "custom_report")
+      end
+    end
+
+    def custom_report_generate_respond_to_js
+      render action: "on_custom_report"
+    end
+
+    def reset_report_respond_on_iframe
+      responds_to_parent do
+        render action: "on_custom_report", formats: [:js], layout: false
+      end
+    end
+
+    def reset_report_respond_to_html
+      if @on_form
+        render(action: "custom_report")
+      else
+        return_to_main
+      end
+    end
+
+    def reset_report_respond_to_js
+      render action: "on_custom_report"
     end
 
   private

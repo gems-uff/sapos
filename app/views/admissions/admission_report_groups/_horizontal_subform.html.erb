@@ -1,6 +1,7 @@
 <%
   valid_controllers = [
     "Admissions::AdmissionReportConfigsController",
+    "Admissions::AdmissionProcessesController",
   ]
   if valid_controllers.include? controller.class.name
    associated = associated.sort_by { |f| [f.order, f.id]}

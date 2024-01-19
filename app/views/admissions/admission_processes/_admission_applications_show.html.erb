@@ -1,5 +1,5 @@
 <%
-  admission_report_config = Admissions::AdmissionReportConfig.new.init_default
+  admission_report_config = @admission_report_config || Admissions::AdmissionReportConfig.new.init_default
   config = admission_report_config.prepare_table(record)
   config[:base_url] = request.base_url
 %>
