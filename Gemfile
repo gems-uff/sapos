@@ -17,7 +17,10 @@ gem "sprockets-rails"
 # gem "sqlite3", "~> 1.4"
 
 # Use the Puma web server [https://github.com/puma/puma]
-gem "puma", ">= 5.0"
+gem "puma", ">= 6.4.2"
+
+# HTML and XML parser
+gem "nokogiri", ">= 1.16.2"
 
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 # gem "importmap-rails"
@@ -102,7 +105,7 @@ gem "simple-navigation"
 gem "rufus-scheduler"
 
 # Image
-gem "carrierwave"
+gem "carrierwave", ">= 3.0.5"
 gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-activerecord.git", branch: "rails7"
 
 # Nested Forms / ApplicationProcess and FormTemplates functionalities.

@@ -127,7 +127,7 @@ GEM
       rack-test (>= 0.6.3)
       regexp_parser (>= 1.5, < 3.0)
       xpath (~> 3.2)
-    carrierwave (3.0.4)
+    carrierwave (3.0.5)
       activemodel (>= 6.0.0)
       activesupport (>= 6.0.0)
       addressable (~> 2.6)
@@ -272,10 +272,10 @@ GEM
     net-smtp (0.4.0)
       net-protocol
     nio4r (2.5.9)
-    nokogiri (1.15.4)
+    nokogiri (1.16.2)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
-    nokogiri (1.15.4-x86-mingw32)
+    nokogiri (1.16.2-x86-mingw32)
       racc (~> 1.4)
     orm_adapter (0.5.0)
     paper_trail (15.1.0)
@@ -301,7 +301,7 @@ GEM
     psych (5.1.1.1)
       stringio
     public_suffix (5.0.3)
-    puma (6.4.0)
+    puma (6.4.2)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.7.3)
@@ -498,7 +498,7 @@ DEPENDENCIES
   bootsnap
   cancancan
   capybara
-  carrierwave
+  carrierwave (>= 3.0.5)
   carrierwave-activerecord!
   caxlsx
   caxlsx_rails
@@ -522,12 +522,13 @@ DEPENDENCIES
   net-http
   net-imap
   net-smtp
+  nokogiri (>= 1.16.2)
   paper_trail
   prawn
   prawn-rails
   prawn-table
   pry
-  puma (>= 5.0)
+  puma (>= 6.4.2)
   rails (~> 7.0.7)
   rails-erd
   rdoc
