@@ -104,7 +104,7 @@ module ClassScheduleHelperConcern
 
     table_data += demand_data
 
-    table_data.sort_by! { |e| e[1] }
+    table_data.sort_by! { |e| I18n.transliterate(e[1]) }
 
     {
       star: star,
