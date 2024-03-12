@@ -93,7 +93,7 @@ class CustomVariable < ApplicationRecord
 
   def self.year_semester_range
     config = CustomVariable.find_by_variable(:year_semester_range)
-    self.parse_range(config, [5, 1, true])
+    self.parse_range(config, [20, 1, true])
   end
 
   def self.past_calendar_range
