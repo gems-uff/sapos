@@ -105,7 +105,7 @@ gem "simple-navigation"
 gem "rufus-scheduler"
 
 # Image
-gem "carrierwave", ">= 3.0.5"
+gem "carrierwave", ">= 3.0.7"
 gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-activerecord.git", branch: "rails7"
 
 # Nested Forms / ApplicationProcess and FormTemplates functionalities.
