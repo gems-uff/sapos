@@ -298,7 +298,7 @@ GEM
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    psych (5.1.1.1)
+    psych (5.1.2)
       stringio
     public_suffix (5.0.3)
     puma (6.4.2)
@@ -343,7 +343,7 @@ GEM
       zeitwerk (~> 2.5)
     rainbow (3.1.1)
     rake (13.1.0)
-    rdoc (6.5.0)
+    rdoc (6.6.3.1)
       psych (>= 4.0.0)
     recaptcha (5.16.0)
     recordselect (3.10.4)
@@ -531,7 +531,7 @@ DEPENDENCIES
   puma (>= 6.4.2)
   rails (~> 7.0.7)
   rails-erd
-  rdoc
+  rdoc (>= 6.5.1.1)
   recaptcha
   recordselect
   redcarpet
