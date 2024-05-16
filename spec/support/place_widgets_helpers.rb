@@ -42,7 +42,7 @@ module PlaceWidgetsHelpers
     expect(page.all("select#widget_record_#{city_field} option").map(&:text)).to eq ["Selecione a cidade"]
   end
 
-  def expect_to_have_identity_issuing_place_widget(page, field)
-    expect(page).to have_selector("input#widget_record_#{field}_", visible: true)
+  def expect_to_have_identity_issuing_place_widget(page, field, record_id = "")
+    expect(page).to have_selector("input#record_#{field}_#{record_id}", visible: true)
   end
 end
