@@ -52,6 +52,7 @@
 /app/assets/images/student
 coverage/
 /vendor/bundle
+/node_modules/
 
 # Ignore IDEs and text editors
 .idea/
