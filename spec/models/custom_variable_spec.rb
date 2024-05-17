@@ -136,6 +136,31 @@ RSpec.describe CustomVariable, type: :model do
       end
     end
 
+    context 'reply_to' do
+      it "should return nil when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:reply_to)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.reply_to).to eq(nil)
+      end
+
+      it "should return '' when the value is nil" do
+        config = CustomVariable.find_by_variable(:reply_to)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create(variable: :reply_to, value: nil)
+
+        expect(CustomVariable.reply_to).to eq("")
+      end
+
+      it "should return 'bla' when it is defined to bla" do
+        config = CustomVariable.find_by_variable(:reply_to)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create(variable: :reply_to, value: "bla")
+
+        expect(CustomVariable.reply_to).to eq("bla")
+      end
+    end
+
     context "notification_footer" do
       it "should return '' when there is no variable defined" do
         config = CustomVariable.find_by_variable(:notification_footer)
