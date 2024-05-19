@@ -12,6 +12,8 @@ class EmailTemplate < ApplicationRecord
   validates :to, presence: true
   validates :subject, presence: true
 
+  EMAIL_SAPOS ||= "sapos@sapos.ic.uff.br"
+
   BUILTIN_TEMPLATES = {
     "accomplishments:email_to_advisor" => {
       path: File.join("accomplishments", "mailer", "email_to_advisor.text.erb"),
@@ -283,6 +285,7 @@ class EmailTemplate < ApplicationRecord
       unless builtin.blank?
         template.subject = builtin[:subject]
         template.to = builtin[:to]
+        template.reply_to = EMAIL_SAPOS
         template.body = File.read File.join(
           Rails.root, "app", "views", builtin[:path]
         )
