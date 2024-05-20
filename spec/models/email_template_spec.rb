@@ -111,6 +111,20 @@ RSpec.describe EmailTemplate, type: :model do
         })
         CustomVariable.delete_all
       end
+      it "should have 'reply_to' attribute when reply_to is set" do
+        FactoryBot.create(:custom_variable, variable: "reply_to", value: "email@email.com")
+        template = EmailTemplate.load_template("accomplishments:email_to_advisor")
+
+        headers = {
+          to: "a", subject: "b", body: "c"
+        }
+        template.update_mailer_headers(headers)
+        expect(headers).to eq({
+                                reply_to: "email@email.com", subject: "b", body: "c", to: "a",
+                                skip_message: false, skip_footer: true
+                              })
+        CustomVariable.delete_all
+      end
     end
     describe "prepare_message" do
       it "should use the ERB formating in all fields" do
