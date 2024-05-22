@@ -164,7 +164,7 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have identity issuing place widget for identity issuing place" do
-      expect(find("#widget_record_identity_issuing_place_#{@record.id}").value).to eq @state.name
+      expect(find("#record_identity_issuing_place_#{@record.id}").value).to eq @state.name
     end
 
     it "should have a datepicker for birthdate with a range starting 100 years ago" do
