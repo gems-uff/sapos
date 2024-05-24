@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_18_203814) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_24_135850) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -254,6 +254,18 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_18_203814) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["enrollment_id"], name: "index_advisements_on_enrollment_id"
     t.index ["professor_id"], name: "index_advisements_on_professor_id"
+  end
+
+  create_table "affiliations", force: :cascade do |t|
+    t.integer "professor_id"
+    t.integer "institution_id"
+    t.boolean "active"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["institution_id"], name: "index_affiliations_on_institution_id"
+    t.index ["professor_id"], name: "index_affiliations_on_professor_id"
   end
 
   create_table "allocations", force: :cascade do |t|
@@ -701,7 +713,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_18_203814) do
     t.string "siape", limit: 255
     t.string "enrollment_number", limit: 255
     t.string "identity_issuing_place", limit: 255
-    t.integer "institution_id"
     t.string "email", limit: 255
     t.date "academic_title_date"
     t.integer "academic_title_country_id"
@@ -715,7 +726,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_18_203814) do
     t.index ["city_id"], name: "index_professors_on_city_id"
     t.index ["cpf"], name: "index_professors_on_cpf"
     t.index ["email"], name: "index_professors_on_email"
-    t.index ["institution_id"], name: "index_professors_on_institution_id"
     t.index ["user_id"], name: "index_professors_on_user_id"
   end
 
