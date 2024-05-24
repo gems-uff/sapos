@@ -6,5 +6,6 @@ FactoryBot.define do
     professor
     start_date { Time.now }
     end_date { Time.now }
+    active { true }
   end
 end

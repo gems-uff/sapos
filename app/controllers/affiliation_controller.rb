@@ -14,9 +14,8 @@ class AffiliationController < ApplicationController
     config.columns[:professor].form_ui = :record_select
     config.columns[:institution].form_ui = :record_select
     config.columns[:start_date].form_ui = :date_picker
-    config.columns[:active].form_ui = :radio_button
+    config.columns[:active].form_ui = :checkbox
     config.columns[:end_date].form_ui = :date_picker
-
   end
   record_select(
     per_page: 10,
