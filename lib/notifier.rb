@@ -80,8 +80,8 @@ module Notifier
   def self.display_notification_info(notification, attachments_file_name_list)
     Notifier.logger.info "\n#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}"
     Notifier.logger.info "########## Notification ##########"
-    Notifier.logger.info "Notifying #{notification[:to]}"
-    Notifier.logger.info "Replying #{notification[:reply_to]}"
+    Notifier.logger.info "Notifying: #{notification[:to]}"
+    Notifier.logger.info "Replying: #{notification[:reply_to]}"
     Notifier.logger.info "Subject: #{notification[:subject]}"
     Notifier.logger.info "body: #{notification[:body]}"
     if attachments_file_name_list

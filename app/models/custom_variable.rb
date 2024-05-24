@@ -7,6 +7,8 @@
 class CustomVariable < ApplicationRecord
   has_paper_trail
 
+  SAPOS_MAIL = "sapos@sapos.ic.uff.br"
+
   VARIABLES = {
     "single_advisor_points" => :text,
     "multiple_advisor_points" => :text,
@@ -61,8 +63,9 @@ class CustomVariable < ApplicationRecord
   end
 
   def self.reply_to
+    default = ActionMailer::Base.default[:from]
     config = CustomVariable.find_by_variable(:reply_to)
-    config.blank? ? nil : (config.value || "")
+    config.blank? ? default : (config.value || default)
   end
 
   def self.notification_footer

@@ -16,6 +16,7 @@ RSpec.describe EmailTemplate, type: :model do
       subject: "Title",
     )
   end
+  let(:default_from) { ActionMailer::Base.default[:from] }
   subject { email_template }
   describe "Validations" do
     it { should be_valid }
@@ -93,7 +94,7 @@ RSpec.describe EmailTemplate, type: :model do
         }
         template.update_mailer_headers(headers)
         expect(headers).to eq({
-          to: "a", subject: "b", body: "c",
+          to: "a", subject: "b", body: "c", reply_to: default_from,
           skip_message: true, skip_footer: true
         })
       end
@@ -106,12 +107,12 @@ RSpec.describe EmailTemplate, type: :model do
         }
         template.update_mailer_headers(headers)
         expect(headers).to eq({
-          to: "email@email.com", subject: "b (Originalmente para a)", body: "c",
+          to: "email@email.com", subject: "b (Originalmente para a)", body: "c", reply_to: default_from,
           skip_message: false, skip_footer: true, skip_redirect: true
         })
         CustomVariable.delete_all
       end
-      it "should have 'reply_to' attribute when reply_to is set" do
+      it "should have 'reply_to' equal to variable reply_to attribute when variable is set" do
         FactoryBot.create(:custom_variable, variable: "reply_to", value: "email@email.com")
         template = EmailTemplate.load_template("accomplishments:email_to_advisor")
 
@@ -121,6 +122,19 @@ RSpec.describe EmailTemplate, type: :model do
         template.update_mailer_headers(headers)
         expect(headers).to eq({
                                 reply_to: "email@email.com", subject: "b", body: "c", to: "a",
+                                skip_message: false, skip_footer: true
+                              })
+        CustomVariable.delete_all
+      end
+      it "should have 'reply_to' equal to default[:from] when variable isnt set" do
+        template = EmailTemplate.load_template("accomplishments:email_to_advisor")
+
+        headers = {
+          to: "a", subject: "b", body: "c"
+        }
+        template.update_mailer_headers(headers)
+        expect(headers).to eq({
+                                reply_to: default_from, subject: "b", body: "c", to: "a",
                                 skip_message: false, skip_footer: true
                               })
         CustomVariable.delete_all
@@ -136,6 +150,7 @@ RSpec.describe EmailTemplate, type: :model do
           to: "t1",
           subject: "s1",
           body: "b1",
+          reply_to: default_from,
           skip_footer: true,
           skip_message: true,
         })

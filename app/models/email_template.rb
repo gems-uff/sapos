@@ -283,7 +283,6 @@ class EmailTemplate < ApplicationRecord
       unless builtin.blank?
         template.subject = builtin[:subject]
         template.to = builtin[:to]
-        template.reply_to = CustomVariable.reply_to unless CustomVariable.reply_to.blank?
         template.body = File.read File.join(
           Rails.root, "app", "views", builtin[:path]
         )
@@ -299,7 +298,7 @@ class EmailTemplate < ApplicationRecord
       headers[:to] = CustomVariable.redirect_email
       headers[:skip_redirect] = true
     end
-    headers[:reply_to] = CustomVariable.reply_to unless CustomVariable.reply_to.blank?
+    headers[:reply_to] = CustomVariable.reply_to
     headers[:skip_message] = ! self.enabled
     headers[:skip_footer] = true
   end

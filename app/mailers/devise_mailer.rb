@@ -23,8 +23,8 @@ class DeviseMailer < Devise::Mailer
       inline: @template.body
     ) unless @template.body.nil?
     headers[:reply_to] = render_to_string(
-      inline: @template.reply_to
-    ) unless @template.reply_to.nil?
+      inline: CustomVariable.reply_to
+    )
     @template.update_mailer_headers(headers)
     headers
   end

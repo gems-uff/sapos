@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_17_150433) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_22_181457) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -440,7 +440,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_17_150433) do
     t.boolean "enabled", default: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "reply_to", limit: 255
   end
 
   create_table "enrollment_holds", force: :cascade do |t|
