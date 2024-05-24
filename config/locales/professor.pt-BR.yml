@@ -21,7 +21,7 @@ pt-BR:
         identity_issuing_body: "Órgão Expeditor"
         identity_issuing_place: "Local de Expedição"
         identity_number: "Número da identidade"
-        institution: "Instituição"
+        affiliations: "Afiliações"
         name: "Nome"
         neighborhood: "Bairro"
         professor_research_areas: "Áreas de Pesquisa"
