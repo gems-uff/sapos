@@ -23,7 +23,7 @@ RSpec.describe Affiliation, type: :model do
       it "When active, do not add new affiliation active" do
         affiliation_active
         aff = FactoryBot.build(:affiliation, professor: professor, active: true)
-        expect(aff).to_not be_valid
+        expect(aff).to be_invalid
       end
       context "When inactive, you can add new affiliation active/inactive" do
         before do
