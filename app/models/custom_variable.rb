@@ -10,7 +10,6 @@ class CustomVariable < ApplicationRecord
   VARIABLES = {
     "single_advisor_points" => :text,
     "multiple_advisor_points" => :text,
-    "program_level" => :text,
     "identity_issuing_country" => :text,
     "class_schedule_text" => :text,
     "redirect_email" => :text,
