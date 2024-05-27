@@ -26,18 +26,28 @@ class AffiliationController < ApplicationController
 
   def populate
     professor_versions = PaperTrail::Version.where(item_type: "Professor")
-
     professor_versions.each do |version|
       professor = version.reify
-      if version.event == "create"
+      if version.event.eql?("create")
         Affiliation.create(
           professor_id: professor.id,
           institution_id: professor.institution_id,
           start_date: version.created_at,
           active: true
         )
-      else
-
+      elsif version.event.eql?("update") &&
+        Affiliation.where(professor_id: professor.id, institution_id: professor.institution_id).blank?
+        aff = Affiliation.where(professor_id: professor.id).last
+        aff.update(end_date: version.created_at, active: false)
+        Affiliation.create(
+          professor_id: professor.id,
+          institution_id: professor.institution_id,
+          start_date: version.created_at,
+          active: true
+        )
+      elsif version.event.eql?("destroy")
+        aff = Affiliation.where(professor_id: professor.id, institution_id: professor.institution_id).last
+        aff.update(end_date: version.created_at, active: false)
       end
     end
   end
