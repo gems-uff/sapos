@@ -34,13 +34,17 @@ module Notifier
       m = message.merge(options)
       next if m[:skip_message]
       m_attachments = messages_attachments[message]
-      if ! CustomVariable.notification_footer.empty? && ! m[:skip_footer]
+      if !CustomVariable.notification_footer.empty? && ! m[:skip_footer]
         m[:body] += "\n\n\n" + CustomVariable.notification_footer
       end
-      if ! CustomVariable.redirect_email.nil? && ! m[:skip_redirect]
+      if !CustomVariable.redirect_email.nil? && ! m[:skip_redirect]
         Notifier.logger.info "Custom Variable 'redirect_email' is set. Redirecting the emails"
         m[:body] = "Originalmente para #{m[:to]}\n\n" + m[:body]
         m[:to] = CustomVariable.redirect_email
+      end
+      unless CustomVariable.reply_to.nil?
+        Notifier.logger.info "Custom Variable 'reply_to' is set. Forwarding email"
+        m[:reply_to] = CustomVariable.reply_to
       end
       unless m[:to].blank?
         actionmailer_base = ActionMailer::Base.new
@@ -65,6 +69,7 @@ module Notifier
           to: m[:to],
           subject: m[:subject],
           body: m[:body],
+          reply_to: m[:reply_to],
           attachments_file_names: attachments_file_name_list
         ).save
         Notifier.display_notification_info(m, attachments_file_name_list)
@@ -75,7 +80,8 @@ module Notifier
   def self.display_notification_info(notification, attachments_file_name_list)
     Notifier.logger.info "\n#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}"
     Notifier.logger.info "########## Notification ##########"
-    Notifier.logger.info "Notifying #{notification[:to]}"
+    Notifier.logger.info "Notifying: #{notification[:to]}"
+    Notifier.logger.info "Replying: #{notification[:reply_to]}"
     Notifier.logger.info "Subject: #{notification[:subject]}"
     Notifier.logger.info "body: #{notification[:body]}"
     if attachments_file_name_list
