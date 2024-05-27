@@ -29,25 +29,31 @@ class AffiliationController < ApplicationController
     professor_versions.each do |version|
       professor = version.reify
       if version.event.eql?("create")
+
         Affiliation.create(
           professor_id: professor.id,
           institution_id: professor.institution_id,
           start_date: version.created_at,
           active: true
         )
-      elsif version.event.eql?("update") &&
-        Affiliation.where(professor_id: professor.id, institution_id: professor.institution_id).blank?
-        aff = Affiliation.where(professor_id: professor.id).last
-        aff.update(end_date: version.created_at, active: false)
+
+      elsif version.event.eql?("update") && Affiliation.where(professor_id: professor.id, institution_id: professor.institution_id)&.blank?
+
+        Affiliation.where(professor_id: professor.id)&.last&.update(end_date: version.created_at, active: false)
         Affiliation.create(
           professor_id: professor.id,
           institution_id: professor.institution_id,
           start_date: version.created_at,
           active: true
         )
+
       elsif version.event.eql?("destroy")
-        aff = Affiliation.where(professor_id: professor.id, institution_id: professor.institution_id).last
-        aff.update(end_date: version.created_at, active: false)
+
+        Affiliation.where(professor_id: professor.id, institution_id: professor.institution_id)&.last&.update(
+          end_date: version.created_at,
+          active: false
+        )
+
       end
     end
   end
