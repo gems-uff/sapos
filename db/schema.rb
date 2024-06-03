@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_24_135850) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_27_174758) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -727,6 +727,15 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_24_135850) do
     t.index ["cpf"], name: "index_professors_on_cpf"
     t.index ["email"], name: "index_professors_on_email"
     t.index ["user_id"], name: "index_professors_on_user_id"
+  end
+
+  create_table "program_levels", force: :cascade do |t|
+    t.integer "level", null: false
+    t.datetime "start_date", null: false
+    t.datetime "end_date"
+    t.boolean "active", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "queries", force: :cascade do |t|
