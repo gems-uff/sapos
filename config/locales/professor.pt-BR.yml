@@ -22,6 +22,9 @@ pt-BR:
         identity_issuing_place: "Local de Expedição"
         identity_number: "Número da identidade"
         affiliations: "Afiliações"
+        institution:
+          one: "Instituição"
+          other: "Instituições"
         name: "Nome"
         neighborhood: "Bairro"
         professor_research_areas: "Áreas de Pesquisa"

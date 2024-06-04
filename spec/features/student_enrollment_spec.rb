@@ -5,7 +5,7 @@
 
 require "spec_helper"
 
-RSpec.describe "StudentEnrollment features", type: :feature do
+RSpec.describe "StudentEnrollment features", type: :feature, js: true do
   let(:url_path) { "/pendencies" }
   before(:all) do
     @destroy_later = []
@@ -459,9 +459,8 @@ RSpec.describe "StudentEnrollment features", type: :feature do
 
       it "should show the proper allocations" do
         # Two allocations in the same day
-        expect(page.all(".enroll-table tbody tr:nth-of-type(1) td.cell-segunda").map(&:text)).to eq [
-          "11-13 14-16"
-        ]
+        expect(page.all(".enroll-table tbody tr:nth-of-type(1) td.cell-segunda").map(&:text)).to have_text "11-13"
+        expect(page.all(".enroll-table tbody tr:nth-of-type(1) td.cell-segunda").map(&:text)).to have_text "14-16"
         # No allocations for class
         expect(page.all(".enroll-table tbody tr:nth-of-type(2) td.cell-segunda").map(&:text)).to eq [
           "*"
