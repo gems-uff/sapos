@@ -28,6 +28,7 @@ gem "rack", "~> 2.2.8.1"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 # gem "importmap-rails"
 
+# Fix vulnerability
 gem "actiontext", ">= 7.0.8.4"
 
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
