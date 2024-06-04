@@ -60,23 +60,6 @@ RSpec.describe CustomVariable, type: :model do
       end
     end
 
-    context "program_level" do
-      it "should return nil when there is no variable defined" do
-        config = CustomVariable.find_by_variable(:program_level)
-        config.delete unless config.nil?
-
-        expect(CustomVariable.program_level).to eq(nil)
-      end
-
-      it "should return 5 when it is defined to 5" do
-        config = CustomVariable.find_by_variable(:program_level)
-        config.delete unless config.nil?
-        @destroy_later << CustomVariable.create(variable: :program_level, value: "5")
-
-        expect(CustomVariable.program_level).to eq(5)
-      end
-    end
-
     context "identity_issuing_country" do
       it "should return '' when there is no variable defined" do
         config = CustomVariable.find_by_variable(:identity_issuing_country)

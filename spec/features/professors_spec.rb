@@ -74,6 +74,7 @@ RSpec.describe "Professors features", type: :feature do
         fill_in "CPF", with: "1"
       end
       click_button "Salvar"
+      binding.pry
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Ana")
 
       # Remove inserted record

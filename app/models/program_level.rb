@@ -10,4 +10,8 @@ class ProgramLevel < ApplicationRecord
   def active?
     active
   end
+
+  def date(instant_date)
+    ProgramLevel.where("start_date <= #{instant_date} AND (end_date >= #{instant_date} OR #{active?})")&.last
+  end
 end

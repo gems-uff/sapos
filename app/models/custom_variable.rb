@@ -38,11 +38,6 @@ class CustomVariable < ApplicationRecord
     config.blank? ? 0.5 : config.value.to_f
   end
 
-  def self.program_level
-    config = CustomVariable.find_by_variable(:program_level)
-    config.blank? ? nil : config.value.to_i
-  end
-
   def self.identity_issuing_country
     config = CustomVariable.find_by_variable(:identity_issuing_country)
     config.blank? ? "" : config.value

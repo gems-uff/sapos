@@ -137,7 +137,7 @@ module EnrollmentsPdfHelper
         pdf.line_width 0.5
 
         common_header_part1(pdf, enrollment, [
-          "#{i18n_eht(:program_level)} <b>#{CustomVariable.program_level} </b>"
+          "#{i18n_eht(:program_level)} <b>#{ProgramLevel.date(enrollment.thesis_defense_date)&.level}</b>"
         ])
 
         common_header_part(pdf) do
@@ -616,9 +616,7 @@ module EnrollmentsPdfHelper
           ]]
           # TODO: modificar o institution para a affiliation
           thesis_desense_committee.each do |professor|
-            affiliation = Affiliation.where(professor_id: professor.id)
-                                     .where("start_date <= #{thesis_defense_date} AND (end_date >= #{thesis_defense_date} OR active = true)")
-
+            affiliation = Affiliation.where(professor_id: professor.id).date(thesis_defense_date)
             data_table_rows_defense_committee += [[
               "<b>#{professor.name} / #{rescue_blank_text(
                 affiliation.institution, method_call: :name

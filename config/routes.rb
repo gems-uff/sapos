@@ -160,6 +160,10 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :affiliation do
+    concerns :active_scaffold
+  end
+
   resources :professors do
     concerns :active_scaffold
     record_select_routes
