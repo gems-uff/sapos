@@ -18,8 +18,8 @@ class Professor < ApplicationRecord
     dependent: :restrict_with_exception
   has_many :thesis_defense_committee_enrollments,
     source: :enrollment, through: :thesis_defense_committee_participations
-  has_many :affiliations, dependent: :restrict_with_exception
-  has_many :institutions, through: :affiliations
+  has_many :affiliations, dependent: :nullify
+  has_many :institutions, through: :affiliations, dependent: :nullify
 
   belongs_to :city, optional: true
   belongs_to :academic_title_country,
