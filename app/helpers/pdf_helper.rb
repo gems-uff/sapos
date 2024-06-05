@@ -98,8 +98,7 @@ module PdfHelper
 
     diff_width = options[:diff_width]
     diff_width ||= 0
-
-    last_box_height = 50
+    last_box_height = options[:qr_code_signature] ? 80 : 50
     last_box_width1 = 165
     last_box_width2 = 335
 
@@ -109,47 +108,70 @@ module PdfHelper
         [0, last_box_y],
         width: last_box_width1, height: last_box_height
       ) do
-        pdf.stroke_bounds
         current_x = x
-        pdf.move_down last_box_height / 2
-        pdf.draw_text(
-          "#{I18n.t("pdf_content.enrollment.footer.location")}, #{I18n.localize(
-            Date.today, format: :long
-          )}", at: [current_x, pdf.cursor])
+        if options[:qr_code_signature]
+          qrcode_signature(pdf, { size: 80 })
+        else
+          pdf.stroke_bounds
+
+          pdf.move_down last_box_height / 2
+          pdf.draw_text(
+            "#{I18n.t("pdf_content.enrollment.footer.location")}, #{I18n.localize(
+              Date.today, format: :long
+            )}", at: [current_x, pdf.cursor])
+        end
       end
     end
 
-    pdf.font("FreeMono", size: 6) do
+    signature_font_size = options[:qr_code_signature] ? 8 : 6
+
+    pdf.font("FreeMono", size: signature_font_size) do
       pdf.bounding_box(
         [last_box_width1, last_box_y],
         width: last_box_width2,
         height: last_box_height
       ) do
         pdf.stroke_bounds
-        current_x = x
-        pdf.move_down 8
 
-        pdf.draw_text(
-          "#{I18n.t("pdf_content.enrollment.footer.warning1")}",
-          at: [current_x, pdf.cursor]
-        )
+        if options[:qr_code_signature]
+          qrcode_signature_warning = I18n.t("pdf_content.enrollment.footer.qrcode_signature_warning")
+          pdf.move_down last_box_height / 2 - signature_font_size / 2
+          current_x = (last_box_width2 - pdf.width_of(qrcode_signature_warning)) / 2
+          pdf.draw_text(
+            "#{qrcode_signature_warning}",
+            at: [current_x, pdf.cursor]
+          )
+          pdf.move_down signature_font_size
+          pdf.draw_text(
+            "#{I18n.t("pdf_content.enrollment.footer.signed_by_qrcode")} #{I18n.localize(Time.now, format: :defaultdatetime)} (Horário de Brasília)",
+            at: [current_x, pdf.cursor]
+          )
+        else
+          current_x = x
+          pdf.move_down 8
 
-        underline_width = 3.7
-        pdf.move_down 30
-        underline = "_" * 74
-        current_x += (last_box_width2 - underline.size * underline_width) / 2
+          pdf.draw_text(
+            "#{I18n.t("pdf_content.enrollment.footer.warning1")}",
+            at: [current_x, pdf.cursor]
+          )
 
-        pdf.draw_text(underline, at: [current_x, pdf.cursor])
+          underline_width = 3.7
+          pdf.move_down 30
+          underline = "_" * 74
+          current_x += (last_box_width2 - underline.size * underline_width) / 2
 
-        pdf.move_down 8
-        font_width = 6.7
-        coordinator_signature = I18n.t(
-          "pdf_content.enrollment.footer.coordinator_signature"
-        )
-        current_x += (
-          last_box_width2 - coordinator_signature.size * font_width
-        ) / 2
-        pdf.draw_text(coordinator_signature, at: [current_x, pdf.cursor])
+          pdf.draw_text(underline, at: [current_x, pdf.cursor])
+
+          pdf.move_down 8
+          font_width = 6.7
+          coordinator_signature = I18n.t(
+            "pdf_content.enrollment.footer.coordinator_signature"
+          )
+          current_x += (
+            last_box_width2 - coordinator_signature.size * font_width
+          ) / 2
+          pdf.draw_text(coordinator_signature, at: [current_x, pdf.cursor])
+        end
       end
     end
 
@@ -226,14 +248,9 @@ module PdfHelper
 
   def new_document(name, title, options = {}, &block)
     type = options[:pdf_type] || :report
-    pdf_type = :"use_at_#{type}"
-    pdf_config = (
-      options[:pdf_config] ||
-      ReportConfiguration.where(pdf_type => true).order(order: :desc).first ||
-      ReportConfiguration.new
-    )
+    pdf_config = setup_pdf_config(type, options)
 
-    prawn_document({
+    document = prawn_document({
       page_size: "A4",
       left_margin: 0.6.cm,
       right_margin: (
@@ -275,10 +292,17 @@ module PdfHelper
       header(pdf, title, pdf_config)
       yield pdf
 
-      pdf.repeat(:all, dynamic: true) do
-        if pdf_config.signature_footer
+      if pdf_config.qr_code_signature
+        pdf.repeat(:all, dynamic: true) do
+          signature_footer(pdf, { qr_code_signature: true })
+        end
+      elsif pdf_config.signature_footer
+        pdf.repeat(:all, dynamic: true) do
           signature_footer(pdf)
-        else
+        end
+      end
+      pdf.repeat(:all, dynamic: true) do
+        unless pdf_config.signature_footer
           datetime_footer(pdf)
         end
       end
@@ -299,6 +323,14 @@ module PdfHelper
         end
       end
     end
+
+    if pdf_config.qr_code_signature
+      uploader = PdfUploader.new
+      uploader.store!({ base64_contents: Base64.encode64(document), filename: "academic_transcript.pdf" })
+      uploader.file&.file&.update!(medium_hash: @qrcode_identifier)
+    end
+
+    document
   end
 
   def pdf_list_with_title(pdf, title, data, options = {}, &block)
@@ -382,6 +414,21 @@ module PdfHelper
         pdf.horizontal_line 0, (pdf.bounds.left + pdf.bounds.right).floor
       end
     end
+  end
+
+  def qrcode_signature(pdf, options = {})
+    @qrcode_identifier ||= SecureRandom.uuid + ".pdf"
+
+    data = "#{request.protocol}#{request.host_with_port}/files/#{@qrcode_identifier}"
+
+    pdf.print_qr_code(data, extent: options[:size] || 80, align: :center)
+  end
+
+  def setup_pdf_config(pdf_type, options)
+    pdf_type_property = :"use_at_#{pdf_type}"
+    options[:pdf_config] ||
+      ReportConfiguration.where(pdf_type_property => true).order(order: :desc).first ||
+      ReportConfiguration.new
   end
 end
 
