@@ -205,6 +205,10 @@ Rails.application.routes.draw do
     record_select_routes
   end
 
+  resources :assertions do
+    concerns :active_scaffold
+  end
+
   resources :levels do
     concerns :active_scaffold
   end
