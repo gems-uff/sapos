@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_18_203814) do
+ActiveRecord::Schema[7.0].define(version: 2024_22_04_223140) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -265,6 +265,12 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_18_203814) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["course_class_id"], name: "index_allocations_on_course_class_id"
+  end
+
+  create_table "assertions", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "carrier_wave_files", force: :cascade do |t|
