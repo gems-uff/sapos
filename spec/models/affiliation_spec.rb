@@ -4,8 +4,8 @@ require "spec_helper"
 
 RSpec.describe Affiliation, type: :model do
   it { should be_able_to_be_destroyed }
-  it { should belong_to(:institution) }
-  it { should belong_to(:professor) }
+  it { should belong_to(:institution).required(:false) }
+  it { should belong_to(:professor).required(:false) }
   let(:affiliation) { FactoryBot.create :affiliation }
 
 

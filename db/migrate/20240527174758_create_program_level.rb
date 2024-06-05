@@ -2,8 +2,8 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
   def up
     create_table :program_levels do |t|
       t.integer :level, null: false
-      t.datetime :start_date, null: false
-      t.datetime :end_date
+      t.date :start_date, null: false
+      t.date :end_date
       t.boolean :active, null: false
 
       t.timestamps

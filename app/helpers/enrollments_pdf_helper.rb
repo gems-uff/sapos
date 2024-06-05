@@ -132,12 +132,12 @@ module EnrollmentsPdfHelper
 
   def enrollment_header(pdf, options = {})
     enrollment ||= options[:enrollment]
+    program_level ||= options[:program_level]
     pdf.bounding_box([0, pdf.cursor - 3], width: 560) do
       pdf.font("FreeMono", size: 8) do
         pdf.line_width 0.5
-
         common_header_part1(pdf, enrollment, [
-          "#{i18n_eht(:program_level)} <b>#{ProgramLevel.date(enrollment.thesis_defense_date)&.level}</b>"
+          "#{i18n_eht(:program_level)} <b>#{program_level.level}</b>"
         ])
 
         common_header_part(pdf) do
@@ -616,7 +616,8 @@ module EnrollmentsPdfHelper
           ]]
           # TODO: modificar o institution para a affiliation
           thesis_desense_committee.each do |professor|
-            affiliation = Affiliation.where(professor_id: professor.id).date(thesis_defense_date)
+            affiliation = professor.affiliations.date(thesis_defense_date).last
+            binding.pry
             data_table_rows_defense_committee += [[
               "<b>#{professor.name} / #{rescue_blank_text(
                 affiliation.institution, method_call: :name

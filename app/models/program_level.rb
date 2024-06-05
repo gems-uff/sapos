@@ -7,11 +7,9 @@ class ProgramLevel < ApplicationRecord
   validates :end_date, presence: true, unless: :active?, on: [:create, :update]
   validates_uniqueness_of :active, if: :active?, on: [:create, :update]
 
+  scope :date, -> (date) { where("program_levels.start_date <= ? AND program_levels.end_date > ? OR program_levels.active is true", date, date)}
+
   def active?
     active
-  end
-
-  def date(instant_date)
-    ProgramLevel.where("start_date <= #{instant_date} AND (end_date >= #{instant_date} OR #{active?})")&.last
   end
 end

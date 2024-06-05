@@ -9,7 +9,7 @@ class Institution < ApplicationRecord
 
   has_many :majors, dependent: :restrict_with_exception
   has_many :affiliations, dependent: :destroy
-  has_many :professors, through: :affiliations
+  has_many :professors, through: :affiliations, dependent: :destroy
 
 
   validates :name, presence: true, uniqueness: true
