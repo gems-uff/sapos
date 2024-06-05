@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_18_203814) do
+ActiveRecord::Schema[7.0].define(version: 2024_04_22_210224) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -810,6 +810,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_18_203814) do
     t.integer "y"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.boolean "qr_code_signature", default: false
   end
 
   create_table "research_areas", force: :cascade do |t|
