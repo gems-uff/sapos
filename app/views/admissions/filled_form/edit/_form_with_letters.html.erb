@@ -1,4 +1,10 @@
 <ol class="form filled-form">
+  <% if !admission_application.valid? && admission_application.filled_form.form_template.has_file_fields? %>
+    <% admission_application.filled_form.erase_non_filled_file_fields %>
+    <li class="reupload-notice">
+      <%= t "admissions.apply.edit.upload_notice" %>
+    </li>
+  <% end %>
   <% if show_name %>
     <li class="form-element required">
       <dl>

@@ -40,6 +40,11 @@
                       <%= error.full_message %></li>
                     <% end %>
                   </li>
+                  <% if @show_reupload_files_notice %>
+                    <li>
+                      <%= t "admissions.apply.edit.upload_notice" %>
+                    </li>
+                  <% end %>
                 <% end %>
               </ul>
             </div>
