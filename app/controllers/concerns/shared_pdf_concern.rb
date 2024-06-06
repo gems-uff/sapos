@@ -41,7 +41,7 @@ module SharedPdfConcern
       .order("course_classes.year", "course_classes.semester")
 
     accomplished_phases = enrollment.accomplishments.order(:conclusion_date)
-
+    program_level = ProgramLevel.date(enrollment.thesis_defense_date).last
     render_to_string(
       template: "enrollments/academic_transcript_pdf",
       type: "application/pdf",
@@ -50,6 +50,7 @@ module SharedPdfConcern
         enrollment: enrollment,
         class_enrollments: class_enrollments,
         accomplished_phases: accomplished_phases,
+        program_level: program_level
       }
     )
   end

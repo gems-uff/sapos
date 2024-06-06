@@ -29,7 +29,7 @@ class ProfessorsController < ApplicationController
     config.columns[:civil_status].options = {
       options: [["Solteiro(a)", "solteiro"], ["Casado(a)", "casado"]]
     }
-    config.columns[:institution].form_ui = :record_select
+    config.nested.add_link(:affiliations)
     config.columns[:sex].form_ui = :select
     config.columns[:sex].options = { options: [["Masculino", "M"],
                                                ["Feminino", "F"]] }
@@ -54,9 +54,9 @@ class ProfessorsController < ApplicationController
       :address, :zip_code, :telephone1, :telephone2, :cpf,
       :identity_expedition_date, :identity_issuing_body,
       :identity_issuing_place, :identity_number, :enrollment_number,
-      :siape, :institution, :scholarships, :academic_title_level,
+      :siape, :scholarships, :academic_title_level,
       :academic_title_institution, :academic_title_country,
-      :academic_title_date, :obs, :professor_research_areas,
+      :academic_title_date, :obs, :professor_research_areas, :affiliations
     ]
 
     config.create.columns = form_columns

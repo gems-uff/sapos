@@ -20,13 +20,17 @@ gem "sprockets-rails"
 gem "puma", ">= 6.4.2"
 
 # HTML and XML parser
-gem "nokogiri", ">= 1.16.2"
+gem "nokogiri", ">= 1.16.5"
 
 #Wrapp HTTP requests and responses
 gem "rack", "~> 2.2.8.1"
 
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 # gem "importmap-rails"
+
+# Fix vulnerability
+gem "actiontext", ">= 7.0.8.4"
+gem "rexml", ">= 3.2.7"
 
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 # gem "turbo-rails"
