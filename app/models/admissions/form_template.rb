@@ -51,4 +51,8 @@ class Admissions::FormTemplate < ActiveRecord::Base
     super
     self.fields = other.fields.map(&:dup)
   end
+
+  def has_file_fields?
+    fields.any? { |f| f.is_file_field? }
+  end
 end

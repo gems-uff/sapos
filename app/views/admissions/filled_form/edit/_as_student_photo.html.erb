@@ -5,7 +5,10 @@
   options = active_scaffold_input_options(column, scope, :object => field.object)
   options[:required] = configuration["required"] ? true : false
   basename = options[:name][..-("file".size + 3)]
-  data_url = field.object.file.file.present? ? download_url(field.object.file.medium_hash) : ""
+  data_url = ""
+  if field.object.file.file.present? && field.object.file.file.file.respond_to?(:medium_hash)
+    data_url = download_url(field.object.file.medium_hash)
+  end
   file_id = "file_#{SecureRandom.random_number(1_000_000)}"
   options[:class] = filled_class
 %>
