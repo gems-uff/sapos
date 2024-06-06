@@ -152,4 +152,16 @@ class Admissions::FilledForm < ActiveRecord::Base
     end
     nil
   end
+
+  def erase_non_filled_file_fields
+    self.fields.each do |field|
+      if field.form_field.is_file_field?
+        if field.persisted?
+          field.reload
+        else
+          field.file = nil
+        end
+      end
+    end
+  end
 end

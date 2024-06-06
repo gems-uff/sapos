@@ -10,6 +10,12 @@
             <% filled_form_hidden.each do |hidden| %>
               <%= filled_form.hidden_field hidden %>
             <% end %>
+            <% if !admission_application.valid? && object.filled_form.form_template.has_file_fields? %>
+              <% object.filled_form.erase_non_filled_file_fields %>
+              <li class="reupload-notice">
+                <%= t "admissions.apply.edit.upload_notice" %>
+              </li>
+            <% end %>
             <%= render partial: "admissions/filled_form/edit/filled_form_template", locals: {
               form: form,
               form_template: object.filled_form.form_template,

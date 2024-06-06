@@ -19,6 +19,7 @@ RSpec.describe CustomVariable, type: :model do
       variable: "single_advisor_points"
     )
   end
+  let(:default_from) { ActionMailer::Base.default[:from]}
   subject { custom_variable }
   describe "Validations" do
     it { should be_valid }
@@ -116,6 +117,31 @@ RSpec.describe CustomVariable, type: :model do
         @destroy_later << CustomVariable.create(variable: :redirect_email, value: "bla")
 
         expect(CustomVariable.redirect_email).to eq("bla")
+      end
+    end
+
+    context "reply_to" do
+      it "should return default value when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:reply_to)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.reply_to).to eq(default_from)
+      end
+
+      it "should return default value when the value is nil" do
+        config = CustomVariable.find_by_variable(:reply_to)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create(variable: :reply_to, value: nil)
+
+        expect(CustomVariable.reply_to).to eq(default_from)
+      end
+
+      it "should return value when the values is defined" do
+        config = CustomVariable.find_by_variable(:reply_to)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create(variable: :reply_to, value: "email@email.com.br")
+
+        expect(CustomVariable.reply_to).to eq("email@email.com.br")
       end
     end
 

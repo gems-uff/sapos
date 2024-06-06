@@ -256,17 +256,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_27_174758) do
     t.index ["professor_id"], name: "index_advisements_on_professor_id"
   end
 
-  create_table "affiliations", force: :cascade do |t|
-    t.integer "professor_id"
-    t.integer "institution_id"
-    t.date "start_date"
-    t.date "end_date"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["institution_id"], name: "index_affiliations_on_institution_id"
-    t.index ["professor_id"], name: "index_affiliations_on_professor_id"
-  end
-
   create_table "allocations", force: :cascade do |t|
     t.string "day", limit: 255
     t.string "room", limit: 255
@@ -712,6 +701,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_27_174758) do
     t.string "siape", limit: 255
     t.string "enrollment_number", limit: 255
     t.string "identity_issuing_place", limit: 255
+    t.integer "institution_id"
     t.string "email", limit: 255
     t.date "academic_title_date"
     t.integer "academic_title_country_id"
@@ -725,15 +715,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_27_174758) do
     t.index ["city_id"], name: "index_professors_on_city_id"
     t.index ["cpf"], name: "index_professors_on_cpf"
     t.index ["email"], name: "index_professors_on_email"
+    t.index ["institution_id"], name: "index_professors_on_institution_id"
     t.index ["user_id"], name: "index_professors_on_user_id"
-  end
-
-  create_table "program_levels", force: :cascade do |t|
-    t.integer "level", null: false
-    t.date "start_date", null: false
-    t.date "end_date"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "queries", force: :cascade do |t|
