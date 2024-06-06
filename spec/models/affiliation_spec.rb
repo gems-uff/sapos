@@ -4,8 +4,8 @@ require "spec_helper"
 
 RSpec.describe Affiliation, type: :model do
   it { should be_able_to_be_destroyed }
-  it { should belong_to(:institution).required(:false) }
-  it { should belong_to(:professor).required(:false) }
+  it { should belong_to(:institution).optional(true) }
+  it { should belong_to(:professor).optional(true) }
   let(:affiliation) { FactoryBot.create :affiliation }
 
 
@@ -14,15 +14,21 @@ RSpec.describe Affiliation, type: :model do
     it { should be_valid }
     it { should validate_presence_of(:start_date) }
     context "Active" do
-      let(:professor) { FactoryBot.create :professor}
-      let(:affiliation_active) { FactoryBot.create :affiliation, professor: professor, active: true}
-      let(:affiliation_inactive) { FactoryBot.create :affiliation, professor: professor, active: false}
-      let(:affiliation_teste_active) { FactoryBot.build :affiliation, professor: professor, active: true}
-      let(:affiliation_teste_inactive) { FactoryBot.build :affiliation, professor: professor, active: false}
+      let(:professor) { FactoryBot.create :professor }
+      let(:affiliation_active) { FactoryBot.create :affiliation, professor: professor, start_date: Time.now}
+      let(:affiliation_inactive) { FactoryBot.create :affiliation,
+                                                     professor: professor,
+                                                     start_date: Time.now + 1.day,
+                                                     end_date: Time.now + 2.day}
+      let(:affiliation_teste_active) { FactoryBot.build :affiliation, professor: professor, start_date: Time.now + 2.day }
+      let(:affiliation_teste_inactive) { FactoryBot.build :affiliation,
+                                                          professor: professor,
+                                                          start_date: Time.now + 3.day,
+                                                          end_date: Time.now + 4.day }
 
       it "When active, do not add new affiliation active" do
         affiliation_active
-        aff = FactoryBot.build(:affiliation, professor: professor, active: true)
+        aff = FactoryBot.build(:affiliation, professor: professor, end_date: nil)
         expect(aff).to be_invalid
       end
       context "When inactive, you can add new affiliation active/inactive" do
@@ -40,13 +46,16 @@ RSpec.describe Affiliation, type: :model do
       end
     end
     context "Active e End Date" do
-      let(:affiliation_active) { FactoryBot.create :affiliation, end_date: nil, active: true }
-      let(:affiliation_inactive_valid) { FactoryBot.create :affiliation, end_date: Time.now, active: false }
-      let(:affiliation_inactive_invalid) { FactoryBot.build :affiliation, end_date: nil, active: false }
+      let(:affiliation_active) { FactoryBot.create :affiliation, end_date: nil }
+      let(:affiliation_inactive_valid) { FactoryBot.create :affiliation, end_date: Time.now }
+      let(:affiliation_inactive_invalid) { FactoryBot.build :affiliation, professor: affiliation_active.professor, end_date: nil }
       context "When active, don't need end date" do
         it { expect(affiliation_active).to be_valid }
       end
       context "When inactive, need an end date" do
+        before(:each) do
+          affiliation_active
+        end
         it { expect(affiliation_inactive_valid).to be_valid }
         it { expect(affiliation_inactive_invalid).to be_invalid }
       end

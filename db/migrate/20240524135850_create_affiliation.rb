@@ -5,7 +5,6 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
       t.belongs_to :institution, index: true
       t.date :start_date
       t.date :end_date
-      t.boolean :active
 
       t.timestamps
     end
@@ -17,8 +16,7 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
       affiliation = Affiliation.create(
         professor: professor,
         institution_id: institution_id,
-        start_date: start_date,
-        active: true
+        start_date: start_date
       )
       professor = professor.paper_trail.previous_version
       while professor.present?
@@ -33,7 +31,6 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
             professor: professor,
             institution_id: institution_id,
             start_date: start_date,
-            active: false,
             end_date: end_date
           )
         else
@@ -53,8 +50,10 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
   def down
     add_column :professors, :institution_id, :integer
     add_index :professors, :institution_id
-    affiliation = Affiliation.professor.where(active?).last
-    professor.update(institution_id: affiliation.institution_id)
+    Professor.all.each do |p|
+      affiliation = Affiliation.professor(p).where(active: true).last
+      p.update(institution_id: affiliation.institution_id)
+    end
     drop_table :affiliations
   end
 end

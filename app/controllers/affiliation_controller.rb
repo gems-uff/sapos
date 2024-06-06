@@ -4,7 +4,7 @@ class AffiliationController < ApplicationController
   authorize_resource
 
   active_scaffold :affiliation do |config|
-    columns = [:professor, :institution, :start_date, :end_date, :active]
+    columns = [:professor, :institution, :start_date, :end_date]
 
     config.list.columns = columns
     config.create.columns = columns
@@ -14,7 +14,6 @@ class AffiliationController < ApplicationController
     config.columns[:professor].form_ui = :record_select
     config.columns[:institution].form_ui = :record_select
     config.columns[:start_date].form_ui = :date_picker
-    config.columns[:active].form_ui = :checkbox
     config.columns[:end_date].form_ui = :date_picker
   end
   record_select(

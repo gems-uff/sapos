@@ -261,7 +261,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_27_174758) do
     t.integer "institution_id"
     t.date "start_date"
     t.date "end_date"
-    t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["institution_id"], name: "index_affiliations_on_institution_id"
@@ -733,7 +732,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_27_174758) do
     t.integer "level", null: false
     t.date "start_date", null: false
     t.date "end_date"
-    t.boolean "active", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

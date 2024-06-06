@@ -3,27 +3,28 @@
 class Affiliation < ApplicationRecord
   has_paper_trail
 
-  before_save :set_active_default
-
   belongs_to :institution, optional: true
   belongs_to :professor, optional: true
 
   validates :start_date, presence: true
-  validates :end_date, presence: true, unless: :active?
-  validates :end_date, presence: false, if: :active?
+  validates :end_date, presence: false
+  validates_uniqueness_of :start_date, scope: [:professor_id],
+                          allow_nil: true, allow_blank: true,
+                          message: "A afiliação só pode ser iniciada em uma data por professor"
+  validate :uniqueness_end_date
 
-
-  validates_uniqueness_of :active, if: :active?, scope: [:professor_id], message: "Apenas uma afiliação pode estar ativa por professor."
-
-  scope :date, ->(date) { where("start_date <= ? AND (end_date > ? OR active IS TRUE)", date, date) }
+  scope :date, ->(date) { where("start_date <= ? AND (end_date > ? OR end_date IS null)", date, date) }
   scope :professor, ->(professor) { where(professor_id: professor.id) }
   scope :date_professor, ->(professor, date) { professor(professor).date(date) }
-  def active?
-    active
-  end
 
   private
-    def set_active_default
-      self.active = false if active.nil?
+
+  def uniqueness_end_date
+    exists = Affiliation.where(professor_id: professor_id, end_date: end_date).where.not(id: id).exists?
+    if exists
+      errors.add(:end_date,"Apenas uma afiliação pode estar ativa por professor e só pode ter uma data de fim por professor")
     end
+    exists
+  end
+
 end

@@ -4,7 +4,6 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
       t.integer :level, null: false
       t.date :start_date, null: false
       t.date :end_date
-      t.boolean :active, null: false
 
       t.timestamps
     end
@@ -13,7 +12,6 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
       program_level = ProgramLevel.create(
         level: pl.value,
         start_date: pl.updated_at,
-        active: true
       )
       pl = pl.paper_trail.previous_version
       while pl.present?
@@ -26,7 +24,6 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
             level: level,
             end_date: end_date,
             start_date: start_date,
-            active: false
           )
         else
           start_date = pl.updated_at

@@ -162,6 +162,7 @@ Rails.application.routes.draw do
 
   resources :affiliation do
     concerns :active_scaffold
+    record_select_routes
   end
 
   resources :professors do
