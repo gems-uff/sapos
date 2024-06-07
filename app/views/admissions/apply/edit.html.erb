@@ -52,6 +52,7 @@
         </div>
         <%= render partial: "admissions/filled_form/candidate_forms", locals: {
           form: form,
+          may_show_reupload_notice: false,
           admission_process: @admission_process,
           admission_application: @admission_application,
           show_name: @show_name,

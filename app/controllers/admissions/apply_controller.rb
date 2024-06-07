@@ -90,6 +90,15 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
         id: @admission_application.token
       ), notice: notice
     else
+      # Temporary log to understand the reason of why submission is failing
+      ExceptionNotifier.notify_exception(
+        Exception.new("Validação javascript de seleção falhou e form com erro chegou no servidor"),
+        data: {
+          params:,
+          full_messages: @admission_application.errors.full_messages,
+          errors: @admission_application.errors
+        }
+      )
       if !was_filled
         @admission_application.submission_time = nil
       end

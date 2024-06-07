@@ -8,6 +8,7 @@
     <% if can_edit_main %>
       <%= render partial: "admissions/filled_form/edit/form_with_letters", locals: {
         form: form,
+        may_show_reupload_notice:,
         admission_process: admission_process,
         admission_application: admission_application,
         show_name: show_name,
@@ -27,6 +28,7 @@
     <% letter_request.filled_form.sync_fields_before(letter_request) %>
     <%= render partial: "admissions/filled_form/show_or_edit_filled_form", locals: {
         form: form,
+        may_show_reupload_notice:,
         admission_application:,
         name: "Carta de #{letter_request.name}",
         id: "#{subid}-letter-#{letter_request.id}",
