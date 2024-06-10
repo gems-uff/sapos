@@ -958,6 +958,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_09_002506) do
     t.integer "birth_country_id"
     t.integer "user_id", limit: 8
     t.integer "skin_color_id"
+    t.boolean "pcd"
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"

@@ -7,6 +7,7 @@ class CreateSkinColor < ActiveRecord::Migration[7.0]
       t.timestamps
     end
     add_column :students, :skin_color_id, :integer
+    add_column :students, :pcd, :boolean
     add_foreign_key :students, :skin_colors, name: "skin_color_id"
   end
   def down
