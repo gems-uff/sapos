@@ -177,6 +177,11 @@ Rails.application.routes.draw do
     concerns :active_scaffold
   end
 
+  resources :skin_colors do
+    concerns :active_scaffold
+    record_select_routes
+  end
+
   resources :enrollments do
     concerns :active_scaffold
     record_select_routes
