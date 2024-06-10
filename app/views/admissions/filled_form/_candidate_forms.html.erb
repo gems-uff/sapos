@@ -59,6 +59,7 @@
     <% app_forms[:phase_forms].each do |phase_form| %>
       <%= render partial: "admissions/filled_form/show_or_edit_filled_form", locals: {
         form: form,
+        may_show_reupload_notice:,
         admission_application:,
         name: "#{phase.name} (#{phase_form[:name]})",
         id: "#{phase_subid}-#{phase_form[:name]}",
@@ -82,6 +83,7 @@
     <% ranking.filled_form.prepare_missing_fields %>
     <%= render partial: "admissions/filled_form/show_or_edit_filled_form", locals: {
         form: form,
+        may_show_reupload_notice:,
         admission_application:,
         name: ranking.ranking_config.name,
         id: "ranking-#{ranking.id}",
