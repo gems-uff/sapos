@@ -13270,3 +13270,10 @@ City.create([
   { name: "Wanderlandia", state: State.find_by_code("TO") },
   { name: "Xambioa", state: State.find_by_code("TO") },
 ])
+SkinColor.create([
+                   {name: "Preta"},
+                   {name: "Branco"},
+                   {name: "Pardo"},
+                   {name: "Indígena"},
+                   {name: "Não declarado"},
+                 ])
