@@ -13,6 +13,7 @@ class CreateSkinColor < ActiveRecord::Migration[7.0]
   def down
     drop_table :skin_colors
     remove_column :students, :skin_color_id
+    remove_column :students, :pcd
     remove_foreign_key :students, :skin_colors
   end
 end
