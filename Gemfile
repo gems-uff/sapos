@@ -115,7 +115,7 @@ gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-ac
 gem "cocoon"
 
 # ReCaptcha Helpers
-gem "dotenv-rails", require: "dotenv/rails-now"
+gem "dotenv-rails", require: "dotenv/load"
 gem "recaptcha", require: "recaptcha/rails"
 
 # xlsx Spreadsheets
@@ -150,7 +150,7 @@ end
 
 group :development, :test do
   # Use SQLite database for development
-  gem "sqlite3"
+  gem "sqlite3", "~> 1.6.8"
 
   # Prints Ruby object in full color
   gem "awesome_print"
