@@ -18,7 +18,7 @@ module UserHelpers
       **kwargs
     )
     user.skip_confirmation!
-    user.save!
+    user.save
     user
   end
 end

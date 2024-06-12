@@ -125,6 +125,10 @@ RSpec.configure do |config|
     DownloadHelpers.clear_downloads
   end
 
+  config.after(:all) do
+    logout
+  end
+
   config.around(:each) do |example|
     DatabaseCleaner.cleaning do
       example.run

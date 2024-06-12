@@ -64,6 +64,7 @@ class User < ApplicationRecord
   def role_valid?
     return if current_user.blank?
     return if role.blank?
+    return if current_user.role.blank?
 
     role_index = Role::ORDER.index(current_user.role.id)
     if role_index < Role::ORDER.index(self.role_id_was)
