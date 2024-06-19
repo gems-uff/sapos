@@ -324,10 +324,15 @@ module PdfHelper
       end
     end
 
-    if pdf_config.qr_code_signature
+    if pdf_config.qr_code_signature && !pdf_config.preview
       uploader = PdfUploader.new
       uploader.store!({ base64_contents: Base64.encode64(document), filename: "academic_transcript.pdf" })
       uploader.file&.file&.update!(medium_hash: @qrcode_identifier)
+
+      report = Report.new
+      report.user = current_user
+      report.carrierwave_file = uploader.file&.file
+      report.save!
     end
 
     document
