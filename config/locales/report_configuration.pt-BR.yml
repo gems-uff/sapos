@@ -8,6 +8,7 @@ pt-BR:
         name: "Nome"
         image: "Logo"
         signature_footer: "Rodapé com assinatura"
+        qr_code_signature: "Assinatura em QR Code"
         text: "Header"
         use_at_grades_report: "Usar no boletim"
         use_at_report: "Usar em relatórios"

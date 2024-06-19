@@ -12,16 +12,17 @@ class ReportConfigurationsController < ApplicationController
     config.create.label = :create_report_configuration_label
     columns = [
       :name, :image, :scale, :x, :y, :order, :text, :signature_footer,
-      :preview, :use_at_report, :use_at_transcript, :use_at_grades_report,
-      :use_at_schedule,
+      :preview, :qr_code_signature, :use_at_report, :use_at_transcript,
+      :use_at_grades_report, :use_at_schedule,
     ]
     config.create.columns = columns
     config.update.columns = columns
     columns.delete(:preview)
     config.columns = columns
     config.list.columns = [
-      :name, :order, :text, :signature_footer, :use_at_report,
-      :use_at_transcript, :use_at_grades_report, :use_at_schedule
+      :name, :order, :text, :signature_footer, :qr_code_signature,
+      :use_at_report, :use_at_transcript, :use_at_grades_report,
+      :use_at_schedule,
     ]
     config.list.sorting = { name: "ASC" }
     config.actions << :duplicate
@@ -41,7 +42,7 @@ class ReportConfigurationsController < ApplicationController
     record.assign_attributes(record_params.except(:image_cache, :remove_image))
     # up = ImageUploader.new record, :image
     # up.store(File.open(params[:record][:image]))
-    @pdf_config = record
+    @pdf_config = record.tap { |r| r.preview = true }
     respond_to do |format|
       format.pdf do
         title = I18n.t("pdf_content.report_configurations.preview")
@@ -62,7 +63,7 @@ class ReportConfigurationsController < ApplicationController
       params.required(:record).permit(
         :name, :use_at_report, :use_at_transcript, :use_at_grades_report,
         :use_at_schedule, :text, :image, :signature_footer, :order, :scale,
-        :x, :y
+        :x, :y, :qr_code_signature
       )
     end
 end
