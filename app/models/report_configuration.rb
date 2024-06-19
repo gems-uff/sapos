@@ -6,6 +6,7 @@
 # Represents Configuration of a Report
 class ReportConfiguration < ApplicationRecord
   has_paper_trail
+  attr_accessor :preview
 
   validates :text, presence: true
   validates :order, presence: true

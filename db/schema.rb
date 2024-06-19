@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_04_22_210224) do
+ActiveRecord::Schema[7.0].define(version: 2024_06_05_174859) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -813,6 +813,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_04_22_210224) do
     t.boolean "qr_code_signature", default: false
   end
 
+  create_table "reports", force: :cascade do |t|
+    t.integer "generated_by_id"
+    t.integer "carrierwave_file_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "research_areas", force: :cascade do |t|
     t.string "name", limit: 255
     t.string "code", limit: 255
@@ -997,4 +1004,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_04_22_210224) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
+  add_foreign_key "reports", "users", column: "generated_by_id"
 end
