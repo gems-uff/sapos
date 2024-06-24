@@ -246,6 +246,7 @@ GEM
       letter_opener (~> 1.9)
       railties (>= 6.1)
       rexml
+    logger (1.6.0)
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -362,8 +363,8 @@ GEM
     responders (3.1.1)
       actionpack (>= 5.2)
       railties (>= 5.2)
-    rexml (3.2.8)
-      strscan (>= 3.0.9)
+    rexml (3.3.0)
+      strscan
     rouge (4.2.1)
     rspec-collection_matchers (1.2.1)
       rspec-expectations (>= 2.99.0.beta1)
@@ -438,8 +439,9 @@ GEM
       tilt
     sdoc (2.6.1)
       rdoc (>= 5.0)
-    selenium-webdriver (4.21.1)
+    selenium-webdriver (4.22.0)
       base64 (~> 0.2)
+      logger (~> 1.4)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
