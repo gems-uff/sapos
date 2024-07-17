@@ -2,7 +2,16 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 pt-BR:
+  active_scaffold:
+    create_assertion_label: "Adicionar Declaração"
+
   activerecord:
     attributes:
       assertion:
-        document: "Nome do documento"
+        name: "Nome da Declaração"
+        params: "Parâmetros configuráveis da declaração"
+
+    models:
+      assertion:
+        one: "Documento"
+        other: "Documentos"
