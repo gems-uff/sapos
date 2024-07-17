@@ -137,26 +137,33 @@ module PdfHelper
           qrcode_url = "#{request.protocol}#{request.host_with_port}/files/#{@qrcode_identifier}"
           qrcode_signature_warning = I18n.t("pdf_content.enrollment.footer.qrcode_signature_warning")
           signed_at = "#{I18n.t("pdf_content.enrollment.footer.signed_by_qrcode")} #{I18n.localize(Time.now, format: :defaultdatetime)} (Horário de Brasília)"
-          you_can_also_access = "Você também pode acessar o documento em:"
-          # max between all of the above
-          center_around = [qrcode_signature_warning, signed_at, you_can_also_access].max_by(&:size)
+          you_can_also_access = I18n.t("pdf_content.enrollment.footer.you_can_also_access")
+
+          center_around = [qrcode_signature_warning, signed_at, you_can_also_access, qrcode_url].max_by(&:size)
           pdf.move_down last_box_height / 2 - signature_font_size
           current_x = (last_box_width2 - pdf.width_of(center_around)) / 2
+
           pdf.draw_text(
             "#{qrcode_signature_warning}",
             at: [current_x, pdf.cursor]
           )
+
           pdf.move_down signature_font_size
+
           pdf.draw_text(
             signed_at,
             at: [current_x, pdf.cursor]
           )
+
           pdf.move_down signature_font_size
+
           pdf.draw_text(
             you_can_also_access,
             at: [current_x, pdf.cursor]
           )
+
           pdf.move_down signature_font_size
+
           pdf.draw_text(
             qrcode_url,
             at: [current_x, pdf.cursor]
