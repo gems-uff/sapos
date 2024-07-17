@@ -10,7 +10,6 @@ pt-BR:
       student: Alunos
       dismissal: Desligamentos
       enrollment: Matrículas
-      enrollment: Matrículas
       enrollment_hold: Trancamentos
       level: Níveis
       dismissal_reason: Razões de Desligamento
@@ -53,6 +52,10 @@ pt-BR:
       label: Formação
       major: Cursos
       institution: Instituições
+
+    documents:
+      label: Documentos
+      assertion: Declarações
 
     locations:
       label: Localidades

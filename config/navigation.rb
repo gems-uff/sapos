@@ -189,6 +189,11 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.modelitem Institution
     end
 
+    documents_models = [Assertion]
+    mainhelper.listitem :documents, documents_models do |submenu|
+      submenu.modelitem Assertion
+    end
+
     locations_models = [City, State, Country]
     mainhelper.listitem :locations, locations_models do |submenu|
       submenu.modelitem City
