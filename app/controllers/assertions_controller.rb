@@ -9,12 +9,10 @@ class AssertionsController < ApplicationController
   active_scaffold :assertion do |config|
     config.create.label = :create_assertion_label
     config.list.sorting = { name: "ASC" }
+    config.list.columns = [:name]
     config.columns = [:name]
     config.actions.exclude :deleted_records
 
-    config.list.columns = [
-      :document
-    ]
   end
 
 
