@@ -134,16 +134,31 @@ module PdfHelper
         pdf.stroke_bounds
 
         if options[:qr_code_signature]
+          qrcode_url = "#{request.protocol}#{request.host_with_port}/files/#{@qrcode_identifier}"
           qrcode_signature_warning = I18n.t("pdf_content.enrollment.footer.qrcode_signature_warning")
-          pdf.move_down last_box_height / 2 - signature_font_size / 2
-          current_x = (last_box_width2 - pdf.width_of(qrcode_signature_warning)) / 2
+          signed_at = "#{I18n.t("pdf_content.enrollment.footer.signed_by_qrcode")} #{I18n.localize(Time.now, format: :defaultdatetime)} (Horário de Brasília)"
+          you_can_also_access = "Você também pode acessar o documento em:"
+          # max between all of the above
+          center_around = [qrcode_signature_warning, signed_at, you_can_also_access].max_by(&:size)
+          pdf.move_down last_box_height / 2 - signature_font_size
+          current_x = (last_box_width2 - pdf.width_of(center_around)) / 2
           pdf.draw_text(
             "#{qrcode_signature_warning}",
             at: [current_x, pdf.cursor]
           )
           pdf.move_down signature_font_size
           pdf.draw_text(
-            "#{I18n.t("pdf_content.enrollment.footer.signed_by_qrcode")} #{I18n.localize(Time.now, format: :defaultdatetime)} (Horário de Brasília)",
+            signed_at,
+            at: [current_x, pdf.cursor]
+          )
+          pdf.move_down signature_font_size
+          pdf.draw_text(
+            you_can_also_access,
+            at: [current_x, pdf.cursor]
+          )
+          pdf.move_down signature_font_size
+          pdf.draw_text(
+            qrcode_url,
             at: [current_x, pdf.cursor]
           )
         else
@@ -258,7 +273,7 @@ module PdfHelper
       ),
       top_margin: 0.8.cm,
       bottom_margin: (
-        pdf_config.signature_footer ? 96 + FOOTER_TOP_MARGIN : 1.cm
+        !pdf_config.no_signature? ? 96 + FOOTER_TOP_MARGIN : 1.cm
       ),
       filename: name
     }.merge(options)) do |pdf|
@@ -292,17 +307,16 @@ module PdfHelper
       header(pdf, title, pdf_config)
       yield pdf
 
-      if pdf_config.qr_code_signature
+      if pdf_config.qr_code?
         pdf.repeat(:all, dynamic: true) do
           signature_footer(pdf, { qr_code_signature: true })
         end
-      elsif pdf_config.signature_footer
+      elsif pdf_config.manual?
         pdf.repeat(:all, dynamic: true) do
           signature_footer(pdf)
         end
-      end
-      pdf.repeat(:all, dynamic: true) do
-        unless pdf_config.signature_footer
+      else
+        pdf.repeat(:all, dynamic: true) do
           datetime_footer(pdf)
         end
       end
@@ -422,7 +436,7 @@ module PdfHelper
   end
 
   def qrcode_signature(pdf, options = {})
-    @qrcode_identifier ||= SecureRandom.uuid + ".pdf"
+    @qrcode_identifier ||= SecureRandom.alphanumeric(8).upcase + ".pdf"
 
     data = "#{request.protocol}#{request.host_with_port}/files/#{@qrcode_identifier}"
 

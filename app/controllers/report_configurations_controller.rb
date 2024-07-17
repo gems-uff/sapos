@@ -11,8 +11,8 @@ class ReportConfigurationsController < ApplicationController
   active_scaffold :report_configuration do |config|
     config.create.label = :create_report_configuration_label
     columns = [
-      :name, :image, :scale, :x, :y, :order, :text, :signature_footer,
-      :preview, :qr_code_signature, :use_at_report, :use_at_transcript,
+      :name, :image, :scale, :x, :y, :order, :text, :signature_type,
+      :preview, :use_at_report, :use_at_transcript,
       :use_at_grades_report, :use_at_schedule,
     ]
     config.create.columns = columns
@@ -20,10 +20,12 @@ class ReportConfigurationsController < ApplicationController
     columns.delete(:preview)
     config.columns = columns
     config.list.columns = [
-      :name, :order, :text, :signature_footer, :qr_code_signature,
+      :name, :order, :text, :signature_type,
       :use_at_report, :use_at_transcript, :use_at_grades_report,
       :use_at_schedule,
     ]
+    config.columns[:signature_type].form_ui = :select
+    config.columns[:signature_type].options = { options: ReportConfiguration.signature_types.keys.map(&:to_sym) }
     config.list.sorting = { name: "ASC" }
     config.actions << :duplicate
     config.duplicate.link.label = "
@@ -62,8 +64,8 @@ class ReportConfigurationsController < ApplicationController
     def record_params
       params.required(:record).permit(
         :name, :use_at_report, :use_at_transcript, :use_at_grades_report,
-        :use_at_schedule, :text, :image, :signature_footer, :order, :scale,
-        :x, :y, :qr_code_signature
+        :use_at_schedule, :text, :image, :order, :scale,
+        :x, :y, :signature_type
       )
     end
 end

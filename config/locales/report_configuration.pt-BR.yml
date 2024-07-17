@@ -7,8 +7,7 @@ pt-BR:
       report_configuration:
         name: "Nome"
         image: "Logo"
-        signature_footer: "Rodapé com assinatura"
-        qr_code_signature: "Assinatura em QR Code"
+        signature_type: "Tipo de Assinatura"
         text: "Header"
         use_at_grades_report: "Usar no boletim"
         use_at_report: "Usar em relatórios"
@@ -18,6 +17,9 @@ pt-BR:
         scale: "Escala"
         x: "X"
         y: "Y"
+        no_signature: "Sem Assinatura"
+        manual: "Manual"
+        qr_code: "Código QR"
 
     models:
       report_configuration:

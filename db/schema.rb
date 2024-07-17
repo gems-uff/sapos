@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_06_05_174859) do
+ActiveRecord::Schema[7.0].define(version: 2024_07_02_214957) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -803,14 +803,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_05_174859) do
     t.boolean "use_at_schedule"
     t.text "text"
     t.string "image", limit: 255
-    t.boolean "signature_footer"
     t.integer "order", default: 2
     t.decimal "scale", precision: 10, scale: 8
     t.integer "x"
     t.integer "y"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "qr_code_signature", default: false
+    t.integer "signature_type", default: 0
   end
 
   create_table "reports", force: :cascade do |t|

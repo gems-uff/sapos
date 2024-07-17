@@ -16,6 +16,8 @@ class ReportConfiguration < ApplicationRecord
 
   mount_uploader :image, ImageUploader
 
+  enum signature_type: { no_signature: 0, manual: 1, qr_code: 2 }
+
   def initialize_dup(other)
     super
     attrib = other.attributes.except("id", "created_at", "updated_at")
@@ -24,5 +26,13 @@ class ReportConfiguration < ApplicationRecord
 
   def mount_uploader_name
     :image
+  end
+
+  def signature_footer
+    signature_type === "manual"
+  end
+
+  def qr_code_signature
+    signature_type === "qr_code"
   end
 end
