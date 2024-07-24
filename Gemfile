@@ -98,7 +98,7 @@ gem "matrix", "~> 0.4.2"
 gem "redcarpet"
 
 # Active scaffold support for newer Rails
-gem "active_scaffold", git: "https://github.com/activescaffold/active_scaffold.git"
+gem "active_scaffold", git: "https://github.com/activescaffold/active_scaffold.git", ref: "7a61ff721e4ee68ac9dc5ce65128f63b067a4d7d"
 gem "active_scaffold_duplicate", ">= 1.1.0"
 gem "recordselect"
 
