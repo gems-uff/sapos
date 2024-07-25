@@ -94,7 +94,7 @@ gem "matrix", "~> 0.4.2"
 gem "redcarpet"
 
 # Active scaffold support for newer Rails
-gem "active_scaffold", git: "https://github.com/activescaffold/active_scaffold.git"
+gem "active_scaffold", git: "https://github.com/activescaffold/active_scaffold.git", ref: "7a61ff721e4ee68ac9dc5ce65128f63b067a4d7d"
 gem "active_scaffold_duplicate", ">= 1.1.0"
 gem "recordselect"
 
@@ -115,7 +115,7 @@ gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-ac
 gem "cocoon"
 
 # ReCaptcha Helpers
-gem "dotenv-rails", require: "dotenv/rails-now"
+gem "dotenv-rails", require: "dotenv/load"
 gem "recaptcha", require: "recaptcha/rails"
 
 # xlsx Spreadsheets
@@ -150,7 +150,7 @@ end
 
 group :development, :test do
   # Use SQLite database for development
-  gem "sqlite3"
+  gem "sqlite3", "~> 1.6.8"
 
   # Prints Ruby object in full color
   gem "awesome_print"

@@ -1,6 +1,7 @@
 GIT
   remote: https://github.com/activescaffold/active_scaffold.git
   revision: 7a61ff721e4ee68ac9dc5ce65128f63b067a4d7d
+  ref: 7a61ff721e4ee68ac9dc5ce65128f63b067a4d7d
   specs:
     active_scaffold (3.6.99)
       cow_proxy (~> 0.3)
@@ -277,8 +278,6 @@ GEM
       racc (~> 1.4)
     nokogiri (1.16.5-x86-mingw32)
       racc (~> 1.4)
-    nokogiri (1.16.5-x86_64-linux)
-      racc (~> 1.4)
     orm_adapter (0.5.0)
     paper_trail (15.1.0)
       activerecord (>= 6.1)
@@ -495,6 +494,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  actiontext (>= 7.0.8.4)
   active_scaffold!
   active_scaffold_duplicate (>= 1.1.0)
   activerecord-session_store
@@ -542,6 +542,7 @@ DEPENDENCIES
   recaptcha
   recordselect
   redcarpet
+  rexml (>= 3.2.7)
   rspec-collection_matchers
   rspec-rails
   rubocop
@@ -555,7 +556,7 @@ DEPENDENCIES
   simple-navigation
   simplecov
   sprockets-rails
-  sqlite3
+  sqlite3 (~> 1.6.8)
   stringio
   tzinfo-data
   validates_timeliness (~> 7.0.0.beta1)
