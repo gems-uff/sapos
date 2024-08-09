@@ -23,7 +23,11 @@ module ClassSchedulesPdfHelper
     table_width << (520 - day_width * count)
 
     count = 0
-    rows_per_page = 15
+    if table[:data].size > 0
+      rows_per_page = table[:data].size
+    else
+      rows_per_page = 1
+    end
     num_pages = (table[:data].size.to_f / rows_per_page).ceil
 
     table[:data].each_slice(rows_per_page) do |data_slice|
