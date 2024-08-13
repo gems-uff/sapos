@@ -28,7 +28,7 @@ module ClassSchedulesPdfHelper
   end
 
   def class_schedule_print_table(pdf, table_width, header, data, star, footer)
-    simple_pdf_table(pdf, table_width, header, data) do |table|
+    simple_pdf_table(pdf, table_width, header, data, {}, true) do |table|
       table.column(0).align = :left
       table.column(0).valign = :center
       table.column(0).padding = [-2, 4, 2, 4]
