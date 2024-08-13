@@ -13,7 +13,7 @@ class ReportConfigurationsController < ApplicationController
     columns = [
       :name, :image, :scale, :x, :y, :order, :text, :signature_type,
       :preview, :use_at_report, :use_at_transcript,
-      :use_at_grades_report, :use_at_schedule,
+      :use_at_grades_report, :use_at_schedule, :expiration_in_months
     ]
     config.create.columns = columns
     config.update.columns = columns
@@ -22,7 +22,7 @@ class ReportConfigurationsController < ApplicationController
     config.list.columns = [
       :name, :order, :text, :signature_type,
       :use_at_report, :use_at_transcript, :use_at_grades_report,
-      :use_at_schedule,
+      :use_at_schedule, :expiration_in_months
     ]
     config.columns[:signature_type].form_ui = :select
     config.columns[:signature_type].options = { options: ReportConfiguration.signature_types.keys.map(&:to_sym) }
@@ -65,7 +65,7 @@ class ReportConfigurationsController < ApplicationController
       params.required(:record).permit(
         :name, :use_at_report, :use_at_transcript, :use_at_grades_report,
         :use_at_schedule, :text, :image, :order, :scale,
-        :x, :y, :signature_type
+        :x, :y, :signature_type, :expiration_value, :expiration_unit
       )
     end
 end

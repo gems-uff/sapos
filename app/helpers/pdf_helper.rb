@@ -136,11 +136,17 @@ module PdfHelper
         if options[:qr_code_signature]
           qrcode_url = "#{request.protocol}#{request.host_with_port}/files/#{@qrcode_identifier}"
           qrcode_signature_warning = I18n.t("pdf_content.enrollment.footer.qrcode_signature_warning")
-          signed_at = "#{I18n.t("pdf_content.enrollment.footer.signed_by_qrcode")} #{I18n.localize(Time.now, format: :defaultdatetime)} (Horário de Brasília)"
+          signed_at = "#{I18n.t("pdf_content.enrollment.footer.signed_by_qrcode")} #{I18n.l(Time.now, format: :defaultdatetime)} (Horário de Brasília)"
           you_can_also_access = I18n.t("pdf_content.enrollment.footer.you_can_also_access")
 
-          center_around = [qrcode_signature_warning, signed_at, you_can_also_access, qrcode_url].max_by(&:size)
-          pdf.move_down last_box_height / 2 - signature_font_size
+          all_sentences = [qrcode_signature_warning, signed_at, you_can_also_access, qrcode_url]
+          if options[:expires_at]
+            valid_until = "#{I18n.t("pdf_content.enrollment.footer.valid_until")} #{I18n.l(Date.today + options[:expires_at].months, format: :default)}"
+            all_sentences.append(valid_until)
+          end
+
+          center_around = all_sentences.max_by(&:size)
+          pdf.move_down (last_box_height - signature_font_size * (all_sentences.count - 1)) / 2
           current_x = (last_box_width2 - pdf.width_of(center_around)) / 2
 
           pdf.draw_text(
@@ -168,6 +174,14 @@ module PdfHelper
             qrcode_url,
             at: [current_x, pdf.cursor]
           )
+          if options[:expires_at]
+            2.times { pdf.move_down signature_font_size }
+
+            pdf.draw_text(
+              valid_until,
+              at: [current_x, pdf.cursor]
+            )
+          end
         else
           current_x = x
           pdf.move_down 8
@@ -316,7 +330,7 @@ module PdfHelper
 
       if pdf_config.qr_code?
         pdf.repeat(:all, dynamic: true) do
-          signature_footer(pdf, { qr_code_signature: true })
+          signature_footer(pdf, { qr_code_signature: true, expires_at: pdf_config.expiration_in_months })
         end
       elsif pdf_config.manual?
         pdf.repeat(:all, dynamic: true) do
@@ -350,10 +364,11 @@ module PdfHelper
       uploader.store!({ base64_contents: Base64.encode64(document), filename: "academic_transcript.pdf" })
       uploader.file&.file&.update!(medium_hash: @qrcode_identifier)
 
-      report = Report.new
-      report.user = current_user
-      report.carrierwave_file = uploader.file&.file
-      report.save!
+      Report.create!(
+        expires_at: pdf_config.expiration_in_months.present? ? Date.today + pdf_config.expiration_in_months.months : nil,
+        user: current_user,
+        carrierwave_file: uploader.file&.file
+      )
     end
 
     document
@@ -443,7 +458,10 @@ module PdfHelper
   end
 
   def qrcode_signature(pdf, options = {})
-    @qrcode_identifier ||= SecureRandom.alphanumeric(8).upcase + ".pdf"
+    @qrcode_identifier ||= generate_qr_code_key + ".pdf"
+    while CarrierWave::Storage::ActiveRecord::ActiveRecordFile.where(medium_hash: @qrcode_identifier).exists?
+      @qrcode_identifier = generate_qr_code_key + ".pdf"
+    end
 
     data = "#{request.protocol}#{request.host_with_port}/files/#{@qrcode_identifier}"
 
@@ -455,6 +473,11 @@ module PdfHelper
     options[:pdf_config] ||
       ReportConfiguration.where(pdf_type_property => true).order(order: :desc).first ||
       ReportConfiguration.new
+  end
+
+  def generate_qr_code_key
+    12.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }
+      .insert(4, "-").insert(9, "-").join("")
   end
 end
 
