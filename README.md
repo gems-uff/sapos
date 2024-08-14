@@ -23,6 +23,8 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 * Luis Antônio Vieira Junior (joined in August 2013)
 * Daniel Prett (joined in August 2014)
 * Carlos Eduardo Cabral da Cunha (joined in August 2016)
+* Caio Henrique Velloso Paranhos (joined in March 2024)
+* Igor de Paula Siqueira Monárdez (joined in May 2024)
 
 # Additional contributors
 

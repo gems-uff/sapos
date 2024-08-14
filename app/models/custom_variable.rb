@@ -7,6 +7,8 @@
 class CustomVariable < ApplicationRecord
   has_paper_trail
 
+  SAPOS_MAIL = "sapos@sapos.ic.uff.br"
+
   VARIABLES = {
     "single_advisor_points" => :text,
     "multiple_advisor_points" => :text,
@@ -14,6 +16,7 @@ class CustomVariable < ApplicationRecord
     "identity_issuing_country" => :text,
     "class_schedule_text" => :text,
     "redirect_email" => :text,
+    "reply_to" => :text,
     "notification_footer" => :text,
     "minimum_grade_for_approval" => :text,
     "grade_of_disapproval_for_absence" => :text,
@@ -57,6 +60,12 @@ class CustomVariable < ApplicationRecord
   def self.redirect_email
     config = CustomVariable.find_by_variable(:redirect_email)
     config.blank? ? nil : (config.value || "")
+  end
+
+  def self.reply_to
+    default = ActionMailer::Base.default[:from]
+    config = CustomVariable.find_by_variable(:reply_to)
+    config.blank? ? default : (config.value || default)
   end
 
   def self.notification_footer

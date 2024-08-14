@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_01_18_203814) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_22_181457) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -619,6 +619,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_01_18_203814) do
     t.string "subject", limit: 255
     t.text "body"
     t.string "attachments_file_names"
+    t.string "reply_to", limit: 255
     t.index ["notification_id"], name: "index_notification_logs_on_notification_id"
   end
 
