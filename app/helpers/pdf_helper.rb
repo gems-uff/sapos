@@ -340,48 +340,89 @@ module PdfHelper
     simple_pdf_table(pdf, widths, header, data, options, &block)
   end
 
-  def simple_pdf_table(pdf, widths, header, data, options = {}, &block)
-    # Header
-    unless header.empty?
-      pdf.table(header, column_widths: widths,
-                width: widths.sum,
-                row_colors: ["E5E5FF"],
-                cell_style: { font: "FreeSans",
-                              size: 9,
-                              inline_format: true,
-                              border_width: 1,
-                              borders: [:top, :left, :right, :bottom],
-                              border_color: "000080",
-                              align: :center,
-                              padding: [2, 2]
-              }
-      )
+  def simple_pdf_table(pdf, widths, header, data, options = {}, join_header_and_table = false, &block)
+    if not join_header_and_table
+      # Header
+      unless header.empty?
+        pdf.table(header, column_widths: widths,
+                  width: widths.sum,
+                  row_colors: ["E5E5FF"],
+                  cell_style: { font: "FreeSans",
+                                size: 9,
+                                inline_format: true,
+                                border_width: 1,
+                                borders: [:top, :left, :right, :bottom],
+                                border_color: "000080",
+                                align: :center,
+                                padding: [2, 2]
+                }
+        )
+      end
+
+      # Content
+      unless data.empty?
+        pdf.fill_color "000000"
+        pdf.table(data, column_widths: widths,
+                  width: widths.sum,
+                  row_colors: ["F2F2FF", "E5E5FF"],
+                  cell_style: { font: "FreeSans",
+                                size: 9,
+                                inline_format: true,
+                                border_width: 1,
+                                borders: [:left, :right],
+                                border_color: "000080",
+                                align: :center,
+                                padding: 2
+                  }
+        ) do |table|
+          table.row(0).borders = [:top, :left, :right]
+          yield table unless block.nil?
+        end
+        pdf.fill_color "000080"
+        pdf.stroke do
+          pdf.horizontal_line 0, (pdf.bounds.left + pdf.bounds.right).floor
+        end
+      end
+
+    else
+      # Header and Content
+      unless data.empty?
+        pdf.table(header + data, column_widths: widths, header: true,
+                  width: widths.sum,
+                  row_colors: ["F2F2FF", "E5E5FF"],
+                  cell_style: { font: "FreeSans",
+                                size: 9,
+                                inline_format: true,
+                                border_width: 1,
+                                borders: [:left, :right],
+                                border_color: "000080",
+                                align: :center,
+                                padding: 2
+                  }
+        ) do |table|
+
+          table.before_rendering_page do |page|
+        
+            page.row(0).background_color = "E5E5FF"
+            page.row(0).borders = [:top, :bottom, :left, :right]
+            page.row(0).column(0).align = :center
+            page.row(0).column(-1).align = :center
+          
+            if page.row_count > 1
+              page.rows(1 .. -1).text_color = "000000"
+              page.row(-1).borders = [:bottom, :left, :right]
+            end
+          end
+       
+          yield table unless block.nil?
+        end
+        pdf.fill_color "000080"
+        pdf.stroke do
+          pdf.horizontal_line 0, (pdf.bounds.left + pdf.bounds.right).floor
+        end
+      end
     end
 
-    # Content
-    unless data.empty?
-      pdf.fill_color "000000"
-      pdf.table(data, column_widths: widths,
-                width: widths.sum,
-                row_colors: ["F2F2FF", "E5E5FF"],
-                cell_style: { font: "FreeSans",
-                              size: 9,
-                              inline_format: true,
-                              border_width: 1,
-                              borders: [:left, :right],
-                              border_color: "000080",
-                              align: :center,
-                              padding: 2
-                }
-      ) do |table|
-        table.row(0).borders = [:top, :left, :right]
-        yield table unless block.nil?
-      end
-      pdf.fill_color "000080"
-      pdf.stroke do
-        pdf.horizontal_line 0, (pdf.bounds.left + pdf.bounds.right).floor
-      end
-    end
   end
 end
 

@@ -499,7 +499,6 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  actiontext (>= 7.0.8.4)
   active_scaffold!
   active_scaffold_duplicate (>= 1.1.0)
   activerecord-session_store
@@ -547,7 +546,6 @@ DEPENDENCIES
   recaptcha
   recordselect
   redcarpet
-  rexml (>= 3.2.7)
   rspec-collection_matchers
   rspec-rails
   rubocop
