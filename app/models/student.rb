@@ -23,7 +23,6 @@ class Student < ApplicationRecord
     class_name: "Country",
     foreign_key: "birth_country_id"
   belongs_to :user, optional: true
-  belongs_to :skin_color, optional: true
 
   has_many :student_majors, dependent: :destroy
   has_many :majors, through: :student_majors

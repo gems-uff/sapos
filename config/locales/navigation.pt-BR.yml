@@ -82,7 +82,6 @@ pt-BR:
       notification_log: Notificações Enviadas
       custom_variable: Variáveis
       report_configuration: Configurações de Relatório
-      skin_color: Cor de pele
 
     logout:
       label: 'Logout'

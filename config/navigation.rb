@@ -231,7 +231,7 @@ SimpleNavigation::Configuration.run do |navigation|
 
     config_models = [
       User, Role, CustomVariable, Version, Notification,
-      NotificationLog, ReportConfiguration, EmailTemplate, SkinColor
+      NotificationLog, ReportConfiguration, EmailTemplate
     ]
     mainhelper.listitem :configurations, config_models do |submenu|
       submenu.modelitem User
@@ -243,7 +243,6 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.modelitem NotificationLog
       submenu.modelitem CustomVariable
       submenu.modelitem ReportConfiguration
-      submenu.modelitem SkinColor
     end
 
     mainhelper.item :logout, destroy_user_session_path
