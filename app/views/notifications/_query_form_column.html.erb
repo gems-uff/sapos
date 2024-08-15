@@ -26,7 +26,7 @@
     <%= field %>
     <%= link_to(
       "SQL", "javascript:void(0)",
-      onclick: "$('##{column_options[:id] + "container"}').toggle();"
+      onclick: "$('##{column_options[:id] + "container"}').toggle();".html_safe
     ) %>
     <%= loading_indicator_tag(
       action: :render_field, id: params[:id]
