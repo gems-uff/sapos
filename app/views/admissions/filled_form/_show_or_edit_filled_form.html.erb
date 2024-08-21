@@ -10,7 +10,7 @@
             <% filled_form_hidden.each do |hidden| %>
               <%= filled_form.hidden_field hidden %>
             <% end %>
-            <% if !admission_application.valid? && object.filled_form.form_template.has_file_fields? %>
+            <% if may_show_reupload_notice && !admission_application.valid? && object.filled_form.form_template.has_file_fields? %>
               <% object.filled_form.erase_non_filled_file_fields %>
               <li class="reupload-notice">
                 <%= t "admissions.apply.edit.upload_notice" %>

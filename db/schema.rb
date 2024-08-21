@@ -118,7 +118,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_10_001559) do
     t.integer "member_form_id"
     t.integer "shared_form_id"
     t.integer "consolidation_form_id"
-    t.boolean "can_edit_candidate", default: false, null: false
+    t.boolean "can_edit_candidate"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "approval_condition_id"
@@ -128,7 +128,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_10_001559) do
     t.boolean "candidate_can_see_member", default: false, null: false
     t.boolean "candidate_can_see_shared", default: false, null: false
     t.boolean "candidate_can_see_consolidation", default: false, null: false
-    t.index "\"ranking_config_id\"", name: "index_admission_phases_on_ranking_config_id"
+    t.index ["approval_condition_id"], name: "index_admission_phases_on_approval_condition_id"
     t.index ["candidate_form_id"], name: "index_admission_phases_on_candidate_form_id"
     t.index ["consolidation_form_id"], name: "index_admission_phases_on_consolidation_form_id"
     t.index ["keep_in_phase_condition_id"], name: "index_admission_phases_on_keep_in_phase_condition_id"
