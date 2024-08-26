@@ -31,6 +31,7 @@ pt-BR:
     create_report_configuration_label: "Adicionar Configuração de Relatório"
     report_configurations:
       preview: "Visualizar"
+      expiration_in_months_description: "Deixe em branco caso não haja validade definida."
 
   pdf_content:
     report_configurations:

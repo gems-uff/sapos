@@ -26,6 +26,7 @@ class ReportConfigurationsController < ApplicationController
     ]
     config.columns[:signature_type].form_ui = :select
     config.columns[:signature_type].options = { options: ReportConfiguration.signature_types.keys.map(&:to_sym) }
+    config.columns[:expiration_in_months].description = I18n.t("active_scaffold.report_configurations.expiration_in_months_description")
     config.list.sorting = { name: "ASC" }
     config.actions << :duplicate
     config.duplicate.link.label = "

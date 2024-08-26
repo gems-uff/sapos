@@ -14,6 +14,8 @@ class ReportConfiguration < ApplicationRecord
   validates :y, presence: true
   validates :scale, presence: true
 
+  validates :expiration_in_months, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+
   mount_uploader :image, ImageUploader
 
   enum signature_type: { no_signature: 0, manual: 1, qr_code: 2 }
