@@ -256,6 +256,14 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :assertions do
+    concerns :active_scaffold
+    member do
+      get "execute"
+      get "assertion_pdf"
+    end
+  end
+
   resources :queries do
     concerns :active_scaffold
     member do
