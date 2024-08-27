@@ -15,3 +15,7 @@ pt-BR:
       assertion:
         one: "Documento"
         other: "Documentos"
+
+    pdf_content:
+      assertion:
+        assertion_pdf: "Declaração"
