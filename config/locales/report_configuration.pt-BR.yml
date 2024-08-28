@@ -27,11 +27,18 @@ pt-BR:
         one: "Configuração de relatório"
         other: "Configurações de relatório"
 
+    errors:
+      models:
+        report_configuration:
+          attributes:
+            expiration_in_months:
+              only_for_qr_code: "só pode ser preenchido se o tipo de assinatura for QR Code"
+
   active_scaffold:
     create_report_configuration_label: "Adicionar Configuração de Relatório"
     report_configurations:
       preview: "Visualizar"
-      expiration_in_months_description: "Deixe em branco caso não haja validade definida."
+      expiration_in_months_description: "Deixe em branco caso não haja validade definida. Válido somente para assinaturas via QR Code."
 
   pdf_content:
     report_configurations:

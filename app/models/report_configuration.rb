@@ -13,8 +13,8 @@ class ReportConfiguration < ApplicationRecord
   validates :x, presence: true
   validates :y, presence: true
   validates :scale, presence: true
-
   validates :expiration_in_months, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
+  validate :expiration_in_months_only_for_qr_code
 
   mount_uploader :image, ImageUploader
 
@@ -37,4 +37,11 @@ class ReportConfiguration < ApplicationRecord
   def qr_code_signature
     signature_type === "qr_code"
   end
+
+  private
+    def expiration_in_months_only_for_qr_code
+      if expiration_in_months.present? && signature_type != "qr_code"
+        errors.add(:expiration_in_months, :only_for_qr_code)
+      end
+    end
 end
