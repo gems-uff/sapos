@@ -22,22 +22,13 @@ module ClassSchedulesPdfHelper
     end
     table_width << (520 - day_width * count)
 
-    count = 0
-    rows_per_page = 15
-    num_pages = (table[:data].size.to_f / rows_per_page).ceil
-
-    table[:data].each_slice(rows_per_page) do |data_slice|
-      count += 1
-      last_page = (num_pages == count)
-      class_schedule_print_table(
-        pdf, table_width, table[:header], data_slice, table[:star], last_page
-      )
-      pdf.start_new_page unless last_page
-    end
+    class_schedule_print_table(
+        pdf, table_width, table[:header], table[:data], table[:star], true
+    )
   end
 
   def class_schedule_print_table(pdf, table_width, header, data, star, footer)
-    simple_pdf_table(pdf, table_width, header, data) do |table|
+    simple_pdf_table(pdf, table_width, header, data, {}, true) do |table|
       table.column(0).align = :left
       table.column(0).valign = :center
       table.column(0).padding = [-2, 4, 2, 4]

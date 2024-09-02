@@ -22,12 +22,12 @@ gem "puma", ">= 6.4.2"
 # HTML and XML parser
 gem "nokogiri", ">= 1.16.5"
 
-#Wrapp HTTP requests and responses
+# Wrapp HTTP requests and responses
 gem "rack", "~> 2.2.8.1"
 
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 # gem "importmap-rails"
-#
+
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 # gem "turbo-rails"
 
@@ -122,7 +122,7 @@ gem "recaptcha", require: "recaptcha/rails"
 gem "rubyzip"
 gem "caxlsx"
 gem "caxlsx_rails"
-#gem "acts_as_xlsx"
+# gem "acts_as_xlsx"
 
 # Temporary fix of warnings
 # In the beggining of rails command executions, it shows some warnings related to these gems

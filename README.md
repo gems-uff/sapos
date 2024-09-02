@@ -1,4 +1,4 @@
-![Sapos Logo](https://github.com/gems-uff/sapos/raw/master/app/assets/images/logoSapos.png)
+![Sapos Logo](https://github.com/gems-uff/sapos/blob/main/app/assets/images/logoSapos.png?raw=true)
 [![Release](https://img.shields.io/github/release/gems-uff/sapos.svg)](https://github.com/gems-uff/sapos/releases)
 [![Build](https://img.shields.io/github/actions/workflow/status/gems-uff/sapos/rubyonrails.yml)](https://github.com/gems-uff/sapos/actions/workflows/rubyonrails.yml)
 [![Code Climate coverage](https://img.shields.io/codeclimate/coverage/gems-uff/sapos)](https://codeclimate.com/github/gems-uff/sapos)
@@ -23,6 +23,7 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 * Luis Antônio Vieira Junior (joined in August 2013)
 * Daniel Prett (joined in August 2014)
 * Carlos Eduardo Cabral da Cunha (joined in August 2016)
+* Caio Henrique Velloso Paranhos (joined in March 2024)
 * Igor de Paula Siqueira Monárdez (joined in May 2024)
 
 # Additional contributors
