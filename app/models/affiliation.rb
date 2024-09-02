@@ -13,9 +13,9 @@ class Affiliation < ApplicationRecord
                           message: "A afiliação só pode ser iniciada em uma data por professor"
   validate :uniqueness_end_date
 
-  scope :date, ->(date) { where("start_date <= ? AND (end_date > ? OR end_date IS null)", date, date) }
-  scope :professor, ->(professor) { where(professor_id: professor.id) }
-  scope :date_professor, ->(professor, date) { professor(professor).date(date) }
+  scope :on_date, ->(date) { where("start_date <= ? AND (end_date > ? OR end_date IS null)", date, date).last }
+  scope :of_professor, ->(professor) { where(professor_id: professor.id) }
+  scope :date_professor, ->(professor, date) { of_professor(professor).on_date(date) }
 
   private
 

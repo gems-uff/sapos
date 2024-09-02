@@ -3,8 +3,8 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
     create_table :affiliations do |t|
       t.belongs_to :professor, index: true
       t.belongs_to :institution, index: true
-      t.date :start_date
-      t.date :end_date
+      t.datetime :start_date
+      t.datetime :end_date
 
       t.timestamps
     end
@@ -51,7 +51,7 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
     add_column :professors, :institution_id, :integer
     add_index :professors, :institution_id
     Professor.all.each do |p|
-      affiliation = Affiliation.professor(p).where(active: true).last
+      affiliation = Affiliation.of_professor(p).where(end_date: nil).last
       p.update(institution_id: affiliation.institution_id)
     end
     drop_table :affiliations

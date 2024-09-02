@@ -15,7 +15,7 @@ RSpec.describe Affiliation, type: :model do
     it { should validate_presence_of(:start_date) }
     context "Active" do
       let(:professor) { FactoryBot.create :professor }
-      let(:affiliation_active) { FactoryBot.create :affiliation, professor: professor, start_date: Time.now}
+      let(:affiliation_active) { FactoryBot.create :affiliation, professor: professor, start_date: Time.now, end_date: nil }
       let(:affiliation_inactive) { FactoryBot.create :affiliation,
                                                      professor: professor,
                                                      start_date: Time.now + 1.day,
@@ -59,6 +59,20 @@ RSpec.describe Affiliation, type: :model do
         it { expect(affiliation_inactive_valid).to be_valid }
         it { expect(affiliation_inactive_invalid).to be_invalid }
       end
+    end
+  end
+  
+  context "Scope" do
+    context "date_professor" do
+      let!(:professor) { FactoryBot.create :professor }
+      let!(:affiliation_active) { FactoryBot.create :affiliation, professor: professor, start_date: Time.now, end_date: nil }
+      let!(:affiliation_inactive) do
+        FactoryBot.create :affiliation, professor: professor, start_date: Time.now - 1.day, end_date: Time.now
+      end
+
+
+      it { expect(Affiliation.date_professor(professor, Time.now)).to eq(affiliation_active) }
+      it { expect(Affiliation.date_professor(professor, Time.now - 5.hours)).to eq(affiliation_inactive) }
     end
   end
 end

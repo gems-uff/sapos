@@ -100,7 +100,7 @@ RSpec.configure do |config|
       "text/csv,text/tsv,text/xml,text/plain,application/pdf,application/doc,application/docx,image/jpeg,application/gzip,application/x-gzip"
     options = Selenium::WebDriver::Firefox::Options.new
     options.profile = profile
-    options.args << "--headless" unless ENV["BROWSER"]
+    #options.args << "--headless" unless ENV["BROWSER"]
 
     Capybara::Selenium::Driver.new(
       app,

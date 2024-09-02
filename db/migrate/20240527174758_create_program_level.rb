@@ -2,8 +2,8 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
   def up
     create_table :program_levels do |t|
       t.integer :level, null: false
-      t.date :start_date, null: false
-      t.date :end_date
+      t.datetime :start_date, null: false
+      t.datetime :end_date
 
       t.timestamps
     end
@@ -15,7 +15,6 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
       )
       pl = pl.paper_trail.previous_version
       while pl.present?
-        binding.pry
         if pl.value != level
           end_date = start_date
           start_date = pl.updated_at

@@ -51,6 +51,12 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << @professor3 = FactoryBot.create(:professor, name: "Gi", cpf: "1")
     @destroy_all << @professor4 = FactoryBot.create(:professor, name: "Helena", cpf: "4")
 
+    @destroy_all << @institution = FactoryBot.create(:institution, name: 'UFF')
+
+    @destroy_all << @affiliation1 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor1, end_date: nil)
+    @destroy_all << @affiliation2 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor2, end_date: nil)
+    @destroy_all << @affiliation3 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor3, end_date: nil)
+
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level1)
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level2)
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level1)
@@ -184,6 +190,8 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
             "Nome", "Instituição"
           ]
           expect(page.all("tbody tr").size).to eq 3
+          binding.pry
+          expect(page).to have_content "UFF"
         end
       end
 

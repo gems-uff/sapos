@@ -128,7 +128,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_10_001559) do
     t.boolean "candidate_can_see_member", default: false, null: false
     t.boolean "candidate_can_see_shared", default: false, null: false
     t.boolean "candidate_can_see_consolidation", default: false, null: false
-    t.index ["approval_condition_id"], name: "index_admission_phases_on_approval_condition_id"
+    t.index "\"ranking_config_id\"", name: "index_admission_phases_on_ranking_config_id"
     t.index ["candidate_form_id"], name: "index_admission_phases_on_candidate_form_id"
     t.index ["consolidation_form_id"], name: "index_admission_phases_on_consolidation_form_id"
     t.index ["keep_in_phase_condition_id"], name: "index_admission_phases_on_keep_in_phase_condition_id"
@@ -259,8 +259,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_10_001559) do
   create_table "affiliations", force: :cascade do |t|
     t.integer "professor_id"
     t.integer "institution_id"
-    t.date "start_date"
-    t.date "end_date"
+    t.datetime "start_date"
+    t.datetime "end_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["institution_id"], name: "index_affiliations_on_institution_id"
@@ -950,6 +950,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_10_001559) do
     t.string "photo", limit: 255
     t.integer "birth_country_id"
     t.integer "user_id", limit: 8
+    t.string "skin_color"
+    t.boolean "pcd"
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"

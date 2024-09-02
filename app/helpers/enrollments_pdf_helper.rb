@@ -614,10 +614,8 @@ module EnrollmentsPdfHelper
           data_table_rows_defense_committee += [[
             "#{I18n.t("pdf_content.enrollment.thesis.defense_committee")} "
           ]]
-          # TODO: modificar o institution para a affiliation
           thesis_desense_committee.each do |professor|
-            affiliation = professor.affiliations.date(thesis_defense_date).last
-            binding.pry
+            affiliation = Affiliation.date_professor(professor, thesis_defense_date)
             data_table_rows_defense_committee += [[
               "<b>#{professor.name} / #{rescue_blank_text(
                 affiliation.institution, method_call: :name
