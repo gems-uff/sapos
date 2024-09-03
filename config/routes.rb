@@ -236,6 +236,10 @@ Rails.application.routes.draw do
     concerns :active_scaffold
   end
 
+  resources :program_level do
+    concerns :active_scaffold
+  end
+
   resources :thesis_defense_committee_participations do
     concerns :active_scaffold
     record_select_routes

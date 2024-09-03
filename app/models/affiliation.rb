@@ -16,6 +16,7 @@ class Affiliation < ApplicationRecord
   scope :on_date, ->(date) { where("start_date <= ? AND (end_date > ? OR end_date IS null)", date, date).last }
   scope :of_professor, ->(professor) { where(professor_id: professor.id) }
   scope :date_professor, ->(professor, date) { of_professor(professor).on_date(date) }
+  scope :active, -> { where(end_date: nil) }
 
   private
 
