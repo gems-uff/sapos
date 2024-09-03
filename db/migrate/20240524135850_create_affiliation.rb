@@ -8,7 +8,7 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
 
       t.timestamps
     end
-    Professor.all.each do |professor|
+    Professor.where.not(institution_id: nil).each do |professor|
       start_date = professor.updated_at
       end_date = nil
       institution_id = professor.institution_id
@@ -21,9 +21,7 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
       professor = professor.paper_trail.previous_version
       while professor.present?
         if professor.institution_id != institution_id
-          if institution_id.present? # Não armazena afiliação em branco
-            institutions << { institution_id:, start_date:, end_date: }
-          end
+          institutions << { institution_id:, start_date:, end_date: }
           end_date = start_date
           start_date = professor.updated_at
           institution_id = professor.institution_id
@@ -40,9 +38,7 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
         end
         professor = professor.paper_trail.previous_version
       end
-      if institution_id.present? # Não armazena afiliação em branco
-        institutions << { institution_id:, start_date:, end_date: }
-      end
+      institutions << { institution_id:, start_date:, end_date: }
     end
 
     remove_column :professors, :institution_id

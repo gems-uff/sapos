@@ -3,8 +3,8 @@
 class Affiliation < ApplicationRecord
   has_paper_trail
 
-  belongs_to :institution, optional: true
-  belongs_to :professor, optional: true
+  belongs_to :institution
+  belongs_to :professor
 
   validates :start_date, presence: true
   validates :end_date, presence: false
