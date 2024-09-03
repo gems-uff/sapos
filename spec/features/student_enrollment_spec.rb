@@ -190,7 +190,6 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
             "Nome", "Instituição"
           ]
           expect(page.all("tbody tr").size).to eq 3
-          binding.pry
           expect(page).to have_content "UFF"
         end
       end
