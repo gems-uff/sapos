@@ -236,7 +236,7 @@ Rails.application.routes.draw do
     concerns :active_scaffold
   end
 
-  resources :program_level do
+  resources :program_levels do
     concerns :active_scaffold
   end
 

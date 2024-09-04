@@ -10,7 +10,6 @@ pt-BR:
       student: Alunos
       dismissal: Desligamentos
       enrollment: Matrículas
-      enrollment: Matrículas
       enrollment_hold: Trancamentos
       level: Níveis
       dismissal_reason: Razões de Desligamento
@@ -82,6 +81,7 @@ pt-BR:
       notification_log: Notificações Enviadas
       custom_variable: Variáveis
       report_configuration: Configurações de Relatório
+      program_level: Nível
 
     logout:
       label: 'Logout'

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ProgramLevelController < ApplicationController
+class ProgramLevelsController < ApplicationController
   authorize_resource
   active_scaffold :program_level do |config|
     config.create.columns = [:level]
@@ -14,6 +14,7 @@ class ProgramLevelController < ApplicationController
     def do_update
       # BEFORE UPDATE
       # cria o histórico
+
       pl = ProgramLevel.last
       unless pl.nil?
         ProgramLevel.create!(

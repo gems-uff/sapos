@@ -19,13 +19,12 @@ class Affiliation < ApplicationRecord
   scope :active, -> { where(end_date: nil) }
 
   private
-
-  def uniqueness_end_date
-    exists = Affiliation.where(professor_id: professor_id, end_date: end_date).where.not(id: id).exists?
-    if exists
-      errors.add(:end_date,"Apenas uma afiliação pode estar ativa por professor e só pode ter uma data de fim por professor")
+    def uniqueness_end_date
+      exists = Affiliation.where(professor_id: professor_id, end_date: end_date).where.not(id: id).exists?
+      if exists
+        errors.add(:end_date,"Apenas uma afiliação pode estar ativa por professor e só pode ter uma data de fim por professor")
+      end
+      exists
     end
-    exists
-  end
 
 end
