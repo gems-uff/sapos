@@ -71,8 +71,8 @@ RSpec.describe Affiliation, type: :model do
       end
 
 
-      it { expect(Affiliation.date_professor(professor, Time.now)).to eq(affiliation_active) }
-      it { expect(Affiliation.date_professor(professor, Time.now - 5.hours)).to eq(affiliation_inactive) }
+      it { expect(Affiliation.professor_date(professor, Time.now).last).to eq(affiliation_active) }
+      it { expect(Affiliation.professor_date(professor, Time.now - 1.days).last).to eq(affiliation_inactive) }
     end
   end
 end

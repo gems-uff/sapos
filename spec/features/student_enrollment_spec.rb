@@ -51,7 +51,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << @professor3 = FactoryBot.create(:professor, name: "Gi", cpf: "1")
     @destroy_all << @professor4 = FactoryBot.create(:professor, name: "Helena", cpf: "4")
 
-    @destroy_all << @institution = FactoryBot.create(:institution, name: 'UFF')
+    @destroy_all << @institution = FactoryBot.create(:institution, name: "UFF")
 
     @destroy_all << @affiliation1 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor1, end_date: nil)
     @destroy_all << @affiliation2 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor2, end_date: nil)
@@ -65,7 +65,10 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor3, level: @level2)
 
     @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana")
-    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1, level: @level2, enrollment_status: @enrollment_status1, admission_date: 3.years.ago.at_beginning_of_month.to_date, research_area: @research_area1)
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1,
+                                                     level: @level2, enrollment_status: @enrollment_status1,
+                                                     admission_date: 3.years.ago.at_beginning_of_month.to_date,
+                                                     research_area: @research_area1, thesis_defense_date: Time.now)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level2, enrollment_status: @enrollment_status1)
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "D01", student: @student1, level: @level1, enrollment_status: @enrollment_status1)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "D02", student: @student1, level: @level1, enrollment_status: @enrollment_status1)

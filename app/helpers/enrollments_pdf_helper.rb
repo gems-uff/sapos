@@ -137,7 +137,7 @@ module EnrollmentsPdfHelper
       pdf.font("FreeMono", size: 8) do
         pdf.line_width 0.5
         common_header_part1(pdf, enrollment, [
-          "#{i18n_eht(:program_level)} <b>#{program_level.level}</b>"
+          "#{i18n_eht(:program_level)} <b>#{program_level}</b>"
         ])
 
         common_header_part(pdf) do
@@ -615,10 +615,10 @@ module EnrollmentsPdfHelper
             "#{I18n.t("pdf_content.enrollment.thesis.defense_committee")} "
           ]]
           thesis_desense_committee.each do |professor|
-            affiliation = Affiliation.date_professor(professor, thesis_defense_date)
+            affiliation = Affiliation.professor_date(professor, thesis_defense_date)&.last
             data_table_rows_defense_committee += [[
               "<b>#{professor.name} / #{rescue_blank_text(
-                affiliation.institution, method_call: :name
+                affiliation&.institution, method_call: :name
               )}</b>"
             ]]
           end
