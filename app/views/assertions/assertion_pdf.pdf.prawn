@@ -8,6 +8,8 @@ new_document(
   "Assertion",
   pdf_type: :assertion
 ) do |pdf|
-  pdf.text "SQL Query:", size: 14, style: :bold
+  assertion_table(
+      pdf, assertion: @assertion
+    )
 
 end
