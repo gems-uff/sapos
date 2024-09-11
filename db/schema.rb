@@ -619,6 +619,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_08_13_223037) do
     t.string "subject", limit: 255
     t.text "body"
     t.string "attachments_file_names"
+    t.string "reply_to", limit: 255
     t.index ["notification_id"], name: "index_notification_logs_on_notification_id"
   end
 

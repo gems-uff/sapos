@@ -8,6 +8,7 @@
     <% if can_edit_main %>
       <%= render partial: "admissions/filled_form/edit/form_with_letters", locals: {
         form: form,
+        may_show_reupload_notice:,
         admission_process: admission_process,
         admission_application: admission_application,
         show_name: show_name,
@@ -27,6 +28,8 @@
     <% letter_request.filled_form.sync_fields_before(letter_request) %>
     <%= render partial: "admissions/filled_form/show_or_edit_filled_form", locals: {
         form: form,
+        may_show_reupload_notice:,
+        admission_application:,
         name: "Carta de #{letter_request.name}",
         id: "#{subid}-letter-#{letter_request.id}",
         visible: main_visible,
@@ -56,6 +59,8 @@
     <% app_forms[:phase_forms].each do |phase_form| %>
       <%= render partial: "admissions/filled_form/show_or_edit_filled_form", locals: {
         form: form,
+        may_show_reupload_notice:,
+        admission_application:,
         name: "#{phase.name} (#{phase_form[:name]})",
         id: "#{phase_subid}-#{phase_form[:name]}",
         visible: phase_visible,
@@ -78,6 +83,8 @@
     <% ranking.filled_form.prepare_missing_fields %>
     <%= render partial: "admissions/filled_form/show_or_edit_filled_form", locals: {
         form: form,
+        may_show_reupload_notice:,
+        admission_application:,
         name: ranking.ranking_config.name,
         id: "ranking-#{ranking.id}",
         visible: false,

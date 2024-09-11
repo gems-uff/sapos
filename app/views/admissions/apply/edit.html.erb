@@ -40,6 +40,11 @@
                       <%= error.full_message %></li>
                     <% end %>
                   </li>
+                  <% if @show_reupload_files_notice %>
+                    <li>
+                      <%= t "admissions.apply.edit.upload_notice" %>
+                    </li>
+                  <% end %>
                 <% end %>
               </ul>
             </div>
@@ -47,6 +52,7 @@
         </div>
         <%= render partial: "admissions/filled_form/candidate_forms", locals: {
           form: form,
+          may_show_reupload_notice: false,
           admission_process: @admission_process,
           admission_application: @admission_application,
           show_name: @show_name,

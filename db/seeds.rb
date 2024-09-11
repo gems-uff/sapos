@@ -20,6 +20,7 @@ CustomVariable.create([
   { description: "País padrão de emissão da identidade", variable: "identity_issuing_country", value: "Brasil" },
   { description: "Texto no final do quadro de horários", variable: "class_schedule_text", value: "Alunos interessados em cursar disciplinas de Tópicos Avançados devem consultar os respectivos professores antes da matrícula." },
   { description: "E-mail de redirecionamento para as notificações", variable: "redirect_email", value: "" },
+  { description: "E-mail das resposta de emails automáticos", variable: "reply_to", value: "sapos@sapos.ic.uff.br"},
   { description: "Texto de rodapé da notificação",
     variable: "notification_footer",
     value: <<~TEXT
