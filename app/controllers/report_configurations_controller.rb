@@ -66,7 +66,7 @@ class ReportConfigurationsController < ApplicationController
       params.required(:record).permit(
         :name, :use_at_report, :use_at_transcript, :use_at_grades_report,
         :use_at_schedule, :text, :image, :order, :scale,
-        :x, :y, :signature_type, :expiration_value, :expiration_unit
+        :x, :y, :signature_type, :expiration_in_months
       )
     end
 end
