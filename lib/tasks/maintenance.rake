@@ -16,7 +16,7 @@ namespace :maintenance do
     expired_reports.map do |expired_report|
       carrierwave_file = expired_report.carrierwave_file
       expired_report.update!(carrierwave_file_id: nil)
-      carrierwave_file.delete!
+      carrierwave_file.delete
     end
 
     Rails.logger.info "[Reports] #{Time.now.to_fs} Finished removing reports"
