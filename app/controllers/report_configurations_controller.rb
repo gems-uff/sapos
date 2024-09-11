@@ -13,7 +13,7 @@ class ReportConfigurationsController < ApplicationController
     columns = [
       :name, :image, :scale, :x, :y, :order, :text, :signature_footer,
       :preview, :use_at_report, :use_at_transcript, :use_at_grades_report,
-      :use_at_schedule,
+      :use_at_schedule, :use_at_assertion
     ]
     config.create.columns = columns
     config.update.columns = columns
@@ -21,7 +21,7 @@ class ReportConfigurationsController < ApplicationController
     config.columns = columns
     config.list.columns = [
       :name, :order, :text, :signature_footer, :use_at_report,
-      :use_at_transcript, :use_at_grades_report, :use_at_schedule
+      :use_at_transcript, :use_at_grades_report, :use_at_schedule, :use_at_assertion
     ]
     config.list.sorting = { name: "ASC" }
     config.actions << :duplicate
@@ -61,7 +61,7 @@ class ReportConfigurationsController < ApplicationController
     def record_params
       params.required(:record).permit(
         :name, :use_at_report, :use_at_transcript, :use_at_grades_report,
-        :use_at_schedule, :text, :image, :signature_footer, :order, :scale,
+        :use_at_schedule, :use_at_assertion, :text, :image, :signature_footer, :order, :scale,
         :x, :y
       )
     end
