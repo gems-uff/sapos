@@ -41,6 +41,7 @@ pt-BR:
         thesis_defense_committee_participations: "Banca Avaliadora"
         thesis_defense_committee_professors: "Banca Avaliadora"
         accomplishment_conclusion_date_not_given: "---------/----"
+        obs_to_academic_transcript: "Observação para o Histórico"
 
     errors:
       models:
@@ -101,6 +102,7 @@ pt-BR:
         title: "Histórico Escolar"
         total_credits: "Total"
         scholarships: "BOLSAS"
+        obs_to_academic_transcript: "OBSERVAÇÕES:"
       grade_list:
         title: "DISCIPLINAS CURSADAS COM APROVEITAMENTO"
         course_approved: "AP"
