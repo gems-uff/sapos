@@ -8,21 +8,27 @@ module AssertionsPdfHelper
     cpf.gsub(/(\d{3})(\d{3})(\d{3})(\d{2})/, '\1.\2.\3-\4')
   end
 
+  def format_date(date)
+    I18n.l(date, format: :long, locale: :'pt-BR')
+  end
+
   def replace_placeholders(template, values, records = [])
     template = template.dup
     values.each do |key, value|
       template.gsub!("<%= var('#{key}') %>", value.to_s)
     end
 
-    if records.any?
+    record_template = template.scan(/<% records.each do \|record\| %>(.*?)<% end %>/m).flatten.first
+    unless record_template.nil?
       record_template = template.scan(/<% records.each do \|record\| %>(.*?)<% end %>/m).flatten.first
       record_text = records.map do |record|
         record_content = record_template.dup
         record.each do |key, value|
-          record_content.gsub!("<%= var('#{key}') %>", value.to_s)
+          formatted_value = key == 'data' ? format_date(Date.parse(value)) : value.to_s
+          record_content.gsub!("<%= var('#{key}') %>", formatted_value)
         end
         record_content
-      end.join("\n")
+      end.join("")
       template.gsub!(/<% records.each do \|record\| %>.*?<% end %>/m, record_text)
     end
 
@@ -43,7 +49,7 @@ module AssertionsPdfHelper
       lines = pdf.text_box text, at: [(pdf.bounds.width - box_width) / 2, pdf.cursor], width: box_width, height: box_height, align: :justify, inline_format: true, dry_run: true
     end
 
-    end
+  end
 
   def assertion_table(pdf, options = {})
     assertion = options[:assertion]
@@ -55,15 +61,22 @@ module AssertionsPdfHelper
     rows = results[:rows]
     columns = results[:columns]
 
-    values = {
-      'nome_aluno' => rows.first[columns.index('nome_aluno')],
-      'cpf' => mask_cpf(rows.first[columns.index('cpf')])
-    }
+    # Identifica registros com colunas com valores idênticos para cada linha
+    unique_columns = columns.select do |column|
+      rows.all? { |row| row[columns.index(column)] == rows.first[columns.index(column)] }
+    end
 
+    # Recupera os valores únicos para as colunas identificadas
+    values = unique_columns.index_with do |column|
+      rows.first[columns.index(column)]
+    end
+    values['cpf_aluno'] = mask_cpf(values['cpf_aluno']) if values.key?('cpf_aluno')
+
+    # Prepara os registros para impressão excluindo as colunas identificadas como únicas
     records = rows.each_with_index.map do |row, index|
       record = { 'counter' => (index + 1).to_s }
       columns.each do |column|
-        next if %w[nome_aluno cpf].include?(column)
+        next if unique_columns.include?(column)
         record[column] = row[columns.index(column)]
       end
       record

@@ -13,6 +13,7 @@ pt-BR:
     attributes:
       assertion:
         name: "Nome da Declaração"
+        query: "Consulta"
         params: "Parâmetros configuráveis da declaração"
         assertion_template: "Template do Corpo"
         assertion_box_width: "Largura da Caixa de Texto"

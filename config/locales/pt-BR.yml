@@ -148,3 +148,9 @@ pt-BR:
   unauthorized:
     access_denied: "Acesso negado"
     default: "Acesso negado à URL. Tentativa de acesso reportada."
+
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      long: "%d de %B de %Y"
+      short: "%d/%m"
