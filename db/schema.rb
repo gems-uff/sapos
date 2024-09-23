@@ -273,8 +273,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_22_04_223146) do
     t.datetime "updated_at", null: false
     t.integer "query_id", null: false
     t.string "assertion_template"
-    t.integer "assertion_box_width"
-    t.integer "assertion_box_height"
+    t.integer "assertion_box_width", default: 400
+    t.integer "assertion_box_height", default: 580
     t.index ["query_id"], name: "index_assertions_on_query_id"
   end
 
