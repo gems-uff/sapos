@@ -4,15 +4,6 @@
 
 <%= render "assertions/params_form", resource: @assertion, query_params: @query_params %>
 
-<div class="actions" style="display: block; margin: 10px 0">
-  <a id="as_queries-execute-<%= @assertion.id %>-link"
-     class="execute as_action again"
-     href="javascript:void(0)"><i class="fa fa-play" title="Executar"></i>
-    Executar</a>
-  &nbsp;&nbsp;
-  <%= render "queries/show_sql", sql_query: @query_sql %>
-</div>
-
 <table>
   <thead>
   <tr>
