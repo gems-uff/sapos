@@ -1,0 +1,41 @@
+<%
+  column_options = active_scaffold_input_options(column, scope, object: record)
+  attributes = field_attributes(column, record)
+  attributes[:class] = "#{attributes[:class]} #{col_class}" if col_class.present?
+  field = unless only_value
+    active_scaffold_input_for column, scope, column_options
+  else
+    content_tag(
+      :span, get_column_value(record, column),
+      column_options.except(:name, :object)
+    ) << hidden_field(
+      :record,
+      column.association ? column.association.foreign_key : column.name,
+      column_options
+    )
+  end
+%>
+<%= content_tag :dl, attributes do %>
+  <dt>
+    <%= label_tag label_for(column, column_options), column.label %>
+    <div>
+      <span class="description"><%= record.query.try :description %></span>
+    </div>
+  </dt>
+  <dd>
+    <%= field %>
+    <%= link_to(
+      "SQL", "javascript:void(0)",
+      onclick: "$('##{column_options[:id] + "container"}').toggle();"
+    ) %>
+    <%= loading_indicator_tag(
+      action: :render_field, id: params[:id]
+    ) if column.update_columns %>
+    <%= content_tag(
+      :span, column.description, class: "description"
+    ) if column.description.present? %>
+    <div id="<%= column_options[:id] + "container" %>">
+      <%= query_sql_form_column(record, column_options) %>
+    </div>
+  </dd>
+<% end %>
