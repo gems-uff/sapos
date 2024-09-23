@@ -38,7 +38,7 @@ module AssertionsPdfHelper
   def assertion_table(pdf, options = {})
     assertions = options[:assertion]
     template = assertions.assertion_template
-    results = get_avulso_results(assertions)
+    results = get_query_results(assertions)
     box_width = assertions.assertion_box_width
     box_height = assertions.assertion_box_height
     rows = results[:rows]
@@ -50,14 +50,12 @@ module AssertionsPdfHelper
     }
 
     records = rows.each_with_index.map do |row, index|
-      {
-        'counter' => (index + 1).to_s,
-        'nome_disciplina' => row[columns.index('nome_disciplina')],
-        'carga_horaria' => row[columns.index('carga_horaria')],
-        'periodo' => "#{row[columns.index('ano')]}.#{row[columns.index('semestre')]}",
-        'nota_final' => row[columns.index('nota')],
-        'situacao_final' => row[columns.index('situacao')]
-      }
+      record = { 'counter' => (index + 1).to_s }
+      columns.each do |column|
+        next if %w[nome_aluno cpf].include?(column)
+        record[column] = row[columns.index(column)]
+      end
+      record
     end
 
     assertion_box_text_print(pdf, template, values, records, box_width, box_height)
