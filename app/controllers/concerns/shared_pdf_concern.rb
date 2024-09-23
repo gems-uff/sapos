@@ -74,13 +74,13 @@ module SharedPdfConcern
     )
   end
 
-  def render_assertion_pdf(assertion_query_result)
+  def render_assertion_pdf(assertion)
     render_to_string(
       template: "assertions/assertion_pdf",
       type: "application/pdf",
       formats: [:pdf],
       assigns: {
-        assertion_query_result: assertion_query_result
+        assertion: assertion
       }
     )
   end

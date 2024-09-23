@@ -259,7 +259,7 @@ Rails.application.routes.draw do
   resources :assertions do
     concerns :active_scaffold
     member do
-      get "execute"
+      get "simulate"
       get "assertion_pdf"
     end
   end

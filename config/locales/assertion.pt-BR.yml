@@ -3,7 +3,11 @@
 
 pt-BR:
   active_scaffold:
-    create_assertion_label: "Adicionar Declaração"
+    assertion:
+      create_assertion_label: "Adicionar Declaração"
+      simulate: "Simular"
+      generate_pdf: "Gerar PDF"
+      query_date: "Data de Consulta"
 
   activerecord:
     attributes:

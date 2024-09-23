@@ -30,17 +30,18 @@ module AssertionsPdfHelper
   end
 
   def assertion_box_text_print(pdf, template, values, records = [], box_width, box_height)
-    pdf.move_down 50
+    pdf.move_down 30
     text = replace_placeholders(template, values, records)
     pdf.text_box text, at: [(pdf.bounds.width - box_width) / 2, pdf.cursor], width: box_width, height: box_height, align: :justify, inline_format: true
   end
 
   def assertion_table(pdf, options = {})
-    assertions = options[:assertion]
-    template = assertions.assertion_template
-    results = get_query_results(assertions)
-    box_width = assertions.assertion_box_width
-    box_height = assertions.assertion_box_height
+    assertion = options[:assertion]
+    args = assertion.args
+    results = get_query_results(assertion, args)
+    template = assertion.assertion_template
+    box_width = assertion.assertion_box_width
+    box_height = assertion.assertion_box_height
     rows = results[:rows]
     columns = results[:columns]
 
