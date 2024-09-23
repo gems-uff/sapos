@@ -10,13 +10,14 @@ pt-BR:
       assertion:
         name: "Nome da Declaração"
         params: "Parâmetros configuráveis da declaração"
-        fixed: "TESTE - Declaro, para os devidos fins, que FULANO DE TAL, CPF: 000.000.000-00, cursou como aluno avulso as seguintes disciplinas do Programa de Pós-Graduação em Computação, nos termos do parágrafo único do Art. 18 do Regulamento dos Programas de Pós-Graduação Stricto Sensu da Universidade Federal Fluminense:"
+        assertion_template: "Template do Corpo"
 
     models:
       assertion:
         one: "Documento"
         other: "Documentos"
 
-    pdf_content:
-      assertion:
-        assertion_pdf: "Declaração"
+  pdf_content:
+    assertion:
+      assertion_pdf:
+        filename: "DECLARAÇÃO"

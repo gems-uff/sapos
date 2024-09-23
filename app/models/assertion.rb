@@ -16,6 +16,7 @@ class Assertion < ApplicationRecord
   }
 
   validates :name, presence: true
+  validates :assertion_template, presence: true, on: :update
 
   def to_label
     "#{self.name}"

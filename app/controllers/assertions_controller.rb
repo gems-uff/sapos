@@ -21,10 +21,16 @@ class AssertionsController < ApplicationController
       type: :member,
       parameters: { format: :pdf }
 
+    form_columns = [
+      :name, :query, :assertion_template
+    ]
+
     config.create.label = :create_assertion_label
     config.list.sorting = { name: "ASC" }
     config.list.columns = [:name, :query]
-    config.columns = [:name, :query]
+    config.columns = form_columns
+    config.update.columns = form_columns
+    config.show.columns = form_columns
     config.actions.exclude :deleted_records
 
     config.columns[:query].form_ui = :select
