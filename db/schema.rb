@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_22_04_223140) do
+ActiveRecord::Schema[7.0].define(version: 2024_22_04_223145) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -271,6 +271,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_22_04_223140) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "query_id", null: false
+    t.string "assertion_template"
+    t.index ["query_id"], name: "index_assertions_on_query_id"
   end
 
   create_table "carrier_wave_files", force: :cascade do |t|
@@ -816,6 +819,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_22_04_223140) do
     t.integer "y"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.boolean "use_at_assertion"
   end
 
   create_table "research_areas", force: :cascade do |t|
@@ -1002,4 +1006,5 @@ ActiveRecord::Schema[7.0].define(version: 2024_22_04_223140) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "assertions", "queries"
 end
