@@ -24,8 +24,7 @@ module AssertionsPdfHelper
       record_text = records.map do |record|
         record_content = record_template.dup
         record.each do |key, value|
-          formatted_value = key == 'data' ? format_date(Date.parse(value)) : value.to_s
-          record_content.gsub!("<%= var('#{key}') %>", formatted_value)
+          record_content.gsub!("<%= var('#{key}') %>", value)
         end
         record_content
       end.join("")
@@ -71,6 +70,7 @@ module AssertionsPdfHelper
       rows.first[columns.index(column)]
     end
     values['cpf_aluno'] = mask_cpf(values['cpf_aluno']) if values.key?('cpf_aluno')
+    values['data'] = format_date(Date.parse(values['data'])) if values.key?('data')
 
     # Prepara os registros para impressão excluindo as colunas identificadas como únicas
     records = rows.each_with_index.map do |row, index|
