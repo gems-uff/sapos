@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_22_04_223145) do
+ActiveRecord::Schema[7.0].define(version: 2024_22_04_223146) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -273,6 +273,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_22_04_223145) do
     t.datetime "updated_at", null: false
     t.integer "query_id", null: false
     t.string "assertion_template"
+    t.integer "assertion_box_width"
+    t.integer "assertion_box_height"
     t.index ["query_id"], name: "index_assertions_on_query_id"
   end
 

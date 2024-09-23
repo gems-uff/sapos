@@ -22,7 +22,7 @@ class AssertionsController < ApplicationController
       parameters: { format: :pdf }
 
     form_columns = [
-      :name, :query, :assertion_template
+      :name, :query, :assertion_template, :assertion_box_width, :assertion_box_height
     ]
 
     config.create.label = :create_assertion_label

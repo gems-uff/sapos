@@ -29,11 +29,9 @@ module AssertionsPdfHelper
     template
   end
 
-  def assertion_box_text_print(pdf, template, values, records = [])
+  def assertion_box_text_print(pdf, template, values, records = [], box_width, box_height)
     pdf.move_down 50
     text = replace_placeholders(template, values, records)
-    box_width = 400
-    box_height = 500
     pdf.text_box text, at: [(pdf.bounds.width - box_width) / 2, pdf.cursor], width: box_width, height: box_height, align: :justify, inline_format: true
   end
 
@@ -41,6 +39,8 @@ module AssertionsPdfHelper
     assertions = options[:assertion]
     template = assertions.assertion_template
     results = get_avulso_results(assertions)
+    box_width = assertions.assertion_box_width
+    box_height = assertions.assertion_box_height
     rows = results[:rows]
     columns = results[:columns]
 
@@ -49,8 +49,9 @@ module AssertionsPdfHelper
       'cpf' => mask_cpf(rows.first[columns.index('cpf')])
     }
 
-    records = rows.map do |row|
+    records = rows.each_with_index.map do |row, index|
       {
+        'counter' => (index + 1).to_s,
         'nome_disciplina' => row[columns.index('nome_disciplina')],
         'carga_horaria' => row[columns.index('carga_horaria')],
         'periodo' => "#{row[columns.index('ano')]}.#{row[columns.index('semestre')]}",
@@ -59,6 +60,6 @@ module AssertionsPdfHelper
       }
     end
 
-    assertion_box_text_print(pdf, template, values, records)
+    assertion_box_text_print(pdf, template, values, records, box_width, box_height)
   end
 end

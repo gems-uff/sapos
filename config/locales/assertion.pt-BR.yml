@@ -11,6 +11,8 @@ pt-BR:
         name: "Nome da Declaração"
         params: "Parâmetros configuráveis da declaração"
         assertion_template: "Template do Corpo"
+        assertion_box_width: "Largura da Caixa de Texto"
+        assertion_box_height: "Altura da Caixa de Texto"
 
     models:
       assertion:
