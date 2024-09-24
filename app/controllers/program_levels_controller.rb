@@ -3,14 +3,19 @@
 class ProgramLevelsController < ApplicationController
   authorize_resource
   active_scaffold :program_level do |config|
-    config.create.columns = [:level]
-    config.update.columns = [:level]
+    config.create.columns = [:level, :start_date, :end_date]
+    config.update.columns = [:level, :start_date, :end_date]
     config.show.columns = [:level, :start_date, :end_date]
-    config.list.columns = [:level, :start_date]
+    config.list.columns = [:level, :start_date, :end_date]
+
+    config.actions.swap :search, :field_search
+    config.columns.add :active
+    config.field_search.columns = [:active]
+
+    config.actions.exclude :deleted_records
   end
 
   protected
-
     def do_update
       # BEFORE UPDATE
       # cria o histórico
@@ -30,18 +35,5 @@ class ProgramLevelsController < ApplicationController
 
       pl = ProgramLevel.last
       pl.update!(start_date: pl.updated_at)
-    end
-
-    def do_create
-      super
-      # AFTER CREATE
-      # Coloca a data de início com a mesma do created_at
-
-      pl = ProgramLevel.last
-      pl.update!(start_date: pl.created_at)
-    end
-
-    def conditions_for_collection
-      ["end_date is null"]
     end
 end

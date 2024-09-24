@@ -81,7 +81,7 @@ pt-BR:
       notification_log: Notificações Enviadas
       custom_variable: Variáveis
       report_configuration: Configurações de Relatório
-      program_level: Nível
+      program_level: Conceito CAPES
 
     logout:
       label: 'Logout'
