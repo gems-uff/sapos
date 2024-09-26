@@ -22,7 +22,7 @@ class AssertionsController < ApplicationController
       type: :member
 
     form_columns = [
-      :name, :query, :assertion_template, :assertion_box_width, :assertion_box_height
+      :name, :query, :assertion_template
     ]
 
     config.create.label = :create_assertion_label

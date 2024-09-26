@@ -24,7 +24,7 @@ module AssertionsPdfHelper
       record_text = records.map do |record|
         record_content = record_template.dup
         record.each do |key, value|
-          record_content.gsub!("<%= var('#{key}') %>", value)
+          record_content.gsub!("<%= var('#{key}') %>", value.to_s)
         end
         record_content
       end.join("")
@@ -55,8 +55,6 @@ module AssertionsPdfHelper
     args = assertion.args
     results = get_query_results(assertion, args)
     template = assertion.assertion_template
-    box_width = assertion.assertion_box_width
-    box_height = assertion.assertion_box_height
     rows = results[:rows]
     columns = results[:columns]
 
@@ -81,6 +79,9 @@ module AssertionsPdfHelper
       end
       record
     end
+
+    box_width = 500
+    box_height = 560
 
     assertion_box_text_print(pdf, template, values, records, box_width, box_height)
   end
