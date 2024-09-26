@@ -225,7 +225,8 @@ class Ability
 
   def initialize_documents(user, roles)
     if roles[Role::ROLE_SECRETARIA]
-      can :manage, Ability::DOCUMENT_MODELS
+      can :read, Ability::DOCUMENT_MODELS
+      can :execute, Ability::DOCUMENT_MODELS
     end
   end
 
