@@ -520,6 +520,13 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :reports do
+    concerns :active_scaffold
+    member do
+      get "download"
+    end
+  end
+
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
