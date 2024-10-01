@@ -40,6 +40,7 @@ class Ability
   ]
 
   DOCUMENT_MODELS = [
+    Report
   ]
 
   PLACE_MODELS = [
@@ -223,8 +224,9 @@ class Ability
   end
 
   def initialize_documents(user, roles)
-    if roles[Role::ROLE_SECRETARIA]
+    if roles[:manager]
       can :manage, Ability::DOCUMENT_MODELS
+      cannot :update, Report unless roles[Role::ROLE_ADMINISTRADOR]
     end
   end
 
