@@ -23,5 +23,7 @@ new_document(
 
   thesis_table(pdf, enrollment: @enrollment)
 
+  obs_table(pdf, enrollment: @enrollment)
+
   enrollment_holds_table(pdf, enrollment: @enrollment)
 end

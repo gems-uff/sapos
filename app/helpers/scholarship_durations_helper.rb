@@ -108,4 +108,18 @@ module ScholarshipDurationsHelper
       options.merge(local_options)
     )
   end
+
+  def enrollment_search_column(record, options)
+    options.delete("data-update_url")
+    options.delete("data-update_send_form")
+    options[:class] = options[:class].sub("update_form", "text-input")
+    text_field(:record, :enrollment, options)
+  end
+
+  def scholarship_search_column(record, options)
+    options.delete("data-update_url")
+    options.delete("data-update_send_form")
+    options[:class] = options[:class].sub("update_form", "text-input")
+    text_field(:record, :scholarship, options)
+  end
 end
