@@ -76,4 +76,11 @@
       "#record_text_<%=record.id%>": ".header_text_field"
     });
   });
+
+  $('.signature_type-input').change(function(){
+    var selected = $(this).find('option:selected');
+    $(this).find('option').removeAttr('selected');
+
+    selected.attr('selected', 'selected');
+  });
 </script>
