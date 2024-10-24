@@ -805,13 +805,22 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.boolean "use_at_schedule", default: false, null: false
     t.text "text"
     t.string "image", limit: 255
-    t.boolean "signature_footer", default: false, null: false
     t.integer "order", default: 2
     t.decimal "scale", precision: 10, scale: 8
     t.integer "x"
     t.integer "y"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.integer "signature_type", default: 0
+    t.integer "expiration_in_months"
+  end
+
+  create_table "reports", force: :cascade do |t|
+    t.integer "generated_by_id"
+    t.integer "carrierwave_file_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.date "expires_at"
   end
 
   create_table "research_areas", force: :cascade do |t|
@@ -998,4 +1007,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
+  add_foreign_key "reports", "users", column: "generated_by_id"
 end

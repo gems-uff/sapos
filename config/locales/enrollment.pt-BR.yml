@@ -93,6 +93,10 @@ pt-BR:
         location: "Niterói"
         page: "Pág. nº "
         warning1: "Este documento só é válido sem rasuras, com selo da UFF e com a assinatura do Coordenador."
+        qrcode_signature_warning: "O documento original pode ser visto acessando o QR Code ao lado."
+        signed_by_qrcode: "Assinado digitalmente em"
+        you_can_also_access: "Você também pode acessar o documento em:"
+        valid_until: "Documento válido até"
       academic_transcript:
         deferrals: "PRORROGAÇÕES"
         accomplished_phases: "ETAPAS OBRIGATÓRIAS CONCLUÍDAS"

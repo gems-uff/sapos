@@ -295,7 +295,7 @@ module EnrollmentsPdfHelper
 
           if table_data.size >= page_size
             new_page = true
-            next_table_data = table_data.slice(page_size..-1)
+            next_table_data = table_data.slice(page_size + 1..-1)
             table_data = table_data.slice(0..page_size)
             page_size = 50
           end

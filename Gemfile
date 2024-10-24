@@ -89,6 +89,7 @@ gem "prawn"
 gem "prawn-table"
 gem "prawn-rails"
 gem "matrix", "~> 0.4.2"
+gem "prawn-qrcode"
 
 # Redcarpet for Readme MarkDown (or README.md) - Credits Page
 gem "redcarpet"

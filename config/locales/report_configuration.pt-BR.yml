@@ -7,7 +7,7 @@ pt-BR:
       report_configuration:
         name: "Nome"
         image: "Logo"
-        signature_footer: "Rodapé com assinatura"
+        signature_type: "Tipo de Assinatura"
         text: "Header"
         use_at_grades_report: "Usar no boletim"
         use_at_report: "Usar em relatórios"
@@ -17,16 +17,28 @@ pt-BR:
         scale: "Escala"
         x: "X"
         y: "Y"
+        no_signature: "Sem Assinatura"
+        manual: "Manual"
+        qr_code: "Código QR"
+        expiration_in_months: "Validade (meses)"
 
     models:
       report_configuration:
         one: "Configuração de relatório"
         other: "Configurações de relatório"
 
+    errors:
+      models:
+        report_configuration:
+          attributes:
+            expiration_in_months:
+              only_for_qr_code: "só pode ser preenchido se o tipo de assinatura for QR Code"
+
   active_scaffold:
     create_report_configuration_label: "Adicionar Configuração de Relatório"
     report_configurations:
       preview: "Visualizar"
+      expiration_in_months_description: "Deixe em branco caso não haja validade definida. Válido somente para assinaturas via QR Code."
 
   pdf_content:
     report_configurations:

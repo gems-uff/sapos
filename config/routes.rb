@@ -205,6 +205,10 @@ Rails.application.routes.draw do
     record_select_routes
   end
 
+  resources :assertions do
+    concerns :active_scaffold
+  end
+
   resources :levels do
     concerns :active_scaffold
   end
@@ -513,6 +517,13 @@ Rails.application.routes.draw do
     concerns :active_scaffold
     collection do
       get "builtin"
+    end
+  end
+
+  resources :reports do
+    concerns :active_scaffold
+    member do
+      get "download"
     end
   end
 
