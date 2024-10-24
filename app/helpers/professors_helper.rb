@@ -62,6 +62,38 @@ module ProfessorsHelper
     resp.html_safe
   end
 
+  def professor_institutions_show_column(record, options)
+    affiliations = record.affiliations
+    return "-" if affiliations.empty?
+
+    body = ""
+    count = 0
+    affiliations.each do |affiliation|
+      count += 1
+      tr_class = count.even? ? "even-record" : ""
+      body += "<tr class=\"record #{tr_class}\">
+                <td>#{affiliation.institution.name}</td>
+                <td>#{affiliation.start_date}</td>
+                <td>#{affiliation.end_date}</td>
+              </tr>"
+    end
+
+    resp =
+      "<table class=\"showtable listed-records-table\">
+        <thead>
+          <tr>
+            <th>#{I18n.t("activerecord.attributes.institution.name")}</th>
+            <th>#{I18n.t("activerecord.attributes.affiliation.start_date")}</th>
+            <th>#{I18n.t("activerecord.attributes.affiliation.end_date")}</th>
+          </tr>
+        </thead>
+        <tboby class=\"records\">
+        #{body}
+        </tbody>
+      </table>"
+    resp.html_safe
+  end
+
   def permit_rs_browse_params
     [:page, :update, :utf8]
   end

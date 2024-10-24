@@ -46,7 +46,7 @@ class Ability
   CONFIGURATION_MODELS = [
     User, Role, Version, Notification, EmailTemplate, Query, NotificationLog,
     CustomVariable, ReportConfiguration,
-    YearSemester
+    YearSemester, ProgramLevel
   ]
 
   def initialize(user)
@@ -228,7 +228,7 @@ class Ability
     alias_action :execute_now, :execute_now, :notify, to: :update
     if roles[Role::ROLE_COORDENACAO]
       can :manage, (Ability::CONFIGURATION_MODELS - [
-        CustomVariable, ReportConfiguration
+        CustomVariable, ReportConfiguration, ProgramLevel
       ])
     end
     if roles[Role::ROLE_SECRETARIA]
