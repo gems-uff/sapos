@@ -17,23 +17,19 @@ class ProgramLevelsController < ApplicationController
 
   protected
     def do_update
-      # BEFORE UPDATE
-      # cria o histórico
 
-      pl = ProgramLevel.last
-      unless pl.nil?
-        ProgramLevel.create!(
-          level: pl.level,
-          start_date: pl.start_date,
-          end_date: Time.now
-        )
-      end
+      old_record = ProgramLevel.find_by_id(params[:id])
 
       super
-      # AFTER UPDATE
-      # atualiza a data de início
 
-      pl = ProgramLevel.last
-      pl.update!(start_date: pl.updated_at)
+      record = self.params[:record]
+
+      if old_record.level != record[:level]
+        ProgramLevel.create!(
+          level: old_record.level,
+          start_date: old_record.start_date,
+          end_date: record[:start_date]
+        )
+      end
     end
 end
