@@ -8,7 +8,7 @@ require "spec_helper"
 RSpec.describe Institution, type: :model do
   it { should be_able_to_be_destroyed }
   it { should have_many(:majors).dependent(:restrict_with_exception) }
-  it { should have_many(:affiliations).dependent(:destroy) }
+  it { should have_many(:affiliations) }
   it { should have_many(:professors).through(:affiliations) }
 
   let(:institution) { Institution.new(name: "instituicao") }

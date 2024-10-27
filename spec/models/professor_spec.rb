@@ -16,7 +16,7 @@ RSpec.describe Professor, type: :model do
   it { should have_many(:course_classes).dependent(:restrict_with_exception) }
   it { should have_many(:thesis_defense_committee_participations).dependent(:restrict_with_exception) }
   it { should have_many(:thesis_defense_committee_enrollments).source(:enrollment).through(:thesis_defense_committee_participations) }
-  it { should have_many(:affiliations) }
+  it { should have_many(:affiliations).dependent(:destroy) }
   it { should have_many(:institutions).through(:affiliations) }
   before(:all) do
     @professor_role = FactoryBot.create :role_professor
