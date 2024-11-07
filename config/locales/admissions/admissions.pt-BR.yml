@@ -61,6 +61,7 @@ pt-BR:
         new: "Enviar inscrição"
         new_phase: "Enviar %{phase}"
         edit_phase: "Modificar %{phase}"
+        upload_notice: "Atenção! Caso algum arquivo tenha sido enviado na última submissão, é necessário selecioná-lo novamente!"
 
       update:
         new_notice: "Inscrição realizada com sucesso"

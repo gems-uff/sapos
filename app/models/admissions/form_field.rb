@@ -213,6 +213,15 @@ class Admissions::FormField < ActiveRecord::Base
     result
   end
 
+  def is_file_field?
+    return true if self.field_type == FILE
+    if self.field_type == STUDENT_FIELD
+      config = self.config_hash
+      return true if config["field"] == "photo"
+    end
+    false
+  end
+
   def self.search_name(field: nil, substring: false)
     field = "%#{field}%" if field.present? && substring
     Admissions::FormField.where(

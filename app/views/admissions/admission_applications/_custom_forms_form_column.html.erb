@@ -1,4 +1,5 @@
 <%
+  @override = false if @override.blank?
   if @override
     return "Acesso inválido" if !controller.override_authorized?(record)
   else
@@ -63,12 +64,14 @@
 <% end %>
 </ol>
 <input type="hidden" name="can_edit_override" value="<%= 1 if can_edit_override %>"/>
+<input type="hidden" name="override" value="<%= 1 if @override %>"/>
 
 <%= fields_for :record, record, multipart: true do |form| %>
   <div id="<%= subid %>">
     <%= render partial: "admissions/filled_form/candidate_forms", locals: {
       subid:,
       form: form,
+      may_show_reupload_notice: true,
       admission_process: admission_process,
       admission_application: record,
       show_name: show_name,

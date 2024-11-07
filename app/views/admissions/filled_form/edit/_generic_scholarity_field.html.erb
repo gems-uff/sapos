@@ -5,14 +5,15 @@
     configuration: configuration,
     values: form_field.get_values("values"),
     statuses: form_field.get_values("statuses"),
-    filled_class: filled_class
+    filled_class: filled_class,
+    run_js: false
   }
 %>
 <div id="<%= sid %>-links" class="<%= filled_class %>-link">
   <div id="<%= sid %>">
     <%= field.fields_for :scholarities do |scholarity| %>
       <%= render partial: "admissions/filled_form/edit/scholarity_item",
-        locals: local_options.merge({ f: scholarity }) %>
+        locals: local_options.merge({ f: scholarity, run_js: true }) %>
     <% end %>
   </div>
   <div class="links">
@@ -28,12 +29,26 @@
 <script>
   $(`#<%= sid %> > input[type=hidden]`).addClass("<%= filled_class %>");
   $(document).ready(function() {
+    let scholarity_stack = [];
     let check_disabled = function(event) {
       if ($("#<%= sid %>-links").hasClass("disabled-links")) {
         event.preventDefault();
+        return false;
       }
+      return true;
     };
-    $("#<%= sid %>-links").on("cocoon:before-insert", check_disabled);
+    $("#<%= sid %>-links").on("cocoon:before-insert", function(event, inserted_item, original_event) {
+      if (check_disabled(event)) {
+        let random_number = parseInt(Math.random() * 1000000);
+        let new_id = `scholarity-item-${random_number}`;
+        inserted_item.closest('.scholarity').attr("id", new_id);
+        scholarity_stack.push(new_id);
+      }
+    });
+    $("#<%= sid %>-links").on("cocoon:after-insert", function() {
+      let new_id = scholarity_stack.pop();
+      scholarity_item_activate_js(new_id);
+    });
     $("#<%= sid %>-links").on("cocoon:before-remove", check_disabled);
   })
 </script>

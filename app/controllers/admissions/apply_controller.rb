@@ -90,11 +90,25 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
         id: @admission_application.token
       ), notice: notice
     else
+      # Temporary log to understand the reason of why submission is failing
+      ExceptionNotifier.notify_exception(
+        Exception.new("Validação javascript de seleção falhou e form com erro chegou no servidor"),
+        data: {
+          params:,
+          full_messages: @admission_application.errors.full_messages,
+          errors: @admission_application.errors
+        }
+      )
       if !was_filled
         @admission_application.submission_time = nil
       end
       @admission_application.filled_form.is_filled = was_filled
       prepare_admission_application_fields
+      @show_reupload_files_notice = @admission_application
+        .filled_form.form_template.has_file_fields?
+      if @show_reupload_files_notice
+        @admission_application.filled_form.erase_non_filled_file_fields
+      end
       render :edit
     end
   end
@@ -126,6 +140,7 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       if !creating
         @show_name = false
         @show_email = false
+        @show_reupload_files_notice = false
         @submission_url = admission_apply_path(
           admission_id: @admission_process.simple_id,
           id: @admission_application.token

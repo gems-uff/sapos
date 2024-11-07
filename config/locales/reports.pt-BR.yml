@@ -1,0 +1,15 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      report:
+        user: "Gerado por"
+        created_at: "Data de Criação"
+        expires_at: "Data de Expiração"
+
+    models:
+      report:
+        one: "Documento Assinado"
+        other: "Documentos Assinados"

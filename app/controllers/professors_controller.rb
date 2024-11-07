@@ -37,7 +37,6 @@ class ProfessorsController < ApplicationController
     config.columns[:professor_research_areas].includes = {
       research_areas: :professor_research_areas
     }
-    config.columns[:identity_issuing_place].form_ui = ""
     config.columns[:identity_expedition_date].form_ui = :date_picker
     config.columns[:identity_expedition_date].options = {
       data: CustomVariable.past_calendar_range

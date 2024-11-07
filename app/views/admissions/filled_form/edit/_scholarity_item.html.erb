@@ -22,7 +22,6 @@
     field[:options] = {
       class: ["scholarity-#{field[:name]}", "text-input", filled_class],
       required: field[:required],
-      id: "#{sid}-#{field[:name]}"
     }
     if field[:type] == :date
       dates << field
@@ -90,37 +89,37 @@
 
 <script>
 
-$(document).ready(function() {
-  $(`#<%= sid %> .remove-scholarity input[type=hidden]`).addClass("<%= filled_class %>");
-  $(`#<%= sid %> .scholarity-location .city-field`).on("change", function() {
-    let value = $(`#<%= sid %> .scholarity-location .city-field`)
+function scholarity_item_activate_js(sid) {
+  $(`#${sid} .remove-scholarity input[type=hidden]`).addClass("<%= filled_class %>");
+  $(`#${sid} .scholarity-location .city-field`).on("change", function() {
+    let value = $(`#${sid} .scholarity-location .city-field`)
       .map((i, el) => $(el).val()).toArray().reverse()
       .join(", ")
-    $(`#<%= sid %> .scholarity-location .hidden`).val(value)
+    $(`#${sid} .scholarity-location .hidden`).val(value)
   })
 
-  $(`#<%= sid %> .scholarity-location input[name="city"]`).autocomplete({
+  $(`#${sid} .scholarity-location input[name="city"]`).autocomplete({
     source: autocomplete_search("<%= city_form_autocompletes_path %>", (request) => {
-      request.state = $(`#<%= sid %> .scholarity-location input[name="state"]`).val();
+      request.state = $(`#${sid} .scholarity-location input[name="state"]`).val();
     })
   })
 
-  $(`#<%= sid %> .scholarity-location input[name="state"]`).autocomplete({
+  $(`#${sid} .scholarity-location input[name="state"]`).autocomplete({
     source: autocomplete_search("<%= state_form_autocompletes_path %>", (request) => {})
   })
 
 
-  $(`#<%= sid %> input.scholarity-institution`).autocomplete({
+  $(`#${sid} input.scholarity-institution`).autocomplete({
     source: autocomplete_search("<%= institution_form_autocompletes_path %>", (request) => {})
   })
 
-  $(`#<%= sid %> input.scholarity-course`).autocomplete({
+  $(`#${sid} input.scholarity-course`).autocomplete({
     source: autocomplete_search("<%= course_form_autocompletes_path %>", (request) => {
-      request.institution = $(`#<%= sid %> input.scholarity-institution`).val();
+      request.institution = $(`#${sid} input.scholarity-institution`).val();
     }),
   })
 
-  $(`#<%= sid %> input.scholarity-grade_interval`).autocomplete({
+  $(`#${sid} input.scholarity-grade_interval`).autocomplete({
     source: ["[0, 10]", "[0, 100]", "[0, 5]", "[0, 4]", "[F, A]", "A, B, C, D, F"],
   })
 
@@ -140,12 +139,12 @@ $(document).ready(function() {
 
 
   <% dates.each do |field| %>
-    $(`#<%= sid %> input.scholarity-<%= field[:name] %>`).datepicker({
+    $(`#${sid} input.scholarity-<%= field[:name] %>`).datepicker({
       yearRange: '<%= first_year %>:<%= last_year %>'
     })
 
     window.customFormValidations["<%= filled_class %>"].push(function() {
-      let input = $(`#<%= sid %> input.scholarity-<%= field[:name] %>`).get(0)
+      let input = $(`#${sid} input.scholarity-<%= field[:name] %>`).get(0)
       if (input.disabled) {
         return true;
       }
@@ -159,6 +158,12 @@ $(document).ready(function() {
       return true;
     })
 
+  <% end %>
+}
+
+$(document).ready(function() {
+  <% if run_js %>
+    scholarity_item_activate_js("<%= sid %>");
   <% end %>
 })
 

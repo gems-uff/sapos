@@ -298,6 +298,7 @@ class EmailTemplate < ApplicationRecord
       headers[:to] = CustomVariable.redirect_email
       headers[:skip_redirect] = true
     end
+    headers[:reply_to] = CustomVariable.reply_to
     headers[:skip_message] = ! self.enabled
     headers[:skip_footer] = true
   end
