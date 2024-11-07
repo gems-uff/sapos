@@ -20,7 +20,7 @@ CustomVariable.create([
   { description: "País padrão de emissão da identidade", variable: "identity_issuing_country", value: "Brasil" },
   { description: "Texto no final do quadro de horários", variable: "class_schedule_text", value: "Alunos interessados em cursar disciplinas de Tópicos Avançados devem consultar os respectivos professores antes da matrícula." },
   { description: "E-mail de redirecionamento para as notificações", variable: "redirect_email", value: "" },
-  { description: "E-mail das resposta de emails automáticos", variable: "reply_to", value: "sapos@sapos.ic.uff.br"},
+  { description: "E-mail das resposta de emails automáticos", variable: "reply_to", value: "sapos@sapos.ic.uff.br" },
   { description: "Texto de rodapé da notificação",
     variable: "notification_footer",
     value: <<~TEXT
@@ -36,7 +36,6 @@ CustomVariable.create([
 
 ReportConfiguration.create([
   { name: "Boletim", scale: 1, x: 0, y: 0, order: 1,
-    signature_footer: true,
     use_at_report: false,
     use_at_transcript: false,
     use_at_grades_report: true,
@@ -48,7 +47,6 @@ ReportConfiguration.create([
     TEXT
   },
   { name: "Histórico", scale: 0.45, x: 5, y: 12, order: 1,
-    signature_footer: true,
     use_at_report: false,
     use_at_transcript: true,
     use_at_grades_report: false,
@@ -60,7 +58,6 @@ ReportConfiguration.create([
     TEXT
   },
   { name: "Padrão", scale: 1, x: 0, y: 0, order: 1,
-    signature_footer: true,
     use_at_report: true,
     use_at_transcript: false,
     use_at_grades_report: false,
@@ -13271,25 +13268,25 @@ City.create([
   { name: "Xambioa", state: State.find_by_code("TO") },
 ])
 
-query_assertion_example = Query.create(
+query_assertion_example = Query.create!(
   name: "DECLARAÇÃO - Participante externo em defesa de tese",
+  description: "Declaração de participante externo em defesa de dissertação.",
   sql: <<-SQL
-    SELECT
-        s.name as nome_aluno,
-        l.name as nivel_aluno,
-        e.thesis_defense_date as data,
-        p.name as nome_professor
-    FROM
-        thesis_defense_committee_participations tdcp, enrollments e, students s, professors p, levels l
-    WHERE
-        tdcp.enrollment_id = e.id AND
-        e.student_id = s.id AND
-        tdcp.professor_id = p.id AND
-        e.level_id = l.id AND
-        e.enrollment_number = :matricula_aluno AND
-        p.cpf = :cpf_professor
+      SELECT
+          s.name as nome_aluno,
+          l.name as nivel_aluno,
+          e.thesis_defense_date as data,
+          p.name as nome_professor
+      FROM
+          thesis_defense_committee_participations tdcp, enrollments e, students s, professors p, levels l
+      WHERE
+          tdcp.enrollment_id = e.id AND
+          e.student_id = s.id AND
+          tdcp.professor_id = p.id AND
+          e.level_id = l.id AND
+          e.enrollment_number = :matricula_aluno AND
+          p.cpf = :cpf_professor
   SQL
-description: "Declaração de participante externo em defesa de dissertação."
 )
 
 QueryParam.create([
@@ -13299,10 +13296,10 @@ QueryParam.create([
 
 Assertion.create(
   name: "Declaração de participante externo em defesa de tese",
+  query_id: query_assertion_example.id,
   assertion_template: <<-TEMPLATE
-    A quem possa interessar,
+      A quem possa interessar,
 
-    Declaramos que o professor <%= var('nome_professor') %> participou da banca de defesa da dissertação de <%= var('nivel_aluno') %> de <%= var('nome_aluno') %>, no dia <%= var('data') %>.
+      Declaramos que o professor <%= var('nome_professor') %> participou da banca de defesa da dissertação de <%= var('nivel_aluno') %> de <%= var('nome_aluno') %>, no dia <%= var('data') %>.
   TEMPLATE
-query_id: query_assertion_example.id
 )

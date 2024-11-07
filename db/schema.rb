@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
+ActiveRecord::Schema[7.0].define(version: 2024_22_04_223145) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -633,6 +633,17 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.index ["notification_id"], name: "index_notification_logs_on_notification_id"
   end
 
+  create_table "notification_params", force: :cascade do |t|
+    t.integer "notification_id"
+    t.integer "query_param_id"
+    t.string "value"
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.boolean "active", default: false, null: false
+    t.index ["notification_id"], name: "index_notification_params_on_notification_id"
+    t.index ["query_param_id"], name: "index_notification_params_on_query_param_id"
+  end
+
   create_table "notifications", force: :cascade do |t|
     t.string "title", limit: 255
     t.string "to_template", limit: 255
@@ -820,9 +831,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.integer "y"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "use_at_assertion"
     t.integer "signature_type", default: 0
     t.integer "expiration_in_months"
+    t.boolean "use_at_assertion"
   end
 
   create_table "reports", force: :cascade do |t|
@@ -1017,7 +1028,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "assertions", "queries"
   add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
   add_foreign_key "reports", "users", column: "generated_by_id"
-  add_foreign_key "assertions", "queries"
 end
