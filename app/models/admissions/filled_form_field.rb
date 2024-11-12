@@ -189,7 +189,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
       values << ".jpg" if is_photo
       filename = self.file.filename.downcase
       if values.none? { |ext| filename.end_with?(ext.downcase) }
-        add_error(:extension, valid: configuration["values"].join(', '))
+        add_error(:extension, valid: configuration["values"].join(", "))
       end
     end
   end
