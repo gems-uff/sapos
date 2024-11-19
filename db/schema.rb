@@ -128,7 +128,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.boolean "candidate_can_see_member", default: false, null: false
     t.boolean "candidate_can_see_shared", default: false, null: false
     t.boolean "candidate_can_see_consolidation", default: false, null: false
-    t.index ["approval_condition_id"], name: "index_admission_phases_on_approval_condition_id"
+    t.index "\"ranking_config_id\"", name: "index_admission_phases_on_ranking_config_id"
     t.index ["candidate_form_id"], name: "index_admission_phases_on_candidate_form_id"
     t.index ["consolidation_form_id"], name: "index_admission_phases_on_consolidation_form_id"
     t.index ["keep_in_phase_condition_id"], name: "index_admission_phases_on_keep_in_phase_condition_id"
@@ -254,6 +254,17 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["enrollment_id"], name: "index_advisements_on_enrollment_id"
     t.index ["professor_id"], name: "index_advisements_on_professor_id"
+  end
+
+  create_table "affiliations", force: :cascade do |t|
+    t.integer "professor_id"
+    t.integer "institution_id"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["institution_id"], name: "index_affiliations_on_institution_id"
+    t.index ["professor_id"], name: "index_affiliations_on_professor_id"
   end
 
   create_table "allocations", force: :cascade do |t|
@@ -703,7 +714,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.string "siape", limit: 255
     t.string "enrollment_number", limit: 255
     t.string "identity_issuing_place", limit: 255
-    t.integer "institution_id"
     t.string "email", limit: 255
     t.date "academic_title_date"
     t.integer "academic_title_country_id"
@@ -717,8 +727,15 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.index ["city_id"], name: "index_professors_on_city_id"
     t.index ["cpf"], name: "index_professors_on_cpf"
     t.index ["email"], name: "index_professors_on_email"
-    t.index ["institution_id"], name: "index_professors_on_institution_id"
     t.index ["user_id"], name: "index_professors_on_user_id"
+  end
+
+  create_table "program_levels", force: :cascade do |t|
+    t.integer "level", null: false
+    t.date "start_date", null: false
+    t.date "end_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "queries", force: :cascade do |t|
@@ -934,6 +951,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.string "photo", limit: 255
     t.integer "birth_country_id"
     t.integer "user_id", limit: 8
+    t.string "skin_color"
+    t.boolean "pcd"
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"
