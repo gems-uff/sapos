@@ -6,7 +6,7 @@
 require "prawn/measurement_extensions"
 
 new_document(
-  "transcript.pdf",
+  @filename,
   I18n.t("pdf_content.enrollment.header.title"),
   watermark: cannot?(
     :generate_report_without_watermark, @enrollment
