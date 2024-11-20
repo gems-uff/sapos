@@ -331,7 +331,7 @@ module EnrollmentsHelper
   end
 
   def options_for_association_conditions(association, record)
-    result = enrollment_options_for_association_conditions(association, record)
+    result = custom_enrollment_options_for_association_conditions(association, record)
     return result if result != "<not found>"
     super
   end

@@ -9,4 +9,6 @@ updates:
     directory: "/" # Location of package manifests
     target-branch: "bugfixes"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    # Disable version updates
+    open-pull-requests-limit: 0

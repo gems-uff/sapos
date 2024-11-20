@@ -34,7 +34,6 @@ class StudentsController < ApplicationController
     config.columns[:birth_state].form_ui = :hidden
     config.columns[:birth_country].form_ui = :hidden
     config.columns[:city].form_ui = :select
-    config.columns[:identity_issuing_place].form_ui = ""
 
     config.columns[:sex].form_ui = :select
     config.columns[:sex].options = {

@@ -315,7 +315,7 @@ RSpec.describe Enrollment, type: :model do
     before(:all) do
       @destroy_all = []
       @destroy_all << with_grade = FactoryBot.create(:course_type, has_score: true)
-      @destroy_all << without_grade = FactoryBot.create(:course_type, has_score: nil)
+      @destroy_all << without_grade = FactoryBot.create(:course_type, has_score: false)
       # create courses by number of credits
       courses = [4, 6, 6, 4, 2, 4].collect do |credits|
         @destroy_all << course = FactoryBot.create(:course, credits: credits, course_type: with_grade)
@@ -386,7 +386,7 @@ RSpec.describe Enrollment, type: :model do
           enrollment = FactoryBot.create(:enrollment, student: @student, level: @level)
 
           @destroy_later << FactoryBot.create(:class_enrollment,
-                            enrollment: enrollment, course_class: class1, grade: 70, grade_not_count_in_gpr: nil,
+                            enrollment: enrollment, course_class: class1, grade: 70, grade_not_count_in_gpr: false,
                             situation: ClassEnrollment::APPROVED)
           @destroy_later << FactoryBot.create(:class_enrollment,
                             enrollment: enrollment, course_class: class2, grade: 80, grade_not_count_in_gpr: true,
@@ -420,7 +420,7 @@ RSpec.describe Enrollment, type: :model do
           @destroy_later << enrollment = FactoryBot.create(:enrollment, student: @student, level: @level)
 
           @destroy_later << FactoryBot.create(:class_enrollment,
-                            enrollment: enrollment, course_class: class1, grade: 70, grade_not_count_in_gpr: nil,
+                            enrollment: enrollment, course_class: class1, grade: 70, grade_not_count_in_gpr: false,
                             situation: ClassEnrollment::APPROVED)
           @destroy_later << FactoryBot.create(:class_enrollment,
                             enrollment: enrollment, course_class: class2, grade: 80, grade_not_count_in_gpr: true,
@@ -429,7 +429,7 @@ RSpec.describe Enrollment, type: :model do
                             enrollment: enrollment, course_class: class3, grade: 85, grade_not_count_in_gpr: false,
                             situation: ClassEnrollment::APPROVED)
           @destroy_later << FactoryBot.create(:class_enrollment,
-                            enrollment: enrollment, course_class: class4, grade: 90, grade_not_count_in_gpr: nil,
+                            enrollment: enrollment, course_class: class4, grade: 90, grade_not_count_in_gpr: false,
                             situation: ClassEnrollment::APPROVED)
 
           expect((enrollment.total_gpr * 10).round).to eq(817)

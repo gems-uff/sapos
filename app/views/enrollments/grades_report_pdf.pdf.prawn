@@ -23,6 +23,8 @@ new_document(
 
   thesis_table(pdf, enrollment: @enrollment, show_advisors: true)
 
+  obs_table(pdf, enrollment: @enrollment)
+
   accomplished_table(pdf, accomplished_phases: @accomplished_phases)
 
   deferrals_table(pdf, deferrals: @deferrals)

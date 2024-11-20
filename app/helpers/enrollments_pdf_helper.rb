@@ -710,6 +710,32 @@ module EnrollmentsPdfHelper
     end
   end
 
+  def obs_table(pdf, options = {})
+    if options[:enrollment]&.obs_to_academic_transcript.present?
+      data_table_rows = [[
+        "#{I18n.t("pdf_content.enrollment.academic_transcript.obs_to_academic_transcript")} <b>#{
+          rescue_blank_text(options[:enrollment].obs_to_academic_transcript)
+        }</b>"
+      ]]
+
+      pdf.table(
+        data_table_rows,
+        cell_style: {
+          borders: [:left, :right, :bottom, :top],
+          border_bottom_width: 0.5,
+          border_top_width: 0.15,
+          width: 560,
+          padding_top: 5.5,
+          padding_bottom: 7.5,
+          inline_format: true,
+          font: "FreeMono",
+          size: 8,
+          border_color: "000080"
+        }
+      )
+    end
+  end
+
   def justification_grade_not_count_in_gpr_table(curr_pdf, options = {})
     enrollment ||= options[:enrollment]
 

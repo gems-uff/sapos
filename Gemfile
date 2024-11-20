@@ -1,11 +1,11 @@
-# ruby=3.2.1
+# ruby=3.2.5
 # frozen_string_literal: true
 
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 # The following line is necessary to allow RVM choosing the correct ruby version. RVM 2.0 will probably be able to interpret the "~>" symbol and we will be able to safely remove the "#ruby=3.2.2" line.
-ruby "~> 3.2.1"
+ruby "~> 3.2.5"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.0.8.1"
@@ -20,7 +20,7 @@ gem "sprockets-rails"
 gem "puma", ">= 6.4.2"
 
 # HTML and XML parser
-gem "nokogiri", ">= 1.16.2"
+gem "nokogiri", ">= 1.16.5"
 
 # Wrapp HTTP requests and responses
 gem "rack", "~> 2.2.8.1"
@@ -95,7 +95,7 @@ gem "prawn-qrcode"
 gem "redcarpet"
 
 # Active scaffold support for newer Rails
-gem "active_scaffold", git: "https://github.com/activescaffold/active_scaffold.git"
+gem "active_scaffold", git: "https://github.com/activescaffold/active_scaffold.git", ref: "7a61ff721e4ee68ac9dc5ce65128f63b067a4d7d"
 gem "active_scaffold_duplicate", ">= 1.1.0"
 gem "recordselect"
 
@@ -116,7 +116,7 @@ gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-ac
 gem "cocoon"
 
 # ReCaptcha Helpers
-gem "dotenv-rails", require: "dotenv/rails-now"
+gem "dotenv-rails", require: "dotenv/load"
 gem "recaptcha", require: "recaptcha/rails"
 
 # xlsx Spreadsheets
@@ -151,7 +151,7 @@ end
 
 group :development, :test do
   # Use SQLite database for development
-  gem "sqlite3"
+  gem "sqlite3", "~> 1.6.8"
 
   # Prints Ruby object in full color
   gem "awesome_print"
