@@ -474,20 +474,18 @@ module PdfHelper
                                 padding: 2
                   }
         ) do |table|
-
           table.before_rendering_page do |page|
-        
             page.row(0).background_color = "E5E5FF"
             page.row(0).borders = [:top, :bottom, :left, :right]
             page.row(0).column(0).align = :center
             page.row(0).column(-1).align = :center
-          
+
             if page.row_count > 1
               page.rows(1 .. -1).text_color = "000000"
               page.row(-1).borders = [:bottom, :left, :right]
             end
           end
-       
+
           yield table unless block.nil?
         end
         pdf.fill_color "000080"
@@ -496,7 +494,6 @@ module PdfHelper
         end
       end
     end
-
   end
   def qrcode_signature(pdf, options = {})
     @qrcode_identifier ||= generate_qr_code_key
@@ -517,8 +514,8 @@ module PdfHelper
   end
 
   def generate_qr_code_key
-    12.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }
-      .insert(4, "-").insert(9, "-").join("")
+    10.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }
+      .insert(5, "-").join("")
   end
 end
 
