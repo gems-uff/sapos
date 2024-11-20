@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
+ActiveRecord::Schema[7.0].define(version: 2024_11_19_221152) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -821,6 +821,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.date "expires_at"
+    t.string "identifier"
+    t.string "file_name"
   end
 
   create_table "research_areas", force: :cascade do |t|

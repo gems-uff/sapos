@@ -523,7 +523,10 @@ Rails.application.routes.draw do
   resources :reports do
     concerns :active_scaffold
     member do
-      get "download"
+      get :download
+    end
+    collection do
+      get ":identifier.pdf", to: "reports#download_by_identifier", as: :download_by_identifier
     end
   end
 
