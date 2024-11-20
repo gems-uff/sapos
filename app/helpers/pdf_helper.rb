@@ -134,7 +134,7 @@ module PdfHelper
         pdf.stroke_bounds
 
         if options[:qr_code_signature]
-          qrcode_url = "#{request.protocol}#{request.host_with_port}/files/#{@qrcode_identifier}"
+          qrcode_url = "#{request.protocol}#{request.host_with_port}/reports/#{@qrcode_identifier}.pdf"
           qrcode_signature_warning = I18n.t("pdf_content.enrollment.footer.qrcode_signature_warning")
           signed_at = "#{I18n.t("pdf_content.enrollment.footer.signed_by_qrcode")} #{I18n.l(Time.now, format: :defaultdatetime)} (Horário de Brasília)"
           you_can_also_access = I18n.t("pdf_content.enrollment.footer.you_can_also_access")
@@ -361,13 +361,14 @@ module PdfHelper
 
     if pdf_config.qr_code_signature && !pdf_config.preview
       uploader = PdfUploader.new
-      uploader.store!({ base64_contents: Base64.encode64(document), filename: "academic_transcript.pdf" })
-      uploader.file&.file&.update!(medium_hash: @qrcode_identifier)
+      uploader.store!({ base64_contents: Base64.encode64(document), filename: name })
 
       Report.create!(
         expires_at: pdf_config.expiration_in_months.present? ? Date.today + pdf_config.expiration_in_months.months : nil,
         user: current_user,
-        carrierwave_file: uploader.file&.file
+        carrierwave_file: uploader.file&.file,
+        file_name: name,
+        identifier: @qrcode_identifier
       )
     end
 
@@ -497,14 +498,13 @@ module PdfHelper
     end
 
   end
-
   def qrcode_signature(pdf, options = {})
-    @qrcode_identifier ||= generate_qr_code_key + ".pdf"
-    while CarrierWave::Storage::ActiveRecord::ActiveRecordFile.where(medium_hash: @qrcode_identifier).exists?
-      @qrcode_identifier = generate_qr_code_key + ".pdf"
+    @qrcode_identifier ||= generate_qr_code_key
+    while Report.where(identifier: @qrcode_identifier).exists?
+      @qrcode_identifier = generate_qr_code_key
     end
 
-    data = "#{request.protocol}#{request.host_with_port}/files/#{@qrcode_identifier}"
+    data = "#{request.protocol}#{request.host_with_port}/reports/#{@qrcode_identifier}.pdf"
 
     pdf.print_qr_code(data, extent: options[:size] || 80, align: :center)
   end

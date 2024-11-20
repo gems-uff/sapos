@@ -6,6 +6,8 @@ pt-BR:
     attributes:
       report:
         user: "Gerado por"
+        file_name: "Nome do Arquivo"
+        identifier: "Identificador"
         created_at: "Data de Criação"
         expires_at: "Data de Expiração"
 

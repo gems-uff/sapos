@@ -1,11 +1,16 @@
 # frozen_string_literal: true
 
 class ReportsController < ApplicationController
-  authorize_resource
+  before_action :set_report, only: [:download, :download_by_identifier]
+  before_action :check_downloadable, only: [:download, :download_by_identifier]
+
+  skip_authorization_check only: :download_by_identifier
+  skip_authorize_resource only: :download_by_identifier
+  skip_before_action :authenticate_user!, only: :download_by_identifier
 
   active_scaffold :report do |config|
-    config.list.columns = [:user, :created_at, :expires_at]
-    config.show.columns = [:user, :created_at, :expires_at]
+    config.list.columns = [:user, :file_name, :identifier, :created_at, :expires_at]
+    config.show.columns = [:user, :file_name, :identifier, :created_at, :expires_at]
     config.update.columns = [:expires_at]
     config.columns[:user].clear_link
     config.actions.exclude :create, :delete
@@ -23,11 +28,23 @@ class ReportsController < ApplicationController
   end
 
   def download
-    report = Report.find(params[:id])
-    redirect_to download_path(medium_hash: report.carrierwave_file.medium_hash)
+    redirect_to download_path(medium_hash: @report.carrierwave_file.medium_hash)
+  end
+
+  def download_by_identifier
+    redirect_to download_path(medium_hash: @report.carrierwave_file.medium_hash)
   end
 
   private
+    def set_report
+      @report = params[:id] ? Report.find(params[:id]) : Report.find_by_identifier(params[:identifier])
+      raise ActionController::RoutingError.new("Este documento não foi encontrado.") if @report.nil?
+    end
+
+    def check_downloadable
+      raise ActionController::RoutingError.new("Este documento expirou.") if cant_download?(@report)
+    end
+
     def cant_download?(record)
       record.carrierwave_file.blank?
     end
