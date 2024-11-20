@@ -47,4 +47,18 @@ namespace :maintenance do
 
     Notifier.logger.info "[Notifications] #{Time.now.to_fs} - Finished sending notifications"
   end
+
+  private
+    def prepare_attachments(notification_result)
+      notification_result[:notifications].each do |message|
+        attachments = notification_result[:notifications_attachments][message]
+        next if attachments.blank?
+        if attachments[:grades_report_pdf]
+          enrollment = Enrollment.find(message[:enrollments_id])
+          attachments[:grades_report_pdf][:file_contents] =
+            render_enrollments_grades_report_pdf(enrollment)
+        end
+      end
+      notification_result
+    end
 end
