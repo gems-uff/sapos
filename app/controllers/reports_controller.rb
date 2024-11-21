@@ -3,6 +3,7 @@
 class ReportsController < ApplicationController
   before_action :set_report, only: [:download, :download_by_identifier]
   before_action :check_downloadable, only: [:download, :download_by_identifier]
+  authorize_resource
 
   skip_authorization_check only: :download_by_identifier
   skip_authorize_resource only: :download_by_identifier
@@ -32,7 +33,7 @@ class ReportsController < ApplicationController
   end
 
   def download_by_identifier
-    redirect_to download_path(medium_hash: @report.carrierwave_file.medium_hash)
+    send_data(@report.carrierwave_file.read, filename: @report.carrierwave_file.original_filename, disposition: :inline)
   end
 
   private

@@ -501,7 +501,7 @@ module PdfHelper
       @qrcode_identifier = generate_qr_code_key
     end
 
-    data = "#{request.protocol}#{request.host_with_port}/reports/#{@qrcode_identifier}.pdf"
+    data = reports_url(identifier: @qrcode_identifier)
 
     pdf.print_qr_code(data, extent: options[:size] || 80, align: :center)
   end
