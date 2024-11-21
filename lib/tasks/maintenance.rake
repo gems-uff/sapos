@@ -50,6 +50,8 @@ namespace :maintenance do
 
   private
     def prepare_attachments(notification_result)
+      include SharedPdfConcern
+      include AbstractController::Rendering
       notification_result[:notifications].each do |message|
         attachments = notification_result[:notifications_attachments][message]
         next if attachments.blank?
