@@ -10,10 +10,20 @@ FactoryBot.define do
     "admissions/admission_process"
   ] do
     name { "Mestrado 2024.1" }
+    simple_url { "mestrado" }
     year { 2024 }
     semester { 1 }
     start_date { Date.parse("2024/01/01") }
     end_date { Date.parse("2024/02/01") }
+    edit_date { Date.parse("2024/02/15") }
     form_template
+    # letter_template
+    min_letters { 0 }
+    max_letters { 0 }
+    allow_multiple_applications { false }
+    visible { true }
+    staff_can_edit { true }
+    staff_can_undo { true }
+    require_session { false }
   end
 end

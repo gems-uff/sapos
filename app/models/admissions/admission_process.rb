@@ -55,6 +55,7 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
   end
 
   def end_greater_than_start_date
+    return if self.start_date.nil? || self.end_date.nil?
     if self.end_date < self.start_date
       self.errors.add(:base, :end_greater_than_start_date)
     end
@@ -77,6 +78,7 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
   end
 
   def simple_url_is_unique_while_open
+    return if self.end_date.nil?
     return if self.end_date < Date.today
 
     if self.simple_url.to_i.to_s == self.simple_url
