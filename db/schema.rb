@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_06_10_001559) do
+ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -505,6 +505,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_06_10_001559) do
     t.string "thesis_title", limit: 255
     t.date "thesis_defense_date"
     t.integer "research_area_id"
+    t.text "obs_to_academic_transcript"
     t.index ["enrollment_number"], name: "index_enrollments_on_enrollment_number"
     t.index ["enrollment_status_id"], name: "index_enrollments_on_enrollment_status_id"
     t.index ["level_id"], name: "index_enrollments_on_level_id"

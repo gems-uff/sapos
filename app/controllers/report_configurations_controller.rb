@@ -5,7 +5,6 @@
 
 class ReportConfigurationsController < ApplicationController
   authorize_resource
-  skip_before_action :verify_authenticity_token, only: [:preview]
 
   include ApplicationHelper
   active_scaffold :report_configuration do |config|

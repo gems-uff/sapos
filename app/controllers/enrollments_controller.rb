@@ -126,6 +126,7 @@ class EnrollmentsController < ApplicationController
       :thesis_title,
       :thesis_defense_date,
       :obs,
+      :obs_to_academic_transcript,
 
       :advisements,
       :scholarship_durations,
