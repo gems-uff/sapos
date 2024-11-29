@@ -16,7 +16,7 @@ class Ability
   PROFESSOR_MODELS = [
     Professor, Advisement, AdvisementAuthorization,
     ThesisDefenseCommitteeParticipation,
-    ProfessorResearchArea,
+    ProfessorResearchArea, Grant
   ]
 
   SCHOLARSHIP_MODELS = [
@@ -140,6 +140,9 @@ class Ability
     end
     if roles[Role::ROLE_PROFESSOR]
       can :read, Ability::PROFESSOR_MODELS
+      cannot :edit_professor, Grant
+      can :create, Grant
+      can :update, Grant, professor: user.professor
     end
   end
 

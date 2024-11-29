@@ -5,7 +5,7 @@
 
 class ReportConfigurationsController < ApplicationController
   authorize_resource
-  skip_before_action :verify_authenticity_token, only: [:preview]
+  skip_before_action :verify_authenticity_token, only: [:preview]  # noqa # do not remove this line based on Code Scanner suggestions
 
   include ApplicationHelper
   active_scaffold :report_configuration do |config|

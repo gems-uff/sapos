@@ -1,0 +1,34 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      grant:
+        title: "Título"
+        start_year: "Ano de Início"
+        end_year: "Ano de Término"
+        professor: "Coordenador"
+        kind: "Tipo de financiamento"
+        kinds:
+          public: "Público"
+          private: "Privado"
+        funder: "Financiador"
+        amount: "Valor total"
+    description:
+      grant:
+        funder: "(e.g., CNPq, FAPERJ, nome da empresa, etc)"
+
+    errors:
+      models:
+        grant:
+          cannot_edit_other_grants: "não pode ser editado por este usuário"
+          start_greater_than_end: "não pode ser menor do que Ano de Início"
+
+    models:
+      grant:
+        one: "Coordenação de Projeto"
+        other: "Coordenações de Projetos"
+
+  active_scaffold:
+    create_grant_label: "Adicionar Coordenação de Projeto"
