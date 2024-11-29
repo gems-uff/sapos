@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
+ActiveRecord::Schema[7.0].define(version: 2024_11_29_022042) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -254,6 +254,17 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["enrollment_id"], name: "index_advisements_on_enrollment_id"
     t.index ["professor_id"], name: "index_advisements_on_professor_id"
+  end
+
+  create_table "affiliations", force: :cascade do |t|
+    t.integer "professor_id"
+    t.integer "institution_id"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["institution_id"], name: "index_affiliations_on_institution_id"
+    t.index ["professor_id"], name: "index_affiliations_on_professor_id"
   end
 
   create_table "allocations", force: :cascade do |t|
@@ -571,6 +582,19 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "grants", force: :cascade do |t|
+    t.string "title"
+    t.integer "start_year"
+    t.integer "end_year"
+    t.string "kind"
+    t.string "funder"
+    t.decimal "amount", precision: 14, scale: 2
+    t.integer "professor_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["professor_id"], name: "index_grants_on_professor_id"
+  end
+
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255
     t.datetime "created_at", precision: nil, null: false
@@ -703,7 +727,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.string "siape", limit: 255
     t.string "enrollment_number", limit: 255
     t.string "identity_issuing_place", limit: 255
-    t.integer "institution_id"
     t.string "email", limit: 255
     t.date "academic_title_date"
     t.integer "academic_title_country_id"
@@ -717,8 +740,15 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.index ["city_id"], name: "index_professors_on_city_id"
     t.index ["cpf"], name: "index_professors_on_cpf"
     t.index ["email"], name: "index_professors_on_email"
-    t.index ["institution_id"], name: "index_professors_on_institution_id"
     t.index ["user_id"], name: "index_professors_on_user_id"
+  end
+
+  create_table "program_levels", force: :cascade do |t|
+    t.integer "level", null: false
+    t.datetime "start_date", null: false
+    t.datetime "end_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "queries", force: :cascade do |t|
@@ -805,13 +835,24 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.boolean "use_at_schedule", default: false, null: false
     t.text "text"
     t.string "image", limit: 255
-    t.boolean "signature_footer", default: false, null: false
     t.integer "order", default: 2
     t.decimal "scale", precision: 10, scale: 8
     t.integer "x"
     t.integer "y"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.integer "signature_type", default: 0
+    t.integer "expiration_in_months"
+  end
+
+  create_table "reports", force: :cascade do |t|
+    t.integer "generated_by_id"
+    t.integer "carrierwave_file_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.date "expires_at"
+    t.string "identifier"
+    t.string "file_name"
   end
 
   create_table "research_areas", force: :cascade do |t|
@@ -998,4 +1039,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "grants", "professors"
+  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
+  add_foreign_key "reports", "users", column: "generated_by_id"
 end
