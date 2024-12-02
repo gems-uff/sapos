@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_11_19_221152) do
+ActiveRecord::Schema[7.0].define(version: 2024_11_29_022042) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -254,6 +254,17 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_19_221152) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["enrollment_id"], name: "index_advisements_on_enrollment_id"
     t.index ["professor_id"], name: "index_advisements_on_professor_id"
+  end
+
+  create_table "affiliations", force: :cascade do |t|
+    t.integer "professor_id"
+    t.integer "institution_id"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["institution_id"], name: "index_affiliations_on_institution_id"
+    t.index ["professor_id"], name: "index_affiliations_on_professor_id"
   end
 
   create_table "allocations", force: :cascade do |t|
@@ -571,6 +582,19 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_19_221152) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "grants", force: :cascade do |t|
+    t.string "title"
+    t.integer "start_year"
+    t.integer "end_year"
+    t.string "kind"
+    t.string "funder"
+    t.decimal "amount", precision: 14, scale: 2
+    t.integer "professor_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["professor_id"], name: "index_grants_on_professor_id"
+  end
+
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255
     t.datetime "created_at", precision: nil, null: false
@@ -719,6 +743,14 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_19_221152) do
     t.index ["email"], name: "index_professors_on_email"
     t.index ["institution_id"], name: "index_professors_on_institution_id"
     t.index ["user_id"], name: "index_professors_on_user_id"
+  end
+
+  create_table "program_levels", force: :cascade do |t|
+    t.integer "level", null: false
+    t.datetime "start_date", null: false
+    t.datetime "end_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "queries", force: :cascade do |t|
@@ -1009,6 +1041,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_19_221152) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "grants", "professors"
   add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
   add_foreign_key "reports", "users", column: "generated_by_id"
 end
