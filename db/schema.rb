@@ -855,6 +855,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_29_022042) do
     t.date "expires_at"
     t.string "identifier"
     t.string "file_name"
+    t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
+    t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
   end
 
   create_table "research_areas", force: :cascade do |t|
