@@ -134,7 +134,7 @@ module PdfHelper
         pdf.stroke_bounds
 
         if options[:qr_code_signature]
-          qrcode_url = "#{request.protocol}#{request.host_with_port}/reports/#{@qrcode_identifier}.pdf"
+          qrcode_url = reports_url(identifier: @qrcode_identifier, host: ENV["RAILS_RELATIVE_URL_ROOT"] || "")
           qrcode_signature_warning = I18n.t("pdf_content.enrollment.footer.qrcode_signature_warning")
           signed_at = "#{I18n.t("pdf_content.enrollment.footer.signed_by_qrcode")} #{I18n.l(Time.now, format: :defaultdatetime)} (Horário de Brasília)"
           you_can_also_access = I18n.t("pdf_content.enrollment.footer.you_can_also_access")
@@ -501,7 +501,7 @@ module PdfHelper
       @qrcode_identifier = generate_qr_code_key
     end
 
-    data = reports_url(identifier: @qrcode_identifier)
+    data = reports_url(identifier: @qrcode_identifier, host: ENV["RAILS_RELATIVE_URL_ROOT"] || "")
 
     pdf.print_qr_code(data, extent: options[:size] || 80, align: :center)
   end
