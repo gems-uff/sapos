@@ -38,7 +38,6 @@ pt-BR:
       paper:
         reference: "(conforme informado para o Sucupira)"
         doi_issn_event: "(conforme informado na Sucupira)"
-        other_authors: "(caso não tenha, informar NA)"
         order: "Considerando o conjunto que você selecionou (1 é o mais relevante)"
 
     errors:

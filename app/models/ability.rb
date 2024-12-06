@@ -158,6 +158,8 @@ class Ability
       can :update, PaperStudent, paper: { owner: user.professor }
       can :destroy, PaperProfessor, paper: { owner: user.professor }
       can :destroy, PaperStudent, paper: { owner: user.professor }
+      can :destroy, PaperProfessor, paper: { owner: nil }
+      can :destroy, PaperStudent, paper: { owner: nil }
       can :destroy, Paper, owner: user.professor
     end
   end
