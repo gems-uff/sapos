@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_11_29_022042) do
+ActiveRecord::Schema[7.0].define(version: 2024_12_06_034047) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -254,17 +254,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_29_022042) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["enrollment_id"], name: "index_advisements_on_enrollment_id"
     t.index ["professor_id"], name: "index_advisements_on_professor_id"
-  end
-
-  create_table "affiliations", force: :cascade do |t|
-    t.integer "professor_id"
-    t.integer "institution_id"
-    t.datetime "start_date"
-    t.datetime "end_date"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["institution_id"], name: "index_affiliations_on_institution_id"
-    t.index ["professor_id"], name: "index_affiliations_on_professor_id"
   end
 
   create_table "allocations", force: :cascade do |t|
@@ -665,6 +654,51 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_29_022042) do
     t.index ["query_id"], name: "index_notifications_on_query_id"
   end
 
+  create_table "paper_professors", force: :cascade do |t|
+    t.integer "paper_id", null: false
+    t.integer "professor_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["paper_id"], name: "index_paper_professors_on_paper_id"
+    t.index ["professor_id"], name: "index_paper_professors_on_professor_id"
+  end
+
+  create_table "paper_students", force: :cascade do |t|
+    t.integer "paper_id", null: false
+    t.integer "student_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["paper_id"], name: "index_paper_students_on_paper_id"
+    t.index ["student_id"], name: "index_paper_students_on_student_id"
+  end
+
+  create_table "papers", force: :cascade do |t|
+    t.string "period"
+    t.text "reference"
+    t.string "kind"
+    t.string "doi_issn_event"
+    t.integer "owner_id", null: false
+    t.text "other_authors"
+    t.boolean "reason_impact_factor", default: false, null: false
+    t.boolean "reason_international_list", default: false, null: false
+    t.boolean "reason_citations", default: false, null: false
+    t.boolean "reason_national_interest", default: false, null: false
+    t.boolean "reason_international_interest", default: false, null: false
+    t.boolean "reason_national_representativeness", default: false, null: false
+    t.boolean "reason_scientific_contribution", default: false, null: false
+    t.boolean "reason_tech_contribution", default: false, null: false
+    t.boolean "reason_innovation_contribution", default: false, null: false
+    t.boolean "reason_social_contribution", default: false, null: false
+    t.text "reason_other"
+    t.text "reason_justify"
+    t.string "impact_factor"
+    t.integer "order"
+    t.text "other"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_id"], name: "index_papers_on_owner_id"
+  end
+
   create_table "phase_completions", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -743,14 +777,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_29_022042) do
     t.index ["email"], name: "index_professors_on_email"
     t.index ["institution_id"], name: "index_professors_on_institution_id"
     t.index ["user_id"], name: "index_professors_on_user_id"
-  end
-
-  create_table "program_levels", force: :cascade do |t|
-    t.integer "level", null: false
-    t.datetime "start_date", null: false
-    t.datetime "end_date"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
   end
 
   create_table "queries", force: :cascade do |t|
@@ -1044,6 +1070,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_29_022042) do
   end
 
   add_foreign_key "grants", "professors"
+  add_foreign_key "paper_professors", "papers"
+  add_foreign_key "paper_professors", "professors"
+  add_foreign_key "paper_students", "papers"
+  add_foreign_key "paper_students", "students"
+  add_foreign_key "papers", "professors", column: "owner_id"
   add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
   add_foreign_key "reports", "users", column: "generated_by_id"
 end
