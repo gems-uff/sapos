@@ -40,7 +40,7 @@ class Ability
   ]
 
   DOCUMENT_MODELS = [
-    Report
+    Report, Assertion
   ]
 
   PLACE_MODELS = [
@@ -230,6 +230,10 @@ class Ability
     if roles[:manager]
       can :manage, Ability::DOCUMENT_MODELS
       cannot :update, Report unless roles[Role::ROLE_ADMINISTRADOR]
+    end
+    if roles[Role::ROLE_SECRETARIA]
+      can :read, Ability::DOCUMENT_MODELS
+      can :execute, Ability::DOCUMENT_MODELS
     end
   end
 
