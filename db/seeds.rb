@@ -13270,3 +13270,39 @@ City.create([
   { name: "Wanderlandia", state: State.find_by_code("TO") },
   { name: "Xambioa", state: State.find_by_code("TO") },
 ])
+
+query_assertion_example = Query.create(
+  name: "DECLARAÇÃO - Participante externo em defesa de tese",
+  sql: <<-SQL
+    SELECT
+        s.name as nome_aluno,
+        l.name as nivel_aluno,
+        e.thesis_defense_date as data,
+        p.name as nome_professor
+    FROM
+        thesis_defense_committee_participations tdcp, enrollments e, students s, professors p, levels l
+    WHERE
+        tdcp.enrollment_id = e.id AND
+        e.student_id = s.id AND
+        tdcp.professor_id = p.id AND
+        e.level_id = l.id AND
+        e.enrollment_number = :matricula_aluno AND
+        p.cpf = :cpf_professor
+  SQL
+description: "Declaração de participante externo em defesa de dissertação."
+)
+
+QueryParam.create([
+                    { name: "matricula_aluno", query_id: query_assertion_example.id },
+                    { name: "cpf_professor", query_id: query_assertion_example.id }
+                  ])
+
+Assertion.create(
+  name: "Declaração de participante externo em defesa de tese",
+  assertion_template: <<-TEMPLATE
+    A quem possa interessar,
+
+    Declaramos que o professor <%= var('nome_professor') %> participou da banca de defesa da dissertação de <%= var('nivel_aluno') %> de <%= var('nome_aluno') %>, no dia <%= var('data') %>.
+  TEMPLATE
+query_id: query_assertion_example.id
+)
