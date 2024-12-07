@@ -13,5 +13,9 @@ FactoryBot.define do
     email { "ana@email.com" }
     admission_process
     filled_form
+
+    trait :in_process_with_letters do
+      admission_process { create(:admission_process, :with_letter_template) }
+    end
   end
 end

@@ -25,5 +25,11 @@ FactoryBot.define do
     staff_can_edit { true }
     staff_can_undo { true }
     require_session { false }
+
+    trait :with_letter_template do
+      letter_template { create(:form_template, template_type: "Carta de Recomendação") }
+      min_letters { nil }
+      max_letters { nil }
+    end
   end
 end
