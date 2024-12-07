@@ -38,12 +38,12 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Configurações de relatório"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Nome", "Prioridade", "Header", "Rodapé com assinatura", "Usar em relatórios", "Usar no histórico", "Usar no boletim", "Usar no quadro de horários", ""
+          "Nome", "Prioridade", "Header", "Tipo de Assinatura", "Usar em relatórios", "Usar no histórico", "Usar no boletim", "Usar no quadro de horários", "Validade (meses)", ""
       ]
     end
 
     it "should sort the list by name, asc" do
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Boletim", "Histórico", "Padrão"]
+      expect(page.all("tr td.name-column").map(&:text)).to eq %w[Boletim Histórico Padrão]
     end
   end
 

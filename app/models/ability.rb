@@ -39,8 +39,12 @@ class Ability
     Major, Institution,
   ]
 
+  DOCUMENT_MODELS = [
+    Report
+  ]
+
   PLACE_MODELS = [
-    City, State, Country,
+    City, State, Country
   ]
 
   CONFIGURATION_MODELS = [
@@ -81,6 +85,7 @@ class Ability
     initialize_phases(user, roles)
     initialize_courses(user, roles)
     initialize_education(user, roles)
+    initialize_documents(user, roles)
     initialize_places(user, roles)
     initialize_admissions(user, roles)
     initialize_configurations(user, roles)
@@ -218,6 +223,13 @@ class Ability
     end
     if roles[Role::ROLE_PROFESSOR]
       can :read, Ability::EDUCATION_MODELS
+    end
+  end
+
+  def initialize_documents(user, roles)
+    if roles[:manager]
+      can :manage, Ability::DOCUMENT_MODELS
+      cannot :update, Report unless roles[Role::ROLE_ADMINISTRADOR]
     end
   end
 

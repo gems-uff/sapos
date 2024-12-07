@@ -727,6 +727,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_29_022042) do
     t.string "siape", limit: 255
     t.string "enrollment_number", limit: 255
     t.string "identity_issuing_place", limit: 255
+    t.integer "institution_id"
     t.string "email", limit: 255
     t.date "academic_title_date"
     t.integer "academic_title_country_id"
@@ -740,6 +741,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_29_022042) do
     t.index ["city_id"], name: "index_professors_on_city_id"
     t.index ["cpf"], name: "index_professors_on_cpf"
     t.index ["email"], name: "index_professors_on_email"
+    t.index ["institution_id"], name: "index_professors_on_institution_id"
     t.index ["user_id"], name: "index_professors_on_user_id"
   end
 
@@ -853,6 +855,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_11_29_022042) do
     t.date "expires_at"
     t.string "identifier"
     t.string "file_name"
+    t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
+    t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
   end
 
   create_table "research_areas", force: :cascade do |t|
