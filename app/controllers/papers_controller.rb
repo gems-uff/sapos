@@ -11,11 +11,9 @@ class PapersController < ApplicationController
     config.actions.swap :search, :field_search
     config.list.sorting = { period: "DESC", owner: "ASC", order: "ASC" }
 
-    config.columns.add :header
     config.columns.add :reason_group
     config.columns.add :reason_group_end
     form_columns = [
-      :header,
       :period, :owner, :reference, :order, :kind, :doi_issn_event,
       :paper_professors, :paper_students, :other_authors,
       :reason_group,
@@ -31,7 +29,6 @@ class PapersController < ApplicationController
       :reason_social_contribution,
       :reason_other,
       :reason_justify,
-      :impact_factor,
       :reason_group_end,
       :other,
     ]
@@ -52,7 +49,6 @@ class PapersController < ApplicationController
       :reason_social_contribution,
       :reason_other,
       :reason_justify,
-      :impact_factor,
       :order,
       :other,
     ]

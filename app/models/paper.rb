@@ -28,7 +28,6 @@ class Paper < ApplicationRecord
   validates :kind, presence: true, inclusion: { in: KINDS }
   validates :doi_issn_event, presence: true
   validates :reason_justify, presence: true
-  validates :impact_factor, presence: true
   validates :order, presence: true, inclusion: { in: ORDERS }, uniqueness: {
     scope: [:period, :owner_id], message: :order_uniqueness
   }

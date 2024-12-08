@@ -31,13 +31,12 @@ pt-BR:
         reason_social_contribution: "Contribuição social (p.ex., se o artigo apresenta uma solução inovadora para um problema da sociedade)"
         reason_other: "Outro aspecto"
         reason_justify: "Justifique brevemente as suas marcações na pergunta anterior"
-        impact_factor: "Valor quantitativo do fórum (fator de impacto, h-index, JCR, etc)"
         order: "Relevância"
         other: "Caso queira, descreva brevemente qualquer outro ponto que ache relevante para o artigo."
     description:
       paper:
-        reference: "(conforme informado para o Sucupira)"
-        doi_issn_event: "(conforme informado na Sucupira)"
+        reference: "(copiar do seu lattes)"
+        doi_issn_event: "(copiar do seu lattes)"
         order: "Considerando o conjunto que você selecionou (1 é o mais relevante)"
 
     errors:

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_12_06_034047) do
+ActiveRecord::Schema[7.0].define(version: 2024_12_08_052442) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -691,7 +691,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_06_034047) do
     t.boolean "reason_social_contribution", default: false, null: false
     t.text "reason_other"
     t.text "reason_justify"
-    t.string "impact_factor"
     t.integer "order"
     t.text "other"
     t.datetime "created_at", null: false

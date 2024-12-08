@@ -12,7 +12,6 @@ FactoryBot.define do
     owner { create(:professor) }
     reason_international_list { true }
     reason_justify { "Internacional" }
-    impact_factor { "1" }
     order { 1 }
   end
 end

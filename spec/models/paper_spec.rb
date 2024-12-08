@@ -24,7 +24,6 @@ RSpec.describe Paper, type: :model do
       owner: professor,
       reason_international_list: true,
       reason_justify: "Internacional",
-      impact_factor: "1",
       order: 1
     )
   end
@@ -39,7 +38,6 @@ RSpec.describe Paper, type: :model do
     it { should validate_presence_of(:order) }
     it { should validate_presence_of(:doi_issn_event) }
     it { should validate_presence_of(:reason_justify) }
-    it { should validate_presence_of(:impact_factor) }
     # ToDo: professor cannot edit other papers
 
   end
