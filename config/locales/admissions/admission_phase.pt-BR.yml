@@ -22,6 +22,7 @@ pt-BR:
         candidate_can_see_member: "Candidato pode ver preenchimento de formulário individual"
         candidate_can_see_shared: "Candidato pode ver preenchimento de formulário compartilhado"
         candidate_can_see_consolidation: "Candidato pode ver preenchimento de consolidação"
+        committee_can_see_other_individual: "Comitê pode ver preenchimento de formulário individual de outros membros"
     models:
       admissions/admission_phase:
         one: "Fase"

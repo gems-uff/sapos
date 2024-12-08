@@ -17,7 +17,7 @@ class Admissions::AdmissionPhasesController < ApplicationController
     form_columns = [
       :name, :member_form, :shared_form, :consolidation_form, :candidate_form, :can_edit_candidate,
       :candidate_can_edit, :candidate_can_see_member, :candidate_can_see_shared,
-      :candidate_can_see_consolidation,
+      :candidate_can_see_consolidation, :committee_can_see_other_individual,
       :approval_condition, :keep_in_phase_condition, :admission_phase_committees,
     ]
 
