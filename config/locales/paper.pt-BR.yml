@@ -1,0 +1,54 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      paper:
+        period: Avaliação quadrienal - 4N
+        owner: "Professor"
+        reference: "Referência completa"
+        kind: "Tipo"
+        kinds:
+          journal: "Periódico"
+          conference: "Conferência"
+        doi_issn_event: "DOI ou ISSN ou Sigla Evento"
+        students: "Autores discentes da Pós ou egressos"
+        paper_students: "Autores discentes da Pós ou egressos"
+        professors: "Autores docentes da Pós"
+        paper_professors: "Autores docentes da Pós"
+        other_authors: "Outros autores separados por ';'"
+        reasons: "Quais aspectos atribui ao artigo para que ele entre na sua lista?"
+        reason_impact_factor: "Valor quantitativo do fórum (fator de impacto, h-index)"
+        reason_international_list: "Fórum em alguma lista de referência internacional (p.ex. CSRankings)"
+        reason_citations: "Número elevado de citações para a sua área"
+        reason_national_interest: "Receptividade da comunidade nacional (p.ex, se seu artigo teve muito interesse ao ser apresentado em um evento nacional, ou se muitas pessoas no Brasil te perguntaram sobre ele)"
+        reason_international_interest: "Recepetividade da comunidade internacional (p.ex, se seu artigo teve muito interesse ao ser apresentado em um evento internacional, ou se muitas pessoas fora do Brasil te perguntaram sobre ele)"
+        reason_national_representativeness: "Representatividade nacional (p.ex., se é um fórum que poucos brasileiros conseguem publicar)"
+        reason_scientific_contribution: "Contribuição científica (p.ex., é uma contribuição original de um método, um algoritmo, uma prova matemática, uma investigação científica)"
+        reason_tech_contribution: "Contribuição tecnológica (p.ex. é um produto de software de código aberto)"
+        reason_innovation_contribution: "Contribuição de inovação (p.ex., se o artigo poderia ser uma ideia inicial para uma startup)"
+        reason_social_contribution: "Contribuição social (p.ex., se o artigo apresenta uma solução inovadora para um problema da sociedade)"
+        reason_other: "Outro aspecto"
+        reason_justify: "Justifique brevemente as suas marcações na pergunta anterior"
+        order: "Relevância"
+        other: "Caso queira, descreva brevemente qualquer outro ponto que ache relevante para o artigo."
+    description:
+      paper:
+        reference: "(copiar do seu lattes)"
+        doi_issn_event: "(copiar do seu lattes)"
+        order: "Considerando o conjunto que você selecionou (1 é o mais relevante)"
+
+    errors:
+      models:
+        paper:
+          cannot_edit_other_papers: "não pode ser editado por este usuário"
+          order_uniqueness: "deve ser única para professor no período quadrienal"
+
+    models:
+      paper:
+        one: "Avaliação quadrienal - 4N"
+        other: "Artigo"
+
+  active_scaffold:
+    create_paper_label: "Adicionar Artigo"

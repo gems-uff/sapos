@@ -1,0 +1,25 @@
+</li>
+<style>
+.paper-reason-group {
+    width: 35em;
+}
+.paper-reason-group li.checkbox dl {
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: nowrap;
+}
+.paper-reason-group li.checkbox dl > dt {
+    width: 100% !important;
+    flex: 1 1 100%;
+    padding: 10px 0;
+}
+.paper-reason-group li.checkbox dl > dd {
+    flex: 0 1 23px;
+}
+</style>
+
+<% id ||= "group_#{SecureRandom.random_number(1_000_000)}" %>
+<h5> Motivos <a href="#" class="as-js-button visibility-toggle" data-toggable="<%= id %>" data-show="Mostrar" data-hide="Ocultar">Ocultar</a> </h5>
+<div id="<%= id %>" class="paper-reason-group">
+  Quais aspectos atribui ao artigo para que ele entre na sua lista?
+<li>

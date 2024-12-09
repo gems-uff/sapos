@@ -1,0 +1,17 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      paper_professor:
+        paper: "Artigo"
+        professor: "Docente"
+
+    models:
+      paper_professor:
+        one: "Docente Autor"
+        other: "Docentes Autores"
+
+  active_scaffold:
+    create_paper_professor_label: "Adicionar Docente Autor"

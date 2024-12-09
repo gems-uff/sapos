@@ -411,7 +411,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     self.assign_attributes(params)
     all_forms = []
     all_phase_forms = []
-    if self.filled_form.try(:disable_submission) != "1"
+    if self.filled_form.try(:enable_submission) == "1"
       self.filled_form.prepare_missing_fields
       self.filled_form.sync_fields_after(self)
       all_forms << {
@@ -423,7 +423,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
     if has_letter_forms
       self.letter_requests.each do |letter_request|
-        if letter_request.filled_form.try(:disable_submission) != "1"
+        if letter_request.filled_form.try(:enable_submission) == "1"
           letter_request.filled_form.sync_fields_after(letter_request)
           all_forms << {
             was_filled: letter_request.filled_form.is_filled,
@@ -449,7 +449,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
           # Do not solve pendency if it was not created by assign_attributes
           next if phase_form[:from_build]
           # Do not solve pendency if form submission was disabled
-          next if phase_form[:object].filled_form.try(:disable_submission) == "1"
+          next if phase_form[:object].filled_form.try(:enable_submission) != "1"
           phase_form[:was_filled] = phase_form[:object].filled_form.is_filled
           phase_form[:object].filled_form.is_filled = true
           all_phase_forms << phase_form
@@ -462,7 +462,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       self.ordered_rankings.each do |ranking|
         next if !ranking.filled_form.is_filled
         next if !can_edit_override
-        next if ranking.filled_form.try(:disable_submission) == "1"
+        next if ranking.filled_form.try(:enable_submission) != "1"
         ranking.filled_form.prepare_missing_fields
         all_forms << {
           was_filled: ranking.filled_form.is_filled,

@@ -6,7 +6,7 @@
 class Admissions::FilledForm < ActiveRecord::Base
   has_paper_trail
 
-  attr_accessor :disable_submission
+  attr_accessor :enable_submission
 
   has_one :admission_application, dependent: :restrict_with_exception,
     class_name: "Admissions::AdmissionApplication"
