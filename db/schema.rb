@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
+ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -257,17 +257,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.index ["professor_id"], name: "index_advisements_on_professor_id"
   end
 
-  create_table "affiliations", force: :cascade do |t|
-    t.integer "professor_id"
-    t.integer "institution_id"
-    t.datetime "start_date"
-    t.datetime "end_date"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["institution_id"], name: "index_affiliations_on_institution_id"
-    t.index ["professor_id"], name: "index_affiliations_on_professor_id"
-  end
-
   create_table "allocations", force: :cascade do |t|
     t.string "day", limit: 255
     t.string "room", limit: 255
@@ -277,14 +266,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["course_class_id"], name: "index_allocations_on_course_class_id"
-  end
-
-  create_table "assertions", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "query_id", null: false
-    t.index ["query_id"], name: "index_assertions_on_query_id"
   end
 
   create_table "carrier_wave_files", force: :cascade do |t|
@@ -328,8 +309,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.integer "enrollment_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "disapproved_by_absence", default: false
-    t.boolean "grade_not_count_in_gpr", default: false
+    t.boolean "disapproved_by_absence", default: false, null: false
+    t.boolean "grade_not_count_in_gpr", default: false, null: false
     t.string "justification_grade_not_count_in_gpr", default: ""
     t.index ["course_class_id"], name: "index_class_enrollments_on_course_class_id"
     t.index ["enrollment_id"], name: "index_class_enrollments_on_enrollment_id"
@@ -362,7 +343,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.integer "semester"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "not_schedulable", default: false
+    t.boolean "not_schedulable", default: false, null: false
     t.string "obs_schedule"
     t.index ["course_id"], name: "index_course_classes_on_course_id"
     t.index ["professor_id"], name: "index_course_classes_on_professor_id"
@@ -379,11 +360,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
 
   create_table "course_types", force: :cascade do |t|
     t.string "name", limit: 255
-    t.boolean "has_score"
+    t.boolean "has_score", default: false, null: false
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "schedulable", default: true
-    t.boolean "show_class_name", default: true
+    t.boolean "schedulable", default: true, null: false
+    t.boolean "show_class_name", default: true, null: false
     t.boolean "allow_multiple_classes", default: false, null: false
     t.boolean "on_demand", default: false, null: false
   end
@@ -397,7 +378,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.integer "workload"
-    t.boolean "available", default: true
+    t.boolean "available", default: true, null: false
     t.index ["course_type_id"], name: "index_courses_on_course_type_id"
   end
 
@@ -437,7 +418,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.text "description"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "show_advisor_name", default: false
+    t.boolean "show_advisor_name", default: false, null: false
     t.string "thesis_judgement", limit: 255
   end
 
@@ -457,7 +438,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.string "to"
     t.string "subject"
     t.text "body"
-    t.boolean "enabled", default: true
+    t.boolean "enabled", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -469,7 +450,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.integer "number_of_semesters", default: 1
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "active", default: true
+    t.boolean "active", default: true, null: false
     t.index ["enrollment_id"], name: "index_enrollment_holds_on_enrollment_id"
   end
 
@@ -499,7 +480,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.string "name", limit: 255
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "user"
+    t.boolean "user", default: false, null: false
   end
 
   create_table "enrollments", force: :cascade do |t|
@@ -552,7 +533,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
 
   create_table "filled_forms", force: :cascade do |t|
     t.integer "form_template_id"
-    t.boolean "is_filled"
+    t.boolean "is_filled", default: false, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["form_template_id"], name: "index_filled_forms_on_form_template_id"
@@ -631,7 +612,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.datetime "updated_at", precision: nil, null: false
     t.string "course_name", limit: 255
     t.integer "default_duration", default: 0
-    t.boolean "show_advisements_points_in_list"
+    t.boolean "show_advisements_points_in_list", default: false, null: false
     t.string "short_name_showed_in_list_header"
   end
 
@@ -653,6 +634,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.string "subject", limit: 255
     t.text "body"
     t.string "attachments_file_names"
+    t.string "reply_to", limit: 255
     t.index ["notification_id"], name: "index_notification_logs_on_notification_id"
   end
 
@@ -667,9 +649,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.datetime "next_execution", precision: nil
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "individual", default: true
+    t.boolean "individual", default: true, null: false
     t.integer "query_id", null: false
-    t.boolean "has_grades_report_pdf_attachment", default: false
+    t.boolean "has_grades_report_pdf_attachment", default: false, null: false
     t.index ["query_id"], name: "index_notifications_on_query_id"
   end
 
@@ -745,9 +727,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.string "description", limit: 255
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "is_language", default: false
-    t.boolean "extend_on_hold", default: false
-    t.boolean "active", default: true
+    t.boolean "is_language", default: false, null: false
+    t.boolean "extend_on_hold", default: false, null: false
+    t.boolean "active", default: true, null: false
   end
 
   create_table "professor_research_areas", force: :cascade do |t|
@@ -836,7 +818,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.integer "form_condition_id"
     t.string "behavior_on_invalid_condition", default: "Erro - apenas em seletores"
     t.string "behavior_on_invalid_ranking", default: "Erro"
-    t.boolean "candidate_can_see"
+    t.boolean "candidate_can_see", default: false, null: false
     t.index ["form_condition_id"], name: "index_ranking_configs_on_form_condition_id"
     t.index ["form_template_id"], name: "index_ranking_configs_on_form_template_id"
     t.index ["machine_field_id"], name: "index_ranking_configs_on_machine_field_id"
@@ -875,10 +857,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
 
   create_table "report_configurations", force: :cascade do |t|
     t.string "name", limit: 255
-    t.boolean "use_at_report"
-    t.boolean "use_at_transcript"
-    t.boolean "use_at_grades_report"
-    t.boolean "use_at_schedule"
+    t.boolean "use_at_report", default: false, null: false
+    t.boolean "use_at_transcript", default: false, null: false
+    t.boolean "use_at_grades_report", default: false, null: false
+    t.boolean "use_at_schedule", default: false, null: false
     t.text "text"
     t.string "image", limit: 255
     t.integer "order", default: 2
@@ -887,7 +869,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.integer "y"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "use_at_assertion"
     t.integer "signature_type", default: 0
     t.integer "expiration_in_months"
   end
@@ -900,6 +881,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.date "expires_at"
     t.string "identifier"
     t.string "file_name"
+    t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
+    t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
   end
 
   create_table "research_areas", force: :cascade do |t|
@@ -932,7 +915,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
   create_table "scholarship_suspensions", force: :cascade do |t|
     t.date "start_date"
     t.date "end_date"
-    t.boolean "active", default: true
+    t.boolean "active", default: true, null: false
     t.integer "scholarship_duration_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
@@ -1086,7 +1069,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_09_223143) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
-  add_foreign_key "assertions", "queries"
   add_foreign_key "grants", "professors"
   add_foreign_key "paper_professors", "papers"
   add_foreign_key "paper_professors", "professors"
