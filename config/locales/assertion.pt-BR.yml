@@ -1,0 +1,28 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  active_scaffold:
+    assertion:
+      create_assertion_label: "Adicionar Declaração"
+      simulate: "Simular"
+      generate_pdf: "Gerar PDF"
+      query_date: "Data de Consulta"
+
+  activerecord:
+    attributes:
+      assertion:
+        name: "Nome da Declaração"
+        query: "Consulta"
+        params: "Parâmetros configuráveis da declaração"
+        assertion_template: "Template do Corpo"
+
+    models:
+      assertion:
+        one: "Documento"
+        other: "Declarações"
+
+  pdf_content:
+    assertion:
+      assertion_pdf:
+        filename: "DECLARAÇÃO"
