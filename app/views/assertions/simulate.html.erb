@@ -74,7 +74,7 @@
             var form = $('<form>', {
                 'action': '<%= assertion_pdf_assertion_path(@assertion, format: :pdf) %>',
                 'method': 'GET'
-            }).append($.map(<%= escape_javascript(params[:query_params].to_json) %>, function(value, key) {
+            }).append($.map(<%= params[:query_params].to_json.html_safe %>, function(value, key) {
                 return $('<input>', {
                     'type': 'hidden',
                     'name': 'query_params[' + key + ']',
