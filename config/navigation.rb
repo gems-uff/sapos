@@ -149,6 +149,8 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.modelitem Advisement
       submenu.modelitem AdvisementAuthorization
       submenu.modelitem ThesisDefenseCommitteeParticipation
+      submenu.modelitem Grant
+      submenu.modelitem Paper
     end
 
     scholar_models = [Scholarship, ScholarshipType, ScholarshipDuration]
@@ -187,6 +189,11 @@ SimpleNavigation::Configuration.run do |navigation|
     mainhelper.listitem :grades, grade_models do |submenu|
       submenu.modelitem Major
       submenu.modelitem Institution
+    end
+
+    documents_models = [Report]
+    mainhelper.listitem :documents, documents_models do |submenu|
+      submenu.modelitem Report
     end
 
     locations_models = [City, State, Country]

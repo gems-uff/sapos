@@ -6,7 +6,7 @@
 require "prawn/measurement_extensions"
 
 new_document(
-  "transcript.pdf",
+  @filename,
   I18n.t("pdf_content.enrollment.header.title"),
   watermark: cannot?(
     :generate_report_without_watermark, @enrollment
@@ -22,6 +22,8 @@ new_document(
   justification_grade_not_count_in_gpr_table(pdf, enrollment: @enrollment)
 
   thesis_table(pdf, enrollment: @enrollment)
+
+  obs_table(pdf, enrollment: @enrollment)
 
   enrollment_holds_table(pdf, enrollment: @enrollment)
 end

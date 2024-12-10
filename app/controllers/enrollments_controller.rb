@@ -126,6 +126,7 @@ class EnrollmentsController < ApplicationController
       :thesis_title,
       :thesis_defense_date,
       :obs,
+      :obs_to_academic_transcript,
 
       :advisements,
       :scholarship_durations,
@@ -219,8 +220,9 @@ class EnrollmentsController < ApplicationController
       format.pdf do
         title = I18n.t("pdf_content.enrollment.academic_transcript.title")
         student = enrollment.student.name
-        send_data render_enrollments_academic_transcript_pdf(enrollment),
-          filename: "#{title} - #{student}.pdf",
+        filename = "#{title} - #{student}.pdf"
+        send_data render_enrollments_academic_transcript_pdf(enrollment, filename),
+          filename: filename,
           type: "application/pdf"
       end
     end
@@ -232,8 +234,9 @@ class EnrollmentsController < ApplicationController
       format.pdf do
         title = I18n.t("pdf_content.enrollment.grades_report.title")
         student = enrollment.student.name
-        send_data render_enrollments_grades_report_pdf(enrollment),
-          filename: "#{title} - #{student}.pdf",
+        filename = "#{title} - #{student}.pdf"
+        send_data render_enrollments_grades_report_pdf(enrollment, filename),
+          filename: filename,
           type: "application/pdf"
       end
     end

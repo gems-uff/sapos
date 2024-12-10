@@ -34,7 +34,7 @@ module SharedPdfConcern
     )
   end
 
-  def render_enrollments_academic_transcript_pdf(enrollment)
+  def render_enrollments_academic_transcript_pdf(enrollment, filename = "transcript.pdf")
     class_enrollments = enrollment.class_enrollments
       .where(situation: ClassEnrollment::APPROVED)
       .joins(:course_class)
@@ -47,6 +47,7 @@ module SharedPdfConcern
       type: "application/pdf",
       formats: [:pdf],
       assigns: {
+        filename: filename,
         enrollment: enrollment,
         class_enrollments: class_enrollments,
         accomplished_phases: accomplished_phases,
@@ -55,7 +56,7 @@ module SharedPdfConcern
     )
   end
 
-  def render_enrollments_grades_report_pdf(enrollment)
+  def render_enrollments_grades_report_pdf(enrollment, filename = "grades_report.pdf")
     class_enrollments = enrollment.class_enrollments
       .where(situation: ClassEnrollment::APPROVED)
       .joins(:course_class)
@@ -67,6 +68,7 @@ module SharedPdfConcern
       type: "application/pdf",
       formats: [:pdf],
       assigns: {
+        filename: filename,
         enrollment: enrollment,
         class_enrollments: class_enrollments,
         accomplished_phases: accomplished_phases,

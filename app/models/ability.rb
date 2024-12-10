@@ -16,7 +16,7 @@ class Ability
   PROFESSOR_MODELS = [
     Professor, Advisement, AdvisementAuthorization,
     ThesisDefenseCommitteeParticipation,
-    ProfessorResearchArea,
+    ProfessorResearchArea, Grant, Paper, PaperProfessor, PaperStudent
   ]
 
   SCHOLARSHIP_MODELS = [
@@ -39,8 +39,12 @@ class Ability
     Major, Institution,
   ]
 
+  DOCUMENT_MODELS = [
+    Report
+  ]
+
   PLACE_MODELS = [
-    City, State, Country,
+    City, State, Country
   ]
 
   CONFIGURATION_MODELS = [
@@ -81,6 +85,7 @@ class Ability
     initialize_phases(user, roles)
     initialize_courses(user, roles)
     initialize_education(user, roles)
+    initialize_documents(user, roles)
     initialize_places(user, roles)
     initialize_admissions(user, roles)
     initialize_configurations(user, roles)
@@ -140,6 +145,22 @@ class Ability
     end
     if roles[Role::ROLE_PROFESSOR]
       can :read, Ability::PROFESSOR_MODELS
+      cannot :edit_professor, Grant
+      cannot :edit_professor, Paper
+      can :create, Grant
+      can :update, Grant, professor: user.professor
+      can :destroy, Grant, professor: user.professor
+      can :create, Paper
+      can :update, Paper, owner: user.professor
+      can :create, PaperProfessor
+      can :create, PaperStudent
+      can :update, PaperProfessor, paper: { owner: user.professor }
+      can :update, PaperStudent, paper: { owner: user.professor }
+      can :destroy, PaperProfessor, paper: { owner: user.professor }
+      can :destroy, PaperStudent, paper: { owner: user.professor }
+      can :destroy, PaperProfessor, paper: { owner: nil }
+      can :destroy, PaperStudent, paper: { owner: nil }
+      can :destroy, Paper, owner: user.professor
     end
   end
 
@@ -215,6 +236,13 @@ class Ability
     end
     if roles[Role::ROLE_PROFESSOR]
       can :read, Ability::EDUCATION_MODELS
+    end
+  end
+
+  def initialize_documents(user, roles)
+    if roles[:manager]
+      can :manage, Ability::DOCUMENT_MODELS
+      cannot :update, Report unless roles[Role::ROLE_ADMINISTRADOR]
     end
   end
 

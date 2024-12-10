@@ -4,7 +4,7 @@
 # frozen_string_literal: true
 
 new_document(
-  "grades_report.pdf",
+  @filename,
   I18n.t("pdf_content.enrollment.grades_report.title"),
   watermark: (
     current_user.nil? ? false : cannot?(
@@ -22,6 +22,8 @@ new_document(
   justification_grade_not_count_in_gpr_table(pdf, enrollment: @enrollment)
 
   thesis_table(pdf, enrollment: @enrollment, show_advisors: true)
+
+  obs_table(pdf, enrollment: @enrollment)
 
   accomplished_table(pdf, accomplished_phases: @accomplished_phases)
 
