@@ -520,6 +520,14 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :assertions do
+    concerns :active_scaffold
+    member do
+      get "simulate"
+      get "assertion_pdf"
+    end
+  end
+
   resources :reports do
     concerns :active_scaffold
     member do

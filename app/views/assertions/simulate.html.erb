@@ -1,0 +1,87 @@
+<h4> <%= @assertion.to_label %> </h4>
+
+<%= render "assertions/params_form", resource: @assertion, query_params: @query_params %>
+
+<div class="actions" style="display: block; margin: 10px 0 0 0;">
+  <a id="as_assertions-simulate-<%= @assertion.id %>-link"
+     class="simulate as_action again"
+     href="javascript:void(0)">
+    <i title='<%= I18n.t("active_scaffold.assertion.simulate") %>'></i><%= I18n.t("active_scaffold.assertion.simulate") %>
+  </a>
+  &nbsp;&nbsp;
+  <%= render "queries/show_sql", sql_query: @query_sql %>
+  <% if @messages.any? %>
+    <a id="generate-pdf-link" class="btn btn-primary" href="javascript:void(0)">
+      <i class="fa fa-file-pdf-o" title='<%= I18n.t("active_scaffold.assertion.generate_pdf") %>'></i>
+    </a>
+  <% end %>
+</div>
+
+<% if @messages.size.zero? && params[:query_params].try(:[], :data_consulta).nil? %>
+  <div style="margin: 10px 0">Faça uma simulação</div>
+
+<% elsif @messages.size.zero? && params[:query_params].try(:[], :data_consulta) %>
+  <div style="margin: 10px 0">Esta consulta não retornou nenhum resultado</div>
+<% else %>
+  <div class="actions" style="display: block">
+    <p class="simulate_query_date">
+      <span>
+      <% if params[:query_params].try(:[], :data_consulta) %>
+        <%= I18n.t("active_scaffold.notification.query_date") %>:
+          <%= params[:query_params][:data_consulta] %>
+      <% end %>
+      </span>
+    </p>
+  </div>
+
+  <table class="assertion-results showtable listed-records-table">
+    <thead>
+    <tr>
+      <% @query_result[:columns].each do |column| %>
+        <th><%= column %></th>
+      <% end %>
+    </tr>
+    </thead>
+    <tbody>
+    <% @query_result[:rows].each do |row| %>
+      <tr>
+        <% row.each do |value| %>
+          <td><%= value %></td>
+        <% end %>
+      </tr>
+    <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<p class="form-footer">
+  <%= link_to(
+        as_(:close), main_path_to_return,
+        class: "as_cancel", remote: request.xhr?
+      ) %>
+  <%= loading_indicator_tag(action: :create, id: params[:id]) %>
+</p>
+
+<script type="text/javascript">
+    $(function () {
+        $(".simulate.as_action.again").click(function () {
+            ActiveScaffold.find_action_link(
+                $("#as_assertions-simulate-<%= @assertion.id %>-link")
+            ).reload();
+        });
+
+        $("#generate-pdf-link").click(function () {
+            var form = $('<form>', {
+                'action': '<%= assertion_pdf_assertion_path(@assertion, format: :pdf) %>',
+                'method': 'GET'
+            }).append($.map(<%= escape_javascript(params[:query_params].to_json) %>, function(value, key) {
+                return $('<input>', {
+                    'type': 'hidden',
+                    'name': 'query_params[' + key + ']',
+                    'value': value
+                });
+            }));
+            form.appendTo('body').submit();
+        });
+    });
+</script>
