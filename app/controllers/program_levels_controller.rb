@@ -22,14 +22,13 @@ class ProgramLevelsController < ApplicationController
 
       super
 
-      record = self.params[:record]
-
-      if old_record.level.to_s != record[:level]
+      if old_record.level.to_s != @record.level
         ProgramLevel.create!(
           level: old_record.level,
           start_date: old_record.start_date,
-          end_date: record[:start_date]
+          end_date: @record.start_date
         )
       end
+      flash[:info] = "Atualizado com sucesso! Atualize a página para ter todos os conceitos CAPES."
     end
 end
