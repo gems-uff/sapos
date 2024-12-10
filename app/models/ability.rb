@@ -228,7 +228,7 @@ class Ability
     alias_action :execute_now, :execute_now, :notify, to: :update
     if roles[Role::ROLE_COORDENACAO]
       can :manage, (Ability::CONFIGURATION_MODELS - [
-        CustomVariable, ReportConfiguration, ProgramLevel
+        CustomVariable, ReportConfiguration
       ])
     end
     if roles[Role::ROLE_SECRETARIA]

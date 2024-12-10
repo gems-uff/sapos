@@ -35,7 +35,7 @@
       <h4><%= t "activerecord.attributes.enrollment.thesis_defense_committee_professors" %></h4>
       <%= render partial: "enrollments/show_defense_committee_table", locals: {
         thesis_defense_committee_professors: thesis_defense_committee_professors,
-        thesis_defense_date: enrollment.thesis_defense_date,
+        thesis_defense_date: thesis_defense_date,
       } %>
     <% end %>
   </details>
