@@ -210,6 +210,10 @@ Rails.application.routes.draw do
     record_select_routes
   end
 
+  resources :assertions do
+    concerns :active_scaffold
+  end
+
   resources :levels do
     concerns :active_scaffold
   end
@@ -521,7 +525,34 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :reports do
+    concerns :active_scaffold
+    member do
+      get :download
+    end
+    collection do
+      get ":identifier.pdf", to: "reports#download_by_identifier", as: :download_by_identifier
+    end
+  end
+
   if Rails.env.development?
     mount LetterOpenerWeb::Engine, at: "/letter_opener"
   end
+
+  resources :grants do
+    concerns :active_scaffold
+  end
+
+  resources :paper_professors do
+    concerns :active_scaffold
+  end
+
+  resources :paper_students do
+    concerns :active_scaffold
+  end
+
+  resources :papers do
+    concerns :active_scaffold
+  end
+
 end

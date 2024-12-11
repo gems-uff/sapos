@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
+ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -128,6 +128,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.boolean "candidate_can_see_member", default: false, null: false
     t.boolean "candidate_can_see_shared", default: false, null: false
     t.boolean "candidate_can_see_consolidation", default: false, null: false
+    t.boolean "committee_can_see_other_individual", default: false, null: false
     t.index ["approval_condition_id"], name: "index_admission_phases_on_approval_condition_id"
     t.index ["candidate_form_id"], name: "index_admission_phases_on_candidate_form_id"
     t.index ["consolidation_form_id"], name: "index_admission_phases_on_consolidation_form_id"
@@ -582,6 +583,19 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "grants", force: :cascade do |t|
+    t.string "title"
+    t.integer "start_year"
+    t.integer "end_year"
+    t.string "kind"
+    t.string "funder"
+    t.decimal "amount", precision: 14, scale: 2
+    t.integer "professor_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["professor_id"], name: "index_grants_on_professor_id"
+  end
+
   create_table "institutions", force: :cascade do |t|
     t.string "name", limit: 255
     t.datetime "created_at", precision: nil, null: false
@@ -650,6 +664,50 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.integer "query_id", null: false
     t.boolean "has_grades_report_pdf_attachment", default: false, null: false
     t.index ["query_id"], name: "index_notifications_on_query_id"
+  end
+
+  create_table "paper_professors", force: :cascade do |t|
+    t.integer "paper_id", null: false
+    t.integer "professor_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["paper_id"], name: "index_paper_professors_on_paper_id"
+    t.index ["professor_id"], name: "index_paper_professors_on_professor_id"
+  end
+
+  create_table "paper_students", force: :cascade do |t|
+    t.integer "paper_id", null: false
+    t.integer "student_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["paper_id"], name: "index_paper_students_on_paper_id"
+    t.index ["student_id"], name: "index_paper_students_on_student_id"
+  end
+
+  create_table "papers", force: :cascade do |t|
+    t.string "period"
+    t.text "reference"
+    t.string "kind"
+    t.string "doi_issn_event"
+    t.integer "owner_id", null: false
+    t.text "other_authors"
+    t.boolean "reason_impact_factor", default: false, null: false
+    t.boolean "reason_international_list", default: false, null: false
+    t.boolean "reason_citations", default: false, null: false
+    t.boolean "reason_national_interest", default: false, null: false
+    t.boolean "reason_international_interest", default: false, null: false
+    t.boolean "reason_national_representativeness", default: false, null: false
+    t.boolean "reason_scientific_contribution", default: false, null: false
+    t.boolean "reason_tech_contribution", default: false, null: false
+    t.boolean "reason_innovation_contribution", default: false, null: false
+    t.boolean "reason_social_contribution", default: false, null: false
+    t.text "reason_other"
+    t.text "reason_justify"
+    t.integer "order"
+    t.text "other"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["owner_id"], name: "index_papers_on_owner_id"
   end
 
   create_table "phase_completions", force: :cascade do |t|
@@ -822,13 +880,26 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.boolean "use_at_schedule", default: false, null: false
     t.text "text"
     t.string "image", limit: 255
-    t.boolean "signature_footer", default: false, null: false
     t.integer "order", default: 2
     t.decimal "scale", precision: 10, scale: 8
     t.integer "x"
     t.integer "y"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.integer "signature_type", default: 0
+    t.integer "expiration_in_months"
+  end
+
+  create_table "reports", force: :cascade do |t|
+    t.integer "generated_by_id"
+    t.integer "carrierwave_file_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.date "expires_at"
+    t.string "identifier"
+    t.string "file_name"
+    t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
+    t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
   end
 
   create_table "research_areas", force: :cascade do |t|
@@ -1017,4 +1088,12 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_12_113419) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "grants", "professors"
+  add_foreign_key "paper_professors", "papers"
+  add_foreign_key "paper_professors", "professors"
+  add_foreign_key "paper_students", "papers"
+  add_foreign_key "paper_students", "students"
+  add_foreign_key "papers", "professors", column: "owner_id"
+  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
+  add_foreign_key "reports", "users", column: "generated_by_id"
 end

@@ -12,6 +12,7 @@ FactoryBot.define do
     use_at_schedule { false }
     text { "MyText" }
     image { "MyString" }
-    signature_footer { false }
+    signature_type { 1 }
+    expiration_in_months { nil }
   end
 end
