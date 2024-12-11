@@ -4,7 +4,7 @@
 # frozen_string_literal: true
 
 new_document(
-  "grades_report.pdf",
+  @filename,
   I18n.t("pdf_content.enrollment.grades_report.title"),
   watermark: (
     current_user.nil? ? false : cannot?(
