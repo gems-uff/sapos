@@ -16,7 +16,7 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
       pl = pl.paper_trail.previous_version
       while pl.present?
         if pl.value != level
-          end_date = start_date
+          end_date = program_level.start_date
           start_date = pl.updated_at
           level = pl.value
           program_level = ProgramLevel.create(
