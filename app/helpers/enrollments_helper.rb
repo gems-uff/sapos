@@ -261,8 +261,8 @@ module EnrollmentsHelper
     render(
       partial: "enrollments/show_defense_committee_table",
       locals: {
-        thesis_defense_committee_professors:
-          record.thesis_defense_committee_professors
+        thesis_defense_committee_professors: record.thesis_defense_committee_professors,
+        thesis_defense_date: record.thesis_defense_date
       }
     )
   end
