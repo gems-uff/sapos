@@ -5,7 +5,7 @@
 
 require "spec_helper"
 
-RSpec.describe Assertion, type: model do
+RSpec.describe Assertion, type: :model do
   it { should belong_to(:query).required(true) }
 
 
