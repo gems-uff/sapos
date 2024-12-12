@@ -5,18 +5,23 @@
 
 require "spec_helper"
 
-RSpec.describe Assertion, type: :model do
-  describe "associations" do
-    it "belongs to a query" do
-      assoc = described_class.reflect_on_association(:query)
-      expect(assoc.macro).to eq :belongs_to
-    end
-  end
+Rspec.describe Assertion, type: model do
+  it { should belong_to(:query).required(true) }
 
-  describe "to_label" do
-    it "returns the name of the assertion" do
-      assertion = Assertion.new(name: "Sample Assertion")
-      expect(assertion.to_label).to eq "Sample Assertion"
-    end
+
+  let(:query) { FactoryBot.build(:query) }
+  let(:assertion) do
+    Assertion.new(
+      name: "Test Assertion",
+      assertion_template: "Template",
+      query: query
+    )
+  end
+  subject { assertion }
+
+  describe "Validations" do
+    it { should be_valid }
+    it { should validate_presence_of(:name) }
+    it { should validate_presence_of(:assertion_template).on(:update) }
   end
 end

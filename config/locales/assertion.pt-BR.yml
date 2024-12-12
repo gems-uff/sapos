@@ -19,7 +19,7 @@ pt-BR:
 
     models:
       assertion:
-        one: "Documento"
+        one: "Declaração"
         other: "Declarações"
 
   pdf_content:
