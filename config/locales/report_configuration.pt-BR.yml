@@ -13,6 +13,7 @@ pt-BR:
         use_at_report: "Usar em relatórios"
         use_at_schedule: "Usar no quadro de horários"
         use_at_transcript: "Usar no histórico"
+        use_at_assertion: "Usar em declarações"
         order: "Prioridade"
         scale: "Escala"
         x: "X"
