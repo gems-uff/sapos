@@ -28,7 +28,7 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
           start_date = pl.updated_at
           program_level.update(start_date: start_date)
         end
-        pl.paper_trail.previous_version
+        pl = pl.paper_trail.previous_version
       end
     end
     CustomVariable.where(variable: "program_level").destroy_all
