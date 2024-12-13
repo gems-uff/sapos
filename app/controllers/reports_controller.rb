@@ -43,7 +43,7 @@ class ReportsController < ApplicationController
     end
 
     def check_downloadable
-      raise ActionController::RoutingError.new("Este documento expirou.") if cant_download?(@report)
+      render("reports/expired_or_invalid_report") if cant_download?(@report)
     end
 
     def cant_download?(record)
