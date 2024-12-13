@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ReportsController < ApplicationController
-  before_action :set_report, only: [:download, :download_by_identifier]
+  before_action :set_report, only: [:download, :download_by_identifier, :invalidate]
   before_action :check_downloadable, only: [:download, :download_by_identifier]
   authorize_resource
 
@@ -19,13 +19,22 @@ class ReportsController < ApplicationController
                             label: "
         <i title='#{I18n.t("active_scaffold.download_link")}'
            class='fa fa-download'></i>
-      ".html_safe,
-                            page: true,
-                            type: :member,
-                            parameters: { format: :pdf },
-                            method: :get,
-                            html_options: { target: "_blank" },
-                            ignore_method: :cant_download?
+      ".html_safe, page: true,
+                   type: :member,
+                   parameters: { format: :pdf },
+                   method: :get,
+                   html_options: { target: "_blank" },
+                   ignore_method: :cant_download?
+
+    config.action_links.add "invalidate",
+                            label: "
+        <i title='#{I18n.t("active_scaffold.invalidate_link")}'
+            class='fa fa-times'></i>
+      ".html_safe, page: true,
+                   type: :member,
+                   method: :put,
+                   confirm: "Tem certeza que deseja invalidar este documento?",
+                   ignore_method: :cant_download?
   end
 
   def download
@@ -34,6 +43,12 @@ class ReportsController < ApplicationController
 
   def download_by_identifier
     send_data(@report.carrierwave_file.read, filename: @report.carrierwave_file.original_filename, disposition: :inline)
+  end
+
+  def invalidate
+    @report.invalidate!
+
+    redirect_to reports_path, notice: "Documento invalidado com sucesso."
   end
 
   private

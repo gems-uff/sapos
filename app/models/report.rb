@@ -7,4 +7,10 @@ class Report < ApplicationRecord
   def to_label
     "#{self.user.name} - #{I18n.l(self.created_at, format: '%d/%m/%Y %H:%M')}"
   end
+
+  def invalidate!
+    carrierwave_file = self.carrierwave_file
+    self.update!(carrierwave_file_id: nil)
+    carrierwave_file.delete
+  end
 end
