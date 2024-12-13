@@ -1,0 +1,7 @@
+<div style="display: flex; flex-direction: column; gap: 10px;">
+  <div style="display: flex; justify-content: space-around; gap: 20px;">
+    <%= link_to 'Sem Assinatura', override_signature_grades_report_pdf_enrollment_path(id: @record.id, signature_type: :no_signature, transcript: true), target: "_blank" %>
+    <%= link_to 'Assinatura Manual', override_signature_grades_report_pdf_enrollment_path(id: @record.id, signature_type: :manual, transcript: true), target: "_blank" %>
+    <%= link_to 'Assinatura por QR Code', override_signature_grades_report_pdf_enrollment_path(id: @record.id, signature_type: :qr_code, transcript: true), target: "_blank" %>
+  </div>
+</div>

@@ -508,9 +508,14 @@ module PdfHelper
 
   def setup_pdf_config(pdf_type, options)
     pdf_type_property = :"use_at_#{pdf_type}"
-    options[:pdf_config] ||
-      ReportConfiguration.where(pdf_type_property => true).order(order: :desc).first ||
-      ReportConfiguration.new
+    config = options[:pdf_config] ||
+        ReportConfiguration.where(pdf_type_property => true).order(order: :desc).first ||
+        ReportConfiguration.new
+    if options[:signature_override].present?
+      config.signature_type = options[:signature_override]
+    end
+
+    config
   end
 
   def generate_qr_code_key
