@@ -18,7 +18,6 @@ RSpec.describe 'ProgramLevel', js: true do
       visit edit_program_level_path(program_level)
       fill_in "record[level]", with: "2"
       click_on "Atualizar"
-      page.refresh
       expect(ProgramLevel.count).to eq(2)
     end
   end
