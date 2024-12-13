@@ -10,10 +10,12 @@ class ReportsController < ApplicationController
   skip_before_action :authenticate_user!, only: :download_by_identifier
 
   active_scaffold :report do |config|
-    config.list.columns = [:user, :file_name, :identifier, :created_at, :expires_at]
-    config.show.columns = [:user, :file_name, :identifier, :created_at, :expires_at]
+    config.list.columns = [:user, :file_name, :identifier, :created_at, :expires_at_or_invalid]
+    config.show.columns = [:user, :file_name, :identifier, :created_at, :expires_at, :invalidated_by, :invalidated_at]
     config.update.columns = [:expires_at]
+    config.columns = config.list.columns
     config.columns[:user].clear_link
+    config.columns[:expires_at_or_invalid].label = I18n.t("activerecord.attributes.report.expires_at")
     config.actions.exclude :create, :delete
     config.action_links.add "download",
                             label: "
@@ -46,7 +48,7 @@ class ReportsController < ApplicationController
   end
 
   def invalidate
-    @report.invalidate!
+    @report.invalidate!(user: current_user)
 
     redirect_to reports_path, notice: "Documento invalidado com sucesso."
   end
