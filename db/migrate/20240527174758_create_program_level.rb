@@ -11,13 +11,13 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
       level = pl.value
       program_level = ProgramLevel.create(
         level: pl.value,
-        start_date: pl.updated_at,
+        start_date: pl.updated_at - 1.month,
       )
       pl = pl.paper_trail.previous_version
       while pl.present?
         if pl.value != level
-          end_date = program_level.start_date
-          start_date = pl.updated_at
+          end_date = program_level.start_date - 1.month
+          start_date = pl.updated_at - 1.month
           level = pl.value
           program_level = ProgramLevel.create(
             level: level,
@@ -25,7 +25,7 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
             start_date: start_date,
           )
         else
-          start_date = pl.updated_at
+          start_date = pl.updated_at - 1.month
           program_level.update(start_date: start_date)
         end
         pl = pl.paper_trail.previous_version
