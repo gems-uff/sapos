@@ -10,9 +10,10 @@
     <% thesis_defense_committee_professors.each do |professor| %>
       <% count += 1 %>
       <% tr_class = count.even? ? "even-record" : "" %>
+      <% date =  thesis_defense_date || dismissal_date %>
       <tr class="record <%= tr_class %>">
         <td><%= professor.name %></td>
-        <td><%= rescue_blank_text(Affiliation.professor_date(professor, thesis_defense_date)&.last&.institution, method_call: :name) %></td>
+        <td><%= rescue_blank_text(Affiliation.professor_date(professor, date&.to_date)&.last&.institution, method_call: :name) %></td>
       </tr>
     <% end %>
   </tbody>

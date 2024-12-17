@@ -615,7 +615,9 @@ module EnrollmentsPdfHelper
             "#{I18n.t("pdf_content.enrollment.thesis.defense_committee")} "
           ]]
           thesis_desense_committee.each do |professor|
-            affiliation = Affiliation.professor_date(professor, thesis_defense_date)&.last
+            dismissal_date =  enrollment.dismissal.date
+            date = thesis_defense_date || dismissal_date
+            affiliation = Affiliation.professor_date(professor, date&.to_date)&.last
             data_table_rows_defense_committee += [[
               "<b>#{professor.name} / #{rescue_blank_text(
                 affiliation&.institution, method_call: :name
