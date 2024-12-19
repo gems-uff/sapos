@@ -11,13 +11,13 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
       level = pl.value
       program_level = ProgramLevel.create(
         level: pl.value,
-        start_date: pl.updated_at - 1.month,
+        start_date: pl.updated_at,
       )
       pl = pl.paper_trail.previous_version
       while pl.present?
         if pl.value != level
-          end_date = program_level.start_date - 1.month
-          start_date = pl.updated_at - 1.month
+          end_date = program_level.start_date
+          start_date = pl.updated_at
           level = pl.value
           program_level = ProgramLevel.create(
             level: level,
@@ -34,7 +34,7 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
     CustomVariable.where(variable: "program_level").destroy_all
   end
   def down
-    ProgramLevel.all.each do |pl|
+    ProgramLevel.all&.where(end_date: nil)&.each do |pl|
       CustomVariable.create(
         variable: "program_level",
         value: pl.level,
