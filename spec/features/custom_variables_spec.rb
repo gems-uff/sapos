@@ -15,7 +15,6 @@ RSpec.describe "CustomVariables features", type: :feature do
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
     @destroy_all << @user = create_confirmed_user(@role_adm)
 
-    @destroy_all << FactoryBot.create(:custom_variable, variable: "program_level", value: "5")
     @destroy_all << @record = FactoryBot.create(:custom_variable, variable: "single_advisor_points", value: "1.0")
     @destroy_all << FactoryBot.create(:custom_variable, variable: "minimum_grade_for_approval", value: "6.0")
   end
@@ -42,7 +41,7 @@ RSpec.describe "CustomVariables features", type: :feature do
     end
 
     it "should sort the list by variable, asc" do
-      expect(page.all("tr td.variable-column").map(&:text)).to eq ["minimum_grade_for_approval", "program_level", "single_advisor_points"]
+      expect(page.all("tr td.variable-column").map(&:text)).to eq ["minimum_grade_for_approval", "single_advisor_points"]
     end
   end
 
@@ -64,12 +63,12 @@ RSpec.describe "CustomVariables features", type: :feature do
       expect(page).to have_css("tr:nth-child(1) td.variable-column", text: "identity_issuing_country")
 
       # Remove inserted record
-      expect(page.all("tr td.variable-column").map(&:text)).to eq ["identity_issuing_country", "minimum_grade_for_approval", "program_level", "single_advisor_points"]
+      expect(page.all("tr td.variable-column").map(&:text)).to eq ["identity_issuing_country", "minimum_grade_for_approval", "single_advisor_points"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
       sleep(0.2)
       visit current_path
-      expect(page.all("tr td.variable-column").map(&:text)).to eq ["minimum_grade_for_approval", "program_level", "single_advisor_points"]
+      expect(page.all("tr td.variable-column").map(&:text)).to eq ["minimum_grade_for_approval", "single_advisor_points"]
     end
 
     it "should have a selection for variable options" do

@@ -250,6 +250,7 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.modelitem NotificationLog
       submenu.modelitem CustomVariable
       submenu.modelitem ReportConfiguration
+      submenu.modelitem ProgramLevel
     end
 
     mainhelper.item :logout, destroy_user_session_path

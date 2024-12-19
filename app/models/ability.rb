@@ -50,7 +50,7 @@ class Ability
   CONFIGURATION_MODELS = [
     User, Role, Version, Notification, EmailTemplate, Query, NotificationLog,
     CustomVariable, ReportConfiguration,
-    YearSemester
+    YearSemester, ProgramLevel
   ]
 
   def initialize(user)
