@@ -58,6 +58,7 @@ pt-BR:
     documents:
       label: Documentos
       report: Documentos Assinados
+      assertion: Declarações
 
     locations:
       label: Localidades
