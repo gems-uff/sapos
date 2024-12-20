@@ -20,11 +20,10 @@ module AssertionsPdfHelper
 
     record_template = template.scan(/<% records.each do \|record\| %>(.*?)<% end %>/m).flatten.first
     unless record_template.nil?
-      record_template = template.scan(/<% records.each do \|record\| %>(.*?)<% end %>/m).flatten.first
       record_text = records.map do |record|
         record_content = record_template.dup
         record.each do |key, value|
-          record_content.gsub!("<%= var('#{key}') %>", value.to_s)
+          record_content.gsub!("<%= record['#{key}'] %>", value.to_s)
         end
         record_content
       end.join("")
