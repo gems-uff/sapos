@@ -243,6 +243,11 @@ class EnrollmentsController < ApplicationController
 
   def grades_report_pdf(signature_type = nil)
     enrollment = Enrollment.find(params[:id])
+
+    if cannot?(:grades_report_pdf, enrollment)
+      raise CanCan::AccessDenied
+    end
+
     respond_to do |format|
       format.pdf do
         title = I18n.t("pdf_content.enrollment.grades_report.title")
