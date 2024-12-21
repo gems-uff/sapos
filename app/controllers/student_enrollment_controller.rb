@@ -55,6 +55,10 @@ class StudentEnrollmentController < ApplicationController
       "student_enrollment/show_scholarships",
       :scholarship_durations, @enrollment.scholarship_durations
     )
+    existing_partial(
+      "student_enrollment/show_documents",
+      :documents, @enrollment
+    )
 
     render :show
   end

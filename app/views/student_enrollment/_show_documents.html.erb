@@ -1,0 +1,11 @@
+<div class="show-box">
+  <details open>
+    <summary> <%= t "activerecord.models.report.other" %> </summary>
+    <div style="display: flex; gap: 20px;">
+      <% if can?(:academic_transcript_pdf, @enrollment) %>
+        <%= button_to t("pdf_content.enrollment.academic_transcript.link"), academic_transcript_pdf_enrollment_path(id: @enrollment.id, format: :pdf), target: "_blank", method: :get %>
+      <% end %>
+      <%= button_to t("pdf_content.enrollment.grades_report.link"), grades_report_pdf_enrollment_path(id: @enrollment.id, format: :pdf), target: "_blank", method: :get %>
+    </div>
+  </details>
+</div>
