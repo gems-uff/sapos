@@ -538,4 +538,16 @@ Rails.application.routes.draw do
   resources :grants do
     concerns :active_scaffold
   end
+
+  resources :paper_professors do
+    concerns :active_scaffold
+  end
+
+  resources :paper_students do
+    concerns :active_scaffold
+  end
+
+  resources :papers do
+    concerns :active_scaffold
+  end
 end

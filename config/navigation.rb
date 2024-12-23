@@ -150,6 +150,7 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.modelitem AdvisementAuthorization
       submenu.modelitem ThesisDefenseCommitteeParticipation
       submenu.modelitem Grant
+      submenu.modelitem Paper
     end
 
     scholar_models = [Scholarship, ScholarshipType, ScholarshipDuration]

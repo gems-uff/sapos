@@ -1,0 +1,17 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      paper_student:
+        paper: "Artigo"
+        student: "Discente"
+
+    models:
+      paper_student:
+        one: "Discente Autor"
+        other: "Discentes Autores"
+
+  active_scaffold:
+    create_paper_student_label: "Adicionar Discente Autor"
