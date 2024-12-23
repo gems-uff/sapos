@@ -42,6 +42,8 @@ pt-BR:
         thesis_defense_committee_professors: "Banca Avaliadora"
         accomplishment_conclusion_date_not_given: "---------/----"
         obs_to_academic_transcript: "Observação para o Histórico"
+        grades_report: "Boletim"
+        academic_transcript: "Histórico"
 
     errors:
       models:

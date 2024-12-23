@@ -97,6 +97,7 @@ pt-BR:
     show_link: "Visualizar"
     show_model: ""
     download_link: "Download"
+    invalidate_link: "Invalidar"
     to_pdf: "Gerar relatório"
     total_label: "Total"
     update: "Atualizar"

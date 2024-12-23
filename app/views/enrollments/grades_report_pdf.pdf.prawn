@@ -11,7 +11,8 @@ new_document(
       :generate_report_without_watermark, @enrollment
     )
   ),
-  pdf_type: :grades_report
+  pdf_type: :grades_report,
+  signature_override: @signature_override
 ) do |pdf|
   enrollment_student_header(pdf, enrollment: @enrollment)
 
