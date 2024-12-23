@@ -524,6 +524,7 @@ Rails.application.routes.draw do
     concerns :active_scaffold
     member do
       get :download
+      put :invalidate
     end
     collection do
       get ":identifier.pdf", to: "reports#download_by_identifier", as: :download_by_identifier
@@ -537,5 +538,4 @@ Rails.application.routes.draw do
   resources :grants do
     concerns :active_scaffold
   end
-
 end

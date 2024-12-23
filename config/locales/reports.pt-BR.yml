@@ -10,6 +10,9 @@ pt-BR:
         identifier: "Identificador"
         created_at: "Data de Criação"
         expires_at: "Data de Expiração"
+        invalidated: "Invalidado"
+        invalidated_at: "Data de Invalidação"
+        invalidated_by: "Invalidado por"
 
     models:
       report:
