@@ -187,7 +187,9 @@ Rails.application.routes.draw do
     end
     member do
       get "academic_transcript_pdf"
+      get "academic_transcript/:signature_type.pdf", to: "enrollments#override_signature_transcript_pdf", as: :override_signature_transcript_pdf
       get "grades_report_pdf"
+      get "grades_report/:signature_type.pdf", to: "enrollments#override_signature_grades_report_pdf", as: :override_signature_grades_report_pdf
     end
   end
 
