@@ -39,7 +39,6 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
         end
         # Se for a primeira versão do professor diminui a data de start da affiliation em um mês
         if professor.paper_trail.previous_version.nil?
-          binding.pry
           affiliation.update(start_date: affiliation.start_date - 1.month)
         end
         professor = professor.paper_trail.previous_version
