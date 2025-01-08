@@ -39,7 +39,7 @@ class AddQueryAndAssertionForExaminingBoard < ActiveRecord::Migration[7.0]
       VALUES (
         'Declaração da ata de defesa',
         #{query_id},
-        'Declaro, para os devidos fins, que a Banca Examinadora da Defesa de Dissertação de Mestrado intitulada “<%= var('titulo_tese') %>”, apresentada pelo aluno <%= var('nome_aluno') %>, no dia <%= localize(var('data'), :longdate) %>, no $REPLACE_UNIVERSITY, foi composta pelos seguintes membros:
+        'Declaro, para os devidos fins, que a Banca Examinadora da Defesa de Dissertação de Mestrado intitulada “<%= var(''titulo_tese'') %>”, apresentada pelo aluno <%= var(''nome_aluno'') %>, no dia <%= localize(var(''data''), :longdate) %>, no $REPLACE_UNIVERSITY, foi composta pelos seguintes membros:
 
         <% records.each do |record| %> 
           - Prof. <%= record[''nome_professor''] %>, <%= record[''codigo_instituicao''] %>
