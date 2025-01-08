@@ -34,7 +34,7 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
             start_date: start_date,
             end_date: end_date
           )
-        elsif !professor.institution_id.nil? && (end_date - start_date) > 1.month
+        elsif professor.institution_id == institution_id || ((end_date - start_date) <= 1.month)
           affiliation.update(start_date: start_date)
         end
         # Se for a primeira versão do professor diminui a data de start da affiliation em um mês
