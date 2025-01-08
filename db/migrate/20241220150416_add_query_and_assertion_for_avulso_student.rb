@@ -48,11 +48,12 @@ class AddQueryAndAssertionForAvulsoStudent < ActiveRecord::Migration[7.0]
         Declaro, para os devidos fins, que <%= var(''nome_aluno'') %> cursou como Aluno Avulso as seguintes disciplinas do Programa de Pós-Graduação em Computação, nos termos do Art. 15 do Regulamento dos Programas de Pós-Graduação Stricto Sensu da Universidade Federal Fluminense.
 
         <% records.each do |record| %>
-          <%= record[''counter''] %>. Nome da disciplina: "<%= record[''nome_disciplina''] %>"
+          Nome da disciplina: "<%= record[''nome_disciplina''] %>"
           Carga horaria total: <%= record[''carga_horaria''] %>
           Período: <%= var(''ano_disciplina'') %>/<%= var(''semestre_disciplina'') %>
           Nota: <%= record[''nota''] %>
           Situação final: <%= record[''situacao''] %>
+
         <% end %>',
         CURRENT_TIMESTAMP,
         CURRENT_TIMESTAMP
