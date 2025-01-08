@@ -142,9 +142,6 @@ pt-BR:
     class_enrollments:
       justification_grade_not_count_in_gpr: "    Justificativa     "
 
-  pdf_content:
-    professor_watermark: "DOCUMENTO VÁLIDO APENAS PARA USO INTERNO E PESSOAL DO PROFESSOR"
-
   rescue_blank_text: "Não informado"
 
   unauthorized:
