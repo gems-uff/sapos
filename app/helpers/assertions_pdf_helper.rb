@@ -4,38 +4,21 @@
 module AssertionsPdfHelper
   include AssertionHelperConcern
 
-  def mask_cpf(cpf)
-    cpf.gsub(/(\d{3})(\d{3})(\d{3})(\d{2})/, '\1.\2.\3-\4')
+  def format_text(bindings, template)
+    formatter = ErbFormatter.new(bindings)
+    formatter.format(template)
   end
 
-  def format_date(date)
-    I18n.l(date, format: :long, locale: :'pt-BR')
-  end
-
-  def replace_placeholders(template, values, records = [])
-    template = template.dup
-    values.each do |key, value|
-      template.gsub!("<%= var('#{key}') %>", value.to_s)
+  def find_unique_columns(columns, rows)
+    columns.select do |column|
+      rows.all? { |row| row[columns.index(column)] == rows.first[columns.index(column)] }
     end
-
-    record_template = template.scan(/<% records.each do \|record\| %>(.*?)<% end %>/m).flatten.first
-    unless record_template.nil?
-      record_text = records.map do |record|
-        record_content = record_template.dup
-        record.each do |key, value|
-          record_content.gsub!("<%= record['#{key}'] %>", value.to_s)
-        end
-        record_content
-      end.join("")
-      template.gsub!(/<% records.each do \|record\| %>.*?<% end %>/m, record_text)
-    end
-
-    template
   end
 
-  def assertion_box_text_print(pdf, template, values, records = [], box_width, box_height)
+  def assertion_box_text_print(pdf, template, bindings, box_width, box_height)
     pdf.move_down 30
-    text = replace_placeholders(template, values, records)
+
+    text = format_text(bindings, template)
 
     lines = pdf.text_box text, at: [(pdf.bounds.width - box_width) / 2, pdf.cursor], width: box_width, height: box_height, align: :justify, inline_format: true, dry_run: true
 
@@ -57,31 +40,19 @@ module AssertionsPdfHelper
     rows = results[:rows]
     columns = results[:columns]
 
-    # Identifica registros com colunas com valores idênticos para cada linha
-    unique_columns = columns.select do |column|
-      rows.all? { |row| row[columns.index(column)] == rows.first[columns.index(column)] }
-    end
-
-    # Recupera os valores únicos para as colunas identificadas
-    values = unique_columns.index_with do |column|
-      rows.first[columns.index(column)]
-    end
-    values['cpf_aluno'] = mask_cpf(values['cpf_aluno']) if values.key?('cpf_aluno')
-    values['data'] = format_date(Date.parse(values['data'])) if values.key?('data')
-
-    # Prepara os registros para impressão excluindo as colunas identificadas como únicas
-    records = rows.each_with_index.map do |row, index|
-      record = { 'counter' => (index + 1).to_s }
-      columns.each do |column|
-        next if unique_columns.include?(column)
-        record[column] = row[columns.index(column)]
-      end
-      record
+    if results[:rows].size == 1
+      bindings = {}.merge(Hash[columns.zip(rows.first)])
+    else
+      unique_columns = find_unique_columns(columns, rows)
+      bindings = {
+        rows: rows,
+        columns: columns
+      }.merge(Hash[unique_columns.zip(rows.first.values_at(*unique_columns.map { |col| columns.index(col) }))])
     end
 
     box_width = 500
     box_height = 560
 
-    assertion_box_text_print(pdf, template, values, records, box_width, box_height)
+    assertion_box_text_print(pdf, template, bindings, box_width, box_height)
   end
 end

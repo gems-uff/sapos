@@ -6,7 +6,6 @@ class AddQueryAndAssertionForAvulsoStudent < ActiveRecord::Migration[7.0]
         'DECLARAÇÃO - Disciplinas de aluno avulso',
         'SELECT
           s.name as nome_aluno,
-          s.cpf as cpf_aluno,
           c.name as nome_disciplina,
           c.workload as carga_horaria,
           cs.year as ano_disciplina,
