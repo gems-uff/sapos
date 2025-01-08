@@ -8,10 +8,8 @@ require "prawn/measurement_extensions"
 new_document(
   @filename,
   I18n.t("pdf_content.enrollment.header.title"),
-  watermark: cannot?(
-    :generate_report_without_watermark, @enrollment
-  ),
-  pdf_type: :transcript
+  pdf_type: :transcript,
+  signature_override: can?(:generate_report_without_qrcode, @enrollment) ? @signature_override : :qr_code
 ) do |pdf|
   enrollment_student_header(pdf, enrollment: @enrollment)
 

@@ -33,7 +33,7 @@ pt-BR:
   notifications:
     course_class:
       email_to_professor:
-        subject: "Alteração de notas da turma <%= var(:record).label_with_course %>"
+        subject: "Alteração de notas em <%= var(:record).label_for_email_subject %>"
 
   pdf_content:
     course_class:

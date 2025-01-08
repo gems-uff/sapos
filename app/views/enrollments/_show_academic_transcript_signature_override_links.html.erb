@@ -1,0 +1,7 @@
+<div style="display: flex; gap: 20px;">
+  <% if can?(:generate_report_without_qrcode, @record) %>
+    <%= link_to 'Sem Assinatura', override_signature_transcript_pdf_enrollment_path(id: @record.id, signature_type: :no_signature), target: "_blank" %>
+    <%= link_to 'Assinatura Manual', override_signature_transcript_pdf_enrollment_path(id: @record.id, signature_type: :manual), target: "_blank" %>
+  <% end %>
+  <%= link_to 'Assinatura por QR Code', override_signature_transcript_pdf_enrollment_path(id: @record.id, signature_type: :qr_code), target: "_blank" %>
+</div>

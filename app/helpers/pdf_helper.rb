@@ -341,22 +341,6 @@ module PdfHelper
           datetime_footer(pdf)
         end
       end
-      if options[:watermark]
-        pdf.create_stamp("watermark") do
-          pdf.rotate(60, origin: [0, 0]) do
-            pdf.fill_color "993333"
-            pdf.font("FreeMono", size: 22) do
-              pdf.draw_text(
-                I18n.t("pdf_content.professor_watermark"), at: [0, 0]
-              )
-            end
-            pdf.fill_color "000000"
-          end
-        end
-        pdf.repeat(:all, dynamic: true) do
-          pdf.stamp_at "watermark", [80, 0]
-        end
-      end
     end
 
     if pdf_config.qr_code_signature && !pdf_config.preview
@@ -508,9 +492,14 @@ module PdfHelper
 
   def setup_pdf_config(pdf_type, options)
     pdf_type_property = :"use_at_#{pdf_type}"
-    options[:pdf_config] ||
-      ReportConfiguration.where(pdf_type_property => true).order(order: :desc).first ||
-      ReportConfiguration.new
+    config = options[:pdf_config] ||
+        ReportConfiguration.where(pdf_type_property => true).order(order: :desc).first ||
+        ReportConfiguration.new
+    if options[:signature_override].present?
+      config.signature_type = options[:signature_override]
+    end
+
+    config
   end
 
   def generate_qr_code_key

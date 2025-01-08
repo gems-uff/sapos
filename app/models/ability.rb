@@ -126,13 +126,16 @@ class Ability
       can :manage, Ability::STUDENT_MODELS
       can :update_all_fields, Student
       can :read_all_fields, Student
-      can :generate_report_without_watermark, Enrollment
+      can :generate_report_without_qrcode, Enrollment
       can :invite, User
     end
     if roles[Role::ROLE_PROFESSOR]
       can :read, Ability::STUDENT_MODELS
       can :read_all_fields, Student
       can :photo, Student
+      cannot :academic_transcript_pdf, Enrollment do |enrollment|
+        enrollment.dismissal&.dismissal_reason&.thesis_judgement != DismissalReason::APPROVED
+      end
     end
     if roles[Role::ROLE_SUPORTE]
       can [:read, :update, :update_only_photo], (Student)

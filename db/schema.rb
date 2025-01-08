@@ -10,7 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
+
+ActiveRecord::Schema[7.0].define(version: 2024_12_13_223506) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -881,8 +882,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.date "expires_at"
     t.string "identifier"
     t.string "file_name"
+    t.integer "invalidated_by_id"
+    t.datetime "invalidated_at"
     t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
     t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
+    t.index ["invalidated_by_id"], name: "index_reports_on_invalidated_by_id"
   end
 
   create_table "research_areas", force: :cascade do |t|
@@ -1077,4 +1081,5 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
   add_foreign_key "papers", "professors", column: "owner_id"
   add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
   add_foreign_key "reports", "users", column: "generated_by_id"
+  add_foreign_key "reports", "users", column: "invalidated_by_id"
 end
