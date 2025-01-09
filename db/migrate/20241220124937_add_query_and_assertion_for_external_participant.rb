@@ -37,6 +37,7 @@ class AddQueryAndAssertionForExternalParticipant < ActiveRecord::Migration[7.0]
     end
     query_obj.save!
 
+    Assertion.reset_column_information
     assertion = {
       name: "Declaração de participante externo em defesa de tese",
       query_id: query_obj.id,

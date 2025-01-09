@@ -45,6 +45,7 @@ class AddQueryAndAssertionForAvulsoStudent < ActiveRecord::Migration[7.0]
     end
     query_obj.save!
 
+    Assertion.reset_column_information
     assertion = {
       name: "Declaração de relatório de disciplinas para aluno avulso",
       query_id: query_obj.id,
