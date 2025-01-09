@@ -1,10 +1,24 @@
 class AddQueryAndAssertionForAvulsoStudent < ActiveRecord::Migration[7.0]
   def up
-    execute <<-SQL
-      INSERT INTO queries (name, sql, description, created_at, updated_at)
-      VALUES (
-        'DECLARAÇÃO - Disciplinas de aluno avulso',
-        'SELECT
+    query = {
+      name: "DECLARAÇÃO - Disciplinas de aluno avulso",
+      description: "Recupera as notas das disciplinas que um avulso obteve num determinado ano/semestre.",
+      params: [
+        {
+          name: "matricula_aluno",
+          value_type: "String",
+        },
+        {
+          name: "ano_semestre_busca",
+          value_type: "Integer",
+        },
+        {
+          name: "numero_semestre_busca",
+          value_type: "Integer",
+        },
+      ],
+      sql: <<~SQL
+        SELECT
           s.name as nome_aluno,
           c.name as nome_disciplina,
           c.workload as carga_horaria,
@@ -21,60 +35,46 @@ class AddQueryAndAssertionForAvulsoStudent < ActiveRecord::Migration[7.0]
           e.student_id = s.id AND
           cs.year = :ano_semestre_busca AND
           cs.semester = :numero_semestre_busca AND
-          e.enrollment_number = :matricula_aluno',
-        'Recupera as notas das disciplinas que um avulso obteve num determinado ano/semestre.',
-        CURRENT_TIMESTAMP,
-        CURRENT_TIMESTAMP
-      );
-    SQL
+          e.enrollment_number = :matricula_aluno
+      SQL
+    }
 
-    query_id = execute("SELECT last_insert_rowid()").first['last_insert_rowid()']
+    query_obj = Query.new(query.except(:params))
+    query[:params].map do |query_param|
+      query_obj.params.build(query_param)
+    end
+    query_obj.save!
 
-    execute <<-SQL
-      INSERT INTO query_params (query_id, name, default_value, value_type, created_at, updated_at)
-      VALUES
-        (#{query_id}, 'matricula_aluno', NULL, 'String', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-        (#{query_id}, 'ano_semestre_busca', NULL, 'Integer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-        (#{query_id}, 'numero_semestre_busca', NULL, 'Integer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-    SQL
+    assertion = {
+      name: "Declaração de relatório de disciplinas para aluno avulso",
+      query_id: query_obj.id,
+      assertion_template: "
+        DECLARAÇÃO
 
-    execute <<-SQL
-      INSERT INTO assertions (name, query_id, assertion_template, created_at, updated_at)
-      VALUES (
-        'Declaração de relatório de disciplinas para aluno avulso',
-        #{query_id},
-        'DECLARAÇÃO
-
-        Declaro, para os devidos fins, que <%= var(''nome_aluno'') %> cursou como Aluno Avulso as seguintes disciplinas do Programa de Pós-Graduação em Computação, nos termos do Art. 15 do Regulamento dos Programas de Pós-Graduação Stricto Sensu da Universidade Federal Fluminense.
+        Declaro, para os devidos fins, que <%= var('nome_aluno') %> cursou como Aluno Avulso as seguintes disciplinas do Programa de Pós-Graduação em Computação, nos termos do Art. 15 do Regulamento dos Programas de Pós-Graduação Stricto Sensu da Universidade Federal Fluminense.
 
         <% records.each do |record| %>
-          Nome da disciplina: "<%= record[''nome_disciplina''] %>"
-          Carga horaria total: <%= record[''carga_horaria''] %>
-          Período: <%= var(''ano_disciplina'') %>/<%= var(''semestre_disciplina'') %>
-          Nota: <%= record[''nota''] %>
-          Situação final: <%= record[''situacao''] %>
+          Nome da disciplina: <%= record['nome_disciplina'] %>
+          Carga horaria total: <%= record['carga_horaria'] %>
+          Período: <%= var('ano_disciplina') %>/<%= var('semestre_disciplina') %>
+          Nota: <%= record['nota'] %>
+          Situação final: <%= record['situacao'] %>
 
-        <% end %>',
-        CURRENT_TIMESTAMP,
-        CURRENT_TIMESTAMP
-      );
-    SQL
+        <% end %>"
+    }
+
+    assertion_obj = Assertion.new(assertion)
+    assertion_obj.save!
   end
 
   def down
-    execute <<-SQL
-      DELETE FROM assertions
-      WHERE name = 'Declaração de relatório de disciplinas para aluno avulso';
-    SQL
+    assertion = Assertion.find_by(name: "Declaração de relatório de disciplinas para aluno avulso")
+    assertion.destroy if assertion
 
-    execute <<-SQL
-      DELETE FROM query_params
-      WHERE query_id = (SELECT id FROM queries WHERE name = 'DECLARAÇÃO - Disciplinas de aluno avulso');
-    SQL
+    query_param = QueryParam.where(query_id: Query.find_by(name: "DECLARAÇÃO - Disciplinas de aluno avulso").id)
+    query_param.destroy_all if query_param
 
-    execute <<-SQL
-      DELETE FROM queries
-      WHERE name = 'DECLARAÇÃO - Disciplinas de aluno avulso';
-    SQL
+    query = Query.find_by(name: "DECLARAÇÃO - Disciplinas de aluno avulso")
+    query.destroy if query
   end
 end
