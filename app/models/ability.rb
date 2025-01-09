@@ -40,7 +40,7 @@ class Ability
   ]
 
   DOCUMENT_MODELS = [
-    Report, Assertion
+    Report, Assertion, Notification, NotificationLog, ReportConfiguration, Query
   ]
 
   PLACE_MODELS = [
@@ -48,9 +48,8 @@ class Ability
   ]
 
   CONFIGURATION_MODELS = [
-    User, Role, Version, Notification, EmailTemplate, Query, NotificationLog,
-    CustomVariable, ReportConfiguration,
-    YearSemester
+    User, Role, Version, EmailTemplate,
+    CustomVariable, YearSemester
   ]
 
   def initialize(user)
@@ -245,9 +244,10 @@ class Ability
       cannot :update, Report unless roles[Role::ROLE_ADMINISTRADOR]
     end
     if roles[Role::ROLE_SECRETARIA]
-      can :read, Ability::DOCUMENT_MODELS
-      can :execute, Ability::DOCUMENT_MODELS
+      can :read, Ability::DOCUMENT_MODELS, [Query, Assertion, NotificationLog]
+      can :execute, Ability::DOCUMENT_MODELS, [Assertion, Query]
     end
+    cannot [:destroy, :update, :create], NotificationLog
   end
 
   def initialize_places(user, roles)
@@ -264,11 +264,9 @@ class Ability
       ])
     end
     if roles[Role::ROLE_SECRETARIA]
-      can :read, [Query, Version, NotificationLog]
-      can :execute, (Query)
+      can :read, (Version)
     end
     cannot [:destroy, :update, :create], Role
-    cannot [:destroy, :update, :create], NotificationLog
     cannot [:destroy, :update, :create], Version
   end
 

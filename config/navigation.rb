@@ -191,10 +191,16 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.modelitem Institution
     end
 
-    documents_models = [Report, Assertion]
+    documents_models = [
+      Report, Assertion, Notification, NotificationLog, ReportConfiguration, Query
+    ]
     mainhelper.listitem :documents, documents_models do |submenu|
-      submenu.modelitem Report
       submenu.modelitem Assertion
+      submenu.modelitem Notification
+      submenu.modelitem Report
+      submenu.modelitem NotificationLog
+      submenu.modelitem ReportConfiguration
+      submenu.modelitem Query
     end
 
     locations_models = [City, State, Country]
@@ -238,19 +244,14 @@ SimpleNavigation::Configuration.run do |navigation|
     end
 
     config_models = [
-      User, Role, CustomVariable, Version, Notification,
-      NotificationLog, ReportConfiguration, EmailTemplate
+      User, Role, CustomVariable, Version, EmailTemplate
     ]
     mainhelper.listitem :configurations, config_models do |submenu|
       submenu.modelitem User
       submenu.modelitem Role
       submenu.modelitem Version
-      submenu.modelitem Notification
       submenu.modelitem EmailTemplate
-      submenu.modelitem Query
-      submenu.modelitem NotificationLog
       submenu.modelitem CustomVariable
-      submenu.modelitem ReportConfiguration
     end
 
     mainhelper.item :logout, destroy_user_session_path
