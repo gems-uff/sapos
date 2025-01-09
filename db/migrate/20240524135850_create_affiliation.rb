@@ -9,6 +9,9 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
       t.timestamps
     end
     Professor.where.not(institution_id: nil).each do |professor|
+      initial_start_date = Enrollment.joins(:thesis_defense_committee_participations).
+        where(thesis_defense_committee_participations: { professor: professor }).minimum(:thesis_defense_date)
+
       start_date = professor.updated_at
       end_date = nil
       institution_id = professor.institution_id
@@ -37,9 +40,14 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
         elsif professor.institution_id == institution_id || ((end_date - start_date) <= 1.month)
           affiliation.update(start_date: start_date)
         end
-        # Se for a primeira versão do professor diminui a data de start da affiliation em um mês
+        # Se for a primeira versão do professor pega a data da primeira tese do professor e diminui um mês
         if professor.paper_trail.previous_version.nil?
-          affiliation.update(start_date: affiliation.start_date - 1.month)
+          if initial_start_date.nil?
+            affiliation.update(start_date: start_date - 1.month)
+          else
+            affiliation.update(start_date: initial_start_date - 1.month)
+          end
+          break
         end
         professor = professor.paper_trail.previous_version
       end
