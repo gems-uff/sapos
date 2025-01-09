@@ -192,7 +192,7 @@ SimpleNavigation::Configuration.run do |navigation|
     end
 
     documents_models = [
-      Report, Assertion, Notification, NotificationLog, ReportConfiguration, Query
+      Assertion, Report, Notification, NotificationLog, ReportConfiguration, Query
     ]
     mainhelper.listitem :documents, documents_models do |submenu|
       submenu.modelitem Assertion
