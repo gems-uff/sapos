@@ -50,8 +50,6 @@ class AddQueryAndAssertionForAvulsoStudent < ActiveRecord::Migration[7.0]
       name: "Declaração de relatório de disciplinas para aluno avulso",
       query_id: query_obj.id,
       assertion_template: "
-        DECLARAÇÃO
-
         Declaro, para os devidos fins, que <%= var('nome_aluno') %> cursou como Aluno Avulso as seguintes disciplinas do Programa de Pós-Graduação em Computação, nos termos do Art. 15 do Regulamento dos Programas de Pós-Graduação Stricto Sensu da Universidade Federal Fluminense.
 
         <% records.each do |record| %>
