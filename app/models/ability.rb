@@ -16,7 +16,7 @@ class Ability
   PROFESSOR_MODELS = [
     Professor, Advisement, AdvisementAuthorization,
     ThesisDefenseCommitteeParticipation,
-    ProfessorResearchArea, Grant
+    ProfessorResearchArea, Grant, Paper, PaperProfessor, PaperStudent
   ]
 
   SCHOLARSHIP_MODELS = [
@@ -146,8 +146,21 @@ class Ability
     if roles[Role::ROLE_PROFESSOR]
       can :read, Ability::PROFESSOR_MODELS
       cannot :edit_professor, Grant
+      cannot :edit_professor, Paper
       can :create, Grant
       can :update, Grant, professor: user.professor
+      can :destroy, Grant, professor: user.professor
+      can :create, Paper
+      can :update, Paper, owner: user.professor
+      can :create, PaperProfessor
+      can :create, PaperStudent
+      can :update, PaperProfessor, paper: { owner: user.professor }
+      can :update, PaperStudent, paper: { owner: user.professor }
+      can :destroy, PaperProfessor, paper: { owner: user.professor }
+      can :destroy, PaperStudent, paper: { owner: user.professor }
+      can :destroy, PaperProfessor, paper: { owner: nil }
+      can :destroy, PaperStudent, paper: { owner: nil }
+      can :destroy, Paper, owner: user.professor
     end
   end
 

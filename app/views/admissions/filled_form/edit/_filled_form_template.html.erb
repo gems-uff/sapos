@@ -32,13 +32,15 @@
   <li class="form-element">
     <dl>
       <dt>
-        <%= filled_form.label :disable_submission, "Desabilitar formulário nesta submissão", style: "color:red;",
+        <%= filled_form.label :enable_submission, "Habilitar formulário nesta submissão", style: "color:red;",
           for: "#{filled_class}-toggle",
-          title: "Desabilita parte do formulário com suas validações e resolução de pendências. Desabilita apenas para esta submissão" %>
+          title: "Habilita parte do formulário com suas validações e resolução de pendências para esta submissão" %>
       </dt>
-      <dd> <%= filled_form.check_box :disable_submission, checked: true, data: { filled_class: }, id: "#{filled_class}-toggle" %> </dd>
+      <dd> <%= filled_form.check_box :enable_submission, checked: false, data: { filled_class: }, id: "#{filled_class}-toggle" %> </dd>
     </dl>
   </li>
+<% else %>
+  <%= filled_form.hidden_field :enable_submission, value: "1" %>
 <% end %>
 <% groups.each do |gfield, gtag, fields| %>
   <% if gfield.present? %>
@@ -64,12 +66,12 @@
 <script>
 $(document).ready(function() {
   <% if can_disable_submission %>
-    if ($(`#<%= filled_class %>-toggle`).is(":checked")) {
+    if (!$(`#<%= filled_class %>-toggle`).is(":checked")) {
       $(".<%= filled_class %>:input").prop('disabled', true);
       $(".<%= filled_class %>-link").addClass("disabled-links")
     }
     $(`#<%= filled_class %>-toggle`).on("change", function(e){
-      $(".<%= filled_class %>:input").prop('disabled', this.checked);
+      $(".<%= filled_class %>:input").prop('disabled', !this.checked);
       $(".<%= filled_class %>-link").toggleClass("disabled-links")
     })
   <% end %>

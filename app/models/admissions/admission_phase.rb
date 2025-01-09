@@ -246,7 +246,10 @@ class Admissions::AdmissionPhase < ActiveRecord::Base
         ) && (phase_form[:mode] == :candidate)
       end
       if committee_permission_user.present?
-        next false if phase_form[:mode] == :member && phase_form[:user_id] != committee_permission_user.id
+        if phase_form[:mode] == :member
+          next false if phase_form[:user_id] != committee_permission_user.id && !current_phase.try(:committee_can_see_other_individual)
+          can_edit_form = can_edit_override || phase_form[:user_id] == committee_permission_user.id
+        end
         if phase_form[:mode] == :candidate
           can_edit_form = can_edit_override || current_phase.try(:can_edit_candidate)
         end
