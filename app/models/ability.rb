@@ -239,13 +239,14 @@ class Ability
   end
 
   def initialize_documents(user, roles)
+    alias_action :execute_now, :execute_now, :notify, to: :update
     if roles[:manager]
       can :manage, Ability::DOCUMENT_MODELS
       cannot :update, Report unless roles[Role::ROLE_ADMINISTRADOR]
     end
     if roles[Role::ROLE_SECRETARIA]
-      can :read, Ability::DOCUMENT_MODELS, [Query, Assertion, NotificationLog]
-      can :execute, Ability::DOCUMENT_MODELS, [Assertion, Query]
+      can :read, Ability::DOCUMENT_MODELS, (Ability::DOCUMENT_MODELS - [Report, Notification, ReportConfiguration, Query, Assertion, NotificationLog])
+      can :execute, Ability::DOCUMENT_MODELS, (Ability::DOCUMENT_MODELS - [Report, Notification, ReportConfiguration, NotificationLog])
     end
     cannot [:destroy, :update, :create], NotificationLog
   end
@@ -260,7 +261,7 @@ class Ability
     alias_action :execute_now, :execute_now, :notify, to: :update
     if roles[Role::ROLE_COORDENACAO]
       can :manage, (Ability::CONFIGURATION_MODELS - [
-        CustomVariable, ReportConfiguration
+        CustomVariable
       ])
     end
     if roles[Role::ROLE_SECRETARIA]
