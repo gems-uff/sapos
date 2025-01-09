@@ -42,6 +42,7 @@ ReportConfiguration.create([
     use_at_transcript: false,
     use_at_grades_report: true,
     use_at_schedule: false,
+    use_at_assertion: false,
     text: <<~TEXT
       <NOME DA UNIVERSIDADE>
       <NOME DO INSTITUTO>
@@ -54,6 +55,7 @@ ReportConfiguration.create([
     use_at_transcript: true,
     use_at_grades_report: false,
     use_at_schedule: false,
+    use_at_assertion: false,
     text: <<~TEXT
       <NOME DA UNIVERSIDADE>
       <NOME DO INSTITUTO>
@@ -66,12 +68,26 @@ ReportConfiguration.create([
     use_at_transcript: false,
     use_at_grades_report: false,
     use_at_schedule: true,
+    use_at_assertion: false,
     text: <<~TEXT
       <NOME DA UNIVERSIDADE>
       <NOME DO INSTITUTO>
       <NOME DO PROGRAMA>
     TEXT
   },
+  { name: "Declaração", scale: 1, x: 0, y: 0, order: 1,
+    signature_footer: true,
+    use_at_report: false,
+    use_at_transcript: false,
+    use_at_grades_report: false,
+    use_at_schedule: false,
+    use_at_assertion: true,
+    text: <<~TEXT
+      <NOME DA UNIVERSIDADE>
+      <NOME DO INSTITUTO>
+      <NOME DO PROGRAMA>
+    TEXT
+ },
 ])
 
 # Queries and notifications
