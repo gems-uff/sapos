@@ -1,0 +1,17 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      affiliation:
+        institution: "Instituição"
+        professor: "Professor"
+        start_date: "Data de início"
+        end_date: "Data de fim"
+        active: "Ativo"
+
+    models:
+      affiliation:
+        one: "Afiliação"
+        other: "Afiliações"

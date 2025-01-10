@@ -215,6 +215,7 @@ class EnrollmentsController < ApplicationController
 
   def academic_transcript_pdf
     enrollment = Enrollment.find(params[:id])
+
     respond_to do |format|
       format.pdf do
         title = I18n.t("pdf_content.enrollment.academic_transcript.title")
