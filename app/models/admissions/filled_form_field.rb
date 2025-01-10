@@ -356,6 +356,10 @@ class Admissions::FilledFormField < ActiveRecord::Base
       else
         "string"
       end
+    when Admissions::FormField::CODE
+      configuration = self.form_field.config_hash
+      return configuration["code_type"] if configuration["code_type"].present?
+      "number"
     else
       "string"
     end
