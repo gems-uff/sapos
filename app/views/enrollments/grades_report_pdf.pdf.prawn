@@ -12,7 +12,7 @@ new_document(
     )
   ),
   pdf_type: :grades_report,
-  signature_override: can?(:generate_report_without_qrcode, @enrollment) ? @signature_override : nil
+  signature_override: can?(:override_report_signature_type, @enrollment) ? @signature_type : nil
 ) do |pdf|
   enrollment_student_header(pdf, enrollment: @enrollment)
 
