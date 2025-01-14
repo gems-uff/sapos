@@ -283,7 +283,7 @@ class Ability
     if roles.include?(Role::ROLE_ALUNO) && user.student.present?
       can [:show, :enroll, :save_enroll], :student_enrollment
       can :academic_transcript_pdf, Enrollment do |enrollment|
-        enrollment.dismissal&.dismissal_reason&.thesis_judgement === DismissalReason::APPROVED
+        enrollment.dismissal&.dismissal_reason&.thesis_judgement === DismissalReason::APPROVED && enrollment.student_id === user.student.id
       end
       can :grades_report_pdf, Enrollment, student_id: user.student.id
     else
