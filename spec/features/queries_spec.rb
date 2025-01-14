@@ -39,7 +39,7 @@ RSpec.describe "Queries features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Consultas"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Nome", "Descrição", "Notificações", ""
+        "Nome", "Descrição", "Declarações", "Notificações", ""
       ]
     end
 

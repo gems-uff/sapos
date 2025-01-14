@@ -36,7 +36,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     end
 
     it "should show table" do
-      expect(page).to have_content "Configurações de relatório"
+      expect(page).to have_content "Configurações de Documentos"
       expect(page.all("tr th").map(&:text)).to eq [
                                                     "Nome", "Prioridade", "Header", "Tipo de Assinatura", "Usar em relatórios", "Usar no histórico", "Usar no boletim", "Usar no quadro de horários", "Usar em declarações", "Validade (meses)", ""
       ]
