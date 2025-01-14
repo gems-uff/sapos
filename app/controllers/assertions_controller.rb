@@ -60,8 +60,10 @@ class AssertionsController < ApplicationController
     respond_to do |format|
       format.pdf do
         title = I18n.t("pdf_content.assertion.assertion_pdf.filename")
-        send_data render_assertion_pdf(@assertion),
-                  filename: "#{title} - #{@assertion.name}.pdf",
+        assertion = @assertion.name
+        filename = "#{title} - #{assertion}.pdf"
+        send_data render_assertion_pdf(@assertion, filename),
+                  filename: filename,
                   type: "application/pdf"
       end
     end

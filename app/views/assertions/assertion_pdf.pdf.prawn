@@ -4,7 +4,7 @@
 # frozen_string_literal: true
 
 new_document(
-  "assertion.pdf",
+  @filename,
   I18n.t("pdf_content.assertion.assertion_pdf.filename"),
   pdf_type: :assertion
 ) do |pdf|
