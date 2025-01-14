@@ -126,6 +126,7 @@ class Ability
       can :manage, Ability::STUDENT_MODELS
       can :update_all_fields, Student
       can :read_all_fields, Student
+      can :override_report_signature_type, Enrollment
       can :generate_report_without_watermark, Enrollment
       can :invite, User
     end
@@ -137,6 +138,11 @@ class Ability
     if roles[Role::ROLE_SUPORTE]
       can [:read, :update, :update_only_photo], (Student)
     end
+
+    # Keep this at the end or :read STUDENT_MODELS will override it
+    cannot :academic_transcript_pdf, Enrollment do |enrollment|
+      enrollment.dismissal&.dismissal_reason&.thesis_judgement != DismissalReason::APPROVED
+    end unless roles[:manager]
   end
 
   def initialize_professors(user, roles)

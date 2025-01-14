@@ -12,7 +12,7 @@ new_document(
     :generate_report_without_watermark, @enrollment
   ),
   pdf_type: :transcript,
-  signature_override: @signature_override
+  signature_override: can?(:override_report_type, @enrollment) ? @signature_type : nil
 ) do |pdf|
   enrollment_student_header(pdf, enrollment: @enrollment)
 

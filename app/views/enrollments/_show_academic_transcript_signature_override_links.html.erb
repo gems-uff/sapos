@@ -1,5 +1,13 @@
 <div style="display: flex; gap: 20px;">
-  <%= link_to 'Sem Assinatura', override_signature_transcript_pdf_enrollment_path(id: @record.id, signature_type: :no_signature), target: "_blank" %>
-  <%= link_to 'Assinatura Manual', override_signature_transcript_pdf_enrollment_path(id: @record.id, signature_type: :manual), target: "_blank" %>
-  <%= link_to 'Assinatura por QR Code', override_signature_transcript_pdf_enrollment_path(id: @record.id, signature_type: :qr_code), target: "_blank" %>
+  <% if can?(:academic_transcript_pdf, @record) %>
+    <% if can?(:override_report_signature_type, @record) %>
+      <%= link_to_if can?(:academic_transcript_pdf, @record), 'Sem Assinatura', override_signature_transcript_pdf_enrollment_path(id: @record.id, signature_type: :no_signature), target: "_blank" %>
+      <%= link_to 'Assinatura Manual', override_signature_transcript_pdf_enrollment_path(id: @record.id, signature_type: :manual), target: "_blank" %>
+      <%= link_to 'Assinatura por QR Code', override_signature_transcript_pdf_enrollment_path(id: @record.id, signature_type: :qr_code), target: "_blank" %>
+    <% else %>
+      <%= link_to 'Gerar', academic_transcript_pdf_enrollment_path(id: @record.id, format: :pdf), target: "_blank" %>
+    <% end %>
+  <% else %>
+   -
+  <% end %>
 </div>

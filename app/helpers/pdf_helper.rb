@@ -341,7 +341,7 @@ module PdfHelper
           datetime_footer(pdf)
         end
       end
-      if options[:watermark]
+      if options[:watermark] && pdf_config.signature_type != "qr_code"
         pdf.create_stamp("watermark") do
           pdf.rotate(60, origin: [0, 0]) do
             pdf.fill_color "993333"

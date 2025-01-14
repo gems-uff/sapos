@@ -224,6 +224,11 @@ class EnrollmentsController < ApplicationController
 
   def academic_transcript_pdf(signature_type = nil)
     enrollment = Enrollment.find(params[:id])
+
+    if cannot? :academic_transcript_pdf, enrollment
+      raise CanCan::AccessDenied.new
+    end
+
     respond_to do |format|
       format.pdf do
         title = I18n.t("pdf_content.enrollment.academic_transcript.title")
