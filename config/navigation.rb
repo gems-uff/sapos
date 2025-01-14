@@ -185,12 +185,6 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.modelitem ClassEnrollmentRequest
     end
 
-    grade_models = [Major, Institution]
-    mainhelper.listitem :grades, grade_models do |submenu|
-      submenu.modelitem Major
-      submenu.modelitem Institution
-    end
-
     documents_models = [
       Assertion, Report, Notification, NotificationLog, ReportConfiguration, Query
     ]
@@ -201,6 +195,12 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.modelitem NotificationLog
       submenu.modelitem ReportConfiguration
       submenu.modelitem Query
+    end
+
+    grade_models = [Major, Institution]
+    mainhelper.listitem :grades, grade_models do |submenu|
+      submenu.modelitem Major
+      submenu.modelitem Institution
     end
 
     locations_models = [City, State, Country]
