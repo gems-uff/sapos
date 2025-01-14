@@ -1,9 +1,9 @@
 <div style="display: flex; gap: 20px;">
   <% if can?(:override_report_signature_type, @record) %>
-      <%= link_to 'Sem Assinatura', override_signature_grades_report_pdf_enrollment_path(id: @record.id, signature_type: :no_signature, transcript: true), target: "_blank" %>
-      <%= link_to 'Assinatura Manual', override_signature_grades_report_pdf_enrollment_path(id: @record.id, signature_type: :manual, transcript: true), target: "_blank" %>
-      <%= link_to 'Assinatura por QR Code', override_signature_grades_report_pdf_enrollment_path(id: @record.id, signature_type: :qr_code, transcript: true), target: "_blank" %>
+      <%= link_to 'Sem Assinatura', override_signature_grades_report_pdf_enrollment_path(id: @record.id, signature_type: :no_signature, transcript: true) %>
+      <%= link_to 'Assinatura Manual', override_signature_grades_report_pdf_enrollment_path(id: @record.id, signature_type: :manual, transcript: true) %>
+      <%= link_to 'Assinatura por QR Code', override_signature_grades_report_pdf_enrollment_path(id: @record.id, signature_type: :qr_code, transcript: true) %>
   <% else %>
-    <%= link_to 'Gerar', grades_report_pdf_enrollment_path(id: @record.id, format: :pdf), target: "_blank" %>
+    <%= link_to 'Gerar', grades_report_pdf_enrollment_path(id: @record.id, format: :pdf) %>
   <% end %>
 </div>
