@@ -245,8 +245,11 @@ class Ability
       cannot :update, Report unless roles[Role::ROLE_ADMINISTRADOR]
     end
     if roles[Role::ROLE_SECRETARIA]
-      can :read, Ability::DOCUMENT_MODELS, (Ability::DOCUMENT_MODELS - [Report, Notification, ReportConfiguration, Query, Assertion, NotificationLog])
-      can :execute, Ability::DOCUMENT_MODELS, (Ability::DOCUMENT_MODELS - [Report, Notification, ReportConfiguration, NotificationLog])
+      can :read, [Assertion, Query, NotificationLog]
+      can :execute, [Assertion, Query]
+    end
+    if roles[Role::ROLE_COORDENACAO]
+      can :manage, (Ability::DOCUMENT_MODELS - [ReportConfiguration])
     end
     cannot [:destroy, :update, :create], NotificationLog
   end
