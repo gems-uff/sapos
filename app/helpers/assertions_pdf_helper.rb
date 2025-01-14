@@ -29,7 +29,6 @@ module AssertionsPdfHelper
       pdf.start_new_page
       lines = pdf.text_box text, at: [(pdf.bounds.width - box_width) / 2, pdf.cursor], width: box_width, height: box_height, align: :justify, inline_format: true, dry_run: true
     end
-
   end
 
   def assertion_table(pdf, options = {})

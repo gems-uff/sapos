@@ -17,7 +17,7 @@ class QueriesController < ApplicationController
       type: :member
 
     config.update.columns = [:name, :description, :params, :sql]
-    config.list.columns = [:name, :description, :notifications]
+    config.list.columns = [:name, :description, :assertions, :notifications]
     config.columns[:description].form_ui = :textarea
     config.columns[:description].options = { cols: 124, rows: 3 }
     config.columns[:params].allow_add_existing = false

@@ -25,8 +25,8 @@ pt-BR:
 
     models:
       report_configuration:
-        one: "Configuração de relatório"
-        other: "Configurações de relatório"
+        one: "Configuração de documento"
+        other: "Configurações de documento"
 
     errors:
       models:
