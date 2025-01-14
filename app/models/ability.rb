@@ -247,6 +247,8 @@ class Ability
     if roles[Role::ROLE_SECRETARIA]
       can :read, [Assertion, Query, NotificationLog]
       can :execute, [Assertion, Query]
+      cannot :read, [ReportConfiguration, Notification]
+      cannot [:destroy, :update, :create], Query
     end
     if roles[Role::ROLE_COORDENACAO]
       can :manage, (Ability::DOCUMENT_MODELS - [ReportConfiguration])
