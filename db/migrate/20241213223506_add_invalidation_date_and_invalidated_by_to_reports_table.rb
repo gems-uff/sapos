@@ -8,6 +8,6 @@ class AddInvalidationDateAndInvalidatedByToReportsTable < ActiveRecord::Migratio
 
   def down
     remove_column :reports, :invalidated_at
-    remove_reference :reports, :invalidated_by, foreign_key: true
+    remove_reference :reports, :invalidated_by, foreign_key: { to_table: :users }
   end
 end
