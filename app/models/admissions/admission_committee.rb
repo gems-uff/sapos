@@ -15,7 +15,7 @@ class Admissions::AdmissionCommittee < ActiveRecord::Base
   has_many :admission_phases, through: :admission_phase_committees,
     class_name: "Admissions::AdmissionPhase"
 
-  belongs_to :form_condition, optional:true,
+  belongs_to :form_condition, optional: true,
     class_name: "Admissions::FormCondition"
 
   validates :name, presence: true

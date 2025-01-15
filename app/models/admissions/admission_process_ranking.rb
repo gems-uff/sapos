@@ -17,6 +17,7 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
 
   def that_phase_is_part_of_the_process
     return if self.admission_phase.blank?
+    return if self.admission_process.blank?
     self.admission_process.phases.each do |p|
       return if p.admission_phase == self.admission_phase
     end

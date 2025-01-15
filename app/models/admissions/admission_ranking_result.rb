@@ -20,6 +20,7 @@ class Admissions::AdmissionRankingResult < ActiveRecord::Base
   after_initialize :initialize_filled_form
 
   def initialize_filled_form
+    return if self.ranking_config.nil?
     self.filled_form ||= Admissions::FilledForm.new(
       is_filled: false,
       form_template: self.ranking_config.form_template
