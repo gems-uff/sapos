@@ -254,7 +254,7 @@ class Ability
       can :read, [Assertion, Query, NotificationLog]
       can :execute, [Assertion, Query]
       cannot :read, [ReportConfiguration, Notification]
-      cannot [:destroy, :update, :create], Query
+      cannot [:destroy, :update, :create], [Assertion, Query]
     end
     if roles[Role::ROLE_COORDENACAO]
       can :manage, (Ability::DOCUMENT_MODELS - [ReportConfiguration])
