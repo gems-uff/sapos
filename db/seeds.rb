@@ -37,7 +37,7 @@ CustomVariable.create([
 
 ReportConfiguration.create([
   { name: "Boletim", scale: 1, x: 0, y: 0, order: 1,
-    signature_footer: true,
+    # signature_footer: true,
     use_at_report: false,
     use_at_transcript: false,
     use_at_grades_report: true,
@@ -50,7 +50,7 @@ ReportConfiguration.create([
     TEXT
   },
   { name: "Histórico", scale: 0.45, x: 5, y: 12, order: 1,
-    signature_footer: true,
+    # signature_footer: true,
     use_at_report: false,
     use_at_transcript: true,
     use_at_grades_report: false,
@@ -63,7 +63,7 @@ ReportConfiguration.create([
     TEXT
   },
   { name: "Padrão", scale: 1, x: 0, y: 0, order: 1,
-    signature_footer: true,
+    # signature_footer: true,
     use_at_report: true,
     use_at_transcript: false,
     use_at_grades_report: false,
@@ -76,7 +76,7 @@ ReportConfiguration.create([
     TEXT
   },
   { name: "Declaração", scale: 1, x: 0, y: 0, order: 1,
-    signature_footer: true,
+    # signature_footer: true,
     use_at_report: false,
     use_at_transcript: false,
     use_at_grades_report: false,
