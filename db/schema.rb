@@ -10,8 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-
-ActiveRecord::Schema[7.0].define(version: 2024_12_13_223506) do
+ActiveRecord::Schema[7.0].define(version: 2025_01_09_162516) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -279,6 +278,15 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_13_223506) do
     t.string "content_type"
     t.integer "size"
     t.index ["medium_hash"], name: "index_carrier_wave_files_on_medium_hash"
+  end
+
+  create_table "assertions", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "query_id", null: false
+    t.text "assertion_template"
+    t.index ["query_id"], name: "index_assertions_on_query_id"
   end
 
   create_table "cities", force: :cascade do |t|
@@ -862,6 +870,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_13_223506) do
     t.boolean "use_at_transcript", default: false, null: false
     t.boolean "use_at_grades_report", default: false, null: false
     t.boolean "use_at_schedule", default: false, null: false
+    t.boolean "use_at_assertion", default: false, null: false
     t.text "text"
     t.string "image", limit: 255
     t.integer "order", default: 2
@@ -1073,6 +1082,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_13_223506) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "assertions", "queries"
   add_foreign_key "grants", "professors"
   add_foreign_key "paper_professors", "papers"
   add_foreign_key "paper_professors", "professors"

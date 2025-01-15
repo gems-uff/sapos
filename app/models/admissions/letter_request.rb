@@ -33,6 +33,7 @@ class Admissions::LetterRequest < ActiveRecord::Base
   after_initialize :initialize_filled_form
 
   def initialize_filled_form
+    return if self.admission_application.blank?
     self.filled_form ||= Admissions::FilledForm.new(
       is_filled: false,
       form_template: self.admission_application.admission_process.letter_template

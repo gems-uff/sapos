@@ -40,7 +40,7 @@ class Ability
   ]
 
   DOCUMENT_MODELS = [
-    Report
+    Report, Assertion, Notification, NotificationLog, ReportConfiguration, Query
   ]
 
   PLACE_MODELS = [
@@ -48,9 +48,8 @@ class Ability
   ]
 
   CONFIGURATION_MODELS = [
-    User, Role, Version, Notification, EmailTemplate, Query, NotificationLog,
-    CustomVariable, ReportConfiguration,
-    YearSemester
+    User, Role, Version, EmailTemplate,
+    CustomVariable, YearSemester
   ]
 
   def initialize(user)
@@ -246,10 +245,21 @@ class Ability
   end
 
   def initialize_documents(user, roles)
+    alias_action :execute_now, :execute_now, :notify, to: :update
     if roles[:manager]
       can :manage, Ability::DOCUMENT_MODELS
       cannot :update, Report unless roles[Role::ROLE_ADMINISTRADOR]
     end
+    if roles[Role::ROLE_SECRETARIA]
+      can :read, [Assertion, Query, NotificationLog]
+      can :execute, [Assertion, Query]
+      cannot :read, [ReportConfiguration, Notification]
+      cannot [:destroy, :update, :create], Query
+    end
+    if roles[Role::ROLE_COORDENACAO]
+      can :manage, (Ability::DOCUMENT_MODELS - [ReportConfiguration])
+    end
+    cannot [:destroy, :update, :create], NotificationLog
   end
 
   def initialize_places(user, roles)
@@ -262,15 +272,13 @@ class Ability
     alias_action :execute_now, :execute_now, :notify, to: :update
     if roles[Role::ROLE_COORDENACAO]
       can :manage, (Ability::CONFIGURATION_MODELS - [
-        CustomVariable, ReportConfiguration
+        CustomVariable
       ])
     end
     if roles[Role::ROLE_SECRETARIA]
-      can :read, [Query, Version, NotificationLog]
-      can :execute, (Query)
+      can :read, (Version)
     end
     cannot [:destroy, :update, :create], Role
-    cannot [:destroy, :update, :create], NotificationLog
     cannot [:destroy, :update, :create], Version
   end
 

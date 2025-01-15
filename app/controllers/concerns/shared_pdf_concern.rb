@@ -77,4 +77,16 @@ module SharedPdfConcern
       }
     )
   end
+
+  def render_assertion_pdf(assertion, filename = "assertion.pdf")
+    render_to_string(
+      template: "assertions/assertion_pdf",
+      type: "application/pdf",
+      formats: [:pdf],
+      assigns: {
+        filename: filename,
+        assertion: assertion
+      }
+    )
+  end
 end
