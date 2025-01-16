@@ -248,7 +248,6 @@ class Ability
     alias_action :execute_now, :execute_now, :notify, to: :update
     if roles[:manager]
       can :manage, Ability::DOCUMENT_MODELS
-      cannot :update, Report unless roles[Role::ROLE_ADMINISTRADOR]
     end
     if roles[Role::ROLE_SECRETARIA]
       cannot :read, [ReportConfiguration]

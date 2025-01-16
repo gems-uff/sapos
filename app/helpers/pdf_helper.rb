@@ -363,13 +363,18 @@ module PdfHelper
       uploader = PdfUploader.new
       uploader.store!({ base64_contents: Base64.encode64(document), filename: name })
 
-      Report.create!(
-        expires_at: pdf_config.expiration_in_months.present? ? Date.today + pdf_config.expiration_in_months.months : nil,
-        user: current_user,
-        carrierwave_file: uploader.file&.file,
-        file_name: name,
-        identifier: @qrcode_identifier
-      )
+      if options[:report].present?
+        @report.identifier = @qrcode_identifier
+        @report.carrierwave_file = uploader.file&.file
+      else
+        Report.create!(
+          expires_at: pdf_config.expiration_in_months.present? ? Date.today + pdf_config.expiration_in_months.months : nil,
+          user: current_user,
+          carrierwave_file: uploader.file&.file,
+          file_name: name,
+          identifier: @qrcode_identifier
+        )
+      end
     end
 
     document
@@ -511,8 +516,8 @@ module PdfHelper
     config = options[:pdf_config] ||
         ReportConfiguration.where(pdf_type_property => true).order(order: :desc).first ||
         ReportConfiguration.new
-    if options[:signature_override].present?
-      config.signature_type = options[:signature_override]
+    if options[:override].present?
+      config.assign_attributes(options[:override])
     end
 
     config
