@@ -20,14 +20,16 @@ module AssertionsPdfHelper
 
     text = format_text(bindings, template)
 
-    lines = pdf.text_box text, at: [(pdf.bounds.width - box_width) / 2, pdf.cursor], width: box_width, height: box_height, align: :justify, inline_format: true, dry_run: true
-
-    while lines.size > 0
-      not_printed_text_length = lines.map { |line| line[:text].length }.sum
-      text = text[-not_printed_text_length..-1]
-
-      pdf.start_new_page
+    pdf.font("Times-Roman", size: 12) do
       lines = pdf.text_box text, at: [(pdf.bounds.width - box_width) / 2, pdf.cursor], width: box_width, height: box_height, align: :justify, inline_format: true, dry_run: true
+
+      while lines.size > 0
+        not_printed_text_length = lines.map { |line| line[:text].length }.sum
+        text = text[-not_printed_text_length..-1]
+
+        pdf.start_new_page
+        lines = pdf.text_box text, at: [(pdf.bounds.width - box_width) / 2, pdf.cursor], width: box_width, height: box_height, align: :justify, inline_format: true, dry_run: true
+      end
     end
   end
 
