@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
 class Report < ApplicationRecord
+  attr_accessor :document_title, :document_body, :expiration_in_months
   belongs_to :user, foreign_key: "generated_by_id"
   belongs_to :invalidated_by, foreign_key: "invalidated_by_id", class_name: "User", optional: true
   belongs_to :carrierwave_file, foreign_key: "carrierwave_file_id", class_name: "CarrierWave::Storage::ActiveRecord::ActiveRecordFile", optional: true
+
+  validates :file_name, presence: true
 
   def to_label
     "#{self.user.name} - #{I18n.l(self.created_at, format: '%d/%m/%Y %H:%M')}"
