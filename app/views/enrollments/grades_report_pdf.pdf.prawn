@@ -12,7 +12,7 @@ new_document(
     )
   ),
   pdf_type: :grades_report,
-  override: can?(:override_report_signature_type, @enrollment) ? { signature_type: @signature_override } : nil
+  override: can?(:override_report_signature_type, @enrollment) ? { signature_type: @signature_override }.compact : nil
 ) do |pdf|
   enrollment_student_header(pdf, enrollment: @enrollment)
 
