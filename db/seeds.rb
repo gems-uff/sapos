@@ -37,12 +37,13 @@ CustomVariable.create([
 
 ReportConfiguration.create([
   { name: "Boletim", scale: 1, x: 0, y: 0, order: 1,
-    signature_footer: true,
+    signature_type: :qr_code,
     use_at_report: false,
     use_at_transcript: false,
     use_at_grades_report: true,
     use_at_schedule: false,
     use_at_assertion: false,
+    expiration_in_months: 12,
     text: <<~TEXT
       <NOME DA UNIVERSIDADE>
       <NOME DO INSTITUTO>
@@ -50,12 +51,13 @@ ReportConfiguration.create([
     TEXT
   },
   { name: "Histórico", scale: 0.45, x: 5, y: 12, order: 1,
-    signature_footer: true,
+    signature_type: :qr_code,
     use_at_report: false,
     use_at_transcript: true,
     use_at_grades_report: false,
     use_at_schedule: false,
     use_at_assertion: false,
+    expiration_in_months: 12,
     text: <<~TEXT
       <NOME DA UNIVERSIDADE>
       <NOME DO INSTITUTO>
@@ -63,12 +65,13 @@ ReportConfiguration.create([
     TEXT
   },
   { name: "Padrão", scale: 1, x: 0, y: 0, order: 1,
-    signature_footer: true,
+    signature_type: :no_signature,
     use_at_report: true,
     use_at_transcript: false,
     use_at_grades_report: false,
     use_at_schedule: true,
     use_at_assertion: false,
+    expiration_in_months: nil,
     text: <<~TEXT
       <NOME DA UNIVERSIDADE>
       <NOME DO INSTITUTO>
@@ -76,12 +79,13 @@ ReportConfiguration.create([
     TEXT
   },
   { name: "Declaração", scale: 1, x: 0, y: 0, order: 1,
-    signature_footer: true,
+    signature_type: :manual,
     use_at_report: false,
     use_at_transcript: false,
     use_at_grades_report: false,
     use_at_schedule: false,
     use_at_assertion: true,
+    expiration_in_months: nil,
     text: <<~TEXT
       <NOME DA UNIVERSIDADE>
       <NOME DO INSTITUTO>
