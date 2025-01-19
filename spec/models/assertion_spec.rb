@@ -23,5 +23,6 @@ RSpec.describe Assertion, type: :model do
     it { should be_valid }
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:assertion_template).on(:update) }
+    it { should validate_numericality_of(:expiration_in_months).only_integer.is_greater_than(0).allow_nil }
   end
 end
