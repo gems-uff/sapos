@@ -22,7 +22,7 @@ class AssertionsController < ApplicationController
                             type: :member
 
     form_columns = [
-      :name, :query, :assertion_template
+      :name, :student_can_generate, :query, :assertion_template
     ]
 
     config.create.label = :create_assertion_label
@@ -52,8 +52,15 @@ class AssertionsController < ApplicationController
     render action: "simulate"
   end
 
-  def assertion_pdf
+  def override_signature_assertion_pdf
+    assertion_pdf(params[:signature_type])
+  end
+
+  def assertion_pdf(signature_type = nil)
     @assertion = Assertion.find(params[:id])
+
+    authorize! :generate_assertion, @assertion, get_query_params[:matricula_aluno]
+
     args = @assertion.query.map_params(get_query_params)
     @assertion.args = args
 
@@ -62,7 +69,7 @@ class AssertionsController < ApplicationController
         title = I18n.t("pdf_content.assertion.assertion_pdf.filename")
         assertion = @assertion.name
         filename = "#{title} - #{assertion}.pdf"
-        send_data render_assertion_pdf(@assertion, filename),
+        send_data render_assertion_pdf(@assertion, filename, signature_type),
                   filename: filename,
                   type: "application/pdf"
       end
@@ -70,11 +77,10 @@ class AssertionsController < ApplicationController
   end
 
   private
-  def get_query_params
-    return params[:query_params].to_unsafe_h if params[:query_params].is_a?(
-      ActionController::Parameters
-    )
-    params[:query_params] || {}
-  end
-
+    def get_query_params
+      return params[:query_params].to_unsafe_h if params[:query_params].is_a?(
+        ActionController::Parameters
+      )
+      params[:query_params] || {}
+    end
 end

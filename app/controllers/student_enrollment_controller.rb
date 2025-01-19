@@ -57,7 +57,7 @@ class StudentEnrollmentController < ApplicationController
     )
     existing_partial(
       "student_enrollment/show_documents",
-      :documents, @enrollment
+      :documents, @enrollment, allowed_assertions: Assertion.student_allowed
     )
 
     render :show

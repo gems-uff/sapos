@@ -16,6 +16,12 @@ pt-BR:
         query: "Consulta"
         params: "Parâmetros configuráveis da declaração"
         assertion_template: "Template do Corpo"
+        student_can_generate: "Pode ser gerada pelo aluno"
+
+    errors:
+      models:
+        assertion:
+          default_enrollment_variable_required: "A consulta deve conter somente uma variável: :matricula_aluno"
 
     models:
       assertion:

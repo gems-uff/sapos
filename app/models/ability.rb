@@ -60,7 +60,8 @@ class Ability
     alias_action :update_column, :edit_associated, :new_existing, :add_existing,
       :duplicate, to: :update
     alias_action :delete, :destroy_existing, to: :destroy
-
+    alias_action :override_signature_grades_report_pdf, :override_signature_transcript_pdf,
+                :override_signature_assertion_pdf, to: :override_report_signature_type
     user ||= User.new
 
     role_id = user.role_id
@@ -255,6 +256,18 @@ class Ability
     end
     if roles[Role::ROLE_COORDENACAO]
       cannot :manage, ReportConfiguration
+    end
+    if roles[Role::ROLE_ALUNO]
+      can :assertion_pdf, Assertion
+      can :generate_assertion, Assertion do |assertion, matricula_aluno|
+        assertion.student_can_generate && matricula_aluno.in?(user.student.enrollments.pluck(:enrollment_number))
+      end
+    end
+    if roles[Role::ROLE_PROFESSOR]
+      can :assertion_pdf, Assertion
+      can :generate_assertion, Assertion do |assertion|
+        assertion.student_can_generate
+      end
     end
     cannot [:destroy, :update, :create], NotificationLog
   end
