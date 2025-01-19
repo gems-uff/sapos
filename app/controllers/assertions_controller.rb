@@ -22,7 +22,7 @@ class AssertionsController < ApplicationController
                             type: :member
 
     form_columns = [
-      :name, :student_can_generate, :query, :assertion_template
+      :name, :student_can_generate, :query, :assertion_template, :expiration_in_months
     ]
 
     config.create.label = :create_assertion_label
@@ -32,6 +32,8 @@ class AssertionsController < ApplicationController
     config.update.columns = form_columns
     config.show.columns = form_columns
     config.actions.exclude :deleted_records
+
+    config.columns[:expiration_in_months].description = I18n.t("active_scaffold.expiration_in_months_description")
 
     config.columns[:query].form_ui = :select
   end

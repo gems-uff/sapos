@@ -12,6 +12,7 @@ class Assertion < ApplicationRecord
   validates :name, presence: true
   validates :assertion_template, presence: true, on: :update
   validate :only_student_enrollment_param, if: -> { self.student_can_generate }
+  validates :expiration_in_months, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
 
   scope :student_allowed, -> { where(student_can_generate: true) }
 

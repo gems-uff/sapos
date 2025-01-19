@@ -20,4 +20,8 @@ module AssertionsHelper
     )
   end
 
+  def expiration_in_months_form_column(record, options)
+    merge_options = { min: 1, value: record.new_record? ? ReportConfiguration.where(use_at_assertion: true).order(order: :desc).first&.expiration_in_months : record.expiration_in_months }
+    number_field :record, :expiration_in_months, options.merge!(merge_options)
+  end
 end
