@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_01_09_162516) do
+ActiveRecord::Schema[7.0].define(version: 2025_01_17_175508) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -286,6 +286,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_09_162516) do
     t.datetime "updated_at", null: false
     t.integer "query_id", null: false
     t.text "assertion_template"
+    t.boolean "student_can_generate", default: false
     t.index ["query_id"], name: "index_assertions_on_query_id"
   end
 
