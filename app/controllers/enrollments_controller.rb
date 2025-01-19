@@ -144,7 +144,7 @@ class EnrollmentsController < ApplicationController
     ]
     config.update.columns = columns - [:phase_due_dates]
     config.show.columns = columns - [:accomplishments]
-    config.show.columns.add :academic_transcript, :grades_report
+    config.show.columns.add :documents
 
     config.actions.exclude :deleted_records
   end

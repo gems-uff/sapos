@@ -527,6 +527,7 @@ Rails.application.routes.draw do
     member do
       get "simulate"
       get "assertion_pdf"
+      get "assertion_pdf/:signature_type.pdf", to: "assertions#override_signature_assertion_pdf",  as: :override_signature_assertion_pdf
     end
   end
 

@@ -78,14 +78,15 @@ module SharedPdfConcern
     )
   end
 
-  def render_assertion_pdf(assertion, filename = "assertion.pdf")
+  def render_assertion_pdf(assertion, filename = "assertion.pdf", signature_override = nil)
     render_to_string(
       template: "assertions/assertion_pdf",
       type: "application/pdf",
       formats: [:pdf],
       assigns: {
         filename: filename,
-        assertion: assertion
+        assertion: assertion,
+        signature_override: signature_override
       }
     )
   end

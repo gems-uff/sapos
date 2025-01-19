@@ -340,13 +340,8 @@ module EnrollmentsHelper
     [:page, :update, :utf8]
   end
 
-  def academic_transcript_show_column(record, column)
-    render(partial: "enrollments/show_academic_transcript_signature_override_links",
-           locals: { record: record })
-  end
-
-  def grades_report_show_column(record, column)
-    render(partial: "enrollments/show_grades_report_signature_override_links",
-           locals: { record: record })
+  def documents_show_column(record, column)
+    render(partial: "enrollments/show_documents_table",
+           locals: { enrollment: record, allowed_assertions: Assertion.student_allowed })
   end
 end
