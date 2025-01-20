@@ -143,7 +143,7 @@ pt-BR:
       justification_grade_not_count_in_gpr: "    Justificativa     "
 
   pdf_content:
-    professor_watermark: "DOCUMENTO VÁLIDO APENAS PARA USO INTERNO E PESSOAL DO PROFESSOR"
+    watermark: "DOCUMENTO PARA USO INTERNO E SEM VALOR OFICIAL"
 
   rescue_blank_text: "Não informado"
 

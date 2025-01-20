@@ -3,8 +3,8 @@
 
 pt-BR:
   active_scaffold:
+    create_assertion_label: "Adicionar Declaração"
     assertion:
-      create_assertion_label: "Adicionar Declaração"
       simulate: "Simular"
       generate_pdf: "Gerar PDF"
       query_date: "Data de Consulta"
@@ -16,6 +16,13 @@ pt-BR:
         query: "Consulta"
         params: "Parâmetros configuráveis da declaração"
         assertion_template: "Template do Corpo"
+        student_can_generate: "Pode ser gerada pelo aluno"
+        expiration_in_months: "Validade (meses)"
+
+    errors:
+      models:
+        assertion:
+          default_enrollment_variable_required: "A consulta deve conter somente uma variável: :matricula_aluno"
 
     models:
       assertion:

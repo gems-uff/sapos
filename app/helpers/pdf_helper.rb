@@ -345,15 +345,15 @@ module PdfHelper
         pdf.create_stamp("watermark") do
           pdf.rotate(60, origin: [0, 0]) do
             pdf.fill_color "993333"
-            pdf.font("FreeMono", size: 22) do
+            pdf.font("FreeMono", size: 25) do
               pdf.draw_text(
-                I18n.t("pdf_content.professor_watermark"), at: [0, 0]
+                I18n.t("pdf_content.watermark"), at: [0, 0]
               )
             end
             pdf.fill_color "000000"
           end
         end
-        pdf.repeat(:all, dynamic: true) do
+        pdf.repeat(:all) do
           pdf.stamp_at "watermark", [80, 0]
         end
       end

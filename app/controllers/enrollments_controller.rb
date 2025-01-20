@@ -144,7 +144,7 @@ class EnrollmentsController < ApplicationController
     ]
     config.update.columns = columns - [:phase_due_dates]
     config.show.columns = columns - [:accomplishments]
-    config.show.columns.add :academic_transcript, :grades_report
+    config.show.columns.add :documents
 
     config.actions.exclude :deleted_records
   end
@@ -243,6 +243,11 @@ class EnrollmentsController < ApplicationController
 
   def grades_report_pdf(signature_type = nil)
     enrollment = Enrollment.find(params[:id])
+
+    if cannot?(:grades_report_pdf, enrollment)
+      raise CanCan::AccessDenied
+    end
+
     respond_to do |format|
       format.pdf do
         title = I18n.t("pdf_content.enrollment.grades_report.title")

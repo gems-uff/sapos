@@ -1,0 +1,53 @@
+<table class="showtable listed-records-table">
+  <thead>
+  <tr>
+    <th><%= t "activerecord.models.assertion.one" %></th>
+    <% if can? :override_report_signature_type, Enrollment %>
+      <th>Sem ass.</th>
+      <th>Ass. manual</th>
+      <th>Ass. QR Code</th>
+    <% else %>
+      <th>Ação</th>
+    <% end %>
+  </tr>
+  </thead>
+  <tbody class="records">
+  <% count = 0 %>
+  <tr class="record">
+    <td><%= t("pdf_content.enrollment.grades_report.link") %></td>
+    <% if can? :override_report_signature_type, Enrollment %>
+      <td><%= link_to 'Gerar', override_signature_grades_report_pdf_enrollment_path(id: enrollment.id, signature_type: :no_signature, format: :pdf), target: "_blank", method: :get %></td>
+      <td><%= link_to 'Gerar', override_signature_grades_report_pdf_enrollment_path(id: enrollment.id, signature_type: :manual, format: :pdf), target: "_blank", method: :get %></td>
+      <td><%= link_to 'Gerar', override_signature_grades_report_pdf_enrollment_path(id: enrollment.id, signature_type: :qr_code, format: :pdf), target: "_blank", method: :get %></td>
+    <% else %>
+      <td><%= link_to "Gerar", grades_report_pdf_enrollment_path(id: enrollment.id, format: :pdf), target: "_blank", method: :get %></td>
+    <% end %>
+  </tr>
+  <% if can?(:academic_transcript_pdf, enrollment) %>
+    <tr class="record">
+      <td><%= t("pdf_content.enrollment.academic_transcript.link") %></td>
+      <% if can? :override_report_signature_type, Enrollment %>
+        <td><%= link_to 'Gerar', override_signature_transcript_pdf_enrollment_path(id: enrollment.id, signature_type: :no_signature, format: :pdf), target: "_blank", method: :get %></td>
+        <td><%= link_to 'Gerar', override_signature_transcript_pdf_enrollment_path(id: enrollment.id, signature_type: :manual, format: :pdf), target: "_blank", method: :get %></td>
+        <td><%= link_to 'Gerar', override_signature_transcript_pdf_enrollment_path(id: enrollment.id, signature_type: :qr_code, format: :pdf), target: "_blank", method: :get %></td>
+      <% else %>
+        <td><%= link_to "Gerar", academic_transcript_pdf_enrollment_path(id: enrollment.id, format: :pdf), target: "_blank", method: :get %></td>
+      <% end %>
+    </tr>
+  <% end %>
+  <% allowed_assertions.each do |assertion| %>
+    <% count += 1 %>
+    <% tr_class = count.even? ? "even-record" : "" %>
+    <tr class="record <%= tr_class %>">
+      <td><%= assertion.name %></td>
+      <% if can? :override_report_signature_type, Enrollment %>
+        <td><%= link_to "Gerar", override_signature_assertion_pdf_assertion_path(id: assertion.id, query_params: {matricula_aluno: enrollment.enrollment_number}, signature_type: :no_signature, format: :pdf), target: "_blank", method: :get %></td>
+        <td><%= link_to "Gerar", override_signature_assertion_pdf_assertion_path(id: assertion.id, query_params: {matricula_aluno: enrollment.enrollment_number}, signature_type: :manual, format: :pdf), target: "_blank", method: :get %></td>
+        <td><%= link_to "Gerar", override_signature_assertion_pdf_assertion_path(id: assertion.id, query_params: {matricula_aluno: enrollment.enrollment_number}, signature_type: :qr_code, format: :pdf), target: "_blank", method: :get %></td>
+      <% else %>
+        <td><%= link_to "Gerar", assertion_pdf_assertion_path(id: assertion.id, query_params: {matricula_aluno: enrollment.enrollment_number}, format: :pdf), target: "_blank", method: :get %></td>
+      <% end %>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
