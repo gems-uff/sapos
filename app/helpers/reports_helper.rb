@@ -15,6 +15,7 @@ module ReportsHelper
   def report_body_text(pdf, document_body)
     pdf.bounding_box([(pdf.bounds.width - 500) / 2, pdf.cursor], width: 500, height: pdf.bounds.height - 98) do
       pdf.font("Times-Roman", size: 12) do
+        pdf.fill_color "000000"
         pdf.move_down 30
 
         pdf.text document_body, align: :justify

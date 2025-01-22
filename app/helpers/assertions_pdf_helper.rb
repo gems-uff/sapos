@@ -21,6 +21,7 @@ module AssertionsPdfHelper
     text = format_text(bindings, template)
 
     pdf.font("Times-Roman", size: 12) do
+      pdf.fill_color "000000"
       lines = pdf.text_box text, at: [(pdf.bounds.width - box_width) / 2, pdf.cursor], width: box_width, height: box_height, align: :justify, inline_format: true, dry_run: true
 
       while lines.size > 0
