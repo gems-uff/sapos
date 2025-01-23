@@ -144,7 +144,9 @@ class EnrollmentsController < ApplicationController
     ]
     config.update.columns = columns - [:phase_due_dates]
     config.show.columns = columns - [:accomplishments]
+    config.columns.add :documents
     config.show.columns.add :documents
+    config.columns[:documents].label = I18n.t("activerecord.models.assertion.other")
 
     config.actions.exclude :deleted_records
   end
