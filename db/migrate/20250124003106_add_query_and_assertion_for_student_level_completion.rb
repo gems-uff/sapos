@@ -40,6 +40,7 @@ class AddQueryAndAssertionForStudentLevelCompletion < ActiveRecord::Migration[7.
     Assertion.reset_column_information
     assertion = {
       name: "Declaração de conclusão de nível pelo aluno",
+      student_can_generate: true,
       query_id: query_obj.id,
       assertion_template: "Declaramos, para os devidos fins, que <%= var('nome_aluno') %>, CPF: <%= var('cpf_aluno') %>, matrícula <%= var('matricula_aluno') %>, cumpriu todos os requisitos para obtenção do título de <%= var('nivel_aluno') == 'Doutorado' ? 'Doutor' : 'Mestre' %>, tendo defendido, com aprovação, a Dissertação intitulada \"<%= var('titulo_tese') %>\", em <%= localize(var('data_defesa_tese'), :longdate) %>.",
     }
