@@ -42,7 +42,8 @@ module AssertionsPdfHelper
     rows = results[:rows]
     columns = results[:columns]
 
-    if results[:rows].size == 1
+    raise Exceptions::EmptyQueryException if rows.empty?
+    if rows.size == 1
       bindings = {}.merge(Hash[columns.zip(rows.first)])
     else
       unique_columns = find_unique_columns(columns, rows)

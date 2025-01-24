@@ -76,6 +76,13 @@ class AssertionsController < ApplicationController
                   type: "application/pdf"
       end
     end
+  rescue ActionView::Template::Error => e
+    if e.cause.is_a?(Exceptions::EmptyQueryException)
+      redirect_back(fallback_location: root_path, flash: { warning: I18n.t("activerecord.errors.models.assertion.empty_query", matricula: get_query_params[:matricula_aluno]) })
+      return
+    end
+
+    raise e
   end
 
   private
