@@ -141,7 +141,7 @@ module PdfHelper
 
           all_sentences = [qrcode_signature_warning, signed_at, you_can_also_access, qrcode_url]
           if options[:expires_at]
-            valid_until = "#{I18n.t("pdf_content.enrollment.footer.valid_until")} #{I18n.l(Date.today + options[:expires_at].months, format: :default)}"
+            valid_until = "#{I18n.t("pdf_content.enrollment.footer.valid_until")} #{I18n.l(Date.today + options[:expires_at].months, format: :default)}."
             all_sentences.append(valid_until)
           end
 
