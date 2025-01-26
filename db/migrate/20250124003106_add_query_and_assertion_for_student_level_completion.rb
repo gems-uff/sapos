@@ -3,8 +3,8 @@
 class AddQueryAndAssertionForStudentLevelCompletion < ActiveRecord::Migration[7.0]
   def up
     query = {
-      name: "DECLARAÇÃO - Conclusão de nível",
-      description: "Declaração de conclusão de nível pelo aluno.",
+      name: "DECLARAÇÃO - Conclusão de curso",
+      description: "Declaração de conclusão de curso.",
       params: [
         {
           name: "matricula_aluno",
@@ -39,7 +39,7 @@ class AddQueryAndAssertionForStudentLevelCompletion < ActiveRecord::Migration[7.
 
     Assertion.reset_column_information
     assertion = {
-      name: "Declaração de conclusão de nível pelo aluno",
+      name: "Declaração de conclusão de curso",
       student_can_generate: true,
       query_id: query_obj.id,
       assertion_template: "Declaramos, para os devidos fins, que <%= var('nome_aluno') %>, CPF: <%= var('cpf_aluno') %>, matrícula <%= var('matricula_aluno') %>, cumpriu todos os requisitos para obtenção do título de <%= var('nivel_aluno') == 'Doutorado' ? 'Doutor' : 'Mestre' %>, tendo defendido, com aprovação, a Dissertação intitulada \"<%= var('titulo_tese') %>\", em <%= localize(var('data_defesa_tese'), :longdate) %>.",
@@ -49,10 +49,10 @@ class AddQueryAndAssertionForStudentLevelCompletion < ActiveRecord::Migration[7.
   end
 
   def down
-    assertion = Assertion.find_by(name: "Declaração de conclusão de nível pelo aluno")
+    assertion = Assertion.find_by(name: "Declaração de conclusão de curso")
     assertion.destroy if assertion
 
-    query = Query.find_by(name: "DECLARAÇÃO - Conclusão de nível")
+    query = Query.find_by(name: "DECLARAÇÃO - Conclusão de curso")
     query_param = QueryParam.where(query_id: query.id)
     query_param.destroy_all if query_param
 
