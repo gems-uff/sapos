@@ -35,19 +35,21 @@
       <% end %>
     </tr>
   <% end %>
-  <% allowed_assertions.each do |assertion| %>
-    <% count += 1 %>
-    <% tr_class = count.even? ? "even-record" : "" %>
-    <tr class="record <%= tr_class %>">
-      <td><%= assertion.name %></td>
-      <% if can? :override_report_signature_type, Enrollment %>
-        <td><%= link_to "Gerar", override_signature_assertion_pdf_assertion_path(id: assertion.id, query_params: {matricula_aluno: enrollment.enrollment_number}, signature_type: :no_signature, format: :pdf), target: "_blank", method: :get %></td>
-        <td><%= link_to "Gerar", override_signature_assertion_pdf_assertion_path(id: assertion.id, query_params: {matricula_aluno: enrollment.enrollment_number}, signature_type: :manual, format: :pdf), target: "_blank", method: :get %></td>
-        <td><%= link_to "Gerar", override_signature_assertion_pdf_assertion_path(id: assertion.id, query_params: {matricula_aluno: enrollment.enrollment_number}, signature_type: :qr_code, format: :pdf), target: "_blank", method: :get %></td>
-      <% else %>
-        <td><%= link_to "Gerar", assertion_pdf_assertion_path(id: assertion.id, query_params: {matricula_aluno: enrollment.enrollment_number}, format: :pdf), target: "_blank", method: :get %></td>
-      <% end %>
-    </tr>
+  <% if can? :generate_assertion, Assertion %>
+    <% allowed_assertions.each do |assertion| %>
+      <% count += 1 %>
+      <% tr_class = count.even? ? "even-record" : "" %>
+      <tr class="record <%= tr_class %>">
+        <td><%= assertion.name %></td>
+        <% if can? :override_report_signature_type, Enrollment %>
+          <td><%= link_to "Gerar", override_signature_assertion_pdf_assertion_path(id: assertion.id, query_params: {matricula_aluno: enrollment.enrollment_number}, signature_type: :no_signature, format: :pdf), target: "_blank", method: :get %></td>
+          <td><%= link_to "Gerar", override_signature_assertion_pdf_assertion_path(id: assertion.id, query_params: {matricula_aluno: enrollment.enrollment_number}, signature_type: :manual, format: :pdf), target: "_blank", method: :get %></td>
+          <td><%= link_to "Gerar", override_signature_assertion_pdf_assertion_path(id: assertion.id, query_params: {matricula_aluno: enrollment.enrollment_number}, signature_type: :qr_code, format: :pdf), target: "_blank", method: :get %></td>
+        <% else %>
+          <td><%= link_to "Gerar", assertion_pdf_assertion_path(id: assertion.id, query_params: {matricula_aluno: enrollment.enrollment_number}, format: :pdf), target: "_blank", method: :get %></td>
+        <% end %>
+      </tr>
+    <% end %>
   <% end %>
   </tbody>
 </table>
