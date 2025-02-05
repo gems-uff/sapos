@@ -41,7 +41,7 @@ class EnrollmentHold < ApplicationRecord
       errors.add(:base, :before_admission_date)
     end
     dismissal = enrollment.dismissal
-    if dismissal.present? && self.start_date > dismissal.date
+    if dismissal.present? && (self.start_date + (number_of_semesters - 1) * 180 > dismissal.date)
       errors.add(:base, :after_dismissal_date)
     end
   end
