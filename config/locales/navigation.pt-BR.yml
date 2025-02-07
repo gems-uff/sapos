@@ -56,8 +56,13 @@ pt-BR:
       institution: Instituições
 
     documents:
-      label: Documentos
+      label: Informativos
       report: Documentos Assinados
+      assertion: Declarações
+      notification: Notificações
+      notification_log: Notificações Enviadas
+      report_configuration: Configurações de Documentos
+      query: Consultas
 
     locations:
       label: Localidades
@@ -81,10 +86,7 @@ pt-BR:
       user: Usuários
       role: Papéis
       version: Log
-      notification: Notificações
       email_template: Templates de Email
-      query: Consultas
-      notification_log: Notificações Enviadas
       custom_variable: Variáveis
       report_configuration: Configurações de Relatório
       program_level: Conceito CAPES

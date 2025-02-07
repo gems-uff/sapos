@@ -10,8 +10,18 @@ pt-BR:
         identifier: "Identificador"
         created_at: "Data de Criação"
         expires_at: "Data de Expiração"
+        invalidated: "Invalidado"
+        invalidated_at: "Data de Invalidação"
+        invalidated_by: "Invalidado por"
+        document_title: "Título do Documento"
+        document_body: "Corpo do Documento"
 
     models:
       report:
         one: "Documento Assinado"
         other: "Documentos Assinados"
+
+  active_scaffold:
+    create_report_label: "Gerar Documento Assinado"
+    expiration_in_months_description: "Caso vazio, o documento não terá data de expiração."
+    expires_at_description: "O texto da validade no documento não será alterado."

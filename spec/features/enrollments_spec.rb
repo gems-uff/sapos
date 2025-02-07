@@ -29,6 +29,9 @@ RSpec.describe "Enrollments features", type: :feature do
 
     @destroy_all << @user2 = create_confirmed_user(@role_student, "bia.sapos@ic.uff.br", "Bia", "A1b2c3d4!", student: @student2)
 
+    @destroy_all << @role_professor = FactoryBot.create(:role_professor)
+    @destroy_all << @user3 = create_confirmed_user(@role_professor, "joao.sapos@ic.uff.br", "João", "A1b2c3d4!")
+
     @destroy_all << @reasearch_area1 = FactoryBot.create(:research_area, name: "Ciência de Dados", code: "CD")
 
     @destroy_all << @phase2 = FactoryBot.create(:phase, name: "Pedido de Banca")
@@ -46,6 +49,9 @@ RSpec.describe "Enrollments features", type: :feature do
 
     @destroy_all << @dismissal_reason1 = FactoryBot.create(:dismissal_reason, name: "Reprovado", thesis_judgement: "Reprovado")
     @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment3, date: 1.day.ago, dismissal_reason: @dismissal_reason1)
+
+    @destroy_all << @dismissal_reason2 = FactoryBot.create(:dismissal_reason, name: "Aprovado", thesis_judgement: DismissalReason::APPROVED)
+    @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment2, date: 1.day.ago, dismissal_reason: @dismissal_reason2)
 
     @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Erica", cpf: "3")
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment1, professor: @professor1, main_advisor: true)
@@ -191,7 +197,7 @@ RSpec.describe "Enrollments features", type: :feature do
       expect(page.all("select#search_active option").map(&:text)).to eq ["Todas", "Ativas", "Inativas"]
       find(:select, "search_active").find(:option, text: "Inativas").select_option
       click_button "Buscar"
-      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M03"]
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M01", "M03"]
     end
 
     it "should be able to search by scholarship_durations_active" do
@@ -255,16 +261,36 @@ RSpec.describe "Enrollments features", type: :feature do
   end
 
   describe "academic transcript report", js: true do
-    before(:each) do
-      login_as(@user)
-      visit url_path
+    context "when logged in as @user" do
+      before(:each) do
+        login_as(@user)
+        visit url_path
+      end
+
+      it "should download an academic transcript" do
+        find("#as_#{plural_name}-academic_transcript_pdf-#{@record.id}-link").click
+
+        wait_for_download
+        expect(download).to match(/Histórico Escolar - Ana\.pdf/)
+      end
     end
 
-    it "should download an academic transcript" do
-      find("#as_#{plural_name}-academic_transcript_pdf-#{@record.id}-link").click
+    context "when logged in as professor" do
+      before(:each) do
+        login_as(@user3)
+        visit url_path
+      end
+      context "when student is dismissed with title" do
+        it "should be able to click the academic transcript link" do
+          expect(page).to have_selector("#as_#{plural_name}-academic_transcript_pdf-#{@enrollment2.id}-link")
+        end
+      end
 
-      wait_for_download
-      expect(download).to match(/Histórico Escolar - Ana\.pdf/)
+      context "when student is not dismissed with title" do
+        it "should not be able to click the academic transcript link" do
+          expect(page).not_to have_selector("#as_#{plural_name}-academic_transcript_pdf-#{@record.id}-link")
+        end
+      end
     end
   end
 
@@ -304,9 +330,9 @@ RSpec.describe "Enrollments features", type: :feature do
 
     it "should create users" do
       click_button "Adicionar"
-      expect(User.all.size).to eq 3
+      expect(User.all.size).to eq 4
       User.all.each do |user|
-        next if [@user.id, @user2.id].include? user.id
+        next if [@user.id, @user2.id, @user3.id].include? user.id
         user.destroy
       end
     end

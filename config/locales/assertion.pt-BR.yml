@@ -1,0 +1,36 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  active_scaffold:
+    create_assertion_label: "Adicionar Declaração"
+    assertion:
+      simulate: "Simular"
+      generate_pdf: "Gerar PDF"
+      query_date: "Data de Consulta"
+
+  activerecord:
+    attributes:
+      assertion:
+        name: "Nome da Declaração"
+        query: "Consulta"
+        params: "Parâmetros configuráveis da declaração"
+        assertion_template: "Template do Corpo"
+        student_can_generate: "Pode ser gerada pelo aluno"
+        expiration_in_months: "Validade (meses)"
+
+    errors:
+      models:
+        assertion:
+          default_enrollment_variable_required: "A consulta deve conter somente uma variável: :matricula_aluno"
+          empty_query: "Não há dados no Sapos que permitam a geração dessa declaração para a matrícula %{matricula}. Por favor, entre em contato com a secretaria do curso."
+
+    models:
+      assertion:
+        one: "Declaração"
+        other: "Declarações"
+
+  pdf_content:
+    assertion:
+      assertion_pdf:
+        filename: "DECLARAÇÃO"

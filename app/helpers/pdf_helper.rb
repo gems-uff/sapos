@@ -141,7 +141,7 @@ module PdfHelper
 
           all_sentences = [qrcode_signature_warning, signed_at, you_can_also_access, qrcode_url]
           if options[:expires_at]
-            valid_until = "#{I18n.t("pdf_content.enrollment.footer.valid_until")} #{I18n.l(Date.today + options[:expires_at].months, format: :default)}"
+            valid_until = "#{I18n.t("pdf_content.enrollment.footer.valid_until")} #{I18n.l(Date.today + options[:expires_at].months, format: :default)}."
             all_sentences.append(valid_until)
           end
 
@@ -341,19 +341,19 @@ module PdfHelper
           datetime_footer(pdf)
         end
       end
-      if options[:watermark]
+      if options[:watermark] && pdf_config.signature_type != "qr_code"
         pdf.create_stamp("watermark") do
           pdf.rotate(60, origin: [0, 0]) do
             pdf.fill_color "993333"
-            pdf.font("FreeMono", size: 22) do
+            pdf.font("FreeMono", size: 25) do
               pdf.draw_text(
-                I18n.t("pdf_content.professor_watermark"), at: [0, 0]
+                I18n.t("pdf_content.watermark"), at: [0, 0]
               )
             end
             pdf.fill_color "000000"
           end
         end
-        pdf.repeat(:all, dynamic: true) do
+        pdf.repeat(:all) do
           pdf.stamp_at "watermark", [80, 0]
         end
       end
@@ -363,13 +363,18 @@ module PdfHelper
       uploader = PdfUploader.new
       uploader.store!({ base64_contents: Base64.encode64(document), filename: name })
 
-      Report.create!(
-        expires_at: pdf_config.expiration_in_months.present? ? Date.today + pdf_config.expiration_in_months.months : nil,
-        user: current_user,
-        carrierwave_file: uploader.file&.file,
-        file_name: name,
-        identifier: @qrcode_identifier
-      )
+      if options[:report].present?
+        @report.identifier = @qrcode_identifier
+        @report.carrierwave_file = uploader.file&.file
+      else
+        Report.create!(
+          expires_at: pdf_config.expiration_in_months.present? ? Date.today + pdf_config.expiration_in_months.months : nil,
+          user: current_user,
+          carrierwave_file: uploader.file&.file,
+          file_name: name,
+          identifier: @qrcode_identifier
+        )
+      end
     end
 
     document
@@ -508,9 +513,14 @@ module PdfHelper
 
   def setup_pdf_config(pdf_type, options)
     pdf_type_property = :"use_at_#{pdf_type}"
-    options[:pdf_config] ||
-      ReportConfiguration.where(pdf_type_property => true).order(order: :desc).first ||
-      ReportConfiguration.new
+    config = options[:pdf_config] ||
+        ReportConfiguration.where(pdf_type_property => true).order(order: :desc).first ||
+        ReportConfiguration.new
+    if options[:override].present?
+      config.assign_attributes(options[:override])
+    end
+
+    config
   end
 
   def generate_qr_code_key

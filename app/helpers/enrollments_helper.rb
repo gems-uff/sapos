@@ -100,7 +100,7 @@ module EnrollmentsHelper
         :record, :phases,
         options_for_select([["Alguma", "all"]] +
           Phase.where(active: true).map { |phase| [phase.name, phase.id] }
-        ),
+                          ),
         { include_blank: as_(:_select_) },
         select_html_options
       ) +
@@ -120,14 +120,14 @@ module EnrollmentsHelper
     select_html_options = { name: "search[accomplishments][phase]" }
     day_html_options = { name: "search[accomplishments][day]" }
     month_html_options = { name: "search[accomplishments][month]" }
-    year_html_options = { name: "search[accomplishments][year]"}
+    year_html_options = { name: "search[accomplishments][year]" }
 
     (
       select(
         :record, :phases,
         options_for_select([["Todas", "all"]] +
           Phase.all.map { |phase| [phase.name, phase.id] }
-        ),
+                          ),
         { include_blank: as_(:_select_) },
         select_html_options
       ) +
@@ -339,5 +339,10 @@ module EnrollmentsHelper
 
   def permit_rs_browse_params
     [:page, :update, :utf8]
+  end
+
+  def documents_show_column(record, column)
+    render(partial: "enrollments/show_documents_table",
+           locals: { enrollment: record, allowed_assertions: Assertion.student_allowed })
   end
 end
