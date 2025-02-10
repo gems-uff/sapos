@@ -41,9 +41,9 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
         end
         professor = professor.paper_trail.previous_version
       end
-      if initial_start_date.nil? && initial_start_date >= start_date
+      if initial_start_date.nil? || (initial_start_date >= start_date)
         affiliation.update(start_date: start_date - 1.month)
-      elsif initial_start_date >= start_date
+      elsif initial_start_date <= start_date
         affiliation.update(start_date: initial_start_date - 1.month)
       end
       institutions << { institution_id:, start_date:, end_date: }
