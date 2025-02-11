@@ -51,7 +51,7 @@ module SharedPdfConcern
         enrollment: enrollment,
         class_enrollments: class_enrollments,
         accomplished_phases: accomplished_phases,
-        signature_override: signature_override
+        signature_override: signature_override,
         program_level: program_level
       }
     )
