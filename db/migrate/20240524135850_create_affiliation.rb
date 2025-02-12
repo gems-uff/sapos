@@ -27,19 +27,24 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
         end_date = start_date
         # A data inicial é quando o professor recebeu algum
         start_date = professor.updated_at
-        if ((professor.institution_id != institution_id )&& ((end_date - start_date) > 1.month)) && (!professor.institution_id.nil?)
-          # Atualiza a data caso a mudança de instituição seja maior que 1 mes, tenha uma intuição não nula diferente da atual
-          institutions << { institution_id:, start_date:, end_date: }
-          institution_id = professor.institution_id
-          affiliation.update(start_date: start_date)
-          affiliation = Affiliation.create(
-            professor: professor,
-            institution_id: institution_id,
-            start_date: start_date - 1.month,
-            end_date: end_date
-          )
+        if (end_date - start_date) > 1.month
+          if (professor.institution_id != institution_id) && (!professor.institution_id.nil?)
+            # Atualiza a data caso a mudança de instituição seja maior que 1 mes, tenha uma intuição não nula diferente da atual
+            institutions << { institution_id:, start_date:, end_date: }
+            institution_id = professor.institution_id
+            affiliation.update(start_date: start_date)
+            affiliation = Affiliation.create(
+              professor: professor,
+              institution_id: institution_id,
+              start_date: start_date - 1.month,
+              end_date: end_date
+            )
+          else
+            affiliation.update(start_date: start_date)
+          end
         end
         professor = professor.paper_trail.previous_version
+
       end
       if initial_start_date.nil? || (initial_start_date >= start_date)
         affiliation.update(start_date: start_date - 1.month)
