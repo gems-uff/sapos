@@ -9,7 +9,7 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
       t.timestamps
     end
     Professor.where.not(institution_id: nil).each do |professor|
-      initial_start_date = Enrollment.joins(:thesis_defense_committee_participations).
+      first_committee_participation_date = Enrollment.joins(:thesis_defense_committee_participations).
         where(thesis_defense_committee_participations: { professor: professor }).minimum(:thesis_defense_date)
 
       start_date = professor.updated_at
@@ -44,10 +44,10 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
         professor = professor.paper_trail.previous_version
 
       end
-      if initial_start_date.nil? || (initial_start_date >= start_date)
+      if first_committee_participation_date.nil? || (first_committee_participation_date >= start_date)
         affiliation.update(start_date: start_date - 1.month)
-      elsif initial_start_date <= start_date
-        affiliation.update(start_date: initial_start_date - 1.month)
+      elsif first_committee_participation_date <= start_date
+        affiliation.update(start_date: first_committee_participation_date - 1.month)
       end
     end
 
