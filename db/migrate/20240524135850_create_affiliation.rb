@@ -15,7 +15,6 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
       start_date = professor.updated_at
       end_date = nil
       institution_id = professor.institution_id
-      institutions = []
       affiliation = Affiliation.create(
         professor: professor,
         institution_id: institution_id,
@@ -30,7 +29,6 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
         if (end_date - start_date) > 1.month
           if (professor.institution_id != institution_id) && (!professor.institution_id.nil?)
             # Atualiza a data caso a mudança de instituição seja maior que 1 mes, tenha uma intuição não nula diferente da atual
-            institutions << { institution_id:, start_date:, end_date: }
             institution_id = professor.institution_id
             affiliation.update(start_date: start_date)
             affiliation = Affiliation.create(
@@ -51,7 +49,6 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
       elsif initial_start_date <= start_date
         affiliation.update(start_date: initial_start_date - 1.month)
       end
-      institutions << { institution_id:, start_date:, end_date: }
     end
 
     remove_column :professors, :institution_id
