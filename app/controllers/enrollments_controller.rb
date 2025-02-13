@@ -143,7 +143,10 @@ class EnrollmentsController < ApplicationController
       :accomplishments, :deferrals, :phase_due_dates
     ]
     config.update.columns = columns - [:phase_due_dates]
-    config.show.columns =  columns - [:accomplishments]
+    config.show.columns = columns - [:accomplishments]
+    config.columns.add :documents
+    config.show.columns.add :documents
+    config.columns[:documents].label = I18n.t("activerecord.models.assertion.other")
 
     config.actions.exclude :deleted_records
   end
@@ -213,29 +216,46 @@ class EnrollmentsController < ApplicationController
     end
   end
 
-  def academic_transcript_pdf
+  def override_signature_transcript_pdf
+    academic_transcript_pdf(params[:signature_type])
+  end
+
+  def override_signature_grades_report_pdf
+    grades_report_pdf(params[:signature_type])
+  end
+
+  def academic_transcript_pdf(signature_type = nil)
     enrollment = Enrollment.find(params[:id])
+
+    if cannot? :academic_transcript_pdf, enrollment
+      raise CanCan::AccessDenied.new
+    end
 
     respond_to do |format|
       format.pdf do
         title = I18n.t("pdf_content.enrollment.academic_transcript.title")
         student = enrollment.student.name
         filename = "#{title} - #{student}.pdf"
-        send_data render_enrollments_academic_transcript_pdf(enrollment, filename),
+        send_data render_enrollments_academic_transcript_pdf(enrollment, filename, signature_type),
           filename: filename,
           type: "application/pdf"
       end
     end
   end
 
-  def grades_report_pdf
+  def grades_report_pdf(signature_type = nil)
     enrollment = Enrollment.find(params[:id])
+
+    if cannot?(:grades_report_pdf, enrollment)
+      raise CanCan::AccessDenied
+    end
+
     respond_to do |format|
       format.pdf do
         title = I18n.t("pdf_content.enrollment.grades_report.title")
         student = enrollment.student.name
         filename = "#{title} - #{student}.pdf"
-        send_data render_enrollments_grades_report_pdf(enrollment, filename),
+        send_data render_enrollments_grades_report_pdf(enrollment, filename, signature_type),
           filename: filename,
           type: "application/pdf"
       end

@@ -185,15 +185,22 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.modelitem ClassEnrollmentRequest
     end
 
+    documents_models = [
+      Assertion, Report, Notification, NotificationLog, ReportConfiguration, Query
+    ]
+    mainhelper.listitem :documents, documents_models do |submenu|
+      submenu.modelitem Assertion
+      submenu.modelitem Notification
+      submenu.modelitem Report
+      submenu.modelitem NotificationLog
+      submenu.modelitem ReportConfiguration
+      submenu.modelitem Query
+    end
+
     grade_models = [Major, Institution]
     mainhelper.listitem :grades, grade_models do |submenu|
       submenu.modelitem Major
       submenu.modelitem Institution
-    end
-
-    documents_models = [Report]
-    mainhelper.listitem :documents, documents_models do |submenu|
-      submenu.modelitem Report
     end
 
     locations_models = [City, State, Country]
@@ -237,19 +244,14 @@ SimpleNavigation::Configuration.run do |navigation|
     end
 
     config_models = [
-      User, Role, CustomVariable, Version, Notification,
-      NotificationLog, ReportConfiguration, EmailTemplate
+      User, Role, CustomVariable, Version, EmailTemplate
     ]
     mainhelper.listitem :configurations, config_models do |submenu|
       submenu.modelitem User
       submenu.modelitem Role
       submenu.modelitem Version
-      submenu.modelitem Notification
       submenu.modelitem EmailTemplate
-      submenu.modelitem Query
-      submenu.modelitem NotificationLog
       submenu.modelitem CustomVariable
-      submenu.modelitem ReportConfiguration
       submenu.modelitem ProgramLevel
     end
 

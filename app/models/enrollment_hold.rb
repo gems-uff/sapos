@@ -41,8 +41,10 @@ class EnrollmentHold < ApplicationRecord
       errors.add(:base, :before_admission_date)
     end
     dismissal = enrollment.dismissal
-    if dismissal.present? && self.end_date > dismissal.date
-      errors.add(:base, :after_dismissal_date)
+    if dismissal.present? && dismissal.dismissal_reason.thesis_judgement == DismissalReason::APPROVED
+      if self.end_date > dismissal.date
+        errors.add(:base, :after_dismissal_date)
+      end
     end
   end
 

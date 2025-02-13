@@ -53,9 +53,9 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
 
     @destroy_all << @institution = FactoryBot.create(:institution, name: "UFF")
 
-    @destroy_all << @affiliation1 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor1, end_date: nil)
-    @destroy_all << @affiliation2 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor2, end_date: nil)
-    @destroy_all << @affiliation3 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor3, end_date: nil)
+    @destroy_all << @affiliation1 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor1, start_date: 3.year.ago, end_date: nil)
+    @destroy_all << @affiliation2 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor2, start_date: 3.year.ago, end_date: nil)
+    @destroy_all << @affiliation3 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor3, start_date: 3.year.ago, end_date: nil)
 
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level1)
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level2)
@@ -118,7 +118,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << FactoryBot.create(:deferral, deferral_type: @deferral_type2, enrollment: @enrollment1, approval_date: 15.months.ago.at_beginning_of_month)
 
     # Holds
-    @destroy_all << @record = FactoryBot.create(:enrollment_hold, enrollment: @enrollment1, year: 2.years.ago.year, semester: 2, number_of_semesters: 1)
+    @destroy_all << @record = FactoryBot.create(:enrollment_hold, enrollment: @enrollment1, year: 3.years.ago.year, semester: 2, number_of_semesters: 1)
 
     # Scholarships
     @destroy_all << @sponsor1 = FactoryBot.create(:sponsor, name: "CNPq")

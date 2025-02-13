@@ -12,4 +12,5 @@ module Exceptions
       super(msg)
     end
   end
+  class EmptyQueryException < StandardError; end
 end

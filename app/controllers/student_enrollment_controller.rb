@@ -55,6 +55,11 @@ class StudentEnrollmentController < ApplicationController
       "student_enrollment/show_scholarships",
       :scholarship_durations, @enrollment.scholarship_durations
     )
+    # Voltar essa partial assim que alunos puderem gerar seus próprios documentos
+    # existing_partial(
+    #   "student_enrollment/show_documents",
+    #   :documents, @enrollment, allowed_assertions: Assertion.student_allowed
+    # )
 
     render :show
   end

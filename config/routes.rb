@@ -197,7 +197,9 @@ Rails.application.routes.draw do
     end
     member do
       get "academic_transcript_pdf"
+      get "academic_transcript/:signature_type.pdf", to: "enrollments#override_signature_transcript_pdf", as: :override_signature_transcript_pdf
       get "grades_report_pdf"
+      get "grades_report/:signature_type.pdf", to: "enrollments#override_signature_grades_report_pdf", as: :override_signature_grades_report_pdf
     end
   end
 
@@ -534,10 +536,20 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :assertions do
+    concerns :active_scaffold
+    member do
+      get "simulate"
+      get "assertion_pdf"
+      get "assertion_pdf/:signature_type.pdf", to: "assertions#override_signature_assertion_pdf",  as: :override_signature_assertion_pdf
+    end
+  end
+
   resources :reports do
     concerns :active_scaffold
     member do
       get :download
+      put :invalidate
     end
     collection do
       get ":identifier.pdf", to: "reports#download_by_identifier", as: :download_by_identifier
@@ -563,5 +575,4 @@ Rails.application.routes.draw do
   resources :papers do
     concerns :active_scaffold
   end
-
 end

@@ -44,6 +44,7 @@ pt-BR:
           email: Email
           date: Data
         configurations:
+          code_type: "Tipo do resultado"
           show_config: "Mostrar configuração"
           hide_config: "Esconder configuração"
           error_exists: "Há algum problema nas configurações"

@@ -189,7 +189,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
       values << ".jpg" if is_photo
       filename = self.file.filename.downcase
       if values.none? { |ext| filename.end_with?(ext.downcase) }
-        add_error(:extension, valid: configuration["values"].join(', '))
+        add_error(:extension, valid: configuration["values"].join(", "))
       end
     end
   end
@@ -356,6 +356,10 @@ class Admissions::FilledFormField < ActiveRecord::Base
       else
         "string"
       end
+    when Admissions::FormField::CODE
+      configuration = self.form_field.config_hash
+      return configuration["code_type"] if configuration["code_type"].present?
+      "number"
     else
       "string"
     end

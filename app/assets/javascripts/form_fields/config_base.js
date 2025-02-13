@@ -138,7 +138,8 @@ function form_field_config_base(form_field) {
     } else if (selected_value == "code") {
       form_field.widgets = [
         config_form_field_codemirror(form_field, "code", "text/x-ruby"),
-        config_form_field_condition(form_field, "condition", form_field.condition_options)
+        config_form_field_condition(form_field, "condition", form_field.condition_options),
+        config_form_field_select(form_field, "code_type", [["number", "Número"], ["string", "Texto"], ["date", "Data"]], { required: false, default: "number" })
       ]
     } else if (selected_value == "email") {
       form_field.widgets = [

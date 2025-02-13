@@ -1,0 +1,11 @@
+<div class="show-box">
+  <details open>
+    <summary> <%= t "activerecord.models.assertion.other" %> </summary>
+    <%= render partial: "enrollments/show_documents_table", locals: {
+      enrollment: @enrollment,
+      allowed_assertions: allowed_assertions,
+      dateformat: :monthyear,
+      show_obs: false
+    } %>
+  </details>
+</div>

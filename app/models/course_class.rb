@@ -41,6 +41,10 @@ class CourseClass < ApplicationRecord
     "#{year}.#{semester}"
   end
 
+  def label_for_email_subject
+    "#{self.course.name} - #{year}/#{semester}"
+  end
+
   def label_with_course
     name_l = self.name.blank? ? "" : " (#{self.name})"
     "#{self.course.name}#{name_l} - #{year}/#{semester}"

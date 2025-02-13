@@ -9,10 +9,12 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
       t.timestamps
     end
     Professor.where.not(institution_id: nil).each do |professor|
+      first_committee_participation_date = Enrollment.joins(:thesis_defense_committee_participations).
+        where(thesis_defense_committee_participations: { professor: professor }).minimum(:thesis_defense_date)
+
       start_date = professor.updated_at
       end_date = nil
       institution_id = professor.institution_id
-      institutions = []
       affiliation = Affiliation.create(
         professor: professor,
         institution_id: institution_id,
@@ -20,31 +22,27 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
       )
       professor = professor.paper_trail.previous_version
       while professor.present?
-        # A data final é a data inicial da instituição anterior
         end_date = start_date
-        # A data inicial é quando o professor recebeu algum
         start_date = professor.updated_at
-        if professor.institution_id != institution_id && (start_date - end_date).abs > 1.month
-          # Atualiza a data caso a mudança de instituição seja maior que 1 mes
-          institutions << { institution_id:, start_date:, end_date: }
-          institution_id = professor.institution_id
-          affiliation = Affiliation.create(
-            professor: professor,
-            institution_id: institution_id,
-            start_date: start_date,
-            end_date: end_date
-          )
-        else
-          affiliation.update(start_date: start_date)
-        end
-        # Se for a primeira versão do professor diminui a data de start da affiliation em um mês
-        if professor.paper_trail.previous_version.nil?
-          start_date = professor.updated_at - 1.month
+        # When last version has another institution, the institution is not null, and the interval is greater than one month, register the last version
+        if (professor.institution_id != institution_id) && (!professor.institution_id.nil?) && ((end_date - start_date) > 1.month)
+            institution_id = professor.institution_id
+            affiliation = Affiliation.create(
+              professor: professor,
+              institution_id: institution_id,
+              start_date: start_date,
+              end_date: end_date
+            )
+        else # Otherwise, only moves the start date
           affiliation.update(start_date: start_date)
         end
         professor = professor.paper_trail.previous_version
       end
-      institutions << { institution_id:, start_date:, end_date: }
+      if first_committee_participation_date.nil? || (first_committee_participation_date >= start_date)
+        affiliation.update(start_date: start_date - 1.month)
+      elsif first_committee_participation_date < start_date
+        affiliation.update(start_date: first_committee_participation_date - 1.month)
+      end
     end
 
     remove_column :professors, :institution_id

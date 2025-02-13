@@ -40,7 +40,7 @@ class Ability
   ]
 
   DOCUMENT_MODELS = [
-    Report
+    Report, Assertion, Notification, NotificationLog, ReportConfiguration, Query
   ]
 
   PLACE_MODELS = [
@@ -48,20 +48,20 @@ class Ability
   ]
 
   CONFIGURATION_MODELS = [
-    User, Role, Version, Notification, EmailTemplate, Query, NotificationLog,
-    CustomVariable, ReportConfiguration,
-    YearSemester, ProgramLevel
+    User, Role, Version, EmailTemplate,
+    CustomVariable, YearSemester, ProgramLevel
   ]
 
   def initialize(user)
     alias_action :list, :row, :show_search, :render_field, :class_schedule_pdf,
       :to_pdf, :summary_pdf, :academic_transcript_pdf, :grades_report_pdf,
       :browse, :simulate, :set_query_date, :cities, :states,
-      :preview, :builtin, :help, to: :read
+      :preview, :builtin, :help, :generate_assertion, to: :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing,
       :duplicate, to: :update
     alias_action :delete, :destroy_existing, to: :destroy
-
+    alias_action :override_signature_grades_report_pdf, :override_signature_transcript_pdf,
+                :override_signature_assertion_pdf, to: :override_report_signature_type
     user ||= User.new
 
     role_id = user.role_id
@@ -126,6 +126,7 @@ class Ability
       can :manage, Ability::STUDENT_MODELS
       can :update_all_fields, Student
       can :read_all_fields, Student
+      can :override_report_signature_type, Enrollment
       can :generate_report_without_watermark, Enrollment
       can :invite, User
     end
@@ -137,6 +138,11 @@ class Ability
     if roles[Role::ROLE_SUPORTE]
       can [:read, :update, :update_only_photo], (Student)
     end
+
+    # Keep this at the end or :read STUDENT_MODELS will override it
+    cannot :academic_transcript_pdf, Enrollment do |enrollment|
+      enrollment.dismissal&.dismissal_reason&.thesis_judgement != DismissalReason::APPROVED
+    end unless roles[:manager]
   end
 
   def initialize_professors(user, roles)
@@ -240,10 +246,32 @@ class Ability
   end
 
   def initialize_documents(user, roles)
+    alias_action :execute_now, :execute_now, :notify, to: :update
     if roles[:manager]
       can :manage, Ability::DOCUMENT_MODELS
-      cannot :update, Report unless roles[Role::ROLE_ADMINISTRADOR]
     end
+    if roles[Role::ROLE_SECRETARIA]
+      cannot :read, [ReportConfiguration]
+      cannot [:destroy, :update, :create], [Assertion, Query, Notification]
+    end
+    if roles[Role::ROLE_COORDENACAO]
+      cannot :manage, ReportConfiguration
+    end
+    # Voltar essas permissões assim que alunos puderem gerar seus próprios documentos
+    # if roles[Role::ROLE_ALUNO]
+    #   can :assertion_pdf, Assertion
+    #   can :generate_assertion, Assertion do |assertion, matricula_aluno|
+    #     assertion.student_can_generate && matricula_aluno.in?(user.student.enrollments.pluck(:enrollment_number))
+    #   end
+    # end
+    if roles[Role::ROLE_PROFESSOR]
+      can :assertion_pdf, Assertion
+      # Voltar junto com a permissão dos alunos
+      # can :generate_assertion, Assertion do |assertion|
+      #   assertion.student_can_generate
+      # end
+    end
+    cannot [:destroy, :update, :create], NotificationLog
   end
 
   def initialize_places(user, roles)
@@ -256,21 +284,24 @@ class Ability
     alias_action :execute_now, :execute_now, :notify, to: :update
     if roles[Role::ROLE_COORDENACAO]
       can :manage, (Ability::CONFIGURATION_MODELS - [
-        CustomVariable, ReportConfiguration
+        CustomVariable
       ])
     end
     if roles[Role::ROLE_SECRETARIA]
-      can :read, [Query, Version, NotificationLog]
-      can :execute, (Query)
+      can :read, (Version)
     end
     cannot [:destroy, :update, :create], Role
-    cannot [:destroy, :update, :create], NotificationLog
     cannot [:destroy, :update, :create], Version
   end
 
   def initialize_student_pages(user, roles)
     if roles.include?(Role::ROLE_ALUNO) && user.student.present?
       can [:show, :enroll, :save_enroll], :student_enrollment
+      # Voltar essas permissões assim que alunos puderem gerar seus próprios documentos
+      # can :academic_transcript_pdf, Enrollment do |enrollment|
+      #   enrollment.dismissal&.dismissal_reason&.thesis_judgement === DismissalReason::APPROVED && enrollment.student_id === user.student.id
+      # end
+      # can :grades_report_pdf, Enrollment, student_id: user.student.id
     else
       cannot [:show, :enroll, :save_enroll], :student_enrollment
     end

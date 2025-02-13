@@ -2,7 +2,7 @@ function config_form_field_select(form_field, field, selectable, options) {
   let r = (Math.random() + 1).toString(36).substring(7);
   let title = form_field.i18n(field);
   let id = `${form_field.baseid}_${field}_${r}`
-  let value = form_field.data[field] || "";
+  let value = form_field.data[field] || options["default"] || "";
 
   let options_text = [];
   let found = null;
