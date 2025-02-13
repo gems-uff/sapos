@@ -8,27 +8,37 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
       t.timestamps
     end
     CustomVariable.where(variable: "program_level").each do |pl|
-      level = pl.value
+      first_committee_date = Enrollment.minimum(:thesis_defense_date)
+
+      start_date = pl.updated_at
+      end_date = nil
+      level = pl.value      
       program_level = ProgramLevel.create(
-        level: pl.value,
-        start_date: pl.updated_at,
+        level: level,
+        start_date: start_date,
       )
-      pl = pl.paper_trail.previous_version
+      
+      pl = pl.paper_trail.previous_version      
       while pl.present?
-        if pl.value != level
-          end_date = program_level.start_date
-          start_date = pl.updated_at
+        end_date = start_date
+        start_date = pl.updated_at
+        # When last version has another level, the level is not null, and the interval is greater than one month, register the last version
+        if (pl.value != level) && (!pl.value.nil?) && ((end_date - start_date) > 1.month)
           level = pl.value
           program_level = ProgramLevel.create(
             level: level,
-            end_date: end_date,
             start_date: start_date,
+            end_date: end_date
           )
-        else
-          start_date = pl.updated_at - 1.month
+        else # Otherwise, only moves the start date
           program_level.update(start_date: start_date)
         end
         pl = pl.paper_trail.previous_version
+      end
+      if first_committee_date.nil? || (first_committee_date >= start_date)
+        program_level.update(start_date: start_date - 1.month)
+      elsif first_committee_date < start_date
+        program_level.update(start_date: first_committee_date - 1.month)
       end
     end
     CustomVariable.where(variable: "program_level").destroy_all

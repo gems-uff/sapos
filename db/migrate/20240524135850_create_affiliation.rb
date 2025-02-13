@@ -22,14 +22,10 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
       )
       professor = professor.paper_trail.previous_version
       while professor.present?
-        # A data final é a data inicial da instituição anterior
         end_date = start_date
-        # A data inicial é quando o professor recebeu algum
         start_date = professor.updated_at
-        # Só considera mudanças com duração maior que 1 mês
-        if (end_date - start_date) > 1.month
-        # Quando a versão anterior tem outra instituição e ela não é nula, cadastra a instituição anterior
-          if (professor.institution_id != institution_id) && (!professor.institution_id.nil?)
+        # When last version has another institution, the institution is not null, and the interval is greater than one month, register the last version
+        if (professor.institution_id != institution_id) && (!professor.institution_id.nil?) && ((end_date - start_date) > 1.month)
             institution_id = professor.institution_id
             affiliation = Affiliation.create(
               professor: professor,
@@ -37,9 +33,8 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
               start_date: start_date,
               end_date: end_date
             )
-          else # Quando a versão anterior tem a mesma instituição é nula, só estica a data de início
-            affiliation.update(start_date: start_date)
-          end
+        else # Otherwise, only moves the start date
+          affiliation.update(start_date: start_date)
         end
         professor = professor.paper_trail.previous_version
       end
