@@ -35,7 +35,6 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
         end
         pl = pl.paper_trail.previous_version
       end
-      start_date = pl.created_at
       if first_committee_date.nil? || (first_committee_date >= start_date)
         program_level.update(start_date: start_date - 1.month)
       elsif first_committee_date < start_date

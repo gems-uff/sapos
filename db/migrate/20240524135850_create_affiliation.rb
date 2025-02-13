@@ -38,7 +38,6 @@ class CreateAffiliation < ActiveRecord::Migration[7.0]
         end
         professor = professor.paper_trail.previous_version
       end
-      start_date = professor.created_at
       if first_committee_participation_date.nil? || (first_committee_participation_date >= start_date)
         affiliation.update(start_date: start_date - 1.month)
       elsif first_committee_participation_date < start_date
