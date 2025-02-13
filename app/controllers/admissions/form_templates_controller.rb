@@ -96,13 +96,13 @@ class Admissions::FormTemplatesController < ApplicationController
         field_type: Admissions::FormField::STUDENT_FIELD,
         configuration: JSON.dump({ "field": "sex", "required": true }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.race_color"),
-        field_type: Admissions::FormField::SELECT,
+        field_type: Admissions::FormField::STUDENT_FIELD,
         configuration: JSON.dump({
           "values": I18n.t("active_scaffold.admissions/form_template.generate_fields.race_colors").values,
           "required": true
         }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiency"),
-        field_type: Admissions::FormField::SELECT,
+        field_type: Admissions::FormField::STUDENT_FIELD,
         configuration: JSON.dump({
           "values": I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values,
           "required": true
