@@ -9,6 +9,7 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
     end
     CustomVariable.where(variable: "program_level").each do |pl|
       first_committee_date = Enrollment.minimum(:thesis_defense_date)
+      created_at = pl.created_at
 
       start_date = pl.updated_at
       end_date = nil
@@ -35,9 +36,10 @@ class CreateProgramLevel < ActiveRecord::Migration[7.0]
         end
         pl = pl.paper_trail.previous_version
       end
+      start_date = created_at if created_at < start_date
       if first_committee_date.nil? || (first_committee_date >= start_date)
         program_level.update(start_date: start_date - 1.month)
-      elsif first_committee_date < start_date
+      else
         program_level.update(start_date: first_committee_date - 1.month)
       end
     end
