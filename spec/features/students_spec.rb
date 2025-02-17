@@ -117,9 +117,14 @@ RSpec.describe "Student features", type: :feature do
       expect(page.all("select#record_sex_ option").map(&:value)).to eq ["M", "F"]
     end
 
-    it "should have a selection for sex options" do
+    it "should have a selection for skin_color options" do
       expect(page.all("select#record_skin_color_ option").map(&:text)).to eq ["Não declarado", "Branca", "Preta",  "Parda", "Amarela", "Indígena"]
       expect(page.all("select#record_skin_color_ option").map(&:value)).to eq  ["Não declarado", "Branca", "Preta",  "Parda", "Amarela", "Indígena"]
+    end
+
+    it "should have a selection for skin_color options" do
+      expect(page.all("select#record_gender_ option").map(&:text)).to eq ["Cis", "Trans", "Não declarado", "Outros"]
+      expect(page.all("select#record_gender_ option").map(&:value)).to eq ["Cis", "Trans", "Não declarado", "Outros"]
     end
 
     it "should have a selection for civil_status options" do
