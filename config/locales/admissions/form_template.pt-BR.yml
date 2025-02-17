@@ -61,6 +61,7 @@ pt-BR:
         name: Nome
         birthdate: Data de nascimento
         birth_city: Naturalidade
+        refugee: Refugiado
         sex: Sexo
         race_color: Raça/cor
         race_colors:
@@ -70,6 +71,13 @@ pt-BR:
           mixed: Parda
           yellow: Amarela
           indigenous: Indígena
+          no_information: Sem informação
+        gender: Gênero
+        genders:
+          cis: Cis
+          trans: Trans
+          others: Outros
+          not_declared: Não declarado
         deficiency: Pessoa com deficiência
         deficiencies:
           no: Não
