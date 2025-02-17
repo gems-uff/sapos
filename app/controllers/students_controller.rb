@@ -9,11 +9,11 @@ class StudentsController < ApplicationController
   helper :student_majors
 
   UPDATE_FIELDS = [
-    :name, :photo, :sex, :civil_status, :skin_color, :birthdate, :city, :neighborhood,
+    :name, :photo, :sex, :gender, :civil_status, :skin_color, :pcd, :birthdate, :city, :neighborhood,
     :address, :zip_code, :telephone1, :telephone2, :email, :employer,
     :job_position, :cpf, :identity_number, :identity_issuing_body,
     :identity_issuing_place, :identity_expedition_date, :birth_country,
-    :birth_state, :birth_city, :father_name, :mother_name, :obs,
+    :birth_state, :birth_city, :refugee, :father_name, :mother_name, :obs,
     :student_majors
   ]
 
@@ -34,6 +34,11 @@ class StudentsController < ApplicationController
     config.columns[:birth_state].form_ui = :hidden
     config.columns[:birth_country].form_ui = :hidden
     config.columns[:city].form_ui = :select
+
+    config.columns[:gender].form_ui = :select
+    config.columns[:gender].options = {
+      options: ["Cis", "Trans", "Não declarado", "Outros"]
+    }
 
     config.columns[:sex].form_ui = :select
     config.columns[:sex].options = {
