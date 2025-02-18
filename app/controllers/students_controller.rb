@@ -39,10 +39,18 @@ class StudentsController < ApplicationController
     config.columns[:gender].options = {
       options: ["Cis", "Trans", "Não declarado", "Outros"]
     }
+    config.columns[:pcd].form_ui = :select
+    config.columns[:pcd].options = {
+      options: ["Sim", "Não", "Não Declarado"]
+    }
+    config.columns[:refugee].form_ui = :select
+    config.columns[:refugee].options = {
+      options: ["Sim", "Não", "Não Declarado"]
+    }
 
     config.columns[:sex].form_ui = :select
     config.columns[:sex].options = {
-      options: [["Masculino", "M"], ["Feminino", "F"]]
+      options: [["Masculino", "M"], ["Feminino", "F"], ["Não Declarado", "ND"]]
     }
     config.columns[:civil_status].form_ui = :select
     config.columns[:civil_status].options = {

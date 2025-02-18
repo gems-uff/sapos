@@ -1037,10 +1037,10 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_17_173017) do
     t.string "photo", limit: 255
     t.integer "birth_country_id"
     t.integer "user_id", limit: 8
-    t.string "skin_color"
-    t.boolean "pcd"
     t.string "gender"
-    t.boolean "refugee"
+    t.string "skin_color"
+    t.string "pcd"
+    t.string "refugee"
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"

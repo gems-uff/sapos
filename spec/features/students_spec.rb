@@ -113,13 +113,23 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for sex options" do
-      expect(page.all("select#record_sex_ option").map(&:text)).to eq ["Masculino", "Feminino"]
-      expect(page.all("select#record_sex_ option").map(&:value)).to eq ["M", "F"]
+      expect(page.all("select#record_sex_ option").map(&:text)).to eq ["Masculino", "Feminino", "Não Declarado"]
+      expect(page.all("select#record_sex_ option").map(&:value)).to eq ["M", "F", "ND"]
+    end
+
+    it "should have a selection for pcd options" do
+      expect(page.all("select#record_pcd_ option").map(&:text)).to eq ["Sim", "Não", "Não Declarado"]
+      expect(page.all("select#record_pcd_ option").map(&:value)).to eq ["Sim", "Não", "Não Declarado"]
+    end
+
+    it "should have a selection for refugee options" do
+      expect(page.all("select#record_refugee_ option").map(&:text)).to eq ["Sim", "Não", "Não Declarado"]
+      expect(page.all("select#record_refugee_ option").map(&:value)).to eq ["Sim", "Não", "Não Declarado"]
     end
 
     it "should have a selection for skin_color options" do
       expect(page.all("select#record_skin_color_ option").map(&:text)).to eq ["Não declarado", "Branca", "Preta",  "Parda", "Amarela", "Indígena"]
-      expect(page.all("select#record_skin_color_ option").map(&:value)).to eq  ["Não declarado", "Branca", "Preta",  "Parda", "Amarela", "Indígena"]
+      expect(page.all("select#record_skin_color_ option").map(&:value)).to eq ["Não declarado", "Branca", "Preta",  "Parda", "Amarela", "Indígena"]
     end
 
     it "should have a selection for skin_color options" do
