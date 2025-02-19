@@ -45,7 +45,7 @@ class StudentsController < ApplicationController
     }
     config.columns[:refugee].form_ui = :select
     config.columns[:refugee].options = {
-      options: ["Sim", "Não", "Não Declarado"]
+      options: ["Não", "Sim", "Não Declarado"]
     }
 
     config.columns[:sex].form_ui = :select
