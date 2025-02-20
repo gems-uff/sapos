@@ -6,7 +6,7 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
       field = fields.find_by(name: "Raça/cor")
       field.field_type = Admissions::FormField::STUDENT_FIELD
       values = I18n.t("active_scaffold.admissions/form_template.generate_fields.race_colors").values
-      binding.pry
+
       field.configuration["values"] = values
       field.save
 
