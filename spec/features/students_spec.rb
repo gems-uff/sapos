@@ -123,8 +123,8 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for refugee options" do
-      expect(page.all("select#record_refugee_ option").map(&:text)).to eq ["Sim", "Não", "Não Declarado"]
-      expect(page.all("select#record_refugee_ option").map(&:value)).to eq ["Sim", "Não", "Não Declarado"]
+      expect(page.all("select#record_refugee_ option").map(&:text)).to eq ["Não", "Sim", "Não Declarado"]
+      expect(page.all("select#record_refugee_ option").map(&:value)).to eq ["Não", "Sim", "Não Declarado"]
     end
 
     it "should have a selection for skin_color options" do
