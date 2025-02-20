@@ -88,6 +88,8 @@ pt-BR:
       version: Log
       email_template: Templates de Email
       custom_variable: Variáveis
+      report_configuration: Configurações de Relatório
+      program_level: Conceito CAPES
 
     logout:
       label: 'Logout'

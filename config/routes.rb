@@ -160,6 +160,11 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :affiliation do
+    concerns :active_scaffold
+    record_select_routes
+  end
+
   resources :professors do
     concerns :active_scaffold
     record_select_routes
@@ -234,6 +239,10 @@ Rails.application.routes.draw do
   end
 
   resources :custom_variables do
+    concerns :active_scaffold
+  end
+
+  resources :program_levels do
     concerns :active_scaffold
   end
 

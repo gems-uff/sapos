@@ -252,6 +252,7 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.modelitem Version
       submenu.modelitem EmailTemplate
       submenu.modelitem CustomVariable
+      submenu.modelitem ProgramLevel
     end
 
     mainhelper.item :logout, destroy_user_session_path

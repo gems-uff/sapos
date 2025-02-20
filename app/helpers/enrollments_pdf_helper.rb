@@ -132,12 +132,12 @@ module EnrollmentsPdfHelper
 
   def enrollment_header(pdf, options = {})
     enrollment ||= options[:enrollment]
+    program_level ||= options[:program_level]
     pdf.bounding_box([0, pdf.cursor - 3], width: 560) do
       pdf.font("FreeMono", size: 8) do
         pdf.line_width 0.5
-
         common_header_part1(pdf, enrollment, [
-          "#{i18n_eht(:program_level)} <b>#{CustomVariable.program_level} </b>"
+          "#{i18n_eht(:program_level)} <b>#{program_level}</b>"
         ])
 
         common_header_part(pdf) do
@@ -615,9 +615,12 @@ module EnrollmentsPdfHelper
             "#{I18n.t("pdf_content.enrollment.thesis.defense_committee")} "
           ]]
           thesis_desense_committee.each do |professor|
+            dismissal_date =  enrollment.dismissal.date
+            date = thesis_defense_date || dismissal_date
+            affiliation = Affiliation.professor_date(professor, date&.to_date)&.last
             data_table_rows_defense_committee += [[
               "<b>#{professor.name} / #{rescue_blank_text(
-                professor.institution, method_call: :name
+                affiliation&.institution, method_call: :name
               )}</b>"
             ]]
           end

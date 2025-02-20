@@ -1,0 +1,13 @@
+pt-BR:
+  activerecord:
+    attributes:
+      program_level:
+        active: Ativo?
+        level: Nível
+        start_date: Data de início
+        end_date: Data de fim
+
+    models:
+      program_level:
+        one: Conceito CAPES
+        other: Conceito CAPES

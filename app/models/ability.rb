@@ -49,14 +49,14 @@ class Ability
 
   CONFIGURATION_MODELS = [
     User, Role, Version, EmailTemplate,
-    CustomVariable, YearSemester
+    CustomVariable, YearSemester, ProgramLevel
   ]
 
   def initialize(user)
     alias_action :list, :row, :show_search, :render_field, :class_schedule_pdf,
       :to_pdf, :summary_pdf, :academic_transcript_pdf, :grades_report_pdf,
       :browse, :simulate, :set_query_date, :cities, :states,
-      :preview, :builtin, :help, :generate_assertion, to: :read
+      :preview, :builtin, :help, to: :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing,
       :duplicate, to: :update
     alias_action :delete, :destroy_existing, to: :destroy
@@ -257,19 +257,17 @@ class Ability
     if roles[Role::ROLE_COORDENACAO]
       cannot :manage, ReportConfiguration
     end
-    # Voltar essas permissões assim que alunos puderem gerar seus próprios documentos
-    # if roles[Role::ROLE_ALUNO]
-    #   can :assertion_pdf, Assertion
-    #   can :generate_assertion, Assertion do |assertion, matricula_aluno|
-    #     assertion.student_can_generate && matricula_aluno.in?(user.student.enrollments.pluck(:enrollment_number))
-    #   end
-    # end
+    if roles[Role::ROLE_ALUNO]
+      can :assertion_pdf, Assertion
+      can :generate_assertion, Assertion do |assertion, matricula_aluno|
+        assertion.student_can_generate && matricula_aluno.in?(user.student.enrollments.pluck(:enrollment_number))
+      end
+    end
     if roles[Role::ROLE_PROFESSOR]
       can :assertion_pdf, Assertion
-      # Voltar junto com a permissão dos alunos
-      # can :generate_assertion, Assertion do |assertion|
-      #   assertion.student_can_generate
-      # end
+      can :generate_assertion, Assertion do |assertion|
+        assertion.student_can_generate
+      end
     end
     cannot [:destroy, :update, :create], NotificationLog
   end
@@ -297,11 +295,10 @@ class Ability
   def initialize_student_pages(user, roles)
     if roles.include?(Role::ROLE_ALUNO) && user.student.present?
       can [:show, :enroll, :save_enroll], :student_enrollment
-      # Voltar essas permissões assim que alunos puderem gerar seus próprios documentos
-      # can :academic_transcript_pdf, Enrollment do |enrollment|
-      #   enrollment.dismissal&.dismissal_reason&.thesis_judgement === DismissalReason::APPROVED && enrollment.student_id === user.student.id
-      # end
-      # can :grades_report_pdf, Enrollment, student_id: user.student.id
+      can :academic_transcript_pdf, Enrollment do |enrollment|
+        enrollment.dismissal&.dismissal_reason&.thesis_judgement === DismissalReason::APPROVED && enrollment.student_id === user.student.id
+      end
+      can :grades_report_pdf, Enrollment, student_id: user.student.id
     else
       cannot [:show, :enroll, :save_enroll], :student_enrollment
     end
