@@ -96,6 +96,7 @@ class Admissions::FormTemplatesController < ApplicationController
         field_type: Admissions::FormField::STUDENT_FIELD,
         configuration: JSON.dump({
           "field": "refugee",
+          "values": I18n.t("active_scaffold.admissions/form_template.generate_fields.refugees").values,
           "required": true
         }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.sex"),

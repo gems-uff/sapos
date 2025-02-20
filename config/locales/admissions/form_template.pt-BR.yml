@@ -62,6 +62,9 @@ pt-BR:
         birthdate: Data de nascimento
         birth_city: Naturalidade
         refugee: Refugiado
+        refugees:
+          no: Não
+          yes: Sim
         sex: Sexo
         race_color: Raça/cor
         race_colors:
