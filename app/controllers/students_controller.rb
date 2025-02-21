@@ -37,15 +37,15 @@ class StudentsController < ApplicationController
 
     config.columns[:gender].form_ui = :select
     config.columns[:gender].options = {
-      options: ["Cis", "Trans", "Não declarado", "Outros"]
+      options: I18n.t("admissions/form_template.generate_fields.genders").values
     }
     config.columns[:pcd].form_ui = :select
     config.columns[:pcd].options = {
-      options: ["Sim", "Não", "Não Declarado"]
+      options: I18n.t("admissions/form_template.generate_fields.deficiencies").values
     }
     config.columns[:refugee].form_ui = :select
     config.columns[:refugee].options = {
-      options: ["Não", "Sim", "Não Declarado"]
+      options: I18n.t("admissions/form_template.generate_fields.refugees").values
     }
 
     config.columns[:sex].form_ui = :select
@@ -58,7 +58,7 @@ class StudentsController < ApplicationController
     }
     config.columns[:skin_color].form_ui = :select
     config.columns[:skin_color].options = {
-      options: ["Não declarado", "Branca", "Preta",  "Parda", "Amarela", "Indígena"]
+      options: I18n.t("admissions/form_template.generate_fields.skin_colors").values
     }
 
     config.columns[:student_majors].includes = [:majors, :student_majors]
