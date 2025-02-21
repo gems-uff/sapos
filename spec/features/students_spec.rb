@@ -118,23 +118,23 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for pcd options" do
-      expect(page.all("select#record_pcd_ option").map(&:text)).to eq ["Sim", "Não", "Não Declarado"]
-      expect(page.all("select#record_pcd_ option").map(&:value)).to eq ["Sim", "Não", "Não Declarado"]
+      expect(page.all("select#record_pcd_ option").map(&:text)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
+      expect(page.all("select#record_pcd_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
     end
 
     it "should have a selection for refugee options" do
-      expect(page.all("select#record_refugee_ option").map(&:text)).to eq ["Não", "Sim", "Não Declarado"]
-      expect(page.all("select#record_refugee_ option").map(&:value)).to eq ["Não", "Sim", "Não Declarado"]
+      expect(page.all("select#record_refugee_ option").map(&:text)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.refugees").values
+      expect(page.all("select#record_refugee_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.refugees").values
     end
 
     it "should have a selection for skin_color options" do
-      expect(page.all("select#record_skin_color_ option").map(&:text)).to eq ["Não declarado", "Branca", "Preta",  "Parda", "Amarela", "Indígena"]
-      expect(page.all("select#record_skin_color_ option").map(&:value)).to eq ["Não declarado", "Branca", "Preta",  "Parda", "Amarela", "Indígena"]
+      expect(page.all("select#record_skin_color_ option").map(&:text)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
+      expect(page.all("select#record_skin_color_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
     end
 
-    it "should have a selection for skin_color options" do
-      expect(page.all("select#record_gender_ option").map(&:text)).to eq ["Cis", "Trans", "Não declarado", "Outros"]
-      expect(page.all("select#record_gender_ option").map(&:value)).to eq ["Cis", "Trans", "Não declarado", "Outros"]
+    it "should have a selection for gender options" do
+      expect(page.all("select#record_gender_ option").map(&:text)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
+      expect(page.all("select#record_gender_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
     end
 
     it "should have a selection for civil_status options" do
