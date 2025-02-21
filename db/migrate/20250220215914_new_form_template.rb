@@ -1,29 +1,28 @@
 class NewFormTemplate < ActiveRecord::Migration[7.0]
   def change
-    Admissions::FormTemplate.all.each do |form_template|
+    Admissions::FormTemplate.where(template_type: "Formulário").each do |form_template|
       fields = form_template.fields
 
       field = fields.find_by(name: "Raça/cor")
       field.field_type = Admissions::FormField::STUDENT_FIELD
       values = I18n.t("active_scaffold.admissions/form_template.generate_fields.race_colors").values
-
-      field.configuration["values"] = values
+      JSON.parse(field.configuration)["values"] = values
       field.save
 
       field = fields.find_by(name: "Pessoa com deficiência")
       field.field_type = Admissions::FormField::STUDENT_FIELD
-      values = I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiences").values
-      field.configuration["values"] = values
+      values = I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
+      JSON.parse(field.configuration)["values"] = values
       field.save
 
       field = fields.find_by(name: "Sexo")
       field.field_type = Admissions::FormField::STUDENT_FIELD
       values = ["Masculino", "Feminino", "Não declarado"]
-      field.configuration["values"] = values
+      JSON.parse(field.configuration)["values"] = values
       field.save
 
-      fields.where("order >= ?", 6).update_all("order = order + 1")
-      field = Admission::FormField.new(
+      fields.where('"order" >= ?', 6).update_all('"order" = "order" + 1')
+      field = Admissions::FormField.new(
         name: I18n.t("active_scaffold.admissions/form_template.generate_fields.refugee"),
         field_type: Admissions::FormField::STUDENT_FIELD,
         order: 6,
@@ -37,8 +36,8 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
 
 
 
-      fields.where("order >= ?", 8).update_all("order = order + 1")
-      field = Admission::FormField.new(
+      fields.where('"order" >= ?', 8).update_all('"order" = "order" + 1')
+      field = Admissions::FormField.new(
         name: I18n.t("active_scaffold.admissions/form_template.generate_fields.gender"),
         field_type: Admissions::FormField::STUDENT_FIELD,
         order: 8,
