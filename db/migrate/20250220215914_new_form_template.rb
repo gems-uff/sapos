@@ -34,7 +34,7 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
       end
       field&.save
 
-      fields&.where('"order" >= ?', 6)&.update_all('"order" = "order" + 1')
+      fields&.where("'order' >= ?", 6)&.update_all("'order' = 'order' + 1")
       field = Admissions::FormField.new(
         name: I18n.t("active_scaffold.admissions/form_template.generate_fields.refugee"),
         field_type: Admissions::FormField::STUDENT_FIELD,
@@ -49,7 +49,7 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
 
 
 
-      fields.where('"order" >= ?', 8).update_all('"order" = "order" + 1')
+      fields&.where("'order' >= ?", 8)&.update_all("'order' = 'order' + 1")
       field = Admissions::FormField.new(
         name: I18n.t("active_scaffold.admissions/form_template.generate_fields.gender"),
         field_type: Admissions::FormField::STUDENT_FIELD,
