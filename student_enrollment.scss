@@ -1,0 +1,133 @@
+.show-box {
+  margin-top: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+
+.enrollment-show-box{
+  background-color: #f9f9a6;
+  border-color:gold;
+  border-radius: 5px;
+}
+
+
+.enrollment-show-box a{
+  color: blue;
+}
+
+
+.background-valid {
+  background-color: #a6f9ad;
+  border-color: green;
+}
+
+.background-invalid {
+  background-color: #f9a6a6;
+  border-color: red;
+}
+
+.background-effected{
+  background-color: #56e571;
+  border-color: rgb(1, 104, 1);
+}
+
+.show-box summary {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.15em;
+  font-weight: bold;
+}
+
+.show-box summary:hover {
+  cursor: pointer;
+}
+
+.show-box h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.info-show-box .name-admission-container {
+  display: flex;
+  width: 100%;
+}
+ 
+.info-show-box .student-name {
+  margin-right: auto;
+}
+
+.info-show-box .enrollment-admission{
+  margin-right: 5px;
+}
+
+.info-show-box ul, .dismissal-show-box ul {
+  padding: 0;
+  list-style-type: none;
+}
+
+.dismissal-show-box ul {
+  margin-bottom: 0;
+}
+
+.dismissal-show-box li {
+  margin-bottom: 5px;
+}
+
+.dismissal-show-box .attr:after {
+  content: ":"
+}
+
+.dismissal-show-box h4 {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+.dismissal-show-box h4:after {
+  content: ":"
+}
+
+
+.info-show-box ul .attr, .dismissal-show-box ul .attr {
+  font-weight: bold;
+}
+
+.show-box th {
+  color: #eee;
+  background-color: #427fa4;
+    text-align: left;
+}
+
+.show-box thead {
+  color: white;
+  background-color: #427FA4;
+}
+
+.show-box table {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.show-box tr.record {
+  background-color: #E6F2FF;
+}
+
+.show-box tr.record td {
+  padding: 5px 4px;
+  color: #333;
+  font-family: Verdana, sans-serif;
+  font-weight: bold;
+  border-bottom: solid 1px #C5DBF7;
+  border-left: solid 1px #C5DBF7;
+  border-color: #C5DBF7;
+  border-width: 0 0 1px 1px;
+}
+
+.show-box tr.record td:last-child {
+  border-right: 1px solid #C5DBF7;
+}
+
+.show-box tr.even-record {
+  background-color: #fff;
+}
