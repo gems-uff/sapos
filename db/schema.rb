@@ -284,7 +284,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "query_id", null: false
-    t.string "assertion_template"
+    t.text "assertion_template"
     t.boolean "student_can_generate", default: false
     t.integer "expiration_in_months"
     t.index ["query_id"], name: "index_assertions_on_query_id"
@@ -912,6 +912,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
     t.string "file_name"
     t.integer "invalidated_by_id"
     t.datetime "invalidated_at"
+    t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
+    t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
     t.index ["invalidated_by_id"], name: "index_reports_on_invalidated_by_id"
   end
 
@@ -1099,14 +1101,4 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
-  add_foreign_key "assertions", "queries"
-  add_foreign_key "grants", "professors"
-  add_foreign_key "paper_professors", "papers"
-  add_foreign_key "paper_professors", "professors"
-  add_foreign_key "paper_students", "papers"
-  add_foreign_key "paper_students", "students"
-  add_foreign_key "papers", "professors", column: "owner_id"
-  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
-  add_foreign_key "reports", "users", column: "generated_by_id"
-  add_foreign_key "reports", "users", column: "invalidated_by_id"
 end
