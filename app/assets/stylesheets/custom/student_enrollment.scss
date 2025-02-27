@@ -4,6 +4,34 @@
   border: 1px solid #ccc;
 }
 
+
+.enrollment-show-box{
+  background-color: #f9f9a6;
+  border-color:gold;
+  border-radius: 5px;
+}
+
+
+.enrollment-show-box a{
+  color: blue;
+}
+
+
+.background-valid {
+  background-color: #a6f9ad;
+  border-color: green;
+}
+
+.background-invalid {
+  background-color: #f9a6a6;
+  border-color: red;
+}
+
+.background-effected{
+  background-color: #56e571;
+  border-color: rgb(1, 104, 1);
+}
+
 .show-box summary {
   margin-top: 0;
   margin-bottom: 10px;
