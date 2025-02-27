@@ -10,8 +10,8 @@ class Affiliation < ApplicationRecord
   validates :end_date, presence: false
   validates_uniqueness_of :start_date, scope: [:professor_id],
                           allow_nil: true, allow_blank: true,
-                          message: "A afiliação só pode ser iniciada em uma data por professor"
-  validate :uniqueness_end_date
+                          message: "A afiliação só pode ser iniciada em uma data por professor", on: :update
+  validate :uniqueness_end_date, on: :update
 
   scope :on_date, ->(date) { where("DATE(start_date) <= ? AND (DATE(end_date) > ? OR end_date IS null)", date, date) }
   scope :of_professor, ->(professor) { where(professor_id: professor.id) }
