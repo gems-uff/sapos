@@ -10,9 +10,10 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
       if field&.configuration
         configuration = JSON.parse(field.configuration)
         configuration["values"] = values
-        field.configuration = configuration.to_s
+        configuration["field"] = "skin_color"
+        field.configuration = JSON.dump(configuration)
       end
-      field&.save
+      field&.save!
 
       field = fields&.find_by(name: "Pessoa com deficiência")
       field&.field_type = Admissions::FormField::STUDENT_FIELD
@@ -20,9 +21,10 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
       if field&.configuration
         configuration = JSON.parse(field.configuration)
         configuration["values"] = values
-        field.configuration = configuration.to_s
+        configuration["field"] = "pcd"
+        field.configuration = JSON.dump(configuration)
       end
-      field&.save
+      field&.save!
 
       field = fields&.find_by(name: "Sexo")
       field&.field_type = Admissions::FormField::STUDENT_FIELD
@@ -30,10 +32,10 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
       if field&.configuration
         configuration = JSON.parse(field.configuration)
         configuration["values"] = values
-        field.configuration = configuration.to_s
+        configuration["field"] = "sex"
+        field.configuration = JSON.dump(configuration)
       end
-      field&.save
-
+      field&.save!
 
     end
   end
@@ -48,7 +50,8 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
       if field&.configuration
         configuration = JSON.parse(field.configuration)
         configuration["values"] = values
-        field.configuration = configuration.to_s
+        configuration["field"] = "skin_color"
+        field.configuration = JSON.dump(configuration)
       end
       field&.save
 
@@ -58,7 +61,8 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
       if field&.configuration
         configuration = JSON.parse(field.configuration)
         configuration["values"] = values
-        field.configuration = configuration.to_s
+        configuration["field"] = "pcd"
+        field.configuration = JSON.dump(configuration)
       end
       field&.save
 
@@ -68,7 +72,8 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
       if field&.configuration
         configuration = JSON.parse(field.configuration)
         configuration["values"] = values
-        field.configuration = configuration.to_s
+        configuration["field"] = "sex"
+        field.configuration = JSON.dump(configuration)
       end
       field&.save
 
