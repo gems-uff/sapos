@@ -1,0 +1,17 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      skin_color:
+        name: "Nome"
+        description: "Descrição"
+
+    models:
+      skin_color:
+        one: "Cor de pele"
+        other: "Cores de pele"
+
+  activescaffold:
+    create_skin_color_label: "Adicionar cor de pele"

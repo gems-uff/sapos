@@ -61,19 +61,32 @@ pt-BR:
         name: Nome
         birthdate: Data de nascimento
         birth_city: Naturalidade
+        refugee: Refugiado
+        refugees:
+          no: Não
+          yes: Sim
+          not_declared: Não declarado
         sex: Sexo
-        race_color: Raça/cor
-        race_colors:
+        skin_color: Raça/cor
+        skin_colors:
           not_declared: Não declarado
           white: Branca
           black: Preta
           mixed: Parda
           yellow: Amarela
           indigenous: Indígena
+          no_information: Sem informação
+        gender: Gênero
+        genders:
+          cis: Cis
+          trans: Trans
+          others: Outros
+          not_declared: Não declarado
         deficiency: Pessoa com deficiência
         deficiencies:
           no: Não
           yes: Sim
+          not_declared: Não declarado
         identity_or_passport: Número da identidade ou passaporte
         identity_issuing_body: Órgão expeditor
         identity_issuing_place: Local de expedição
