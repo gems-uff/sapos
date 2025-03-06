@@ -26,38 +26,42 @@ RSpec.describe "Professors features", type: :feature do
     @destroy_all << @level3 = FactoryBot.create(:level, name: "Especialização", show_advisements_points_in_list: false,
      short_name_showed_in_list_header: "E",  default_duration: 0)
 
-    config = CustomVariable.find_by_variable(:single_advisor_points)
-    config.delete unless config.nil?
-    config = CustomVariable.find_by_variable(:multiple_advisor_points)
-    config.delete unless config.nil?
-    @destroy_later << CustomVariable.create(variable: :single_advisor_points, value: "1.0")
-    @destroy_later << CustomVariable.create(variable: :multiple_advisor_points, value: "0.5")
+    @destroy_all << CustomVariable.create(variable: :single_advisor_points, value: "1.0")
+    @destroy_all << CustomVariable.create(variable: :multiple_advisor_points, value: "0.5")
 
-    @destroy_later << enrollment1 = FactoryBot.create(:enrollment, level: @level1)
-    @destroy_later << enrollment2 = FactoryBot.create(:enrollment, level: @level2)
-    @destroy_later << enrollment3 = FactoryBot.create(:enrollment, level: @level1)
-    @destroy_later << enrollment4 = FactoryBot.create(:enrollment, level: @level2)
+
+    @destroy_all << @student1 = FactoryBot.create(:student, name: "Andre")
+    @destroy_all << @student2 = FactoryBot.create(:student, name: "Bernardo")
+    @destroy_all << @student3 = FactoryBot.create(:student, name: "Carlos")
+    @destroy_all << @student4 = FactoryBot.create(:student, name: "Daniel")
+
+    @destroy_all << @status = FactoryBot.create(:enrollment_status, name: "Regular", user: true)
+
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, student: @student1, enrollment_status: @status, level: @level1)
+    @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, student: @student2, enrollment_status: @status, level: @level2)
+    @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, student: @student3, enrollment_status: @status, level: @level1)
+    @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, student: @student4, enrollment_status: @status, level: @level2)
 
 
     @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Carol", cpf: "3")
-    @destroy_all << @professor2 = FactoryBot.create(
+    @destroy_all << @record = FactoryBot.create(
       :professor, name: "Bia", cpf: "2",
       city: @city, identity_issuing_place: @state.name, birthdate: 25.years.ago
     )
     @destroy_all << @professor3 = FactoryBot.create(:professor, name: "Dani", cpf: "4")
 
-    @destroy_later << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level1)
-    @destroy_later << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level1)
-    @destroy_later << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level2)
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level1)
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @record, level: @level1)
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @record, level: @level2)
 
 
-    @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: enrollment1, main_advisor: true)
-    @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: enrollment3)
-    @destroy_later << FactoryBot.create(:advisement, professor: @professor2, enrollment: enrollment1, main_advisor: false)
-    @destroy_later << FactoryBot.create(:advisement, professor: @professor2, enrollment: enrollment2, main_advisor: true)
-    @destroy_later << FactoryBot.create(:advisement, professor: @professor2, enrollment: enrollment4)
-    @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: enrollment1, main_advisor: false)
-    @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: enrollment2, main_advisor: false)
+    @destroy_all << FactoryBot.create(:advisement, professor: @professor1, enrollment: @enrollment1)
+    @destroy_all << FactoryBot.create(:advisement, professor: @professor1, enrollment: @enrollment3)
+    @destroy_all << FactoryBot.create(:advisement, professor: @record, enrollment: @enrollment1, main_advisor: false)
+    @destroy_all << FactoryBot.create(:advisement, professor: @record, enrollment: @enrollment2)
+    @destroy_all << FactoryBot.create(:advisement, professor: @record, enrollment: @enrollment4)
+    @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment1, main_advisor: false)
+    @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment2, main_advisor: false)
 
     @destroy_all << @user = create_confirmed_user(@role_adm)
   end
@@ -89,31 +93,31 @@ RSpec.describe "Professors features", type: :feature do
     end
   end
 
-  describe "sort by partial points", js: true, order: :defined do
+  describe "sort by partial points", order: :defined do
     before(:each) do
       login_as(@user)
       visit url_path
     end
     it "Should sort the list by the points of a level, asc, if clicked on its column first time" do
-      click_on "M"
+      click_link "M"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Dani", "Bia", "Carol"]
-      expect(page.all("tr td.advisement_points_of_level1-column").map(&:text)).to eq ["0.0", "0.5", "1.5"]
+      expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["0.0", "0.5", "1.5"]
     end
 
     it "Should sort the list by the points of a level, desc, if clicked on its column second time" do
       2.times do
-        click_on "M"
+        click_link "M"
       end
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Carol", "Bia", "Dani"]
-      expect(page.all("tr td.advisement_points_of_level1-column").map(&:text)).to eq ["1.5", "0.5", "0.0"]
+      expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["1.5", "0.5", "0.0"]
     end
 
     it "Should back to default sort, if clicked on its column third time" do
       3.times do
-        click_on "M"
+        click_link "M"
       end
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia", "Carol", "Dani"]
-      expect(page.all("tr td.advisement_points_of_level1-column").map(&:text)).to eq ["0.5", "1.5", "0.0"]
+      expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["0.5", "1.5", "0.0"]
     end
   end
 
@@ -182,7 +186,7 @@ RSpec.describe "Professors features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      find("#as_#{plural_name}-edit-#{@professor2.id}-link").click
+      find("#as_#{plural_name}-edit-#{@record.id}-link").click
     end
 
     it "should be able to edit record" do
@@ -196,17 +200,17 @@ RSpec.describe "Professors features", type: :feature do
     end
 
     it "should have city widget for address" do
-      expect(find("#widget_record_city_#{@professor2.id}").value).to eq @city.id.to_s
-      expect(find("#widget_record_address_state_#{@professor2.id}").value).to eq @city.state.id.to_s
-      expect(find("#widget_record_address_country_#{@professor2.id}").value).to eq @city.state.country.id.to_s
+      expect(find("#widget_record_city_#{@record.id}").value).to eq @city.id.to_s
+      expect(find("#widget_record_address_state_#{@record.id}").value).to eq @city.state.id.to_s
+      expect(find("#widget_record_address_country_#{@record.id}").value).to eq @city.state.country.id.to_s
     end
 
     it "should have identity issuing place widget for identity issuing place" do
-      expect(find("#record_identity_issuing_place_#{@professor2.id}").value).to eq @state.name
+      expect(find("#record_identity_issuing_place_#{@record.id}").value).to eq @state.name
     end
 
     it "should have a datepicker for birthdate with a range starting 100 years ago" do
-      expect(find("#record_birthdate_#{@professor2.id}").value).to eq 25.years.ago.strftime("%d/%m/%Y")
+      expect(find("#record_birthdate_#{@record.id}").value).to eq 25.years.ago.strftime("%d/%m/%Y")
     end
   end
 
@@ -216,7 +220,7 @@ RSpec.describe "Professors features", type: :feature do
       @destroy_all << @user_sec = create_confirmed_user(@role_sec, email: "secretaria@secretaria.com")
       login_as(@user_sec)
       visit url_path
-      find("#as_#{plural_name}-edit-#{@professor2.id}-link").click
+      find("#as_#{plural_name}-edit-#{@record.id}-link").click
     end
 
     it "should have a nested affiliation" do
