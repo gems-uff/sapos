@@ -29,6 +29,9 @@ pt-BR:
         neighborhood: "Bairro"
         photo: "Foto"
         sex: "Sexo"
+        gender: "Gênero"
+        skin_color: "Raça/Cor"
+        pcd: "PCD"
         student_majors: "Cursos"
         telephone1: "1º Telefone"
         telephone2: "2º Telefone"
@@ -37,6 +40,7 @@ pt-BR:
         special_city: "Residência*"
         special_birth_city: "Naturalidade*"
         special_majors: "Cursos*"
+        refugee: "Refugiado"
 
     errors:
       models:
