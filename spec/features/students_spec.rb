@@ -138,8 +138,8 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for civil_status options" do
-      expect(page.all("select#record_civil_status_ option").map(&:text)).to eq ["Solteiro(a)", "Casado(a)"]
-      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["Solteiro(a)", "Casado(a)"]
+      expect(page.all("select#record_civil_status_ option").map(&:text)).to eq ["Não declarado","Solteiro(a)", "Casado(a)"]
+      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["Não declarado","Solteiro(a)", "Casado(a)"]
     end
 
     it "should have identity issuing place widget for identity issuing place" do
