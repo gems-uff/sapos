@@ -106,6 +106,7 @@ class ProfessorsController < ApplicationController
         else
           active_scaffold_config.columns[method_name].label = level.name
         end
+        active_scaffold_config.columns[method_name].sort_by method: method_name
       end
 
       insert_position = Array(active_scaffold_config.list.columns)

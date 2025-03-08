@@ -19,16 +19,50 @@ RSpec.describe "Professors features", type: :feature do
     prepare_city_widget(@destroy_all)
     @state = State.first
     @city = City.first
-    @destroy_all << @level1 = FactoryBot.create(:level, name: "Mestrado", default_duration: 24)
-    @destroy_all << @level2 = FactoryBot.create(:level, name: "Doutorado", default_duration: 48)
-    @destroy_all << @level3 = FactoryBot.create(:level, name: "Especialização", default_duration: 0)
+    @destroy_all << @level1 = FactoryBot.create(:level, name: "Mestrado", show_advisements_points_in_list: true,
+     short_name_showed_in_list_header: "M", default_duration: 24)
+    @destroy_all << @level2 = FactoryBot.create(:level, name: "Doutorado", show_advisements_points_in_list: true,
+     short_name_showed_in_list_header: "D", default_duration: 48)
+    @destroy_all << @level3 = FactoryBot.create(:level, name: "Especialização", show_advisements_points_in_list: false,
+     short_name_showed_in_list_header: "E",  default_duration: 0)
 
-    @destroy_all << FactoryBot.create(:professor, name: "Carol", cpf: "3")
+    @destroy_all << CustomVariable.create(variable: :single_advisor_points, value: "1.0")
+    @destroy_all << CustomVariable.create(variable: :multiple_advisor_points, value: "0.5")
+
+
+    @destroy_all << @student1 = FactoryBot.create(:student, name: "Andre")
+    @destroy_all << @student2 = FactoryBot.create(:student, name: "Bernardo")
+    @destroy_all << @student3 = FactoryBot.create(:student, name: "Carlos")
+    @destroy_all << @student4 = FactoryBot.create(:student, name: "Daniel")
+
+    @destroy_all << @status = FactoryBot.create(:enrollment_status, name: "Regular", user: true)
+
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, student: @student1, enrollment_status: @status, level: @level1)
+    @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, student: @student2, enrollment_status: @status, level: @level2)
+    @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, student: @student3, enrollment_status: @status, level: @level1)
+    @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, student: @student4, enrollment_status: @status, level: @level2)
+
+
+    @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Carol", cpf: "3")
     @destroy_all << @record = FactoryBot.create(
       :professor, name: "Bia", cpf: "2",
       city: @city, identity_issuing_place: @state.name, birthdate: 25.years.ago
     )
-    @destroy_all << FactoryBot.create(:professor, name: "Dani", cpf: "4")
+    @destroy_all << @professor3 = FactoryBot.create(:professor, name: "Dani", cpf: "4")
+
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level1)
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @record, level: @level1)
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @record, level: @level2)
+
+
+    @destroy_all << FactoryBot.create(:advisement, professor: @professor1, enrollment: @enrollment1)
+    @destroy_all << FactoryBot.create(:advisement, professor: @professor1, enrollment: @enrollment3)
+    @destroy_all << FactoryBot.create(:advisement, professor: @record, enrollment: @enrollment1, main_advisor: false)
+    @destroy_all << FactoryBot.create(:advisement, professor: @record, enrollment: @enrollment2)
+    @destroy_all << FactoryBot.create(:advisement, professor: @record, enrollment: @enrollment4)
+    @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment1, main_advisor: false)
+    @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment2, main_advisor: false)
+
     @destroy_all << @user = create_confirmed_user(@role_adm)
   end
   after(:each) do
@@ -50,12 +84,40 @@ RSpec.describe "Professors features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Professores"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Nome", "CPF", "Data de Nascimento", "Pontos Total", "Matrícula", ""
+        "Nome", "CPF", "Data de Nascimento", "Pontos Total", "D", "M", "Matrícula", ""
       ]
     end
 
     it "should sort the list by name, asc" do
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia", "Carol", "Dani"]
+    end
+  end
+
+  describe "sort by partial points", order: :defined do
+    before(:each) do
+      login_as(@user)
+      visit url_path
+    end
+    it "Should sort the list by the points of a level, asc, if clicked on its column first time" do
+      click_link "M"
+      expect(page.all("tr td.name-column").map(&:text)).to eq ["Dani", "Bia", "Carol"]
+      expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["0.0", "0.5", "1.5"]
+    end
+
+    it "Should sort the list by the points of a level, desc, if clicked on its column second time" do
+      2.times do
+        click_link "M"
+      end
+      expect(page.all("tr td.name-column").map(&:text)).to eq ["Carol", "Bia", "Dani"]
+      expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["1.5", "0.5", "0.0"]
+    end
+
+    it "Should back to default sort, if clicked on its column third time" do
+      3.times do
+        click_link "M"
+      end
+      expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia", "Carol", "Dani"]
+      expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["0.5", "1.5", "0.0"]
     end
   end
 
