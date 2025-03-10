@@ -23,6 +23,7 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 * Luis Antônio Vieira Junior (joined in August 2013)
 * Daniel Prett (joined in August 2014)
 * Carlos Eduardo Cabral da Cunha (joined in August 2016)
+* Anderson Otaviano Meireles Junior (joined in March 2024)
 * Caio Henrique Velloso Paranhos (joined in March 2024)
 * Igor de Paula Siqueira Monárdez (joined in May 2024)
 
@@ -39,9 +40,10 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 
 # Documentation
 
-* [Term paper about the first version](https://github.com/gems-uff/sapos/raw/master/doc/TCC%20Rodrigo%20e%20Tiago.pdf)
-* [Term paper about the second version](https://github.com/gems-uff/sapos/raw/master/doc/TCC%20Bruno%20Schettino.pdf)
-* [Term paper about the third version](https://github.com/gems-uff/sapos/raw/master/doc/TCC%20Joao%20e%20Luis.pdf)
+* [Term paper about the first version](https://github.com/gems-uff/sapos/raw/main/doc/TCC%20Rodrigo%20e%20Tiago.pdf)
+* [Term paper about the second version](https://github.com/gems-uff/sapos/raw/main/doc/TCC%20Bruno%20Schettino.pdf)
+* [Term paper about the third version](https://github.com/gems-uff/sapos/raw/main/doc/TCC%20Joao%20e%20Luis.pdf)
+* [Term paper about the signature and custom documents](https://github.com/gems-uff/sapos/raw/main/doc/TCC%20Anderson%20e%20Caio.pdf)
 * [Wiki](https://github.com/gems-uff/sapos/wiki)
 
 # Development

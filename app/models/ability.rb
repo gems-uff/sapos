@@ -16,7 +16,7 @@ class Ability
   PROFESSOR_MODELS = [
     Professor, Advisement, AdvisementAuthorization,
     ThesisDefenseCommitteeParticipation,
-    ProfessorResearchArea, Grant, Paper, PaperProfessor, PaperStudent
+    ProfessorResearchArea, Grant, Paper, PaperProfessor, PaperStudent, Affiliation
   ]
 
   SCHOLARSHIP_MODELS = [

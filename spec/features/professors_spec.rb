@@ -152,6 +152,20 @@ RSpec.describe "Professors features", type: :feature do
     end
   end
 
+  describe "edit as secretaria", js: true do
+    before(:each) do
+      @destroy_all << @role_sec = FactoryBot.create(:role_secretaria)
+      @destroy_all << @user_sec = create_confirmed_user(@role_sec, email: "secretaria@secretaria.com")
+      login_as(@user_sec)
+      visit url_path
+      find("#as_#{plural_name}-edit-#{@record.id}-link").click
+    end
+
+    it "should have a nested affiliation" do
+      expect(page).to have_field(class: "institution-input")
+    end
+  end
+
   describe "search page", js: true do
     before(:each) do
       login_as(@user)
