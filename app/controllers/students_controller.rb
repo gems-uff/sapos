@@ -50,7 +50,7 @@ class StudentsController < ApplicationController
 
     config.columns[:sex].form_ui = :select
     config.columns[:sex].options = {
-      options: [["Masculino", "M"], ["Feminino", "F"], ["Não Declarado", "ND"]]
+      options: [["Não Declarado", "ND"], ["Masculino", "M"], ["Feminino", "F"]]
     }
     config.columns[:civil_status].form_ui = :select
     config.columns[:civil_status].options = {

@@ -113,8 +113,8 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for sex options" do
-      expect(page.all("select#record_sex_ option").map(&:text)).to eq ["Masculino", "Feminino", "Não Declarado"]
-      expect(page.all("select#record_sex_ option").map(&:value)).to eq ["M", "F", "ND"]
+      expect(page.all("select#record_sex_ option").map(&:text)).to eq ["Não Declarado", "Masculino", "Feminino"]
+      expect(page.all("select#record_sex_ option").map(&:value)).to eq ["ND", "M", "F"]
     end
 
     it "should have a selection for pcd options" do
