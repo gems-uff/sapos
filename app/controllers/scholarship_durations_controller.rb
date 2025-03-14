@@ -17,11 +17,11 @@ class ScholarshipDurationsController < ApplicationController
     config.actions.swap :search, :field_search
 
     # virtual columns for advanced search
-    config.columns.add :adviser, :sponsors, :scholarship_types, :active, :level
+    config.columns.add :adviser, :sponsors, :scholarship_types, :active, :level, :suspended
 
     config.field_search.columns = [
       :scholarship, :start_date, :end_date, :cancel_date, :enrollment,
-      :adviser, :sponsors, :scholarship_types, :level, :active
+      :adviser, :sponsors, :scholarship_types, :level, :active, :suspended
     ]
     config.columns[:start_date].search_sql = "scholarship_durations.start_date"
     config.columns[:end_date].search_sql = "scholarship_durations.end_date"
@@ -32,6 +32,7 @@ class ScholarshipDurationsController < ApplicationController
     config.columns[:sponsors].search_sql = ""
     config.columns[:scholarship_types].search_sql = ""
     config.columns[:active].search_sql = ""
+    config.columns[:suspended].search_sql = ""
     config.columns[:level].search_sql = ""
     config.columns[:scholarship].search_ui = :text
     config.columns[:enrollment].search_ui = :text
@@ -187,6 +188,61 @@ class ScholarshipDurationsController < ApplicationController
 
         ["#{column.search_sql.last} >= ?", date]
       end
+    end
+  end
+
+  def self.condition_for_suspended_column(column, value, like_pattern)
+    if value[:use] == "yes"
+      start_month = value[:start_month].present? ? value[:start_month].to_i : 1
+      start_year = value[:start_year].present? ? value[:start_year].to_i : 1
+
+      end_month = value[:end_month].present? ? value[:end_month].to_i : 1
+      end_year = value[:end_year].present? ? value[:end_year].to_i : 1
+
+      start_dt = Date.new(start_year.to_i, start_month.to_i)
+      end_dt = Date.new(end_year.to_i, end_month.to_i)
+
+      # scholarship_durations = ScholarshipDuration.arel_table
+      # scholarship_suspensions = ScholarshipSuspension.arel_table
+      # scholarship_durations_id = ScholarshipDuration.arel_table[:id]
+
+      if start_year == 1 && end_year == 1
+        query = "(SELECT d.id
+                FROM scholarship_durations as d
+                JOIN scholarship_suspensions as s
+                ON d.id = s.scholarship_duration_id
+                WHERE s.active
+                GROUP BY d.id)"
+      elsif end_year == 1
+        query = "(SELECT d.id
+                FROM scholarship_durations as d
+                JOIN scholarship_suspensions as s
+                ON d.id = s.scholarship_duration_id
+                WHERE s.active
+                AND s.end_date > ?
+                GROUP BY d.id)"
+        query_params = [start_dt]
+      elsif start_year == 1
+        query = "(SELECT d.id
+                FROM scholarship_durations as d
+                JOIN scholarship_suspensions as s
+                ON d.id = s.scholarship_duration_id
+                WHERE s.active
+                AND s.start_date < ?
+                GROUP BY d.id)"
+        query_params = [end_dt]
+      else
+        query = "(SELECT d.id
+                FROM scholarship_durations as d
+                JOIN scholarship_suspensions as s
+                ON d.id = s.scholarship_duration_id
+                WHERE s.active
+                AND s.end_date > ?
+                AND s.start_date < ?
+                GROUP BY d.id)"
+        query_params = [start_dt, end_dt]
+      end
+      ["scholarship_durations.id IN" + query, *query_params]
     end
   end
 
