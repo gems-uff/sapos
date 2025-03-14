@@ -11,9 +11,10 @@
       <% count += 1 %>
       <% tr_class = count.even? ? "even-record" : "" %>
       <% date =  thesis_defense_date || dismissal_date %>
+      <% affiliation = Affiliation.professor_date(professor, date&.to_date)&.last || Affiliation.of_professor(professor)&.last %>
       <tr class="record <%= tr_class %>">
         <td><%= professor.name %></td>
-        <td><%= rescue_blank_text(Affiliation.professor_date(professor, date&.to_date)&.last&.institution, method_call: :name) %></td>
+        <td><%= rescue_blank_text(affiliation&.institution, method_call: :name) %></td>
       </tr>
     <% end %>
   </tbody>
