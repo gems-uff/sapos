@@ -21,6 +21,9 @@ pt-BR:
         sponsors: "Agência de Fomento"
         start_date: "Data de Início"
         obs: "Observação"
+        suspended: "Suspenso"
+        suspended_start_label: "a partir de"
+        suspended_end_label: "até"
 
     errors:
       models:

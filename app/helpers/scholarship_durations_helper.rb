@@ -122,4 +122,50 @@ module ScholarshipDurationsHelper
     options[:class] = options[:class].sub("update_form", "text-input")
     text_field(:record, :scholarship, options)
   end
+
+  def suspended_search_column(record, options)
+    local_options = {
+        include_blank: true
+    }
+
+    start_month_html_options = {
+        id: "suspended_start_month",
+        name: "search[suspended][start_month]"
+    }
+    start_year_html_options = {
+        id: "suspended_start_year",
+        name: "search[suspended][start_year]"
+    }
+
+    end_month_html_options = {
+        id: "suspended_end_month",
+        name: "search[suspended][end_month]"
+    }
+    end_year_html_options = {
+        id: "suspended_end_year",
+        name: "search[suspended][end_year]"
+    }
+    current_year = Date.today.year
+    html = check_box_tag(
+      "search[suspended][use]", "yes", false, style: "vertical-align: sub;"
+    )
+    html += label_tag(
+      "search[suspended][use]",
+      I18n.t("activerecord.attributes.scholarship_duration.suspended_label1"),
+      style: "margin: 0 15px;"
+    )
+
+    html += select_month(local_options, local_options, start_month_html_options)
+    html += select_year(local_options, local_options.merge(start_year: current_year - 20, end_year: current_year + 20), start_year_html_options)
+
+    html += label_tag(
+      "search[suspended][use]",
+      I18n.t("activerecord.attributes.scholarship_duration.suspended_label2"),
+      style: "margin: 0 15px;"
+    )
+
+    html += select_month(local_options, local_options, end_month_html_options)
+    html += select_year(local_options, local_options.merge(start_year: current_year - 20, end_year: current_year + 20), end_year_html_options)
+    html
+  end
 end
