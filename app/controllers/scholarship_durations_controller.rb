@@ -202,10 +202,6 @@ class ScholarshipDurationsController < ApplicationController
       start_dt = Date.new(start_year.to_i, start_month.to_i)
       end_dt = Date.new(end_year.to_i, end_month.to_i)
 
-      # scholarship_durations = ScholarshipDuration.arel_table
-      # scholarship_suspensions = ScholarshipSuspension.arel_table
-      # scholarship_durations_id = ScholarshipDuration.arel_table[:id]
-
       if start_year == 1 && end_year == 1
         query = "(SELECT d.id
                 FROM scholarship_durations as d
