@@ -88,25 +88,22 @@ class Admissions::FormTemplatesController < ApplicationController
         configuration: JSON.dump({ "field": "birthdate", "required": true }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.birth_city"),
         field_type: Admissions::FormField::STUDENT_FIELD,
-        configuration: JSON.dump({
-          "field": "special_birth_city",
-          "required": true
-        }) },
+        configuration: JSON.dump({"field": "special_birth_city", "required": true }) },
+      { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.refugee"),
+        field_type: Admissions::FormField::STUDENT_FIELD,
+        configuration: JSON.dump({ "field": "refugee", "required": true }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.sex"),
         field_type: Admissions::FormField::STUDENT_FIELD,
         configuration: JSON.dump({ "field": "sex", "required": true }) },
-      { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.race_color"),
-        field_type: Admissions::FormField::SELECT,
-        configuration: JSON.dump({
-          "values": I18n.t("active_scaffold.admissions/form_template.generate_fields.race_colors").values,
-          "required": true
-        }) },
+      { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.gender"),
+        field_type: Admissions::FormField::STUDENT_FIELD,
+        configuration: JSON.dump({ "field": "gender", "required": true }) },
+      { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_color"),
+        field_type: Admissions::FormField::STUDENT_FIELD,
+        configuration: JSON.dump({ "field": "skin_color", "required": true }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiency"),
-        field_type: Admissions::FormField::SELECT,
-        configuration: JSON.dump({
-          "values": I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values,
-          "required": true
-        }) },
+        field_type: Admissions::FormField::STUDENT_FIELD,
+        configuration: JSON.dump({ "field": "pcd", "required": true }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.identity_or_passport"),
         field_type: Admissions::FormField::STUDENT_FIELD,
         configuration: JSON.dump({ "field": "identity_number", "required": true }) },
