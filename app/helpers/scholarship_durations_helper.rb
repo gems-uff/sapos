@@ -151,7 +151,7 @@ module ScholarshipDurationsHelper
     )
     html += label_tag(
       "search[suspended][use]",
-      I18n.t("activerecord.attributes.scholarship_duration.suspended_label1"),
+      I18n.t("activerecord.attributes.scholarship_duration.suspended_start_label"),
       style: "margin: 0 15px;"
     )
 
@@ -160,7 +160,7 @@ module ScholarshipDurationsHelper
 
     html += label_tag(
       "search[suspended][use]",
-      I18n.t("activerecord.attributes.scholarship_duration.suspended_label2"),
+      I18n.t("activerecord.attributes.scholarship_duration.suspended_end_label"),
       style: "margin: 0 15px;"
     )
 
