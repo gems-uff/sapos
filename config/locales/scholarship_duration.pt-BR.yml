@@ -24,6 +24,7 @@ pt-BR:
         suspended: "Suspenso"
         suspended_start_label: "a partir de"
         suspended_end_label: "até"
+        active_suspension: "Suspensão ativa?"
 
     errors:
       models:
