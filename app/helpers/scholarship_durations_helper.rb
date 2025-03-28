@@ -146,9 +146,7 @@ module ScholarshipDurationsHelper
         name: "search[suspended][end_year]"
     }
     current_year = Date.today.year
-    # html = check_box_tag(
-    #   "search[suspended][use]", "yes", false, style: "vertical-align: sub;"
-    # )
+    
     html = label_tag(
       "search[suspended][use]",
       I18n.t("activerecord.attributes.scholarship_duration.suspended_start_label"),
