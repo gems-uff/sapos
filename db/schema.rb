@@ -1100,4 +1100,5 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
     t.datetime "created_at", precision: nil
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
+
 end
