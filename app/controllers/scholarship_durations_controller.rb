@@ -199,38 +199,46 @@ class ScholarshipDurationsController < ApplicationController
       end_month = value[:end_month].present? ? value[:end_month].to_i : 1
       end_year = value[:end_year].present? ? value[:end_year].to_i : 1
 
-      active = value[:active_suspension]
-
       start_dt = Date.new(start_year.to_i, start_month.to_i)
       end_dt = Date.new(end_year.to_i, end_month.to_i)
 
-      case active
-      when "active" then
-        active_param = "s.active"
-      when "not_active" then
-        active_param = "s.active = FALSE"
-      else
-        active_param = "TRUE"
-      end
-
       if start_year == 1 && end_year == 1
-        query_date = ""
+        query = "(SELECT d.id
+                FROM scholarship_durations as d
+                JOIN scholarship_suspensions as s
+                ON d.id = s.scholarship_duration_id
+                WHERE s.active
+                GROUP BY d.id)"
       elsif end_year == 1
-        query_date = " AND s.end_date > ?"
+        query = "(SELECT d.id
+                FROM scholarship_durations as d
+                JOIN scholarship_suspensions as s
+                ON d.id = s.scholarship_duration_id
+                WHERE s.active
+                AND s.end_date > ?
+                GROUP BY d.id)"
         query_params = [start_dt]
       elsif start_year == 1
-        query_date = " AND s.start_date < ?"
+        query = "(SELECT d.id
+                FROM scholarship_durations as d
+                JOIN scholarship_suspensions as s
+                ON d.id = s.scholarship_duration_id
+                WHERE s.active
+                AND s.start_date < ?
+                GROUP BY d.id)"
         query_params = [end_dt]
       else
-        query_date = " AND s.end_date > ? AND s.start_date < ?"
+        query = "(SELECT d.id
+                FROM scholarship_durations as d
+                JOIN scholarship_suspensions as s
+                ON d.id = s.scholarship_duration_id
+                WHERE s.active
+                AND s.end_date > ?
+                AND s.start_date < ?
+                GROUP BY d.id)"
         query_params = [start_dt, end_dt]
       end
-      ["scholarship_durations.id IN
-       (SELECT d.id
-        FROM scholarship_durations as d
-        JOIN scholarship_suspensions as s
-        ON d.id = s.scholarship_duration_id
-        WHERE #{active_param}" + query_date + "\nGROUP BY d.id)", *query_params]
+      ["scholarship_durations.id IN" + query, *query_params]
     end
   end
 

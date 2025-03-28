@@ -166,17 +166,6 @@ module ScholarshipDurationsHelper
 
     html += select_month(local_options, local_options, end_month_html_options)
     html += select_year(local_options, local_options.merge(start_year: current_year - 20, end_year: current_year + 20), end_year_html_options)
-    html += label_tag(
-      "search[suspended][use]",
-      I18n.t("activerecord.attributes.scholarship_duration.active_suspension"),
-      style: "margin: 0 15px;"
-    )
-    html += select_tag(
-      "search[suspended][active_suspension]",
-      options_for_select(
-        [["Todas", "all"], ["Sim", "active"], ["Não", "not_active"]]
-      )
-    )
     html
   end
 end
