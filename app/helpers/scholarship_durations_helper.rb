@@ -146,13 +146,13 @@ module ScholarshipDurationsHelper
         name: "search[suspended][end_year]"
     }
     current_year = Date.today.year
-    html = check_box_tag(
-      "search[suspended][use]", "yes", false, style: "vertical-align: sub;"
-    )
-    html += label_tag(
+    # html = check_box_tag(
+    #   "search[suspended][use]", "yes", false, style: "vertical-align: sub;"
+    # )
+    html = label_tag(
       "search[suspended][use]",
       I18n.t("activerecord.attributes.scholarship_duration.suspended_start_label"),
-      style: "margin: 0 15px;"
+      style: "margin: 0 15px 0 0;"
     )
 
     html += select_month(local_options, local_options, start_month_html_options)
@@ -174,7 +174,7 @@ module ScholarshipDurationsHelper
     html += select_tag(
       "search[suspended][active_suspension]",
       options_for_select(
-        [["Todas", "all"], ["Sim", "active"], ["Não", "not_active"]]
+        [["", ""], ["Alguma", "active"], ["Nenhuma", "not_active"]]
       )
     )
     html

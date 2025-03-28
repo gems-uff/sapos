@@ -220,15 +220,12 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     end
 
     it "should be able to search by active suspensions" do
-      find(:css, "#search_suspended_use").set(true)
-      find(:select, "search_suspended_active_suspension").find(:option, text: "Sim").select_option
+      find(:select, "search_suspended_active_suspension").find(:option, text: "Alguma").select_option
       click_button "Buscar"
       expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1"]
     end
 
     it "should be able to search by the time interval of suspension" do
-      find(:css, "#search_suspended_use").set(true)
-
       start_year = 0.years.ago.year
       find(:select, "suspended_start_year").find(:option, text: start_year.to_s).select_option
 

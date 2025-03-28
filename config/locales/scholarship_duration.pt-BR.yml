@@ -22,7 +22,7 @@ pt-BR:
         start_date: "Data de Início"
         obs: "Observação"
         suspended: "Suspenso"
-        suspended_start_label: "a partir de"
+        suspended_start_label: "A partir de"
         suspended_end_label: "até"
         active_suspension: "Suspensão ativa?"
 
