@@ -41,8 +41,8 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     @destroy_all << @scholarship_duration2 = FactoryBot.create(:scholarship_duration, enrollment: @enrollment2, scholarship: @scholarship2, start_date: 3.years.ago.at_beginning_of_month, end_date: 2.years.from_now.at_beginning_of_month)
     @destroy_all << FactoryBot.create(:scholarship_duration, enrollment: @enrollment3, scholarship: @scholarship2, start_date: 6.years.ago.at_beginning_of_month, cancel_date: 5.years.ago.at_beginning_of_month, end_date: 4.years.ago.at_beginning_of_month)
 
-    @destroy_all << @scholarship_suspension1 = FactoryBot.create(:scholarship_suspension, scholarship_duration: @record, start_date: 1.year.ago.at_beginning_of_month, end_date: 6.months.ago.at_beginning_of_month, active: true)
-    @destroy_all << @scholarship_suspension2 = FactoryBot.create(:scholarship_suspension, scholarship_duration: @scholarship_duration2, start_date: 1.month.ago.at_beginning_of_month, end_date: 1.month.from_now.at_beginning_of_month, active: false)
+    @destroy_all << @scholarship_suspension1 = FactoryBot.create(:scholarship_suspension, scholarship_duration: @record, start_date: 1.year.ago.at_beginning_of_month, end_date: 6.months.ago.at_beginning_of_month)
+    @destroy_all << @scholarship_suspension2 = FactoryBot.create(:scholarship_suspension, scholarship_duration: @scholarship_duration2, start_date: 1.month.ago.at_beginning_of_month, end_date: 1.month.from_now.at_beginning_of_month)
 
 
     @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Erica", cpf: "3")
@@ -219,11 +219,10 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
       expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2"]
     end
 
-    it "should be able to search by active suspensions" do
+    it "should be able to search by suspended" do
       find(:css, "#search_suspended_use").set(true)
-      find(:select, "search_suspended_active_suspension").find(:option, text: "Sim").select_option
       click_button "Buscar"
-      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1"]
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1", "B2"]
     end
 
     it "should be able to search by the time interval of suspension" do
