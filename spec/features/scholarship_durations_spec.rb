@@ -24,9 +24,9 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     @destroy_all << @scholarship_type1 = FactoryBot.create(:scholarship_type, name: "Individual")
     @destroy_all << @scholarship_type2 = FactoryBot.create(:scholarship_type, name: "Projeto")
 
-    @destroy_all << @scholarship1 = FactoryBot.create(:scholarship, scholarship_number: "B1", level: @level2, sponsor: @sponsor1, start_date: 3.years.ago.at_beginning_of_month, end_date: 1.year.from_now.at_beginning_of_month, scholarship_type: @scholarship_type1)
-    @destroy_all << @scholarship2 = FactoryBot.create(:scholarship, scholarship_number: "B2", level: @level1, sponsor: @sponsor2, start_date: 3.years.ago.at_beginning_of_month, end_date: 4.years.from_now.at_beginning_of_month, scholarship_type: @scholarship_type1)
-    @destroy_all << @scholarship3 = FactoryBot.create(:scholarship, scholarship_number: "B3", level: @level1, sponsor: @sponsor1, start_date: 3.years.ago.at_beginning_of_month, end_date: 1.year.from_now.at_beginning_of_month, scholarship_type: @scholarship_type2)
+    @destroy_all << @scholarship1 = FactoryBot.create(:scholarship, scholarship_number: "B1", level: @level2, sponsor: @sponsor1, start_date: 8.years.ago.at_beginning_of_month, end_date: 1.year.from_now.at_beginning_of_month, scholarship_type: @scholarship_type1)
+    @destroy_all << @scholarship2 = FactoryBot.create(:scholarship, scholarship_number: "B2", level: @level1, sponsor: @sponsor2, start_date: 6.years.ago.at_beginning_of_month, end_date: 4.years.from_now.at_beginning_of_month, scholarship_type: @scholarship_type1)
+    @destroy_all << @scholarship3 = FactoryBot.create(:scholarship, scholarship_number: "B3", level: @level1, sponsor: @sponsor1, start_date: 6.years.ago.at_beginning_of_month, end_date: 1.year.from_now.at_beginning_of_month, scholarship_type: @scholarship_type2)
 
     @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana")
     @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia")
@@ -38,8 +38,12 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status)
 
     @destroy_all << @record = FactoryBot.create(:scholarship_duration, enrollment: @enrollment1, scholarship: @scholarship1, start_date: 2.years.ago.at_beginning_of_month, end_date: 1.months.from_now.at_beginning_of_month)
-    @destroy_all << FactoryBot.create(:scholarship_duration, enrollment: @enrollment2, scholarship: @scholarship2, start_date: 3.years.ago.at_beginning_of_month, end_date: 2.years.ago.at_beginning_of_month)
-    @destroy_all << FactoryBot.create(:scholarship_duration, enrollment: @enrollment3, scholarship: @scholarship2, start_date: 1.years.ago.at_beginning_of_month, cancel_date: 6.months.from_now.at_beginning_of_month, end_date: 1.year.from_now.at_beginning_of_month)
+    @destroy_all << @scholarship_duration2 = FactoryBot.create(:scholarship_duration, enrollment: @enrollment2, scholarship: @scholarship2, start_date: 3.years.ago.at_beginning_of_month, end_date: 2.years.from_now.at_beginning_of_month)
+    @destroy_all << FactoryBot.create(:scholarship_duration, enrollment: @enrollment3, scholarship: @scholarship2, start_date: 6.years.ago.at_beginning_of_month, cancel_date: 5.years.ago.at_beginning_of_month, end_date: 4.years.ago.at_beginning_of_month)
+
+    @destroy_all << @scholarship_suspension1 = FactoryBot.create(:scholarship_suspension, scholarship_duration: @record, start_date: 1.year.ago.at_beginning_of_month, end_date: 6.months.ago.at_beginning_of_month, active: true)
+    @destroy_all << @scholarship_suspension2 = FactoryBot.create(:scholarship_suspension, scholarship_duration: @scholarship_duration2, start_date: 1.month.ago.at_beginning_of_month, end_date: 1.month.from_now.at_beginning_of_month, active: false)
+
 
     @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Erica", cpf: "3")
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment1, professor: @professor1, main_advisor: true)
@@ -158,9 +162,9 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     end
 
     it "should be able to search by start_date" do
-      select_month_year("search_start_date", 1.years.ago.at_beginning_of_month)
+      select_month_year("search_start_date", 3.years.ago.at_beginning_of_month)
       click_button "Buscar"
-      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2"]
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1", "B2"]
     end
 
     it "should be able to search by end_date" do
@@ -170,7 +174,7 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     end
 
     it "should be able to search by cancel_date" do
-      select_month_year("search_cancel_date", 6.months.from_now.at_beginning_of_month)
+      select_month_year("search_cancel_date", 5.years.ago.at_beginning_of_month)
       click_button "Buscar"
       expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2"]
     end
@@ -211,6 +215,29 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     it "should be able to search by active" do
       expect(page.all("select#search_active option").map(&:text)).to eq ["Todas", "Ativas", "Inativas"]
       find(:select, "search_active").find(:option, text: "Inativas").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2"]
+    end
+
+    it "should be able to search by active suspensions" do
+      find(:select, "search_suspended_active_suspension").find(:option, text: "Alguma").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1"]
+    end
+
+    it "should be able to search by the time interval of suspension" do
+      start_year = 0.years.ago.year
+      find(:select, "suspended_start_year").find(:option, text: start_year.to_s).select_option
+
+      start_month = I18n.l(2.months.ago, format: "%B")
+      find(:select, "suspended_start_month").find(:option, text: start_month).select_option
+
+      end_year = 0.years.ago.year
+      find(:select, "suspended_end_year").find(:option, text: end_year.to_s).select_option
+
+      end_month = I18n.l(2.months.from_now, format: "%B")
+      find(:select, "suspended_end_month").find(:option, text: end_month).select_option
+
       click_button "Buscar"
       expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B2"]
     end
