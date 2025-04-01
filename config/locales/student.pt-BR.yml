@@ -32,6 +32,7 @@ pt-BR:
         gender: "Gênero"
         skin_color: "Raça/Cor"
         pcd: "PCD"
+        obs_pcd: "Observações PCD"
         student_majors: "Cursos"
         telephone1: "1º Telefone"
         telephone2: "2º Telefone"
@@ -41,6 +42,8 @@ pt-BR:
         special_birth_city: "Naturalidade*"
         special_majors: "Cursos*"
         refugee: "Refugiado"
+        obs_refugee: "Observações de Refugiado"
+        obs: "Observações"
 
     errors:
       models:

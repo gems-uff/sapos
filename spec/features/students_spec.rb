@@ -122,9 +122,21 @@ RSpec.describe "Student features", type: :feature do
       expect(page.all("select#record_pcd_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
     end
 
+    it "should have a textarea for obs pcd" do
+      expect(page).to have_field("Observações PCD", type: "textarea")
+    end
+
     it "should have a selection for refugee options" do
       expect(page.all("select#record_refugee_ option").map(&:text)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.refugees").values
       expect(page.all("select#record_refugee_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.refugees").values
+    end
+
+    it "should have a textarea for obs refugee" do
+      expect(page).to have_field("Observações Refugiados", type: "textarea")
+    end
+
+    it "should have a textarea for obs" do
+      expect(page).to have_field("Observações", type: "textarea")
     end
 
     it "should have a selection for skin_color options" do

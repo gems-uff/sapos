@@ -9,11 +9,11 @@ class StudentsController < ApplicationController
   helper :student_majors
 
   UPDATE_FIELDS = [
-    :name, :photo, :sex, :gender, :civil_status, :skin_color, :pcd, :birthdate, :city, :neighborhood,
+    :name, :photo, :sex, :gender, :civil_status, :skin_color, :pcd, :obs_pcd, :birthdate, :city, :neighborhood,
     :address, :zip_code, :telephone1, :telephone2, :email, :employer,
     :job_position, :cpf, :identity_number, :identity_issuing_body,
     :identity_issuing_place, :identity_expedition_date, :birth_country,
-    :birth_state, :birth_city, :refugee, :father_name, :mother_name, :obs,
+    :birth_state, :birth_city, :refugee, :obs_refugee, :father_name, :mother_name, :obs,
     :student_majors
   ]
 
