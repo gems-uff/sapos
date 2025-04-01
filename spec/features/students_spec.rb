@@ -123,16 +123,16 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a textarea for obs pcd" do
-      expect(page).to have_field("Observações PCD", type: "textarea")
+      expect(page).to have_field("Observações de PCD", type: "textarea")
     end
 
     it "should have a selection for refugee options" do
       expect(page.all("select#record_refugee_ option").map(&:text)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.refugees").values
-      expect(page.all("select#record_refugee_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.refugees").values
+      expect(page.all("select#record_refugee_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.refugees").valuesde
     end
 
     it "should have a textarea for obs refugee" do
-      expect(page).to have_field("Observações Refugiados", type: "textarea")
+      expect(page).to have_field("Observações de Refugiado", type: "textarea")
     end
 
     it "should have a textarea for obs" do
