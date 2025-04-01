@@ -1,5 +1,5 @@
 class NewFormTemplate < ActiveRecord::Migration[7.0]
-  def change
+  def up
     Admissions::AdmissionProcess.all.each do |admission_process|
       form_template = admission_process.form_template
       fields = form_template&.fields
@@ -10,9 +10,10 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
       if field&.configuration
         configuration = JSON.parse(field.configuration)
         configuration["values"] = values
-        field.configuration = configuration.to_s
+        configuration["field"] = "skin_color"
+        field.configuration = JSON.dump(configuration)
       end
-      field&.save
+      field&.save!
 
       field = fields&.find_by(name: "Pessoa com deficiência")
       field&.field_type = Admissions::FormField::STUDENT_FIELD
@@ -20,9 +21,10 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
       if field&.configuration
         configuration = JSON.parse(field.configuration)
         configuration["values"] = values
-        field.configuration = configuration.to_s
+        configuration["field"] = "pcd"
+        field.configuration = JSON.dump(configuration)
       end
-      field&.save
+      field&.save!
 
       field = fields&.find_by(name: "Sexo")
       field&.field_type = Admissions::FormField::STUDENT_FIELD
@@ -30,34 +32,50 @@ class NewFormTemplate < ActiveRecord::Migration[7.0]
       if field&.configuration
         configuration = JSON.parse(field.configuration)
         configuration["values"] = values
-        field.configuration = configuration.to_s
+        configuration["field"] = "sex"
+        field.configuration = JSON.dump(configuration)
+      end
+      field&.save!
+
+    end
+  end
+  def down
+    Admissions::AdmissionProcess.all.each do |admission_process|
+      form_template = admission_process.form_template
+      fields = form_template&.fields
+
+      field = fields&.find_by(name: "Raça/cor")
+      field&.field_type = Admissions::FormField::SELECT
+      values = ["Sim", "Não"]
+      if field&.configuration
+        configuration = JSON.parse(field.configuration)
+        configuration["values"] = values
+        configuration["field"] = "skin_color"
+        field.configuration = JSON.dump(configuration)
       end
       field&.save
 
-      fields&.where('"order" >= ?', 6)&.update_all('"order" = "order" + 1')
-      field = Admissions::FormField.new(
-        name: I18n.t("active_scaffold.admissions/form_template.generate_fields.refugee"),
-        field_type: Admissions::FormField::STUDENT_FIELD,
-        order: 6,
-        configuration: JSON.dump({
-                                   "field": "refugee",
-                                   "values": I18n.t("active_scaffold.admissions/form_template.generate_fields.refugees").values,
-                                   "required": true })
-      )
-      field.form_template = form_template
-      field.save
+      field = fields&.find_by(name: "Pessoa com deficiência")
+      field&.field_type = Admissions::FormField::SELECT
+      values = ["Sim", "Não"]
+      if field&.configuration
+        configuration = JSON.parse(field.configuration)
+        configuration["values"] = values
+        configuration["field"] = "pcd"
+        field.configuration = JSON.dump(configuration)
+      end
+      field&.save
 
-
-
-      fields.where('"order" >= ?', 8).update_all('"order" = "order" + 1')
-      field = Admissions::FormField.new(
-        name: I18n.t("active_scaffold.admissions/form_template.generate_fields.gender"),
-        field_type: Admissions::FormField::STUDENT_FIELD,
-        order: 8,
-        configuration: JSON.dump({ "field": "gender", "required": true }),
-      )
-      field.form_template = form_template
-      field.save
+      field = fields&.find_by(name: "Sexo")
+      field&.field_type = Admissions::FormField::SELECT
+      values = ["Masculino", "Feminino", "Não declarado"]
+      if field&.configuration
+        configuration = JSON.parse(field.configuration)
+        configuration["values"] = values
+        configuration["field"] = "sex"
+        field.configuration = JSON.dump(configuration)
+      end
+      field&.save
 
 
     end

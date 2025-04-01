@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_02_20_215914) do
+ActiveRecord::Schema[7.0].define(version: 2025_04_01_141450) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -1041,6 +1041,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_02_20_215914) do
     t.string "skin_color"
     t.string "pcd"
     t.string "refugee"
+    t.text "obs_pcd"
+    t.text "obs_refugee"
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"

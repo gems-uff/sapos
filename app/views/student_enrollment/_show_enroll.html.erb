@@ -1,4 +1,4 @@
-<div class="enrollment-show-box show-box">
+<div class="enrollment-show-box show-box <%= "background-#{enrollment_request.persisted? ? ClassEnrollmentRequest::STATUSES_MAP[enrollment_request.status] : 'not-persisted'}"%>"> 
   <h3>
     <% if semester.main_enroll_open? %>
       <%= t "student_enrollment.show_enroll.title_main", semester:  semester.to_label %>
