@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
+ActiveRecord::Schema[7.0].define(version: 2025_04_01_141450) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -129,7 +129,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
     t.boolean "candidate_can_see_shared", default: false, null: false
     t.boolean "candidate_can_see_consolidation", default: false, null: false
     t.boolean "committee_can_see_other_individual", default: false, null: false
-    t.index ["approval_condition_id"], name: "index_admission_phases_on_approval_condition_id"
+    t.index "\"ranking_config_id\"", name: "index_admission_phases_on_ranking_config_id"
     t.index ["candidate_form_id"], name: "index_admission_phases_on_candidate_form_id"
     t.index ["consolidation_form_id"], name: "index_admission_phases_on_consolidation_form_id"
     t.index ["keep_in_phase_condition_id"], name: "index_admission_phases_on_keep_in_phase_condition_id"
@@ -801,8 +801,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
 
   create_table "program_levels", force: :cascade do |t|
     t.integer "level", null: false
-    t.datetime "start_date", null: false
-    t.datetime "end_date"
+    t.date "start_date", null: false
+    t.date "end_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -1037,6 +1037,12 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
     t.string "photo", limit: 255
     t.integer "birth_country_id"
     t.integer "user_id", limit: 8
+    t.string "gender"
+    t.string "skin_color"
+    t.string "pcd"
+    t.string "refugee"
+    t.text "obs_pcd"
+    t.text "obs_refugee"
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"
@@ -1101,4 +1107,14 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "assertions", "queries"
+  add_foreign_key "grants", "professors"
+  add_foreign_key "paper_professors", "papers"
+  add_foreign_key "paper_professors", "professors"
+  add_foreign_key "paper_students", "papers"
+  add_foreign_key "paper_students", "students"
+  add_foreign_key "papers", "professors", column: "owner_id"
+  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
+  add_foreign_key "reports", "users", column: "generated_by_id"
+  add_foreign_key "reports", "users", column: "invalidated_by_id"
 end
