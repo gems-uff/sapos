@@ -66,6 +66,7 @@ pt-BR:
           not_declared: Não declarado
           no: Não
           yes: Sim
+        obs_refugee: Observação do Refugiado
         sex: Sexo
         skin_color: Raça/cor
         skin_colors:
@@ -86,6 +87,7 @@ pt-BR:
           not_declared: Não declarado
           no: Não
           yes: Sim
+        obs_pcd: Observação PCD
         identity_or_passport: Número da identidade ou passaporte
         identity_issuing_body: Órgão expeditor
         identity_issuing_place: Local de expedição
