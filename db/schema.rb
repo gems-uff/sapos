@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_04_01_141450) do
+ActiveRecord::Schema[7.0].define(version: 2025_04_04_133643) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -348,6 +348,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_04_01_141450) do
     t.datetime "enrollment_adjust", precision: nil
     t.datetime "enrollment_insert", precision: nil
     t.datetime "enrollment_remove", precision: nil
+    t.datetime "grade_pendency", precision: nil
   end
 
   create_table "countries", force: :cascade do |t|

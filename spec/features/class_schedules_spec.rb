@@ -21,7 +21,8 @@ RSpec.describe "ClassSchedules features", type: :feature do
       enrollment_end: DateTime.new(2023, 3, 23, 23, 59, 59, Time.zone.formatted_offset),
       enrollment_adjust: DateTime.new(2023, 4, 3, 0, 0, 0, Time.zone.formatted_offset),
       enrollment_insert: DateTime.new(2023, 4, 18, 23, 59, 59, Time.zone.formatted_offset),
-      enrollment_remove: DateTime.new(2023, 5, 3, 23, 59, 59, Time.zone.formatted_offset)
+      enrollment_remove: DateTime.new(2023, 5, 3, 23, 59, 59, Time.zone.formatted_offset),
+      grade_pendency: DateTime.new(2023, 6, 22, 0, 0, 0, Time.zone.formatted_offset)
     )
     @destroy_all << @record = FactoryBot.create(
       :class_schedule, year: 2022, semester: 1,
@@ -29,7 +30,8 @@ RSpec.describe "ClassSchedules features", type: :feature do
       enrollment_end: DateTime.new(2022, 3, 17, 23, 59, 59, Time.zone.formatted_offset),
       enrollment_adjust: DateTime.new(2022, 3, 28, 0, 0, 0, Time.zone.formatted_offset),
       enrollment_insert: DateTime.new(2022, 4, 12, 23, 59, 59, Time.zone.formatted_offset),
-      enrollment_remove: DateTime.new(2022, 4, 27, 23, 59, 59, Time.zone.formatted_offset)
+      enrollment_remove: DateTime.new(2022, 4, 27, 23, 59, 59, Time.zone.formatted_offset),
+      grade_pendency: DateTime.new(2022, 5, 22, 0, 0, 0, Time.zone.formatted_offset)
     )
     @destroy_all << FactoryBot.create(
       :class_schedule, year: 2022, semester: 2,
@@ -37,7 +39,8 @@ RSpec.describe "ClassSchedules features", type: :feature do
       enrollment_end: DateTime.new(2022, 8, 11, 23, 59, 59, Time.zone.formatted_offset),
       enrollment_adjust: DateTime.new(2022, 8, 22, 0, 0, 0, Time.zone.formatted_offset),
       enrollment_insert: DateTime.new(2022, 9, 6, 23, 59, 59, Time.zone.formatted_offset),
-      enrollment_remove: DateTime.new(2022, 9, 21, 23, 59, 59, Time.zone.formatted_offset)
+      enrollment_remove: DateTime.new(2022, 9, 21, 23, 59, 59, Time.zone.formatted_offset),
+      grade_pendency: DateTime.new(2022, 10, 22, 0, 0, 0, Time.zone.formatted_offset)
     )
   end
   after(:each) do
@@ -61,7 +64,8 @@ RSpec.describe "ClassSchedules features", type: :feature do
         "Ano", "Semestre", "Data de Início das Inscrições",
         "Data de Fim das Inscrições", "Início do Período de Ajustes",
         "Data Limite para Adicionar Disciplinas",
-        "Data Limite para Remover Disciplinas", ""
+        "Data Limite para Remover Disciplinas",
+        "Data de Pendência de Lançamento de Nota", ""
       ]
     end
 
@@ -115,6 +119,10 @@ RSpec.describe "ClassSchedules features", type: :feature do
 
     it "should have a datetime picker for enrollment_remove" do
       expect(page).to have_css("input.enrollment_remove-input.datetime_picker")
+    end
+
+    it "should have a datetime picker for grade_pendency" do
+      expect(page).to have_css("input.grade_pendency-input.datetime_picker")
     end
   end
 
