@@ -70,6 +70,33 @@ class CourseClass < ApplicationRecord
     name_with_class.gsub("<", "&lt;")
   end
 
+  def self.pendency_condition(user = nil)
+    user ||= current_user
+    return ["0 = -1"] if user.blank?
+    return ["0 = -1"] if user.cannot?(:read_pendencies, CourseClass)
+
+    semester = ClassSchedule.find_by(year: YearSemester.current.year, semester: YearSemester.current.semester)
+
+    if semester && semester.show_grade_pendency?
+      course_class_arel = CourseClass.arel_table.dup
+      class_enrollment_arel = ClassEnrollment.arel_table.dup
+
+      query = course_class_arel
+      .join(class_enrollment_arel)
+      .on(course_class_arel[:id].eq(class_enrollment_arel[:course_class_id]))
+      .where(class_enrollment_arel[:grade].eq(nil)
+      .and(course_class_arel[:year].eq(YearSemester.current.year))
+      .and(course_class_arel[:semester].eq(YearSemester.current.semester)))
+
+      if user.professor.present?
+        query = query.where(course_class_arel[:professor_id].eq(user.professor.id))
+      end
+
+      return [course_class_arel[:id].in(query.project(course_class_arel[:id])).to_sql]
+    end
+    ["0 = -1"]
+  end
+
   private
     def professor_changed_only_valid_fields
       campos_modificaveis = []

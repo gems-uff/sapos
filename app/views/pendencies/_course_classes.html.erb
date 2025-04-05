@@ -1,0 +1,8 @@
+<div class="pendency-type-box">
+  <%= render active_scaffold: "course_classes", conditions: conditions %>
+
+  <span class="pendency-description">
+    Essa lista exibe apenas as turmas que apresentam algum aluno sem nota.<br>
+    Para acessar a lista de turmas completa, acesse: <%= link_to "Disciplinas > Turmas", course_classes_path %>
+  </span>
+</div>

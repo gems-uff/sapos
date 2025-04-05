@@ -16,7 +16,8 @@ RSpec.describe ClassSchedule, type: :model do
       enrollment_end: Time.now,
       enrollment_adjust: Time.now,
       enrollment_insert: Time.now,
-      enrollment_remove: Time.now
+      enrollment_remove: Time.now,
+      grade_pendency: Time.now
     )
   end
   subject { class_schedule }
@@ -31,10 +32,11 @@ RSpec.describe ClassSchedule, type: :model do
     it { should validate_presence_of(:enrollment_adjust) }
     it { should validate_presence_of(:enrollment_insert) }
     it { should validate_presence_of(:enrollment_remove) }
+    it { should validate_presence_of(:grade_pendency) }
   end
   describe "Methods" do
     describe "to_label" do
-      it "should return YYYY.S" do 
+      it "should return YYYY.S" do
         class_schedule.year = 2021
         class_schedule.semester = 1
         expect(class_schedule.to_label).to eq("2021.1")
