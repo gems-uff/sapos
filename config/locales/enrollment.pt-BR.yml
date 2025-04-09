@@ -9,6 +9,7 @@ pt-BR:
         accomplishment_date: "até"
         active: "Ativo?"
         admission_date: "Data de Admissão"
+        admission_selection: "Seleção do ingresso"
         advisements: "Orientadores"
         class_enrollments: "Inscrições"
         course_class_year_semester: "Disciplina"

@@ -84,6 +84,10 @@ class EnrollmentsController < ApplicationController
     config.columns[:active].search_ui = :select
     config.columns[:admission_date].options = { format: :monthyear }
     config.columns[:admission_date].search_sql = "enrollments.admission_date"
+    config.columns[:admission_selection].form_ui = :select
+    config.columns[:admission_selection].options = {
+      options: ["Ampla Concorrência", "PCD", "Racial"]
+    }
     config.columns[:course_class_year_semester].search_sql = ""
     config.columns[:delayed_phase].search_sql = ""
     config.columns[:delayed_phase].search_ui = :select
@@ -120,6 +124,7 @@ class EnrollmentsController < ApplicationController
       :enrollment_number,
       :student,
       :admission_date,
+      :admission_selection,
       :enrollment_status,
       :level,
       :research_area,
