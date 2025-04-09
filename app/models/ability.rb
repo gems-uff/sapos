@@ -40,7 +40,7 @@ class Ability
   ]
 
   DOCUMENT_MODELS = [
-    Report, Assertion, Notification, NotificationLog, ReportConfiguration, Query
+    Report, Assertion, Notification, NotificationLog, ReportConfiguration, Query, QueryParam
   ]
 
   PLACE_MODELS = [
