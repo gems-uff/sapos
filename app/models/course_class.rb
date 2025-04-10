@@ -76,6 +76,7 @@ class CourseClass < ApplicationRecord
     return ["0 = -1"] if user.cannot?(:read_pendencies, CourseClass)
 
     semester = ClassSchedule.find_by(year: YearSemester.current.year, semester: YearSemester.current.semester)
+    return ["0 = -1"] if semester.grade_pendency.nil?
 
     if semester && semester.show_grade_pendency?
       course_class_arel = CourseClass.arel_table.dup
