@@ -133,7 +133,8 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
       enrollment_end: DateTime.new(2022, 8, 11, 23, 59, 59, Time.zone.formatted_offset),
       enrollment_adjust: DateTime.new(2022, 8, 22, 0, 0, 0, Time.zone.formatted_offset),
       enrollment_insert: DateTime.new(2022, 9, 6, 23, 59, 59, Time.zone.formatted_offset),
-      enrollment_remove: DateTime.new(2022, 9, 21, 23, 59, 59, Time.zone.formatted_offset)
+      enrollment_remove: DateTime.new(2022, 9, 21, 23, 59, 59, Time.zone.formatted_offset),
+      grade_pendency: DateTime.new(2022, 11, 22, 0, 0, 0, Time.zone.formatted_offset)
     )
 
     # Enrollment request

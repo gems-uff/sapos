@@ -14,5 +14,6 @@ FactoryBot.define do
     enrollment_adjust { "2021-07-27 17:02:22" }
     enrollment_insert { "2021-07-27 17:02:22" }
     enrollment_remove { "2021-07-27 17:02:22" }
+    grade_pendency { "2021-07-27 17:02:22" }
   end
 end

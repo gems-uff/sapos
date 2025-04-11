@@ -51,4 +51,8 @@ module ClassSchedulesHelper
   def enrollment_remove_form_column(record, options)
     _end_date_column(record, options, :enrollment_remove, :enrollment_end)
   end
+
+  def grade_pendency_form_column(record, options)
+    _start_date_column(record, options, :grade_pendency)
+  end
 end

@@ -43,15 +43,12 @@ module AssertionsPdfHelper
     columns = results[:columns]
 
     raise Exceptions::EmptyQueryException if rows.empty?
-    if rows.size == 1
-      bindings = {}.merge(Hash[columns.zip(rows.first)])
-    else
-      unique_columns = find_unique_columns(columns, rows)
-      bindings = {
-        rows: rows,
-        columns: columns
-      }.merge(Hash[unique_columns.zip(rows.first.values_at(*unique_columns.map { |col| columns.index(col) }))])
-    end
+    
+    unique_columns = find_unique_columns(columns, rows)
+    bindings = {
+      rows: rows,
+      columns: columns
+    }.merge(Hash[unique_columns.zip(rows.first.values_at(*unique_columns.map { |col| columns.index(col) }))])
 
     box_width = 500
     box_height = 560
