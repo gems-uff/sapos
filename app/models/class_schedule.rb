@@ -17,7 +17,7 @@ class ClassSchedule < ApplicationRecord
   validates :enrollment_adjust, presence: true
   validates :enrollment_insert, presence: true
   validates :enrollment_remove, presence: true
-  validates :grade_pendency, presence: false
+  validates :grade_pendency, presence: true
 
   def to_label
     "#{year}.#{semester}"
