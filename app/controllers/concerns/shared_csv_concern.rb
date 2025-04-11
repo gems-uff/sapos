@@ -22,12 +22,11 @@ module SharedCsvConcern
           sequencial_number,
           class_enrollment.enrollment.enrollment_number,
           class_enrollment.enrollment.student.name,
-          class_enrollment.grade,
+          class_enrollment.grade_to_view,
           class_enrollment.attendance_to_label,
           class_enrollment.situation,
           class_enrollment.obs,
-          class_enrollment.enrollment.has_active_scholarship_now? ? has_scholarship : hasnt_scholarship
-        ]
+          class_enrollment.enrollment.has_active_scholarship_now? ? has_scholarship : hasnt_scholarship]
       end
     end
   end
