@@ -77,7 +77,7 @@ class CourseClass < ApplicationRecord
 
     semester = ClassSchedule.find_by(year: YearSemester.current.year, semester: YearSemester.current.semester)
 
-    if semester && semester.show_grade_pendency?
+    if semester && semester.show_period_end?
       course_class_arel = CourseClass.arel_table.dup
       class_enrollment_arel = ClassEnrollment.arel_table.dup
 

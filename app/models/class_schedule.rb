@@ -14,18 +14,23 @@ class ClassSchedule < ApplicationRecord
     uniqueness: { scope: [:year] }
   validates :enrollment_start, presence: true
   validates :enrollment_end, presence: true
-  validates :enrollment_adjust, presence: true
+  validates :period_start, presence: true
   validates :enrollment_insert, presence: true
   validates :enrollment_remove, presence: true
-  validates :grade_pendency, presence: true
+  validates :period_end, presence: true
+  validates :grades_deadline, presence: true
 
   def to_label
     "#{year}.#{semester}"
   end
 
-  def show_grade_pendency?(now = nil)
+  def show_period_end?(now = nil)
     now ||= Time.now
-    self.grade_pendency && self.grade_pendency <= now
+    self.period_end && self.period_end - 7.days <= now
+  end
+
+  def grades_deadline_to_view
+    "#{ "%.2i" % (self.grades_deadline.day)}/#{ "%.2i" % (self.grades_deadline.month)}"
   end
 
   def main_enroll_open?(now = nil)
@@ -35,12 +40,12 @@ class ClassSchedule < ApplicationRecord
 
   def adjust_enroll_insert_open?(now = nil)
     now ||= Time.now
-    self.enrollment_adjust <= now && now <= self.enrollment_insert
+    self.period_start <= now && now <= self.enrollment_insert
   end
 
   def adjust_enroll_remove_open?(now = nil)
     now ||= Time.now
-    self.enrollment_adjust <= now && now <= self.enrollment_remove
+    self.period_start <= now && now <= self.enrollment_remove
   end
 
   def enroll_open?(now = nil)
@@ -69,13 +74,13 @@ class ClassSchedule < ApplicationRecord
 
   def self.arel_adjust_enroll_insert_open?(now = nil)
     now ||= Time.now
-    ClassSchedule.arel_table[:enrollment_adjust].lteq(now)
+    ClassSchedule.arel_table[:period_start].lteq(now)
     .and(ClassSchedule.arel_table[:enrollment_insert].gteq(now))
   end
 
   def self.arel_adjust_enroll_remove_open?(now = nil)
     now ||= Time.now
-    ClassSchedule.arel_table[:enrollment_adjust].lteq(now)
+    ClassSchedule.arel_table[:period_start].lteq(now)
     .and(ClassSchedule.arel_table[:enrollment_remove].gteq(now))
   end
 
