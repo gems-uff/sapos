@@ -14,10 +14,11 @@ RSpec.describe ClassSchedule, type: :model do
       semester: 2,
       enrollment_start: Time.now,
       enrollment_end: Time.now,
-      enrollment_adjust: Time.now,
+      period_start: Time.now,
       enrollment_insert: Time.now,
       enrollment_remove: Time.now,
-      grade_pendency: Time.now
+      period_end: Time.now,
+      grades_deadline: Time.now
     )
   end
   subject { class_schedule }
@@ -29,10 +30,11 @@ RSpec.describe ClassSchedule, type: :model do
     it { should validate_presence_of(:semester) }
     it { should validate_presence_of(:enrollment_start) }
     it { should validate_presence_of(:enrollment_end) }
-    it { should validate_presence_of(:enrollment_adjust) }
+    it { should validate_presence_of(:period_start) }
     it { should validate_presence_of(:enrollment_insert) }
     it { should validate_presence_of(:enrollment_remove) }
-    it { should validate_presence_of(:grade_pendency) }
+    it { should validate_presence_of(:period_end) }
+    it { should validate_presence_of(:grades_deadline) }
   end
   describe "Methods" do
     describe "to_label" do
@@ -67,21 +69,21 @@ RSpec.describe ClassSchedule, type: :model do
     describe "adjust_enroll_insert_open?" do
       it "should return true when time is in between the adjust and insert dates" do
         now = Time.now
-        class_schedule.enrollment_adjust = now - 1.day
+        class_schedule.period_start = now - 1.day
         class_schedule.enrollment_insert = now + 1.day
         expect(class_schedule.adjust_enroll_insert_open?).to eq(true)
         expect(class_schedule.adjust_enroll_insert_open?(now)).to eq(true)
       end
       it "should return false when time before the adjust date" do
         now = Time.now
-        class_schedule.enrollment_adjust = now + 1.day
+        class_schedule.period_start = now + 1.day
         class_schedule.enrollment_insert = now + 2.days
         expect(class_schedule.adjust_enroll_insert_open?).to eq(false)
         expect(class_schedule.adjust_enroll_insert_open?(now - 3.days)).to eq(false)
       end
       it "should return false when time after both the insert and remove dates" do
         now = Time.now
-        class_schedule.enrollment_adjust = now + 1.day
+        class_schedule.period_start = now + 1.day
         class_schedule.enrollment_insert = now + 2.days
         expect(class_schedule.adjust_enroll_insert_open?(now + 3.days)).to eq(false)
       end
@@ -89,21 +91,21 @@ RSpec.describe ClassSchedule, type: :model do
     describe "adjust_enroll_remove_open?" do
       it "should return true when time is in between the adjust and remove dates" do
         now = Time.now
-        class_schedule.enrollment_adjust = now - 1.day
+        class_schedule.period_start = now - 1.day
         class_schedule.enrollment_remove = now + 1.day
         expect(class_schedule.adjust_enroll_remove_open?).to eq(true)
         expect(class_schedule.adjust_enroll_remove_open?(now)).to eq(true)
       end
       it "should return false when time before the adjust date" do
         now = Time.now
-        class_schedule.enrollment_adjust = now + 1.day
+        class_schedule.period_start = now + 1.day
         class_schedule.enrollment_remove = now + 2.days
         expect(class_schedule.adjust_enroll_remove_open?).to eq(false)
         expect(class_schedule.adjust_enroll_remove_open?(now - 3.days)).to eq(false)
       end
       it "should return false when time after both the insert and remove dates" do
         now = Time.now
-        class_schedule.enrollment_adjust = now + 1.day
+        class_schedule.period_start = now + 1.day
         class_schedule.enrollment_remove = now + 2.days
         expect(class_schedule.adjust_enroll_remove_open?(now + 3.days)).to eq(false)
       end
@@ -114,7 +116,7 @@ RSpec.describe ClassSchedule, type: :model do
           now = Time.now
           class_schedule.enrollment_start = now - 1.day
           class_schedule.enrollment_end = now + 1.day
-          class_schedule.enrollment_adjust = now + 5.days
+          class_schedule.period_start = now + 5.days
           class_schedule.enrollment_insert = now + 6.days
           class_schedule.enrollment_remove = now + 6.days
           expect(class_schedule.enroll_open?).to eq(true)
@@ -124,7 +126,7 @@ RSpec.describe ClassSchedule, type: :model do
           now = Time.now
           class_schedule.enrollment_start = now + 1.day
           class_schedule.enrollment_end = now + 2.days
-          class_schedule.enrollment_adjust = now + 5.days
+          class_schedule.period_start = now + 5.days
           class_schedule.enrollment_insert = now + 6.days
           class_schedule.enrollment_remove = now + 6.days
           expect(class_schedule.enroll_open?).to eq(false)
@@ -134,7 +136,7 @@ RSpec.describe ClassSchedule, type: :model do
           now = Time.now
           class_schedule.enrollment_start = now + 1.day
           class_schedule.enrollment_end = now + 2.days
-          class_schedule.enrollment_adjust = now + 5.days
+          class_schedule.period_start = now + 5.days
           class_schedule.enrollment_insert = now + 6.days
           class_schedule.enrollment_remove = now + 6.days
           expect(class_schedule.enroll_open?(now + 3.days)).to eq(false)
@@ -145,7 +147,7 @@ RSpec.describe ClassSchedule, type: :model do
           now = Time.now
           class_schedule.enrollment_start = now - 5.days
           class_schedule.enrollment_end = now - 4.days
-          class_schedule.enrollment_adjust = now - 1.day
+          class_schedule.period_start = now - 1.day
           class_schedule.enrollment_insert = now + 1.day
           class_schedule.enrollment_remove = now - 1.day
           expect(class_schedule.enroll_open?).to eq(true)
@@ -155,7 +157,7 @@ RSpec.describe ClassSchedule, type: :model do
           now = Time.now
           class_schedule.enrollment_start = now - 5.days
           class_schedule.enrollment_end = now - 4.days
-          class_schedule.enrollment_adjust = now - 1.day
+          class_schedule.period_start = now - 1.day
           class_schedule.enrollment_insert = now - 1.day
           class_schedule.enrollment_remove = now + 1.day
           expect(class_schedule.enroll_open?).to eq(true)
@@ -165,7 +167,7 @@ RSpec.describe ClassSchedule, type: :model do
           now = Time.now
           class_schedule.enrollment_start = now - 5.days
           class_schedule.enrollment_end = now - 4.days
-          class_schedule.enrollment_adjust = now - 1.day
+          class_schedule.period_start = now - 1.day
           class_schedule.enrollment_insert = now + 1.day
           class_schedule.enrollment_remove = now + 1.day
           expect(class_schedule.enroll_open?).to eq(true)
@@ -175,7 +177,7 @@ RSpec.describe ClassSchedule, type: :model do
           now = Time.now
           class_schedule.enrollment_start = now - 5.days
           class_schedule.enrollment_end = now - 4.days
-          class_schedule.enrollment_adjust = now + 1.day
+          class_schedule.period_start = now + 1.day
           class_schedule.enrollment_insert = now + 2.days
           class_schedule.enrollment_remove = now + 2.days
           expect(class_schedule.enroll_open?).to eq(false)
@@ -185,7 +187,7 @@ RSpec.describe ClassSchedule, type: :model do
           now = Time.now
           class_schedule.enrollment_start = now - 5.days
           class_schedule.enrollment_end = now - 4.days
-          class_schedule.enrollment_adjust = now + 1.day
+          class_schedule.period_start = now + 1.day
           class_schedule.enrollment_insert = now + 2.days
           class_schedule.enrollment_remove = now + 2.days
           expect(class_schedule.enroll_open?(now + 3.days)).to eq(false)

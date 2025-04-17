@@ -131,10 +131,11 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
       :class_schedule, year: 2022, semester: 2,
       enrollment_start: DateTime.new(2022, 8, 8, 0, 0, 0, Time.zone.formatted_offset),
       enrollment_end: DateTime.new(2022, 8, 11, 23, 59, 59, Time.zone.formatted_offset),
-      enrollment_adjust: DateTime.new(2022, 8, 22, 0, 0, 0, Time.zone.formatted_offset),
+      period_start: DateTime.new(2022, 8, 22, 0, 0, 0, Time.zone.formatted_offset),
       enrollment_insert: DateTime.new(2022, 9, 6, 23, 59, 59, Time.zone.formatted_offset),
       enrollment_remove: DateTime.new(2022, 9, 21, 23, 59, 59, Time.zone.formatted_offset),
-      grade_pendency: DateTime.new(2022, 11, 22, 0, 0, 0, Time.zone.formatted_offset)
+      period_end: DateTime.new(2022, 11, 22, 0, 0, 0, Time.zone.formatted_offset),
+      grades_deadline: DateTime.new(2022, 11, 29, 0, 0, 0, Time.zone.formatted_offset)
     )
 
     # Enrollment request
@@ -398,7 +399,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
       before(:all) do
         @class_schedule.enrollment_start = 3.days.ago
         @class_schedule.enrollment_end = 2.days.ago
-        @class_schedule.enrollment_adjust = 1.days.ago
+        @class_schedule.period_start = 1.days.ago
         @class_schedule.enrollment_insert = 3.days.from_now
         @class_schedule.enrollment_remove = 3.days.from_now
         @class_schedule.save!
@@ -406,7 +407,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
       after(:all) do
         @class_schedule.enrollment_start = DateTime.new(2022, 8, 8, 0, 0, 0, Time.zone.formatted_offset)
         @class_schedule.enrollment_end = DateTime.new(2022, 8, 11, 23, 59, 59, Time.zone.formatted_offset)
-        @class_schedule.enrollment_adjust = DateTime.new(2022, 8, 22, 0, 0, 0, Time.zone.formatted_offset)
+        @class_schedule.period_start = DateTime.new(2022, 8, 22, 0, 0, 0, Time.zone.formatted_offset)
         @class_schedule.enrollment_insert = DateTime.new(2022, 9, 6, 23, 59, 59, Time.zone.formatted_offset)
         @class_schedule.enrollment_remove = DateTime.new(2022, 9, 21, 23, 59, 59, Time.zone.formatted_offset)
         @enrollment_request3_2022_2.student_view_at = 3.days.ago
@@ -432,7 +433,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     before(:all) do
       @class_schedule.enrollment_start = 3.days.ago
       @class_schedule.enrollment_end = 3.days.from_now
-      @class_schedule.enrollment_adjust = 4.days.from_now
+      @class_schedule.period_start = 4.days.from_now
       @class_schedule.enrollment_insert = 5.days.from_now
       @class_schedule.enrollment_remove = 6.days.from_now
       @class_schedule.save!
@@ -551,7 +552,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     before(:all) do
       @class_schedule.enrollment_start = 3.days.ago
       @class_schedule.enrollment_end = 3.days.from_now
-      @class_schedule.enrollment_adjust = 4.days.from_now
+      @class_schedule.period_start = 4.days.from_now
       @class_schedule.enrollment_insert = 5.days.from_now
       @class_schedule.enrollment_remove = 6.days.from_now
       @class_schedule.save!

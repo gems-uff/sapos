@@ -19,28 +19,31 @@ RSpec.describe "ClassSchedules features", type: :feature do
       :class_schedule, year: 2023, semester: 1,
       enrollment_start: DateTime.new(2023, 3, 20, 0, 0, 0, Time.zone.formatted_offset),
       enrollment_end: DateTime.new(2023, 3, 23, 23, 59, 59, Time.zone.formatted_offset),
-      enrollment_adjust: DateTime.new(2023, 4, 3, 0, 0, 0, Time.zone.formatted_offset),
+      period_start: DateTime.new(2023, 4, 3, 0, 0, 0, Time.zone.formatted_offset),
       enrollment_insert: DateTime.new(2023, 4, 18, 23, 59, 59, Time.zone.formatted_offset),
       enrollment_remove: DateTime.new(2023, 5, 3, 23, 59, 59, Time.zone.formatted_offset),
-      grade_pendency: DateTime.new(2023, 6, 22, 0, 0, 0, Time.zone.formatted_offset)
+      period_end: DateTime.new(2023, 6, 22, 0, 0, 0, Time.zone.formatted_offset),
+      grades_deadline: DateTime.new(2023, 6, 29, 0, 0, 0, Time.zone.formatted_offset)
     )
     @destroy_all << @record = FactoryBot.create(
       :class_schedule, year: 2022, semester: 1,
       enrollment_start: DateTime.new(2022, 3, 14, 0, 0, 0, Time.zone.formatted_offset),
       enrollment_end: DateTime.new(2022, 3, 17, 23, 59, 59, Time.zone.formatted_offset),
-      enrollment_adjust: DateTime.new(2022, 3, 28, 0, 0, 0, Time.zone.formatted_offset),
+      period_start: DateTime.new(2022, 3, 28, 0, 0, 0, Time.zone.formatted_offset),
       enrollment_insert: DateTime.new(2022, 4, 12, 23, 59, 59, Time.zone.formatted_offset),
       enrollment_remove: DateTime.new(2022, 4, 27, 23, 59, 59, Time.zone.formatted_offset),
-      grade_pendency: DateTime.new(2022, 5, 22, 0, 0, 0, Time.zone.formatted_offset)
+      period_end: DateTime.new(2022, 5, 22, 0, 0, 0, Time.zone.formatted_offset),
+      grades_deadline: DateTime.new(2022, 5, 29, 0, 0, 0, Time.zone.formatted_offset)
     )
     @destroy_all << FactoryBot.create(
       :class_schedule, year: 2022, semester: 2,
       enrollment_start: DateTime.new(2022, 8, 8, 0, 0, 0, Time.zone.formatted_offset),
       enrollment_end: DateTime.new(2022, 8, 11, 23, 59, 59, Time.zone.formatted_offset),
-      enrollment_adjust: DateTime.new(2022, 8, 22, 0, 0, 0, Time.zone.formatted_offset),
+      period_start: DateTime.new(2022, 8, 22, 0, 0, 0, Time.zone.formatted_offset),
       enrollment_insert: DateTime.new(2022, 9, 6, 23, 59, 59, Time.zone.formatted_offset),
       enrollment_remove: DateTime.new(2022, 9, 21, 23, 59, 59, Time.zone.formatted_offset),
-      grade_pendency: DateTime.new(2022, 10, 22, 0, 0, 0, Time.zone.formatted_offset)
+      period_end: DateTime.new(2022, 10, 22, 0, 0, 0, Time.zone.formatted_offset),
+      grades_deadline: DateTime.new(2022, 10, 29, 0, 0, 0, Time.zone.formatted_offset)
     )
   end
   after(:each) do
@@ -62,10 +65,11 @@ RSpec.describe "ClassSchedules features", type: :feature do
       expect(page).to have_content "Quadros de Horários"
       expect(page.all("tr th").map(&:text)).to eq [
         "Ano", "Semestre", "Data de Início das Inscrições",
-        "Data de Fim das Inscrições", "Início do Período de Ajustes",
+        "Data de Fim das Inscrições", "Data de Início do Período Letivo",
         "Data Limite para Adicionar Disciplinas",
         "Data Limite para Remover Disciplinas",
-        "Data de Pendência de Lançamento de Nota", ""
+        "Data de Fim do Período Letivo",
+        "Data Limite para Lançamento de Notas", ""
       ]
     end
 
@@ -109,8 +113,8 @@ RSpec.describe "ClassSchedules features", type: :feature do
       expect(page).to have_css("input.enrollment_end-input.datetime_picker")
     end
 
-    it "should have a datetime picker for enrollment_adjust" do
-      expect(page).to have_css("input.enrollment_adjust-input.datetime_picker")
+    it "should have a datetime picker for period_start" do
+      expect(page).to have_css("input.period_start-input.datetime_picker")
     end
 
     it "should have a datetime picker for enrollment_insert" do
@@ -121,8 +125,12 @@ RSpec.describe "ClassSchedules features", type: :feature do
       expect(page).to have_css("input.enrollment_remove-input.datetime_picker")
     end
 
-    it "should have a datetime picker for grade_pendency" do
-      expect(page).to have_css("input.grade_pendency-input.datetime_picker")
+    it "should have a datetime picker for period_end" do
+      expect(page).to have_css("input.period_end-input.datetime_picker")
+    end
+
+    it "should have a datetime picker for grades_deadline" do
+      expect(page).to have_css("input.grades_deadline-input.datetime_picker")
     end
   end
 
@@ -143,10 +151,10 @@ RSpec.describe "ClassSchedules features", type: :feature do
       @record.save!
     end
 
-    it "should be able to copy enrollment_start to enrollment_adjust" do
-      expect(find("input.enrollment_adjust-input.datetime_picker").value).to eq "28 Mar 2022 00:00:00"
+    it "should be able to copy enrollment_start to period_start" do
+      expect(find("input.period_start-input.datetime_picker").value).to eq "28 Mar 2022 00:00:00"
       click_link "Repetir Data de Início das Inscrições"
-      expect(find("input.enrollment_adjust-input.datetime_picker").value).to eq "14 Mar 2022 00:00:00"
+      expect(find("input.period_start-input.datetime_picker").value).to eq "14 Mar 2022 00:00:00"
     end
 
     it "should be able to copy enrollment_end to enrollment_insert" do

@@ -17,7 +17,7 @@ RSpec.describe "Pendencies features", type: :feature do
 
     @destroy_all << CustomVariable.create(variable: :professor_login_can_post_grades, value: "yes")
 
-    @destroy_all << @class_schedule = FactoryBot.create(:class_schedule, year: 0.years.ago.year, semester: YearSemester.current.semester, grade_pendency: 5.days.ago)
+    @destroy_all << @class_schedule = FactoryBot.create(:class_schedule, year: 0.years.ago.year, semester: YearSemester.current.semester, period_end: 5.days.ago)
 
     @destroy_all << @level1 = FactoryBot.create(:level, name: "Doutorado")
     @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
