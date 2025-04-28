@@ -34,7 +34,7 @@ CustomVariable.create([
   { description: "Professor logado no sistema pode lançar notas. O valor yes habilita turmas do semestre atual, yes_all_semesters habilita qualquer semestre.", variable: "professor_login_can_post_grades", value: "no" },
   { description: "Periodo da Avaliação Quadrienal", variable: "quadrennial_period", value: "2021 - 2021" },
 ])
-ProgramLevel.create([{ value: "5", start_date: Time.now, end_date: nil }])
+ProgramLevel.create([{ level: "5", start_date: Time.now, end_date: nil }])
 
 ReportConfiguration.create([
   { name: "Boletim", scale: 1, x: 0, y: 0, order: 1,
