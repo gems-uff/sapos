@@ -4,8 +4,13 @@
 module AssertionsPdfHelper
   include AssertionHelperConcern
 
-  def format_text(bindings, template)
-    formatter = ErbFormatter.new(bindings)
+  def format_text(bindings, template, template_type)
+    if template_type == Assertion::ERB
+      cls = ErbFormatter
+    else
+      cls = LiquidFormatter
+    end
+    formatter = cls.new(bindings)
     formatter.format(template)
   end
 
@@ -15,10 +20,10 @@ module AssertionsPdfHelper
     end
   end
 
-  def assertion_box_text_print(pdf, template, bindings, box_width, box_height)
+  def assertion_box_text_print(pdf, template, template_type, bindings, box_width, box_height)
     pdf.move_down 30
 
-    text = format_text(bindings, template)
+    text = format_text(bindings, template, template_type)
 
     pdf.font("Times-Roman", size: 12) do
       pdf.fill_color "000000"
@@ -39,6 +44,7 @@ module AssertionsPdfHelper
     args = assertion.args
     results = get_query_results(assertion, args)
     template = assertion.assertion_template
+    template_type = assertion.template_type
     rows = results[:rows]
     columns = results[:columns]
 
@@ -53,6 +59,6 @@ module AssertionsPdfHelper
     box_width = 500
     box_height = 560
 
-    assertion_box_text_print(pdf, template, bindings, box_width, box_height)
+    assertion_box_text_print(pdf, template, template_type, bindings, box_width, box_height)
   end
 end
