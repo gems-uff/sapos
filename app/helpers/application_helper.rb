@@ -101,9 +101,9 @@ module ApplicationHelper
                      extra: extra })
   end
 
-  def code_mirror_text_area_widget(column, id, type, options, set_size = false)
+  def code_mirror_text_area_widget(column, id, type, options, set_size = false, line_wrapping = false)
     set_size_str = set_size ?
-      ".setSize(null, '#{options[:value].count("\n") + 2}em')" :
+      ".setSize(null, '#{(set_size.is_a?(TrueClass) ? options[:value].count("\n") + 2 : set_size)}em')" :
       ""
     block = text_area(:record, :sql_query, options)
     block + "<script>
@@ -113,7 +113,8 @@ module ApplicationHelper
       smartIndent: true,
       lineNumbers: true,
       matchBrackets : true,
-      autofocus: true
+      autofocus: true,
+      lineWrapping: #{line_wrapping ? "true" : "false"}
      }
     )#{set_size_str};
     </script>".html_safe

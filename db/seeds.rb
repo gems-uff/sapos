@@ -3244,9 +3244,124 @@ assertion = {
   name: "Declaração de conclusão de curso",
   student_can_generate: true,
   query_id: query_obj.id,
-  assertion_template: "Declaramos, para os devidos fins, que <%= var('nome_aluno') %>, CPF: <%= var('cpf_aluno') %>, matrícula <%= var('matricula_aluno') %>, cumpriu todos os requisitos para obtenção do título de <%= var('nivel_aluno') == 'Doutorado' ? 'Doutor' : 'Mestre' %>, tendo defendido, com aprovação, a Dissertação intitulada \"<%= var('titulo_tese') %>\", em <%= localize(var('data_defesa_tese'), :longdate) %>.",
+  template_type: "Liquid",
+  assertion_template: "Declaramos, para os devidos fins, que {{ nome_aluno }}, CPF: {{ cpf_aluno }}, matrícula {{ matricula_aluno }}, cumpriu todos os requisitos para obtenção do título de {% if nivel_aluno == 'Doutorado' %}Doutor{% else %}Mestre{% endif %}, tendo defendido, com aprovação, a Dissertação intitulada \"{{ titulo_tese }}\", em {{ data_defesa_tese | localize: 'longdate' }}.",
 }
 Assertion.create!(assertion)
+
+
+query = {
+  name: "DECLARAÇÃO - Disciplinas de aluno avulso",
+  description: "Recupera as notas das disciplinas que um avulso obteve num determinado ano/semestre.",
+  params: [
+    {
+      name: "matricula_aluno",
+      value_type: "String",
+    },
+    {
+      name: "ano_semestre_busca",
+      value_type: "Integer",
+    },
+    {
+      name: "numero_semestre_busca",
+      value_type: "Integer",
+    },
+  ],
+  sql: <<~SQL
+        SELECT
+          s.name as nome_aluno,
+          c.name as nome_disciplina,
+          c.workload as carga_horaria,
+          cs.year as ano_disciplina,
+          cs.semester as semestre_disciplina,
+          ce.grade as nota,
+          ce.situation as situacao
+        FROM
+          course_classes cs, class_enrollments ce, enrollments e, courses c, students s
+        WHERE
+          cs.id = ce.course_class_id AND
+          ce.enrollment_id = e.id AND
+          c.id = cs.course_id AND
+          e.student_id = s.id AND
+          cs.year = :ano_semestre_busca AND
+          cs.semester = :numero_semestre_busca AND
+          e.enrollment_number = :matricula_aluno
+  SQL
+}
+
+query_obj = Query.new(query.except(:params))
+query[:params].map do |query_param|
+  query_obj.params.build(query_param)
+end
+query_obj.save!
+
+Assertion.reset_column_information
+assertion = {
+  name: "Declaração de relatório de disciplinas para aluno avulso",
+  query_id: query_obj.id,
+  template_type: "Liquid",
+  assertion_template: "
+        Declaro, para os devidos fins, que {{ nome_aluno }} cursou como Aluno Avulso as seguintes disciplinas do Programa de Pós-Graduação em Computação, nos termos do Art. 15 do Regulamento dos Programas de Pós-Graduação Stricto Sensu da Universidade Federal Fluminense.
+
+        {% for record in records %>
+          Nome da disciplina: {{ record.nome_disciplina }}
+          Carga horaria total: {{ record.carga_horaria }}
+          Período: {{ record.ano_disciplina }}/{{ record.semestre_disciplina }} %>
+          Nota: {{ record.nota }}
+          Situação final: {{ record.situacao }}
+
+        {% endfor %}"
+}
+Assertion.create!(assertion)
+
+
+query = {
+  name: "DECLARAÇÃO - Participante externo em defesa de tese",
+  description: "Declaração de participante externo em defesa de dissertação.",
+  params: [
+    {
+      name: "matricula_aluno",
+      value_type: "String",
+    },
+    {
+      name: "cpf_professor",
+      value_type: "String",
+    },
+  ],
+  sql: <<~SQL
+      SELECT
+        s.name as nome_aluno,
+        l.name as nivel_aluno,
+        e.thesis_defense_date as data,
+        p.name as nome_professor
+      FROM
+        thesis_defense_committee_participations tdcp, enrollments e, students s, professors p, levels l
+      WHERE
+        tdcp.enrollment_id = e.id AND
+        e.student_id = s.id AND
+        tdcp.professor_id = p.id AND
+        e.level_id = l.id AND
+        e.enrollment_number = :matricula_aluno AND
+        p.cpf = :cpf_professor
+  SQL
+}
+
+query_obj = Query.new(query.except(:params))
+query[:params].map do |query_param|
+  query_obj.params.build(query_param)
+end
+query_obj.save!
+
+Assertion.reset_column_information
+assertion = {
+  name: "Declaração de participante externo em defesa de tese",
+  student_can_generate: true,
+  query_id: query_obj.id,
+  template_type: "Liquid",
+  assertion_template: "A quem possa interessar, declaramos que {{ nome_professor }} participou da banca de defesa da dissertação de {{ nivel_aluno }} de {{ nome_aluno }}, no dia {{ data | localize: 'longdate' }}.",
+}
+Assertion.create!(assertion)
+
 
 Institution.create([
   { name: "Associação de Ensino Superior do Piauí", code: "AESPI" },

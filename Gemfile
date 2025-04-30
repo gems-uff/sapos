@@ -125,6 +125,9 @@ gem "caxlsx"
 gem "caxlsx_rails"
 # gem "acts_as_xlsx"
 
+# Templates
+gem 'liquid'
+
 # Temporary fix of warnings
 # In the beggining of rails command executions, it shows some warnings related to these gems
 # If I'm not mistaken, the warnings should disappear on Ruby 3 or when a gem that depends on these gems update (I don't know which)

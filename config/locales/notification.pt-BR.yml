@@ -45,6 +45,7 @@ pt-BR:
     notification:
       sql_query_default: "SELECT students.name as name FROM students\nWHERE students.created_at < :data_consulta"
       body_template_default: "<%= var('name') %>"
+      body_template_default_liquid: "{{ name }}"
       frequency_description: "Diária: todo dia; Semanal: toda segunda; Mensal: dia 01 de cada mês; Semestral: 01/03 e 01/08; Anual: 01/01"
       execute_now: "Enviar agora"
       simulate: "Simular"
