@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_04_01_141450) do
+ActiveRecord::Schema[7.0].define(version: 2025_04_28_224615) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -129,7 +129,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_04_01_141450) do
     t.boolean "candidate_can_see_shared", default: false, null: false
     t.boolean "candidate_can_see_consolidation", default: false, null: false
     t.boolean "committee_can_see_other_individual", default: false, null: false
-    t.index "\"ranking_config_id\"", name: "index_admission_phases_on_ranking_config_id"
+    t.index ["approval_condition_id"], name: "index_admission_phases_on_approval_condition_id"
     t.index ["candidate_form_id"], name: "index_admission_phases_on_candidate_form_id"
     t.index ["consolidation_form_id"], name: "index_admission_phases_on_consolidation_form_id"
     t.index ["keep_in_phase_condition_id"], name: "index_admission_phases_on_keep_in_phase_condition_id"
@@ -287,6 +287,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_04_01_141450) do
     t.text "assertion_template"
     t.boolean "student_can_generate", default: false
     t.integer "expiration_in_months"
+    t.string "template_type", default: "Liquid"
     t.index ["query_id"], name: "index_assertions_on_query_id"
   end
 
