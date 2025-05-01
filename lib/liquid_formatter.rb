@@ -14,6 +14,18 @@ module SaposLiquidFilters
 end
 Liquid::Template.register_filter(SaposLiquidFilters)
 
+class RoleEmail < Liquid::Tag
+  def initialize(tag_name, role_name, tokens)
+     super
+     @role_name = role_name.strip
+  end
+
+  def render(context)
+    Role.find_by(name: @role_name).users.map(&:email).join(';')
+  end
+end
+Liquid::Template.register_tag('emails', RoleEmail)
+
 class LanguageTag < Liquid::Block
   @lang = nil
   def initialize(tag_name, markup, tokens)

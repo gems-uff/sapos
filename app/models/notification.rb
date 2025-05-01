@@ -7,9 +7,11 @@
 class Notification < ApplicationRecord
   has_paper_trail
 
-  belongs_to :query, inverse_of: :notifications, optional: false
+  @@disable_erb_validation = false
+  LIQUID = record_i18n_attr("template_types.liquid")
+  ERB = record_i18n_attr("template_types.erb")
 
-  has_many :notification_logs
+  TEMPLATE_TYPES = [LIQUID, ERB]
 
   DERIVATION_DEFS = {
     "data_consulta" => { name: "data_consulta", value_type: "Date" }
@@ -29,6 +31,10 @@ class Notification < ApplicationRecord
   MANUAL = I18n.t("activerecord.attributes.notification.frequencies.manual")
 
   FREQUENCIES = [ANNUAL, SEMIANNUAL, MONTHLY, WEEKLY, DAILY, MANUAL]
+
+  belongs_to :query, inverse_of: :notifications, optional: false
+
+  has_many :notification_logs
 
   validates :query, presence: true, on: :update
   validates :body_template, presence: true, on: :update
@@ -58,6 +64,9 @@ class Notification < ApplicationRecord
   validate do
     execution unless self.new_record?
   end
+
+  validates :template_type, presence: true, inclusion: { in: TEMPLATE_TYPES }, allow_blank: false
+  validate :cannot_create_new_erb_template, if: -> { self.template_type == ERB } 
 
   after_initialize do
     self.query_offset ||= "0"
@@ -182,10 +191,10 @@ class Notification < ApplicationRecord
       # Build the notifications with the results from the query
       if self.individual
         result[:rows].each do |raw_result|
-          bindings = {}.merge(params)
+          bindings = {rows: [raw_result], columns: result[:columns]}.merge(params)
           bindings.merge!(Hash[result[:columns].zip(raw_result)])
 
-          formatter = ErbFormatter.new(bindings)
+          formatter = FormatterFactory.create_formatter(bindings, self.template_type)
 
           notification = {
             notification_id: self.id,
@@ -217,7 +226,7 @@ class Notification < ApplicationRecord
             rows: result[:rows],
             columns: result[:columns]
           }.merge(params)
-          formatter = ErbFormatter.new(bindings)
+          formatter = FormatterFactory.create_formatter(bindings, self.template_type)
           notifications << {
               notification_id: self.id,
               to: formatter.format(self.to_template),
@@ -286,4 +295,36 @@ class Notification < ApplicationRecord
   def get_simulation_query_date
     self.where(active: true).find { |p| p.name == "data_consulta" }.simulation_value
   end
+
+  def self.disable_erb_validation!
+    @@disable_erb_validation = true
+    yield
+    @@disable_erb_validation = false
+  end
+
+  private
+
+    def cannot_create_new_erb_template
+      return if @@disable_erb_validation
+      notification = self.paper_trail.previous_version
+      current_to = I18n.transliterate(self.to_template).downcase
+      current_subject = I18n.transliterate(self.subject_template).downcase
+      current_body = I18n.transliterate(self.body_template).downcase
+      while notification.present?
+        old_to = I18n.transliterate(notification.to_template).downcase
+        old_subject = I18n.transliterate(notification.subject_template).downcase
+        old_body = I18n.transliterate(notification.body_template).downcase
+        all_same_ERB = (
+          current_to == old_to &&
+          current_subject == old_subject &&
+          current_body == old_body &&
+          notification.template_type == ERB
+        )
+        if all_same_ERB
+          return
+        end
+        notification = notification.paper_trail.previous_version
+      end
+      errors.add(:body_template, :cannot_create_new_erb_template)
+    end
 end

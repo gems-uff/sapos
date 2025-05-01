@@ -30,7 +30,7 @@ class NotificationsController < ApplicationController
 
     form_columns = [
       :title, :frequency, :notification_offset, :query_offset, :query,
-      :individual, :has_grades_report_pdf_attachment,
+      :individual, :has_grades_report_pdf_attachment, :template_type,
       :to_template, :subject_template, :body_template
     ]
     config.columns = form_columns
@@ -64,6 +64,11 @@ class NotificationsController < ApplicationController
       "active_scaffold.notification.query_offset_description"
     )
     config.columns[:query].update_columns = [:query]
+    config.columns[:template_type].form_ui = :select
+    config.columns[:template_type].options = {
+      options: Notification::TEMPLATE_TYPES,
+    }
+    #config.columns[:to_template].description = "Use {% emails Secretaria %} para todos emails de usuários da secretaria."
 
 
     config.create.label = :create_notification_label

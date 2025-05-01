@@ -44,7 +44,7 @@ class AddQueryAndAssertionForExternalParticipant < ActiveRecord::Migration[7.0]
       assertion_template: "A quem possa interessar, declaramos que <%= var('nome_professor') %> participou da banca de defesa da dissertação de <%= var('nivel_aluno') %> de <%= var('nome_aluno') %>, no dia <%= localize(var('data'), :longdate) %>.",
     }
     assertion_obj = Assertion.new(assertion)
-    assertion_obj.save!
+    assertion_obj.save!(validate: false)
   end
 
   def down

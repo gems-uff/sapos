@@ -5,12 +5,7 @@ module AssertionsPdfHelper
   include AssertionHelperConcern
 
   def format_text(bindings, template, template_type)
-    if template_type == Assertion::ERB
-      cls = ErbFormatter
-    else
-      cls = LiquidFormatter
-    end
-    formatter = cls.new(bindings)
+    formatter = FormatterFactory.create_formatter(bindings, template_type)
     formatter.format(template)
   end
 
