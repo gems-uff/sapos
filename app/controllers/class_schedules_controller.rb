@@ -13,8 +13,8 @@ class ClassSchedulesController < ApplicationController
     config.actions.swap :search, :field_search
     config.field_search.columns = [:year, :semester]
     columns = [
-      :year, :semester, :enrollment_start, :enrollment_end, :enrollment_adjust,
-      :enrollment_insert, :enrollment_remove
+      :year, :semester, :enrollment_start, :enrollment_end, :period_start,
+      :enrollment_insert, :enrollment_remove, :period_end, :grades_deadline
     ]
     config.list.columns = columns
     config.create.columns = columns
@@ -48,12 +48,16 @@ class ClassSchedulesController < ApplicationController
     config.columns[:enrollment_start].options = { format: :picker }
     config.columns[:enrollment_end].form_ui = :datetime_picker
     config.columns[:enrollment_end].options = { format: :picker }
-    config.columns[:enrollment_adjust].form_ui = :datetime_picker
-    config.columns[:enrollment_adjust].options = { format: :picker }
+    config.columns[:period_start].form_ui = :datetime_picker
+    config.columns[:period_start].options = { format: :picker }
     config.columns[:enrollment_insert].form_ui = :datetime_picker
     config.columns[:enrollment_insert].options = { format: :picker }
     config.columns[:enrollment_remove].form_ui = :datetime_picker
     config.columns[:enrollment_remove].options = { format: :picker }
+    config.columns[:period_end].form_ui = :datetime_picker
+    config.columns[:period_end].options = { format: :picker }
+    config.columns[:grades_deadline].form_ui = :datetime_picker
+    config.columns[:grades_deadline].options = { format: :picker }
   end
 
   def class_schedule_pdf

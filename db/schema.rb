@@ -346,9 +346,11 @@ ActiveRecord::Schema[7.0].define(version: 2025_04_28_224615) do
     t.datetime "enrollment_end", precision: nil
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "enrollment_adjust", precision: nil
+    t.datetime "period_start", precision: nil
     t.datetime "enrollment_insert", precision: nil
     t.datetime "enrollment_remove", precision: nil
+    t.datetime "period_end", precision: nil
+    t.datetime "grades_deadline", precision: nil
   end
 
   create_table "countries", force: :cascade do |t|
