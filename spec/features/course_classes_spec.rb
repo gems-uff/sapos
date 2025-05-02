@@ -4,7 +4,6 @@
 # frozen_string_literal: true
 
 require "spec_helper"
-require "csv"
 
 # ToDo: allocations
 
@@ -238,16 +237,16 @@ RSpec.describe "CourseClasses features", type: :feature do
     end
   end
 
-  describe "course class report as csv", js: true do
+  describe "course class report as xlsx", js: true do
     before(:each) do
         login_as(@user)
         visit url_path
       end
-    it "should download a summary as csv for a record" do
-      find("#as_#{plural_name}-summary_csv-#{@record.id}-link").click
+    it "should download a summary as xlsx for a record" do
+      find("#as_#{plural_name}-summary_xls-#{@record.id}-link").click
 
       wait_for_download
-      expect(download).to match(/Resumo Semestral - Defesa\.csv/)
+      expect(download).to match(/Resumo Semestral - Defesa\.xlsx/)
     end
   end
 end

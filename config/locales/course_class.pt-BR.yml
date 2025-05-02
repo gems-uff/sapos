@@ -54,13 +54,13 @@ pt-BR:
         year_semester: "Semestre/Ano"
         active_scholarship_table_footer_subtitle: "* aluno bolsista"
 
-  csv_content:
+  xls_content:
     course_class:
       summary:
         attendance: "Freq S/I"
         enrollment_number: "Matrícula"
         final_grade: "Nota Final"
-        link: "Pauta-CSV"
+        link: "Pauta-Excel"
         obs: "Obs.:"
         sequential_number: "Nº"
         situation: "Situação"

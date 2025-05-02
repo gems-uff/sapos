@@ -6,9 +6,8 @@
 class CourseClassesController < ApplicationController
   authorize_resource
   include SharedPdfConcern
-  include SharedCsvConcern
+  include SharedXlsConcern
   include NumbersHelper
-  require "csv"
 
   before_action :remove_constraint_to_show_enrollment_column, only: [:edit]
 
@@ -29,13 +28,13 @@ class CourseClassesController < ApplicationController
       type: :member,
       parameters: { format: :pdf }
 
-    config.action_links.add "summary_csv",
+    config.action_links.add "summary_xls",
       label: "<i title='#{I18n.t(
-        "csv_content.course_class.summary.link"
+        "xls_content.course_class.summary.link"
       )}' class='fa fa-table'></i>".html_safe,
       page: true,
       type: :member,
-      parameters: { format: :csv }
+      parameters: { format: :xlsx }
 
 
     config.list.sorting = { name: "ASC", id: "DESC" }
@@ -137,16 +136,16 @@ class CourseClassesController < ApplicationController
     end
   end
 
-  def summary_csv
+  def summary_xls
     @course_class = CourseClass.find(params[:id])
     @class_enrollments = ClassEnrollment.where(ClassEnrollment.arel_table[:course_class_id].eq(@course_class.id))
 
     respond_to do |format|
-      format.csv do
-        title = I18n.t("csv_content.course_class.summary.title")
-        send_data render_course_classes_summary_csv(@class_enrollments),
-          filename: "#{title} - #{@course_class.name_with_class}.csv",
-          type: "text/csv"
+      format.xlsx do
+        title = I18n.t("xls_content.course_class.summary.title")
+        send_data render_course_classes_summary_xls(@class_enrollments),
+          filename: "#{title} - #{@course_class.name_with_class}.xlsx",
+          type: "text/xlsx"
       end
     end
   end
