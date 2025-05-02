@@ -530,7 +530,7 @@ queries = [
           Informamos que os alunos abaixo não se se inscreveram em disciplinas:
 
           {% for record in records %}
-              - {{ record.nome }} ({{ record.matricula }}), status da matrícula: ({{ record.nome }}), data de admissão: {{ ingresso | localize: 'monthyear' }}
+              - {{ record.nome }} ({{ record.matricula }}), status da matrícula: ({{ record.nome }}), data de admissão: {{ record.ingresso | localize: 'monthyear' }}
           {% endfor %}
         LIQUID
       },
@@ -3334,7 +3334,7 @@ assertion = {
           Nome da disciplina: {{ record.nome_disciplina }}
           Carga horaria total: {{ record.carga_horaria }}
           Período: {{ record.ano_disciplina }}/{{ record.semestre_disciplina }}
-          Nota: {{ record.nota }}
+          Nota: {{ record.nota | divided_by: 10.0 }}
           Situação final: {{ record.situacao }}
 
         {% endfor %}"

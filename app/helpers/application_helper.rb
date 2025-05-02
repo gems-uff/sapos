@@ -120,9 +120,9 @@ module ApplicationHelper
     </script>".html_safe
   end
 
-  def code_mirror_view_widget(id, type, value, set_size = false)
+  def code_mirror_view_widget(id, type, value, set_size = false, line_wrapping = false)
     set_size_str = set_size ?
-      ".setSize(null, '#{value.count("\n") + 2}em')" :
+      ".setSize(null, '#{(set_size.is_a?(TrueClass) ? value.count("\n") + 2 : set_size)}em')" :
       ""
     "<div id='#{id}'></div>
     <script>
@@ -134,7 +134,8 @@ module ApplicationHelper
       lineNumbers: true,
       matchBrackets : true,
       autofocus: true,
-      readOnly: true
+      readOnly: true,
+      lineWrapping: #{line_wrapping ? "true" : "false"}
      }
     )#{set_size_str};
     </script>".html_safe
