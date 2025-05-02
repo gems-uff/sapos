@@ -5,7 +5,7 @@ class AddEndOfPeriodAndGradesDeadlineToClassSchedule < ActiveRecord::Migration[7
     reversible do |dir|
       dir.up do
         ClassSchedule.find_each do |schedule|
-          schedule.update!(period_end: schedule.period_start + 109.days, grades_deadline: schedule.period_start + 116.days)
+          schedule.update!(period_end: schedule.period_start + 110.days - 1.second, grades_deadline: schedule.period_start + 117.days - 1.second)
         end
       end
     end
