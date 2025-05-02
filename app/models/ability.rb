@@ -197,6 +197,7 @@ class Ability
       can :update_all_fields, CourseClass
       if !roles[Role::ROLE_COORDENACAO] && !roles[Role::ROLE_SECRETARIA]
         cannot :read_pendencies, ClassEnrollmentRequest
+        cannot :read_pendencies, CourseClass
       end
     end
     if roles[Role::ROLE_PROFESSOR]
@@ -216,14 +217,14 @@ class Ability
           can [:update, :post_grades], ClassEnrollment, course_class: {
             professor: user.professor
           }
-          can [:update, :post_grades], CourseClass, professor: user.professor
+          can [:update, :post_grades, :read_pendencies], CourseClass, professor: user.professor
         elsif CustomVariable.professor_login_can_post_grades == "yes"
           can [:update, :post_grades], ClassEnrollment, course_class: {
             professor: user.professor,
             year: YearSemester.current.year,
             semester: YearSemester.current.semester
           }
-          can [:update, :post_grades], CourseClass,
+          can [:update, :post_grades, :read_pendencies], CourseClass,
             professor: user.professor,
             year: YearSemester.current.year,
             semester: YearSemester.current.semester

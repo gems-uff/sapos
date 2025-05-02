@@ -346,9 +346,11 @@ ActiveRecord::Schema[7.0].define(version: 2025_04_28_224615) do
     t.datetime "enrollment_end", precision: nil
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "enrollment_adjust", precision: nil
+    t.datetime "period_start", precision: nil
     t.datetime "enrollment_insert", precision: nil
     t.datetime "enrollment_remove", precision: nil
+    t.datetime "period_end", precision: nil
+    t.datetime "grades_deadline", precision: nil
   end
 
   create_table "countries", force: :cascade do |t|
@@ -1108,14 +1110,4 @@ ActiveRecord::Schema[7.0].define(version: 2025_04_28_224615) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
-  add_foreign_key "assertions", "queries"
-  add_foreign_key "grants", "professors"
-  add_foreign_key "paper_professors", "papers"
-  add_foreign_key "paper_professors", "professors"
-  add_foreign_key "paper_students", "papers"
-  add_foreign_key "paper_students", "students"
-  add_foreign_key "papers", "professors", column: "owner_id"
-  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
-  add_foreign_key "reports", "users", column: "generated_by_id"
-  add_foreign_key "reports", "users", column: "invalidated_by_id"
 end

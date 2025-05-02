@@ -465,7 +465,7 @@ RSpec.describe EnrollmentRequest, type: :model do
               :class_schedule,
               enrollment_start: now - 1.day,
               enrollment_end: now + 1.day,
-              enrollment_adjust: now - 5.days,
+              period_start: now - 5.days,
               enrollment_insert: now - 4.days,
               enrollment_remove: now - 4.days,
             )
@@ -496,7 +496,7 @@ RSpec.describe EnrollmentRequest, type: :model do
               :class_schedule,
               enrollment_start: now - 5.days,
               enrollment_end: now - 4.days,
-              enrollment_adjust: now - 1.day,
+              period_start: now - 1.day,
               enrollment_insert: now + 1.day,
               enrollment_remove: now + 1.day,
             )
@@ -527,7 +527,7 @@ RSpec.describe EnrollmentRequest, type: :model do
               :class_schedule,
               enrollment_start: now - 5.days,
               enrollment_end: now - 4.days,
-              enrollment_adjust: now - 5.days,
+              period_start: now - 5.days,
               enrollment_insert: now - 4.days,
               enrollment_remove: now - 4.days,
             )
@@ -558,7 +558,7 @@ RSpec.describe EnrollmentRequest, type: :model do
               :class_schedule,
               enrollment_start: now - 5.days,
               enrollment_end: now - 4.days,
-              enrollment_adjust: now - 1.day,
+              period_start: now - 1.day,
               enrollment_insert: now + 1.day,
               enrollment_remove: now - 4.days,
             )
@@ -588,7 +588,7 @@ RSpec.describe EnrollmentRequest, type: :model do
               :class_schedule,
               enrollment_start: now - 5.days,
               enrollment_end: now - 4.days,
-              enrollment_adjust: now - 1.day,
+              period_start: now - 1.day,
               enrollment_insert: now - 4.days,
               enrollment_remove: now + 1.day,
             )
@@ -622,7 +622,7 @@ RSpec.describe EnrollmentRequest, type: :model do
               :class_schedule,
               enrollment_start: now - 1.day,
               enrollment_end: now + 1.day,
-              enrollment_adjust: now - 5.days,
+              period_start: now - 5.days,
               enrollment_insert: now - 4.days,
               enrollment_remove: now - 4.days,
             )
@@ -634,7 +634,7 @@ RSpec.describe EnrollmentRequest, type: :model do
               :class_schedule,
               enrollment_start: now - 5.days,
               enrollment_end: now - 4.days,
-              enrollment_adjust: now - 1.day,
+              period_start: now - 1.day,
               enrollment_insert: now + 1.day,
               enrollment_remove: now - 4.days,
             )
@@ -648,7 +648,7 @@ RSpec.describe EnrollmentRequest, type: :model do
               :class_schedule,
               enrollment_start: now - 5.days,
               enrollment_end: now - 4.days,
-              enrollment_adjust: now - 5.days,
+              period_start: now - 5.days,
               enrollment_insert: now - 4.days,
               enrollment_remove: now - 4.days,
             )
@@ -661,7 +661,7 @@ RSpec.describe EnrollmentRequest, type: :model do
               :class_schedule,
               enrollment_start: now - 5.days,
               enrollment_end: now - 4.days,
-              enrollment_adjust: now - 1.day,
+              period_start: now - 1.day,
               enrollment_insert: now + 1.day,
               enrollment_remove: now - 4.days,
             )
