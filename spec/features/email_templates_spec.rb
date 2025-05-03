@@ -78,25 +78,25 @@ RSpec.describe "EmailTemplates features", type: :feature do
         find(:css, ".select_builtin_options").find(:option, text: "devise:email_changed").select_option
       end
       expect(page).to have_field("Nome", with: "devise:email_changed")
-      expect(page).to have_field("Template do Destinatário", with: "<%= @resource.email %>")
+      expect(page).to have_field("Template do Destinatário", with: "{{ user.email }}")
       expect(page).to have_field("Template do Assunto", with: "Seu email no SAPOS foi alterado")
       expect(page).to have_css(".CodeMirror-code", text: "1
-<%= @resource.name %>,
+{{ user.name }},
 2
 3
-<% if @resource.try(:unconfirmed_email?) %>
+{% if unconfirmed_email %}
 4
-Seu email do SAPOS está sendo alterado para <%= @resource.unconfirmed_email %>.
+Seu email do SAPOS está sendo alterado para {{ user.unconfirmed_email }}.
 5
-<% else %>
+{% else %}
 6
-Seu email do SAPOS foi alterado para <%= @resource.email %>.
+Seu email do SAPOS foi alterado para {{ user.email }}.
 7
-<% end %>
+{% endif %}
 8
 9
 10
-<%= CustomVariable.notification_footer %>")
+{{ variables.notification_footer }}")
     end
 
     it "should have a codemirror for body" do

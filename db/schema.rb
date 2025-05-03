@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_05_01_031327) do
+ActiveRecord::Schema[7.0].define(version: 2025_05_02_212135) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -466,6 +466,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_01_031327) do
     t.boolean "enabled", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "template_type", default: "Liquid"
   end
 
   create_table "enrollment_holds", force: :cascade do |t|

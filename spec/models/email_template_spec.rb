@@ -64,9 +64,9 @@ RSpec.describe EmailTemplate, type: :model do
       it "should load a builtin template if it does not exist in the database" do
         template = EmailTemplate.load_template("accomplishments:email_to_advisor")
         expect(template).to have_attributes(
-          to: "<%= var(:advisement).professor.email %>",
+          to: "{{ advisement.professor.email }}",
           subject: I18n.t("notifications.accomplishment.email_to_advisor.subject"),
-          body: File.read(File.join(Rails.root, "app", "views", File.join("accomplishments", "mailer", "email_to_advisor.text.erb")))
+          body: File.read(File.join(Rails.root, "app", "views", File.join("accomplishments", "mailer", "email_to_advisor.text.liquid")))
         )
       end
 
@@ -141,10 +141,10 @@ RSpec.describe EmailTemplate, type: :model do
       end
     end
     describe "prepare_message" do
-      it "should use the ERB formating in all fields" do
+      it "should use the Liquid formating in all fields" do
         template = FactoryBot.create(
           :email_template, enabled: false,
-          to: "t<%= var(:temp) %>", subject: "s<%= var(:temp) %>", body: "b<%= var(:temp) %>"
+          to: "t{{ temp }}", subject: "s{{ temp }}", body: "b{{ temp }}"
         )
         expect(template.prepare_message(temp: 1)).to eq({
           to: "t1",

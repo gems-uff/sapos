@@ -1,0 +1,9 @@
+{{ advisement.professor.name }},
+
+Informamos que a inscrição em {{ record.course_class.label_with_course }} de seu orientando {{ record.enrollment.student.name }} foi atualizada:
+-Situação: {{ record.situation }}
+-Nota: {{ record.grade_to_view }}
+-Reprovado por falta: {{ record.absence_to_view }}
+
+
+{{ variables.notification_footer }}

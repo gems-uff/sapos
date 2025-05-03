@@ -57,7 +57,7 @@ class LiquidFormatter
   end
 
   def set_records!
-    unless @attributes["records"]
+    if !@attributes.key?("records") && @attributes.key?(:columns) && @attributes.key?(:rows)
       @attributes["records"] = []
       keys = @attributes[:columns]
       @attributes[:rows].each do |row|

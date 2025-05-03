@@ -111,10 +111,10 @@ pt-BR:
   notifications:
     student_enrollment:
       email_to_student:
-        subject: "Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> <%= var(:record).created_at == var(:record).updated_at ? 'realizado' : 'atualizado' %>"
+        subject: "Pedido de inscrição em disciplinas de {{ record.year }}.{{ record.semester }} {% if record.created_at == record.updated_at %}realizado{% else %}atualizado{% endif %}"
       email_to_advisor:
-        subject: "Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> de orientando foi <%= var(:record).created_at == var(:record).updated_at ? 'realizado' : 'atualizado' %>"
+        subject: "Pedido de inscrição em disciplinas de {{ record.year }}.{{ record.semester }} de orientando foi {% if record.created_at == record.updated_at %}realizado{% else %}atualizado{% endif %}"
       removal_email_to_student:
-        subject: "Remoção do Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> <%= var(:requesting) ? 'solicitada' : 'realizada' %>"
+        subject: "Remoção do Pedido de inscrição em disciplinas de {{ record.year }}.{{ record.semester }} {% if requesting %}solicitada{% else %}realizada{% endif %}"
       removal_email_to_advisor:
-        subject: "Remoção do Pedido de inscrição em disciplinas de <%= var(:record).year %>.<%= var(:record).semester %> de orientando foi <%= var(:requesting) ? 'solicitada' : 'realizada' %>"
+        subject: "Remoção do Pedido de inscrição em disciplinas de {{ record.year }}.{{ record.semester }} de orientando foi {% if requesting %}solicitada{% else %}realizada{% endif %}"
