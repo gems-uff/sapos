@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_04_28_224615) do
+ActiveRecord::Schema[7.0].define(version: 2025_05_01_031327) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -677,6 +677,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_04_28_224615) do
     t.boolean "individual", default: true, null: false
     t.integer "query_id", null: false
     t.boolean "has_grades_report_pdf_attachment", default: false, null: false
+    t.string "template_type", default: "Liquid"
     t.index ["query_id"], name: "index_notifications_on_query_id"
   end
 

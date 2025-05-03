@@ -17,7 +17,7 @@ module AssertionsHelper
         value: record.assertion_template ||
           I18n.t("active_scaffold.notification.body_template_default_liquid"),
       ),
-      set_size=30,
+      set_size=35,
       line_wrapping=true
     )
   end

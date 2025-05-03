@@ -19,7 +19,7 @@ class ConvertAssertionMigrationsFromErBtoLiquid < ActiveRecord::Migration[7.0]
           Nome da disciplina: {{ record.nome_disciplina }}
           Carga horaria total: {{ record.carga_horaria }}
           Período: {{ record.ano_disciplina }}/{{ record.semestre_disciplina }}
-          Nota: {{ record.nota }}
+          Nota: {{ record.nota | divided_by: 10.0 }}
           Situação final: {{ record.situacao }}
 
         {% endfor %}"

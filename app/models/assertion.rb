@@ -28,6 +28,29 @@ class Assertion < ApplicationRecord
     "#{self.name}"
   end
 
+  def query_results(args=nil)
+    self.query.execute(args || self.args)
+  end
+   
+  def format_text(args=nil)
+    results = self.query_results(args)
+    rows = results[:rows]
+    columns = results[:columns]
+    raise Exceptions::EmptyQueryException if rows.empty?
+
+    unique_columns = columns.select do |column|
+      rows.all? { |row| row[columns.index(column)] == rows.first[columns.index(column)] }
+    end
+    bindings = {
+      rows: rows,
+      columns: columns
+    }.merge(Hash[unique_columns.zip(rows.first.values_at(*unique_columns.map { |col| columns.index(col) }))])
+
+    formatter = FormatterFactory.create_formatter(bindings, self.template_type)
+    formatter.format(self.assertion_template)
+  end
+
+
   def self.disable_erb_validation!
     @@disable_erb_validation = true
     yield

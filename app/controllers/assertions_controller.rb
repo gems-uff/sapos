@@ -45,8 +45,8 @@ class AssertionsController < ApplicationController
 
   def simulate
     @assertion = Assertion.find(params[:id])
-    args = @assertion.query.map_params(get_query_params)
-    result = @assertion.query.execute(args)
+    @args = @assertion.query.map_params(get_query_params)
+    result = @assertion.query_results(@args)
     @messages = result[:rows] || []
     @query_sql = result[:query]
 

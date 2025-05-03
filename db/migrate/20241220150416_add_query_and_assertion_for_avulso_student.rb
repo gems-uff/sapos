@@ -63,7 +63,7 @@ class AddQueryAndAssertionForAvulsoStudent < ActiveRecord::Migration[7.0]
     }
 
     assertion_obj = Assertion.new(assertion)
-    assertion_obj.save!
+    assertion_obj.save!(validate: false)
   end
 
   def down

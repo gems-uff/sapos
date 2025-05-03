@@ -25,6 +25,10 @@ pt-BR:
         has_grades_report_pdf_attachment: "Boletim anexado"
         no_name: "Sem nome"
         query: "Consulta"
+        template_type: "Formato do Template"
+        template_types:
+          liquid: "Liquid"
+          erb: "ERB"
 
     errors:
       models:
@@ -34,6 +38,7 @@ pt-BR:
           individual_required: "requer que o email seja individual"
           query_with_enrollments_id_alias_column_required: "requer que a Consulta possua com campo com alias enrollments_id"
           manual_frequency_requires_notification_offset_to_be_zero: ": Quando a Frequência for Manual, deixar Offset da Notificação com valor 0"
+          cannot_create_new_erb_template: "Não é possível fazer alterações em template ERB. Converta para Liquid e altere o formato"
 
     models:
       notification:
