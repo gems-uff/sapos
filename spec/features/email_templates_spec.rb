@@ -83,19 +83,18 @@ RSpec.describe "EmailTemplates features", type: :feature do
       expect(page).to have_css(".CodeMirror-code", text: "1
 {{ user.name }},
 2
-3
 {% if unconfirmed_email %}
-4
+3
 Seu email do SAPOS está sendo alterado para {{ user.unconfirmed_email }}.
+4
+{%- else %}
 5
-{% else %}
-6
 Seu email do SAPOS foi alterado para {{ user.email }}.
+6
+{%- endif %}
 7
-{% endif %}
 8
 9
-10
 {{ variables.notification_footer }}")
     end
 
