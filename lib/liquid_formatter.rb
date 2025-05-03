@@ -12,7 +12,6 @@ module SaposLiquidFilters
 
   alias_method :l, :localize
 end
-Liquid::Template.register_filter(SaposLiquidFilters)
 
 class RoleEmail < Liquid::Tag
   def initialize(tag_name, role_name, tokens)
@@ -24,7 +23,6 @@ class RoleEmail < Liquid::Tag
     Role.find_by(name: @role_name).users.map(&:email).join(';')
   end
 end
-Liquid::Template.register_tag('emails', RoleEmail)
 
 class LanguageTag < Liquid::Block
   @lang = nil
@@ -44,8 +42,6 @@ class LanguageTag < Liquid::Block
     end
   end
 end
-
-Liquid::Template.register_tag('language', LanguageTag)
 
 
 class LiquidFormatter
@@ -67,8 +63,11 @@ class LiquidFormatter
   end
 
   def format(code)
-    
-    @template = Liquid::Template.parse(code)
+    env = Liquid::Environment.new
+    env.register_filter(SaposLiquidFilters)
+    env.register_tag('emails', RoleEmail)
+    env.register_tag('language', LanguageTag)
+    @template = Liquid::Template.parse(code, environment: env)
     @template.render(@attributes)    
   end
 end
