@@ -18,22 +18,28 @@ module SharedXlsConcern
        I18n.t("xls_content.course_class.summary.situation"),
        I18n.t("xls_content.course_class.summary.obs"),
        I18n.t("xls_content.course_class.summary.active_scholarship")]
-      has_scholarship = I18n.t("xls_content.course_class.summary.active_scholarship_true")
-      hasnt_scholarship = I18n.t("xls_content.course_class.summary.active_scholarship_false")
-      sequencial_number = 0
-      class_enrollments.each do |class_enrollment|
-        sequencial_number += 1
-        sheet.add_row [
-          sequencial_number,
-          class_enrollment.enrollment.enrollment_number,
-          class_enrollment.enrollment.student.name,
-          class_enrollment.grade_to_view,
-          class_enrollment.attendance_to_label,
-          class_enrollment.situation,
-          class_enrollment.obs,
-          class_enrollment.enrollment.has_active_scholarship_now? ? has_scholarship : hasnt_scholarship]
+      class_enrollments.each_with_index do |class_enrollment, index|
+        sheet.add_row build_summary_row(class_enrollment, index)
       end
     end
     p.to_stream.read
+  end
+
+
+  def build_summary_row(class_enrollment, index)
+    [
+      index + 1,
+      class_enrollment.enrollment.enrollment_number,
+      class_enrollment.enrollment.student.name,
+      class_enrollment.grade_to_view,
+      class_enrollment.attendance_to_label,
+      class_enrollment.situation,
+      class_enrollment.obs,
+      scholarship_status(class_enrollment)
+    ]
+  end
+  def scholarship_status(class_enrollment)
+    key = class_enrollment.enrollment.has_active_scholarship_now? ? "active_scholarship_true" : "active_scholarship_false"
+    I18n.t("xls_content.course_class.summary.#{key}")
   end
 end
