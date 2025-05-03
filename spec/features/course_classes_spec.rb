@@ -246,7 +246,7 @@ RSpec.describe "CourseClasses features", type: :feature do
       find("#as_#{plural_name}-summary_xls-#{@record.id}-link").click
 
       wait_for_download
-      expect(download).to match(/Resumo Semestral - Defesa\.xlsx/)
+      expect(download).to match(/Resumo Semestral - Defesa\(2022-2\)\.xlsx/)
     end
   end
 end

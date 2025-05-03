@@ -58,6 +58,7 @@ pt-BR:
     course_class:
       summary:
         attendance: "Freq S/I"
+        student_email: "Email"
         enrollment_number: "Matrícula"
         final_grade: "Nota Final"
         link: "Pauta-Excel"

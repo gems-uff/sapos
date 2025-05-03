@@ -144,7 +144,7 @@ class CourseClassesController < ApplicationController
       format.xlsx do
         title = I18n.t("xls_content.course_class.summary.title")
         send_data render_course_classes_summary_xls(@class_enrollments),
-          filename: "#{title} - #{@course_class.name_with_class}.xlsx",
+          filename: "#{title} - #{@course_class.name_with_class}(#{@course_class.year}-#{@course_class.semester}).xlsx",
           type: "text/xlsx"
       end
     end
