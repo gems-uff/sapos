@@ -1,0 +1,6 @@
+{{ advisement.professor.name }},
+
+Informamos que foi {% if requesting %}solicitada{% else %}realizada{% endif %} a remoção do pedido de inscrição em disciplinas de {{ record.year }}.{{ record.semester }} de seu orientando {{ record.enrollment.student.name }}.
+
+
+{{ variables.notification_footer }}
