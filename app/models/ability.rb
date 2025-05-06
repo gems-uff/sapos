@@ -64,7 +64,7 @@ class Ability
                 :override_signature_assertion_pdf, to: :override_report_signature_type
     user ||= User.new
 
-    role_id = user.role_id
+    role_id = user.actual_role
     roles = { role_id => true }
     roles[:manager] = (
       roles[Role::ROLE_ADMINISTRADOR] ||

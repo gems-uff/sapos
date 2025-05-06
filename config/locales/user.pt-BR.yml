@@ -11,7 +11,7 @@ pt-BR:
         current_password: "Senha atual"
         professor: "Professor"
         student: "Aluno"
-        role: Papel
+        roles: Papéis
 
     errors:
       models:

@@ -37,6 +37,8 @@ Rails.application.routes.draw do
     delete "users/profile", to: "users/registrations#update"
   end
 
+  post "change_role", to: "user_roles#change_role", as: :change_role
+
   resources :versions do
     concerns :active_scaffold
   end
@@ -136,6 +138,13 @@ Rails.application.routes.draw do
   resources :roles do
     concerns :active_scaffold
   end
+
+  resources :user_roles do
+    concerns :active_scaffold
+    record_select_routes
+  end
+
+  
 
   resources :scholarship_durations do
     concerns :active_scaffold

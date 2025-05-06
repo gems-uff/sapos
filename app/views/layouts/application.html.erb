@@ -41,7 +41,7 @@
           <% end %>
         </div>
         <div id="sub">
-          Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %>
+          Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %> | <%= role_selector(current_user) %>
         </div>
       </div>
       <span class="notice"><%= notice %></span>
