@@ -466,6 +466,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_04_195245) do
     t.boolean "enabled", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "template_type", default: "Liquid"
   end
 
   create_table "enrollment_holds", force: :cascade do |t|
