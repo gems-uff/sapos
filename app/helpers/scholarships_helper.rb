@@ -17,7 +17,7 @@ module ScholarshipsHelper
   end
 
   def scholarship_duration_end_date_form_column(record, options)
-    month_year_widget record, options, :end_date
+    month_year_widget record, options, :end_date, select_options: { class: "end_date-input" }
   end
 
   def scholarship_start_date_form_column(record, options)

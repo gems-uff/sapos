@@ -118,9 +118,9 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
       expect_to_have_month_year_widget_i(page, "start_date")
     end
 
-    it "should have an optional month_year widget for end_date" do
+    it "should have a month_year widget for end_date" do
       page.send_keys :escape
-      expect_to_have_month_year_widget_i(page, "end_date", "")
+      expect_to_have_month_year_widget_i(page, "end_date")
     end
 
     it "should have an optional month_year widget for cancel_date" do
