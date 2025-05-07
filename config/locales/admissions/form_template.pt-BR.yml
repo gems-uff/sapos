@@ -61,11 +61,16 @@ pt-BR:
         name: Nome
         birthdate: Data de nascimento
         birth_city: Naturalidade
-        refugee: Refugiado
-        refugees:
+        humanity_policy: Política Humanitária
+        humanity_policies:
           not_declared: Não declarado
-          no: Não
-          yes: Sim
+          not_applied: Não se aplica
+          refugee: Refugiado
+          asylum_seeker: Solicitante de refúgio
+          political_asylum: Asilado político
+          stateless_person: Apátrida
+          residence_humanitarian_coalition: Portador de autorização de residência por motivo de coligação humanitária
+          residence_other_humanitarian_policie: Portador de autorização de residência sob os quais recai outras políticas humanitárias no Brasil.
         sex: Sexo
         skin_color: Raça/cor
         skin_colors:
@@ -78,9 +83,8 @@ pt-BR:
         gender: Gênero
         genders:
           not_declared: Não declarado
-          cis: Cis
-          trans: Trans
-          others: Outros
+          cis: Cisgênero
+          trans: Transgênero
         deficiency: Pessoa com deficiência
         deficiencies:
           not_declared: Não declarado

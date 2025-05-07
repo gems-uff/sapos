@@ -127,8 +127,8 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for refugee options" do
-      expect(page.all("select#record_refugee_ option").map(&:text)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.refugees").values
-      expect(page.all("select#record_refugee_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.refugees").values
+      expect(page.all("select#record_humanity_policy_ option").map(&:text)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.humanity_policies").values
+      expect(page.all("select#record_humanity_policy_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.humanity_policies").values
     end
 
     it "should have a textarea for obs refugee" do
