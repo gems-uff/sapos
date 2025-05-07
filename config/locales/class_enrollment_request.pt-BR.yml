@@ -55,6 +55,6 @@ pt-BR:
   notifications:
     class_enrollment_request:
       email_to_student:
-        subject: "Seu pedido de inscrição em <%= var(:record).course_class.label_for_email_subject %> foi efetivado"
+        subject: "Seu pedido de inscrição em {{ record.course_class.label_for_email_subject }} foi efetivado"
       removal_email_to_student:
-        subject: "Seu pedido de remoção da disciplina <%= var(:record).course_class.label_for_email_subject %> foi efetivado"
+        subject: "Seu pedido de remoção da disciplina {{ record.course_class.label_for_email_subject }} foi efetivado"

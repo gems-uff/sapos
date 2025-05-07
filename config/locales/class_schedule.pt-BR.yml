@@ -9,9 +9,11 @@ pt-BR:
         semester: "Semestre"
         enrollment_start: "Data de Início das Inscrições"
         enrollment_end: "Data de Fim das Inscrições"
-        enrollment_adjust: "Início do Período de Ajustes"
+        period_start: "Data de Início do Período Letivo"
         enrollment_insert: "Data Limite para Adicionar Disciplinas"
         enrollment_remove: "Data Limite para Remover Disciplinas"
+        period_end: "Data de Fim do Período Letivo"
+        grades_deadline: "Data Limite para Lançamento de Notas"
         table:
           professor: "Professor"
           course_name: "Disciplina"

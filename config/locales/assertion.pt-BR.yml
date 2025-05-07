@@ -18,13 +18,17 @@ pt-BR:
         assertion_template: "Template do Corpo"
         student_can_generate: "Pode ser gerada pelo aluno"
         expiration_in_months: "Validade (meses)"
+        template_type: "Formato do Template"
+        template_types:
+          liquid: "Liquid"
+          erb: "ERB"
 
     errors:
       models:
         assertion:
           default_enrollment_variable_required: "A consulta deve conter somente uma variável: :matricula_aluno"
           empty_query: "Não há dados no Sapos que permitam a geração dessa declaração para a matrícula %{matricula}. Por favor, entre em contato com a secretaria do curso."
-
+          cannot_create_new_erb_template: "Não é possível fazer alterações em template ERB. Converta para Liquid e altere o formato"
     models:
       assertion:
         one: "Declaração"

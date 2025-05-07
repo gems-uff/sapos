@@ -60,6 +60,7 @@ Rails.application.routes.draw do
     record_select_routes
     member do
       get "summary_pdf"
+      get "summary_xls"
     end
     collection do
       get "class_schedule_pdf"

@@ -13,11 +13,13 @@ module NotificationsHelper
 
   def body_template_form_column(record, options)
     code_mirror_text_area_widget(
-      :body_template, "record_body_template_#{record.id}", "text/html",
+      :body_template, "record_body_template_#{record.id}", "liquid",
       options.merge(
         value: record.body_template ||
-        I18n.t("active_scaffold.notification.body_template_default")
-      )
+        I18n.t("active_scaffold.notification.body_template_default_liquid")
+      ),
+      set_size=35,
+      line_wrapping=true
     )
   end
 
@@ -37,7 +39,7 @@ module NotificationsHelper
 
   def body_template_show_column(record, column)
     code_mirror_view_widget(
-      "body_template-view-#{record.id}", "text/html", record.body_template
+      "body_template-view-#{record.id}", "liquid", record.body_template
     )
   end
 

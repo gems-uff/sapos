@@ -13,19 +13,25 @@ class DeviseMailer < Devise::Mailer
 
   def headers_for(action, opts)
     headers = super
-    headers[:subject] = render_to_string(
-      inline: @template.subject
-    ) unless @template.subject.nil?
-    headers[:to] = render_to_string(
-      inline: @template.to
-    ) unless @template.to.nil?
-    headers[:body] = render_to_string(
-      inline: @template.body
-    ) unless @template.body.nil?
-    headers[:reply_to] = render_to_string(
-      inline: CustomVariable.reply_to
-    )
-    @template.update_mailer_headers(headers)
+    if @template.template_type == "ERB"
+      headers[:subject] = render_to_string(
+        inline: @template.subject
+      ) unless @template.subject.nil?
+      headers[:to] = render_to_string(
+        inline: @template.to
+      ) unless @template.to.nil?
+      headers[:body] = render_to_string(
+        inline: @template.body
+      ) unless @template.body.nil?
+      headers[:reply_to] = CustomVariable.reply_to
+      @template.update_mailer_headers(headers)
+    else
+      name = @template.name.split(":", 2)[1]
+      message = @template.prepare_message(
+        self.send("liquid_#{name}")  
+      )
+      headers.update(message)
+    end
     headers
   end
 
@@ -35,4 +41,45 @@ class DeviseMailer < Devise::Mailer
       super
     end
   end
+
+  def liquid_confirmation_instructions
+    {
+      user: @resource,
+      confirmation_link: confirmation_url(@resource, confirmation_token: @token),
+      user_email: @resource.unconfirmed_email || @resource.email
+    }
+  end
+
+  def liquid_email_changed
+    { 
+      user: @resource,
+      unconfirmed_email: @resource.try(:unconfirmed_email?)
+    }
+  end
+
+  def liquid_invitation_instructions
+    { 
+      user: @resource,
+      accept_invitation_link: accept_invitation_url(@resource, invitation_token: @token)
+    }
+  end
+
+  def liquid_password_change
+    { user: @resource }
+  end
+
+  def liquid_reset_password_instructions
+    { 
+      user: @resource,
+      edit_password_link: edit_password_url(@resource, reset_password_token: @token)
+    }
+  end
+
+  def liquid_unlock_instructions
+    { 
+      user: @resource,
+      unlock_link: unlock_url(@resource, unlock_token: @token)
+    }
+  end
+
 end
