@@ -54,7 +54,7 @@ class Ability
 
   def initialize(user)
     alias_action :list, :row, :show_search, :render_field, :class_schedule_pdf,
-      :to_pdf, :summary_pdf, :academic_transcript_pdf, :grades_report_pdf,
+      :to_pdf, :summary_pdf, :summary_xls, :academic_transcript_pdf, :grades_report_pdf,
       :browse, :simulate, :set_query_date, :cities, :states,
       :preview, :builtin, :help, to: :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing,
