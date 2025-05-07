@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_05_02_212135) do
+ActiveRecord::Schema[7.0].define(version: 2025_05_04_195245) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -1112,14 +1112,4 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_02_212135) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
-  add_foreign_key "assertions", "queries"
-  add_foreign_key "grants", "professors"
-  add_foreign_key "paper_professors", "papers"
-  add_foreign_key "paper_professors", "professors"
-  add_foreign_key "paper_students", "papers"
-  add_foreign_key "paper_students", "students"
-  add_foreign_key "papers", "professors", column: "owner_id"
-  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
-  add_foreign_key "reports", "users", column: "generated_by_id"
-  add_foreign_key "reports", "users", column: "invalidated_by_id"
 end

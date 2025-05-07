@@ -223,17 +223,30 @@ RSpec.describe "CourseClasses features", type: :feature do
     end
   end
 
-  describe "course class report", js: true do
+  describe "course class report as pdf", js: true do
     before(:each) do
       login_as(@user)
       visit url_path
     end
 
-    it "should download a summary for a record" do
+    it "should download a summary as pdf for a record" do
       find("#as_#{plural_name}-summary_pdf-#{@record.id}-link").click
 
       wait_for_download
       expect(download).to match(/Resumo Semestral - Defesa\.pdf/)
+    end
+  end
+
+  describe "course class report as xlsx", js: true do
+    before(:each) do
+        login_as(@user)
+        visit url_path
+      end
+    it "should download a summary as xlsx for a record" do
+      find("#as_#{plural_name}-summary_xls-#{@record.id}-link").click
+
+      wait_for_download
+      expect(download).to match(/Resumo Semestral - Defesa\(2022-2\)\.xlsx/)
     end
   end
 end
