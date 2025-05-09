@@ -11,8 +11,10 @@ FactoryBot.define do
     semester { 1 }
     enrollment_start { "2021-07-27 17:02:22" }
     enrollment_end { "2021-07-27 17:02:22" }
-    enrollment_adjust { "2021-07-27 17:02:22" }
+    period_start { "2021-07-27 17:02:22" }
     enrollment_insert { "2021-07-27 17:02:22" }
     enrollment_remove { "2021-07-27 17:02:22" }
+    period_end { "2021-07-27 17:02:22" }
+    grades_deadline { "2021-07-27 17:02:22" }
   end
 end

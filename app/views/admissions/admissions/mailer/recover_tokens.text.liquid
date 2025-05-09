@@ -1,0 +1,14 @@
+{{ admission_applications.first.name }},
+
+{% if admission_applications.size == 1 -%}
+O seguinte código de identificação de inscrição em processo seletivo foi encontrado:
+{% else -%}
+Os seguintes códigos de identificação de inscrição em processo seletivo foram encontrados:
+{% endif -%}
+{% for application in admission_applications -%}
+- {{ application.admission_process.title }}: {{ application.token }}
+{% endfor %}
+Acesse sua inscrição no link abaixo:
+{{ url }}
+
+{{ variables.notification_footer }}

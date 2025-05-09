@@ -1,0 +1,9 @@
+{{ user.name }},
+{% if unconfirmed_email %}
+Seu email do SAPOS está sendo alterado para {{ user.unconfirmed_email }}.
+{%- else %}
+Seu email do SAPOS foi alterado para {{ user.email }}.
+{%- endif %}
+
+
+{{ variables.notification_footer }}

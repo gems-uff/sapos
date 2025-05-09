@@ -52,6 +52,10 @@
     <% end %>
     </tbody>
   </table>
+
+  <%= toggable_area("Pré-visualização", enabled: true, visible: true) do %>
+    <textarea><%=@assertion.format_text(@args)%></textarea>
+  <% end %>
 <% end %>
 
 <p class="form-footer">

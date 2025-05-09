@@ -1,0 +1,46 @@
+{{ record.enrollment.student.name }},
+
+Informamos que seu pedido de inscrição em disciplinas de {{ record.year }}.{{ record.semester }} foi {% if record.created_at == record.updated_at %}realizado{% else %}atualizado{% endif %}.
+{% if new_insertion_requests.size > 0 %}
+Foram solicitadas inscrições nas seguintes disciplinas:
+{% for cer in new_insertion_requests -%}
+- {{ cer.course_class.to_label }}
+{% endfor -%}
+{% endif %}
+{%- if remove_removal_requests.size > 0 %}
+Foram desfeitas solicitações de remoção das seguintes disciplinas:
+{% for cer in remove_removal_requests -%}
+- {{ cer.course_class.to_label }}
+{% endfor -%}
+{% endif %}
+{%- if existing_insertion_requests.size > 0 %}
+As seguintes solicitações de inscrição continuam no pedido:
+{% for cer in existing_insertion_requests -%}
+- {{ cer.course_class.to_label }} ({{ cer.status }})
+{% endfor -%}
+{% endif %}
+{%- if new_removal_requests.size > 0 %}
+Foram solicitadas remoções das seguintes disciplinas:
+{% for cer in new_removal_requests -%}
+- {{ cer.course_class.to_label }}
+{% endfor -%}
+{% endif %}
+{%- if remove_insertion_requests.size > 0 %}
+Foram desfeitas solicitações de inscrição nas seguintes disciplinas:
+{% for cer in remove_insertion_requests -%}
+- {{ cer.course_class.to_label }}
+{% endfor -%}
+{% endif %}
+{%- if existing_removal_requests.size > 0 %}
+As seguintes solicitações de remoção de disciplinas continuam no pedido:
+{% for cer in existing_removal_requests -%}
+- {{ cer.course_class.to_label }} ({{ cer.status }})
+{% endfor -%}
+{% endif %}
+{%- if message != blank %}
+
+Nova mensagem:
+[{{ user.name }}] {{ message }}
+{% endif %}
+
+{{ variables.notification_footer }}

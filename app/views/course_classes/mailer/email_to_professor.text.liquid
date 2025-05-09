@@ -1,0 +1,10 @@
+{{ record.professor.name }},
+
+Informamos que as notas da sua turma {{ record.label_with_course }} foram lançadas ou alteradas:
+{% for class_enrollment in record.class_enrollments -%}
+-{{ class_enrollment.enrollment.to_label }}: {{ class_enrollment.situation }}{{ class_enrollment.situation_changed }} - {{ class_enrollment.grade_to_view }}{{ class_enrollment.grade_changed }} ({{ class_enrollment.full_absence_to_view }}{{ class_enrollment.absence_changed }})
+{% endfor %}
+* Valores alterados
+
+
+{{ variables.notification_footer }}

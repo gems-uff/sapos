@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
+ActiveRecord::Schema[7.0].define(version: 2025_05_04_195245) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -287,6 +287,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
     t.text "assertion_template"
     t.boolean "student_can_generate", default: false
     t.integer "expiration_in_months"
+    t.string "template_type", default: "Liquid"
     t.index ["query_id"], name: "index_assertions_on_query_id"
   end
 
@@ -345,9 +346,11 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
     t.datetime "enrollment_end", precision: nil
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "enrollment_adjust", precision: nil
+    t.datetime "period_start", precision: nil
     t.datetime "enrollment_insert", precision: nil
     t.datetime "enrollment_remove", precision: nil
+    t.datetime "period_end", precision: nil
+    t.datetime "grades_deadline", precision: nil
   end
 
   create_table "countries", force: :cascade do |t|
@@ -463,6 +466,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
     t.boolean "enabled", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "template_type", default: "Liquid"
   end
 
   create_table "enrollment_holds", force: :cascade do |t|
@@ -674,6 +678,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
     t.boolean "individual", default: true, null: false
     t.integer "query_id", null: false
     t.boolean "has_grades_report_pdf_attachment", default: false, null: false
+    t.string "template_type", default: "Liquid"
     t.index ["query_id"], name: "index_notifications_on_query_id"
   end
 
@@ -801,8 +806,8 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
 
   create_table "program_levels", force: :cascade do |t|
     t.integer "level", null: false
-    t.datetime "start_date", null: false
-    t.datetime "end_date"
+    t.date "start_date", null: false
+    t.date "end_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -1037,6 +1042,12 @@ ActiveRecord::Schema[7.0].define(version: 2025_01_24_003106) do
     t.string "photo", limit: 255
     t.integer "birth_country_id"
     t.integer "user_id", limit: 8
+    t.string "gender"
+    t.string "skin_color"
+    t.string "pcd"
+    t.string "refugee"
+    t.text "obs_pcd"
+    t.text "obs_refugee"
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"

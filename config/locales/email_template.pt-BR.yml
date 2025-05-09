@@ -10,10 +10,15 @@ pt-BR:
         to: "Template do Destinatário"
         subject: "Template do Assunto"
         enabled: "Habilitado"
+        template_type: "Formato do Template"
+        template_types:
+          liquid: "Liquid"
+          erb: "ERB"
 
     errors:
       models:
         email_template:
+          cannot_create_new_erb_template: "Não é possível fazer alterações em template ERB. Converta para Liquid e altere o formato"
           attributes:
             name:
               taken: já existe
@@ -31,4 +36,4 @@ pt-BR:
       builtin: "Configurar template interno:"
       builtin_confirm: "O formulário foi alterado. Ao continuar as informações dele serão perdidas. Deseja continuar?"
     body:
-      default: "<%= CustomVariable.notification_footer %>"
+      default: "{{ variables.notification_footer }}"

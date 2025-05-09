@@ -29,6 +29,8 @@ class ScholarshipDuration < ApplicationRecord
     on_or_before_message: :start_date_after_end_date
   validates :start_date, presence: true
 
+  validates :end_date, presence: true
+
   # validates if a cancel date of an scholarship duration is valid
   validates_date :cancel_date,
     on_or_after: :start_date,
@@ -78,7 +80,7 @@ class ScholarshipDuration < ApplicationRecord
 
   def update_end_date
     dates = []
-    unless self.enrollment.nil? || self.enrollment.level.nil?
+    unless self.enrollment.nil? || self.enrollment.level.nil? || self.enrollment.level.default_duration < 2
       default_duration = (self.enrollment.level.default_duration - 1).months
       dates << (self.enrollment.admission_date + default_duration).end_of_month
     end

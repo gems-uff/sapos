@@ -22,7 +22,7 @@ class AssertionsController < ApplicationController
                             type: :member
 
     form_columns = [
-      :name, :student_can_generate, :query, :assertion_template, :expiration_in_months
+      :name, :student_can_generate, :query, :template_type, :assertion_template, :expiration_in_months
     ]
 
     config.create.label = :create_assertion_label
@@ -34,14 +34,19 @@ class AssertionsController < ApplicationController
     config.actions.exclude :deleted_records
 
     config.columns[:expiration_in_months].description = I18n.t("active_scaffold.expiration_in_months_description")
+    
+    config.columns[:template_type].form_ui = :select
+    config.columns[:template_type].options = {
+      options: Assertion::TEMPLATE_TYPES,
+    }
 
     config.columns[:query].form_ui = :select
   end
 
   def simulate
     @assertion = Assertion.find(params[:id])
-    args = @assertion.query.map_params(get_query_params)
-    result = @assertion.query.execute(args)
+    @args = @assertion.query.map_params(get_query_params)
+    result = @assertion.query_results(@args)
     @messages = result[:rows] || []
     @query_sql = result[:query]
 
