@@ -146,7 +146,7 @@ RSpec.describe EmailTemplate, type: :model do
           :email_template, enabled: false,
           to: "t{{ temp }}", subject: "s{{ temp }}", body: "b{{ temp }}"
         )
-        expect(template.prepare_message(temp: 1)).to eq({
+        expect(template.prepare_message("temp" => 1)).to eq({
           to: "t1",
           subject: "s1",
           body: "b1",

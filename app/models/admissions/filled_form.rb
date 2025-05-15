@@ -6,6 +6,13 @@
 class Admissions::FilledForm < ActiveRecord::Base
   has_paper_trail
 
+  CONSOLIDATE_DROPS = {
+    application: Admissions::AdmissionApplicationDrop,
+    process: Admissions::AdmissionProcessDrop,
+    committees: :value,
+    fields: :value,
+  }
+
   attr_accessor :enable_submission
 
   has_one :admission_application, dependent: :restrict_with_exception,
@@ -116,16 +123,21 @@ class Admissions::FilledForm < ActiveRecord::Base
         fields[form_field.name] = value
         next
       end
-
       case form_field.field_type
       when Admissions::FormField::CODE
-        value = CodeEvaluator.evaluate_code(configuration["code"], **vars)
+        value = CodeEvaluator.evaluate_code(
+          configuration["code"], vars,
+          configuration["template_type"], CONSOLIDATE_DROPS
+        )
         field_objects[form_field.name] = self.fields.new(
           form_field_id: form_field.id, value: value
         )
+        value = Admissions::FilledFormField.convert_value(value, form_field.get_type)
         fields[form_field.name] = value
       when Admissions::FormField::EMAIL
-        formatter = ErbFormatter.new(vars)
+        formatter = CodeEvaluator.create_formatter(
+          vars, configuration["template_type"], CONSOLIDATE_DROPS
+        )
         notification = {
           to: formatter.format(configuration["to"]),
           subject: formatter.format(configuration["subject"]),

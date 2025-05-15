@@ -10,7 +10,40 @@ module SaposLiquidFilters
     I18n.localize(time, format: format.to_sym)
   end
 
+  def avg(input, property = nil)
+    values_for_sum = self.to_number(input, property)
+    result = Liquid::StandardFilters::InputIterator.new(values_for_sum, context).sum do |item|
+      Liquid::Utils.to_number(item)
+    end
+    result.to_f / values_for_sum.size
+  end
+
+  def median(input, property = nil)
+    values = self.to_number(input, property)
+    sorted = values.sort
+    length = values.size
+    (sorted[(length - 1) / 2] + sorted[length / 2]) / 2.0
+  end
+
   alias_method :l, :localize
+
+  private
+    def to_number(input, property = nil)
+      ary = Liquid::StandardFilters::InputIterator.new(input, context)
+      return 0 if ary.empty?
+
+      ary.map do |item|
+        if property.nil?
+          Liquid::Utils.to_number(item)
+        elsif item.respond_to?(:[])
+          Liquid::Utils.to_number(item[property])
+        else
+          0
+        end
+      rescue TypeError
+        raise Liquid::ArgumentError, "cannot select the property '#{Liquid::Utils.to_s(property)}'"
+      end
+    end
 end
 
 class RoleEmail < Liquid::Tag
