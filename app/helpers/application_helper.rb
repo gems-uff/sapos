@@ -180,7 +180,7 @@ module ApplicationHelper
   end
 
   def role_selector(current_user)
-    unless current_user.blank?
+    unless current_user.blank? || current_user.roles.length < 2
       form_with url: change_role_path, method: :post, local: true do
         select_tag(:role_id,
                     options_from_collection_for_select(
