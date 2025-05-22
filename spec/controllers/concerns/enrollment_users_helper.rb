@@ -92,7 +92,7 @@ shared_examples_for "enrollment_user_helper" do
     let(:enrollments) do
       emails = ["abc@def.com", "def@ghi.com", "ghi@jkl.com", "jkl@mno.com", "mno@pqr.com"]
       delete_users_by_emails emails
-      @destroy_later << FactoryBot.create(:user, email: "abc@def.com", role: @role)
+      @destroy_later << FactoryBot.create(:user, email: "abc@def.com", actual_role: @role)
       students = emails.map do |email|
         @destroy_later << student = FactoryBot.create(:student, email: email)
         student
@@ -137,7 +137,7 @@ shared_examples_for "enrollment_user_helper" do
     let(:enrollments) do
       emails = ["abc@def.com", "def@ghi.com", "ghi@jkl.com", "jkl@mno.com", "mno@pqr.com"]
       delete_users_by_emails emails
-      @destroy_later << FactoryBot.create(:user, email: "abc@def.com", role: @role)
+      @destroy_later << FactoryBot.create(:user, email: "abc@def.com", actual_role: @role)
       students = emails.map do |email|
         @destroy_later << student = FactoryBot.create(:student, email: email)
         student

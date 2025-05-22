@@ -15,7 +15,7 @@ RSpec.describe "ResearchAreas features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << FactoryBot.create(:research_area, name: "Ciência de Dados", code: "CD")
     @destroy_all << @record = FactoryBot.create(:research_area, name: "Sistemas de Computação", code: "SC")
@@ -28,6 +28,7 @@ RSpec.describe "ResearchAreas features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do

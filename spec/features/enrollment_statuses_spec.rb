@@ -13,7 +13,7 @@ RSpec.describe "EnrollmentStatuses features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
     @destroy_all << @record = FactoryBot.create(:enrollment_status, name: "Especial", user: true)
     @destroy_all << FactoryBot.create(:enrollment_status, name: "Avulso", user: false)
     @destroy_all << FactoryBot.create(:enrollment_status, name: "Regular", user: true)
@@ -25,6 +25,7 @@ RSpec.describe "EnrollmentStatuses features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do

@@ -15,7 +15,7 @@ RSpec.describe "Queries features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << FactoryBot.create(:query, name: "students", sql: "select * from students")
     @destroy_all << @record = FactoryBot.create(:query, name: "queries", sql: "select name, sql from queries")
@@ -28,6 +28,7 @@ RSpec.describe "Queries features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -61,7 +62,7 @@ RSpec.describe "Queries features", type: :feature do
       within("#as_#{plural_name}-create--form") do
         fill_in "record_name_", with: "enrollments"
         codemirror = find("#record_sql_ + .CodeMirror").click
-        codemirror.send_keys [:control, 'a'], :delete, "select * from enrollments"
+        codemirror.send_keys [:control, "a"], :delete, "select * from enrollments"
       end
       click_button "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "enrollments")

@@ -30,7 +30,7 @@ RSpec.describe "Student features", type: :feature do
     )
     @destroy_all << FactoryBot.create(:student, name: "Dani", cpf: "4")
     @destroy_all << FactoryBot.create(:enrollment, enrollment_number: "M001", student: @record, level: level, enrollment_status: enrollment_status)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -40,6 +40,7 @@ RSpec.describe "Student features", type: :feature do
     @role_adm.delete
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -150,8 +151,8 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for civil_status options" do
-      expect(page.all("select#record_civil_status_ option").map(&:text)).to eq ["Não declarado","Solteiro(a)", "Casado(a)"]
-      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["Não declarado","Solteiro(a)", "Casado(a)"]
+      expect(page.all("select#record_civil_status_ option").map(&:text)).to eq ["Não declarado", "Solteiro(a)", "Casado(a)"]
+      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["Não declarado", "Solteiro(a)", "Casado(a)"]
     end
 
     it "should have identity issuing place widget for identity issuing place" do

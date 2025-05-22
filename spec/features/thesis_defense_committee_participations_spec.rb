@@ -38,7 +38,7 @@ RSpec.describe "ThesisDefenseCommitteeParticipations features", type: :feature d
     @destroy_all << FactoryBot.create(:thesis_defense_committee_participation, enrollment: @enrollment3, professor: @professor1)
     @destroy_all << FactoryBot.create(:thesis_defense_committee_participation, enrollment: @enrollment3, professor: @professor2)
 
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -48,6 +48,7 @@ RSpec.describe "ThesisDefenseCommitteeParticipations features", type: :feature d
     @role_adm.delete
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
