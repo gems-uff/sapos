@@ -34,10 +34,9 @@ class User < ApplicationRecord
   after_create :skip_confirmation!,
     unless: Proc.new { self.invitation_token.nil? }
 
-  validates :user_roles, presence: true
+  validates :user_roles, presence: false
   validates :email, presence: true, uniqueness: { case_sensitive: false }
   validates :name, presence: true
-  validate :store_max_role_was
   validate :roles_valid?
   validate :role_is_professor_if_the_professor_field_is_filled
   validate :role_is_student_if_the_student_field_is_filled
@@ -55,11 +54,11 @@ class User < ApplicationRecord
   end
 
   def is_professor?
-    self.roles.pluck(:role_id).include? Role::ROLE_PROFESSOR
+    roles.any? { |role| role.id == Role::ROLE_PROFESSOR }
   end
 
   def is_student?
-    self.roles.pluck(:role_id).include? Role::ROLE_ALUNO
+    roles.any? { |role| role.id == Role::ROLE_ALUNO }
   end
 
   def to_label
@@ -68,16 +67,16 @@ class User < ApplicationRecord
 
   def roles_valid?
     return if current_user.blank?
-    return if roles.blank?
 
-    unless self.id == current_user.id && current_user.user_max_role.id == current_user.max_role_was
+    self.roles << Role.find_by(id: Role::ROLE_DESCONHECIDO) if roles.blank?
+
+    unless self.id == current_user.id && current_user.max_role_was == self.max_role_was
       current_user_role_index = Role::ORDER.index(current_user.actual_role)
-      puts "UYCYTCYCC#{current_user_role_index} cytctciiyctyicrftc #{current_user.actual_role}"
       if self.max_role_was.present? && current_user_role_index < Role::ORDER.index(self.max_role_was)
-        errors.add(:roles, :invalid_role_was)
+        errors.add(:base, :invalid_role_was)
       end
-      if current_user_role_index < Role::ORDER.index(self.user_max_role.id)
-        errors.add(:roles, :invalid_role)
+      if current_user_role_index < Role::ORDER.index(self.user_max_role)
+        errors.add(:base, :invalid_role)
       end
     end
   end
@@ -87,7 +86,7 @@ class User < ApplicationRecord
     errors.add(:base, :delete) if User.count == 1
     unless current_user.blank?
       role_index = Role::ORDER.index(current_user.actual_role)
-      if role_index < Role::ORDER.index(self.user_max_role.id)
+      if role_index < Role::ORDER.index(self.user_max_role)
         errors.add(:base, :invalid_role_full)
       end
       if current_user.id == self.id
@@ -100,14 +99,20 @@ class User < ApplicationRecord
   end
 
   def role_is_professor_if_the_professor_field_is_filled
-    if professor && !self.is_professor?
+    if professor && !is_professor?
       errors.add(:professor, :selected_role_was_not_professor)
+    end
+    if is_professor? && !professor
+      errors.add(:base, :role_professor_not_associated)
     end
   end
 
   def role_is_student_if_the_student_field_is_filled
     if student && !self.is_student?
       errors.add(:student, :selected_role_was_not_student)
+    end
+    if !student && self.is_student?
+      errors.add(:base, :role_student_not_associated)
     end
   end
 
@@ -155,18 +160,21 @@ class User < ApplicationRecord
   def user_max_role
     if self.roles.present?
       max_role = self.roles.max_by { |role| Role::ORDER.index(role.id) }
-      max_role
+      max_role.id
     end
   end
 
+  def roles=(value)
+    self.max_role_was ||= self.user_max_role
+    super
+  end
+
   private
+    def set_default_actual_role
+      self.actual_role = actual_role.present? ? actual_role : user_max_role
+    end
 
-  def set_default_actual_role
-    puts "AQUIIIIIIIIIIIIIIII #{actual_role.present?}"
-    self.actual_role = actual_role.present? ? actual_role : user_max_role.id
-  end
-
-  def store_max_role_was
-    self.max_role_was = self.user_max_role.id
-  end
+    def store_max_role_was
+      self.max_role_was = self.user_max_role
+    end
 end
