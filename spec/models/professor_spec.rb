@@ -36,7 +36,7 @@ RSpec.describe Professor, type: :model do
       name: "professor",
       email: "professor@ic.uff.br",
       enrollment_number: "P1",
-      )
+    )
   end
   subject { professor }
   describe "Validations" do
@@ -61,7 +61,7 @@ RSpec.describe Professor, type: :model do
         end
         it "user is set to null after a predefined vaule" do
           delete_users_by_emails ["abc@def.com", "def@ghi.com"]
-          @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", role_id: Role::ROLE_PROFESSOR)
+          @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", actual_role: Role::ROLE_PROFESSOR)
           professor.user = user1
           professor.save(validate: false)
           @destroy_later << professor
@@ -72,8 +72,8 @@ RSpec.describe Professor, type: :model do
       context "should have error changed_to_different_user when" do
         it "user is set to a different user" do
           delete_users_by_emails ["abc@def.com", "def@ghi.com"]
-          @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", role_id: Role::ROLE_PROFESSOR)
-          @destroy_later << user2 = FactoryBot.create(:user, email: "def@ghi.com", role_id: Role::ROLE_PROFESSOR)
+          @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", actual_role: Role::ROLE_PROFESSOR)
+          @destroy_later << user2 = FactoryBot.create(:user, email: "def@ghi.com", actual_role: Role::ROLE_PROFESSOR)
           professor.user = user1
           professor.save(validate: false)
           @destroy_later << professor

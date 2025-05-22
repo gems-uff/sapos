@@ -7,7 +7,8 @@
 class Role < ApplicationRecord
   has_paper_trail
 
-  has_many :users, dependent: :restrict_with_exception
+  has_many :user_roles, dependent: :restrict_with_exception
+  has_many :users, through: :user_roles
 
   ROLE_DESCONHECIDO = 1
   ROLE_COORDENACAO = 2
