@@ -78,11 +78,8 @@ pt-BR:
         gender: Gênero
         genders:
           not_declared: Não declarado
-          men_cis: Homem Cisgênero
-          women_cis: Mulher Cisgênero
-          men_trans: Homem Transgênero
-          women_trans: Mulher Transgênero
-          non_binary: Pessoa Não-Binário
+          cis: Cis
+          trans: Trans
           others: Outros
         deficiency: Pessoa com deficiência
         deficiencies:
