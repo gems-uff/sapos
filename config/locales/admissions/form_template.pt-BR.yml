@@ -62,10 +62,15 @@ pt-BR:
         birthdate: Data de nascimento
         birth_city: Naturalidade
         refugee: Refugiado
-        refugees:
+        humanity_policies:
           not_declared: Não declarado
-          no: Não
-          yes: Sim
+          not_applied: Não se aplica
+          refugee: Refugiado
+          asylum_seeker: Solicitante de refúgio
+          political_asylum: Asilado político
+          stateless: Apátrida
+          residence_humanitarian_reason: Portador de autorização de residência por motivo de acolhida humanitária
+          residence_humanitarian_br_policies: Portador de autorização de residência sob os quais recaem outras políticas humanitárias no Brasil
         sex: Sexo
         skin_color: Raça/cor
         skin_colors:
