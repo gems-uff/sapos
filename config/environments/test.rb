@@ -64,6 +64,8 @@ Rails.application.configure do
   config.logger = ActiveSupport::Logger.new(STDOUT) if ENV['LOGS_ENABLED']
   config.log_level = :debug
 
+  config.logger = ActiveSupport::Logger.new(STDOUT) if ENV['LOGS_ENABLED']
+
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
 
