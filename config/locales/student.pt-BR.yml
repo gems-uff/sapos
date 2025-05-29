@@ -41,8 +41,7 @@ pt-BR:
         special_city: "Residência*"
         special_birth_city: "Naturalidade*"
         special_majors: "Cursos*"
-        refugee: "Refugiado"
-        obs_refugee: "Observações de Refugiado"
+        humanity_policy: "Política Humanitária"
         obs: "Observações"
 
     errors:
