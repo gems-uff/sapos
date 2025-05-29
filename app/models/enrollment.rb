@@ -218,7 +218,7 @@ class Enrollment < ApplicationRecord
       user = User.invite!({
         email: student.first_email,
         name: student.name,
-        role_id: Role::ROLE_ALUNO
+        actual_role: Role::ROLE_ALUNO
       }, current_user) do |invitable|
         invitable.skip_confirmation!
       end
