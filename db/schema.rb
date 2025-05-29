@@ -1046,7 +1046,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_27_204233) do
     t.string "gender"
     t.string "skin_color"
     t.string "pcd"
-    t.string "humanity_policy"
+    t.string "humanitarian_policy"
     t.text "obs_pcd"
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
