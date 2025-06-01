@@ -13,7 +13,7 @@ RSpec.describe "NotificationLogs features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << @query1 = FactoryBot.create(:query, name: "students", sql: "select * from students")
     @destroy_all << @query2 = FactoryBot.create(:query, name: "queries", sql: "select name, sql from queries")
@@ -32,6 +32,7 @@ RSpec.describe "NotificationLogs features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do

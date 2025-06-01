@@ -9,7 +9,7 @@ class LandingController < ApplicationController
   def index
     raise CanCan::AccessDenied.new if current_user.nil?
 
-    unless current_user.student.nil?
+    unless current_user.actual_role != Role::ROLE_ALUNO
       enrollments = current_user.student.enrollments.order(admission_date: :desc)
       max_enrollment = enrollments.each_with_index.max_by do |enrolmment, index|
         [

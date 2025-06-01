@@ -13,7 +13,7 @@ RSpec.describe "CustomVariables features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << @record = FactoryBot.create(:custom_variable, variable: "single_advisor_points", value: "1.0")
     @destroy_all << FactoryBot.create(:custom_variable, variable: "minimum_grade_for_approval", value: "6.0")
@@ -25,6 +25,7 @@ RSpec.describe "CustomVariables features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do

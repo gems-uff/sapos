@@ -1,0 +1,11 @@
+pt-BR:
+  activerecord:
+    attributes:
+      user_role:
+        user: "Usuário"
+        role: "Papel"
+    
+    models:
+      user_role:
+        one: "Papel de Usuário"
+        other: "Papéis de Usuários"

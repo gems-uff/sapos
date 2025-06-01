@@ -16,7 +16,7 @@ RSpec.describe "Enrollments features", type: :feature do
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
     @destroy_all << @role_student = FactoryBot.create(:role_aluno)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
     @destroy_all << @level1 = FactoryBot.create(:level, name: "Doutorado")
     @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
 
@@ -27,10 +27,11 @@ RSpec.describe "Enrollments features", type: :feature do
     @destroy_all << @student3 = FactoryBot.create(:student, name: "Carol")
     @destroy_all << @student4 = FactoryBot.create(:student, name: "Dani")
 
-    @destroy_all << @user2 = create_confirmed_user(@role_student, "bia.sapos@ic.uff.br", "Bia", "A1b2c3d4!", student: @student2)
+    @destroy_all << @user2 = create_confirmed_user([@role_student], "bia.sapos@ic.uff.br", "Bia", "A1b2c3d4!", student: @student2)
 
     @destroy_all << @role_professor = FactoryBot.create(:role_professor)
-    @destroy_all << @user3 = create_confirmed_user(@role_professor, "joao.sapos@ic.uff.br", "João", "A1b2c3d4!")
+    @destroy_all << @professor = FactoryBot.create(:professor, name: "João", cpf: "123.456.789-10")
+    @destroy_all << @user3 = create_confirmed_user([@role_professor], "joao.sapos@ic.uff.br", "A1b2c3d4!", professor: @professor)
 
     @destroy_all << @reasearch_area1 = FactoryBot.create(:research_area, name: "Ciência de Dados", code: "CD")
 
@@ -80,6 +81,8 @@ RSpec.describe "Enrollments features", type: :feature do
     PhaseCompletion.destroy_all
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    NotificationLog.delete_all
+    UserRole.delete_all
   end
 
   describe "view list page" do
