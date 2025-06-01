@@ -8,4 +8,8 @@ class UserRole < ApplicationRecord
 
   validates :role, presence: true
   validates :role, presence: true
+
+  def to_label
+    "#{self.user.name} - #{self.role.name}"
+  end
 end

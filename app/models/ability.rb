@@ -49,7 +49,7 @@ class Ability
 
   CONFIGURATION_MODELS = [
     User, Role, Version, EmailTemplate,
-    CustomVariable, YearSemester, ProgramLevel
+    CustomVariable, YearSemester, ProgramLevel, UserRole
   ]
 
   def initialize(user)
