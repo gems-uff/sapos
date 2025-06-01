@@ -40,9 +40,11 @@
             <%= image_tag 'logoSapos.png' %>
           <% end %>
         </div>
-        <div id="sub">
-          Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %> 
-          <div id="role_selector" style="padding-left: 90px;">
+        <div id="sub" style="display: flex-column;">
+          <div>
+            Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %>
+          </div> 
+          <div id="role_selector" style="float: right">
             <%= role_selector(current_user) %>
           </div>
         </div>
