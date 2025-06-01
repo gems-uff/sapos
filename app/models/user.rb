@@ -8,9 +8,9 @@ class User < ApplicationRecord
   has_paper_trail
   attr_accessor :max_role_was
 
-  scope :professors, -> { where(role_id: Role::ROLE_PROFESSOR) }
-  scope :coordination, -> { where(role_id: Role::ROLE_COORDENACAO) }
-  scope :secretary, -> { where(role_id: Role::ROLE_SECRETARIA) }
+  scope :professors, -> { joins(:roles).where(roles: { id: Role::ROLE_PROFESSOR }) }
+  scope :coordination, -> { joins(:roles).where(roles: { id: Role::ROLE_COORDENACAO }) }
+  scope :secretary, -> { joins(:roles).where(roles: { id: Role::ROLE_SECRETARIA }) }
 
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
