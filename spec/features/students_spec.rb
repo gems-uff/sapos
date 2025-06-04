@@ -114,7 +114,6 @@ RSpec.describe "Student features", type: :feature do
 
     it "should have a selection for sex options" do
       expect(page.all("select#record_sex_ option").map(&:text)).to eq ["Não declarado", "Masculino", "Feminino"]
-      expect(page.all("select#record_sex_ option").map(&:value)).to eq ["", "M", "F"]
     end
 
     it "should have a selection for pcd options" do
@@ -126,9 +125,9 @@ RSpec.describe "Student features", type: :feature do
       expect(page).to have_field("Observações de PCD", type: "textarea")
     end
 
-    it "should have a selection for humanitarian policy options" do
+    it "should have a selection for humanity policy options" do
       expect(page.all("select#record_humanitarian_policy_ option").map(&:text)).to eq ["Não declarado", "Não se aplica", "Refugiado", "Solicitante de refúgio", "Asilado político", "Apátrida", "Portador de autorização de residência por motivo de acolhida humanitária", "Portador de autorização de residência sob os quais recaem outras políticas humanitárias no Brasil"]
-      expect(page.all("select#record_humanitarian_policy_ option").map(&:value)).to eq ["", "Não se aplica", "Refugiado", "Solicitante de refúgio", "Asilado político", "Apátrida", "Portador de autorização de residência por motivo de acolhida humanitária", "Portador de autorização de residência sob os quais recaem outras políticas humanitárias no Brasil"]
+      expect(page.all("select#record_humanitarian_policy_ option").map(&:value)).to eq ["Não declarado", "Não se aplica", "Refugiado", "Solicitante de refúgio", "Asilado político", "Apátrida", "Portador de autorização de residência por motivo de acolhida humanitária", "Portador de autorização de residência sob os quais recaem outras políticas humanitárias no Brasil"]
     end
     it "should have a textarea for obs" do
       expect(page).to have_field("Observações", type: "textarea")

@@ -1014,8 +1014,47 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_27_204233) do
     t.index ["student_id"], name: "index_student_majors_on_student_id"
   end
 
-# Could not dump table "students" because of following StandardError
-#   Unknown type '' for column 'humanitarian_policy'
+  create_table "students", force: :cascade do |t|
+    t.string "name", limit: 255
+    t.string "cpf", limit: 255
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.text "obs"
+    t.date "birthdate"
+    t.string "sex", limit: 255
+    t.string "civil_status", limit: 255
+    t.string "father_name", limit: 255
+    t.string "mother_name", limit: 255
+    t.string "identity_number", limit: 255
+    t.string "identity_issuing_body", limit: 255
+    t.date "identity_expedition_date"
+    t.string "employer", limit: 255
+    t.string "job_position", limit: 255
+    t.integer "birth_state_id"
+    t.integer "city_id"
+    t.string "neighborhood", limit: 255
+    t.string "zip_code", limit: 255
+    t.string "address", limit: 255
+    t.string "telephone1", limit: 255
+    t.string "telephone2", limit: 255
+    t.string "email", limit: 255
+    t.integer "birth_city_id"
+    t.string "identity_issuing_place", limit: 255
+    t.string "photo", limit: 255
+    t.integer "birth_country_id"
+    t.integer "user_id", limit: 8
+    t.string "gender"
+    t.string "skin_color"
+    t.string "pcd"
+    t.string "humanitarian_policy"
+    t.text "obs_pcd"
+    t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
+    t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
+    t.index ["birth_state_id"], name: "index_students_on_state_id"
+    t.index ["city_id"], name: "index_students_on_city_id"
+    t.index ["cpf"], name: "index_students_on_cpf"
+    t.index ["user_id"], name: "index_students_on_user_id"
+  end
 
   create_table "thesis_defense_committee_participations", force: :cascade do |t|
     t.integer "professor_id"
@@ -1073,4 +1112,14 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_27_204233) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "assertions", "queries"
+  add_foreign_key "grants", "professors"
+  add_foreign_key "paper_professors", "papers"
+  add_foreign_key "paper_professors", "professors"
+  add_foreign_key "paper_students", "papers"
+  add_foreign_key "paper_students", "students"
+  add_foreign_key "papers", "professors", column: "owner_id"
+  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
+  add_foreign_key "reports", "users", column: "generated_by_id"
+  add_foreign_key "reports", "users", column: "invalidated_by_id"
 end
