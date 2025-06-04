@@ -126,8 +126,8 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for humanity policy options" do
-      expect(page.all("select#record_humanitarian_policy_ option").map(&:text)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.humanitarian_policies").values << "Não declarado"
-      expect(page.all("select#record_humanitarian_policy_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.humanitarian_policies").values << "Não declarado"
+      expect(page.all("select#record_humanitarian_policy_ option").map(&:text)).to eq ["Não declarado"] << I18n.t("active_scaffold.admissions/form_template.generate_fields.humanitarian_policies").values
+      expect(page.all("select#record_humanitarian_policy_ option").map(&:value)).to eq ["Não declarado"] << I18n.t("active_scaffold.admissions/form_template.generate_fields.humanitarian_policies").values
     end
     it "should have a textarea for obs" do
       expect(page).to have_field("Observações", type: "textarea")
