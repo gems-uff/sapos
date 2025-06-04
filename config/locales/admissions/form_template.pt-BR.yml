@@ -61,7 +61,7 @@ pt-BR:
         name: Nome
         birthdate: Data de nascimento
         birth_city: Naturalidade
-        refugee: Refugiado
+        humanitarian_policy: Política humanitária
         humanitarian_policies:
           not_applied: Não se aplica
           refugee: Refugiado
