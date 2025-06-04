@@ -22,6 +22,6 @@ jobs:
       - name: Set up database schema
         run: bundle exec rake db:test:prepare
       - name: Run tests
-        run: bundle exec rspec spec
+        run: bundle exec rspec --format=progress spec
       - name: Publish code coverage
         uses: paambaati/codeclimate-action@v5.0.0
