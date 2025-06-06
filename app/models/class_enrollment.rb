@@ -39,6 +39,7 @@ class ClassEnrollment < ApplicationRecord
   validate :check_multiple_class_enrollment_allowed
   validate :professor_changed_only_valid_fields,
     if: -> { can?(:post_grades, self) && cannot?(:update_all_fields, self) }
+  validate :check_enrollment_hold
 
   after_save :notify_student_and_advisor
   after_save :class_enrollment_request_cascade
@@ -127,6 +128,15 @@ class ClassEnrollment < ApplicationRecord
       self.will_save_change_to_situation? ||
       self.will_save_change_to_disapproved_by_absence?
     )
+  end
+
+  def check_enrollment_hold
+    enrollment_holds = EnrollmentHold.where(enrollment: enrollment)
+    unless enrollment_holds.empty?
+      enrollment_holds.each do |hold|
+        self.errors.add(:enrollment, :enrollment_is_held) unless course_class.end_date < hold.start_date || course_class.start_date > hold.end_date
+      end
+    end
   end
 
   private
