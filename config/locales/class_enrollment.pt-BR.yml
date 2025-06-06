@@ -30,6 +30,7 @@ pt-BR:
         student: "Aluno"
         enrollment_level: "Nível"
         enrollment_status: "Tipo de Matrícula"
+        enrollment_hold: "Matrícula Trancada"
         admission_date: "Data de Admissão"
         scholarship_durations_active: "Possui bolsa?"
         advisor: "Orientador"
@@ -51,6 +52,7 @@ pt-BR:
           grade_gt_100: "deve ser menor ou igual a 10.0"
           grade_lt_0: "deve ser maior ou igual a 0.0"
           changes_to_disallowed_fields: "houve modificação de campos não válidos"
+          enrollment_is_held: "está trancada no período da turma"
 
     models:
       class_enrollment:
