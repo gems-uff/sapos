@@ -71,6 +71,15 @@ RSpec.describe EnrollmentHold, type: :model do
 
         expect(enrollment_hold.to_label).to eq("2014.1 - 2 semestres")
       end
+
+      it "should delete class_enrollments, when enrollment is hold" do
+        @destroy_later << e = FactoryBot.create(:enrollment)
+        @destroy_later << course = FactoryBot.create(:course_class, year: YearSemester.current.year, semester: YearSemester.current.semester)
+        @destroy_later << FactoryBot.create(:class_enrollment, enrollment: e, course_class: course)
+        expect(ClassEnrollment.all.size).to eq 1
+        @destroy_later << FactoryBot.create(:enrollment_hold, enrollment: e,  year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1)
+        expect(ClassEnrollment.all.size).to eq 0
+      end
     end
   end
 end
