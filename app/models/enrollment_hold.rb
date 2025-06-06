@@ -16,6 +16,7 @@ class EnrollmentHold < ApplicationRecord
   validates :year, presence: true
 
   validate :validate_dates
+  validate :cancel_class_enrollments
 
   after_commit :create_phase_completions
 
@@ -60,5 +61,15 @@ class EnrollmentHold < ApplicationRecord
 
   def create_phase_completions
     enrollment.create_phase_completions
+  end
+
+  def cancel_class_enrollments
+    class_enrollments = ClassEnrollment.where(enrollment: self.enrollment)
+    class_enrollments.each do |class_enrollment|
+      course_class = class_enrollment.course_class
+      unless course_class.end_date < self.start_date || course_class.start_date > self.end_date
+        class_enrollment.delete
+      end
+    end
   end
 end
