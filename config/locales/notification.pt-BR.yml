@@ -22,7 +22,6 @@ pt-BR:
         title: "Título"
         to_template: "Template do Destinatário"
         individual: "Individual"
-        has_grades_report_pdf_attachment: "Boletim anexado"
         no_name: "Sem nome"
         query: "Consulta"
         template_type: "Formato do Template"
@@ -54,7 +53,6 @@ pt-BR:
       execute_now: "Enviar agora"
       simulate: "Simular"
       individual_description: "Um e-mail para cada resultado"
-      has_grades_report_pdf_attachment_description: "Requer email individual e um campo na query, com alias enrollments_id"
       notification_offset_description: "Data de execução. Frequência Mensal com offset 3d executará todo dia 04 do mês"
       query_offset_description: "Data de consulta. Frequência Semestral com offset -1M terá variavel para dias 01/02 ou 01/07"
       execute_now_success: 'Notificação disparada com sucesso'
