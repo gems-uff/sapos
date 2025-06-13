@@ -30,15 +30,14 @@ class NotificationsController < ApplicationController
 
     form_columns = [
       :title, :frequency, :notification_offset, :query_offset, :query,
-      :individual, :has_grades_report_pdf_attachment, :template_type,
-      :to_template, :subject_template, :body_template
+      :individual, :template_type, :to_template, :subject_template,
+      :body_template
     ]
     config.columns = form_columns
     config.update.columns = form_columns
     config.create.columns = [
       :title, :frequency, :notification_offset, :query_offset, :query,
-      :individual, :has_grades_report_pdf_attachment,
-      :to_template, :subject_template, :body_template
+      :individual, :to_template, :subject_template, :body_template
     ]
     config.show.columns = form_columns + [:next_execution]
     config.list.columns = [
@@ -53,9 +52,6 @@ class NotificationsController < ApplicationController
     )
     config.columns[:individual].description = I18n.t(
       "active_scaffold.notification.individual_description"
-    )
-    config.columns[:has_grades_report_pdf_attachment].description = I18n.t(
-      "active_scaffold.notification.has_grades_report_pdf_attachment_description"
     )
     config.columns[:notification_offset].description = I18n.t(
       "active_scaffold.notification.notification_offset_description"
