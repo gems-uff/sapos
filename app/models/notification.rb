@@ -11,6 +11,14 @@ class Notification < ApplicationRecord
   LIQUID = record_i18n_attr("template_types.liquid")
   ERB = record_i18n_attr("template_types.erb")
 
+  NOTIFICATION_DROPS = {
+    data_consulta: :value,
+    ano_semestre_atual: :value,
+    numero_semestre_atual: :value,
+    ano_ultimo_semestre: :value,
+    numero_ultimo_semestre: :value,
+  }
+
   TEMPLATE_TYPES = [LIQUID, ERB]
 
   DERIVATION_DEFS = {
@@ -194,7 +202,7 @@ class Notification < ApplicationRecord
           bindings = {rows: [raw_result], columns: result[:columns]}.merge(params)
           bindings.merge!(Hash[result[:columns].zip(raw_result)])
 
-          formatter = FormatterFactory.create_formatter(bindings, self.template_type)
+          formatter = CodeEvaluator.create_formatter(bindings, self.template_type, NOTIFICATION_DROPS)
 
           notification = {
             notification_id: self.id,
@@ -226,7 +234,7 @@ class Notification < ApplicationRecord
             rows: result[:rows],
             columns: result[:columns]
           }.merge(params)
-          formatter = FormatterFactory.create_formatter(bindings, self.template_type)
+          formatter = CodeEvaluator.create_formatter(bindings, self.template_type, NOTIFICATION_DROPS)
           notifications << {
               notification_id: self.id,
               to: formatter.format(self.to_template),

@@ -105,30 +105,36 @@ pt-BR:
           scholarity_grade_interval: Intervalo do CR ou conceito
           scholarity_start_date: Data de Início
           scholarity_end_date: Data de Fim
+          template_type: Formato do template
+          template_types:
+            liquid: Liquid
+            erb: ERB
+            ruby: Ruby
           html: HTML
           html_description: Campo usado para exibir textos adicionais no formulário.
           code: Código
           code_description: >
             <span class="description">
-              <span class="desc-title"> Código em Ruby usado para consolidação. A última linha será salva </span>
+              <span class="desc-title"> Código em Liquid usado para consolidação (<a href="https://shopify.dev/docs/api/liquid/"> Ver detalhes </a>). O resultado será salvo. Cuidado com espaços em branco e quebras de linha. Use "-" nas tags para evitar problemas. </span>
               <span class="desc-title"> Variáveis: </span>
               <ul>
                 <li>
-                  <strong>process</strong><br>
+                  <strong>{{ process }}</strong><br>
                   Representa um Edital de Seleção (Modelo: AdmissionProcess)
                 </li>
                 <li>
-                  <strong>application</strong><br>
+                  <strong>{{ application }}</strong><br>
                   Representa uma Candidatura (Modelo: AdmissionApplication)
                 </li>
                 <li>
-                  <strong>fields</strong><br>
-                  Hash de nome -> valor para cada campo de candidatura, incluindo consolidados. <br>
+                  <strong>{{ fields }}</strong><br>
+                  Mapa de nome -> valor para cada campo de candidatura, incluindo consolidados. <br>
                   Os valores são string e o nome é case-sensitive.
+                  Exemplo: <strong> {{ fields["Nome"] }} </strong>
                 </li>
                 <li>
-                  <strong>committees</strong><br>
-                  Lista de Hash (nome -> valor) com resultados de formulários individuais na fase. <br>
+                  <strong>{{ committees }}</strong><br>
+                  Lista de Mapa (nome -> valor) com resultados de formulários individuais na fase. <br>
                   Cada elemento da lista representa um formulário de um membro do comitê.
                 </li>
               </ul>
@@ -136,15 +142,11 @@ pt-BR:
               <ul>
                 <li>
                   <strong>Média</strong>
-              <pre>  grades = committees.map{ |x| x["Nota"].to_f }
-              grades.sum / grades.size</pre>
+              <pre>{{- committees | avg: 'Nota' -}}</pre>
                 </li>
                 <li>
                   <strong>Mediana</strong>
-              <pre>  grades = committees.map{ |x| x["Nota"].to_f }
-              sorted = committees.sort
-              length = committees.length
-              (sorted[(length - 1) / 2] + sorted[length / 2]) / 2.0</pre>
+              <pre>{{- committees | median: 'Nota' -}}</pre>
                 </li>
               </ul>
             </span>
@@ -153,24 +155,25 @@ pt-BR:
           body: Template do Corpo
           body_description: >
             <span class="description">
-              <span class="desc-title">Os campos de template utilizam linguagem ERB. <a href="http://stackoverflow.com/questions/7996695/rails-erb-syntax"> Ver detalhes </a>.</span>
-              <span class="desc-title"> Variáveis: <strong>&lt;%= var(:variavel) %&gt;</strong> </span>
+              <span class="desc-title">Os campos de template utilizam linguagem Liquid. <a href="https://shopify.dev/docs/api/liquid/"> Ver detalhes </a>.</span>
+              <span class="desc-title"> Variáveis: </span>
               <ul>
                 <li>
-                  <strong>&lt;%= var(:process) %&gt;</strong><br>
+                  <strong>{{ process }}</strong><br>
                   Representa um Edital de Seleção (Modelo: AdmissionProcess)
                 </li>
                 <li>
-                  <strong>&lt;%= var(:application) %&gt;</strong><br>
+                  <strong>{{ application }}</strong><br>
                   Representa uma Candidatura (Modelo: AdmissionApplication)
                 </li>
                 <li>
-                  <strong>&lt;%= var(:fields) %&gt;</strong><br>
-                  Hash de nome -> valor para cada campo de candidatura, incluindo consolidados. <br>
+                  <strong>{{ fields }}</strong><br>
+                  Mapa de nome -> valor para cada campo de candidatura, incluindo consolidados. <br>
                   Os valores são string e o nome é case-sensitive.
+                  Exemplo: <strong> {{ fields["Nome"] }} </strong>
                 </li>
                 <li>
-                  <strong>&lt;%= var(:committees) %&gt;</strong><br>
+                  <strong>{{ committees }}</strong><br>
                   Lista de Hash (nome -> valor) com resultados de formulários individuais na fase. <br>
                   Cada elemento da lista representa um formulário de um membro do comitê.
                 </li>
@@ -179,15 +182,15 @@ pt-BR:
               <ul>
                 <li>
                   <strong>Acessar nome do candidato</strong>
-            <pre>&lt;%= var(:application).name %&gt;</pre>
+            <pre>{{ application.name }}</pre>
                 </li>
                 <li>
                   <strong>Acessar média do candidato calculada alteriormente</strong>
-            <pre>&lt;%= var(:fields)["Média"] %&gt;</pre>
+            <pre>{{ fields["Média"] }}</pre>
                 </li>
                 <li>
                   <strong>Acessar nome do edital com ano/semestre</strong>
-            <pre>&lt;%= var(:process).title %&gt;</pre>
+            <pre>{{ process.title }}</pre>
                 </li>
               </ul>
             </span>
@@ -215,6 +218,8 @@ pt-BR:
           condition_blank_field_error: "Campo de condição não pode ficar em branco"
           condition_blank_modo_error: "Modo de condição não pode ficar em branco"
           condition_invalid_name_error: "Campo de condição não encontrado: %{field}"
+          template_type_present_error: Formato do template não pode estar em branco
+          cannot_create_new_erb_template: "Não é possível fazer alterações em template ERB ou Ruby. Converta para Liquid e altere o formato"
 
     models:
       admissions/form_field:

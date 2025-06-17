@@ -279,6 +279,7 @@ class EmailTemplate < ApplicationRecord
         new_removal_requests: [ClassEnrollmentRequestDrop],
         remove_insertion_requests: [ClassEnrollmentRequestDrop],
         existing_removal_requests: [ClassEnrollmentRequestDrop],
+        no_action: [ClassEnrollmentRequestDrop],
         message: :value,
         user: UserDrop,
       }
@@ -297,6 +298,7 @@ class EmailTemplate < ApplicationRecord
         new_removal_requests: [ClassEnrollmentRequestDrop],
         remove_insertion_requests: [ClassEnrollmentRequestDrop],
         existing_removal_requests: [ClassEnrollmentRequestDrop],
+        no_action: [ClassEnrollmentRequestDrop],
         message: :value,
         user: UserDrop,
       }
@@ -367,30 +369,10 @@ class EmailTemplate < ApplicationRecord
     headers[:skip_footer] = true
   end
 
-  def load_drop(variables, key, value)
-    if variables.key?(key)
-      cls = variables[key]
-      if cls == :value
-        result = value
-      elsif cls.kind_of?(Array)
-        result = value.map { |v| cls[0].new(v) }
-      else
-        result = cls.new(value)
-      end
-    else
-      result = value
-    end
-    result
-  end
-
   def prepare_message(bindings)
-    if self.template_type == "Liquid"
-      builtin = BUILTIN_TEMPLATES[self.name] || {}
-      variables = builtin[:variables] || {}
-      bindings = bindings.map { |k, v| [k.to_s, load_drop(variables, k, v)] }.to_h
-      bindings["variables"] = VariablesDrop.new
-    end
-    formatter = FormatterFactory.create_formatter(bindings, self.template_type)
+    builtin = BUILTIN_TEMPLATES[self.name] || {}
+    drops = builtin[:variables] || {}
+    formatter = CodeEvaluator.create_formatter(bindings, self.template_type, drops)
     message = {
       to: formatter.format(self.to),
       subject: formatter.format(self.subject),

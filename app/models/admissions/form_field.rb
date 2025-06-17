@@ -6,6 +6,11 @@
 class Admissions::FormField < ActiveRecord::Base
   has_paper_trail
 
+  @@disable_erb_validation = false
+  LIQUID = record_i18n_attr("configurations.template_types.liquid")
+  ERB = record_i18n_attr("configurations.template_types.erb")
+  RUBY = record_i18n_attr("configurations.template_types.ruby")
+
   HTML = record_i18n_attr("field_types.html")
   STRING = record_i18n_attr("field_types.string")
   NUMBER = record_i18n_attr("field_types.number")
@@ -80,6 +85,9 @@ class Admissions::FormField < ActiveRecord::Base
   validates :name, presence: true
   validate :that_configuration_is_valid
   validate :that_field_type_is_valid_for_template
+  validate :cannot_create_new_erb_template, if: -> { 
+    [Admissions::FormField::CODE, Admissions::FormField::EMAIL].include? self.field_type
+  } 
 
   def config_hash
     JSON.parse(self.configuration || "{}")
@@ -109,11 +117,13 @@ class Admissions::FormField < ActiveRecord::Base
       validate_scholarity(config)
     when Admissions::FormField::CODE
       validate_conditions(config, "condition")
+      validate_presence(config, "template_type") unless @@disable_erb_validation
     when Admissions::FormField::EMAIL
       validate_presence(config, "to")
       validate_presence(config, "subject")
       validate_presence(config, "body")
       validate_conditions(config, "condition")
+      validate_presence(config, "template_type") unless @@disable_erb_validation
     end
   end
 
@@ -222,6 +232,29 @@ class Admissions::FormField < ActiveRecord::Base
     false
   end
 
+  def get_type
+    case self.field_type
+    when Admissions::FormField::NUMBER
+      "number"
+    when Admissions::FormField::DATE
+      "date"
+    when Admissions::FormField::STUDENT_FIELD
+      configuration = self.config_hash
+      case configuration["field"]
+      when "birthdate", "identity_expedition_date"
+        "date"
+      else
+        "string"
+      end
+    when Admissions::FormField::CODE
+      configuration = self.config_hash
+      return configuration["code_type"] if configuration["code_type"].present?
+      "number"
+    else
+      "string"
+    end
+  end
+
   def self.search_name(field: nil, substring: false)
     field = "%#{field}%" if field.present? && substring
     Admissions::FormField.where(
@@ -257,4 +290,55 @@ class Admissions::FormField < ActiveRecord::Base
   def self.field_name_exists?(field, in_main: true, in_letter: false)
     self.full_search_name(field:, limit: 1, in_main:, in_letter:).present?
   end
+
+  def self.disable_erb_validation!
+    @@disable_erb_validation = true
+    yield
+    @@disable_erb_validation = false
+  end
+
+  # Returns a list for CODE and EMAIL types where:
+  # - the first element indicates that the template is from an unsafe template type (Ruby or ERB)
+  # - the remaining elements have the template value(s). 
+  def template_values
+    config = self.config_hash
+  rescue JSON::ParserError, TypeError
+    return [false]
+  else
+    if self.field_type == Admissions::FormField::CODE
+      return [
+        config["template_type"] == "Ruby", 
+        I18n.transliterate(config["code"] || "").downcase
+      ]
+    elsif self.field_type == Admissions::FormField::EMAIL
+      return [
+        config["template_type"] == "ERB",
+        I18n.transliterate(config["to"] || "").downcase,
+        I18n.transliterate(config["subject"] || "").downcase,
+        I18n.transliterate(config["body"] || "").downcase,
+      ]
+    else
+      return [false]
+    end
+  end
+
+  private
+    def cannot_create_new_erb_template
+      return if @@disable_erb_validation
+      config = self.config_hash
+    rescue JSON::ParserError, TypeError
+      self.errors.add(:configuration, :invalid_format)
+    else
+      form_field = self.paper_trail.previous_version
+      current = self.template_values
+      return unless current[0]
+      while form_field.present?
+        old = form_field.template_values
+        if current == old && old[0]
+          return
+        end
+        form_field = form_field.paper_trail.previous_version
+      end
+      self.errors.add(:base, :cannot_create_new_erb_template)
+    end
 end

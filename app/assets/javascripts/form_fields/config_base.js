@@ -133,22 +133,24 @@ function form_field_config_base(form_field) {
       ]
     } else if (selected_value == "html") {
       form_field.widgets = [
-        config_form_field_codemirror(form_field, "html", "application/x-erb")
+        config_form_field_codemirror(form_field, "html", "text/html")
       ]
     } else if (selected_value == "code") {
       form_field.widgets = [
-        config_form_field_codemirror(form_field, "code", "text/x-ruby"),
+        config_form_field_codemirror(form_field, "code", "liquid"),
         config_form_field_condition(form_field, "condition", form_field.condition_options),
-        config_form_field_select(form_field, "code_type", [["number", "Número"], ["string", "Texto"], ["date", "Data"]], { required: false, default: "number" })
+        config_form_field_select(form_field, "code_type", [["number", "Número"], ["string", "Texto"], ["date", "Data"]], { required: false, default: "number" }),
+        config_form_field_select(form_field, "template_type", [["Ruby", "Ruby"], ["Liquid", "Liquid"]], { required: true, default: "Liquid" })
       ]
     } else if (selected_value == "email") {
       form_field.widgets = [
         config_form_field_input(form_field, "to", "text", {
-          required: true, default: "<%= var(:application).email %>"
+          required: true, default: "{{ application.email }}"
         }),
         config_form_field_input(form_field, "subject", "text", { required: true }),
-        config_form_field_codemirror(form_field, "body", "application/x-erb", { required: true }),
-        config_form_field_condition(form_field, "condition", form_field.condition_options)
+        config_form_field_codemirror(form_field, "body", "liquid", { required: true }),
+        config_form_field_condition(form_field, "condition", form_field.condition_options),
+        config_form_field_select(form_field, "template_type", [["ERB", "ERB"], ["Liquid", "Liquid"]], { required: true, default: "Liquid" })
       ]
     } else if (selected_value == "invalid") {
       form_field.widgets = [
