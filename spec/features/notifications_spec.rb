@@ -35,8 +35,8 @@ RSpec.describe "Notifications features", type: :feature do
 
     @destroy_all << FactoryBot.create(:notification, query: @query1, title: "saudacao", to_template: "jpimentel@ic.uff.br", subject_template: "Olá", body_template: "Corpo")
     @destroy_all << @record = FactoryBot.create(:notification, query: @query2, title: "despedida", to_template: "jpimentel@ic.uff.br", subject_template: "Tchau", body_template: "<%= var('name') %>")
-    @destroy_all << @notification3 = FactoryBot.create(:notification, query: @query3, title: "boletim", to_template: "jpimentel@ic.uff.br", subject_template: "SAPOS: boletim em anexo", body_template: "Corpo", frequency: "Anual", has_grades_report_pdf_attachment: true, individual: true)
-    @destroy_all << @notification4 = FactoryBot.create(:notification, query: @query3, title: "lembrete", to_template: "jpimentel@ic.uff.br", subject_template: "SAPOS: lembrar de etapa", body_template: "Corpo", frequency: "Anual", has_grades_report_pdf_attachment: false, individual: true)
+    @destroy_all << @notification3 = FactoryBot.create(:notification, query: @query3, title: "boletim", to_template: "jpimentel@ic.uff.br", subject_template: "SAPOS: boletim em anexo", body_template: "Corpo", frequency: "Anual", individual: true)
+    @destroy_all << @notification4 = FactoryBot.create(:notification, query: @query3, title: "lembrete", to_template: "jpimentel@ic.uff.br", subject_template: "SAPOS: lembrar de etapa", body_template: "Corpo", frequency: "Anual", individual: true)
   end
   after(:each) do
     @destroy_later.each(&:delete)

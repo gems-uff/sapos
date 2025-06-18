@@ -65,8 +65,6 @@ class Notification < ApplicationRecord
   validate :has_notification_offset_within_range,
     if: Proc.new { |o| o.errors.empty? }
 
-  validate :has_grades_report_pdf_attachment_requirements
-
   validate :frequency_manual_has_notification_offset_equals_zero
 
   validate do
@@ -92,24 +90,6 @@ class Notification < ApplicationRecord
         :notification_offset,
         :manual_frequency_requires_notification_offset_to_be_zero
       )
-    end
-  end
-
-  def has_grades_report_pdf_attachment_requirements
-    if self.has_grades_report_pdf_attachment
-      if !self.individual
-        errors.add(:has_grades_report_pdf_attachment, :individual_required)
-      end
-
-      does_not_have_enrollments_id_alias = !self.query.execute(
-        prepare_params_and_derivations({ data_consulta: Time.zone.now })
-      )[:columns].include?("enrollments_id")
-      if does_not_have_enrollments_id_alias
-        errors.add(
-          :has_grades_report_pdf_attachment,
-          :query_with_enrollments_id_alias_column_required
-        )
-      end
     end
   end
 
@@ -212,18 +192,6 @@ class Notification < ApplicationRecord
           }
 
           attachments = {}
-
-          # add grades_report_pdf attachment if required
-          if self.has_grades_report_pdf_attachment
-            notification[:enrollments_id] = bindings["enrollments_id"]
-
-            pdf_title = I18n.t("pdf_content.enrollment.grades_report.title")
-            student = Enrollment.find(bindings["enrollments_id"]).student.name
-            attachment_file_name = "#{pdf_title} - #{student}.pdf"
-            attachments[:grades_report_pdf] = {
-              file_name: attachment_file_name
-            }
-          end
 
           notifications << notification
           notifications_attachments[notification] = attachments
