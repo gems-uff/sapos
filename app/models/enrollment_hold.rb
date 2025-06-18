@@ -16,8 +16,8 @@ class EnrollmentHold < ApplicationRecord
   validates :year, presence: true
 
   validate :validate_dates
-  validate :cancel_class_enrollments
 
+  after_commit :cancel_class_enrollments
   after_commit :create_phase_completions
 
   def to_label
