@@ -131,8 +131,8 @@ RSpec.describe "Dismissal features", type: :feature do
     end
 
     it "should be able to search by enrollment level" do
-      expect(page.all("select#search_enrollment_level option").map(&:text)).to eq ["", "Doutorado"]
-      find(:select, "search_enrollment_level").find(:option, text: "Doutorado").select_option
+      expect(page.all("select#search_level option").map(&:text)).to eq ["", "Doutorado"]
+      find(:select, "search_level").find(:option, text: "Doutorado").select_option
       click_button "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Ana", "M01 - Bia", "M03 - Carol"]
     end
