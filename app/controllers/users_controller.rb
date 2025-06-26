@@ -27,6 +27,11 @@ class UsersController < ApplicationController
     order_by: "name ASC", full_text_search: true
   )
 
+  def before_update_save(record)
+    if params[:record][:roles].nil?
+      record.roles = []
+    end
+  end
   def after_update_save(record)
     if record == current_user
       bypass_sign_in(record)

@@ -45,6 +45,8 @@ class User < ApplicationRecord
 
   validates_confirmation_of :password
 
+  before_save :set_actual_role
+
   before_destroy :validate_destroy
 
   delegate :can?, :cannot?, to: :ability
@@ -99,18 +101,12 @@ class User < ApplicationRecord
   end
 
   def role_is_professor_if_the_professor_field_is_filled
-    if professor && !is_professor?
-      errors.add(:professor, :selected_role_was_not_professor)
-    end
     if is_professor? && !professor
       errors.add(:base, :role_professor_not_associated)
     end
   end
 
   def role_is_student_if_the_student_field_is_filled
-    if student && !self.is_student?
-      errors.add(:student, :selected_role_was_not_student)
-    end
     if !student && self.is_student?
       errors.add(:base, :role_student_not_associated)
     end
@@ -155,6 +151,11 @@ class User < ApplicationRecord
         "REPLACE(REPLACE(students.cpf, '-', ''), '.', '') = ?", cpf
       ).first
     end
+  end
+
+  def set_actual_role
+    actual = UserRole.find_by(user_id: self.id, role_id: actual_role)
+    self.actual_role = self.user_max_role if actual.nil?
   end
 
   def user_max_role
