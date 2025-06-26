@@ -289,13 +289,15 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
       describe "pendency_condition" do
         describe "should return a condition that returns valid and requested ClassEnrollmentRequests" do
           it "when user has a coordination role" do
-            @destroy_later << user = FactoryBot.create(:user, actual_role: Role::ROLE_COORDENACAO)
+            @destroy_later << coordination_role = FactoryBot.create(:role_coordenacao)
+            @destroy_later << user = FactoryBot.create(:user, roles: [coordination_role])
             result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
             expect(result.count).to eq(2)
             expect(result).to include(@valid, @requested)
           end
           it "when user has a secretary role" do
-            @destroy_later << user = FactoryBot.create(:user, actual_role: Role::ROLE_SECRETARIA)
+            @destroy_later << secretary_role = FactoryBot.create(:role_secretaria)
+            @destroy_later << user = FactoryBot.create(:user, roles: [secretary_role])
             result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
             expect(result.count).to eq(2)
             expect(result).to include(@valid, @requested)

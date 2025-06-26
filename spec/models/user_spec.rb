@@ -70,16 +70,6 @@ RSpec.describe User, type: :model do
           expect(user).to have(0).errors_on :professor
         end
       end
-      context "should have error selected_role_was_not_professor when" do
-        it "professor is not null and role is not professor" do
-          user.actual_role = Role::ROLE_ALUNO
-          @destroy_later << user.professor = FactoryBot.create(:professor)
-          expect(user).to have_error(:selected_role_was_not_professor).on :professor
-        end
-      end
-      # context "should have error selected_professor_is_already_linked_to_another_user when" do
-      # I could not reproduce this validation outside active scaffold
-      # end
     end
     describe "student" do
       context "should be valid when" do
@@ -104,16 +94,6 @@ RSpec.describe User, type: :model do
           expect(user).to have(0).errors_on :student
         end
       end
-      context "should have error selected_role_was_not_student when" do
-        it "student is not null and role is not student" do
-          user.actual_role = Role::ROLE_PROFESSOR
-          @destroy_later << user.student = FactoryBot.create(:student)
-          expect(user).to have_error(:selected_role_was_not_student).on :student
-        end
-      end
-      # context "should have error selected_student_is_already_linked_to_another_user when" do
-      # I could not reproduce this validation outside active scaffold
-      # end
     end
   end
 end
