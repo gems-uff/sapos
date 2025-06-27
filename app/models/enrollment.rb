@@ -215,10 +215,11 @@ class Enrollment < ApplicationRecord
     return false unless self.should_have_user?
     begin
       student = self.student
+      role = Role.find_by(id: Role::ROLE_ALUNO)
       user = User.invite!({
         email: student.first_email,
         name: student.name,
-        role_id: Role::ROLE_ALUNO
+        roles: [role],
       }, current_user) do |invitable|
         invitable.skip_confirmation!
       end

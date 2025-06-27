@@ -9,12 +9,12 @@ class DismissalsController < ApplicationController
   active_scaffold :dismissal do |config|
     # Enables advanced search A.K.A FieldSearch
     config.actions.swap :search, :field_search
-    config.columns.add :enrollment, :enrollment_level
-    config.field_search.columns = [:enrollment, :enrollment_level, :date, :dismissal_reason]
+    config.columns.add :enrollment, :level
+    config.field_search.columns = [:enrollment, :level, :date, :dismissal_reason]
     config.columns[:enrollment].search_ui = :text
     config.columns[:enrollment].search_sql = "enrollments.enrollment_number"
     config.columns[:date].search_sql = "dismissals.date"
-    config.columns[:enrollment_level].search_sql = "enrollments.level"
+    config.columns[:level].search_sql = "enrollments.level"
 
     config.list.columns = [:enrollment, :dismissal_reason, :date, :obs]
     config.create.label = :create_dismissal_label
@@ -23,13 +23,15 @@ class DismissalsController < ApplicationController
     config.columns[:date].options = { format: :monthyear }
     config.columns[:dismissal_reason].clear_link
 
+    config.show.columns = [:enrollment, :level, :dismissal_reason, :obs]
+
     config.update.columns = [:enrollment, :date, :dismissal_reason, :obs]
     config.create.columns = [:enrollment, :date, :dismissal_reason, :obs]
 
     config.actions.exclude :deleted_records
   end
 
-  def self.condition_for_enrollment_level_column(column, value, like_pattern)
+  def self.condition_for_level_column(column, value, like_pattern)
     unless value.blank?
       ["dismissals.id IN (
         SELECT dismissals.id
