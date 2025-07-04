@@ -1,5 +1,5 @@
 class GenerateOrdinanceToProgramLevel < ActiveRecord::Migration[7.0]
-  def change
+  def up
     Level.find_each do |level|
       next if level.course_name.nil?
       match = level.course_name.match(/\(([^)]+)\)/)
@@ -17,6 +17,20 @@ class GenerateOrdinanceToProgramLevel < ActiveRecord::Migration[7.0]
       end
       new_course_name = level.course_name.sub(/\s*\([^)]+\)/, "")
       level.update!(course_name: new_course_name)
+    end
+  end
+
+  def down
+    program = ProgramLevel.where.not(ordinance: nil).order(start_date: :desc).first
+    return if program.nil?
+    ordi = program.ordinance
+    Level.find_each do |level|
+      next if level.course_name.nil?
+      new_course_name = "#{level.course_name} (#{ordi})"
+      level.update!(course_name: new_course_name)
+    end
+    ProgramLevel.find_each do |program|
+      program.update!(ordinance: nil)
     end
   end
 end
