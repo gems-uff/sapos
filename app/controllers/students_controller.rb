@@ -13,7 +13,7 @@ class StudentsController < ApplicationController
     :address, :zip_code, :telephone1, :telephone2, :email, :employer,
     :job_position, :cpf, :identity_number, :identity_issuing_body,
     :identity_issuing_place, :identity_expedition_date, :birth_country,
-    :birth_state, :birth_city, :humanity_policy, :obs_refugee, :father_name, :mother_name, :obs,
+    :birth_state, :birth_city, :humanitarian_policy, :father_name, :mother_name, :obs,
     :student_majors
   ]
 
@@ -22,6 +22,7 @@ class StudentsController < ApplicationController
   active_scaffold :student do |config|
     config.list.sorting = { name: "ASC" }
     config.list.columns = [:name, :cpf, :enrollments]
+    config.list.empty_field_text = "Não declarado"
     config.create.label = :create_student_label
 
     config.columns[:birthdate].options = {
@@ -43,14 +44,17 @@ class StudentsController < ApplicationController
     config.columns[:pcd].options = {
       options: I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
     }
-    config.columns[:humanity_policy].form_ui = :select
-    config.columns[:humanity_policy].options = {
-      options: I18n.t("active_scaffold.admissions/form_template.generate_fields.humanity_policies").values
+    config.columns[:humanitarian_policy].form_ui = :select
+    config.columns[:humanitarian_policy].options = {
+      include_blank: "Não declarado",
+      options: I18n.t("active_scaffold.admissions/form_template.generate_fields.humanitarian_policies").values
     }
+
 
     config.columns[:sex].form_ui = :select
     config.columns[:sex].options = {
-      options: [["Não Declarado", "ND"], ["Masculino", "M"], ["Feminino", "F"]]
+      include_blank: "Não declarado",
+      options: [["Masculino", "M"], ["Feminino", "F"]]
     }
     config.columns[:civil_status].form_ui = :select
     config.columns[:civil_status].options = {
