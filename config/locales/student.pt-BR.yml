@@ -30,6 +30,7 @@ pt-BR:
         photo: "Foto"
         sex: "Sexo"
         gender: "Gênero"
+        obs_gender: "Observações de gênero"
         skin_color: "Raça/Cor"
         pcd: "PCD"
         obs_pcd: "Observações de PCD"
