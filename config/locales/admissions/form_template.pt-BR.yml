@@ -57,7 +57,7 @@ pt-BR:
               color: red;
             }
           </style>
-        personal_data: Dados Pessoais
+        personal_data: Dados pessoais
         name: Nome
         birthdate: Data de nascimento
         birth_city: Naturalidade
@@ -82,11 +82,11 @@ pt-BR:
         gender: Gênero
         genders:
           not_declared: Não declarado
-          men_cis: Homem Cisgênero
-          women_cis: Mulher Cisgênero
-          men_trans: Homem Transgênero
-          women_trans: Mulher Transgênero
-          non_binary: Pessoa Não-Binária
+          men_cis: Homem cisgênero
+          women_cis: Mulher cisgênero
+          men_trans: Homem transgênero
+          women_trans: Mulher transgênero
+          non_binary: Pessoa não-Binária
           others: Outros
         deficiency: Pessoa com deficiência
         deficiencies:
