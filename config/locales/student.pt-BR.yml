@@ -41,7 +41,7 @@ pt-BR:
         special_city: "Residência*"
         special_birth_city: "Naturalidade*"
         special_majors: "Cursos*"
-        humaniarian_policy: "Política Humanitária"
+        humanitarian_policy: "Política Humanitária"
         obs: "Observações"
 
     errors:
