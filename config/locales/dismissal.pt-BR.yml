@@ -8,6 +8,7 @@ pt-BR:
         date: "Data"
         dismissal_reason: "Motivo do Desligamento"
         enrollment: "Matrícula"
+        level: "Nível de Matrícula"
         obs: "Observação"
 
     errors:

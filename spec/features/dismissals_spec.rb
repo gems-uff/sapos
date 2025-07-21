@@ -30,7 +30,7 @@ RSpec.describe "Dismissal features", type: :feature do
 
     @destroy_all << @record = FactoryBot.create(:dismissal, enrollment: @enrollment1, date: Date.today, dismissal_reason: @dismissal_reason1)
     @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment2, date: Date.today, dismissal_reason: @dismissal_reason2)
-    @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment3, date: Date.today, dismissal_reason: @dismissal_reason1)
+    @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment3, date: 2.years.ago.at_beginning_of_month.to_date, dismissal_reason: @dismissal_reason1)
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -127,6 +127,27 @@ RSpec.describe "Dismissal features", type: :feature do
       fill_in "Matrícula", with: "M03"
       click_button "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M03 - Carol"]
+    end
+
+    it "should be able to search by enrollment level" do
+      expect(page.all("select#search_level option").map(&:text)).to eq ["", "Doutorado"]
+      find(:select, "search_level").find(:option, text: "Doutorado").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Ana", "M01 - Bia", "M03 - Carol"]
+    end
+
+    it "should be able to search by dismissal date" do
+      year = 2.years.ago.year
+      find(:select, "search_date_year").find(:option, text: year).select_option
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M03 - Carol"]
+    end
+
+    it "should be able to search by dismissal reason" do
+      expect(page.all("select#search_dismissal_reason option").map(&:text)).to eq ["Selecione uma opção", "Reprovado", "Titulação"]
+      find(:select, "search_dismissal_reason").find(:option, text: "Reprovado").select_option
+      click_button "Buscar"
+      expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Ana", "M03 - Carol"]
     end
   end
 end

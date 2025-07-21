@@ -2,7 +2,10 @@ function config_form_field_select(form_field, field, selectable, options) {
   let r = (Math.random() + 1).toString(36).substring(7);
   let title = form_field.i18n(field);
   let id = `${form_field.baseid}_${field}_${r}`
-  let value = form_field.data[field] || options["default"] || "";
+  let value = form_field.data[field] || "";
+  if ((form_field.data[field] === undefined) && options["default"]) {
+    value = form_field.data[field] = options["default"];
+  }
 
   let options_text = [];
   let found = null;
@@ -56,7 +59,8 @@ function config_form_field_select(form_field, field, selectable, options) {
     },
     validate: () => {
       let result = true;
-      if (options["required"] && !form_field.data[field]) {
+      uses_default = form_field.data[field] === undefined && options["default"];
+      if (options["required"] && !form_field.data[field] && !uses_default) {
         let present_error = form_field.i18n_error(field + "_present_error");
         $(`#${id}_error`).text(present_error)
         $(`#${id}_error`).show();

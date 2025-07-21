@@ -343,26 +343,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
   end
 
   def get_type
-    case self.form_field.field_type
-    when Admissions::FormField::NUMBER
-      "number"
-    when Admissions::FormField::DATE
-      "date"
-    when Admissions::FormField::STUDENT_FIELD
-      configuration = self.form_field.config_hash
-      case configuration["field"]
-      when "birthdate", "identity_expedition_date"
-        "date"
-      else
-        "string"
-      end
-    when Admissions::FormField::CODE
-      configuration = self.form_field.config_hash
-      return configuration["code_type"] if configuration["code_type"].present?
-      "number"
-    else
-      "string"
-    end
+    self.form_field.get_type
   end
 
   def self.convert_value(value, type)
