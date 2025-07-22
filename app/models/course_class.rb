@@ -90,10 +90,10 @@ class CourseClass < ApplicationRecord
       .on(course_arel[:id].eq(course_class_arel[:course_id]))
       .join(class_enrollment_arel)
       .on(course_class_arel[:id].eq(class_enrollment_arel[:course_class_id]))
-      .where(class_enrollment_arel[:grade].eq(nil)
+      .where(class_enrollment_arel[:situation].eq(ClassEnrollment::REGISTERED)
       .and(course_class_arel[:year].eq(YearSemester.current.year))
       .and(course_class_arel[:semester].eq(YearSemester.current.semester))
-      .and(course_type_arel[:has_score].eq(true)))
+      .and(course_type_arel[:schedulable].eq(true)))
 
       if user.professor.present?
         query = query.where(course_class_arel[:professor_id].eq(user.professor.id))
