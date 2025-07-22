@@ -13,8 +13,10 @@ class ProgramLevel < ApplicationRecord
 
 
   def to_label
-    to_ordinance = self.ordinance ? "(#{self.ordinance})" : ""
-    "#{I18n.t("activerecord.attributes.program_level.level")} #{level} #{to_ordinance}"
+    "#{I18n.t("activerecord.attributes.program_level.level")} #{level}"
   end
 
+  def to_ordinance
+    self.ordinance ? "(#{self.ordinance})" : ""
+  end
 end
