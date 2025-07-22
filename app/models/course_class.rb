@@ -78,15 +78,22 @@ class CourseClass < ApplicationRecord
     semester = ClassSchedule.find_by(year: YearSemester.current.year, semester: YearSemester.current.semester)
 
     if semester && semester.show_period_end?
+      course_type_arel = CourseType.arel_table.dup
+      course_arel = Course.arel_table.dup
       course_class_arel = CourseClass.arel_table.dup
       class_enrollment_arel = ClassEnrollment.arel_table.dup
 
-      query = course_class_arel
+      query = course_type_arel
+      .join(course_arel)
+      .on(course_type_arel[:id].eq(course_arel[:course_type_id]))
+      .join(course_class_arel)
+      .on(course_arel[:id].eq(course_class_arel[:course_id]))
       .join(class_enrollment_arel)
       .on(course_class_arel[:id].eq(class_enrollment_arel[:course_class_id]))
       .where(class_enrollment_arel[:grade].eq(nil)
       .and(course_class_arel[:year].eq(YearSemester.current.year))
-      .and(course_class_arel[:semester].eq(YearSemester.current.semester)))
+      .and(course_class_arel[:semester].eq(YearSemester.current.semester))
+      .and(course_type_arel[:has_score].eq(true)))
 
       if user.professor.present?
         query = query.where(course_class_arel[:professor_id].eq(user.professor.id))
