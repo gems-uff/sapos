@@ -77,6 +77,7 @@ RSpec.describe "Enrollments features", type: :feature do
     @destroy_later.clear
   end
   after(:all) do
+    NotificationLog.destroy_all
     PhaseCompletion.destroy_all
     @destroy_all.each(&:delete)
     @destroy_all.clear
