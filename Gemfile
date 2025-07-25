@@ -198,6 +198,7 @@ group :test do
 
   # Measure code coverage
   gem "simplecov"
+  gem "simplecov-lcov"
 end
 
 # Notify exceptions
