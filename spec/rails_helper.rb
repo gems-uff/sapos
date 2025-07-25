@@ -5,6 +5,10 @@
 require "spec_helper"
 
 require "simplecov"
+require "simplecov-lcov"
+
+SimpleCov.formatter = SimpleCov::Formatter::LcovFormatter
+
 SimpleCov.start "rails" do
   #enable_coverage_for_eval
 end unless ENV["SKIP_COVERAGE"]
