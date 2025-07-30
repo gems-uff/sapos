@@ -3,7 +3,7 @@
 
   <span class="pendency-description">
     Essa lista exibe as turmas que apresentam algum aluno que não tenha completado a disciplina nesse semestre.(Situação: Incompleto)<br>
-     Data lilmite para alterar a situação do aluno: 
+     Data limite para alterar a situação do aluno: 
      <span style="color: red">
       <%= ClassSchedule.find_by(year: YearSemester.current.year, semester: YearSemester.current.semester)&.grades_deadline_to_view%>
       </span><br>
