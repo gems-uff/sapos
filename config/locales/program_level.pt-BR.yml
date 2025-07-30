@@ -4,6 +4,7 @@ pt-BR:
       program_level:
         active: Ativo?
         level: Nível
+        ordinance: Portaria
         start_date: Data de início
         end_date: Data de fim
 
