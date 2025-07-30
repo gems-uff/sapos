@@ -5,17 +5,12 @@
 require "spec_helper"
 
 require "simplecov"
-require "simplecov-lcov"
 
-SimpleCov::Formatter::LcovFormatter.config do |c|
-  c.report_with_single_file = true
-  c.single_report_path = "coverage/lcov.info"
-end
+require "simplecov_json_formatter"
 
-SimpleCov.formatter = SimpleCov::Formatter::LcovFormatter
-
-SimpleCov.start "rails" do
-  #enable_coverage_for_eval
+SimpleCov.start do
+  formatter SimpleCov::Formatter::JSONFormatter
+  add_filter "/spec/"
 end unless ENV["SKIP_COVERAGE"]
 
 ENV["RAILS_ENV"] ||= "test"
