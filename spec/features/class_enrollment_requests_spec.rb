@@ -289,7 +289,10 @@ RSpec.describe "ClassEnrollmentRequests features", type: :feature do
       expect(page.all("select#search_enrollment_level option").map(&:text)).to eq ["Selecione uma opção", "Doutorado", "Mestrado"]
       find(:select, "search_enrollment_level").find(:option, text: "Mestrado").select_option
       click_button "Buscar"
-      expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M01 - Ana", "M02 - Bia", "M02 - Bia"]
+      expected = ["M01 - Ana", "M01 - Ana", "M02 - Bia", "M02 - Bia"]
+      expect(page).to have_selector("tr td.enrollment-column", text: "M01 - Ana")
+      values = page.all("tr td.enrollment-column", minimum: 4).map(&:text)
+      expect(values).to eq expected
     end
 
     it "should be able to search by enrollment_status" do
