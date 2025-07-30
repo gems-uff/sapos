@@ -225,7 +225,9 @@ RSpec.describe "Enrollments features", type: :feature do
       expect(page.all("select[name=\"search[delayed_phase][phase]\"] option").map(&:text)).to eq ["Selecione uma opção", "Alguma", "Pedido de Banca", "Exame de Qualificação"]
       find(:css, "select[name=\"search[delayed_phase][phase]\"]").find(:option, text: "Pedido de Banca").select_option
       click_button "Buscar"
-      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
+      expect(page).to have_selector("tr td.enrollment_number-column", text: "M02")
+      numbers = page.all("tr td.enrollment_number-column", minimum: 1).map(&:text)
+      expect(numbers).to eq ["M02"]
     end
 
     it "should be able to search by course_class" do
