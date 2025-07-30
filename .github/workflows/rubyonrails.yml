@@ -30,4 +30,5 @@ jobs:
         uses: qltysh/qlty-action/coverage@v1
         with:
 #          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+          oidc: true
           files: coverage/.resultset.json
