@@ -1,9 +1,9 @@
 # This workflow will install a prebuilt Ruby version, install dependencies, and run tests.
 name: "Ruby on Rails CI"
 on: [push, pull_request]
-permissions:
-    contents: read
-    id-token: write
+#permissions:
+#    contents: read
+#    id-token: write
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -11,7 +11,7 @@ jobs:
       RAILS_ENV: test
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup geckodriver
         uses: browser-actions/setup-geckodriver@latest
         with:
