@@ -11,7 +11,7 @@ jobs:
       RAILS_ENV: test
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Setup geckodriver
         uses: browser-actions/setup-geckodriver@latest
         with:
