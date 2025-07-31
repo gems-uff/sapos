@@ -109,6 +109,8 @@ RSpec.configure do |config|
     )
   end
 
+  Capybara.default_max_wait_time = 20
+
   config.include DateHelpers
   config.include UserHelpers
   config.include PlaceWidgetsHelpers
