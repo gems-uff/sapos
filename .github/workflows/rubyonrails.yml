@@ -1,9 +1,6 @@
 # This workflow will install a prebuilt Ruby version, install dependencies, and run tests.
 name: "Ruby on Rails CI"
 on: [push, pull_request]
-permissions:
-    contents: read
-    id-token: write
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -28,5 +25,5 @@ jobs:
       - name: Publish code coverage
         uses: qltysh/qlty-action/coverage@v1
         with:
-          oidc: true
+          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
           files: coverage/.resultset.json
