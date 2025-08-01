@@ -82,8 +82,7 @@ module EnrollmentsPdfHelper
         [
           "#{i18n_eht(:course)} <b>#{rescue_blank_text(
             enrollment.level.name.nil? ? nil : (enrollment.level.full_name)
-          )} <font name='FreeMono'>#{ProgramLevel.on_date(enrollment.thesis_defense_date)&.last&.to_ordinance}
-          </font>
+          )} #{ProgramLevel.on_date(enrollment.thesis_defense_date)&.last&.to_ordinance}
           </b>"
         ], [
           "#{i18n_eht(:field_of_study)} <b>#{rescue_blank_text(
