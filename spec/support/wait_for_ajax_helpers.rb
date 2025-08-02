@@ -1,22 +1,24 @@
-module Capybara
-  module Node
-    module Actions
-      alias_method :original_click_button, :click_button
+# frozen_string_literal: true
 
-      def click_button(locator = nil, **options)
-        original_click_button(locator, **options)
-        wait_for_ajax_if_jquery_present
-      end
-
-      private
-
-      def wait_for_ajax_if_jquery_present
-        return unless evaluate_script('typeof jQuery !== "undefined"') rescue false
-
-        Timeout.timeout(Capybara.default_max_wait_time) do
-          loop until evaluate_script('jQuery.active').zero?
-        end
+module WaitForAjax
+  def wait_for_ajax
+    Timeout.timeout(Capybara.default_max_wait_time) do
+      until finished_all_ajax_requests?
+        sleep 0.01
       end
     end
   end
+
+  def finished_all_ajax_requests?
+    page.evaluate_script('typeof jQuery !== "undefined" && jQuery.active === 0')
+  end
+
+  def click_button_and_wait(*args, **kwargs)
+    click_button(*args, **kwargs)
+    wait_for_ajax
+  end
+end
+
+RSpec.configure do |config|
+  config.include WaitForAjax, type: :feature
 end

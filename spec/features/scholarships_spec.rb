@@ -80,7 +80,7 @@ RSpec.describe "Scholarships features", type: :feature do
         find(:select, "record_level_").find(:option, text: "Doutorado").select_option
         find(:select, "record_sponsor_").find(:option, text: "CNPq").select_option
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.scholarship_number-column", text: "B4")
 
       # Remove inserted record
@@ -128,7 +128,7 @@ RSpec.describe "Scholarships features", type: :feature do
       within(".as_form") do
         find(:select, "record_level_#{@record.id}").find(:option, text: @level2.name).select_option
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("#as_#{plural_name}-list-#{@record.id}-row td.level-column", text: "Mestrado")
       @record.level = @level1
       @record.save!
@@ -145,58 +145,58 @@ RSpec.describe "Scholarships features", type: :feature do
 
     it "should be able to search by scholarship_number" do
       fill_in "Número da Bolsa", with: "B1"
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.scholarship_number-column").map(&:text)).to eq ["B1"]
     end
 
     it "should be able to search by level" do
       find(:select, "search_level").find(:option, text: "Doutorado").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.scholarship_number-column").map(&:text)).to eq ["B1", "B3"]
     end
 
     it "should be able to search by sponsor" do
       find(:select, "search_sponsor").find(:option, text: "CNPq").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.scholarship_number-column").map(&:text)).to eq ["B2", "B3"]
     end
 
     it "should be able to search by scholarship_type" do
       find(:select, "search_scholarship_type").find(:option, text: "Individual").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.scholarship_number-column").map(&:text)).to eq ["B1", "B2"]
     end
 
     it "should be able to search by start_date" do
       select_month_year("search_start_date", 2.years.ago - 1.month)
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.scholarship_number-column").map(&:text)).to eq ["B2"]
     end
 
     it "should be able to search by end_date" do
       select_month_year("search_end_date", 4.months.from_now)
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.scholarship_number-column").map(&:text)).to eq ["B2", "B3"]
     end
 
     it "should be able to search for available scholarships considering scholarship_durations" do
       find(:css, "#search_available_use").set(true)
       select_month_year("date", Date.today)
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.scholarship_number-column").map(&:text)).to eq ["B1", "B2"]
     end
 
     it "should be able to search for available scholarships after scholarship duration" do
       find(:css, "#search_available_use").set(true)
       select_month_year("date", 2.months.from_now)
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.scholarship_number-column").map(&:text)).to eq ["B1", "B2", "B3"]
     end
 
     it "should be able to search for available scholarships considering end_date" do
       find(:css, "#search_available_use").set(true)
       select_month_year("date", 5.months.from_now)
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.scholarship_number-column").map(&:text)).to eq ["B2", "B3"]
     end
   end
