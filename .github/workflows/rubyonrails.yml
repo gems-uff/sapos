@@ -21,7 +21,7 @@ jobs:
       - name: Set up database schema
         run: bundle exec rake db:test:prepare
       - name: Run tests
-        run: bundle exec rspec spec
+        run: bundle exec rspec
       - name: Publish code coverage
         uses: qltysh/qlty-action/coverage@v1
         with:
