@@ -62,7 +62,7 @@ RSpec.describe "ResearchAreas features", type: :feature do
         fill_in "Nome", with: "Inteligência Artificial"
         fill_in "Código", with: "IA"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Inteligência Artificial")
 
       # Remove inserted record
@@ -86,7 +86,7 @@ RSpec.describe "ResearchAreas features", type: :feature do
       within(".as_form") do
         fill_in "Nome", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
       @record.name = "Sistemas de Computação"
       @record.save!

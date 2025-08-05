@@ -6,10 +6,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       RAILS_ENV: test
-      CC_TEST_REPORTER_ID: e124d2db428c426bc2e4a984bbc007b5ecf7c0ee2533b687adac0f301048afae
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup geckodriver
         uses: browser-actions/setup-geckodriver@latest
         with:
@@ -22,6 +21,9 @@ jobs:
       - name: Set up database schema
         run: bundle exec rake db:test:prepare
       - name: Run tests
-        run: bundle exec rspec spec
+        run: bundle exec rspec
       - name: Publish code coverage
-        uses: paambaati/codeclimate-action@v5.0.0
+        uses: qltysh/qlty-action/coverage@v1
+        with:
+          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+          files: coverage/.resultset.json

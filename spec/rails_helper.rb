@@ -109,6 +109,17 @@ RSpec.configure do |config|
     )
   end
 
+  Capybara.default_max_wait_time = 20
+
+  Capybara.default_driver = :selenium
+  Capybara.javascript_driver = :selenium
+
+  RSpec.configure do |config|
+    config.before(:each, type: :feature) do
+      Capybara.current_driver = :selenium
+    end
+  end
+
   config.include DateHelpers
   config.include UserHelpers
   config.include PlaceWidgetsHelpers
