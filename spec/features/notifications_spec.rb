@@ -82,7 +82,7 @@ RSpec.describe "Notifications features", type: :feature do
         fill_in "Template do Assunto", with: "Assunto"
         find(:select, "record_query_").find(:option, text: "queries").select_option
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.title-column", text: "Query")
 
       # Remove inserted record
@@ -129,7 +129,7 @@ RSpec.describe "Notifications features", type: :feature do
       within(".as_form") do
         fill_in "Título", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.title-column", text: "Teste")
       @record.title = "despedida"
       @record.save!

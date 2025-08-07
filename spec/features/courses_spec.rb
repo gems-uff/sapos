@@ -81,7 +81,7 @@ RSpec.describe "Courses features", type: :feature do
         fill_in "Carga Horária", with: "60"
         find(:select, "record_course_type_").find(:option, text: @course_type1.name).select_option
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Programação")
 
       # Remove inserted record
@@ -109,7 +109,7 @@ RSpec.describe "Courses features", type: :feature do
       within(".as_form") do
         fill_in "Nome", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
       @record.name = "Defesa"
       @record.save!
@@ -125,27 +125,27 @@ RSpec.describe "Courses features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "Nome", with: "Ver"
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Versionamento"]
     end
 
     it "should be able to search by course_type" do
       expect(page.all("select#search_course_type option").map(&:text)).to eq ["Selecione uma opção", "Defesa", "Obrigatória", "Pesquisa", "Tópicos"]
       find(:select, "search_course_type").find(:option, text: "Tópicos").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Tópicos em ES"]
     end
 
     it "should be able to search by research_area" do
       fill_in "Áreas de Pesquisa", with: "Engenharia de Software"
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Tópicos em ES", "Versionamento"]
     end
 
     it "should be able to search by availability" do
       expect(page.all("select#search_available option").map(&:text)).to eq ["Selecione uma opção", "Sim", "Não"]
       find(:select, "search_available").find(:option, text: "Não").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Algebra"]
     end
   end

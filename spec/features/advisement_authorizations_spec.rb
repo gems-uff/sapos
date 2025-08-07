@@ -69,7 +69,7 @@ RSpec.describe "Advisements features", type: :feature do
       expect(page).to have_content "Adicionar Credenciamento"
       fill_record_select("professor_", "professors", "Helena")
       find(:select, "record_level_").find(:option, text: @level2.name).select_option
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.professor-column", text: "Helena")
 
       # Remove inserted record
@@ -101,7 +101,7 @@ RSpec.describe "Advisements features", type: :feature do
       within(".as_form") do
         find(:select, "record_level_#{@record.id}").find(:option, text: @level1.name).select_option
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("#as_#{plural_name}-list-#{@record.id}-row td.level-column", text: "Doutorado")
       @record.level = @level2
       @record.save!
@@ -118,14 +118,14 @@ RSpec.describe "Advisements features", type: :feature do
 
     it "should be able to search by advisor" do
       search_record_select("professor", "professors", "Erica")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.professor-column").map(&:text)).to eq ["Erica"]
     end
 
     it "should be able to search by level" do
       page.send_keys :escape
       find(:select, "search_level").find(:option, text: "Doutorado").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.professor-column").map(&:text)).to eq ["Erica", "Gi"]
     end
   end

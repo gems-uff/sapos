@@ -81,7 +81,7 @@ RSpec.describe "Majors features", type: :feature do
         find(:select, "record_level_").find(:option, text: @level3.name).select_option
       end
       fill_record_select("institution_", "institutions", "Flum")
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Tecnologia em Sistemas de Computação")
 
       # Remove inserted record
@@ -113,7 +113,7 @@ RSpec.describe "Majors features", type: :feature do
       within(".as_form") do
         fill_in "Nome", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
     end
   end

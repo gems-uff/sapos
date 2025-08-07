@@ -66,7 +66,7 @@ RSpec.describe "States features", type: :feature do
         fill_in "Nome", with: "Minas Gerais"
         fill_in "Sigla", with: "MG"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Minas Gerais")
 
       # Remove inserted record
@@ -94,7 +94,7 @@ RSpec.describe "States features", type: :feature do
       within(".as_form") do
         fill_in "Nome", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
     end
   end

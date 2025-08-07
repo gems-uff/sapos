@@ -62,7 +62,7 @@ RSpec.describe "DismissalReason features", type: :feature do
         fill_in "Nome", with: "Prazo"
         find(:select, "record_thesis_judgement_").find(:option, text: "--").select_option
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Prazo")
       expect(page).to have_css("tr:nth-child(1) td.thesis_judgement-column", text: "--")
 
@@ -92,7 +92,7 @@ RSpec.describe "DismissalReason features", type: :feature do
         fill_in "Nome", with: "Teste"
         find(:select, "record_thesis_judgement_#{@record.id}").find(:option, text: "Aprovado").select_option
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
       expect(page).to have_css("td.thesis_judgement-column", text: "Aprovado")
     end

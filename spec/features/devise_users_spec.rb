@@ -36,7 +36,7 @@ RSpec.describe "Users features", type: :feature do
       fill_in "Email ou CPF", with: "user@ic.uff.br"
       fill_in "Senha", with: "A1b2c3d4!"
     end
-    click_button "Login"
+    click_button_and_wait "Login"
     expect(page).to have_content "Login feito com sucesso."
   end
 
@@ -51,7 +51,7 @@ RSpec.describe "Users features", type: :feature do
       fill_in "Email ou CPF", with: "123.456.789-10"
       fill_in "Senha", with: "A1b2c3d4!"
     end
-    click_button "Login"
+    click_button_and_wait "Login"
     expect(page).to have_content "Login feito com sucesso."
   end
 
@@ -66,7 +66,7 @@ RSpec.describe "Users features", type: :feature do
       fill_in "Email ou CPF", with: "123.456.789-10"
       fill_in "Senha", with: "A1b2c3d4!"
     end
-    click_button "Login"
+    click_button_and_wait "Login"
     expect(page).to have_content "Login feito com sucesso."
   end
 end

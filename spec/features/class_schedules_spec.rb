@@ -94,7 +94,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
         find(:select, "record_year_").find(:option, text: YearSemester.current.year.to_s).select_option
         find(:select, "record_semester_").find(:option, text: YearSemester.current.semester.to_s).select_option
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.year-column", text: YearSemester.current.year.to_s)
 
       # Remove inserted record
@@ -146,7 +146,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
       within(".as_form") do
         fill_in "Data Limite para Remover Disciplinas", with: "15 Ago 2023 23:59:59"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.enrollment_remove-column", text: "15 Ago 2023 23:59:59")
       @record.enrollment_remove = DateTime.new(2022, 4, 27, 23, 59, 59, Time.zone.formatted_offset)
       @record.save!
@@ -180,7 +180,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
 
     it "should be able to search by name" do
       find(:select, "search_year").find(:option, text: "2022").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.year-column").map(&:text)).to eq ["2022", "2022"]
     end
   end

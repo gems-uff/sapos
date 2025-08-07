@@ -120,7 +120,7 @@ RSpec.describe "Enrollments features", type: :feature do
         find(:select, "record_enrollment_status_").find(:option, text: @enrollment_status1.name).select_option
         find(:select, "record_level_").find(:option, text: @level1.name).select_option
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.enrollment_number-column", text: "M04")
       expect(page).to have_css("tr:nth-child(1) td.student-column", text: "Dani")
 
@@ -153,7 +153,7 @@ RSpec.describe "Enrollments features", type: :feature do
       within(".as_form") do
         fill_in "Número de Matrícula", with: "M05"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("tr:nth-child(2) td.enrollment_number-column", text: "M05")
     end
   end
@@ -167,67 +167,67 @@ RSpec.describe "Enrollments features", type: :feature do
 
     it "should be able to search by enrollment_number" do
       fill_in "Número de Matrícula", with: "M02"
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
     end
 
     it "should be able to search by student" do
       search_record_select("student", "students", "Ana")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
     end
 
     it "should be able to search by level" do
       expect(page.all("select#search_level option").map(&:text)).to eq ["", "Doutorado", "Mestrado"]
       find(:select, "search_level").find(:option, text: "Mestrado").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M01", "M02"]
     end
 
     it "should be able to search by enrollment_status" do
       expect(page.all("select#search_enrollment_status option").map(&:text)).to eq ["Selecione uma opção", "Avulso", "Regular"]
       find(:select, "search_enrollment_status").find(:option, text: "Avulso").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M01"]
     end
 
     it "should be able to search by admision_date" do
       select_month_year("search_admission_date", 3.years.ago.at_beginning_of_month.to_date)
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
     end
 
     it "should be able to search by active" do
       expect(page.all("select#search_active option").map(&:text)).to eq ["Todas", "Ativas", "Inativas"]
       find(:select, "search_active").find(:option, text: "Inativas").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M01", "M03"]
     end
 
     it "should be able to search by scholarship_durations_active" do
       expect(page.all("select#search_scholarship_durations_active option").map(&:text)).to eq ["Selecione uma opção", "Sim", "Não"]
       find(:select, "search_scholarship_durations_active").find(:option, text: "Sim").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
     end
 
     it "should be able to search by advisor" do
       fill_in "Orientador", with: "Erica"
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
     end
 
     it "should be able to search by phase" do
       expect(page.all("select[name=\"search[accomplishments][phase]\"] option").map(&:text)).to eq ["Selecione uma opção", "Todas", "Pedido de Banca", "Exame de Qualificação"]
       find(:css, "select[name=\"search[accomplishments][phase]\"]").find(:option, text: "Pedido de Banca").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M01"]
     end
 
     it "should be able to search by delayed_phase" do
       expect(page.all("select[name=\"search[delayed_phase][phase]\"] option").map(&:text)).to eq ["Selecione uma opção", "Alguma", "Pedido de Banca", "Exame de Qualificação"]
       find(:css, "select[name=\"search[delayed_phase][phase]\"]").find(:option, text: "Pedido de Banca").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page).to have_selector("tr td.enrollment_number-column", text: "M02")
       numbers = page.all("tr td.enrollment_number-column", minimum: 1).map(&:text)
       expect(numbers).to eq ["M02"]
@@ -235,19 +235,19 @@ RSpec.describe "Enrollments features", type: :feature do
 
     it "should be able to search by course_class" do
       find(:select, "search_course_class_year_semester_course").find(:option, text: "Algebra").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M01"]
     end
 
     it "should be able to search by research_area" do
       search_record_select("research_area", "research_areas", "Ciência de Dados")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M03"]
     end
 
     it "should be able to search for enrollment on hold" do
       find(:css, "input[name=\"search[enrollment_hold][hold]\"][type=\"checkbox\"]").set(true)
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
     end
   end
@@ -335,7 +335,7 @@ RSpec.describe "Enrollments features", type: :feature do
     end
 
     it "should create users" do
-      click_button "Adicionar"
+      click_button_and_wait "Adicionar"
       expect(User.all.size).to eq 4
       User.all.each do |user|
         next if [@user.id, @user2.id, @user3.id].include? user.id
