@@ -284,7 +284,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
 
       it "should show enroll now option" do
         expect(page).to have_content "Inscrições em disciplinas do semestre 2022.2 estão abertas!"
-        click_link "Clique aqui para fazer um pedido de inscrição."
+        click_link_and_wait "Clique aqui para fazer um pedido de inscrição."
         expect(page).to have_current_path("/enrollment/#{@enrollment2.id}/enroll/2022-2")
       end
     end
@@ -315,7 +315,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
           expect(page).to have_content "Inscrições em disciplinas do semestre 2022.2 estão abertas!"
           expect(page).to have_content "Seu pedido de inscrição foi marcado como inválido"
           expect(page).to have_content "1 mensagem não lida"
-          click_link "Clique aqui para editar"
+          click_link_and_wait "Clique aqui para editar"
           expect(page).to have_current_path("/enrollment/#{@enrollment3.id}/enroll/2022-2")
         end
       end
@@ -338,7 +338,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
           expect(page).to have_content "Inscrições em disciplinas do semestre 2022.2 estão abertas!"
           expect(page).to have_content "Seu pedido de inscrição foi marcado como válido"
           expect(page).to have_content "1 mensagem não lida"
-          click_link "Clique aqui para editar"
+          click_link_and_wait "Clique aqui para editar"
           expect(page).to have_current_path("/enrollment/#{@enrollment3.id}/enroll/2022-2")
         end
       end
@@ -362,7 +362,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
         it "should show edit option" do
           expect(page).to have_content "Inscrições em disciplinas do semestre 2022.2 estão abertas!"
           expect(page).to have_content "1 mensagem não lida"
-          click_link "Clique aqui para editar seu pedido de inscrição."
+          click_link_and_wait "Clique aqui para editar seu pedido de inscrição."
           expect(page).to have_current_path("/enrollment/#{@enrollment3.id}/enroll/2022-2")
         end
       end
@@ -389,7 +389,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
           expect(page).to have_content "Inscrições em disciplinas do semestre 2022.2 estão abertas!"
           expect(page).to have_content "Seu pedido de inscrição foi efetivado."
           expect(page).to have_content "1 mensagem não lida"
-          click_link "Clique aqui para se inscrever em outras disciplinas"
+          click_link_and_wait "Clique aqui para se inscrever em outras disciplinas"
           expect(page).to have_current_path("/enrollment/#{@enrollment3.id}/enroll/2022-2")
         end
       end
@@ -423,7 +423,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
         expect(page).to have_content "Período de ajustes do semestre 2022.2 está aberto!"
         expect(page).to have_content "Seu pedido de inscrição foi marcado como inválido"
         expect(page).to have_content "1 mensagem não lida"
-        click_link "Clique aqui para editar"
+        click_link_and_wait "Clique aqui para editar"
         expect(page).to have_current_path("/enrollment/#{@enrollment3.id}/enroll/2022-2")
       end
     end

@@ -99,16 +99,14 @@ RSpec.describe "Professors features", type: :feature do
       visit url_path
     end
     it "Should sort the list by the points of a level, asc, if clicked on its column first time" do
-      click_link "M"
-      wait_for_ajax
+      click_link_and_wait "M"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Dani", "Bia", "Carol"]
       expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["0.0", "0.5", "1.5"]
     end
 
     it "Should sort the list by the points of a level, desc, if clicked on its column second time" do
       2.times do
-        click_link "M"
-        wait_for_ajax
+        click_link_and_wait "M"
       end
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Carol", "Bia", "Dani"]
       expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["1.5", "0.5", "0.0"]
@@ -116,8 +114,7 @@ RSpec.describe "Professors features", type: :feature do
 
     it "Should back to default sort, if clicked on its column third time" do
       3.times do
-        click_link "M"
-        wait_for_ajax
+        click_link_and_wait "M"
       end
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia", "Carol", "Dani"]
       expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["0.5", "1.5", "0.0"]
@@ -128,8 +125,7 @@ RSpec.describe "Professors features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
-      wait_for_ajax
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -192,7 +188,6 @@ RSpec.describe "Professors features", type: :feature do
       login_as(@user)
       visit url_path
       find("#as_#{plural_name}-edit-#{@record.id}-link").click
-      wait_for_ajax
     end
 
     it "should be able to edit record" do
@@ -227,7 +222,6 @@ RSpec.describe "Professors features", type: :feature do
       login_as(@user_sec)
       visit url_path
       find("#as_#{plural_name}-edit-#{@record.id}-link").click
-      wait_for_ajax
     end
 
     it "should have a nested affiliation" do
@@ -239,8 +233,7 @@ RSpec.describe "Professors features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
-      wait_for_ajax
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do

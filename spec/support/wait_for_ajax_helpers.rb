@@ -17,6 +17,11 @@ module WaitForAjax
     click_button(*args, **kwargs)
     wait_for_ajax
   end
+
+  def click_link_and_wait(*args, **kwargs)
+    click_link(*args, **kwargs)
+    wait_for_ajax
+  end
 end
 
 RSpec.configure do |config|
