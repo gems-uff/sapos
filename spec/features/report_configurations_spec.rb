@@ -72,7 +72,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
       wait_for_download
       expect(download).to match(/Visualizar\.pdf/)
 
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Relatório")
       expect(model.last.image.file).not_to eq nil
 
@@ -97,7 +97,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
       within(".as_form") do
         fill_in "Nome", with: "Quadro de Horários"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Quadro de Horários")
     end
   end
