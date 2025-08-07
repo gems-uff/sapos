@@ -49,7 +49,7 @@ RSpec.describe "Phases features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -58,7 +58,7 @@ RSpec.describe "Phases features", type: :feature do
       within("#as_#{plural_name}-create--form") do
         fill_in "Nome", with: "Prova de Inglês"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Prova de Inglês")
 
       # Remove inserted record
@@ -82,7 +82,7 @@ RSpec.describe "Phases features", type: :feature do
       within(".as_form") do
         fill_in "Descrição", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.description-column", text: "Teste")
     end
   end
@@ -91,7 +91,7 @@ RSpec.describe "Phases features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do

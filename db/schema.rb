@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_05_15_173026) do
+ActiveRecord::Schema[7.0].define(version: 2025_06_27_152845) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -810,6 +810,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_05_15_173026) do
     t.date "end_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "ordinance"
   end
 
   create_table "queries", force: :cascade do |t|

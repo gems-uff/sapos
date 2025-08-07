@@ -52,7 +52,7 @@ RSpec.describe "Institutions features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -62,7 +62,7 @@ RSpec.describe "Institutions features", type: :feature do
         fill_in "Nome", with: "Universidade Federal do Rio de Janeiro"
         fill_in "Sigla", with: "UFRJ"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Universidade Federal do Rio de Janeiro")
 
       # Remove inserted record
@@ -86,7 +86,7 @@ RSpec.describe "Institutions features", type: :feature do
       within(".as_form") do
         fill_in "Nome", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
     end
   end
@@ -95,7 +95,7 @@ RSpec.describe "Institutions features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do

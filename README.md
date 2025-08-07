@@ -1,7 +1,8 @@
 ![Sapos Logo](https://github.com/gems-uff/sapos/blob/main/app/assets/images/logoSapos.png?raw=true)
+
 [![Release](https://img.shields.io/github/release/gems-uff/sapos.svg)](https://github.com/gems-uff/sapos/releases)
 [![Build](https://img.shields.io/github/actions/workflow/status/gems-uff/sapos/rubyonrails.yml)](https://github.com/gems-uff/sapos/actions/workflows/rubyonrails.yml)
-[![Code Climate coverage](https://img.shields.io/codeclimate/coverage/gems-uff/sapos)](https://codeclimate.com/github/gems-uff/sapos)
+[![Code Coverage](https://qlty.sh/gh/gems-uff/projects/sapos/coverage.svg)](https://qlty.sh/gh/gems-uff/projects/sapos)
 [![MIT License](https://img.shields.io/github/license/gems-uff/sapos.svg)](https://github.com/gems-uff/sapos/blob/master/LICENSE)
 
 # About

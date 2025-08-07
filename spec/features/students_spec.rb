@@ -68,7 +68,7 @@ RSpec.describe "Student features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -78,7 +78,7 @@ RSpec.describe "Student features", type: :feature do
         fill_in "Nome", with: "Ana"
         fill_in "CPF", with: "1"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Ana")
       expect(Student.last.photo.file).to eq nil
 
@@ -98,7 +98,7 @@ RSpec.describe "Student features", type: :feature do
         fill_in "CPF", with: "5"
         attach_file("Foto", Rails.root + "spec/fixtures/user.png")
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Erica")
       expect(Student.last.photo.file).not_to eq nil
     end
@@ -150,8 +150,8 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for civil_status options" do
-      expect(page.all("select#record_civil_status_ option").map(&:text)).to eq ["Não declarado","Solteiro(a)", "Casado(a)"]
-      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["Não declarado","Solteiro(a)", "Casado(a)"]
+      expect(page.all("select#record_civil_status_ option").map(&:text)).to eq ["Não declarado", "Solteiro(a)", "Casado(a)"]
+      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["Não declarado", "Solteiro(a)", "Casado(a)"]
     end
 
     it "should have identity issuing place widget for identity issuing place" do
@@ -178,7 +178,7 @@ RSpec.describe "Student features", type: :feature do
         fill_in "Nome", with: "teste"
         fill_in "CPF", with: "9"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "teste")
       expect(page).to have_css("td.cpf-column", text: "9")
     end
@@ -208,7 +208,7 @@ RSpec.describe "Student features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do

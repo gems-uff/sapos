@@ -2,8 +2,8 @@
   <%= render active_scaffold: "course_classes", conditions: conditions %>
 
   <span class="pendency-description">
-    Essa lista exibe apenas as turmas que apresentam algum aluno sem nota.<br>
-     Data lilmite para a adição dessas notas: 
+    Essa lista exibe as turmas que apresentam algum aluno que não tenha completado a disciplina nesse semestre.(Situação: Incompleto)<br>
+     Data limite para alterar a situação do aluno: 
      <span style="color: red">
       <%= ClassSchedule.find_by(year: YearSemester.current.year, semester: YearSemester.current.semester)&.grades_deadline_to_view%>
       </span><br>

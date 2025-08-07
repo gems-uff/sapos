@@ -53,7 +53,7 @@ RSpec.describe "DeferralTypes features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -64,7 +64,7 @@ RSpec.describe "DeferralTypes features", type: :feature do
         fill_in "Duração(períodos)", with: "1"
         find(:select, "record_phase_").find(:option, text: "Exame de Qualificação").select_option
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "EQ")
 
       # Remove inserted record
@@ -92,7 +92,7 @@ RSpec.describe "DeferralTypes features", type: :feature do
       within(".as_form") do
         fill_in "Descrição", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.description-column", text: "Teste")
     end
   end
@@ -101,7 +101,7 @@ RSpec.describe "DeferralTypes features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do

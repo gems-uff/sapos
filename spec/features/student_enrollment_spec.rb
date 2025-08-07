@@ -73,14 +73,14 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "D01", student: @student1, level: @level1, enrollment_status: @enrollment_status1)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "D02", student: @student1, level: @level1, enrollment_status: @enrollment_status1)
 
-    @destroy_all << @course_class1 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: 2022, semester: 1)
-    @destroy_all << @course_class2 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: 2022, semester: 2)
-    @destroy_all << @course_class3 = FactoryBot.create(:course_class, name: "Algebra", course: @course2, professor: @professor1, year: 2021, semester: 1)
-    @destroy_all << @course_class4 = FactoryBot.create(:course_class, name: "Versionamento", course: @course3, professor: @professor2, year: 2022, semester: 2)
-    @destroy_all << @course_class5 = FactoryBot.create(:course_class, name: "Defesa", course: @course4, professor: @professor3, year: 2022, semester: 2)
-    @destroy_all << @course_class6 = FactoryBot.create(:course_class, name: "Mineração de Repositórios", course: @course5, professor: @professor2, year: 2022, semester: 2)
-    @destroy_all << @course_class7 = FactoryBot.create(:course_class, name: "Pesquisa", course: @course6, professor: @professor3, year: 2022, semester: 2)
-    @destroy_all << @course_class8 = FactoryBot.create(:course_class, name: "Programação", course: @course7, professor: @professor1, year: 2022, semester: 2)
+    @destroy_all << @course_class1 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: 3.years.ago.year, semester: 1)
+    @destroy_all << @course_class2 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: 3.years.ago.year, semester: 2)
+    @destroy_all << @course_class3 = FactoryBot.create(:course_class, name: "Algebra", course: @course2, professor: @professor1, year: 4.years.ago.year, semester: 1)
+    @destroy_all << @course_class4 = FactoryBot.create(:course_class, name: "Versionamento", course: @course3, professor: @professor2, year: 3.years.ago.year, semester: 2)
+    @destroy_all << @course_class5 = FactoryBot.create(:course_class, name: "Defesa", course: @course4, professor: @professor3, year: 3.years.ago.year, semester: 2)
+    @destroy_all << @course_class6 = FactoryBot.create(:course_class, name: "Mineração de Repositórios", course: @course5, professor: @professor2, year: 3.years.ago.year, semester: 2)
+    @destroy_all << @course_class7 = FactoryBot.create(:course_class, name: "Pesquisa", course: @course6, professor: @professor3, year: 3.years.ago.year, semester: 2)
+    @destroy_all << @course_class8 = FactoryBot.create(:course_class, name: "Programação", course: @course7, professor: @professor1, year: 3.years.ago.year, semester: 2)
 
     @destroy_all << FactoryBot.create(:allocation, course_class: @course_class2, day: "Segunda", start_time: 11, end_time: 13)
     @destroy_all << FactoryBot.create(:allocation, course_class: @course_class2, day: "Segunda", start_time: 14, end_time: 16)
@@ -118,7 +118,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << FactoryBot.create(:deferral, deferral_type: @deferral_type2, enrollment: @enrollment1, approval_date: 15.months.ago.at_beginning_of_month)
 
     # Holds
-    @destroy_all << @record = FactoryBot.create(:enrollment_hold, enrollment: @enrollment1, year: 3.years.ago.year, semester: 2, number_of_semesters: 1)
+    @destroy_all << @record = FactoryBot.create(:enrollment_hold, enrollment: @enrollment1, year: 2.years.ago.year, semester: 2, number_of_semesters: 1)
 
     # Scholarships
     @destroy_all << @sponsor1 = FactoryBot.create(:sponsor, name: "CNPq")
@@ -284,7 +284,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
 
       it "should show enroll now option" do
         expect(page).to have_content "Inscrições em disciplinas do semestre 2022.2 estão abertas!"
-        click_link "Clique aqui para fazer um pedido de inscrição."
+        click_link_and_wait "Clique aqui para fazer um pedido de inscrição."
         expect(page).to have_current_path("/enrollment/#{@enrollment2.id}/enroll/2022-2")
       end
     end
@@ -315,7 +315,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
           expect(page).to have_content "Inscrições em disciplinas do semestre 2022.2 estão abertas!"
           expect(page).to have_content "Seu pedido de inscrição foi marcado como inválido"
           expect(page).to have_content "1 mensagem não lida"
-          click_link "Clique aqui para editar"
+          click_link_and_wait "Clique aqui para editar"
           expect(page).to have_current_path("/enrollment/#{@enrollment3.id}/enroll/2022-2")
         end
       end
@@ -338,7 +338,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
           expect(page).to have_content "Inscrições em disciplinas do semestre 2022.2 estão abertas!"
           expect(page).to have_content "Seu pedido de inscrição foi marcado como válido"
           expect(page).to have_content "1 mensagem não lida"
-          click_link "Clique aqui para editar"
+          click_link_and_wait "Clique aqui para editar"
           expect(page).to have_current_path("/enrollment/#{@enrollment3.id}/enroll/2022-2")
         end
       end
@@ -362,7 +362,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
         it "should show edit option" do
           expect(page).to have_content "Inscrições em disciplinas do semestre 2022.2 estão abertas!"
           expect(page).to have_content "1 mensagem não lida"
-          click_link "Clique aqui para editar seu pedido de inscrição."
+          click_link_and_wait "Clique aqui para editar seu pedido de inscrição."
           expect(page).to have_current_path("/enrollment/#{@enrollment3.id}/enroll/2022-2")
         end
       end
@@ -389,7 +389,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
           expect(page).to have_content "Inscrições em disciplinas do semestre 2022.2 estão abertas!"
           expect(page).to have_content "Seu pedido de inscrição foi efetivado."
           expect(page).to have_content "1 mensagem não lida"
-          click_link "Clique aqui para se inscrever em outras disciplinas"
+          click_link_and_wait "Clique aqui para se inscrever em outras disciplinas"
           expect(page).to have_current_path("/enrollment/#{@enrollment3.id}/enroll/2022-2")
         end
       end
@@ -423,7 +423,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
         expect(page).to have_content "Período de ajustes do semestre 2022.2 está aberto!"
         expect(page).to have_content "Seu pedido de inscrição foi marcado como inválido"
         expect(page).to have_content "1 mensagem não lida"
-        click_link "Clique aqui para editar"
+        click_link_and_wait "Clique aqui para editar"
         expect(page).to have_current_path("/enrollment/#{@enrollment3.id}/enroll/2022-2")
       end
     end
@@ -571,7 +571,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
       it "should create a new enrollment request for users without it" do
         visit student_enroll_path(id: @enrollment2.id, year: 2022, semester: 2)
         find("#table_row_2").click
-        click_button "Enviar"
+        click_button_and_wait "Enviar"
         expect(page).to have_current_path("/enrollment/#{@enrollment2.id}")
 
         last_request = EnrollmentRequest.last
@@ -593,7 +593,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
         visit student_enroll_path(id: @enrollment2.id, year: 2022, semester: 2)
         find("#table_row_2").click
         fill_in "enrollment_request_message", with: "Mensagem de teste"
-        click_button "Enviar"
+        click_button_and_wait "Enviar"
         expect(page).to have_current_path("/enrollment/#{@enrollment2.id}")
 
         last_request = EnrollmentRequest.last
@@ -609,7 +609,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
         visit student_enroll_path(id: @enrollment2.id, year: 2022, semester: 2)
         find("select#enrollment_request-course_ids-#{@course6.id}-professor").find(:option, text: "Gi").select_option
         find("#table_row_demand_1").click
-        click_button "Enviar"
+        click_button_and_wait "Enviar"
         expect(page).to have_current_path("/enrollment/#{@enrollment2.id}")
 
         last_request = EnrollmentRequest.last
@@ -624,7 +624,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
         visit student_enroll_path(id: @enrollment2.id, year: 2022, semester: 2)
         find("select#enrollment_request-course_ids-#{@course6.id}-professor").find(:option, text: "Erica").select_option
         find("#table_row_demand_1").click
-        click_button "Enviar"
+        click_button_and_wait "Enviar"
         expect(page).to have_current_path("/enrollment/#{@enrollment2.id}")
 
         last_course_class = CourseClass.last
@@ -650,7 +650,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
       it "should create a new class enrollment request during edit" do
         visit student_enroll_path(id: @enrollment4.id, year: 2022, semester: 2)
         find("#table_row_2").click
-        click_button "Enviar"
+        click_button_and_wait "Enviar"
         expect(page).to have_current_path("/enrollment/#{@enrollment4.id}")
 
         last_class_request = ClassEnrollmentRequest.last
@@ -667,9 +667,9 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
       it "should be possible to remove enrollment request by checking the destroy option" do
         visit student_enroll_path(id: @enrollment4.id, year: 2022, semester: 2)
         find("#table_row_4").click
-        click_button "Enviar"
+        click_button_and_wait "Enviar"
         find("#delete_request").set(true)
-        click_button "Enviar"
+        click_button_and_wait "Enviar"
         expect(page).to have_current_path("/enrollment/#{@enrollment4.id}")
         expect(page).to have_content "Inscrições em disciplinas do semestre 2022.2 estão abertas!"
         expect(page).to have_content "Clique aqui para fazer um pedido de inscrição."
@@ -685,7 +685,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     describe "validations" do
       it "should prevent the submission without a selection" do
         visit student_enroll_path(id: @enrollment2.id, year: 2022, semester: 2)
-        click_button "Enviar"
+        click_button_and_wait "Enviar"
         expect(page).to have_content "1 erro impediu que pedido de inscrição fosse salvo"
         expect(page).to have_content "Disciplinas deve incluir pelo menos uma seleção"
       end
@@ -693,7 +693,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
       it "should prevent the removal of all classes during edit" do
         visit student_enroll_path(id: @enrollment4.id, year: 2022, semester: 2)
         find("#table_row_4").click
-        click_button "Enviar"
+        click_button_and_wait "Enviar"
         expect(page).to have_content "1 erro impediu que pedido de inscrição fosse salvo"
         expect(page).to have_content "Disciplinas deve incluir pelo menos uma seleção"
         expect(page).to have_content "Remover pedido?"
@@ -703,7 +703,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
         visit student_enroll_path(id: @enrollment2.id, year: 2022, semester: 2)
         find("#table_row_0").click
         find("#table_row_4").click
-        click_button "Enviar"
+        click_button_and_wait "Enviar"
         expect(page).to have_content "1 erro impediu que pedido de inscrição fosse salvo"
         expect(page).to have_content "Há pelo menos um conflito de horário nas disciplinas escolhidas. Confira Segunda, 11-13"
       end
@@ -711,7 +711,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
       it "should require the selection of a professor for on demand classes" do
         visit student_enroll_path(id: @enrollment2.id, year: 2022, semester: 2)
         find("#table_row_demand_1").click
-        click_button "Enviar"
+        click_button_and_wait "Enviar"
         expect(page).to have_content "É necessário selecionar um professor para Pesquisa"
       end
     end
