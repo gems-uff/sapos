@@ -38,6 +38,8 @@ RSpec.describe EnrollmentRequest, type: :model do
     @enrollment_status.delete
     @professor.delete
     @student.delete
+    UserRole.delete_all
+    Role.delete_all
   end
 
   describe "Main Scenario" do
@@ -241,11 +243,8 @@ RSpec.describe EnrollmentRequest, type: :model do
       describe "student_unread_messages" do
         it "should return the number of comments posted after the last time the student read" do
           @destroy_later << enrollment_request if enrollment_request.save
-
-          role_student = FactoryBot.build(:role_aluno)
-          role_professor = FactoryBot.build(:role_aluno)
-          student = FactoryBot.build(:user, role: role_student)
-          advisor = FactoryBot.build(:user, role: role_professor)
+          student = FactoryBot.create(:user, :student)
+          advisor = FactoryBot.create(:user, :professor)
 
           enrollment_request.enrollment_request_comments.build(
             message: "a", user: student, updated_at: enrollment_request.created_at
@@ -708,7 +707,9 @@ RSpec.describe EnrollmentRequest, type: :model do
       @destroy_scenario << enrollment1 = FactoryBot.create(:enrollment, student: @student, level: @level, enrollment_status: @enrollment_status)
       @destroy_scenario << enrollment2 = FactoryBot.create(:enrollment, student: @student, level: @level, enrollment_status: @enrollment_status)
       @destroy_scenario << enrollment3 = FactoryBot.create(:enrollment, student: @student, level: @level, enrollment_status: @enrollment_status)
+      @destroy_later << professor_role = FactoryBot.create(:role_professor)
       @destroy_scenario << @advisor = FactoryBot.create(:professor)
+      @destroy_scenario << @user = FactoryBot.create(:user, roles: [professor_role], professor: @advisor)
       @destroy_scenario << FactoryBot.create(:advisement, professor: @advisor, enrollment: enrollment3)
       @destroy_scenario << course1 = FactoryBot.create(:course, course_type: @course_type)
       @destroy_scenario << course2 = FactoryBot.create(:course, course_type: @course_type)
@@ -745,24 +746,20 @@ RSpec.describe EnrollmentRequest, type: :model do
       describe "pendency_condition" do
         describe "should return a condition that returns EnrollmentRequests that have requestes ClassEnrollmentRequests" do
           it "when user has a professor role and is the advisor" do
-            role = FactoryBot.create(:role_professor)
-            user = FactoryBot.create(:user, role: role, professor: @advisor)
-            result = EnrollmentRequest.where(EnrollmentRequest.pendency_condition(user))
+            result = EnrollmentRequest.where(EnrollmentRequest.pendency_condition(@user))
             expect(result.count).to eq(1)
             expect(result).to include(@with_requested_and_advisor)
           end
         end
         describe "should return a condition that does not return anything" do
           it "when user has an admin role" do
-            role = FactoryBot.create(:role_administrador)
-            user = FactoryBot.create(:user, role: role)
-            result = EnrollmentRequest.where(EnrollmentRequest.pendency_condition(user))
+            @destroy_later << admin = FactoryBot.create(:user, :admin)
+            result = EnrollmentRequest.where(EnrollmentRequest.pendency_condition(admin))
             expect(result.count).to eq(0)
           end
           it "when user has a professor role that is not the advisor" do
-            role = FactoryBot.create(:role_professor)
-            user = FactoryBot.create(:user, role: role)
-            result = EnrollmentRequest.where(EnrollmentRequest.pendency_condition(user))
+            @destroy_later << professor = FactoryBot.create(:user, :professor)
+            result = EnrollmentRequest.where(EnrollmentRequest.pendency_condition(professor))
             expect(result.count).to eq(0)
           end
         end

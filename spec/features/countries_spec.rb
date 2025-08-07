@@ -13,7 +13,7 @@ RSpec.describe "Countries features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << FactoryBot.create(:country, name: "Brasil", nationality: "brasileiro(a)")
     @destroy_all << @record = FactoryBot.create(:country, name: "Portugal", nationality: "português(a)")
@@ -26,6 +26,7 @@ RSpec.describe "Countries features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -60,7 +61,7 @@ RSpec.describe "Countries features", type: :feature do
         fill_in "Nome", with: "Inglaterra"
         fill_in "Nacionalidade", with: "inglês(a)"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Inglaterra")
 
       # Remove inserted record
@@ -84,7 +85,7 @@ RSpec.describe "Countries features", type: :feature do
       within(".as_form") do
         fill_in "Nome", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
     end
   end

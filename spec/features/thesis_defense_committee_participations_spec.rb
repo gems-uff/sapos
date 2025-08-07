@@ -38,7 +38,7 @@ RSpec.describe "ThesisDefenseCommitteeParticipations features", type: :feature d
     @destroy_all << FactoryBot.create(:thesis_defense_committee_participation, enrollment: @enrollment3, professor: @professor1)
     @destroy_all << FactoryBot.create(:thesis_defense_committee_participation, enrollment: @enrollment3, professor: @professor2)
 
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -48,6 +48,7 @@ RSpec.describe "ThesisDefenseCommitteeParticipations features", type: :feature d
     @role_adm.delete
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -81,7 +82,7 @@ RSpec.describe "ThesisDefenseCommitteeParticipations features", type: :feature d
       expect(page).to have_content "Adicionar Participação em Banca"
       fill_record_select("enrollment_", "enrollments", "M04")
       fill_record_select("professor_", "professors", "Fiona")
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04 - Dani")
 
       # Remove inserted record
@@ -113,7 +114,7 @@ RSpec.describe "ThesisDefenseCommitteeParticipations features", type: :feature d
     it "should be able to edit record" do
       page.send_keys :escape
       fill_record_select("professor_#{@record.id}", "professors", "Fiona")
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("#as_#{plural_name}-list-#{@record.id}-row td.professor-column", text: "Fiona")
       @record.professor = @professor1
       @record.save!
@@ -130,7 +131,7 @@ RSpec.describe "ThesisDefenseCommitteeParticipations features", type: :feature d
 
     it "should be able to search by advisor" do
       search_record_select("professor", "professors", "Erica")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M03 - Carol"]
     end
   end

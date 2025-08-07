@@ -13,7 +13,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @role_adm = FactoryBot.create :role_administrador
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << FactoryBot.create(:report_configuration, name: "Padrão", scale: 1, x: 0, y: 0, order: 1, text: "UFF")
     @destroy_all << @record = FactoryBot.create(:report_configuration, name: "Histórico", scale: 1, x: 0, y: 0, order: 1, text: "UFF", image: File.open(Rails.root + "spec/fixtures/user.png"))
@@ -27,6 +27,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     @role_adm.delete
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -72,7 +73,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
       wait_for_download
       expect(download).to match(/Visualizar\.pdf/)
 
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Relatório")
       expect(model.last.image.file).not_to eq nil
 
@@ -97,7 +98,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
       within(".as_form") do
         fill_in "Nome", with: "Quadro de Horários"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Quadro de Horários")
     end
   end

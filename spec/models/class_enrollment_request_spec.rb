@@ -289,15 +289,15 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
       describe "pendency_condition" do
         describe "should return a condition that returns valid and requested ClassEnrollmentRequests" do
           it "when user has a coordination role" do
-            @destroy_later << role = FactoryBot.create(:role_coordenacao)
-            @destroy_later << user = FactoryBot.create(:user, role: role)
+            @destroy_later << coordination_role = FactoryBot.create(:role_coordenacao)
+            @destroy_later << user = FactoryBot.create(:user, roles: [coordination_role])
             result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
             expect(result.count).to eq(2)
             expect(result).to include(@valid, @requested)
           end
           it "when user has a secretary role" do
-            @destroy_later << role = FactoryBot.create(:role_secretaria)
-            @destroy_later << user = FactoryBot.create(:user, role: role)
+            @destroy_later << secretary_role = FactoryBot.create(:role_secretaria)
+            @destroy_later << user = FactoryBot.create(:user, roles: [secretary_role])
             result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
             expect(result.count).to eq(2)
             expect(result).to include(@valid, @requested)
@@ -305,14 +305,12 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
         end
         describe "should return a condition that does not return anything" do
           it "when user has an admin role" do
-            @destroy_later << role = FactoryBot.create(:role_administrador)
-            @destroy_later << user = FactoryBot.create(:user, role: role)
+            @destroy_later << user = FactoryBot.create(:user, :admin)
             result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
             expect(result.count).to eq(0)
           end
           it "when user has a professor role" do
-            @destroy_later << role = FactoryBot.create(:role_professor)
-            @destroy_later << user = FactoryBot.create(:user, role: role)
+            @destroy_later << user = FactoryBot.create(:user, :professor)
             result = ClassEnrollmentRequest.where(ClassEnrollmentRequest.pendency_condition(user))
             expect(result.count).to eq(0)
           end

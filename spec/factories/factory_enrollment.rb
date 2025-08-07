@@ -13,6 +13,6 @@ FactoryBot.define do
     sequence :enrollment_number do |number|
       "M#{number}"
     end
-    admission_date { YearSemester.current.semester_begin }
+    admission_date { 5.days.ago.to_date }
   end
 end

@@ -13,7 +13,7 @@ RSpec.describe "Accomplishments features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << @level1 = FactoryBot.create(:level, name: "Doutorado")
     @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
@@ -48,6 +48,7 @@ RSpec.describe "Accomplishments features", type: :feature do
     @destroy_all.each(&:delete)
     @destroy_all.clear
     PhaseCompletion.delete_all
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -84,7 +85,7 @@ RSpec.describe "Accomplishments features", type: :feature do
         select_month_year_i("record_conclusion_date", Date.today)
         find(:select, "record_phase_").find(:option, text: "Pedido de Banca").select_option
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04 - Dani")
 
       # Remove inserted record
@@ -104,7 +105,7 @@ RSpec.describe "Accomplishments features", type: :feature do
         find(:select, "record_phase_").find(:option, text: "Exame de Qualificação").select_option
       end
       fill_record_select("enrollment_", "enrollments", "M01")
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_content "Matrícula não possui o mesmo nível que a etapa"
     end
 
@@ -136,7 +137,7 @@ RSpec.describe "Accomplishments features", type: :feature do
       within(".as_form") do
         select_month_year_i("record_conclusion_date", date)
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("#as_#{plural_name}-list-#{@record.id}-row td.conclusion_date-column", text: I18n.l(date, format: "%B-%Y"))
     end
   end

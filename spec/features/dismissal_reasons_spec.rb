@@ -15,7 +15,7 @@ RSpec.describe "DismissalReason features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
     @destroy_all << @record = FactoryBot.create(:dismissal_reason, name: "Desistência", thesis_judgement: "--")
     @destroy_all << FactoryBot.create(:dismissal_reason, name: "Reprovado", thesis_judgement: "Reprovado")
     @destroy_all << FactoryBot.create(:dismissal_reason, name: "Titulação", thesis_judgement: "Aprovado")
@@ -27,6 +27,7 @@ RSpec.describe "DismissalReason features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -61,7 +62,7 @@ RSpec.describe "DismissalReason features", type: :feature do
         fill_in "Nome", with: "Prazo"
         find(:select, "record_thesis_judgement_").find(:option, text: "--").select_option
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Prazo")
       expect(page).to have_css("tr:nth-child(1) td.thesis_judgement-column", text: "--")
 
@@ -91,7 +92,7 @@ RSpec.describe "DismissalReason features", type: :feature do
         fill_in "Nome", with: "Teste"
         find(:select, "record_thesis_judgement_#{@record.id}").find(:option, text: "Aprovado").select_option
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
       expect(page).to have_css("td.thesis_judgement-column", text: "Aprovado")
     end
