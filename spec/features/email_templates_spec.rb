@@ -61,7 +61,7 @@ RSpec.describe "EmailTemplates features", type: :feature do
         fill_in "Template do Destinatário", with: "jpimentel@ic.uff.br"
         fill_in "Template do Assunto", with: "Assunto"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "template")
 
       # Remove inserted record
@@ -118,7 +118,7 @@ Seu email do SAPOS foi alterado para {{ user.email }}.
       within(".as_form") do
         fill_in "Nome", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
       @record.name = "despedida"
       @record.save!

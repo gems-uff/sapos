@@ -59,7 +59,7 @@ RSpec.describe "CustomVariables features", type: :feature do
         find(:select, "record_variable_").find(:option, text: "identity_issuing_country").select_option
         fill_in "Valor", with: "Brasil"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.variable-column", text: "identity_issuing_country")
 
       # Remove inserted record
@@ -87,7 +87,7 @@ RSpec.describe "CustomVariables features", type: :feature do
       within(".as_form") do
         fill_in "Descrição", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.description-column", text: "Teste")
     end
   end
