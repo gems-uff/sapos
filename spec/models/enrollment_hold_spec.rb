@@ -20,7 +20,9 @@ RSpec.describe EnrollmentHold, type: :model do
     @destroy_later.clear
   end
 
-  let(:enrollment) { FactoryBot.build(:enrollment) }
+  let(:enrollment) { 
+    enrollment = FactoryBot.build(:enrollment, admission_date: 2.year.ago.to_date)
+  }
   let(:enrollment_hold) do
     EnrollmentHold.new(
       enrollment: enrollment,
