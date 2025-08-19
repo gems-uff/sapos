@@ -204,7 +204,7 @@ RSpec.describe "EnrollmentRequests features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Ajuda"
+      click_link_and_wait "Ajuda"
     end
 
     it "should show the number of requests that can be effected" do
@@ -216,7 +216,7 @@ RSpec.describe "EnrollmentRequests features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by status" do
