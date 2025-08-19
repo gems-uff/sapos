@@ -109,7 +109,7 @@ RSpec.describe "CourseClasses features", type: :feature do
       end
       fill_record_select("professor_", "professors", "Helena")
       fill_record_select("course_", "courses", "Programação")
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Programação")
 
       # Remove inserted record
@@ -149,7 +149,7 @@ RSpec.describe "CourseClasses features", type: :feature do
       within(".as_form") do
         fill_in "Nome", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
       @record.name = "Defesa"
       @record.save!
@@ -165,37 +165,37 @@ RSpec.describe "CourseClasses features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "Nome", with: "Ver"
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Versionamento"]
     end
 
     it "should be able to search by year" do
       find(:select, "search_year").find(:option, text: "2021").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Algebra"]
     end
 
     it "should be able to search by semester" do
       find(:select, "search_semester").find(:option, text: "1").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Algebra"]
     end
 
     it "should be able to search by professor" do
       fill_in "Professor", with: "Fiona"
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Mineração de Repositórios", "Versionamento"]
     end
 
     it "should be able to search by course" do
       fill_in "Disciplina", with: "Vers"
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Versionamento"]
     end
 
     it "should be able to search by enrollment" do
       search_record_select("enrollments", "enrollments", "M01")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Versionamento"]
     end
   end
@@ -215,7 +215,7 @@ RSpec.describe "CourseClasses features", type: :feature do
       click_link "Buscar"
       find(:select, "search_year").find(:option, text: "2022").select_option
       find(:select, "search_semester").find(:option, text: "2").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
 
       click_link "Quadro de Horários"
       wait_for_download

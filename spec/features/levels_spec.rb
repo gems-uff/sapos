@@ -61,7 +61,7 @@ RSpec.describe "Level features", type: :feature do
         fill_in "Nome", with: "Graduação"
         fill_in "Duração padrão (meses)", with: "48"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Graduação")
       expect(page).to have_css("tr:nth-child(1) td.default_duration-column", text: "48")
 
@@ -87,7 +87,7 @@ RSpec.describe "Level features", type: :feature do
         fill_in "Nome", with: "Teste"
         fill_in "Duração padrão (meses)", with: "12"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
       expect(page).to have_css("td.default_duration-column", text: "12")
     end
