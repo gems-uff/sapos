@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
+ActiveRecord::Schema[7.0].define(version: 2025_06_27_135451) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -129,7 +129,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
     t.boolean "candidate_can_see_shared", default: false, null: false
     t.boolean "candidate_can_see_consolidation", default: false, null: false
     t.boolean "committee_can_see_other_individual", default: false, null: false
-    t.index "\"ranking_config_id\"", name: "index_admission_phases_on_ranking_config_id"
+    t.index ["approval_condition_id"], name: "index_admission_phases_on_approval_condition_id"
     t.index ["candidate_form_id"], name: "index_admission_phases_on_candidate_form_id"
     t.index ["consolidation_form_id"], name: "index_admission_phases_on_consolidation_form_id"
     t.index ["keep_in_phase_condition_id"], name: "index_admission_phases_on_keep_in_phase_condition_id"
@@ -522,7 +522,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
     t.date "thesis_defense_date"
     t.integer "research_area_id"
     t.text "obs_to_academic_transcript"
-    t.string "admission_selection"
     t.index ["enrollment_number"], name: "index_enrollments_on_enrollment_number"
     t.index ["enrollment_status_id"], name: "index_enrollments_on_enrollment_status_id"
     t.index ["level_id"], name: "index_enrollments_on_level_id"
@@ -1015,8 +1014,48 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
     t.index ["student_id"], name: "index_student_majors_on_student_id"
   end
 
-# Could not dump table "students" because of following StandardError
-#   Unknown type '' for column 'humanitarian_policy'
+  create_table "students", force: :cascade do |t|
+    t.string "name", limit: 255
+    t.string "cpf", limit: 255
+    t.datetime "created_at", precision: nil, null: false
+    t.datetime "updated_at", precision: nil, null: false
+    t.text "obs"
+    t.date "birthdate"
+    t.string "sex", limit: 255
+    t.string "civil_status", limit: 255
+    t.string "father_name", limit: 255
+    t.string "mother_name", limit: 255
+    t.string "identity_number", limit: 255
+    t.string "identity_issuing_body", limit: 255
+    t.date "identity_expedition_date"
+    t.string "employer", limit: 255
+    t.string "job_position", limit: 255
+    t.integer "birth_state_id"
+    t.integer "city_id"
+    t.string "neighborhood", limit: 255
+    t.string "zip_code", limit: 255
+    t.string "address", limit: 255
+    t.string "telephone1", limit: 255
+    t.string "telephone2", limit: 255
+    t.string "email", limit: 255
+    t.integer "birth_city_id"
+    t.string "identity_issuing_place", limit: 255
+    t.string "photo", limit: 255
+    t.integer "birth_country_id"
+    t.integer "user_id", limit: 8
+    t.string "gender"
+    t.string "skin_color"
+    t.string "pcd"
+    t.string "refugee"
+    t.text "obs_pcd"
+    t.text "obs_refugee"
+    t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
+    t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
+    t.index ["birth_state_id"], name: "index_students_on_state_id"
+    t.index ["city_id"], name: "index_students_on_city_id"
+    t.index ["cpf"], name: "index_students_on_cpf"
+    t.index ["user_id"], name: "index_students_on_user_id"
+  end
 
   create_table "thesis_defense_committee_participations", force: :cascade do |t|
     t.integer "professor_id"

@@ -134,7 +134,7 @@ RSpec.describe "EnrollmentRequests features", type: :feature do
 
     it "should be able to send comment" do
       fill_in "record_comment_message", with: "Teste"
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       visit url_path
       find("#as_#{plural_name}-edit-#{@enrollment_request3_2022_2.id}-link").click
       expect(page).to have_content "Teste"
@@ -143,7 +143,7 @@ RSpec.describe "EnrollmentRequests features", type: :feature do
 
     it "should be able to set status as valid" do
       choose("record[class_enrollment_requests][#{@class_enrollment_request5.id}][status]", option: "Válida")
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       @class_enrollment_request5.reload
       expect(@class_enrollment_request5.status).to eq "Válida"
       @class_enrollment_request5.status = "Solicitada"
@@ -152,7 +152,7 @@ RSpec.describe "EnrollmentRequests features", type: :feature do
 
     it "should be able to set status as invalid" do
       choose("record[class_enrollment_requests][#{@class_enrollment_request5.id}][status]", option: "Inválida")
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       @class_enrollment_request5.reload
       expect(@class_enrollment_request5.status).to eq "Inválida"
       @class_enrollment_request5.status = "Solicitada"
@@ -161,7 +161,7 @@ RSpec.describe "EnrollmentRequests features", type: :feature do
 
     it "should be able to set status as effected" do
       choose("record[class_enrollment_requests][#{@class_enrollment_request5.id}][status]", option: "Efetivada")
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       @class_enrollment_request5.reload
       expect(@class_enrollment_request5.status).to eq "Efetivada"
       expect(@class_enrollment_request5.class_enrollment).not_to eq nil
@@ -172,7 +172,7 @@ RSpec.describe "EnrollmentRequests features", type: :feature do
 
     it "should be able to set status as invalid" do
       choose("record[class_enrollment_requests][#{@class_enrollment_request4.id}][status]", option: "Solicitada")
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       @class_enrollment_request4.reload
       expect(@class_enrollment_request4.status).to eq "Solicitada"
       @class_enrollment_request4.status = "Válida"
@@ -204,7 +204,7 @@ RSpec.describe "EnrollmentRequests features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Ajuda"
+      click_link_and_wait "Ajuda"
     end
 
     it "should show the number of requests that can be effected" do
@@ -216,79 +216,79 @@ RSpec.describe "EnrollmentRequests features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by status" do
       expect(page.all("select#search_status option").map(&:text)).to eq ["Selecione uma opção", "Inválida", "Solicitada", "Válida", "Efetivada"]
       find(:select, "search_status").find(:option, text: "Inválida").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia"]
     end
 
     it "should be able to search by year" do
       expect(page.all("select#search_year option").map(&:text)).to eq [""] + YearSemester.selectable_years.map(&:to_s)
       find(:select, "search_year").find(:option, text: "2021").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia"]
     end
 
     it "should be able to search by semester" do
       expect(page.all("select#search_semester option").map(&:text)).to eq [""] + YearSemester::SEMESTERS.map(&:to_s)
       find(:select, "search_semester").find(:option, text: "1").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia"]
     end
 
     it "should be able to search by enrollment" do
       search_record_select("enrollment", "enrollments", "M01")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana"]
     end
 
     it "should be able to search by student" do
       search_record_select("student_", "students", "Ana")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana"]
     end
 
     it "should be able to search by enrollment_level" do
       expect(page.all("select#search_enrollment_level option").map(&:text)).to eq ["Selecione uma opção", "Doutorado", "Mestrado"]
       find(:select, "search_enrollment_level").find(:option, text: "Mestrado").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M02 - Bia", "M02 - Bia"]
     end
 
     it "should be able to search by enrollment_status" do
       expect(page.all("select#search_enrollment_status option").map(&:text)).to eq ["Selecione uma opção", "Regular", "Avulso"]
       find(:select, "search_enrollment_status").find(:option, text: "Avulso").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia", "M02 - Bia"]
     end
 
     it "should be able to search by admision_date" do
       select_month_year("search_admission_date", 3.years.ago.at_beginning_of_month.to_date)
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana"]
     end
 
     it "should be able to search by scholarship_durations_active" do
       expect(page.all("select#search_scholarship_durations_active option").map(&:text)).to eq ["Selecione uma opção", "Sim", "Não"]
       find(:select, "search_scholarship_durations_active").find(:option, text: "Sim").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana"]
     end
 
     it "should be able to search by has_advisor" do
       expect(page.all("select#search_has_advisor option").map(&:text)).to eq ["Selecione uma opção", "Sim", "Não"]
       find(:select, "search_has_advisor").find(:option, text: "Sim").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana"]
     end
 
     it "should be able to search by advisor" do
       search_record_select("advisor_", "professors", "Erica")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana"]
     end
   end

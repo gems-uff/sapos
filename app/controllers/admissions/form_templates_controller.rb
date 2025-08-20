@@ -61,17 +61,9 @@ class Admissions::FormTemplatesController < ApplicationController
     @filled_form.prepare_missing_fields
   end
 
-  def populate_field
-    @scope = params[:scope]
-    @parent_record = params[:id].nil? ?
-      new_parent_record : find_if_allowed(params[:id], :update)
-
-    if @parent_record.new_record?
-      cache_generated_id(@parent_record, params[:generated_id])
-    end
-    @column = active_scaffold_config.columns[:fields]
-
-    attribute_configs = [
+  def self.sispos_sucupira_student_fields_config
+    # ToDo: move to model. I'm leaving it here right now to avoid merge conflicts with issue 477
+    [
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.initial_text"),
         field_type: Admissions::FormField::HTML,
         configuration: JSON.dump({
@@ -192,6 +184,19 @@ class Admissions::FormTemplatesController < ApplicationController
         description: I18n.t("active_scaffold.admissions/form_template.generate_fields.grades_report_description"),
         configuration: JSON.dump({ "required": true }) },
     ]
+  end
+
+  def populate_field
+    @scope = params[:scope]
+    @parent_record = params[:id].nil? ?
+      new_parent_record : find_if_allowed(params[:id], :update)
+
+    if @parent_record.new_record?
+      cache_generated_id(@parent_record, params[:generated_id])
+    end
+    @column = active_scaffold_config.columns[:fields]
+
+    attribute_configs = self.sispos_sucupira_student_fields_config
 
     @records = attribute_configs.collect do |attributes|
       record = build_associated(@column.association, @parent_record)

@@ -51,7 +51,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert record with uploaded logo, preview it and remove record" do
@@ -67,12 +67,12 @@ RSpec.describe "ReportConfigurations features", type: :feature do
         attach_file("Logo", Rails.root + "spec/fixtures/user.png")
       end
       # Preview
-      click_link "Visualizar"
+      click_link_and_wait "Visualizar"
 
       wait_for_download
       expect(download).to match(/Visualizar\.pdf/)
 
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Relatório")
       expect(model.last.image.file).not_to eq nil
 
@@ -97,7 +97,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
       within(".as_form") do
         fill_in "Nome", with: "Quadro de Horários"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Quadro de Horários")
     end
   end
@@ -135,7 +135,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do
