@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_06_27_135451) do
+ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -129,7 +129,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_06_27_135451) do
     t.boolean "candidate_can_see_shared", default: false, null: false
     t.boolean "candidate_can_see_consolidation", default: false, null: false
     t.boolean "committee_can_see_other_individual", default: false, null: false
-    t.index "\"ranking_config_id\"", name: "index_admission_phases_on_ranking_config_id"
+    t.index ["approval_condition_id"], name: "index_admission_phases_on_approval_condition_id"
     t.index ["candidate_form_id"], name: "index_admission_phases_on_candidate_form_id"
     t.index ["consolidation_form_id"], name: "index_admission_phases_on_consolidation_form_id"
     t.index ["keep_in_phase_condition_id"], name: "index_admission_phases_on_keep_in_phase_condition_id"
@@ -522,7 +522,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_06_27_135451) do
     t.date "thesis_defense_date"
     t.integer "research_area_id"
     t.text "obs_to_academic_transcript"
-    t.string "admission_selection"
     t.index ["enrollment_number"], name: "index_enrollments_on_enrollment_number"
     t.index ["enrollment_status_id"], name: "index_enrollments_on_enrollment_status_id"
     t.index ["level_id"], name: "index_enrollments_on_level_id"
@@ -1049,6 +1048,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_06_27_135451) do
     t.string "pcd"
     t.string "humanitarian_policy"
     t.text "obs_pcd"
+    t.text "obs_gender"
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"
