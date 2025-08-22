@@ -5,8 +5,8 @@
 
 FactoryBot.define do
   factory :enrollment_hold do
-    enrollment
-    year { 1.year.from_now.year }
+    association :enrollment, factory: :enrollment, admission_date: 2.year.ago.to_date
+    year { YearSemester.current.year }
     semester { YearSemester.current.semester }
     number_of_semesters { 1 }
   end
