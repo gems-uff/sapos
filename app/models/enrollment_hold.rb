@@ -17,7 +17,8 @@ class EnrollmentHold < ApplicationRecord
 
   validate :validate_dates
 
-  after_commit :cancel_class_enrollments
+  validate :verify_class_enrollments
+
   after_commit :create_phase_completions
 
   def to_label
@@ -63,13 +64,23 @@ class EnrollmentHold < ApplicationRecord
     enrollment.create_phase_completions
   end
 
-  def cancel_class_enrollments
+  def verify_class_enrollments
     class_enrollments = ClassEnrollment.where(enrollment: self.enrollment)
     class_enrollments.each do |class_enrollment|
       course_class = class_enrollment.course_class
       unless course_class.end_date < self.start_date || course_class.start_date > self.end_date
-        class_enrollment.delete
+        errors.add(:base, :class_enrollments_exist)
       end
     end
+  end
+
+  def self.hold_in_date(enrollment, course_start, course_end)
+    enrollment_holds = EnrollmentHold.where(enrollment: enrollment)
+    unless enrollment_holds.empty?
+      enrollment_holds.each do |hold|
+        return true unless course_end < hold.start_date || course_start > hold.end_date
+      end
+    end
+    false
   end
 end

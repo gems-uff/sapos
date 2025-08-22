@@ -14,16 +14,12 @@ pt-BR:
           one: "1 semestre"
           other: "%{count} semestres"
 
-    description:
-      enrollment_hold:
-        number_of_semesters: "Atenção! A matrícula terá as inscrições
-         canceladas nos semestres trancados"
-
     errors:
       models:
         enrollment_hold:
           before_admission_date: "anterior a Data de Admissão"
           after_dismissal_date: "posterior a Data de Desligamento"
+          class_enrollments_exist: "existem inscrições no período trancado"
 
     models:
       enrollment_hold:
