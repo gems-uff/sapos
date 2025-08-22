@@ -174,6 +174,17 @@ RSpec.describe ClassEnrollment, type: :model do
           expect(class_enrollment).to have_error(:disapproved_by_absence_for_situation_aproved).on :disapproved_by_absence
         end
       end
+      context "should have error enrollment_is_held when" do
+        it "enrollment has an enrollment hold conflicting the date of course_class" do
+          @destroy_later << e = FactoryBot.create(:enrollment, admission_date: 3.years.ago.at_beginning_of_month.to_date)
+          @destroy_later << cc = FactoryBot.create(:course_class, year: 1.year.ago.year, semester: 1)
+          @destroy_later << FactoryBot.create(:enrollment_hold, enrollment: e,
+           year: 2.years.ago.year, number_of_semesters: 4)
+          class_enrollment.enrollment = e
+          class_enrollment.course_class = cc
+          expect(class_enrollment).to have_error(:enrollment_is_held).on :enrollment
+        end
+      end
     end
   end
   describe "Methods" do
