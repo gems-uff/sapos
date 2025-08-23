@@ -4,7 +4,7 @@ class RemoveRoleIdFromUser < ActiveRecord::Migration[7.0]
   end
 
   def down
-    add_column :users, :role_id, :integer
+    add_column :users, :role_id, :integer, default: 1
 
     User.find_each do |user|
       user.update!(role_id: user.user_max_role)

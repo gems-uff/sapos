@@ -66,24 +66,24 @@ RSpec.describe "UserRoles features", type: :feature do
     end
 
     it "should order by user name, asc, when clicked" do
-      click_link "Usuário"
+      click_link_and_wait "Usuário"
       expect(page.all("tr td.user-column").map(&:text)).to eq ["ana", "ana", "ana", "bia", "bia", "carol"]
     end
 
     it "should order by user name, desc, when clicked twice" do
-      click_link "Usuário"
-      click_link "Usuário"
+      click_link_and_wait "Usuário"
+      click_link_and_wait "Usuário"
       expect(page.all("tr td.user-column").map(&:text)).to eq ["carol", "bia", "bia", "ana", "ana", "ana"]
     end
 
     it "should order by role name, asc, when clicked" do
-      click_link "Papel"
+      click_link_and_wait "Papel"
       expect(page.all("tr td.user-column").map(&:text)).to eq ["ana", "bia", "ana",  "carol", "bia", "ana"]
     end
 
     it "should order by role name, desc, when clicked twice" do
-      click_link "Papel"
-      click_link "Papel"
+      click_link_and_wait "Papel"
+      click_link_and_wait "Papel"
       expect(page.all("tr td.user-column").map(&:text)).to eq ["ana", "ana", "carol", "bia", "ana", "bia"]
     end
   end
