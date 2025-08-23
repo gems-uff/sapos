@@ -97,7 +97,7 @@ RSpec.describe "CourseClasses features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -161,7 +161,7 @@ RSpec.describe "CourseClasses features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do
@@ -208,17 +208,17 @@ RSpec.describe "CourseClasses features", type: :feature do
     end
 
     it "should show an error when year/semester is not selected" do
-      click_link "Quadro de Horários"
+      click_link_and_wait "Quadro de Horários"
       expect(page).to have_content "Selecione Ano/Semestre na busca!"
     end
 
     it "should generate report when year/semester is selected" do
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
       find(:select, "search_year").find(:option, text: "2022").select_option
       find(:select, "search_semester").find(:option, text: "2").select_option
       click_button_and_wait "Buscar"
 
-      click_link "Quadro de Horários"
+      click_link_and_wait "Quadro de Horários"
       wait_for_download
       expect(download).to match(/QUADRO DE HORÁRIOS \(2022_2\)\.pdf/)
     end

@@ -61,7 +61,7 @@ RSpec.describe "Advisements features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -112,7 +112,7 @@ RSpec.describe "Advisements features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
       sleep(0.2)
     end
 

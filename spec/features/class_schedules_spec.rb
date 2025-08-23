@@ -84,7 +84,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -154,7 +154,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
 
     it "should be able to copy enrollment_start to period_start" do
       expect(find("input.period_start-input.datetime_picker").value).to eq "28 Mar 2022 00:00:00"
-      click_link "Repetir Data de Início das Inscrições"
+      click_link_and_wait "Repetir Data de Início das Inscrições"
       expect(find("input.period_start-input.datetime_picker").value).to eq "14 Mar 2022 00:00:00"
     end
 
@@ -175,7 +175,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do

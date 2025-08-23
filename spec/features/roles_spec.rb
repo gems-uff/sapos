@@ -63,7 +63,7 @@ RSpec.describe "Roles features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by model name" do

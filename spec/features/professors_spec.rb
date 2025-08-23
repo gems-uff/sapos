@@ -100,14 +100,14 @@ RSpec.describe "Professors features", type: :feature do
       visit url_path
     end
     it "Should sort the list by the points of a level, asc, if clicked on its column first time" do
-      click_link "M"
+      click_link_and_wait "M"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Dani", "Bia", "Carol"]
       expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["0.0", "0.5", "1.5"]
     end
 
     it "Should sort the list by the points of a level, desc, if clicked on its column second time" do
       2.times do
-        click_link "M"
+        click_link_and_wait "M"
       end
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Carol", "Bia", "Dani"]
       expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["1.5", "0.5", "0.0"]
@@ -115,7 +115,7 @@ RSpec.describe "Professors features", type: :feature do
 
     it "Should back to default sort, if clicked on its column third time" do
       3.times do
-        click_link "M"
+        click_link_and_wait "M"
       end
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia", "Carol", "Dani"]
       expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["0.5", "1.5", "0.0"]
@@ -126,7 +126,7 @@ RSpec.describe "Professors features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -169,6 +169,7 @@ RSpec.describe "Professors features", type: :feature do
     it "should have a datepicker for birthdate with a range starting 100 years ago" do
       expect(page).not_to have_selector("#ui-datepicker-div")
       find("#record_birthdate_").click
+      wait_for_ajax
       expect(page).to have_selector("#ui-datepicker-div", visible: true)
       expect(page.all("select.ui-datepicker-year option").map(&:text)).to include(100.years.ago.year.to_s)
     end
@@ -233,12 +234,12 @@ RSpec.describe "Professors features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do
       fill_in "search", with: "Bia"
-      sleep(0.8)
+      sleep(1)
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia"]
     end
   end

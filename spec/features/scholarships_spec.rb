@@ -70,7 +70,7 @@ RSpec.describe "Scholarships features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -140,7 +140,7 @@ RSpec.describe "Scholarships features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
       sleep(0.2)
     end
 
@@ -209,7 +209,7 @@ RSpec.describe "Scholarships features", type: :feature do
     end
 
     it "should download a pdf report of scholarships" do
-      click_link "Gerar relatório"
+      click_link_and_wait "Gerar relatório"
 
       wait_for_download
       expect(download).to match(/Relatório de Bolsas\.pdf/)
