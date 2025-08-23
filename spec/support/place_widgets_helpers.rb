@@ -21,23 +21,34 @@ module PlaceWidgetsHelpers
     expect(page.all("select#widget_record_#{country_field} option").map(&:text)).to eq ["Selecione o país", "Brasil", "USA"]
 
     find(:select, "widget_record_#{country_field}").find(:option, text: "Brasil").select_option
+    wait_for_ajax
     expect(page.all("select#widget_record_#{state_field} option").map(&:text)).to eq ["Selecione o estado", "RJ", "SP"]
     find(:select, "widget_record_#{country_field}").find(:option, text: "Selecione o país").select_option
+    wait_for_ajax
     expect(page.all("select#widget_record_#{state_field} option").map(&:text)).to eq ["Selecione o estado"]
     find(:select, "widget_record_#{country_field}").find(:option, text: "Brasil").select_option
+    wait_for_ajax
 
     find(:select, "widget_record_#{state_field}").find(:option, text: "RJ").select_option
+    wait_for_ajax
     expect(page.all("select#widget_record_#{city_field} option").map(&:text)).to eq ["Selecione a cidade", "Niteroi", "Rio"]
     find(:select, "widget_record_#{state_field}").find(:option, text: "Selecione o estado").select_option
+    wait_for_ajax
     expect(page.all("select#widget_record_#{city_field} option").map(&:text)).to eq ["Selecione a cidade"]
     find(:select, "widget_record_#{state_field}").find(:option, text: "RJ").select_option
+    wait_for_ajax
 
     find(:select, "widget_record_#{city_field}").find(:option, text: "Niteroi").select_option
+    wait_for_ajax
     find(:select, "widget_record_#{state_field}").find(:option, text: "Selecione o estado").select_option
+    wait_for_ajax
     expect(page.all("select#widget_record_#{city_field} option").map(&:text)).to eq ["Selecione a cidade"]
     find(:select, "widget_record_#{state_field}").find(:option, text: "RJ").select_option
+    wait_for_ajax
     find(:select, "widget_record_#{city_field}").find(:option, text: "Niteroi").select_option
+    wait_for_ajax
     find(:select, "widget_record_#{country_field}").find(:option, text: "Selecione o país").select_option
+    wait_for_ajax
     expect(page.all("select#widget_record_#{state_field} option").map(&:text)).to eq ["Selecione o estado"]
     expect(page.all("select#widget_record_#{city_field} option").map(&:text)).to eq ["Selecione a cidade"]
   end

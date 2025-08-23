@@ -10,7 +10,7 @@ admission_form = Admissions::FormTemplate.new({
   name: "Formulário para candidatura ao mestrado",
   template_type: "Formulário"
 })
-admission_form_fields_configs = Admissions::FormTemplatesController.sispos_sucupira_student_fields_config
+admission_form_fields_configs = Admissions::FormTemplate.sispos_sucupira_student_fields_config
 admission_form_fields_configs += [
   { name: "Informações Gerais",
     field_type: Admissions::FormField::GROUP },
