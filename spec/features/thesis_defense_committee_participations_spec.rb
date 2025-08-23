@@ -111,7 +111,7 @@ RSpec.describe "ThesisDefenseCommitteeParticipations features", type: :feature d
     end
 
     it "should be able to edit record" do
-      page.send_keys :escape
+      page.driver.browser.action.send_keys(:escape).perform
       fill_record_select("professor_#{@record.id}", "professors", "Fiona")
       click_button_and_wait "Atualizar"
       expect(page).to have_css("#as_#{plural_name}-list-#{@record.id}-row td.professor-column", text: "Fiona")
