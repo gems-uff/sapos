@@ -123,7 +123,7 @@ RSpec.describe "Deferrals features", type: :feature do
     end
 
     it "should be able to edit student" do
-      page.send_keys :escape
+      page.driver.browser.action.send_keys(:escape).perform
       date = 3.months.from_now
       within(".as_form") do
         select_month_year_i("record_approval_date", date)

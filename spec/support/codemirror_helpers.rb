@@ -3,10 +3,11 @@
 module CodemirrorHelper
   def select_all_keys
     if RUBY_PLATFORM.include?("darwin")
-      [:meta, "a"]    # Command+A no macOS
+      chr = :meta  # Command+A no macOS
     else
-      [:control, "a"] # Ctrl+A no Linux/Windows
+      chr = :control  # Ctrl+A no Linux/Windows
     end
+    page.driver.browser.action.key_down(chr).send_keys("a").key_up(chr).perform
   end
 end
 
