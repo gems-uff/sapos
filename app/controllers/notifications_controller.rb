@@ -165,8 +165,10 @@ class NotificationsController < ApplicationController
         next if attachments.blank?
         if attachments[:grades_report_pdf]
           enrollment = Enrollment.find(message[:enrollments_id])
+          filename = "grades_report.pdf"
+          signature_type = 0
           attachments[:grades_report_pdf][:file_contents] =
-            render_enrollments_grades_report_pdf(enrollment)
+            render_enrollments_grades_report_pdf(enrollment, filename, signature_type, watermark: true)
         end
       end
       notification_result
