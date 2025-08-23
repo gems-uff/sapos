@@ -90,7 +90,8 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
       # Insert record
       expect(page).to have_content "Adicionar Bolsa"
       fill_record_select("scholarship_", "scholarships", "B3")
-      page.send_keys :escape
+      sleep 0.1
+      page.driver.browser.action.send_keys(:escape).perform
       fill_record_select("enrollment_", "enrollments", "M04")
       click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.scholarship-column", text: "B3")

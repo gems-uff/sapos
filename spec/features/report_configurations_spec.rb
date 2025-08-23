@@ -112,6 +112,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     it "should be able to duplicate record with logo" do
       expect(page.all("tr td.name-column").size).to eq 3
       find("#as_#{plural_name}-duplicate-#{@record.id}-link").click
+      wait_for_ajax
       expect(page.all("tr td.name-column").size).to eq 4
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
@@ -123,6 +124,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     it "should be able to duplicate record without logo" do
       expect(page.all("tr td.name-column").size).to eq 3
       find("#as_#{plural_name}-duplicate-#{@record2.id}-link").click
+      wait_for_ajax
       expect(page.all("tr td.name-column").size).to eq 4
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }

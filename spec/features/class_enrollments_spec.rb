@@ -169,7 +169,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     end
 
     it "should be able to edit student" do
-      page.send_keys :escape
+      page.driver.browser.action.send_keys(:escape).perform
       within(".as_form") do
         fill_in "Nota", with: "6"
       end
