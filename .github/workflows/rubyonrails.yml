@@ -10,7 +10,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Setup chromedriver
-        uses: nanasess/setup-chromedriver@latest
+        uses: nanasess/setup-chromedriver@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install Ruby and gems
