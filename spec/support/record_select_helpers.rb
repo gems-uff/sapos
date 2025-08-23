@@ -4,6 +4,7 @@
 module RecordSelectHelpers
   def search_record_select(field, plural, value)
     record_select = find("#search_#{field}").click
+    wait_for_ajax
     record_select.send_keys value
     sleep(0.5)
     find("#record-select-#{plural} .current").click

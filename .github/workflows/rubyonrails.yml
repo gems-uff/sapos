@@ -9,8 +9,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Setup geckodriver
-        uses: browser-actions/setup-geckodriver@latest
+      - name: Setup chromedriver
+        uses: nanasess/setup-chromedriver@latest
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Install Ruby and gems
