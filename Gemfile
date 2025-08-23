@@ -20,7 +20,7 @@ gem "sprockets-rails"
 gem "puma", ">= 6.4.2"
 
 # HTML and XML parser
-gem "nokogiri", ">= 1.16.5"
+gem "nokogiri", ">= 1.18.9"
 
 # Wrapp HTTP requests and responses
 gem "rack", "~> 2.2.12"
