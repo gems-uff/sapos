@@ -45,7 +45,7 @@ RSpec.describe Student, type: :model do
     describe "user" do
       context "should be valid when" do
         it "user is set to null after a predefined value" do
-          @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", role_id: Role::ROLE_ALUNO)
+          @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", actual_role: Role::ROLE_ALUNO)
           student.user = user1
           student.save(validate: false)
           @destroy_later << student
@@ -55,8 +55,8 @@ RSpec.describe Student, type: :model do
       end
       context "should have error changed_to_different_user when" do
         it "user is set to a different user" do
-          @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", role_id: Role::ROLE_ALUNO)
-          @destroy_later << user2 = FactoryBot.create(:user, email: "def@ghi.com", role_id: Role::ROLE_ALUNO)
+          @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", actual_role: Role::ROLE_ALUNO)
+          @destroy_later << user2 = FactoryBot.create(:user, email: "def@ghi.com", actual_role: Role::ROLE_ALUNO)
           student.user = user1
           student.save(validate: false)
           @destroy_later << student
@@ -107,18 +107,18 @@ RSpec.describe Student, type: :model do
         expect(student.can_have_new_user?).to eq(true)
       end
       it "should return false if the student has the same email as an user" do
-        @destroy_later << FactoryBot.create(:user, email: "abc@def.com", role: @role)
+        @destroy_later << FactoryBot.create(:user, :student, email: "abc@def.com")
         student.email = "abc@def.com"
         expect(student.can_have_new_user?).to eq(false)
       end
       it "should return false if the student has the same email as an user among a list of emails" do
-        @destroy_later << FactoryBot.create(:user, email: "def@ghi.com", role: @role)
+        @destroy_later << FactoryBot.create(:user, :student, email: "def@ghi.com")
         student.email = "abc@def.com;def@ghi.com"
         expect(student.can_have_new_user?).to eq(false)
       end
       it "should return false if the student already has an user" do
         student.email = "abc@def.com"
-        @destroy_later << student.user = FactoryBot.create(:user, email: "def@ghi.com", role: @role)
+        @destroy_later << student.user = FactoryBot.create(:user, :student, email: "def@ghi.com")
         expect(student.can_have_new_user?).to eq(false)
       end
     end

@@ -13,7 +13,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @role_adm = FactoryBot.create :role_administrador
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << FactoryBot.create(:report_configuration, name: "Padrão", scale: 1, x: 0, y: 0, order: 1, text: "UFF")
     @destroy_all << @record = FactoryBot.create(:report_configuration, name: "Histórico", scale: 1, x: 0, y: 0, order: 1, text: "UFF", image: File.open(Rails.root + "spec/fixtures/user.png"))
@@ -27,6 +27,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     @role_adm.delete
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do

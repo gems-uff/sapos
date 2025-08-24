@@ -16,7 +16,9 @@ RSpec.describe Admissions::AdmissionPhaseEvaluation, type: :model do
     @destroy_later = []
     @admission_phase = FactoryBot.create(:admission_phase, :with_member_form)
     @role = FactoryBot.create(:role_professor)
-    @user = FactoryBot.create(:user, role: @role)
+    @user = FactoryBot.create(:user, email: "abc@def.com")
+    @user_role = FactoryBot.create(:user_role, user: @user, role: @role)
+    @user.update!(actual_role: @role.id)
     @admission_application = FactoryBot.create(:admission_application)
     @filled_form = FactoryBot.create(:filled_form)
   end
@@ -24,6 +26,7 @@ RSpec.describe Admissions::AdmissionPhaseEvaluation, type: :model do
     @admission_phase.delete
     @user.delete
     @role.delete
+    @user_role.delete
     @admission_application.delete
     @filled_form.delete
   end
