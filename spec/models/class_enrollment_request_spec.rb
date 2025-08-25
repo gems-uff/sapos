@@ -155,6 +155,18 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
               :must_represent_the_same_enrollment_and_class).on :class_enrollment
           end
         end
+        context "should have error enrollment_is_held when" do
+          it "enrollment has an enrollment hold conflicting the date of course_class" do
+            @destroy_later << e = FactoryBot.create(:enrollment, admission_date: 3.years.ago.at_beginning_of_month.to_date)
+            @destroy_later << cc = FactoryBot.create(:course_class, year: 1.year.ago.year, semester: 1)
+            @destroy_later << FactoryBot.create(:enrollment_hold, enrollment: e,
+            year: 2.years.ago.year, number_of_semesters: 4)
+            @destroy_later << cer = FactoryBot.create(:enrollment_request, enrollment: e)
+            class_enrollment_request.enrollment_request = cer
+            class_enrollment_request.course_class = cc
+            expect(class_enrollment_request).to have_error(:enrollment_is_held).on :enrollment
+          end
+        end
       end
     end
     describe "Methods" do
