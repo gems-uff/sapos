@@ -52,7 +52,7 @@ RSpec.describe "Queries features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -61,7 +61,11 @@ RSpec.describe "Queries features", type: :feature do
       within("#as_#{plural_name}-create--form") do
         fill_in "record_name_", with: "enrollments"
         codemirror = find("#record_sql_ + .CodeMirror").click
-        codemirror.send_keys select_all_keys, :delete, "select * from enrollments"
+        wait_for_ajax
+        select_all_keys
+        page.driver.browser.action.send_keys(
+          :delete, "select * from enrollments"
+        ).perform
       end
       click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "enrollments")
@@ -113,7 +117,7 @@ RSpec.describe "Queries features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do

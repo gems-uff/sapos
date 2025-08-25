@@ -82,14 +82,15 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
       # Insert record
       expect(page).to have_content "Adicionar Bolsa"
       fill_record_select("scholarship_", "scholarships", "B3")
-      page.send_keys :escape
+      sleep 0.1
+      page.driver.browser.action.send_keys(:escape).perform
       fill_record_select("enrollment_", "enrollments", "M04")
       click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.scholarship-column", text: "B3")
@@ -152,7 +153,7 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by scholarship" do
@@ -250,7 +251,7 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     end
 
     it "should download a pdf report of scholarships" do
-      click_link "Gerar relatório"
+      click_link_and_wait "Gerar relatório"
 
       wait_for_download
       expect(download).to match(/Relatório de Alocação de Bolsas\.pdf/)

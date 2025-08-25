@@ -109,7 +109,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -168,7 +168,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     end
 
     it "should be able to edit student" do
-      page.send_keys :escape
+      page.driver.browser.action.send_keys(:escape).perform
       within(".as_form") do
         fill_in "Nota", with: "6"
       end
@@ -183,7 +183,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by situation" do

@@ -51,7 +51,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert record with uploaded logo, preview it and remove record" do
@@ -67,7 +67,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
         attach_file("Logo", Rails.root + "spec/fixtures/user.png")
       end
       # Preview
-      click_link "Visualizar"
+      click_link_and_wait "Visualizar"
 
       wait_for_download
       expect(download).to match(/Visualizar\.pdf/)
@@ -111,6 +111,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     it "should be able to duplicate record with logo" do
       expect(page.all("tr td.name-column").size).to eq 3
       find("#as_#{plural_name}-duplicate-#{@record.id}-link").click
+      wait_for_ajax
       expect(page.all("tr td.name-column").size).to eq 4
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
@@ -122,6 +123,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     it "should be able to duplicate record without logo" do
       expect(page.all("tr td.name-column").size).to eq 3
       find("#as_#{plural_name}-duplicate-#{@record2.id}-link").click
+      wait_for_ajax
       expect(page.all("tr td.name-column").size).to eq 4
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
@@ -135,7 +137,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do
