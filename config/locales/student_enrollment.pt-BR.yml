@@ -10,6 +10,7 @@ pt-BR:
     show_enroll:
       title_main: Inscrições em disciplinas do semestre %{semester} estão abertas!
       title_adjust: Período de ajustes do semestre %{semester} está aberto!
+      enrollment_is_held: Sua matrícula está trancada. Entre em contato com a secretaria caso queira destrancar para esta inscrição.
       enroll_link_new: Clique aqui para fazer um pedido de inscrição.
       enroll_link_edit_valid: Seu pedido de inscrição foi marcado como válido. Clique aqui para editar
       enroll_link_edit_requested: Clique aqui para editar seu pedido de inscrição.
