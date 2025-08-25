@@ -9,7 +9,6 @@ require "rails/all"
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
-ENV["RAILS_DISABLE_DEPRECATED_TO_S_CONVERSION"] = "true"
 Bundler.require(*Rails.groups)
 
 module Sapos
