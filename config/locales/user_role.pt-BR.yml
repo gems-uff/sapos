@@ -9,3 +9,10 @@ pt-BR:
       user_role:
         one: "Papel de Usuário"
         other: "Papéis de Usuários"
+    
+    notice:
+      role_changed: "Papel alterado para "
+    
+    alert:
+      invalid_role: "Papel inválido ou não associado ao usuário."
+

@@ -21,8 +21,8 @@ class UserRolesController < ApplicationController
     changed_user_role = UserRole.find_by(user: current_user, role_id: params[:role_id])
     if changed_user_role
       current_user.update!(actual_role: changed_user_role.role_id)
-      redirect_to root_path, notice: "Role alterado para #{changed_user_role.role.name}."
-    else redirect_to root_path, alert: "Role inválido ou não associado ao usuário."
+      redirect_to root_path, notice: I18n.t("activerecord.notice.role_changed") + changed_user_role.role.name
+    else redirect_to root_path, alert: I18n.t("activerecord.alert.invalid_role")
     end
   end
 end
