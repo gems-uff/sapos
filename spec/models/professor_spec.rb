@@ -284,4 +284,87 @@ RSpec.describe Professor, type: :model do
       end
     end
   end
+
+  describe "Destroy" do
+    describe "handle_user_role_removal" do
+      context "when professor has a linked user" do
+        it "should remove professor role from user when professor is destroyed" do
+          @destroy_later << user = FactoryBot.create(:user, email: "prof@test.com", actual_role: Role::ROLE_PROFESSOR)
+          @destroy_later << professor = FactoryBot.create(:professor, user: user)
+          user.roles << @professor_role
+          user.save!
+
+          expect(user.roles).to include(@professor_role)
+          
+          professor.destroy
+          user.reload
+          
+          expect(user.roles).not_to include(@professor_role)
+        end
+
+        it "should assign unknown role when user has only professor role" do
+          @destroy_later << unknown_role = FactoryBot.create(:role_desconhecido)
+          @destroy_later << user = FactoryBot.create(:user, email: "prof@test.com", actual_role: Role::ROLE_PROFESSOR)
+          @destroy_later << professor = FactoryBot.create(:professor, user: user)
+          user.roles << @professor_role
+          user.save!
+
+          expect(user.roles.count).to eq(1)
+          expect(user.roles).to include(@professor_role)
+
+          professor.destroy
+          user.reload
+
+          expect(user.roles.count).to eq(1)
+          expect(user.roles.first.id).to eq(Role::ROLE_DESCONHECIDO)
+          expect(user.actual_role).to eq(Role::ROLE_DESCONHECIDO)
+        end
+
+        it "should keep other roles when user has multiple roles" do
+          @destroy_later << admin_role = FactoryBot.create(:role, id: Role::ROLE_ADMINISTRADOR, name: "Administrador")
+          @destroy_later << user = FactoryBot.create(:user, email: "prof@test.com", actual_role: Role::ROLE_ADMINISTRADOR)
+          @destroy_later << professor = FactoryBot.create(:professor, user: user)
+          user.roles << @professor_role
+          user.roles << admin_role
+          user.save!
+
+          expect(user.roles.count).to eq(2)
+          expect(user.roles).to include(@professor_role)
+          expect(user.roles).to include(admin_role)
+
+          professor.destroy
+          user.reload
+
+          expect(user.roles.count).to eq(1)
+          expect(user.roles).to include(admin_role)
+          expect(user.roles).not_to include(@professor_role)
+          expect(user.actual_role).to eq(Role::ROLE_ADMINISTRADOR)
+        end
+
+        it "should update actual_role when it was professor role" do
+          @destroy_later << coord_role = FactoryBot.create(:role, id: Role::ROLE_COORDENACAO, name: "Coordenacao")
+          @destroy_later << user = FactoryBot.create(:user, email: "prof@test.com", actual_role: Role::ROLE_PROFESSOR)
+          @destroy_later << professor = FactoryBot.create(:professor, user: user)
+          user.roles << @professor_role
+          user.roles << coord_role
+          user.save!
+
+          expect(user.actual_role).to eq(Role::ROLE_PROFESSOR)
+
+          professor.destroy
+          user.reload
+
+          expect(user.actual_role).to eq(Role::ROLE_COORDENACAO)
+        end
+      end
+
+      context "when professor has no linked user" do
+        it "should not cause errors when destroying professor without user" do
+          @destroy_later << professor = FactoryBot.create(:professor, user: nil)
+          
+          expect { professor.destroy }.not_to raise_error
+        end
+      end
+    end
+  end
 end

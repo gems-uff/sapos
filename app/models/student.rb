@@ -35,6 +35,8 @@ class Student < ApplicationRecord
   validates :cpf, presence: true, uniqueness: true
   validate :changed_to_different_user
 
+  before_destroy :handle_user_role_removal
+
   accepts_nested_attributes_for :student_majors, allow_destroy: true
 
   before_save :set_birth_state_by_birth_city
@@ -105,5 +107,33 @@ class Student < ApplicationRecord
   protected
     def set_birth_state_by_birth_city
       self.birth_state_id = birth_city.state_id unless birth_city.blank?
+    end
+
+  private
+
+    def handle_user_role_removal
+      return unless user.present?
+
+      # Remove the student role from the user
+      student_role = Role.find_by(id: Role::ROLE_ALUNO)
+      if student_role && user.roles.include?(student_role)
+        user.roles.delete(student_role)
+        
+        # If user has no roles left, assign the default unknown role
+        if user.roles.empty?
+          unknown_role = Role.find_by(id: Role::ROLE_DESCONHECIDO)
+          user.roles << unknown_role if unknown_role
+        end
+        
+        # Update user's actual_role if it was student
+        if user.actual_role == Role::ROLE_ALUNO
+          user.actual_role = user.user_max_role || Role::ROLE_DESCONHECIDO
+        end
+        
+        user.save!
+      end
+      
+      # Clear the user association
+      self.user = nil
     end
 end

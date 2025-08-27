@@ -41,6 +41,8 @@ class Professor < ApplicationRecord
   validates :enrollment_number, uniqueness: true, allow_blank: true
   validate :changed_to_different_user
 
+  before_destroy :handle_user_role_removal
+
   def create_advisement_points_of_level_method(column_name)
     self.class.send(:define_method, column_name) {
       advisement_points(column_name[26..-1])
@@ -128,4 +130,32 @@ class Professor < ApplicationRecord
       errors.add(:user, :changed_to_different_user)
     end
   end
+
+  private
+
+    def handle_user_role_removal
+      return unless user.present?
+
+      # Remove the professor role from the user
+      professor_role = Role.find_by(id: Role::ROLE_PROFESSOR)
+      if professor_role && user.roles.include?(professor_role)
+        user.roles.delete(professor_role)
+        
+        # If user has no roles left, assign the default unknown role
+        if user.roles.empty?
+          unknown_role = Role.find_by(id: Role::ROLE_DESCONHECIDO)
+          user.roles << unknown_role if unknown_role
+        end
+        
+        # Update user's actual_role if it was professor
+        if user.actual_role == Role::ROLE_PROFESSOR
+          user.actual_role = user.user_max_role || Role::ROLE_DESCONHECIDO
+        end
+        
+        user.save!
+      end
+      
+      # Clear the user association
+      self.user = nil
+    end
 end
