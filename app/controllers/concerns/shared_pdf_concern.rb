@@ -57,7 +57,7 @@ module SharedPdfConcern
     )
   end
 
-  def render_enrollments_grades_report_pdf(enrollment, filename = "grades_report.pdf", signature_override = nil)
+  def render_enrollments_grades_report_pdf(enrollment, filename = "grades_report.pdf", signature_override = nil, watermark = nil)
     class_enrollments = enrollment.class_enrollments
       .where(situation: ClassEnrollment::APPROVED)
       .joins(:course_class)
@@ -74,7 +74,8 @@ module SharedPdfConcern
         class_enrollments: class_enrollments,
         accomplished_phases: accomplished_phases,
         deferrals: deferrals,
-        signature_override: signature_override
+        signature_override: signature_override,
+        watermark: watermark
       }
     )
   end
