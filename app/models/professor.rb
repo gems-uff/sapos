@@ -132,30 +132,20 @@ class Professor < ApplicationRecord
   end
 
   private
-
     def handle_user_role_removal
       return unless user.present?
 
-      # Remove the professor role from the user
       professor_role = Role.find_by(id: Role::ROLE_PROFESSOR)
-      if professor_role && user.roles.include?(professor_role)
+      if user.roles.include?(professor_role)
         user.roles.delete(professor_role)
-        
-        # If user has no roles left, assign the default unknown role
-        if user.roles.empty?
-          unknown_role = Role.find_by(id: Role::ROLE_DESCONHECIDO)
-          user.roles << unknown_role if unknown_role
-        end
-        
-        # Update user's actual_role if it was professor
+
+        user.roles << Role.find_by(id: Role::ROLE_DESCONHECIDO) if user.roles.empty?
+
         if user.actual_role == Role::ROLE_PROFESSOR
           user.actual_role = user.user_max_role || Role::ROLE_DESCONHECIDO
         end
-        
+
         user.save!
       end
-      
-      # Clear the user association
-      self.user = nil
     end
 end

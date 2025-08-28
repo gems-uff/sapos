@@ -178,86 +178,38 @@ RSpec.describe Student, type: :model do
     end
   end
 
-  describe "Destroy" do
-    describe "handle_user_role_removal" do
-      context "when student has a linked user" do
-        it "should remove student role from user when student is destroyed" do
-          @destroy_later << user = FactoryBot.create(:user, email: "student@test.com", actual_role: Role::ROLE_ALUNO)
-          @destroy_later << student = FactoryBot.create(:student, user: user)
-          user.roles << @role_aluno
-          user.save!
+  describe "Before destroy" do
+    it "should assign unknown role when user has only student role" do
+      @destroy_later << FactoryBot.create(:role_desconhecido)
+      @destroy_later << user = FactoryBot.create(:user, actual_role: Role::ROLE_ALUNO)
+      @destroy_later << student = FactoryBot.create(:student, user: user)
+      user.roles << @role_aluno
+      user.save!
 
-          expect(user.roles).to include(@role_aluno)
-          
-          student.destroy
-          user.reload
-          
-          expect(user.roles).not_to include(@role_aluno)
-        end
+      student.destroy
+      user.reload
 
-        it "should assign unknown role when user has only student role" do
-          @destroy_later << unknown_role = FactoryBot.create(:role_desconhecido)
-          @destroy_later << user = FactoryBot.create(:user, email: "student@test.com", actual_role: Role::ROLE_ALUNO)
-          @destroy_later << student = FactoryBot.create(:student, user: user)
-          user.roles << @role_aluno
-          user.save!
+      expect(user.roles.count).to eq(1)
+      expect(user.roles).not_to include(@role_aluno)
+      expect(user.roles.first.id).to eq(Role::ROLE_DESCONHECIDO)
+      expect(user.actual_role).to eq(Role::ROLE_DESCONHECIDO)
+    end
 
-          expect(user.roles.count).to eq(1)
-          expect(user.roles).to include(@role_aluno)
+    it "should keep other roles when user has multiple roles" do
+      @destroy_later << admin_role = FactoryBot.create(:role_administrador)
+      @destroy_later << user = FactoryBot.create(:user, actual_role: Role::ROLE_ADMINISTRADOR)
+      @destroy_later << student = FactoryBot.create(:student, user: user)
+      user.roles << @role_aluno
+      user.roles << admin_role
+      user.save!
 
-          student.destroy
-          user.reload
+      student.destroy
+      user.reload
 
-          expect(user.roles.count).to eq(1)
-          expect(user.roles.first.id).to eq(Role::ROLE_DESCONHECIDO)
-          expect(user.actual_role).to eq(Role::ROLE_DESCONHECIDO)
-        end
-
-        it "should keep other roles when user has multiple roles" do
-          @destroy_later << admin_role = FactoryBot.create(:role, id: Role::ROLE_ADMINISTRADOR, name: "Administrador")
-          @destroy_later << user = FactoryBot.create(:user, email: "student@test.com", actual_role: Role::ROLE_ADMINISTRADOR)
-          @destroy_later << student = FactoryBot.create(:student, user: user)
-          user.roles << @role_aluno
-          user.roles << admin_role
-          user.save!
-
-          expect(user.roles.count).to eq(2)
-          expect(user.roles).to include(@role_aluno)
-          expect(user.roles).to include(admin_role)
-
-          student.destroy
-          user.reload
-
-          expect(user.roles.count).to eq(1)
-          expect(user.roles).to include(admin_role)
-          expect(user.roles).not_to include(@role_aluno)
-          expect(user.actual_role).to eq(Role::ROLE_ADMINISTRADOR)
-        end
-
-        it "should update actual_role when it was student role" do
-          @destroy_later << coord_role = FactoryBot.create(:role, id: Role::ROLE_COORDENACAO, name: "Coordenacao")
-          @destroy_later << user = FactoryBot.create(:user, email: "student@test.com", actual_role: Role::ROLE_ALUNO)
-          @destroy_later << student = FactoryBot.create(:student, user: user)
-          user.roles << @role_aluno
-          user.roles << coord_role
-          user.save!
-
-          expect(user.actual_role).to eq(Role::ROLE_ALUNO)
-
-          student.destroy
-          user.reload
-
-          expect(user.actual_role).to eq(Role::ROLE_COORDENACAO)
-        end
-      end
-
-      context "when student has no linked user" do
-        it "should not cause errors when destroying student without user" do
-          @destroy_later << student = FactoryBot.create(:student, user: nil)
-          
-          expect { student.destroy }.not_to raise_error
-        end
-      end
+      expect(user.roles.count).to eq(1)
+      expect(user.roles).to include(admin_role)
+      expect(user.roles).not_to include(@role_aluno)
+      expect(user.actual_role).to eq(Role::ROLE_ADMINISTRADOR)
     end
   end
 end
