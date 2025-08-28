@@ -26,10 +26,11 @@ RSpec.describe "Users features", type: :feature do
     @role_adm.delete
     @role_aluno.delete
     @role_professor.delete
+    UserRole.delete_all
   end
 
   it "sign admin in" do
-    @destroy_later << create_confirmed_user(@role_adm)
+    @destroy_later << create_confirmed_user([@role_adm])
     visit "/users/sign_in"
     within("#login_form") do
       fill_in "Email ou CPF", with: "user@ic.uff.br"
@@ -41,7 +42,7 @@ RSpec.describe "Users features", type: :feature do
 
   it "sign professor in by CPF" do
     @destroy_later << professor = Professor.create(name: "ana", cpf: "123.456.789-10")
-    @destroy_later << user = create_confirmed_user(@role_professor)
+    @destroy_later << user = create_confirmed_user([@role_professor], professor: professor)
     professor.user = user
     professor.save!
 
@@ -56,7 +57,7 @@ RSpec.describe "Users features", type: :feature do
 
   it "sign student in by CPF" do
     @destroy_later << student = Student.create(name: "ana", cpf: "123.456.789-10")
-    @destroy_later << user = create_confirmed_user(@role_aluno)
+    @destroy_later << user = create_confirmed_user([@role_aluno], student: student)
     student.user = user
     student.save!
 

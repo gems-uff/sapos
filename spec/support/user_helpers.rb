@@ -9,9 +9,9 @@ module UserHelpers
     end
   end
 
-  def create_confirmed_user(role, email = "user@ic.uff.br", name = "ana", password = "A1b2c3d4!", **kwargs)
+  def create_confirmed_user(roles, email = "user@ic.uff.br", name = "ana", password = "A1b2c3d4!", **kwargs)
     user = User.create(
-      role: role,
+      roles: roles,
       email: email,
       name: name,
       password: password,

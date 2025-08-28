@@ -26,7 +26,7 @@ RSpec.describe "Advisements features", type: :feature do
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level2)
     @destroy_all << @record = FactoryBot.create(:advisement_authorization, professor: @professor3, level: @level1)
 
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -36,6 +36,7 @@ RSpec.describe "Advisements features", type: :feature do
     @role_adm.delete
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
