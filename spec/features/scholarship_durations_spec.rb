@@ -46,6 +46,7 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
 
 
     @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Erica", cpf: "3")
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level2)
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment1, professor: @professor1, main_advisor: true)
 
     @destroy_all << @user = create_confirmed_user([@role_adm])

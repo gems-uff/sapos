@@ -83,6 +83,13 @@ RSpec.describe Enrollment, type: :model do
           expect(enrollment).not_to be_valid
           expect(enrollment).to have_error(:main_advisor_uniqueness).on(:base)
         end
+        it "has different level of his main advisor" do
+          professor = FactoryBot.build(:professor)
+          level = FactoryBot.build(:level)
+          professor.advisement_authorizations.build(level: level)
+          advisement = enrollment.advisements.build(professor: professor, main_advisor: true)
+          expect(advisement).to have_error(:main_advisor_should_has_level).on :base
+        end
       end
     end
     describe "thesis_defense_date" do

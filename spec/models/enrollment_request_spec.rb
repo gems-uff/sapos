@@ -710,6 +710,7 @@ RSpec.describe EnrollmentRequest, type: :model do
       @destroy_later << professor_role = FactoryBot.create(:role_professor)
       @destroy_scenario << @advisor = FactoryBot.create(:professor)
       @destroy_scenario << @user = FactoryBot.create(:user, roles: [professor_role], professor: @advisor)
+      @destroy_scenario << FactoryBot.create(:advisement_authorization, professor: @advisor, level: @level)
       @destroy_scenario << FactoryBot.create(:advisement, professor: @advisor, enrollment: enrollment3)
       @destroy_scenario << course1 = FactoryBot.create(:course, course_type: @course_type)
       @destroy_scenario << course2 = FactoryBot.create(:course, course_type: @course_type)

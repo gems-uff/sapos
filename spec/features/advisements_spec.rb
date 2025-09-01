@@ -33,6 +33,10 @@ RSpec.describe "Advisements features", type: :feature do
 
     @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment1, date: Date.today, dismissal_reason: @dismissal_reason)
 
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level2)
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level2)
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level1)
+
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment1, professor: @professor1, main_advisor: true)
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment2, professor: @professor2, main_advisor: true)
     @destroy_all << @record = FactoryBot.create(:advisement, enrollment: @enrollment3, professor: @professor1, main_advisor: true)
