@@ -63,7 +63,7 @@ RSpec.describe "Professors features", type: :feature do
     @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment1, main_advisor: false)
     @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment2, main_advisor: false)
 
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -73,6 +73,7 @@ RSpec.describe "Professors features", type: :feature do
     @role_adm.delete
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -99,14 +100,14 @@ RSpec.describe "Professors features", type: :feature do
       visit url_path
     end
     it "Should sort the list by the points of a level, asc, if clicked on its column first time" do
-      click_link "M"
+      click_link_and_wait "M"
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Dani", "Bia", "Carol"]
       expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["0.0", "0.5", "1.5"]
     end
 
     it "Should sort the list by the points of a level, desc, if clicked on its column second time" do
       2.times do
-        click_link "M"
+        click_link_and_wait "M"
       end
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Carol", "Bia", "Dani"]
       expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["1.5", "0.5", "0.0"]
@@ -114,7 +115,7 @@ RSpec.describe "Professors features", type: :feature do
 
     it "Should back to default sort, if clicked on its column third time" do
       3.times do
-        click_link "M"
+        click_link_and_wait "M"
       end
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia", "Carol", "Dani"]
       expect(page.all("tr td.advisement_points_of_level#{@level1.id}-column").map(&:text)).to eq ["0.5", "1.5", "0.0"]
@@ -125,7 +126,7 @@ RSpec.describe "Professors features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -135,7 +136,7 @@ RSpec.describe "Professors features", type: :feature do
         fill_in "Nome", with: "Ana"
         fill_in "CPF", with: "1"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Ana")
 
       # Remove inserted record
@@ -168,6 +169,7 @@ RSpec.describe "Professors features", type: :feature do
     it "should have a datepicker for birthdate with a range starting 100 years ago" do
       expect(page).not_to have_selector("#ui-datepicker-div")
       find("#record_birthdate_").click
+      wait_for_ajax
       expect(page).to have_selector("#ui-datepicker-div", visible: true)
       expect(page.all("select.ui-datepicker-year option").map(&:text)).to include(100.years.ago.year.to_s)
     end
@@ -194,7 +196,7 @@ RSpec.describe "Professors features", type: :feature do
         fill_in "Nome", with: "teste"
         fill_in "CPF", with: "9"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "teste")
       expect(page).to have_css("td.cpf-column", text: "9")
     end
@@ -217,7 +219,7 @@ RSpec.describe "Professors features", type: :feature do
   describe "edit as secretaria", js: true do
     before(:each) do
       @destroy_all << @role_sec = FactoryBot.create(:role_secretaria)
-      @destroy_all << @user_sec = create_confirmed_user(@role_sec, email: "secretaria@secretaria.com")
+      @destroy_all << @user_sec = create_confirmed_user([@role_sec], email: "secretaria@secretaria.com")
       login_as(@user_sec)
       visit url_path
       find("#as_#{plural_name}-edit-#{@record.id}-link").click
@@ -232,12 +234,12 @@ RSpec.describe "Professors features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do
       fill_in "search", with: "Bia"
-      sleep(0.8)
+      sleep(1)
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia"]
     end
   end

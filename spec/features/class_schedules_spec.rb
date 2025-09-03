@@ -13,7 +13,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << FactoryBot.create(
       :class_schedule, year: 2023, semester: 1,
@@ -53,6 +53,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -83,7 +84,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -93,7 +94,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
         find(:select, "record_year_").find(:option, text: YearSemester.current.year.to_s).select_option
         find(:select, "record_semester_").find(:option, text: YearSemester.current.semester.to_s).select_option
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.year-column", text: YearSemester.current.year.to_s)
 
       # Remove inserted record
@@ -145,7 +146,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
       within(".as_form") do
         fill_in "Data Limite para Remover Disciplinas", with: "15 Ago 2023 23:59:59"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.enrollment_remove-column", text: "15 Ago 2023 23:59:59")
       @record.enrollment_remove = DateTime.new(2022, 4, 27, 23, 59, 59, Time.zone.formatted_offset)
       @record.save!
@@ -153,7 +154,7 @@ RSpec.describe "ClassSchedules features", type: :feature do
 
     it "should be able to copy enrollment_start to period_start" do
       expect(find("input.period_start-input.datetime_picker").value).to eq "28 Mar 2022 00:00:00"
-      click_link "Repetir Data de Início das Inscrições"
+      click_link_and_wait "Repetir Data de Início das Inscrições"
       expect(find("input.period_start-input.datetime_picker").value).to eq "14 Mar 2022 00:00:00"
     end
 
@@ -174,12 +175,12 @@ RSpec.describe "ClassSchedules features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do
       find(:select, "search_year").find(:option, text: "2022").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.year-column").map(&:text)).to eq ["2022", "2022"]
     end
   end

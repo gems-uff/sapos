@@ -15,7 +15,7 @@ RSpec.describe "Notifications features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << @level1 = FactoryBot.create(:level, name: "Doutorado")
     @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
@@ -45,6 +45,7 @@ RSpec.describe "Notifications features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -69,7 +70,7 @@ RSpec.describe "Notifications features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -81,7 +82,7 @@ RSpec.describe "Notifications features", type: :feature do
         fill_in "Template do Assunto", with: "Assunto"
         find(:select, "record_query_").find(:option, text: "queries").select_option
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.title-column", text: "Query")
 
       # Remove inserted record
@@ -105,10 +106,10 @@ RSpec.describe "Notifications features", type: :feature do
       TEXT
       )
 
-      click_link "SQL"
+      click_link_and_wait "SQL"
       expect(page).to have_selector("#record_query_container .CodeMirror-code", visible: false)
 
-      click_link "SQL"
+      click_link_and_wait "SQL"
       expect(page).to have_selector("#record_query_container .CodeMirror-code", visible: true)
     end
 
@@ -128,7 +129,7 @@ RSpec.describe "Notifications features", type: :feature do
       within(".as_form") do
         fill_in "Título", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.title-column", text: "Teste")
       @record.title = "despedida"
       @record.save!
@@ -148,7 +149,7 @@ RSpec.describe "Notifications features", type: :feature do
     end
 
     it "should be able to notify now" do
-      click_link "Notificar agora"
+      click_link_and_wait "Notificar agora"
       expect(page).to have_content "Notificação disparada com sucesso"
     end
   end
@@ -175,7 +176,7 @@ RSpec.describe "Notifications features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by title" do

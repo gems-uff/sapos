@@ -13,7 +13,7 @@ RSpec.describe "Allocations features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << @course_type1 = FactoryBot.create(:course_type, name: "Obrigatória", has_score: true, schedulable: true, show_class_name: false, allow_multiple_classes: false, on_demand: false)
     @destroy_all << @course_type3 = FactoryBot.create(:course_type, name: "Tópicos", has_score: true, schedulable: true, show_class_name: true, allow_multiple_classes: true, on_demand: false)
@@ -52,6 +52,7 @@ RSpec.describe "Allocations features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -76,7 +77,7 @@ RSpec.describe "Allocations features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -88,7 +89,7 @@ RSpec.describe "Allocations features", type: :feature do
         fill_in "Hora de início", with: "9"
         fill_in "Hora de fim", with: "11"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.course_class-column", text: "Programação - 2022/2")
 
       # Remove inserted record
@@ -108,7 +109,7 @@ RSpec.describe "Allocations features", type: :feature do
         fill_in "Hora de início", with: "11"
         fill_in "Hora de fim", with: "9"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_content "Hora de início menor do que a hora de fim"
     end
 
@@ -120,7 +121,7 @@ RSpec.describe "Allocations features", type: :feature do
         fill_in "Hora de início", with: "10"
         fill_in "Hora de fim", with: "12"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_content "Hora de fim este horário já está sendo usado em outra alocação da mesma turma"
     end
 
@@ -144,7 +145,7 @@ RSpec.describe "Allocations features", type: :feature do
       within(".as_form") do
         fill_in "Sala", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.room-column", text: "Teste")
     end
   end
@@ -153,7 +154,7 @@ RSpec.describe "Allocations features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by day" do

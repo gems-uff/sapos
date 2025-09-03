@@ -30,7 +30,7 @@ RSpec.describe "Student features", type: :feature do
     )
     @destroy_all << FactoryBot.create(:student, name: "Dani", cpf: "4")
     @destroy_all << FactoryBot.create(:enrollment, enrollment_number: "M001", student: @record, level: level, enrollment_status: enrollment_status)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -40,6 +40,7 @@ RSpec.describe "Student features", type: :feature do
     @role_adm.delete
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -68,7 +69,7 @@ RSpec.describe "Student features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -78,7 +79,7 @@ RSpec.describe "Student features", type: :feature do
         fill_in "Nome", with: "Ana"
         fill_in "CPF", with: "1"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Ana")
       expect(Student.last.photo.file).to eq nil
 
@@ -98,7 +99,7 @@ RSpec.describe "Student features", type: :feature do
         fill_in "CPF", with: "5"
         attach_file("Foto", Rails.root + "spec/fixtures/user.png")
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Erica")
       expect(Student.last.photo.file).not_to eq nil
     end
@@ -173,7 +174,7 @@ RSpec.describe "Student features", type: :feature do
         fill_in "Nome", with: "teste"
         fill_in "CPF", with: "9"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "teste")
       expect(page).to have_css("td.cpf-column", text: "9")
     end
@@ -203,7 +204,7 @@ RSpec.describe "Student features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do

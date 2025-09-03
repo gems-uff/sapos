@@ -13,7 +13,7 @@ RSpec.describe "Deferrals features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << @level1 = FactoryBot.create(:level, name: "Doutorado")
     @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
@@ -52,6 +52,7 @@ RSpec.describe "Deferrals features", type: :feature do
     PhaseCompletion.delete_all
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -76,7 +77,7 @@ RSpec.describe "Deferrals features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -88,7 +89,7 @@ RSpec.describe "Deferrals features", type: :feature do
         select_month_year_i("record_approval_date", Date.today)
         find(:select, "record_deferral_type_").find(:option, text: "Regular").select_option
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04 - Dani")
 
       # Remove inserted record
@@ -123,12 +124,12 @@ RSpec.describe "Deferrals features", type: :feature do
     end
 
     it "should be able to edit student" do
-      page.send_keys :escape
+      page.driver.browser.action.send_keys(:escape).perform
       date = 3.months.from_now
       within(".as_form") do
         select_month_year_i("record_approval_date", date)
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("#as_#{plural_name}-list-#{@record.id}-row td.approval_date-column", text: I18n.l(date, format: "%B-%Y"))
     end
   end
@@ -137,7 +138,7 @@ RSpec.describe "Deferrals features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by enrollment number" do

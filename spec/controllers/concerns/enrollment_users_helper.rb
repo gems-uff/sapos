@@ -10,7 +10,7 @@ shared_examples_for "enrollment_user_helper" do
   before(:all) do
     @enrollment_status_with_user = FactoryBot.create(:enrollment_status, user: true)
     @enrollment_status_without_user = FactoryBot.create(:enrollment_status, user: false)
-    @role = FactoryBot.create(:role)
+    @role = FactoryBot.create(:role_aluno)
     @destroy_later = []
   end
   after(:each) do
@@ -92,11 +92,11 @@ shared_examples_for "enrollment_user_helper" do
     let(:enrollments) do
       emails = ["abc@def.com", "def@ghi.com", "ghi@jkl.com", "jkl@mno.com", "mno@pqr.com"]
       delete_users_by_emails emails
-      @destroy_later << FactoryBot.create(:user, email: "abc@def.com", role: @role)
       students = emails.map do |email|
         @destroy_later << student = FactoryBot.create(:student, email: email)
         student
       end
+      @destroy_later << FactoryBot.create(:user, email: "abc@def.com", roles: [@role], student: students[0])
       students << student = FactoryBot.create(:student, email: nil)
       @destroy_later << student
       enrollments = students.map { |student| FactoryBot.build(:enrollment, student: student, enrollment_status: @enrollment_status_with_user) }
@@ -137,7 +137,6 @@ shared_examples_for "enrollment_user_helper" do
     let(:enrollments) do
       emails = ["abc@def.com", "def@ghi.com", "ghi@jkl.com", "jkl@mno.com", "mno@pqr.com"]
       delete_users_by_emails emails
-      @destroy_later << FactoryBot.create(:user, email: "abc@def.com", role: @role)
       students = emails.map do |email|
         @destroy_later << student = FactoryBot.create(:student, email: email)
         student
@@ -145,6 +144,7 @@ shared_examples_for "enrollment_user_helper" do
       students << student = FactoryBot.create(:student, email: nil)
       @destroy_later << student
       enrollments = students.map { |student| FactoryBot.build(:enrollment, student: student, enrollment_status: @enrollment_status_with_user) }
+      @destroy_later << FactoryBot.create(:user, email: "abc@def.com", roles: [@role], student: students[0])
       enrollments << FactoryBot.build(:enrollment, student: students[1], enrollment_status: @enrollment_status_with_user)
       enrollments[2].enrollment_status = @enrollment_status_without_user
       enrollments[3].dismissal = FactoryBot.build(:dismissal)

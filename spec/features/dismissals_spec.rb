@@ -13,7 +13,7 @@ RSpec.describe "Dismissal features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
     @destroy_all << @level = FactoryBot.create(:level, name: "Doutorado")
     @destroy_all << @enrollment_status = FactoryBot.create(:enrollment_status, name: "Regular")
     @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana")
@@ -39,6 +39,7 @@ RSpec.describe "Dismissal features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -63,7 +64,7 @@ RSpec.describe "Dismissal features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -74,7 +75,7 @@ RSpec.describe "Dismissal features", type: :feature do
         find(:select, "record_dismissal_reason_").find(:option, text: @dismissal_reason1.name).select_option
         select_month_year_i("record_date", Date.today)
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04")
       expect(page).to have_css("tr:nth-child(1) td.dismissal_reason-column", text: @dismissal_reason1.name)
 
@@ -107,7 +108,7 @@ RSpec.describe "Dismissal features", type: :feature do
       within(".as_form") do
         fill_in "Observação", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("tr:nth-child(1) td.obs-column", text: "Teste")
     end
 
@@ -120,33 +121,33 @@ RSpec.describe "Dismissal features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by enrollment" do
       fill_in "Matrícula", with: "M03"
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M03 - Carol"]
     end
 
     it "should be able to search by enrollment level" do
       expect(page.all("select#search_level option").map(&:text)).to eq ["", "Doutorado"]
       find(:select, "search_level").find(:option, text: "Doutorado").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Ana", "M01 - Bia", "M03 - Carol"]
     end
 
     it "should be able to search by dismissal date" do
       year = 2.years.ago.year
       find(:select, "search_date_year").find(:option, text: year).select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M03 - Carol"]
     end
 
     it "should be able to search by dismissal reason" do
       expect(page.all("select#search_dismissal_reason option").map(&:text)).to eq ["Selecione uma opção", "Reprovado", "Titulação"]
       find(:select, "search_dismissal_reason").find(:option, text: "Reprovado").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Ana", "M03 - Carol"]
     end
   end

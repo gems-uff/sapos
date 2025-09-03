@@ -13,7 +13,7 @@ RSpec.describe "CustomVariables features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << @record = FactoryBot.create(:custom_variable, variable: "single_advisor_points", value: "1.0")
     @destroy_all << FactoryBot.create(:custom_variable, variable: "minimum_grade_for_approval", value: "6.0")
@@ -25,6 +25,7 @@ RSpec.describe "CustomVariables features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -49,7 +50,7 @@ RSpec.describe "CustomVariables features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -59,7 +60,7 @@ RSpec.describe "CustomVariables features", type: :feature do
         find(:select, "record_variable_").find(:option, text: "identity_issuing_country").select_option
         fill_in "Valor", with: "Brasil"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.variable-column", text: "identity_issuing_country")
 
       # Remove inserted record
@@ -87,7 +88,7 @@ RSpec.describe "CustomVariables features", type: :feature do
       within(".as_form") do
         fill_in "Descrição", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.description-column", text: "Teste")
     end
   end
@@ -96,7 +97,7 @@ RSpec.describe "CustomVariables features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by variable" do

@@ -20,7 +20,7 @@ RSpec.describe "Users features", type: :feature do
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
     @destroy_all << FactoryBot.create(:role_suporte)
 
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
     @destroy_all << FactoryBot.create(:user, email: "user3@ic.uff.br", name: "carol")
     @destroy_all << @record = FactoryBot.create(:user, email: "user2@ic.uff.br", name: "bia")
   end
@@ -31,6 +31,7 @@ RSpec.describe "Users features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -42,7 +43,7 @@ RSpec.describe "Users features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Usuários"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Email", "Nome do usuário", "Papel", ""
+        "Email", "Nome do usuário", "Papéis", ""
       ]
     end
 
@@ -55,18 +56,18 @@ RSpec.describe "Users features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
       # Insert record
       expect(page).to have_content "Adicionar Usuário"
       within("#as_#{plural_name}-create--form") do
-        find(:select, "record_role_").find(:option, text: "Administrador").select_option
+        find(:label, text: "Administrador").select_option
         fill_in "Email", with: "user4@ic.uff.br"
         fill_in "Nome do usuário", with: "dani"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "dani")
 
       # Remove inserted record
@@ -79,7 +80,8 @@ RSpec.describe "Users features", type: :feature do
     end
 
     it "should have a selection for role options" do
-      expect(page.all("select#record_role_ option").map(&:text)).to eq ["Selecione uma opção", "Administrador", "Aluno", "Coordenação", "Desconhecido", "Professor", "Secretaria", "Suporte"]
+      labels = page.all("li.form-element.select dl dd label").map(&:text)
+      expect(labels).to eq ["Administrador", "Coordenação", "Secretaria", "Professor", "Suporte", "Aluno"]
     end
 
     it "should have a record_select widget for professor" do
@@ -102,7 +104,7 @@ RSpec.describe "Users features", type: :feature do
       within(".as_form") do
         fill_in "Nome do usuário", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
       @record.name = "bia"
       @record.save!
@@ -113,7 +115,7 @@ RSpec.describe "Users features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do

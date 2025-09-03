@@ -15,7 +15,7 @@ RSpec.describe "Majors features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << @level1 = FactoryBot.create(:level, name: "Doutorado")
     @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
@@ -41,6 +41,7 @@ RSpec.describe "Majors features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -60,7 +61,7 @@ RSpec.describe "Majors features", type: :feature do
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Ciência da Computação", "Ciência da Computação", "Sistemas de Informação"]
     end
 
-    it "should show a list of students" do 
+    it "should show a list of students" do
       expect(page).to have_css("#as_#{plural_name}-list-#{@major1.id}-row td.students-column", text: "Ana, Bia")
     end
   end
@@ -69,7 +70,7 @@ RSpec.describe "Majors features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -80,7 +81,7 @@ RSpec.describe "Majors features", type: :feature do
         find(:select, "record_level_").find(:option, text: @level3.name).select_option
       end
       fill_record_select("institution_", "institutions", "Flum")
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Tecnologia em Sistemas de Computação")
 
       # Remove inserted record
@@ -112,7 +113,7 @@ RSpec.describe "Majors features", type: :feature do
       within(".as_form") do
         fill_in "Nome", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
     end
   end
@@ -121,7 +122,7 @@ RSpec.describe "Majors features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do
