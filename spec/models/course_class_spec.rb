@@ -44,7 +44,7 @@ RSpec.describe CourseClass, type: :model do
     # describe "professor_changed_only_valid_fields" do
     #   it "should prevent professors from changing fields" do
     #     @destroy_later << role = FactoryBot.create(:role_professor)
-    #     @destroy_later << user = FactoryBot.create(:user, role: role)
+    #     @destroy_later << user = FactoryBot.create(:user, actual_role: actual_role)
     #     user.confirmed_at = Time.zone.now
     #     user.save
     #     sign_in user

@@ -63,7 +63,7 @@ RSpec.describe "Professors features", type: :feature do
     @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment1, main_advisor: false)
     @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment2, main_advisor: false)
 
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -73,6 +73,7 @@ RSpec.describe "Professors features", type: :feature do
     @role_adm.delete
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -218,7 +219,7 @@ RSpec.describe "Professors features", type: :feature do
   describe "edit as secretaria", js: true do
     before(:each) do
       @destroy_all << @role_sec = FactoryBot.create(:role_secretaria)
-      @destroy_all << @user_sec = create_confirmed_user(@role_sec, email: "secretaria@secretaria.com")
+      @destroy_all << @user_sec = create_confirmed_user([@role_sec], email: "secretaria@secretaria.com")
       login_as(@user_sec)
       visit url_path
       find("#as_#{plural_name}-edit-#{@record.id}-link").click
