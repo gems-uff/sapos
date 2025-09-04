@@ -118,7 +118,7 @@ class CustomVariable < ApplicationRecord
 
   def self.instance_name
     config = CustomVariable.find_by_variable(:instance_name)
-    config.value
+    config.blank? ? nil : config.value
   end
 
   def to_label
