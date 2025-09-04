@@ -1043,9 +1043,9 @@ ActiveRecord::Schema[7.0].define(version: 2025_06_27_135451) do
     t.string "photo", limit: 255
     t.integer "birth_country_id"
     t.integer "user_id", limit: 8
-    t.string "gender"
     t.string "skin_color"
     t.string "pcd"
+    t.string "gender"
     t.string "refugee"
     t.text "obs_pcd"
     t.text "obs_refugee"
