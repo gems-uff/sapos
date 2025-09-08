@@ -21,7 +21,7 @@ RSpec.describe EnrollmentHold, type: :model do
   end
 
   let(:enrollment) { 
-    enrollment = FactoryBot.build(:enrollment, admission_date: 2.year.ago.to_date)
+    enrollment = FactoryBot.build(:enrollment, admission_date: YearSemester.current.semester_begin - 2.years)
   }
   let(:enrollment_hold) do
     EnrollmentHold.new(
