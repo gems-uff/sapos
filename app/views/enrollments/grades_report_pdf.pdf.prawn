@@ -6,7 +6,7 @@
 new_document(
   @filename,
   I18n.t("pdf_content.enrollment.grades_report.title"),
-  watermark: (
+  watermark: @watermark ? true : (
     current_user.nil? ? false : cannot?(
       :generate_report_without_watermark, @enrollment
     )
