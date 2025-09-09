@@ -43,7 +43,8 @@ RSpec.describe "Enrollments features", type: :feature do
 
     @destroy_all << FactoryBot.create(:program_level)
 
-    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level2, enrollment_status: @enrollment_status1, admission_date: 3.years.ago.at_beginning_of_month.to_date)
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level2,
+     enrollment_status: @enrollment_status1, admission_date: YearSemester.current.semester_begin - 3.years)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student2, level: @level2, enrollment_status: @enrollment_status2)
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status1, research_area: @reasearch_area1)
     @record = @enrollment1
@@ -192,7 +193,7 @@ RSpec.describe "Enrollments features", type: :feature do
     end
 
     it "should be able to search by admision_date" do
-      select_month_year("search_admission_date", 3.years.ago.at_beginning_of_month.to_date)
+      select_month_year("search_admission_date", YearSemester.current.semester_begin - 3.years)
       click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
     end
