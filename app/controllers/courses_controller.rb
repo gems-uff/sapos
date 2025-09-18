@@ -14,17 +14,18 @@ class CoursesController < ApplicationController
 
     config.columns.add :workload_text
     config.columns = [
-      :name, :code, :credits, :workload, :course_research_areas,
+      :name, :code, :credits, :workload, :course_research_areas, :course_research_lines,
       :content, :course_type, :available
     ]
     config.list.columns = [
-      :name, :code, :course_research_areas, :credits,
+      :name, :code, :course_research_lines, :credits,
       :workload_text, :course_type, :available
     ]
     config.field_search.columns = [
       :name,
       :course_type,
       :course_research_areas,
+      :course_research_lines,
       :available
     ]
 
@@ -35,6 +36,12 @@ class CoursesController < ApplicationController
     }
     config.columns[:course_research_areas].search_sql = "research_areas.name"
     config.columns[:course_research_areas].search_ui = :text
+
+    config.columns[:course_research_lines].includes = {
+      course_research_lines: :research_line
+    }
+    config.columns[:course_research_lines].search_sql = "research_lines.name"
+    config.columns[:course_research_lines].search_ui = :text
     config.actions.exclude :deleted_records
   end
   record_select(
