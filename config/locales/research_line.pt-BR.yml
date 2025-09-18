@@ -4,17 +4,17 @@
 pt-BR:
   activerecord:
     attributes:
-      research_area:
+      research_line:
         code: "Código"
         name: "Nome"
-        professor_research_areas: "Professores"
+        research_area: "Área de Pesquisa"
+        professor_research_lines: "Professores"
         professors: "Professores"
-        research_lines: "Linhas de Pesquisa"
 
     models:
-      research_area:
-        one: "Área de Pesquisa"
-        other: "Áreas de Pesquisa"
+      research_line:
+        one: "Linha de Pesquisa"
+        other: "Linhas de Pesquisa"
 
   active_scaffold:
-    create_research_area_label: "Adicionar Área de Pesquisa"
+    create_research_line_label: "Adicionar Linha de Pesquisa"
