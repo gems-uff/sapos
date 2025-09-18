@@ -16,7 +16,8 @@ class ResearchAreasController < ApplicationController
     }
 
     config.columns = [:name, :code, :professor_research_areas]
-    config.list.columns = [:name, :code]
+    config.list.columns = [:name, :code, :research_lines]
+    config.show.columns.add :research_lines
 
     config.actions.exclude :deleted_records
   end

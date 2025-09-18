@@ -10,8 +10,12 @@ class Course < ApplicationRecord
   belongs_to :course_type, optional: false
 
   has_many :course_research_areas, dependent: :destroy
+  has_many :course_research_lines, dependent: :destroy
   has_many :course_classes, dependent: :restrict_with_exception
   has_many :research_areas, through: :course_research_areas
+  has_many :research_lines, through: :course_research_lines
+
+  validate :verify_research_lines
 
   validates :course_type, presence: true
   validates :name, presence: true
@@ -55,6 +59,16 @@ class Course < ApplicationRecord
       end
     end
     ids
+  end
+
+  def verify_research_lines
+    unless course_research_lines.blank?
+      research_lines.each do |rl|
+        unless research_areas.include?(rl.research_area)
+          errors.add(:course_research_lines, :lines_should_correspond_to_area)
+        end
+      end
+    end
   end
 
   private

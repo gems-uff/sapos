@@ -12,6 +12,7 @@ pt-BR:
         credits: "Créditos"
         name: "Nome"
         course_research_areas: "Áreas de Pesquisa"
+        course_research_lines: "Linhas de Pesquisa"
         workload: "Carga Horária"
         empty_workload: "N/A"
         workload_time: "%{time}h"
@@ -21,6 +22,7 @@ pt-BR:
       models:
         course:
           check_unique_name_for_available_courses: "de disciplina já existe no currículo vigente"
+          lines_should_correspond_to_area: "devem possuir as Áreas correspondentes"
 
     models:
       course:
