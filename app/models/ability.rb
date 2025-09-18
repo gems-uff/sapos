@@ -16,7 +16,8 @@ class Ability
   PROFESSOR_MODELS = [
     Professor, Advisement, AdvisementAuthorization,
     ThesisDefenseCommitteeParticipation,
-    ProfessorResearchArea, Grant, Paper, PaperProfessor, PaperStudent, Affiliation
+    ProfessorResearchArea, ProfessorResearchLine, Grant,
+    Paper, PaperProfessor, PaperStudent, Affiliation
   ]
 
   SCHOLARSHIP_MODELS = [
@@ -30,7 +31,7 @@ class Ability
   ]
 
   COURSE_MODELS = [
-    ResearchArea, Course, CourseType, CourseClass, ClassSchedule,
+    ResearchArea, ResearchLine, Course, CourseType, CourseClass, ClassSchedule,
     ClassEnrollment, Allocation, EnrollmentRequest, ClassEnrollmentRequest,
     EnrollmentRequestComment,
   ]
