@@ -18,7 +18,7 @@ class CoursesController < ApplicationController
       :content, :course_type, :available
     ]
     config.list.columns = [
-      :name, :code, :course_research_lines, :credits,
+      :name, :code, :course_research_areas, :credits,
       :workload_text, :course_type, :available
     ]
     config.field_search.columns = [

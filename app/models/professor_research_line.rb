@@ -21,8 +21,7 @@ class ProfessorResearchLine < ApplicationRecord
   end
 
   def verify_area
-    puts "AAAAAAAAAAAAAAAAAAAAAAA"
-    unless professor.research_areas.include?(research_line.research_area)
+    unless professor.blank? || research_line.blank? || professor.research_areas.include?(research_line.research_area)
       errors.add(:professor, :professor_area)
     end
   end

@@ -15,8 +15,6 @@ class Course < ApplicationRecord
   has_many :research_areas, through: :course_research_areas
   has_many :research_lines, through: :course_research_lines
 
-  validate :verify_research_lines
-
   validates :course_type, presence: true
   validates :name, presence: true
   validates :code, presence: true, uniqueness: true
@@ -59,16 +57,6 @@ class Course < ApplicationRecord
       end
     end
     ids
-  end
-
-  def verify_research_lines
-    unless course_research_lines.blank?
-      research_lines.each do |rl|
-        unless research_areas.include?(rl.research_area)
-          errors.add(:course_research_lines, :lines_should_correspond_to_area)
-        end
-      end
-    end
   end
 
   private

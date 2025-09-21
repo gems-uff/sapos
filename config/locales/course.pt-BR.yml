@@ -22,7 +22,6 @@ pt-BR:
       models:
         course:
           check_unique_name_for_available_courses: "de disciplina já existe no currículo vigente"
-          lines_should_correspond_to_area: "devem possuir as Áreas correspondentes"
 
     models:
       course:

@@ -9,6 +9,8 @@ class CourseResearchLine < ApplicationRecord
   belongs_to :course, optional: false
   belongs_to :research_line, optional: false
 
+  validate :verify_area
+
   validates :course, presence: true
   validates :research_line, presence: true
   validates :course,
@@ -19,8 +21,8 @@ class CourseResearchLine < ApplicationRecord
   end
 
   def verify_area
-    unless course.research_areas.include?(research_line.research_area)
-      errors.add(:course, :course_area)
+    unless course.blank? || research_line.blank? || course.research_areas.include?(research_line.research_area)
+      errors.add(:research_line, :course_area)
     end
   end
 end
