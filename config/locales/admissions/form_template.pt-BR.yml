@@ -81,6 +81,7 @@ pt-BR:
           indigenous: Indígena
         gender: Gênero
         genders:
+          not_declared: Não declarado
           men_cis: Homem cisgênero
           women_cis: Mulher cisgênero
           men_trans: Homem transgênero
