@@ -6,5 +6,12 @@ class UpdateGenderStudent < ActiveRecord::Migration[7.0]
       student.update(gender: nil)
       student.save
     end
+
+    nd_sex = "ND"
+
+    Student.where(sex: nd_sex).each do |student|
+      student.update(sex: nil)
+      student.save
+    end
   end
 end
