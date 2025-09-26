@@ -522,7 +522,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
     t.date "thesis_defense_date"
     t.integer "research_area_id"
     t.text "obs_to_academic_transcript"
-    t.string "admission_selection"
     t.index ["enrollment_number"], name: "index_enrollments_on_enrollment_number"
     t.index ["enrollment_status_id"], name: "index_enrollments_on_enrollment_status_id"
     t.index ["level_id"], name: "index_enrollments_on_level_id"
@@ -1121,7 +1120,4 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
     t.datetime "created_at", precision: nil
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
-
-  add_foreign_key "user_roles", "roles"
-  add_foreign_key "user_roles", "users"
 end
