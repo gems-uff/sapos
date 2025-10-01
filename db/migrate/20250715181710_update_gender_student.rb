@@ -14,17 +14,22 @@ class UpdateGenderStudent < ActiveRecord::Migration[7.0]
       student.save
     end
 
-    Student.where(humanitarian_policy: "Não declarado").each do |student|
+    actual_hp = I18n.t("active_scaffold.admissions/form_template.generate_fields.humanitarian_policies").values
+
+    Student.where.not(humanitarian_policy: actual_hp).each do |student|
       student.update(humanitarian_policy: nil)
       student.save
     end
 
-    Student.where(pcd: "Não declarado").each do |student|
+    actual_pcd = I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
+
+    Student.where.not(pcd: actual_pcd).each do |student|
       student.update(pcd: nil)
       student.save
     end
 
-    Student.where(skin_color: "Não declarado").each do |student|
+    actual_skin_color = I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
+    Student.where.not(skin_color: actual_skin_color).each do |student|
       student.update(skin_color: nil)
       student.save
     end
