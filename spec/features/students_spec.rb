@@ -136,8 +136,8 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for skin_color options" do
-      expect(page.all("select#record_skin_color_ option").map(&:text)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
-      expect(page.all("select#record_skin_color_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
+      expect(page.all("select#record_skin_color_ option").map(&:text)).to eq ['Não declarado'] + I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
+      expect(page.all("select#record_skin_color_ option").map(&:value)).to eq [''] + I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
     end
 
     it "should have a selection for gender options" do
@@ -147,7 +147,7 @@ RSpec.describe "Student features", type: :feature do
 
     it "should have a selection for civil_status options" do
       expect(page.all("select#record_civil_status_ option").map(&:text)).to eq ["Não declarado", "Solteiro(a)", "Casado(a)"]
-      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["", "Solteiro(a)", "Casado(a)"]
+      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["Não declarado", "Solteiro(a)", "Casado(a)"]
     end
 
     it "should have identity issuing place widget for identity issuing place" do
