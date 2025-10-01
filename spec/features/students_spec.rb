@@ -119,8 +119,8 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for pcd options" do
-      expect(page.all("select#record_pcd_ option").map(&:text)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
-      expect(page.all("select#record_pcd_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
+      expect(page.all("select#record_pcd_ option").map(&:text)).to eq ['Não declarado'] +I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
+      expect(page.all("select#record_pcd_ option").map(&:value)).to eq [''] + I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
     end
 
     it "should have a textarea for obs pcd" do
@@ -141,13 +141,13 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for gender options" do
-      expect(page.all("select#record_gender_ option").map(&:text)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
-      expect(page.all("select#record_gender_ option").map(&:value)).to eq I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
+      expect(page.all("select#record_gender_ option").map(&:text)).to eq ['Não declarado'] + I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
+      expect(page.all("select#record_gender_ option").map(&:value)).to eq [''] + I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
     end
 
     it "should have a selection for civil_status options" do
       expect(page.all("select#record_civil_status_ option").map(&:text)).to eq ["Não declarado", "Solteiro(a)", "Casado(a)"]
-      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["Não declarado", "Solteiro(a)", "Casado(a)"]
+      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["", "Solteiro(a)", "Casado(a)"]
     end
 
     it "should have identity issuing place widget for identity issuing place" do
