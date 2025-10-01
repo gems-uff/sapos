@@ -36,10 +36,12 @@ class StudentsController < ApplicationController
 
     config.columns[:gender].form_ui = :select
     config.columns[:gender].options = {
+      include_blank: "Não declarado",
       options: I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
     }
     config.columns[:pcd].form_ui = :select
     config.columns[:pcd].options = {
+      include_blank: "Não declarado",
       options: I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
     }
     config.columns[:humanitarian_policy].form_ui = :select
@@ -60,6 +62,7 @@ class StudentsController < ApplicationController
     }
     config.columns[:skin_color].form_ui = :select
     config.columns[:skin_color].options = {
+      include_blank: "Não declarado",
       options: I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
     }
 

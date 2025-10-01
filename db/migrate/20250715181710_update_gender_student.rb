@@ -1,8 +1,8 @@
 class UpdateGenderStudent < ActiveRecord::Migration[7.0]
   def change
-    actual_genders = I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
+    actual_genders = I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values - ['Não declarado']
 
-    Student.where(gender: "Não declarado").each do |student|
+    Student.where.not(gender: actual_genders).each do |student|
       student.update(gender: nil)
       student.save
     end
