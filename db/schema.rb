@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_09_15_225156) do
+ActiveRecord::Schema[7.0].define(version: 2025_09_21_123658) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -938,8 +938,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_09_15_225156) do
     t.string "file_name"
     t.integer "invalidated_by_id"
     t.datetime "invalidated_at"
-    t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
-    t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
     t.index ["invalidated_by_id"], name: "index_reports_on_invalidated_by_id"
   end
 
@@ -948,6 +946,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_09_15_225156) do
     t.string "code", limit: 255
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.boolean "available"
   end
 
   create_table "research_lines", force: :cascade do |t|
@@ -956,6 +955,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_09_15_225156) do
     t.integer "research_area_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "available"
     t.index ["research_area_id"], name: "index_research_lines_on_research_area_id"
   end
 
