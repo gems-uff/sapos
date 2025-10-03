@@ -40,7 +40,7 @@ RSpec.describe "ResearchAreas features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Áreas de Pesquisa"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Nome", "Código", "Linhas de Pesquisa", ""
+        "Nome", "Código", "Linhas de Pesquisa", "Área de Pesquisa Ativa", ""
       ]
     end
 
