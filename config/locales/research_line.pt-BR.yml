@@ -10,6 +10,7 @@ pt-BR:
         research_area: "Área de Pesquisa"
         professor_research_lines: "Professores"
         professors: "Professores"
+        available: "Linha de Pesquisa Ativa"
 
     models:
       research_line:
