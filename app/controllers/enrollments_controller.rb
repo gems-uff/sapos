@@ -108,8 +108,10 @@ class EnrollmentsController < ApplicationController
     config.columns[:professor].includes = { advisements: :professor }
     config.columns[:professor].search_sql = "professors.name"
     config.columns[:professor].search_ui = :text
-    config.columns[:research_area].form_ui = :record_select
-    config.columns[:research_line].form_ui = :record_select
+    config.columns[:research_area].form_ui = :select
+    config.columns[:research_area].send_form_on_update_column = true
+    config.columns[:research_area].update_columns = [:research_line]
+    config.columns[:research_line].form_ui = :select
     config.columns[:scholarship_durations_active].search_sql = ""
     config.columns[:scholarship_durations_active].search_ui = :select
     config.columns[:student].form_ui = :record_select
