@@ -9,7 +9,7 @@ ruby "~> 3.2.5"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.0.8.1"
-
+gem 'concurrent-ruby', '1.3.4'
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 
