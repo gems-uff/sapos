@@ -69,11 +69,13 @@ module EnrollmentHelperConcern
       research_lines = ResearchLine.where(available: true,
        research_area: record.research_area).to_a
     else
-      research_lines = ResearchLine.where(available: true).to_a
+      research_lines = ResearchLine.joins(:research_area)
+      .where(available: true)
+      .where(research_areas: { available: true })
+      .to_a
     end
 
     if record.research_line.present? && !record.research_line.available?
-
       research_lines << record.research_line
     end
 

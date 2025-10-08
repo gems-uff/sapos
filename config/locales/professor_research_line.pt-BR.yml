@@ -1,7 +1,7 @@
 pt-BR:
   activerecord:
     attributes:
-      professor_research_area:
+      professor_research_line:
         professor: "Professor"
         research_line: "Linha de Pesquisa"
 

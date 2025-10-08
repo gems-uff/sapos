@@ -9,5 +9,6 @@ FactoryBot.define do
       "ResearchLine_#{code}"
     end
     research_area
+    available { true }
   end
 end

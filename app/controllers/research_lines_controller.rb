@@ -39,6 +39,8 @@ class ResearchLinesController < ApplicationController
   )
 
   def record_select_conditions_from_controller
-    [ResearchLine.arel_table[:available].eq(true).to_sql]
+    [ResearchLine.select(:id).joins(:research_area)
+      .where(available: true)
+      .where(research_areas: { available: true }).to_sql]
   end
 end
