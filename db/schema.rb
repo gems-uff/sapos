@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
+ActiveRecord::Schema[7.0].define(version: 2025_09_21_123658) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -383,6 +383,15 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
     t.index ["research_area_id"], name: "index_course_research_areas_on_research_area_id"
   end
 
+  create_table "course_research_lines", force: :cascade do |t|
+    t.integer "course_id", null: false
+    t.integer "research_line_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_course_research_lines_on_course_id"
+    t.index ["research_line_id"], name: "index_course_research_lines_on_research_line_id"
+  end
+
   create_table "course_types", force: :cascade do |t|
     t.string "name", limit: 255
     t.boolean "has_score", default: false, null: false
@@ -522,10 +531,12 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
     t.date "thesis_defense_date"
     t.integer "research_area_id"
     t.text "obs_to_academic_transcript"
+    t.integer "research_line_id"
     t.index ["enrollment_number"], name: "index_enrollments_on_enrollment_number"
     t.index ["enrollment_status_id"], name: "index_enrollments_on_enrollment_status_id"
     t.index ["level_id"], name: "index_enrollments_on_level_id"
     t.index ["research_area_id"], name: "index_enrollments_on_research_area_id"
+    t.index ["research_line_id"], name: "index_enrollments_on_research_line_id"
     t.index ["student_id"], name: "index_enrollments_on_student_id"
   end
 
@@ -768,6 +779,15 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
     t.index ["research_area_id"], name: "index_professor_research_areas_on_research_area_id"
   end
 
+  create_table "professor_research_lines", force: :cascade do |t|
+    t.integer "professor_id", null: false
+    t.integer "research_line_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["professor_id"], name: "index_professor_research_lines_on_professor_id"
+    t.index ["research_line_id"], name: "index_professor_research_lines_on_research_line_id"
+  end
+
   create_table "professors", force: :cascade do |t|
     t.string "name", limit: 255
     t.string "cpf", limit: 255
@@ -918,8 +938,6 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
     t.string "file_name"
     t.integer "invalidated_by_id"
     t.datetime "invalidated_at"
-    t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
-    t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
     t.index ["invalidated_by_id"], name: "index_reports_on_invalidated_by_id"
   end
 
@@ -928,6 +946,17 @@ ActiveRecord::Schema[7.0].define(version: 2025_07_15_181710) do
     t.string "code", limit: 255
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.boolean "available", default: true
+  end
+
+  create_table "research_lines", force: :cascade do |t|
+    t.string "name"
+    t.string "code"
+    t.integer "research_area_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "available", default: true
+    t.index ["research_area_id"], name: "index_research_lines_on_research_area_id"
   end
 
   create_table "roles", force: :cascade do |t|

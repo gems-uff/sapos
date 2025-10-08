@@ -54,7 +54,8 @@ class ProfessorsController < ApplicationController
       :identity_issuing_place, :identity_number, :enrollment_number,
       :siape, :scholarships, :academic_title_level,
       :academic_title_institution, :academic_title_country,
-      :academic_title_date, :obs, :professor_research_areas, :affiliations
+      :academic_title_date, :obs, :professor_research_areas, :professor_research_lines,
+      :affiliations
     ]
 
     config.create.columns = form_columns
@@ -68,6 +69,7 @@ class ProfessorsController < ApplicationController
       :advisement_authorizations, :advisements_with_points,
       :academic_title_level, :academic_title_institution,
       :academic_title_country, :academic_title_date, :obs, :research_areas,
+      :research_lines
     ]
 
     config.actions.exclude :deleted_records

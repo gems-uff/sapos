@@ -30,6 +30,8 @@ pt-BR:
         neighborhood: "Bairro"
         professor_research_areas: "Áreas de Pesquisa"
         research_areas: "Áreas de Pesquisa"
+        professor_research_lines: "Linhas de Pesquisa"
+        research_lines: "Linhas de Pesquisa"
         scholarships: "Bolsas"
         sex: "Sexo"
         telephone1: "1º Telefone"

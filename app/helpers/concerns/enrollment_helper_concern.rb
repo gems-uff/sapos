@@ -48,4 +48,43 @@ module EnrollmentHelperConcern
     end
   end
 
+  def custom_research_area_form_column(record, options)
+    research_areas = ResearchArea.where(available: true).to_a
+
+    if record.research_area.present? && !record.research_area.available?
+      research_areas << record.research_area
+    end
+
+    sorted_areas = research_areas.sort_by(&:name)
+
+    select_options = options_for_select(
+      sorted_areas.map { |ra| [ra.name, ra.id] },
+      record.research_area_id
+    )
+    select_tag(options[:name], select_options, options.merge(prompt: as_(:_select_)))
+  end
+
+  def custom_research_line_form_column(record, options)
+    if record.research_area.present?
+      research_lines = ResearchLine.where(available: true,
+       research_area: record.research_area).to_a
+    else
+      research_lines = ResearchLine.joins(:research_area)
+      .where(available: true)
+      .where(research_areas: { available: true })
+      .to_a
+    end
+
+    if record.research_line.present? && !record.research_line.available?
+      research_lines << record.research_line
+    end
+
+    sorted_lines = research_lines.sort_by(&:name)
+
+    select_options = options_for_select(
+      sorted_lines.map { |ra| [ra.name, ra.id] },
+      record.research_line_id
+    )
+    select_tag(options[:name], select_options, options.merge(prompt: as_(:_select_)))
+  end
 end

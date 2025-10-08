@@ -21,6 +21,7 @@ pt-BR:
         enrollment_number: "Número de Matrícula"
         enrollment_status: "Tipo de Matrícula"
         research_area: "Área de Concentração"
+        research_line: "Linha de Pesquisa"
         level: "Nível"
         phase: "Etapa"
         phase_completions: "Realização de Etapas"
@@ -52,6 +53,7 @@ pt-BR:
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
           thesis_defense_date_before_admission_date: "anterior a Data de Admissão"
           research_area_different_from_professors: "diferente de áreas de pesquisa do(s) orientador(es)"
+          :different_research_areas: "deve ser correspondente à area da linha de pesquisa selecionada"
 
     models:
       enrollment:

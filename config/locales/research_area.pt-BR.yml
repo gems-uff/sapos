@@ -9,6 +9,8 @@ pt-BR:
         name: "Nome"
         professor_research_areas: "Professores"
         professors: "Professores"
+        research_lines: "Linhas de Pesquisa"
+        available: "Área de Pesquisa Ativa"
 
     models:
       research_area:

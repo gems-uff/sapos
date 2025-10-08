@@ -12,6 +12,7 @@ pt-BR:
         credits: "Créditos"
         name: "Nome"
         course_research_areas: "Áreas de Pesquisa"
+        course_research_lines: "Linhas de Pesquisa"
         workload: "Carga Horária"
         empty_workload: "N/A"
         workload_time: "%{time}h"

@@ -32,6 +32,14 @@ module EnrollmentsHelper
     :level_form_column,
     :custom_level_form_column
   )
+  alias_method(
+    :research_area_form_column,
+    :custom_research_area_form_column
+  )
+  alias_method(
+    :research_line_form_column,
+    :custom_research_line_form_column
+  )
 
   # ClassEnrollmentHelperConcern
   alias_method(

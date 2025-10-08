@@ -41,6 +41,7 @@ pt-BR:
     courses:
       label: Disciplinas
       research_area: Áreas de Pesquisa
+      research_line: Linhas de Pesquisa
       course: Disciplinas
       course_type: Tipos de Disciplinas
       course_class: Turmas
