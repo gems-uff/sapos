@@ -5,9 +5,6 @@ FactoryBot.define do
     sequence :name do |name|
       "ResearchLine_#{name}"
     end
-    sequence :code do |code|
-      "ResearchLine_#{code}"
-    end
     research_area
     available { true }
   end

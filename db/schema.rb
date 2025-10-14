@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_09_21_123658) do
+ActiveRecord::Schema[7.0].define(version: 2025_10_14_131727) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -946,16 +946,15 @@ ActiveRecord::Schema[7.0].define(version: 2025_09_21_123658) do
     t.string "code", limit: 255
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "available", default: true
+    t.boolean "available"
   end
 
   create_table "research_lines", force: :cascade do |t|
     t.string "name"
-    t.string "code"
     t.integer "research_area_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "available", default: true
+    t.boolean "available"
     t.index ["research_area_id"], name: "index_research_lines_on_research_area_id"
   end
 
@@ -1072,9 +1071,9 @@ ActiveRecord::Schema[7.0].define(version: 2025_09_21_123658) do
     t.string "photo", limit: 255
     t.integer "birth_country_id"
     t.integer "user_id", limit: 8
-    t.string "gender"
     t.string "skin_color"
     t.string "pcd"
+    t.string "gender"
     t.string "humanitarian_policy"
     t.text "obs_pcd"
     t.text "obs_gender"
@@ -1149,4 +1148,5 @@ ActiveRecord::Schema[7.0].define(version: 2025_09_21_123658) do
     t.datetime "created_at", precision: nil
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
+
 end

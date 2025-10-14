@@ -10,12 +10,10 @@ class ResearchLinesController < ApplicationController
     config.actions.swap :search, :field_search
     config.field_search.columns = [
       :name,
-      :code,
       :research_area,
       :professors
     ]
     config.columns[:name].search_ui = :text
-    config.columns[:code].search_ui = :text
     config.columns[:professors].search_ui = :record_select
 
     config.list.sorting = { name: "ASC" }
@@ -25,9 +23,9 @@ class ResearchLinesController < ApplicationController
       professors: :professor_research_lines
     }
 
-    config.columns = [:name, :code, :research_area, :professor_research_lines, :available]
+    config.columns = [:name, :research_area, :professor_research_lines, :available]
     config.columns[:research_area].form_ui = :record_select
-    config.list.columns = [:name, :code, :research_area, :available]
+    config.list.columns = [:name, :research_area, :available]
 
     config.actions.exclude :deleted_records
   end

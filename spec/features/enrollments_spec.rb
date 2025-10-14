@@ -36,8 +36,8 @@ RSpec.describe "Enrollments features", type: :feature do
     @destroy_all << @research_area1 = FactoryBot.create(:research_area, name: "Ciência de Dados", code: "CD")
     @destroy_all << @research_area2 = FactoryBot.create(:research_area, name: "Engenharia de Software", code: "ES")
 
-    @destroy_all << @research_line1 = FactoryBot.create(:research_line, name: "Machine Learning", code: "CD-ML", research_area: @research_area1)
-    @destroy_all << @research_line2 = FactoryBot.create(:research_line, name: "Versionamento", code: "ES-VE", research_area: @research_area2)
+    @destroy_all << @research_line1 = FactoryBot.create(:research_line, name: "Machine Learning", research_area: @research_area1)
+    @destroy_all << @research_line2 = FactoryBot.create(:research_line, name: "Versionamento", research_area: @research_area2)
 
 
     @destroy_all << @phase2 = FactoryBot.create(:phase, name: "Pedido de Banca")

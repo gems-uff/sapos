@@ -15,9 +15,4 @@ class ResearchLine < ApplicationRecord
   has_many :professors, through: :professor_research_lines
 
   validates :name, presence: true, uniqueness: true
-  validates :code, presence: true, uniqueness: true
-
-  def to_label
-    "#{code} - #{name}"
-  end
 end

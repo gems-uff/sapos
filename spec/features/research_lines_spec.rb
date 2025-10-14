@@ -18,9 +18,9 @@ RSpec.describe "ResearchLines features", type: :feature do
     @destroy_all << @research_area = FactoryBot.create(:research_area, name: "Ciência da Computação", code: "CC")
     @destroy_all << @research_area1 = FactoryBot.create(:research_area, name: "Sistemas de Informação", code: "SI")
 
-    @destroy_all << FactoryBot.create(:research_line, name: "Ciência de Dados", code: "CD", research_area: @research_area)
-    @destroy_all << @record = FactoryBot.create(:research_line, name: "Engenharia de Software", code: "ES", research_area: @research_area)
-    @destroy_all << FactoryBot.create(:research_line, name: "Desenvolvimento Web", code: "DW", research_area: @research_area1)
+    @destroy_all << FactoryBot.create(:research_line, name: "Ciência de Dados", research_area: @research_area)
+    @destroy_all << @record = FactoryBot.create(:research_line, name: "Engenharia de Software", research_area: @research_area)
+    @destroy_all << FactoryBot.create(:research_line, name: "Desenvolvimento Web", research_area: @research_area1)
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -41,7 +41,7 @@ RSpec.describe "ResearchLines features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Linhas de Pesquisa"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Nome", "Código", "Área de Pesquisa", "Linha de Pesquisa Ativa", ""
+        "Nome", "Área de Pesquisa", "Linha de Pesquisa Ativa", ""
       ]
     end
 
@@ -62,7 +62,6 @@ RSpec.describe "ResearchLines features", type: :feature do
       fill_record_select("research_area_", "research_areas", "")
       within("#as_#{plural_name}-create--form") do
         fill_in "Nome", with: "Inteligência Artificial"
-        fill_in "Código", with: "IA"
       end
       click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Inteligência Artificial")
