@@ -26,6 +26,7 @@ class ResearchLinesController < ApplicationController
     config.columns = [:name, :research_area, :professor_research_lines, :available]
     config.columns[:research_area].form_ui = :record_select
     config.list.columns = [:name, :research_area, :available]
+    config.show.columns = [:name, :research_area, :professors, :courses, :available]
 
     config.actions.exclude :deleted_records
   end
