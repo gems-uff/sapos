@@ -145,9 +145,15 @@ RSpec.describe "Enrollments features", type: :feature do
 
     it "should update research_line columns when research_area is chosen" do
       within("#as_#{plural_name}-create--form") do
-        expect(page.all("select#record_research_line_ option").map(&:text)).to eq ["Selecione uma opção", "Machine Learning", "Versionamento"]
+        expect(page).to have_select(
+          "record_research_line_",
+          options: ["Selecione uma opção", "Machine Learning", "Versionamento"]
+        )
         find(:select, "record_research_area_").find(:option, text: @research_area1.name).select_option
-        expect(page.all("select#record_research_line_ option").map(&:text)).to eq ["Selecione uma opção", "Machine Learning"]
+        expect(page).to have_select(
+          "record_research_line_",
+          options: ["Selecione uma opção", "Machine Learning"]
+        )
       end
     end
   end
