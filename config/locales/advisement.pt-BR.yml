@@ -23,6 +23,7 @@ pt-BR:
       models:
         advisement:
           advisement_professor_uniqueness: "não pode ser orientador duas vezes da mesma matrícula"
+          main_advisor_should_has_level: "O orientador principal deve ter credenciamento no nivel da matrícula"
 
     models:
       advisement:

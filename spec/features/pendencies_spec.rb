@@ -68,6 +68,7 @@ RSpec.describe "Pendencies features", type: :feature do
     @destroy_all << @course_class7 = FactoryBot.create(:course_class, name: "Pesquisa", course: @course6, professor: @professor3, year: 0.years.ago.year, semester: YearSemester.current.semester)
     @destroy_all << @course_class8 = FactoryBot.create(:course_class, name: "Programação", course: @course7, professor: @professor1, year: 0.years.ago.year, semester: YearSemester.current.semester)
 
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level2)
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment1, professor: @professor1, main_advisor: true)
     @destroy_all << @sponsor1 = FactoryBot.create(:sponsor, name: "CNPq")
     @destroy_all << @scholarship_type2 = FactoryBot.create(:scholarship_type, name: "Projeto")
