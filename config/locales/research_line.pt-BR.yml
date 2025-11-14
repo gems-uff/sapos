@@ -5,7 +5,7 @@ pt-BR:
   activerecord:
     attributes:
       research_line:
-        code: "Código"
+        courses: "Disciplinas"
         name: "Nome"
         research_area: "Área de Pesquisa"
         professor_research_lines: "Professores"

@@ -61,6 +61,7 @@ class ClassEnrollmentRequest < ApplicationRecord
     if: -> { !student_saving && !marked_for_destruction? }
   validate :that_course_class_does_not_exist_in_a_class_enrollment,
     if: -> { !marked_for_destruction? }
+  validate :check_enrollment_hold
 
   before_validation :create_or_destroy_class_enrollment, on: %i[create update]
   after_save :destroy_or_create_class_enrollment
@@ -124,6 +125,12 @@ class ClassEnrollmentRequest < ApplicationRecord
   def remove_not_effected?
     self.action == ClassEnrollmentRequest::REMOVE &&
     self.status != ClassEnrollmentRequest::EFFECTED
+  end
+
+  def check_enrollment_hold
+    if self.course_class && EnrollmentHold.hold_in_date(enrollment, self.course_class.start_date, self.course_class.end_date)
+      errors.add(:enrollment, :enrollment_is_held)
+    end
   end
 
   protected

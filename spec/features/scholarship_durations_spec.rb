@@ -235,7 +235,7 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
       start_month = I18n.l(2.months.ago, format: "%B")
       find(:select, "suspended_start_month").find(:option, text: start_month).select_option
 
-      end_year = 0.years.ago.year
+      end_year = 1.year.from_now.year
       find(:select, "suspended_end_year").find(:option, text: end_year.to_s).select_option
 
       end_month = I18n.l(2.months.from_now, format: "%B")

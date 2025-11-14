@@ -19,6 +19,7 @@ pt-BR:
         enrollment_hold:
           before_admission_date: "anterior a Data de Admissão"
           after_dismissal_date: "posterior a Data de Desligamento"
+          class_enrollments_exist: "existem inscrições no período trancado"
 
     models:
       enrollment_hold:

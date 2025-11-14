@@ -60,6 +60,17 @@ RSpec.describe EnrollmentHold, type: :model do
           enrollment_hold.number_of_semesters = 20
           expect(enrollment_hold).to have_error(:after_dismissal_date).on :base
         end
+
+        it "exist class enrollment in enrollment hold period" do
+          @destroy_later << e = FactoryBot.create(:enrollment)
+          @destroy_later << cc = FactoryBot.create(:course_class, year: e.admission_date.year + 2)
+          @destroy_later << FactoryBot.create(:class_enrollment, enrollment: e, course_class: cc)
+          enrollment_hold.enrollment = e
+          enrollment_hold.year = e.admission_date.year + 1
+          enrollment_hold.semester = 2
+          enrollment_hold.number_of_semesters = 6
+          expect(enrollment_hold).to have_error(:class_enrollments_exist).on :base
+        end
       end
     end
   end
