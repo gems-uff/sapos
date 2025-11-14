@@ -57,19 +57,22 @@ pt-BR:
               color: red;
             }
           </style>
-        personal_data: Dados Pessoais
+        personal_data: Dados pessoais
         name: Nome
         birthdate: Data de nascimento
         birth_city: Naturalidade
-        refugee: Refugiado
-        refugees:
-          not_declared: Não declarado
-          no: Não
-          yes: Sim
+        humanitarian_policy: Política humanitária
+        humanitarian_policies:
+          not_applied: Não se aplica
+          refugee: Refugiado
+          asylum_seeker: Solicitante de refúgio
+          political_asylum: Asilado político
+          stateless: Apátrida
+          residence_humanitarian_reason: Portador de autorização de residência por motivo de acolhida humanitária
+          residence_humanitarian_br_policies: Portador de autorização de residência sob os quais recaem outras políticas humanitárias no Brasil
         sex: Sexo
         skin_color: Raça/cor
         skin_colors:
-          not_declared: Não declarado
           white: Branca
           black: Preta
           mixed: Parda
@@ -77,13 +80,14 @@ pt-BR:
           indigenous: Indígena
         gender: Gênero
         genders:
-          not_declared: Não declarado
-          cis: Cis
-          trans: Trans
+          men_cis: Homem cisgênero
+          women_cis: Mulher cisgênero
+          men_trans: Homem transgênero
+          women_trans: Mulher transgênero
+          non_binary: Pessoa não-binária
           others: Outros
         deficiency: Pessoa com deficiência
         deficiencies:
-          not_declared: Não declarado
           no: Não
           yes: Sim
         identity_or_passport: Número da identidade ou passaporte

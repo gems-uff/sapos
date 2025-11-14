@@ -33,7 +33,12 @@ RSpec.describe "Enrollments features", type: :feature do
     @destroy_all << @professor = FactoryBot.create(:professor, name: "João", cpf: "123.456.789-10")
     @destroy_all << @user3 = create_confirmed_user([@role_professor], "joao.sapos@ic.uff.br", "A1b2c3d4!", professor: @professor)
 
-    @destroy_all << @reasearch_area1 = FactoryBot.create(:research_area, name: "Ciência de Dados", code: "CD")
+    @destroy_all << @research_area1 = FactoryBot.create(:research_area, name: "Ciência de Dados", code: "CD")
+    @destroy_all << @research_area2 = FactoryBot.create(:research_area, name: "Engenharia de Software", code: "ES")
+
+    @destroy_all << @research_line1 = FactoryBot.create(:research_line, name: "Machine Learning", research_area: @research_area1)
+    @destroy_all << @research_line2 = FactoryBot.create(:research_line, name: "Versionamento", research_area: @research_area2)
+
 
     @destroy_all << @phase2 = FactoryBot.create(:phase, name: "Pedido de Banca")
     @destroy_all << @phase3 = FactoryBot.create(:phase, name: "Exame de Qualificação")
@@ -43,9 +48,10 @@ RSpec.describe "Enrollments features", type: :feature do
 
     @destroy_all << FactoryBot.create(:program_level)
 
-    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level2, enrollment_status: @enrollment_status1, admission_date: 3.years.ago.at_beginning_of_month.to_date)
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level2,
+     enrollment_status: @enrollment_status1, admission_date: YearSemester.current.semester_begin - 3.years)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student2, level: @level2, enrollment_status: @enrollment_status2)
-    @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status1, research_area: @reasearch_area1)
+    @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status1, research_area: @research_area1)
     @record = @enrollment1
 
     @destroy_all << @dismissal_reason1 = FactoryBot.create(:dismissal_reason, name: "Reprovado", thesis_judgement: "Reprovado")
@@ -137,8 +143,18 @@ RSpec.describe "Enrollments features", type: :feature do
       expect_to_have_month_year_widget_i(page, "admission_date")
     end
 
-    it "should have a record_select widget for research_area" do
-      expect_to_have_record_select(page, "research_area_", "research_areas")
+    it "should update research_line columns when research_area is chosen" do
+      within("#as_#{plural_name}-create--form") do
+        expect(page).to have_select(
+          "record_research_line_",
+          options: ["Selecione uma opção", "Machine Learning", "Versionamento"]
+        )
+        find(:select, "record_research_area_").find(:option, text: @research_area1.name).select_option
+        expect(page).to have_select(
+          "record_research_line_",
+          options: ["Selecione uma opção", "Machine Learning"]
+        )
+      end
     end
   end
 
@@ -192,7 +208,7 @@ RSpec.describe "Enrollments features", type: :feature do
     end
 
     it "should be able to search by admision_date" do
-      select_month_year("search_admission_date", 3.years.ago.at_beginning_of_month.to_date)
+      select_month_year("search_admission_date", YearSemester.current.semester_begin - 3.years)
       click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
     end
@@ -240,7 +256,7 @@ RSpec.describe "Enrollments features", type: :feature do
     end
 
     it "should be able to search by research_area" do
-      search_record_select("research_area", "research_areas", "Ciência de Dados")
+      find(:select, "search_research_area").find(:option, text: "CD - Ciência de Dados").select_option
       click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M03"]
     end

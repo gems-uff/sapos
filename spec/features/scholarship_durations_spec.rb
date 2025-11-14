@@ -32,7 +32,8 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia")
     @destroy_all << @student3 = FactoryBot.create(:student, name: "Carol")
     @destroy_all << @student4 = FactoryBot.create(:student, name: "Dani")
-    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1, level: @level2, enrollment_status: @enrollment_status, admission_date: 3.years.ago.at_beginning_of_month.to_date)
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1, level: @level2,
+     enrollment_status: @enrollment_status, admission_date: YearSemester.current.semester_begin - 3.years)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student2, level: @level1, enrollment_status: @enrollment_status)
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status)
@@ -234,7 +235,7 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
       start_month = I18n.l(2.months.ago, format: "%B")
       find(:select, "suspended_start_month").find(:option, text: start_month).select_option
 
-      end_year = 0.years.ago.year
+      end_year = 1.year.from_now.year
       find(:select, "suspended_end_year").find(:option, text: end_year.to_s).select_option
 
       end_month = I18n.l(2.months.from_now, format: "%B")

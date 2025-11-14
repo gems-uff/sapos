@@ -1,0 +1,15 @@
+pt-BR:
+  activerecord:
+    attributes:
+      course_research_line:
+        course: "Curso"
+        research_line: "Linha de Pesquisa"
+
+    errors:
+        models:
+          course_research_line:
+            course_area: "selecionada não faz parte das Áreas de Pesquisa escolhidas"
+    models:
+      course_research_line:
+        one: "Linha de Pesquisa do Curso"
+        other: "Linhas de Pesquisa do Curso"
