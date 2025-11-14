@@ -19,8 +19,8 @@ RSpec.describe "Landing features", type: :feature do
     @destroy_all << @enrollment_status1 = FactoryBot.create(:enrollment_status, name: "Regular")
 
     @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana")
-    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1, level: @level2, enrollment_status: @enrollment_status1, admission_date: 3.years.ago.at_beginning_of_month.to_date)
-    @destroy_all << @enrollment5 = FactoryBot.create(:enrollment, enrollment_number: "D01", student: @student1, level: @level1, enrollment_status: @enrollment_status1, admission_date: Date.today.at_beginning_of_month.to_date)
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1, level: @level2, enrollment_status: @enrollment_status1, admission_date: YearSemester.current.semester_begin - 3.years)
+    @destroy_all << @enrollment5 = FactoryBot.create(:enrollment, enrollment_number: "D01", student: @student1, level: @level1, enrollment_status: @enrollment_status1, admission_date: YearSemester.current.semester_begin)
 
     @destroy_all << @student_user = create_confirmed_user([@role_student], "ana.sapos@ic.uff.br", "Ana", "A1b2c3d4!", student: @student1)
 
