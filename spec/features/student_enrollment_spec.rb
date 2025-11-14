@@ -13,7 +13,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
     @destroy_all << @role_professor = FactoryBot.create(:role_professor)
     @destroy_all << @role_student = FactoryBot.create(:role_aluno)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << @level1 = FactoryBot.create(:level, name: "Doutorado")
     @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
@@ -67,7 +67,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana")
     @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1,
                                                      level: @level2, enrollment_status: @enrollment_status1,
-                                                     admission_date: 3.years.ago.at_beginning_of_month.to_date,
+                                                     admission_date: YearSemester.current.semester_begin - 3.years,
                                                      research_area: @research_area1, thesis_defense_date: Time.now)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level2, enrollment_status: @enrollment_status1)
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "D01", student: @student1, level: @level1, enrollment_status: @enrollment_status1)
@@ -155,7 +155,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
 
     @destroy_all << @enrollment_request_comment = FactoryBot.create(:enrollment_request_comment, enrollment_request: @enrollment_request3_2022_2, user: @user, message: "Some comment")
 
-    @destroy_all << @student_user = create_confirmed_user(@role_student, "ana.sapos@ic.uff.br", "Ana", "A1b2c3d4!", student: @student1)
+    @destroy_all << @student_user = create_confirmed_user([@role_student], "ana.sapos@ic.uff.br", "Ana", "A1b2c3d4!", student: @student1)
 
     @enrollment_status1.update!(user: true)
   end
@@ -167,6 +167,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all.each(&:delete)
     @destroy_all.clear
     PhaseCompletion.destroy_all
+    UserRole.delete_all
   end
 
   describe "show" do
@@ -177,7 +178,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
       end
 
       it "should show enrollment info" do
-        date = 3.years.ago.at_beginning_of_month.to_date
+        date = YearSemester.current.semester_begin - 3.years
         expect(page).to have_content "Matrícula de Mestrado M01 (Desligada)"
         expect(page).to have_content "Ana"
         expect(page).to have_content "Área de Concentração: Ciência de Dados"

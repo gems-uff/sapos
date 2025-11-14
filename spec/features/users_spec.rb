@@ -20,7 +20,7 @@ RSpec.describe "Users features", type: :feature do
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
     @destroy_all << FactoryBot.create(:role_suporte)
 
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
     @destroy_all << FactoryBot.create(:user, email: "user3@ic.uff.br", name: "carol")
     @destroy_all << @record = FactoryBot.create(:user, email: "user2@ic.uff.br", name: "bia")
   end
@@ -31,6 +31,7 @@ RSpec.describe "Users features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -42,7 +43,7 @@ RSpec.describe "Users features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Usuários"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Email", "Nome do usuário", "Papel", ""
+        "Email", "Nome do usuário", "Papéis", ""
       ]
     end
 
@@ -62,7 +63,7 @@ RSpec.describe "Users features", type: :feature do
       # Insert record
       expect(page).to have_content "Adicionar Usuário"
       within("#as_#{plural_name}-create--form") do
-        find(:select, "record_role_").find(:option, text: "Administrador").select_option
+        find(:label, text: "Administrador").select_option
         fill_in "Email", with: "user4@ic.uff.br"
         fill_in "Nome do usuário", with: "dani"
       end
@@ -79,7 +80,8 @@ RSpec.describe "Users features", type: :feature do
     end
 
     it "should have a selection for role options" do
-      expect(page.all("select#record_role_ option").map(&:text)).to eq ["Selecione uma opção", "Administrador", "Aluno", "Coordenação", "Desconhecido", "Professor", "Secretaria", "Suporte"]
+      labels = page.all("li.form-element.select dl dd label").map(&:text)
+      expect(labels).to eq ["Administrador", "Coordenação", "Secretaria", "Professor", "Suporte", "Aluno"]
     end
 
     it "should have a record_select widget for professor" do

@@ -13,5 +13,6 @@ FactoryBot.define do
     sequence :code do |code|
       "ResearchArea_#{code}"
     end
+    available { true }
   end
 end

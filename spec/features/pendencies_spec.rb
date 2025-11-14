@@ -13,7 +13,7 @@ RSpec.describe "Pendencies features", type: :feature do
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
     @destroy_all << @role_professor = FactoryBot.create(:role_professor)
     @destroy_all << @role_secretary = FactoryBot.create(:role_secretaria)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << CustomVariable.create(variable: :professor_login_can_post_grades, value: "yes")
 
@@ -53,7 +53,8 @@ RSpec.describe "Pendencies features", type: :feature do
     @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia")
     @destroy_all << @student3 = FactoryBot.create(:student, name: "Carol")
     @destroy_all << @student4 = FactoryBot.create(:student, name: "Dani")
-    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1, level: @level2, enrollment_status: @enrollment_status1, admission_date: 3.years.ago.at_beginning_of_month.to_date)
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1, level: @level2,
+     enrollment_status: @enrollment_status1, admission_date: YearSemester.current.semester_begin - 3.years)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student2, level: @level2, enrollment_status: @enrollment_status2)
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status1)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status2)
@@ -89,8 +90,8 @@ RSpec.describe "Pendencies features", type: :feature do
     @destroy_all << @class_enrollment_request3 = FactoryBot.create(:class_enrollment_request, enrollment_request: @enrollment_request2_2022_2, course_class: @course_class4, action: ClassEnrollmentRequest::INSERT, status: ClassEnrollmentRequest::INVALID)
     @destroy_all << @class_enrollment_request4 = FactoryBot.create(:class_enrollment_request, enrollment_request: @enrollment_request3_2022_2, course_class: @course_class2, class_enrollment: @class_enrollment5, action: ClassEnrollmentRequest::REMOVE, status: ClassEnrollmentRequest::VALID)
     @destroy_all << @class_enrollment_request5 = FactoryBot.create(:class_enrollment_request, enrollment_request: @enrollment_request3_2022_2, course_class: @course_class4, action: ClassEnrollmentRequest::INSERT, status: ClassEnrollmentRequest::REQUESTED)
-    @destroy_all << @professor_user = create_confirmed_user(@role_professor, "erica.sapos@ic.uff.br", "Erica", "A1b2c3d4!", professor: @professor1)
-    @destroy_all << @secretary_user = create_confirmed_user(@role_secretary, "zenia.sapos@ic.uff.br", "Zenia", "A1b2c3d4!")
+    @destroy_all << @professor_user = create_confirmed_user([@role_professor], "erica.sapos@ic.uff.br", "Erica", "A1b2c3d4!", professor: @professor1)
+    @destroy_all << @secretary_user = create_confirmed_user([@role_secretary], "zenia.sapos@ic.uff.br", "Zenia", "A1b2c3d4!")
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -99,6 +100,7 @@ RSpec.describe "Pendencies features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view pendencies as admin" do

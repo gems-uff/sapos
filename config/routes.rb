@@ -34,8 +34,10 @@ Rails.application.routes.draw do
       to: "users/registrations#update", as: :user_registration
     put "users/profile", to: "users/registrations#update"
     post "users/profile", to: "users/registrations#update"
+    post "change_role", to: "user_roles#change_role", as: :change_role
     delete "users/profile", to: "users/registrations#update"
   end
+
 
   resources :versions do
     concerns :active_scaffold
@@ -88,6 +90,19 @@ Rails.application.routes.draw do
     record_select_routes
   end
 
+  resources :research_lines do
+    concerns :active_scaffold
+    record_select_routes
+  end
+
+  resources :professor_research_lines do
+    concerns :active_scaffold
+    record_select_routes
+  end
+
+  resources :course_research_lines do
+    concerns :active_scaffold
+  end
 
   get "credits/show"
 
@@ -136,6 +151,13 @@ Rails.application.routes.draw do
   resources :roles do
     concerns :active_scaffold
   end
+
+  resources :user_roles do
+    concerns :active_scaffold
+    record_select_routes
+  end
+
+  
 
   resources :scholarship_durations do
     concerns :active_scaffold

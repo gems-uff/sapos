@@ -15,6 +15,7 @@ class Enrollment < ApplicationRecord
   belongs_to :level, optional: false
   belongs_to :enrollment_status, optional: false
   belongs_to :research_area, optional: true
+  belongs_to :research_line, optional: true
 
   has_one :dismissal, dependent: :restrict_with_exception
   has_many :advisements, dependent: :destroy
@@ -48,6 +49,7 @@ class Enrollment < ApplicationRecord
     on_or_after_message: :thesis_defense_date_before_admission_date
 
   validate :verify_research_area_with_advisors
+  validate :verify_research_line
 
   after_save :create_phase_completions
   after_create :create_user!
@@ -184,6 +186,18 @@ class Enrollment < ApplicationRecord
     errors.add(:research_area, :research_area_different_from_professors)
   end
 
+  def verify_research_line
+    unless research_line.blank?
+      if research_area.blank?
+        self.update(research_area: research_line.research_area)
+      else
+        if research_line.research_area != research_area
+          errors.add(:research_area, :different_research_areas)
+        end
+      end
+    end
+  end
+
   def create_phase_completions
     PhaseCompletion.where(enrollment_id: id).destroy_all
 
@@ -215,10 +229,11 @@ class Enrollment < ApplicationRecord
     return false unless self.should_have_user?
     begin
       student = self.student
+      role = Role.find_by(id: Role::ROLE_ALUNO)
       user = User.invite!({
         email: student.first_email,
         name: student.name,
-        role_id: Role::ROLE_ALUNO
+        roles: [role],
       }, current_user) do |invitable|
         invitable.skip_confirmation!
       end

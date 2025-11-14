@@ -16,7 +16,8 @@ class Ability
   PROFESSOR_MODELS = [
     Professor, Advisement, AdvisementAuthorization,
     ThesisDefenseCommitteeParticipation,
-    ProfessorResearchArea, Grant, Paper, PaperProfessor, PaperStudent, Affiliation
+    ProfessorResearchArea, ProfessorResearchLine, Grant,
+    Paper, PaperProfessor, PaperStudent, Affiliation
   ]
 
   SCHOLARSHIP_MODELS = [
@@ -30,7 +31,7 @@ class Ability
   ]
 
   COURSE_MODELS = [
-    ResearchArea, Course, CourseType, CourseClass, ClassSchedule,
+    ResearchArea, ResearchLine, Course, CourseType, CourseClass, ClassSchedule,
     ClassEnrollment, Allocation, EnrollmentRequest, ClassEnrollmentRequest,
     EnrollmentRequestComment,
   ]
@@ -49,7 +50,7 @@ class Ability
 
   CONFIGURATION_MODELS = [
     User, Role, Version, EmailTemplate,
-    CustomVariable, YearSemester, ProgramLevel
+    CustomVariable, YearSemester, ProgramLevel, UserRole
   ]
 
   def initialize(user)
@@ -64,8 +65,8 @@ class Ability
                 :override_signature_assertion_pdf, to: :override_report_signature_type
     user ||= User.new
 
-    role_id = user.role_id
-    roles = { role_id => true }
+    actual_role = user.actual_role
+    roles = { actual_role => true }
     roles[:manager] = (
       roles[Role::ROLE_ADMINISTRADOR] ||
       roles[Role::ROLE_COORDENACAO] ||

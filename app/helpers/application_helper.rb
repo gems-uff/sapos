@@ -152,7 +152,7 @@ module ApplicationHelper
       id: options[:id] + '_cache',
       # Change >
       object: record
-      # < Change
+        # < Change
       }
       hidden_field(:record, "#{column.name}_cache", cache_field_options)
     end
@@ -177,5 +177,20 @@ module ApplicationHelper
     end
     body_part = content_tag(group_tag, **group_options.merge(id:, style:), &block)
     title_part + body_part
+  end
+
+  def role_selector(current_user)
+    unless current_user.blank? || current_user.roles.length < 2
+      form_with url: change_role_path, method: :post, local: true do
+        select_tag(:role_id,
+                    options_from_collection_for_select(
+                      UserRole.where(user: current_user).includes(:role).map(&:role),
+                      :id,
+                      :name,
+                      current_user.actual_role
+                    ), { onchange: "this.form.submit();" }
+        )
+      end
+    end
   end
 end

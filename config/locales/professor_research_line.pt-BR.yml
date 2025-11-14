@@ -1,0 +1,20 @@
+pt-BR:
+  activerecord:
+    attributes:
+      professor_research_line:
+        professor: "Professor"
+        research_line: "Linha de Pesquisa"
+
+    errors:
+      models:
+        professor_research_line:
+          unique_pair: "não pode estar em duas ou mais linhas de pesquisa repetidas e linha de pesquisa não pode possuir o mesmo professor duas ou mais vezes"
+          professor_area: "Tem que possuir a area na qual a linha de pesquisa pertence"
+
+    models:
+      professor_research_line:
+        one: "Linha de Pesquisa do Professor"
+        other: "Linha de Pesquisa dos Professores"
+
+  active_scaffold:
+    create_professor_research_line_label: "Adicionar Linha de Pesquisa do Professor"
