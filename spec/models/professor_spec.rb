@@ -13,6 +13,8 @@ RSpec.describe Professor, type: :model do
   it { should have_many(:advisement_authorizations).dependent(:restrict_with_exception) }
   it { should have_many(:professor_research_areas).dependent(:destroy) }
   it { should have_many(:research_areas).through(:professor_research_areas) }
+  it { should have_many(:professor_research_lines).dependent(:destroy) }
+  it { should have_many(:research_lines).through(:professor_research_lines) }
   it { should have_many(:course_classes).dependent(:restrict_with_exception) }
   it { should have_many(:thesis_defense_committee_participations).dependent(:restrict_with_exception) }
   it { should have_many(:thesis_defense_committee_enrollments).source(:enrollment).through(:thesis_defense_committee_participations) }

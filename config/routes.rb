@@ -90,6 +90,19 @@ Rails.application.routes.draw do
     record_select_routes
   end
 
+  resources :research_lines do
+    concerns :active_scaffold
+    record_select_routes
+  end
+
+  resources :professor_research_lines do
+    concerns :active_scaffold
+    record_select_routes
+  end
+
+  resources :course_research_lines do
+    concerns :active_scaffold
+  end
 
   get "credits/show"
 

@@ -10,8 +10,10 @@ class Course < ApplicationRecord
   belongs_to :course_type, optional: false
 
   has_many :course_research_areas, dependent: :destroy
+  has_many :course_research_lines, dependent: :destroy
   has_many :course_classes, dependent: :restrict_with_exception
   has_many :research_areas, through: :course_research_areas
+  has_many :research_lines, through: :course_research_lines
 
   validates :course_type, presence: true
   validates :name, presence: true

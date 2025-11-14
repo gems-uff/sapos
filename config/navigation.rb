@@ -171,10 +171,12 @@ SimpleNavigation::Configuration.run do |navigation|
 
     courses_models = [
       Course, ResearchArea, CourseType, CourseClass, ClassSchedule,
-      ClassEnrollment, Allocation, EnrollmentRequest, ClassEnrollmentRequest
+      ClassEnrollment, Allocation, EnrollmentRequest, ClassEnrollmentRequest,
+      ResearchLine
     ]
     mainhelper.listitem :courses, courses_models do |submenu|
       submenu.modelitem ResearchArea
+      submenu.modelitem ResearchLine
       submenu.modelitem Course
       submenu.modelitem CourseType
       submenu.modelitem CourseClass

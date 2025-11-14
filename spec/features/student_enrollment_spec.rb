@@ -67,7 +67,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana")
     @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1,
                                                      level: @level2, enrollment_status: @enrollment_status1,
-                                                     admission_date: 3.years.ago.at_beginning_of_month.to_date,
+                                                     admission_date: YearSemester.current.semester_begin - 3.years,
                                                      research_area: @research_area1, thesis_defense_date: Time.now)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level2, enrollment_status: @enrollment_status1)
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "D01", student: @student1, level: @level1, enrollment_status: @enrollment_status1)
@@ -118,7 +118,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << FactoryBot.create(:deferral, deferral_type: @deferral_type2, enrollment: @enrollment1, approval_date: 15.months.ago.at_beginning_of_month)
 
     # Holds
-    @destroy_all << @record = FactoryBot.create(:enrollment_hold, enrollment: @enrollment1, year: 3.years.ago.year, semester: 2, number_of_semesters: 1)
+    @destroy_all << @record = FactoryBot.create(:enrollment_hold, enrollment: @enrollment1, year: 2.years.ago.year, semester: 2, number_of_semesters: 1)
 
     # Scholarships
     @destroy_all << @sponsor1 = FactoryBot.create(:sponsor, name: "CNPq")
@@ -178,7 +178,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
       end
 
       it "should show enrollment info" do
-        date = 3.years.ago.at_beginning_of_month.to_date
+        date = YearSemester.current.semester_begin - 3.years
         expect(page).to have_content "Matrícula de Mestrado M01 (Desligada)"
         expect(page).to have_content "Ana"
         expect(page).to have_content "Área de Concentração: Ciência de Dados"
