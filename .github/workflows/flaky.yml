@@ -1,0 +1,58 @@
+name: "Flaky tests (multi-OS, multi-trial)"
+
+on:
+  workflow_dispatch:
+    inputs:
+      trials:
+        description: "Número de execuções (trials) por sistema operacional"
+        required: true
+        default: "5"
+
+jobs:
+  flaky-tests:
+    name: Trial ${{ matrix.trial }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        trial: [1, 2, 3, 4, 5]
+
+    env:
+      RAILS_ENV: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup chromedriver
+        uses: nanasess/setup-chromedriver@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          cache-version: 0
+
+      - name: Set up database schema
+        run: bundle exec rake db:test:prepare
+
+      - name: Show trial info
+        run: |
+          echo "OS: ${{ matrix.os }}"
+          echo "Trial: ${{ matrix.trial }}"
+
+      - name: Run tests
+        run: |
+          set -o pipefail
+          bundle exec rspec | tee "test-log-${{ matrix.os }}-trial-${{ matrix.trial }}.log"
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.os }}-trial-${{ matrix.trial }}
+          path: test-log-${{ matrix.os }}-trial-${{ matrix.trial }}.log
