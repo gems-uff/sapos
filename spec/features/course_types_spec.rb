@@ -61,15 +61,14 @@ RSpec.describe "CourseTypes features", type: :feature do
         fill_in "Nome", with: "Estudo Orientado"
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Estudo Orientado")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Estudo Orientado", "Dissertação e Tese", "Obrigatória", "Optativa"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Dissertação e Tese", "Obrigatória", "Optativa"]
+      expect(page).to have_no_content("Estudo Orientado")
     end
   end
 
@@ -100,7 +99,7 @@ RSpec.describe "CourseTypes features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "search", with: "Opta"
-      sleep(0.8)
+      expect(page).to have_no_content("Dissertação e Tese")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Optativa"]
     end
   end

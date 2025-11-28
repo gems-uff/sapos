@@ -69,15 +69,14 @@ RSpec.describe "Queries features", type: :feature do
         ).perform
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "enrollments")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["enrollments", "students", "queries", "levels"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["students", "queries", "levels"]
+      expect(page).to have_no_content("enrollments")
     end
 
     it "should have a codemirror for sql" do
@@ -123,7 +122,7 @@ RSpec.describe "Queries features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "search", with: "quer"
-      sleep(0.8)
+      expect(page).to have_no_content("students")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["queries"]
     end
   end

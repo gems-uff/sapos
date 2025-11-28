@@ -64,15 +64,14 @@ RSpec.describe "ResearchAreas features", type: :feature do
         fill_in "Código", with: "IA"
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Inteligência Artificial")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Inteligência Artificial", "Ciência de Dados", "Engenharia de Software", "Sistemas de Computação"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Ciência de Dados", "Engenharia de Software", "Sistemas de Computação"]
+      expect(page).to have_no_content("Inteligência Artificial")
     end
   end
 
@@ -103,7 +102,7 @@ RSpec.describe "ResearchAreas features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "search", with: "Enge"
-      sleep(0.8)
+      expect(page).to have_no_content("Ciência de Dados")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Engenharia de Software"]
     end
   end

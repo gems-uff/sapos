@@ -68,7 +68,7 @@ RSpec.describe "Roles features", type: :feature do
 
     it "should be able to search by model name" do
       fill_in "search", with: "Coor"
-      sleep(0.8)
+      expect(page).to have_no_content("Desconhecido")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Coordenação"]
     end
   end

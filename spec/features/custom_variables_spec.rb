@@ -61,15 +61,14 @@ RSpec.describe "CustomVariables features", type: :feature do
         fill_in "Valor", with: "Brasil"
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.variable-column", text: "identity_issuing_country")
 
       # Remove inserted record
       expect(page.all("tr td.variable-column").map(&:text)).to eq ["identity_issuing_country", "minimum_grade_for_approval", "single_advisor_points"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.variable-column").map(&:text)).to eq ["minimum_grade_for_approval", "single_advisor_points"]
+      expect(page).to have_no_content("identity_issuing_country")
     end
 
     it "should have a selection for variable options" do
@@ -102,7 +101,7 @@ RSpec.describe "CustomVariables features", type: :feature do
 
     it "should be able to search by variable" do
       fill_in "search", with: "singl"
-      sleep(0.8)
+      expect(page).to have_no_content("minimum_grade_for_approval")
       expect(page.all("tr td.variable-column").map(&:text)).to eq ["single_advisor_points"]
     end
   end

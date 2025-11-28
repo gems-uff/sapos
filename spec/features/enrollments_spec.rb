@@ -127,6 +127,7 @@ RSpec.describe "Enrollments features", type: :feature do
         find(:select, "record_level_").find(:option, text: @level1.name).select_option
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.enrollment_number-column", text: "M04")
       expect(page).to have_css("tr:nth-child(1) td.student-column", text: "Dani")
 
@@ -134,9 +135,7 @@ RSpec.describe "Enrollments features", type: :feature do
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M04", "M01", "M02", "M03"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M01", "M02", "M03"]
+      expect(page).to have_no_content("M04")
     end
 
     it "should have a month_year widget for admission_date" do

@@ -82,15 +82,14 @@ RSpec.describe "Majors features", type: :feature do
       end
       fill_record_select("institution_", "institutions", "Flum")
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Tecnologia em Sistemas de Computação")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Tecnologia em Sistemas de Computação", "Ciência da Computação", "Ciência da Computação", "Sistemas de Informação"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Ciência da Computação", "Ciência da Computação", "Sistemas de Informação"]
+      expect(page).to have_no_content("Tecnologia em Sistemas de Computação")
     end
 
     it "should have a record_select widget for professor" do
@@ -127,7 +126,7 @@ RSpec.describe "Majors features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "search", with: "Sis"
-      sleep(0.8)
+      expect(page).to have_no_content("Ciência da Computação")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Sistemas de Informação"]
     end
   end

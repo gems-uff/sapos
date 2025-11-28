@@ -66,7 +66,7 @@ RSpec.describe "Versions features", type: :feature do
 
     it "should be able to search by model name" do
       fill_in "search", with: "Country"
-      sleep(0.8)
+      expect(page).to have_no_content("Papel de Usuário")
       expect(page.all("tr td.item_type-column").map(&:text)).to include("País")
     end
   end

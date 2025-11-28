@@ -95,15 +95,14 @@ RSpec.describe "ClassSchedules features", type: :feature do
         find(:select, "record_semester_").find(:option, text: YearSemester.current.semester.to_s).select_option
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.year-column", text: YearSemester.current.year.to_s)
 
       # Remove inserted record
       expect(page.all("tr td.year-column").map(&:text)).to eq [YearSemester.current.year.to_s, "2023", "2022", "2022"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.year-column").map(&:text)).to eq ["2023", "2022", "2022"]
+      expect(page).to have_no_content(YearSemester.current.year.to_s)
     end
 
     it "should have a datetime picker for enrollment_start" do

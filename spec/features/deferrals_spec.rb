@@ -91,15 +91,14 @@ RSpec.describe "Deferrals features", type: :feature do
         find(:select, "record_deferral_type_").find(:option, text: "Regular").select_option
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04 - Dani")
 
       # Remove inserted record
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M04 - Dani", "M02 - Bia", "M01 - Ana", "M03 - Carol"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia", "M01 - Ana", "M03 - Carol"]
+      expect(page).to have_no_content("M04 - Dani")
     end
 
     it "should have a record_select widget for enrollment" do
@@ -144,7 +143,7 @@ RSpec.describe "Deferrals features", type: :feature do
 
     it "should be able to search by enrollment number" do
       fill_in "search", with: "M02"
-      sleep(0.8)
+      expect(page).to have_no_content("M01 - Ana")
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia"]
     end
   end

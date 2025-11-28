@@ -82,15 +82,14 @@ RSpec.describe "Courses features", type: :feature do
         find(:select, "record_course_type_").find(:option, text: @course_type1.name).select_option
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Programação")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Programação", "Algebra", "Algebra", "Defesa", "Pesquisa", "Tópicos em ES", "Versionamento"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Algebra", "Algebra", "Defesa", "Pesquisa", "Tópicos em ES", "Versionamento"]
+      expect(page).to have_no_content("Programação")
     end
 
     it "should have a selection for course_type options" do

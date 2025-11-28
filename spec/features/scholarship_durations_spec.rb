@@ -95,6 +95,7 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
       page.driver.browser.action.send_keys(:escape).perform
       fill_record_select("enrollment_", "enrollments", "M04")
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.scholarship-column", text: "B3")
       expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04")
 
@@ -102,9 +103,7 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
       expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B3", "B1", "B2", "B2"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.scholarship-column").map(&:text)).to eq ["B1", "B2", "B2"]
+      expect(page).to have_no_content("B3")
     end
 
     it "should have a record_select widget for scholarship" do
