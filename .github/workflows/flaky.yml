@@ -36,6 +36,8 @@ jobs:
         with:
           bundler-cache: true
           cache-version: 0
+        env:
+          BUNDLE_WITHOUT: production
 
       - name: Set up database schema
         run: bundle exec rake db:test:prepare
