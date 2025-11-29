@@ -90,15 +90,14 @@ RSpec.describe "Allocations features", type: :feature do
         fill_in "Hora de fim", with: "11"
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.course_class-column", text: "Programação - 2022/2")
 
       # Remove inserted record
       expect(page.all("tr td.course_class-column").map(&:text)).to eq ["Programação - 2022/2", "Algebra - 2022/2", "Algebra - 2022/2", "Versionamento - 2022/2", "Versionamento - 2022/2", "Tópicos em ES (Mineração de Repositórios) - 2022/2", "Tópicos em ES (Mineração de Repositórios) - 2022/2"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.course_class-column").map(&:text)).to eq ["Algebra - 2022/2", "Algebra - 2022/2", "Versionamento - 2022/2", "Versionamento - 2022/2", "Tópicos em ES (Mineração de Repositórios) - 2022/2", "Tópicos em ES (Mineração de Repositórios) - 2022/2"]
+      expect(page).to have_no_content("Programação - 2022/2")
     end
 
     it "should show end_time_before_start_time error when end time occurs before start time" do
@@ -159,7 +158,7 @@ RSpec.describe "Allocations features", type: :feature do
 
     it "should be able to search by day" do
       fill_in "search", with: "Segunda"
-      sleep(0.8)
+      expect(page).to have_no_content("Tópicos em ES (Mineração de Repositórios) - 2022/2")
       expect(page.all("tr td.course_class-column").map(&:text)).to eq ["Algebra - 2022/2", "Algebra - 2022/2", "Versionamento - 2022/2"]
     end
   end

@@ -112,15 +112,14 @@ RSpec.describe "CourseClasses features", type: :feature do
       fill_record_select("professor_", "professors", "Helena")
       fill_record_select("course_", "courses", "Programação")
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Programação")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Programação", "Algebra", "Algebra", "Algebra", "Defesa", "Mineração de Repositórios", "Pesquisa", "Versionamento"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Algebra", "Algebra", "Algebra", "Defesa", "Mineração de Repositórios", "Pesquisa", "Versionamento"]
+      expect(page).to have_no_content("Programação")
     end
 
     it "should have a selection for semester" do

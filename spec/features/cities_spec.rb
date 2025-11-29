@@ -68,15 +68,14 @@ RSpec.describe "Cities features", type: :feature do
         fill_in "Nome", with: "São Gonçalo"
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "São Gonçalo")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["São Gonçalo", "Maricá", "Niterói", "Rio de Janeiro"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Maricá", "Niterói", "Rio de Janeiro"]
+      expect(page).to have_no_content("São Gonçalo")
     end
 
     it "should have a selection for state options" do
@@ -109,7 +108,7 @@ RSpec.describe "Cities features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "search", with: "Nit"
-      sleep(0.8)
+      expect(page).to have_no_content("Maricá")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Niterói"]
     end
   end

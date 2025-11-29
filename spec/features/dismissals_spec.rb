@@ -76,6 +76,7 @@ RSpec.describe "Dismissal features", type: :feature do
         select_month_year_i("record_date", Date.today)
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04")
       expect(page).to have_css("tr:nth-child(1) td.dismissal_reason-column", text: @dismissal_reason1.name)
 
@@ -83,9 +84,7 @@ RSpec.describe "Dismissal features", type: :feature do
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M04 - Dani", "M02 - Ana", "M01 - Bia", "M03 - Carol"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Ana", "M01 - Bia", "M03 - Carol"]
+      expect(page).to have_no_content("M04 - Dani")
     end
 
     it "should have a month_year widget for date" do

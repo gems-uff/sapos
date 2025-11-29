@@ -75,8 +75,8 @@ RSpec.describe "NotificationLogs features", type: :feature do
 
     it "should be able to search by subject" do
       fill_in "search", with: "syn"
-      sleep(0.8)
-      expect(page.all("tr td.subject-column").map(&:text)).to include("Sync")
+      expect(page).to have_no_content("Tchau")
+      expect(page.all("tr td.subject-column").map(&:text)).to eq ["Sync"]
     end
   end
 end
