@@ -11,6 +11,8 @@ module WaitForAjax
 
   def finished_all_ajax_requests?
     page.evaluate_script('typeof jQuery !== "undefined" && jQuery.active === 0')
+  rescue Selenium::WebDriver::Error::UnknownError
+    false
   end
 
   def click_button_and_wait(*args, **kwargs)
