@@ -17,6 +17,7 @@ jobs:
 
       - uses: browser-actions/setup-chrome@v2
         with:
+          install-dependencies: true
           install-chromedriver: true
         
       - name: Install Ruby and gems
