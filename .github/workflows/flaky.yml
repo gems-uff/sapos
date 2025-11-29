@@ -2,11 +2,6 @@ name: "Flaky tests (multi-OS, multi-trial)"
 
 on:
   workflow_dispatch:
-    inputs:
-      trials:
-        description: "Número de execuções (trials) por sistema operacional"
-        required: true
-        default: "5"
 
 jobs:
   flaky-tests:
@@ -21,6 +16,7 @@ jobs:
 
     env:
       RAILS_ENV: test
+      BUNDLE_WITHOUT: production
 
     steps:
       - name: Checkout code
@@ -36,8 +32,6 @@ jobs:
         with:
           bundler-cache: true
           cache-version: 0
-        env:
-          BUNDLE_WITHOUT: production
 
       - name: Set up database schema
         run: bundle exec rake db:test:prepare
