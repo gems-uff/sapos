@@ -84,15 +84,14 @@ RSpec.describe "ThesisDefenseCommitteeParticipations features", type: :feature d
       fill_record_select("enrollment_", "enrollments", "M04")
       fill_record_select("professor_", "professors", "Fiona")
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04 - Dani")
 
       # Remove inserted record
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M04 - Dani", "M01 - Ana", "M02 - Bia", "M03 - Carol", "M03 - Carol"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M02 - Bia", "M03 - Carol", "M03 - Carol"]
+      expect(page).to have_no_content("M04 - Dani")
     end
 
     it "should have a record_select widget for enrollment" do

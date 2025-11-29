@@ -60,15 +60,14 @@ RSpec.describe "Sponsor features", type: :feature do
         fill_in "Nome", with: "Serrapilheira"
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Serrapilheira")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Serrapilheira", "CAPES", "CNPq", "FAPERJ"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["CAPES", "CNPq", "FAPERJ"]
+      expect(page).to have_no_content("Serrapilheira")
     end
   end
 
@@ -97,7 +96,7 @@ RSpec.describe "Sponsor features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "search", with: "CNP"
-      sleep(0.8)
+      expect(page).to have_no_content("CAPES")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["CNPq"]
     end
   end

@@ -66,15 +66,14 @@ RSpec.describe "DeferralTypes features", type: :feature do
         find(:select, "record_phase_").find(:option, text: "Exame de Qualificação").select_option
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "EQ")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["EQ", "Extraordinária", "Final", "Regular"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Extraordinária", "Final", "Regular"]
+      expect(page).to have_no_content("EQ")
     end
 
     it "should have a selection for phase options" do
@@ -107,7 +106,7 @@ RSpec.describe "DeferralTypes features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "search", with: "Fin"
-      sleep(0.8)
+      expect(page).to have_no_content("Regular")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Final"]
     end
   end

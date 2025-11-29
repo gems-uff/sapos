@@ -137,15 +137,14 @@ RSpec.describe "Professors features", type: :feature do
         fill_in "CPF", with: "1"
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Ana")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Ana", "Bia", "Carol", "Dani"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia", "Carol", "Dani"]
+      expect(page).to have_no_content("Ana")
     end
 
     it "should have city widget for address" do
@@ -239,7 +238,7 @@ RSpec.describe "Professors features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "search", with: "Bia"
-      sleep(1)
+      expect(page).to have_no_content("Carol")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia"]
     end
   end

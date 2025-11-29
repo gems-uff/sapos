@@ -26,7 +26,7 @@ jobs:
           cache-version: 0 # Increment this number if you need to re-download cached gems
 
       - name: Set up database schema
-        run: bundle exec rake db:test:prepare
+        run: bundle exec rake db:test:prepare --trace
         
       - name: Run tests
         run: bundle exec rspec

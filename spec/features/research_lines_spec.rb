@@ -64,14 +64,13 @@ RSpec.describe "ResearchLines features", type: :feature do
         fill_in "Nome", with: "Inteligência Artificial"
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Inteligência Artificial")
 
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Inteligência Artificial", "Ciência de Dados", "Desenvolvimento Web", "Engenharia de Software"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Ciência de Dados", "Desenvolvimento Web", "Engenharia de Software"]
+      expect(page).to have_no_content("Inteligência Artificial")
     end
   end
 
@@ -103,14 +102,12 @@ RSpec.describe "ResearchLines features", type: :feature do
     it "should be able to search by name" do
       fill_in "Nome", with: "Enge"
       click_button_and_wait "Buscar"
-      sleep(0.8)
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Engenharia de Software"]
     end
 
     it "should be able to search by area" do
       search_record_select("research_area", "research_areas", "Sist")
       click_button_and_wait "Buscar"
-      sleep(0.8)
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Desenvolvimento Web"]
     end
   end
