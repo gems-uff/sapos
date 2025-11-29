@@ -22,10 +22,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup chromedriver
-        uses: nanasess/setup-chromedriver@v2
+      - uses: browser-actions/setup-chrome@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          install-chromedriver: true
 
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
