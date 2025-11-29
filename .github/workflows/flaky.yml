@@ -1,18 +1,17 @@
-name: "Flaky tests (multi-OS, multi-trial)"
+name: "Flaky tests (multi-trial)"
 
 on:
   workflow_dispatch:
 
 jobs:
   flaky-tests:
-    name: Trial ${{ matrix.trial }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    name: Trial ${{ matrix.trial }}
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        trial: [1, 2, 3, 4, 5]
+        trial: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
     env:
       RAILS_ENV: test
@@ -22,10 +21,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup chromedriver
-        uses: nanasess/setup-chromedriver@v2
+      - uses: browser-actions/setup-chrome@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          install-chromedriver: true
 
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
@@ -36,19 +34,14 @@ jobs:
       - name: Set up database schema
         run: bundle exec rake db:test:prepare
 
-      - name: Show trial info
-        run: |
-          echo "OS: ${{ matrix.os }}"
-          echo "Trial: ${{ matrix.trial }}"
-
       - name: Run tests
         run: |
           set -o pipefail
-          bundle exec rspec | tee "test-log-${{ matrix.os }}-trial-${{ matrix.trial }}.log"
+          bundle exec rspec | tee "test-log-trial-${{ matrix.trial }}.log"
 
       - name: Upload logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: logs-${{ matrix.os }}-trial-${{ matrix.trial }}
-          path: test-log-${{ matrix.os }}-trial-${{ matrix.trial }}.log
+          name: logs-trial-${{ matrix.trial }}
+          path: test-log-trial-${{ matrix.trial }}.log
