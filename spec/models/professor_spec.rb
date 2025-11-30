@@ -286,4 +286,39 @@ RSpec.describe Professor, type: :model do
       end
     end
   end
+
+  describe "Before destroy" do
+    it "should assign unknown role when user has only professor role" do
+      @destroy_later << FactoryBot.create(:role_desconhecido)
+      @destroy_later << user = FactoryBot.create(:user, actual_role: Role::ROLE_PROFESSOR)
+      @destroy_later << professor = FactoryBot.create(:professor, user: user)
+      user.roles << @professor_role
+      user.save!
+
+      professor.destroy
+      user.reload
+
+      expect(user.roles.count).to eq(1)
+      expect(user.roles).not_to include(@professor_role)
+      expect(user.roles.first.id).to eq(Role::ROLE_DESCONHECIDO)
+      expect(user.actual_role).to eq(Role::ROLE_DESCONHECIDO)
+    end
+
+    it "should keep other roles when user has multiple roles" do
+      @destroy_later << admin_role = FactoryBot.create(:role_administrador)
+      @destroy_later << user = FactoryBot.create(:user, actual_role: Role::ROLE_ADMINISTRADOR)
+      @destroy_later << professor = FactoryBot.create(:professor, user: user)
+      user.roles << @professor_role
+      user.roles << admin_role
+      user.save!
+
+      professor.destroy
+      user.reload
+
+      expect(user.roles.count).to eq(1)
+      expect(user.roles).to include(admin_role)
+      expect(user.roles).not_to include(@professor_role)
+      expect(user.actual_role).to eq(Role::ROLE_ADMINISTRADOR)
+    end
+  end
 end
