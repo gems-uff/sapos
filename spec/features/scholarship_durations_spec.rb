@@ -228,7 +228,7 @@ RSpec.describe "ScholarshipDurations features", type: :feature do
     end
 
     it "should be able to search by the time interval of suspension" do
-      start_year = 0.years.ago.year
+      start_year = YearSemester.current.year
       find(:select, "suspended_start_year").find(:option, text: start_year.to_s).select_option
 
       start_month = I18n.l(2.months.ago, format: "%B")
