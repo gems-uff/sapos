@@ -14,6 +14,7 @@
   <tbody class="records">
   <% count = 0 %>
   <% if can?(:grades_report_pdf, enrollment) %>
+    <% count += 1 %>
     <tr class="record">
       <td><%= t("pdf_content.enrollment.grades_report.link") %></td>
       <% if can? :override_report_signature_type, Enrollment %>
@@ -26,7 +27,9 @@
     </tr>
   <% end %>
   <% if can?(:academic_transcript_pdf, enrollment) %>
-    <tr class="record">
+    <% count += 1 %>
+    <% tr_class = count.even? ? "even-record" : "" %>
+    <tr class="record <%= tr_class %>">
       <td><%= t("pdf_content.enrollment.academic_transcript.link") %></td>
       <% if can? :override_report_signature_type, Enrollment %>
         <td><%= link_to 'Gerar', override_signature_transcript_pdf_enrollment_path(id: enrollment.id, signature_type: :no_signature, format: :pdf), target: "_blank", method: :get %></td>
