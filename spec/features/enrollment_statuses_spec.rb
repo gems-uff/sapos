@@ -37,7 +37,7 @@ RSpec.describe "EnrollmentStatuses features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Tipos de Matrícula"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Nome", "Com usuário", ""
+        "Nome", "Com usuário", "Professor pode gerar boletim", ""
       ]
     end
 

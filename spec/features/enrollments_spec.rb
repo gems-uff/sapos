@@ -21,7 +21,7 @@ RSpec.describe "Enrollments features", type: :feature do
     @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
 
     @destroy_all << @enrollment_status1 = FactoryBot.create(:enrollment_status, name: "Regular")
-    @destroy_all << @enrollment_status2 = FactoryBot.create(:enrollment_status, name: "Avulso")
+    @destroy_all << @enrollment_status2 = FactoryBot.create(:enrollment_status, name: "Avulso", professor_can_generate_report: false)
     @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana", email: "ana.sapos@ic.uff.br")
     @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia", email: "bia.sapos@ic.uff.br")
     @destroy_all << @student3 = FactoryBot.create(:student, name: "Carol")
@@ -310,6 +310,18 @@ RSpec.describe "Enrollments features", type: :feature do
       context "when student is not dismissed with title" do
         it "should not be able to click the academic transcript link" do
           expect(page).not_to have_selector("#as_#{plural_name}-academic_transcript_pdf-#{@record.id}-link")
+        end
+      end
+
+      context "when professor can generate grade report due the enrollment status" do
+        it "should be able to click the grade report link" do
+          expect(page).to have_selector("#as_#{plural_name}-grades_report_pdf-#{@record.id}-link")
+        end
+      end
+
+      context "when professor can't generate grade report due the enrollment status" do
+        it "should be able to click the academic transcript link" do
+          expect(page).not_to have_selector("#as_#{plural_name}-grades_report_pdf-#{@enrollment2.id}-link")
         end
       end
     end
