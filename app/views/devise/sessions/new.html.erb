@@ -11,6 +11,11 @@
       html: { id: "login_form" }
     ) do |f| %>
         <%= flash[:name] %>
+        <% if CustomVariable.instance_name %>
+          <div style="margin-bottom: 10px;">
+            Login de acesso para <%= CustomVariable.instance_name %>
+          </div>
+        <% end %>
 
         <div id="login_input">
           <%= f.label :email, 'Email ou CPF' %>
