@@ -294,15 +294,11 @@ module EnrollmentsPdfHelper
         pdf.bounding_box([0, pdf.cursor], width: 560) do
           pdf.fill_color "000000"
 
-          if table_data.size >= page_size
+          if table_data.size > page_size
             new_page = true
-            next_table_data = table_data.slice(page_size + 1..-1)
-            table_data = table_data.slice(0..page_size)
+            next_table_data = table_data.drop(page_size)
+            table_data = table_data.first(page_size)
             page_size = 50
-          end
-
-          if table_data.size % 2 == 0
-            table_data.push([" ", "", "", "", "", ""])
           end
 
           pdf.table(
