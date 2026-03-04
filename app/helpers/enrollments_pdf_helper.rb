@@ -222,55 +222,47 @@ module EnrollmentsPdfHelper
           size: 9,
           inline_format: true,
           border_width: 1,
-          borders: [:left, :right],
+          borders: [:left, :right, :top],
           border_color: "000080",
           align: :left,
           padding: [2, 4]
         }
       )
 
-      pdf.stroke_bounds
     end
 
-    pdf.bounding_box([0, pdf.cursor], width: 560) do
-      header = [[
-        "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_code")}</b>",
-        "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_name")}</b>",
-        "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_grade")}</b>",
-        "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_credits")}</b>",
-        "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_workload")}</b>",
-        "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_year_semester")}</b>"
-      ]]
+    header = [[
+      "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_code")}</b>",
+      "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_name")}</b>",
+      "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_grade")}</b>",
+      "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_credits")}</b>",
+      "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_workload")}</b>",
+      "<b>#{I18n.t("pdf_content.enrollment.grade_list.course_year_semester")}</b>"
+    ]]
 
-      pdf.table(
-        header,
-        column_widths: table_width,
-        row_colors: ["E5E5FF"],
-        cell_style: {
-          font: "FreeSans",
-          size: 9,
-          inline_format: true,
-          border_width: 1,
-          borders: [:left, :right],
-          border_color: "000080",
-          align: :center,
-          padding: [12, 2]
-        }
-      ) do |table|
-        table.column(2).padding = [7, 2]
-        table.column(3).padding = [2, 2]
-        table.column(4).padding = [7, 2]
-      end
-
-      pdf.stroke_bounds
+    pdf.table(
+      header,
+      column_widths: table_width,
+      row_colors: ["E5E5FF"],
+      cell_style: {
+        font: "FreeSans",
+        size: 9,
+        inline_format: true,
+        border_width: 1,
+        borders: [:left, :right, :top, :bottom],
+        border_color: "000080",
+        align: :center,
+        padding: [12, 2]
+      }
+    ) do |table|
+      table.column(2).padding = [7, 2]
+      table.column(3).padding = [2, 2]
+      table.column(4).padding = [7, 2]
     end
 
     # Content
     unless class_enrollments.empty?
-      new_page = true
-      page_size = (pdf.cursor / 15.5).floor
-
-      next_table_data = class_enrollments.map do |class_enrollment|
+      table_data = class_enrollments.map do |class_enrollment|
         [
           class_enrollment.course_class.course.code,
           class_enrollment.course_class.name_with_class_formated_to_reports,
@@ -287,67 +279,12 @@ module EnrollmentsPdfHelper
         ]
       end
 
-      while new_page do
-        new_page = false
-        table_data = next_table_data
+      pdf.fill_color "000000"
 
-        pdf.bounding_box([0, pdf.cursor], width: 560) do
-          pdf.fill_color "000000"
-
-          if table_data.size > page_size
-            new_page = true
-            next_table_data = table_data.drop(page_size)
-            table_data = table_data.first(page_size)
-            page_size = 50
-          end
-
-          pdf.table(
-            table_data,
-            column_widths: table_width,
-            row_colors: ["F2F2FF", "E5E5FF"],
-            cell_style: {
-              font: "FreeSans",
-              size: 9,
-              inline_format: true,
-              border_width: 1,
-              borders: [:left, :right],
-              border_color: "000080",
-              align: :center,
-              padding: 2
-            }
-          ) do |table|
-            table.column(1).align = :left
-            table.column(1).font = "FreeSans"
-            table.column(1).padding = [2, 4]
-          end
-          pdf.fill_color "000080"
-
-          pdf.stroke_bounds
-        end
-        if new_page
-          pdf.start_new_page
-        end
-      end
-    end
-
-    # Footer
-    pdf.bounding_box([0, pdf.cursor], width: 560) do
-      footer = [[
-        "",
-        "<b>#{I18n.t("pdf_content.enrollment.grade_list.total")}</b>",
-        "",
-        class_enrollments.joins({ course_class: :course }).sum(:credits).to_i,
-        I18n.translate(
-          "activerecord.attributes.course.workload_time",
-          time: class_enrollments.joins({ course_class: :course })
-            .sum(:workload).to_i
-        ),
-        ""
-      ]]
       pdf.table(
-        footer,
+        table_data,
         column_widths: table_width,
-        row_colors: ["E5E5FF"],
+        row_colors: ["F2F2FF", "E5E5FF"],
         cell_style: {
           font: "FreeSans",
           size: 9,
@@ -359,12 +296,45 @@ module EnrollmentsPdfHelper
           padding: 2
         }
       ) do |table|
-        table.column(1).align = :right
+        table.column(1).align = :left
+        table.column(1).font = "FreeSans"
         table.column(1).padding = [2, 4]
-        table.column(3).text_color = "000000"
-        table.column(4).text_color = "000000"
       end
-      pdf.stroke_bounds
+      pdf.fill_color "000080"
+    end
+
+    # Footer
+    footer = [[
+      "",
+      "<b>#{I18n.t("pdf_content.enrollment.grade_list.total")}</b>",
+      "",
+      class_enrollments.joins({ course_class: :course }).sum(:credits).to_i,
+      I18n.translate(
+        "activerecord.attributes.course.workload_time",
+        time: class_enrollments.joins({ course_class: :course })
+          .sum(:workload).to_i
+      ),
+      ""
+    ]]
+    pdf.table(
+      footer,
+      column_widths: table_width,
+      row_colors: ["E5E5FF"],
+      cell_style: {
+        font: "FreeSans",
+        size: 9,
+        inline_format: true,
+        border_width: 1,
+        borders: [:left, :right, :top, :bottom],
+        border_color: "000080",
+        align: :center,
+        padding: 2
+      }
+    ) do |table|
+      table.column(1).align = :right
+      table.column(1).padding = [2, 4]
+      table.column(3).text_color = "000000"
+      table.column(4).text_color = "000000"
     end
   end
 
