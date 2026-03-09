@@ -113,14 +113,12 @@ RSpec.configure do |config|
       browser: :chrome,
       options: options
     )
-    bridge = driver.browser.send(:bridge)
-    path = "/session/#{bridge.session_id}/chromium/send_command"
-
-    bridge.http.call(:post, path, cmd: 'Page.setDownloadBehavior',
-                                  params: {
-                                    behavior: 'allow',
-                                    downloadPath: DownloadHelpers::PATH.to_s
-                              })
+    
+    driver.browser.execute_cdp('Page.setDownloadBehavior',
+    behavior: 'allow',
+    downloadPath: DownloadHelpers::PATH.to_s
+    )
+    
     driver
   end
 
