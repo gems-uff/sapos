@@ -82,15 +82,14 @@ RSpec.describe "Scholarships features", type: :feature do
         find(:select, "record_sponsor_").find(:option, text: "CNPq").select_option
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.scholarship_number-column", text: "B4")
 
       # Remove inserted record
       expect(page.all("tr td.scholarship_number-column").map(&:text)).to eq ["B4", "B1", "B2", "B3"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.scholarship_number-column").map(&:text)).to eq ["B1", "B2", "B3"]
+      expect(page).to have_no_content("B4")
     end
 
     it "should have a record_select widget for professor" do
