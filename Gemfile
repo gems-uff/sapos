@@ -8,7 +8,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby "~> 3.2.5"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 7.0.8.1"
+gem "rails", "~> 7.1.0"
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
@@ -95,12 +95,13 @@ gem "prawn-qrcode"
 gem "redcarpet"
 
 # Active scaffold support for newer Rails
-gem "active_scaffold", git: "https://github.com/activescaffold/active_scaffold.git", ref: "7a61ff721e4ee68ac9dc5ce65128f63b067a4d7d"
+gem "request_store", ">= 1.6.0"
+gem "active_scaffold", git: "https://github.com/activescaffold/active_scaffold.git", ref: "6210cdc4c0da0cba17e0716b65a16a783e12b407"
 gem "active_scaffold_duplicate", ">= 1.1.0"
 gem "recordselect"
 
 # Date Validation Plugin
-gem "validates_timeliness", "~> 7.0.0.beta1"
+gem "validates_timeliness", "~> 7.1.0"
 
 # Menu
 gem "simple-navigation"
