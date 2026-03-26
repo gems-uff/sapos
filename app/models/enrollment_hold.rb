@@ -20,6 +20,7 @@ class EnrollmentHold < ApplicationRecord
   validate :verify_class_enrollments
 
   after_commit :create_phase_completions
+  after_commit :invalidate_enrollment_requests, on: [:create, :update]
 
   def to_label
     "#{date_label} - #{number_label}"
@@ -62,6 +63,17 @@ class EnrollmentHold < ApplicationRecord
 
   def create_phase_completions
     enrollment.create_phase_completions
+  end
+
+  def invalidate_enrollment_requests
+    enrollment_requests = EnrollmentRequest.where(enrollment: self.enrollment)
+    enrollment_requests.each do |enrollment_request|
+      if self.year == enrollment_request.year && self.semester == enrollment_request.semester
+        enrollment_request.class_enrollment_requests.each do |class_enrollment_request|
+          class_enrollment_request.set_status!(ClassEnrollmentRequest::INVALID)
+        end
+      end
+    end
   end
 
   def verify_class_enrollments

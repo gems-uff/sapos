@@ -85,5 +85,15 @@ RSpec.describe EnrollmentHold, type: :model do
         expect(enrollment_hold.to_label).to eq("2014.1 - 2 semestres")
       end
     end
+
+    it "should set class_enrollment_requests to INVALID when hold is created for the same semester" do
+      @destroy_later << e = FactoryBot.create(:enrollment, admission_date: 2.years.ago.to_date)
+      @destroy_later << cc = FactoryBot.create(:course_class, year: YearSemester.current.year, semester: YearSemester.current.semester)
+      @destroy_later << er = FactoryBot.create(:enrollment_request, enrollment: e, year: YearSemester.current.year, semester: YearSemester.current.semester)
+      @destroy_later << cer = FactoryBot.create(:class_enrollment_request, enrollment_request: er, course_class: cc, action: ClassEnrollmentRequest::INSERT)
+      @destroy_later << FactoryBot.create(:enrollment_hold, enrollment: e,
+        year: YearSemester.current.year, semester: YearSemester.current.semester)
+      expect(cer.reload.status).to eq(ClassEnrollmentRequest::INVALID)
+    end
   end
 end

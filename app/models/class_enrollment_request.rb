@@ -61,7 +61,7 @@ class ClassEnrollmentRequest < ApplicationRecord
     if: -> { !student_saving && !marked_for_destruction? }
   validate :that_course_class_does_not_exist_in_a_class_enrollment,
     if: -> { !marked_for_destruction? }
-  validate :check_enrollment_hold
+  validate :check_enrollment_hold, unless: -> { status == INVALID }
 
   before_validation :create_or_destroy_class_enrollment, on: %i[create update]
   after_save :destroy_or_create_class_enrollment
