@@ -20,14 +20,27 @@ RSpec.describe "EnrollmentHolds features", type: :feature do
     @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia")
     @destroy_all << @student3 = FactoryBot.create(:student, name: "Carol")
     @destroy_all << @student4 = FactoryBot.create(:student, name: "Dani")
+    @destroy_all << @student5 = FactoryBot.create(:student, name: "Eva")
     @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level, enrollment_status: @enrollment_status, admission_date: YearSemester.current.semester_begin - 3.years)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student2, level: @level, enrollment_status: @enrollment_status, admission_date: YearSemester.current.semester_begin - 3.years)
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level, enrollment_status: @enrollment_status, admission_date: YearSemester.current.semester_begin - 3.years)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level, enrollment_status: @enrollment_status, admission_date: YearSemester.current.semester_begin - 3.years)
+    @destroy_all << @enrollment5 = FactoryBot.create(:enrollment, enrollment_number: "M05", student: @student5, level: @level, enrollment_status: @enrollment_status, admission_date: YearSemester.current.semester_begin - 3.years)
 
     @destroy_all << @record = FactoryBot.create(:enrollment_hold, enrollment: @enrollment1, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1)
     @destroy_all << FactoryBot.create(:enrollment_hold, enrollment: @enrollment2, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1, active: false)
     @destroy_all << FactoryBot.create(:enrollment_hold, enrollment: @enrollment3, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1)
+
+    @destroy_all << @course_type_cer = FactoryBot.create(:course_type)
+    @destroy_all << @course_cer = FactoryBot.create(:course, course_type: @course_type_cer)
+    @destroy_all << @professor_cer = FactoryBot.create(:professor)
+    @destroy_all << @course_class_cer = FactoryBot.create(:course_class, course: @course_cer, professor: @professor_cer, year: YearSemester.current.year, semester: YearSemester.current.semester)
+    @destroy_all << @enrollment_request_cer = FactoryBot.create(:enrollment_request, enrollment: @enrollment5, year: YearSemester.current.year, semester: YearSemester.current.semester)
+    @destroy_all << @cer = @enrollment_request_cer.class_enrollment_requests.create!(
+      course_class: @course_class_cer,
+      status: ClassEnrollmentRequest::REQUESTED,
+      action: ClassEnrollmentRequest::INSERT
+    )
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -87,6 +100,17 @@ RSpec.describe "EnrollmentHolds features", type: :feature do
 
     it "should have a record_select widget for enrollment" do
       expect_to_have_record_select(page, "enrollment_", "enrollments")
+    end
+
+    it "should invalidate class_enrollment_requests for the same semester when hold is created" do
+      fill_record_select("enrollment_", "enrollments", "M05")
+      within("#as_#{plural_name}-create--form") do
+        find(:select, "record_year_").find(:option, text: YearSemester.current.year.to_s).select_option
+        find(:select, "record_semester_").find(:option, text: YearSemester.current.semester.to_s).select_option
+      end
+      click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
+      expect(@cer.reload.status).to eq(ClassEnrollmentRequest::INVALID)
     end
   end
 
