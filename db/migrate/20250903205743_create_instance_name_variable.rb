@@ -8,4 +8,8 @@ class CreateInstanceNameVariable < ActiveRecord::Migration[7.0]
       value: nil
     )
   end
+
+  def down
+    CustomVariable.where(variable: "instance_name").destroy_all
+  end
 end
