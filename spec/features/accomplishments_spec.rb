@@ -87,14 +87,14 @@ RSpec.describe "Accomplishments features", type: :feature do
         find(:select, "record_phase_").find(:option, text: "Pedido de Banca").select_option
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04 - Dani")
 
       # Remove inserted record
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M04 - Dani", "M02 - Bia", "M01 - Ana", "M03 - Carol"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
+      expect(page).to have_no_content("M04 - Dani")
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia", "M01 - Ana", "M03 - Carol"]
     end
 
@@ -152,7 +152,7 @@ RSpec.describe "Accomplishments features", type: :feature do
 
     it "should be able to search by enrollment number" do
       fill_in "search", with: "M02"
-      sleep(0.8)
+      expect(page).to have_no_content("M01 - Ana")
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia"]
     end
   end

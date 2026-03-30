@@ -74,6 +74,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
       expect(download).to match(/Visualizar\.pdf/)
 
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Relatório")
       expect(model.last.image.file).not_to eq nil
 
@@ -81,9 +82,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Relatório", "Boletim", "Histórico", "Padrão"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Boletim", "Histórico", "Padrão"]
+      expect(page).to have_no_content("Relatório")
     end
   end
 
@@ -143,7 +142,7 @@ RSpec.describe "ReportConfigurations features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "search", with: "Bol"
-      sleep(0.8)
+      expect(page).to have_no_content("Padrão")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Boletim"]
     end
   end

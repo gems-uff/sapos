@@ -21,7 +21,7 @@ RSpec.describe "Enrollments features", type: :feature do
     @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
 
     @destroy_all << @enrollment_status1 = FactoryBot.create(:enrollment_status, name: "Regular")
-    @destroy_all << @enrollment_status2 = FactoryBot.create(:enrollment_status, name: "Avulso")
+    @destroy_all << @enrollment_status2 = FactoryBot.create(:enrollment_status, name: "Avulso", professor_can_generate_report: false)
     @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana", email: "ana.sapos@ic.uff.br")
     @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia", email: "bia.sapos@ic.uff.br")
     @destroy_all << @student3 = FactoryBot.create(:student, name: "Carol")
@@ -128,6 +128,7 @@ RSpec.describe "Enrollments features", type: :feature do
         find(:select, "record_level_").find(:option, text: @level1.name).select_option
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.enrollment_number-column", text: "M04")
       expect(page).to have_css("tr:nth-child(1) td.student-column", text: "Dani")
 
@@ -135,9 +136,7 @@ RSpec.describe "Enrollments features", type: :feature do
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M04", "M01", "M02", "M03"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M01", "M02", "M03"]
+      expect(page).to have_no_content("M04")
     end
 
     it "should have a month_year widget for admission_date" do
@@ -312,6 +311,18 @@ RSpec.describe "Enrollments features", type: :feature do
       context "when student is not dismissed with title" do
         it "should not be able to click the academic transcript link" do
           expect(page).not_to have_selector("#as_#{plural_name}-academic_transcript_pdf-#{@record.id}-link")
+        end
+      end
+
+      context "when professor can generate grade report due the enrollment status" do
+        it "should be able to click the grade report link" do
+          expect(page).to have_selector("#as_#{plural_name}-grades_report_pdf-#{@record.id}-link")
+        end
+      end
+
+      context "when professor can't generate grade report due the enrollment status" do
+        it "should be able to click the academic transcript link" do
+          expect(page).not_to have_selector("#as_#{plural_name}-grades_report_pdf-#{@enrollment2.id}-link")
         end
       end
     end

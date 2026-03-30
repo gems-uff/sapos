@@ -17,7 +17,7 @@ RSpec.describe "Pendencies features", type: :feature do
 
     @destroy_all << CustomVariable.create(variable: :professor_login_can_post_grades, value: "yes")
 
-    @destroy_all << @class_schedule = FactoryBot.create(:class_schedule, year: 0.years.ago.year, semester: YearSemester.current.semester, period_end: 5.days.ago)
+    @destroy_all << @class_schedule = FactoryBot.create(:class_schedule, year: YearSemester.current.year, semester: YearSemester.current.semester, period_end: 5.days.ago)
 
     @destroy_all << @level1 = FactoryBot.create(:level, name: "Doutorado")
     @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
@@ -60,13 +60,13 @@ RSpec.describe "Pendencies features", type: :feature do
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status2)
 
     @destroy_all << @course_class1 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: 2022, semester: 1)
-    @destroy_all << @course_class2 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: 0.years.ago.year, semester: YearSemester.current.semester)
+    @destroy_all << @course_class2 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: YearSemester.current.year, semester: YearSemester.current.semester)
     @destroy_all << @course_class3 = FactoryBot.create(:course_class, name: "Algebra", course: @course2, professor: @professor1, year: 2021, semester: 1)
-    @destroy_all << @course_class4 = FactoryBot.create(:course_class, name: "Versionamento", course: @course3, professor: @professor2, year: 0.years.ago.year, semester: YearSemester.current.semester)
-    @destroy_all << @course_class5 = FactoryBot.create(:course_class, name: "Defesa", course: @course4, professor: @professor3, year: 0.years.ago.year, semester: YearSemester.current.semester)
-    @destroy_all << @course_class6 = FactoryBot.create(:course_class, name: "Mineração de Repositórios", course: @course5, professor: @professor2, year: 0.years.ago.year, semester: YearSemester.current.semester)
-    @destroy_all << @course_class7 = FactoryBot.create(:course_class, name: "Pesquisa", course: @course6, professor: @professor3, year: 0.years.ago.year, semester: YearSemester.current.semester)
-    @destroy_all << @course_class8 = FactoryBot.create(:course_class, name: "Programação", course: @course7, professor: @professor1, year: 0.years.ago.year, semester: YearSemester.current.semester)
+    @destroy_all << @course_class4 = FactoryBot.create(:course_class, name: "Versionamento", course: @course3, professor: @professor2, year: YearSemester.current.year, semester: YearSemester.current.semester)
+    @destroy_all << @course_class5 = FactoryBot.create(:course_class, name: "Defesa", course: @course4, professor: @professor3, year: YearSemester.current.year, semester: YearSemester.current.semester)
+    @destroy_all << @course_class6 = FactoryBot.create(:course_class, name: "Mineração de Repositórios", course: @course5, professor: @professor2, year: YearSemester.current.year, semester: YearSemester.current.semester)
+    @destroy_all << @course_class7 = FactoryBot.create(:course_class, name: "Pesquisa", course: @course6, professor: @professor3, year: YearSemester.current.year, semester: YearSemester.current.semester)
+    @destroy_all << @course_class8 = FactoryBot.create(:course_class, name: "Programação", course: @course7, professor: @professor1, year: YearSemester.current.year, semester: YearSemester.current.semester)
 
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level2)
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment1, professor: @professor1, main_advisor: true)

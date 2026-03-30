@@ -57,7 +57,7 @@ class Allocation < ApplicationRecord
       return if self.start_time.blank?
       return if self.end_time.blank?
       allocations = Allocation.where(
-        course_class_id: self.course_class,
+        course_class_id: self.course_class_id,
         day: self.day
       )
       return if allocations.blank?

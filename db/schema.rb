@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2025_10_14_131727) do
+ActiveRecord::Schema[7.1].define(version: 2026_03_18_155403) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -516,6 +516,7 @@ ActiveRecord::Schema[7.0].define(version: 2025_10_14_131727) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.boolean "user", default: false, null: false
+    t.boolean "professor_can_generate_report", default: true
   end
 
   create_table "enrollments", force: :cascade do |t|
@@ -1148,5 +1149,4 @@ ActiveRecord::Schema[7.0].define(version: 2025_10_14_131727) do
     t.datetime "created_at", precision: nil
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
-
 end

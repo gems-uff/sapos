@@ -6,7 +6,7 @@
 class Admissions::FilledFormField < ActiveRecord::Base
   has_paper_trail
 
-  serialize :list
+  serialize :list, coder: YAML
 
   belongs_to :filled_form, optional: false,
     class_name: "Admissions::FilledForm"
