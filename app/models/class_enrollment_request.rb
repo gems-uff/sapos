@@ -72,8 +72,7 @@ class ClassEnrollmentRequest < ApplicationRecord
     return ["0 = -1"] if user.blank?
     return ["0 = -1"] if user.cannot?(:read_pendencies, ClassEnrollmentRequest)
 
-    cer = ClassEnrollmentRequest.arel_table.dup
-    cer.table_alias = "cer"
+    cer = Arel::Table.new(ClassEnrollmentRequest.table_name, as: "cer")
     check_status = cer.where(
       cer[:status].not_eq(ClassEnrollmentRequest::EFFECTED)
       .and(cer[:status].not_eq(ClassEnrollmentRequest::INVALID))

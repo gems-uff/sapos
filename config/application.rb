@@ -17,7 +17,11 @@ module Sapos
     # Using defaults of rails < 5, since it was the original generated version.
     #   Consider checking which defaults we should update:
     #   https://guides.rubyonrails.org/configuring.html#versioned-default-values
-    config.load_defaults 7.0
+    config.load_defaults 7.1
+
+    # ActiveScaffold defines callbacks for actions not always present in all controllers.
+    # Rails 7.1 raised this to true by default, causing AbstractController::ActionNotFound.
+    config.action_controller.raise_on_missing_callback_actions = false
 
 
     # Allow the notifier to send emails

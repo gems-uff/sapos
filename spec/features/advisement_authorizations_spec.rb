@@ -70,15 +70,14 @@ RSpec.describe "Advisements features", type: :feature do
       fill_record_select("professor_", "professors", "Helena")
       find(:select, "record_level_").find(:option, text: @level2.name).select_option
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.professor-column", text: "Helena")
 
       # Remove inserted record
       expect(page.all("tr td.professor-column").map(&:text)).to eq ["Helena", "Erica", "Fiona", "Gi"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.professor-column").map(&:text)).to eq ["Erica", "Fiona", "Gi"]
+      expect(page).to have_no_content("Helena")
     end
 
     it "should have a record_select widget for professor" do

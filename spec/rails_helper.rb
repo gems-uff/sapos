@@ -54,7 +54,7 @@ end
 
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  config.fixture_paths = ["#{::Rails.root}/spec/fixtures"]
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
@@ -113,14 +113,12 @@ RSpec.configure do |config|
       browser: :chrome,
       options: options
     )
-    bridge = driver.browser.send(:bridge)
-    path = "/session/#{bridge.session_id}/chromium/send_command"
-
-    bridge.http.call(:post, path, cmd: 'Page.setDownloadBehavior',
-                                  params: {
-                                    behavior: 'allow',
-                                    downloadPath: DownloadHelpers::PATH.to_s
-                              })
+    
+    driver.browser.execute_cdp('Page.setDownloadBehavior',
+    behavior: 'allow',
+    downloadPath: DownloadHelpers::PATH.to_s
+    )
+    
     driver
   end
 
