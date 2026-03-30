@@ -66,28 +66,32 @@ class EnrollmentHold < ApplicationRecord
   end
 
   def invalidate_enrollment_requests
-    enrollment_requests = EnrollmentRequest.where(enrollment: self.enrollment)
+    enrollment_requests = EnrollmentRequest.where(
+      enrollment: enrollment,
+      year: year,
+      semester: semester
+    ).includes(:class_enrollment_requests)
+
     enrollment_requests.each do |enrollment_request|
-      if self.year == enrollment_request.year && self.semester == enrollment_request.semester
-        enrollment_request.class_enrollment_requests.each do |class_enrollment_request|
-          class_enrollment_request.set_status!(ClassEnrollmentRequest::INVALID)
-        end
+      enrollment_request.class_enrollment_requests.each do |class_enrollment_request|
+        class_enrollment_request.set_status!(ClassEnrollmentRequest::INVALID)
       end
     end
   end
 
   def verify_class_enrollments
     class_enrollments = ClassEnrollment.where(enrollment: self.enrollment)
-    class_enrollments.each do |class_enrollment|
-      course_class = class_enrollment.course_class
-      unless course_class.end_date < self.start_date || course_class.start_date > self.end_date
-        errors.add(:base, :class_enrollments_exist)
-      end
+    if class_enrollments.any? { |ce|
+     !(ce.course_class.end_date < self.start_date || ce.course_class.start_date > self.end_date) 
+    }
+      errors.add(:base, :class_enrollments_exist)
     end
   end
 
   def self.hold_in_date(enrollment, course_start, course_end)
-    enrollment_holds = EnrollmentHold.where(enrollment: enrollment)
+    course_start = course_start.to_date
+    course_end   = course_end.to_date
+    enrollment_holds = EnrollmentHold.where(enrollment: enrollment, active: true)
     unless enrollment_holds.empty?
       enrollment_holds.each do |hold|
         return true unless course_end < hold.start_date || course_start > hold.end_date

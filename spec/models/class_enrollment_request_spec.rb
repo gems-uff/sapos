@@ -161,8 +161,8 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
             @destroy_later << cc = FactoryBot.create(:course_class, year: 1.year.ago.year, semester: 1)
             @destroy_later << FactoryBot.create(:enrollment_hold, enrollment: e,
             year: 2.years.ago.year, number_of_semesters: 4)
-            @destroy_later << cer = FactoryBot.create(:enrollment_request, enrollment: e)
-            class_enrollment_request.enrollment_request = cer
+            @destroy_later << er = FactoryBot.create(:enrollment_request, enrollment: e)
+            class_enrollment_request.enrollment_request = er
             class_enrollment_request.course_class = cc
             expect(class_enrollment_request).to have_error(:enrollment_is_held).on :enrollment
           end
