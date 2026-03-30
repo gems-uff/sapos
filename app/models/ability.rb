@@ -135,6 +135,9 @@ class Ability
       can :read, Ability::STUDENT_MODELS
       can :read_all_fields, Student
       can :photo, Student
+      cannot :grades_report_pdf, Enrollment do |enrollment|
+        !enrollment.enrollment_status.professor_can_generate_report
+      end
     end
     if roles[Role::ROLE_SUPORTE]
       can [:read, :update, :update_only_photo], (Student)

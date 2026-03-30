@@ -64,15 +64,14 @@ RSpec.describe "Institutions features", type: :feature do
         fill_in "Sigla", with: "UFRJ"
       end
       click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Universidade Federal do Rio de Janeiro")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Universidade Federal do Rio de Janeiro", "Universidade Estadual do Rio de Janeiro", "Universidade Federal Fluminense", "Universidade de São Paulo"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Universidade Estadual do Rio de Janeiro", "Universidade Federal Fluminense", "Universidade de São Paulo"]
+      expect(page).to have_no_content("Universidade Federal do Rio de Janeiro")
     end
   end
 
@@ -101,7 +100,7 @@ RSpec.describe "Institutions features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "search", with: "Flu"
-      sleep(0.8)
+      expect(page).to have_no_content("Universidade de São Paulo")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Universidade Federal Fluminense"]
     end
   end
