@@ -34,6 +34,7 @@ pt-BR:
         scholarship_durations_active: "Possui bolsa?"
         advisor: "Orientador"
         has_advisor: "Possui orientador?"
+        created_at: "Data de Inscrição"
 
     errors:
       models:
