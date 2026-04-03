@@ -19,8 +19,6 @@ class Advisement < ApplicationRecord
     message: :advisement_professor_uniqueness
   }
 
-  validate :main_advisor_authorization
-
   after_create :notify_advisor
 
   def to_label
@@ -92,14 +90,4 @@ class Advisement < ApplicationRecord
     Notifier.send_emails(notifications: emails)
   end
 
-  def main_advisor_authorization
-    if professor && main_advisor && enrollment
-      has_authorization = professor.advisement_authorizations.
-                          where(level: enrollment.level).
-                          exists?
-      unless has_authorization
-        errors.add(:base, :main_advisor_should_has_level)
-      end
-    end
-  end
 end
