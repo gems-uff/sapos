@@ -38,3 +38,26 @@ jobs:
         with:
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
           files: coverage/.resultset.json
+
+  smoke-test:
+    runs-on: ubuntu-latest
+
+    env:
+      RAILS_ENV: production
+      SECRET_KEY_BASE: chave_falsa_apenas_para_o_boot_do_smoke_test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install sendmail
+        run: sudo apt-get install -y sendmail
+
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          cache-version: 1
+
+      - name: Run smoke test
+        run: bundle exec rake smoke_test:all
