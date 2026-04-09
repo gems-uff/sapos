@@ -121,6 +121,20 @@ class EmailTemplate < ApplicationRecord
         record: ClassEnrollmentDrop
       }
     },
+    "class_enrollments:email_to_professor_enrolment" => {
+      template_type: "Liquid",
+      path: File.join(
+        "class_enrollments", "mailer", "email_to_professor_enrolment.text.liquid"
+      ),
+      subject: I18n.t(
+        "notifications.class_enrollment.email_to_professor_enrolment.subject"
+      ),
+      to: "{{ record.course_class.professor.email }}",
+      variables: {
+        record: ClassEnrollmentDrop
+      }
+    },
+
     "class_enrollments:email_to_student" => {
       template_type: "Liquid",
       path: File.join(

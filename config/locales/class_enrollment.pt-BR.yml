@@ -69,3 +69,5 @@ pt-BR:
         subject: "Inscrição em {{ record.course_class.label_for_email_subject }} de {{ record.enrollment.to_label }} foi atualizada"
       email_to_professor:
         subject: "Alteração da nota de {{ record.enrollment.to_label }} em {{ record.course_class.label_for_email_subject }}"
+      email_to_professor_enrolment:
+        subject: "Alteração da inscrição de {{ record.enrollment.to_label }} na turma {{ record.course_class.label_for_email_subject }}"

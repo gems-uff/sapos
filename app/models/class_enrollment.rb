@@ -216,6 +216,14 @@ class ClassEnrollment < ApplicationRecord
           advisement: advisement
         })
       end
+      @class_schedule = ClassSchedule.find_by(year: self.course_class.year, semester: self.course_class.semester)
+      if @class_schedule.adjust_enroll_insert_open? || @class_schedule.adjust_enroll_remove_open?
+        emails << EmailTemplate.load_template(
+          "class_enrollments:email_to_professor_enrolment"
+        ).prepare_message({
+          record: self
+        })
+      end
       Notifier.send_emails(notifications: emails)
     end
 

@@ -1,0 +1,6 @@
+{{ record.course_class.professor.name }},
+
+Informamos que a inscrição de {{ record.enrollment.to_label }} na turma {{ record.course_class.label_with_course }} foi atualizada:
+-Situação: {{ record.situation }}{{ record.situation_changed }}
+
+{{ variables.notification_footer }}
