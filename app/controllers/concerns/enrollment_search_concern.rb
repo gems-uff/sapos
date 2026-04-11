@@ -202,7 +202,7 @@ module EnrollmentSearchConcern
       return "" if value[:hold].blank? || value[:hold].to_i == 0
       eh = EnrollmentHold.arel_table
       enrollments_ids = Enrollment.joins(:enrollment_holds)
-        .where(eh[:active].eq(true)).pluck(:id)
+        .pluck(:id)
       query_enrollment_hold = enrollments_ids.blank? ? "1 = 2" : "
         enrollments.id in (#{enrollments_ids.join(',')})"
       query_enrollment_hold

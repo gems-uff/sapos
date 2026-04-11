@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_01_10_185310) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_10_193422) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -284,7 +284,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_10_185310) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "query_id", null: false
-    t.text "assertion_template"
+    t.string "assertion_template"
     t.boolean "student_can_generate", default: false
     t.integer "expiration_in_months"
     t.string "template_type", default: "Liquid"
@@ -485,7 +485,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_10_185310) do
     t.integer "number_of_semesters", default: 1
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "active", default: true, null: false
     t.index ["enrollment_id"], name: "index_enrollment_holds_on_enrollment_id"
   end
 
@@ -827,8 +826,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_10_185310) do
 
   create_table "program_levels", force: :cascade do |t|
     t.integer "level", null: false
-    t.date "start_date", null: false
-    t.date "end_date"
+    t.datetime "start_date", null: false
+    t.datetime "end_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "ordinance"
@@ -947,7 +946,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_10_185310) do
     t.string "code", limit: 255
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "available"
+    t.boolean "available", default: true
   end
 
   create_table "research_lines", force: :cascade do |t|
@@ -955,7 +954,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_10_185310) do
     t.integer "research_area_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "available"
+    t.boolean "available", default: true
     t.index ["research_area_id"], name: "index_research_lines_on_research_area_id"
   end
 
@@ -1149,4 +1148,23 @@ ActiveRecord::Schema[7.1].define(version: 2026_01_10_185310) do
     t.datetime "created_at", precision: nil
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
+
+  add_foreign_key "assertions", "queries"
+  add_foreign_key "course_research_lines", "courses"
+  add_foreign_key "course_research_lines", "research_lines"
+  add_foreign_key "enrollments", "research_lines", on_delete: :nullify
+  add_foreign_key "grants", "professors"
+  add_foreign_key "paper_professors", "papers"
+  add_foreign_key "paper_professors", "professors"
+  add_foreign_key "paper_students", "papers"
+  add_foreign_key "paper_students", "students"
+  add_foreign_key "papers", "professors", column: "owner_id"
+  add_foreign_key "professor_research_lines", "professors"
+  add_foreign_key "professor_research_lines", "research_lines"
+  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
+  add_foreign_key "reports", "users", column: "generated_by_id"
+  add_foreign_key "reports", "users", column: "invalidated_by_id"
+  add_foreign_key "research_lines", "research_areas"
+  add_foreign_key "user_roles", "roles"
+  add_foreign_key "user_roles", "users"
 end

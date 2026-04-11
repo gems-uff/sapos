@@ -326,7 +326,7 @@ module EnrollmentsHelper
       search[:enrollment_hold][:hold].to_i != 0
     )
     if searching_hold
-      holds = record.enrollment_holds.where(active: true)
+      holds = record.enrollment_holds
         .collect(&:to_label).join(", ")
       result += ("
         </tr></table></td>

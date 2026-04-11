@@ -8,9 +8,9 @@ class EnrollmentHoldsController < ApplicationController
   active_scaffold :"enrollment_hold" do |config|
     config.create.label = :create_enrollment_hold_label
     config.actions.swap :search, :field_search
-    config.field_search.columns = [:enrollment, :active]
+    config.field_search.columns = [:enrollment]
     config.columns = [
-      :enrollment, :year, :semester, :number_of_semesters, :active
+      :enrollment, :year, :semester, :number_of_semesters
     ]
     config.columns[:enrollment].search_ui = :text
     config.columns[:enrollment].search_sql = "enrollments.enrollment_number"

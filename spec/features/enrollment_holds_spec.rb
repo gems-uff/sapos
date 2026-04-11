@@ -28,7 +28,7 @@ RSpec.describe "EnrollmentHolds features", type: :feature do
     @destroy_all << @enrollment5 = FactoryBot.create(:enrollment, enrollment_number: "M05", student: @student5, level: @level, enrollment_status: @enrollment_status, admission_date: YearSemester.current.semester_begin - 3.years)
 
     @destroy_all << @record = FactoryBot.create(:enrollment_hold, enrollment: @enrollment1, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1)
-    @destroy_all << FactoryBot.create(:enrollment_hold, enrollment: @enrollment2, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1, active: false)
+    @destroy_all << FactoryBot.create(:enrollment_hold, enrollment: @enrollment2, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1)
     @destroy_all << FactoryBot.create(:enrollment_hold, enrollment: @enrollment3, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1)
 
     @destroy_all << @course_type_cer = FactoryBot.create(:course_type)
@@ -61,7 +61,7 @@ RSpec.describe "EnrollmentHolds features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Trancamentos"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Matrícula", "Ano", "Semestre", "Número de Semestres", "Trancado?", ""
+        "Matrícula", "Ano", "Semestre", "Número de Semestres", ""
       ]
     end
 
@@ -141,18 +141,6 @@ RSpec.describe "EnrollmentHolds features", type: :feature do
       fill_in "Matrícula", with: "M03"
       click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M03 - Carol"]
-    end
-
-    it "should be able to search by active = yes" do
-      find(:select, "search_active").find(:option, text: "Sim").select_option
-      click_button_and_wait "Buscar"
-      expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Ana", "M03 - Carol"]
-    end
-
-    it "should be able to search by active = no" do
-      find(:select, "search_active").find(:option, text: "Não").select_option
-      click_button_and_wait "Buscar"
-      expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Bia"]
     end
   end
 end

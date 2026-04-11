@@ -88,10 +88,28 @@ class EnrollmentHold < ApplicationRecord
     end
   end
 
+  def active?
+    today = Date.today
+    today > start_date && today < end_date
+  end
+
+  def self.currently_active
+    all.select(&:active?)
+  end
+
+  def self.currently_active_ids
+    currently_active.map(&:id)
+  end
+
+  def self.currently_active_enrollment_ids
+    currently_active.map(&:enrollment_id)
+  end
+
   def self.hold_in_date(enrollment, course_start, course_end)
+    return false if enrollment.nil?
     course_start = course_start.to_date
     course_end   = course_end.to_date
-    enrollment_holds = EnrollmentHold.where(enrollment: enrollment, active: true)
+    enrollment_holds = enrollment.enrollment_holds
     unless enrollment_holds.empty?
       enrollment_holds.each do |hold|
         return true unless course_end < hold.start_date || course_start > hold.end_date
