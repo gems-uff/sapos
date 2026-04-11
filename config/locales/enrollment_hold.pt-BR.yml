@@ -5,7 +5,7 @@ pt-BR:
   activerecord:
     attributes:
       enrollment_hold:
-        active: "Trancado?"
+        active: "Atualmente Trancado?"
         enrollment: "Matrícula"
         year: "Ano"
         semester: "Semestre"

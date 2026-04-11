@@ -75,6 +75,13 @@ RSpec.describe "Enrollments features", type: :feature do
     @destroy_all << FactoryBot.create(:class_enrollment, enrollment: @enrollment2, course_class: @course_class3, grade: 80, situation: ClassEnrollment::APPROVED)
 
     @destroy_all << FactoryBot.create(:enrollment_hold, enrollment: @enrollment1, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1)
+    @destroy_all << FactoryBot.create(
+      :enrollment_hold,
+      enrollment: @enrollment1,
+      year: YearSemester.current.year - 2,
+      semester: YearSemester.current.semester,
+      number_of_semesters: 10
+    )
 
     @enrollment_status1.update!(user: true)
     @enrollment_status2.update!(user: true)
@@ -264,6 +271,20 @@ RSpec.describe "Enrollments features", type: :feature do
       find(:css, "input[name=\"search[enrollment_hold][hold]\"][type=\"checkbox\"]").set(true)
       click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
+    end
+
+    it "should be able to search for enrollment on hold currently active" do
+      find(:css, "input[name=\"search[enrollment_hold][hold]\"][type=\"checkbox\"]").set(true)
+      find(:css, "select[name=\"search[enrollment_hold][active]\"]").find(:option, text: "Sim").select_option
+      click_button_and_wait "Buscar"
+      expect(page.all("tr td.enrollment_number-column").map(&:text)).to eq ["M02"]
+    end
+
+    it "should be able to search for enrollment on hold not currently active" do
+      find(:css, "input[name=\"search[enrollment_hold][hold]\"][type=\"checkbox\"]").set(true)
+      find(:css, "select[name=\"search[enrollment_hold][active]\"]").find(:option, text: "Não").select_option
+      click_button_and_wait "Buscar"
+      expect(page).to have_no_css("tr td.enrollment_number-column")
     end
   end
 

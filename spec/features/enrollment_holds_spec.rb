@@ -28,8 +28,8 @@ RSpec.describe "EnrollmentHolds features", type: :feature do
     @destroy_all << @enrollment5 = FactoryBot.create(:enrollment, enrollment_number: "M05", student: @student5, level: @level, enrollment_status: @enrollment_status, admission_date: YearSemester.current.semester_begin - 3.years)
 
     @destroy_all << @record = FactoryBot.create(:enrollment_hold, enrollment: @enrollment1, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1)
-    @destroy_all << FactoryBot.create(:enrollment_hold, enrollment: @enrollment2, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1)
-    @destroy_all << FactoryBot.create(:enrollment_hold, enrollment: @enrollment3, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1)
+    @destroy_all << FactoryBot.create(:enrollment_hold, enrollment: @enrollment2, year: YearSemester.current.year - 1, semester: YearSemester.current.semester, number_of_semesters: 3)
+    @destroy_all << FactoryBot.create(:enrollment_hold, enrollment: @enrollment3, year: YearSemester.current.year - 3, semester: YearSemester.current.semester, number_of_semesters: 1)
 
     @destroy_all << @course_type_cer = FactoryBot.create(:course_type)
     @destroy_all << @course_cer = FactoryBot.create(:course, course_type: @course_type_cer)
@@ -141,6 +141,22 @@ RSpec.describe "EnrollmentHolds features", type: :feature do
       fill_in "Matrícula", with: "M03"
       click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M03 - Carol"]
+    end
+
+    it "should be able to search by active - sim" do
+      find(:select, "search_active").find(:option, text: "Sim").select_option
+      click_button_and_wait "Buscar"
+      result = page.all("tr td.enrollment-column").map(&:text)
+      expect(result).to include("M01 - Bia")
+      expect(result).not_to include("M03 - Carol")
+    end
+
+    it "should be able to search by active - não" do
+      find(:select, "search_active").find(:option, text: "Não").select_option
+      click_button_and_wait "Buscar"
+      result = page.all("tr td.enrollment-column").map(&:text)
+      expect(result).to include("M03 - Carol")
+      expect(result).not_to include("M01 - Bia")
     end
   end
 end

@@ -151,11 +151,31 @@ module EnrollmentsHelper
   end
 
   def enrollment_hold_search_column(record, input_name)
-    select_html_options = {
+    hold_options = {
       name: "search[enrollment_hold][hold]",
       style: "float:left; margin: 5px 2px;"
     }
-    check_box(record, :enrollment_hold, select_html_options)
+    active_options = {
+      style: "display:inline-block; margin: 5px 2px;"
+    }
+    active_select_options = options_for_select(
+      [
+        [I18n.t("active_scaffold.true"), "1"],
+        [I18n.t("active_scaffold.false"), "0"]
+      ]
+    )
+    check_box(record, :enrollment_hold, hold_options) +
+    label_tag(
+      :enrollment_hold_active,
+      I18n.t("activerecord.attributes.enrollment.enrollment_hold_active"),
+      style: "margin: 0px 5px"
+    ) +
+    select_tag(
+      "search[enrollment_hold][active]",
+      active_select_options,
+      include_blank: true,
+      style: active_options[:style]
+    )
   end
 
   def course_class_year_semester_search_column(record, options)

@@ -88,13 +88,13 @@ class EnrollmentHold < ApplicationRecord
     end
   end
 
-  def active?
+  def active
     today = Date.today
     today > start_date && today < end_date
   end
 
   def self.currently_active
-    all.select(&:active?)
+    all.select(&:active)
   end
 
   def self.currently_active_ids
