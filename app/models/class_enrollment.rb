@@ -44,6 +44,9 @@ class ClassEnrollment < ApplicationRecord
   after_save :class_enrollment_request_cascade
   after_destroy :set_request_status_after_destroy
 
+  after_create :notify_professor
+  after_destroy :notify_professor
+
   default_scope {
     joins(enrollment: :student).order("students.name").readonly(false)
   }
@@ -216,14 +219,22 @@ class ClassEnrollment < ApplicationRecord
           advisement: advisement
         })
       end
-      @class_schedule = ClassSchedule.find_by(year: self.course_class.year, semester: self.course_class.semester)
-      if @class_schedule.adjust_enroll_insert_open? || @class_schedule.adjust_enroll_remove_open?
-        emails << EmailTemplate.load_template(
-          "class_enrollments:email_to_professor_enrolment"
+      Notifier.send_emails(notifications: emails)
+    end
+
+    def notify_professor
+      return if self.course_class.blank? || self.course_class.professor.blank?
+      class_schedule = ClassSchedule.find_by(year: self.course_class.year, semester: self.course_class.semester)
+      return if class_schedule.blank?
+      return unless class_schedule.adjust_enroll_insert_open? || class_schedule.adjust_enroll_remove_open?
+      emails = [
+        EmailTemplate.load_template(
+          "class_enrollments:email_to_professor_enrollment"
         ).prepare_message({
-          record: self
+          record: self,
+          destroyed: self.destroyed?
         })
-      end
+      ]
       Notifier.send_emails(notifications: emails)
     end
 
