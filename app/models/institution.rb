@@ -21,8 +21,8 @@ class Institution < ApplicationRecord
   def self.search_name(institution: nil, substring: false)
     institution = "%#{institution}%" if institution.present? && substring
     Institution.where(
-      "name COLLATE LIKE :institution 
-       OR code COLLATE LIKE :institution
+      "name LIKE :institution 
+       OR code LIKE :institution
       ", {institution: institution}
     )
   end

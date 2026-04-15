@@ -22,7 +22,7 @@ class Country < ApplicationRecord
   def self.search_name(country: nil, substring: false)
     country = "%#{country}%" if country.present? && substring
     Country.where(
-      "name COLLATE LIKE :country
+      "name LIKE :country
       ", {country: country}
     )
   end
