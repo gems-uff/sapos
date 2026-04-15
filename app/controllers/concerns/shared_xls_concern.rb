@@ -18,7 +18,8 @@ module SharedXlsConcern
        I18n.t("xls_content.course_class.summary.attendance"),
        I18n.t("xls_content.course_class.summary.situation"),
        I18n.t("xls_content.course_class.summary.obs"),
-       I18n.t("xls_content.course_class.summary.active_scholarship")]
+       I18n.t("xls_content.course_class.summary.active_scholarship"),
+       I18n.t("xls_content.course_class.summary.created_at")]
       class_enrollments.each_with_index do |class_enrollment, index|
         sheet.add_row build_summary_row(class_enrollment, index)
       end
@@ -37,7 +38,9 @@ module SharedXlsConcern
       class_enrollment.attendance_to_label,
       class_enrollment.situation,
       class_enrollment.obs,
-      scholarship_status(class_enrollment)
+      scholarship_status(class_enrollment),
+      I18n.l(class_enrollment.created_at, format: :defaultdatetime)
+
     ]
   end
   def scholarship_status(class_enrollment)
