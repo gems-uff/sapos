@@ -17,7 +17,10 @@ class EnrollmentHold < ApplicationRecord
 
   validate :validate_dates
 
+  validate :verify_class_enrollments
+
   after_commit :create_phase_completions
+  after_commit :invalidate_enrollment_requests, on: [:create, :update]
 
   def to_label
     "#{date_label} - #{number_label}"
@@ -60,5 +63,58 @@ class EnrollmentHold < ApplicationRecord
 
   def create_phase_completions
     enrollment.create_phase_completions
+  end
+
+  def invalidate_enrollment_requests
+    enrollment_requests = EnrollmentRequest.where(
+      enrollment: enrollment,
+      year: year,
+      semester: semester
+    ).includes(:class_enrollment_requests)
+
+    enrollment_requests.each do |enrollment_request|
+      enrollment_request.class_enrollment_requests.each do |class_enrollment_request|
+        class_enrollment_request.set_status!(ClassEnrollmentRequest::INVALID)
+      end
+    end
+  end
+
+  def verify_class_enrollments
+    class_enrollments = ClassEnrollment.where(enrollment: self.enrollment)
+    if class_enrollments.any? { |ce|
+     !(ce.course_class.end_date < self.start_date || ce.course_class.start_date > self.end_date) 
+    }
+      errors.add(:base, :class_enrollments_exist)
+    end
+  end
+
+  def active
+    today = Date.today
+    today > start_date && today < end_date
+  end
+
+  def self.currently_active
+    all.select(&:active)
+  end
+
+  def self.currently_active_ids
+    currently_active.map(&:id)
+  end
+
+  def self.currently_active_enrollment_ids
+    currently_active.map(&:enrollment_id)
+  end
+
+  def self.hold_in_date(enrollment, course_start, course_end)
+    return false if enrollment.nil?
+    course_start = course_start.to_date
+    course_end   = course_end.to_date
+    enrollment_holds = enrollment.enrollment_holds
+    unless enrollment_holds.empty?
+      enrollment_holds.each do |hold|
+        return true unless course_end < hold.start_date || course_start > hold.end_date
+      end
+    end
+    false
   end
 end

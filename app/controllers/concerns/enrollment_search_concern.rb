@@ -200,12 +200,21 @@ module EnrollmentSearchConcern
 
     def custom_condition_for_enrollment_hold_column(column, value, like_pattern)
       return "" if value[:hold].blank? || value[:hold].to_i == 0
-      eh = EnrollmentHold.arel_table
-      enrollments_ids = Enrollment.joins(:enrollment_holds)
-        .where(eh[:active].eq(true)).pluck(:id)
-      query_enrollment_hold = enrollments_ids.blank? ? "1 = 2" : "
-        enrollments.id in (#{enrollments_ids.join(',')})"
-      query_enrollment_hold
+      case value[:active]
+      when "1"
+        ids = EnrollmentHold.currently_active_enrollment_ids
+        return "1 = 2" if ids.blank?
+        "enrollments.id IN (#{ids.join(',')})"
+      when "0"
+        all_ids = Enrollment.joins(:enrollment_holds).pluck(:id)
+        return "1 = 2" if all_ids.blank?
+        ids = all_ids - EnrollmentHold.currently_active_enrollment_ids
+        return "1 = 2" if ids.blank?
+        "enrollments.id IN (#{ids.join(',')})"
+      else
+        ids = Enrollment.joins(:enrollment_holds).pluck(:id)
+        ids.blank? ? "1 = 2" : "enrollments.id in (#{ids.join(',')})"
+      end
     end
   end
 end
