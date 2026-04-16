@@ -258,9 +258,8 @@ class Admissions::FormField < ActiveRecord::Base
   def self.search_name(field: nil, substring: false)
     field = "%#{field}%" if field.present? && substring
     Admissions::FormField.where(
-      "name COLLATE :db_collation
-        LIKE :field COLLATE :value_collation
-      ", Collation.collations.merge(field:)
+      "name LIKE :field
+      ", {field: field}
     )
   end
 

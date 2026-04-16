@@ -95,6 +95,7 @@ RSpec.configure do |config|
     options.args << "--no-sandbox"
     options.args << "--disable-gpu"
     options.args << "--disable-dev-shm-usage"
+    options.args << "--disable-features=BackForwardCache"
 
     prefs = {
       "download.default_directory" => DownloadHelpers::PATH.to_s,
