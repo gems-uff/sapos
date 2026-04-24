@@ -74,7 +74,7 @@ gem "kaminari"
 
 # User access
 gem "cancancan"
-gem "devise", "~> 4.9"
+gem "devise", "~> 5.0"
 gem "devise_invitable", "~> 2.0.0"
 gem "paper_trail"
 
