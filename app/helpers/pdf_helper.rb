@@ -299,6 +299,8 @@ module PdfHelper
       filename: name
     }.merge(options)) do |pdf|
       freefont_directory = "#{Rails.root}/vendor/assets/fonts/gnu-freefont/"
+      dejavu_font_directory = "#{Rails.root}/vendor/assets/fonts/dejavu-fonts/"
+      noto_font_directory = "#{Rails.root}/vendor/assets/fonts/noto-fonts/"
 
       pdf.font_families.update("FreeMono" => {
         normal: freefont_directory + "FreeMono.ttf",
@@ -321,7 +323,36 @@ module PdfHelper
         bold_italic: freefont_directory + "FreeSerifBoldOblique.ttf"
       })
 
-      pdf.fallback_fonts(["FreeSans"])
+      pdf.font_families.update("DejaVuSans" => {
+        normal: dejavu_font_directory + "DejaVuSans.ttf",
+        bold: dejavu_font_directory + "DejaVuSans-Bold.ttf",
+        italic: dejavu_font_directory + "DejaVuSans-Oblique.ttf",
+        bold_italic: dejavu_font_directory + "DejaVuSans-BoldOblique.ttf"
+      })
+
+      pdf.font_families.update("DejaVuSerif" => {
+        normal: dejavu_font_directory + "DejaVuSerif.ttf",
+        bold: dejavu_font_directory + "DejaVuSerif-Bold.ttf",
+        italic: dejavu_font_directory + "DejaVuSerif-Italic.ttf",
+        bold_italic: dejavu_font_directory + "DejaVuSerif-BoldItalic.ttf"
+      })
+
+      pdf.font_families.update("DejaVuSansMono" => {
+        normal: dejavu_font_directory + "DejaVuSansMono.ttf",
+        bold: dejavu_font_directory + "DejaVuSansMono-Bold.ttf",
+        italic: dejavu_font_directory + "DejaVuSansMono-Oblique.ttf",
+        bold_italic: dejavu_font_directory + "DejaVuSansMono-BoldOblique.ttf"
+      })
+
+      pdf.font_families.update("NotoSansMath" => {
+        normal: noto_font_directory + "NotoSansMath-Regular.ttf",
+        bold: noto_font_directory + "NotoSansMath-Regular.ttf",
+        italic: noto_font_directory + "NotoSansMath-Regular.ttf",
+        bold_italic: noto_font_directory + "NotoSansMath-Regular.ttf"
+      })
+
+      # adicionar fonts com mais caracteres diferentes como Noto ou DejaVu
+      pdf.fallback_fonts(["NotoSansMath", "FreeSans", "FreeMono", "FreeSerif", "DejaVuSans", "DejaVuSerif", "DejaVuSansMono"])
 
       pdf.fill_color "000080"
       pdf.stroke_color "000080"
