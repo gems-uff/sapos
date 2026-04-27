@@ -25,6 +25,7 @@ class CustomVariable < ApplicationRecord
     "past_calendar_range" => :text,
     "academic_calendar_range" => :text,
     "quadrennial_period" => :text,
+    "instance_name" => :text,
   }
 
   validates :variable, presence: true
@@ -115,6 +116,10 @@ class CustomVariable < ApplicationRecord
     config.blank? ? "Not defined" : config.value
   end
 
+  def self.instance_name
+    config = CustomVariable.find_by_variable(:instance_name)
+    config.blank? ? nil : config.value
+  end
 
   def to_label
     self.variable.to_s
