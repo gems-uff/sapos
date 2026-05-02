@@ -281,6 +281,63 @@ RSpec.describe ScholarshipDuration, type: :model do
         expect(scholarship_duration.was_cancelled?).to eq(true)
       end
     end
+    describe "day_of" do
+      it "should return the date as a YYYYMMDD integer" do
+        date = Date.new(2023, 5, 15)
+        expect(scholarship_duration.day_of(date)).to eq(20230515)
+      end
+    end
+
+    describe "update_end_and_cancel_dates" do
+      it "normalizes end_date to end of month" do
+        scholarship_duration.end_date = Date.new(2023, 5, 10)
+        scholarship_duration.cancel_date = nil
+        scholarship_duration.update_end_and_cancel_dates
+        expect(scholarship_duration.end_date).to eq(Date.new(2023, 5, 31))
+      end
+
+      it "normalizes cancel_date to end of month when present" do
+        scholarship_duration.end_date = Date.new(2023, 5, 31)
+        scholarship_duration.cancel_date = Date.new(2023, 3, 15)
+        scholarship_duration.update_end_and_cancel_dates
+        expect(scholarship_duration.cancel_date).to eq(Date.new(2023, 3, 31))
+      end
+
+      it "does not change cancel_date when it is nil" do
+        scholarship_duration.cancel_date = nil
+        scholarship_duration.update_end_and_cancel_dates
+        expect(scholarship_duration.cancel_date).to be_nil
+      end
+    end
+
+    describe "update_end_date" do
+      it "sets end_date to minimum between enrollment level duration and scholarship end_date" do
+        enrollment.admission_date = Date.new(2020, 1, 1)
+        scholarship_duration.update_end_date
+        expected = (Date.new(2020, 1, 1) + 47.months).end_of_month
+        expect(scholarship_duration.end_date).to eq(expected)
+      end
+    end
+
+    describe "scholarship_level_equals_enrollment_level" do
+      context "should add an error when" do
+        it "scholarship level differs from enrollment level" do
+          @destroy_later << other_level = FactoryBot.create(:level)
+          @destroy_later << other_scholarship = FactoryBot.create(:scholarship, level: other_level,
+                                                                                start_date: start_date,
+                                                                                end_date: end_date)
+          scholarship_duration.scholarship = other_scholarship
+          expect(scholarship_duration).to have_error(:the_levels_of_scholarship_and_enrollment_are_different).on :scholarship
+        end
+      end
+
+      context "should not add an error when" do
+        it "scholarship level equals enrollment level" do
+          expect(scholarship_duration).to have(0).errors_on :scholarship
+        end
+      end
+    end
+
     describe "active?" do
       it "should return false if date is after end_date" do
         scholarship_duration.end_date = end_date + 2.months
