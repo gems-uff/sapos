@@ -60,7 +60,7 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 * [ActiveScaffold](https://github.com/activescaffold/active_scaffold)
 * [Prawn](https://github.com/prawnpdf/prawn)
 * [SQLite](https://www.sqlite.org/) (development/testing)
-* [MySQL](http://www.mysql.com/) (production)
+* [MySQL](https://www.mysql.com/) (production)
 
 # Acknowledgements
 
