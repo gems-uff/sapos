@@ -22,4 +22,12 @@ $(function() {
       }
     }
   });
+  $(document).on('as:action_success', function() {
+    $('.class_enrollments-sub-form').each(function() {
+      var subform = $(this);
+      if (subform.find('[course_has_grade="false"]').length>0){
+        subform.addClass('hide-score-column');
+      }
+    });
+  });
 });
