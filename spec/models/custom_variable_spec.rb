@@ -161,5 +161,22 @@ RSpec.describe CustomVariable, type: :model do
         expect(CustomVariable.notification_footer).to eq("bla")
       end
     end
+
+    context "instance_name" do
+      it "should return nil when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:instance_name)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.instance_name).to eq(nil)
+      end
+
+      it "should return 'Computacao' when it is defined to Computacao" do
+        config = CustomVariable.find_by_variable(:instance_name)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create(variable: :instance_name, value: "Computacao")
+
+        expect(CustomVariable.instance_name).to eq("Computacao")
+      end
+    end
   end
 end

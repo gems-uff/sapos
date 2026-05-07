@@ -371,19 +371,19 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     cpf = cpf.delete(".").delete("-").strip
     Student.where('
       TRIM(REPLACE(
-        REPLACE(`students`.`cpf` COLLATE :db_collation, ".", ""),
+        REPLACE(`students`.`cpf`, ".", ""),
         "-", ""
-      )) = :cpf COLLATE :value_collation
-    ', Collation.collations.merge(cpf:))
+      )) = :cpf
+    ', {cpf: cpf})
   end
 
   def students_by_email
     email = self.email.strip.downcase
     Student.where('
       TRIM(
-        LOWER(`students`.`email` COLLATE :db_collation)
-      ) = :email COLLATE :value_collation
-    ', Collation.collations.merge(email:))
+        LOWER(`students`.`email`)
+      ) = :email
+    ', {email: email})
   end
 
   def students
