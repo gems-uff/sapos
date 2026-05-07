@@ -263,5 +263,52 @@ RSpec.describe ClassEnrollment, type: :model do
         expect(cer.status).to eq(ClassEnrollmentRequest::REQUESTED)
       end
     end
+
+    describe "notify_professor" do
+      it "should send email to professor when class enrollment is created" do
+        @destroy_later << student = FactoryBot.create(:student, name: "ana")
+        @destroy_later << professor = FactoryBot.create(:professor, name: "professor", email: "professor@example.com")
+        @destroy_later << course = FactoryBot.create(:course, name: "Alquimia")
+        @destroy_later << course_class = FactoryBot.create(:course_class, professor: professor, course: course, year: 2026, semester: 2)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment, student: student, enrollment_number: "M01")
+        @destroy_later << FactoryBot.create(:class_schedule, year: course_class.year, semester: course_class.semester, period_start: 1.day.ago, enrollment_insert: 1.day.from_now, enrollment_remove: 1.day.from_now)
+
+        @destroy_later << class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
+        deliveries = ActionMailer::Base.deliveries
+        expect(deliveries.last.to).to eq([course_class.professor.email])
+        expect(deliveries.last.subject).to eq("Inscrição de M01 - ana na turma Alquimia - 2026/2 foi realizada")
+      end
+
+      it "should send email to professor when class enrollment is destroyed" do
+        @destroy_later << student = FactoryBot.create(:student, name: "ana")
+        @destroy_later << professor = FactoryBot.create(:professor, name: "professor", email: "professor@example.com")
+        @destroy_later << course = FactoryBot.create(:course, name: "Alquimia")
+        @destroy_later << course_class = FactoryBot.create(:course_class, professor: professor, course: course, year: 2026, semester: 2)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment, student: student, enrollment_number: "M01")
+        @destroy_later << FactoryBot.create(:class_schedule, year: course_class.year, semester: course_class.semester, period_start: 3.day.ago, enrollment_insert: 2.day.ago, enrollment_remove: 1.day.from_now)
+
+        @destroy_later << class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
+        class_enrollment.destroy
+        deliveries = ActionMailer::Base.deliveries
+        expect(deliveries.last.to).to eq([course_class.professor.email])
+        expect(deliveries.last.subject).to eq("Remoção de inscrição de M01 - ana na turma Alquimia - 2026/2 foi realizada")
+      end
+
+      it "should not send email to professor when it is not on adjust period" do
+        @destroy_later << student = FactoryBot.create(:student, name: "ana")
+        @destroy_later << professor = FactoryBot.create(:professor, name: "professor", email: "professornaorecebe@example.com")
+        @destroy_later << course = FactoryBot.create(:course, name: "Alquimia")
+        @destroy_later << course_class = FactoryBot.create(:course_class, professor: professor, course: course, year: 2026, semester: 2)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment, student: student, enrollment_number: "M01")
+        @destroy_later << FactoryBot.create(:class_schedule, year: course_class.year, semester: course_class.semester, period_start: 3.day.ago, enrollment_insert: 1.day.ago, enrollment_remove: 1.day.ago)
+
+        @destroy_later << class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
+        deliveries = ActionMailer::Base.deliveries
+        if deliveries.present?
+          expect(deliveries.last.to).not_to eq([course_class.professor.email])
+          expect(deliveries.last.subject).not_to eq("Inscrição de M01 - ana na turma Alquimia - 2026/2 foi realizada")
+        end
+      end
+    end
   end
 end

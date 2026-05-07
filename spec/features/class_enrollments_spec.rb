@@ -98,7 +98,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Inscrições"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Matrícula", "Turma", "Situação", "Nota", "Reprovado por Falta", ""
+        "Matrícula", "Turma", "Situação", "Nota", "Reprovado por Falta", "Data de Inscrição", ""
       ]
     end
 
