@@ -22,6 +22,13 @@ $(function() {
       }
     }
   });
+  function changeSituationInput(context,situation){
+    var row = context.closest('tr');
+    var situationSelect = row.find('.situation-input');
+    if(situationSelect.val() != situation){
+      situationSelect.val(situation).trigger('change');
+    }
+  }
   $(document).on('focus','.grade-input',function(){
     $(this).attr('placeholder','0,0');
   });
@@ -34,6 +41,16 @@ $(function() {
     var number = parseInt(digits, 10);
     var formatted = (number / 10).toFixed(1).replace('.', ',');
     $(this).val(formatted);
+    var minimum_grade = this.getAttribute('minimum_grade_for_approval');
+    var actual_grade = parseFloat(formatted.replace(',','.'));
+    if(actual_grade <= 10){ /* sanity check */
+      if(actual_grade >= minimum_grade){
+        changeSituationInput($(this),"Aprovado");
+      }
+      else{
+        changeSituationInput($(this),"Reprovado");
+      }
+    }
   });
   $(document).on('as:action_success', function() {
     $('.class_enrollments-sub-form').each(function() {

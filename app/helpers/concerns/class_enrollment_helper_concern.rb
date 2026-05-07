@@ -61,7 +61,8 @@ module ClassEnrollmentHelperConcern
   def custom_grade_form_column(record, options)
     return "" if !record.course_has_grade
     options = options.merge({
-      maxlength: 5, class: "grade-input numeric-input text-input"
+      maxlength: 5, class: "grade-input numeric-input text-input", 
+      minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0)
     })
     text_field(:record, :grade_to_view, options)
   end
