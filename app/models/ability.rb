@@ -91,6 +91,7 @@ class Ability
     initialize_admissions(user, roles)
     initialize_configurations(user, roles)
     initialize_student_pages(user, roles)
+    initialize_panel(user, roles)
 
     can :read, :landing
     can :notify, Notification
@@ -306,6 +307,14 @@ class Ability
       can :grades_report_pdf, Enrollment, student_id: user.student.id
     else
       cannot [:show, :enroll, :save_enroll], :student_enrollment
+    end
+  end
+
+  def initialize_panel(user, roles)
+    if roles[Role::ROLE_ADMINISTRADOR]
+      can :read, :panel
+      can :read, :garbage_collector
+      can [:read, :destroy], CarrierWave::Storage::ActiveRecord::ActiveRecordFile
     end
   end
 end

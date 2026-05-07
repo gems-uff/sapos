@@ -245,6 +245,12 @@ SimpleNavigation::Configuration.run do |navigation|
         if: check_admission_application)
     end
 
+
+    mainhelper.item :panel, panel_carrierwave_files_path, if: can_read?(:panel) do |submenu|
+      submenu.item :garbage_collector, panel_carrierwave_files_path, if: can_read?(:garbage_collector)
+    end
+
+    
     config_models = [
       User, Role, CustomVariable, Version, EmailTemplate
     ]

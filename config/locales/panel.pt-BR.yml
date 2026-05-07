@@ -1,0 +1,22 @@
+pt-BR:
+  panel:
+    garbage_collector:
+      title: "Coleta de Lixo - CarrierWave"
+      description: "Arquivos órfãos no banco de dados que não estão referenciados por nenhuma tabela."
+      no_orphans: "Nenhum arquivo órfão encontrado."
+      no_selection: "Nenhum arquivo selecionado para exclusão."
+      deleted:
+        one: "1 arquivo excluído com sucesso."
+        other: "%{count} arquivos excluídos com sucesso."
+      id: "ID"
+      filename: "Arquivo"
+      content_type: "Tipo"
+      size: "Tamanho"
+      created_at: "Criado em"
+      total: "Total"
+      delete_selected: "Excluir Selecionados"
+      delete_all: "Excluir Todos"
+      confirm_delete: "Tem certeza que deseja excluir este arquivo? Esta ação não pode ser desfeita."
+      confirm_delete_all: "Tem certeza que deseja excluir TODOS os arquivos listados? Esta ação não pode ser desfeita."
+      preview: "Visualizar"
+      download: "Download"

@@ -582,6 +582,15 @@ Rails.application.routes.draw do
     concerns :active_scaffold
   end
 
+  namespace :panel do
+    resources :carrierwave_files do
+      concerns :active_scaffold
+      collection do
+        post :delete_all
+      end
+    end
+  end
+
   resources :paper_professors do
     concerns :active_scaffold
   end
