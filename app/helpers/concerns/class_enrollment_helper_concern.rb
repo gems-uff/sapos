@@ -33,35 +33,13 @@ module ClassEnrollmentHelperConcern
       }",
       course_has_grade: "#{record.course_has_grade}"
     })
-    if record.course_has_grade
-      grade_of_disapproval_for_absence = (
-        (!CustomVariable.grade_of_disapproval_for_absence) ||
-        (CustomVariable.grade_of_disapproval_for_absence.nil?)
-      ) ? nil : CustomVariable.grade_of_disapproval_for_absence.to_f / 10.0
-      options = options.merge(
-        onchange: "
-          if(
-            (this.checked) &&
-            (document.getElementById('record_grade_#{
-              record.course_class_id
-            }_class_enrollments_#{record.id}').value.trim() == '')
-          ){
-            document.getElementById('record_grade_#{
-              record.course_class_id
-            }_class_enrollments_#{record.id}').value = '#{
-              grade_of_disapproval_for_absence
-            }';
-          }
-        "
-      )
-    end
     check_box(:record, :disapproved_by_absence_to_view, options)
   end
 
   def custom_grade_form_column(record, options)
     return "" if !record.course_has_grade
     options = options.merge({
-      maxlength: 5, class: "grade-input numeric-input text-input", 
+      maxlength: 5, class: "grade-input numeric-input text-input",
       minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0)
     })
     text_field(:record, :grade_to_view, options)
@@ -123,6 +101,6 @@ module ClassEnrollmentHelperConcern
     if can?(:post_grades, record) && cannot?(:update_all_fields, record)
       return { style: "display:none;" }
     end
-    return { style: "width: 190px;" } if controller_name != "class_enrollments"
+    { style: "width: 190px;" } if controller_name != "class_enrollments"
   end
 end
