@@ -57,6 +57,22 @@ $(function() {
       }
     }
   });
+  $(document).on('keydown','.grade-input',function(e){
+    if (e.which == 40 || e.which == 38){
+      var subform = $(this).closest('.class_enrollments-sub-form');
+      var gradeInputs = subform.find('.grade-input:visible');
+      var index = gradeInputs.index(this);
+      var nextIndex = (e.which==40) ? index + 1 : index - 1;
+      if(nextIndex >= 0 && nextIndex < gradeInputs.length){
+        var nextEl = gradeInputs.eq(nextIndex);
+        nextEl.focus();
+        /* 10ms timeout to make sure the select() works properly */
+        setTimeout(function(){ 
+          nextEl.select();
+        }, 10);
+      }
+    }
+  });
   $(document).on('as:action_success', function() {
     $('.class_enrollments-sub-form').each(function() {
       var subform = $(this);
