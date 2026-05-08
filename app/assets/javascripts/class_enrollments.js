@@ -2,23 +2,28 @@ $(function() {
   $(document).on('change', '.disapproved_by_absence-input', function() {
     if(this.checked){
       var course_has_grade = this.getAttribute("course_has_grade");
+      var target_row = $(this).closest("tr");
       if (course_has_grade == "true") {
         var grade_of_disapproval_for_absence = this.getAttribute("grade_of_disapproval_for_absence");
-        grade_of_disapproval_for_absence = grade_of_disapproval_for_absence.replace(/\s+/g, '').replace(",", ".");
         if (grade_of_disapproval_for_absence != "") {
-          grade_of_disapproval_for_absence = parseFloat(grade_of_disapproval_for_absence);
-          var class_enrollments_id = this.getAttribute("class_enrollments_id");
-          var grade = document.getElementById( "record_grade_" + class_enrollments_id ).value;
-          grade = grade.replace(/\s+/g, '').replace(",", ".");
-          if (grade == "") {
-            document.getElementById("record_grade_" + class_enrollments_id).value = grade_of_disapproval_for_absence;
-          } else {
-            grade = parseFloat(grade);
-            if( grade > grade_of_disapproval_for_absence ){
-              document.getElementById("record_grade_" + class_enrollments_id).value = grade_of_disapproval_for_absence;
+          var grade = target_row.find(".grade-input").val();
+          if (grade == "" || parseFloat(grade)== 0){
+            target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
+          }
+          else if (parseFloat(grade) != parseFloat(grade_of_disapproval_for_absence)){
+            var msg = "Já existe uma nota digitada ("+grade.replace('.',',')+"). "+
+            "Deseja sobrescrevê-la com a nota de reprovação por falta (" + grade_of_disapproval_for_absence.replace('.',',') + ")?";
+            if(confirm(msg)){
+              target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
+            }
+            else{
+              this.checked = false;
             }
           }
         }
+      }
+      else{
+        changeSituationInput(target_row,"Reprovado");
       }
     }
   });
@@ -30,7 +35,7 @@ $(function() {
     }
   }
   $(document).on('focus','.grade-input',function(){
-    $(this).attr('placeholder','0,0');
+    $(this).attr('placeholder','_,_');
   });
   $(document).on('blur','.grade-input',function(){
     $(this).attr('placeholder','');
