@@ -89,4 +89,5 @@ class Advisement < ApplicationRecord
     ]
     Notifier.send_emails(notifications: emails)
   end
+
 end

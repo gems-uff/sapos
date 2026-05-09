@@ -61,6 +61,7 @@ RSpec.describe "Enrollments features", type: :feature do
     @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment2, date: 1.day.ago, dismissal_reason: @dismissal_reason2)
 
     @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Erica", cpf: "3")
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level2)
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment1, professor: @professor1, main_advisor: true)
     @destroy_all << @sponsor1 = FactoryBot.create(:sponsor, name: "CNPq")
     @destroy_all << @scholarship_type2 = FactoryBot.create(:scholarship_type, name: "Projeto")

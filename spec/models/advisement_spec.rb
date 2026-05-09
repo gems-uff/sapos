@@ -60,9 +60,13 @@ RSpec.describe Advisement, type: :model do
       it "should return the expected string" do
         professor1_name = "Leonardo"
         professor2_name = "Vanessa"
+        @destroy_later << professor0 = FactoryBot.create(:professor)
         @destroy_later << professor1 = FactoryBot.create(:professor, name: professor1_name)
         @destroy_later << professor2 = FactoryBot.create(:professor, name: professor2_name)
-        @destroy_later << advisement = FactoryBot.create(:advisement)
+        @destroy_later << level = FactoryBot.create(:level)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
+        @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor0, level: level)
+        @destroy_later << advisement = FactoryBot.create(:advisement, professor: professor0, enrollment: enrollment)
         @destroy_later << FactoryBot.create(:advisement, professor: professor1, enrollment: advisement.enrollment, main_advisor: false)
         @destroy_later << FactoryBot.create(:advisement, professor: professor2, enrollment: advisement.enrollment, main_advisor: false)
         expect(advisement.co_advisor_list).to eql("#{professor1_name} , #{professor2_name}")
@@ -71,14 +75,22 @@ RSpec.describe Advisement, type: :model do
     describe "active" do
       context "should return true when " do
         it "the enrollment does not have a dismissal" do
-          @destroy_later << advisement = FactoryBot.create(:advisement)
+          @destroy_later << level = FactoryBot.create(:level)
+          @destroy_later << professor1 = FactoryBot.create(:professor)
+          @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
+          @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level)
+          @destroy_later << advisement = FactoryBot.create(:advisement, enrollment: enrollment, professor: professor1)
           expect(advisement.active).to be_truthy
         end
       end
       context "should return false when " do
         it "the enrollment have a dismissal" do
-          @destroy_later << advisement = FactoryBot.create(:advisement)
-          @destroy_later << FactoryBot.create(:dismissal, enrollment: advisement.enrollment)
+          @destroy_later << level = FactoryBot.create(:level)
+          @destroy_later << professor1 = FactoryBot.create(:professor)
+          @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
+          @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level)
+          @destroy_later << advisement = FactoryBot.create(:advisement, enrollment: enrollment, professor: professor1)
+          @destroy_later << FactoryBot.create(:dismissal, enrollment: enrollment)
           expect(advisement.active).to be_falsey
         end
       end
@@ -86,14 +98,22 @@ RSpec.describe Advisement, type: :model do
     describe "co_advisor" do
       context "should return true when " do
         it "the enrollment have another advisement" do
-          @destroy_later << other_advisement = FactoryBot.create(:advisement)
+          @destroy_later << level = FactoryBot.create(:level)
+          @destroy_later << professor1 = FactoryBot.create(:professor)
+          @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
+          @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level)
+          @destroy_later << other_advisement = FactoryBot.create(:advisement, professor: professor1, enrollment: enrollment)
           @destroy_later << FactoryBot.create(:advisement, enrollment: other_advisement.enrollment, main_advisor: false)
           expect(other_advisement.co_advisor).to be_truthy
         end
       end
       context "should return false when " do
         it "the enrollment does not have another advisement" do
-          @destroy_later << advisement = FactoryBot.create(:advisement)
+          @destroy_later << level = FactoryBot.create(:level)
+          @destroy_later << professor1 = FactoryBot.create(:professor)
+          @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
+          @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level)
+          @destroy_later << advisement = FactoryBot.create(:advisement, professor: professor1, enrollment: enrollment, main_advisor: true)
           expect(advisement.co_advisor).to be_falsey
         end
       end
@@ -101,7 +121,11 @@ RSpec.describe Advisement, type: :model do
     describe "enrollment_has_advisors" do
       context "should return true when " do
         it "the enrollment have one advisement" do
-          @destroy_later << advisement = FactoryBot.create(:advisement)
+          @destroy_later << level = FactoryBot.create(:level)
+          @destroy_later << professor1 = FactoryBot.create(:professor)
+          @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
+          @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level)
+          @destroy_later << advisement = FactoryBot.create(:advisement, professor: professor1, enrollment: enrollment, main_advisor: true)
           expect(advisement.enrollment_has_advisors).to be_truthy
         end
       end
