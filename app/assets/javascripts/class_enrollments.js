@@ -11,8 +11,7 @@ $(function() {
             target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
           }
           else if (parseFloat(grade) != parseFloat(grade_of_disapproval_for_absence)){
-            var msg = "Já existe uma nota digitada ("+grade.replace('.',',')+"). "+
-            "Deseja sobrescrevê-la com a nota de reprovação por falta (" + grade_of_disapproval_for_absence.replace('.',',') + ")?";
+            msg = this.getAttribute('overwrite_confirm_msg').replace('actual_grade',grade.replace('.',',')).replace('grade_for_disapproval',grade_of_disapproval_for_absence.replace('.',','));
             if(confirm(msg)){
               target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
             }
@@ -23,7 +22,8 @@ $(function() {
         }
       }
       else{
-        changeSituationInput(target_row,"Reprovado");
+        var disapproved_label = this.getAttribute('data_disapproved');
+        changeSituationInput(target_row,disapproved_label);
       }
     }
   });
@@ -35,7 +35,8 @@ $(function() {
     }
   }
   $(document).on('focus','.grade-input',function(){
-    $(this).attr('placeholder','_,_');
+    placeholder = this.getAttribute('grade_placeholder');
+    $(this).attr('placeholder',placeholder);
   });
   $(document).on('blur','.grade-input',function(){
     $(this).attr('placeholder','');
@@ -50,10 +51,12 @@ $(function() {
     var actual_grade = parseFloat(formatted.replace(',','.'));
     if(actual_grade <= 10){ /* sanity check */
       if(actual_grade >= minimum_grade){
-        changeSituationInput($(this),"Aprovado");
+        var approved_label = this.getAttribute('data_approved');
+        changeSituationInput($(this),approved_label);
       }
       else{
-        changeSituationInput($(this),"Reprovado");
+        var disapproved_label = this.getAttribute('data_disapproved');
+        changeSituationInput($(this),disapproved_label);
       }
     }
   });
