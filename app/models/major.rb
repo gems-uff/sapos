@@ -30,27 +30,22 @@ class Major < ApplicationRecord
     level = "%#{level}%" if level.present? && substring
     majors = Major
     majors = majors.joins(:institution).where(
-      "`institutions`.`name` COLLATE :db_collation
-        LIKE :institution COLLATE :value_collation
-      OR `institutions`.`code` COLLATE :db_collation
-        LIKE :institution COLLATE :value_collation
-      ", Collation.collations.merge(institution:)
+      "`institutions`.`name` LIKE :institution
+      OR `institutions`.`code` LIKE :institution
+      ", {institution: institution}
     ) if institution.present?
     majors = majors.joins(:level).where(
-      "`levels`.`name` COLLATE :db_collation
-        LIKE :level COLLATE :value_collation
-      ", Collation.collations.merge(level:)
+      "`levels`.`name` LIKE :level
+      ", {level: level}
     ) if level.present?
     majors = majors.where(
-      "`majors`.`name` COLLATE :db_collation
-        LIKE :major COLLATE :value_collation
-      ", Collation.collations.merge(major:)
+      "`majors`.`name` LIKE :major
+      ", {major: major}
     )
     if majors.empty? && ignore_association
       majors = Major.where(
-        "`majors`.`name` COLLATE :db_collation
-          LIKE :major COLLATE :value_collation
-        ", Collation.collations.merge(major:)
+        "`majors`.`name` LIKE :major
+        ", {major: major}
       )
     end
     majors
