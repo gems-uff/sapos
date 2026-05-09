@@ -44,4 +44,21 @@ module SharedXlsConcern
     key = class_enrollment.enrollment.has_active_scholarship_now? ? "active_scholarship_true" : "active_scholarship_false"
     I18n.t("xls_content.course_class.summary.#{key}")
   end
+
+  def parse_grades_xlsx(file)
+    grades = {}
+    Zip::File.open(file) do |zip|
+      sheet = zip.find_entry("xl/worksheets/sheet1.xml")
+      xml = Nokogiri::XML(sheet.get_input_stream.read)
+      ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+      xml.xpath("//xmlns:row", "xmlns" => ns).each_with_index do |row, index|
+        next if index == 0
+        enrollment_number = row.at_xpath('xmlns:c[@r[starts-with(., "B")]]//xmlns:v', "xmlns" => ns)&.text
+        grade_node = row.at_xpath('xmlns:c[@r[starts-with(., "E")]]//xmlns:v', "xmlns" => ns)
+        next if enrollment_number.nil?
+        grades[enrollment_number] = grade_node&.text
+      end
+    end
+    grades
+  end
 end
