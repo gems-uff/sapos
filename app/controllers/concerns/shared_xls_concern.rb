@@ -49,7 +49,7 @@ module SharedXlsConcern
     raise ArgumentError, "Invalid upload" unless file.is_a?(ActionDispatch::Http::UploadedFile)
 
     original_filename = file.original_filename.to_s
-    valid_filename = /\A[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)?\.xlsx\z/.match?(original_filename) &&
+    valid_filename = original_filename.end_with?(".xlsx") &&
       !original_filename.include?("/") &&
       !original_filename.include?("\\")
     raise ArgumentError, "Invalid file name" unless valid_filename

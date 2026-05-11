@@ -13,11 +13,11 @@ RSpec.describe SharedXlsConcern, type: :concern do
     let(:class_enrollment2) { FactoryBot.build(:class_enrollment, enrollment: enrollment2, grade: nil) }
 
     let(:xlsx_file) do
-      file = Tempfile.new(["test", ".xlsx"])
-      file.binmode
-      file.write(render_course_classes_summary_xls([class_enrollment1, class_enrollment2]))
-      file.rewind
-      file.path
+      tempfile = Tempfile.new(["test", ".xlsx"])
+      tempfile.binmode
+      tempfile.write(render_course_classes_summary_xls([class_enrollment1, class_enrollment2]))
+      tempfile.rewind
+      ActionDispatch::Http::UploadedFile.new(tempfile: tempfile,filename: "test.xlsx")
     end
 
     it "returns a hash with enrollment numbers as keys" do
