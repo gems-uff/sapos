@@ -46,8 +46,16 @@ module SharedXlsConcern
   end
 
   def parse_grades_xlsx(file)
+    raise ArgumentError, "Invalid upload" unless file.is_a?(ActionDispatch::Http::UploadedFile)
+
+    original_filename = file.original_filename.to_s
+    valid_filename = /\A[a-zA-Z0-9_-]+(?:\.[a-zA-Z0-9_-]+)?\.xlsx\z/.match?(original_filename) &&
+      !original_filename.include?("/") &&
+      !original_filename.include?("\\")
+    raise ArgumentError, "Invalid file name" unless valid_filename
+
     grades = {}
-    Zip::File.open(file) do |zip|
+    Zip::File.open(file.tempfile.path) do |zip|
       sheet = zip.find_entry("xl/worksheets/sheet1.xml")
       xml = Nokogiri::XML(sheet.get_input_stream.read)
       ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
