@@ -44,4 +44,29 @@ module SharedXlsConcern
     key = class_enrollment.enrollment.has_active_scholarship_now? ? "active_scholarship_true" : "active_scholarship_false"
     I18n.t("xls_content.course_class.summary.#{key}")
   end
+
+  def parse_grades_xlsx(file)
+    raise ArgumentError, "Invalid upload" unless file.is_a?(ActionDispatch::Http::UploadedFile)
+
+    original_filename = file.original_filename.to_s
+    valid_filename = original_filename.end_with?(".xlsx") &&
+      !original_filename.include?("/") &&
+      !original_filename.include?("\\")
+    raise ArgumentError, "Invalid file name" unless valid_filename
+
+    grades = {}
+    Zip::File.open(file.tempfile.path) do |zip|
+      sheet = zip.find_entry("xl/worksheets/sheet1.xml")
+      xml = Nokogiri::XML(sheet.get_input_stream.read)
+      ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+      xml.xpath("//xmlns:row", "xmlns" => ns).each_with_index do |row, index|
+        next if index == 0
+        enrollment_number = row.at_xpath('xmlns:c[@r[starts-with(., "B")]]//xmlns:v', "xmlns" => ns)&.text
+        grade_node = row.at_xpath('xmlns:c[@r[starts-with(., "E")]]//xmlns:v', "xmlns" => ns)
+        next if enrollment_number.nil?
+        grades[enrollment_number] = grade_node&.text
+      end
+    end
+    grades
+  end
 end

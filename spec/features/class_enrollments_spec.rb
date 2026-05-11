@@ -142,7 +142,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     it "should have a disapproved by absence widget" do
       page.send_keys :escape
       find(:css, "#record_disapproved_by_absence_").set(true)
-      expect(page).to have_field("Nota", with: "1")
+      expect(page).to have_field("Nota", with: "1,0")
     end
 
     it "should have a justification_grade_not_count_in_gpr without a label" do
@@ -171,7 +171,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     it "should be able to edit student" do
       page.driver.browser.action.send_keys(:escape).perform
       within(".as_form") do
-        fill_in "Nota", with: "6"
+        fill_in "Nota", with: "60"
       end
       click_button_and_wait "Atualizar"
       expect(page).to have_css("td.grade_label-column", text: "6.0")

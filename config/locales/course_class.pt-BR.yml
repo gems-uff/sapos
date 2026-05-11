@@ -56,6 +56,13 @@ pt-BR:
 
   xls_content:
     course_class:
+      spreadsheet_label: "Planilha (.xlsx)"
+      upload_button: "Fazer Upload"
+      upload_loading: "Enviando..."
+      import_grades_xls_label: "Importar Notas"
+      import_grades_xls_title: "Importar notas para %{course}"
+      import_grades_xls_success: "Notas importadas com sucesso!"
+      import_grades_xls_error: "Erro ao importar planilha."
       summary:
         attendance: "Freq S/I"
         student_email: "Email"

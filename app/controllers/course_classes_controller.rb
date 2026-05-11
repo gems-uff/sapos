@@ -35,6 +35,11 @@ class CourseClassesController < ApplicationController
       page: true,
       type: :member,
       parameters: { format: :xlsx }
+    config.action_links.add "import_grades_xls",
+      label: "<i title='Importar Notas' class='fa fa-upload'></i>".html_safe,
+      type: :member,
+      position: :replace,
+      crud_type: :update
 
 
     config.list.sorting = { name: "ASC", id: "DESC" }
@@ -147,6 +152,33 @@ class CourseClassesController < ApplicationController
           filename: "#{title} - #{@course_class.name_with_class}(#{@course_class.year}-#{@course_class.semester}).xlsx",
           type: "text/xlsx"
       end
+    end
+  end
+
+  def import_grades_xls
+    @course_class = CourseClass.find(params[:id])
+    if request.post? && params[:spreadsheet].present?
+      file = params[:spreadsheet]
+      minimum_grade_for_approval = CustomVariable.minimum_grade_for_approval
+      grades = parse_grades_xlsx(file)
+      grades.each do |id, grade|
+        enrollment = Enrollment.find_by(enrollment_number: id)
+        class_enrollment = @course_class.class_enrollments.find_by(enrollment: enrollment)
+        if class_enrollment
+          class_enrollment.grade = grade
+          if class_enrollment.grade.to_i >= minimum_grade_for_approval
+            class_enrollment.situation = ClassEnrollment::APPROVED
+          else
+            class_enrollment.situation = ClassEnrollment::DISAPPROVED
+          end
+          class_enrollment.save
+        end
+      end
+      flash[:info] = "Notas importadas com sucesso!"
+      return redirect_to course_classes_path
+    end
+    respond_to do |format|
+      format.html { render layout: false if request.xhr? }
     end
   end
 

@@ -34,6 +34,9 @@ pt-BR:
         scholarship_durations_active: "Possui bolsa?"
         advisor: "Orientador"
         has_advisor: "Possui orientador?"
+        placeholder_grade: "_,_"
+        confirm_grade_overwrite: "Já existe uma nota digitada (actual_grade). Deseja substituí-la com a nota de reprovação por falta (grade_for_disapproval)?"
+        
 
     errors:
       models:
