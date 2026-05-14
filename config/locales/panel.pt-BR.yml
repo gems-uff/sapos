@@ -1,5 +1,20 @@
 pt-BR:
   panel:
+    admission_data:
+      title: "Gerenciamento de Seleção"
+      description: "Gerencie os dados de processos seletivos para otimizar o armazenamento do banco de dados."
+      process_name: "Processo Seletivo"
+      year_semester: "Período"
+      applications_count: "Candidaturas"
+      status: "Status"
+      status_open: "Em aberto"
+      status_closed: "Completo"
+      actions: "Ações"
+      export: "Exportar"
+      import: "Importar"
+      delete: "Excluir"
+      no_processes: "Nenhum processo seletivo encontrado."
+      coming_soon: "Em breve"
     garbage_collector:
       title: "Coleta de Lixo - CarrierWave"
       description: "Arquivos órfãos no banco de dados que não estão referenciados por nenhuma tabela."

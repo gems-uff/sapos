@@ -95,6 +95,7 @@ pt-BR:
     panel:
       label: Painel
       garbage_collector: Coleta de Lixo
+      admission_data: Gerenciamento de Seleção
 
     logout:
       label: 'Logout'

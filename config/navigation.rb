@@ -248,6 +248,7 @@ SimpleNavigation::Configuration.run do |navigation|
 
     mainhelper.item :panel, panel_carrierwave_files_path, if: can_read?(:panel) do |submenu|
       submenu.item :garbage_collector, panel_carrierwave_files_path, if: can_read?(:garbage_collector)
+      submenu.item :admission_data, panel_selection_processes_path, if: can_read?(:admission_data)
     end
 
     

@@ -589,6 +589,16 @@ Rails.application.routes.draw do
         post :delete_all
       end
     end
+    resources :selection_processes, controller: "admission_data" do
+      concerns :active_scaffold
+      member do
+        get :export
+        get :purge
+      end
+      collection do
+        get :import
+      end
+    end
   end
 
   resources :paper_professors do

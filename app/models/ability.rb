@@ -315,6 +315,7 @@ class Ability
       can :read, :panel
       can :read, :garbage_collector
       can [:read, :destroy], CarrierWave::Storage::ActiveRecord::ActiveRecordFile
+      can :read, :admission_data
     end
   end
 end
