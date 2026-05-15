@@ -1,19 +1,28 @@
-<div class="enrollment-show-box show-box <%= "background-#{enrollment_request.persisted? ? ClassEnrollmentRequest::STATUSES_MAP[enrollment_request.status] : 'not-persisted'}"%>"> 
-  <h3>
-    <% if semester.main_enroll_open? %>
-      <%= t "student_enrollment.show_enroll.title_main", semester:  semester.to_label %>
+<% is_held = EnrollmentHold.hold_in_date(@enrollment, semester.period_start, semester.period_end)%>
+<% unless is_held%>
+  <div class="enrollment-show-box show-box <%= "background-#{enrollment_request.persisted? ? ClassEnrollmentRequest::STATUSES_MAP[enrollment_request.status] : 'not-persisted'}"%>">
+<% else %>
+  <div class="enrollment-show-box show-box background-held">
+<% end %>
+    <h3>
+      <% if semester.main_enroll_open? %>
+        <%= t "student_enrollment.show_enroll.title_main", semester:  semester.to_label %>
+      <% else %>
+        <%= t "student_enrollment.show_enroll.title_adjust", semester:  semester.to_label %>
+      <% end %>
+    </h3>
+    <% unless is_held%>
+      <% linkpath = student_enroll_path(id: @enrollment.id, year: semester.year, semester: semester.semester) %>
+      <% if enrollment_request.persisted? %>
+        <% unread = enrollment_request.student_unread_messages %>
+        <%= link_to t("student_enrollment.show_enroll.enroll_link_edit_#{ClassEnrollmentRequest::STATUSES_MAP[enrollment_request.status]}"), linkpath %>
+        <% if unread > 0 %>
+          <%= t("student_enrollment.show_enroll.unread", count: unread) %>
+        <% end %>
+      <% else %>
+        <%= link_to t("student_enrollment.show_enroll.enroll_link_new"), linkpath %>
+      <% end %>
     <% else %>
-      <%= t "student_enrollment.show_enroll.title_adjust", semester:  semester.to_label %>
+      <p><%= t "student_enrollment.show_enroll.enrollment_is_held" %></p>
     <% end %>
-  </h3>
-  <% linkpath = student_enroll_path(id: @enrollment.id, year: semester.year, semester: semester.semester) %>
-  <% if enrollment_request.persisted? %>
-    <% unread = enrollment_request.student_unread_messages %>
-    <%= link_to t("student_enrollment.show_enroll.enroll_link_edit_#{ClassEnrollmentRequest::STATUSES_MAP[enrollment_request.status]}"), linkpath %>
-    <% if unread > 0 %>
-      <%= t("student_enrollment.show_enroll.unread", count: unread) %>
-    <% end %>
-  <% else %>
-    <%= link_to t("student_enrollment.show_enroll.enroll_link_new"), linkpath %>
-  <% end %>
-</div>
+  </div>

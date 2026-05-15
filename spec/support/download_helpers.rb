@@ -8,7 +8,7 @@ module DownloadHelpers
   extend self
 
   def downloads
-    Dir[PATH.join("*")]
+    Dir[PATH.join("*")].reject { |f| f.end_with?("downloads.html") }
   end
 
   def download
