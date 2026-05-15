@@ -39,7 +39,7 @@ class ClassEnrollment < ApplicationRecord
   validate :check_multiple_class_enrollment_allowed
   validate :professor_changed_only_valid_fields,
     if: -> { can?(:post_grades, self) && cannot?(:update_all_fields, self) }
-  validate :check_enrollment_hold
+  validate :check_enrollment_hold, if: :dates_affecting_hold_changed?
 
   after_save :notify_student_and_advisor
   after_save :class_enrollment_request_cascade
@@ -274,6 +274,11 @@ class ClassEnrollment < ApplicationRecord
           request.save
         end
       end
+    end
+
+    def dates_affecting_hold_changed?
+      new_record? || course_class_id_changed? || enrollment_id_changed? ||
+        course_class&.year_changed? || course_class&.semester_changed?
     end
 
     delegate :can?, :cannot?, to: :ability
