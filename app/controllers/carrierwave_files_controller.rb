@@ -3,7 +3,7 @@
 
 # frozen_string_literal: true
 
-class Panel::CarrierwaveFilesController < ApplicationController
+class CarrierwaveFilesController < ApplicationController
   include PanelHelper
 
   authorize_resource class: false, instance_name: :panel

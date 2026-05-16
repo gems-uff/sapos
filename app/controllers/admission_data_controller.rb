@@ -3,7 +3,7 @@
 
 # frozen_string_literal: true
 
-class Panel::AdmissionDataController < ApplicationController
+class AdmissionDataController < ApplicationController
   include Panel::AdmissionDataHelper
 
   authorize_resource class: false, instance_name: :panel
