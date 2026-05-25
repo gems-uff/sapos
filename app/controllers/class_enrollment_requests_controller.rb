@@ -236,7 +236,8 @@ class ClassEnrollmentRequestsController < ApplicationController
         yield record if block_given?
         flash[:info] = I18n.t(message, count: 1)
       else
-        flash[:error] = I18n.t(message, count: 0)
+        flash[:info] = (I18n.t(message, count: 0))
+        flash[:error] = record.errors.full_messages
       end
     end
   end
