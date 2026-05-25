@@ -4,7 +4,7 @@
 # frozen_string_literal: true
 
 class CarrierwaveFilesController < ApplicationController
-  include PanelHelper
+  helper Panel::CarrierwaveFilesHelper
 
   authorize_resource class: false, instance_name: :panel
 
@@ -12,16 +12,22 @@ class CarrierwaveFilesController < ApplicationController
     config.label = I18n.t("panel.garbage_collector.title")
     config.actions = [:list, :show, :delete, :field_search]
 
-    config.list.columns = [:id, :original_filename, :content_type, :size, :created_at]
+    config.list.columns = [:id, :original_filename, :content_type, :size, :created_at, :original_model]
     config.show.columns = [:id, :original_filename, :content_type, :size, :created_at, :preview]
     config.list.sorting = { created_at: :desc }
 
     config.columns.add :preview
     config.columns[:preview].sort = false
 
-    config.field_search.columns = [:original_filename, :content_type]
+    config.columns.add :original_model
+    config.columns[:original_model].sort = false
+    config.columns[:original_model].label = I18n.t("panel.garbage_collector.original_model")
+
+    config.field_search.columns = [:original_filename, :content_type, :original_model]
     config.columns[:original_filename].search_ui = :text
     config.columns[:content_type].search_ui = :text
+    config.columns[:original_model].search_sql = ""
+    config.columns[:original_model].search_ui = :text
 
     config.columns[:id].label = I18n.t("panel.garbage_collector.id")
     config.columns[:original_filename].label = I18n.t("panel.garbage_collector.filename")
@@ -63,11 +69,43 @@ class CarrierwaveFilesController < ApplicationController
   protected
 
   def conditions_for_collection
-    orphan_ids = find_carrierwave_orphan_ids
+    orphan_ids = Panel::CarrierwaveFilesHelper.find_carrierwave_orphan_ids
     if orphan_ids.present?
       ["carrier_wave_files.id IN (?)", orphan_ids]
     else
       ["1 = 0"]
     end
+  end
+
+  def self.condition_for_original_model_column(column, value, like_pattern)
+    return nil if value.blank?
+
+    matching_ids = find_orphan_ids_by_model_search(value.downcase)
+
+    if matching_ids.present?
+      ["carrier_wave_files.id IN (?)", matching_ids]
+    else
+      ["1 = 0"]
+    end
+  end
+
+  def self.find_orphan_ids_by_model_search(search_term)
+    cw = CarrierWave::Storage::ActiveRecord::ActiveRecordFile
+    orphan_ids = Panel::CarrierwaveFilesHelper.find_carrierwave_orphan_ids
+    orphans = cw.where(id: orphan_ids)
+
+    orphans.select do |file|
+      version = Panel::CarrierwaveFilesHelper.find_version_for_carrierwave_file(file)
+      next false if version.nil?
+
+      model_type = version.item_type
+      translated_name = I18n.t(
+        "activerecord.models.#{model_type.underscore}.one",
+        default: model_type
+      )
+
+      model_type.downcase.include?(search_term) ||
+        translated_name.downcase.include?(search_term)
+    end.map(&:id)
   end
 end

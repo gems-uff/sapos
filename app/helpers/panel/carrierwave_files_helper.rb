@@ -4,6 +4,45 @@
 # frozen_string_literal: true
 
 module Panel::CarrierwaveFilesHelper
+  CARRIERWAVE_REFERENCES = [
+    ["reports", "carrierwave_file_id", "id"],
+    ["students", "photo", "medium_hash"],
+    ["report_configurations", "image", "medium_hash"],
+    ["filled_form_fields", "file", "medium_hash"]
+  ].freeze
+
+  def self.find_carrierwave_orphan_ids
+    cw = CarrierWave::Storage::ActiveRecord::ActiveRecordFile
+    referenced_ids = CARRIERWAVE_REFERENCES.flat_map do |table, column, key|
+      cw.joins("INNER JOIN #{table} ON #{table}.#{column} = carrier_wave_files.#{key}").pluck(:id)
+    end
+    cw.where.not(id: referenced_ids).pluck(:id)
+  end
+
+  def self.find_version_for_carrierwave_file(carrierwave_file, model_type: nil)
+    medium_hash = carrierwave_file.medium_hash
+    file_id = carrierwave_file.id
+
+    return nil if medium_hash.blank? && file_id.blank?
+
+    version = nil
+
+    if model_type == "Report" || (model_type.nil? && file_id.present?)
+      version = Version.where("object LIKE ?", "%carrierwave_file_id: #{file_id}%")
+                       .where(item_type: "Report")
+                       .order(created_at: :desc)
+                       .first
+    end
+
+    if version.nil? && medium_hash.present?
+      query = Version.where("object LIKE ?", "%#{medium_hash}%")
+      query = query.where(item_type: model_type) if model_type.present?
+      version = query.order(created_at: :desc).first
+    end
+
+    version
+  end
+
   def size_column(record, column)
     number_to_human_size(record.size) if record.size.present?
   end
@@ -23,5 +62,12 @@ module Panel::CarrierwaveFilesHelper
               download_path(record.medium_hash),
               target: "_blank"
     end
+  end
+
+  def original_model_column(record, column)
+    version = Panel::CarrierwaveFilesHelper.find_version_for_carrierwave_file(record)
+    return "-" if version.blank?
+
+    I18n.t("activerecord.models.#{version.item_type.underscore}.one", default: version.item_type)
   end
 end

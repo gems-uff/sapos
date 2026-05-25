@@ -35,3 +35,4 @@ pt-BR:
       confirm_delete_all: "Tem certeza que deseja excluir TODOS os arquivos listados? Esta ação não pode ser desfeita."
       preview: "Visualizar"
       download: "Download"
+      original_model: "Modelo Original"
