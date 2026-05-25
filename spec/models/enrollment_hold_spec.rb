@@ -60,6 +60,17 @@ RSpec.describe EnrollmentHold, type: :model do
           enrollment_hold.number_of_semesters = 20
           expect(enrollment_hold).to have_error(:after_dismissal_date).on :base
         end
+
+        it "exist class enrollment in enrollment hold period" do
+          @destroy_later << e = FactoryBot.create(:enrollment)
+          @destroy_later << cc = FactoryBot.create(:course_class, year: e.admission_date.year + 2)
+          @destroy_later << FactoryBot.create(:class_enrollment, enrollment: e, course_class: cc)
+          enrollment_hold.enrollment = e
+          enrollment_hold.year = e.admission_date.year + 1
+          enrollment_hold.semester = 2
+          enrollment_hold.number_of_semesters = 6
+          expect(enrollment_hold).to have_error(:class_enrollments_exist).on :base
+        end
       end
     end
   end
@@ -73,6 +84,16 @@ RSpec.describe EnrollmentHold, type: :model do
 
         expect(enrollment_hold.to_label).to eq("2014.1 - 2 semestres")
       end
+    end
+
+    it "should set class_enrollment_requests to INVALID when hold is created for the same semester" do
+      @destroy_later << e = FactoryBot.create(:enrollment, admission_date: 2.years.ago.to_date)
+      @destroy_later << cc = FactoryBot.create(:course_class, year: YearSemester.current.year, semester: YearSemester.current.semester)
+      @destroy_later << er = FactoryBot.create(:enrollment_request, enrollment: e, year: YearSemester.current.year, semester: YearSemester.current.semester)
+      @destroy_later << cer = FactoryBot.create(:class_enrollment_request, enrollment_request: er, course_class: cc, action: ClassEnrollmentRequest::INSERT)
+      @destroy_later << FactoryBot.create(:enrollment_hold, enrollment: e,
+        year: YearSemester.current.year, semester: YearSemester.current.semester)
+      expect(cer.reload.status).to eq(ClassEnrollmentRequest::INVALID)
     end
   end
 end

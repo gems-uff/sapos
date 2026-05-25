@@ -33,6 +33,7 @@ pt-BR:
           remove: "Remoção"
       class_enrollment_requests:
         course_class: Turma
+        enrollment: Matrícula
 
     errors:
       models:
@@ -43,6 +44,8 @@ pt-BR:
             course_class:
               previously_approved: "já foi cursada anteriormente com aprovação"
               taken: "duplicada"
+            enrollment:
+              enrollment_is_held: "está trancada no período"
 
     models:
       class_enrollment_request:
