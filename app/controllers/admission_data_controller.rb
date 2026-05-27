@@ -15,9 +15,10 @@ class AdmissionDataController < ApplicationController
     config.columns.add :admission_applications_count
     config.columns.add :year_semester
     config.columns.add :is_open?
+    config.columns.add :total_file_size
 
-    config.list.columns = [:name, :year_semester, :admission_applications_count, :is_open?]
-    config.show.columns = [:name, :year_semester, :start_date, :end_date, :admission_applications_count, :is_open?]
+    config.list.columns = [:name, :year_semester, :admission_applications_count, :total_file_size, :is_open?]
+    config.show.columns = [:name, :year_semester, :start_date, :end_date, :admission_applications_count, :total_file_size, :is_open?]
     config.list.sorting = { year: :desc, semester: :desc }
 
     config.field_search.columns = [:name, :year, :semester]
@@ -26,14 +27,15 @@ class AdmissionDataController < ApplicationController
     config.columns[:name].label = I18n.t("panel.admission_data.process_name")
     config.columns[:year_semester].label = I18n.t("panel.admission_data.year_semester")
     config.columns[:admission_applications_count].label = I18n.t("panel.admission_data.applications_count")
+    config.columns[:total_file_size].label = I18n.t("panel.admission_data.total_file_size")
     config.columns[:is_open?].label = I18n.t("panel.admission_data.status")
 
     config.action_links.add :export,
-      label: "<i title='#{I18n.t("panel.admission_data.export")}' class='fa fa-upload'></i>".html_safe,
+      label: "<i title='#{I18n.t("panel.admission_data.export")}' class='fa fa-download'></i>".html_safe,
       type: :member
 
     config.action_links.add :import,
-      label: "<i title='#{I18n.t("panel.admission_data.import")}' class='fa fa-download'></i>".html_safe,
+      label: "<i title='#{I18n.t("panel.admission_data.import")}' class='fa fa-upload'></i>".html_safe,
       type: :collection
 
     config.action_links.add :purge,

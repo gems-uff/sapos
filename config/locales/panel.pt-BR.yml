@@ -6,6 +6,7 @@ pt-BR:
       process_name: "Processo Seletivo"
       year_semester: "Período"
       applications_count: "Candidaturas"
+      total_file_size: "Tamanho dos Arquivos (MB)"
       status: "Status"
       status_open: "Em aberto"
       status_closed: "Completo"

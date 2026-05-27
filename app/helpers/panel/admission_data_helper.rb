@@ -11,4 +11,10 @@ module Panel::AdmissionDataHelper
       I18n.t("panel.admission_data.status_closed")
     end
   end
+
+  def total_file_size_column(record, column)
+    size_in_mb = record.total_file_size
+    return "-" if size_in_mb.nil? || size_in_mb == 0
+    "#{size_in_mb} MB"
+  end
 end
