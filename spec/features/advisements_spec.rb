@@ -129,13 +129,12 @@ RSpec.describe "Advisements features", type: :feature do
     it "should show error when no main advisor is selected" do
       fill_record_select("professor_", "professors", "Fiona")
       fill_record_select("enrollment_", "enrollments", "M04")
-      find(:css, "#record_main_advisor_").set(false)
       click_button_and_wait "Salvar"
       expect(page).to have_content "Um dos orientadores deve ser Orientador Principal"
     end
 
     it "should show error when advisor does not have authorization at level" do
-      fill_record_select("professor_", "professors", "Gisela")
+      fill_record_select("professor_", "professors", "Gis")
       fill_record_select("enrollment_", "enrollments", "M04")
       find(:css, "#record_main_advisor_").set(true)
       click_button_and_wait "Salvar"
@@ -143,7 +142,7 @@ RSpec.describe "Advisements features", type: :feature do
     end
 
     it "should show error when advisor research area is different from enrollment" do
-      fill_record_select("professor_", "professors", "Helia")
+      fill_record_select("professor_", "professors", "Hel")
       fill_record_select("enrollment_", "enrollments", "M04")
       find(:css, "#record_main_advisor_").set(true)
       click_button_and_wait "Salvar"
