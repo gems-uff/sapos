@@ -21,6 +21,11 @@ RSpec.describe "Advisements features", type: :feature do
 
     @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Erica", cpf: "3")
     @destroy_all << @professor2 = FactoryBot.create(:professor, name: "Fiona", cpf: "2")
+    @destroy_all << @professor3 = FactoryBot.create(:professor, name: "Gisela", cpf: "4")
+    @destroy_all << @professor4 = FactoryBot.create(:professor, name: "Helia", cpf: "5")
+
+    @destroy_all << @research_area1 = FactoryBot.create(:research_area, name: "Ciência de Dados")
+    @destroy_all << @research_area2 = FactoryBot.create(:research_area, name: "Engenharia de Software")
 
     @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana")
     @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia")
@@ -30,18 +35,25 @@ RSpec.describe "Advisements features", type: :feature do
      enrollment_status: @enrollment_status, admission_date: YearSemester.current.semester_begin - 3.years)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student2, level: @level2, enrollment_status: @enrollment_status)
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status)
-    @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status)
+    @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status, research_area: @research_area1)
 
     @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment1, date: Date.today, dismissal_reason: @dismissal_reason)
 
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level2)
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level2)
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level1)
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor4, level: @level1)
+    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level1)
 
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment1, professor: @professor1, main_advisor: true)
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment2, professor: @professor2, main_advisor: true)
     @destroy_all << @record = FactoryBot.create(:advisement, enrollment: @enrollment3, professor: @professor1, main_advisor: true)
+    @enrollment3.reload
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment3, professor: @professor2, main_advisor: false)
+
+    
+    @destroy_all << FactoryBot.create(:professor_research_area, professor: @professor4, research_area: @research_area2)
+    @destroy_all << FactoryBot.create(:professor_research_area, professor: @professor2, research_area: @research_area1)
 
     @destroy_all << @user = create_confirmed_user([@role_adm])
   end
@@ -89,6 +101,7 @@ RSpec.describe "Advisements features", type: :feature do
       expect(page).to have_content "Adicionar Orientação"
       fill_record_select("professor_", "professors", "Fiona")
       fill_record_select("enrollment_", "enrollments", "M04")
+      find(:css, "#record_main_advisor_").set(true)
       click_button_and_wait "Salvar"
       expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04 - Dani")
@@ -107,6 +120,34 @@ RSpec.describe "Advisements features", type: :feature do
     it "should have a record_select widget for enrollment" do
       page.send_keys :escape
       expect_to_have_record_select(page, "enrollment_", "enrollments")
+    end
+
+    it "should show recommendation message" do
+      expect(page).to have_content "Ao adicionar múltiplas orientações, dê preferência para a tela de matrículas"
+    end
+
+    it "should show error when no main advisor is selected" do
+      fill_record_select("professor_", "professors", "Fiona")
+      fill_record_select("enrollment_", "enrollments", "M04")
+      find(:css, "#record_main_advisor_").set(false)
+      click_button_and_wait "Salvar"
+      expect(page).to have_content "Um dos orientadores deve ser Orientador Principal"
+    end
+
+    it "should show error when advisor does not have authorization at level" do
+      fill_record_select("professor_", "professors", "Gisela")
+      fill_record_select("enrollment_", "enrollments", "M04")
+      find(:css, "#record_main_advisor_").set(true)
+      click_button_and_wait "Salvar"
+      expect(page).to have_content "Ao menos um orientador deve ter credenciamento no nível da matrícula"
+    end
+
+    it "should show error when advisor research area is different from enrollment" do
+      fill_record_select("professor_", "professors", "Helia")
+      fill_record_select("enrollment_", "enrollments", "M04")
+      find(:css, "#record_main_advisor_").set(true)
+      click_button_and_wait "Salvar"
+      expect(page).to have_content "diferente de áreas de pesquisa do(s) orientador(es)"
     end
   end
 

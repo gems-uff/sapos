@@ -6,7 +6,16 @@
 require "spec_helper"
 
 RSpec.describe Advisement, type: :model do
-  it { should be_able_to_be_destroyed }
+  it "should be able to be destroyed" do
+    level = FactoryBot.create(:level)
+    professor = FactoryBot.create(:professor)
+    enrollment = FactoryBot.create(:enrollment, level: level)
+    FactoryBot.create(:advisement_authorization, professor: professor, level: level)
+    advisement = FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
+    expect { advisement.destroy }.not_to raise_error
+    expect(advisement.destroyed?).to be true
+    [level, professor, enrollment].each(&:delete)
+  end
 
   before(:all) do
     @destroy_later = []
@@ -16,12 +25,18 @@ RSpec.describe Advisement, type: :model do
     @destroy_later.clear
   end
 
-  let(:professor) { FactoryBot.build(:professor) }
-  let(:enrollment) { FactoryBot.build(:enrollment) }
+  let(:level) { FactoryBot.build(:level) }
+  let(:professor) do
+    prof = FactoryBot.build(:professor)
+    prof.advisement_authorizations.build(level: level)
+    prof
+  end
+  let(:enrollment) { FactoryBot.build(:enrollment, level: level) }
   let(:advisement) do
     Advisement.new(
       professor: professor,
-      enrollment: enrollment
+      enrollment: enrollment,
+      main_advisor: true
     )
   end
   subject { advisement }
@@ -43,6 +58,54 @@ RSpec.describe Advisement, type: :model do
           advisement.main_advisor = true
           expect(advisement).to have(0).errors_on :main_advisor
         end
+      end
+    end
+
+    describe "enrollment_has_main_advisor" do
+      it "should have error when no advisor is main advisor" do
+        @destroy_later << level = FactoryBot.create(:level)
+        @destroy_later << professor1 = FactoryBot.create(:professor)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
+        @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level)
+        advisement = Advisement.new(professor: professor1, enrollment: enrollment, main_advisor: false)
+        expect(advisement).to have_error(:main_advisor_required).on(:base)
+      end
+
+      it "should have error when more than one advisor is main advisor" do
+        @destroy_later << level = FactoryBot.create(:level)
+        @destroy_later << professor1 = FactoryBot.create(:professor)
+        @destroy_later << professor2 = FactoryBot.create(:professor)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
+        @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level)
+        @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor2, level: level)
+        @destroy_later << FactoryBot.create(:advisement, professor: professor1, enrollment: enrollment, main_advisor: true)
+        enrollment.reload
+        advisement = Advisement.new(professor: professor2, enrollment: enrollment, main_advisor: true)
+        expect(advisement).to have_error(:main_advisor_uniqueness).on(:base)
+      end
+    end
+
+    describe "enrollment_has_authorized_advisor" do
+      it "should have error when advisor does not have authorization at enrollment level" do
+        @destroy_later << level = FactoryBot.create(:level)
+        @destroy_later << professor1 = FactoryBot.create(:professor)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
+        advisement = Advisement.new(professor: professor1, enrollment: enrollment, main_advisor: true)
+        expect(advisement).to have_error(:no_advisor_with_level).on(:base)
+      end
+    end
+
+    describe "verify_research_area_with_advisors" do
+      it "should have error when advisor research area is different from enrollment" do
+        @destroy_later << level = FactoryBot.create(:level)
+        @destroy_later << research_area1 = FactoryBot.create(:research_area)
+        @destroy_later << research_area2 = FactoryBot.create(:research_area)
+        @destroy_later << professor1 = FactoryBot.create(:professor)
+        @destroy_later << FactoryBot.create(:professor_research_area, professor: professor1, research_area: research_area1)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level, research_area: research_area2)
+        @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level)
+        advisement = Advisement.new(professor: professor1, enrollment: enrollment, main_advisor: true)
+        expect(advisement).to have_error(:research_area_different_from_professors).on(:base)
       end
     end
   end
@@ -67,6 +130,7 @@ RSpec.describe Advisement, type: :model do
         @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
         @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor0, level: level)
         @destroy_later << advisement = FactoryBot.create(:advisement, professor: professor0, enrollment: enrollment)
+        advisement.enrollment.reload
         @destroy_later << FactoryBot.create(:advisement, professor: professor1, enrollment: advisement.enrollment, main_advisor: false)
         @destroy_later << FactoryBot.create(:advisement, professor: professor2, enrollment: advisement.enrollment, main_advisor: false)
         expect(advisement.co_advisor_list).to eql("#{professor1_name} , #{professor2_name}")
@@ -103,6 +167,7 @@ RSpec.describe Advisement, type: :model do
           @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
           @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level)
           @destroy_later << other_advisement = FactoryBot.create(:advisement, professor: professor1, enrollment: enrollment)
+          other_advisement.enrollment.reload
           @destroy_later << FactoryBot.create(:advisement, enrollment: other_advisement.enrollment, main_advisor: false)
           expect(other_advisement.co_advisor).to be_truthy
         end

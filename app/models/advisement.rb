@@ -100,7 +100,7 @@ class Advisement < ApplicationRecord
 
   def enrollment_has_authorized_advisor
     return if enrollment.blank? || enrollment.level.blank?
-    return if professor.advisement_authorizations.any? { |auth| auth.level == enrollment.level }
+    return if professor.present? && professor.advisement_authorizations.any? { |auth| auth.level == enrollment.level }
 
     advisements = enrollment.advisements.reject(&:marked_for_destruction?)
     has_authorized = advisements.any? do |a|
