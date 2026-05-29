@@ -50,6 +50,16 @@ class CourseClass < ApplicationRecord
     "#{self.course.name}#{name_l} - #{year}/#{semester}"
   end
 
+  def start_date
+    ys = YearSemester.new(year: year, semester: semester)
+    ys.semester_begin
+  end
+
+  def end_date
+    ys = YearSemester.new(year: year, semester: semester)
+    ys.semester_end
+  end
+
   def class_enrollments_count
     self.class_enrollments.count
   end

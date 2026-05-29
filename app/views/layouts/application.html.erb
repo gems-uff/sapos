@@ -41,11 +41,18 @@
           <% end %>
         </div>
         <div id="sub" style="display: flex-column;">
-          <div>
+          <div style="text-align: right;">
             Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %>
-          </div> 
-          <div id="role_selector" style="float: right">
-            <%= role_selector(current_user) %>
+          </div>
+          <div style="float: right; text-align: right;">
+            <% if CustomVariable.instance_name %>
+              <div>
+                <%= CustomVariable.instance_name %>
+              </div>
+            <% end %>
+            <div id="role_selector">
+              <%= role_selector(current_user) %>
+            </div>
           </div>
         </div>
       </div>
