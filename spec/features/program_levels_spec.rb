@@ -70,8 +70,10 @@ RSpec.describe "ProgramLevels features", type: :feature do
       within("#as_#{plural_name}-create--form") do
         fill_in "Nível", with: "6"
         fill_in "Portaria", with: "Portaria MEC 9999/2024"
-        fill_in "Data de início", with: Date.today.strftime("%d/%m/%Y")
+        find("#record_start_date_").click
       end
+      page.execute_script("$('#record_start_date_').datepicker('setDate', new Date(2021, 7, 13))")
+      page.execute_script("$('#ui-datepicker-div').hide()")
       click_button_and_wait "Salvar"
       expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.level-column", text: "6")
