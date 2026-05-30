@@ -30,6 +30,7 @@ pt-BR:
         student: "Aluno"
         enrollment_level: "Nível"
         enrollment_status: "Tipo de Matrícula"
+        enrollment_hold: "Matrícula Trancada"
         admission_date: "Data de Admissão"
         scholarship_durations_active: "Possui bolsa?"
         advisor: "Orientador"
@@ -51,6 +52,7 @@ pt-BR:
           grade_gt_100: "deve ser menor ou igual a 10.0"
           grade_lt_0: "deve ser maior ou igual a 0.0"
           changes_to_disallowed_fields: "houve modificação de campos não válidos"
+          enrollment_is_held: "está trancada no período da turma"
 
     models:
       class_enrollment:
@@ -63,8 +65,8 @@ pt-BR:
   notifications:
     class_enrollment:
       email_to_student:
-        subject: "Sua inscrição em <%= var(:record).course_class.label_with_course %> foi atualizada"
+        subject: "Sua inscrição em {{ record.course_class.label_for_email_subject }} foi atualizada"
       email_to_advisor:
-        subject: "Inscrição em <%= var(:record).course_class.label_with_course %> de <%= var(:record).enrollment.to_label %> foi atualizada"
+        subject: "Inscrição em {{ record.course_class.label_for_email_subject }} de {{ record.enrollment.to_label }} foi atualizada"
       email_to_professor:
-        subject: "Alteração da nota de <%= var(:record).enrollment.to_label %> na turma <%= var(:record).course_class.label_with_course %>"
+        subject: "Alteração da nota de {{ record.enrollment.to_label }} em {{ record.course_class.label_for_email_subject }}"

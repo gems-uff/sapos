@@ -29,7 +29,6 @@ class ProfessorsController < ApplicationController
     config.columns[:civil_status].options = {
       options: [["Solteiro(a)", "solteiro"], ["Casado(a)", "casado"]]
     }
-    config.columns[:institution].form_ui = :record_select
     config.columns[:sex].form_ui = :select
     config.columns[:sex].options = { options: [["Masculino", "M"],
                                                ["Feminino", "F"]] }
@@ -53,9 +52,10 @@ class ProfessorsController < ApplicationController
       :address, :zip_code, :telephone1, :telephone2, :cpf,
       :identity_expedition_date, :identity_issuing_body,
       :identity_issuing_place, :identity_number, :enrollment_number,
-      :siape, :institution, :scholarships, :academic_title_level,
+      :siape, :scholarships, :academic_title_level,
       :academic_title_institution, :academic_title_country,
-      :academic_title_date, :obs, :professor_research_areas,
+      :academic_title_date, :obs, :professor_research_areas, :professor_research_lines,
+      :affiliations
     ]
 
     config.create.columns = form_columns
@@ -64,11 +64,12 @@ class ProfessorsController < ApplicationController
     config.show.columns = [
       :name, :email, :cpf, :birthdate, :address, :birthdate, :civil_status,
       :identity_expedition_date, :identity_issuing_body, :identity_number,
-      :neighborhood, :sex, :enrollment_number, :siape,
+      :neighborhood, :sex, :enrollment_number, :siape, :institutions,
       :telephone1, :telephone2, :zip_code, :scholarships,
       :advisement_authorizations, :advisements_with_points,
       :academic_title_level, :academic_title_institution,
       :academic_title_country, :academic_title_date, :obs, :research_areas,
+      :research_lines
     ]
 
     config.actions.exclude :deleted_records
@@ -107,6 +108,7 @@ class ProfessorsController < ApplicationController
         else
           active_scaffold_config.columns[method_name].label = level.name
         end
+        active_scaffold_config.columns[method_name].sort_by method: method_name
       end
 
       insert_position = Array(active_scaffold_config.list.columns)

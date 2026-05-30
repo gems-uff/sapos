@@ -12,14 +12,12 @@ RSpec.describe Admissions::AdmissionCommitteeMember, type: :model do
 
   before(:all) do
     @admission_committee = FactoryBot.create(:admission_committee)
-    @role = FactoryBot.create(:role_professor)
-    @user = FactoryBot.create(:user, role: @role)
+    @user = FactoryBot.create(:user, actual_role: Role::ROLE_PROFESSOR)
     @destroy_later = []
   end
   after(:all) do
     @admission_committee.delete
     @user.delete
-    @role.delete
   end
   after(:each) do
     @destroy_later.each(&:delete)

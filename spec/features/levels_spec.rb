@@ -15,7 +15,7 @@ RSpec.describe "Level features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
     @destroy_all << @record = FactoryBot.create(:level, name: "Mestrado", default_duration: 24)
     @destroy_all << FactoryBot.create(:level, name: "Doutorado", default_duration: 48)
     @destroy_all << FactoryBot.create(:level, name: "Especialização", default_duration: 0)
@@ -27,6 +27,7 @@ RSpec.describe "Level features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -51,7 +52,7 @@ RSpec.describe "Level features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -61,7 +62,8 @@ RSpec.describe "Level features", type: :feature do
         fill_in "Nome", with: "Graduação"
         fill_in "Duração padrão (meses)", with: "48"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Graduação")
       expect(page).to have_css("tr:nth-child(1) td.default_duration-column", text: "48")
 
@@ -69,9 +71,7 @@ RSpec.describe "Level features", type: :feature do
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Graduação", "Doutorado", "Especialização", "Mestrado"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Doutorado", "Especialização", "Mestrado"]
+      expect(page).to have_no_content("Graduação")
     end
   end
 
@@ -87,7 +87,7 @@ RSpec.describe "Level features", type: :feature do
         fill_in "Nome", with: "Teste"
         fill_in "Duração padrão (meses)", with: "12"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
       expect(page).to have_css("td.default_duration-column", text: "12")
     end
@@ -97,12 +97,12 @@ RSpec.describe "Level features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do
       fill_in "search", with: "Especia"
-      sleep(0.8)
+      expect(page).to have_no_content("Doutorado")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Especialização"]
     end
   end

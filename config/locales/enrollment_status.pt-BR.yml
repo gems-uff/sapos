@@ -9,6 +9,7 @@ pt-BR:
         user: "Com usuário"
         enrollments: "Matrículas"
         application_processes: "Editais de Seleção"
+        professor_can_generate_report: "Professor pode gerar boletim"
 
     models:
       enrollment_status:

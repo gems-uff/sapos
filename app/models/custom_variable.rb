@@ -12,7 +12,6 @@ class CustomVariable < ApplicationRecord
   VARIABLES = {
     "single_advisor_points" => :text,
     "multiple_advisor_points" => :text,
-    "program_level" => :text,
     "identity_issuing_country" => :text,
     "class_schedule_text" => :text,
     "redirect_email" => :text,
@@ -26,6 +25,7 @@ class CustomVariable < ApplicationRecord
     "past_calendar_range" => :text,
     "academic_calendar_range" => :text,
     "quadrennial_period" => :text,
+    "instance_name" => :text,
   }
 
   validates :variable, presence: true
@@ -41,11 +41,6 @@ class CustomVariable < ApplicationRecord
   def self.multiple_advisor_points
     config = CustomVariable.find_by_variable(:multiple_advisor_points)
     config.blank? ? 0.5 : config.value.to_f
-  end
-
-  def self.program_level
-    config = CustomVariable.find_by_variable(:program_level)
-    config.blank? ? nil : config.value.to_i
   end
 
   def self.identity_issuing_country
@@ -121,6 +116,10 @@ class CustomVariable < ApplicationRecord
     config.blank? ? "Not defined" : config.value
   end
 
+  def self.instance_name
+    config = CustomVariable.find_by_variable(:instance_name)
+    config.blank? ? nil : config.value
+  end
 
   def to_label
     self.variable.to_s

@@ -13,10 +13,13 @@ RSpec.describe Professor, type: :model do
   it { should have_many(:advisement_authorizations).dependent(:restrict_with_exception) }
   it { should have_many(:professor_research_areas).dependent(:destroy) }
   it { should have_many(:research_areas).through(:professor_research_areas) }
+  it { should have_many(:professor_research_lines).dependent(:destroy) }
+  it { should have_many(:research_lines).through(:professor_research_lines) }
   it { should have_many(:course_classes).dependent(:restrict_with_exception) }
   it { should have_many(:thesis_defense_committee_participations).dependent(:restrict_with_exception) }
   it { should have_many(:thesis_defense_committee_enrollments).source(:enrollment).through(:thesis_defense_committee_participations) }
-
+  it { should have_many(:affiliations).dependent(:destroy) }
+  it { should have_many(:institutions).through(:affiliations) }
   before(:all) do
     @professor_role = FactoryBot.create :role_professor
     @destroy_later = []
@@ -41,7 +44,6 @@ RSpec.describe Professor, type: :model do
   describe "Validations" do
     it { should be_valid }
     it { should belong_to(:city).required(false) }
-    it { should belong_to(:institution).required(false) }
     it { should belong_to(:academic_title_country).required(false) }
     it { should belong_to(:academic_title_institution).required(false) }
     it { should belong_to(:academic_title_level).required(false) }
@@ -61,7 +63,7 @@ RSpec.describe Professor, type: :model do
         end
         it "user is set to null after a predefined vaule" do
           delete_users_by_emails ["abc@def.com", "def@ghi.com"]
-          @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", role_id: Role::ROLE_PROFESSOR)
+          @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", actual_role: Role::ROLE_PROFESSOR)
           professor.user = user1
           professor.save(validate: false)
           @destroy_later << professor
@@ -72,8 +74,8 @@ RSpec.describe Professor, type: :model do
       context "should have error changed_to_different_user when" do
         it "user is set to a different user" do
           delete_users_by_emails ["abc@def.com", "def@ghi.com"]
-          @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", role_id: Role::ROLE_PROFESSOR)
-          @destroy_later << user2 = FactoryBot.create(:user, email: "def@ghi.com", role_id: Role::ROLE_PROFESSOR)
+          @destroy_later << user1 = FactoryBot.create(:user, email: "abc@def.com", actual_role: Role::ROLE_PROFESSOR)
+          @destroy_later << user2 = FactoryBot.create(:user, email: "def@ghi.com", actual_role: Role::ROLE_PROFESSOR)
           professor.user = user1
           professor.save(validate: false)
           @destroy_later << professor
@@ -282,6 +284,41 @@ RSpec.describe Professor, type: :model do
 
         expect(professor.advisement_point(enrollment)).to eql(1.0)
       end
+    end
+  end
+
+  describe "Before destroy" do
+    it "should assign unknown role when user has only professor role" do
+      @destroy_later << FactoryBot.create(:role_desconhecido)
+      @destroy_later << user = FactoryBot.create(:user, actual_role: Role::ROLE_PROFESSOR)
+      @destroy_later << professor = FactoryBot.create(:professor, user: user)
+      user.roles << @professor_role
+      user.save!
+
+      professor.destroy
+      user.reload
+
+      expect(user.roles.count).to eq(1)
+      expect(user.roles).not_to include(@professor_role)
+      expect(user.roles.first.id).to eq(Role::ROLE_DESCONHECIDO)
+      expect(user.actual_role).to eq(Role::ROLE_DESCONHECIDO)
+    end
+
+    it "should keep other roles when user has multiple roles" do
+      @destroy_later << admin_role = FactoryBot.create(:role_administrador)
+      @destroy_later << user = FactoryBot.create(:user, actual_role: Role::ROLE_ADMINISTRADOR)
+      @destroy_later << professor = FactoryBot.create(:professor, user: user)
+      user.roles << @professor_role
+      user.roles << admin_role
+      user.save!
+
+      professor.destroy
+      user.reload
+
+      expect(user.roles.count).to eq(1)
+      expect(user.roles).to include(admin_role)
+      expect(user.roles).not_to include(@professor_role)
+      expect(user.actual_role).to eq(Role::ROLE_ADMINISTRADOR)
     end
   end
 end

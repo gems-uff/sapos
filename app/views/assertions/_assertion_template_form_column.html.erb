@@ -1,0 +1,60 @@
+<% column_options = active_scaffold_input_options(column, scope, object: record) %>
+<dl>
+  <dt>
+    <%= label_tag label_for(column, column_options), column.label %>
+    <br>
+    <span class="description">
+      <span class="desc-title">Os campos de template utilizam linguagem Liquid. <a href="https://shopify.dev/docs/api/liquid/"> Ver detalhes </a>.</span>
+      <span class="desc-title">Variáveis: </span>
+      <ul>
+        <li>
+          <strong>{{ coluna }}</strong> <br>
+          Escreve uma coluna da consulta no corpo do texto da declaração
+        </li>
+        <li>
+          <strong>{{ records }}</strong> <br>
+          Lista com todos os resultados
+<pre>{% for record in records %}
+  {{ record.coluna }};
+{% endfor %}</pre>
+        </li>
+      </ul>
+      <span class="desc-title">Filtros: </span>
+      <ul>
+        <li>
+          <strong>{{ data | localize: 'short' }}</strong> <br>
+          Imprime tempo com formato diferente. Opções de formato: <br>
+          <span title="%A, %d de %B de %Y, %H:%M h">'default'</span>,
+          <span title="%d-%m-%Y">'defaultdate'</span>,
+          <span title="%H:%M h">'short'</span>,
+          <span title="%d de %B">'shortdate'</span>,
+          <span title="%A, %d de %B de %Y, %H:%M h">'long'</span>,
+          <span title="%d de %B de %Y">'longdate'</span>,
+          <span title="%a, %d %b %Y %H:%M:%S">'picker'</span>,
+          <span title="%A, %d de %B de %Y">'day'</span>,
+          <span title="%B-%Y">'monthyear'</span>,
+          <span title="%B/%Y">'monthyear2'</span>
+        </li>
+      </ul>
+      <span class="desc-title">Tags: </span>
+      <ul>
+        <li>
+          <strong>language en</strong> <br>
+          Ao utilizar esta tag, a formatação de datas pelo localize dentro dela fica em inglês.
+<pre>{% language en %}
+  {{ data | localize: 'long' }}
+{% endlanguage %}</pre>
+        </li>
+        <li>
+          <strong>emails <i>Papel</i></strong> <br>
+          Retorna todos emails de um determinado papel.
+<pre>{% emails Secretaria %}
+{% emails Coordenação %}</pre>
+        </li>
+      </ul>
+    </span>
+  </dt>
+  <dd>
+    <%= assertion_template_form_column record, column_options %>
+  </dd>
+</dl>

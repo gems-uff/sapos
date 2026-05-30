@@ -6,12 +6,13 @@
 new_document(
   @filename,
   I18n.t("pdf_content.enrollment.grades_report.title"),
-  watermark: (
+  watermark: @watermark ? true : (
     current_user.nil? ? false : cannot?(
       :generate_report_without_watermark, @enrollment
     )
   ),
-  pdf_type: :grades_report
+  pdf_type: :grades_report,
+  override: can?(:override_report_signature_type, @enrollment) ? { signature_type: @signature_override }.compact : nil
 ) do |pdf|
   enrollment_student_header(pdf, enrollment: @enrollment)
 

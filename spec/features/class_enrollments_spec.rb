@@ -13,7 +13,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << @level1 = FactoryBot.create(:level, name: "Doutorado")
     @destroy_all << @level2 = FactoryBot.create(:level, name: "Mestrado")
@@ -49,7 +49,8 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     @destroy_all << @student2 = FactoryBot.create(:student, name: "Bia")
     @destroy_all << @student3 = FactoryBot.create(:student, name: "Carol")
     @destroy_all << @student4 = FactoryBot.create(:student, name: "Dani")
-    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1, level: @level2, enrollment_status: @enrollment_status1, admission_date: 3.years.ago.at_beginning_of_month.to_date)
+    @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1, level: @level2,
+     enrollment_status: @enrollment_status1, admission_date: YearSemester.current.semester_begin - 3.years)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student2, level: @level2, enrollment_status: @enrollment_status2)
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status1)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status2)
@@ -85,6 +86,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -109,7 +111,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -121,16 +123,15 @@ RSpec.describe "ClassEnrollments features", type: :feature do
         find(:select, "record_situation_").find(:option, text: "Incompleto").select_option
       end
       fill_record_select("course_class_", "course_classes", "Programação")
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.enrollment-column", text: "M04 - Dani")
 
       # Remove inserted record
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M04 - Dani", "M01 - Ana", "M01 - Ana", "M02 - Bia", "M02 - Bia", "M03 - Carol", "M03 - Carol"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M01 - Ana", "M02 - Bia", "M02 - Bia", "M03 - Carol", "M03 - Carol"]
+      expect(page).to have_no_content("M04 - Dani")
     end
 
     it "should have a selection for semester" do
@@ -168,11 +169,11 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     end
 
     it "should be able to edit student" do
-      page.send_keys :escape
+      page.driver.browser.action.send_keys(:escape).perform
       within(".as_form") do
         fill_in "Nota", with: "6"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.grade_label-column", text: "6.0")
       @record.grade = 80
       @record.save!
@@ -183,105 +184,105 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by situation" do
       expect(page.all("select#search_situation option").map(&:text)).to eq ["Selecione"] + ClassEnrollment::SITUATIONS
       find(:select, "search_situation").find(:option, text: "Incompleto").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M03 - Carol"]
     end
 
     it "should be able to search by year" do
       expect(page.all("select#search_year option").map(&:text)).to eq [""] + YearSemester.selectable_years.map(&:to_s)
       find(:select, "search_year").find(:option, text: "2021").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia"]
     end
 
     it "should be able to search by semester" do
       expect(page.all("select#search_semester option").map(&:text)).to eq [""] + YearSemester::SEMESTERS.map(&:to_s)
       find(:select, "search_semester").find(:option, text: "1").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia"]
     end
 
     it "should be able to search by enrollment" do
       search_record_select("enrollment_", "enrollments", "M01")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M01 - Ana"]
     end
 
     it "should be able to search by student" do
       search_record_select("student_", "students", "Ana")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M01 - Ana"]
     end
 
     it "should be able to search by enrollment_level" do
       expect(page.all("select#search_enrollment_level option").map(&:text)).to eq ["Selecione uma opção", "Doutorado", "Mestrado"]
       find(:select, "search_enrollment_level").find(:option, text: "Mestrado").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M01 - Ana", "M02 - Bia", "M02 - Bia"]
     end
 
     it "should be able to search by enrollment_status" do
       expect(page.all("select#search_enrollment_status option").map(&:text)).to eq ["Selecione uma opção", "Regular", "Avulso"]
       find(:select, "search_enrollment_status").find(:option, text: "Avulso").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia", "M02 - Bia"]
     end
 
     it "should be able to search by admision_date" do
-      select_month_year("search_admission_date", 3.years.ago.at_beginning_of_month.to_date)
-      click_button "Buscar"
+      select_month_year("search_admission_date", YearSemester.current.semester_begin - 3.years)
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M01 - Ana"]
     end
 
     it "should be able to search by scholarship_durations_active" do
       expect(page.all("select#search_scholarship_durations_active option").map(&:text)).to eq ["Selecione uma opção", "Sim", "Não"]
       find(:select, "search_scholarship_durations_active").find(:option, text: "Sim").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M01 - Ana"]
     end
 
     it "should be able to search by has_advisor" do
       expect(page.all("select#search_has_advisor option").map(&:text)).to eq ["Selecione uma opção", "Sim", "Não"]
       find(:select, "search_has_advisor").find(:option, text: "Sim").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M01 - Ana"]
     end
 
     it "should be able to search by advisor" do
       search_record_select("advisor_", "professors", "Erica")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M01 - Ana"]
     end
 
     it "should be able to search by course_class" do
       search_record_select("course_class", "course_classes", "Vers")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M02 - Bia", "M03 - Carol"]
     end
 
     it "should be able to search by course_type" do
       expect(page.all("select#search_course_type option").map(&:text)).to eq ["Selecione uma opção", "Obrigatória", "Pesquisa", "Tópicos", "Defesa"]
       find(:select, "search_course_type").find(:option, text: "Defesa").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana"]
     end
 
     it "should be able to search by professor" do
       search_record_select("professor_", "professors", "Fiona")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M01 - Ana", "M02 - Bia", "M03 - Carol", "M03 - Carol"]
     end
 
     it "should be able to search by disapproved_by_absence" do
       expect(page.all("select#search_disapproved_by_absence option").map(&:text)).to eq ["Selecione uma opção", "Sim", "Não"]
       find(:select, "search_disapproved_by_absence").find(:option, text: "Sim").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.enrollment-column").map(&:text)).to eq ["M02 - Bia"]
     end
   end

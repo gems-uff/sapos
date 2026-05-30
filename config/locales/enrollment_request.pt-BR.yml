@@ -46,4 +46,4 @@ pt-BR:
   notifications:
     enrollment_request:
       email_to_student:
-        subject: "Alteração de situação de pedido de inscrição de <%= var(:record).year %>.<%= var(:record).semester %>"
+        subject: "Alteração de situação de pedido de inscrição de {{ record.year }}.{{ record.semester }}"

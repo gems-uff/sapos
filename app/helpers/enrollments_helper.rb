@@ -32,6 +32,14 @@ module EnrollmentsHelper
     :level_form_column,
     :custom_level_form_column
   )
+  alias_method(
+    :research_area_form_column,
+    :custom_research_area_form_column
+  )
+  alias_method(
+    :research_line_form_column,
+    :custom_research_line_form_column
+  )
 
   # ClassEnrollmentHelperConcern
   alias_method(
@@ -100,7 +108,7 @@ module EnrollmentsHelper
         :record, :phases,
         options_for_select([["Alguma", "all"]] +
           Phase.where(active: true).map { |phase| [phase.name, phase.id] }
-        ),
+                          ),
         { include_blank: as_(:_select_) },
         select_html_options
       ) +
@@ -120,14 +128,14 @@ module EnrollmentsHelper
     select_html_options = { name: "search[accomplishments][phase]" }
     day_html_options = { name: "search[accomplishments][day]" }
     month_html_options = { name: "search[accomplishments][month]" }
-    year_html_options = { name: "search[accomplishments][year]"}
+    year_html_options = { name: "search[accomplishments][year]" }
 
     (
       select(
         :record, :phases,
         options_for_select([["Todas", "all"]] +
           Phase.all.map { |phase| [phase.name, phase.id] }
-        ),
+                          ),
         { include_blank: as_(:_select_) },
         select_html_options
       ) +
@@ -143,11 +151,31 @@ module EnrollmentsHelper
   end
 
   def enrollment_hold_search_column(record, input_name)
-    select_html_options = {
+    hold_options = {
       name: "search[enrollment_hold][hold]",
       style: "float:left; margin: 5px 2px;"
     }
-    check_box(record, :enrollment_hold, select_html_options)
+    active_options = {
+      style: "display:inline-block; margin: 5px 2px;"
+    }
+    active_select_options = options_for_select(
+      [
+        [I18n.t("active_scaffold.true"), "1"],
+        [I18n.t("active_scaffold.false"), "0"]
+      ]
+    )
+    check_box(record, :enrollment_hold, hold_options) +
+    label_tag(
+      :enrollment_hold_active,
+      I18n.t("activerecord.attributes.enrollment.enrollment_hold_active"),
+      style: "margin: 0px 5px"
+    ) +
+    select_tag(
+      "search[enrollment_hold][active]",
+      active_select_options,
+      include_blank: true,
+      style: active_options[:style]
+    )
   end
 
   def course_class_year_semester_search_column(record, options)
@@ -261,8 +289,9 @@ module EnrollmentsHelper
     render(
       partial: "enrollments/show_defense_committee_table",
       locals: {
-        thesis_defense_committee_professors:
-          record.thesis_defense_committee_professors
+        thesis_defense_committee_professors: record.thesis_defense_committee_professors,
+        thesis_defense_date: record.thesis_defense_date,
+        dismissal_date: record.dismissal&.date
       }
     )
   end
@@ -317,7 +346,7 @@ module EnrollmentsHelper
       search[:enrollment_hold][:hold].to_i != 0
     )
     if searching_hold
-      holds = record.enrollment_holds.where(active: true)
+      holds = record.enrollment_holds
         .collect(&:to_label).join(", ")
       result += ("
         </tr></table></td>
@@ -338,5 +367,10 @@ module EnrollmentsHelper
 
   def permit_rs_browse_params
     [:page, :update, :utf8]
+  end
+
+  def documents_show_column(record, column)
+    render(partial: "enrollments/show_documents_table",
+           locals: { enrollment: record, allowed_assertions: Assertion.student_allowed })
   end
 end

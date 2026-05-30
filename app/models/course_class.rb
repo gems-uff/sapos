@@ -41,9 +41,23 @@ class CourseClass < ApplicationRecord
     "#{year}.#{semester}"
   end
 
+  def label_for_email_subject
+    "#{self.course.name} - #{year}/#{semester}"
+  end
+
   def label_with_course
     name_l = self.name.blank? ? "" : " (#{self.name})"
     "#{self.course.name}#{name_l} - #{year}/#{semester}"
+  end
+
+  def start_date
+    ys = YearSemester.new(year: year, semester: semester)
+    ys.semester_begin
+  end
+
+  def end_date
+    ys = YearSemester.new(year: year, semester: semester)
+    ys.semester_end
   end
 
   def class_enrollments_count
@@ -64,6 +78,40 @@ class CourseClass < ApplicationRecord
 
   def name_with_class_formated_to_reports
     name_with_class.gsub("<", "&lt;")
+  end
+
+  def self.pendency_condition(user = nil)
+    user ||= current_user
+    return ["0 = -1"] if user.blank?
+    return ["0 = -1"] if user.cannot?(:read_pendencies, CourseClass)
+
+    semester = ClassSchedule.find_by(year: YearSemester.current.year, semester: YearSemester.current.semester)
+
+    if semester && semester.show_period_end?
+      course_type_arel = CourseType.arel_table.dup
+      course_arel = Course.arel_table.dup
+      course_class_arel = CourseClass.arel_table.dup
+      class_enrollment_arel = ClassEnrollment.arel_table.dup
+
+      query = course_type_arel
+      .join(course_arel)
+      .on(course_type_arel[:id].eq(course_arel[:course_type_id]))
+      .join(course_class_arel)
+      .on(course_arel[:id].eq(course_class_arel[:course_id]))
+      .join(class_enrollment_arel)
+      .on(course_class_arel[:id].eq(class_enrollment_arel[:course_class_id]))
+      .where(class_enrollment_arel[:situation].eq(ClassEnrollment::REGISTERED)
+      .and(course_class_arel[:year].eq(YearSemester.current.year))
+      .and(course_class_arel[:semester].eq(YearSemester.current.semester))
+      .and(course_type_arel[:schedulable].eq(true)))
+
+      if user.professor.present?
+        query = query.where(course_class_arel[:professor_id].eq(user.professor.id))
+      end
+
+      return [course_class_arel[:id].in(query.project(course_class_arel[:id])).to_sql]
+    end
+    ["0 = -1"]
   end
 
   private

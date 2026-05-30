@@ -30,8 +30,10 @@ function config_form_field_codemirror(form_field, field, mode, options) {
         smartIndent: true,
         lineNumbers: true,
         matchBrackets : true,
-        autofocus: true
+        autofocus: true,
+        lineWrapping: true
       })
+      editor.setSize(null, '32em');
       editor.on("change", function(cm, change){
         form_field.data[field] = cm.getValue();
         form_field.save_config();

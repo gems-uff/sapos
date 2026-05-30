@@ -1,0 +1,13 @@
+<div style="display: flex; gap: 20px;">
+  <% if can?(:academic_transcript_pdf, @record) %>
+    <% if can?(:override_report_signature_type, @record) %>
+      <%= link_to 'Sem Assinatura', override_signature_transcript_pdf_enrollment_path(id: @record.id, signature_type: :no_signature) %>
+      <%= link_to 'Assinatura Manual', override_signature_transcript_pdf_enrollment_path(id: @record.id, signature_type: :manual) %>
+      <%= link_to 'Assinatura por QR Code', override_signature_transcript_pdf_enrollment_path(id: @record.id, signature_type: :qr_code) %>
+    <% else %>
+      <%= link_to 'Gerar', academic_transcript_pdf_enrollment_path(id: @record.id, format: :pdf) %>
+    <% end %>
+  <% else %>
+   -
+  <% end %>
+</div>

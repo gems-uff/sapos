@@ -18,6 +18,8 @@
 //= require codemirror/mode/javascript/javascript
 //= require codemirror/mode/sql/sql
 //= require codemirror/mode/xml/xml
+//= require codemirror/mode/htmlmixed/htmlmixed
+//= require codemirror/addon/mode/overlay
 //= require codemirror
 //= require cocoon
 //= require_tree .

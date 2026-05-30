@@ -77,6 +77,7 @@ module Admissions::Ability
       can :cancel, Admissions::AdmissionApplication
       can :configuration, Admissions::AdmissionApplication
       can :read_all, Admissions::AdmissionApplication
+      can :read_pendencies, Admissions::AdmissionApplication
       can :map_student, Admissions::AdmissionApplication
       can :custom_report, Admissions::AdmissionProcess
     end

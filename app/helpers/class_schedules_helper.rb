@@ -36,8 +36,8 @@ module ClassSchedulesHelper
     _start_date_column(record, options, :enrollment_start)
   end
 
-  def enrollment_adjust_form_column(record, options)
-    _start_date_column(record, options, :enrollment_adjust, :enrollment_start)
+  def period_start_form_column(record, options)
+    _start_date_column(record, options, :period_start, :enrollment_start)
   end
 
   def enrollment_end_form_column(record, options)
@@ -50,5 +50,13 @@ module ClassSchedulesHelper
 
   def enrollment_remove_form_column(record, options)
     _end_date_column(record, options, :enrollment_remove, :enrollment_end)
+  end
+
+  def period_end_form_column(record, options)
+    _end_date_column(record, options, :period_end)
+  end
+
+  def grades_deadline_form_column(record, options)
+    _end_date_column(record, options, :grades_deadline, :period_end)
   end
 end

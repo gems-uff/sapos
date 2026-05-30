@@ -16,7 +16,8 @@ class Ability
   PROFESSOR_MODELS = [
     Professor, Advisement, AdvisementAuthorization,
     ThesisDefenseCommitteeParticipation,
-    ProfessorResearchArea, Grant, Paper, PaperProfessor, PaperStudent
+    ProfessorResearchArea, ProfessorResearchLine, Grant,
+    Paper, PaperProfessor, PaperStudent, Affiliation
   ]
 
   SCHOLARSHIP_MODELS = [
@@ -30,7 +31,7 @@ class Ability
   ]
 
   COURSE_MODELS = [
-    ResearchArea, Course, CourseType, CourseClass, ClassSchedule,
+    ResearchArea, ResearchLine, Course, CourseType, CourseClass, ClassSchedule,
     ClassEnrollment, Allocation, EnrollmentRequest, ClassEnrollmentRequest,
     EnrollmentRequestComment,
   ]
@@ -40,7 +41,7 @@ class Ability
   ]
 
   DOCUMENT_MODELS = [
-    Report
+    Report, Assertion, Notification, NotificationLog, ReportConfiguration, Query, QueryParam
   ]
 
   PLACE_MODELS = [
@@ -48,24 +49,24 @@ class Ability
   ]
 
   CONFIGURATION_MODELS = [
-    User, Role, Version, Notification, EmailTemplate, Query, NotificationLog,
-    CustomVariable, ReportConfiguration,
-    YearSemester
+    User, Role, Version, EmailTemplate,
+    CustomVariable, YearSemester, ProgramLevel, UserRole
   ]
 
   def initialize(user)
     alias_action :list, :row, :show_search, :render_field, :class_schedule_pdf,
-      :to_pdf, :summary_pdf, :academic_transcript_pdf, :grades_report_pdf,
+      :to_pdf, :summary_pdf, :summary_xls, :academic_transcript_pdf, :grades_report_pdf,
       :browse, :simulate, :set_query_date, :cities, :states,
       :preview, :builtin, :help, to: :read
     alias_action :update_column, :edit_associated, :new_existing, :add_existing,
       :duplicate, to: :update
     alias_action :delete, :destroy_existing, to: :destroy
-
+    alias_action :override_signature_grades_report_pdf, :override_signature_transcript_pdf,
+                :override_signature_assertion_pdf, to: :override_report_signature_type
     user ||= User.new
 
-    role_id = user.role_id
-    roles = { role_id => true }
+    actual_role = user.actual_role
+    roles = { actual_role => true }
     roles[:manager] = (
       roles[Role::ROLE_ADMINISTRADOR] ||
       roles[Role::ROLE_COORDENACAO] ||
@@ -126,6 +127,7 @@ class Ability
       can :manage, Ability::STUDENT_MODELS
       can :update_all_fields, Student
       can :read_all_fields, Student
+      can :override_report_signature_type, Enrollment
       can :generate_report_without_watermark, Enrollment
       can :invite, User
     end
@@ -133,10 +135,18 @@ class Ability
       can :read, Ability::STUDENT_MODELS
       can :read_all_fields, Student
       can :photo, Student
+      cannot :grades_report_pdf, Enrollment do |enrollment|
+        !enrollment.enrollment_status.professor_can_generate_report
+      end
     end
     if roles[Role::ROLE_SUPORTE]
       can [:read, :update, :update_only_photo], (Student)
     end
+
+    # Keep this at the end or :read STUDENT_MODELS will override it
+    cannot :academic_transcript_pdf, Enrollment do |enrollment|
+      enrollment.dismissal&.dismissal_reason&.thesis_judgement != DismissalReason::APPROVED
+    end unless roles[:manager]
   end
 
   def initialize_professors(user, roles)
@@ -191,6 +201,7 @@ class Ability
       can :update_all_fields, CourseClass
       if !roles[Role::ROLE_COORDENACAO] && !roles[Role::ROLE_SECRETARIA]
         cannot :read_pendencies, ClassEnrollmentRequest
+        cannot :read_pendencies, CourseClass
       end
     end
     if roles[Role::ROLE_PROFESSOR]
@@ -210,14 +221,14 @@ class Ability
           can [:update, :post_grades], ClassEnrollment, course_class: {
             professor: user.professor
           }
-          can [:update, :post_grades], CourseClass, professor: user.professor
+          can [:update, :post_grades, :read_pendencies], CourseClass, professor: user.professor
         elsif CustomVariable.professor_login_can_post_grades == "yes"
           can [:update, :post_grades], ClassEnrollment, course_class: {
             professor: user.professor,
             year: YearSemester.current.year,
             semester: YearSemester.current.semester
           }
-          can [:update, :post_grades], CourseClass,
+          can [:update, :post_grades, :read_pendencies], CourseClass,
             professor: user.professor,
             year: YearSemester.current.year,
             semester: YearSemester.current.semester
@@ -240,10 +251,30 @@ class Ability
   end
 
   def initialize_documents(user, roles)
+    alias_action :execute_now, :execute_now, :notify, to: :update
     if roles[:manager]
       can :manage, Ability::DOCUMENT_MODELS
-      cannot :update, Report unless roles[Role::ROLE_ADMINISTRADOR]
     end
+    if roles[Role::ROLE_SECRETARIA]
+      cannot :read, [ReportConfiguration]
+      cannot [:destroy, :update, :create], [Assertion, Query, Notification]
+    end
+    if roles[Role::ROLE_COORDENACAO]
+      cannot :manage, ReportConfiguration
+    end
+    if roles[Role::ROLE_ALUNO]
+      can :assertion_pdf, Assertion
+      can :generate_assertion, Assertion do |assertion, matricula_aluno|
+        assertion.student_can_generate && matricula_aluno.in?(user.student.enrollments.pluck(:enrollment_number))
+      end
+    end
+    if roles[Role::ROLE_PROFESSOR]
+      can :assertion_pdf, Assertion
+      can :generate_assertion, Assertion do |assertion|
+        assertion.student_can_generate
+      end
+    end
+    cannot [:destroy, :update, :create], NotificationLog
   end
 
   def initialize_places(user, roles)
@@ -256,21 +287,23 @@ class Ability
     alias_action :execute_now, :execute_now, :notify, to: :update
     if roles[Role::ROLE_COORDENACAO]
       can :manage, (Ability::CONFIGURATION_MODELS - [
-        CustomVariable, ReportConfiguration
+        CustomVariable
       ])
     end
     if roles[Role::ROLE_SECRETARIA]
-      can :read, [Query, Version, NotificationLog]
-      can :execute, (Query)
+      can :read, (Version)
     end
     cannot [:destroy, :update, :create], Role
-    cannot [:destroy, :update, :create], NotificationLog
     cannot [:destroy, :update, :create], Version
   end
 
   def initialize_student_pages(user, roles)
     if roles.include?(Role::ROLE_ALUNO) && user.student.present?
       can [:show, :enroll, :save_enroll], :student_enrollment
+      can :academic_transcript_pdf, Enrollment do |enrollment|
+        enrollment.dismissal&.dismissal_reason&.thesis_judgement === DismissalReason::APPROVED && enrollment.student_id === user.student.id
+      end
+      can :grades_report_pdf, Enrollment, student_id: user.student.id
     else
       cannot [:show, :enroll, :save_enroll], :student_enrollment
     end

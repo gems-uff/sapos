@@ -6,7 +6,7 @@
 class Admissions::FilledFormField < ActiveRecord::Base
   has_paper_trail
 
-  serialize :list
+  serialize :list, coder: YAML
 
   belongs_to :filled_form, optional: false,
     class_name: "Admissions::FilledForm"
@@ -343,22 +343,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
   end
 
   def get_type
-    case self.form_field.field_type
-    when Admissions::FormField::NUMBER
-      "number"
-    when Admissions::FormField::DATE
-      "date"
-    when Admissions::FormField::STUDENT_FIELD
-      configuration = self.form_field.config_hash
-      case configuration["field"]
-      when "birthdate", "identity_expedition_date"
-        "date"
-      else
-        "string"
-      end
-    else
-      "string"
-    end
+    self.form_field.get_type
   end
 
   def self.convert_value(value, type)

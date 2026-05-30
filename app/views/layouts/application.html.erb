@@ -40,8 +40,20 @@
             <%= image_tag 'logoSapos.png' %>
           <% end %>
         </div>
-        <div id="sub">
-          Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %>
+        <div id="sub" style="display: flex-column;">
+          <div style="text-align: right;">
+            Versão <%= APP_VERSION %> | <%= link_to 'Créditos', credits_show_path %>
+          </div>
+          <div style="float: right; text-align: right;">
+            <% if CustomVariable.instance_name %>
+              <div>
+                <%= CustomVariable.instance_name %>
+              </div>
+            <% end %>
+            <div id="role_selector">
+              <%= role_selector(current_user) %>
+            </div>
+          </div>
         </div>
       </div>
       <span class="notice"><%= notice %></span>

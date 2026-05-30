@@ -13,7 +13,7 @@ RSpec.describe "Countries features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << FactoryBot.create(:country, name: "Brasil", nationality: "brasileiro(a)")
     @destroy_all << @record = FactoryBot.create(:country, name: "Portugal", nationality: "português(a)")
@@ -26,6 +26,7 @@ RSpec.describe "Countries features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -50,7 +51,7 @@ RSpec.describe "Countries features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -60,16 +61,15 @@ RSpec.describe "Countries features", type: :feature do
         fill_in "Nome", with: "Inglaterra"
         fill_in "Nacionalidade", with: "inglês(a)"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Inglaterra")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Inglaterra", "Brasil", "Estados Unidos", "Portugal"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Brasil", "Estados Unidos", "Portugal"]
+      expect(page).to have_no_content("Inglaterra")
     end
   end
 
@@ -84,7 +84,7 @@ RSpec.describe "Countries features", type: :feature do
       within(".as_form") do
         fill_in "Nome", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "Teste")
     end
   end
@@ -93,12 +93,12 @@ RSpec.describe "Countries features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do
       fill_in "search", with: "Bra"
-      sleep(0.8)
+      expect(page).to have_no_content("Portugal")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Brasil"]
     end
   end

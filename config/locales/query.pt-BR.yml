@@ -8,6 +8,7 @@ pt-BR:
         name: Nome
         description: Descrição
         sql: Consulta
+        assertions: Declarações
         notifications: Notificações
         params: Parâmetros
 

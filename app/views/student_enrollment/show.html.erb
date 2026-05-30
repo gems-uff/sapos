@@ -1,6 +1,6 @@
 <div class="landing-main">
-  <% if flash[:alert] %>
-      <div id="error_login"><%= flash[:alert] %></div>
+  <% if flash[:alert] || flash[:warning] %>
+      <div id="error_login"><%= flash[:alert] || flash[:warning] %></div>
   <% end %>
 
   <h2> <%= t(

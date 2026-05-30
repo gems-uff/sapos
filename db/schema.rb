@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
+ActiveRecord::Schema[7.1].define(version: 2026_04_10_193422) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -257,6 +257,17 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.index ["professor_id"], name: "index_advisements_on_professor_id"
   end
 
+  create_table "affiliations", force: :cascade do |t|
+    t.integer "professor_id"
+    t.integer "institution_id"
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["institution_id"], name: "index_affiliations_on_institution_id"
+    t.index ["professor_id"], name: "index_affiliations_on_professor_id"
+  end
+
   create_table "allocations", force: :cascade do |t|
     t.string "day", limit: 255
     t.string "room", limit: 255
@@ -266,6 +277,18 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["course_class_id"], name: "index_allocations_on_course_class_id"
+  end
+
+  create_table "assertions", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "query_id", null: false
+    t.string "assertion_template"
+    t.boolean "student_can_generate", default: false
+    t.integer "expiration_in_months"
+    t.string "template_type", default: "Liquid"
+    t.index ["query_id"], name: "index_assertions_on_query_id"
   end
 
   create_table "carrier_wave_files", force: :cascade do |t|
@@ -323,9 +346,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.datetime "enrollment_end", precision: nil
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "enrollment_adjust", precision: nil
+    t.datetime "period_start", precision: nil
     t.datetime "enrollment_insert", precision: nil
     t.datetime "enrollment_remove", precision: nil
+    t.datetime "period_end", precision: nil
+    t.datetime "grades_deadline", precision: nil
   end
 
   create_table "countries", force: :cascade do |t|
@@ -356,6 +381,15 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.datetime "updated_at", precision: nil
     t.index ["course_id"], name: "index_course_research_areas_on_course_id"
     t.index ["research_area_id"], name: "index_course_research_areas_on_research_area_id"
+  end
+
+  create_table "course_research_lines", force: :cascade do |t|
+    t.integer "course_id", null: false
+    t.integer "research_line_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_course_research_lines_on_course_id"
+    t.index ["research_line_id"], name: "index_course_research_lines_on_research_line_id"
   end
 
   create_table "course_types", force: :cascade do |t|
@@ -441,6 +475,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.boolean "enabled", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "template_type", default: "Liquid"
   end
 
   create_table "enrollment_holds", force: :cascade do |t|
@@ -450,7 +485,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.integer "number_of_semesters", default: 1
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
-    t.boolean "active", default: true, null: false
     t.index ["enrollment_id"], name: "index_enrollment_holds_on_enrollment_id"
   end
 
@@ -481,6 +515,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
     t.boolean "user", default: false, null: false
+    t.boolean "professor_can_generate_report", default: true
   end
 
   create_table "enrollments", force: :cascade do |t|
@@ -496,10 +531,12 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.date "thesis_defense_date"
     t.integer "research_area_id"
     t.text "obs_to_academic_transcript"
+    t.integer "research_line_id"
     t.index ["enrollment_number"], name: "index_enrollments_on_enrollment_number"
     t.index ["enrollment_status_id"], name: "index_enrollments_on_enrollment_status_id"
     t.index ["level_id"], name: "index_enrollments_on_level_id"
     t.index ["research_area_id"], name: "index_enrollments_on_research_area_id"
+    t.index ["research_line_id"], name: "index_enrollments_on_research_line_id"
     t.index ["student_id"], name: "index_enrollments_on_student_id"
   end
 
@@ -652,6 +689,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.boolean "individual", default: true, null: false
     t.integer "query_id", null: false
     t.boolean "has_grades_report_pdf_attachment", default: false, null: false
+    t.string "template_type", default: "Liquid"
     t.index ["query_id"], name: "index_notifications_on_query_id"
   end
 
@@ -741,6 +779,15 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.index ["research_area_id"], name: "index_professor_research_areas_on_research_area_id"
   end
 
+  create_table "professor_research_lines", force: :cascade do |t|
+    t.integer "professor_id", null: false
+    t.integer "research_line_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["professor_id"], name: "index_professor_research_lines_on_professor_id"
+    t.index ["research_line_id"], name: "index_professor_research_lines_on_research_line_id"
+  end
+
   create_table "professors", force: :cascade do |t|
     t.string "name", limit: 255
     t.string "cpf", limit: 255
@@ -761,7 +808,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.string "siape", limit: 255
     t.string "enrollment_number", limit: 255
     t.string "identity_issuing_place", limit: 255
-    t.integer "institution_id"
     t.string "email", limit: 255
     t.date "academic_title_date"
     t.integer "academic_title_country_id"
@@ -775,8 +821,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.index ["city_id"], name: "index_professors_on_city_id"
     t.index ["cpf"], name: "index_professors_on_cpf"
     t.index ["email"], name: "index_professors_on_email"
-    t.index ["institution_id"], name: "index_professors_on_institution_id"
     t.index ["user_id"], name: "index_professors_on_user_id"
+  end
+
+  create_table "program_levels", force: :cascade do |t|
+    t.integer "level", null: false
+    t.datetime "start_date", null: false
+    t.datetime "end_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "ordinance"
   end
 
   create_table "queries", force: :cascade do |t|
@@ -871,6 +925,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.datetime "updated_at", precision: nil, null: false
     t.integer "signature_type", default: 0
     t.integer "expiration_in_months"
+    t.boolean "use_at_assertion", default: false, null: false
   end
 
   create_table "reports", force: :cascade do |t|
@@ -881,8 +936,9 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.date "expires_at"
     t.string "identifier"
     t.string "file_name"
-    t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
-    t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
+    t.integer "invalidated_by_id"
+    t.datetime "invalidated_at"
+    t.index ["invalidated_by_id"], name: "index_reports_on_invalidated_by_id"
   end
 
   create_table "research_areas", force: :cascade do |t|
@@ -890,6 +946,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.string "code", limit: 255
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.boolean "available", default: true
+  end
+
+  create_table "research_lines", force: :cascade do |t|
+    t.string "name"
+    t.integer "research_area_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "available", default: true
+    t.index ["research_area_id"], name: "index_research_lines_on_research_area_id"
   end
 
   create_table "roles", force: :cascade do |t|
@@ -1005,6 +1071,12 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.string "photo", limit: 255
     t.integer "birth_country_id"
     t.integer "user_id", limit: 8
+    t.string "skin_color"
+    t.string "pcd"
+    t.string "gender"
+    t.string "humanitarian_policy"
+    t.text "obs_pcd"
+    t.text "obs_gender"
     t.index ["birth_city_id"], name: "index_students_on_birth_city_id"
     t.index ["birth_country_id"], name: "index_students_on_birth_country_id"
     t.index ["birth_state_id"], name: "index_students_on_state_id"
@@ -1020,6 +1092,15 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.datetime "updated_at", precision: nil, null: false
     t.index ["enrollment_id"], name: "index_thesis_defense_committee_participations_on_enrollment_id"
     t.index ["professor_id"], name: "index_thesis_defense_committee_participations_on_professor_id"
+  end
+
+  create_table "user_roles", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "role_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["role_id"], name: "index_user_roles_on_role_id"
+    t.index ["user_id"], name: "index_user_roles_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -1042,7 +1123,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.integer "failed_attempts", default: 0
     t.string "unlock_token", limit: 255
     t.datetime "locked_at", precision: nil
-    t.integer "role_id", default: 1, null: false
     t.string "unconfirmed_email"
     t.string "invitation_token"
     t.datetime "invitation_created_at", precision: nil
@@ -1052,11 +1132,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.string "invited_by_type"
     t.integer "invited_by_id"
     t.integer "invitations_count", default: 0
+    t.integer "actual_role"
     t.index ["email"], name: "index_users_on_email"
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
     t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
     t.index ["invited_by_type", "invited_by_id"], name: "index_users_on_invited_by_type_and_invited_by_id"
-    t.index ["role_id"], name: "index_users_on_role_id"
   end
 
   create_table "versions", force: :cascade do |t|
@@ -1069,12 +1149,22 @@ ActiveRecord::Schema[7.0].define(version: 2024_12_08_063322) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "assertions", "queries"
+  add_foreign_key "course_research_lines", "courses"
+  add_foreign_key "course_research_lines", "research_lines"
+  add_foreign_key "enrollments", "research_lines", on_delete: :nullify
   add_foreign_key "grants", "professors"
   add_foreign_key "paper_professors", "papers"
   add_foreign_key "paper_professors", "professors"
   add_foreign_key "paper_students", "papers"
   add_foreign_key "paper_students", "students"
   add_foreign_key "papers", "professors", column: "owner_id"
+  add_foreign_key "professor_research_lines", "professors"
+  add_foreign_key "professor_research_lines", "research_lines"
   add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
   add_foreign_key "reports", "users", column: "generated_by_id"
+  add_foreign_key "reports", "users", column: "invalidated_by_id"
+  add_foreign_key "research_lines", "research_areas"
+  add_foreign_key "user_roles", "roles"
+  add_foreign_key "user_roles", "users"
 end

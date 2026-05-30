@@ -13,6 +13,7 @@ pt-BR:
         use_at_report: "Usar em relatórios"
         use_at_schedule: "Usar no quadro de horários"
         use_at_transcript: "Usar no histórico"
+        use_at_assertion: "Usar em declarações"
         order: "Prioridade"
         scale: "Escala"
         x: "X"
@@ -24,8 +25,8 @@ pt-BR:
 
     models:
       report_configuration:
-        one: "Configuração de relatório"
-        other: "Configurações de relatório"
+        one: "Configuração de documento"
+        other: "Configurações de documento"
 
     errors:
       models:

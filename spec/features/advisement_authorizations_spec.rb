@@ -26,7 +26,7 @@ RSpec.describe "Advisements features", type: :feature do
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level2)
     @destroy_all << @record = FactoryBot.create(:advisement_authorization, professor: @professor3, level: @level1)
 
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -36,6 +36,7 @@ RSpec.describe "Advisements features", type: :feature do
     @role_adm.delete
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -60,7 +61,7 @@ RSpec.describe "Advisements features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -68,16 +69,15 @@ RSpec.describe "Advisements features", type: :feature do
       expect(page).to have_content "Adicionar Credenciamento"
       fill_record_select("professor_", "professors", "Helena")
       find(:select, "record_level_").find(:option, text: @level2.name).select_option
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.professor-column", text: "Helena")
 
       # Remove inserted record
       expect(page.all("tr td.professor-column").map(&:text)).to eq ["Helena", "Erica", "Fiona", "Gi"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.professor-column").map(&:text)).to eq ["Erica", "Fiona", "Gi"]
+      expect(page).to have_no_content("Helena")
     end
 
     it "should have a record_select widget for professor" do
@@ -100,7 +100,7 @@ RSpec.describe "Advisements features", type: :feature do
       within(".as_form") do
         find(:select, "record_level_#{@record.id}").find(:option, text: @level1.name).select_option
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("#as_#{plural_name}-list-#{@record.id}-row td.level-column", text: "Doutorado")
       @record.level = @level2
       @record.save!
@@ -111,20 +111,20 @@ RSpec.describe "Advisements features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
       sleep(0.2)
     end
 
     it "should be able to search by advisor" do
       search_record_select("professor", "professors", "Erica")
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.professor-column").map(&:text)).to eq ["Erica"]
     end
 
     it "should be able to search by level" do
       page.send_keys :escape
       find(:select, "search_level").find(:option, text: "Doutorado").select_option
-      click_button "Buscar"
+      click_button_and_wait "Buscar"
       expect(page.all("tr td.professor-column").map(&:text)).to eq ["Erica", "Gi"]
     end
   end

@@ -28,6 +28,6 @@ pt-BR:
   notifications:
     accomplishment:
       email_to_student:
-        subject: "<%= var(:record).phase.name %>"
+        subject: "{{ record.phase.name }}"
       email_to_advisor:
-        subject: "<%= var(:record).enrollment.student.name %> completou uma etapa"
+        subject: "{{ record.enrollment.student.name }} completou uma etapa"

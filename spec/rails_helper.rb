@@ -54,7 +54,7 @@ end
 
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
-  config.fixture_path = "#{::Rails.root}/spec/fixtures"
+  config.fixture_paths = ["#{::Rails.root}/spec/fixtures"]
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
@@ -90,23 +90,48 @@ RSpec.configure do |config|
   config.infer_base_class_for_anonymous_controllers = false
 
   Capybara.register_driver :selenium do |app|
-    profile = Selenium::WebDriver::Firefox::Profile.new
-    profile["devtools.selfxss.count"] = 9999
-    profile["browser.download.dir"] = DownloadHelpers::PATH.to_s
-    profile["browser.download.folderList"] = 2
+    options = Selenium::WebDriver::Chrome::Options.new
+    options.args << "--headless=new" unless ENV["BROWSER"]
+    options.args << "--no-sandbox"
+    options.args << "--disable-gpu"
+    options.args << "--disable-dev-shm-usage"
+    options.args << "--disable-features=BackForwardCache"
 
-    # Suppress "open with" dialog
-    profile["browser.helperApps.neverAsk.saveToDisk"] =
-      "text/csv,text/tsv,text/xml,text/plain,application/pdf,application/doc,application/docx,image/jpeg,application/gzip,application/x-gzip"
-    options = Selenium::WebDriver::Firefox::Options.new
-    options.profile = profile
-    options.args << "--headless" unless ENV["BROWSER"]
+    prefs = {
+      "download.default_directory" => DownloadHelpers::PATH.to_s,
+      "download.prompt_for_download" => false,
+      "plugins.always_open_pdf_externally" => true,
+      "safebrowsing.enabled" => true,
+      "profile.default_content_settings.popups" => 0,
+      "download.directory_upgrade" => true
+    }
+    options.add_preference(:download, prefs["download.default_directory"])
+    options.add_preference(:prefs, prefs)
+    options.add_preference(:browser, set_download_behavior: { behavior: 'allow' })
 
-    Capybara::Selenium::Driver.new(
+    driver = Capybara::Selenium::Driver.new(
       app,
-      browser: :firefox,
+      browser: :chrome,
       options: options
     )
+    
+    driver.browser.execute_cdp('Page.setDownloadBehavior',
+    behavior: 'allow',
+    downloadPath: DownloadHelpers::PATH.to_s
+    )
+    
+    driver
+  end
+
+  Capybara.default_max_wait_time = 20
+
+  Capybara.default_driver = :selenium
+  Capybara.javascript_driver = :selenium
+
+  RSpec.configure do |config|
+    config.before(:each, type: :feature) do
+      Capybara.current_driver = :selenium
+    end
   end
 
   config.include DateHelpers

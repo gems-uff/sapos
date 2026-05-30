@@ -16,11 +16,13 @@ pt-BR:
         delayed_phase: "Etapa atrasada"
         delayed_phase_date: "em"
         dismissal: "Desligamento"
-        enrollment_hold: "Trancado?"
+        enrollment_hold: "Possui trancamento?"
+        enrollment_hold_active: "Atualmente?"
         enrollment_holds: "Trancamentos"
         enrollment_number: "Número de Matrícula"
         enrollment_status: "Tipo de Matrícula"
         research_area: "Área de Concentração"
+        research_line: "Linha de Pesquisa"
         level: "Nível"
         phase: "Etapa"
         phase_completions: "Realização de Etapas"
@@ -42,6 +44,8 @@ pt-BR:
         thesis_defense_committee_professors: "Banca Avaliadora"
         accomplishment_conclusion_date_not_given: "---------/----"
         obs_to_academic_transcript: "Observação para o Histórico"
+        grades_report: "Boletim"
+        academic_transcript: "Histórico"
 
     errors:
       models:
@@ -50,6 +54,7 @@ pt-BR:
           main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
           thesis_defense_date_before_admission_date: "anterior a Data de Admissão"
           research_area_different_from_professors: "diferente de áreas de pesquisa do(s) orientador(es)"
+          :different_research_areas: "deve ser correspondente à area da linha de pesquisa selecionada"
 
     models:
       enrollment:

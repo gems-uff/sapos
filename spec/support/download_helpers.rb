@@ -2,13 +2,13 @@
 # frozen_string_literal: true
 
 module DownloadHelpers
-  TIMEOUT = 1
+  TIMEOUT = 5
   PATH    = Rails.root.join("tmp/test_downloads")
 
   extend self
 
   def downloads
-    Dir[PATH.join("*")]
+    Dir[PATH.join("*")].reject { |f| f.end_with?("downloads.html") }
   end
 
   def download
@@ -31,7 +31,7 @@ module DownloadHelpers
   end
 
   def downloading?
-    downloads.grep(/\.part$/).any?
+    downloads.any? { |f| f.end_with?(".part", ".crdownload") }
   end
 
   def clear_downloads

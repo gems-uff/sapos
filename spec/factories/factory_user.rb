@@ -14,6 +14,40 @@ FactoryBot.define do
       "User_#{name}"
     end
     password { "password" }
-    role factory: :role_administrador
+
+    trait :admin do
+      after(:create) do |user|
+        role = FactoryBot.create(:role_administrador)
+        FactoryBot.create(:user_role, user: user, role: role)
+      end
+    end
+
+    trait :professor do
+      after(:create) do |user|
+        role = Role.find_by(id: Role::ROLE_PROFESSOR) || FactoryBot.create(:role_professor)
+        UserRole.where(user: user, role: role).first_or_create!
+      end
+    end
+
+    trait :student do
+      after(:create) do |user|
+        role = FactoryBot.create(:role_aluno)
+        FactoryBot.create(:user_role, user: user, role: role)
+      end
+    end
+
+    trait :coordination do
+      after(:create) do |user|
+        role = FactoryBot.create(:role_coordenacao)
+        FactoryBot.create(:user_role, user: user, role: role)
+      end
+    end
+
+    trait :secretary do
+      after(:create) do |user|
+        role = FactoryBot.create(:role_secretaria)
+        FactoryBot.create(:user_role, user: user, role: role)
+      end
+    end
   end
 end

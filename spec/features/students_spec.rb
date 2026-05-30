@@ -30,7 +30,7 @@ RSpec.describe "Student features", type: :feature do
     )
     @destroy_all << FactoryBot.create(:student, name: "Dani", cpf: "4")
     @destroy_all << FactoryBot.create(:enrollment, enrollment_number: "M001", student: @record, level: level, enrollment_status: enrollment_status)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -40,6 +40,7 @@ RSpec.describe "Student features", type: :feature do
     @role_adm.delete
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -51,8 +52,8 @@ RSpec.describe "Student features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Alunos"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Nome", "CPF", "Matrículas", ""
-      ]
+                                                    "Nome", "CPF", "Matrículas", ""
+                                                  ]
     end
 
     it "should sort the list by name, asc" do
@@ -68,7 +69,7 @@ RSpec.describe "Student features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -78,7 +79,8 @@ RSpec.describe "Student features", type: :feature do
         fill_in "Nome", with: "Ana"
         fill_in "CPF", with: "1"
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Ana")
       expect(Student.last.photo.file).to eq nil
 
@@ -86,9 +88,7 @@ RSpec.describe "Student features", type: :feature do
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Ana", "Bia", "Carol", "Dani"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia", "Carol", "Dani"]
+      expect(page).to have_no_content("Ana")
     end
 
     it "should be able to upload image" do
@@ -98,7 +98,7 @@ RSpec.describe "Student features", type: :feature do
         fill_in "CPF", with: "5"
         attach_file("Foto", Rails.root + "spec/fixtures/user.png")
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Erica")
       expect(Student.last.photo.file).not_to eq nil
     end
@@ -113,13 +113,40 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for sex options" do
-      expect(page.all("select#record_sex_ option").map(&:text)).to eq ["Masculino", "Feminino"]
-      expect(page.all("select#record_sex_ option").map(&:value)).to eq ["M", "F"]
+      expect(page.all("select#record_sex_ option").map(&:text)).to eq ["Não declarado", "Masculino", "Feminino"]
+      expect(page.all("select#record_sex_ option").map(&:value)).to eq ["", "M", "F"]
+    end
+
+    it "should have a selection for pcd options" do
+      expect(page.all("select#record_pcd_ option").map(&:text)).to eq ['Não declarado'] +I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
+      expect(page.all("select#record_pcd_ option").map(&:value)).to eq [''] + I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
+    end
+
+    it "should have a textarea for obs pcd" do
+      expect(page).to have_field("Observações de PCD", type: "textarea")
+    end
+
+    it "should have a selection for humanitarian policy options" do
+      expect(page.all("select#record_humanitarian_policy_ option").map(&:text)).to eq ["Não declarado", "Não se aplica", "Refugiado", "Solicitante de refúgio", "Asilado político", "Apátrida", "Portador de autorização de residência por motivo de acolhida humanitária", "Portador de autorização de residência sob os quais recaem outras políticas humanitárias no Brasil"]
+      expect(page.all("select#record_humanitarian_policy_ option").map(&:value)).to eq ["", "Não se aplica", "Refugiado", "Solicitante de refúgio", "Asilado político", "Apátrida", "Portador de autorização de residência por motivo de acolhida humanitária", "Portador de autorização de residência sob os quais recaem outras políticas humanitárias no Brasil"]
+    end
+    it "should have a textarea for obs" do
+      expect(page).to have_field("Observações", type: "textarea")
+    end
+
+    it "should have a selection for skin_color options" do
+      expect(page.all("select#record_skin_color_ option").map(&:text)).to eq ['Não declarado'] + I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
+      expect(page.all("select#record_skin_color_ option").map(&:value)).to eq [''] + I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
+    end
+
+    it "should have a selection for gender options" do
+      expect(page.all("select#record_gender_ option").map(&:text)).to eq ['Não declarado'] + I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
+      expect(page.all("select#record_gender_ option").map(&:value)).to eq [''] + I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
     end
 
     it "should have a selection for civil_status options" do
-      expect(page.all("select#record_civil_status_ option").map(&:text)).to eq ["Solteiro(a)", "Casado(a)"]
-      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["Solteiro(a)", "Casado(a)"]
+      expect(page.all("select#record_civil_status_ option").map(&:text)).to eq ["Não declarado", "Solteiro(a)", "Casado(a)"]
+      expect(page.all("select#record_civil_status_ option").map(&:value)).to eq ["Não declarado", "Solteiro(a)", "Casado(a)"]
     end
 
     it "should have identity issuing place widget for identity issuing place" do
@@ -146,7 +173,7 @@ RSpec.describe "Student features", type: :feature do
         fill_in "Nome", with: "teste"
         fill_in "CPF", with: "9"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.name-column", text: "teste")
       expect(page).to have_css("td.cpf-column", text: "9")
     end
@@ -176,12 +203,12 @@ RSpec.describe "Student features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do
       fill_in "search", with: "Bia"
-      sleep(0.8)
+      expect(page).to have_no_content("Carol")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Bia"]
     end
   end

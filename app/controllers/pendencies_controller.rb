@@ -38,6 +38,15 @@ class PendenciesController < ApplicationController
       ]
     end
 
+    course_class_condition = CourseClass.pendency_condition
+    course_classes = CourseClass.where(course_class_condition)
+    unless course_classes.empty?
+      @partials << [
+        "pendencies/course_classes",
+        { conditions: course_class_condition }
+      ]
+    end
+
     render :index
   end
 end

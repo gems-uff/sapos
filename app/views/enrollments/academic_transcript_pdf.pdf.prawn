@@ -11,11 +11,12 @@ new_document(
   watermark: cannot?(
     :generate_report_without_watermark, @enrollment
   ),
-  pdf_type: :transcript
+  pdf_type: :transcript,
+  override: can?(:override_report_signature_type, @enrollment) ? { signature_type: @signature_override }.compact : nil
 ) do |pdf|
   enrollment_student_header(pdf, enrollment: @enrollment)
 
-  enrollment_header(pdf, enrollment: @enrollment)
+  enrollment_header(pdf, enrollment: @enrollment, program_level: @program_level)
 
   transcript_table(pdf, class_enrollments: @class_enrollments)
 

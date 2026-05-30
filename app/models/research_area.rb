@@ -7,6 +7,7 @@
 class ResearchArea < ApplicationRecord
   has_paper_trail
 
+  has_many :research_lines, dependent: :destroy
   has_many :course_research_areas, dependent: :destroy
   has_many :courses, through: :course_research_areas
   has_many :enrollments, dependent: :restrict_with_exception

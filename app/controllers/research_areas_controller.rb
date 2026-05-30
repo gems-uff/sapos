@@ -15,8 +15,9 @@ class ResearchAreasController < ApplicationController
       professors: :professor_research_areas
     }
 
-    config.columns = [:name, :code, :professor_research_areas]
-    config.list.columns = [:name, :code]
+    config.columns = [:name, :code, :professor_research_areas, :available]
+    config.list.columns = [:name, :code, :research_lines, :available]
+    config.show.columns.add :research_lines
 
     config.actions.exclude :deleted_records
   end
@@ -26,4 +27,8 @@ class ResearchAreasController < ApplicationController
     order_by: "name",
     full_text_search: true
   )
+
+  def record_select_conditions_from_controller
+    [ResearchArea.arel_table[:available].eq(true).to_sql]
+  end
 end

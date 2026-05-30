@@ -61,8 +61,16 @@ module Notifier
           end
           attachments_file_name_list = attachments_file_name_list[0..-3]
         end
-
+        old_to = m[:to]
+        m[:to] = old_to.to_s.split(",").map(&:strip).reject(&:empty?)
+        old_reply_to = nil
+        if m[:reply_to].is_a?(String) && !m[:reply_to].empty?
+          old_reply_to = m[:reply_to]
+          m[:reply_to] = old_reply_to.to_s.split(",").map(&:strip).reject(&:empty?)
+        end
         actionmailer_base.mail(m).deliver!
+        m[:to] = old_to
+        m[:reply_to] = old_reply_to unless old_reply_to.nil?
 
         NotificationLog.new(
           notification_id: m[:notification_id],

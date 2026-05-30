@@ -6,6 +6,7 @@
 # Represents a Query
 class Query < ApplicationRecord
   has_many :notifications, inverse_of: :query
+  has_many :assertions, inverse_of: :query
   has_many :params,
     class_name: "QueryParam",
     dependent: :destroy, validate: false,

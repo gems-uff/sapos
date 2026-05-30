@@ -5,7 +5,28 @@
 
 # Helper for Dismissals
 module DismissalsHelper
+  def date_search_column(record, options)
+    month_year_widget record, options, :date, required: false, multiparameter: false,
+    date_options: { discard_month: true, prefix: options[:name] }
+  end
+
+  def level_search_column(record, options)
+    local_options = {
+        include_blank: true
+    }
+
+    select_tag(
+      record[:level],
+      options_from_collection_for_select(Level.order("name"), "id", "name"),
+      options.merge(local_options)
+    )
+  end
+
   def date_form_column(record, options)
     month_year_widget record, options, :date, required: false
+  end
+
+  def dismissal_level_show_column(record, column)
+    record.enrollment.level.name
   end
 end

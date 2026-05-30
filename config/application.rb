@@ -17,7 +17,11 @@ module Sapos
     # Using defaults of rails < 5, since it was the original generated version.
     #   Consider checking which defaults we should update:
     #   https://guides.rubyonrails.org/configuring.html#versioned-default-values
-    config.load_defaults 7.0
+    config.load_defaults 7.1
+
+    # ActiveScaffold defines callbacks for actions not always present in all controllers.
+    # Rails 7.1 raised this to true by default, causing AbstractController::ActionNotFound.
+    config.action_controller.raise_on_missing_callback_actions = false
 
 
     # Allow the notifier to send emails
@@ -35,9 +39,11 @@ module Sapos
     # config.autoload_paths += %W(#{config.root}/extras)
     config.autoload_paths << "#{config.root}/lib"
 
+
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
     # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
+    config.active_record.yaml_column_permitted_classes = [Symbol, Date, Time]
 
     # Activate observers that should always be running.
     # config.active_record.observers = :cacher, :garbage_collector, :forum_observer

@@ -15,7 +15,7 @@ RSpec.describe "Queries features", type: :feature do
     @destroy_later = []
     @destroy_all = []
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << @user = create_confirmed_user(@role_adm)
+    @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << FactoryBot.create(:query, name: "students", sql: "select * from students")
     @destroy_all << @record = FactoryBot.create(:query, name: "queries", sql: "select name, sql from queries")
@@ -28,6 +28,7 @@ RSpec.describe "Queries features", type: :feature do
   after(:all) do
     @destroy_all.each(&:delete)
     @destroy_all.clear
+    UserRole.delete_all
   end
 
   describe "view list page" do
@@ -39,7 +40,7 @@ RSpec.describe "Queries features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Consultas"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Nome", "Descrição", "Notificações", ""
+        "Nome", "Descrição", "Declarações", "Notificações", ""
       ]
     end
 
@@ -52,7 +53,7 @@ RSpec.describe "Queries features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Adicionar"
+      click_link_and_wait "Adicionar"
     end
 
     it "should be able to insert and remove record" do
@@ -61,18 +62,21 @@ RSpec.describe "Queries features", type: :feature do
       within("#as_#{plural_name}-create--form") do
         fill_in "record_name_", with: "enrollments"
         codemirror = find("#record_sql_ + .CodeMirror").click
-        codemirror.send_keys [:control, 'a'], :delete, "select * from enrollments"
+        wait_for_ajax
+        select_all_keys
+        page.driver.browser.action.send_keys(
+          :delete, "select * from enrollments"
+        ).perform
       end
-      click_button "Salvar"
+      click_button_and_wait "Salvar"
+      expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "enrollments")
 
       # Remove inserted record
       expect(page.all("tr td.name-column").map(&:text)).to eq ["enrollments", "students", "queries", "levels"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
-      visit current_path
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["students", "queries", "levels"]
+      expect(page).to have_no_content("enrollments")
     end
 
     it "should have a codemirror for sql" do
@@ -91,7 +95,7 @@ RSpec.describe "Queries features", type: :feature do
       within(".as_form") do
         fill_in "Descrição", with: "Teste"
       end
-      click_button "Atualizar"
+      click_button_and_wait "Atualizar"
       expect(page).to have_css("td.description-column", text: "Teste")
     end
   end
@@ -113,12 +117,12 @@ RSpec.describe "Queries features", type: :feature do
     before(:each) do
       login_as(@user)
       visit url_path
-      click_link "Buscar"
+      click_link_and_wait "Buscar"
     end
 
     it "should be able to search by name" do
       fill_in "search", with: "quer"
-      sleep(0.8)
+      expect(page).to have_no_content("students")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["queries"]
     end
   end

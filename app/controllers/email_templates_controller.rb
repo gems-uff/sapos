@@ -11,10 +11,14 @@ class EmailTemplatesController < ApplicationController
   active_scaffold :"email_template" do |config|
     config.list.sorting = { name: "ASC" }
 
-    columns = [:name, :to, :subject, :body, :enabled]
-    config.create.columns = columns
-    config.update.columns = columns
+    config.create.columns = [:name, :to, :subject, :body, :enabled]
+    config.update.columns = [:name, :template_type, :to, :subject, :body, :enabled]
     config.list.columns = [:name, :enabled]
+
+    config.columns[:template_type].form_ui = :select
+    config.columns[:template_type].options = {
+      options: EmailTemplate::TEMPLATE_TYPES,
+    }
 
     config.create.label = :create_email_template_label
 

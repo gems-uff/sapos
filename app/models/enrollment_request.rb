@@ -34,9 +34,8 @@ class EnrollmentRequest < ApplicationRecord
     return ["0 = -1"] if user.cannot?(:read_pendencies, EnrollmentRequest) &&
       user.cannot?(:read_advisement_pendencies, EnrollmentRequest)
 
-    er = EnrollmentRequest.arel_table.dup
+    er = Arel::Table.new(EnrollmentRequest.table_name, as: "er")
     cer = ClassEnrollmentRequest.arel_table
-    er.table_alias = "er"
     check_status = er
       .join(cer)
       .on(cer[:enrollment_request_id].eq(er[:id]))

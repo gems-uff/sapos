@@ -1,0 +1,25 @@
+{{ record.enrollment.student.name }},
+
+Informamos que seu pedido de inscrição em disciplinas de {{ record.year }}.{{ record.semester }} foi verificado.
+- Situação: {{ record.status }}.
+{% if change.size > 0 %}
+Foram alteradas as situações das seguintes solicitações:
+{% for cer in change -%}
+- {{ cer.course_class.name_with_class }}: {{ cer.action }} {{ cer.status }}
+{% endfor -%}
+{% endif -%}
+{% if keep.size > 0 %}
+Foram mantidas as situações das seguintes solicitações:
+{% for cer in keep -%}
+- {{ cer.course_class.name_with_class }}: {{ cer.action }} {{ cer.status }}
+{% endfor -%}
+{% endif -%}
+{% if message != blank %}
+Nova mensagem:
+[{{ user.name }}] {{ message }}
+{% endif %}
+
+Verifique sua inscrição aqui: {{ student_enrollment_url }}
+
+
+{{ variables.notification_footer }}

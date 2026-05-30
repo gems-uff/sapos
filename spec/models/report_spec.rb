@@ -15,5 +15,10 @@ RSpec.describe Report, type: :model do
   describe "associations" do
     it { should belong_to(:user).with_foreign_key("generated_by_id") }
     it { should belong_to(:carrierwave_file).with_foreign_key("carrierwave_file_id").class_name("CarrierWave::Storage::ActiveRecord::ActiveRecordFile").optional }
+    it { should belong_to(:invalidated_by).with_foreign_key("invalidated_by_id").class_name("User").optional }
+  end
+
+  describe "validations" do
+    it { should validate_presence_of(:file_name) }
   end
 end

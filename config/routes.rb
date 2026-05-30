@@ -34,8 +34,10 @@ Rails.application.routes.draw do
       to: "users/registrations#update", as: :user_registration
     put "users/profile", to: "users/registrations#update"
     post "users/profile", to: "users/registrations#update"
+    post "change_role", to: "user_roles#change_role", as: :change_role
     delete "users/profile", to: "users/registrations#update"
   end
+
 
   resources :versions do
     concerns :active_scaffold
@@ -60,6 +62,7 @@ Rails.application.routes.draw do
     record_select_routes
     member do
       get "summary_pdf"
+      get "summary_xls"
     end
     collection do
       get "class_schedule_pdf"
@@ -87,6 +90,19 @@ Rails.application.routes.draw do
     record_select_routes
   end
 
+  resources :research_lines do
+    concerns :active_scaffold
+    record_select_routes
+  end
+
+  resources :professor_research_lines do
+    concerns :active_scaffold
+    record_select_routes
+  end
+
+  resources :course_research_lines do
+    concerns :active_scaffold
+  end
 
   get "credits/show"
 
@@ -136,6 +152,13 @@ Rails.application.routes.draw do
     concerns :active_scaffold
   end
 
+  resources :user_roles do
+    concerns :active_scaffold
+    record_select_routes
+  end
+
+  
+
   resources :scholarship_durations do
     concerns :active_scaffold
     record_select_routes
@@ -158,6 +181,11 @@ Rails.application.routes.draw do
     collection do
       get "to_pdf"
     end
+  end
+
+  resources :affiliation do
+    concerns :active_scaffold
+    record_select_routes
   end
 
   resources :professors do
@@ -187,7 +215,9 @@ Rails.application.routes.draw do
     end
     member do
       get "academic_transcript_pdf"
+      get "academic_transcript/:signature_type.pdf", to: "enrollments#override_signature_transcript_pdf", as: :override_signature_transcript_pdf
       get "grades_report_pdf"
+      get "grades_report/:signature_type.pdf", to: "enrollments#override_signature_grades_report_pdf", as: :override_signature_grades_report_pdf
     end
   end
 
@@ -232,6 +262,10 @@ Rails.application.routes.draw do
   end
 
   resources :custom_variables do
+    concerns :active_scaffold
+  end
+
+  resources :program_levels do
     concerns :active_scaffold
   end
 
@@ -520,10 +554,20 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :assertions do
+    concerns :active_scaffold
+    member do
+      get "simulate"
+      get "assertion_pdf"
+      get "assertion_pdf/:signature_type.pdf", to: "assertions#override_signature_assertion_pdf",  as: :override_signature_assertion_pdf
+    end
+  end
+
   resources :reports do
     concerns :active_scaffold
     member do
       get :download
+      put :invalidate
     end
     collection do
       get ":identifier.pdf", to: "reports#download_by_identifier", as: :download_by_identifier
@@ -549,5 +593,4 @@ Rails.application.routes.draw do
   resources :papers do
     concerns :active_scaffold
   end
-
 end

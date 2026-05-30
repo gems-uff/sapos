@@ -7,10 +7,8 @@ class CreditsController < ApplicationController
   skip_authorization_check
   skip_before_action :authenticate_user!
 
-  require "file_utils"
-
   def show
     @show_background = true
-    @readme = FileUtils.file_content("README.md", "rt")
+    @readme = File.read(Rails.root.join("README.md"))
   end
 end

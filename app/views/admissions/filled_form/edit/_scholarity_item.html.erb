@@ -25,10 +25,9 @@
     }
     if field[:type] == :date
       dates << field
+    elsif field[:type] == :select
+      field[:html_options] = field[:options]
     else
-      if field[:type] == :select
-        field[:html_options] = field[:options]
-      end
       field[:options] = field[:options].merge(size: 30)
     end
     field

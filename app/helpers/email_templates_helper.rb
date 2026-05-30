@@ -6,13 +6,15 @@
 module EmailTemplatesHelper
   def body_form_column(record, options)
     code_mirror_text_area_widget(
-      :body, "record_body_#{record.id}", "text/html", options.merge(
+      :body, "record_body_#{record.id}", "liquid", options.merge(
         value: record.body || I18n.t("email_template.body.default")
-      )
+      ),
+      set_size=35,
+      line_wrapping=true
     )
   end
 
   def body_show_column(record, column)
-    code_mirror_view_widget("body-view-#{record.id}", "text/html", record.body)
+    code_mirror_view_widget("body-view-#{record.id}", "liquid", record.body)
   end
 end

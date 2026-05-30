@@ -1,9 +1,0 @@
-<%= @resource.name %>,
-
-Informamos que a sua conta no SAPOS foi criada.
-
-Acesse o seguinte link para confirmar e definir sua senha:
-<%= accept_invitation_url(@resource, invitation_token: @token) %>
-
-
-<%= CustomVariable.notification_footer %>

@@ -61,23 +61,6 @@ RSpec.describe CustomVariable, type: :model do
       end
     end
 
-    context "program_level" do
-      it "should return nil when there is no variable defined" do
-        config = CustomVariable.find_by_variable(:program_level)
-        config.delete unless config.nil?
-
-        expect(CustomVariable.program_level).to eq(nil)
-      end
-
-      it "should return 5 when it is defined to 5" do
-        config = CustomVariable.find_by_variable(:program_level)
-        config.delete unless config.nil?
-        @destroy_later << CustomVariable.create(variable: :program_level, value: "5")
-
-        expect(CustomVariable.program_level).to eq(5)
-      end
-    end
-
     context "identity_issuing_country" do
       it "should return '' when there is no variable defined" do
         config = CustomVariable.find_by_variable(:identity_issuing_country)
@@ -176,6 +159,23 @@ RSpec.describe CustomVariable, type: :model do
         @destroy_later << CustomVariable.create(variable: :notification_footer, value: "bla")
 
         expect(CustomVariable.notification_footer).to eq("bla")
+      end
+    end
+
+    context "instance_name" do
+      it "should return nil when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:instance_name)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.instance_name).to eq(nil)
+      end
+
+      it "should return 'Computacao' when it is defined to Computacao" do
+        config = CustomVariable.find_by_variable(:instance_name)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create(variable: :instance_name, value: "Computacao")
+
+        expect(CustomVariable.instance_name).to eq("Computacao")
       end
     end
   end

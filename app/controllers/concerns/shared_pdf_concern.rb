@@ -34,14 +34,14 @@ module SharedPdfConcern
     )
   end
 
-  def render_enrollments_academic_transcript_pdf(enrollment, filename = "transcript.pdf")
+  def render_enrollments_academic_transcript_pdf(enrollment, filename = "transcript.pdf", signature_override = nil)
     class_enrollments = enrollment.class_enrollments
       .where(situation: ClassEnrollment::APPROVED)
       .joins(:course_class)
       .order("course_classes.year", "course_classes.semester")
 
     accomplished_phases = enrollment.accomplishments.order(:conclusion_date)
-
+    program_level = ProgramLevel.on_date(enrollment.thesis_defense_date)&.last&.to_label || ""
     render_to_string(
       template: "enrollments/academic_transcript_pdf",
       type: "application/pdf",
@@ -51,11 +51,13 @@ module SharedPdfConcern
         enrollment: enrollment,
         class_enrollments: class_enrollments,
         accomplished_phases: accomplished_phases,
+        signature_override: signature_override,
+        program_level: program_level
       }
     )
   end
 
-  def render_enrollments_grades_report_pdf(enrollment, filename = "grades_report.pdf")
+  def render_enrollments_grades_report_pdf(enrollment, filename = "grades_report.pdf", signature_override = nil, watermark = nil)
     class_enrollments = enrollment.class_enrollments
       .where(situation: ClassEnrollment::APPROVED)
       .joins(:course_class)
@@ -71,7 +73,22 @@ module SharedPdfConcern
         enrollment: enrollment,
         class_enrollments: class_enrollments,
         accomplished_phases: accomplished_phases,
-        deferrals: deferrals
+        deferrals: deferrals,
+        signature_override: signature_override,
+        watermark: watermark
+      }
+    )
+  end
+
+  def render_assertion_pdf(assertion, filename = "assertion.pdf", signature_override = nil)
+    render_to_string(
+      template: "assertions/assertion_pdf",
+      type: "application/pdf",
+      formats: [:pdf],
+      assigns: {
+        filename: filename,
+        assertion: assertion,
+        signature_override: signature_override
       }
     )
   end

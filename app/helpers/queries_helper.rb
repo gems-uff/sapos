@@ -20,7 +20,7 @@ module QueriesHelper
       :body_template, "record_body_template_#{record.id}", "text/html",
       options.merge(
         value: record.body_template ||
-        I18n.t("active_scaffold.notification.body_template_default")
+        I18n.t("active_scaffold.notification.body_template_default_liquid")
       )
     )
   end

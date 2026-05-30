@@ -13,14 +13,18 @@ class Professor < ApplicationRecord
   has_many :advisement_authorizations, dependent: :restrict_with_exception
   has_many :professor_research_areas, dependent: :destroy
   has_many :research_areas, through: :professor_research_areas
+  has_many :professor_research_lines, dependent: :destroy
+  has_many :research_lines, through: :professor_research_lines
   has_many :course_classes, dependent: :restrict_with_exception
   has_many :thesis_defense_committee_participations,
     dependent: :restrict_with_exception
   has_many :thesis_defense_committee_enrollments,
     source: :enrollment, through: :thesis_defense_committee_participations
+  has_many :affiliations, dependent: :destroy
+  has_many :institutions, through: :affiliations
+  accepts_nested_attributes_for :affiliations, allow_destroy: false, reject_if: :all_blank
 
   belongs_to :city, optional: true
-  belongs_to :institution, optional: true
   belongs_to :academic_title_country,
     optional: true,
     class_name: "Country",
@@ -38,6 +42,8 @@ class Professor < ApplicationRecord
   validates :email, uniqueness: true, allow_nil: true, allow_blank: true
   validates :enrollment_number, uniqueness: true, allow_blank: true
   validate :changed_to_different_user
+
+  before_destroy :handle_user_role_removal
 
   def create_advisement_points_of_level_method(column_name)
     self.class.send(:define_method, column_name) {
@@ -126,4 +132,22 @@ class Professor < ApplicationRecord
       errors.add(:user, :changed_to_different_user)
     end
   end
+
+  private
+    def handle_user_role_removal
+      return unless user.present?
+
+      professor_role = Role.find_by(id: Role::ROLE_PROFESSOR)
+      if user.roles.include?(professor_role)
+        user.roles.delete(professor_role)
+
+        user.roles << Role.find_by(id: Role::ROLE_DESCONHECIDO) if user.roles.empty?
+
+        if user.actual_role == Role::ROLE_PROFESSOR
+          user.actual_role = user.user_max_role || Role::ROLE_DESCONHECIDO
+        end
+
+        user.save!
+      end
+    end
 end
