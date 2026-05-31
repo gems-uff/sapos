@@ -57,10 +57,12 @@ RSpec.describe "Professors features", type: :feature do
 
     @destroy_all << FactoryBot.create(:advisement, professor: @professor1, enrollment: @enrollment1)
     @destroy_all << FactoryBot.create(:advisement, professor: @professor1, enrollment: @enrollment3)
+    @enrollment1.reload
     @destroy_all << FactoryBot.create(:advisement, professor: @record, enrollment: @enrollment1, main_advisor: false)
     @destroy_all << FactoryBot.create(:advisement, professor: @record, enrollment: @enrollment2)
     @destroy_all << FactoryBot.create(:advisement, professor: @record, enrollment: @enrollment4)
     @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment1, main_advisor: false)
+    @enrollment2.reload
     @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment2, main_advisor: false)
 
     @destroy_all << @user = create_confirmed_user([@role_adm])
