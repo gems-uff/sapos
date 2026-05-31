@@ -35,6 +35,8 @@ class ClassEnrollmentsController < ApplicationController
       format: :i18n_number,
       i18n_options: { format_as: "grade" }
     }
+    config.columns[:grade].css_class = "grade-column"
+    config.columns[:grade_not_count_in_gpr].css_class = "grade_not_count_in_gpr-column"
     config.columns[:situation].form_ui = :select
     config.columns[:situation].options = {
       options: ClassEnrollment::SITUATIONS,

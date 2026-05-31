@@ -352,3 +352,10 @@ small._default_value {
 .active-scaffold li.form-element dd {
   padding: 6px 0;
 }
+.hide-score-column .grade-column,
+.hide-score-column .grade_not_count_in_gpr-column{
+    display: none !important;
+}
+.grade-input{
+    text-align: right;
+}
