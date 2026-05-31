@@ -42,6 +42,7 @@ class Enrollment < ApplicationRecord
   validates :student, presence: true
   validates_associated :dismissal
   validate :enrollment_has_main_advisor
+  validate :enrollment_has_authorized_advisor
 
   validates_date :thesis_defense_date,
     on_or_after: :admission_date,
@@ -170,6 +171,15 @@ class Enrollment < ApplicationRecord
       errors.add(:base, :main_advisor_required) if main_advisors == 0
       errors.add(:base, :main_advisor_uniqueness) if main_advisors > 1
     end
+  end
+
+  def enrollment_has_authorized_advisor
+    return if advisements.blank? || level.blank?
+    has_authorized = advisements.any? do |a|
+      a.professor.present? &&
+        a.professor.advisement_authorizations.any? { |auth| auth.level == level }
+    end
+    errors.add(:base, :no_advisor_with_level) unless has_authorized
   end
 
   def verify_research_area_with_advisors
