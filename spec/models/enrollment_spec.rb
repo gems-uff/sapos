@@ -83,6 +83,21 @@ RSpec.describe Enrollment, type: :model do
           expect(enrollment).not_to be_valid
           expect(enrollment).to have_error(:main_advisor_uniqueness).on(:base)
         end
+        it "has no advisor with authorization at enrollment level" do
+          professor = FactoryBot.build(:professor)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          expect(enrollment).to have_error(:no_advisor_with_level).on :base
+        end
+      end
+      context "should not have advisor level error when" do
+        it "at least one advisor has authorization at enrollment level" do
+          professor1 = FactoryBot.build(:professor)
+          professor2 = FactoryBot.build(:professor)
+          professor2.advisement_authorizations.build(level: enrollment.level)
+          enrollment.advisements.build(professor: professor1, main_advisor: true)
+          enrollment.advisements.build(professor: professor2, main_advisor: false)
+          expect(enrollment).to have(0).errors_on :base
+        end
       end
     end
     describe "thesis_defense_date" do
