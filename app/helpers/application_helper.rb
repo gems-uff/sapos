@@ -101,22 +101,23 @@ module ApplicationHelper
                      extra: extra })
   end
 
-  def code_mirror_text_area_widget(column, id, type, options, set_size = false, line_wrapping = false)
-    set_size_str = set_size ?
-      ".setSize(null, '#{(set_size.is_a?(TrueClass) ? options[:value].count("\n") + 2 : set_size)}em')" :
-      ""
+  def code_mirror_text_area_widget(column, id, type, options, columns = nil, unique_columns = nil, roles = nil, set_size = false, line_wrapping = false)
+    if set_size && set_size.is_a?(TrueClass)
+      set_size_str = "'#{options[:value].count("\n") + 2}em'"
+    elsif set_size
+      set_size_str = "'#{set_size}em'"
+    else
+      set_size_str = "null"
+    end
     block = text_area(:record, :sql_query, options)
     block + "<script>
-    CodeMirror.fromTextArea(document.getElementById('#{id}'),
-     {mode: '#{type}',
-      indentWithTabs: true,
-      smartIndent: true,
-      lineNumbers: true,
-      matchBrackets : true,
-      autofocus: true,
-      lineWrapping: #{line_wrapping ? "true" : "false"}
-     }
-    )#{set_size_str};
+    (function(){
+      if (#{columns.nil?} || #{unique_columns.nil?} || #{roles.nil?}) {
+        createCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str});
+      } else {
+        createPDFCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str}, #{columns.to_json}, #{unique_columns.to_json}, #{roles.to_json});
+      }
+    })();
     </script>".html_safe
   end
 

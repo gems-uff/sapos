@@ -57,6 +57,28 @@ class Assertion < ApplicationRecord
     @@disable_erb_validation = false
   end
 
+  def available_columns(args = {})
+    result = self.query.execute(args)
+    result[:columns] || []
+  rescue => e
+    Rails.logger.error("Error getting available_columns: #{e.message}")
+    []
+  end
+
+  def available_unique_columns(args = {})
+    result = self.query.execute(args)
+    rows = result[:rows] || []
+    columns = result[:columns] || []
+
+    unique = columns.select do |column|
+      rows.all? { |row| row[columns.index(column)] == rows.first[columns.index(column)] }
+    end
+    unique
+  rescue => e
+    Rails.logger.error("Error getting available_unique_columns: #{e.message}")
+    []
+  end
+
   private
     def only_student_enrollment_param
       if self.query.params.pluck(:name) != ["matricula_aluno"]
