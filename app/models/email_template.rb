@@ -18,7 +18,7 @@ class EmailTemplate < ApplicationRecord
   validates :to, presence: true
   validates :subject, presence: true
   validates :template_type, presence: true, inclusion: { in: TEMPLATE_TYPES }, allow_blank: false
-  validate :cannot_create_new_erb_template, if: -> { self.template_type == ERB } 
+  validate :cannot_create_new_erb_template, if: -> { self.template_type == ERB }
 
   BUILTIN_TEMPLATES = {
     "accomplishments:email_to_advisor" => {
@@ -121,6 +121,21 @@ class EmailTemplate < ApplicationRecord
         record: ClassEnrollmentDrop
       }
     },
+    "class_enrollments:email_to_professor_enrollment" => {
+      template_type: "Liquid",
+      path: File.join(
+        "class_enrollments", "mailer", "email_to_professor_enrollment.text.liquid"
+      ),
+      subject: I18n.t(
+        "notifications.class_enrollment.email_to_professor_enrollment.subject"
+      ),
+      to: "{{ record.course_class.professor.email }}",
+      variables: {
+        record: ClassEnrollmentDrop,
+        destroyed: :value
+      }
+    },
+
     "class_enrollments:email_to_student" => {
       template_type: "Liquid",
       path: File.join(

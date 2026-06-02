@@ -20,8 +20,8 @@ class ClassEnrollmentsController < ApplicationController
       :enrollment, :course_class, :situation,
       :grade_label, :disapproved_by_absence, :created_at
     ]
-    config.create.columns = columns - [:grade_label]
-    config.update.columns = columns - [:grade_label]
+    config.create.columns = columns - [:grade_label, :created_at]
+    config.update.columns = columns - [:grade_label, :created_at]
     config.show.columns = [
       :enrollment, :course_class, :situation, :disapproved_by_absence,
       :grade_label, :obs, :grade_not_count_in_gpr,
@@ -42,7 +42,7 @@ class ClassEnrollmentsController < ApplicationController
     }
     config.columns[:justification_grade_not_count_in_gpr].form_ui = :hidden
     config.columns[:justification_grade_not_count_in_gpr].label = ""
-    
+
     config.columns[:created_at].options = {
       format: :defaultdatetime,
     }
