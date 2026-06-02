@@ -18,8 +18,8 @@ FactoryBot.define do
     edit_date { Date.parse("2024/02/15") }
     form_template
     # letter_template
-    min_letters { 0 }
-    max_letters { 0 }
+    min_letters { nil }
+    max_letters { nil }
     allow_multiple_applications { false }
     visible { true }
     staff_can_edit { true }

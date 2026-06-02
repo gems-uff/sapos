@@ -27,6 +27,7 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
   }
 
   validates :form_template, presence: true
+  validates :letter_template, presence: true, if: :has_letters
   validates :min_letters, numericality: { only_integer: true, greater_than: -1 },
     allow_nil: true
   validates :max_letters, numericality: { only_integer: true, greater_than: -1 },
@@ -68,8 +69,7 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
   end
 
   def max_greater_than_min_letters
-    return if !self.has_letters
-    return if self.max_letters.nil?
+    return if self.min_letters.nil? || self.max_letters.nil?
     minletters = self.min_letters.to_i
     maxletters = self.max_letters.to_i
     if maxletters < minletters
