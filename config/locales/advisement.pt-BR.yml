@@ -23,6 +23,11 @@ pt-BR:
       models:
         advisement:
           advisement_professor_uniqueness: "não pode ser orientador duas vezes da mesma matrícula"
+          enrollment_required: "Matrícula é obrigatória"
+          main_advisor_required: "Um dos orientadores deve ser Orientador Principal"
+          main_advisor_uniqueness: "Apenas um orientador pode ser Orientador Principal"
+          no_advisor_with_level: "Ao menos um orientador deve ter credenciamento no nível da matrícula"
+          research_area_different_from_professors: "diferente de áreas de pesquisa do(s) orientador(es)"
 
     models:
       advisement:
@@ -31,6 +36,15 @@ pt-BR:
 
   active_scaffold:
     create_advisement_label: "Adicionar Orientação"
+    new_multiple_advisements: "Criar Múltiplos"
+    new_multiple_advisements_title: "Adicionar Múltiplos Orientadores"
+    created_multiple_advisements:
+      one: "%{count} orientação criada com sucesso"
+      other: "%{count} orientações criadas com sucesso"
+    add_advisor: "Adicionar Orientador"
+    at_least_one_advisor: "É necessário pelo menos um orientador"
+    remove: "Remover"
+    cancel: "Cancelar"
 
   notifications:
     advisement:

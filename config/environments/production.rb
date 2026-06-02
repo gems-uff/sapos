@@ -84,7 +84,7 @@ Rails.application.configure do
   config.should_send_emails = true
   config.action_mailer.delivery_method = :sendmail
   config.action_mailer.default_url_options = { host: "sapos.ic.uff.br" }
-  config.action_mailer.sendmail_settings = { arguments: "-i ", location: "/usr/sbin/sendmail" }
+  config.action_mailer.sendmail_settings = { arguments: ["-i"], location: "/usr/sbin/sendmail" }
 
   config.middleware.use ExceptionNotification::Rack,
     email: {

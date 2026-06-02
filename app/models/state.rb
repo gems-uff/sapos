@@ -28,16 +28,13 @@ class State < ApplicationRecord
     country = "%#{country}%" if country.present? && substring
     states = State
     states = states.joins(:country).where(
-      "`countries`.`name` COLLATE :db_collation
-        LIKE :country COLLATE :value_collation
-      ", Collation.collations.merge(country:)
+      "`countries`.`name` LIKE :country
+      ", {country: country}
     ) if country.present?
     states.where(
-      "`states`.`name` COLLATE :db_collation
-        LIKE :state COLLATE :value_collation
-        OR `states`.`code` COLLATE :db_collation
-        LIKE :state COLLATE :value_collation
-      ", Collation.collations.merge(state:)
+      "`states`.`name` LIKE :state
+        OR `states`.`code` LIKE :state
+      ", {state: state}
     )
   end
 
