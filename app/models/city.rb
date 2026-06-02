@@ -30,21 +30,17 @@ class City < ApplicationRecord
     cities = City
     cities = cities.joins(:state) if country.present? || state.present?
     cities = cities.joins(state: :country).where(
-      "`countries`.`name` COLLATE :db_collation
-        LIKE :country COLLATE :value_collation
-      ", Collation.collations.merge(country:)
+      "`countries`.`name` LIKE :country
+      ", {country: country}
     ) if country.present?
     cities = cities.where(
-      "`states`.`name` COLLATE :db_collation
-        LIKE :state COLLATE :value_collation
-        OR `states`.`code` COLLATE :db_collation
-        LIKE :state COLLATE :value_collation
-      ", Collation.collations.merge(state:)
+      "`states`.`name` LIKE :state
+        OR `states`.`code` LIKE :state
+      ", {state: state}
     ) if state.present?
     cities.where(
-      "`cities`.`name` COLLATE :db_collation
-        LIKE :city COLLATE :value_collation
-      ", Collation.collations.merge(city:)
+      "`cities`.`name` LIKE :city 
+      ", {city: city}
     )
   end
 

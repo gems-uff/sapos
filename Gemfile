@@ -23,7 +23,7 @@ gem "puma", ">= 6.4.2"
 gem "nokogiri", ">= 1.18.9"
 
 # Wrapp HTTP requests and responses
-gem "rack", "~> 2.2.12"
+gem "rack", "~> 2.2.23"
 
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 # gem "importmap-rails"

@@ -12,7 +12,7 @@ RSpec.describe Admissions::AdmissionCommitteeMember, type: :model do
 
   before(:all) do
     @admission_committee = FactoryBot.create(:admission_committee)
-    @user = FactoryBot.create(:user, :professor)
+    @user = FactoryBot.create(:user, actual_role: Role::ROLE_PROFESSOR)
     @destroy_later = []
   end
   after(:all) do

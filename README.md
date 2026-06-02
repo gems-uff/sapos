@@ -9,7 +9,7 @@
 
 SAPOS main goal is to ease the management of information related to graduate programs such as enrollments, courses, advisement, scholarships, requirements, among others.
 
-This project was initiated by professors Leonardo Murta and Vanessa Braganholo and followed by three term projects from the Computer Science undergraduate course at Universidade Federal Fluminense. 
+This project was initiated by professors Leonardo Murta and Vanessa Braganholo and followed by four term projects from the Computer Science undergraduate course at Universidade Federal Fluminense.
 
 # Team
 
@@ -27,6 +27,7 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 * Anderson Otaviano Meireles Junior (joined in March 2024)
 * Caio Henrique Velloso Paranhos (joined in March 2024)
 * Igor de Paula Siqueira Monárdez (joined in May 2024)
+* Luis Felipe Seabra (joined in February 2025)
 
 # Additional contributors
 
@@ -58,7 +59,8 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 * [Ruby on Rails](https://github.com/rails/rails)
 * [ActiveScaffold](https://github.com/activescaffold/active_scaffold)
 * [Prawn](https://github.com/prawnpdf/prawn)
-* [MySQL](http://www.mysql.com/)
+* [SQLite](https://www.sqlite.org/) (development/testing)
+* [MySQL](https://www.mysql.com/) (production)
 
 # Acknowledgements
 

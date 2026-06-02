@@ -381,8 +381,6 @@ queries = [
       FROM students s, enrollments e, enrollment_holds eh
       WHERE s.id = e.student_id
       AND e.id = eh.enrollment_id
-      /* Está trancado no momento */
-      AND eh.active = 1
       AND eh.year = :ano_semestre_anterior
       AND eh.semester = :numero_semestre_anterior
     SQL
@@ -527,8 +525,7 @@ queries = [
       /* não está trancado */
       AND e.id NOT IN (SELECT eh.enrollment_id
                        FROM enrollment_holds eh
-                       WHERE eh.active = 1
-                       AND eh.year = :ano_semestre_atual
+                       WHERE eh.year = :ano_semestre_atual
                        AND eh.semester = :numero_semestre_atual)
       /* não está inscrito */
       AND e.id NOT IN (SELECT ce.enrollment_id

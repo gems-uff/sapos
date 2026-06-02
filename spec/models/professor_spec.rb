@@ -102,6 +102,8 @@ RSpec.describe Professor, type: :model do
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: other_enrollment)
 
+        other_enrollment.reload
+
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: other_enrollment, main_advisor: false)
 
         expect(professor.advisement_points).to eql("1.5")
@@ -125,6 +127,7 @@ RSpec.describe Professor, type: :model do
 
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: other_enrollment)
+        other_enrollment.reload
 
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: other_enrollment, main_advisor: false)
 
@@ -154,8 +157,10 @@ RSpec.describe Professor, type: :model do
           @destroy_later << enrollment2 = FactoryBot.create(:enrollment, level: @level2)
 
           @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: enrollment1)
-          @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: enrollment2, main_advisor: false)
           @destroy_later << FactoryBot.create(:advisement, professor: @professor2, enrollment: enrollment2)
+          enrollment1.reload
+          enrollment2.reload
+          @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: enrollment2, main_advisor: false)
           @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: enrollment1, main_advisor: false)
           @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: enrollment2, main_advisor: false)
         end
@@ -231,6 +236,7 @@ RSpec.describe Professor, type: :model do
         @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor, level: enrollment.level)
 
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
+        enrollment.reload
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: enrollment, main_advisor: false)
 
         expect(professor.advisement_point(enrollment)).to eql(1.0)
@@ -248,6 +254,7 @@ RSpec.describe Professor, type: :model do
         @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor, level: enrollment.level)
 
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
+        enrollment.reload
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: enrollment, main_advisor: false)
 
         expect(professor.advisement_point(enrollment)).to eql(2.0)
@@ -262,6 +269,7 @@ RSpec.describe Professor, type: :model do
         @destroy_later << FactoryBot.create(:advisement_authorization, professor: other_professor, level: enrollment.level)
 
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
+        enrollment.reload
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: enrollment, main_advisor: false)
 
         expect(professor.advisement_point(enrollment)).to eql(0.5)
@@ -280,10 +288,46 @@ RSpec.describe Professor, type: :model do
         @destroy_later << FactoryBot.create(:advisement_authorization, professor: other_professor, level: enrollment.level)
 
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
+        enrollment.reload
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: enrollment, main_advisor: false)
 
         expect(professor.advisement_point(enrollment)).to eql(1.0)
       end
+    end
+  end
+
+  describe "Before destroy" do
+    it "should assign unknown role when user has only professor role" do
+      @destroy_later << FactoryBot.create(:role_desconhecido)
+      @destroy_later << user = FactoryBot.create(:user, actual_role: Role::ROLE_PROFESSOR)
+      @destroy_later << professor = FactoryBot.create(:professor, user: user)
+      user.roles << @professor_role
+      user.save!
+
+      professor.destroy
+      user.reload
+
+      expect(user.roles.count).to eq(1)
+      expect(user.roles).not_to include(@professor_role)
+      expect(user.roles.first.id).to eq(Role::ROLE_DESCONHECIDO)
+      expect(user.actual_role).to eq(Role::ROLE_DESCONHECIDO)
+    end
+
+    it "should keep other roles when user has multiple roles" do
+      @destroy_later << admin_role = FactoryBot.create(:role_administrador)
+      @destroy_later << user = FactoryBot.create(:user, actual_role: Role::ROLE_ADMINISTRADOR)
+      @destroy_later << professor = FactoryBot.create(:professor, user: user)
+      user.roles << @professor_role
+      user.roles << admin_role
+      user.save!
+
+      professor.destroy
+      user.reload
+
+      expect(user.roles.count).to eq(1)
+      expect(user.roles).to include(admin_role)
+      expect(user.roles).not_to include(@professor_role)
+      expect(user.actual_role).to eq(Role::ROLE_ADMINISTRADOR)
     end
   end
 end

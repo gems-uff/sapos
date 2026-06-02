@@ -10,6 +10,7 @@ RSpec.describe "UserRoles features", type: :feature do
   before(:all) do
     @destroy_later = []
     @destroy_all = []
+    UserRole.delete_all
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
     @destroy_all << @role_prof = FactoryBot.create(:role_professor)
     @destroy_all << @role_cord = FactoryBot.create(:role_coordenacao)
