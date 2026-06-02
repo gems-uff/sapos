@@ -1,92 +1,92 @@
-$(document).on('codemirror:initialized', function(e, taId){
+// $(document).on('codemirror:initialized', function(e, taId){
 
-  function insertTextById(id, text){
+//   function insertTextById(id, text){
     
-    var editor = (window.CodeMirrorEditors || {})[id];
-    if (editor) {
-      var doc = editor.getDoc();
-      var pos = doc.getCursor();
-      doc.replaceRange(text, pos);
-      editor.focus();
-      return;
-    }
-    var ta = document.getElementById(id);
-    if (!ta) return;
-    var start = ta.selectionStart || 0;
-    var end = ta.selectionEnd || 0;
-    ta.value = ta.value.substring(0, start) + text + ta.value.substring(end);
-    ta.focus();
-  }
+//     var editor = (window.CodeMirrorEditors || {})[id];
+//     if (editor) {
+//       var doc = editor.getDoc();
+//       var pos = doc.getCursor();
+//       doc.replaceRange(text, pos);
+//       editor.focus();
+//       return;
+//     }
+//     var ta = document.getElementById(id);
+//     if (!ta) return;
+//     var start = ta.selectionStart || 0;
+//     var end = ta.selectionEnd || 0;
+//     ta.value = ta.value.substring(0, start) + text + ta.value.substring(end);
+//     ta.focus();
+//   }
 
-  console.log('CodeMirror initialized for textarea id:', taId);
-  var ta = document.getElementById(taId);
-  if (ta) {
-    var editor = taId.nextSibling.CodeMirror || taId.CodeMirror;
-    console.log('Texto do editor:', editor ? editor.getValue().slice(0, 200) : 'Editor não encontrado');
-    console.log('Textarea element found:', ta);
-    console.log('Data attributes:', ta.dataset);
-  } else {
-    console.warn('Textarea element not found for id:', taId);
-  }
-  var editor = (window.CodeMirrorEditors || {})[taId];
-  console.log('Editor instance:', editor);
-  // usar editor...
-});
-  // unico handler de clique (delegação)
-document.addEventListener('click', function(e) {
-  var t = e.target;
-  // exemplos de ícones/ações — apenas log (não interrompe)
-  // if (t && t.classList && (t.classList.contains('fa-pencil') || t.classList.contains('new') || t.classList.contains('fa-eye'))) {
-  //   initAllAssertionEditors();
-  //   console.log('ícone/ação clicado', t);
-  // }
-  // console.log('Click event: ', e.target);
-  var btn = t && t.closest && t.closest('.insert-attribute, .insert-record-attribute, .insert-loop, .insert-conditional');
-  if (!btn) return;
+//   console.log('CodeMirror initialized for textarea id:', taId);
+//   var ta = document.getElementById(taId);
+//   if (ta) {
+//     var editor = taId.nextSibling.CodeMirror || taId.CodeMirror;
+//     console.log('Texto do editor:', editor ? editor.getValue().slice(0, 200) : 'Editor não encontrado');
+//     console.log('Textarea element found:', ta);
+//     console.log('Data attributes:', ta.dataset);
+//   } else {
+//     console.warn('Textarea element not found for id:', taId);
+//   }
+//   var editor = (window.CodeMirrorEditors || {})[taId];
+//   console.log('Editor instance:', editor);
+//   // usar editor...
+// });
+//   // unico handler de clique (delegação)
+// document.addEventListener('click', function(e) {
+//   var t = e.target;
+//   // exemplos de ícones/ações — apenas log (não interrompe)
+//   // if (t && t.classList && (t.classList.contains('fa-pencil') || t.classList.contains('new') || t.classList.contains('fa-eye'))) {
+//   //   initAllAssertionEditors();
+//   //   console.log('ícone/ação clicado', t);
+//   // }
+//   // console.log('Click event: ', e.target);
+//   var btn = t && t.closest && t.closest('.insert-attribute, .insert-record-attribute, .insert-loop, .insert-conditional');
+//   if (!btn) return;
 
-  var toolbar = btn.closest('.assertion-template-toolbar_pai');
-  if (!toolbar) return;
+//   var toolbar = btn.closest('.assertion-template-toolbar_pai');
+//   if (!toolbar) return;
 
-  var editorId = toolbar.dataset.editorId;
-  var columns = JSON.parse(toolbar.dataset.columns || '[]');
-  var uniqueColumns = JSON.parse(toolbar.dataset.uniqueColumns || '[]');
+//   var editorId = toolbar.dataset.editorId;
+//   var columns = JSON.parse(toolbar.dataset.columns || '[]');
+//   var uniqueColumns = JSON.parse(toolbar.dataset.uniqueColumns || '[]');
 
-  function insertTextById(id, text){
-    var editor = (window.CodeMirrorEditors || {})[id];
-    console.log('Inserindo texto: ' + text + ' no editorId: ' + id);
-    console.log('Editor encontrado: ' + !!editor);
-    console.log('window.CodeMirrorEditors:', window.CodeMirrorEditors);
-    if (editor) {
-      var doc = editor.getDoc();
-      var pos = doc.getCursor();
-      doc.replaceRange(text, pos);
-      editor.focus();
-      return;
-    }
-    var ta = document.getElementById(id);
-    if (!ta) return;
-    var start = ta.selectionStart || 0;
-    var end = ta.selectionEnd || 0;
-    ta.value = ta.value.substring(0, start) + text + ta.value.substring(end);
-    ta.focus();
-  }
+//   function insertTextById(id, text){
+//     var editor = (window.CodeMirrorEditors || {})[id];
+//     console.log('Inserindo texto: ' + text + ' no editorId: ' + id);
+//     console.log('Editor encontrado: ' + !!editor);
+//     console.log('window.CodeMirrorEditors:', window.CodeMirrorEditors);
+//     if (editor) {
+//       var doc = editor.getDoc();
+//       var pos = doc.getCursor();
+//       doc.replaceRange(text, pos);
+//       editor.focus();
+//       return;
+//     }
+//     var ta = document.getElementById(id);
+//     if (!ta) return;
+//     var start = ta.selectionStart || 0;
+//     var end = ta.selectionEnd || 0;
+//     ta.value = ta.value.substring(0, start) + text + ta.value.substring(end);
+//     ta.focus();
+//   }
 
-  if (btn.classList.contains('insert-attribute')) {
-    if (!uniqueColumns.length) return alert('Nenhuma coluna única disponível. Simule para popular os valores.');
-    var choice = prompt('Escolha coluna (únicas):\n' + uniqueColumns.join(', '), uniqueColumns[0]);
-    if (choice) insertTextById(editorId, '{{ ' + choice + ' }}');
-  } else if (btn.classList.contains('insert-record-attribute')) {
-    if (!columns.length) return alert('Nenhuma coluna disponível.');
-    var choice2 = prompt('Escolha coluna para record:\n' + columns.join(', '), columns[0] || '');
-    if (choice2) insertTextById(editorId, '{{ record.' + choice2 + ' }}');
-  } else if (btn.classList.contains('insert-loop')) {
-    var sample = '{% for record in records %}\\n  {{ record.' + (columns[0] || 'coluna') + ' }}\\n{% endfor %}\\n';
-    insertTextById(editorId, sample);
-  } else if (btn.classList.contains('insert-conditional')) {
-    var sample2 = '{% if records.size > 0 %}\\n  <!-- conteúdo -->\\n{% endif %}\\n';
-    insertTextById(editorId, sample2);
-  }
-});
+//   if (btn.classList.contains('insert-attribute')) {
+//     if (!uniqueColumns.length) return alert('Nenhuma coluna única disponível. Simule para popular os valores.');
+//     var choice = prompt('Escolha coluna (únicas):\n' + uniqueColumns.join(', '), uniqueColumns[0]);
+//     if (choice) insertTextById(editorId, '{{ ' + choice + ' }}');
+//   } else if (btn.classList.contains('insert-record-attribute')) {
+//     if (!columns.length) return alert('Nenhuma coluna disponível.');
+//     var choice2 = prompt('Escolha coluna para record:\n' + columns.join(', '), columns[0] || '');
+//     if (choice2) insertTextById(editorId, '{{ record.' + choice2 + ' }}');
+//   } else if (btn.classList.contains('insert-loop')) {
+//     var sample = '{% for record in records %}\\n  {{ record.' + (columns[0] || 'coluna') + ' }}\\n{% endfor %}\\n';
+//     insertTextById(editorId, sample);
+//   } else if (btn.classList.contains('insert-conditional')) {
+//     var sample2 = '{% if records.size > 0 %}\\n  <!-- conteúdo -->\\n{% endif %}\\n';
+//     insertTextById(editorId, sample2);
+//   }
+// });
 
 function createCodeMirror(taId, codetype, lineWrapping, set_size_str){
   console.log('Entrando no createCodeMirror', 'taId:', taId, 'codetype:', codetype, 'lineWrapping:', lineWrapping, 'set_size_str:', set_size_str);
