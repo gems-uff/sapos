@@ -110,12 +110,20 @@ module ApplicationHelper
       set_size_str = "null"
     end
     block = text_area(:record, :sql_query, options)
+
     block + "<script>
     (function(){
-      if (#{columns.nil?} || #{unique_columns.nil?} || #{roles.nil?}) {
-        createCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str});
-      } else {
-        createPDFCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str}, #{columns.to_json}, #{unique_columns.to_json}, #{roles.to_json});
+      const mode = #{local.to_json};
+      switch(mode) {
+        case 'assertions':
+          createPDFCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str}, #{extra_data[:columns].to_json}, #{extra_data[:unique_columns].to_json}, #{extra_data[:roles].to_json}, #{extra_data[:formats].to_json});
+          break;
+        case 'notifications':
+          console.log('notification');
+          createCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str});
+          break;
+        default:
+          createCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str});
       }
     })();
     </script>".html_safe
