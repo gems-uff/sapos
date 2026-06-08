@@ -70,4 +70,5 @@ pt-BR:
         active_scholarship: "Bolsista?"
         active_scholarship_true: "Sim"
         active_scholarship_false: "Não"
+        created_at: "Data de Inscrição"
 
