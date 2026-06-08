@@ -10,14 +10,35 @@ class ProfessorsController < ApplicationController
   include ApplicationHelper
   helper :professor_research_areas
 
-  before_action :set_list_columns
-
   active_scaffold :professor do |config|
     config.columns.add :advisement_points
     config.columns.add :advisements_with_points
-    config.list.columns = [
+
+    base_list_columns = [
       :name, :cpf, :birthdate, :advisement_points, :enrollment_number
     ]
+
+    levels_to_show = begin
+      Level.where(show_advisements_points_in_list: true)
+           .order(:short_name_showed_in_list_header)
+    rescue ActiveRecord::StatementInvalid
+      []
+    end
+
+    level_columns = levels_to_show.map do |level|
+      column_name = :"advisement_points_of_level#{level.id}"
+      config.columns.add column_name
+      config.columns[column_name].label = level.short_name_showed_in_list_header
+      config.columns[column_name].sort_by method: "#{column_name}_order"
+      column_name
+    end
+
+    insert_position = base_list_columns.find_index(:advisement_points)
+    insert_position = insert_position ? insert_position + 1 : base_list_columns.size
+    all_list_columns = base_list_columns.dup
+    all_list_columns.insert(insert_position, *level_columns)
+
+    config.list.columns = all_list_columns
     config.list.sorting = { name: "ASC" }
     config.create.label = :create_professor_label
     config.columns[:advisement_points].sort_by method: "advisement_points_order"
@@ -81,41 +102,4 @@ class ProfessorsController < ApplicationController
     full_text_search: true
   )
 
-  def set_list_columns
-    if Professor.first != nil
-
-      Professor.instance_methods.grep(
-        /^advisement_points_of_level/
-      ).each do |advisement_points_of_level|
-        active_scaffold_config.list.columns.exclude advisement_points_of_level
-        Professor.undef_method advisement_points_of_level
-      end
-
-      levels_to_show = Level
-        .where(show_advisements_points_in_list: true)
-        .order(:short_name_showed_in_list_header)
-      levels_to_add = []
-
-      levels_to_show.each do |level|
-        method_name = "advisement_points_of_level#{level.id}"
-        Professor.first.create_advisement_points_of_level_method(method_name)
-        active_scaffold_config.columns.add method_name
-        levels_to_add.push(method_name)
-
-        if level.short_name_showed_in_list_header.present?
-          active_scaffold_config.columns[method_name].label =
-            level.short_name_showed_in_list_header
-        else
-          active_scaffold_config.columns[method_name].label = level.name
-        end
-        active_scaffold_config.columns[method_name].sort_by method: method_name
-      end
-
-      insert_position = Array(active_scaffold_config.list.columns)
-        .find_index(:advisement_points) + 1
-      Array(active_scaffold_config.list.columns).insert(
-        insert_position, *levels_to_add
-      )
-    end
-  end
 end

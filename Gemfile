@@ -96,7 +96,7 @@ gem "redcarpet"
 
 # Active scaffold support for newer Rails
 gem "request_store", ">= 1.6.0"
-gem "active_scaffold", git: "https://github.com/activescaffold/active_scaffold.git", ref: "6210cdc4c0da0cba17e0716b65a16a783e12b407"
+gem "active_scaffold", "~> 4.0.13"
 gem "active_scaffold_duplicate", ">= 1.1.0"
 gem "recordselect"
 

@@ -67,6 +67,12 @@ class ScholarshipDurationsController < ApplicationController
       :obs, :scholarship_suspensions
     ]
 
+    config.columns[:scholarship_suspensions].allow_add_existing = false
+
+    config.subform.columns = [
+      :enrollment, :start_date, :end_date, :cancel_date, :obs
+    ]
+
     config.actions.exclude :deleted_records
   end
   record_select per_page: 10, full_text_search: true

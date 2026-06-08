@@ -5,7 +5,6 @@
 
 class Admissions::AdmissionApplicationsController < ApplicationController
   authorize_resource
-  before_action :update_table_config
 
   I18N_BASE = "activerecord.attributes.admissions/admission_application"
 
@@ -121,6 +120,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
 
     config.columns[:status].search_sql = ""
     config.columns[:status].search_ui = :select
+    config.columns[:status].sort_by method: "status_sort_sql"
 
     config.columns[:mapping].search_sql = ""
     config.columns[:mapping].search_ui = :select
@@ -149,9 +149,9 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     model: "Admissions::AdmissionApplication"
   )
 
-  def update_table_config
+  def status_sort_sql
     if current_user
-      active_scaffold_config.columns[:status].sort_by sql: Arel.sql("
+      Arel.sql("
         CONCAT(
           CASE
             WHEN `admission_applications`.`status` IS NOT NULL THEN `admission_applications`.`status`
@@ -179,7 +179,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
         )
       ")
     else
-      active_scaffold_config.columns[:status].sort_by sql: "status"
+      "status"
     end
   end
 

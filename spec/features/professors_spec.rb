@@ -64,6 +64,10 @@ RSpec.describe "Professors features", type: :feature do
     @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment2, main_advisor: false)
 
     @destroy_all << @user = create_confirmed_user([@role_adm])
+
+    ProfessorsController.active_scaffold(
+      &ProfessorsController.instance_variable_get(:@active_scaffold_config_block)
+    )
   end
   after(:each) do
     @destroy_later.each(&:delete)
