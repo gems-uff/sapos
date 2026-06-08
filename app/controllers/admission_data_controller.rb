@@ -17,8 +17,8 @@ class AdmissionDataController < ApplicationController
     config.columns.add :is_open?
     config.columns.add :total_file_size
 
-    config.list.columns = [:name, :year_semester, :admission_applications_count, :total_file_size, :is_open?]
-    config.show.columns = [:name, :year_semester, :start_date, :end_date, :admission_applications_count, :total_file_size, :is_open?]
+    config.list.columns = [:year_semester, :name, :admission_applications_count, :total_file_size, :is_open?]
+    config.show.columns = [:year_semester, :name, :start_date, :end_date, :admission_applications_count, :total_file_size, :is_open?]
     config.list.sorting = { year: :desc, semester: :desc }
 
     config.field_search.columns = [:name, :year, :semester]

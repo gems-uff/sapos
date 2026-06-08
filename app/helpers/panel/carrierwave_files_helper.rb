@@ -68,6 +68,6 @@ module Panel::CarrierwaveFilesHelper
     version = Panel::CarrierwaveFilesHelper.find_version_for_carrierwave_file(record)
     return "-" if version.blank?
 
-    I18n.t("activerecord.models.#{version.item_type.underscore}.one", default: version.item_type)
+    version.item_type
   end
 end
