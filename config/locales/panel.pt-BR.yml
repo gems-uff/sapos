@@ -16,6 +16,8 @@ pt-BR:
       delete: "Excluir"
       no_processes: "Nenhum processo seletivo encontrado."
       coming_soon: "Em breve"
+      export_error: "Erro ao exportar o edital: %{message}"
+      export_empty: "Nada para exportar neste edital."
     garbage_collector:
       title: "Coleta de Lixo - CarrierWave"
       description: "Arquivos órfãos no banco de dados que não estão referenciados por nenhuma tabela."

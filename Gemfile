@@ -124,6 +124,7 @@ gem "recaptcha", require: "recaptcha/rails"
 gem "rubyzip"
 gem "caxlsx"
 gem "caxlsx_rails"
+gem "roo"
 # gem "acts_as_xlsx"
 
 # Templates

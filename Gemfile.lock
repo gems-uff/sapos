@@ -177,6 +177,7 @@ GEM
     connection_pool (3.0.2)
     cow_proxy (0.3.3)
     crass (1.0.6)
+    csv (3.3.5)
     database_cleaner-active_record (2.2.2)
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0)
@@ -412,6 +413,12 @@ GEM
       actionpack (>= 5.2)
       railties (>= 5.2)
     rexml (3.4.4)
+    roo (3.0.0)
+      base64 (~> 0.2)
+      csv (~> 3)
+      logger (~> 1)
+      nokogiri (~> 1)
+      rubyzip (>= 3.0.0, < 4.0.0)
     rouge (4.2.0)
     rqrcode (2.2.0)
       chunky_png (~> 1.0)
@@ -610,6 +617,7 @@ DEPENDENCIES
   recordselect
   redcarpet
   request_store (>= 1.6.0)
+  roo
   rspec-collection_matchers
   rspec-rails
   rubocop
