@@ -18,7 +18,8 @@ module RecordSelectHelpers
   end
 
   def expect_to_have_record_select(page, field, plural)
-    click_record_select_input("#record_#{field}")
+    input = click_record_select_input("#record_#{field}")
+    ensure_record_select_open(input, plural)
     expect(page).to have_selector("#record-select-#{plural}", visible: true)
   end
 
@@ -28,8 +29,20 @@ module RecordSelectHelpers
   # would be silently lost.
   def open_record_select(selector, plural)
     input = click_record_select_input(selector)
+    ensure_record_select_open(input, plural)
     find("#record-select-#{plural} li.record", match: :first)
     input
+  end
+
+  # A click only opens the dropdown through the focus event; if the field was
+  # already focused (ActiveScaffold autofocuses the first form field) or the
+  # RecordSelect observers were not attached yet, the click opens nothing.
+  # Blur and click again in that case.
+  def ensure_record_select_open(input, plural)
+    return if page.has_selector?("#record-select-#{plural}", visible: true)
+    page.execute_script("document.activeElement.blur()")
+    sleep(0.2)
+    input.click
   end
 
   # RecordSelect auto-opens its dropdown when ActiveScaffold focuses the first
