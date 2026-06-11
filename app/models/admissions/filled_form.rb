@@ -33,6 +33,8 @@ class Admissions::FilledForm < ActiveRecord::Base
 
   accepts_nested_attributes_for :fields, allow_destroy: true
 
+  before_destroy :cleanup_fields_carrier_wave_files, prepend: true
+
   def to_label
     key = "activerecord.attributes.admissions/filled_form.filled_status"
     key += is_filled ? ".filled" : ".not_filled"
@@ -176,4 +178,13 @@ class Admissions::FilledForm < ActiveRecord::Base
       end
     end
   end
+
+  private
+    def cleanup_fields_carrier_wave_files
+      fields.where.not(file: [nil, ""]).each do |field|
+        Admissions::FilledFormField.delete_unreferenced_carrier_wave_file(
+          field.read_attribute(:file)
+        )
+      end
+    end
 end
