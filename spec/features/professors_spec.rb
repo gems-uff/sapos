@@ -57,10 +57,12 @@ RSpec.describe "Professors features", type: :feature do
 
     @destroy_all << FactoryBot.create(:advisement, professor: @professor1, enrollment: @enrollment1)
     @destroy_all << FactoryBot.create(:advisement, professor: @professor1, enrollment: @enrollment3)
+    @enrollment1.reload
     @destroy_all << FactoryBot.create(:advisement, professor: @record, enrollment: @enrollment1, main_advisor: false)
     @destroy_all << FactoryBot.create(:advisement, professor: @record, enrollment: @enrollment2)
     @destroy_all << FactoryBot.create(:advisement, professor: @record, enrollment: @enrollment4)
     @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment1, main_advisor: false)
+    @enrollment2.reload
     @destroy_all << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment2, main_advisor: false)
 
     @destroy_all << @user = create_confirmed_user([@role_adm])
@@ -172,7 +174,6 @@ RSpec.describe "Professors features", type: :feature do
     it "should have a datepicker for birthdate with a range starting 100 years ago" do
       expect(page).not_to have_selector("#ui-datepicker-div")
       find("#record_birthdate_").click
-      wait_for_ajax
       expect(page).to have_selector("#ui-datepicker-div", visible: true)
       expect(page.all("select.ui-datepicker-year option").map(&:text)).to include(100.years.ago.year.to_s)
     end

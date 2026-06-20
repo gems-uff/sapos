@@ -209,6 +209,7 @@ GEM
       factory_bot (~> 6.5)
       railties (>= 6.1.0)
     ffi (1.17.4)
+    ffi (1.17.4-arm64-darwin)
     ffi (1.17.4-x86-mingw32)
     ffi (1.17.4-x86_64-linux-gnu)
     font-awesome-rails (4.7.0.8)
@@ -303,6 +304,8 @@ GEM
     nio4r (2.7.5)
     nokogiri (1.19.3)
       mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
+    nokogiri (1.19.3-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.19.3-x86_64-linux-gnu)
       racc (~> 1.4)
@@ -510,6 +513,7 @@ GEM
       sprockets (>= 3.0.0)
     sqlite3 (1.6.8)
       mini_portile2 (~> 2.8.0)
+    sqlite3 (1.6.8-arm64-darwin)
     sqlite3 (1.6.8-x86_64-linux)
     ssrf_filter (1.5.0)
     stringio (3.2.0)
@@ -549,6 +553,7 @@ GEM
     zeitwerk (2.8.2)
 
 PLATFORMS
+  arm64-darwin
   ruby
   x86-mingw32
   x86_64-linux
