@@ -134,11 +134,11 @@ RSpec.describe "Papers features", type: :feature do
     end
 
     it "should have a link to add paper_professors" do
-      expect(page).to have_link("as_papers-99999999999-paper_professors-subform-create-another")
+      expect(page).to have_link("as_papers-99999999999-paper_professors-subform-div-create-another")
     end
 
     it "should have a link to add paper_students" do
-      expect(page).to have_link("as_papers-99999999999-paper_students-subform-create-another")
+      expect(page).to have_link("as_papers-99999999999-paper_students-subform-div-create-another")
     end
   end
 
