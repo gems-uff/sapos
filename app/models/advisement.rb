@@ -99,6 +99,7 @@ class Advisement < ApplicationRecord
   end
 
   def enrollment_has_authorized_advisor
+    return unless CustomVariable.enable_advisor_accreditation_validation
     return if enrollment.blank? || enrollment.level.blank?
     return if professor.present? && professor.advisement_authorizations.any? { |auth| auth.level == enrollment.level }
 

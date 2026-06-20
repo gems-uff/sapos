@@ -364,5 +364,38 @@ RSpec.describe CustomVariable, type: :model do
         expect(CustomVariable.quadrennial_period).to eq("2021-2024")
       end
     end
+
+    context "enable advisor accreditation validation" do
+      it "should return true when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:enable_advisor_accreditation_validation)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.enable_advisor_accreditation_validation).to eq(true)
+      end
+
+      it "should return true when the value is blank" do
+        config = CustomVariable.find_by_variable(:enable_advisor_accreditation_validation)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "")
+
+        expect(CustomVariable.enable_advisor_accreditation_validation).to eq(true)
+      end
+
+      it "should return true when it is defined to yes" do
+        config = CustomVariable.find_by_variable(:enable_advisor_accreditation_validation)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "yes")
+
+        expect(CustomVariable.enable_advisor_accreditation_validation).to eq(true)
+      end
+
+      it "should return false when it is defined to no" do
+        config = CustomVariable.find_by_variable(:enable_advisor_accreditation_validation)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "no")
+
+        expect(CustomVariable.enable_advisor_accreditation_validation).to eq(false)
+      end
+    end
   end
 end
