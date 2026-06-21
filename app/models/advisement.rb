@@ -87,7 +87,7 @@ class Advisement < ApplicationRecord
     return if enrollment.blank?
     advisements = enrollment.advisements.reject(&:marked_for_destruction?)
 
-    advisements = advisements.map { |a| a.id == self.id ? self : a }
+    advisements = advisements.map { |a| a == self ? self : a }
 
     advisements << self if new_record? && advisements.exclude?(self)
 
@@ -95,7 +95,7 @@ class Advisement < ApplicationRecord
 
     main_advisors = advisements.count(&:main_advisor)
     errors.add(:base, :main_advisor_required) if main_advisors == 0
-    errors.add(:base, :main_advisor_uniqueness) if main_advisors > 1
+    errors.add(:base, :main_advisor_uniqueness) if main_advisors > 1 && main_advisor
   end
 
   def enrollment_has_authorized_advisor
