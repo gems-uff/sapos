@@ -98,6 +98,12 @@ RSpec.describe Enrollment, type: :model do
           enrollment.advisements.build(professor: professor2, main_advisor: false)
           expect(enrollment).to have(0).errors_on :base
         end
+        it "the accreditation validation is disabled even without an authorized advisor" do
+          @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "no")
+          professor = FactoryBot.build(:professor)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          expect(enrollment).to have(0).errors_on :base
+        end
       end
     end
     describe "thesis_defense_date" do
@@ -197,6 +203,13 @@ RSpec.describe Enrollment, type: :model do
     end
   end
   describe "Methods" do
+    describe "create_user!" do
+      it "should return false when the enrollment status does not require a user" do
+        enrollment.enrollment_status = @enrollment_status_without_user
+        expect(enrollment.create_user!).to be false
+      end
+    end
+
     describe "to_label" do
       it "should return the expected string" do
         enrollment_number = "M213"
@@ -305,6 +318,31 @@ RSpec.describe Enrollment, type: :model do
       @inactive_dismissal.delete
       @inactive_enrollment.delete
       @delayed_enrollment.delete
+    end
+
+    describe "Methods" do
+      describe "phase_completions_show" do
+        it "should return the phase_completions of the enrollment" do
+          expect(@delayed_enrollment.phase_completions_show).to eq(@delayed_enrollment.phase_completions)
+        end
+      end
+
+      describe "delayed_phases" do
+        it "should return phases whose due_date has passed and have no completion_date" do
+          result = @delayed_enrollment.delayed_phases(date: @admission_date + 2.months)
+          expect(result).to include(@one_month_phase)
+        end
+
+        it "should not return phases that have been accomplished" do
+          result = @enrollment_accomplished.delayed_phases(date: @admission_date + 2.months)
+          expect(result).not_to include(@one_month_phase)
+        end
+
+        it "should not return phases whose due_date has not yet passed" do
+          result = @delayed_enrollment.delayed_phases(date: @admission_date + 5.days)
+          expect(result).not_to include(@one_month_phase)
+        end
+      end
     end
 
     describe "Class Methods" do

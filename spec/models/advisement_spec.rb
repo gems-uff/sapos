@@ -93,6 +93,15 @@ RSpec.describe Advisement, type: :model do
         advisement = Advisement.new(professor: professor1, enrollment: enrollment, main_advisor: true)
         expect(advisement).to have_error(:no_advisor_with_level).on(:base)
       end
+
+      it "should not have error when the accreditation validation is disabled" do
+        @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "no")
+        @destroy_later << level = FactoryBot.create(:level)
+        @destroy_later << professor1 = FactoryBot.create(:professor)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
+        advisement = Advisement.new(professor: professor1, enrollment: enrollment, main_advisor: true)
+        expect(advisement).to have(0).errors_on(:base)
+      end
     end
 
     describe "verify_research_area_with_advisors" do

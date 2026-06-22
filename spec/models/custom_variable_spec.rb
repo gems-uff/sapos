@@ -178,5 +178,224 @@ RSpec.describe CustomVariable, type: :model do
         expect(CustomVariable.instance_name).to eq("Computacao")
       end
     end
+
+    context "minimum grade for approval" do
+      it "should return 60 when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:minimum_grade_for_approval)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.minimum_grade_for_approval).to eq(60)
+      end
+
+      it "should return 60 when the value is blank" do
+        config = CustomVariable.find_by_variable(:minimum_grade_for_approval)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :minimum_grade_for_approval, value: "")
+
+        expect(CustomVariable.minimum_grade_for_approval).to eq(60)
+      end
+
+      it "should return 70 when it is defined to 7.0" do
+        config = CustomVariable.find_by_variable(:minimum_grade_for_approval)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :minimum_grade_for_approval, value: "7.0")
+
+        expect(CustomVariable.minimum_grade_for_approval).to eq(70)
+      end
+    end
+
+    context "grade of disapproval for absence" do
+      it "should return nil when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:grade_of_disapproval_for_absence)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.grade_of_disapproval_for_absence).to eq(nil)
+      end
+
+      it "should return nil when the value is blank" do
+        config = CustomVariable.find_by_variable(:grade_of_disapproval_for_absence)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :grade_of_disapproval_for_absence, value: "")
+
+        expect(CustomVariable.grade_of_disapproval_for_absence).to eq(nil)
+      end
+
+      it "should return 50 when it is defined to 5.0" do
+        config = CustomVariable.find_by_variable(:grade_of_disapproval_for_absence)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :grade_of_disapproval_for_absence, value: "5.0")
+
+        expect(CustomVariable.grade_of_disapproval_for_absence).to eq(50)
+      end
+    end
+
+    context "professor login can post grades" do
+      it "should return 'no' when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:professor_login_can_post_grades)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.professor_login_can_post_grades).to eq("no")
+      end
+
+      it "should return 'no' when value is nil" do
+        config = CustomVariable.find_by_variable(:professor_login_can_post_grades)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :professor_login_can_post_grades, value: nil)
+
+        expect(CustomVariable.professor_login_can_post_grades).to eq("no")
+      end
+
+      it "should return 'yes' when it is defined to yes" do
+        config = CustomVariable.find_by_variable(:professor_login_can_post_grades)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :professor_login_can_post_grades, value: "yes")
+
+        expect(CustomVariable.professor_login_can_post_grades).to eq("yes")
+      end
+
+      it "should return 'yes_all_semesters' when it is defined to yes_all_semesters" do
+        config = CustomVariable.find_by_variable(:professor_login_can_post_grades)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :professor_login_can_post_grades, value: "yes_all_semesters")
+
+        expect(CustomVariable.professor_login_can_post_grades).to eq("yes_all_semesters")
+      end
+    end
+
+    context "month year range" do
+      it "should return default [20, 10, false] when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:month_year_range)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.month_year_range).to eq([20, 10, false])
+      end
+
+      it "should return [5, 5, false] when it is defined to '5:5'" do
+        config = CustomVariable.find_by_variable(:month_year_range)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :month_year_range, value: "5:5")
+
+        expect(CustomVariable.month_year_range).to eq([5, 5, false])
+      end
+
+      it "should return [3, 3, true] when it is defined to '~3'" do
+        config = CustomVariable.find_by_variable(:month_year_range)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :month_year_range, value: "~3")
+
+        expect(CustomVariable.month_year_range).to eq([3, 3, true])
+      end
+    end
+
+    context "year semester range" do
+      it "should return default [20, 1, true] when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:year_semester_range)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.year_semester_range).to eq([20, 1, true])
+      end
+
+      it "should return [10, 5, false] when it is defined to '10:5'" do
+        config = CustomVariable.find_by_variable(:year_semester_range)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :year_semester_range, value: "10:5")
+
+        expect(CustomVariable.year_semester_range).to eq([10, 5, false])
+      end
+    end
+
+    context "past calendar range" do
+      it "should return default hash when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:past_calendar_range)
+        config.delete unless config.nil?
+
+        result = CustomVariable.past_calendar_range
+        expect(result).to be_a(Hash)
+        expect(result).to have_key("minDate")
+        expect(result).to have_key("maxDate")
+      end
+
+      it "should return a hash with minDate and maxDate when defined" do
+        config = CustomVariable.find_by_variable(:past_calendar_range)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :past_calendar_range, value: "5:2")
+
+        result = CustomVariable.past_calendar_range
+        expect(result["minDate"]).to eq("-5Y")
+        expect(result["maxDate"]).to eq("+2Y")
+      end
+    end
+
+    context "academic calendar range" do
+      it "should return default hash when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:academic_calendar_range)
+        config.delete unless config.nil?
+
+        result = CustomVariable.academic_calendar_range
+        expect(result).to be_a(Hash)
+        expect(result).to have_key("minDate")
+        expect(result).to have_key("maxDate")
+      end
+
+      it "should return a hash with minDate and maxDate when defined" do
+        config = CustomVariable.find_by_variable(:academic_calendar_range)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :academic_calendar_range, value: "3:1")
+
+        result = CustomVariable.academic_calendar_range
+        expect(result["minDate"]).to eq("-3Y")
+        expect(result["maxDate"]).to eq("+1Y")
+      end
+    end
+
+    context "quadrennial period" do
+      it "should return 'Not defined' when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:quadrennial_period)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.quadrennial_period).to eq("Not defined")
+      end
+
+      it "should return '2021-2024' when it is defined to 2021-2024" do
+        config = CustomVariable.find_by_variable(:quadrennial_period)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :quadrennial_period, value: "2021-2024")
+
+        expect(CustomVariable.quadrennial_period).to eq("2021-2024")
+      end
+    end
+
+    context "enable advisor accreditation validation" do
+      it "should return true when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:enable_advisor_accreditation_validation)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.enable_advisor_accreditation_validation).to eq(true)
+      end
+
+      it "should return true when the value is blank" do
+        config = CustomVariable.find_by_variable(:enable_advisor_accreditation_validation)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "")
+
+        expect(CustomVariable.enable_advisor_accreditation_validation).to eq(true)
+      end
+
+      it "should return true when it is defined to yes" do
+        config = CustomVariable.find_by_variable(:enable_advisor_accreditation_validation)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "yes")
+
+        expect(CustomVariable.enable_advisor_accreditation_validation).to eq(true)
+      end
+
+      it "should return false when it is defined to no" do
+        config = CustomVariable.find_by_variable(:enable_advisor_accreditation_validation)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "no")
+
+        expect(CustomVariable.enable_advisor_accreditation_validation).to eq(false)
+      end
+    end
   end
 end

@@ -23,6 +23,7 @@ CustomVariable.create([
   { description: "Nota de reprovação por falta", variable: "grade_of_disapproval_for_absence", value: "0.0" },
   { description: "Professor logado no sistema pode lançar notas. O valor yes habilita turmas do semestre atual, yes_all_semesters habilita qualquer semestre.", variable: "professor_login_can_post_grades", value: "no" },
   { description: "Periodo da Avaliação Quadrienal", variable: "quadrennial_period", value: "2021 - 2021" },
+  { description: "Ativa a validação de credenciamento de orientadores no nível da matrícula (yes/no)", variable: "enable_advisor_accreditation_validation", value: "yes" },
 ])
 ProgramLevel.create([{ level: "5", start_date: Time.now, end_date: nil }])
 
