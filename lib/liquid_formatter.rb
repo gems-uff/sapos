@@ -48,34 +48,45 @@ end
 
 class RoleEmail < Liquid::Tag
   def initialize(tag_name, role_name, tokens)
-     super
-     @role_name = role_name.strip
+    super
+    @role_name = role_name.strip
   end
 
   def render(context)
-    Role.find_by(name: @role_name).users.map(&:email).join(';')
+    Role.find_by(name: @role_name).users.map(&:email).join(";")
   end
 end
 
 class LanguageTag < Liquid::Block
   @lang = nil
   def initialize(tag_name, markup, tokens)
-     super
-     
-     @lang = markup.strip.to_sym
+    super
+
+    @lang = markup.strip.to_sym
   end
 
   def render(context)
     old = I18n.locale
     begin
       I18n.locale = @lang
-      return super
+      super
     ensure
       I18n.locale = old
     end
   end
 end
 
+class AlignBlock < Liquid::Block
+  def initialize(tag_name, markup, tokens)
+    super
+    @align = (markup.strip.presence || "justify").to_sym
+  end
+
+  def render(context)
+    content = super
+    "<div style=\"text-align: #{@align};\">#{content}</div>"
+  end
+end
 
 class LiquidFormatter
   @attributes = {}
@@ -98,9 +109,10 @@ class LiquidFormatter
   def format(code)
     env = Liquid::Environment.new
     env.register_filter(SaposLiquidFilters)
-    env.register_tag('emails', RoleEmail)
-    env.register_tag('language', LanguageTag)
+    env.register_tag("emails", RoleEmail)
+    env.register_tag("language", LanguageTag)
+    env.register_tag("align", AlignBlock)
     @template = Liquid::Template.parse(code, environment: env)
-    @template.render(@attributes)    
+    @template.render(@attributes)
   end
 end

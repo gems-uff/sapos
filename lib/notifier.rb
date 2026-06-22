@@ -68,7 +68,17 @@ module Notifier
           old_reply_to = m[:reply_to]
           m[:reply_to] = old_reply_to.to_s.split(",").map(&:strip).reject(&:empty?)
         end
-        actionmailer_base.mail(m).deliver!
+        # actionmailer_base.mail(m).deliver!
+        mail = actionmailer_base.mail(
+          to: m[:to],
+          subject: m[:subject],
+          reply_to: m[:reply_to]
+        ) do |format|
+          plain = m[:body_text] || ActionController::Base.helpers.strip_tags(m[:body].to_s)
+          format.text { plain }
+          format.html { m[:body].to_s.html_safe }
+        end
+        mail.deliver!
         m[:to] = old_to
         m[:reply_to] = old_reply_to unless old_reply_to.nil?
 

@@ -284,7 +284,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_10_193422) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "query_id", null: false
-    t.string "assertion_template"
+    t.text "assertion_template"
     t.boolean "student_can_generate", default: false
     t.integer "expiration_in_months"
     t.string "template_type", default: "Liquid"
@@ -826,8 +826,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_10_193422) do
 
   create_table "program_levels", force: :cascade do |t|
     t.integer "level", null: false
-    t.datetime "start_date", null: false
-    t.datetime "end_date"
+    t.date "start_date", null: false
+    t.date "end_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "ordinance"
@@ -938,6 +938,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_10_193422) do
     t.string "file_name"
     t.integer "invalidated_by_id"
     t.datetime "invalidated_at"
+    t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
+    t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
     t.index ["invalidated_by_id"], name: "index_reports_on_invalidated_by_id"
   end
 
@@ -1071,9 +1073,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_10_193422) do
     t.string "photo", limit: 255
     t.integer "birth_country_id"
     t.integer "user_id", limit: 8
+    t.string "gender"
     t.string "skin_color"
     t.string "pcd"
-    t.string "gender"
     t.string "humanitarian_policy"
     t.text "obs_pcd"
     t.text "obs_gender"
@@ -1149,7 +1151,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_04_10_193422) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
-  add_foreign_key "assertions", "queries"
   add_foreign_key "course_research_lines", "courses"
   add_foreign_key "course_research_lines", "research_lines"
   add_foreign_key "enrollments", "research_lines", on_delete: :nullify

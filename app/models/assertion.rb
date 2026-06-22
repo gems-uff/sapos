@@ -20,7 +20,7 @@ class Assertion < ApplicationRecord
   validates :expiration_in_months, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validates :template_type, presence: true, inclusion: { in: TEMPLATE_TYPES }, allow_blank: false
   validate :only_student_enrollment_param, if: -> { self.student_can_generate }
-  validate :cannot_create_new_erb_template, if: -> { self.template_type == ERB } 
+  validate :cannot_create_new_erb_template, if: -> { self.template_type == ERB }
 
   scope :student_allowed, -> { where(student_can_generate: true) }
 
@@ -28,11 +28,11 @@ class Assertion < ApplicationRecord
     "#{self.name}"
   end
 
-  def query_results(args=nil)
+  def query_results(args = nil)
     self.query.execute(args || self.args)
   end
-   
-  def format_text(args=nil)
+
+  def format_text(args = nil)
     results = self.query_results(args)
     rows = results[:rows]
     columns = results[:columns]

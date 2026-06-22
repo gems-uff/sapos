@@ -76,8 +76,7 @@ module ApplicationHelper
     extra[:required] ||= extra[:required].nil? ?
       config.columns[attribute].required? :
       extra[:required]
-    extra[:multiparameter] ||= extra[:multiparameter].nil? ?
-      true :
+    extra[:multiparameter] ||= extra[:multiparameter].nil? ||
       extra[:multiparameter]
     extra[:force_send] ||= extra[:force_send].nil? ? false : extra[:force_send]
     year_range = CustomVariable.month_year_range
@@ -101,7 +100,7 @@ module ApplicationHelper
                      extra: extra })
   end
 
-  def code_mirror_text_area_widget(column, id, type, options, columns = nil, unique_columns = nil, roles = nil, set_size = false, line_wrapping = false)
+  def code_mirror_text_area_widget(column, id, type, options, set_size = false, line_wrapping = false, local = "", **extra_data)
     if set_size && set_size.is_a?(TrueClass)
       set_size_str = "'#{options[:value].count("\n") + 2}em'"
     elsif set_size
@@ -120,7 +119,7 @@ module ApplicationHelper
           break;
         case 'notifications':
           console.log('notification');
-          createCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str});
+          createEmailCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str}, #{extra_data[:columns].to_json}, #{extra_data[:unique_columns].to_json}, #{extra_data[:roles].to_json}, #{extra_data[:formats].to_json});
           break;
         default:
           createCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str});
@@ -155,10 +154,10 @@ module ApplicationHelper
     record = options[:object]
     carrierwave = record.send(column.name.to_s)
     content = get_column_value(record, column) if carrierwave.file.present?
-    active_scaffold_file_with_remove_link(column, options, content, 'remove_', 'carrierwave_controls') do
+    active_scaffold_file_with_remove_link(column, options, content, "remove_", "carrierwave_controls") do
       cache_field_options = {
       name: options[:name].gsub(/\[#{column.name}\]$/, "[#{column.name}_cache]"),
-      id: options[:id] + '_cache',
+      id: options[:id] + "_cache",
       # Change >
       object: record
         # < Change
