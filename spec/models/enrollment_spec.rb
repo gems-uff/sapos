@@ -98,6 +98,12 @@ RSpec.describe Enrollment, type: :model do
           enrollment.advisements.build(professor: professor2, main_advisor: false)
           expect(enrollment).to have(0).errors_on :base
         end
+        it "the accreditation validation is disabled even without an authorized advisor" do
+          @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "no")
+          professor = FactoryBot.build(:professor)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          expect(enrollment).to have(0).errors_on :base
+        end
       end
     end
     describe "thesis_defense_date" do
