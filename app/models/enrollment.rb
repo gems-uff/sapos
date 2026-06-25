@@ -174,6 +174,7 @@ class Enrollment < ApplicationRecord
   end
 
   def enrollment_has_authorized_advisor
+    return unless CustomVariable.enable_advisor_accreditation_validation
     return if advisements.blank? || level.blank?
     has_authorized = advisements.any? do |a|
       a.professor.present? &&
