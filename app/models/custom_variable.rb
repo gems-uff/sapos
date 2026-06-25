@@ -26,6 +26,7 @@ class CustomVariable < ApplicationRecord
     "academic_calendar_range" => :text,
     "quadrennial_period" => :text,
     "instance_name" => :text,
+    "enable_advisor_accreditation_validation" => :text,
   }
 
   validates :variable, presence: true
@@ -119,6 +120,12 @@ class CustomVariable < ApplicationRecord
   def self.instance_name
     config = CustomVariable.find_by_variable(:instance_name)
     config.blank? ? nil : config.value
+  end
+
+  def self.enable_advisor_accreditation_validation
+    config = CustomVariable.find_by_variable(:enable_advisor_accreditation_validation)
+    return true if config.blank? || config.value.blank?
+    config.value.strip.downcase != "no"
   end
 
   def to_label
