@@ -177,15 +177,15 @@ function replaceWithDict(list, dict){
 
 function listDateFormats(formats){
   parans = {
-    '%A': 'semana',
-    '%B': 'mêsExt',
-    '%b': 'mêsAbrev',
-    '%m': 'mêsNum',
-    '%Y': 'ano',
-    '%H': 'hora',
-    '%M': 'minuto',
-    '%S': 'segundo',
-    '%d': 'dia',
+    '%A': 'segunda',
+    '%B': 'julho',
+    '%b': 'jul',
+    '%m': '07',
+    '%Y': '2011',
+    '%H': '10',
+    '%M': '02',
+    '%S': '10',
+    '%d': '18',
   }
   formatsOptions = [];
   Object.keys(formats).forEach(function(key){ formatsOptions.push(key + ' => ' + formats[key]); });
