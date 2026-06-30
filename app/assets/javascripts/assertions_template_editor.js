@@ -160,9 +160,9 @@ class CodeMIrrorToolbar {
   }
 
   icons = {
-    bold: '<i class="fa-solid fa-bold" aria-hidden="true"></i>',
-    italic: '<i class="fa-solid fa-italic" aria-hidden="true"></i>',
-    align: '<i class="fa-solid fa-align-justify" aria-hidden="true"></i>',
+    bold: '<i class="fa fa-bold" aria-hidden="true"></i>',
+    italic: '<i class="fa fa-italic" aria-hidden="true"></i>',
+    align: '<i class="fa fa-align-justify" aria-hidden="true"></i>',
   }
 }
 
