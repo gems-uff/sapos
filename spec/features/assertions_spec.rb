@@ -88,7 +88,7 @@ RSpec.describe "Assertions features", type: :feature do
     end
 
     it "should have a codemirror for assertion template" do
-      expect(page).to have_selector("#record_assertion_template_ + .CodeMirror", visible: true)
+      expect(page).to have_selector("#record_assertion_template_ + .codemirror-toolbar + .CodeMirror", visible: true)
     end
 
     it "should have a toggable codemirror for the query SQL" do

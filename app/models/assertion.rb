@@ -20,7 +20,7 @@ class Assertion < ApplicationRecord
   validates :expiration_in_months, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validates :template_type, presence: true, inclusion: { in: TEMPLATE_TYPES }, allow_blank: false
   validate :only_student_enrollment_param, if: -> { self.student_can_generate }
-  validate :cannot_create_new_erb_template, if: -> { self.template_type == ERB } 
+  validate :cannot_create_new_erb_template, if: -> { self.template_type == ERB }
 
   scope :student_allowed, -> { where(student_can_generate: true) }
 
@@ -28,11 +28,11 @@ class Assertion < ApplicationRecord
     "#{self.name}"
   end
 
-  def query_results(args=nil)
+  def query_results(args = nil)
     self.query.execute(args || self.args)
   end
-   
-  def format_text(args=nil)
+
+  def format_text(args = nil)
     results = self.query_results(args)
     rows = results[:rows]
     columns = results[:columns]
@@ -55,6 +55,28 @@ class Assertion < ApplicationRecord
     @@disable_erb_validation = true
     yield
     @@disable_erb_validation = false
+  end
+
+  def available_columns(args = {})
+    result = self.query.execute(args)
+    result[:columns] || []
+  rescue => e
+    Rails.logger.error("Error getting available_columns: #{e.message}")
+    []
+  end
+
+  def available_unique_columns(args = {})
+    result = self.query.execute(args)
+    rows = result[:rows] || []
+    columns = result[:columns] || []
+
+    unique = columns.select do |column|
+      rows.all? { |row| row[columns.index(column)] == rows.first[columns.index(column)] }
+    end
+    unique
+  rescue => e
+    Rails.logger.error("Error getting available_unique_columns: #{e.message}")
+    []
   end
 
   private
