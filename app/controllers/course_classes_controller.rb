@@ -111,8 +111,8 @@ class CourseClassesController < ApplicationController
       .joins(:course_type).where(course_types: { on_demand: true })
     @search = search_params
 
-    year_param = search_params&.dig(:year, :from) || search_params&.dig(:year)
-    semester_param = search_params&.dig(:semester, :from) || search_params&.dig(:semester)
+    year_param = search_param_value(:year)
+    semester_param = search_param_value(:semester)
     empty_year_semester = year_param.blank? || semester_param.blank?
 
     if empty_year_semester
@@ -167,6 +167,11 @@ class CourseClassesController < ApplicationController
     end
 
   private
+    def search_param_value(key)
+      value = search_params&.dig(key)
+      value.is_a?(Hash) ? value[:from] : value
+    end
+
     def remove_constraint_to_show_enrollment_column
       Thread.current[:constraint_columns]["class_enrollment-subform"]
         .delete(:enrollment)

@@ -1,6 +1,15 @@
 <%
   basename = options[:name][..-(column.name.size + 3)]
-  data_url = record.present? && record.photo.present? ? download_path(record.photo.medium_hash) : ""
+  data_url = ""
+  if record.present? && record.photo.file.present?
+    if record.photo.file.file.respond_to?(:medium_hash)
+      data_url = download_path(record.photo.medium_hash)
+    else
+      cached = record.photo.file
+      content_type = cached.content_type.presence || "image/jpeg"
+      data_url = "data:#{content_type};base64,#{Base64.strict_encode64(cached.read)}"
+    end
+  end
 %>
 
 <div
