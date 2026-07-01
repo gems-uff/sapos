@@ -164,6 +164,11 @@ RSpec.describe "CourseClasses features", type: :feature do
       click_link_and_wait "Buscar"
     end
 
+    it "should not render the search operator combo (=, null, not_null)" do
+      expect(page).to have_select("search_year")
+      expect(page).to have_no_css("select.as_search_range_option")
+    end
+
     it "should be able to search by name" do
       fill_in "Nome", with: "Ver"
       click_button_and_wait "Buscar"

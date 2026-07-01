@@ -103,6 +103,22 @@ RSpec.describe "Student features", type: :feature do
       expect(Student.last.photo.file).not_to eq nil
     end
 
+    it "should show validation error (and not crash) when saving with a photo and a duplicate CPF" do
+      expect(page).to have_content "Adicionar Aluno"
+      within("#as_#{plural_name}-create--form") do
+        fill_in "Nome", with: "Erica"
+        fill_in "CPF", with: "2"
+        attach_file("Foto", Rails.root + "spec/fixtures/user.png")
+      end
+      click_button_and_wait "Salvar"
+      expect(page).to have_content("CPF já existe")
+      expect(page).to have_css("#as_#{plural_name}-create--form")
+      expect(page).to have_css(
+        "#as_#{plural_name}-create--form img.preview-image[src^='data:image']"
+      )
+      expect(Student.where(name: "Erica")).to be_empty
+    end
+
 
     it "should have city widget for birth_city" do
       expect_to_have_city_widget(page, "birth_city_", "birth_state_", "birth_country_")
