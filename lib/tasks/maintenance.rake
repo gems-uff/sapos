@@ -5,8 +5,22 @@ namespace :maintenance do
   task run: [:environment] do
     Rails.logger.info "[Maintenance] #{Time.now.to_fs} - Starting maintenance tasks"
     Rake::Task["maintenance:remove_expired_reports"].invoke
+    Rake::Task["maintenance:clean_upload_cache"].invoke
     Rake::Task["maintenance:trigger_notifications"].invoke
     Rails.logger.info "[Maintenance] #{Time.now.to_fs} - Finished maintenance tasks"
+  end
+
+  desc "Removes stale CarrierWave upload cache (default: older than 24h)"
+  task clean_upload_cache: [:environment] do
+    Rails.logger.info "[UploadCache] #{Time.now.to_fs} - Cleaning stale CarrierWave cache"
+    # The uploaders set config.root = Rails.root, so the file cache lives in
+    # Rails.root/uploads/tmp. CarrierWave.clean_cached_files! would use the base
+    # uploader (root = public/) and scan the wrong directory, so we clean from the
+    # actual uploader classes. clean_cached_files! only removes cache entries older
+    # than the threshold (default 24h), never touching DB blobs or stored uploads.
+    # The maintenance cron runs daily, so 24h is a safe margin for ongoing uploads.
+    [FormFileUploader, ImageUploader].each(&:clean_cached_files!)
+    Rails.logger.info "[UploadCache] #{Time.now.to_fs} - Finished cleaning cache"
   end
 
   task remove_expired_reports: [:environment] do
