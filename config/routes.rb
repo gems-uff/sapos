@@ -582,6 +582,23 @@ Rails.application.routes.draw do
     concerns :active_scaffold
   end
 
+  resources :carrierwave_files do
+    concerns :active_scaffold
+    collection do
+      post :delete_all
+    end
+  end
+  resources :selection_processes, controller: "admission_data" do
+    concerns :active_scaffold
+    member do
+      get :export
+      get :purge
+    end
+    collection do
+      get :import
+    end
+  end
+
   resources :paper_professors do
     concerns :active_scaffold
   end
