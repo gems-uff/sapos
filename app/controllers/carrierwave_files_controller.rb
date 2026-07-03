@@ -4,6 +4,8 @@
 # frozen_string_literal: true
 
 class CarrierwaveFilesController < ApplicationController
+  include PanelEnabledConcern
+
   helper Panel::CarrierwaveFilesHelper
 
   authorize_resource class: false, instance_name: :panel

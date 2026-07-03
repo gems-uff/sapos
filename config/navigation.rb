@@ -246,7 +246,8 @@ SimpleNavigation::Configuration.run do |navigation|
     end
 
 
-    mainhelper.item :panel, carrierwave_files_path, if: can_read?(:panel) do |submenu|
+    panel_if = -> { CustomVariable.enable_panel && can?(:read, :panel) }
+    mainhelper.item :panel, carrierwave_files_path, if: panel_if do |submenu|
       submenu.item :garbage_collector, carrierwave_files_path, if: can_read?(:garbage_collector)
       submenu.item :admission_data, selection_processes_path, if: can_read?(:admission_data)
     end

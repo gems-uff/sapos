@@ -1,5 +1,6 @@
 pt-BR:
   panel:
+    disabled: "O Painel (Beta) está desabilitado. Habilite a variável \"enable_panel\" para acessá-lo."
     admission_data:
       title: "Gerenciamento de Seleção"
       description: "Gerencie os dados de processos seletivos para otimizar o armazenamento do banco de dados."

@@ -4,6 +4,7 @@
 # frozen_string_literal: true
 
 class AdmissionDataController < ApplicationController
+  include PanelEnabledConcern
   include Panel::AdmissionDataHelper
 
   authorize_resource class: false, instance_name: :panel
