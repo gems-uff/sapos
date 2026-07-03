@@ -84,6 +84,7 @@ class FormFileUploader < CarrierWave::Uploader::Base
   end
 
   def medium_hash
-    file.file.medium_hash
+    inner = file.file if file.respond_to?(:file)
+    inner.medium_hash if inner.respond_to?(:medium_hash)
   end
 end

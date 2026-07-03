@@ -111,19 +111,18 @@ class CourseClassesController < ApplicationController
       .joins(:course_type).where(course_types: { on_demand: true })
     @search = search_params
 
-    empty_year_semester = (
-      search_params.nil? ||
-      search_params[:year].empty? ||
-      search_params[:semester].empty?
-    )
+    year_param = search_param_value(:year)
+    semester_param = search_param_value(:semester)
+    empty_year_semester = year_param.blank? || semester_param.blank?
+
     if empty_year_semester
       flash[:error] = I18n.t(
         "pdf_content.class_schedule.class_schedule_pdf.year_semester_error"
       )
       redirect_to action: :index
     else
-      year = search_params[:year]
-      semester = search_params[:semester]
+      year = year_param
+      semester = semester_param
 
       respond_to do |format|
         format.pdf do
@@ -168,6 +167,11 @@ class CourseClassesController < ApplicationController
     end
 
   private
+    def search_param_value(key)
+      value = search_params&.dig(key)
+      value.is_a?(Hash) ? value[:from] : value
+    end
+
     def remove_constraint_to_show_enrollment_column
       Thread.current[:constraint_columns]["class_enrollment-subform"]
         .delete(:enrollment)
