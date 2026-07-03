@@ -45,10 +45,19 @@ class Professor < ApplicationRecord
 
   before_destroy :handle_user_role_removal
 
-  def create_advisement_points_of_level_method(column_name)
-    self.class.send(:define_method, column_name) {
-      advisement_points(column_name[26..-1])
-    }
+  ADVISEMENT_POINTS_OF_LEVEL_PATTERN =
+    /\Aadvisement_points_of_level(\d+)(_order)?\z/
+
+  def method_missing(name, *args, &block)
+    match = ADVISEMENT_POINTS_OF_LEVEL_PATTERN.match(name.to_s)
+    return super unless match
+
+    points = advisement_points(match[1])
+    match[2] ? points.to_f : points
+  end
+
+  def respond_to_missing?(name, include_private = false)
+    ADVISEMENT_POINTS_OF_LEVEL_PATTERN.match?(name.to_s) || super
   end
 
   # It was considered that active advisements were enrollments without dismissals reasons
