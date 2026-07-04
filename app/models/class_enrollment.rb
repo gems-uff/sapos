@@ -99,11 +99,7 @@ class ClassEnrollment < ApplicationRecord
   end
 
   def course_has_grade
-    if self.try(:course_class).try(:course).try(:course_type).blank?
-      true
-    else
-      self.course_class.course.course_type.has_score
-    end
+    self.try(:course_class).try(:course).try(:course_type).blank? || self.course_class.course.course_type.has_score
   end
 
   def grade=(new_grade)
@@ -230,7 +226,7 @@ class ClassEnrollment < ApplicationRecord
     end
 
     def notify_professor
-      return if self.course_class.blank? || self.course_class.professor.blank?
+      return if self.course_class.blank? || self.course_class.professors.blank?
       class_schedule = ClassSchedule.find_by(year: self.course_class.year, semester: self.course_class.semester)
       return if class_schedule.blank?
       return unless class_schedule.adjust_enroll_insert_open? || class_schedule.adjust_enroll_remove_open?

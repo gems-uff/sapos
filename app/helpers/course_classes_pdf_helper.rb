@@ -102,7 +102,7 @@ module CourseClassesPdfHelper
     pdf.text line, align: :center
     pdf.move_down 5
     pdf.font_size 10
-    pdf.text "#{course_class.professor.name}", align: :center
+    pdf.text "#{course_class.professors_names}", align: :center
   end
 
   def summary_emails_table(pdf, options = {})

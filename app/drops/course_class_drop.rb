@@ -10,4 +10,6 @@ class CourseClassDrop < ActiveRecordAttributesDrop
   define_drop_accessor :label_for_email_subject
   define_drop_accessor :name_with_class
   define_drop_accessor :to_label
+  define_drop_accessor :professors_emails
+  define_drop_accessor :professors_names
 end
