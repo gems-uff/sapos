@@ -38,8 +38,7 @@ class CourseClassesController < ApplicationController
     config.action_links.add "import_grades_xls",
       label: "<i title='Importar Notas' class='fa fa-upload'></i>".html_safe,
       type: :member,
-      position: :replace,
-      crud_type: :update
+      position: :replace
 
 
     config.list.sorting = { name: "ASC", id: "DESC" }
@@ -160,21 +159,33 @@ class CourseClassesController < ApplicationController
       file = params[:spreadsheet]
       minimum_grade_for_approval = CustomVariable.minimum_grade_for_approval
       grades = parse_grades_xlsx(file)
+      @results = []
       grades.each do |id, grade|
         enrollment = Enrollment.find_by(enrollment_number: id)
+        unless enrollment
+          @results << { enrollment_number: id, status: :not_found }
+          next
+        end
         class_enrollment = @course_class.class_enrollments.find_by(enrollment: enrollment)
-        if class_enrollment
+        unless class_enrollment
+          @results << { enrollment_number: id, status: :not_enrolled }
+          next
+        end
+        if class_enrollment.attendance_to_label == ClassEnrollment::ATTENDANCE_FALSE
+          class_enrollment.grade = CustomVariable.grade_of_disapproval_for_absence
+          class_enrollment.situation = ClassEnrollment::DISAPPROVED
+        else
           class_enrollment.grade = grade
-          if class_enrollment.grade.to_i >= minimum_grade_for_approval
-            class_enrollment.situation = ClassEnrollment::APPROVED
-          else
-            class_enrollment.situation = ClassEnrollment::DISAPPROVED
-          end
-          class_enrollment.save
+          class_enrollment.situation = class_enrollment.grade.to_f >= minimum_grade_for_approval.to_f ? ClassEnrollment::APPROVED : ClassEnrollment::DISAPPROVED
+        end
+        if class_enrollment.save
+          @results << { enrollment_number: id, status: :success, grade: class_enrollment.grade, attendance: class_enrollment.attendance_to_label }
+        else
+          @results << { enrollment_number: id, status: :error, errors: class_enrollment.errors.full_messages }
         end
       end
-      flash[:info] = "Notas importadas com sucesso!"
-      return redirect_to course_classes_path
+      flash[:info] = "Importação concluída: #{@results.count { |r| r[:status] == :success }} de #{@results.count} notas atualizadas."
+      render :import_grades_xls_results and return
     end
     respond_to do |format|
       format.html { render layout: false if request.xhr? }

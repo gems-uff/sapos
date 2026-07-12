@@ -358,4 +358,8 @@ small._default_value {
 }
 .grade-input{
     text-align: right;
+    padding-right: 4px !important;
+}
+td:has(> dl[style*="display: none"]) {
+  display: none !important;
 }

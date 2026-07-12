@@ -121,13 +121,14 @@ gem "dotenv-rails", require: "dotenv/load"
 gem "recaptcha", require: "recaptcha/rails"
 
 # xlsx Spreadsheets
+gem "roo"
 gem "rubyzip"
 gem "caxlsx"
 gem "caxlsx_rails"
 # gem "acts_as_xlsx"
 
 # Templates
-gem 'liquid'
+gem "liquid"
 
 # Temporary fix of warnings
 # In the beggining of rails command executions, it shows some warnings related to these gems

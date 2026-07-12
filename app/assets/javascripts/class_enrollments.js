@@ -42,11 +42,18 @@ $(function() {
     $(this).attr('placeholder','');
   });
   $(document).on('input', '.grade-input', function() {
+    var input = this;
+    var cursorPos = input.selectionStart;
+    var oldLength = input.value.length;
     var digits = $(this).val().replace(/\D/g, '');
     if (digits === '') return;
     var number = parseInt(digits, 10);
     var formatted = (number / 10).toFixed(1).replace('.', ',');
     $(this).val(formatted);
+    var newLength = formatted.length;
+    var newCursorPos = cursorPos + (newLength - oldLength);
+    newCursorPos = Math.max(0, Math.min(newCursorPos,newLength));
+    input.setSelectionRange(newCursorPos,newCursorPos);
     var minimum_grade = this.getAttribute('minimum_grade_for_approval');
     var actual_grade = parseFloat(formatted.replace(',','.'));
     if(actual_grade <= 10){ /* sanity check */
@@ -75,18 +82,5 @@ $(function() {
         }, 10);
       }
     }
-  });
-  $(document).on('as:action_success', function() {
-    $('.class_enrollments-sub-form').each(function() {
-      var subform = $(this);
-      if (subform.find('[course_has_grade="false"]').length>0){
-        subform.addClass('hide-score-column');
-      }
-      else{
-        subform.find('.grade-input').val(function(i,value){
-          return value.replace('.',',');
-        });
-      }
-    });
   });
 });

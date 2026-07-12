@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "axlsx"
+require "roo"
 
 module SharedXlsConcern
   extend ActiveSupport::Concern
@@ -52,24 +53,30 @@ module SharedXlsConcern
     raise ArgumentError, "Invalid upload" unless file.is_a?(ActionDispatch::Http::UploadedFile)
 
     original_filename = file.original_filename.to_s
-    valid_filename = original_filename.end_with?(".xlsx") &&
+    extension = File.extname(original_filename).downcase
+    valid_filename = %w[.xlsx .xls].include?(extension) &&
       !original_filename.include?("/") &&
       !original_filename.include?("\\")
     raise ArgumentError, "Invalid file name" unless valid_filename
 
+    spreadsheet = Roo::Spreadsheet.open(file.tempfile.path, extension: extension.delete_prefix("."))
+    sheet = spreadsheet.sheet(0)
+    header_row = sheet.row(1).map { |value| value.to_s.strip }
+
+    enrollment_index = header_row.index(I18n.t("xls_content.course_class.summary.enrollment_number"))
+    grade_index = header_row.index(I18n.t("xls_content.course_class.summary.final_grade"))
+    raise ArgumentError, "Invalid file format" if enrollment_index.nil? || grade_index.nil?
+
     grades = {}
-    Zip::File.open(file.tempfile.path) do |zip|
-      sheet = zip.find_entry("xl/worksheets/sheet1.xml")
-      xml = Nokogiri::XML(sheet.get_input_stream.read)
-      ns = "http://schemas.openxmlformats.org/spreadsheetml/2006/main"
-      xml.xpath("//xmlns:row", "xmlns" => ns).each_with_index do |row, index|
-        next if index == 0
-        enrollment_number = row.at_xpath('xmlns:c[@r[starts-with(., "B")]]//xmlns:v', "xmlns" => ns)&.text
-        grade_node = row.at_xpath('xmlns:c[@r[starts-with(., "E")]]//xmlns:v', "xmlns" => ns)
-        next if enrollment_number.nil?
-        grades[enrollment_number] = grade_node&.text
-      end
+    (2..sheet.last_row).each do |row_number|
+      row = sheet.row(row_number)
+      enrollment_number = row[enrollment_index]&.to_s
+      next if enrollment_number.blank?
+
+      grade_value = row[grade_index]
+      grades[enrollment_number] = grade_value.nil? ? nil : grade_value.to_s
     end
+
     grades
   end
 end

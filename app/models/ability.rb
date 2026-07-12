@@ -171,6 +171,7 @@ class Ability
       can :destroy, PaperProfessor, paper: { owner: nil }
       can :destroy, PaperStudent, paper: { owner: nil }
       can :destroy, Paper, owner: user.professor
+      can :import_grades_xls, CourseClass, professor: user.professor
     end
   end
 

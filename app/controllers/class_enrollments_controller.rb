@@ -35,8 +35,14 @@ class ClassEnrollmentsController < ApplicationController
       format: :i18n_number,
       i18n_options: { format_as: "grade" }
     }
-    config.columns[:grade].css_class = "grade-column"
+
+    config.columns[:grade].hide_form_column_if = proc do |record, _column, _scope|
+      record.respond_to?(:course_has_grade) ? !record.course_has_grade : false
+    end
     config.columns[:grade_not_count_in_gpr].css_class = "grade_not_count_in_gpr-column"
+    config.columns[:grade_not_count_in_gpr].hide_form_column_if = proc do |record, _column, _scope|
+      record.respond_to?(:course_has_grade) ? !record.course_has_grade : false
+    end
     config.columns[:situation].form_ui = :select
     config.columns[:situation].options = {
       options: ClassEnrollment::SITUATIONS,

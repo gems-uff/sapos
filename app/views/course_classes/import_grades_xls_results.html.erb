@@ -1,0 +1,67 @@
+<div class="active-scaffold" style="margin: 10px;">
+  <div class="view">
+    <h2>Resultado da Importação de Notas</h2>
+    <p><%= @course_class.name_with_class %> - <%= @course_class.semester_label %></p>
+
+    <%
+      success_count = @results.count { |r| r[:status] == :success }
+      error_count   = @results.count { |r| r[:status] == :error }
+      not_found_count = @results.count { |r| r[:status] == :not_found }
+      not_enrolled_count = @results.count { |r| r[:status] == :not_enrolled }
+    %>
+
+    <div class="import-summary">
+      <p>
+        <strong><%= success_count %></strong> de <strong><%= @results.count %></strong> notas atualizadas com sucesso.
+        <% if error_count > 0 %>
+          <span style="color: #b00;"><%= error_count %> com erro.</span>
+        <% end %>
+        <% if not_found_count > 0 %>
+          <span style="color: #b00;"><%= not_found_count %> matrícula(s) não encontrada(s).</span>
+        <% end %>
+        <% if not_enrolled_count > 0 %>
+          <span style="color: #b00;"><%= not_enrolled_count %> aluno(s) não inscrito(s) nesta turma.</span>
+        <% end %>
+      </p>
+    </div>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Matrícula</th>
+          <th>Status</th>
+          <th>Nota</th>
+          <th>Detalhes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @results.each do |result| %>
+          <tr class="import-row-<%= result[:status] %>">
+            <td><%= result[:enrollment_number] %></td>
+            <td>
+              <% case result[:status] %>
+              <% when :success %>
+                <span style="color: green;">✓ Sucesso</span>
+              <% when :error %>
+                <span style="color: #b00;">X Erro</span>
+              <% when :not_found %>
+                <span style="color: #b00;">X Matrícula não encontrada</span>
+              <% when :not_enrolled %>
+                <span style="color: #b00;">X Não inscrito nesta turma</span>
+              <% end %>
+            </td>
+            <td><%= number_with_precision(result[:grade].to_f / 10, precision: 1, separator: ",") if result[:grade].present? %></td>
+            <td>
+              <% if result[:status] == :error %>
+                <%= result[:errors].join(", ") %>
+              <% elsif result[:attendance] == ClassEnrollment::ATTENDANCE_FALSE %>
+                <span> Reprovado por falta. </span>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <%= link_to "Voltar", course_classes_path, class: "as_cancel" %>
+</div>
