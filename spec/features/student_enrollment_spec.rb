@@ -45,11 +45,14 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
 
     @destroy_all << FactoryBot.create(:course_research_area, course: @course3, research_area: @research_area3)
     @destroy_all << FactoryBot.create(:course_research_area, course: @course5, research_area: @research_area3)
-
+    
     @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Erica", cpf: "3")
     @destroy_all << @professor2 = FactoryBot.create(:professor, name: "Fiona", cpf: "2")
     @destroy_all << @professor3 = FactoryBot.create(:professor, name: "Gi", cpf: "1")
     @destroy_all << @professor4 = FactoryBot.create(:professor, name: "Helena", cpf: "4")
+
+    @destroy_all << FactoryBot.create(:professor_research_area, research_area: @research_area1, professor: @professor1)
+    @destroy_all << FactoryBot.create(:professor_research_area, research_area: @research_area1, professor: @professor2)
 
     @destroy_all << @institution = FactoryBot.create(:institution, name: "UFF")
 
@@ -108,6 +111,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
 
     # Advisements
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment1, professor: @professor1, main_advisor: true)
+    @enrollment1.reload
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment1, professor: @professor2, main_advisor: false)
 
     # Phases

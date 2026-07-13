@@ -8,6 +8,7 @@ require "spec_helper"
 RSpec.describe EnrollmentStatus, type: :model do
   it { should be_able_to_be_destroyed }
   it { should have_many(:enrollments).dependent(:restrict_with_exception) }
+  it { should have_many(:application_processes).class_name("Admissions::AdmissionProcess").dependent(:nullify) }
 
   let(:enrollment_status) { EnrollmentStatus.new(name: "status") }
   subject { enrollment_status }

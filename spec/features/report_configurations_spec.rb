@@ -109,27 +109,25 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     end
 
     it "should be able to duplicate record with logo" do
-      expect(page.all("tr td.name-column").size).to eq 3
+      expect(page).to have_css("tr td.name-column", count: 3)
       find("#as_#{plural_name}-duplicate-#{@record.id}-link").click
-      wait_for_ajax
-      expect(page.all("tr td.name-column").size).to eq 4
+      expect(page).to have_css("tr td.name-column", count: 4)
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
+      expect(page).to have_css("tr td.name-column", count: 3)
       visit current_path
-      expect(page.all("tr td.name-column").size).to eq 3
+      expect(page).to have_css("tr td.name-column", count: 3)
     end
 
     it "should be able to duplicate record without logo" do
-      expect(page.all("tr td.name-column").size).to eq 3
+      expect(page).to have_css("tr td.name-column", count: 3)
       find("#as_#{plural_name}-duplicate-#{@record2.id}-link").click
-      wait_for_ajax
-      expect(page.all("tr td.name-column").size).to eq 4
+      expect(page).to have_css("tr td.name-column", count: 4)
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
-      sleep(0.2)
+      expect(page).to have_css("tr td.name-column", count: 3)
       visit current_path
-      expect(page.all("tr td.name-column").size).to eq 3
+      expect(page).to have_css("tr td.name-column", count: 3)
     end
   end
 

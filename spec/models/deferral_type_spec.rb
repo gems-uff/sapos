@@ -46,6 +46,14 @@ RSpec.describe DeferralType, type: :model do
   end
 
   describe "Class methods" do
+    describe "duration" do
+      it "should return a hash with semesters, months, and days" do
+        deferral_type.duration_semesters = 1
+        deferral_type.duration_months = 2
+        deferral_type.duration_days = 3
+        expect(deferral_type.duration).to eq({ semesters: 1, months: 2, days: 3 })
+      end
+    end
     describe "find_all_for_enrollment" do
       it "should return all deferral_types if enrollment is nil" do
         @destroy_later << FactoryBot.create(:deferral_type)

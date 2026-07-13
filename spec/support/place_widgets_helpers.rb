@@ -15,42 +15,40 @@ module PlaceWidgetsHelpers
     destroy_later << FactoryBot.create(:city, name: "Campinas", state: state12)
   end
 
+  # Uses waiting matchers (have_select) instead of wait_for_ajax + page.all,
+  # which asserted on whatever was in the DOM at that instant and failed if
+  # the cascade AJAX had not repopulated the options yet. Selecting an option
+  # that only exists after a cascade (e.g. "RJ" after picking "Brasil") also
+  # waits, because find(:option, text:) retries until the option appears.
   def expect_to_have_city_widget(page, city_field, state_field, country_field)
-    expect(page.all("select#widget_record_#{city_field} option").map(&:text)).to eq ["Selecione a cidade"]
-    expect(page.all("select#widget_record_#{state_field} option").map(&:text)).to eq ["Selecione o estado"]
-    expect(page.all("select#widget_record_#{country_field} option").map(&:text)).to eq ["Selecione o país", "Brasil", "USA"]
+    city_select = "widget_record_#{city_field}"
+    state_select = "widget_record_#{state_field}"
+    country_select = "widget_record_#{country_field}"
 
-    find(:select, "widget_record_#{country_field}").find(:option, text: "Brasil").select_option
-    wait_for_ajax
-    expect(page.all("select#widget_record_#{state_field} option").map(&:text)).to eq ["Selecione o estado", "RJ", "SP"]
-    find(:select, "widget_record_#{country_field}").find(:option, text: "Selecione o país").select_option
-    wait_for_ajax
-    expect(page.all("select#widget_record_#{state_field} option").map(&:text)).to eq ["Selecione o estado"]
-    find(:select, "widget_record_#{country_field}").find(:option, text: "Brasil").select_option
-    wait_for_ajax
+    expect(page).to have_select(city_select, options: ["Selecione a cidade"])
+    expect(page).to have_select(state_select, options: ["Selecione o estado"])
+    expect(page).to have_select(country_select, options: ["Selecione o país", "Brasil", "USA"])
 
-    find(:select, "widget_record_#{state_field}").find(:option, text: "RJ").select_option
-    wait_for_ajax
-    expect(page.all("select#widget_record_#{city_field} option").map(&:text)).to eq ["Selecione a cidade", "Niteroi", "Rio"]
-    find(:select, "widget_record_#{state_field}").find(:option, text: "Selecione o estado").select_option
-    wait_for_ajax
-    expect(page.all("select#widget_record_#{city_field} option").map(&:text)).to eq ["Selecione a cidade"]
-    find(:select, "widget_record_#{state_field}").find(:option, text: "RJ").select_option
-    wait_for_ajax
+    find(:select, country_select).find(:option, text: "Brasil").select_option
+    expect(page).to have_select(state_select, options: ["Selecione o estado", "RJ", "SP"])
+    find(:select, country_select).find(:option, text: "Selecione o país").select_option
+    expect(page).to have_select(state_select, options: ["Selecione o estado"])
+    find(:select, country_select).find(:option, text: "Brasil").select_option
 
-    find(:select, "widget_record_#{city_field}").find(:option, text: "Niteroi").select_option
-    wait_for_ajax
-    find(:select, "widget_record_#{state_field}").find(:option, text: "Selecione o estado").select_option
-    wait_for_ajax
-    expect(page.all("select#widget_record_#{city_field} option").map(&:text)).to eq ["Selecione a cidade"]
-    find(:select, "widget_record_#{state_field}").find(:option, text: "RJ").select_option
-    wait_for_ajax
-    find(:select, "widget_record_#{city_field}").find(:option, text: "Niteroi").select_option
-    wait_for_ajax
-    find(:select, "widget_record_#{country_field}").find(:option, text: "Selecione o país").select_option
-    wait_for_ajax
-    expect(page.all("select#widget_record_#{state_field} option").map(&:text)).to eq ["Selecione o estado"]
-    expect(page.all("select#widget_record_#{city_field} option").map(&:text)).to eq ["Selecione a cidade"]
+    find(:select, state_select).find(:option, text: "RJ").select_option
+    expect(page).to have_select(city_select, options: ["Selecione a cidade", "Niteroi", "Rio"])
+    find(:select, state_select).find(:option, text: "Selecione o estado").select_option
+    expect(page).to have_select(city_select, options: ["Selecione a cidade"])
+    find(:select, state_select).find(:option, text: "RJ").select_option
+
+    find(:select, city_select).find(:option, text: "Niteroi").select_option
+    find(:select, state_select).find(:option, text: "Selecione o estado").select_option
+    expect(page).to have_select(city_select, options: ["Selecione a cidade"])
+    find(:select, state_select).find(:option, text: "RJ").select_option
+    find(:select, city_select).find(:option, text: "Niteroi").select_option
+    find(:select, country_select).find(:option, text: "Selecione o país").select_option
+    expect(page).to have_select(state_select, options: ["Selecione o estado"])
+    expect(page).to have_select(city_select, options: ["Selecione a cidade"])
   end
 
   def expect_to_have_identity_issuing_place_widget(page, field, record_id = "")

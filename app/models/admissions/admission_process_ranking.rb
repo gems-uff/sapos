@@ -92,7 +92,9 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
                   ngroups = readjust_groups
                   nprocess_vacancies = readjust_process_vacancies
                 end
-                process.decrease_vacancies_and_check_remaining!(ngroups, nprocess_vacancies)
+                if !process.decrease_vacancies_and_check_remaining!(ngroups, nprocess_vacancies)
+                  processes.delete(process)
+                end
               end
             end
             break

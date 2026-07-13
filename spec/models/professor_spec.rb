@@ -102,6 +102,8 @@ RSpec.describe Professor, type: :model do
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: other_enrollment)
 
+        other_enrollment.reload
+
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: other_enrollment, main_advisor: false)
 
         expect(professor.advisement_points).to eql("1.5")
@@ -125,6 +127,7 @@ RSpec.describe Professor, type: :model do
 
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: other_enrollment)
+        other_enrollment.reload
 
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: other_enrollment, main_advisor: false)
 
@@ -154,8 +157,10 @@ RSpec.describe Professor, type: :model do
           @destroy_later << enrollment2 = FactoryBot.create(:enrollment, level: @level2)
 
           @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: enrollment1)
-          @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: enrollment2, main_advisor: false)
           @destroy_later << FactoryBot.create(:advisement, professor: @professor2, enrollment: enrollment2)
+          enrollment1.reload
+          enrollment2.reload
+          @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: enrollment2, main_advisor: false)
           @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: enrollment1, main_advisor: false)
           @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: enrollment2, main_advisor: false)
         end
@@ -231,6 +236,7 @@ RSpec.describe Professor, type: :model do
         @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor, level: enrollment.level)
 
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
+        enrollment.reload
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: enrollment, main_advisor: false)
 
         expect(professor.advisement_point(enrollment)).to eql(1.0)
@@ -248,6 +254,7 @@ RSpec.describe Professor, type: :model do
         @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor, level: enrollment.level)
 
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
+        enrollment.reload
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: enrollment, main_advisor: false)
 
         expect(professor.advisement_point(enrollment)).to eql(2.0)
@@ -262,6 +269,7 @@ RSpec.describe Professor, type: :model do
         @destroy_later << FactoryBot.create(:advisement_authorization, professor: other_professor, level: enrollment.level)
 
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
+        enrollment.reload
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: enrollment, main_advisor: false)
 
         expect(professor.advisement_point(enrollment)).to eql(0.5)
@@ -280,6 +288,7 @@ RSpec.describe Professor, type: :model do
         @destroy_later << FactoryBot.create(:advisement_authorization, professor: other_professor, level: enrollment.level)
 
         @destroy_later << FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
+        enrollment.reload
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: enrollment, main_advisor: false)
 
         expect(professor.advisement_point(enrollment)).to eql(1.0)

@@ -66,6 +66,24 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
     end
     describe "letters" do
       context "should be valid when" do
+        it "letter_template is present when min_letters is filled" do
+          admission_process.min_letters = 1
+          admission_process.max_letters = nil
+          admission_process.letter_template = FactoryBot.create(:form_template)
+          @destroy_later << admission_process.letter_template
+          expect(admission_process).to have(0).errors_on :letter_template
+          admission_process.min_letters = nil
+          admission_process.letter_template = nil
+        end
+        it "letter_template is present when max_letters is filled" do
+          admission_process.min_letters = nil
+          admission_process.max_letters = 2
+          admission_process.letter_template = FactoryBot.create(:form_template)
+          @destroy_later << admission_process.letter_template
+          expect(admission_process).to have(0).errors_on :letter_template
+          admission_process.max_letters = nil
+          admission_process.letter_template = nil
+        end
         it "max_letters is nil" do
           admission_process.min_letters = 1
           admission_process.max_letters = nil
@@ -86,6 +104,22 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
           admission_process.max_letters = 1
           expect(admission_process).to have_error(:max_greater_than_min_letters).on :base
           admission_process.min_letters = nil
+          admission_process.max_letters = nil
+        end
+      end
+      context "should have error blank on letter_template when" do
+        it "min_letters is filled and letter_template is nil" do
+          admission_process.min_letters = 1
+          admission_process.max_letters = nil
+          admission_process.letter_template = nil
+          expect(admission_process).to have_error(:blank).on :letter_template
+          admission_process.min_letters = nil
+        end
+        it "max_letters is filled and letter_template is nil" do
+          admission_process.min_letters = nil
+          admission_process.max_letters = 2
+          admission_process.letter_template = nil
+          expect(admission_process).to have_error(:blank).on :letter_template
           admission_process.max_letters = nil
         end
       end
@@ -122,7 +156,6 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
           )
           expect(admission_process).to have(0).errors_on :simple_url
         end
-
       end
       context "should have error simple_url_integer when" do
         it "it is a number" do
@@ -143,7 +176,6 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
           expect(admission_process).to have_error(:simple_url_collides_in_date_range).on :simple_url
         end
       end
-
     end
   end
   describe "Duplication" do

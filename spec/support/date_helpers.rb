@@ -22,10 +22,13 @@ module DateHelpers
     find(:select, "#{field}_year").find(:option, text: date.year.to_s).select_option
   end
 
+  # Uses waiting matchers (have_select) instead of page.all, which asserted on
+  # whatever was in the DOM at that instant and failed if the AJAX-loaded form
+  # had not rendered the widget yet.
   def expect_to_have_month_year_widget_i(record, field, blank = nil)
     months = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
     months = [blank] + months unless blank.nil?
-    expect(page.all("select#record_#{field}_2i option").map(&:text)).to eq months
-    expect(page.all("select#record_#{field}_1i option").map(&:text)).to include(1.years.ago.year.to_s, 1.years.since.year.to_s)
+    expect(page).to have_select("record_#{field}_2i", options: months)
+    expect(page).to have_select("record_#{field}_1i", with_options: [1.years.ago.year.to_s, 1.years.since.year.to_s])
   end
 end

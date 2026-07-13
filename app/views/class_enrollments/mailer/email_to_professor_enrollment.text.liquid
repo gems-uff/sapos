@@ -1,0 +1,5 @@
+{{ record.course_class.professor.name }},
+
+Informamos que a {% if destroyed %}remoção de inscrição de {% else %}inscrição de {% endif %}{{ record.enrollment.to_label }} na turma {{ record.course_class.label_for_email_subject }} foi realizada.
+
+{{ variables.notification_footer }}
