@@ -28,6 +28,13 @@ module SharedXlsConcern
     p.to_stream.read
   end
 
+  def extract_cell(row, index)
+    return nil if index.nil?
+    return nil if index >= row.length
+    value = row[index]
+    return nil if value.nil?
+    value.to_s.strip.presence
+  end
 
   def build_summary_row(class_enrollment, index)
     [
@@ -49,7 +56,7 @@ module SharedXlsConcern
     I18n.t("xls_content.course_class.summary.#{key}")
   end
 
-  def parse_grades_xlsx(file)
+  def parse_rows_xls(file)
     raise ArgumentError, "Invalid upload" unless file.is_a?(ActionDispatch::Http::UploadedFile)
 
     original_filename = file.original_filename.to_s
@@ -65,18 +72,26 @@ module SharedXlsConcern
 
     enrollment_index = header_row.index(I18n.t("xls_content.course_class.summary.enrollment_number"))
     grade_index = header_row.index(I18n.t("xls_content.course_class.summary.final_grade"))
+    attendance_index = header_row.index(I18n.t("xls_content.course_class.summary.attendance"))
+    situation_index = header_row.index(I18n.t("xls_content.course_class.summary.situation"))
+    obs_index = header_row.index(I18n.t("xls_content.course_class.summary.obs"))
     raise ArgumentError, "Invalid file format" if enrollment_index.nil? || grade_index.nil?
 
-    grades = {}
+    rows = {}
+    return rows if sheet.last_row < 2
     (2..sheet.last_row).each do |row_number|
       row = sheet.row(row_number)
+      next if row.blank?
       enrollment_number = row[enrollment_index]&.to_s
       next if enrollment_number.blank?
 
-      grade_value = row[grade_index]
-      grades[enrollment_number] = grade_value.nil? ? nil : grade_value.to_s
+      rows[enrollment_number] = {
+        grade: extract_cell(row, grade_index),
+        attendance: extract_cell(row, attendance_index),
+        situation: extract_cell(row, situation_index),
+        obs: extract_cell(row, obs_index)
+      }
     end
-
-    grades
+    rows
   end
 end

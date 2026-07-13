@@ -1,26 +1,39 @@
-<div class="active-scaffold" style="margin: 10px;">
+<div class="active-scaffold" style="margin:10px;">
   <div class="view">
-    <h2>Resultado da Importação de Notas</h2>
-    <p><%= @course_class.name_with_class %> - <%= @course_class.semester_label %></p>
+    <h2>Pré-visualização da Importação de Notas</h2>
 
-    <%
-      success_count = @results.count { |r| r[:status] == :success }
-      error_count   = @results.count { |r| r[:status] == :error }
-      not_found_count = @results.count { |r| r[:status] == :not_found }
-      not_enrolled_count = @results.count { |r| r[:status] == :not_enrolled }
+    <p>
+      <%= @course_class.name_with_class %> -
+      <%= @course_class.semester_label %>
+    </p>
+
+    <% 
+      pending_count      = @results.count { |r| r[:status] == "pending" } 
+      not_found_count    = @results.count { |r| r[:status] == "not_found" } 
+      not_enrolled_count = @results.count { |r| r[:status] == "not_enrolled" } 
+      inconsistent_count = @results.count { |r| r[:status] == "pending" && (r[:grade_diff] || r[:situation_diff]) }
     %>
 
     <div class="import-summary">
       <p>
-        <strong><%= success_count %></strong> de <strong><%= @results.count %></strong> notas atualizadas com sucesso.
-        <% if error_count > 0 %>
-          <span style="color: #b00;"><%= error_count %> com erro.</span>
-        <% end %>
+        <strong><%= pending_count %></strong> registros prontos para importação.
+
         <% if not_found_count > 0 %>
-          <span style="color: #b00;"><%= not_found_count %> matrícula(s) não encontrada(s).</span>
+          <span style="color:#b00">
+            <%= not_found_count %> matrícula(s) não encontrada(s).
+          </span>
         <% end %>
+
         <% if not_enrolled_count > 0 %>
-          <span style="color: #b00;"><%= not_enrolled_count %> aluno(s) não inscrito(s) nesta turma.</span>
+          <span style="color:#b00">
+            <%= not_enrolled_count %> aluno(s) não inscrito(s).
+          </span>
+        <% end %>
+
+        <% if inconsistent_count > 0 %>
+          <span style="color:#b00">
+            <%= inconsistent_count %> registro(s) com possível inconsistência entre nota/frequência e situação informada na planilha.
+          </span>
         <% end %>
       </p>
     </div>
@@ -30,38 +43,85 @@
         <tr>
           <th>Matrícula</th>
           <th>Status</th>
-          <th>Nota</th>
-          <th>Detalhes</th>
+          <th>Nota atual</th>
+          <th>Situação atual</th>
+          <th>Nota nova</th>
+          <th>Situação nova</th>
+          <th>Obs.</th>
         </tr>
       </thead>
+
       <tbody>
         <% @results.each do |result| %>
-          <tr class="import-row-<%= result[:status] %>">
+
+          <tr>
+
             <td><%= result[:enrollment_number] %></td>
+
             <td>
               <% case result[:status] %>
-              <% when :success %>
-                <span style="color: green;">✓ Sucesso</span>
-              <% when :error %>
-                <span style="color: #b00;">X Erro</span>
-              <% when :not_found %>
-                <span style="color: #b00;">X Matrícula não encontrada</span>
-              <% when :not_enrolled %>
-                <span style="color: #b00;">X Não inscrito nesta turma</span>
+              <% when "pending" %>
+                <span style="color:green;">Pronto</span>
+
+              <% when "not_found" %>
+                <span style="color:#b00;">Matrícula não encontrada</span>
+
+              <% when "not_enrolled" %>
+                <span style="color:#b00;">Aluno não inscrito</span>
               <% end %>
             </td>
-            <td><%= number_with_precision(result[:grade].to_f / 10, precision: 1, separator: ",") if result[:grade].present? %></td>
+
             <td>
-              <% if result[:status] == :error %>
-                <%= result[:errors].join(", ") %>
-              <% elsif result[:attendance] == ClassEnrollment::ATTENDANCE_FALSE %>
-                <span> Reprovado por falta. </span>
+              <%= result[:current_grade].presence || "—" %>
+            </td>
+
+            <td>
+              <%= result[:current_situation].presence || "—" %> 
+            </td>
+
+            <td>
+              <%= result[:final_grade].presence || "—" %>
+
+              <% if result[:grade_diff] %>
+                <span style="color:#b00;" title="A nota calculada diverge da nota informada na planilha. Verifique a consistência entre nota e situação.">*</span>
               <% end %>
             </td>
+
+            <td>
+              <%= result[:final_situation].presence || "—" %>
+              <% if result[:status] == "pending" && !result[:final_attendance] %>
+                <span style="background:#e2e3e5; color:#41464b; font-size:0.75em; padding:1px 3px; border-radius:3px;">por falta</span>
+              <% end %>
+               <% if result[:situation_diff] %>
+                <span style="color:#b00;" title="A situação calculada diverge da situação informada na planilha. Verifique a consistência entre nota, frequência e situação.">*</span>
+              <% end %>
+            </td>
+
+            <td>
+              <%= result[:final_obs].presence || "—" %>
+            </td>
+
           </tr>
+
         <% end %>
       </tbody>
     </table>
+
+    <p>
+      <span style="color:#b00;">*</span>
+      O valor recalculado pelo sistema diverge do valor informado na planilha. Isso pode indicar uma inconsistência entre a nota, a frequência e a situação lançadas (por exemplo, situação "Aprovado" para um aluno com frequência insuficiente). Confira os dados antes de confirmar.
+    </p>
+
+    <%= form_tag import_grades_xls_course_class_path(@course_class), method: :post do %>
+
+      <%= hidden_field_tag :confirm, "1" %>
+      <%= hidden_field_tag :changes, @results.to_json %>
+
+      <%= submit_tag "Aceitar", class: "as_action" %>
+
+      <%= link_to "Cancelar", course_classes_path, class: "as_cancel" %>
+
+    <% end %>
+
   </div>
-  <%= link_to "Voltar", course_classes_path, class: "as_cancel" %>
 </div>
