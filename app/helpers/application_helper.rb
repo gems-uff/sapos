@@ -108,18 +108,17 @@ module ApplicationHelper
     else
       set_size_str = "null"
     end
-    block = text_area(:record, :sql_query, options)
 
+    block = text_area(:record, :sql_query, options)
     block + "<script>
     (function(){
       const mode = #{local.to_json};
       switch(mode) {
         case 'assertions':
-          createPDFCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str}, #{extra_data[:columns].to_json}, #{extra_data[:unique_columns].to_json}, #{extra_data[:roles].to_json}, #{extra_data[:formats].to_json});
+          createPDFCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str}, #{extra_data.to_json});
           break;
         case 'notifications':
-          console.log('notification');
-          createEmailCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str}, #{extra_data[:columns].to_json}, #{extra_data[:unique_columns].to_json}, #{extra_data[:roles].to_json}, #{extra_data[:formats].to_json});
+          createEmailCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str}, #{extra_data.to_json});
           break;
         default:
           createCodeMirror('#{id}', '#{type}', #{line_wrapping ? "true" : "false"}, #{set_size_str});

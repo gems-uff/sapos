@@ -1,7 +1,10 @@
+const CodeMirrorEditorsOpens = new Set();
+
 class CodeMIrrorToolbar {
   constructor(editor) {
     this.editor = editor;
     this.buttons = [];
+    this.icons = this._icons();
   }
 
   addButton(html, title, onClick) {
@@ -16,13 +19,13 @@ class CodeMIrrorToolbar {
 
   addChoiceButton(html, title, options, formatFn) {
     this.buttons.push(this._makeToolbarButton(html, title, (ev) => {
-      this._showOptionsMenu(ev.currentTarget, options, this._choiceOptionsMenu.bind(this),formatFn);
+      this._showOptionsMenu(ev.currentTarget, options, (fn, opt) => this._choiceOptionsMenu(fn, opt), formatFn);
     }));
   }
 
   addChoiceWrapButton(html, title, options, wrapperFn) {
     this.buttons.push(this._makeToolbarButton(html, title, (ev) => {
-      this._showOptionsMenu(ev.currentTarget, options, this._choiceWrapOptionsMenu.bind(this), wrapperFn);
+      this._showOptionsMenu(ev.currentTarget, options, (fn, opt) => this._choiceWrapOptionsMenu(fn, opt, options), wrapperFn);
     }));
   }
 
@@ -88,11 +91,37 @@ class CodeMIrrorToolbar {
     self.editor.focus();
   }
 
-  _choiceWrapOptionsMenu(wrapperFn, opt) {
-    var self = this;
-    var wrapper1 = wrapperFn(opt)[0];
-    var wrapper2 = wrapperFn(opt)[1];
-    this._toggleWrapSelection(wrapper1, wrapper2);
+  _choiceWrapOptionsMenu(wrapperFn, opt, options) {
+    var [new_wrapper_0, new_wrapper_1] = wrapperFn(opt);
+    
+    var doc = this.editor.getDoc();
+    var sel = doc.getSelection();
+    
+    if (!sel) {
+      var pos = doc.getCursor();
+      doc.replaceRange(new_wrapper_0 + new_wrapper_1, pos);
+      doc.setCursor({ line: pos.line+1, ch: 0 });
+      this.editor.focus();
+      return;
+    }
+    
+    
+    var [regexp_0, regexp_1] = wrapperFn('(' + options.join('|') + ')');
+    var regexp = new RegExp(regexp_0 + '[\\s\\S]*?' + regexp_1);
+    var wrapper_opt = sel.match(regexp);
+    if (wrapper_opt && wrapper_opt.length > 0) {
+      var [old_wrapper_0, old_wrapper_1] = wrapperFn(wrapper_opt[1]);
+      if (old_wrapper_0 === new_wrapper_0 && old_wrapper_1 === new_wrapper_1) {
+        doc.replaceSelection(sel.slice(old_wrapper_0.length, sel.length - old_wrapper_1.length));
+      } else {
+        doc.replaceSelection(new_wrapper_0 + sel.slice(old_wrapper_0.length, sel.length - old_wrapper_1.length) + new_wrapper_1);
+      }
+      this.editor.focus();
+      return;
+    }
+
+    doc.replaceSelection(new_wrapper_0 + sel + new_wrapper_1);
+    this.editor.focus();
   }
 
 
@@ -159,10 +188,12 @@ class CodeMIrrorToolbar {
     }
   }
 
-  icons = {
-    bold: '<i class="fa fa-bold" aria-hidden="true"></i>',
-    italic: '<i class="fa fa-italic" aria-hidden="true"></i>',
-    align: '<i class="fa fa-align-justify" aria-hidden="true"></i>',
+  _icons() {
+    return {
+      bold: '<i class="fa fa-bold" aria-hidden="true"></i>',
+      italic: '<i class="fa fa-italic" aria-hidden="true"></i>',
+      align: '<i class="fa fa-align-justify" aria-hidden="true"></i>',
+    }
   }
 }
 
@@ -176,7 +207,7 @@ function replaceWithDict(list, dict){
 }
 
 function listDateFormats(formats){
-  parans = {
+  var parans = {
     '%A': 'segunda',
     '%B': 'julho',
     '%b': 'jul',
@@ -187,12 +218,12 @@ function listDateFormats(formats){
     '%S': '10',
     '%d': '18',
   }
-  formatsOptions = [];
+  var formatsOptions = [];
   Object.keys(formats).forEach(function(key){ formatsOptions.push(key + ' => ' + formats[key]); });
   return replaceWithDict(formatsOptions, parans)
 }
 
-function createCodeMirror(taId, codetype, lineWrapping, set_size_str){
+function createCodeMirror(taId, codetype, lineWrapping, set_size_str) {
   var editor = CodeMirror.fromTextArea(document.getElementById(taId),
     {mode: codetype,
     indentWithTabs: true,
@@ -207,11 +238,48 @@ function createCodeMirror(taId, codetype, lineWrapping, set_size_str){
   if (set_size_str) {
     editor.setSize(null, set_size_str);
   }
+
+  if (CodeMirrorEditorsOpens.has(taId)) {
+    if (window.CodeMirrorEditors && window.CodeMirrorEditors[taId]) {
+      var value = window.CodeMirrorEditors[taId].getValue();
+      var doc = window.CodeMirrorEditors[taId].getDoc();
+      editor.setValue(value);
+    }
+  }
+  CodeMirrorEditorsOpens.add(taId);
+  bindEditorLifecycle(taId);
   return editor;
 }
 
+function bindEditorLifecycle(taId) {
 
-function createPDFCodeMirror(taId, codetype, lineWrapping, set_size_str, columns, unique_columns, roles, formats){ 
+  var textarea = document.getElementById(taId);
+  if (!textarea) return;
+  var form = textarea.closest('form');
+  if (!form) return;
+  var tr_form = form.closest('tr');
+  if (!tr_form) return;
+
+  const botoes_cancelar =   tr_form.querySelectorAll('.as_cancel');
+  const botoes_salvar =   tr_form.querySelectorAll('.submit');
+
+  botoes_cancelar.forEach(function(botao) {
+    botao.addEventListener('click', function(evento) {
+      // evento.preventDefault();
+      CodeMirrorEditorsOpens.delete(taId);
+
+    }, { once: true });
+  });
+
+  botoes_salvar.forEach(function(botao) {
+    botao.addEventListener('click', function(evento) {
+      // evento.preventDefault();
+      CodeMirrorEditorsOpens.delete(taId);
+    }, { once: true });
+  });
+}
+
+function createPDFCodeMirror(taId, codetype, lineWrapping, set_size_str, extra_data = {}){
   var editor = createCodeMirror(taId, codetype, lineWrapping, set_size_str);
   window.CodeMirrorEditors = window.CodeMirrorEditors || {};
   window.CodeMirrorEditors[taId] = editor;
@@ -220,31 +288,32 @@ function createPDFCodeMirror(taId, codetype, lineWrapping, set_size_str, columns
       // cria botão helper
       const toolbar = new CodeMIrrorToolbar(editor);
       // formatação de texto
-      toolbar.addWrapButton(toolbar.icons.bold, 'Negrito', '<b>', '</b>');
-      toolbar.addWrapButton(toolbar.icons.italic, 'Itálico', '<i>', '</i>');
+      toolbar.addWrapButton(toolbar.icons.bold, 'Negrito', '<strong>', '</strong>');
+      toolbar.addWrapButton(toolbar.icons.italic, 'Itálico', '<em>', '</em>');
       toolbar.addChoiceWrapButton(toolbar.icons.align, 'Alinhamento', ['left', 'center', 'right', 'justify'], function(choice){
         return ['{% align ' + choice + ' %}\n','\n{% endalign %}'];
       });
       // variáveis e estruturas
-      toolbar.addChoiceButton('Coluna', 'Variável {{ coluna }}', unique_columns, function(choice){ return '{{ ' + choice + ' }}'; });
-      toolbar.addChoiceButton('Record', 'Variavel {{ record }}', columns, function(choice){ return '{{ record.' + choice + ' }}'; });
+      toolbar.addChoiceButton('Coluna', 'Variável {{ coluna }}', extra_data['unique_columns'], function(choice){ return '{{ ' + choice + ' }}'; });
+      toolbar.addChoiceButton('Record', 'Variavel {{ record }}', extra_data['columns'], function(choice){ return '{{ record.' + choice + ' }}'; });
       toolbar.addWrapButton('Loop', 'Loop {% for record in records %}', '{% for record in records %}', '{% endfor %}');
       // Filtros
-      toolbar.addChoiceButton('Data', 'Filtro de Data', listDateFormats(formats), function(choice){
+      toolbar.addChoiceButton('Data', 'Filtro de Data', listDateFormats(extra_data['formats']), function(choice){
         return ' | localize: \''+choice.split(' => ')[0]+'\' ';
       });
       // Tags
       toolbar.addWrapButton('Linguagem En', 'Tag (Language en)', '{% language en %}', '{% endlanguage %}');
-      toolbar.addChoiceButton('Email', 'Tag de Email', roles, function(choice){
+      toolbar.addChoiceButton('Email', 'Tag de Email', extra_data['roles'], function(choice){
         return '\n{% emails ' + choice + ' %}\n';
       });
       // criar toolbar
       toolbar.createToolbar();
     }
   } catch (e) { console.error('toolbar create error', e); }
+
 }
 
-function createEmailCodeMirror(taId, codetype, lineWrapping, set_size_str, columns, unique_columns, roles, formats){ 
+function createEmailCodeMirror(taId, codetype, lineWrapping, set_size_str, extra_data = {}){ 
   var editor = createCodeMirror(taId, codetype, lineWrapping, set_size_str);
   window.CodeMirrorEditors = window.CodeMirrorEditors || {};
   window.CodeMirrorEditors[taId] = editor;
@@ -253,22 +322,22 @@ function createEmailCodeMirror(taId, codetype, lineWrapping, set_size_str, colum
       // cria botão helper
       const toolbar = new CodeMIrrorToolbar(editor);
       // formatação de texto
-      toolbar.addWrapButton(toolbar.icons.bold, 'Negrito', '<b>', '</b>');
-      toolbar.addWrapButton(toolbar.icons.italic, 'Itálico', '<i>', '</i>');
+      toolbar.addWrapButton(toolbar.icons.bold, 'Negrito', '<strong>', '</strong>');
+      toolbar.addWrapButton(toolbar.icons.italic, 'Itálico', '<em>', '</em>');
       toolbar.addChoiceWrapButton(toolbar.icons.align, 'Alinhamento', ['left', 'center', 'right', 'justify'], function(choice){
         return ['{% align ' + choice + ' %}\n','\n{% endalign %}'];
       });
       // variáveis e estruturas
-      toolbar.addChoiceButton('Coluna', 'Variável {{ coluna }}', unique_columns, function(choice){ return '{{ ' + choice + ' }}'; });
-      toolbar.addChoiceButton('Record', 'Variavel {{ record }}', columns, function(choice){ return '{{ record.' + choice + ' }}'; });
+      toolbar.addChoiceButton('Coluna', 'Variável {{ coluna }}', extra_data['unique_columns'], function(choice){ return '{{ ' + choice + ' }}'; });
+      toolbar.addChoiceButton('Record', 'Variavel {{ record }}', extra_data['columns'], function(choice){ return '{{ record.' + choice + ' }}'; });
       toolbar.addWrapButton('Loop', 'Loop {% for record in records %}', '{% for record in records %}', '{% endfor %}');
       // Filtros
-      toolbar.addChoiceButton('Data', 'Filtro de Data', listDateFormats(formats), function(choice){
+      toolbar.addChoiceButton('Data', 'Filtro de Data', listDateFormats(extra_data['formats']), function(choice){
         return ' | localize: \''+choice.split(' => ')[0]+'\' ';
       });
       // Tags
       toolbar.addWrapButton('Linguagem En', 'Tag (Language en)', '{% language en %}', '{% endlanguage %}');
-      toolbar.addChoiceButton('Email', 'Tag de Email', roles, function(choice){
+      toolbar.addChoiceButton('Email', 'Tag de Email', extra_data['roles'], function(choice){
         return '\n{% emails ' + choice + ' %}\n';
       });
       // criar toolbar
