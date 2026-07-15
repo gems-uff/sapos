@@ -74,7 +74,7 @@ class Notification < ApplicationRecord
   end
 
   validates :template_type, presence: true, inclusion: { in: TEMPLATE_TYPES }, allow_blank: false
-  validate :cannot_create_new_erb_template, if: -> { self.template_type == ERB } 
+  validate :cannot_create_new_erb_template, if: -> { self.template_type == ERB }
 
   after_initialize do
     self.query_offset ||= "0"
@@ -178,7 +178,7 @@ class Notification < ApplicationRecord
     if self.frequency != MANUAL
       next_date ||= calculate_next_notification_date
     else
-      next_date ||= self.query.params.find { |p| p.name == "data_consulta"}
+      next_date ||= self.query.params.find { |p| p.name == "data_consulta" }
         .try(:default_value).try(:to_date)
       next_date ||= Date.today
     end
@@ -199,7 +199,7 @@ class Notification < ApplicationRecord
       # Build the notifications with the results from the query
       if self.individual
         result[:rows].each do |raw_result|
-          bindings = {rows: [raw_result], columns: result[:columns]}.merge(params)
+          bindings = { rows: [raw_result], columns: result[:columns] }.merge(params)
           bindings.merge!(Hash[result[:columns].zip(raw_result)])
 
           formatter = CodeEvaluator.create_formatter(bindings, self.template_type, NOTIFICATION_DROPS)
@@ -310,8 +310,29 @@ class Notification < ApplicationRecord
     @@disable_erb_validation = false
   end
 
-  private
+  def available_columns(args = {})
+    result = self.query.execute(args)
+    result[:columns] || []
+  rescue => e
+    Rails.logger.error("Error getting available_columns: #{e.message}")
+    []
+  end
 
+  def available_unique_columns(args = {})
+    result = self.query.execute(args)
+    rows = result[:rows] || []
+    columns = result[:columns] || []
+
+    unique = columns.select do |column|
+      rows.all? { |row| row[columns.index(column)] == rows.first[columns.index(column)] }
+    end
+    unique
+  rescue => e
+    Rails.logger.error("Error getting available_unique_columns: #{e.message}")
+    []
+  end
+
+  private
     def cannot_create_new_erb_template
       return if @@disable_erb_validation
       notification = self.paper_trail.previous_version

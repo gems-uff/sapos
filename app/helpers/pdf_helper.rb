@@ -558,6 +558,62 @@ module PdfHelper
     10.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }
       .insert(5, "-").join("")
   end
+
+  def parse_align_segments(text, default = :justify)
+    segments = []
+    return [{ align: default, text: "" }] if text.nil?
+    regex = /<div\s+style=["']text-align:\s*(left|center|right|justify);\s*["']>(?:\r?\n)?(.*?)(?:\r?\n)?<\/div>(?:\r?\n)?/m
+    # regex = /\{% comment\s*align:(left|center|right|justify)\s*%\}(?:\r?\n)?(.*?)(?:\r?\n)?\{% endcomment %\}(?:\r?\n)?/m
+    pos = 0
+    while (m = regex.match(text, pos))
+      before = text[pos...m.begin(0)]
+      segments << { align: default, text: before } unless before.nil? || before.empty?
+      segments << { align: m[1].to_sym, text: m[2] || "" }
+      pos = m.end(0)
+    end
+    tail = text[pos..-1]
+    segments << { align: default, text: tail } unless tail.nil? || tail.empty?
+    segments
+  end
+
+  def print_multipage_text_with_alignments(pdf, text, box_width, box_height, align = :justify, used_box_height = 0)
+    pdf.move_down 30
+    pdf.font("Times-Roman", size: 12) do
+      pdf.fill_color "000000"
+      segments = parse_align_segments(text, align)
+      segments.each do |seg|
+        seg_text = seg[:text].to_s
+        # seg_text = seg[:text].to_s
+        # next if seg_text.strip.empty?
+        lines = pdf.text_box seg_text,
+          at: [(pdf.bounds.width - box_width) / 2, pdf.cursor],
+          width: box_width,
+          height: box_height - used_box_height,
+          align: seg[:align],
+          inline_format: true,
+          dry_run: true
+        next_box = pdf.height_of(seg_text, width: box_width, align: seg[:align], inline_format: true, final_gap: true)
+        used_box_height += next_box
+        pdf.move_down next_box
+        while lines.size > 0
+          not_printed_text_length = lines.map { |line| line[:text].length }.sum
+          # text = text[-not_printed_text_length..-1]
+          seg_text = seg_text[-not_printed_text_length..-1]
+          pdf.move_down 30
+          used_box_height = 0
+          pdf.start_new_page
+          lines = pdf.text_box seg_text,
+          at: [(pdf.bounds.width - box_width) / 2, pdf.cursor],
+          width: box_width,
+          height: box_height,
+          align: seg[:align],
+          inline_format: true,
+          dry_run: true
+          used_box_height = pdf.height_of(seg_text, width: box_width, align: seg[:align], inline_format: true, final_gap: true)
+        end
+      end
+    end
+  end
 end
 
 Prawn::Document.extensions << PdfHelper

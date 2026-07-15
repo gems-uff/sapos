@@ -63,12 +63,13 @@ class NotificationsController < ApplicationController
     config.columns[:query_offset].description = I18n.t(
       "active_scaffold.notification.query_offset_description"
     )
-    config.columns[:query].update_columns = [:query]
+    config.columns[:query].send_form_on_update_column = true
+    config.columns[:query].update_columns = [:body_template, :query]
     config.columns[:template_type].form_ui = :select
     config.columns[:template_type].options = {
       options: Notification::TEMPLATE_TYPES,
     }
-    #config.columns[:to_template].description = "Use {% emails Secretaria %} para todos emails de usuários da secretaria."
+    # config.columns[:to_template].description = "Use {% emails Secretaria %} para todos emails de usuários da secretaria."
 
 
     config.create.label = :create_notification_label
