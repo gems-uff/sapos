@@ -123,6 +123,92 @@ RSpec.describe Notifier, type: :model do
       end
     end
 
+    context "html body" do
+      it "keeps the line breaks of the body" do
+        Notifier.send_emails(notifications: [message])
+        html = delivered.html_part.decoded
+        expect(html).to include("Prezado professor,<br />")
+        expect(html).to include("- Alquimia<br />")
+      end
+
+      it "keeps the blank lines of the body" do
+        Notifier.send_emails(notifications: [message])
+        html = delivered.html_part.decoded
+        expect(html).to match(/Prezado professor,<br \/>\s*<br \/>\s*Seguem/)
+      end
+
+      it "keeps the indentation of the body" do
+        message[:body] = "Turmas:\n    - Alquimia"
+        Notifier.send_emails(notifications: [message])
+        expect(delivered.html_part.decoded).to include(
+          "Turmas:<br />\n&nbsp;&nbsp;&nbsp;&nbsp;- Alquimia"
+        )
+      end
+
+      it "keeps the spaces used to align the body" do
+        message[:body] = "Alquimia    2026/2"
+        Notifier.send_emails(notifications: [message])
+        expect(delivered.html_part.decoded).to include(
+          "Alquimia&nbsp;&nbsp;&nbsp; 2026/2"
+        )
+      end
+
+      it "keeps the markup produced by the template editor toolbar" do
+        # The bold, italic and align buttons of the toolbar produce this markup
+        # (the align tag of lib/liquid_formatter.rb renders the div).
+        message[:body] = "<strong>Aviso</strong> e <em>obs</em>\n" \
+          "<div style=\"text-align: center;\">Centralizado</div>"
+        Notifier.send_emails(notifications: [message])
+        html = delivered.html_part.decoded
+        expect(html).to include("<strong>Aviso</strong>")
+        expect(html).to include("<em>obs</em>")
+        expect(html).to include("<div style=\"text-align: center;\">Centralizado</div>")
+      end
+
+      it "separates the notification footer from the body" do
+        FactoryBot.create(
+          :custom_variable, variable: "notification_footer",
+          value: "Nao responda este e-mail."
+        )
+        Notifier.send_emails(notifications: [message])
+        expect(delivered.html_part.decoded).to match(
+          /<br \/>\s*<br \/>\s*Nao responda este e-mail\./
+        )
+      end
+
+      it "does not leak the html conversion into the text part" do
+        message[:body] = "Turmas:\n    - Alquimia"
+        Notifier.send_emails(notifications: [message])
+        text = delivered.text_part.decoded
+        expect(text).not_to include("<br />")
+        expect(text).not_to include("&nbsp;")
+        expect(text).to include("Turmas:\n    - Alquimia")
+      end
+    end
+
+    describe "body_whitespace_to_html" do
+      it "converts every kind of line break" do
+        expect(Notifier.body_whitespace_to_html("a\nb\r\nc\rd")).to eq(
+          "a<br />\nb<br />\nc<br />\nd"
+        )
+      end
+
+      it "converts tabs into spaces" do
+        expect(Notifier.body_whitespace_to_html("a\tb")).to eq(
+          "a" + ("&nbsp;" * (Notifier::TAB_WIDTH - 1)) + " b"
+        )
+      end
+
+      it "keeps a single space between words" do
+        expect(Notifier.body_whitespace_to_html("a b")).to eq("a b")
+      end
+
+      it "handles an empty body" do
+        expect(Notifier.body_whitespace_to_html(nil)).to eq("")
+        expect(Notifier.body_whitespace_to_html("")).to eq("")
+      end
+    end
+
     context "attachments" do
       it "attaches the files of the message" do
         attachments = {

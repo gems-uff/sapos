@@ -6,8 +6,31 @@
 require "singleton"
 
 module Notifier
+  # Number of spaces that replaces a tab when converting a body to HTML
+  TAB_WIDTH = 8
+
   def self.logger
     Rails.logger
+  end
+
+  # Converts the whitespace of a message body into its HTML equivalent.
+  #
+  # Notification and email templates are written as text, but the toolbar of
+  # the template editor also produces inline markup (<strong>, <em> and the
+  # <div> of the align tag), so the body is delivered as HTML as well. HTML
+  # collapses every run of whitespace, which would join all the lines of the
+  # body into a single paragraph. Line breaks become <br> and the indentation
+  # is kept with non breaking spaces, so that what is written in the template
+  # is what is read in the message.
+  def self.body_whitespace_to_html(body)
+    lines = body.to_s.split(/\r\n|\r|\n/, -1)
+    lines.map! do |line|
+      line
+        .gsub("\t", " " * TAB_WIDTH)
+        .sub(/\A +/) { |spaces| "&nbsp;" * spaces.size }
+        .gsub(/ {2,}/) { |spaces| ("&nbsp;" * (spaces.size - 1)) + " " }
+    end
+    lines.join("<br />\n")
   end
 
   def self.should_run?
@@ -76,7 +99,7 @@ module Notifier
         ) do |format|
           plain = m[:body_text] || ActionController::Base.helpers.strip_tags(m[:body].to_s)
           format.text { plain }
-          format.html { m[:body].to_s.html_safe }
+          format.html { Notifier.body_whitespace_to_html(m[:body]).html_safe }
         end
         mail.deliver!
         m[:to] = old_to
