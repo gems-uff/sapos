@@ -186,6 +186,74 @@ RSpec.describe Notifier, type: :model do
       end
     end
 
+    context "data that looks like markup" do
+      let(:tricky) { "Fulano <fulano@uff.br> tem CR < 7 em P&D" }
+
+      it "escapes the data of the body in the html part" do
+        message[:body] = tricky
+        Notifier.send_emails(notifications: [message])
+        html = delivered.html_part.decoded
+        expect(html).to include("&lt;fulano@uff.br&gt;")
+        expect(html).to include("CR &lt; 7 em P&amp;D")
+      end
+
+      it "keeps the data of the body untouched in the text part" do
+        message[:body] = tricky
+        Notifier.send_emails(notifications: [message])
+        expect(delivered.text_part.decoded).to include(tricky)
+      end
+
+      it "removes the toolbar markup from the text part" do
+        message[:body] = "<strong>Aviso</strong>\n" \
+          "<div style=\"text-align: center;\">Centralizado</div>"
+        Notifier.send_emails(notifications: [message])
+        text = delivered.text_part.decoded
+        expect(text).to include("Aviso\nCentralizado")
+        expect(text).not_to include("<strong>")
+        expect(text).not_to include("<div")
+      end
+
+      it "escapes a closing div that does not belong to an align tag" do
+        message[:body] = "Fim do bloco </div> citado"
+        Notifier.send_emails(notifications: [message])
+        expect(delivered.html_part.decoded).to include("&lt;/div&gt;")
+      end
+    end
+
+    describe "escape_body" do
+      it "escapes text that is not markup" do
+        expect(Notifier.escape_body("a <b> & \"c\"")).to eq(
+          "a &lt;b&gt; &amp; &quot;c&quot;"
+        )
+      end
+
+      it "keeps the markup of the toolbar" do
+        expect(Notifier.escape_body("<strong>a</strong> <em>b</em>")).to eq(
+          "<strong>a</strong> <em>b</em>"
+        )
+      end
+
+      it "keeps the div of the align tag with its closing tag" do
+        body = "<div style=\"text-align: right;\">a</div>"
+        expect(Notifier.escape_body(body)).to eq(body)
+      end
+
+      it "handles an empty body" do
+        expect(Notifier.escape_body(nil)).to eq("")
+        expect(Notifier.escape_body("")).to eq("")
+      end
+    end
+
+    describe "plain_body" do
+      it "keeps the body as it is" do
+        expect(Notifier.plain_body("CR < 7 e P&D")).to eq("CR < 7 e P&D")
+      end
+
+      it "removes the markup of the toolbar" do
+        expect(Notifier.plain_body("<em>a</em> b")).to eq("a b")
+      end
+    end
+
     describe "body_whitespace_to_html" do
       it "converts every kind of line break" do
         expect(Notifier.body_whitespace_to_html("a\nb\r\nc\rd")).to eq(

@@ -9,8 +9,58 @@ module Notifier
   # Number of spaces that replaces a tab when converting a body to HTML
   TAB_WIDTH = 8
 
+  # Markup that the toolbar of the template editor produces in a body: the
+  # bold and italic buttons write the tags, and the align tag of
+  # lib/liquid_formatter.rb renders the div.
+  TOOLBAR_MARKUP = %r{
+    </?strong> | </?em> | </div> |
+    <div\s+style=["']text-align:\s*(?:left|center|right|justify);\s*["']>
+  }x
+
   def self.logger
     Rails.logger
+  end
+
+  # Escapes a message body, keeping the markup of the template editor toolbar.
+  #
+  # Templates are filled with data that the user did not write and that is not
+  # meant to be read as markup. An address such as "Fulano <fulano@uff.br>"
+  # would be swallowed by the mail client, so everything is escaped and only
+  # the markup that the toolbar produces is given back.
+  def self.escape_body(body)
+    text = body.to_s
+    result = +""
+    open_divs = 0
+    last = 0
+    text.scan(TOOLBAR_MARKUP) do
+      match = Regexp.last_match
+      result << ERB::Util.html_escape(text[last...match.begin(0)])
+      markup = match[0]
+      if markup == "</div>"
+        # a closing tag is only markup when the align tag opened a div
+        if open_divs.positive?
+          open_divs -= 1
+          result << markup
+        else
+          result << ERB::Util.html_escape(markup)
+        end
+      else
+        open_divs += 1 if markup.start_with?("<div")
+        result << markup
+      end
+      last = match.end(0)
+    end
+    result << ERB::Util.html_escape(text[last..])
+    result
+  end
+
+  # Builds the text part of a message, removing the markup of the toolbar.
+  #
+  # The body is written as text, so it is used as it is. Only the markup that
+  # the toolbar produces is removed, because it has no meaning when read as
+  # text.
+  def self.plain_body(body)
+    body.to_s.gsub(TOOLBAR_MARKUP, "")
   end
 
   # Converts the whitespace of a message body into its HTML equivalent.
@@ -97,9 +147,13 @@ module Notifier
           subject: m[:subject],
           reply_to: m[:reply_to]
         ) do |format|
-          plain = m[:body_text] || ActionController::Base.helpers.strip_tags(m[:body].to_s)
+          plain = m[:body_text] || Notifier.plain_body(m[:body])
           format.text { plain }
-          format.html { Notifier.body_whitespace_to_html(m[:body]).html_safe }
+          format.html do
+            Notifier.body_whitespace_to_html(
+              Notifier.escape_body(m[:body])
+            ).html_safe
+          end
         end
         mail.deliver!
         m[:to] = old_to
