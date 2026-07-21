@@ -17,7 +17,7 @@ gem "sprockets-rails"
 # gem "sqlite3", "~> 1.4"
 
 # Use the Puma web server [https://github.com/puma/puma]
-gem "puma", ">= 6.4.2"
+gem "puma", "~> 7.2", ">= 7.2.1"
 
 # HTML and XML parser
 gem "nokogiri", ">= 1.18.9"
