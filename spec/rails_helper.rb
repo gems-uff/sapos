@@ -140,6 +140,15 @@ RSpec.configure do |config|
   config.include RecordSelectHelpers
   config.include DownloadHelpers
   config.include Warden::Test::Helpers
+  config.include Devise::Test::IntegrationHelpers, type: :request
+
+  # ActiveScaffold::Registry.current_user_proc is a thread local set by a
+  # prepend_before_action on every request. Request specs run the application in
+  # the same thread as the example, so it has to be cleared or the signed in
+  # user leaks into the following examples.
+  config.after(:each, type: :request) do
+    ActiveScaffold::Registry.current_user_proc = nil
+  end
 
   config.before(:suite) do
     DatabaseCleaner.strategy = :transaction
