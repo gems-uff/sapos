@@ -341,7 +341,7 @@ GEM
       date
       stringio
     public_suffix (7.0.5)
-    puma (7.2.0)
+    puma (7.2.1)
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
@@ -600,7 +600,7 @@ DEPENDENCIES
   prawn-rails
   prawn-table
   pry
-  puma (>= 6.4.2)
+  puma (~> 7.2, >= 7.2.1)
   rack (~> 2.2.23)
   rails (~> 7.1.0)
   rails-erd
