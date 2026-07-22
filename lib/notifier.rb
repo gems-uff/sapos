@@ -147,7 +147,7 @@ module Notifier
           subject: m[:subject],
           reply_to: m[:reply_to]
         ) do |format|
-          plain = m[:body_text] || Notifier.plain_body(m[:body])
+          plain = Notifier.plain_body(m[:body])
           format.text { plain }
           format.html do
             Notifier.body_whitespace_to_html(
