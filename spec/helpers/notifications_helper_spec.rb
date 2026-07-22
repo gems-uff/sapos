@@ -75,6 +75,52 @@ RSpec.describe NotificationsHelper, type: :helper do
         expect(helper.notification_body_preview(body)).to include("text-align")
         expect(helper.notification_body_preview(body)).to include("Centralizado")
       end
+
+      it "does not let a body restyle the page around the preview" do
+        body = "<style>body { display: none }</style>"
+        expect(helper.notification_body_preview(body)).not_to include("<style")
+      end
+
+      it "does not embed another page in the preview" do
+        body = "<iframe src=\"https://evil.com\"></iframe>"
+        expect(helper.notification_body_preview(body)).not_to include("<iframe")
+      end
+    end
+
+    # The preview exists to show what the recipient reads, so it keeps the
+    # markup that a mail client renders, including the legacy markup that
+    # email still relies on.
+    context "the markup that a mail client renders" do
+      {
+        "an image" => "<img src=\"https://uff.br/logo.png\" alt=\"UFF\" width=\"80\">",
+        "a font" => "<font color=\"#cc0000\" size=\"4\" face=\"Arial\">aviso</font>",
+        "a heading" => "<h2>Aviso</h2>",
+        "a rule" => "<hr>",
+        "a quotation" => "<blockquote>texto citado</blockquote>",
+        "a link that opens in another tab" =>
+          "<a href=\"https://uff.br\" target=\"_blank\">SAPOS</a>",
+        "a table with presentational attributes" =>
+          "<table bgcolor=\"#eeeeee\"><tr><td valign=\"top\">a</td></tr></table>",
+        "a list" => "<ul><li>Alquimia</li></ul>"
+      }.each do |what, markup|
+        it "keeps #{what}" do
+          preview = helper.notification_body_preview(markup)
+          tag = markup[/<([a-z0-9]+)/, 1]
+          expect(preview).to include("<#{tag}")
+        end
+      end
+
+      it "keeps the source of an image but not a script in it" do
+        body = "<img src=\"javascript:alert(1)\">"
+        expect(helper.notification_body_preview(body)).not_to include("javascript:")
+      end
+
+      it "drops an event handler of an image" do
+        body = "<img src=\"https://uff.br/l.png\" onerror=\"alert(1)\">"
+        preview = helper.notification_body_preview(body)
+        expect(preview).to include("https://uff.br/l.png")
+        expect(preview).not_to include("onerror")
+      end
     end
   end
 end

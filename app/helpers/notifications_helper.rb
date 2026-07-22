@@ -33,13 +33,25 @@ module NotificationsHelper
     )
   end
 
-  # Markup kept in the preview of a message. Anything a template may write and
-  # a mail client may render, without the tags and the attributes that only
-  # make sense to a browser.
+  # Markup kept in the preview of a message: what a template may write and a
+  # mail client may render, including the legacy markup that mail clients
+  # still support, such as <font> and the presentational attributes of a
+  # table.
+  #
+  # What is left out is what a mail client does not render anyway and would
+  # only act on this page: <script>, <iframe>, <object>, <form> and <style>.
+  # The <style> tag is worth a note, because a mail client does render it: its
+  # rules are not scoped to the preview, so a body could restyle the whole
+  # administration page around it.
   PREVIEW_TAGS = %w[
-    a b br div em i li ol p s span strong sub sup table tbody td th thead tr u ul
+    a b big blockquote br caption center code col colgroup dd del div dl dt em
+    font h1 h2 h3 h4 h5 h6 hr i img ins li ol p pre s small span strike strong
+    sub sup table tbody td tfoot th thead tr u ul
   ].freeze
-  PREVIEW_ATTRIBUTES = %w[align border cellpadding cellspacing colspan href rowspan style title].freeze
+  PREVIEW_ATTRIBUTES = %w[
+    align alt bgcolor border cellpadding cellspacing color colspan dir face
+    height href rowspan size span src style target title valign width
+  ].freeze
 
   # Renders the body of a simulated message the same way it is delivered.
   #
