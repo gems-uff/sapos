@@ -33,6 +33,15 @@ module NotificationsHelper
     )
   end
 
+  # Renders the body of a simulated message the same way it is delivered.
+  #
+  # The simulation exists to show what the recipient is going to read, so the
+  # body goes through the very same conversion that Notifier applies to the
+  # html part of a message.
+  def notification_body_preview(body)
+    Notifier.body_whitespace_to_html(Notifier.escape_body(body)).html_safe
+  end
+
   def next_execution_column(record, options)
     return "-" if record.blank?
     return "-" if record.next_execution.nil?

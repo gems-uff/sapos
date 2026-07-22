@@ -53,7 +53,7 @@
         <tr class="record <%= tr_class %>">
           <td><%= message[:to] %></td>
           <td><%= message[:subject] %></td>
-          <td><%= message[:body].html_safe %></td>
+          <td><%= notification_body_preview(message[:body]) %></td>
         </tr>
     <% end %>
     </tbody>
