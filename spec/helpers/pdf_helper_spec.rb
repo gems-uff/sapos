@@ -129,6 +129,57 @@ RSpec.describe PdfHelper, type: :helper do
   describe "print_multipage_text_with_alignments" do
     let(:pdf) { Prawn::Document.new }
 
+    # Reads back what was printed. Prawn writes the text of a page as hex
+    # strings, and it may break a word into more than one of them.
+    def printed_pages(document)
+      document.render
+      document.state.pages.map do |page|
+        page.content.stream.filtered_stream
+          .scan(/<([0-9a-fA-F]+)>/)
+          .map { |hex| [hex[0]].pack("H*") }.join
+      end
+    end
+
+    context "a text that does not fit in a single page" do
+      let(:words) { (1..120).map { |i| format("w%03d", i) } }
+
+      def print_and_read(text)
+        helper.print_multipage_text_with_alignments(pdf, text, 400, 80)
+        printed_pages(pdf).join
+      end
+
+      it "prints every word of a long text" do
+        printed = print_and_read(words.join(" "))
+        expect(pdf.page_count).to be > 1
+        expect(words.reject { |word| printed.include?(word) }).to be_empty
+      end
+
+      it "prints every word when the markup is in the text of the next page" do
+        text = "#{words[0..99].join(' ')} <strong>#{words[100]}</strong> " \
+          "#{words[101..].join(' ')}"
+        printed = print_and_read(text)
+        expect(words.reject { |word| printed.include?(word) }).to be_empty
+      end
+
+      it "prints every word when an entity is in the text of the next page" do
+        text = "#{words[0..99].join(' ')} a &lt; b #{words[100..].join(' ')}"
+        printed = print_and_read(text)
+        expect(words.reject { |word| printed.include?(word) }).to be_empty
+      end
+
+      it "keeps the markup of a text that is printed on the next page" do
+        text = "#{words[0..99].join(' ')} <strong>NEGRITO</strong> " \
+          "#{words[101..].join(' ')}"
+        helper.print_multipage_text_with_alignments(pdf, text, 400, 80)
+        pages = printed_pages(pdf)
+        page_with_markup = pages.index { |page| page.include?("NEGRITO") }
+        expect(page_with_markup).to be > 0
+        fonts = pdf.state.pages[page_with_markup]
+          .content.stream.filtered_stream.scan(%r{/F[0-9.]+}).uniq
+        expect(fonts.size).to be > 1
+      end
+    end
+
     it "prints a text with the markup of the toolbar" do
       text = "Declaramos que\n" \
         "<div style=\"text-align: center;\"><strong>Fulano</strong></div>\n" \

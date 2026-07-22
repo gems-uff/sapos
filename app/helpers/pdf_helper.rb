@@ -606,31 +606,28 @@ module PdfHelper
       segments = parse_align_segments(text, align)
       segments.each do |seg|
         seg_text = escape_inline_format(seg[:text])
-        lines = pdf.text_box seg_text,
-          at: [(pdf.bounds.width - box_width) / 2, pdf.cursor],
+        left = (pdf.bounds.width - box_width) / 2
+        # what does not fit comes back as the formatted text that was not
+        # printed, and is printed on the next page as it is: measuring it to
+        # cut the text by its length loses the characters of the markup
+        not_printed = pdf.text_box seg_text,
+          at: [left, pdf.cursor],
           width: box_width,
           height: box_height - used_box_height,
           align: seg[:align],
-          inline_format: true,
-          dry_run: true
+          inline_format: true
         next_box = pdf.height_of(seg_text, width: box_width, align: seg[:align], inline_format: true, final_gap: true)
         used_box_height += next_box
         pdf.move_down next_box
-        while lines.size > 0
-          not_printed_text_length = lines.map { |line| line[:text].length }.sum
-          # text = text[-not_printed_text_length..-1]
-          seg_text = seg_text[-not_printed_text_length..-1]
-          pdf.move_down 30
-          used_box_height = 0
+        while not_printed.size > 0
+          printing = not_printed
           pdf.start_new_page
-          lines = pdf.text_box seg_text,
-          at: [(pdf.bounds.width - box_width) / 2, pdf.cursor],
-          width: box_width,
-          height: box_height,
-          align: seg[:align],
-          inline_format: true,
-          dry_run: true
-          used_box_height = pdf.height_of(seg_text, width: box_width, align: seg[:align], inline_format: true, final_gap: true)
+          not_printed = pdf.formatted_text_box printing,
+            at: [left, pdf.cursor],
+            width: box_width,
+            height: box_height,
+            align: seg[:align]
+          used_box_height = pdf.height_of_formatted(printing, width: box_width, align: seg[:align], final_gap: true)
         end
       end
     end
