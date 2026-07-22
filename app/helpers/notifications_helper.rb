@@ -33,13 +33,30 @@ module NotificationsHelper
     )
   end
 
+  # Markup kept in the preview of a message. Anything a template may write and
+  # a mail client may render, without the tags and the attributes that only
+  # make sense to a browser.
+  PREVIEW_TAGS = %w[
+    a b br div em i li ol p s span strong sub sup table tbody td th thead tr u ul
+  ].freeze
+  PREVIEW_ATTRIBUTES = %w[align border cellpadding cellspacing colspan href rowspan style title].freeze
+
   # Renders the body of a simulated message the same way it is delivered.
   #
   # The simulation exists to show what the recipient is going to read, so the
   # body goes through the very same conversion that Notifier applies to the
   # html part of a message.
+  #
+  # The body is markup written by the author of the template, and the preview
+  # is the only place where it reaches a browser: a mail client does not run
+  # scripts and prawn does not even understand them. It is sanitized here so
+  # that showing a message cannot run what the message carries, which is also
+  # closer to what the recipient reads, because mail clients sanitize as well.
   def notification_body_preview(body)
-    Notifier.body_whitespace_to_html(Notifier.escape_body(body)).html_safe
+    sanitized = sanitize(
+      body.to_s, tags: PREVIEW_TAGS, attributes: PREVIEW_ATTRIBUTES
+    )
+    Notifier.body_whitespace_to_html(sanitized).html_safe
   end
 
   def next_execution_column(record, options)
