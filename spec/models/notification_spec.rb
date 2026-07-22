@@ -131,6 +131,49 @@ RSpec.describe Notification, type: :model do
   end
 
   describe "Methods" do
+    describe "get_query_date_derivations" do
+      # The simulation form sends the date of the query as a string, and the
+      # value of a parameter does not always reach here in the same format.
+      def derivations(qdate)
+        notification.get_query_date_derivations(qdate)
+      end
+
+      it "reads a date written in the brazilian order" do
+        expect(derivations("01/07/2026")).to include(
+          ano_semestre_atual: 2026, numero_semestre_atual: 1
+        )
+      end
+
+      it "reads a date written as year, month and day" do
+        expect(derivations("2026-07-01")).to include(
+          ano_semestre_atual: 2026, numero_semestre_atual: 1
+        )
+      end
+
+      it "reads a date that carries a time and a time zone" do
+        expect(derivations("2026-07-01 00:00:00 -0300")).to include(
+          ano_semestre_atual: 2026, numero_semestre_atual: 1
+        )
+      end
+
+      it "reads a date that is not a string" do
+        expect(derivations(Time.zone.parse("2026-07-01"))).to include(
+          ano_semestre_atual: 2026, numero_semestre_atual: 1
+        )
+      end
+
+      it "returns no derivation when there is no date" do
+        expect(derivations("")).to eq({})
+      end
+
+      it "does not read the day as the month" do
+        # 31/12 cannot be read in the other order, so it pins down the order
+        expect(derivations("31/12/2026")).to include(
+          ano_semestre_atual: 2026, numero_semestre_atual: 2
+        )
+      end
+    end
+
     describe "calculate_next_notification_date" do
       describe "for daily frequency" do
         it "should be 01/04 if today is 01/03" do
