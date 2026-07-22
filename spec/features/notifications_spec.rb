@@ -25,7 +25,7 @@ RSpec.describe "Notifications features", type: :feature do
     @destroy_all << FactoryBot.create(:enrollment, enrollment_number: "D02", student: @student1, level: @level1, enrollment_status: @enrollment_status1, admission_date: YearSemester.current.semester_begin - 3.years)
 
     @destroy_all << @query1 = FactoryBot.create(:query, name: "students", sql: "select * from students")
-    @query2 = FactoryBot.build(:query, name: "queries", sql: "select name, sql, :ano_semestre_atual as temp from queries")
+    @query2 = FactoryBot.build(:query, name: "queries", sql: "select name, `sql`, :ano_semestre_atual as temp from queries")
     @destroy_all << @query2.params.build(name: "ano_semestre_atual", value_type: "Integer", default_value: "")
     @query2.save!
     @destroy_all << @query3 = FactoryBot.create(:query, name: "enrollments", sql: "select id as enrollments_id from enrollments")
@@ -101,7 +101,7 @@ RSpec.describe "Notifications features", type: :feature do
       find(:select, "record_query_").find(:option, text: "queries").select_option
       expect(page).to have_css("#record_query_container .CodeMirror-code", text: <<~TEXT.chomp
         1
-        select name, sql, :ano_semestre_atual as temp from queries
+        select name, `sql`, :ano_semestre_atual as temp from queries
       TEXT
       )
 

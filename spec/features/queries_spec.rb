@@ -18,7 +18,7 @@ RSpec.describe "Queries features", type: :feature do
     @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << FactoryBot.create(:query, name: "students", sql: "select * from students")
-    @destroy_all << @record = FactoryBot.create(:query, name: "queries", sql: "select name, sql from queries")
+    @destroy_all << @record = FactoryBot.create(:query, name: "queries", sql: "select name, `sql` from queries")
     @destroy_all << FactoryBot.create(:query, name: "levels", sql: "select * from levels")
   end
   after(:each) do

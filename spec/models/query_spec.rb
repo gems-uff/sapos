@@ -65,6 +65,18 @@ RSpec.describe Query, type: :model do
         # Os stubs existem para fixar as APIs de que ele depende --
         # configs_for, configuration_hash e Mysql2::Client -- que mudam entre
         # versoes do Rails e cuja quebra so apareceria em producao.
+        # As configuracoes sao montadas com HashConfig direto, e nao com
+        # ActiveRecord::DatabaseConfigurations, porque este ultimo mescla
+        # ENV["DATABASE_URL"] por cima do que for passado. Com isso o spec
+        # passaria em SQLite e falharia ao rodar a suite apontada para o
+        # MariaDB local (skill suite-mariadb) -- teste nao pode depender do
+        # ambiente em que roda.
+        def config_for(env, database)
+          ActiveRecord::DatabaseConfigurations::HashConfig.new(
+            env, "primary", { adapter: "mysql2", database: database }
+          )
+        end
+
         let(:connection) { double("connection", adapter_name: "Mysql2") }
         let(:results) do
           double("Mysql2::Result", fields: ["name"], entries: [{ "name" => "Fulano" }])
@@ -72,19 +84,20 @@ RSpec.describe Query, type: :model do
         let(:client) { double("Mysql2::Client instance", query: results, close: nil) }
         let(:client_class) { double("Mysql2::Client", new: client) }
 
+        let(:configurations) { double("configurations") }
+
         before do
           allow(ApplicationRecord).to receive(:connection).and_return(connection)
           allow(ApplicationRecord).to receive(:configurations).and_return(configurations)
+          allow(configurations).to receive(:configs_for)
+            .with(env_name: "#{Rails.env}_read_only").and_return(read_only_configs)
+          allow(configurations).to receive(:configs_for)
+            .with(env_name: Rails.env).and_return([config_for(Rails.env, "main")])
           stub_const("Mysql2::Client", client_class)
         end
 
         context "when a read only configuration exists for the environment" do
-          let(:configurations) do
-            ActiveRecord::DatabaseConfigurations.new(
-              "test" => { "adapter" => "mysql2", "database" => "main" },
-              "test_read_only" => { "adapter" => "mysql2", "database" => "read_only" }
-            )
-          end
+          let(:read_only_configs) { [config_for("#{Rails.env}_read_only", "read_only")] }
 
           it "connects using the read only configuration" do
             Query.run_read_only_query(sql)
@@ -93,11 +106,7 @@ RSpec.describe Query, type: :model do
         end
 
         context "when there is no read only configuration for the environment" do
-          let(:configurations) do
-            ActiveRecord::DatabaseConfigurations.new(
-              "test" => { "adapter" => "mysql2", "database" => "main" }
-            )
-          end
+          let(:read_only_configs) { [] }
 
           it "falls back to the configuration of the environment" do
             Query.run_read_only_query(sql)
