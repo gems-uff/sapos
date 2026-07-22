@@ -80,6 +80,52 @@ RSpec.describe PdfHelper, type: :helper do
     end
   end
 
+  describe "escape_inline_format" do
+    def printed(text)
+      Prawn::Text::Formatted::Parser
+        .format(helper.escape_inline_format(text))
+        .map { |fragment| fragment[:text] }.join
+    end
+
+    it "prints an address written between angle brackets" do
+      expect(printed("Fulano <fulano@uff.br>")).to eq("Fulano <fulano@uff.br>")
+    end
+
+    it "prints a comparison" do
+      expect(printed("CR < 7 e P&D")).to eq("CR < 7 e P&D")
+    end
+
+    it "keeps the markup of the toolbar" do
+      expect(helper.escape_inline_format("<strong>a</strong> <em>b</em>"))
+        .to eq("<strong>a</strong> <em>b</em>")
+    end
+
+    it "keeps the other tags that prawn understands" do
+      [
+        "<b>a</b>", "<i>a</i>", "<u>a</u>", "<sub>a</sub>", "<sup>a</sup>",
+        "<strikethrough>a</strikethrough>", "<br>", "<br/>",
+        "<color rgb=\"FF0000\">a</color>", "<font size=\"14\">a</font>",
+        "<link href=\"http://uff.br\">a</link>"
+      ].each do |markup|
+        expect(helper.escape_inline_format(markup)).to eq(markup)
+      end
+    end
+
+    it "escapes a tag that prawn does not understand" do
+      expect(helper.escape_inline_format("<script>a</script>"))
+        .to eq("&lt;script>a&lt;/script>")
+    end
+
+    it "keeps an entity that was already written in the template" do
+      expect(helper.escape_inline_format("a &lt; b")).to eq("a &lt; b")
+    end
+
+    it "handles an empty text" do
+      expect(helper.escape_inline_format(nil)).to eq("")
+      expect(helper.escape_inline_format("")).to eq("")
+    end
+  end
+
   describe "print_multipage_text_with_alignments" do
     let(:pdf) { Prawn::Document.new }
 
@@ -95,6 +141,13 @@ RSpec.describe PdfHelper, type: :helper do
     it "prints a text without any markup" do
       expect do
         helper.print_multipage_text_with_alignments(pdf, "Declaramos", 500, 560)
+      end.not_to raise_error
+    end
+
+    it "prints data that looks like markup" do
+      text = "Fulano <fulano@uff.br> tem CR < 7"
+      expect do
+        helper.print_multipage_text_with_alignments(pdf, text, 500, 560)
       end.not_to raise_error
     end
   end

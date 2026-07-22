@@ -559,6 +559,29 @@ module PdfHelper
       .insert(5, "-").join("")
   end
 
+  # Tags that prawn understands when a text is printed with inline_format,
+  # taken from Prawn::Text::Formatted::Parser::PARSER_REGEX. The bold and
+  # italic buttons of the template editor toolbar write <strong> and <em>.
+  PRAWN_INLINE_TAGS = %r{
+    </?(?:b|i|u|strikethrough|sub|sup|strong|em)> |
+    </?(?:link|color|font|a)(?:\s[^<>]*)?> |
+    <br\s*/?>
+  }xi
+
+  # Escapes a text that is printed with inline_format, keeping the markup.
+  #
+  # A template is filled with data that is not meant to be read as markup.
+  # Prawn drops anything that looks like a tag, so an address written as
+  # "Fulano <fulano@uff.br>" is printed as "Fulano " and even "CR < 7" loses
+  # the comparison. Every < that does not open a tag prawn understands is
+  # escaped, so the markup of the toolbar keeps working and the data is
+  # printed as it was written.
+  def escape_inline_format(text)
+    text.to_s.gsub(/#{PRAWN_INLINE_TAGS}|</o) do |match|
+      match == "<" ? "&lt;" : match
+    end
+  end
+
   def parse_align_segments(text, default = :justify)
     segments = []
     return [{ align: default, text: "" }] if text.nil?
@@ -582,9 +605,7 @@ module PdfHelper
       pdf.fill_color "000000"
       segments = parse_align_segments(text, align)
       segments.each do |seg|
-        seg_text = seg[:text].to_s
-        # seg_text = seg[:text].to_s
-        # next if seg_text.strip.empty?
+        seg_text = escape_inline_format(seg[:text])
         lines = pdf.text_box seg_text,
           at: [(pdf.bounds.width - box_width) / 2, pdf.cursor],
           width: box_width,
