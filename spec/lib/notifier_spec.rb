@@ -241,14 +241,15 @@ RSpec.describe Notifier, type: :model do
         expect(delivered.text_part.decoded).to include(title)
       end
 
-      it "escapes the footer, which is written as text" do
+      it "keeps the markup that an administrator wrote in the footer" do
         FactoryBot.create(
           :custom_variable, variable: "notification_footer",
-          value: "Duvidas? Fale com <suporte@uff.br>"
+          value: "<strong>Nao responda</strong> este e-mail"
         )
         Notifier.send_emails(notifications: [message])
-        expect(delivered.html_part.decoded).to include("&lt;suporte@uff.br&gt;")
-        expect(delivered.text_part.decoded).to include("<suporte@uff.br>")
+        expect(delivered.html_part.decoded)
+          .to include("<strong>Nao responda</strong>")
+        expect(delivered.text_part.decoded).to include("Nao responda este e-mail")
       end
 
       it "escapes the recipient it announces when redirecting" do

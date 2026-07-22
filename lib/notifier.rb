@@ -79,9 +79,9 @@ module Notifier
       next if m[:skip_message]
       m_attachments = messages_attachments[message]
       if !CustomVariable.notification_footer.empty? && ! m[:skip_footer]
-        # a footer is written as text in a custom variable, and a body is
-        # markup, so the footer is escaped on its way into the body
-        m[:body] += "\n\n\n" + Notifier.as_markup(CustomVariable.notification_footer)
+        # a footer is written by an administrator, who writes markup like the
+        # author of a template does, so it joins the body as it is
+        m[:body] += "\n\n\n" + CustomVariable.notification_footer
       end
       if !CustomVariable.redirect_email.nil? && ! m[:skip_redirect]
         Notifier.logger.info "Custom Variable 'redirect_email' is set. Redirecting the emails"
