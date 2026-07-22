@@ -86,6 +86,30 @@ RSpec.describe Notifier, type: :model do
         expect(delivered.reply_to).to eq(["resposta@example.com"])
       end
 
+      it "sets every reply_to of a comma separated custom variable" do
+        FactoryBot.create(
+          :custom_variable, variable: "reply_to",
+          value: "a@example.com, b@example.com"
+        )
+        Notifier.send_emails(notifications: [message])
+        expect(delivered.reply_to).to eq(["a@example.com", "b@example.com"])
+      end
+
+      it "replies to the sender when the custom variable is not declared" do
+        # CustomVariable.reply_to falls back to the default sender address
+        default_from = Mail::Address.new(ActionMailer::Base.default[:from])
+        Notifier.send_emails(notifications: [message])
+        expect(delivered.reply_to).to eq([default_from.address])
+      end
+
+      it "has no reply_to when the custom variable is declared without value" do
+        FactoryBot.create(:custom_variable, variable: "reply_to", value: "")
+        Notifier.send_emails(notifications: [message])
+        # the header is built, but it is empty and does not reach the message
+        expect(delivered.reply_to).to eq([])
+        expect(delivered.to_s).not_to include("Reply-To")
+      end
+
       it "overrides the reply_to of the message with the custom variable" do
         # CustomVariable.reply_to falls back to the default sender address,
         # so it always takes precedence over the reply_to of the message.
