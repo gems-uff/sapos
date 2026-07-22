@@ -9,67 +9,38 @@ module Notifier
   # Number of spaces that replaces a tab when converting a body to HTML
   TAB_WIDTH = 8
 
-  # Markup that the toolbar of the template editor produces in a body: the
-  # bold and italic buttons write the tags, and the align tag of
-  # lib/liquid_formatter.rb renders the div.
-  TOOLBAR_MARKUP = %r{
-    </?strong> | </?em> | </div> |
-    <div\s+style=["']text-align:\s*(?:left|center|right|justify);\s*["']>
-  }x
-
   def self.logger
     Rails.logger
   end
 
-  # Escapes a message body, keeping the markup of the template editor toolbar.
+  # Escapes a text that is written into the body of a message.
   #
-  # Templates are filled with data that the user did not write and that is not
-  # meant to be read as markup. An address such as "Fulano <fulano@uff.br>"
-  # would be swallowed by the mail client, so everything is escaped and only
-  # the markup that the toolbar produces is given back.
-  def self.escape_body(body)
-    text = body.to_s
-    result = +""
-    open_divs = 0
-    last = 0
-    text.scan(TOOLBAR_MARKUP) do
-      match = Regexp.last_match
-      result << ERB::Util.html_escape(text[last...match.begin(0)])
-      markup = match[0]
-      if markup == "</div>"
-        # a closing tag is only markup when the align tag opened a div
-        if open_divs.positive?
-          open_divs -= 1
-          result << markup
-        else
-          result << ERB::Util.html_escape(markup)
-        end
-      else
-        open_divs += 1 if markup.start_with?("<div")
-        result << markup
-      end
-      last = match.end(0)
-    end
-    result << ERB::Util.html_escape(text[last..])
-    result
+  # A body is markup, so a text that was not written as markup is escaped
+  # before joining it. See CodeEvaluator::ESCAPES, which does the same for the
+  # data that fills a template.
+  def self.as_markup(text)
+    CodeEvaluator::ESCAPES[:html].call(text.to_s)
   end
 
-  # Builds the text part of a message, removing the markup of the toolbar.
+  # Builds the text part of a message out of its body.
   #
-  # The body is written as text, so it is used as it is. Only the markup that
-  # the toolbar produces is removed, because it has no meaning when read as
-  # text.
+  # A body is markup: the toolbar of the template editor writes some of it and
+  # the author of the template is free to write more. None of it has meaning
+  # when read as text, so the tags are removed and the entities are read back
+  # as the characters they stand for. A line break is the one tag whose
+  # removal would change the text, so it becomes a line break.
   def self.plain_body(body)
-    body.to_s.gsub(TOOLBAR_MARKUP, "")
+    text = body.to_s.gsub(/<br\s*\/?>/i, "\n")
+    CGI.unescapeHTML(ActionController::Base.helpers.strip_tags(text))
   end
 
   # Converts the whitespace of a message body into its HTML equivalent.
   #
-  # Notification and email templates are written as text, but the toolbar of
-  # the template editor also produces inline markup (<strong>, <em> and the
-  # <div> of the align tag), so the body is delivered as HTML as well. HTML
-  # collapses every run of whitespace, which would join all the lines of the
-  # body into a single paragraph. Line breaks become <br> and the indentation
+  # Notification and email templates are written as text with inline markup,
+  # so the body is delivered as HTML. HTML collapses every run of whitespace,
+  # which would join all the lines of the body into a single paragraph, and
+  # the data that fills the template is already escaped by the formatter that
+  # rendered it. Line breaks become <br> and the indentation
   # is kept with non breaking spaces, so that what is written in the template
   # is what is read in the message.
   def self.body_whitespace_to_html(body)
@@ -108,11 +79,15 @@ module Notifier
       next if m[:skip_message]
       m_attachments = messages_attachments[message]
       if !CustomVariable.notification_footer.empty? && ! m[:skip_footer]
-        m[:body] += "\n\n\n" + CustomVariable.notification_footer
+        # a footer is written as text in a custom variable, and a body is
+        # markup, so the footer is escaped on its way into the body
+        m[:body] += "\n\n\n" + Notifier.as_markup(CustomVariable.notification_footer)
       end
       if !CustomVariable.redirect_email.nil? && ! m[:skip_redirect]
         Notifier.logger.info "Custom Variable 'redirect_email' is set. Redirecting the emails"
-        m[:body] = "Originalmente para #{m[:to]}\n\n" + m[:body]
+        # a recipient is a header, not markup: an address such as
+        # "Fulano <fulano@uff.br>" has to be escaped to be read in the body
+        m[:body] = "Originalmente para #{Notifier.as_markup(m[:to])}\n\n" + m[:body]
         m[:to] = CustomVariable.redirect_email
       end
       reply_to = CustomVariable.reply_to
@@ -150,11 +125,7 @@ module Notifier
         ) do |format|
           plain = Notifier.plain_body(m[:body])
           format.text { plain }
-          format.html do
-            Notifier.body_whitespace_to_html(
-              Notifier.escape_body(m[:body])
-            ).html_safe
-          end
+          format.html { Notifier.body_whitespace_to_html(m[:body]).html_safe }
         end
         mail.deliver!
         m[:to] = old_to

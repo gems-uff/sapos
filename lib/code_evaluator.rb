@@ -4,6 +4,30 @@
 # frozen_string_literal: true
  
 module CodeEvaluator
+  # Escapes that turn the data of a template into text, one per destination.
+  #
+  # A template mixes markup written by its author with data that comes from a
+  # query, and only the author writes markup: a thesis titled "O uso de
+  # <strong>" is a title, not a request for bold text. The data is escaped
+  # when the template is rendered, so the two are told apart by where they
+  # come from instead of by what they look like.
+  #
+  # The destinations do not read the same entities back. Prawn only knows
+  # &lt;, &gt; and &amp;, and prints anything else as it is written, so a name
+  # such as "Sant'Anna" has to keep its apostrophe. HTML escapes the quotes as
+  # well, because a template may write data inside an attribute.
+  ESCAPES = {
+    html: ->(text) { ERB::Util.html_escape(text).to_s },
+    pdf: ->(text) do
+      text.gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;")
+    end
+  }.freeze
+
+  def self.escaper(destination)
+    return nil if destination.blank?
+    ESCAPES.fetch(destination)
+  end
+
   def self.create_formatter(bindings, template_type, drops = nil)
     if template_type == "ERB"
       cls = ErbFormatter

@@ -80,49 +80,53 @@ RSpec.describe PdfHelper, type: :helper do
     end
   end
 
-  describe "escape_inline_format" do
+  describe "the data that a formatter escaped into the markup" do
+    # The data is escaped when the template is rendered, so what reaches the
+    # PDF is markup. These specs pin down that prawn prints the escaped data
+    # back as the characters that were written in the database.
     def printed(text)
-      Prawn::Text::Formatted::Parser
-        .format(helper.escape_inline_format(text))
+      Prawn::Text::Formatted::Parser.format(text)
         .map { |fragment| fragment[:text] }.join
     end
 
+    def rendered(data)
+      LiquidFormatter.new({ "data" => data })
+        .format("{{ data }}", escape_data: :pdf)
+    end
+
     it "prints an address written between angle brackets" do
-      expect(printed("Fulano <fulano@uff.br>")).to eq("Fulano <fulano@uff.br>")
+      expect(printed(rendered("Fulano <fulano@uff.br>")))
+        .to eq("Fulano <fulano@uff.br>")
     end
 
-    it "prints a comparison" do
-      expect(printed("CR < 7 e P&D")).to eq("CR < 7 e P&D")
+    it "prints a comparison and an ampersand" do
+      expect(printed(rendered("CR < 7 e P&D"))).to eq("CR < 7 e P&D")
     end
 
-    it "keeps the markup of the toolbar" do
-      expect(helper.escape_inline_format("<strong>a</strong> <em>b</em>"))
-        .to eq("<strong>a</strong> <em>b</em>")
+    it "prints a title that looks like markup instead of formatting the text" do
+      title = "Um estudo sobre o uso de <strong> nos CLAUDE.md"
+      expect(printed(rendered(title))).to eq(title)
     end
 
-    it "keeps the other tags that prawn understands" do
-      [
-        "<b>a</b>", "<i>a</i>", "<u>a</u>", "<sub>a</sub>", "<sup>a</sup>",
-        "<strikethrough>a</strikethrough>", "<br>", "<br/>",
-        "<color rgb=\"FF0000\">a</color>", "<font size=\"14\">a</font>",
-        "<link href=\"http://uff.br\">a</link>"
-      ].each do |markup|
-        expect(helper.escape_inline_format(markup)).to eq(markup)
-      end
+    it "prints a title that opens and closes a tag" do
+      title = "Um estudo sobre <strong> e </strong> em projetos"
+      expect(printed(rendered(title))).to eq(title)
     end
 
-    it "escapes a tag that prawn does not understand" do
-      expect(helper.escape_inline_format("<script>a</script>"))
-        .to eq("&lt;script>a&lt;/script>")
+    it "prints every character that the escape produces" do
+      expect(printed(rendered("< > & \" '"))).to eq("< > & \" '")
     end
 
-    it "keeps an entity that was already written in the template" do
-      expect(helper.escape_inline_format("a &lt; b")).to eq("a &lt; b")
+    it "does not let the data change the font of the document" do
+      # a font that does not exist used to raise and stop the PDF
+      expect { printed(rendered("<font name=\"NaoExiste\">x</font>")) }
+        .not_to raise_error
     end
 
-    it "handles an empty text" do
-      expect(helper.escape_inline_format(nil)).to eq("")
-      expect(helper.escape_inline_format("")).to eq("")
+    it "does not let the data add a link to the document" do
+      rendered_data = rendered("<link href=\"http://evil.com\">x</link>")
+      expect(printed(rendered_data))
+        .to eq("<link href=\"http://evil.com\">x</link>")
     end
   end
 
@@ -196,7 +200,8 @@ RSpec.describe PdfHelper, type: :helper do
     end
 
     it "prints data that looks like markup" do
-      text = "Fulano <fulano@uff.br> tem CR < 7"
+      text = LiquidFormatter.new({ "d" => "Fulano <fulano@uff.br> tem CR < 7" })
+        .format("{{ d }}", escape_data: :pdf)
       expect do
         helper.print_multipage_text_with_alignments(pdf, text, 500, 560)
       end.not_to raise_error

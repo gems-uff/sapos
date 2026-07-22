@@ -209,71 +209,92 @@ RSpec.describe Notifier, type: :model do
       end
     end
 
-    context "data that looks like markup" do
+    context "data that a formatter escaped into the body" do
+      # The data is escaped when the template is rendered, so the body that
+      # reaches the notifier is markup. These specs pin down that the html
+      # part keeps the escape and the text part reads it back.
+      def rendered(template, data)
+        LiquidFormatter.new(data).format(template, escape_data: :html)
+      end
+
       let(:tricky) { "Fulano <fulano@uff.br> tem CR < 7 em P&D" }
 
-      it "escapes the data of the body in the html part" do
-        message[:body] = tricky
+      it "keeps the escaped data in the html part" do
+        message[:body] = rendered("{{ d }}", { "d" => tricky })
         Notifier.send_emails(notifications: [message])
         html = delivered.html_part.decoded
         expect(html).to include("&lt;fulano@uff.br&gt;")
         expect(html).to include("CR &lt; 7 em P&amp;D")
       end
 
-      it "keeps the data of the body untouched in the text part" do
-        message[:body] = tricky
+      it "reads the escaped data back in the text part" do
+        message[:body] = rendered("{{ d }}", { "d" => tricky })
         Notifier.send_emails(notifications: [message])
         expect(delivered.text_part.decoded).to include(tricky)
       end
 
-      it "removes the toolbar markup from the text part" do
-        message[:body] = "<strong>Aviso</strong>\n" \
-          "<div style=\"text-align: center;\">Centralizado</div>"
+      it "does not let a title that looks like markup format the message" do
+        title = "Um estudo sobre o uso de <strong> nos CLAUDE.md"
+        message[:body] = rendered("Tese: {{ d }}", { "d" => title })
         Notifier.send_emails(notifications: [message])
-        text = delivered.text_part.decoded
-        expect(text).to include("Aviso\nCentralizado")
-        expect(text).not_to include("<strong>")
-        expect(text).not_to include("<div")
+        expect(delivered.html_part.decoded).not_to include("<strong>")
+        expect(delivered.text_part.decoded).to include(title)
       end
 
-      it "escapes a closing div that does not belong to an align tag" do
-        message[:body] = "Fim do bloco </div> citado"
+      it "escapes the footer, which is written as text" do
+        FactoryBot.create(
+          :custom_variable, variable: "notification_footer",
+          value: "Duvidas? Fale com <suporte@uff.br>"
+        )
         Notifier.send_emails(notifications: [message])
-        expect(delivered.html_part.decoded).to include("&lt;/div&gt;")
+        expect(delivered.html_part.decoded).to include("&lt;suporte@uff.br&gt;")
+        expect(delivered.text_part.decoded).to include("<suporte@uff.br>")
       end
-    end
 
-    describe "escape_body" do
-      it "escapes text that is not markup" do
-        expect(Notifier.escape_body("a <b> & \"c\"")).to eq(
-          "a &lt;b&gt; &amp; &quot;c&quot;"
+      it "escapes the recipient it announces when redirecting" do
+        FactoryBot.create(
+          :custom_variable, variable: "redirect_email", value: "dev@uff.br"
         )
+        message[:to] = "Fulano <fulano@uff.br>"
+        Notifier.send_emails(notifications: [message])
+        expect(delivered.html_part.decoded).to include("&lt;fulano@uff.br&gt;")
+        expect(delivered.text_part.decoded)
+          .to include("Originalmente para Fulano <fulano@uff.br>")
       end
 
-      it "keeps the markup of the toolbar" do
-        expect(Notifier.escape_body("<strong>a</strong> <em>b</em>")).to eq(
-          "<strong>a</strong> <em>b</em>"
+      it "keeps the markup that the template wrote around the data" do
+        message[:body] = rendered(
+          "<strong>{{ d }}</strong>", { "d" => "<em>x</em>" }
         )
-      end
-
-      it "keeps the div of the align tag with its closing tag" do
-        body = "<div style=\"text-align: right;\">a</div>"
-        expect(Notifier.escape_body(body)).to eq(body)
-      end
-
-      it "handles an empty body" do
-        expect(Notifier.escape_body(nil)).to eq("")
-        expect(Notifier.escape_body("")).to eq("")
+        Notifier.send_emails(notifications: [message])
+        expect(delivered.html_part.decoded)
+          .to include("<strong>&lt;em&gt;x&lt;/em&gt;</strong>")
       end
     end
 
     describe "plain_body" do
-      it "keeps the body as it is" do
-        expect(Notifier.plain_body("CR < 7 e P&D")).to eq("CR < 7 e P&D")
+      it "reads the entities back as the characters they stand for" do
+        expect(Notifier.plain_body("CR &lt; 7 e P&amp;D")).to eq("CR < 7 e P&D")
       end
 
       it "removes the markup of the toolbar" do
-        expect(Notifier.plain_body("<em>a</em> b")).to eq("a b")
+        body = "<strong>Aviso</strong>\n" \
+          "<div style=\"text-align: center;\">Centralizado</div>"
+        expect(Notifier.plain_body(body)).to eq("Aviso\nCentralizado")
+      end
+
+      it "removes the markup that the author of a template wrote" do
+        expect(Notifier.plain_body("veja o <a href=\"http://uff.br\">SAPOS</a>"))
+          .to eq("veja o SAPOS")
+      end
+
+      it "reads a line break as a line break" do
+        expect(Notifier.plain_body("a<br />b<br>c")).to eq("a\nb\nc")
+      end
+
+      it "handles an empty body" do
+        expect(Notifier.plain_body(nil)).to eq("")
+        expect(Notifier.plain_body("")).to eq("")
       end
     end
 

@@ -208,7 +208,7 @@ class Notification < ApplicationRecord
             notification_id: self.id,
             to: formatter.format(self.to_template),
             subject: formatter.format(self.subject_template),
-            body: formatter.format(self.body_template)
+            body: formatter.format(self.body_template, escape_data: :html)
           }
 
           attachments = {}
@@ -239,7 +239,7 @@ class Notification < ApplicationRecord
               notification_id: self.id,
               to: formatter.format(self.to_template),
               subject: formatter.format(self.subject_template),
-              body: formatter.format(self.body_template)
+              body: formatter.format(self.body_template, escape_data: :html)
           }
         end
       end

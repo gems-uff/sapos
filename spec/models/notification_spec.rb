@@ -269,5 +269,44 @@ RSpec.describe Notification, type: :model do
         end
       end
     end
+
+    describe "execute" do
+      # A body is delivered as html, so the data that fills it is escaped. A
+      # recipient and a subject are headers, not markup: escaping them would
+      # break an address such as "Fulano <fulano@uff.br>".
+      let(:rows) { [["Fulano <fulano@uff.br>", "O uso de <strong>"]] }
+      let(:columns) { ["email", "titulo"] }
+
+      def execute_with(templates)
+        notification = FactoryBot.create(
+          :notification, query: @query, individual: true, **templates
+        )
+        @destroy_later << notification
+        allow(notification.query).to receive(:execute).and_return(
+          { rows: rows, columns: columns, query: "" }
+        )
+        notification.execute(skip_update: true)[:notifications].first
+      end
+
+      it "escapes the data of the body" do
+        message = execute_with(body_template: "Tese: {{ titulo }}")
+        expect(message[:body]).to eq("Tese: O uso de &lt;strong&gt;")
+      end
+
+      it "keeps the markup that the template wrote in the body" do
+        message = execute_with(body_template: "<strong>{{ titulo }}</strong>")
+        expect(message[:body]).to eq("<strong>O uso de &lt;strong&gt;</strong>")
+      end
+
+      it "does not escape the recipient" do
+        message = execute_with(to_template: "{{ email }}")
+        expect(message[:to]).to eq("Fulano <fulano@uff.br>")
+      end
+
+      it "does not escape the subject" do
+        message = execute_with(subject_template: "Tese: {{ titulo }}")
+        expect(message[:subject]).to eq("Tese: O uso de <strong>")
+      end
+    end
   end
 end
