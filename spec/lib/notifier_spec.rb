@@ -105,8 +105,7 @@ RSpec.describe Notifier, type: :model do
       it "has no reply_to when the custom variable is declared without value" do
         FactoryBot.create(:custom_variable, variable: "reply_to", value: "")
         Notifier.send_emails(notifications: [message])
-        # the header is built, but it is empty and does not reach the message
-        expect(delivered.reply_to).to eq([])
+        expect(delivered.reply_to).to be_nil
         expect(delivered.to_s).not_to include("Reply-To")
       end
 

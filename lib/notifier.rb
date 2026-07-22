@@ -115,9 +115,10 @@ module Notifier
         m[:body] = "Originalmente para #{m[:to]}\n\n" + m[:body]
         m[:to] = CustomVariable.redirect_email
       end
-      unless CustomVariable.reply_to.nil?
+      reply_to = CustomVariable.reply_to
+      if reply_to.present?
         Notifier.logger.info "Custom Variable 'reply_to' is set. Forwarding email"
-        m[:reply_to] = CustomVariable.reply_to
+        m[:reply_to] = reply_to
       end
       unless m[:to].blank?
         actionmailer_base = ActionMailer::Base.new
