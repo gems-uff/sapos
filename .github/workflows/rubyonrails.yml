@@ -58,11 +58,15 @@ jobs:
       - name: Configure database.yml
         run: cp config/database.yml.example config/database.yml
 
-      - name: Create the test database faithful to production
+      # The collation must match production; utf8mb4_unicode_ci is what the
+      # tables materialize there. sql_mode is not set here on purpose: the Rails
+      # mysql2 adapter overrides the session sql_mode to its strict default on
+      # every connection, in CI and in production alike, so a SET GLOBAL would
+      # not change what the app sees.
+      - name: Create the test database with production's collation
         run: |
           mysql -h 127.0.0.1 -u root -proot -e "
             CREATE DATABASE sapos_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-            SET GLOBAL sql_mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
           "
 
       - name: Set up database schema
