@@ -34,7 +34,6 @@ RSpec.describe Course, type: :model do
     it { should be_valid }
     it { should belong_to(:course_type).required(true) }
     it { should validate_presence_of(:name) }
-    it { should validate_uniqueness_of(:code) }
     it { should validate_presence_of(:code) }
     it { should validate_presence_of(:credits) }
     it { should validate_presence_of(:workload) }

@@ -25,6 +25,7 @@ require "support/user_helpers"
 require "support/place_widgets_helpers"
 require "support/record_select_helpers"
 require "support/download_helpers"
+require "support/uniqueness_examples"
 
 Capybara.server = :puma
 

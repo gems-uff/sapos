@@ -24,7 +24,6 @@ RSpec.describe ResearchLine, type: :model do
   subject { research_line }
   describe "Validations" do
     it { should be_valid }
-    it { should validate_uniqueness_of(:name) }
     it { should validate_presence_of(:name) }
     it { should belong_to(:research_area).required(true) }
   end

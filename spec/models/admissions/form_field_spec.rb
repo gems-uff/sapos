@@ -35,9 +35,6 @@ RSpec.describe Admissions::FormField, type: :model do
     it { should be_valid }
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:form_template) }
-    it do
-      should validate_uniqueness_of(:sync).scoped_to(:form_template_id).allow_nil
-    end
     it { should validate_inclusion_of(:field_type).in_array(Admissions::FormField::FIELD_TYPES) }
     # ToDo: test sync
     describe "configuration" do

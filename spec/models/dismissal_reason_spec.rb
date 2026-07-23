@@ -14,7 +14,6 @@ RSpec.describe DismissalReason, type: :model do
   subject { dismissal_reason }
   describe "Validations" do
     it { should be_valid }
-    it { should validate_uniqueness_of(:name) }
     it { should validate_presence_of(:name) }
     it { should validate_inclusion_of(:thesis_judgement).in_array(DismissalReason::THESIS_JUDGEMENT) }
     it { should validate_presence_of(:thesis_judgement) }

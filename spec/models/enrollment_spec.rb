@@ -66,7 +66,6 @@ RSpec.describe Enrollment, type: :model do
     it { should belong_to(:enrollment_status).required(true) }
     it { should belong_to(:research_area).required(false) }
     it { should validate_presence_of(:enrollment_number) }
-    it { should validate_uniqueness_of(:enrollment_number) }
     it { should validate_presence_of(:admission_date) }
     it { should accept_a_month_year_assignment_of(:admission_date, presence: true) }
 
