@@ -26,12 +26,21 @@ para o CI.
 Não presuma. Rode no servidor e copie os valores:
 
 ```sql
-SELECT @@version, @@sql_mode;
+SELECT @@version, @@sql_mode, @@lower_case_table_names;
 SELECT DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA
   WHERE SCHEMA_NAME = DATABASE();
 SELECT DISTINCT TABLE_COLLATION FROM information_schema.TABLES
   WHERE TABLE_SCHEMA = DATABASE();
 ```
+
+**`lower_case_table_names` é um ponto cego do MariaDB no macOS.** No Linux
+(Debian de produção) o default é `0` — nomes de tabela **case-sensitive**, então
+`SELECT * FROM USERS` não encontra a tabela `users`. No macOS o default é `2`
+(case-insensitive), e uma consulta com o nome em caixa errada **passa local e
+quebra em produção**. É uma variável que a instância efêmera **não** consegue
+casar com produção quando a máquina é um Mac (o valor é fixado na inicialização e
+depende do filesystem). Quem roda a suíte no Mac fica cego para esse eixo — é o
+CI (Linux) que o exercita de verdade.
 
 **A collation que vale é a materializada nas tabelas, não a declarada no
 `config/database.yml`.** No SAPOS elas divergem: o arquivo declara
