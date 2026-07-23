@@ -1,0 +1,45 @@
+# Rotas que retornam binario (PDF/XLSX). Os ids sao de registros existentes em
+# homologacao; ajuste se o banco for reimportado. Linhas com # sao ignoradas.
+#
+# ESCOLHA DO EDITAL: prefira uma selecao de doutorado. As de mestrado costumam
+# ter bem mais candidatos, e o relatorio completo delas leva minutos, chegando a
+# estourar o tempo de leitura. Antes de fixar um id aqui, confira na tela de
+# editais qual selecao tem menos candidatos.
+
+# --- PDF de registro individual
+#
+# ATENCAO: as duas rotas abaixo NAO sao somente leitura. Cada geracao cria um
+# registro de documento assinado, com identificador proprio e carimbo de hora,
+# e por isso o QR code muda a cada chamada. Duas capturas do mesmo documento
+# SEMPRE diferem na area da assinatura -- isso e o desenho do recurso, nao
+# regressao. O resto da pagina tem que ser identico.
+/enrollments/2903/academic_transcript_pdf
+/enrollments/2903/grades_report_pdf
+/course_classes/621/summary_pdf
+/class_schedules/1/class_schedule_pdf
+/admission_processes/4/complete_pdf
+/admission_processes/4/short_pdf
+
+# --- PDF de colecao (exigem a extensao explicita; em HTML respondem 406)
+/advisements/to_pdf.pdf
+/enrollments/to_pdf.pdf
+/scholarships/to_pdf.pdf
+/scholarship_durations/to_pdf.pdf
+
+# --- XLSX
+/admission_processes/4/complete_xls
+/course_classes/621/summary_xls
+
+# --- NAO INCLUIDAS, e por que
+#
+# /assertions/:id/assertion_pdf
+#   Exige o parametro matricula_aluno (usado no authorize! e no map_params);
+#   sem ele a acao redireciona. Nao fixamos uma matricula aqui porque e dado
+#   pessoal e este arquivo e versionado. Para exercitar essa rota, passe a
+#   matricula em tempo de execucao, por uma lista de rotas local nao versionada.
+#
+# /course_classes/class_schedule_pdf (colecao)
+#   Exige ano e semestre vindos da busca do active_scaffold, que fica em sessao
+#   e nao e aceita por query string num GET simples. Precisaria dirigir a tela
+#   de busca pelo navegador antes de baixar. A variante por turma
+#   (/class_schedules/:id/class_schedule_pdf) ja cobre o mesmo gerador.

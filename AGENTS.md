@@ -1,0 +1,88 @@
+# SAPOS — instruções para agentes
+
+Sistema de gestão de pós-graduação. Produção roda em Apache+Passenger sobre
+MariaDB; a suíte de testes roda em SQLite. Versões de Ruby, Rails e gems vêm do
+`Gemfile` e do `Gemfile.lock` — não as reproduza aqui.
+
+## Documentação existente
+
+Antes de escrever procedimento novo, consulte a [wiki](https://github.com/gems-uff/sapos/wiki):
+
+- Instalação para desenvolvimento: `Quick-install` e `Explained-Quick-install-for-development`
+- Instalação para produção: `Explained-quick-install-for-production`
+- Atualização de release: `Upgrading-to-a-new-release`
+- Modelo de ramos e fluxo de contribuição: `Contributing`
+
+Referencie essas páginas em vez de duplicá-las. Se algo estiver desatualizado,
+corrija na wiki.
+
+## Convenções de trabalho
+
+- Uma issue, um ramo `issue_NNN`, sempre baseado na `main`. Detalhes do ciclo em
+  `Contributing` na wiki.
+- **Exceção:** vulnerabilidade não ganha issue pública — enumerar o problema
+  expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica.
+- Critério de pronto: `bundle exec rspec` inteiro verde (~12 min, ~2176 exemplos).
+
+## Skills do repositório
+
+Em `.claude/skills/`. O Claude Code as descobre sozinho; a lista existe para
+humanos e para outros agentes.
+
+- `safe-refactor` — mede a mudança pela suíte local: cobre a lacuna, roda antes,
+  muda, roda depois, compara. Primeiro recurso em refatoração, correção de bug,
+  feature ou upgrade de dependência.
+- `suite-mariadb` — sobe um MariaDB local fiel ao de produção e roda a suíte
+  contra ele em vez do SQLite. Use ao mexer em SQL, unicidade, ordenação ou
+  migration.
+- `homologacao` — quando nem isso alcança: compara o SAPOS antes e depois em
+  homologação, capturando telas, PDFs e planilhas nas duas versões, contra o
+  mesmo banco.
+
+## Atualização de dependências
+
+- Uma gem por passo: `bundle update --conservative <gem>`, suíte completa,
+  commit individual. Se quebrar, o commit aponta a gem exata.
+- Alvo é o patch mais atual da mesma série minor/major. Nunca subir major ou
+  minor de carona — isso é decisão separada.
+- **Confira a versão resolvida no `Gemfile.lock`; não confie no `~>`.** Num
+  update de segurança, `"~> 7.2.0"` resolveu para 7.2.3 em vez de 7.2.3.1 — a
+  versão sem a correção — e a suíte verde não acusaria nada. Quando a intenção
+  é piso de segurança, declare-o: `gem "rails", "~> 7.2.3", ">= 7.2.3.1"`.
+- Gem transitiva não entra no `Gemfile` só para travar série. Use
+  `bundle update <gem> --patch`, que restringe o bump sem tocar no arquivo.
+- Higiene em lote (muitas gems atrasadas em patch) é exceção à regra de um passo
+  por gem: `bundle update --patch --strict`, suíte, e bissecção **só se quebrar**.
+  O `--strict` importa — sem ele o nível de patch é apenas preferência e o
+  bundler pode subir além.
+
+## Pontos cegos da suíte
+
+A suíte roda em SQLite; produção é MariaDB com collation `utf8mb4_unicode_ci`
+(case-insensitive **e** accent-insensitive) e `STRICT_TRANS_TABLES`. Isso muda
+unicidade, ordenação e `LIKE` — num sistema em português, com acento em toda
+parte, a diferença é real. Código que os testes nunca executam:
+
+- `Query.run_read_only_query` (`app/models/query.rb`) ramifica por adaptador; o
+  bloco `Mysql2` abre um cliente próprio e usa a configuração
+  `<env>_read_only`. Protegido por specs com stub em `spec/models/query_spec.rb`.
+- `config/initializers/recordselect_patch.rb` reabre `AbstractMysqlAdapter`.
+- `db/seeds/02.reports_notifications.rb` tem um bloco atrás de `unless is_sqlite`
+  que só carrega em MySQL.
+
+Ao mexer nesses pontos, valide em homologação — verde local não basta.
+
+## Monkey-patches
+
+`config/initializers/` contém correções que dependem de interno do Rails e do
+active_scaffold: `fix_rails7_date_format.rb`, `fix_url_for.rb`,
+`recordselect_patch.rb`, `fix_rails61_active_scaffold_dependent_error.rb` e
+`active_scaffold_disable_null_comparators.rb`. São os primeiros suspeitos em
+qualquer upgrade de Rails.
+
+## Dados sensíveis
+
+O banco de homologação é réplica de produção, com dado real de aluno. Nunca
+transcreva nome, e-mail, CPF ou nota para arquivos de trabalho, documentação ou
+comentários de issue e PR — comentário de issue é público e irreversível.
+Descreva achados genericamente: "aluno com nome acentuado", "registro id NNNN".
