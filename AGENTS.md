@@ -29,6 +29,18 @@ corrija na wiki.
   ramo novo: crie só quando pedirem.
 - Documentação e comentário falam em **"mantenedor"**, não em nome próprio —
   o papel sobrevive a quem o exerce.
+- **Antes de abrir issue, pesquise as existentes — inclusive as fechadas:**
+  `gh issue list --state all --search "<termo>"`, variando termos em português e
+  inglês. Achando issue relacionada, leia também os commits que a fecharam
+  (`git log --all --grep="<numero>"`). Não é só evitar duplicata: é ali que está o
+  contexto que torna a issue nova útil — decisão de produto já tomada, tentativa
+  revertida, correção que só alcançou parte do código.
+- **Não afirme impacto em produção sem verificar com o mantenedor.** O repositório
+  não diz quais funcionalidades estão em uso. Issue é pública e irreversível;
+  descreva o que foi medido no código e pergunte o resto.
+- Convenção de trabalho vale para qualquer agente e vive **aqui**, versionada. A
+  memória local do Claude Code não acompanha troca de máquina — guarde nela só o
+  que for específico de uma sessão ou do ambiente.
 
 ## Skills do repositório
 
