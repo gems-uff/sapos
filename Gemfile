@@ -203,8 +203,11 @@ end
 
 # Notify exceptions
 gem "exception_notification"
+# Gems kept out of the default install so a fresh checkout runs on SQLite with
+# no database server and no native MySQL client. Production needs mysql2; so do
+# CI and the suite-mariadb skill, which opt in by installing this group.
 group :production do
-  # Use MySQL database for production
+  # MySQL/MariaDB driver: production, CI and local testing against MariaDB.
   gem "mysql2"
 
   # Temporary fix for passenger
