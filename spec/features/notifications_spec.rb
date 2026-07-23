@@ -165,6 +165,14 @@ RSpec.describe "Notifications features", type: :feature do
 
     before(:each) do
       Rake::Task["maintenance:trigger_notifications"].reenable
+      # Os objetos vem do before(:all) e sobrevivem aos exemplos, guardando o
+      # next_execution que o exemplo anterior atribuiu -- mas o banco voltou ao
+      # valor original pelo rollback. Como notifications.next_execution e
+      # datetime sem precisao fracionaria, em MySQL/MariaDB dois `5.days.ago`
+      # dentro do mesmo segundo sao o mesmo valor: o dirty tracking nao ve
+      # mudanca, o save! vira no-op e a notificacao fica fora da janela do rake,
+      # sem e-mail nenhum. O SQLite guarda a fracao de segundo e escondia isso.
+      [@notification3, @notification4].each(&:reload)
     end
 
     it "should send notifications with attachment" do
