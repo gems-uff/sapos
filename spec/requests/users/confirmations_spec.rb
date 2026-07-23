@@ -48,6 +48,17 @@ RSpec.describe "Users::ConfirmationsController", type: :request do
       expect(professor.reload.email).to eq("new@ic.uff.br")
     end
 
+    it "renders the Devise error instead of a 500 when the token was not issued" do
+      user = create_confirmed_user([@role_adm], "old@ic.uff.br")
+      user.update!(email: "new@ic.uff.br")
+
+      get user_confirmation_path(confirmation_token: "nao-emitido")
+
+      expect(response.status).to be < 500
+      expect(user.reload.email).to eq("old@ic.uff.br")
+      expect(user.unconfirmed_email).to eq("new@ic.uff.br")
+    end
+
     it "keeps the email of the student when the confirmation does not change the email" do
       student = Student.create!(name: "ana", cpf: "123.456.789-10",
         email: "student@ic.uff.br")
