@@ -62,19 +62,27 @@ namespace :maintenance do
     Notifier.logger.info "[Notifications] #{Time.now.to_fs} - Finished sending notifications"
   end
 
-  # The rendering modules live in a class of their own on purpose. Calling
-  # `include` from inside a method body of this file would include them into
-  # Object, which leaks into every object in the process -- harmless for a cron
-  # run that exits right after, but it breaks any other code sharing the
-  # process, the test suite included.
-  class AttachmentRenderer
-    include SharedPdfConcern
-    include AbstractController::Rendering
-  end
-
   private
+    # The rendering modules live in a class of their own on purpose. Calling
+    # `include` from inside a method body of this file would include them into
+    # Object, which leaks into every object in the process -- harmless for a
+    # cron run that exits right after, but it breaks any other code sharing the
+    # process, the test suite included.
+    #
+    # The class is built on first use, not at the top level of this file: rake
+    # loads every rakefile before running any task, so a top-level body would
+    # resolve SharedPdfConcern before the environment is loaded, and Zeitwerk
+    # cannot autoload it yet. That raises NameError on *every* rake invocation,
+    # not just on this task.
+    def attachment_renderer
+      @attachment_renderer ||= Class.new do
+        include SharedPdfConcern
+        include AbstractController::Rendering
+      end.new
+    end
+
     def prepare_attachments(notification_result)
-      renderer = AttachmentRenderer.new
+      renderer = attachment_renderer
       notification_result[:notifications].each do |message|
         attachments = notification_result[:notifications_attachments][message]
         next if attachments.blank?
