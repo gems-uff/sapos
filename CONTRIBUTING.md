@@ -5,11 +5,10 @@ Is this your first time contributing here? Try some [good first issues](https://
 If you want to contribute to our project and **DO NOT BELONG TO THE MAIN TEAM**, follow these steps:
 
 1. Fork the repo
-2. Create your branch (see details below)
-3. Implement and test your code
-4. Submit a pull request
+2. Implement and test your code
+3. Submit a pull request
 
-If you **DO BELONG TO THE MAIN TEAM**, just follow steps 2 and 3.
+If you **DO BELONG TO THE MAIN TEAM**, just follow steps below.
 
 ## Branching model
 
