@@ -153,20 +153,54 @@ RSpec.describe "Notifications features", type: :feature do
     end
   end
 
-  describe "notify" do
+  # Notifications used to be triggered by GET /notifications/notify, an
+  # unauthenticated endpoint. Production drives them through the daily cron
+  # (bundle exec rails maintenance:run), so the rake task is what these
+  # examples exercise.
+  describe "maintenance:trigger_notifications" do
+    before(:all) do
+      require "rake"
+      Rails.application.load_tasks if Rake::Task.tasks.empty?
+    end
+
+    before(:each) do
+      Rake::Task["maintenance:trigger_notifications"].reenable
+    end
+
     it "should send notifications with attachment" do
       @notification3.next_execution = 5.days.ago
       @notification3.save!
-      visit "/notifications/notify"
-      expect(page).to have_content "Ok"
+      Rake::Task["maintenance:trigger_notifications"].invoke
       expect(ActionMailer::Base.deliveries.last.subject).to eq "SAPOS: boletim em anexo"
+    end
+
+    # The attachment goes out EMPTY through the rake task -- see issue #632.
+    # The fix for #547 taught the controller copy of prepare_attachments to pass
+    # filename, signature_type and watermark, but never reached the rake copy,
+    # which still calls render_enrollments_grades_report_pdf with a single
+    # argument. From outside a controller, render_to_string returns nil, so
+    # file_contents ends up empty and nothing is raised.
+    #
+    # No one is affected: the feature has been unused in production since early
+    # 2025, when students started generating the report themselves with a QR
+    # code. #632 decides whether the option is removed or the task is fixed.
+    # This example pins the current behavior so that either decision breaks it
+    # and forces a rewrite.
+    it "currently attaches an EMPTY grades report (see #632)" do
+      @notification3.next_execution = 5.days.ago
+      @notification3.save!
+      Rake::Task["maintenance:trigger_notifications"].invoke
+
+      attachment = ActionMailer::Base.deliveries.last.attachments.first
+      expect(attachment).to be_present
+      expect(attachment.filename).to include("BOLETIM")
+      expect(attachment.body.raw_source.bytesize).to eq 0
     end
 
     it "should send notifications without attachment" do
       @notification4.next_execution = 5.days.ago
       @notification4.save!
-      visit "/notifications/notify"
-      expect(page).to have_content "Ok"
+      Rake::Task["maintenance:trigger_notifications"].invoke
       expect(ActionMailer::Base.deliveries.last.subject).to eq "SAPOS: lembrar de etapa"
     end
   end

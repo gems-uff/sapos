@@ -284,10 +284,6 @@ Rails.application.routes.draw do
       post "execute_now"
       get "simulate"
     end
-
-    collection do
-      get "notify"
-    end
   end
 
   resources :queries do

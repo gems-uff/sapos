@@ -62,17 +62,26 @@ namespace :maintenance do
     Notifier.logger.info "[Notifications] #{Time.now.to_fs} - Finished sending notifications"
   end
 
+  # The rendering modules live in a class of their own on purpose. Calling
+  # `include` from inside a method body of this file would include them into
+  # Object, which leaks into every object in the process -- harmless for a cron
+  # run that exits right after, but it breaks any other code sharing the
+  # process, the test suite included.
+  class AttachmentRenderer
+    include SharedPdfConcern
+    include AbstractController::Rendering
+  end
+
   private
     def prepare_attachments(notification_result)
-      include SharedPdfConcern
-      include AbstractController::Rendering
+      renderer = AttachmentRenderer.new
       notification_result[:notifications].each do |message|
         attachments = notification_result[:notifications_attachments][message]
         next if attachments.blank?
         if attachments[:grades_report_pdf]
           enrollment = Enrollment.find(message[:enrollments_id])
           attachments[:grades_report_pdf][:file_contents] =
-            render_enrollments_grades_report_pdf(enrollment)
+            renderer.render_enrollments_grades_report_pdf(enrollment)
         end
       end
       notification_result
