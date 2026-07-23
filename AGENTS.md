@@ -15,9 +15,6 @@ Antes de escrever procedimento novo, consulte a [wiki](https://github.com/gems-u
 Referencie essas páginas em vez de duplicá-las. Se algo estiver desatualizado,
 corrija na wiki.
 
-O modelo de ramos e o fluxo de contribuição **não** estão mais na wiki: vivem em
-`CONTRIBUTING.md`, na raiz do repositório, versionados junto do código.
-
 ## Convenções de trabalho
 
 - Uma issue, um ramo `issue_NNN`, sempre baseado na `main`. Detalhes do ciclo em
