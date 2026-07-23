@@ -52,6 +52,7 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 
 * [Source Code](https://github.com/gems-uff/sapos)
 * [Issue Tracking](https://github.com/gems-uff/sapos/issues)
+* [Contributing](CONTRIBUTING.md)
 
 # Technologies
 

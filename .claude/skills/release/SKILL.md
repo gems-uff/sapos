@@ -6,11 +6,7 @@ description: Lança uma nova versão do SAPOS — merge na main, tag anotada, la
 # Release do SAPOS
 
 Sequência para transformar um ramo pronto em versão publicada. O passo final —
-o deploy em produção — **é do Leonardo**; a skill vai até a release no GitHub.
-
-Nada aqui substitui olhar o caso anterior. Antes de executar, leia a release mais
-recente (`gh release view <tag>`) e a tag correspondente (`git cat-file tag <tag>`):
-convenções mudam, e o repositório é a fonte da verdade.
+o deploy em produção — **é do mantenedor**; a skill vai até a release no GitHub.
 
 ## Pré-requisitos
 
@@ -19,7 +15,7 @@ Não comece sem isto:
 - Suíte completa verde no ramo (`bundle exec rspec`, ~12 min).
 - Homologação feita, quando a mudança toca o que a suíte não alcança (skill
   `homologacao`).
-- Passada manual do Leonardo em staging, quando houver caminho de escrita, PDF,
+- Passada manual do mantenedor em staging, quando houver caminho de escrita, PDF,
   planilha ou e-mail envolvido — a captura automatizada é só leitura.
 - `main` sincronizada com `origin/main`: `git rev-list --left-right --count origin/main...main` → `0 0`.
 
@@ -38,10 +34,11 @@ fica para issue própria (#626)" não atende a #626 — mencionar não é entreg
 Trabalho de vulnerabilidade **não tem issue** (ver `AGENTS.md`): vai aparecer
 como commits sem referência. Isso é esperado, e o passo 6 diz como descrevê-lo.
 
-### 2. Escolha o número
+### 2. O número da versão
 
-Incremento de patch sobre a última tag (`7.15.20` → `7.15.21`). Confira com
-`git tag -l --sort=-v:refname | head -3` — não confie na memória.
+Quem define é o mantenedor. Se ele não informar, proponha o incremento de patch
+sobre a última tag (`git tag -l --sort=-v:refname | head -3`; `7.15.20` → `7.15.21`)
+e **peça confirmação antes de criar a tag** — o incremento pode não ser de patch.
 
 ### 3. Merge na main, fast-forward
 
@@ -51,12 +48,12 @@ git merge --ff-only <ramo>
 git push origin main
 ```
 
-O `--ff-only` é proposital: pelo modelo de ramos (wiki, `Contributing`), o ramo
+O `--ff-only` é proposital: pelo modelo de ramos (`CONTRIBUTING.md`), o ramo
 já mergeou a `main` nele antes do PR, então o merge **tem** que ser
 fast-forward. Se o git recusar, não force nem faça merge commit — o ramo está
 desatualizado e precisa integrar a `main` primeiro, com a suíte rodada de novo.
 
-Nem toda release passa por PR; quando o Leonardo dispensa, o merge é direto.
+Nem toda release passa por PR; quando o mantenedor dispensa, o merge é direto.
 
 ### 4. Tag anotada
 
@@ -123,7 +120,7 @@ gh release list --limit 3          # a nova deve aparecer como Latest
 gh issue list --label 7.15.21 --state all
 ```
 
-### 8. Deploy — do Leonardo
+### 8. Deploy — do mantenedor
 
 **Passe a tag certa.** Uma versão errada exibida em produção já foi rastreada
 até a tag passada no deploy, não ao Passenger. Depois de subir, confira o rodapé
@@ -131,16 +128,6 @@ da aplicação.
 
 ## Depois da release
 
-- Apague o ramo (GitHub e local), e pode `git fetch --prune`.
-- Crie o ramo do trabalho seguinte a partir da `main` já atualizada.
+- Apague o ramo lançado (GitHub e local), e pode `git fetch --prune`.
 - Se a release fecha alerta do Dependabot, ele só re-varre o ramo padrão — o
   quadro de alertas leva alguns minutos para refletir o push.
-
-## Wiki
-
-O repositório da wiki é separado (`sapos.wiki.git`) e tem `origin` em HTTPS sem
-credencial configurada. Empurre pela URL SSH:
-
-```bash
-git -C <dir_da_wiki> push git@github.com:gems-uff/sapos.wiki.git master
-```

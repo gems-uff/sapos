@@ -11,18 +11,27 @@ Antes de escrever procedimento novo, consulte a [wiki](https://github.com/gems-u
 - Instalação para desenvolvimento: `Quick-install` e `Explained-Quick-install-for-development`
 - Instalação para produção: `Explained-quick-install-for-production`
 - Atualização de release: `Upgrading-to-a-new-release`
-- Modelo de ramos e fluxo de contribuição: `Contributing`
 
 Referencie essas páginas em vez de duplicá-las. Se algo estiver desatualizado,
 corrija na wiki.
 
+O modelo de ramos e o fluxo de contribuição **não** estão mais na wiki: vivem em
+`CONTRIBUTING.md`, na raiz do repositório, versionados junto do código.
+
 ## Convenções de trabalho
 
 - Uma issue, um ramo `issue_NNN`, sempre baseado na `main`. Detalhes do ciclo em
-  `Contributing` na wiki.
+  `CONTRIBUTING.md`.
 - **Exceção:** vulnerabilidade não ganha issue pública — enumerar o problema
   expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica.
-- Critério de pronto: `bundle exec rspec` inteiro verde (~12 min, ~2176 exemplos).
+- Critério de pronto: `bundle exec rspec` inteiro verde (~12 min, ~2189 exemplos).
+- **Não commite por conta própria.** Deixe a mudança pronta na árvore de
+  trabalho, mostre o diff e o resultado da suíte, e espere o mantenedor revisar.
+  Commit, tag e push são dele — inclusive nos passos de baby-step, onde é fácil
+  achar que "um commit por gem" autoriza commitar sozinho. Vale também para
+  ramo novo: crie só quando pedirem.
+- Documentação e comentário falam em **"mantenedor"**, não em nome próprio —
+  o papel sobrevive a quem o exerce.
 
 ## Skills do repositório
 
@@ -39,7 +48,7 @@ humanos e para outros agentes.
   homologação, capturando telas, PDFs e planilhas nas duas versões, contra o
   mesmo banco.
 - `release` — fecha o ciclo: merge fast-forward na `main`, tag anotada, label e
-  issues no GitHub, release publicada. O deploy em si continua sendo do Leonardo.
+  issues no GitHub, release publicada. O deploy em si continua sendo do mantenedor.
 
 ## Atualização de dependências
 
