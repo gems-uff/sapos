@@ -173,10 +173,10 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     debug_inspector (1.1.0)
-    devise (4.9.4)
+    devise (5.0.4)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
-      railties (>= 4.1.0)
+      railties (>= 7.0)
       responders
       warden (~> 1.2.3)
     devise_invitable (2.0.12)
@@ -395,9 +395,9 @@ GEM
       io-console (~> 0.5)
     request_store (1.7.0)
       rack (>= 1.4)
-    responders (3.1.1)
-      actionpack (>= 5.2)
-      railties (>= 5.2)
+    responders (3.2.0)
+      actionpack (>= 7.0)
+      railties (>= 7.0)
     rexml (3.4.4)
     rouge (4.2.0)
     rqrcode (2.2.0)
@@ -568,7 +568,7 @@ DEPENDENCIES
   coffee-rails
   database_cleaner-active_record
   debug
-  devise (~> 4.9)
+  devise (~> 5.0, >= 5.0.4)
   devise_invitable (~> 2.0.0)
   dotenv-rails
   exception_notification
