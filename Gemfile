@@ -80,7 +80,7 @@ group :development do
 end
 
 group :development, :test do
-  gem "sqlite3", "~> 1.6.8"              # banco de dev/test (sem servidor)
+  gem "sqlite3", "~> 2.9.5"              # banco de dev/test; piso 2.9.5: CVE-2026-54620
   gem "awesome_print"
   gem "binding_of_caller"
   gem "better_errors"
