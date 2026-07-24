@@ -50,7 +50,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-          cache-version: 2 # Increment this number if you need to re-download cached gems
+          cache-version: 3 # Increment this number if you need to re-download cached gems
 
       # database.yml is no longer tracked, so provide it from the example. Its
       # test entry is SQLite, but DATABASE_URL above takes precedence and points
@@ -102,7 +102,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          cache-version: 1
+          cache-version: 2
 
       - name: Configure database.yml
         run: cp config/database.yml.example config/database.yml
