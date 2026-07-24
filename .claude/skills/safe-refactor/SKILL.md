@@ -101,6 +101,26 @@ Nos dois últimos casos, **declare antes de rodar quais diferenças você espera
 Sem essa lista feita de antemão, é fácil olhar para uma diferença inesperada e
 racionalizá-la como intencional.
 
+## Rodar a suíte na prática
+
+- **Núcleo antes das features.** Os *feature specs* (Capybara/Chrome) são a parte
+  lenta e a única que trava. Rode primeiro o núcleo, que fecha em segundos e já
+  exercita banco, modelos e requests:
+  `rspec --exclude-pattern "spec/features/**/*_spec.rb"`. Só depois rode as
+  features. Assim uma quebra no núcleo aparece na hora, sem esperar o Chrome.
+- **Em background, não bufferize.** `... | tail -N` **esconde tudo até o fim** — o
+  `tail` só imprime quando o pipe fecha, então o arquivo de saída fica vazio a run
+  inteira e não dá para acompanhar nem ver onde travou. Rode sem o `tail`,
+  deixando a saída fluir para o arquivo, e use `--format progress` (ou
+  `documentation`, mais verboso). O que estiver escrito por último aponta onde
+  parou.
+- **Feature spec travado.** Se a run passa muito do tempo normal (~12 min) com um
+  `chromedriver` girando, travou — mate e investigue, não espere. Confira Chrome ×
+  chromedriver na mesma versão (o Chrome se auto-atualiza). Mas **versão casada não
+  descarta o travamento**: página quebrada — asset que não compila, JS que mudou —
+  faz o Capybara esperar para sempre por um elemento que nunca aparece. Aí a causa
+  é a mudança, não o ambiente.
+
 ## Quando a suíte não basta
 
 Escale para a skill `homologacao` quando a mudança tocar algo que os testes
