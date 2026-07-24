@@ -24,7 +24,9 @@ gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem "sassc-rails"                        # SCSS
 gem "coffee-rails"                       # CoffeeScript
 gem "jquery-rails"
-gem "jquery-ui-rails", git: "https://github.com/jquery-ui-rails/jquery-ui-rails.git", tag: "v7.0.0"
+gem "jquery-ui-rails", "7.0.0"           # rubygems (jQuery UI 1.13.0). 8.0.0 corrige a
+                                         # CVE-2022-31160 mas reestrutura os assets (quebra
+                                         # o application.css) e o app nao usa checkboxradio.
 gem "font-awesome-rails"                 # iconografia
 
 # ─── Autenticacao e autorizacao ──────────────────────────────────────────
