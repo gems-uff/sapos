@@ -39,25 +39,27 @@
     </p>
   </div>
 
-  <table class="notification-results showtable listed-records-table">
-    <thead>
-    <tr>
-      <th><%= I18n.t("activerecord.attributes.notification_log.to") %></th>
-      <th><%= I18n.t("activerecord.attributes.notification_log.subject") %></th>
-      <th><%= I18n.t("activerecord.attributes.notification_log.body") %></th>
-    </tr>
-    </thead>
-    <tbody class="records">
-    <% @messages.each_with_index do |message, index| %>
-        <% tr_class = index.odd? ? "even-record" : "" %>
-        <tr class="record <%= tr_class %>">
-          <td><%= message[:to] %></td>
-          <td><%= message[:subject] %></td>
-          <td><%= notification_body_preview(message[:body]) %></td>
-        </tr>
-    <% end %>
-    </tbody>
-  </table>
+  <div class="results-scroll">
+    <table class="notification-results showtable listed-records-table">
+      <thead>
+      <tr>
+        <th><%= I18n.t("activerecord.attributes.notification_log.to") %></th>
+        <th><%= I18n.t("activerecord.attributes.notification_log.subject") %></th>
+        <th><%= I18n.t("activerecord.attributes.notification_log.body") %></th>
+      </tr>
+      </thead>
+      <tbody class="records">
+      <% @messages.each_with_index do |message, index| %>
+          <% tr_class = index.odd? ? "even-record" : "" %>
+          <tr class="record <%= tr_class %>">
+            <td><%= message[:to] %></td>
+            <td><%= message[:subject] %></td>
+            <td><%= notification_body_preview(message[:body]) %></td>
+          </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
 <% end %>
 
 <p class="form-footer">

@@ -153,6 +153,39 @@ RSpec.describe "Notifications features", type: :feature do
     end
   end
 
+  # Issue #640: uma URL longa e um token sem espaco, e portanto sem ponto de
+  # quebra. A largura minima da celula "Corpo" vira a largura do token inteiro e,
+  # sem restricao de largura na tabela, a pagina inteira passa a rolar na
+  # horizontal -- o cabecalho e o menu, dimensionados a 100% da viewport,
+  # terminam antes do conteudo.
+  describe "simulate page with a long body", js: true do
+    let(:long_url) do
+      "https://www.example.com/documentos/regras/" +
+        ("REGRAS_DE_PRORROGACAO_E_QUALIFICACAO_" * 6)
+    end
+
+    before(:each) do
+      @destroy_later << @long_body_record = FactoryBot.create(
+        :notification, query: @query1, title: "corpo longo",
+        to_template: "sapos-teste@ic.uff.br", subject_template: "Prazo",
+        body_template: "Prezado aluno,\n\nConsulte as regras em:\n\n#{long_url}\n"
+      )
+      login_as(@user)
+      page.driver.browser.manage.window.resize_to(1280, 900)
+      visit url_path
+      find("#as_#{plural_name}-simulate-#{@long_body_record.id}-link").click
+    end
+
+    it "should not make the page scroll horizontally" do
+      expect(page).to have_css("table.notification-results tbody tr")
+
+      overflow = page.evaluate_script(
+        "document.documentElement.scrollWidth - document.documentElement.clientWidth"
+      )
+      expect(overflow).to be <= 0
+    end
+  end
+
   # Notifications used to be triggered by GET /notifications/notify, an
   # unauthenticated endpoint. Production drives them through the daily cron
   # (bundle exec rails maintenance:run), so the rake task is what these

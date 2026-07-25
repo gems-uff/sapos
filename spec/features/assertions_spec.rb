@@ -145,4 +145,35 @@ RSpec.describe "Assertions features", type: :feature do
       expect(page).to have_css("#generated_sql", visible: true, text: "select 1 as col")
     end
   end
+
+  # Issue #640: mesmo defeito da simulacao de notificacao -- um valor longo sem
+  # espaco nao tem ponto de quebra, a celula estica a tabela e a pagina inteira
+  # passa a rolar na horizontal.
+  describe "simulate page with a long value", js: true do
+    before(:each) do
+      long_token = "https://www.example.com/documentos/regras/" +
+        ("REGRAS_DE_PRORROGACAO_E_QUALIFICACAO_" * 6)
+      @destroy_later << @long_query = FactoryBot.create(
+        :query, name: "longa", sql: "select '#{long_token}' as col"
+      )
+      @destroy_later << @long_assertion = Assertion.create!(
+        name: "Declaracao longa", query: @long_query,
+        template_type: "Liquid", assertion_template: "Corpo",
+        student_can_generate: false
+      )
+      login_as(@user)
+      page.driver.browser.manage.window.resize_to(1280, 900)
+      visit url_path
+      find("#as_#{plural_name}-simulate-#{@long_assertion.id}-link").click
+    end
+
+    it "should not make the page scroll horizontally" do
+      expect(page).to have_css("table.assertion-results tbody tr")
+
+      overflow = page.evaluate_script(
+        "document.documentElement.scrollWidth - document.documentElement.clientWidth"
+      )
+      expect(overflow).to be <= 0
+    end
+  end
 end
