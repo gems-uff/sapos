@@ -1,0 +1,15 @@
+{
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "allowUnsandboxedCommands": false,
+    "excludedCommands": [
+      "bundle exec rspec *"
+    ],
+    "filesystem": {
+      "allowWrite": [
+        "~/capturas-sapos-staging"
+      ]
+    }
+  }
+}
