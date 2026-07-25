@@ -1,15 +1,18 @@
-# ruby=3.2.11
+# ruby=3.4.10
 # frozen_string_literal: true
 
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 # A linha "#ruby=" acima deixa o RVM escolher a versao certa do Ruby.
-# Piso 3.2.11 (serie ~> 3.2): e requisito de seguranca. A partir do 3.2.10 o
-# uri default do Ruby vem >= 0.12.5 (CVE-2025-61594, vazamento de credencial
-# via URI#+). Antes o net-http segurava o uri em 0.12.5; sem ele, rodar num
-# Ruby anterior a 3.2.10 regrediria o uri para 0.12.2, sem a correcao.
-ruby "~> 3.2.11"
+# Serie 3.4: a 3.2 chegou ao fim de vida em 01/04/2026 e nao recebe mais nem
+# correcao de seguranca (issue #639). A 3.3 esta so em manutencao de seguranca
+# e vence em 31/03/2027; a 3.4 esta em manutencao normal e serve tambem ao
+# Rails 8 (que exige >= 3.2), entao nao precisa ser refeita nesse salto.
+# Piso 3.4.10: ultimo patch da serie. O piso antigo (3.2.11) existia para
+# garantir o uri >= 0.12.5 do stdlib (CVE-2025-61594, vazamento de credencial
+# via URI#+); a serie 3.4 ja traz o uri bem acima disso.
+ruby "~> 3.4.10"
 
 # ─── Framework e servidor ────────────────────────────────────────────────
 gem "rails", "~> 7.2.3", ">= 7.2.3.1"

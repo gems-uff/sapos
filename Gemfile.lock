@@ -111,7 +111,7 @@ GEM
     bindex (0.8.1)
     binding_of_caller (1.0.0)
       debug_inspector (>= 0.0.1)
-    bootsnap (1.17.1)
+    bootsnap (1.24.6)
       msgpack (~> 1.2)
     brakeman (8.0.5)
       racc
@@ -600,7 +600,7 @@ DEPENDENCIES
   web-console
 
 RUBY VERSION
-   ruby 3.2.11p268
+   ruby 3.4.10p104
 
 BUNDLED WITH
    2.4.19
