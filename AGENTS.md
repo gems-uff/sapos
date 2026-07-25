@@ -41,6 +41,50 @@ corrija na wiki.
 - Convenção de trabalho vale para qualquer agente e vive **aqui**, versionada. A
   memória local do Claude Code não acompanha troca de máquina — guarde nela só o
   que for específico de uma sessão ou do ambiente.
+- **Bloqueio de sandbox se avisa na hora, com a saída.** Se algo pedido falhar
+  porque o sandbox barrou — rede, escrita fora da árvore, comando que não casa a
+  exclusão —, não silencie, não contorne por conta própria e não reduza a tarefa
+  ao que caberia dentro do sandbox. Diga, na resposta em que a falha aconteceu:
+  **o que** foi bloqueado (o comando e a mensagem de erro literal), **por que** (a
+  chave da configuração que barrou, em `.claude/settings.json`), e **quais são as
+  saídas** — a que o mantenedor executa (`! <comando>`, que roda na sessão dele) e
+  a mudança de configuração que liberaria, dizendo se ela foi medida ou é
+  hipótese. **E não pare no primeiro palpite:** o `git push` desta máquina falha
+  com `nc: authentication method negotiation failed`, que parece bloqueio de rede
+  do sandbox mas é outra coisa — o ambiente da sessão exporta
+  `GIT_SSH_COMMAND` com um `ProxyCommand nc -X 5 -x localhost:<porta>` **sem as
+  credenciais** que as demais variáveis de proxy carregam, e o erro é da
+  negociação SOCKS. O `!` do mantenedor herda o mesmo ambiente e falha idêntico,
+  então "rodar com `!`" não é diagnóstico. Medido: tirando o `nc` do caminho
+  (`GIT_SSH_COMMAND=ssh`), o que sobra são dois bloqueios independentes, e o
+  segundo alcança o `!` também — sem DNS no shell do agente
+  (`Could not resolve hostname github.com`) e negado por política no do mantenedor
+  (o mesmo host com o código `-65563` do resolvedor do macOS). Ou seja: **o `!` não
+  é escotilha de saída para rede.** O que resolveu foi pôr os verbos de rede em
+  `excludedCommands` (`git push *`, `git fetch *`, `gh issue list *`, …), porque
+  **comando excluído roda com o ambiente limpo** — medido: `GIT_SSH_COMMAND`,
+  `ALL_PROXY` e `HTTPS_PROXY` vêm todos `nil` — e com rede real.
+- **O `*` em `excludedCommands` não é enfeite — sem ele a entrada é inerte.** Nome
+  puro (`"git"`, `"bundle"`) casa **só** a invocação sem argumento nenhum; com
+  argumento, o comando volta ao sandbox. Medido nas duas direções: `"git ls-remote *"`
+  funcionou, e trocado por `"git"` o mesmo `git ls-remote` falhou, assim como o
+  spec `js: true` (`Errno::EPERM - bind(2) for "127.0.0.1" port 9514`, o lock de
+  socket do Selenium). A documentação oficial de sandboxing descreve o campo mas
+  **não** especifica o casamento, e usa exemplos dos dois tipos (`docker *` e
+  `kubectl`) — daí os tutoriais que sugerem nome puro. O comportamento está descrito
+  no issue [anthropics/claude-code#40831](https://github.com/anthropics/claude-code/issues/40831).
+- **Curinga tira do sandbox a invocação inteira do shell, não só o comando** (mesmo
+  issue). É por isso que `gh issue list … | head` continua casando: o shell todo
+  saiu do sandbox. A consequência é de segurança — com `"git *"`, um
+  `git status && <qualquer coisa>` roda inteiro fora do sandbox. Por isso liste
+  **verbos estreitos** (`git push *`, `git fetch *`) em vez de `git *`, e mantenha
+  fora da lista o que não precisa de rede: o `git` local já funciona sandboxed.
+  Invólucro, por outro lado, nunca casa: o mesmo `gh issue list` dentro de um `for`
+  voltou ao sandbox, e prefixo de variável (`GIT_SSH_COMMAND=ssh git …`) idem.
+- Quem edita o `.claude/settings.json` é o mantenedor — o sandbox protege o próprio
+  arquivo contra escrita. Já houve sessão em que editá-lo derrubou as exclusões até
+  reiniciar; depois, duas edições passaram a valer na hora. Se um comando excluído
+  começar a falhar sem explicação, reiniciar a sessão é o primeiro teste.
 
 ## Skills do repositório
 
