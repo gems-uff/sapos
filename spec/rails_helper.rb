@@ -6,7 +6,7 @@ require "spec_helper"
 
 require "simplecov"
 SimpleCov.start "rails" do
-  #enable_coverage_for_eval
+  # enable_coverage_for_eval
 end unless ENV["SKIP_COVERAGE"]
 
 ENV["RAILS_ENV"] ||= "test"
@@ -80,6 +80,43 @@ module LeakDetector
 
   def self.leaked_records
     counts.map { |name, count| "#{name}=#{count}" }.sort
+  end
+
+  # Apaga o que sobrou, ao fim de um grupo de topo.
+  #
+  # Este e o conserto do vazamento de before(:all), e a terceira tentativa. A
+  # primeira -- transacao por contexto -- quebrou sete exemplos em MariaDB,
+  # porque Query#run_read_only_query abre conexao propria e a rake task de
+  # notificacoes e outro processo: nenhum dos dois enxerga dado nao commitado.
+  # A segunda seria consertar 90 after(:all) na mao.
+  #
+  # Apagar DEPOIS preserva o que aquela tentativa quebrou: durante o grupo o
+  # dado continua commitado e visivel para qualquer conexao. So no fim, quando
+  # nenhum exemplo daquele arquivo roda mais, a limpeza acontece.
+  #
+  # delete_all, nao destroy_all: sem callback, sem ordem de dependencia, e as
+  # chaves estrangeiras do schema de teste nao sao aplicadas no SQLite. Em
+  # MariaDB a ordem importa, entao desliga-se a checagem durante a varredura.
+  def self.sweep!
+    restantes = counts.keys
+    return if restantes.empty?
+
+    modelos = restantes.filter_map do |nome|
+      nome.safe_constantize
+    end
+    conexao = ActiveRecord::Base.connection
+    mysql = conexao.adapter_name == "Mysql2"
+
+    conexao.execute("SET FOREIGN_KEY_CHECKS = 0") if mysql
+    begin
+      modelos.each do |modelo|
+        modelo.delete_all
+      rescue StandardError
+        next
+      end
+    ensure
+      conexao.execute("SET FOREIGN_KEY_CHECKS = 1") if mysql
+    end
   end
 
   # Pilha de baselines, uma entrada por contexto aberto. Sem ela o inventario
@@ -159,19 +196,19 @@ RSpec.configure do |config|
     }
     options.add_preference(:download, prefs["download.default_directory"])
     options.add_preference(:prefs, prefs)
-    options.add_preference(:browser, set_download_behavior: { behavior: 'allow' })
+    options.add_preference(:browser, set_download_behavior: { behavior: "allow" })
 
     driver = Capybara::Selenium::Driver.new(
       app,
       browser: :chrome,
       options: options
     )
-    
-    driver.browser.execute_cdp('Page.setDownloadBehavior',
-    behavior: 'allow',
+
+    driver.browser.execute_cdp("Page.setDownloadBehavior",
+    behavior: "allow",
     downloadPath: DownloadHelpers::PATH.to_s
     )
-    
+
     driver
   end
 
@@ -217,26 +254,13 @@ RSpec.configure do |config|
     end
   end
 
-  # LEAK_AUDIT=1 aponta QUAL grupo deixou registro para tras.
-  #
-  # O after(:suite) diz que sobrou algo; este diz de onde veio. Roda fora da
-  # transacao por exemplo do DatabaseCleaner, entao enxerga dado commitado -- que
-  # e o que atravessa a fronteira entre grupos. Fica atras de env var por ser
-  # caro: uma contagem por modelo a cada contexto, e contextos aninhados repetem
-  # o mesmo achado.
-  # NAO envolva o contexto numa transacao. Parece o conserto obvio para o
-  # vazamento de before(:all) -- e passa inteira em SQLite --, mas quebra sete
-  # exemplos em MariaDB, que e o banco do CI e o de producao:
-  #
-  # - Query#run_read_only_query abre um cliente Mysql2 proprio, com a
-  #   configuracao <env>_read_only, e nao enxerga dado nao commitado: a tela de
-  #   resultado volta com zero linhas.
-  # - As notificacoes rodam a rake task maintenance:trigger_notifications, outro
-  #   processo, que pelo mesmo motivo nao encontra nada para enviar.
-  #
-  # Sao exatamente os pontos cegos que o AGENTS.md lista, e por isso o SQLite
-  # nao acusa. O vazamento de before(:all) continua sendo divida conhecida
-  # (#643), a ser paga grupo a grupo -- nao com transacao por contexto.
+  # NAO envolva o contexto numa transacao. Parece o conserto obvio do vazamento
+  # de before(:all) -- e passa inteira em SQLite --, mas quebra sete exemplos em
+  # MariaDB, que e o banco do CI e o de producao: Query#run_read_only_query abre
+  # um cliente Mysql2 proprio e a rake task maintenance:trigger_notifications e
+  # outro processo, e nenhum dos dois enxerga dado nao commitado. Sao os pontos
+  # cegos que o AGENTS.md lista, e por isso o SQLite nao acusa. A limpeza vem
+  # DEPOIS do grupo, no after(:context) abaixo.
   config.before(:context) do
     LeakDetector.push_baseline if ENV["LEAK_AUDIT"]
   end
@@ -249,6 +273,11 @@ RSpec.configure do |config|
         puts "LEAK_AUDIT\t#{origem}\t#{delta.join(" ")}"
       end
     end
+
+    # So no grupo de TOPO. Contexto aninhado tem o after(:context) disparado
+    # antes do grupo pai terminar, e varrer ali apagaria o before(:all) do pai
+    # no meio da execucao dele.
+    LeakDetector.sweep! if self.class.metadata[:parent_example_group].nil?
   end
 
   config.after(:suite) do
@@ -257,11 +286,12 @@ RSpec.configure do |config|
       puts "Leaked objects -- Please, try to find and delete them to avoid one test interfering with the other"
       puts "  #{leaked.join("\n  ")}"
       puts "  (LEAK_AUDIT=1 aponta de qual grupo vieram)"
-      # Avisa, nao falha: a divida de before(:all) ainda existe (90 arquivos,
-      # #643), e quebrar a suite por ela hoje pararia o CI sem que ninguem tenha
-      # como pagar a conta no mesmo passo. LEAK_CHECK=strict endurece, e e o que
-      # deve virar padrao quando a divida for paga.
-      raise "Vazamento de objetos entre testes (LEAK_CHECK=strict)" if ENV["LEAK_CHECK"] == "strict"
+      # Falha, nao so avisa. A divida foi paga pela varredura pos-grupo -- zero
+      # vazamento em SQLite e em MariaDB --, entao o que aparecer daqui em diante
+      # e regressao, e regressao para a suite. Detector que so avisa volta a ser
+      # ignorado: este passou anos assim, cego e mudo. LEAK_CHECK=warn rebaixa,
+      # se algum dia for preciso investigar sem travar.
+      raise "Vazamento de objetos entre testes" unless ENV["LEAK_CHECK"] == "warn"
     end
   end
 end

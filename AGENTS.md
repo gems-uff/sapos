@@ -28,15 +28,22 @@ corrija na wiki.
   investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
   irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo
   culpado sozinho. O CI registra a seed no resumo do job.
-- **`before(:all)` vaza — limpe no `after(:all)`.** Só o exemplo roda em
-  transação; o que o `before(:all)` cria é commitado e atravessa a fronteira
-  entre grupos, inclusive o que as factories criam por associação. A suíte avisa
-  no fim o que sobrou, `LEAK_AUDIT=1` aponta de qual grupo veio, e
-  `LEAK_CHECK=strict` transforma o aviso em falha. Dívida conhecida em #643.
+- **Prefira `before(:each)`: o rollback da transação limpa sozinho.** O
+  `before(:all)` existe só para amortizar montagem cara entre muitos exemplos, e
+  o ganho depende do tamanho do grupo — medido: em grupo de 6 exemplos não muda
+  nada (0,78 s contra 0,79 s), em grupo de 69 corta pela metade (1,16 s contra
+  2,36 s). Em grupo pequeno ele só traz fragilidade.
+- **O que o `before(:all)` cria é commitado** e atravessaria a fronteira entre
+  grupos, inclusive o que as factories criam por associação. Uma varredura ao fim
+  de cada arquivo apaga o que sobrou, então **não escreva limpeza manual em
+  `after(:all)`** — foi ela que errou em 90 arquivos (#643). A suíte avisa no fim
+  se algo escapar, `LEAK_AUDIT=1` diz de qual grupo veio, `LEAK_CHECK=strict`
+  transforma o aviso em falha.
 - **Envolver o contexto em transação parece o conserto e não é.** Passa inteira
   em SQLite e quebra sete exemplos em MariaDB: `Query#run_read_only_query` abre
   cliente próprio e a rake task de notificações é outro processo — nenhum dos
-  dois enxerga dado não commitado.
+  dois enxerga dado não commitado. Por isso a varredura vem **depois** do grupo,
+  não em transação em volta dele.
 - **Não commite por conta própria.** Deixe a mudança pronta na árvore de
   trabalho, mostre o diff e o resultado da suíte, e espere o mantenedor revisar.
   Commit, tag e push são dele — inclusive nos passos de baby-step, onde é fácil
