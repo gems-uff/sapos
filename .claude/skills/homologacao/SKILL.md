@@ -18,7 +18,17 @@ não há como separar diferença de código de diferença de ambiente.
   `magick`, não pelo binário `compare` — ver "Diferença esperada em PDF".
 - `chromedriver` compatível com o Chrome instalado. Se os feature specs
   começarem a falhar no baseline, provavelmente o Chrome se atualizou e o
-  chromedriver ficou para trás.
+  chromedriver ficou para trás. Não adivinhe pela pasta do cache — pergunte ao
+  Selenium Manager qual driver ele vai usar de verdade, que é quem decide:
+
+  ```bash
+  $(gem contents selenium-webdriver | grep 'bin/macos/selenium-manager') \
+    --browser chrome --output json
+  ```
+
+  Ele usa o driver do `PATH` quando o major casa com o do Chrome, e só então
+  recorre ao `~/.cache/selenium` (ou a um download). Um cache desatualizado não é,
+  por si, problema.
 - Um arquivo de credenciais **fora do repositório**, com `chmod 600`, contendo as
   três variáveis. Elas ficam juntas de propósito: amarrar a URL às credenciais
   evita apontar uma senha de homologação para outro ambiente.
