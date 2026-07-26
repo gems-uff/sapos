@@ -52,6 +52,9 @@ humanos e para outros agentes.
 - `safe-refactor` — mede a mudança pela suíte local: cobre a lacuna, roda antes,
   muda, roda depois, compara. Primeiro recurso em refatoração, correção de bug,
   feature ou upgrade de dependência.
+- `dependencias` — critério para declarar gem no `Gemfile` (restrição cobre
+  exatamente o motivo, e o motivo fica escrito) e para conduzir campanha de
+  atualização. Use antes de mexer em restrição de versão ou planejar um salto.
 - `suite-mariadb` — sobe um MariaDB local fiel ao de produção e roda a suíte
   contra ele em vez do SQLite. Use ao mexer em SQL, unicidade, ordenação ou
   migration.
