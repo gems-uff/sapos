@@ -28,10 +28,18 @@ module GoldenMaster
   GOLDEN_DIR = Rails.root.join("spec", "goldens")
 
   # Campos que variam a cada execução e não dizem nada sobre regressão.
+  WEEKDAYS = %w[
+    Domingo Segunda-feira Terça-feira Quarta-feira
+    Quinta-feira Sexta-feira Sábado
+  ].freeze
+
   VOLATILE = [
     [/\b\d{2}\/\d{2}\/\d{4}\b/, "<DATA>"],
     [/\b\d{2}:\d{2}(:\d{2})?\b/, "<HORA>"],
     [/\b\d{1,2} de [a-zç]+ de \d{4}\b/i, "<DATA_EXTENSO>"],
+    # O rodapé dos relatórios de lista é "SAPOS - Domingo, <data>, <hora> h".
+    # Sem mascarar o dia da semana o baseline quebraria no dia seguinte.
+    [/\b(#{WEEKDAYS.join('|')}),/, "<DIA_SEMANA>,"],
   ].freeze
 
   def expect_matches_golden(name, content, format:)

@@ -99,4 +99,94 @@ RSpec.describe "Saídas em PDF e XLSX", type: :request do
       )
     end
   end
+
+  describe "resumo da turma em PDF" do
+    it "mantém o conteúdo do baseline" do
+      get summary_pdf_course_class_path(@course_class, format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "course_class_summary_pdf", response.body, format: :pdf
+      )
+    end
+  end
+
+  describe "relatório de matrículas" do
+    it "mantém o conteúdo do baseline" do
+      get to_pdf_enrollments_path(format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "enrollments_list", response.body, format: :pdf
+      )
+    end
+  end
+
+  # Os cenários abaixo criam registros próprios em vez de estender o `before`
+  # compartilhado: uma bolsa ligada a @enrollment apareceria no histórico escolar
+  # e invalidaria aquele baseline. Cada relatório monta só o que consome.
+  describe "relatório de orientações" do
+    before(:each) do
+      # Sem o credenciamento no nível da matrícula o Advisement é inválido
+      # ("Ao menos um orientador deve ter credenciamento no nível da matrícula").
+      FactoryBot.create(
+        :advisement_authorization, professor: @professor, level: @level
+      )
+      FactoryBot.create(
+        :advisement, professor: @professor, enrollment: @enrollment,
+        main_advisor: true
+      )
+    end
+
+    it "mantém o conteúdo do baseline" do
+      get to_pdf_advisements_path(format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "advisements_list", response.body, format: :pdf
+      )
+    end
+  end
+
+  describe "relatório de bolsas" do
+    before(:each) do
+      # Datas fixas: a factory usa 3.days.ago/from_now, e data relativa tornaria
+      # o baseline dependente do dia em que a suíte roda.
+      @sponsor = FactoryBot.create(:sponsor, name: "CAPES")
+      @scholarship = FactoryBot.create(
+        :scholarship,
+        sponsor: @sponsor,
+        level: @level,
+        scholarship_number: "B2020001",
+        start_date: Date.new(2020, 3, 1),
+        end_date: Date.new(2022, 2, 28)
+      )
+    end
+
+    it "mantém o conteúdo do baseline" do
+      get to_pdf_scholarships_path(format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "scholarships_list", response.body, format: :pdf
+      )
+    end
+
+    it "mantém o conteúdo do baseline das durações" do
+      FactoryBot.create(
+        :scholarship_duration,
+        enrollment: @enrollment,
+        scholarship: @scholarship,
+        start_date: Date.new(2020, 3, 1),
+        end_date: Date.new(2022, 2, 28)
+      )
+
+      get to_pdf_scholarship_durations_path(format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "scholarship_durations_list", response.body, format: :pdf
+      )
+    end
+  end
 end
