@@ -46,14 +46,9 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
     it { should be_valid }
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:email) }
-    context "when allow_multiple_applications is false" do
-      before { @admission_process.allow_multiple_applications = false }
-      it { should validate_uniqueness_of(:email).scoped_to(:admission_process_id) }
-    end
-    #context "when allow_multiple_applications is false" do
-   #   before { @admission_process.allow_multiple_applications = true }
-   #   it { should_not validate_uniqueness_of(:email).scoped_to(:admission_process_id) }
-   # end
+    # Uniqueness of :email (scoped to admission_process, case- and accent-
+    # insensitive) is covered in spec/models/uniqueness_spec.rb (neutral) and
+    # spec/models/uniqueness_collation_spec.rb (MariaDB only).
     describe "number_of_letters_in_filled_form" do
       context "should be valid when" do
         it "filled_form is blank" do

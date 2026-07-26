@@ -5,8 +5,22 @@ namespace :maintenance do
   task run: [:environment] do
     Rails.logger.info "[Maintenance] #{Time.now.to_fs} - Starting maintenance tasks"
     Rake::Task["maintenance:remove_expired_reports"].invoke
+    Rake::Task["maintenance:clean_upload_cache"].invoke
     Rake::Task["maintenance:trigger_notifications"].invoke
     Rails.logger.info "[Maintenance] #{Time.now.to_fs} - Finished maintenance tasks"
+  end
+
+  desc "Removes stale CarrierWave upload cache (default: older than 24h)"
+  task clean_upload_cache: [:environment] do
+    Rails.logger.info "[UploadCache] #{Time.now.to_fs} - Cleaning stale CarrierWave cache"
+    # The uploaders set config.root = Rails.root, so the file cache lives in
+    # Rails.root/uploads/tmp. CarrierWave.clean_cached_files! would use the base
+    # uploader (root = public/) and scan the wrong directory, so we clean from the
+    # actual uploader classes. clean_cached_files! only removes cache entries older
+    # than the threshold (default 24h), never touching DB blobs or stored uploads.
+    # The maintenance cron runs daily, so 24h is a safe margin for ongoing uploads.
+    [FormFileUploader, ImageUploader].each(&:clean_cached_files!)
+    Rails.logger.info "[UploadCache] #{Time.now.to_fs} - Finished cleaning cache"
   end
 
   task remove_expired_reports: [:environment] do
@@ -49,16 +63,33 @@ namespace :maintenance do
   end
 
   private
+    # The rendering modules live in a class of their own on purpose. Calling
+    # `include` from inside a method body of this file would include them into
+    # Object, which leaks into every object in the process -- harmless for a
+    # cron run that exits right after, but it breaks any other code sharing the
+    # process, the test suite included.
+    #
+    # The class is built on first use, not at the top level of this file: rake
+    # loads every rakefile before running any task, so a top-level body would
+    # resolve SharedPdfConcern before the environment is loaded, and Zeitwerk
+    # cannot autoload it yet. That raises NameError on *every* rake invocation,
+    # not just on this task.
+    def attachment_renderer
+      @attachment_renderer ||= Class.new do
+        include SharedPdfConcern
+        include AbstractController::Rendering
+      end.new
+    end
+
     def prepare_attachments(notification_result)
-      include SharedPdfConcern
-      include AbstractController::Rendering
+      renderer = attachment_renderer
       notification_result[:notifications].each do |message|
         attachments = notification_result[:notifications_attachments][message]
         next if attachments.blank?
         if attachments[:grades_report_pdf]
           enrollment = Enrollment.find(message[:enrollments_id])
           attachments[:grades_report_pdf][:file_contents] =
-            render_enrollments_grades_report_pdf(enrollment)
+            renderer.render_enrollments_grades_report_pdf(enrollment)
         end
       end
       notification_result

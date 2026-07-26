@@ -1,218 +1,120 @@
-# ruby=3.2.5
 # frozen_string_literal: true
 
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-# The following line is necessary to allow RVM choosing the correct ruby version. RVM 2.0 will probably be able to interpret the "~>" symbol and we will be able to safely remove the "#ruby=3.2.2" line.
-ruby "~> 3.2.5"
+# Esta diretiva nao escolhe o Ruby, o .ruby-version escolhe; ela recusa rodar
+# no interpretador errado, e por isso e uma faixa (aceita 3.4.11, barra 3.5).
+# Serie 3.4: a 3.2 chegou ao fim de vida em 01/04/2026 e nao recebe mais nem
+# correcao de seguranca (issue #639). A 3.3 esta so em manutencao de seguranca
+# e vence em 31/03/2027; a 3.4 esta em manutencao normal e serve tambem ao
+# Rails 8 (que exige >= 3.2), entao nao precisa ser refeita nesse salto.
+# Piso 3.4.10: ultimo patch da serie. O piso antigo (3.2.11) existia para
+# garantir o uri >= 0.12.5 do stdlib (CVE-2025-61594, vazamento de credencial
+# via URI#+); a serie 3.4 ja traz o uri bem acima disso.
+ruby "~> 3.4.10"
 
-# Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 7.1.0"
-
-# The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
-gem "sprockets-rails"
-
-# Use sqlite3 as the database for Active Record
-# gem "sqlite3", "~> 1.4"
-
-# Use the Puma web server [https://github.com/puma/puma]
-gem "puma", ">= 6.4.2"
-
-# HTML and XML parser
-gem "nokogiri", ">= 1.18.9"
-
-# Wrapp HTTP requests and responses
+# ─── Framework e servidor ────────────────────────────────────────────────
+gem "rails", "~> 7.2.3", ">= 7.2.3.1"
 gem "rack", "~> 2.2.23"
-
-# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
-# gem "importmap-rails"
-
-# Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
-# gem "turbo-rails"
-
-# Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
-# gem "stimulus-rails"
-
-# Use Terser as compressor for JavaScript assets
-# gem "terser"
-# gem "mini_racer"
-
-# Use CoffeeScript for .js.coffee assets and views
-gem "coffee-rails"
-
-# Build JSON APIs with ease [https://github.com/rails/jbuilder]
-gem "jbuilder"
-
-# Use Redis adapter to run Action Cable in production
-# gem "redis", "~> 4.0"
-
-# Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
-# gem "kredis"
-
-# Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
-
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+gem "puma", "~> 7.2", ">= 7.2.1"
+gem "sprockets-rails"                    # asset pipeline
+gem "bootsnap", require: false           # cache de boot (config/boot.rb)
+gem "nokogiri", ">= 1.18.9"              # piso de seguranca (parser HTML/XML)
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
-# Reduces boot times through caching; required in config/boot.rb
-gem "bootsnap", require: false
-
-# Use Sass to process CSS
-gem "sassc-rails"
-
-# Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
-# gem "image_processing", "~> 1.2"
-
-# Use jquery as the JavaScript library
+# ─── Assets / front-end ──────────────────────────────────────────────────
+gem "sassc-rails"                        # SCSS
+gem "coffee-rails"                       # CoffeeScript
 gem "jquery-rails"
-gem "jquery-ui-rails", git: "https://github.com/jquery-ui-rails/jquery-ui-rails.git", tag: "v7.0.0"
+gem "jquery-ui-rails", "7.0.0"           # rubygems (jQuery UI 1.13.0). 8.0.0 corrige a
+                                         # CVE-2022-31160 mas reestrutura os assets (quebra
+                                         # o application.css) e o app nao usa checkboxradio.
+gem "font-awesome-rails"                 # iconografia
 
-# Pagination
-gem "kaminari"
-
-# User access
-gem "cancancan"
-gem "devise", "~> 4.9"
+# ─── Autenticacao e autorizacao ──────────────────────────────────────────
+gem "devise", "~> 5.0", ">= 5.0.4"
 gem "devise_invitable", "~> 2.0.0"
-gem "paper_trail"
+gem "cancancan"
+gem "recaptcha", require: "recaptcha/rails"
+gem "dotenv-rails", require: "dotenv/load"   # ENV a partir de .env (recaptcha etc.)
 
-# Use Active record session store
-gem "activerecord-session_store"
+# ─── UI administrativa / scaffolding ─────────────────────────────────────
+gem "active_scaffold", "~> 4.0.13"
+gem "active_scaffold_duplicate", ">= 1.1.0"
+gem "recordselect"
+gem "simple-navigation"                  # menu (config/navigation.rb)
+gem "cocoon"                             # nested forms
 
-# Iconography
-gem "font-awesome-rails"
-
-# Prawn to PDF
+# ─── Geracao de PDF ──────────────────────────────────────────────────────
+# O prawn 2.5.0 declara matrix (~> 0.4) no gemspec, entao nao precisamos mais
+# declarar matrix aqui (o prawn 2.4.0 usava Matrix sem declarar, e matrix virou
+# bundled gem no Ruby 3.1 -- por isso a linha explicita existia antes).
 gem "prawn"
 gem "prawn-table"
 gem "prawn-rails"
-gem "matrix", "~> 0.4.2"
 gem "prawn-qrcode"
 
-# Redcarpet for Readme MarkDown (or README.md) - Credits Page
-gem "redcarpet"
+# ─── Planilhas (XLSX) ────────────────────────────────────────────────────
+gem "caxlsx"
+gem "caxlsx_rails"
 
-# Active scaffold support for newer Rails
-gem "request_store", ">= 1.6.0"
-gem "active_scaffold", git: "https://github.com/activescaffold/active_scaffold.git", ref: "6210cdc4c0da0cba17e0716b65a16a783e12b407"
-gem "active_scaffold_duplicate", ">= 1.1.0"
-gem "recordselect"
+# ─── Relatorios / templates ──────────────────────────────────────────────
+gem "liquid"                             # templates de relatorio/notificacao
+gem "redcarpet"                          # Markdown (pagina de creditos)
 
-# Date Validation Plugin
-gem "validates_timeliness", "~> 7.1.0"
-
-# Menu
-gem "simple-navigation"
-
-# Notification
-gem "rufus-scheduler"
-
-# Image
+# ─── Upload de arquivos ──────────────────────────────────────────────────
 gem "carrierwave", ">= 3.0.7"
 gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-activerecord.git", branch: "rails7"
 
-# Nested Forms / ApplicationProcess and FormTemplates functionalities.
-gem "cocoon"
+# ─── Dominio / infraestrutura de app ─────────────────────────────────────
+gem "paper_trail"                        # versionamento/auditoria
+gem "activerecord-session_store"         # sessao no banco (initializers/session_store.rb)
+gem "rufus-scheduler"                    # agendamento de notificacoes
+gem "validates_timeliness", "~> 7.1.0"   # validacao de datas
+gem "exception_notification"             # notifica excecoes
 
-# ReCaptcha Helpers
-gem "dotenv-rails", require: "dotenv/load"
-gem "recaptcha", require: "recaptcha/rails"
-
-# xlsx Spreadsheets
-gem "rubyzip"
-gem "caxlsx"
-gem "caxlsx_rails"
-# gem "acts_as_xlsx"
-
-# Templates
-gem 'liquid'
-
-# Temporary fix of warnings
-# In the beggining of rails command executions, it shows some warnings related to these gems
-# If I'm not mistaken, the warnings should disappear on Ruby 3 or when a gem that depends on these gems update (I don't know which)
-# So, try to remove these gems from this file in the future and check if the warnings appear.
-gem "net-http"
-gem "net-smtp"
-gem "net-imap"
-
-
+# ─── Ambientes ───────────────────────────────────────────────────────────
 group :development do
-  # Use console on exceptions pages [https://github.com/rails/web-console]
-  gem "web-console"
-
-  # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
-  # gem "rack-mini-profiler"
-
-  # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
-  # gem "spring"
-
-  # Linter
+  gem "web-console"                      # console nas paginas de erro
   gem "rubocop", require: false
   gem "rubocop-rails_config", require: false
+  # Seguranca / analise estatica (rodadas via CLI, dai require: false)
+  gem "bundler-audit", require: false    # CVE em dependencias (bundle audit)
+  gem "brakeman", require: false         # SAST de Rails (SQLi, XSS, ...)
 end
 
 group :development, :test do
-  # Use SQLite database for development
-  gem "sqlite3", "~> 1.6.8"
-
-  # Prints Ruby object in full color
+  gem "sqlite3", "~> 2.9.5"              # banco de dev/test; piso 2.9.5: CVE-2026-54620
   gem "awesome_print"
-
-  # View a better error page
   gem "binding_of_caller"
   gem "better_errors"
-
-  # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
-
-  # Better console for debugging
   gem "pry"
-
-  # Open /letter_opener in the browser to view 'sent' emails
-  gem "letter_opener_web"
-
-  # Create entity-relationship diagram
-  gem "rails-erd"
+  gem "letter_opener_web"               # /letter_opener mostra e-mails "enviados"
+  gem "rails-erd"                        # diagrama entidade-relacionamento
 end
 
 group :test do
-  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
-
-  # Test runner
   gem "rspec-rails"
-
-  # Fixtures replacement
   gem "factory_bot_rails"
-
-  # Suport 'have' syntax of rspec
   gem "rspec-collection_matchers"
-
-  # Simpler specs
   gem "shoulda-matchers"
-
-  # Clean database for every test
   gem "database_cleaner-active_record"
-
-  # Measure code coverage
   gem "simplecov"
 end
 
-# Notify exceptions
-gem "exception_notification"
+# Gems fora do install default para um checkout limpo rodar em SQLite sem
+# servidor de banco nem cliente MySQL nativo. Producao precisa da mysql2; CI e
+# a skill suite-mariadb tambem, e optam por ela instalando este grupo.
 group :production do
-  # Use MySQL database for production
-  gem "mysql2"
-
-  # Temporary fix for passenger
-  gem "stringio"
+  gem "mysql2"                           # driver MySQL/MariaDB (producao, CI, MariaDB local)
 end
 
 group :doc do
-  # bundle exec rake doc:rails generates the API under doc/api.
-  gem "rdoc", ">= 6.5.1.1"
-  gem "sdoc", require: false
+  # sdoc puxa rdoc (>= 5.0), resolvido em 7.2.0 -- acima do piso de seguranca
+  # antigo (rdoc >= 6.5.1.1, CVE-2024-27281), entao nao declaramos rdoc aqui.
+  gem "sdoc", require: false             # bundle exec rake doc:rails
 end

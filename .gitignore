@@ -7,6 +7,10 @@
 # Ignore bundler config.
 /.bundle
 
+# The real database config carries credentials and is per-environment. Copy it
+# from config/database.yml.example (see the install guides on the wiki).
+/config/database.yml
+
 # Ignore the default SQLite database.
 /db/*.sqlite3
 /db/*.sqlite3-*

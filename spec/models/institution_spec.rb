@@ -15,7 +15,6 @@ RSpec.describe Institution, type: :model do
   subject { institution }
   describe "Validations" do
     it { should be_valid }
-    it { should validate_uniqueness_of(:name) }
     it { should validate_presence_of(:name) }
   end
 

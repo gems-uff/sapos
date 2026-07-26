@@ -18,7 +18,7 @@ RSpec.describe "Queries features", type: :feature do
     @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << FactoryBot.create(:query, name: "students", sql: "select * from students")
-    @destroy_all << @record = FactoryBot.create(:query, name: "queries", sql: "select name, sql from queries")
+    @destroy_all << @record = FactoryBot.create(:query, name: "queries", sql: "select name, `sql` from queries")
     @destroy_all << FactoryBot.create(:query, name: "levels", sql: "select * from levels")
   end
   after(:each) do
@@ -110,6 +110,36 @@ RSpec.describe "Queries features", type: :feature do
     it "should be able to show query result" do
       expect(page.all("table.query-results tbody tr").size).to eq 3
       expect(page.all("table.query-results thead th").map(&:text)).to eq ["name", "sql"]
+    end
+  end
+
+  # Issue #640: esta tela era segurada por um "width: 865px" inline, e nao pelo
+  # overflow-x que o acompanhava. Trocada a largura fixa pela classe compartilhada
+  # com as telas de simulacao, a medicao passa a valer aqui tambem -- uma coluna
+  # cujo valor nao tem ponto de quebra nao pode fazer a pagina inteira rolar.
+  describe "execute page with a long value", js: true do
+    let(:long_url) do
+      "https://www.example.com/documentos/regras/" +
+        ("REGRAS_DE_PRORROGACAO_E_QUALIFICACAO_" * 6)
+    end
+
+    before(:each) do
+      @destroy_later << @long_value_record = FactoryBot.create(
+        :query, name: "valor longo", sql: "select '#{long_url}' as url"
+      )
+      login_as(@user)
+      page.driver.browser.manage.window.resize_to(1280, 900)
+      visit url_path
+      find("#as_#{plural_name}-execute-#{@long_value_record.id}-link").click
+    end
+
+    it "should not make the page scroll horizontally" do
+      expect(page).to have_css("table.query-results tbody tr")
+
+      overflow = page.evaluate_script(
+        "document.documentElement.scrollWidth - document.documentElement.clientWidth"
+      )
+      expect(overflow).to be <= 0
     end
   end
 

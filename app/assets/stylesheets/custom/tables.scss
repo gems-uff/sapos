@@ -6,6 +6,25 @@ tr.total_points td{
     color: #ffffff !important;
 }
 
+/* Query and simulation results (issue #640)
+   These tables render whatever a query returns, and a message body may carry a
+   long URL -- a single token with no break point. Left alone, the table stretches
+   past the viewport and the whole page scrolls horizontally, cutting the header
+   and the menu short. Confining the scroll to the table keeps the page intact and
+   preserves the alignment that Notifier.body_whitespace_to_html builds into the
+   preview, which wrapping the text would undo.
+
+   overflow-x alone does not confine anything here: the simulation renders inside
+   an active_scaffold nested row, and the table cell around it sizes itself to the
+   content's minimum width, so the wrapper is already too wide by the time it could
+   scroll. width: 0 keeps the content out of that calculation and min-width: 100%
+   grows the wrapper back to the space the cell actually has. */
+.results-scroll {
+  overflow-x: auto;
+  width: 0;
+  min-width: 100%;
+}
+
 /* Admissions show table */
 div.scrollable-table {
   overflow: auto;

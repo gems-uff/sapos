@@ -14,7 +14,6 @@ RSpec.describe EnrollmentStatus, type: :model do
   subject { enrollment_status }
   describe "Validations" do
     it { should be_valid }
-    it { should validate_uniqueness_of(:name) }
     it { should validate_presence_of(:name) }
   end
 end

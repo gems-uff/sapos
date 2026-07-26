@@ -394,7 +394,7 @@ class EmailTemplate < ApplicationRecord
     message = {
       to: formatter.format(self.to),
       subject: formatter.format(self.subject),
-      body: formatter.format(self.body),
+      body: formatter.format(self.body, escape_data: :html),
       skip_footer: true
     }
     self.update_mailer_headers(message)
