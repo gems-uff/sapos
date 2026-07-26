@@ -73,7 +73,23 @@ jobs:
         run: bundle exec rake db:schema:load --trace
 
       - name: Run tests
-        run: bundle exec rspec
+        run: |
+          set -o pipefail
+          bundle exec rspec | tee rspec.log
+
+      # A ordem dos exemplos e sorteada, e a suite ja teve dependencia de ordem
+      # (#643). Sem a seed, um vermelho e irreproduzivel; com ela, o
+      # `rspec --seed <n> --bisect` isola o exemplo culpado sozinho.
+      - name: Registrar a seed
+        if: always()
+        run: |
+          seed=$(grep -oE 'Randomized with seed [0-9]+' rspec.log | head -1 | grep -oE '[0-9]+$')
+          echo "### Seed do RSpec: \`${seed:-desconhecida}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Reproduzir localmente:" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "bundle exec rspec --seed ${seed:-0}" >> "$GITHUB_STEP_SUMMARY"
+          echo "bundle exec rspec --seed ${seed:-0} --bisect   # se for dependencia de ordem" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish code coverage
         uses: qltysh/qlty-action/coverage@v1

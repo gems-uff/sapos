@@ -53,6 +53,57 @@ rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 
+# Modelos que ficaram com registro, para os detectores de vazamento.
+#
+# Varre ActiveRecord::Base, nao ApplicationRecord: os modelos de Admissions
+# herdam direto de ActiveRecord::Base e ficavam invisiveis. Sao 62 descendentes
+# de ApplicationRecord contra 104 de ActiveRecord::Base -- 42 modelos fora do
+# alcance do detector, incluindo exatamente onde estava o vazamento da #643.
+#
+# eager_load! porque config.eager_load so e ligado no CI: sem ele, descendants
+# devolve apenas o que ja foi carregado -- uma classe, na maquina local.
+module LeakDetector
+  def self.counts
+    Rails.application.eager_load!
+    ActiveRecord::Base.descendants.each_with_object({}) do |model, acc|
+      next if model.abstract_class? || model.name.nil?
+      next if model.name.start_with?("ActiveRecord::")  # tabelas de controle
+      begin
+        next unless model.table_exists?
+        count = model.count
+      rescue StandardError
+        next
+      end
+      acc[model.name] = count if count > 0
+    end
+  end
+
+  def self.leaked_records
+    counts.map { |name, count| "#{name}=#{count}" }.sort
+  end
+
+  # Pilha de baselines, uma entrada por contexto aberto. Sem ela o inventario
+  # mede estado ACUMULADO: depois do primeiro vazamento, todo contexto seguinte
+  # reporta o mesmo residuo e 159 arquivos parecem culpados. O que interessa e o
+  # delta -- o que este contexto acrescentou e nao limpou.
+  def self.baselines
+    @baselines ||= []
+  end
+
+  def self.push_baseline
+    baselines.push(counts)
+  end
+
+  def self.pop_delta
+    baseline = baselines.pop || {}
+    atual = counts
+    atual.filter_map do |name, count|
+      antes = baseline[name] || 0
+      "#{name}=+#{count - antes}" if count > antes
+    end.sort
+  end
+end
+
 RSpec.configure do |config|
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = ["#{::Rails.root}/spec/fixtures"]
@@ -166,24 +217,52 @@ RSpec.configure do |config|
     end
   end
 
-  config.after(:suite) do
-    # eager_load! antes de contar: config.eager_load so e ligado no CI
-    # (config/environments/test.rb), e sem ele ApplicationRecord.descendants
-    # devolve apenas as classes ja carregadas -- uma na maquina de
-    # desenvolvimento. O detector varria uma lista vazia e nunca acusava nada,
-    # justamente onde quem desenvolve o usaria.
-    Rails.application.eager_load!
-    models = ApplicationRecord.descendants
-    leaked = models.filter_map do |model|
-      "#{model}: #{model.count}" if model.count > 0
+  # LEAK_AUDIT=1 aponta QUAL grupo deixou registro para tras.
+  #
+  # O after(:suite) diz que sobrou algo; este diz de onde veio. Roda fora da
+  # transacao por exemplo do DatabaseCleaner, entao enxerga dado commitado -- que
+  # e o que atravessa a fronteira entre grupos. Fica atras de env var por ser
+  # caro: uma contagem por modelo a cada contexto, e contextos aninhados repetem
+  # o mesmo achado.
+  # Uma transacao por CONTEXTO, alem da transacao por exemplo do around(:each).
+  #
+  # before(:all) roda fora da transacao por exemplo, entao o que ele cria era
+  # commitado e atravessava a fronteira entre grupos. Media da suite antes desta
+  # linha: 90 arquivos deixavam registro para tras, e sobravam 1397 versoes do
+  # PaperTrail, 32 FormTemplate e 4 AdmissionProcess ao fim -- foi um desses
+  # AdmissionProcess que quebrou tres testes conforme a ordem sorteada (#643).
+  #
+  # O conserto e aqui, e nao nos 90 after(:all): a limpeza manual e que era o
+  # remendo. Vale inclusive para feature spec com js: true, porque o servidor do
+  # Capybara compartilha a conexao nos testes.
+  config.before(:context) do
+    DatabaseCleaner.start
+    LeakDetector.push_baseline if ENV["LEAK_AUDIT"]
+  end
+
+  config.after(:context) do
+    if ENV["LEAK_AUDIT"]
+      delta = LeakDetector.pop_delta
+      if delta.any?
+        origem = self.class.metadata[:file_path] || self.class.metadata[:full_description]
+        puts "LEAK_AUDIT\t#{origem}\t#{delta.join(" ")}"
+      end
     end
-    if leaked.count > 0
+    DatabaseCleaner.clean
+  end
+
+  config.after(:suite) do
+    leaked = LeakDetector.leaked_records
+    if leaked.any?
       puts "Leaked objects -- Please, try to find and delete them to avoid one test interfering with the other"
       puts "  #{leaked.join("\n  ")}"
-      # LEAK_CHECK=strict transforma o aviso em falha. Ainda nao e o padrao: o
-      # aviso passou anos inerte, entao a divida acumulada precisa ser paga
-      # antes de a suite poder quebrar por causa dela.
-      raise "Vazamento de objetos entre testes (LEAK_CHECK=strict)" if ENV["LEAK_CHECK"] == "strict"
+      puts "  (LEAK_AUDIT=1 aponta de qual grupo vieram)"
+      # Falha, nao so avisa. O aviso passou anos inerte porque o detector estava
+      # cego -- varria ApplicationRecord.descendants, e os modelos de Admissions
+      # herdam direto de ActiveRecord::Base. Com a divida zerada pela transacao
+      # por contexto, vazamento novo e regressao, e regressao quebra a suite.
+      # LEAK_CHECK=warn volta ao comportamento antigo, se algum dia for preciso.
+      raise "Vazamento de objetos entre testes" unless ENV["LEAK_CHECK"] == "warn"
     end
   end
 end

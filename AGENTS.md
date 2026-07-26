@@ -21,7 +21,18 @@ corrija na wiki.
   `CONTRIBUTING.md`.
 - **Exceção:** vulnerabilidade não ganha issue pública — enumerar o problema
   expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica.
-- Critério de pronto: `bundle exec rspec` inteiro verde (~12 min, ~2189 exemplos).
+- Critério de pronto: `bundle exec rspec` inteiro verde (~9 min, ~2260 exemplos).
+  Rode **sem** `SKIP_COVERAGE=1` ao menos uma vez antes de fechar: é a
+  configuração real da suíte, e o caminho do simplecov só é exercitado assim.
+- **Verde numa ordem não é verde.** A ordem dos exemplos é sorteada. Ao
+  investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
+  irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo
+  culpado sozinho. O CI registra a seed no resumo do job.
+- **Não vaze registro entre grupos.** Cada exemplo **e cada contexto** roda em
+  transação própria, então `before(:all)` é desfeito ao fim do grupo e limpeza
+  manual em `after(:all)` é desnecessária. Se algum registro sobreviver, a suíte
+  **falha** no fim; `LEAK_AUDIT=1` aponta de qual grupo veio, e `LEAK_CHECK=warn`
+  rebaixa a falha a aviso. Contexto em #643.
 - **Não commite por conta própria.** Deixe a mudança pronta na árvore de
   trabalho, mostre o diff e o resultado da suíte, e espere o mantenedor revisar.
   Commit, tag e push são dele — inclusive nos passos de baby-step, onde é fácil
