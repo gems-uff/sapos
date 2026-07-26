@@ -1,0 +1,3 @@
+── xl/worksheets/sheet1.xml ──
+A1=Principal | B1=Principal | C1=Principal
+A2=Código de Identificação | B2=Nome Completo | C2=Email

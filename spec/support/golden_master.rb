@@ -28,19 +28,15 @@ module GoldenMaster
   GOLDEN_DIR = Rails.root.join("spec", "goldens")
 
   # Campos que variam a cada execução e não dizem nada sobre regressão.
-  WEEKDAYS = %w[
-    Domingo Segunda-feira Terça-feira Quarta-feira
-    Quinta-feira Sexta-feira Sábado
-  ].freeze
-
-  VOLATILE = [
-    [/\b\d{2}\/\d{2}\/\d{4}\b/, "<DATA>"],
-    [/\b\d{2}:\d{2}(:\d{2})?\b/, "<HORA>"],
-    [/\b\d{1,2} de [a-zç]+ de \d{4}\b/i, "<DATA_EXTENSO>"],
-    # O rodapé dos relatórios de lista é "SAPOS - Domingo, <data>, <hora> h".
-    # Sem mascarar o dia da semana o baseline quebraria no dia seguinte.
-    [/\b(#{WEEKDAYS.join('|')}),/, "<DIA_SEMANA>,"],
-  ].freeze
+  # Instante fixo em que os relatórios são gerados. Congelar o relógio é mais
+  # rigoroso do que mascarar data e hora: a data renderizada entra no baseline,
+  # então uma mudança de FORMATO ("15/06/2021" virando "2021-06-15") é detectada
+  # em vez de escondida atrás de uma máscara. Foi por isso que as máscaras que
+  # existiam aqui saíram.
+  #
+  # 15/06/2021 é terça-feira, e cai dentro da vigência da bolsa do cenário
+  # (03/2020 a 02/2022), então os relatórios têm o que mostrar.
+  FROZEN_AT = Time.utc(2021, 6, 15, 13, 30, 0)
 
   def expect_matches_golden(name, content, format:)
     actual = golden_representation(content, format)
@@ -114,15 +110,13 @@ module GoldenMaster
       end.compact.join("\n")
     end
 
+    # Só espaço em branco: o relógio congelado dispensa mascarar data e hora.
     def normalize(text)
-      VOLATILE
-        .reduce(text) { |acc, (pattern, mask)| acc.gsub(pattern, mask) }
-        .gsub(/[ \t]+/, " ")
-        .gsub(/[ \t]+$/, "")
-        .strip
+      text.gsub(/[ \t]+/, " ").gsub(/[ \t]+$/, "").strip
     end
 end
 
 RSpec.configure do |config|
   config.include GoldenMaster, type: :request
+  config.include ActiveSupport::Testing::TimeHelpers, type: :request
 end

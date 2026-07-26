@@ -50,7 +50,7 @@ RESU M O SEM ESTR A L
 
 
 
- SAPOS - <DIA_SEMANA>, <DATA_EXTENSO>, <HORA> h
+ SAPOS - Terça, 15 de Junho de 2021, 10:30 h
 ── página 2 ──
 L I S TA D E E - M A I L S
  NOME DA DISCIPLINA SEMESTRE/ANO AULAS DADAS
@@ -104,4 +104,4 @@ L I S TA D E E - M A I L S
 
 
 
- SAPOS - <DIA_SEMANA>, <DATA_EXTENSO>, <HORA> h
+ SAPOS - Terça, 15 de Junho de 2021, 10:30 h

@@ -16,6 +16,13 @@ require "rails_helper"
 # instável. Datas seguem o mesmo raciocínio — nada de YearSemester.current.
 RSpec.describe "Saídas em PDF e XLSX", type: :request do
   before(:each) do
+    # As factories do projeto usam data relativa (3.days.ago, YearSemester.current)
+    # porque 26 arquivos de spec dependem de "vigente agora". Trocá-las por data
+    # fixa mudaria a semântica de todos eles. A previsibilidade que estes testes
+    # precisam vem daqui: o relógio congela, e o que a factory calcula em cima de
+    # `now` passa a ser determinístico sem que a factory mude.
+    travel_to GoldenMaster::FROZEN_AT
+
     @role_adm = FactoryBot.create(:role_administrador)
     @user = create_confirmed_user([@role_adm], "golden_admin@ic.uff.br")
     sign_in @user
@@ -66,6 +73,8 @@ RSpec.describe "Saídas em PDF e XLSX", type: :request do
       grade: 90
     )
   end
+
+  after(:each) { travel_back }
 
   describe "histórico escolar" do
     it "mantém o conteúdo do baseline" do
@@ -186,6 +195,76 @@ RSpec.describe "Saídas em PDF e XLSX", type: :request do
       expect(response).to have_http_status(:ok)
       expect_matches_golden(
         "scholarship_durations_list", response.body, format: :pdf
+      )
+    end
+  end
+
+  describe "quadro de horários" do
+    before(:each) do
+      @class_schedule = FactoryBot.create(
+        :class_schedule, year: 2020, semester: 1
+      )
+    end
+
+    it "mantém o conteúdo do baseline por período" do
+      get class_schedule_pdf_class_schedule_path(@class_schedule, format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "class_schedule", response.body, format: :pdf
+      )
+    end
+
+    it "mantém o conteúdo do baseline da listagem de turmas" do
+      # Sem ano e semestre a ação recusa e redireciona (flash de erro em
+      # pdf_content.class_schedule.class_schedule_pdf). O active_scaffold guarda
+      # a busca na sessão -- store_search_params_into_session --, então é preciso
+      # buscar primeiro e só depois pedir o PDF.
+      get course_classes_path(search: { year: "2020", semester: "1" })
+      get class_schedule_pdf_course_classes_path(format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "course_classes_schedule", response.body, format: :pdf
+      )
+    end
+  end
+
+  describe "processo de admissão" do
+    before(:each) do
+      # simple_url próprio: a factory usa "mestrado" fixo, e o AdmissionProcess
+      # recusa duas URLs iguais em intervalos que se sobrepõem. Rodando a suíte
+      # inteira, outro spec já deixou esse valor no banco -- isolado passava,
+      # junto quebrava. O golden não pode depender de banco vazio.
+      @admission_process = FactoryBot.create(
+        :admission_process, simple_url: "golden-mestrado"
+      )
+    end
+
+    it "mantém o conteúdo do baseline resumido" do
+      get short_pdf_admission_process_path(@admission_process, format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "admission_process_short", response.body, format: :pdf
+      )
+    end
+
+    it "mantém o conteúdo do baseline completo" do
+      get complete_pdf_admission_process_path(@admission_process, format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "admission_process_complete", response.body, format: :pdf
+      )
+    end
+
+    it "mantém as células do baseline em XLSX" do
+      get complete_xls_admission_process_path(@admission_process, format: :xlsx)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "admission_process_complete_xls", response.body, format: :xlsx
       )
     end
   end

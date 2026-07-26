@@ -77,4 +77,4 @@ João Pereira M2020001 Ana Conceição Mestrado
 
 
 
-SAPOS - <DIA_SEMANA>, <DATA_EXTENSO>, <HORA> h
+SAPOS - Terça, 15 de Junho de 2021, 10:30 h
