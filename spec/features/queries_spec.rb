@@ -61,7 +61,7 @@ RSpec.describe "Queries features", type: :feature do
       expect(page).to have_content "Adicionar Consulta"
       within("#as_#{plural_name}-create--form") do
         fill_in "record_name_", with: "enrollments"
-        codemirror = find("#record_sql_ + .CodeMirror").click
+        find("#record_sql_ + .CodeMirror").click
         wait_for_ajax
         select_all_keys
         page.driver.browser.action.send_keys(

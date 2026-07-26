@@ -9,7 +9,7 @@ class ClassEnrollmentDrop < ActiveRecordAttributesDrop
   define_drop_accessor :grade_to_view
 
   def absence_to_view
-    ((@record.attendance_to_label == "I") ? I18n.t('active_scaffold.true') : I18n.t('active_scaffold.false'))
+    ((@record.attendance_to_label == "I") ? I18n.t("active_scaffold.true") : I18n.t("active_scaffold.false"))
   end
 
   def full_absence_to_view
@@ -21,14 +21,14 @@ class ClassEnrollmentDrop < ActiveRecordAttributesDrop
   end
 
   def absence_changed
-    @record.will_save_change_to_disapproved_by_absence? ? '*' : ''
+    @record.will_save_change_to_disapproved_by_absence? ? "*" : ""
   end
 
   def situation_changed
-    @record.will_save_change_to_situation? ? '*' : ''
+    @record.will_save_change_to_situation? ? "*" : ""
   end
 
   def grade_changed
-    @record.will_save_change_to_grade? ? '*' : ''
+    @record.will_save_change_to_grade? ? "*" : ""
   end
 end

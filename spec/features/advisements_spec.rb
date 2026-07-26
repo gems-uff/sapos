@@ -51,7 +51,7 @@ RSpec.describe "Advisements features", type: :feature do
     @enrollment3.reload
     @destroy_all << FactoryBot.create(:advisement, enrollment: @enrollment3, professor: @professor2, main_advisor: false)
 
-    
+
     @destroy_all << FactoryBot.create(:professor_research_area, professor: @professor4, research_area: @research_area2)
     @destroy_all << FactoryBot.create(:professor_research_area, professor: @professor2, research_area: @research_area1)
 

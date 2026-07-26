@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PaperStudent < ApplicationRecord
   has_paper_trail
 

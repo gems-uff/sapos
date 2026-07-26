@@ -28,7 +28,7 @@ class DeviseMailer < Devise::Mailer
     else
       name = @template.name.split(":", 2)[1]
       message = @template.prepare_message(
-        self.send("liquid_#{name}")  
+        self.send("liquid_#{name}")
       )
       headers.update(message)
     end
@@ -51,14 +51,14 @@ class DeviseMailer < Devise::Mailer
   end
 
   def liquid_email_changed
-    { 
+    {
       user: @resource,
       unconfirmed_email: @resource.try(:unconfirmed_email?)
     }
   end
 
   def liquid_invitation_instructions
-    { 
+    {
       user: @resource,
       accept_invitation_link: accept_invitation_url(@resource, invitation_token: @token)
     }
@@ -69,17 +69,16 @@ class DeviseMailer < Devise::Mailer
   end
 
   def liquid_reset_password_instructions
-    { 
+    {
       user: @resource,
       edit_password_link: edit_password_url(@resource, reset_password_token: @token)
     }
   end
 
   def liquid_unlock_instructions
-    { 
+    {
       user: @resource,
       unlock_link: unlock_url(@resource, unlock_token: @token)
     }
   end
-
 end

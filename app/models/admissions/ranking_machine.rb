@@ -9,7 +9,7 @@ class Admissions::RankingMachine < ActiveRecord::Base
   has_many :ranking_processes, dependent: :destroy,
     class_name: "Admissions::RankingProcess"
 
-  belongs_to :form_condition, optional:true,
+  belongs_to :form_condition, optional: true,
     class_name: "Admissions::FormCondition"
 
   validates :name, presence: true

@@ -16,5 +16,4 @@ class ProgramLevelsController < ApplicationController
 
     config.actions.exclude :deleted_records
   end
-
 end

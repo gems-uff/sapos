@@ -21,7 +21,7 @@ require "spec_helper"
 RSpec.describe "Devise mail cycle", type: :request do
   # Os links dos templates trazem o token como parâmetro de query.
   def token_in(mail, param)
-    mail.body.decoded[/#{param}=([A-Za-z0-9_\-]+)/, 1]
+    mail.body.decoded[/#{param}=([A-Za-z0-9_-]+)/, 1]
   end
 
   # Procurar pelo destinatário, em vez de usar `deliveries.last`, porque uma só

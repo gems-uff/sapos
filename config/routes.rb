@@ -157,7 +157,7 @@ Rails.application.routes.draw do
     record_select_routes
   end
 
-  
+
 
   resources :scholarship_durations do
     concerns :active_scaffold

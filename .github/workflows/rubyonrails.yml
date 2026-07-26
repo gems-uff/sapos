@@ -72,6 +72,13 @@ jobs:
       - name: Set up database schema
         run: bundle exec rake db:schema:load --trace
 
+      # O rubocop está no Gemfile desde sempre e nenhum workflow o executava --
+      # tanto que ficou quebrado por um bump de gem sem ninguém notar (#644). Com
+      # as ofensas em zero, o gate é sustentável. Roda antes da suíte porque é
+      # rápido e falha barato.
+      - name: Lint
+        run: bundle exec rubocop
+
       - name: Run tests
         run: |
           set -o pipefail

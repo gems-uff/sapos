@@ -106,7 +106,7 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
   end
   # ToDo: test scopes
   # ToDo: test before_save
- 
+
 
   describe "Methods" do
     # ToDo: pendency_condition

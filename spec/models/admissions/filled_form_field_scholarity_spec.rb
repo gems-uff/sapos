@@ -32,7 +32,7 @@ RSpec.describe Admissions::FilledFormFieldScholarity, type: :model do
       grade: "9",
       grade_interval: "0..10",
       start_date: 5.years.ago,
-      end_date: 1.year.ago 
+      end_date: 1.year.ago
     )
     @filled_form_field_scholarity.filled_form_field = @filled_form_field
   end
@@ -63,7 +63,7 @@ RSpec.describe Admissions::FilledFormFieldScholarity, type: :model do
           grade: "9",
           grade_interval: "0..10",
           start_date: 5.years.ago,
-          end_date: 1.year.ago 
+          end_date: 1.year.ago
         )
       end
       it "should be valid when all values are filled" do
