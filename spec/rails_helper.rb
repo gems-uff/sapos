@@ -167,6 +167,12 @@ RSpec.configure do |config|
   end
 
   config.after(:suite) do
+    # eager_load! antes de contar: config.eager_load so e ligado no CI
+    # (config/environments/test.rb), e sem ele ApplicationRecord.descendants
+    # devolve apenas as classes ja carregadas -- uma na maquina de
+    # desenvolvimento. O detector varria uma lista vazia e nunca acusava nada,
+    # justamente onde quem desenvolve o usaria.
+    Rails.application.eager_load!
     models = ApplicationRecord.descendants
     leaked = models.filter_map do |model|
       "#{model}: #{model.count}" if model.count > 0
@@ -174,6 +180,10 @@ RSpec.configure do |config|
     if leaked.count > 0
       puts "Leaked objects -- Please, try to find and delete them to avoid one test interfering with the other"
       puts "  #{leaked.join("\n  ")}"
+      # LEAK_CHECK=strict transforma o aviso em falha. Ainda nao e o padrao: o
+      # aviso passou anos inerte, entao a divida acumulada precisa ser paga
+      # antes de a suite poder quebrar por causa dela.
+      raise "Vazamento de objetos entre testes (LEAK_CHECK=strict)" if ENV["LEAK_CHECK"] == "strict"
     end
   end
 end
