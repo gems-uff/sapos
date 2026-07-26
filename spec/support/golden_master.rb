@@ -95,8 +95,8 @@ module GoldenMaster
     end
 
     def sheet_cells(xml, shared)
-      Nokogiri::XML(xml).css("sheetData row").map do |row|
-        cells = row.css("c").map do |cell|
+      Nokogiri::XML(xml).css("sheetData row").filter_map do |row|
+        cells = row.css("c").filter_map do |cell|
           value =
             case cell["t"]
             when "s"         then shared[cell.css("v").text.to_i].to_s
@@ -105,9 +105,9 @@ module GoldenMaster
             end
           next if value.strip.empty?
           "#{cell['r']}=#{normalize(value)}"
-        end.compact
-        cells.empty? ? nil : cells.join(" | ")
-      end.compact.join("\n")
+        end
+        cells.join(" | ") unless cells.empty?
+      end.join("\n")
     end
 
     # Só espaço em branco: o relógio congelado dispensa mascarar data e hora.
