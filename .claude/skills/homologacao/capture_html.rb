@@ -18,9 +18,19 @@
 
 require "selenium-webdriver"
 require "json"
-require "csv"
 require "fileutils"
 require "digest"
+
+# A partir do Ruby 3.4 a csv deixou de ser default gem e passou a bundled gem:
+# sob "bundle exec" ela sai do load path se nao estiver no Gemfile. O CSV aqui e
+# so conveniencia de leitura humana -- quem alimenta compare_html.rb e o
+# results.json -- entao a ausencia dela nao pode impedir a captura.
+begin
+  require "csv"
+  HAS_CSV = true
+rescue LoadError
+  HAS_CSV = false
+end
 
 def env!(name)
   value = ENV[name]
@@ -197,15 +207,19 @@ begin
     puts format("[%3d/%3d] %-45s %-9s %5dms", i + 1, routes.size, route, flag, elapsed_ms)
   end
 
-  CSV.open(File.join(out_dir, "results.csv"), "w") do |csv|
-    csv << %w[route status ms title text_sha text_bytes console_errors broken_requests failed_requests final_url error]
-    results.each do |r|
-      csv << [r[:route], r[:status], r[:ms], r[:title], r[:text_sha], r[:text_bytes],
-              r[:console_errors], r[:broken_requests], r[:failed_requests], r[:final_url], r[:error]]
+  if HAS_CSV
+    CSV.open(File.join(out_dir, "results.csv"), "w") do |csv|
+      csv << %w[route status ms title text_sha text_bytes console_errors broken_requests failed_requests final_url error]
+      results.each do |r|
+        csv << [r[:route], r[:status], r[:ms], r[:title], r[:text_sha], r[:text_bytes],
+                r[:console_errors], r[:broken_requests], r[:failed_requests], r[:final_url], r[:error]]
+      end
     end
+  else
+    puts "\n(sem a gem csv neste Ruby; results.csv nao gerado -- a comparacao usa o results.json)"
   end
   File.write(File.join(out_dir, "results.json"), JSON.pretty_generate(results))
-  puts "\nsaida em #{out_dir}/ (results.csv, results.json, png/, txt/)"
+  puts "\nsaida em #{out_dir}/ (#{"results.csv, " if HAS_CSV}results.json, png/, txt/)"
 ensure
   driver&.quit
 end
