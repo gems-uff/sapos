@@ -1,10 +1,10 @@
-# ruby=3.4.10
 # frozen_string_literal: true
 
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-# A linha "#ruby=" acima deixa o RVM escolher a versao certa do Ruby.
+# Esta diretiva nao escolhe o Ruby, o .ruby-version escolhe; ela recusa rodar
+# no interpretador errado, e por isso e uma faixa (aceita 3.4.11, barra 3.5).
 # Serie 3.4: a 3.2 chegou ao fim de vida em 01/04/2026 e nao recebe mais nem
 # correcao de seguranca (issue #639). A 3.3 esta so em manutencao de seguranca
 # e vence em 31/03/2027; a 3.4 esta em manutencao normal e serve tambem ao
