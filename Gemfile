@@ -104,6 +104,7 @@ group :test do
   gem "shoulda-matchers"
   gem "database_cleaner-active_record"
   gem "simplecov"
+  gem "pdf-reader", require: "pdf/reader"   # le o texto do PDF no golden-master
 end
 
 # Gems fora do install default para um checkout limpo rodar em SQLite sem

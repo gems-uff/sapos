@@ -1,0 +1,3 @@
+── xl/worksheets/sheet1.xml ──
+A1=Nº | B1=Matrícula | C1=Nome do Aluno | D1=Email | E1=Nota Final | F1=Freq S/I | G1=Situação | H1=Obs.: | I1=Bolsista? | J1=Data de Inscrição
+A2=1 | B2=M2020001 | C2=Ana Conceição | E2=9.0 | F2=S | G2=Aprovado | I2=Não | J2=<DATA> <HORA>
