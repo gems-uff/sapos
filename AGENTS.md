@@ -28,11 +28,15 @@ corrija na wiki.
   investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
   irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo
   culpado sozinho. O CI registra a seed no resumo do job.
-- **Não vaze registro entre grupos.** Cada exemplo **e cada contexto** roda em
-  transação própria, então `before(:all)` é desfeito ao fim do grupo e limpeza
-  manual em `after(:all)` é desnecessária. Se algum registro sobreviver, a suíte
-  **falha** no fim; `LEAK_AUDIT=1` aponta de qual grupo veio, e `LEAK_CHECK=warn`
-  rebaixa a falha a aviso. Contexto em #643.
+- **`before(:all)` vaza — limpe no `after(:all)`.** Só o exemplo roda em
+  transação; o que o `before(:all)` cria é commitado e atravessa a fronteira
+  entre grupos, inclusive o que as factories criam por associação. A suíte avisa
+  no fim o que sobrou, `LEAK_AUDIT=1` aponta de qual grupo veio, e
+  `LEAK_CHECK=strict` transforma o aviso em falha. Dívida conhecida em #643.
+- **Envolver o contexto em transação parece o conserto e não é.** Passa inteira
+  em SQLite e quebra sete exemplos em MariaDB: `Query#run_read_only_query` abre
+  cliente próprio e a rake task de notificações é outro processo — nenhum dos
+  dois enxerga dado não commitado.
 - **Não commite por conta própria.** Deixe a mudança pronta na árvore de
   trabalho, mostre o diff e o resultado da suíte, e espere o mantenedor revisar.
   Commit, tag e push são dele — inclusive nos passos de baby-step, onde é fácil

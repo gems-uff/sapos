@@ -224,19 +224,20 @@ RSpec.configure do |config|
   # e o que atravessa a fronteira entre grupos. Fica atras de env var por ser
   # caro: uma contagem por modelo a cada contexto, e contextos aninhados repetem
   # o mesmo achado.
-  # Uma transacao por CONTEXTO, alem da transacao por exemplo do around(:each).
+  # NAO envolva o contexto numa transacao. Parece o conserto obvio para o
+  # vazamento de before(:all) -- e passa inteira em SQLite --, mas quebra sete
+  # exemplos em MariaDB, que e o banco do CI e o de producao:
   #
-  # before(:all) roda fora da transacao por exemplo, entao o que ele cria era
-  # commitado e atravessava a fronteira entre grupos. Media da suite antes desta
-  # linha: 90 arquivos deixavam registro para tras, e sobravam 1397 versoes do
-  # PaperTrail, 32 FormTemplate e 4 AdmissionProcess ao fim -- foi um desses
-  # AdmissionProcess que quebrou tres testes conforme a ordem sorteada (#643).
+  # - Query#run_read_only_query abre um cliente Mysql2 proprio, com a
+  #   configuracao <env>_read_only, e nao enxerga dado nao commitado: a tela de
+  #   resultado volta com zero linhas.
+  # - As notificacoes rodam a rake task maintenance:trigger_notifications, outro
+  #   processo, que pelo mesmo motivo nao encontra nada para enviar.
   #
-  # O conserto e aqui, e nao nos 90 after(:all): a limpeza manual e que era o
-  # remendo. Vale inclusive para feature spec com js: true, porque o servidor do
-  # Capybara compartilha a conexao nos testes.
+  # Sao exatamente os pontos cegos que o AGENTS.md lista, e por isso o SQLite
+  # nao acusa. O vazamento de before(:all) continua sendo divida conhecida
+  # (#643), a ser paga grupo a grupo -- nao com transacao por contexto.
   config.before(:context) do
-    DatabaseCleaner.start
     LeakDetector.push_baseline if ENV["LEAK_AUDIT"]
   end
 
@@ -248,7 +249,6 @@ RSpec.configure do |config|
         puts "LEAK_AUDIT\t#{origem}\t#{delta.join(" ")}"
       end
     end
-    DatabaseCleaner.clean
   end
 
   config.after(:suite) do
@@ -257,12 +257,11 @@ RSpec.configure do |config|
       puts "Leaked objects -- Please, try to find and delete them to avoid one test interfering with the other"
       puts "  #{leaked.join("\n  ")}"
       puts "  (LEAK_AUDIT=1 aponta de qual grupo vieram)"
-      # Falha, nao so avisa. O aviso passou anos inerte porque o detector estava
-      # cego -- varria ApplicationRecord.descendants, e os modelos de Admissions
-      # herdam direto de ActiveRecord::Base. Com a divida zerada pela transacao
-      # por contexto, vazamento novo e regressao, e regressao quebra a suite.
-      # LEAK_CHECK=warn volta ao comportamento antigo, se algum dia for preciso.
-      raise "Vazamento de objetos entre testes" unless ENV["LEAK_CHECK"] == "warn"
+      # Avisa, nao falha: a divida de before(:all) ainda existe (90 arquivos,
+      # #643), e quebrar a suite por ela hoje pararia o CI sem que ninguem tenha
+      # como pagar a conta no mesmo passo. LEAK_CHECK=strict endurece, e e o que
+      # deve virar padrao quando a divida for paga.
+      raise "Vazamento de objetos entre testes (LEAK_CHECK=strict)" if ENV["LEAK_CHECK"] == "strict"
     end
   end
 end
