@@ -124,10 +124,51 @@ Falha aqui **não é sinônimo de bug**. Há três categorias, e a diferença im
 Suspeite da categoria 3 primeiro: é a mais fácil de causar sem perceber e a que
 produz o diagnóstico mais enganoso.
 
-## Desmontagem
+## A instância pode já estar de pé — e o sandbox mente sobre isso
+
+Antes de montar, veja se a instância de uma rodada anterior não continua viva. E
+faça essa checagem **por TCP**, não pelo socket:
 
 ```bash
-kill $(cat $HOME/sapos-mariadb-test/mysql.pid)
-rm -rf $HOME/sapos-mariadb-test
-bundle config set --local without production
+$M/bin/mysql -h 127.0.0.1 -P 3307 -u root -e "SELECT @@version, @@sql_mode;"
 ```
+
+**O sandbox bloqueia conexão a socket unix.** Uma checagem via `--socket=` de
+dentro dele devolve `ERROR 2002 (HY000) ... (1)` — o `(1)` é "operation not
+permitted", e não "servidor não existe", que é o `(2)`. Confundir os dois leva a
+"re-subir" um servidor que já está de pé, e daí o log denuncia o que de fato
+aconteceu:
+
+```
+[ERROR] mariadbd: Can't lock aria control file ... error: 35
+[ERROR] InnoDB: Unable to lock ./ibdata1 error: 35
+```
+
+`error: 35` é **outro processo segurando o datadir**, não corrupção. Se nesse
+caminho o socket e o pid file tiverem sido apagados, o servidor vivo não os
+recria: reponha o pid file (`ps -eo pid,args | grep mariadbd`) e siga por TCP,
+que é o que a `DATABASE_URL` usa de todo modo.
+
+## Desmontagem
+
+**Desmonte ao fim de cada rodada, não "quando lembrar".** A máquina de
+desenvolvimento tem pouca memória e um `mariadbd` esquecido fica semanas de pé
+segurando ~50 MB — foi o que aconteceu entre 22 e 25/07/2026.
+
+```bash
+# Shutdown limpo, que fecha o InnoDB direito. Matar o mariadbd no sinal nao
+# serve: o mysqld_safe que o supervisiona o ressuscita.
+$M/bin/mysqladmin -h 127.0.0.1 -P 3307 -u root shutdown
+
+# Feature spec que estoura no meio deixa driver pendurado; varra depois da suite.
+ps -eo pid,args | grep -E 'chromedriver|Chrome.*headless' | grep -v grep
+```
+
+O datadir (`~/sapos-mariadb-test`, ~200 MB) é **estado reusável, não lixo**:
+mantê-lo poupa o `mysql_install_db` da próxima rodada e, com o servidor
+desligado, não custa memória nenhuma. Apague só quando quiser o disco de volta ou
+quando a fidelidade do ambiente estiver em dúvida.
+
+`bundle config set --local without production` reverte o `without ''` da
+montagem, mas isso desinstala a `mysql2` do caminho e a próxima rodada volta a
+tropeçar nela. Se houver outra rodada à vista, deixe como está.
