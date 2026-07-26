@@ -268,4 +268,67 @@ RSpec.describe "Saídas em PDF e XLSX", type: :request do
       )
     end
   end
+
+  # A prévia não tem rota GET: é POST, monta um ReportConfiguration em memória a
+  # partir de record_params e renderiza sem persistir. record_id -1 é o sinal de
+  # "registro novo" que o controller usa.
+  describe "prévia da configuração de relatório" do
+    it "mantém o conteúdo do baseline" do
+      post preview_report_configurations_path(format: :pdf), params: {
+        record_id: -1,
+        record: {
+          name: "Configuração Golden",
+          text: "UNIVERSIDADE FEDERAL FLUMINENSE",
+          scale: 1,
+          signature_type: "no_signature",
+          use_at_report: true
+        }
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "report_configuration_preview", response.body, format: :pdf
+      )
+    end
+  end
+
+  # O external_report_pdf não é uma ação: é renderizado no before_create_save do
+  # ReportsController, via ReportsHelper#create_external_report_pdf, e o corpo
+  # passa pelo formatador Liquid. Cobri-lo exige criar o documento e baixá-lo --
+  # o que, de quebra, exercita o liquid dentro da geração de PDF.
+  describe "documento externo" do
+    before(:each) do
+      # O identificador do documento é sorteado (PdfHelper#generate_qr_code_key)
+      # e sai IMPRESSO no PDF, na URL de acesso -- então o baseline mudava a cada
+      # execução. Fixar o gerador é o mesmo raciocínio do relógio congelado:
+      # tira o acaso e mantém o formato visível, de modo que uma mudança no
+      # formato do identificador ainda seria detectada.
+      allow_any_instance_of(PdfHelper)
+        .to receive(:generate_qr_code_key).and_return("GOLDN-00001")
+    end
+
+    it "mantém o conteúdo do baseline" do
+      post reports_path, params: {
+        record: {
+          file_name: "documento-golden",
+          document_title: "Declaração",
+          document_body: "Declaramos para os devidos fins.",
+          expiration_in_months: ""
+        }
+      }
+
+      report = Report.order(:id).last
+      expect(report).to be_present
+
+      # set_report busca por Report.find_by_identifier, não pelo hash do arquivo.
+      # E o .pdf é literal na rota (/reports/:identifier.pdf), então passar
+      # format: :pdf o duplicaria.
+      get "/reports/#{report.identifier}.pdf"
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "external_report", response.body, format: :pdf
+      )
+    end
+  end
 end
