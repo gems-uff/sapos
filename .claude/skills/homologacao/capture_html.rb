@@ -148,7 +148,18 @@ begin
     events = network_events(drain(driver, :performance))
     doc = events.find { |e| e[:kind] == :response && e[:type] == "Document" }
     broken = events.select { |e| e[:kind] == :response && e[:status].to_i >= 400 }
-    failed = events.select { |e| e[:kind] == :failed }
+    # Um net::ERR_ABORTED sobre um Document, numa varredura que navega rota a
+    # rota, e a requisicao da pagina ANTERIOR cancelada pela navegacao atual --
+    # nao asset faltando. Medido na homologacao da issue #639, sobre o mesmo
+    # codigo: /advisement_authorizations acusa failed=1 quando precedida de
+    # /admissions (a rota mais lenta da lista) e failed=0 quando capturada
+    # sozinha. Na captura do baseline, com a mesma ordem, ela acusou 0 -- ou seja,
+    # o sinal aparece e desaparece conforme o tempo de resposta, nao conforme o
+    # codigo, e numa comparacao vira falso positivo. Qualquer outro errorText, e
+    # qualquer aborto que nao seja de Document, continua contando.
+    failed = events.select do |e|
+      e[:kind] == :failed && !(e[:error] == "net::ERR_ABORTED" && e[:type] == "Document")
+    end
 
     console = drain(driver, :browser)
                 .select { |m| m.level == "SEVERE" }
@@ -195,7 +206,12 @@ begin
       final_url: driver.current_url,
       error: error,
       console_sample: console.first(3),
-      broken_sample: broken.first(5).map { |b| "#{b[:status]} #{b[:url]}" }
+      broken_sample: broken.first(5).map { |b| "#{b[:status]} #{b[:url]}" },
+      # Sem esta amostra, um failed_requests que sobe de 0 para 1 na comparacao
+      # nao diz o que falhou, e a captura do baseline nao pode ser refeita depois
+      # que a versao nova subiu. O errorText distingue o benigno (net::ERR_ABORTED
+      # de requisicao cancelada) do que merece investigacao.
+      failed_sample: failed.first(5).map { |f| "#{f[:error]} (#{f[:type]})" }
     }
 
     flag = if error then "ERRO"
