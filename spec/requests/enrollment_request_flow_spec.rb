@@ -74,6 +74,18 @@ RSpec.describe "Notificações do fluxo de inscrição", type: :request do
     pedido.reload
   end
 
+  # ClassSchedule#enroll_open? usa Time.now, então a janela precisa conter o
+  # instante congelado -- senão o spec passa ou falha conforme o dia da execução.
+  def janela_de_inscricao
+    FactoryBot.create(
+      :class_schedule, year: 2020, semester: 1,
+      enrollment_start: Time.utc(2020, 3, 1), enrollment_end: Time.utc(2020, 3, 31),
+      period_start: Time.utc(2020, 3, 1), period_end: Time.utc(2020, 7, 31),
+      enrollment_insert: Time.utc(2020, 3, 1), enrollment_remove: Time.utc(2020, 3, 31),
+      grades_deadline: Time.utc(2020, 8, 31)
+    )
+  end
+
   def com_orientador(quantos: 1)
     quantos.times do |i|
       professor = i.zero? ? @professor : FactoryBot.create(
@@ -218,13 +230,7 @@ RSpec.describe "Notificações do fluxo de inscrição", type: :request do
         [@role_aluno], @student.email, "Ana Conceição", "A1b2c3d4!",
         student: @student
       )
-      @periodo = FactoryBot.create(
-        :class_schedule, year: 2020, semester: 1,
-        enrollment_start: Time.utc(2020, 3, 1), enrollment_end: Time.utc(2020, 3, 31),
-        period_start: Time.utc(2020, 3, 1), period_end: Time.utc(2020, 7, 31),
-        enrollment_insert: Time.utc(2020, 3, 1), enrollment_remove: Time.utc(2020, 3, 31),
-        grades_deadline: Time.utc(2020, 8, 31)
-      )
+      @periodo = janela_de_inscricao
       travel_to Time.utc(2020, 3, 15, 12, 0, 0)
     end
 
@@ -247,6 +253,59 @@ RSpec.describe "Notificações do fluxo de inscrição", type: :request do
       expect(destinatarios).to include(@student.email)
       expect(destinatarios.size).to eq(3)
       expect(EnrollmentRequest.where(enrollment: @enrollment).count).to eq(1)
+    end
+  end
+
+  describe "passo 4 — o aluno desfaz o pedido" do
+    before(:each) do
+      @role_aluno ||= FactoryBot.create(:role_aluno)
+      @aluno = create_confirmed_user(
+        [@role_aluno], @student.email, "Ana Conceição", "A1b2c3d4!",
+        student: @student
+      )
+      @periodo = janela_de_inscricao
+      travel_to Time.utc(2020, 3, 15, 12, 0, 0)
+      com_orientador
+      @pedido = pedido_com_disciplina(status: ClassEnrollmentRequest::INVALID)
+      sign_in @aluno
+    end
+
+    after(:each) { travel_back }
+
+    it "notifica o aluno e cada orientador ao apagar o pedido inteiro" do
+      limpar_caixa
+
+      post save_student_enroll_path(id: @enrollment.id, year: 2020, semester: 1),
+        params: { enrollment_request: { delete_request: "1" } }
+
+      destinatarios = ActionMailer::Base.deliveries.flat_map(&:to)
+      expect(destinatarios).to include(@student.email)
+      expect(destinatarios).to include(@professor.email)
+      expect(EnrollmentRequest.where(enrollment: @enrollment).count).to eq(0)
+    end
+
+    it "envia UM e-mail ao trocar a disciplina invalidada por outra" do
+      outra = FactoryBot.create(
+        :course, name: "Banco de Dados", code: "TCC00002",
+        course_type: @course_type, credits: 4, workload: 60
+      )
+      outra_turma = FactoryBot.create(
+        :course_class, course: outra, professor: @professor, year: 2020, semester: 1
+      )
+      limpar_caixa
+
+      # O passo 4 do processo: tira a que o orientador invalidou e põe outra.
+      post save_student_enroll_path(id: @enrollment.id, year: 2020, semester: 1),
+        params: { enrollment_request: {
+          course_class_ids: [outra_turma.id.to_s],
+          message: "Troquei conforme sua orientação."
+        } }
+
+      turmas = @pedido.reload.class_enrollment_requests.map(&:course_class_id)
+      expect(turmas).to eq([outra_turma.id])
+      # Uma submissão do aluno, um e-mail para ele -- mais um por orientação.
+      expect(ActionMailer::Base.deliveries.map(&:to).flatten)
+        .to include(@student.email)
     end
   end
 
