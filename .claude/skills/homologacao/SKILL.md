@@ -105,6 +105,28 @@ ruby $S/compare_binary.rb $ANTES/bin   $DEPOIS/bin
 Os ids são de registros existentes em homologação. Se o banco for reimportado,
 confira-os antes de rodar.
 
+### Capturando por papel
+
+O `ability.rb` decide pelo papel **ativo** (`actual_role`), não pelo conjunto de
+papéis da conta: ter `ROLE_ALUNO` não basta para abrir `/enrollment/:id`. O
+`capture_html.rb` aceita `--role=<nome do combo>` e troca o papel pelo próprio
+seletor do cabeçalho antes de capturar, conferindo depois que ele pegou.
+
+```bash
+bundle exec ruby $S/capture_html.rb $ANTES/aluno $S/routes_aluno.txt --role=Aluno
+```
+
+Cada papel vai para um diretório próprio, e a comparação é sempre papel contra o
+mesmo papel. O combo só é renderizado para contas com **dois ou mais** papéis —
+com um só, o script aborta dizendo isso, em vez de capturar as telas do papel
+errado.
+
+**Passe `--role` sempre, inclusive para o administrador.** O papel ativo é
+gravado no usuário (`actual_role`) e **atravessa execuções**: uma captura sem
+`--role` herda o que a anterior deixou e capturaria as telas administrativas como
+aluno, sem erro nenhum. O script grava o papel usado em `papel.txt` dentro do
+diretório de saída e avisa quando herdou — confira esse arquivo antes de comparar.
+
 ## Como a comparação é feita
 
 - **Texto de página** — hash do texto visível, com o rodapé de versão
@@ -156,6 +178,98 @@ env var + helpers de screenshot) ficaram de uma rodada real em
 `ZZ-TESTE-HOMOLOG`, apagada ao fim; e-mail só com a trava `redirect_email`
 conferida. A extensão do Chrome pode estar indisponível — o harness Selenium
 headless + screenshots avaliadas por visão contorna isso.
+
+## Preparando o ambiente para o papel de aluno
+
+As telas do aluno precisam de três coisas que a réplica de produção não traz
+prontas. **A ordem não é indiferente.**
+
+1. **Criar o aluno**, com rótulo `ZZ-TESTE-HOMOLOG` no nome (é por ele que a
+   limpeza varre depois) e **o e-mail da conta de captura**.
+2. **Editar a conta de captura**: *acrescentar* o papel Aluno — nunca trocar, sem
+   o de Administrador a própria captura perde acesso — e associá-la ao aluno.
+3. **Só então criar a matrícula**, com Tipo de Matrícula que tenha "Com usuário"
+   marcado (hoje é `Regular`); sem isso o `_valid_enrollment` nega o acesso do
+   próprio aluno.
+
+**Por que essa ordem e não outra:** o `after_create` da matrícula chama
+`Enrollment#create_user!`, que faz `User.invite!` com o e-mail do aluno. Se esse
+e-mail já pertence a alguém, o `invite!` levanta e o `rescue` faz
+`User.where(email: ...).destroy_all` — **apagaria a conta de captura**. Com o
+aluno já tendo usuário, `should_have_user?` → `can_have_new_user?` → `has_user?`
+corta antes de chegar lá. E `has_user?` já é verdadeiro pela simples existência de
+um usuário com aquele e-mail, o que torna o passo 1 a primeira trava.
+
+O combo de troca de papel só aparece depois do passo 2 (ele exige dois papéis);
+é ele que o `--role` do `capture_html.rb` usa.
+
+### Se não houver período de inscrição aberto
+
+A tela `/enrollment/:id/enroll/:ano-:semestre` redireciona com "o período de
+inscrições fechou" quando nenhuma janela está aberta, e `/enrollment/:id` aparece
+sem a parte de inscrição. **Confira antes** em *Disciplinas → Quadros de
+Horários* se o último quadro cobre a data de hoje; se cobrir, não crie nada.
+
+Se não cobrir, `abrir_quadro_de_horarios.rb` cria um com as janelas abertas:
+
+```bash
+bundle exec ruby $S/abrir_quadro_de_horarios.rb 2026 2              # simulação
+bundle exec ruby $S/abrir_quadro_de_horarios.rb 2026 2 --confirmar  # cria
+```
+
+Ele recusa duplicar quadro do mesmo ano/semestre, e escalona as janelas (a
+principal fecha primeiro, depois a de inserção, depois a de remoção) para que a
+captura consiga exercitar tanto a inscrição quanto o período de ajustes.
+**Abrir período dá assunto à rake task de notificações** — confira o
+`redirect_email` antes, na tabela verdade abaixo.
+
+## Dirigindo a interface por Selenium
+
+- **O `record_select` não filtra com `send_keys` de uma vez.** A requisição sai
+  como `.../browse?search=` **vazia** e a lista volta sem filtro — e o primeiro
+  item dela é outro registro, então clicar no primeiro associa o **errado**, em
+  silêncio. Digite caractere a caractere (`each_char` com ~0,3 s) e espere o item
+  aparecer antes de clicar. Vale para qualquer script Selenium sobre o SAPOS.
+- **A busca do active_scaffold fica atrás do link "Buscar"**; só depois de clicar
+  nele existe o campo (`input[name='search']`, id `as_<recurso>-search-input`).
+- **`execute_script` derruba o chromedriver na tela de novo Quadro de Horários**
+  (medido duas vezes seguidas). Nas telas com datepicker, prefira
+  `find_element` e `page_source` a JS injetado.
+- **Confirme pela lista, nunca pela ausência de erro na tela** — ver o 500 abaixo,
+  que grava o registro e mostra "Internal Error" ao mesmo tempo.
+
+## Ruído conhecido, que não é regressão
+
+Medido na `main` (7.15.23) em 27/07/2026, presente também no baseline anterior:
+
+- `/form_autocompletes/form_field` responde **500**. Causa no código do app:
+  `Admissions::FormField.full_search_name` tem `field:` com default `nil` e cai
+  em `name.include?(field)` — `TypeError: no implicit conversion of nil into
+  String`. A varredura chama a rota sem parâmetro, que é exatamente esse caso.
+
+Aparece nos dois lados da comparação e deve ser ignorado como achado — mas se
+**mudar** de status entre "antes" e "depois", aí é sinal.
+
+### Não confunda template oculto com erro na tela
+
+O active_scaffold deixa no DOM, **oculto**, um painel
+`.error-message.message.server-error` com o texto "Internal Error". Ler o
+`innerText` dele sem checar visibilidade faz qualquer página parecer quebrada —
+e já custou um diagnóstico inteiro aqui: "salvar Aluno devolve 500" era esse
+painel invisível, com o registro gravando e o servidor respondendo 302.
+
+Ao sondar erro por Selenium, exija visibilidade:
+
+```ruby
+visivel = driver.execute_script(<<~JS)
+  var e = document.querySelector('.error-message, .errorExplanation');
+  return e && e.offsetParent !== null && getComputedStyle(e).display !== 'none'
+    ? e.innerText.trim() : null;
+JS
+```
+
+E cruze com a rede: sem resposta não-2xx no log de performance **e** sem 500 no
+`log/production.log` do servidor, o erro está na sua sonda, não na aplicação.
 
 ## Regras de segurança
 

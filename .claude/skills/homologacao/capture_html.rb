@@ -43,9 +43,13 @@ USER = env!("SAPOS_STAGING_USER")
 PASS = env!("SAPOS_STAGING_PASS") # nunca impresso
 
 out_dir = ARGV[0]
-abort "uso: ruby staging_capture.rb <dir_saida> [arquivo_rotas] [--limit=N]" if out_dir.nil?
+abort "uso: ruby staging_capture.rb <dir_saida> [arquivo_rotas] [--limit=N] [--role=<nome>]" if out_dir.nil?
 routes_file = ARGV[1] && !ARGV[1].start_with?("--") ? ARGV[1] : "rotas.txt"
 limit = ARGV.find { |a| a.start_with?("--limit=") }&.split("=")&.last&.to_i
+# O ability.rb decide pelo papel ATIVO (actual_role), nao pelo conjunto de
+# papeis do usuario: sem trocar, as telas do aluno voltam negadas mesmo para
+# quem tem ROLE_ALUNO. O nome e o que aparece no combo, ex.: --role=Aluno
+role = ARGV.find { |a| a.start_with?("--role=") }&.split("=", 2)&.last
 
 if !BASE.include?("staging") && !ARGV.include?("--force")
   abort "A URL (#{BASE}) nao contem 'staging'. Se for intencional, use --force."
@@ -74,6 +78,52 @@ def drain(driver, kind)
   driver.logs.get(kind)
 rescue StandardError
   []
+end
+
+# Troca o papel ativo pelo combo do cabecalho -- o mesmo caminho do usuario, e
+# nao um POST forjado: se o widget mudar de forma, a captura para aqui em vez de
+# seguir capturando as telas do papel errado.
+#
+# O combo so e renderizado para quem tem DOIS ou mais papeis (role_selector no
+# application_helper). Usuario com um papel so cai no abort de baixo, que e o
+# aviso de que falta associar o papel a conta de captura.
+# O papel ativo (actual_role) fica GRAVADO no usuario e atravessa execucoes: uma
+# captura sem --role herda o que a anterior deixou. Por isso ele e sempre lido e
+# registrado, mesmo quando nao se pede troca -- capturar as telas com o papel
+# errado, em silencio, e o pior desfecho possivel.
+def papel_ativo(driver)
+  driver.execute_script(
+    "var s = document.querySelector(\"form[action*='change_role'] select[name='role_id']\");" \
+    "return s ? s.options[s.selectedIndex].text.trim() : null;"
+  )
+rescue StandardError
+  nil
+end
+
+def switch_role!(driver, wait, base, role_name)
+  driver.navigate.to("#{base}/")
+  wait.until { driver.execute_script("return document.readyState") == "complete" }
+  select_el = begin
+    driver.find_element(css: "form[action*='change_role'] select[name='role_id']")
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    abort "Combo de troca de papel ausente. A conta #{ENV['SAPOS_STAGING_USER']} " \
+          "precisa de pelo menos dois papeis para que ele seja renderizado."
+  end
+  disponiveis = select_el.find_elements(tag_name: "option").map { |o| o.text.strip }
+  unless disponiveis.include?(role_name)
+    abort "Papel #{role_name.inspect} nao esta entre os da conta: #{disponiveis.inspect}"
+  end
+
+  Selenium::WebDriver::Support::Select.new(select_el).select_by(:text, role_name)
+  # O select tem onchange: this.form.submit(), entao a troca ja foi submetida.
+  wait.until { driver.execute_script("return document.readyState") == "complete" }
+
+  # Conferir e o ponto: um POST aceito nao garante papel trocado, e capturar 140
+  # telas com o papel errado produz um "depois" que parece so ruido.
+  driver.navigate.to("#{base}/")
+  wait.until { driver.execute_script("return document.readyState") == "complete" }
+  ativo = papel_ativo(driver)
+  abort "Troca de papel nao pegou: esperado #{role_name.inspect}, ativo #{ativo.inspect}" if ativo != role_name
 end
 
 def network_events(entries)
@@ -123,6 +173,16 @@ begin
     abort "Login recusado para #{USER}. Mensagem da aplicacao: #{reason}"
   end
   puts "login ok como #{USER} -> #{driver.current_url}"
+  switch_role!(driver, wait, BASE, role) if role
+
+  # Registrado em arquivo proprio, e nao no results.json, para nao mexer no
+  # formato que o compare_html.rb consome.
+  ativo = papel_ativo(driver) || "(conta com um papel so)"
+  puts "papel ativo: #{ativo}"
+  File.write(File.join(out_dir, "papel.txt"), "#{ativo}\n")
+  if role.nil? && ativo != "(conta com um papel so)"
+    puts "AVISO: sem --role, a captura herdou o papel #{ativo.inspect} deixado pela execucao anterior."
+  end
 
   results = []
 
