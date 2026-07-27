@@ -48,7 +48,11 @@ def diff_pixels(p1, p2)
   fmt = "%[fx:int(mean*w*h+0.5)] %@"
   out = `magick \\( "#{p1}" -background white -flatten \\) \\( "#{p2}" -background white -flatten \\) \
          -compose difference -composite -colorspace Gray -threshold 0 -format "#{fmt}" info: 2>&1`.strip
-  m = out.match(/\A(\d+)\s+(\S+)/)
+  # A bbox de uma diferenca vazia e indefinida, e o magick avisa no stderr
+  # ("geometry does not contain image") ANTES de imprimir "0 0x0+...". Ancorar
+  # em \A faz toda pagina IDENTICA virar "falha ao medir"; o padrao e procurado
+  # em qualquer posicao, e o stderr fica junto para que falha de verdade apareca.
+  m = out.match(/(\d+)\s+(\d+x\d+[-+]\d+[-+]\d+)/)
   return [nil, out[0, 80]] unless m # tamanhos diferentes, formato inesperado etc.
   [m[1].to_i, m[2]]
 end

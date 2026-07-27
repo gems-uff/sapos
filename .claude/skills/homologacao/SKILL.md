@@ -132,7 +132,15 @@ diretório de saída e avisa quando herdou — confira esse arquivo antes de com
 - **Texto de página** — hash do texto visível, com o rodapé de versão
   neutralizado. Datas **não** são normalizadas de propósito: mudança de formato
   de data é uma das regressões procuradas.
-- **Screenshot** — PNG de página inteira, comparado pixel a pixel.
+- **Screenshot** — PNG de página inteira, comparado pixel a pixel, porque texto
+  igual não é tela igual: asset que sumiu, CSS que quebrou e layout deslocado não
+  mudam uma letra do texto visível. A saída **agrupa as páginas pela bounding box
+  da diferença**, e é assim que se lê: a string de versão está em toda página, na
+  mesma posição, então ela vira um grupo único com quase tudo dentro — e o que
+  divergiu por outro motivo sobra em grupo próprio, no topo (a ordem é por área).
+  Numa rodada real, 125 páginas colapsaram em três linhas. Nenhuma coordenada
+  fica escrita no script: neutralizar a faixa da versão por coordenada fixa
+  quebraria com outro tema, zoom ou resolução.
 - **PDF** — rasterizado em PNG por página. Comparar bytes não funciona: PDF
   embute data de criação, então o mesmo relatório gerado duas vezes já tem hash
   diferente.
@@ -151,6 +159,15 @@ concluir que não houve regressão.
 
 Isso não é hipotético: a primeira versão dessa checagem estava errada e devolvia
 zero para um par que sabidamente diferia.
+
+A mesma armadilha pegou a medição de imagem, e de um jeito que só aparece quando
+**não** há diferença: a bounding box de uma diferença vazia é indefinida, e o
+`magick` avisa no stderr antes de imprimir `0 0x0+...`. O padrão ancorado em `\A`
+lia o aviso, não casava, e reportava "falha ao medir" — ou seja, a página
+**idêntica** era a única que o comparador não sabia classificar. Por isso a
+contagem de páginas alteradas por pixel tem checagem de sanidade própria: com
+duas versões diferentes, zero ali é comparador quebrado, não ausência de
+regressão.
 
 ## Camada exploratória (interativa) — o que a varredura estática não alcança
 
