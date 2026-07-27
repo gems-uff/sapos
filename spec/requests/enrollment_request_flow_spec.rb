@@ -15,6 +15,10 @@ require "rails_helper"
 # Estes exemplos não julgam o conteúdo das mensagens; fixam QUEM recebe e QUANTAS
 # saem, que é onde os erros silenciosos moram -- um laço por orientação que não
 # roda, ou um e-mail por disciplina onde deveria haver um por pedido.
+#
+# Nos passos 6 e 7 eles fixam também o estado, porque ali a notificação é
+# inseparável dele: o que distingue o ajuste da inscrição inicial é que tirar uma
+# disciplina não a apaga, e é essa distinção que escolhe o e-mail que sai.
 RSpec.describe "Notificações do fluxo de inscrição", type: :request do
   before(:each) do
     @role_adm = FactoryBot.create(:role_administrador)
@@ -86,6 +90,46 @@ RSpec.describe "Notificações do fluxo de inscrição", type: :request do
     )
   end
 
+  # As duas janelas de ajuste são independentes (`enrollment_insert` e
+  # `enrollment_remove`), e a principal já fechou nas duas: é justamente o que
+  # separa o passo 6 do passo 2 -- o mesmo formulário, outro comportamento.
+  def janela_de_ajuste(insercao_ate:, remocao_ate:)
+    FactoryBot.create(
+      :class_schedule, year: 2020, semester: 1,
+      enrollment_start: Time.utc(2020, 3, 1), enrollment_end: Time.utc(2020, 3, 31),
+      period_start: Time.utc(2020, 3, 1), period_end: Time.utc(2020, 7, 31),
+      enrollment_insert: insercao_ate, enrollment_remove: remocao_ate,
+      grades_deadline: Time.utc(2020, 8, 31)
+    )
+  end
+
+  def turma(nome, codigo, professor: nil)
+    curso = FactoryBot.create(
+      :course, name: nome, code: codigo, course_type: @course_type,
+      credits: 4, workload: 60
+    )
+    FactoryBot.create(
+      :course_class, course: curso, professor: professor || @professor,
+      year: 2020, semester: 1
+    )
+  end
+
+  # O pedido no estado em que o passo 6 o encontra: a secretaria já efetivou, e
+  # cada efetivação de adição tem um ClassEnrollment por trás -- é ele que o
+  # ajuste não pode apagar direto.
+  def pedido_efetivado(turmas)
+    pedido = FactoryBot.create(
+      :enrollment_request, enrollment: @enrollment, year: 2020, semester: 1
+    )
+    turmas.each do |course_class|
+      FactoryBot.create(
+        :class_enrollment_request, enrollment_request: pedido,
+        course_class: course_class, status: ClassEnrollmentRequest::EFFECTED
+      )
+    end
+    pedido.reload
+  end
+
   def com_orientador(quantos: 1)
     quantos.times do |i|
       professor = i.zero? ? @professor : FactoryBot.create(
@@ -142,13 +186,7 @@ RSpec.describe "Notificações do fluxo de inscrição", type: :request do
     end
 
     it "envia UM e-mail mesmo decidindo várias disciplinas de uma vez" do
-      outra = FactoryBot.create(
-        :course, name: "Banco de Dados", code: "TCC00002",
-        course_type: @course_type, credits: 4, workload: 60
-      )
-      outra_turma = FactoryBot.create(
-        :course_class, course: outra, professor: @professor, year: 2020, semester: 1
-      )
+      outra_turma = turma("Banco de Dados", "TCC00002")
       segundo = FactoryBot.create(
         :class_enrollment_request, enrollment_request: @pedido,
         course_class: outra_turma, status: ClassEnrollmentRequest::REQUESTED
@@ -310,13 +348,7 @@ RSpec.describe "Notificações do fluxo de inscrição", type: :request do
     end
 
     it "envia UM e-mail ao trocar a disciplina invalidada por outra" do
-      outra = FactoryBot.create(
-        :course, name: "Banco de Dados", code: "TCC00002",
-        course_type: @course_type, credits: 4, workload: 60
-      )
-      outra_turma = FactoryBot.create(
-        :course_class, course: outra, professor: @professor, year: 2020, semester: 1
-      )
+      outra_turma = turma("Banco de Dados", "TCC00002")
       limpar_caixa
 
       # O passo 4 do processo: tira a que o orientador invalidou e põe outra.
@@ -340,6 +372,9 @@ RSpec.describe "Notificações do fluxo de inscrição", type: :request do
       sign_in @admin
     end
 
+    # Sem ClassSchedule cadastrado, o ClassEnrollment#notify_professor desiste
+    # logo na primeira linha. O contraste com o passo 7, onde a mesma ação manda
+    # dois e-mails, está lá embaixo -- e é a janela que faz a diferença.
     it "notifica o aluno ao efetivar uma disciplina" do
       cer = @pedido.class_enrollment_requests.first
       limpar_caixa
@@ -349,6 +384,235 @@ RSpec.describe "Notificações do fluxo de inscrição", type: :request do
       expect(cer.reload.status).to eq(ClassEnrollmentRequest::EFFECTED)
       expect(ActionMailer::Base.deliveries.size).to eq(1)
       expect(ActionMailer::Base.deliveries.first.to).to include(@student.email)
+    end
+  end
+
+  # Passos 6 e 7 -- o período de ajustes. A tela é a mesma do passo 2, mas a
+  # disciplina já foi efetivada, e aí tirá-la do formulário não a apaga: vira um
+  # pedido de ação Remoção que a secretaria efetiva depois. O ClassEnrollment
+  # sobrevive ao pedido do aluno e só morre no passo 7.
+  #
+  # Duas turmas em todo cenário de remoção, e não é detalhe: `save_request` liga
+  # o `student_saving`, que por sua vez liga cinco validações no
+  # EnrollmentRequest -- entre elas a de que o pedido precisa conter ao menos uma
+  # ADIÇÃO. Tirando a única disciplina, a última adição vira remoção, a validação
+  # barra, e o formulário volta com erro em vez de pedir a remoção. O caminho
+  # para largar o semestre inteiro é o botão de apagar o pedido, coberto abaixo.
+  describe "passo 6 — o aluno ajusta o que já foi efetivado" do
+    before(:each) do
+      @role_aluno ||= FactoryBot.create(:role_aluno)
+      @aluno = create_confirmed_user(
+        [@role_aluno], @student.email, "Ana Conceição", "A1b2c3d4!",
+        student: @student
+      )
+      com_orientador
+      @outra_turma = turma("Banco de Dados", "TCC00002")
+    end
+
+    after(:each) { travel_back }
+
+    # Só a remoção aberta: a principal fechou em 31/03 e a inserção em 15/04.
+    def no_periodo_de_remocao
+      janela_de_ajuste(
+        insercao_ate: Time.utc(2020, 4, 15), remocao_ate: Time.utc(2020, 4, 30)
+      )
+      travel_to Time.utc(2020, 4, 20, 12, 0, 0)
+    end
+
+    it "tirar uma disciplina efetivada não a apaga: vira pedido de remoção" do
+      pedido = pedido_efetivado([@course_class, @outra_turma])
+      no_periodo_de_remocao
+      sign_in @aluno
+      limpar_caixa
+
+      post save_student_enroll_path(id: @enrollment.id, year: 2020, semester: 1),
+        params: { enrollment_request: {
+          course_class_ids: [@course_class.id.to_s],
+          message: "Preciso trancar Banco de Dados."
+        } }
+
+      pedido.reload
+      removido = pedido.class_enrollment_requests.find do |cer|
+        cer.course_class_id == @outra_turma.id
+      end
+      expect(removido.action).to eq(ClassEnrollmentRequest::REMOVE)
+      expect(removido.status).to eq(ClassEnrollmentRequest::REQUESTED)
+      # A inscrição continua de pé até o passo 7 -- é essa a diferença entre
+      # ajustar e desistir durante a inscrição.
+      expect(removido.class_enrollment).to be_present
+      expect(@enrollment.reload.class_enrollments.count).to eq(2)
+
+      destinatarios = ActionMailer::Base.deliveries.flat_map(&:to)
+      expect(destinatarios).to include(@student.email)
+      expect(destinatarios).to include(@professor.email)
+      expect(destinatarios.size).to eq(2)
+    end
+
+    it "recusa esvaziar o pedido pelo formulário, sem notificar ninguém" do
+      pedido = pedido_efetivado([@course_class])
+      no_periodo_de_remocao
+      sign_in @aluno
+      limpar_caixa
+
+      post save_student_enroll_path(id: @enrollment.id, year: 2020, semester: 1),
+        params: { enrollment_request: { course_class_ids: [], message: "" } }
+
+      expect(response.body).to include("deve incluir pelo menos uma seleção")
+      cer = pedido.reload.class_enrollment_requests.first
+      expect(cer.action).to eq(ClassEnrollmentRequest::INSERT)
+      expect(cer.status).to eq(ClassEnrollmentRequest::EFFECTED)
+      expect(ActionMailer::Base.deliveries).to be_empty
+    end
+
+    # O mesmo botão do passo 4, e outro desfecho: lá o pedido sumia, aqui ele
+    # fica e vira remoção. O controller escolhe o texto pelo
+    # has_effected_class_enrollment?, e o assunto do e-mail muda junto.
+    it "apagar o pedido inteiro com disciplina efetivada pede a remoção" do
+      pedido = pedido_efetivado([@course_class])
+      no_periodo_de_remocao
+      sign_in @aluno
+      limpar_caixa
+
+      post save_student_enroll_path(id: @enrollment.id, year: 2020, semester: 1),
+        params: { enrollment_request: { delete_request: "1" } }
+
+      expect(flash[:notice]).to eq(
+        I18n.t("student_enrollment.notice.removal_requested")
+      )
+      expect(EnrollmentRequest.where(enrollment: @enrollment).count).to eq(1)
+      cer = pedido.reload.class_enrollment_requests.first
+      expect(cer.action).to eq(ClassEnrollmentRequest::REMOVE)
+      expect(cer.status).to eq(ClassEnrollmentRequest::REQUESTED)
+
+      destinatarios = ActionMailer::Base.deliveries.flat_map(&:to)
+      expect(destinatarios).to include(@student.email)
+      expect(destinatarios).to include(@professor.email)
+      expect(destinatarios.size).to eq(2)
+    end
+
+    it "aceita incluir disciplina enquanto a janela de inserção está aberta" do
+      pedido = pedido_efetivado([@course_class])
+      janela_de_ajuste(
+        insercao_ate: Time.utc(2020, 4, 30), remocao_ate: Time.utc(2020, 4, 15)
+      )
+      travel_to Time.utc(2020, 4, 20, 12, 0, 0)
+      sign_in @aluno
+      limpar_caixa
+
+      post save_student_enroll_path(id: @enrollment.id, year: 2020, semester: 1),
+        params: { enrollment_request: {
+          course_class_ids: [@course_class.id.to_s, @outra_turma.id.to_s],
+          message: "Quero incluir Banco de Dados."
+        } }
+
+      incluida = pedido.reload.class_enrollment_requests.find do |cer|
+        cer.course_class_id == @outra_turma.id
+      end
+      expect(incluida.action).to eq(ClassEnrollmentRequest::INSERT)
+      expect(incluida.status).to eq(ClassEnrollmentRequest::REQUESTED)
+      expect(ActionMailer::Base.deliveries.flat_map(&:to).size).to eq(2)
+    end
+
+    # As duas janelas fecham em datas próprias. Com a de inserção aberta e a de
+    # remoção fechada, o `enroll_open?` continua verdadeiro -- o controller não
+    # desvia, e quem barra é o `valid_removal = false` do
+    # unselect_effected_insertion. Sem esse exemplo, trocar uma janela pela outra
+    # no ClassSchedule passaria despercebido.
+    it "recusa a remoção quando só a janela de inserção está aberta" do
+      pedido = pedido_efetivado([@course_class, @outra_turma])
+      janela_de_ajuste(
+        insercao_ate: Time.utc(2020, 4, 30), remocao_ate: Time.utc(2020, 4, 15)
+      )
+      travel_to Time.utc(2020, 4, 20, 12, 0, 0)
+      sign_in @aluno
+      limpar_caixa
+
+      post save_student_enroll_path(id: @enrollment.id, year: 2020, semester: 1),
+        params: { enrollment_request: {
+          course_class_ids: [@course_class.id.to_s], message: ""
+        } }
+
+      expect(response.body).to include("fora do período de ajustes")
+      expect(pedido.reload.class_enrollment_requests.map(&:action))
+        .to all(eq(ClassEnrollmentRequest::INSERT))
+      expect(@enrollment.reload.class_enrollments.count).to eq(2)
+      expect(ActionMailer::Base.deliveries).to be_empty
+    end
+  end
+
+  # Passo 7. O e-mail ao professor da turma não sai de controller nenhum: vem do
+  # after_create/after_destroy :notify_professor do ClassEnrollment, e só quando
+  # alguma janela de ajuste está aberta. Ler o controller sugeriria um
+  # destinatário; são dois.
+  describe "passo 7 — a secretaria efetiva o ajuste" do
+    before(:each) do
+      @role_aluno ||= FactoryBot.create(:role_aluno)
+      @aluno = create_confirmed_user(
+        [@role_aluno], @student.email, "Ana Conceição", "A1b2c3d4!",
+        student: @student
+      )
+      com_orientador
+      # Professora distinta do orientador: sem isso, os dois e-mails cairiam no
+      # mesmo endereço e o exemplo não distinguiria quem foi avisado por quê.
+      @professora = FactoryBot.create(
+        :professor, name: "Maria Silva", email: "maria.fluxo@ic.uff.br"
+      )
+      @turma_dela = turma("Compiladores", "TCC00003", professor: @professora)
+      janela_de_ajuste(
+        insercao_ate: Time.utc(2020, 4, 30), remocao_ate: Time.utc(2020, 4, 30)
+      )
+      travel_to Time.utc(2020, 4, 20, 12, 0, 0)
+    end
+
+    after(:each) { travel_back }
+
+    it "efetivar a remoção apaga a inscrição e avisa aluno e professor da turma" do
+      pedido = pedido_efetivado([@course_class, @turma_dela])
+      sign_in @aluno
+      post save_student_enroll_path(id: @enrollment.id, year: 2020, semester: 1),
+        params: { enrollment_request: {
+          course_class_ids: [@course_class.id.to_s], message: ""
+        } }
+      cer = pedido.reload.class_enrollment_requests.find do |c|
+        c.action == ClassEnrollmentRequest::REMOVE
+      end
+      sign_in @admin
+      limpar_caixa
+
+      put set_effected_class_enrollment_request_path(cer)
+
+      cer.reload
+      expect(cer.status).to eq(ClassEnrollmentRequest::EFFECTED)
+      expect(cer.class_enrollment).to be_nil
+      expect(@enrollment.reload.class_enrollments.map(&:course_class_id))
+        .to eq([@course_class.id])
+
+      destinatarios = ActionMailer::Base.deliveries.flat_map(&:to)
+      expect(destinatarios).to include(@student.email)
+      expect(destinatarios).to include(@professora.email)
+      expect(destinatarios).not_to include(@professor.email)
+      expect(destinatarios.size).to eq(2)
+    end
+
+    it "efetivar uma inserção no período de ajustes avisa também o professor" do
+      pedido = FactoryBot.create(
+        :enrollment_request, enrollment: @enrollment, year: 2020, semester: 1
+      )
+      cer = FactoryBot.create(
+        :class_enrollment_request, enrollment_request: pedido,
+        course_class: @turma_dela, status: ClassEnrollmentRequest::VALID
+      )
+      sign_in @admin
+      limpar_caixa
+
+      put set_effected_class_enrollment_request_path(cer)
+
+      expect(cer.reload.status).to eq(ClassEnrollmentRequest::EFFECTED)
+      destinatarios = ActionMailer::Base.deliveries.flat_map(&:to)
+      # Um a mais que no passo 5, e o mesmo código: a diferença é a janela.
+      expect(destinatarios).to include(@student.email)
+      expect(destinatarios).to include(@professora.email)
+      expect(destinatarios.size).to eq(2)
     end
   end
 end
