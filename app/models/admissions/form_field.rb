@@ -267,6 +267,15 @@ class Admissions::FormField < ActiveRecord::Base
     field: nil, substring: false, limit: 10,
     in_main: true, in_letter: false
   )
+    # Sem termo não há o que sugerir, e o laço abaixo não sabe lidar com isso: em
+    # busca por substring, name.include?(nil) levanta TypeError -- era o 500 do
+    # autocomplete quando o parâmetro term não vinha -- e name.include?("") é
+    # verdadeiro para todos, despejando os campos sombra como se fossem
+    # resultado. A metade SQL já devolve vazio nos dois casos, porque
+    # `name LIKE NULL` e `name LIKE ''` não casam com nada; vazio é o que mantém
+    # as duas metades de acordo.
+    return [] if field.blank?
+
     result = self.search_name(field:, substring:).limit(limit).map(&:name)
     block = -> (param) {
       label = param[0]

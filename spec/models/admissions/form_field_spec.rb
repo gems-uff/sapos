@@ -90,6 +90,63 @@ RSpec.describe Admissions::FormField, type: :model do
   end
 
   describe "Methods" do
-    # ToDo
+    # full_search_name procura em duas fontes e junta os resultados: os campos
+    # gravados, por LIKE, e o SHADOW_FIELDS_MAP, que é um Hash em memória de
+    # rótulo => nome. É o segundo que o autocomplete de formulários de admissão
+    # exercita sem passar pelo banco -- e era ele que estourava.
+    describe "self.full_search_name" do
+      before(:each) do
+        @campo = FactoryBot.create(
+          :form_field, name: "campo_de_teste", form_template: @form_template
+        )
+        @destroy_later << @campo
+      end
+
+      it "acha pelo nome gravado" do
+        expect(
+          Admissions::FormField.full_search_name(field: "de_teste", substring: true)
+        ).to include("campo_de_teste")
+      end
+
+      it "acha pelo nome de um campo sombra" do
+        expect(
+          Admissions::FormField.full_search_name(field: "nam", substring: true)
+        ).to include("name")
+      end
+
+      it "acha pelo rótulo de um campo sombra" do
+        rotulo = Admissions::AdmissionApplication::SHADOW_FIELDS_MAP.keys.first
+        expect(
+          Admissions::FormField.full_search_name(field: rotulo, substring: true)
+        ).to include(rotulo)
+      end
+
+      # O controller repassa params[:term] sem validação, então o termo ausente
+      # chegava aqui como nil e o laço sobre o SHADOW_FIELDS_MAP fazia
+      # name.include?(nil) -- TypeError, e 500 na rota (#623).
+      it "devolve vazio quando o termo é nil, em vez de estourar" do
+        expect(
+          Admissions::FormField.full_search_name(field: nil, substring: true)
+        ).to eq([])
+      end
+
+      # O termo em branco é o mesmo defeito com outra cara: name.include?("") é
+      # verdadeiro para todo mundo, então a busca despejava os primeiros campos
+      # sombra como se fossem resultado -- enquanto a metade SQL, com
+      # `name LIKE ''`, não devolvia nada. As duas metades discordavam.
+      it "devolve vazio quando o termo está em branco" do
+        expect(
+          Admissions::FormField.full_search_name(field: "", substring: true)
+        ).to eq([])
+      end
+
+      # Sem substring o laço compara por igualdade, que não estoura com nil --
+      # mas o resultado tem que continuar vazio.
+      it "devolve vazio com termo nil também na busca exata" do
+        expect(
+          Admissions::FormField.full_search_name(field: nil, substring: false)
+        ).to eq([])
+      end
+    end
   end
 end
