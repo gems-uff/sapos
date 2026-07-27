@@ -192,7 +192,9 @@ class StudentEnrollmentController < ApplicationController
     end
 
     def save_enrollment_request_and_redirect
-      message = enrollment_request_params[:message]
+      # A tela sempre submete o textarea, ainda que vazio, mas o método não deve
+      # depender disso: sem a chave, o `message.empty?` mais abaixo estourava.
+      message = enrollment_request_params[:message].to_s
       request_change = @enrollment_request.assign_course_class_ids(
         prepare_course_class_ids, @semester
       )

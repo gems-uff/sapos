@@ -254,6 +254,31 @@ RSpec.describe "Notificações do fluxo de inscrição", type: :request do
       expect(destinatarios.size).to eq(3)
       expect(EnrollmentRequest.where(enrollment: @enrollment).count).to eq(1)
     end
+
+    # A chave `message` decide o ramo que monta o comentário e dispara os
+    # e-mails, e é lá que a ausência dela doía: `message.empty?` num nil. Pela
+    # tela não acontece -- o textarea sempre é submetido, ainda que vazio -- mas
+    # o método não deve depender disso para não estourar.
+    it "salva sem a chave message, em vez de estourar" do
+      com_orientador
+      sign_in @aluno
+      limpar_caixa
+
+      post save_student_enroll_path(id: @enrollment.id, year: 2020, semester: 1),
+        params: { enrollment_request: {
+          course_class_ids: [@course_class.id.to_s]
+        } }
+
+      expect(response).to redirect_to(student_enrollment_path(@enrollment.id))
+      expect(flash[:notice]).to eq(
+        I18n.t("student_enrollment.notice.request_saved")
+      )
+      expect(EnrollmentRequest.where(enrollment: @enrollment).count).to eq(1)
+      # Sem mensagem não há comentário, mas a notificação continua saindo.
+      expect(EnrollmentRequestComment.count).to eq(0)
+      expect(ActionMailer::Base.deliveries.flat_map(&:to))
+        .to include(@student.email)
+    end
   end
 
   describe "passo 4 — o aluno desfaz o pedido" do
