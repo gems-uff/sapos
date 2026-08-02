@@ -9,7 +9,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby "~> 3.4.10"
 
 # ─── Framework e servidor ────────────────────────────────────────────────
-gem "rails", "~> 7.2.3", ">= 7.2.3.1"
+gem "rails", "~> 7.2.3", ">= 7.2.3.2"    # piso de seguranca (CVE-2026-66066)
 gem "rack", "~> 2.2.23"                  # o 3.x entra junto com o salto do Rails
 gem "sprockets-rails"                    # asset pipeline
 gem "bootsnap", require: false           # cache de boot (config/boot.rb)
