@@ -33,7 +33,7 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 
 * Carol Cruz (text revision)
 * Celso da Cruz Carneiro Ribeiro (usage feedback)
-* Gabriel Campos (usage feedback)
+* Gabriel Campos da Silva (usage feedback)
 * Helio Augusto Garcia de Andrade (usage feedback)
 * Juliana Serra Affonso (design)
 * Pedro Henrique Pegado Ribeiro (logo designer)
