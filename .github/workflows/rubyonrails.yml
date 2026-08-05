@@ -7,10 +7,29 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    # Production runs on MariaDB, so CI does too. SQLite stays available for
+    # local development (it needs no database server), but the collation there
+    # is binary and does not match production; only MariaDB exercises the
+    # case- and accent-insensitive semantics (see spec/models/uniqueness_*.rb).
+    services:
+      mariadb:
+        image: mariadb:10.5
+        env:
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
     env:
       RAILS_ENV: test
-      BUNDLE_WITHOUT: production
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      # The column collation comes from the CREATE DATABASE below; the
+      # connection collation from this URL. Both match production.
+      DATABASE_URL: "mysql2://root:root@127.0.0.1:3306/sapos_test?encoding=utf8mb4&collation=utf8mb4_unicode_ci"
 
     steps:
       - name: Checkout code
@@ -20,19 +39,65 @@ jobs:
         with:
           install-dependencies: true
           install-chromedriver: false
-        
+
+      # Before setup-ruby: the mysql2 gem is a native extension and needs the
+      # client development headers to compile during bundle install. The client
+      # binary is used further down to create the database.
+      - name: Install the MariaDB client and headers
+        run: sudo apt-get update && sudo apt-get install -y mariadb-client libmariadb-dev
+
       - name: Install Ruby and gems
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
-          cache-version: 1 # Increment this number if you need to re-download cached gems
+          cache-version: 3 # Increment this number if you need to re-download cached gems
+
+      # database.yml is no longer tracked, so provide it from the example. Its
+      # test entry is SQLite, but DATABASE_URL above takes precedence and points
+      # the connection at MariaDB; the file only needs to exist.
+      - name: Configure database.yml
+        run: cp config/database.yml.example config/database.yml
+
+      # The collation must match production; utf8mb4_unicode_ci is what the
+      # tables materialize there. sql_mode is not set here on purpose: the Rails
+      # mysql2 adapter overrides the session sql_mode to its strict default on
+      # every connection, in CI and in production alike, so a SET GLOBAL would
+      # not change what the app sees.
+      - name: Create the test database with production's collation
+        run: |
+          mysql -h 127.0.0.1 -u root -proot -e "
+            CREATE DATABASE sapos_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+          "
 
       - name: Set up database schema
-        run: bundle exec rake db:test:prepare --trace
-        
+        run: bundle exec rake db:schema:load --trace
+
+      # O rubocop está no Gemfile desde sempre e nenhum workflow o executava --
+      # tanto que ficou quebrado por um bump de gem sem ninguém notar (#644). Com
+      # as ofensas em zero, o gate é sustentável. Roda antes da suíte porque é
+      # rápido e falha barato.
+      - name: Lint
+        run: bundle exec rubocop
+
       - name: Run tests
-        run: bundle exec rspec
-        
+        run: |
+          set -o pipefail
+          bundle exec rspec | tee rspec.log
+
+      # A ordem dos exemplos e sorteada, e a suite ja teve dependencia de ordem
+      # (#643). Sem a seed, um vermelho e irreproduzivel; com ela, o
+      # `rspec --seed <n> --bisect` isola o exemplo culpado sozinho.
+      - name: Registrar a seed
+        if: always()
+        run: |
+          seed=$(grep -oE 'Randomized with seed [0-9]+' rspec.log | head -1 | grep -oE '[0-9]+$')
+          echo "### Seed do RSpec: \`${seed:-desconhecida}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Reproduzir localmente:" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "bundle exec rspec --seed ${seed:-0}" >> "$GITHUB_STEP_SUMMARY"
+          echo "bundle exec rspec --seed ${seed:-0} --bisect   # se for dependencia de ordem" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
       - name: Publish code coverage
         uses: qltysh/qlty-action/coverage@v1
         with:
@@ -45,6 +110,9 @@ jobs:
     env:
       RAILS_ENV: production
       SECRET_KEY_BASE: chave_falsa_apenas_para_o_boot_do_smoke_test
+      # The smoke test only boots the app to check sendmail; it never touches the
+      # database. Point it at SQLite so it needs no database server.
+      DATABASE_URL: "sqlite3:db/smoke_test.sqlite3"
 
     steps:
       - name: Checkout code
@@ -57,7 +125,10 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          cache-version: 1
+          cache-version: 2
+
+      - name: Configure database.yml
+        run: cp config/database.yml.example config/database.yml
 
       - name: Run smoke test
         run: bundle exec rake smoke_test:all

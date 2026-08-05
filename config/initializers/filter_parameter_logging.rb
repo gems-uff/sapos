@@ -24,7 +24,7 @@ module LogTruncater
     end
     result = self.method(:sql).super_method.call(event)
     payload[:sql] = sql
-    return result
+    result
   end
 end
 

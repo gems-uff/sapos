@@ -30,7 +30,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          cache-version: 0
+          cache-version: 1
 
       - name: Set up database schema
         run: bundle exec rake db:test:prepare
@@ -39,6 +39,16 @@ jobs:
         run: |
           set -o pipefail
           bundle exec rspec | tee "test-log-trial-${{ matrix.trial }}.log"
+
+      # A seed ja fica no log arquivado, mas achar exige baixar o artefato. No
+      # resumo do job ela esta a um clique -- e e o que torna um vermelho
+      # reproduzivel com `rspec --seed <n> --bisect` (#643).
+      - name: Registrar a seed
+        if: always()
+        run: |
+          log="test-log-trial-${{ matrix.trial }}.log"
+          seed=$(grep -oE 'Randomized with seed [0-9]+' "$log" | head -1 | grep -oE '[0-9]+$')
+          echo "Trial ${{ matrix.trial }} -- seed \`${seed:-desconhecida}\`" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload logs
         if: always()

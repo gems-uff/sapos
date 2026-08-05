@@ -61,7 +61,7 @@ RSpec.describe Affiliation, type: :model do
       end
     end
   end
-  
+
   context "Scope" do
     context "date_professor" do
       let!(:professor) { FactoryBot.create :professor }

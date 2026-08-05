@@ -23,7 +23,7 @@ class Country < ApplicationRecord
     country = "%#{country}%" if country.present? && substring
     Country.where(
       "name LIKE :country
-      ", {country: country}
+      ", { country: country }
     )
   end
 

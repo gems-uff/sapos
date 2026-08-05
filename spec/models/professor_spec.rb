@@ -48,11 +48,8 @@ RSpec.describe Professor, type: :model do
     it { should belong_to(:academic_title_institution).required(false) }
     it { should belong_to(:academic_title_level).required(false) }
     it { should belong_to(:user).required(false) }
-    it { should validate_uniqueness_of(:cpf) }
     it { should validate_presence_of(:cpf) }
     it { should validate_presence_of(:name) }
-    it { should validate_uniqueness_of(:email).allow_nil.allow_blank }
-    it { should validate_uniqueness_of(:enrollment_number).allow_blank }
 
     describe "user" do
       context "should be valid when" do

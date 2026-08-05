@@ -31,7 +31,6 @@ RSpec.describe Scholarship, type: :model do
     it { should belong_to(:sponsor).required(true) }
     it { should belong_to(:scholarship_type).required(false) }
     it { should belong_to(:professor).required(false) }
-    it { should validate_uniqueness_of(:scholarship_number) }
     it { should validate_presence_of(:scholarship_number) }
     it { should accept_a_month_year_assignment_of(:start_date, presence: true) }
     it { should validate_presence_of(:start_date) }

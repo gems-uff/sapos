@@ -381,8 +381,7 @@ queries = [
       FROM students s, enrollments e, enrollment_holds eh
       WHERE s.id = e.student_id
       AND e.id = eh.enrollment_id
-      AND eh.year = :ano_semestre_anterior
-      AND eh.semester = :numero_semestre_anterior
+      AND (2*eh.year + eh.semester + eh.number_of_semesters - 1) = (2*:ano_semestre_anterior + :numero_semestre_anterior)
     SQL
   },
   { name: "CHECK INSCRIÇÃO - Alunos que não se inscreveram em Seminários",
@@ -525,8 +524,8 @@ queries = [
       /* não está trancado */
       AND e.id NOT IN (SELECT eh.enrollment_id
                        FROM enrollment_holds eh
-                       WHERE eh.year = :ano_semestre_atual
-                       AND eh.semester = :numero_semestre_atual)
+                       WHERE (2*eh.year + eh.semester) <= (2*:ano_semestre_atual + :numero_semestre_atual)
+                       AND (2*:ano_semestre_atual + :numero_semestre_atual) < (2*eh.year + eh.semester + eh.number_of_semesters))
       /* não está inscrito */
       AND e.id NOT IN (SELECT ce.enrollment_id
                        FROM class_enrollments ce, course_classes cc

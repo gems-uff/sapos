@@ -141,7 +141,7 @@ class Admissions::FilledForm < ActiveRecord::Base
         notification = {
           to: formatter.format(configuration["to"]),
           subject: formatter.format(configuration["subject"]),
-          body: formatter.format(configuration["body"])
+          body: formatter.format(configuration["body"], escape_data: :html)
         }
         Notifier.send_emails(notifications: [notification])
         value = "Para: #{notification[:to]}\nAssunto: #{

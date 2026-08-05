@@ -85,9 +85,9 @@ class Admissions::FormField < ActiveRecord::Base
   validates :name, presence: true
   validate :that_configuration_is_valid
   validate :that_field_type_is_valid_for_template
-  validate :cannot_create_new_erb_template, if: -> { 
+  validate :cannot_create_new_erb_template, if: -> {
     [Admissions::FormField::CODE, Admissions::FormField::EMAIL].include? self.field_type
-  } 
+  }
 
   def config_hash
     JSON.parse(self.configuration || "{}")
@@ -259,7 +259,7 @@ class Admissions::FormField < ActiveRecord::Base
     field = "%#{field}%" if field.present? && substring
     Admissions::FormField.where(
       "name LIKE :field
-      ", {field: field}
+      ", { field: field }
     )
   end
 
@@ -267,6 +267,15 @@ class Admissions::FormField < ActiveRecord::Base
     field: nil, substring: false, limit: 10,
     in_main: true, in_letter: false
   )
+    # Sem termo não há o que sugerir, e o laço abaixo não sabe lidar com isso: em
+    # busca por substring, name.include?(nil) levanta TypeError -- era o 500 do
+    # autocomplete quando o parâmetro term não vinha -- e name.include?("") é
+    # verdadeiro para todos, despejando os campos sombra como se fossem
+    # resultado. A metade SQL já devolve vazio nos dois casos, porque
+    # `name LIKE NULL` e `name LIKE ''` não casam com nada; vazio é o que mantém
+    # as duas metades de acordo.
+    return [] if field.blank?
+
     result = self.search_name(field:, substring:).limit(limit).map(&:name)
     block = -> (param) {
       label = param[0]
@@ -298,33 +307,33 @@ class Admissions::FormField < ActiveRecord::Base
 
   # Returns a list for CODE and EMAIL types where:
   # - the first element indicates that the template is from an unsafe template type (Ruby or ERB)
-  # - the remaining elements have the template value(s). 
+  # - the remaining elements have the template value(s).
   def template_values
     config = self.config_hash
   rescue JSON::ParserError, TypeError
-    return [false]
+    [false]
   else
     if self.field_type == Admissions::FormField::CODE
-      return [
-        config["template_type"] == "Ruby", 
+      [
+        config["template_type"] == "Ruby",
         I18n.transliterate(config["code"] || "").downcase
       ]
     elsif self.field_type == Admissions::FormField::EMAIL
-      return [
+      [
         config["template_type"] == "ERB",
         I18n.transliterate(config["to"] || "").downcase,
         I18n.transliterate(config["subject"] || "").downcase,
         I18n.transliterate(config["body"] || "").downcase,
       ]
     else
-      return [false]
+      [false]
     end
   end
 
   private
     def cannot_create_new_erb_template
       return if @@disable_erb_validation
-      config = self.config_hash
+      self.config_hash
     rescue JSON::ParserError, TypeError
       self.errors.add(:configuration, :invalid_format)
     else

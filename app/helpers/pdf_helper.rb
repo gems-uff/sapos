@@ -136,7 +136,12 @@ module PdfHelper
         if options[:qr_code_signature]
           qrcode_url = download_by_identifier_reports_url(identifier: @qrcode_identifier)
           qrcode_signature_warning = I18n.t("pdf_content.enrollment.footer.qrcode_signature_warning")
-          signed_at = "#{I18n.t("pdf_content.enrollment.footer.signed_by_qrcode")} #{I18n.l(Time.now, format: :defaultdatetime)} (Horário de Brasília)"
+          # Time.zone.now, nao Time.now: a linha AFIRMA "Horario de Brasilia", e
+          # Time.now devolve a hora do sistema. Num servidor em UTC o documento
+          # assinado sairia tres horas adiantado dizendo ser horario local. O
+          # config.time_zone = "Brasilia" ja esta em config/application.rb; era
+          # so nao ignora-lo.
+          signed_at = "#{I18n.t("pdf_content.enrollment.footer.signed_by_qrcode")} #{I18n.l(Time.zone.now, format: :defaultdatetime)} (Horário de Brasília)"
           you_can_also_access = I18n.t("pdf_content.enrollment.footer.you_can_also_access")
 
           all_sentences = [qrcode_signature_warning, signed_at, you_can_also_access, qrcode_url]
@@ -557,6 +562,59 @@ module PdfHelper
   def generate_qr_code_key
     10.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }
       .insert(5, "-").join("")
+  end
+
+  def parse_align_segments(text, default = :justify)
+    segments = []
+    return [{ align: default, text: "" }] if text.nil?
+    regex = /<div\s+style=["']text-align:\s*(left|center|right|justify);\s*["']>(?:\r?\n)?(.*?)(?:\r?\n)?<\/div>(?:\r?\n)?/m
+    # regex = /\{% comment\s*align:(left|center|right|justify)\s*%\}(?:\r?\n)?(.*?)(?:\r?\n)?\{% endcomment %\}(?:\r?\n)?/m
+    pos = 0
+    while (m = regex.match(text, pos))
+      before = text[pos...m.begin(0)]
+      segments << { align: default, text: before } unless before.nil? || before.empty?
+      segments << { align: m[1].to_sym, text: m[2] || "" }
+      pos = m.end(0)
+    end
+    tail = text[pos..-1]
+    segments << { align: default, text: tail } unless tail.nil? || tail.empty?
+    segments
+  end
+
+  def print_multipage_text_with_alignments(pdf, text, box_width, box_height, align = :justify, used_box_height = 0)
+    pdf.move_down 30
+    pdf.font("Times-Roman", size: 12) do
+      pdf.fill_color "000000"
+      segments = parse_align_segments(text, align)
+      segments.each do |seg|
+        # the text is printed as markup: the template wrote it and the data
+        # that filled it was escaped by the formatter that rendered it
+        seg_text = seg[:text]
+        left = (pdf.bounds.width - box_width) / 2
+        # what does not fit comes back as the formatted text that was not
+        # printed, and is printed on the next page as it is: measuring it to
+        # cut the text by its length loses the characters of the markup
+        not_printed = pdf.text_box seg_text,
+          at: [left, pdf.cursor],
+          width: box_width,
+          height: box_height - used_box_height,
+          align: seg[:align],
+          inline_format: true
+        next_box = pdf.height_of(seg_text, width: box_width, align: seg[:align], inline_format: true, final_gap: true)
+        used_box_height += next_box
+        pdf.move_down next_box
+        while not_printed.size > 0
+          printing = not_printed
+          pdf.start_new_page
+          not_printed = pdf.formatted_text_box printing,
+            at: [left, pdf.cursor],
+            width: box_width,
+            height: box_height,
+            align: seg[:align]
+          used_box_height = pdf.height_of_formatted(printing, width: box_width, align: seg[:align], final_gap: true)
+        end
+      end
+    end
   end
 end
 

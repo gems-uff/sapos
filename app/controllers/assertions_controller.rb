@@ -34,13 +34,14 @@ class AssertionsController < ApplicationController
     config.actions.exclude :deleted_records
 
     config.columns[:expiration_in_months].description = I18n.t("active_scaffold.expiration_in_months_description")
-    
+
     config.columns[:template_type].form_ui = :select
     config.columns[:template_type].options = {
       options: Assertion::TEMPLATE_TYPES,
     }
-
     config.columns[:query].form_ui = :select
+    config.columns[:query].send_form_on_update_column = true
+    config.columns[:query].update_columns = [:assertion_template, :query]
   end
 
   def simulate

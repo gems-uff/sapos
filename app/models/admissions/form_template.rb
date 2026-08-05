@@ -74,7 +74,7 @@ class Admissions::FormTemplate < ActiveRecord::Base
         configuration: JSON.dump({ "field": "birthdate", "required": true }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.birth_city"),
         field_type: Admissions::FormField::STUDENT_FIELD,
-        configuration: JSON.dump({"field": "special_birth_city", "required": true }) },
+        configuration: JSON.dump({ "field": "special_birth_city", "required": true }) },
       { name: I18n.t("active_scaffold.admissions/form_template.generate_fields.humanitarian_policy"),
         field_type: Admissions::FormField::STUDENT_FIELD,
         configuration: JSON.dump({ "field": "humanitarian_policy", "required": false }) },

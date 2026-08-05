@@ -16,14 +16,18 @@ RSpec.describe "NotificationLogs features", type: :feature do
     @destroy_all << @user = create_confirmed_user([@role_adm])
 
     @destroy_all << @query1 = FactoryBot.create(:query, name: "students", sql: "select * from students")
-    @destroy_all << @query2 = FactoryBot.create(:query, name: "queries", sql: "select name, sql from queries")
+    @destroy_all << @query2 = FactoryBot.create(:query, name: "queries", sql: "select name, `sql` from queries")
 
     @destroy_all << @notification1 = FactoryBot.create(:notification, query: @query1, title: "saudacao", to_template: "jpimentel@ic.uff.br", subject_template: "Olá", body_template: "Corpo")
     @destroy_all << @notification2 = FactoryBot.create(:notification, query: @query2, title: "despedida", to_template: "jpimentel@ic.uff.br", subject_template: "Tchau", body_template: "<%= var('name') %>")
 
-    @destroy_all << FactoryBot.create(:notification_log, notification: @notification2, to: "jpimentel@ic.uff.br", subject: "Tchau", body: "students")
-    @destroy_all << FactoryBot.create(:notification_log, notification: @notification2, to: "jpimentel@ic.uff.br", subject: "Tchau", body: "queries")
-    @destroy_all << FactoryBot.create(:notification_log, to: "jpimentel@ic.uff.br", subject: "Sync", body: "Notificação síncrona")
+    # created_at explicito: a coluna e datetime sem precisao fracionaria, entao
+    # em MySQL/MariaDB registros criados no mesmo segundo empatam e o desempate
+    # de ORDER BY created_at DESC fica arbitrario. O SQLite guarda fracao de
+    # segundo e escondia isso.
+    @destroy_all << FactoryBot.create(:notification_log, notification: @notification2, to: "jpimentel@ic.uff.br", subject: "Tchau", body: "students", created_at: 3.minutes.ago)
+    @destroy_all << FactoryBot.create(:notification_log, notification: @notification2, to: "jpimentel@ic.uff.br", subject: "Tchau", body: "queries", created_at: 2.minutes.ago)
+    @destroy_all << FactoryBot.create(:notification_log, to: "jpimentel@ic.uff.br", subject: "Sync", body: "Notificação síncrona", created_at: 1.minute.ago)
   end
   after(:each) do
     @destroy_later.each(&:delete)

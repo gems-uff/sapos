@@ -17,6 +17,6 @@ new_document(
             end
 ) do |pdf|
   assertion_table(
-      pdf, assertion: @assertion
+      pdf, assertion: @assertion, align: :justify
     )
 end

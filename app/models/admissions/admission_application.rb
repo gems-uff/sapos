@@ -374,7 +374,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
         REPLACE(`students`.`cpf`, ".", ""),
         "-", ""
       )) = :cpf
-    ', {cpf: cpf})
+    ', { cpf: cpf })
   end
 
   def students_by_email
@@ -383,7 +383,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       TRIM(
         LOWER(`students`.`email`)
       ) = :email
-    ', {email: email})
+    ', { email: email })
   end
 
   def students

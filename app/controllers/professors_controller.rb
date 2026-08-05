@@ -101,5 +101,4 @@ class ProfessorsController < ApplicationController
     order_by: "name",
     full_text_search: true
   )
-
 end

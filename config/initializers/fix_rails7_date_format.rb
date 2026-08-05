@@ -11,6 +11,11 @@
 require "date"
 
 class Date
+  # O trecho original (do StackOverflow) caia em to_default_s, que era um metodo
+  # interno do Rails -- alias do to_s original do Ruby -- removido no Rails 7.2.
+  # Sem este alias, to_s com um formato desconhecido levanta NameError.
+  alias_method :to_default_s, :to_s unless method_defined?(:to_default_s)
+
   def to_s(format = :default)
     if formatter = DATE_FORMATS[format]
       if formatter.respond_to?(:call)

@@ -19,7 +19,7 @@ RSpec.describe CustomVariable, type: :model do
       variable: "single_advisor_points"
     )
   end
-  let(:default_from) { ActionMailer::Base.default[:from]}
+  let(:default_from) { ActionMailer::Base.default[:from] }
   subject { custom_variable }
   describe "Validations" do
     it { should be_valid }

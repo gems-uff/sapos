@@ -45,7 +45,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
 
     @destroy_all << FactoryBot.create(:course_research_area, course: @course3, research_area: @research_area3)
     @destroy_all << FactoryBot.create(:course_research_area, course: @course5, research_area: @research_area3)
-    
+
     @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Erica", cpf: "3")
     @destroy_all << @professor2 = FactoryBot.create(:professor, name: "Fiona", cpf: "2")
     @destroy_all << @professor3 = FactoryBot.create(:professor, name: "Gi", cpf: "1")

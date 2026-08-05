@@ -39,7 +39,6 @@ RSpec.describe Admissions::FilledFormField, type: :model do
     filled_form_field.value = "1"
     filled_form_field.filled_form = @filled_form
     filled_form_field.form_field = @form_field
-
   end
   subject { filled_form_field }
   describe "Validations" do
@@ -585,21 +584,21 @@ RSpec.describe Admissions::FilledFormField, type: :model do
         expect(filled_form_field.to_label).to eq("-")
       end
       it "should return 'field: -' if form_field name is 'field' and all values are blank" do
-        filled_form_field.form_field.name = 'field'
+        filled_form_field.form_field.name = "field"
         filled_form_field.file = nil
         filled_form_field.list = nil
         filled_form_field.value = nil
         expect(filled_form_field.to_label).to eq("field: -")
       end
       it "should return 'field: value' if form_field name is 'field' and it has a value" do
-        filled_form_field.form_field.name = 'field'
+        filled_form_field.form_field.name = "field"
         filled_form_field.file = nil
         filled_form_field.list = nil
         filled_form_field.value = "value"
         expect(filled_form_field.to_label).to eq("field: value")
       end
       it "should return 'field: [1, 2]' if form_field name is 'field' and it has a list" do
-        filled_form_field.form_field.name = 'field'
+        filled_form_field.form_field.name = "field"
         filled_form_field.file = nil
         filled_form_field.list = ["1", "2"]
         filled_form_field.value = nil
@@ -756,7 +755,7 @@ RSpec.describe Admissions::FilledFormField, type: :model do
       end
       it "should return number when the form_type is CODE and code_type is not defined" do
         @form_field.field_type = Admissions::FormField::CODE
-        @form_field.configuration = '{}'
+        @form_field.configuration = "{}"
         expect(filled_form_field.get_type).to eq("number")
       end
       it "should return code_type when the form_type is CODE and code_type is defined" do

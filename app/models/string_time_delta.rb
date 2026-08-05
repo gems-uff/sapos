@@ -57,7 +57,7 @@ class StringTimeDelta
     s = m[2]
 
     while s.length > 0
-      m = nil
+      nil
       if m = s.match(FLOAT_DURATION)
         val += m[1].to_i.send(DURATIONS[m[2]])
       elsif s.match(DAY_DURATION)

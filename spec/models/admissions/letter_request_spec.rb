@@ -17,8 +17,16 @@ RSpec.describe Admissions::LetterRequest, type: :model do
     @destroy_later = []
   end
   after(:all) do
+    # before(:all) roda fora da transacao por exemplo do DatabaseCleaner, entao
+    # o que ele cria fica visivel para os testes seguintes ate ser apagado aqui.
+    # A trait :in_process_with_letters cria tambem um AdmissionProcess, com
+    # simple_url fixo -- e ele nao era apagado. Qualquer teste posterior que
+    # criasse um processo com a mesma URL no mesmo intervalo falhava, dependendo
+    # da ordem sorteada.
+    admission_process = @admission_application.admission_process
     @admission_application.delete
     @filled_form.delete
+    admission_process&.destroy
   end
   after(:each) do
     @destroy_later.each(&:delete)

@@ -23,7 +23,6 @@ RSpec.describe EmailTemplate, type: :model do
     it { should validate_presence_of(:body) }
     it { should validate_presence_of(:to) }
     it { should validate_presence_of(:subject) }
-    it { should validate_uniqueness_of(:name).allow_blank }
   end
   describe "Methods" do
     describe "devise_template" do

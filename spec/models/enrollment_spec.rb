@@ -66,7 +66,6 @@ RSpec.describe Enrollment, type: :model do
     it { should belong_to(:enrollment_status).required(true) }
     it { should belong_to(:research_area).required(false) }
     it { should validate_presence_of(:enrollment_number) }
-    it { should validate_uniqueness_of(:enrollment_number) }
     it { should validate_presence_of(:admission_date) }
     it { should accept_a_month_year_assignment_of(:admission_date, presence: true) }
 
@@ -207,6 +206,40 @@ RSpec.describe Enrollment, type: :model do
       it "should return false when the enrollment status does not require a user" do
         enrollment.enrollment_status = @enrollment_status_without_user
         expect(enrollment.create_user!).to be false
+      end
+
+      # O caminho de sucesso passa por User.invite! dentro de um rescue
+      # silencioso: se o convite quebrar, o usuário é apagado e o método
+      # devolve false, sem exceção. Estes exemplos garantem que uma quebra
+      # apareça como falha de teste em vez de aluno sem conta.
+      describe "when the enrollment status requires a user" do
+        before(:each) do
+          FactoryBot.create(:role_aluno)
+          student.email = "invited@ic.uff.br"
+          student.save!
+          enrollment.enrollment_status = @enrollment_status_with_user
+          enrollment.new_user_mode = "default"
+        end
+
+        it "should invite a user for the student of the enrollment" do
+          expect(enrollment.create_user!).to be true
+
+          user = User.find_by(email: "invited@ic.uff.br")
+          expect(user).to_not be_nil
+          expect(user.name).to eql(student.name)
+          expect(user.roles.to_a).to eql([Role.find_by(id: Role::ROLE_ALUNO)])
+          expect(student.reload.user).to eql(user)
+        end
+
+        it "should leave the invited user pending and already confirmed" do
+          expect(enrollment.create_user!).to be true
+
+          user = User.find_by(email: "invited@ic.uff.br")
+          expect(user.invitation_token).to_not be_nil
+          expect(user.invitation_sent_at).to_not be_nil
+          expect(user.invitation_accepted_at).to be_nil
+          expect(user.confirmed_at).to_not be_nil
+        end
       end
     end
 

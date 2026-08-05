@@ -37,7 +37,12 @@ RSpec.describe "Papers features", type: :feature do
       doi_issn_event: "CONF-BETA",
       owner: @professor2,
       reason_justify: "Relevante nacionalmente",
-      order: 1
+      # order distinto do anterior de proposito: a ordenacao da lista sai como
+      # `ORDER BY papers.period DESC, papers.order ASC` -- o `owner: "ASC"` do
+      # config.list.sorting nao chega ao SQL, porque e associacao. Com os dois
+      # registros no mesmo period e no mesmo order, o empate era total e a ordem
+      # das linhas ficava por conta do banco.
+      order: 2
     )
 
     @destroy_all << @user = create_confirmed_user([@role_adm])
@@ -68,7 +73,7 @@ RSpec.describe "Papers features", type: :feature do
       ]
     end
 
-    it "should sort the list by period desc, then owner asc" do
+    it "should sort the list by period desc, then order asc" do
       expect(page.all("tr td.reference-column").map(&:text)).to eq [
         "Autor1. Artigo Alpha. 2022",
         "Autor2. Artigo Beta. 2023"

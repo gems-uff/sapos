@@ -69,8 +69,11 @@ class ScholarshipDurationsController < ApplicationController
 
     config.columns[:scholarship_suspensions].allow_add_existing = false
 
+    # O subform existe para tirar :scholarship_suspensions da lista -- subform
+    # dentro de subform não se renderiza -- e não para tirar :scholarship, que é
+    # o código da bolsa e sem ele não há o que cadastrar pela tela da matrícula.
     config.subform.columns = [
-      :enrollment, :start_date, :end_date, :cancel_date, :obs
+      :scholarship, :enrollment, :start_date, :end_date, :cancel_date, :obs
     ]
 
     config.actions.exclude :deleted_records

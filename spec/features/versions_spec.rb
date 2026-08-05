@@ -14,9 +14,27 @@ RSpec.describe "Versions features", type: :feature do
   before(:all) do
     @destroy_later = []
     @destroy_all = []
+    first_version_id = (Version.maximum(:id) || 0) + 1
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
     @destroy_all << @user = create_confirmed_user([@role_adm])
     @destroy_all << @country1 = FactoryBot.create(:country, name: "Brasil", nationality: "brasileiro(a)")
+
+    # versions.created_at e datetime sem precisao fracionaria, entao as versoes
+    # criadas aqui caem todas no mesmo segundo e o desempate de
+    # ORDER BY created_at DESC fica arbitrario em MySQL/MariaDB. O SQLite
+    # guardava a fracao de segundo e escondia isso. Espalhar em minutos
+    # distintos, preservando a ordem de criacao (id maior = mais recente).
+    # A versao do login nasce depois, dentro do exemplo, e continua no topo.
+    #
+    # As versoes que outros arquivos de spec deixaram para tras tambem nascem
+    # com o relogio de agora, entao so espalhar as nossas nao basta: elas
+    # apareceriam acima. Empurra-las de uma vez resolve, e mexer no created_at
+    # nao altera o que a paper_trail usa para encadear versoes (o id).
+    Version.where("id < ?", first_version_id).update_all(created_at: 1.hour.ago)
+    Version.where("id >= ?", first_version_id).order(id: :desc)
+           .each_with_index do |version, index|
+      version.update_column(:created_at, (index + 1).minutes.ago)
+    end
   end
   after(:each) do
     @destroy_later.each(&:delete)

@@ -76,11 +76,11 @@ class PapersController < ApplicationController
   end
 
   protected
-  def do_new
-    super
-    @record.period = CustomVariable.quadrennial_period
-    unless current_user.professor.blank?
-      @record.owner = current_user.professor
+    def do_new
+      super
+      @record.period = CustomVariable.quadrennial_period
+      unless current_user.professor.blank?
+        @record.owner = current_user.professor
+      end
     end
-  end
 end

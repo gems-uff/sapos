@@ -7,8 +7,6 @@ class NotificationsController < ApplicationController
   include SharedPdfConcern
 
   authorize_resource
-  skip_authorization_check only: [:notify]
-  skip_before_action :authenticate_user!, only: :notify
   before_action :permit_query_params
   helper PdfHelper
   helper EnrollmentsPdfHelper
@@ -63,12 +61,13 @@ class NotificationsController < ApplicationController
     config.columns[:query_offset].description = I18n.t(
       "active_scaffold.notification.query_offset_description"
     )
-    config.columns[:query].update_columns = [:query]
+    config.columns[:query].send_form_on_update_column = true
+    config.columns[:query].update_columns = [:body_template, :query]
     config.columns[:template_type].form_ui = :select
     config.columns[:template_type].options = {
       options: Notification::TEMPLATE_TYPES,
     }
-    #config.columns[:to_template].description = "Use {% emails Secretaria %} para todos emails de usuários da secretaria."
+    # config.columns[:to_template].description = "Use {% emails Secretaria %} para todos emails de usuários da secretaria."
 
 
     config.create.label = :create_notification_label
@@ -123,32 +122,6 @@ class NotificationsController < ApplicationController
     end
 
     render action: "simulate"
-  end
-
-  def notify
-    Notifier.logger.info "Sending Registered Notifications"
-
-    Notifier.logger.info "[Notifications] #{Time.now.to_fs} - Notifications from DB"
-    notifications = []
-    notifications_attachments = {}
-
-    # Get the next execution time arel table
-    next_execution = Notification.arel_table[:next_execution]
-
-    # Find notifications that should run
-    Notification.where.not(frequency: Notification::MANUAL)
-      .where(next_execution.lt(Time.now)).each do |notification|
-        result = prepare_attachments(notification.execute)
-        notifications.concat(result[:notifications])
-        notifications_attachments.merge!(result[:notifications_attachments])
-      end
-
-    Notifier.send_emails({
-      notifications: notifications,
-      notifications_attachments: notifications_attachments
-    })
-
-    render inline: "Ok", content_type: "text/html"
   end
 
   private

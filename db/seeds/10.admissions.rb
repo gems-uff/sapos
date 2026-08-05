@@ -159,7 +159,7 @@ evaluation_consolidate_form_fields_configs = [
     field_type: Admissions::FormField::CODE,
     configuration: JSON.dump({
       "code": "{{- committees | avg: 'Nota da formação acadêmica' -}}",
-      "condition": { "mode": "Nenhuma", "field": "","condition": "Contém", "value": "","form_conditions": [] },
+      "condition": { "mode": "Nenhuma", "field": "", "condition": "Contém", "value": "", "form_conditions": [] },
       "template_type": "Liquid",
       "code_type": "number"
     })
@@ -168,7 +168,7 @@ evaluation_consolidate_form_fields_configs = [
     field_type: Admissions::FormField::CODE,
     configuration: JSON.dump({
       "code": "{{- committees | avg: 'Nota da experiência acadêmica e profissional' -}}",
-      "condition": { "mode": "Nenhuma", "field": "","condition": "Contém", "value": "","form_conditions": [] },
+      "condition": { "mode": "Nenhuma", "field": "", "condition": "Contém", "value": "", "form_conditions": [] },
       "template_type": "Liquid",
       "code_type": "number"
     })
@@ -177,7 +177,7 @@ evaluation_consolidate_form_fields_configs = [
     field_type: Admissions::FormField::CODE,
     configuration: JSON.dump({
       "code": "{%- assign v1 = fields['Média da formação acadêmica'] | times: 7 -%}\n{%- assign v2 = fields['Média da experiência acadêmica e profissional'] | times: 3 -%}\n{{- v1 | plus: v2 | divided_by: 10.0 -}}",
-      "condition": { "mode": "Nenhuma", "field": "","condition": "Contém", "value": "","form_conditions": [] },
+      "condition": { "mode": "Nenhuma", "field": "", "condition": "Contém", "value": "", "form_conditions": [] },
       "template_type": "Liquid",
       "code_type": "number"
     })
@@ -237,13 +237,13 @@ evaluation_phase.approval_condition = Admissions::FormCondition.new({ mode: "Con
 evaluation_phase.admission_phase_committees.build({ admission_committee: evaluation_committee })
 evaluation_phase.save!
 
-## Ranking machines 
+## Ranking machines
 general_condition = Admissions::FormCondition.new({
   mode: "E"
 })
-general_condition.form_conditions.build({mode: "Condição", field: "Homologação", condition: "=", value: "Deferida"})
-general_condition.form_conditions.build({mode: "Condição", field: "Candidato solicita bolsa de estudos?", condition: "!=", value: "Sim (já sou aluno de mestrado do Programa e quero concorrer a uma bolsa)"})
-general_selection =  Admissions::RankingMachine.create!({
+general_condition.form_conditions.build({ mode: "Condição", field: "Homologação", condition: "=", value: "Deferida" })
+general_condition.form_conditions.build({ mode: "Condição", field: "Candidato solicita bolsa de estudos?", condition: "!=", value: "Sim (já sou aluno de mestrado do Programa e quero concorrer a uma bolsa)" })
+general_selection = Admissions::RankingMachine.create!({
   name: "Ampla concorrência",
   form_condition: general_condition
 })
@@ -252,10 +252,10 @@ general_selection =  Admissions::RankingMachine.create!({
 pcd_condition = Admissions::FormCondition.new({
   mode: "E"
 })
-pcd_condition.form_conditions.build({mode: "Condição", field: "Homologação", condition: "=", value: "Deferida"})
-pcd_condition.form_conditions.build({mode: "Condição", field: "PcD", condition: "=", value: "1"})
-pcd_condition.form_conditions.build({mode: "Condição", field: "Candidato solicita bolsa de estudos?", condition: "!=", value: "Sim (já sou aluno de mestrado do Programa e quero concorrer a uma bolsa)"})
-pcd_selection =  Admissions::RankingMachine.create!({
+pcd_condition.form_conditions.build({ mode: "Condição", field: "Homologação", condition: "=", value: "Deferida" })
+pcd_condition.form_conditions.build({ mode: "Condição", field: "PcD", condition: "=", value: "1" })
+pcd_condition.form_conditions.build({ mode: "Condição", field: "Candidato solicita bolsa de estudos?", condition: "!=", value: "Sim (já sou aluno de mestrado do Programa e quero concorrer a uma bolsa)" })
+pcd_selection = Admissions::RankingMachine.create!({
   name: "PcD",
   form_condition: pcd_condition
 })
@@ -263,10 +263,10 @@ pcd_selection =  Admissions::RankingMachine.create!({
 race_condition = Admissions::FormCondition.new({
   mode: "E"
 })
-race_condition.form_conditions.build({mode: "Condição", field: "Homologação", condition: "=", value: "Deferida"})
-race_condition.form_conditions.build({mode: "Condição", field: "Optante negro ou indígena", condition: "=", value: "1"})
-race_condition.form_conditions.build({mode: "Condição", field: "Candidato solicita bolsa de estudos?", condition: "!=", value: "Sim (já sou aluno de mestrado do Programa e quero concorrer a uma bolsa)"})
-race_selection =  Admissions::RankingMachine.create!({
+race_condition.form_conditions.build({ mode: "Condição", field: "Homologação", condition: "=", value: "Deferida" })
+race_condition.form_conditions.build({ mode: "Condição", field: "Optante negro ou indígena", condition: "=", value: "1" })
+race_condition.form_conditions.build({ mode: "Condição", field: "Candidato solicita bolsa de estudos?", condition: "!=", value: "Sim (já sou aluno de mestrado do Programa e quero concorrer a uma bolsa)" })
+race_selection = Admissions::RankingMachine.create!({
   name: "Racial",
   form_condition: pcd_condition
 })
@@ -283,26 +283,26 @@ general_ranking = Admissions::RankingConfig.new({
   candidate_can_see: false,
 
 })
-general_ranking.form_condition = Admissions::FormCondition.new({mode: "Condição", field: "Nota final", condition: ">=", value: "6"})
-general_ranking.ranking_columns.build({name: "Nota final", order: "DESC"})
-general_ranking.ranking_columns.build({name: "Média da formação acadêmica", order: "DESC"})
-general_ranking.ranking_groups.build({name: "Geral", vacancies: "50"})
-general_ranking.ranking_groups.build({name: "PcD", vacancies: "1"})
-general_ranking.ranking_processes.build({order: "1", vacancies: "40", group: "Geral", ranking_machine: general_selection, step: "1"})
-general_ranking.ranking_processes.build({order: "2", vacancies: "10", group: "Geral", ranking_machine: race_selection, step: "1"})
-general_ranking.ranking_processes.build({order: "3", vacancies: "1", group: "PcD", ranking_machine: pcd_selection, step: "1"})
+general_ranking.form_condition = Admissions::FormCondition.new({ mode: "Condição", field: "Nota final", condition: ">=", value: "6" })
+general_ranking.ranking_columns.build({ name: "Nota final", order: "DESC" })
+general_ranking.ranking_columns.build({ name: "Média da formação acadêmica", order: "DESC" })
+general_ranking.ranking_groups.build({ name: "Geral", vacancies: "50" })
+general_ranking.ranking_groups.build({ name: "PcD", vacancies: "1" })
+general_ranking.ranking_processes.build({ order: "1", vacancies: "40", group: "Geral", ranking_machine: general_selection, step: "1" })
+general_ranking.ranking_processes.build({ order: "2", vacancies: "10", group: "Geral", ranking_machine: race_selection, step: "1" })
+general_ranking.ranking_processes.build({ order: "3", vacancies: "1", group: "PcD", ranking_machine: pcd_selection, step: "1" })
 general_ranking.save!
 
 
 scholarship_condition = Admissions::FormCondition.new({
   mode: "E"
 })
-scholarship_condition.form_conditions.build({mode: "Condição", field: "Homologação", condition: "=", value: "Deferida"})
-or_condition = scholarship_condition.form_conditions.build({mode: "Ou"})
-or_condition.form_conditions.build({mode: "Condição", field: "Candidato solicita bolsa de estudos?", condition: "Contém", value: "Sim (já sou aluno de mestrado do Programa e quero concorrer a uma bolsa)"})
-and_condition = or_condition.form_conditions.build({mode: "E"})
-and_condition.form_conditions.build({mode: "Condição", field: "Posição/Ranking de mestrado", condition: "Não nulo"})
-and_condition.form_conditions.build({mode: "Condição", field: "Candidato solicita bolsa de estudos?", condition: "=", value: "Sim (ainda não sou aluno de mestrado do Programa e quero concorrer a uma bolsa)"})
+scholarship_condition.form_conditions.build({ mode: "Condição", field: "Homologação", condition: "=", value: "Deferida" })
+or_condition = scholarship_condition.form_conditions.build({ mode: "Ou" })
+or_condition.form_conditions.build({ mode: "Condição", field: "Candidato solicita bolsa de estudos?", condition: "Contém", value: "Sim (já sou aluno de mestrado do Programa e quero concorrer a uma bolsa)" })
+and_condition = or_condition.form_conditions.build({ mode: "E" })
+and_condition.form_conditions.build({ mode: "Condição", field: "Posição/Ranking de mestrado", condition: "Não nulo" })
+and_condition.form_conditions.build({ mode: "Condição", field: "Candidato solicita bolsa de estudos?", condition: "=", value: "Sim (ainda não sou aluno de mestrado do Programa e quero concorrer a uma bolsa)" })
 
 scholarship_ranking = Admissions::RankingConfig.new({
   name: "Ranking de bolsas de mestrado",
@@ -311,9 +311,9 @@ scholarship_ranking = Admissions::RankingConfig.new({
   candidate_can_see: false,
   form_condition: scholarship_condition,
 })
-scholarship_ranking.ranking_columns.build({name: "Nota final", order: "DESC"})
-scholarship_ranking.ranking_columns.build({name: "Média da formação acadêmica", order: "DESC"})
-scholarship_ranking.ranking_processes.build({order: "1", vacancies: "", group: "", ranking_machine: scholarship_selection, step: "1"})
+scholarship_ranking.ranking_columns.build({ name: "Nota final", order: "DESC" })
+scholarship_ranking.ranking_columns.build({ name: "Média da formação acadêmica", order: "DESC" })
+scholarship_ranking.ranking_processes.build({ order: "1", vacancies: "", group: "", ranking_machine: scholarship_selection, step: "1" })
 scholarship_ranking.save!
 
 
@@ -341,9 +341,9 @@ admission_process = Admissions::AdmissionProcess.new({
   admission_date: "2025-03-01",
 })
 
-admission_process.phases.build({admission_phase: staging_phase, start_date: "2024-12-10", end_date: "2024-12-16", partial_consolidation: true})
-admission_process.phases.build({admission_phase: evaluation_phase, start_date: "2024-12-17", end_date: "2024-01-13", partial_consolidation: false})
+admission_process.phases.build({ admission_phase: staging_phase, start_date: "2024-12-10", end_date: "2024-12-16", partial_consolidation: true })
+admission_process.phases.build({ admission_phase: evaluation_phase, start_date: "2024-12-17", end_date: "2024-01-13", partial_consolidation: false })
 
-admission_process.rankings.build({ranking_config: general_ranking, admission_phase: evaluation_phase})
-admission_process.rankings.build({ranking_config: scholarship_ranking, admission_phase: evaluation_phase})
+admission_process.rankings.build({ ranking_config: general_ranking, admission_phase: evaluation_phase })
+admission_process.rankings.build({ ranking_config: scholarship_ranking, admission_phase: evaluation_phase })
 admission_process.save!

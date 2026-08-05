@@ -6,5 +6,4 @@
 class DeferralDrop < ActiveRecordAttributesDrop
   define_drop_relationship :enrollment, EnrollmentDrop
   define_drop_relationship :deferral_type, DeferralTypeDrop
-
 end

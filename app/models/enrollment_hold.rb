@@ -82,7 +82,7 @@ class EnrollmentHold < ApplicationRecord
   def verify_class_enrollments
     class_enrollments = ClassEnrollment.where(enrollment: self.enrollment)
     if class_enrollments.any? { |ce|
-     !(ce.course_class.end_date < self.start_date || ce.course_class.start_date > self.end_date) 
+      !(ce.course_class.end_date < self.start_date || ce.course_class.start_date > self.end_date)
     }
       errors.add(:base, :class_enrollments_exist)
     end

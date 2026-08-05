@@ -17,9 +17,17 @@ RSpec.describe "Institutions features", type: :feature do
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
     @destroy_all << @user = create_confirmed_user([@role_adm])
 
+    # Os nomes evitam de proposito um ponto de decisao que dependa de caixa.
+    # A ordenacao vem do banco: o SQLite compara em binario (maiuscula antes de
+    # minuscula) e a collation de producao, utf8mb4_unicode_ci, ignora caixa e
+    # acento. Com "Universidade de Sao Paulo" no lugar, o "de" minusculo caia no
+    # fim sob SQLite e no comeco sob MariaDB, e o spec afirmava uma ordem que
+    # producao nao produz. Aqui as tres divergem em posicoes de mesma caixa
+    # ("Estadual de" x "Estadual do" x "Federal"), entao os dois bancos ordenam
+    # igual. Ao trocar estes nomes, manter essa propriedade.
     @destroy_all << FactoryBot.create(:institution, name: "Universidade Federal Fluminense", code: "UFF")
     @destroy_all << @record = FactoryBot.create(:institution, name: "Universidade Estadual do Rio de Janeiro", code: "UERJ")
-    @destroy_all << FactoryBot.create(:institution, name: "Universidade de São Paulo", code: "USP")
+    @destroy_all << FactoryBot.create(:institution, name: "Universidade Estadual de Maringá", code: "UEM")
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -45,7 +53,7 @@ RSpec.describe "Institutions features", type: :feature do
     end
 
     it "should sort the list by name, asc" do
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Universidade Estadual do Rio de Janeiro", "Universidade Federal Fluminense", "Universidade de São Paulo"]
+      expect(page.all("tr td.name-column").map(&:text)).to eq ["Universidade Estadual de Maringá", "Universidade Estadual do Rio de Janeiro", "Universidade Federal Fluminense"]
     end
   end
 
@@ -68,7 +76,7 @@ RSpec.describe "Institutions features", type: :feature do
       expect(page).to have_css("tr:nth-child(1) td.name-column", text: "Universidade Federal do Rio de Janeiro")
 
       # Remove inserted record
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Universidade Federal do Rio de Janeiro", "Universidade Estadual do Rio de Janeiro", "Universidade Federal Fluminense", "Universidade de São Paulo"]
+      expect(page.all("tr td.name-column").map(&:text)).to eq ["Universidade Federal do Rio de Janeiro", "Universidade Estadual de Maringá", "Universidade Estadual do Rio de Janeiro", "Universidade Federal Fluminense"]
       record = model.last
       accept_confirm { find("#as_#{plural_name}-destroy-#{record.id}-link").click }
       expect(page).to have_no_content("Universidade Federal do Rio de Janeiro")
@@ -100,7 +108,7 @@ RSpec.describe "Institutions features", type: :feature do
 
     it "should be able to search by name" do
       fill_in "search", with: "Flu"
-      expect(page).to have_no_content("Universidade de São Paulo")
+      expect(page).to have_no_content("Universidade Estadual de Maringá")
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Universidade Federal Fluminense"]
     end
   end
