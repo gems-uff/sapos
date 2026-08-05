@@ -40,3 +40,7 @@ pt-BR:
       preview: "Visualizar"
       download: "Download"
       original_model: "Modelo Original"
+      run_mark_and_sweep: "Rodar Mark-and-Sweep"
+      last_scanned_at: "Última varredura em %{timestamp}"
+      never_scanned: "Nenhuma varredura executada ainda. Clique no botão acima."
+      scan_done: "Varredura concluída com sucesso. %{count} arquivo(s) órfão(s) encontrado(s)."

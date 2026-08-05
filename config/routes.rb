@@ -586,6 +586,7 @@ Rails.application.routes.draw do
     concerns :active_scaffold
     collection do
       post :delete_all
+      post :run_mark_and_sweep
     end
   end
   resources :selection_processes, controller: "admission_data" do

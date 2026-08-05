@@ -48,6 +48,22 @@ class CarrierwaveFilesController < ApplicationController
       type: :collection,
       crud_type: :delete,
       position: :top
+
+    config.action_links.add :run_mark_and_sweep,
+      label: I18n.t("panel.garbage_collector.run_mark_and_sweep"),
+      method: :post,
+      page: true,
+      confirm: nil,
+      type: :collection,
+      crud_type: :create,
+      position: :top
+  end
+
+  def run_mark_and_sweep
+    raise CanCan::AccessDenied.new if cannot?(:read, CarrierWave::Storage::ActiveRecord::ActiveRecordFile)
+    count = Panel::CarrierwaveFilesHelper.run_mark_and_sweep!
+    flash[:notice] = I18n.t("panel.garbage_collector.scan_done", count: count)
+    redirect_to carrierwave_files_path
   end
 
   def delete_all
@@ -58,56 +74,43 @@ class CarrierwaveFilesController < ApplicationController
       sorting: active_scaffold_config.list.user.sorting
     ).items
 
-    return redirect_to(panel_carrierwave_files_path) if filtered_records.empty?
+    return redirect_to(carrierwave_files_path) if filtered_records.empty?
 
     cw = CarrierWave::Storage::ActiveRecord::ActiveRecordFile
     filtered_ids = filtered_records.map(&:id)
     count = cw.where(id: filtered_ids).destroy_all.count
+    CarrierwaveOrphanFile.where(carrierwave_file_id: filtered_ids).delete_all
 
     flash[:notice] = I18n.t("panel.garbage_collector.deleted", count: count)
-    redirect_to panel_carrierwave_files_path
+    redirect_to carrierwave_files_path
   end
 
   protected
 
-  def conditions_for_collection
-    orphan_ids = Panel::CarrierwaveFilesHelper.find_carrierwave_orphan_ids
-    if orphan_ids.present?
-      ["carrier_wave_files.id IN (?)", orphan_ids]
-    else
-      ["1 = 0"]
+  # Also removes the orphan tracking row so it does not dangle until the next
+  # mark-and-sweep scan.
+  def do_destroy(record = nil)
+    record ||= destroy_find_record
+    super(record)
+    if successful? && record
+      CarrierwaveOrphanFile.where(carrierwave_file_id: record.id).delete_all
     end
+  end
+
+  def conditions_for_collection
+    ["carrier_wave_files.id IN (SELECT carrierwave_file_id FROM carrierwave_orphan_files)"]
   end
 
   def self.condition_for_original_model_column(column, value, like_pattern)
     return nil if value.blank?
-
-    matching_ids = find_orphan_ids_by_model_search(value.downcase)
-
+    term = "%#{value.downcase}%"
+    matching_ids = CarrierwaveOrphanFile
+      .where("LOWER(original_model) LIKE ?", term)
+      .pluck(:carrierwave_file_id)
     if matching_ids.present?
       ["carrier_wave_files.id IN (?)", matching_ids]
     else
       ["1 = 0"]
     end
-  end
-
-  def self.find_orphan_ids_by_model_search(search_term)
-    cw = CarrierWave::Storage::ActiveRecord::ActiveRecordFile
-    orphan_ids = Panel::CarrierwaveFilesHelper.find_carrierwave_orphan_ids
-    orphans = cw.where(id: orphan_ids)
-
-    orphans.select do |file|
-      version = Panel::CarrierwaveFilesHelper.find_version_for_carrierwave_file(file)
-      next false if version.nil?
-
-      model_type = version.item_type
-      translated_name = I18n.t(
-        "activerecord.models.#{model_type.underscore}.one",
-        default: model_type
-      )
-
-      model_type.downcase.include?(search_term) ||
-        translated_name.downcase.include?(search_term)
-    end.map(&:id)
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_07_03_120000) do
+ActiveRecord::Schema[7.1].define(version: 2026_07_11_120000) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -284,7 +284,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_03_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "query_id", null: false
-    t.text "assertion_template"
+    t.string "assertion_template"
     t.boolean "student_can_generate", default: false
     t.integer "expiration_in_months"
     t.string "template_type", default: "Liquid"
@@ -301,6 +301,15 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_03_120000) do
     t.string "content_type"
     t.integer "size"
     t.index ["medium_hash"], name: "index_carrier_wave_files_on_medium_hash"
+  end
+
+  create_table "carrierwave_orphan_files", force: :cascade do |t|
+    t.integer "carrierwave_file_id", null: false
+    t.string "original_model"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["carrierwave_file_id"], name: "index_carrierwave_orphan_files_on_carrierwave_file_id", unique: true
+    t.index ["original_model"], name: "index_carrierwave_orphan_files_on_original_model"
   end
 
   create_table "cities", force: :cascade do |t|
@@ -532,6 +541,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_03_120000) do
     t.integer "research_area_id"
     t.text "obs_to_academic_transcript"
     t.integer "research_line_id"
+    t.string "admission_selection"
     t.index ["enrollment_number"], name: "index_enrollments_on_enrollment_number"
     t.index ["enrollment_status_id"], name: "index_enrollments_on_enrollment_status_id"
     t.index ["level_id"], name: "index_enrollments_on_level_id"
@@ -564,6 +574,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_03_120000) do
     t.string "file"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["file"], name: "index_filled_form_fields_on_file"
     t.index ["filled_form_id"], name: "index_filled_form_fields_on_filled_form_id"
     t.index ["form_field_id"], name: "index_filled_form_fields_on_form_field_id"
   end
@@ -926,6 +937,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_03_120000) do
     t.integer "signature_type", default: 0
     t.integer "expiration_in_months"
     t.boolean "use_at_assertion", default: false, null: false
+    t.index ["image"], name: "index_report_configurations_on_image"
   end
 
   create_table "reports", force: :cascade do |t|
@@ -938,6 +950,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_03_120000) do
     t.string "file_name"
     t.integer "invalidated_by_id"
     t.datetime "invalidated_at"
+    t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
     t.index ["invalidated_by_id"], name: "index_reports_on_invalidated_by_id"
   end
 
@@ -1082,6 +1095,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_03_120000) do
     t.index ["birth_state_id"], name: "index_students_on_state_id"
     t.index ["city_id"], name: "index_students_on_city_id"
     t.index ["cpf"], name: "index_students_on_cpf"
+    t.index ["photo"], name: "index_students_on_photo"
     t.index ["user_id"], name: "index_students_on_user_id"
   end
 

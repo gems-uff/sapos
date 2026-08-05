@@ -19,6 +19,27 @@ module Panel::CarrierwaveFilesHelper
     cw.where.not(id: referenced_ids).pluck(:id)
   end
 
+  def self.run_mark_and_sweep!
+    cw = CarrierWave::Storage::ActiveRecord::ActiveRecordFile
+    orphan_ids = find_carrierwave_orphan_ids
+    orphan_files = cw.where(id: orphan_ids)
+    now = Time.current
+    rows = orphan_files.map do |file|
+      version = find_version_for_carrierwave_file(file)
+      {
+        carrierwave_file_id: file.id,
+        original_model: version&.item_type,
+        created_at: now,
+        updated_at: now
+      }
+    end
+    ActiveRecord::Base.transaction do
+      CarrierwaveOrphanFile.delete_all
+      CarrierwaveOrphanFile.insert_all(rows) if rows.present?
+    end
+    orphan_ids.size
+  end
+
   def self.find_version_for_carrierwave_file(carrierwave_file, model_type: nil)
     medium_hash = carrierwave_file.medium_hash
     file_id = carrierwave_file.id
@@ -65,9 +86,7 @@ module Panel::CarrierwaveFilesHelper
   end
 
   def original_model_column(record, column)
-    version = Panel::CarrierwaveFilesHelper.find_version_for_carrierwave_file(record)
-    return "-" if version.blank?
-
-    version.item_type
+    @orphan_model_map ||= CarrierwaveOrphanFile.pluck(:carrierwave_file_id, :original_model).to_h
+    @orphan_model_map[record.id] || "-"
   end
 end
