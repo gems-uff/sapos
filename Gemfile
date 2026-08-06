@@ -20,7 +20,7 @@ gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem "sassc-rails"
 gem "coffee-rails"
 gem "jquery-rails"
-gem "jquery-ui-rails", "~> 7.0.0"        # o 8.0.0 quebra o application.css (#638)
+gem "jquery-ui-rails", "~> 8.0.0"        # o 8.0.0 quebra o application.css (#638)
 gem "font-awesome-rails"
 
 # ─── Autenticacao e autorizacao ──────────────────────────────────────────
