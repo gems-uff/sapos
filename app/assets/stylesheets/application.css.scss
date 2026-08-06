@@ -11,10 +11,7 @@
  *= require_self
  */
 @import 'variables';
-@import "active_scaffold_layout";
-@import "active_scaffold_images";
-@import "active_scaffold_extensions";
-@import "active_scaffold_colors";
+@import "active_scaffold";
 @import "jquery-ui.css";
 @import "jquery-ui/datepicker.css";
 @import 'blue-theme';
