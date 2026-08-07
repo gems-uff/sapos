@@ -19,7 +19,7 @@
       <% if enrollment.thesis_defense_date.present? %>
         <li>
           <span class="attr"><%= t "activerecord.attributes.enrollment.thesis_defense_date" %></span>
-          <span class="value"><%= enrollment.thesis_defense_date %>
+          <span class="value"><%= date_br(enrollment.thesis_defense_date) %>
         </li>
       <% end %>
       <% if enrollment.thesis_defense_date.present? %>

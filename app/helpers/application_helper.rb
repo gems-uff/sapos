@@ -40,6 +40,12 @@ module ApplicationHelper
     I18n.localize(date, format: :monthyear2)
   end
 
+  def date_br(date, options = {})
+    options[:blank_text] ||= I18n.t("rescue_blank_text")
+    return options[:blank_text] if date.nil?
+    I18n.localize(date, format: :default)
+  end
+
   def read_attribute(record, attribute_name)
     return nil unless record.respond_to?(attribute_name)
 

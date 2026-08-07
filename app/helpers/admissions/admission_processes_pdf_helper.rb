@@ -20,8 +20,8 @@ module Admissions::AdmissionProcessesPdfHelper
   def admission_process_pdf_title(admission_process)
     [
       ["<b>#{admission_process_pdf_t("generic.title", title: admission_process.title)}</b>"],
-      ["<b>#{admission_process_pdf_t("generic.start", date: admission_process.start_date)}
-        #{admission_process_pdf_t('generic.end', date: admission_process.end_date)}
+      ["<b>#{admission_process_pdf_t("generic.start", date: admission_process.start_date&.to_fs(:default))}
+        #{admission_process_pdf_t('generic.end', date: admission_process.end_date&.to_fs(:default))}
         #{admission_process_pdf_t('generic.total', count: admission_process.admission_applications_count)}</b>"
       ]
     ]
