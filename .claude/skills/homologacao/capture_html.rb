@@ -283,6 +283,21 @@ begin
     puts format("[%3d/%3d] %-45s %-9s %5dms", i + 1, routes.size, route, flag, elapsed_ms)
   end
 
+  # Sessao perdida no meio da varredura: a rota devolve 200 (a tela de login
+  # tambem devolve 200), casa entre "antes" e "depois" porque as duas capturas
+  # perderam a sessao no mesmo ponto, e a rodada reporta zero diferenca sobre
+  # paginas que ninguem viu. Nao da para detectar pelo status -- so pela URL
+  # final. Rota do proprio Devise cair no login e esperado; qualquer outra, nao.
+  desviadas = results.reject { |r| r[:route].to_s.start_with?("/users/") }
+                     .select { |r| r[:final_url].to_s.include?("/users/sign_in") }
+  unless desviadas.empty?
+    puts "\n!! SESSAO PERDIDA: #{desviadas.size} rota(s) capturaram a tela de login,"
+    puts "   nao a pagina pedida. Elas nao valem como evidencia:"
+    desviadas.each { |r| puts "   - #{r[:route]}" }
+    puts "   Causa provavel: uma rota anterior na lista encerra a sessao"
+    puts "   (/users/sign_out). Mova-a para o fim do arquivo de rotas e recapture."
+  end
+
   if HAS_CSV
     CSV.open(File.join(out_dir, "results.csv"), "w") do |csv|
       csv << %w[route status ms title text_sha text_bytes console_errors broken_requests failed_requests final_url error]
