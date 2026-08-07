@@ -196,6 +196,26 @@ env var + helpers de screenshot) ficaram de uma rodada real em
 conferida. A extensão do Chrome pode estar indisponível — o harness Selenium
 headless + screenshots avaliadas por visão contorna isso.
 
+### Zero diferença na estática não é evidência sobre widget
+
+Widget que só existe depois de um clique **não está na foto**. Isso não é uma
+ressalva teórica: em 07/08/2026, no #649, o tema do datepicker mudou de cinza
+para laranja e passou pelas **125 rotas sem um único pixel de diferença**, porque
+nenhuma delas abre o calendário. A regressão só apareceu na camada exploratória,
+medindo estilo computado do widget aberto.
+
+Ou seja: quando a mudança toca asset de widget (jquery-ui, datepicker,
+timepicker, record_select, CodeMirror), a estática **não vota**. Ela cobre outra
+coisa — status, texto, layout da página. Ler o "zero diferença" dela como "nada
+regrediu" é o erro que essa rodada quase cometeu.
+
+E cuidado com a sonda que **força** o widget a existir. A `probe_final.rb` daquela
+rodada vinculava o datepicker à mão (`jQuery('._param_type_date').datepicker()`)
+para contornar um erro de JS que abortava o bind automático (#624). Isso mede o
+tema do widget, mas **não** mede se ele aparece para o usuário — coisa que só se
+soube na rodada seguinte. Quando precisar forçar, registre o que ficou por medir
+em vez de deixar a homologação parecer completa.
+
 ## Preparando o ambiente para o papel de aluno
 
 As telas do aluno precisam de três coisas que a réplica de produção não traz
