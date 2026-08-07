@@ -17,10 +17,10 @@ gem "nokogiri", ">= 1.18.9"              # piso de seguranca (parser HTML/XML)
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # ─── Assets / front-end ──────────────────────────────────────────────────
-gem "sassc-rails"
+gem "dartsass-sprockets"                 # compilador sass; AS 4.1.6 trocou libsass por dart-sass (#621)
 gem "coffee-rails"
 gem "jquery-rails"
-gem "jquery-ui-rails", "~> 7.0.0"        # o 8.0.0 quebra o application.css (#638)
+gem "jquery-ui-rails", "~> 8.0"          # major mexe no layout de assets e o AS ramifica por versao (#638)
 gem "font-awesome-rails"
 
 # ─── Autenticacao e autorizacao ──────────────────────────────────────────
@@ -31,7 +31,7 @@ gem "recaptcha", require: "recaptcha/rails"
 gem "dotenv-rails", require: "dotenv/load"   # ENV a partir de .env (recaptcha etc.)
 
 # ─── UI administrativa / scaffolding ─────────────────────────────────────
-gem "active_scaffold", "~> 4.0.13"       # upgrade exige saltos de versao (#621)
+gem "active_scaffold", "~> 4.1.6"        # upgrade em saltos de minor; trava a serie 4.1 (#621)
 gem "active_scaffold_duplicate"
 gem "recordselect"
 gem "simple-navigation"                  # menu (config/navigation.rb)
