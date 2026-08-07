@@ -146,6 +146,29 @@ RSpec.describe "Assertions features", type: :feature do
     end
   end
 
+  # Issue #624: só a carga direta reproduz. Sem o action link do ActiveScaffold
+  # no DOM, link.prop("search") é undefined, o .replace estoura e o script morre
+  # antes de inicializar o datepicker.
+  describe "simulate page with date param loaded directly", js: true do
+    before(:each) do
+      query = Query.new(name: "data_param", sql: "select :data as col")
+      query.params.build(name: "data", value_type: "Date", default_value: "")
+      query.save!
+      @destroy_later << query
+      @destroy_later << @date_assertion = Assertion.create!(
+        name: "Declaracao data", query: query,
+        template_type: "Liquid", assertion_template: "Corpo",
+        student_can_generate: false
+      )
+      login_as(@user)
+      visit "/assertions/#{@date_assertion.id}/simulate"
+    end
+
+    it "should initialize datepicker on date param fields" do
+      expect(page).to have_css("input._param_type_date.hasDatepicker")
+    end
+  end
+
   # Issue #640: mesmo defeito da simulacao de notificacao -- um valor longo sem
   # espaco nao tem ponto de quebra, a celula estica a tabela e a pagina inteira
   # passa a rolar na horizontal.
