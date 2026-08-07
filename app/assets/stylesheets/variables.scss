@@ -1,31 +1,68 @@
-$showwidth: 678px;
-$show_border_color: #C5DBF7;
-
 /*
-Check active scaffold override colors here: https://github.com/activescaffold/active_scaffold/blob/master/app/assets/stylesheets/active_scaffold_colors.scss
+Paleta do SAPOS e mapeamento dela para cada biblioteca de terceiro.
+
+Duas secoes, com papeis distintos:
+
+  1. PALETA -- fonte unica das cores. Nome semantico, sem referencia a
+     biblioteca nenhuma. E aqui que se muda a identidade visual.
+  2. MAPEAMENTOS -- traduzem a paleta para os nomes que cada gem espera.
+
+A separacao existe porque nem toda biblioteca aceita ser tematizada do mesmo
+jeito. O active_scaffold declara suas cores com `!default` e obedece a variavel
+Sass; a jQuery UI chega como CSS pronto, com hex cravado, e so aceita
+sobrescrita de regra -- que mora em `custom/jquery_ui_tema.scss`. As duas pontas
+leem a mesma paleta daqui, entao trocar uma cor continua sendo mexer num lugar so.
 */
 
+/* ─── 1. Paleta ──────────────────────────────────────────────────────────── */
 
-$header_color: #656464;
+$sapos_azul:          #427fa4;   /* primaria: cabecalho de lista, titulo de form */
+$sapos_azul_escuro:   #33506d;   /* coluna ordenada, borda de destaque          */
+$sapos_azul_hover:    #407398;   /* hover sobre a primaria                      */
+$sapos_azul_claro:    #c4e7f0;   /* texto sobre a primaria em hover             */
+$sapos_azul_palido:   #E6F2FF;   /* fundo de linha aninhada                     */
+$sapos_azul_borda:    #C5DBF7;   /* borda suave                                 */
+$sapos_azul_campo:    #a4c7d0;   /* borda de input                              */
+$sapos_azul_foco:     #d3e5ea;   /* fundo de input em foco                      */
 
-$column_header_bg: #427fa4;
-$label_color: #555;
-$subform_header_color: #555;
-$column_header_link_hover_bg: #407398;
-$column_header_link_hover_color: #c4e7f0;
-$column_header_sorted_bg: #33506d;
+$sapos_cinza:         #656464;   /* cabecalho de secao                          */
+$sapos_cinza_texto:   #555;      /* rotulo de campo                             */
+$sapos_cinza_borda:   #c8c6c6;   /* borda neutra                                */
+$sapos_branco:        #FFF;
 
-$nested_bg: #FFF;
-$nested_border_color: #c8c6c6;
-$nested_column_bg: #E6F2FF;
-$second_nested_bg: #FFF;
-$second_nested_border_color: #c8c6c6;
-$third_nested_bg: #FFF;
+$sapos_erro_bg:       #fcc;      /* fundo de mensagem de erro                   */
 
-$msg_error_bg: #fcc;
+$showwidth: 678px;
 
-$form_title_color: #427fa4;
-$input_border_color: #a4c7d0;
-$input_focus_bg: #d3e5ea;
+/* ─── 2. Mapeamentos ─────────────────────────────────────────────────────── */
 
-$draggable_list_bg: #FFF;
+/* active_scaffold -- os nomes vem do active_scaffold.scss da gem, que os
+   declara com !default. Referencia:
+   https://github.com/activescaffold/active_scaffold/blob/master/app/assets/stylesheets/active_scaffold.scss */
+
+$header_color: $sapos_cinza;
+
+$column_header_bg: $sapos_azul;
+$label_color: $sapos_cinza_texto;
+$subform_header_color: $sapos_cinza_texto;
+$column_header_link_hover_bg: $sapos_azul_hover;
+$column_header_link_hover_color: $sapos_azul_claro;
+$column_header_sorted_bg: $sapos_azul_escuro;
+
+$nested_bg: $sapos_branco;
+$nested_border_color: $sapos_cinza_borda;
+$nested_column_bg: $sapos_azul_palido;
+$second_nested_bg: $sapos_branco;
+$second_nested_border_color: $sapos_cinza_borda;
+$third_nested_bg: $sapos_branco;
+
+$msg_error_bg: $sapos_erro_bg;
+
+$form_title_color: $sapos_azul;
+$input_border_color: $sapos_azul_campo;
+$input_focus_bg: $sapos_azul_foco;
+
+$draggable_list_bg: $sapos_branco;
+
+/* telas proprias do SAPOS (show, formularios customizados) */
+$show_border_color: $sapos_azul_borda;

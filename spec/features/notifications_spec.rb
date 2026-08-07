@@ -153,6 +153,20 @@ RSpec.describe "Notifications features", type: :feature do
     end
   end
 
+  # Issue #624: só a carga direta reproduz. Sem o action link do ActiveScaffold
+  # no DOM, link.prop("search") é undefined, o .replace estoura e o script morre
+  # antes de inicializar o datepicker.
+  describe "simulate page loaded directly", js: true do
+    before(:each) do
+      login_as(@user)
+      visit "/notifications/#{@record.id}/simulate"
+    end
+
+    it "should initialize datepicker on date param fields" do
+      expect(page).to have_css("input._param_type_date.hasDatepicker")
+    end
+  end
+
   # Issue #640: uma URL longa e um token sem espaco, e portanto sem ponto de
   # quebra. A largura minima da celula "Corpo" vira a largura do token inteiro e,
   # sem restricao de largura na tabela, a pagina inteira passa a rolar na
