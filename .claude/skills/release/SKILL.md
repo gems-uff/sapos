@@ -18,6 +18,17 @@ Não comece sem isto:
 - Passada manual do mantenedor em staging, quando houver caminho de escrita, PDF,
   planilha ou e-mail envolvido — a captura automatizada é só leitura.
 - `main` sincronizada com `origin/main`: `git rev-list --left-right --count origin/main...main` → `0 0`.
+- **Árvore de trabalho limpa: `git status --short` vazio.** Se houver qualquer
+  coisa não commitada, **pare e avise o mantenedor antes do merge** — mostrando o
+  quê, e perguntando se entra nesta versão ou fica para a próxima. A decisão é
+  dele; o que não pode é ele descobrir depois da release publicada, quando entrar
+  já custa outra versão.
+
+  Isso vale inclusive para o que o próprio agente escreveu durante o ciclo:
+  anotação em skill, roteiro, script de sonda. Ter avisado no meio do caminho, ao
+  criar o arquivo, **não conta** — o aviso tem que estar aqui, junto da decisão
+  de lançar. Foi assim que a anotação da skill `homologacao` ficou de fora da
+  7.15.27.
 
 ## Passos
 
