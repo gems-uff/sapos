@@ -35,7 +35,7 @@ Não é preferência de estilo. O gerador do próprio Rails
 em linhas comentadas, como sugestão. A si mesmo o Rails se pina na série minor,
 porque um minor do Rails é migração de verdade.
 
-### Um erro de leitura que já aconteceu aqui
+### `bundle install` não sobe versão
 
 `bundle install` **nunca** sobe versão sozinho. Num checkout limpo ele reproduz o
 lock exatamente. A declaração do `Gemfile` só é consultada quando alguém digita
@@ -64,12 +64,12 @@ piso de segurança, declare-o.
 
 > **A restrição cobre exatamente o motivo, e o motivo fica escrito ao lado.**
 
-Os dois lados importam. Restrição que ultrapassa o motivo bloqueia correção sem
-querer: `jquery-ui-rails` esteve travada em `"7.0.0"` quando o motivo documentado
-justificava apenas `< 8.0.0` — a série 7.0 não tem patch hoje, mas se vier um, o
-caminho provável é o backport da CVE, e a trava exata o recusaria calada. Virou
-`~> 7.0.0`. E teto sem motivo escrito é o defeito simétrico: quem revisa daqui a
-dois anos não sabe se pode subir.
+Os dois lados importam. **Restrição que ultrapassa o motivo bloqueia correção sem
+querer:** quando o motivo escrito é "o próximo major muda X", a restrição que ele
+justifica é `~> x.y` — travar na versão exata recusaria, calada, um patch de
+segurança backportado para a série. Confira sempre se a forma declarada é a mais
+frouxa que ainda cobre o motivo. E teto sem motivo escrito é o defeito simétrico:
+quem revisa daqui a dois anos não sabe se pode subir.
 
 Quando um teto for precaução legítima e não impedimento conhecido — major de gem
 de autenticação, por exemplo, que costuma exigir migração de dados —, o certo é
@@ -126,9 +126,9 @@ A diferença entre as duas listas é exatamente o que os pins bloqueiam.
 **Não use os filtros de nível para esse diagnóstico.** `--patch` e `--minor`
 resolvem dentro das restrições do `Gemfile` por conta própria, então `--minor` e
 `--minor --strict` devolvem a mesma lista *sempre* — e a coincidência não diz nada
-sobre pins. Medido aqui: com `active_scaffold` travado em `~> 4.0.13` e o 4.3.1
-publicado, `bundle outdated active_scaffold --minor` responde "Bundle up to date!",
-enquanto o comando pelado mostra o 4.3.1. Três minors escondidos por um flag.
+sobre pins. Pior: numa gem travada na série minor, `bundle outdated <gem> --minor`
+responde **"Bundle up to date!"** enquanto o comando pelado mostra os minors
+publicados. O flag esconde exatamente o que o diagnóstico procura.
 
 ### Sondagem antes de campanha
 

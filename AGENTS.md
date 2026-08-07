@@ -86,6 +86,29 @@ humanos e para outros agentes.
 - `release` — fecha o ciclo: merge fast-forward na `main`, tag anotada, label e
   issues no GitHub, release publicada. O deploy em si continua sendo do mantenedor.
 
+### Skill é procedimento, não diário de bordo
+
+Ao anotar aprendizado numa skill, o teste é: **uma rodada futura faria algo
+diferente por causa desta linha?** Passa o mecanismo e a consequência ("a rota X
+responde 500 no papel Aluno, ignore"; "`--flatten` é obrigatório, senão a bbox vem
+vazia"). Não passa *quando* foi medido, em que versão, qual issue descobriu, nem
+que o problema já foi corrigido — isso o `git log` já guarda, e na skill só
+cresce.
+
+Duas consequências práticas:
+
+- **Não empilhe rodadas.** Anotação nova sobre o mesmo assunto **substitui** a
+  antiga; não vira parágrafo "já corrigido, não procure mais". Lista de ruído
+  conhecido é revisada na rodada em que se usa, e entrada que sumiu sai no mesmo
+  commit.
+- **Exemplo com número de versão apodrece.** Já aconteceu: as restrições citadas
+  aqui como reais divergiram do `Gemfile` e passaram a enganar quem lia. Prefira
+  a forma genérica; quando o concreto for necessário, cite o arquivo em vez de
+  copiar o valor.
+
+Script reusável é conteúdo legítimo de skill, e mora **na pasta da skill** — nunca
+referenciado por caminho de uma captura datada, que é descartável.
+
 ## Atualização de dependências
 
 - Uma gem por passo: `bundle update --conservative <gem>`, suíte completa,

@@ -27,8 +27,8 @@ Não comece sem isto:
   Isso vale inclusive para o que o próprio agente escreveu durante o ciclo:
   anotação em skill, roteiro, script de sonda. Ter avisado no meio do caminho, ao
   criar o arquivo, **não conta** — o aviso tem que estar aqui, junto da decisão
-  de lançar. Foi assim que a anotação da skill `homologacao` ficou de fora da
-  7.15.27.
+  de lançar. É por esse caminho que anotação de skill fica de fora da versão que
+  a produziu.
 
 ## Passos
 
@@ -73,8 +73,7 @@ git tag -a 7.15.21 -m "7.15.21"
 git push origin 7.15.21
 ```
 
-Sempre anotada (`-a`), nunca leve. As tags antigas têm mensagem vazia e a
-`7.15.19` tem o próprio número; use o número.
+Sempre anotada (`-a`), nunca leve. A mensagem é o próprio número da versão.
 
 A tag não é decorativa: `config/environment.rb:12` deriva `APP_VERSION` de
 `git describe --tag --always` em tempo de execução, então é ela que aparece no
@@ -90,8 +89,8 @@ gh issue close <N> --reason completed
 
 - Cor `0e8a16` para todo label de versão — é o que dá o verde uniforme na lista.
 - **Rotular e fechar são decisões separadas.** Uma issue entregue em parte leva o
-  label e continua aberta (a #621 tem `7.15.19` e segue aberta). Só feche o que
-  a versão de fato encerra.
+  label e **continua aberta** — o label diz "saiu nesta versão", não "acabou". Só
+  feche o que a versão de fato encerra.
 - Fechamento é `completed`, sem comentário de encerramento — é o padrão do
   repositório.
 
@@ -133,9 +132,8 @@ gh issue list --label 7.15.21 --state all
 
 ### 8. Deploy — do mantenedor
 
-**Passe a tag certa.** Uma versão errada exibida em produção já foi rastreada
-até a tag passada no deploy, não ao Passenger. Depois de subir, confira o rodapé
-da aplicação.
+**Passe a tag certa.** Versão errada no rodapé de produção costuma ser a tag
+passada no deploy, não o Passenger. Depois de subir, confira o rodapé.
 
 ## Depois da release
 
