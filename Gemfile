@@ -20,7 +20,7 @@ gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem "dartsass-sprockets"                 # compilador sass; AS 4.1.6 trocou libsass por dart-sass (#621)
 gem "coffee-rails"
 gem "jquery-rails"
-gem "jquery-ui-rails", "~> 7.0.0"        # o 8.0.0 quebra o application.css (#638)
+gem "jquery-ui-rails", "~> 8.0"          # major mexe no layout de assets e o AS ramifica por versao (#638)
 gem "font-awesome-rails"
 
 # ─── Autenticacao e autorizacao ──────────────────────────────────────────
