@@ -10,6 +10,12 @@ SimpleCov.start "rails" do
 end unless ENV["SKIP_COVERAGE"]
 
 ENV["RAILS_ENV"] ||= "test"
+
+# Antes do boot: depois dele o manifesto de assets ja esta em memoria, e
+# recompilar nao mudaria o que esta rodada serve ao navegador.
+require_relative "support/asset_freshness"
+AssetFreshness.recompile_if_stale!
+
 require_relative "../config/environment"
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
