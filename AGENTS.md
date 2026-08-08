@@ -107,6 +107,11 @@ vazia"). Não passa *quando* foi medido, em que versão, qual issue descobriu, n
 que o problema já foi corrigido — isso o `git log` já guarda, e na skill só
 cresce.
 
+Esse contexto tem para onde ir: **comentário na issue**. Medida de antes e
+depois, versão em que o defeito aparecia, caminho que a rodada usou para
+reproduzir, armadilha que custou tempo — tudo isso é útil, e ali fica junto do
+trabalho que o originou, ao alcance de quem for reabrir o assunto.
+
 Duas consequências práticas:
 
 - **Não empilhe rodadas.** Anotação nova sobre o mesmo assunto **substitui** a
