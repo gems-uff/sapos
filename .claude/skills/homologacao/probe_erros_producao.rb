@@ -36,34 +36,54 @@ begin
   switch_role!(driver, wait, "Administrador")
 
   puts "\n=== fluxo 1: token de CSRF que nao bate (item 2) ==="
-  # Ate 7.15.29 o usuario recebia a pagina estatica de 422, que fala em falta de
-  # permissao, e o erro virava e-mail para a lista. Depois: volta ao login com
-  # "sua sessao expirou", e so notifica quando a sessao tem conteudo.
-  # NAO poste em /users/sign_in: o require_no_authentication do Devise e
-  # prependado depois do verify_authenticity_token e desvia o usuario logado
-  # antes da checagem de CSRF -- a sonda mediria o desvio, nao o token.
+  # Tres cenarios levantam a MESMA excecao e devem ter respostas diferentes.
+  # Separa-los exige cuidado com duas armadilhas:
+  #
+  # 1. Abrir a pagina de login JA CRIA sessao, com _csrf_token dentro. Estragar
+  #    o campo do formulario produz "sessao viva com token que nao bate", nao
+  #    expiracao. Para reproduzir a expiracao e preciso apagar os cookies.
+  # 2. Nao meca por fetch: ele manda Accept "*/*", que o Rails nao trata como
+  #    HTML, e a resposta cai no ramo nao-navegacional (422 sem corpo). O que o
+  #    usuario ve so aparece submetendo formulario de verdade.
+  def aviso_na_tela(driver)
+    driver.find_element(css: "body").text.to_s.lines.map(&:strip).find do |l|
+      l.include?("sessão expirou") || l.include?("confirmar o envio") ||
+        l.include?("rejeitada") || l.include?("já está logado")
+    end
+  end
+
+  # Sair antes: com a sessao de admin viva, /users/sign_in desvia e nem existe
+  # campo de e-mail para preencher.
+  driver.manage.delete_all_cookies
+  driver.navigate.to("#{BASE}/users/sign_in")
+  settle(driver, wait)
+  # Agora sim: a pagina rendeu o formulario e criou sessao; apagar o cookie
+  # aqui deixa o token do formulario sem sessao com que casar, que e o que a
+  # expiracao faz na pratica.
+  driver.manage.delete_all_cookies
+  driver.find_element(id: "user_email").send_keys("ninguem@example.invalid")
+  driver.find_element(id: "user_password").send_keys("qualquer-coisa")
+  driver.find_element(id: "user_password").submit
+  sleep 3
+  puts "  sem sessao   -> #{driver.current_url.split("/").last}: #{aviso_na_tela(driver).inspect}"
+
+  login(driver, wait)
+  origem = driver.current_url
   # /enrollment_holds e um POST comum de quem esta logado, e o pedido morre na
   # checagem de CSRF, sem criar registro nenhum.
-  resultado = driver.execute_async_script(<<~JS)
-    var done = arguments[0];
-    var body = new URLSearchParams({
-      "authenticity_token": "token-que-nao-bate",
-      "commit": "Criar"
-    });
-    fetch("#{BASE}/enrollment_holds", {
-      method: "POST", body: body, redirect: "follow",
-      headers: {"Content-Type": "application/x-www-form-urlencoded"}
-    }).then(function(r) {
-      return r.text().then(function(t) {
-        done({status: r.status, url: r.url, trecho: t.slice(0, 600)});
-      });
-    }).catch(function(e) { done({erro: String(e)}); });
+  driver.execute_script(<<~JS)
+    var f = document.createElement("form");
+    f.method = "post";
+    f.action = "#{BASE}/enrollment_holds";
+    var t = document.createElement("input");
+    t.type = "hidden"; t.name = "authenticity_token"; t.value = "adulterado";
+    f.appendChild(t);
+    document.body.appendChild(f);
+    f.submit();
   JS
-  texto = resultado["trecho"].to_s
-  puts "  status: #{resultado['status']}"
-  puts "  url final: #{resultado['url']}"
-  puts "  anuncia sessao expirada? #{texto.downcase.include?('sess') ? 'sim' : 'nao'}"
-  puts "  pagina generica de rejeicao? #{texto.include?('rejeitada') ? 'sim' : 'nao'}"
+  sleep 3
+  puts "  sessao viva  -> #{aviso_na_tela(driver).inspect}"
+  puts "  voltou para a origem? #{driver.current_url == origem ? 'sim' : 'nao'}"
   console_severe(driver)
 
   puts "\n=== fluxo 2: campo composto de cidade (item 3) ==="
