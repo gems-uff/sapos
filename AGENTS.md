@@ -60,6 +60,9 @@ corrija na wiki.
 - **Não afirme impacto em produção sem verificar com o mantenedor.** O repositório
   não diz quais funcionalidades estão em uso. Issue é pública e irreversível;
   descreva o que foi medido no código e pergunte o resto.
+- **Tudo que é acessível pelo usuário conta como em uso.** Não condicione
+  validação a "se essa tela for usada": não há tela dispensável, e a pergunta só
+  serve para encolher o escopo do que se vai verificar.
 - Convenção de trabalho vale para qualquer agente e vive **aqui**, versionada. A
   memória local do Claude Code não acompanha troca de máquina — guarde nela só o
   que for específico de uma sessão ou do ambiente.
