@@ -8,6 +8,10 @@
 /notifications/1/simulate
 /notifications/2/simulate
 /notifications/3/simulate
+# Data de consulta que nenhum formato le. Ate 7.15.28 derrubava a pagina com
+# Date::Error; a partir da correcao a simulacao abre com aviso e usa a data
+# padrao da notificacao.
+/notifications/1/simulate?query_params[data_consulta]=31/31/2026
 /assertions/1/simulate
 /assertions/3/simulate
 /students/2129
