@@ -3,6 +3,10 @@ name: "Flaky tests (multi-trial)"
 on:
   workflow_dispatch:
 
+# Nenhum job escreve no repositorio: so checkout, setup e upload de artefato.
+permissions:
+  contents: read
+
 jobs:
   flaky-tests:
     name: Trial ${{ matrix.trial }}
