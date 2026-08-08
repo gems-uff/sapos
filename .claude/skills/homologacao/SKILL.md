@@ -197,6 +197,25 @@ Regras da passada: só `new`/`edit` **sem salvar** onde der; a única escrita
 persistida é em tabela de apoio com rótulo `ZZ-TESTE-HOMOLOG`, apagada ao fim;
 e-mail só com a trava `redirect_email` conferida.
 
+**Chame `switch_role!` no início de toda sonda.** O papel ativo atravessa
+execuções tanto aqui quanto na captura, e a captura do aluno costuma ser a
+última — a sonda seguinte navega como aluno e não acha link de edição nenhum. O
+sintoma mente: parece "a tela sumiu", não "papel errado".
+
+**Chegue à tela como o usuário chega.** Navegar direto para a rota de uma ação do
+active_scaffold monta a tela sem o link de ação que o JS dela procura, e o script
+estoura sozinho (`find_action_link(...)` devolve `undefined`). O erro é da sonda e
+some quando se clica a ação a partir da lista.
+
+**Drene o log de console entre fluxos** (ler é que drena). Um fluxo que sai pelo
+caminho de erro sem ler o console empurra os próprios erros para o relatório do
+fluxo seguinte, que os reporta como se fossem da tela dele.
+
+**Conte elementos dentro do container, não por padrão de nome.** Um seletor por
+nome que não casa devolve sempre o mesmo número: a medida fica idêntica nos dois
+lados e cega a qualquer regressão. Meça algo que **mude** quando você mexe na
+tela, e confira que mudou, antes de confiar na comparação.
+
 ### Zero diferença na estática não é evidência sobre widget
 
 Widget que só existe depois de um clique **não está na foto** — nenhuma rota da
