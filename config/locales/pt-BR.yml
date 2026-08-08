@@ -30,6 +30,7 @@ pt-BR:
       required: "não pode ficar em branco"
 
     session_expired: "Sua sessão expirou. Entre novamente para continuar."
+    invalid_form_token: "Não foi possível confirmar o envio deste formulário. Atualize a página e tente novamente."
 
     template:
       header:

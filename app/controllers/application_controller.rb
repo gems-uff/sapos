@@ -45,13 +45,26 @@ class ApplicationController < ActionController::Base
   end
 
   private
-    # Token de CSRF inválido tem duas causas bem diferentes. Sessão vazia é
-    # expiração — a página ficou horas aberta, o cookie caiu — e não é defeito:
-    # o usuário volta ao login com o motivo escrito e ninguém é notificado.
-    # Sessão com conteúdo e token que não bate é anomalia (defeito nosso, form
-    # adulterado, ataque): o usuário também não leva 500, mas o e-mail sai.
+    # Token de CSRF inválido tem duas causas bem diferentes, e cada uma pede um
+    # destino e um aviso próprios.
+    #
+    # Sessão vazia é expiração — a página ficou horas aberta, o cookie caiu.
+    # Não é defeito, ninguém é notificado, e o login é para onde o usuário
+    # precisa ir de qualquer forma.
+    #
+    # Sessão com conteúdo e token que não bate é anomalia: defeito nosso,
+    # formulário adulterado ou ataque. Sai e-mail, e o usuário volta para a
+    # página de onde veio. Mandá-lo ao login estaria errado duas vezes: a sessão
+    # dele não expirou, e o require_no_authentication do Devise devolveria quem
+    # já está logado à raiz, trocando este aviso pelo "você já está logado".
     def expired_session(exception)
-      notify_invalid_token(exception) if live_session?
+      if live_session?
+        notify_invalid_token(exception)
+        return head :unprocessable_entity unless request.format.html?
+
+        return redirect_back fallback_location: root_path,
+          alert: I18n.t("errors.invalid_form_token")
+      end
 
       # Requisição sem navegação (js, json) não tem para onde redirecionar:
       # devolve o status e deixa o cliente decidir.

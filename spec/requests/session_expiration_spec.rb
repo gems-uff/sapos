@@ -58,8 +58,12 @@ RSpec.describe "Expired session", type: :request do
     # prependado depois e desvia o usuário logado antes da checagem de CSRF.
     post enrollment_holds_path, params: {
       authenticity_token: "token-que-nao-bate-com-a-sessao"
-    }
+    }, headers: { "HTTP_REFERER" => enrollment_holds_url }
 
-    expect(response).to redirect_to(new_user_session_path)
+    # Não vai para o login: a sessão dele não expirou, e mandá-lo ao login faria
+    # o require_no_authentication do Devise devolvê-lo à raiz trocando o aviso
+    # pelo dele. Volta para onde estava, com a mensagem que descreve o caso.
+    expect(response).to redirect_to(enrollment_holds_url)
+    expect(flash[:alert]).to eq I18n.t("errors.invalid_form_token")
   end
 end
