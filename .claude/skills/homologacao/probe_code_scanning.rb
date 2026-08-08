@@ -20,6 +20,12 @@
 #      CHAMAR o metodo em vez de escrever o atributo, estourando com "cannot
 #      call methods prior to initialization" e abortando o resto do script.
 #
+# ATENCAO: o fluxo 2 ESCREVE. Cada clique no botao gera o PDF de verdade, e cada
+# geracao grava um documento assinado com identificador proprio -- que aparece em
+# /reports e em /versions. Rodar a sonda N vezes de um lado so faz esses dois
+# ecrans divergirem por causa dela, e nao da mudanca. Se precisar depurar a
+# sonda, depure contra o lado que ja tem baseline e conte quantas vezes rodou.
+#
 # Uso:
 #   set -a; source ~/.sapos_staging_env; set +a
 #   EXPLORE_OUT=~/capturas-sapos-staging/<rodada>/exploratorio \
