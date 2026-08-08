@@ -29,6 +29,8 @@ pt-BR:
       wrong_length: "não possui o tamanho esperado (%{count} caracteres)"
       required: "não pode ficar em branco"
 
+    session_expired: "Sua sessão expirou. Entre novamente para continuar."
+
     template:
       header:
         one: "Não foi possível gravar %{model}: 1 erro"

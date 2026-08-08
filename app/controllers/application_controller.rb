@@ -8,6 +8,11 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
+  # Sessão expirada com o formulário aberto derruba o token de CSRF. Sem
+  # tratamento, o usuário recebe a página estática de 422, que fala em falta de
+  # permissão em vez de sessão vencida, e a exceção ainda vira e-mail de erro.
+  rescue_from ActionController::InvalidAuthenticityToken, with: :expired_session
+
   check_authorization unless: :devise_controller?
 
   skip_authorization_check only: [:root, :route_not_found]
@@ -40,6 +45,37 @@ class ApplicationController < ActionController::Base
   end
 
   private
+    # Token de CSRF inválido tem duas causas bem diferentes. Sessão vazia é
+    # expiração — a página ficou horas aberta, o cookie caiu — e não é defeito:
+    # o usuário volta ao login com o motivo escrito e ninguém é notificado.
+    # Sessão com conteúdo e token que não bate é anomalia (defeito nosso, form
+    # adulterado, ataque): o usuário também não leva 500, mas o e-mail sai.
+    def expired_session(exception)
+      notify_invalid_token(exception) if live_session?
+
+      # Requisição sem navegação (js, json) não tem para onde redirecionar:
+      # devolve o status e deixa o cliente decidir.
+      return head :unprocessable_entity unless request.format.html?
+
+      redirect_to new_user_session_path,
+        alert: I18n.t("errors.session_expired")
+    end
+
+    def live_session?
+      session.to_hash.except("session_id").present?
+    end
+
+    def notify_invalid_token(exception)
+      ExceptionNotifier.notify_exception(exception,
+        env: request.env,
+        data: {
+          user_id: current_user&.id,
+          url: request.original_url,
+          session_keys: session.to_hash.keys,
+        }
+      )
+    end
+
     def prepare_background
       @simple_view = params[:simple_view].present?
       @show_background = user_signed_in?
