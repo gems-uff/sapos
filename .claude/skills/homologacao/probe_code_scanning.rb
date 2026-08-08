@@ -22,8 +22,8 @@
 #
 # ATENCAO: o fluxo 2 ESCREVE. Cada clique no botao gera o PDF de verdade, e cada
 # geracao grava um documento assinado com identificador proprio -- que aparece em
-# /reports e em /versions. Rodar a sonda N vezes de um lado so faz esses dois
-# ecrans divergirem por causa dela, e nao da mudanca. Se precisar depurar a
+# /reports e em /versions. Rodar a sonda N vezes de um lado so faz essas duas
+# telas divergirem por causa dela, e nao da mudanca. Se precisar depurar a
 # sonda, depure contra o lado que ja tem baseline e conte quantas vezes rodou.
 #
 # Uso:
