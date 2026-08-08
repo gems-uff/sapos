@@ -22,10 +22,15 @@ function create_form_condition(options) {
     // Interpolar em string mantem o mesmo resultado de antes quando o valor e
     // undefined; passar undefined ao jQuery faria dele um getter, e o atributo
     // simplesmente nao seria escrito.
+    //
+    // `autocomplete` fica fora do hash de propriedades de proposito: quando a
+    // chave coincide com um metodo de $.fn -- e o jQuery UI define
+    // $.fn.autocomplete -- o jQuery CHAMA o metodo em vez de escrever o
+    // atributo, e o autocomplete estoura com "cannot call methods prior to
+    // initialization". O .attr() escreve o atributo sem essa ambiguidade.
     return $("<input/>", {
-      type: "hidden", name: `${input_name}`, value: `${value}`,
-      autocomplete: "off"
-    }).outerHTML()
+      type: "hidden", name: `${input_name}`, value: `${value}`
+    }).attr("autocomplete", "off").outerHTML()
   }
 
   let report = options.report ?? function(){
