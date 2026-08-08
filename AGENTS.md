@@ -19,6 +19,15 @@ corrija na wiki.
 
 - Uma issue, um ramo `issue_NNN`, sempre baseado na `main`. Detalhes do ciclo em
   `CONTRIBUTING.md`.
+- **O assunto do commit começa por `Issue #NNN: `**, com o número da issue do
+  ramo. O GitHub transforma o número em link, e o assunto é o que aparece na
+  lista de commits e no `git log --oneline`. Depois do prefixo sobram cerca de
+  60 colunas: imperativo, sem ponto final, e o porquê no corpo. Commit que não
+  pertence a issue nenhuma — convenção, skill, infraestrutura — vai sem prefixo.
+- **Cite a issue só pelo prefixo, sem `Fixes` nem `Closes`.** Essas palavras
+  fecham a issue assim que o commit chega na `main`, e fechar é decisão do passo
+  de release, separada de rotular: issue entregue pela metade leva o label e
+  continua aberta (ver a skill `release`).
 - **Exceção:** vulnerabilidade não ganha issue pública — enumerar o problema
   expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica.
 - Critério de pronto: `bundle exec rspec` inteiro verde (~9 min, ~2260 exemplos).
