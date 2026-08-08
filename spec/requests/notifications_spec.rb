@@ -28,11 +28,15 @@ RSpec.describe "NotificationsController", type: :request do
       get simulate_notification_path(@notification),
         params: { query_params: { data_consulta: "31/31/2026" } }
 
-      expect(response).to have_http_status(:ok)
-      expect(flash[:alert]).to eq I18n.t(
+      aviso = I18n.t(
         "activerecord.errors.models.notification.invalid_query_date",
         date: "31/31/2026"
       )
+      expect(response).to have_http_status(:ok)
+      expect(flash[:alert]).to eq aviso
+      # Nao basta o flash existir: a tela de simulacao nao renderiza flash por
+      # si, e o aviso passaria despercebido pelo usuario.
+      expect(response.body).to include(ERB::Util.html_escape(aviso))
     end
 
     it "still reads a date that carries a time and a time zone" do
