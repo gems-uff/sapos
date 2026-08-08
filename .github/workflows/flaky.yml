@@ -36,6 +36,11 @@ jobs:
           bundler-cache: true
           cache-version: 1
 
+      # O database.yml deixou de ser rastreado; sem esta copia o
+      # db:test:prepare aborta com "Could not load database configuration".
+      - name: Configure database.yml
+        run: cp config/database.yml.example config/database.yml
+
       - name: Set up database schema
         run: bundle exec rake db:test:prepare
 
