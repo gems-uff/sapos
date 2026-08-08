@@ -55,7 +55,7 @@ puts "Matricula #{NUMERO} em #{BASE}"
 puts "  aluno         #{ALUNO}"
 puts "  admissao      #{ADMISSAO.strftime('%m/%Y')}"
 puts "  desligamento  #{DESLIGAMENTO.strftime('%m/%Y')}"
-puts "  defesa        (em branco -- e o que faz a tela quebrar antes da correcao)"
+puts "  defesa        (em branco -- e a data nula que a combinacao exige)"
 unless confirmar
   puts "\n(simulacao -- rode de novo com --confirmar para criar)"
   exit 0

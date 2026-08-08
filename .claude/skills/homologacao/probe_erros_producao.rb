@@ -12,21 +12,16 @@
 #   EXPLORE_OUT=~/capturas-sapos-staging/<pasta>/sonda \
 #     bundle exec ruby probe_erros_producao.rb
 #
-# NAO ESCREVE. O fluxo 1 tem o POST recusado antes de tocar em registro; o fluxo
-# 2 mede o campo escondido sem submeter (dispatchEvent de "submit" roda os
-# handlers e nao envia o formulario).
+# NAO ESCREVE. O POST do CSRF e recusado antes de tocar em registro; a medida do
+# campo composto nao submete (dispatchEvent de "submit" roda os handlers e nao
+# envia o formulario).
 #
-# O QUE ESTA SONDA NAO COBRE, e por que: a submissao sem o parametro `record` no
-# apply do candidato precisa de processo seletivo ABERTO e de um token de
-# inscricao real -- sem os dois, o pedido para antes, no
-# check_if_process_is_open_to_edit, e a sonda mediria outra coisa. A evidencia
-# desse caso fica nos request specs. Se um dia houver processo aberto na
-# replica, vale acrescentar o fluxo aqui.
+# O fluxo publico de inscricao nao esta aqui: ele exige abrir um processo
+# seletivo, que e escrita, e mora no abrir_processo_seletivo.rb.
 
 require_relative "explore_common"
 
 driver = build_driver
-driver.manage.timeouts.script_timeout = 30 # o fluxo 1 usa execute_async_script
 wait = Selenium::WebDriver::Wait.new(timeout: 60)
 
 # O papel ativo atravessa execucoes, e a captura do aluno costuma ser a ultima.
@@ -35,7 +30,7 @@ begin
   login(driver, wait)
   switch_role!(driver, wait, "Administrador")
 
-  puts "\n=== fluxo 1: token de CSRF que nao bate (item 2) ==="
+  puts "\n=== token de CSRF que nao bate ==="
   # Tres cenarios levantam a MESMA excecao e devem ter respostas diferentes.
   # Separa-los exige cuidado com duas armadilhas:
   #
@@ -86,11 +81,13 @@ begin
   puts "  voltou para a origem? #{driver.current_url == origem ? 'sim' : 'nao'}"
   console_severe(driver)
 
-  puts "\n=== fluxo 2: campo composto de cidade (item 3) ==="
+  puts "\n=== campo composto de cidade ==="
   # A estatica NAO vota aqui: o composto so se monta depois de preencher os
-  # campos visiveis, e nenhuma rota da varredura faz isso. Ate 7.15.29, valor
-  # que entrava sem disparar evento nao chegava ao escondido, e quem preenchia
-  # recebia "nao pode ficar em branco" num campo preenchido na tela.
+  # campos visiveis, e nenhuma rota da varredura faz isso.
+  #
+  # O que o servidor valida e o input escondido, nao os visiveis. A medida poe
+  # valor nos visiveis SEM disparar evento -- e o que autofill, gerenciador de
+  # senha e script fazem -- e confere se o escondido acompanhou.
   #
   # Mede na tela do admin porque a replica nao tem processo seletivo aberto: o
   # widget e o mesmo parcial do formulario publico do candidato.

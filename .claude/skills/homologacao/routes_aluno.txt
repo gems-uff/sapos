@@ -10,15 +10,14 @@
 # tela.
 /enrollment/3074
 /enrollment/3074/enroll/2026-2
-# Semestre sem Quadro de Horarios cadastrado. Ate 7.15.28 respondia 500
-# (CanCan::AccessDenied), acusando de tentativa de acesso indevido um aluno que
-# so chegou antes de a coordenacao abrir o periodo. Se um dia existir quadro
-# para 2030.1, troque o ano aqui -- a rota so vale enquanto nao houver quadro.
+# Semestre sem Quadro de Horarios cadastrado: o aluno que abre o periodo antes
+# de a coordenacao cadastrar o calendario. Se um dia existir quadro para 2030.1,
+# troque o ano -- a rota so vale enquanto nao houver quadro para o ano citado.
 /enrollment/3074/enroll/2030-1
-# Matricula desligada, com banca e SEM data de defesa: a combinacao que a
-# replica nao tem e que o preparar_matricula_desligada.rb cria. Ate 7.15.28 a
-# tela do proprio aluno respondia 500 (NameError de dismissal_date), enquanto a
-# tela do admin para a mesma matricula abria normalmente.
+# Matricula desligada, com banca e SEM data de defesa: combinacao que a replica
+# nao tem, e que o preparar_matricula_desligada.rb cria. Tem que ser do aluno de
+# teste e vista pelo papel Aluno: a tela do admin para a mesma matricula passa
+# por outro caminho e nao serve de evidencia.
 /enrollment/3075
 /pendencies
 /
