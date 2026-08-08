@@ -258,6 +258,17 @@ um usuário com aquele e-mail, o que torna o passo 1 a primeira trava.
 O combo de troca de papel só aparece depois do passo 2 (ele exige dois papéis);
 é ele que o `--role` do `capture_html.rb` usa.
 
+### Se precisar do formulário público de inscrição
+
+A réplica não tem processo seletivo aberto, e **todos os processos dela vêm com
+`require_session` ligado** — que faz o `prepare_new_admission_application`
+desviar antes de o pedido chegar ao controller. São dois campos a mexer, não só
+a data. O `abrir_processo_seletivo.rb` abre, exercita e reverte os dois na mesma
+execução, conferindo o que gravou.
+
+Prefira exercitar o **create**: ele só precisa do processo aberto, enquanto o
+update exigiria o token de uma inscrição de candidato real.
+
 ### Se não houver período de inscrição aberto
 
 A tela `/enrollment/:id/enroll/:ano-:semestre` redireciona com "o período de
