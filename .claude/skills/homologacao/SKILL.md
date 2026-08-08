@@ -236,6 +236,18 @@ completa.
 
 ## Preparando o ambiente para o papel de aluno
 
+**O banco de homologação é regerado por dump de produção de tempos em tempos.**
+Todo dado inserido por uma rodada some nessas horas, e com ele as rotas do
+`routes_aluno.txt`, que deixam de responder. Trate esse conjunto como algo a
+**refazer**, não a preservar: rodar
+`preparar_aluno_de_teste.rb --confirmar` recria o que faltar, deixa em paz o que
+existe, e imprime as linhas prontas para o `routes_aluno.txt` — os ids mudam a
+cada regeração. Rodar sem necessidade não custa nada.
+
+Os dois primeiros passos abaixo continuam manuais de propósito, pela armadilha
+descrita adiante; o script cobre do terceiro em diante e para com instruções se
+o aluno não existir.
+
 As telas do aluno precisam de três coisas que a réplica de produção não traz
 prontas. **A ordem não é indiferente.**
 

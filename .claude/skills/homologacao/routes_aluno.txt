@@ -2,8 +2,10 @@
 # Administrador ativo elas voltam negadas, porque o ability.rb decide pelo papel
 # ativo (actual_role).
 #
-# Os ids sao do aluno de teste rotulado ZZ-TESTE-HOMOLOG. Se o banco for
-# reimportado, refaca a preparacao descrita no SKILL.md e ajuste aqui.
+# Os ids sao do aluno de teste rotulado ZZ-TESTE-HOMOLOG, e mudam toda vez que o
+# banco e regerado por dump de producao. Depois de cada regeracao rode
+# preparar_aluno_de_teste.rb --confirmar: ele recria o conjunto e imprime as
+# linhas com os ids novos, prontas para substituir as daqui.
 #
 # A tela de inscricao exige janela aberta: sem isso ela redireciona com "o
 # periodo de inscricoes fechou" e a captura registra o redirecionamento, nao a
