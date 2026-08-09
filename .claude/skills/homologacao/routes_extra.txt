@@ -8,6 +8,9 @@
 /notifications/1/simulate
 /notifications/2/simulate
 /notifications/3/simulate
+# Data de consulta que nenhum formato le. A tela deve abrir com aviso e usar a
+# data padrao da notificacao -- pagina de erro aqui e regressao.
+/notifications/1/simulate?query_params[data_consulta]=31/31/2026
 /assertions/1/simulate
 /assertions/3/simulate
 /students/2129

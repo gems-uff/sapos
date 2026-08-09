@@ -119,7 +119,14 @@
 /users/password/edit
 /users/profile
 /users/sign_in
-/users/sign_out
 /users/sign_up
 /users/unlock
 /versions
+
+# /users/sign_out ENCERRA A SESSAO, e o script loga uma vez so: toda rota depois
+# dela captura a tela de login com status 200, casa entre "antes" e "depois" e
+# passa por "sem diferenca". Por isso ela e a ULTIMA linha, e nada pode ser
+# acrescentado abaixo -- em ordem alfabetica ela vinha antes de /versions, que
+# nunca foi capturada de fato. A guarda no capture_html.rb avisa se voltar a
+# acontecer.
+/users/sign_out

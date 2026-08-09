@@ -3,6 +3,11 @@ name: "Ruby on Rails CI"
 
 on: [push, pull_request]
 
+# No job writes to the repository: only checkout, setup and artifact upload.
+# Coverage upload uses secrets.QLTY_COVERAGE_TOKEN, not the GITHUB_TOKEN.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest

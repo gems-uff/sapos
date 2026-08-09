@@ -95,6 +95,7 @@ pt-BR:
       invalid_letter: "A carta acessada não existe ou é de um processo fechado"
       unauthorized_application: "Acesso não autorizado à inscrição %{token}. Por favor, use a opção de recuperar inscrição para acessá-la por este navegador."
       invalid_captcha: "reCAPTCHA inválido"
+      empty_submission: "Nenhuma alteração foi recebida. Por favor, tente enviar novamente."
 
   notifications:
     admissions:

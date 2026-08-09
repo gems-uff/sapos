@@ -152,8 +152,8 @@ que é o que a `DATABASE_URL` usa de todo modo.
 ## Desmontagem
 
 **Desmonte ao fim de cada rodada, não "quando lembrar".** A máquina de
-desenvolvimento tem pouca memória e um `mariadbd` esquecido fica semanas de pé
-segurando ~50 MB — foi o que aconteceu entre 22 e 25/07/2026.
+desenvolvimento tem pouca memória, e um `mariadbd` esquecido fica semanas de pé
+segurando ~50 MB sem que nada o denuncie.
 
 ```bash
 # Shutdown limpo, que fecha o InnoDB direito. Matar o mariadbd no sinal nao

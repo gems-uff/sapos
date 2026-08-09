@@ -18,6 +18,17 @@ Não comece sem isto:
 - Passada manual do mantenedor em staging, quando houver caminho de escrita, PDF,
   planilha ou e-mail envolvido — a captura automatizada é só leitura.
 - `main` sincronizada com `origin/main`: `git rev-list --left-right --count origin/main...main` → `0 0`.
+- **Árvore de trabalho limpa: `git status --short` vazio.** Se houver qualquer
+  coisa não commitada, **pare e avise o mantenedor antes do merge** — mostrando o
+  quê, e perguntando se entra nesta versão ou fica para a próxima. A decisão é
+  dele; o que não pode é ele descobrir depois da release publicada, quando entrar
+  já custa outra versão.
+
+  Isso vale inclusive para o que o próprio agente escreveu durante o ciclo:
+  anotação em skill, roteiro, script de sonda. Ter avisado no meio do caminho, ao
+  criar o arquivo, **não conta** — o aviso tem que estar aqui, junto da decisão
+  de lançar. É por esse caminho que anotação de skill fica de fora da versão que
+  a produziu.
 
 ## Passos
 
@@ -62,8 +73,7 @@ git tag -a 7.15.21 -m "7.15.21"
 git push origin 7.15.21
 ```
 
-Sempre anotada (`-a`), nunca leve. As tags antigas têm mensagem vazia e a
-`7.15.19` tem o próprio número; use o número.
+Sempre anotada (`-a`), nunca leve. A mensagem é o próprio número da versão.
 
 A tag não é decorativa: `config/environment.rb:12` deriva `APP_VERSION` de
 `git describe --tag --always` em tempo de execução, então é ela que aparece no
@@ -78,9 +88,16 @@ gh issue close <N> --reason completed
 ```
 
 - Cor `0e8a16` para todo label de versão — é o que dá o verde uniforme na lista.
+- **Crie o label mesmo que a versão não feche issue nenhuma.** Assim a existência
+  do label não depende do conteúdo da versão, e não há como confundir "não tinha
+  issue" com "esqueci de criar" ao olhar a lista depois. O link do corpo da
+  release (passo 6) resolve para uma consulta vazia, que é o resultado correto.
+- **Confira a lista com `--limit` folgado.** O repositório passa de 200 labels, e
+  o padrão do `gh label list` trunca — uma varredura truncada some justamente com
+  os labels mais recentes e faz parecer que ninguém rotula há várias versões.
 - **Rotular e fechar são decisões separadas.** Uma issue entregue em parte leva o
-  label e continua aberta (a #621 tem `7.15.19` e segue aberta). Só feche o que
-  a versão de fato encerra.
+  label e **continua aberta** — o label diz "saiu nesta versão", não "acabou". Só
+  feche o que a versão de fato encerra.
 - Fechamento é `completed`, sem comentário de encerramento — é o padrão do
   repositório.
 
@@ -122,9 +139,8 @@ gh issue list --label 7.15.21 --state all
 
 ### 8. Deploy — do mantenedor
 
-**Passe a tag certa.** Uma versão errada exibida em produção já foi rastreada
-até a tag passada no deploy, não ao Passenger. Depois de subir, confira o rodapé
-da aplicação.
+**Passe a tag certa.** Versão errada no rodapé de produção costuma ser a tag
+passada no deploy, não o Passenger. Depois de subir, confira o rodapé.
 
 ## Depois da release
 

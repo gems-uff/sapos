@@ -92,7 +92,7 @@ class NotificationsController < ApplicationController
   def simulate
     @notification = Notification.find(params[:id])
     # Execute notification with current parameters
-    args = @notification.prepare_params_and_derivations(get_query_params)
+    args = prepare_simulation_args
     result = @notification.execute(skip_update: true, override_params: args)
     @messages = result[:notifications]
     @query_sql = result[:query]
@@ -125,6 +125,22 @@ class NotificationsController < ApplicationController
   end
 
   private
+    # Data mal digitada na tela de simulação é erro de preenchimento, não
+    # defeito: avisa e simula com a data padrão da notificação, em vez de
+    # derrubar a página.
+    def prepare_simulation_args
+      query_params = get_query_params
+      @notification.prepare_params_and_derivations(query_params)
+    rescue Date::Error
+      flash.now[:alert] = I18n.t(
+        "activerecord.errors.models.notification.invalid_query_date",
+        date: query_params[:data_consulta]
+      )
+      @notification.prepare_params_and_derivations(
+        query_params.except(:data_consulta)
+      )
+    end
+
     def get_query_params
       return params[:query_params].to_unsafe_h if params[:query_params].is_a?(
         ActionController::Parameters

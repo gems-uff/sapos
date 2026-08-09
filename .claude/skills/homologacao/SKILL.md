@@ -79,8 +79,8 @@ S=.claude/skills/homologacao
 CAP=~/capturas-sapos-staging
 
 # Ajuste as duas versões à rodada. Nomeie pela versão do rodapé de cada deploy.
-ANTES=$CAP/2026-07-22_v7.15.20_producao
-DEPOIS=$CAP/2026-07-24_v7.15.21-27-gc0e804a2_security_updates
+ANTES=$CAP/<data>_v<versão>_<rótulo>
+DEPOIS=$CAP/<data>_v<versão>_<rótulo>
 
 bundle exec ruby $S/capture_html.rb   $ANTES/html   $S/routes_html.txt
 bundle exec ruby $S/capture_html.rb   $ANTES/extra  $S/routes_extra.txt
@@ -138,9 +138,9 @@ diretório de saída e avisa quando herdou — confira esse arquivo antes de com
   da diferença**, e é assim que se lê: a string de versão está em toda página, na
   mesma posição, então ela vira um grupo único com quase tudo dentro — e o que
   divergiu por outro motivo sobra em grupo próprio, no topo (a ordem é por área).
-  Numa rodada real, 125 páginas colapsaram em três linhas. Nenhuma coordenada
-  fica escrita no script: neutralizar a faixa da versão por coordenada fixa
-  quebraria com outro tema, zoom ou resolução.
+  Espere a varredura inteira colapsar em poucas linhas; leia as de cima.
+  Nenhuma coordenada fica escrita no script: neutralizar a faixa da versão por
+  coordenada fixa quebraria com outro tema, zoom ou resolução.
 - **PDF** — rasterizado em PNG por página. Comparar bytes não funciona: PDF
   embute data de criação, então o mesmo relatório gerado duas vezes já tem hash
   diferente.
@@ -151,23 +151,20 @@ diretório de saída e avisa quando herdou — confira esse arquivo antes de com
 
 ## Verifique o instrumento, não só o sistema
 
-Um comparador quebrado também devolve "nenhuma diferença". O `compare_html.rb`
-imprime, ao final, quantas páginas diferem **sem** normalizar: como as duas
-versões têm strings de versão diferentes, esse número tem que ser alto. Se ele
-vier zero junto com o resultado principal, desconfie da comparação antes de
-concluir que não houve regressão.
+Um comparador quebrado também devolve "nenhuma diferença", e é o mesmo resultado
+que "nada regrediu". Três checagens separam os dois, e nenhuma é opcional:
 
-Isso não é hipotético: a primeira versão dessa checagem estava errada e devolvia
-zero para um par que sabidamente diferia.
-
-A mesma armadilha pegou a medição de imagem, e de um jeito que só aparece quando
-**não** há diferença: a bounding box de uma diferença vazia é indefinida, e o
-`magick` avisa no stderr antes de imprimir `0 0x0+...`. O padrão ancorado em `\A`
-lia o aviso, não casava, e reportava "falha ao medir" — ou seja, a página
-**idêntica** era a única que o comparador não sabia classificar. Por isso a
-contagem de páginas alteradas por pixel tem checagem de sanidade própria: com
-duas versões diferentes, zero ali é comparador quebrado, não ausência de
-regressão.
+- **Contagem sem normalizar.** O `compare_html.rb` imprime quantas páginas
+  diferem **sem** neutralizar o rodapé. Como as duas versões têm strings de
+  versão diferentes, esse número tem que ser alto. Zero ali, junto com zero no
+  resultado principal, é comparador quebrado.
+- **Contagem por pixel.** Vale o mesmo: com duas versões diferentes, zero página
+  alterada por pixel é o comparador, não o sistema. O `compare_binary.rb` tem
+  checagem de sanidade própria para isso.
+- **Sessão perdida.** Uma rota que caiu na tela de login grava **200** e casa
+  perfeitamente entre "antes" e "depois" — passa por "sem diferença" sem nunca
+  ter sido vista. O `capture_html.rb` avisa (`SESSAO PERDIDA`) comparando a URL
+  final; se o aviso aparecer, aquelas rotas não valem como evidência.
 
 ## Camada exploratória (interativa) — o que a varredura estática não alcança
 
@@ -187,16 +184,69 @@ de coisas que um upgrade quebra e que só aparecem interagindo:
 
 Faça uma passada exploratória sempre que o upgrade mexer em asset (jquery-ui),
 sanitizador, Devise, active_scaffold ou o adaptador MySQL. É complementar, não
-substitui a estática. Roteiro-modelo e um harness Selenium reusável (login lendo a
-env var + helpers de screenshot) ficaram de uma rodada real em
-`~/capturas-sapos-staging/2026-07-24_*_security_updates/` (`roteiro-exploratorio.md`
-+ `exploratorio/harness/`) — use como ponto de partida. Regras: só `new`/`edit`
-**sem salvar** onde der; a única escrita persistida é em tabela de apoio com rótulo
-`ZZ-TESTE-HOMOLOG`, apagada ao fim; e-mail só com a trava `redirect_email`
-conferida. A extensão do Chrome pode estar indisponível — o harness Selenium
+substitui a estática.
+
+O `explore_common.rb` desta pasta é o ponto de partida: sobe o Chrome headless,
+loga lendo as mesmas env vars da captura e dá helpers de screenshot e de erro de
+console. Escreva os passos da rodada como scripts curtos ao lado dele, apontando
+`EXPLORE_OUT` para o diretório da rodada — os screenshots contêm dado real e não
+podem cair no repositório. A extensão do Chrome pode estar indisponível; Selenium
 headless + screenshots avaliadas por visão contorna isso.
 
+Regras da passada: só `new`/`edit` **sem salvar** onde der; a única escrita
+persistida é em tabela de apoio com rótulo `ZZ-TESTE-HOMOLOG`, apagada ao fim;
+e-mail só com a trava `redirect_email` conferida.
+
+**Chame `switch_role!` no início de toda sonda.** O papel ativo atravessa
+execuções tanto aqui quanto na captura, e a captura do aluno costuma ser a
+última — a sonda seguinte navega como aluno e não acha link de edição nenhum. O
+sintoma mente: parece "a tela sumiu", não "papel errado".
+
+**Chegue à tela como o usuário chega.** Navegar direto para a rota de uma ação do
+active_scaffold monta a tela sem o link de ação que o JS dela procura, e o script
+estoura sozinho (`find_action_link(...)` devolve `undefined`). O erro é da sonda e
+some quando se clica a ação a partir da lista.
+
+**Drene o log de console entre fluxos** (ler é que drena). Um fluxo que sai pelo
+caminho de erro sem ler o console empurra os próprios erros para o relatório do
+fluxo seguinte, que os reporta como se fossem da tela dele.
+
+**Conte elementos dentro do container, não por padrão de nome.** Um seletor por
+nome que não casa devolve sempre o mesmo número: a medida fica idêntica nos dois
+lados e cega a qualquer regressão. Meça algo que **mude** quando você mexe na
+tela, e confira que mudou, antes de confiar na comparação.
+
+### Zero diferença na estática não é evidência sobre widget
+
+Widget que só existe depois de um clique **não está na foto** — nenhuma rota da
+varredura abre um calendário. Um datepicker pode trocar de tema por inteiro e
+passar pelas rotas todas sem um único pixel de diferença.
+
+Então, quando a mudança toca asset de widget (jquery-ui, datepicker, timepicker,
+record_select, CodeMirror), a estática **não vota**: ela cobre status, texto e
+layout de página, outra coisa. A regressão só aparece na camada exploratória,
+medindo estilo computado do widget aberto.
+
+E cuidado com a sonda que **força** o widget a existir — vincular o datepicker à
+mão (`jQuery('._param_type_date').datepicker()`) contorna um bind automático que
+falhou e mede o tema, mas **não** mede se o widget aparece para o usuário. São
+duas regressões diferentes, e forçar o bind esconde a segunda. Quando precisar
+forçar, registre o que ficou por medir em vez de deixar a homologação parecer
+completa.
+
 ## Preparando o ambiente para o papel de aluno
+
+**O banco de homologação é regerado por dump de produção de tempos em tempos.**
+Todo dado inserido por uma rodada some nessas horas, e com ele as rotas do
+`routes_aluno.txt`, que deixam de responder. Trate esse conjunto como algo a
+**refazer**, não a preservar: rodar
+`preparar_aluno_de_teste.rb --confirmar` recria o que faltar, deixa em paz o que
+existe, e imprime as linhas prontas para o `routes_aluno.txt` — os ids mudam a
+cada regeração. Rodar sem necessidade não custa nada.
+
+Os dois primeiros passos abaixo continuam manuais de propósito, pela armadilha
+descrita adiante; o script cobre do terceiro em diante e para com instruções se
+o aluno não existir.
 
 As telas do aluno precisam de três coisas que a réplica de produção não traz
 prontas. **A ordem não é indiferente.**
@@ -219,6 +269,17 @@ um usuário com aquele e-mail, o que torna o passo 1 a primeira trava.
 
 O combo de troca de papel só aparece depois do passo 2 (ele exige dois papéis);
 é ele que o `--role` do `capture_html.rb` usa.
+
+### Se precisar do formulário público de inscrição
+
+A réplica não tem processo seletivo aberto, e **todos os processos dela vêm com
+`require_session` ligado** — que faz o `prepare_new_admission_application`
+desviar antes de o pedido chegar ao controller. São dois campos a mexer, não só
+a data. O `abrir_processo_seletivo.rb` abre, exercita e reverte os dois na mesma
+execução, conferindo o que gravou.
+
+Prefira exercitar o **create**: ele só precisa do processo aberto, enquanto o
+update exigiria o token de uma inscrição de candidato real.
 
 ### Se não houver período de inscrição aberto
 
@@ -257,23 +318,31 @@ captura consiga exercitar tanto a inscrição quanto o período de ajustes.
 
 ## Ruído conhecido, que não é regressão
 
-Medido na `main` (7.15.23) em 27/07/2026, presente também no baseline anterior:
+Estas rotas não respondem 200 na varredura, e não é defeito da aplicação:
 
-- `/form_autocompletes/form_field` responde **500**. Causa no código do app:
-  `Admissions::FormField.full_search_name` tem `field:` com default `nil` e cai
-  em `name.include?(field)` — `TypeError: no implicit conversion of nil into
-  String`. A varredura chama a rota sem parâmetro, que é exatamente esse caso.
+- `406` em `/advisements/to_pdf`, `/enrollments/to_pdf`, `/scholarships/to_pdf`,
+  `/scholarship_durations/to_pdf` e `/email_templates/builtin` — a lista chama a
+  rota sem o formato que ela exige.
+- `404` em `/cities/autocomplete`, `/countries/autocomplete`,
+  `/states/autocomplete` e `/notifications/notify` — rotas que só existem com
+  parâmetro.
+- `500` (`CanCan::AccessDenied`) em `/pendencies`, **no papel Aluno**.
 
-Aparece nos dois lados da comparação e deve ser ignorado como achado — mas se
-**mudar** de status entre "antes" e "depois", aí é sinal.
+Aparecem nos dois lados da comparação e devem ser ignorados como achado — mas se
+**mudarem** de status entre "antes" e "depois", aí é sinal.
+
+**A lista é verificada na captura "antes" de cada rodada, e corrigida ali
+mesmo.** Entrada que voltou a responder 200 sai desta lista no mesmo commit; ruído
+que apareceu, entra. "Ruído conhecido" que envelhece manda ignorar um 500 que, se
+voltar, é regressão de verdade — e essa é a única defesa contra isso.
 
 ### Não confunda template oculto com erro na tela
 
 O active_scaffold deixa no DOM, **oculto**, um painel
 `.error-message.message.server-error` com o texto "Internal Error". Ler o
-`innerText` dele sem checar visibilidade faz qualquer página parecer quebrada —
-e já custou um diagnóstico inteiro aqui: "salvar Aluno devolve 500" era esse
-painel invisível, com o registro gravando e o servidor respondendo 302.
+`innerText` dele sem checar visibilidade faz **qualquer** página parecer
+quebrada: um "salvar devolve 500" pode ser esse painel invisível, com o registro
+gravando e o servidor respondendo 302.
 
 Ao sondar erro por Selenium, exija visibilidade:
 
@@ -335,8 +404,7 @@ magick \( antes.png -background white -flatten \) \
 
 O `-background white -flatten` não é opcional: os PNGs são `PaletteAlpha`, e sem
 achatar sobre o branco o composite de diferença devolve uma bbox vazia
-(`0x0+...`) — parece "sem diferença" numa página que mudou. Foi um dos dois bugs
-que o `compare_binary.rb` carregou.
+(`0x0+...`) — parece "sem diferença" numa página que mudou.
 
 - Uma faixa estreita no rodapé (poucas centenas de px), na mesma posição em
   todas as páginas, é a hora de geração. Benigno.
@@ -353,8 +421,8 @@ magick antes.png -crop 560x110+80+1035 +repage /tmp/antes.png
 Contagem de pixels sozinha engana: `compare -metric AE` imprime notação
 científica (`4.5e+07`) e diverge de uma contagem real em PNG paletizado — por
 isso o `compare_binary.rb` mede pela média do composite achatado, não pelo AE.
-Quando a contagem e a imagem discordarem, olhe a imagem — foi assim que se
-distinguiu "QR code novo por desenho" de "regressão de renderização".
+**Quando a contagem e a imagem discordarem, olhe a imagem**: é o que distingue
+"QR code novo por desenho" de "regressão de renderização".
 
 ## Rota que dá 500 é sinal, não ruído
 

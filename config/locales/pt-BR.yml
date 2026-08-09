@@ -29,6 +29,9 @@ pt-BR:
       wrong_length: "não possui o tamanho esperado (%{count} caracteres)"
       required: "não pode ficar em branco"
 
+    session_expired: "Sua sessão expirou. Entre novamente para continuar."
+    invalid_form_token: "Não foi possível confirmar o envio deste formulário. Atualize a página e tente novamente."
+
     template:
       header:
         one: "Não foi possível gravar %{model}: 1 erro"
