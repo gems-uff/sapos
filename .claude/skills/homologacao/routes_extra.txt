@@ -24,8 +24,10 @@
 # Este professor tem data de inicio preenchida e data de fim vazia, entao a
 # mesma tela exercita o valor presente e o ausente.
 /professors/124
-# Comentarios da solicitacao (data e hora, formato defaultdatetime).
+# Comentarios da solicitacao, com data e hora.
 /enrollment_requests/2850
-# Candidatura com campo de escolaridade preenchido: o rotulo termina no periodo
-# "(dd/mm/aaaa - dd/mm/aaaa)", montado por um join que chama to_s em cada data.
-/admission_applications/1206
+# Nao adianta acrescentar /admission_applications/<id> para ver o rotulo de
+# escolaridade: a secao "Dados" da tela de show carrega sob demanda, e a
+# varredura estatica registra so a casca -- 1,4 KB de texto, sem uma data. O
+# rotulo com o periodo aparece em /admission_processes/4/complete_pdf, que ja
+# esta no routes_binary.txt.
