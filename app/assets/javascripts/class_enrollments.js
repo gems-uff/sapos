@@ -11,7 +11,7 @@ $(function() {
             target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
           }
           else if (parseFloat(grade) != parseFloat(grade_of_disapproval_for_absence)){
-            msg = this.getAttribute('overwrite_confirm_msg').replace('actual_grade',grade.replace('.',',')).replace('grade_for_disapproval',grade_of_disapproval_for_absence.replace('.',','));
+            var msg = this.getAttribute('overwrite_confirm_msg').replace('actual_grade',grade.replace('.',',')).replace('grade_for_disapproval',grade_of_disapproval_for_absence.replace('.',','));
             if(confirm(msg)){
               target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
             }
@@ -35,7 +35,7 @@ $(function() {
     }
   }
   $(document).on('focus','.grade-input',function(){
-    placeholder = this.getAttribute('grade_placeholder');
+    var placeholder = this.getAttribute('grade_placeholder');
     $(this).attr('placeholder',placeholder);
   });
   $(document).on('blur','.grade-input',function(){
