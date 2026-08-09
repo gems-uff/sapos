@@ -59,6 +59,12 @@ Entre 2 e 5 o banco **não pode ser reimportado**. Uma réplica nova traria
 edições feitas em produção no meio do caminho, e diferenças de dado apareceriam
 como se fossem de código.
 
+Pelo mesmo motivo, as listas de rotas têm de ser as **mesmas** nos dois lados. Se
+uma delas mudar no meio do ciclo — rota acrescentada, rota removida —, capture o
+"depois" com a lista que produziu o "antes" (`git show <commit>:<arquivo>` para
+um caminho fora do repositório) e só então adote a nova. Sem isso a comparação
+acusa a rota que você mexeu, misturada com o que ela deveria medir.
+
 ### Onde as capturas ficam
 
 Tudo mora em `~/capturas-sapos-staging/`, **fora do repositório** (contêm dado
@@ -338,6 +344,18 @@ Aparecem nos dois lados da comparação e devem ser ignorados como achado — ma
 mesmo.** Entrada que voltou a responder 200 sai desta lista no mesmo commit; ruído
 que apareceu, entra. "Ruído conhecido" que envelhece manda ignorar um 500 que, se
 voltar, é regressão de verdade — e essa é a única defesa contra isso.
+
+### Duas rotas divergem sempre, porque a captura escreve nelas
+
+`/reports` lista os documentos gerados e `/versions` é o log de auditoria. A
+própria varredura alimenta os dois: baixar histórico e boletim assinados cria um
+registro por chamada, e cada `--role` grava `actual_role` no usuário, que o log
+audita. O lado "depois" ganha linhas que o "antes" não tem, e elas são da rodada,
+não da mudança.
+
+São diferença de **conteúdo**, não de status, então não entram na lista acima.
+Antes de investigar qualquer uma, olhe a autoria e o horário das linhas novas: se
+forem da conta de captura, no intervalo da rodada, são pegada do instrumento.
 
 ### Não confunda template oculto com erro na tela
 
