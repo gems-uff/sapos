@@ -66,7 +66,8 @@ real — ver "Regras de segurança"). Uma pasta por versão capturada, nomeada
 `<data>_v<versão>_<rótulo>`, com `html/`, `extra/` e `bin/` dentro:
 
 - `<data>` — dia da captura (`AAAA-MM-DD`), para ordenar cronologicamente.
-- `<versão>` — a do rodapé (`Versão 7.15.21-27-gc0e804a2`), que identifica o
+- `<versão>` — a do cabeçalho, no alto à direita (`Versão 7.15.21-27-gc0e804a2`),
+  que identifica o
   código exato.
 - `<rótulo>` — o que aquela versão é (`producao`, `rails72`, `security_updates`).
 
@@ -78,7 +79,7 @@ set -a; source ~/.sapos_staging_env; set +a
 S=.claude/skills/homologacao
 CAP=~/capturas-sapos-staging
 
-# Ajuste as duas versões à rodada. Nomeie pela versão do rodapé de cada deploy.
+# Ajuste as duas versões à rodada. Nomeie pela versão do cabeçalho de cada deploy.
 ANTES=$CAP/<data>_v<versão>_<rótulo>
 DEPOIS=$CAP/<data>_v<versão>_<rótulo>
 
@@ -129,8 +130,8 @@ diretório de saída e avisa quando herdou — confira esse arquivo antes de com
 
 ## Como a comparação é feita
 
-- **Texto de página** — hash do texto visível, com o rodapé de versão
-  neutralizado. Datas **não** são normalizadas de propósito: mudança de formato
+- **Texto de página** — hash do texto visível, com a faixa de versão do cabeçalho
+  neutralizada. Datas **não** são normalizadas de propósito: mudança de formato
   de data é uma das regressões procuradas.
 - **Screenshot** — PNG de página inteira, comparado pixel a pixel, porque texto
   igual não é tela igual: asset que sumiu, CSS que quebrou e layout deslocado não
@@ -155,7 +156,7 @@ Um comparador quebrado também devolve "nenhuma diferença", e é o mesmo result
 que "nada regrediu". Três checagens separam os dois, e nenhuma é opcional:
 
 - **Contagem sem normalizar.** O `compare_html.rb` imprime quantas páginas
-  diferem **sem** neutralizar o rodapé. Como as duas versões têm strings de
+  diferem **sem** neutralizar o cabeçalho. Como as duas versões têm strings de
   versão diferentes, esse número tem que ser alto. Zero ali, junto com zero no
   resultado principal, é comparador quebrado.
 - **Contagem por pixel.** Vale o mesmo: com duas versões diferentes, zero página
