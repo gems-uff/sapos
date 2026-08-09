@@ -3,8 +3,10 @@ name: "Ruby on Rails CI"
 
 on: [push, pull_request]
 
-# No job writes to the repository: only checkout, setup and artifact upload.
-# Coverage upload uses secrets.QLTY_COVERAGE_TOKEN, not the GITHUB_TOKEN.
+# No job writes to the repository contents: only checkout, setup and artifact
+# upload. The qlty upload uses secrets.QLTY_COVERAGE_TOKEN; the GitHub coverage
+# upload uses the GITHUB_TOKEN, and the code-quality:write it needs is granted
+# in that job alone -- it writes coverage data, never the repository.
 permissions:
   contents: read
 
@@ -108,6 +110,48 @@ jobs:
         with:
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
           files: coverage/.resultset.json
+
+      # A cobertura nativa do GitHub roda em paralelo com o qlty durante o
+      # periodo de prova. Quando ela tiver produzido dado, o passo do qlty acima,
+      # o secret QLTY_COVERAGE_TOKEN e os GitHub Apps do qlty saem juntos.
+      #
+      # O upload em si e outro job: a acao exige code-quality:write, e este job
+      # nao precisa dessa permissao para rodar a suite. PR de fork nao consegue
+      # escrever no repositorio base, dai a guarda.
+      - name: Upload the Cobertura report
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-ruby
+          path: coverage/coverage.xml
+
+  upload-coverage:
+    needs: test
+    if: ${{ !cancelled() && needs.test.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      code-quality: write
+
+    steps:
+      - name: Download the Cobertura report
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report-ruby
+
+      # fail-on-error: false de proposito enquanto durar a prova. A cobertura
+      # nativa esta em preview publico e a acao, por padrao, derruba o passo e
+      # ainda espera ate 160 s pelo processamento -- uma instabilidade do servico
+      # deixaria o CI vermelho sem nada a ver com o codigo. O erro continua
+      # aparecendo como anotacao no log.
+      - name: Publish code coverage to GitHub
+        uses: actions/upload-code-coverage@v1
+        with:
+          file: coverage.xml
+          language: Ruby
+          label: code-coverage/simplecov
+          fail-on-error: false
 
   smoke-test:
     runs-on: ubuntu-latest
