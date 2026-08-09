@@ -18,3 +18,14 @@
 /course_classes/621
 /queries/1
 /notifications/1
+# Colunas de show que so aparecem na tela do registro, nao no indice.
+# Afiliacoes do professor: as colunas sao datetime, nao date -- e o caso em que
+# o I18n escolhe o formato longo por extenso se a data nao for convertida antes.
+# Este professor tem data de inicio preenchida e data de fim vazia, entao a
+# mesma tela exercita o valor presente e o ausente.
+/professors/124
+# Comentarios da solicitacao (data e hora, formato defaultdatetime).
+/enrollment_requests/2850
+# Candidatura com campo de escolaridade preenchido: o rotulo termina no periodo
+# "(dd/mm/aaaa - dd/mm/aaaa)", montado por um join que chama to_s em cada data.
+/admission_applications/1206
