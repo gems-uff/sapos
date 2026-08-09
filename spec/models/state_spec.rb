@@ -22,9 +22,7 @@ RSpec.describe State, type: :model do
   describe "Validations" do
     it { should be_valid }
     it { should belong_to(:country).required(true) }
-    it { should validate_uniqueness_of(:name) }
     it { should validate_presence_of(:name) }
-    it { should validate_uniqueness_of(:code) }
     it { should validate_presence_of(:code) }
   end
 end

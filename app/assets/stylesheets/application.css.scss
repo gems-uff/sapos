@@ -11,18 +11,14 @@
  *= require_self
  */
 @import 'variables';
-@import "active_scaffold_layout";
-@import "active_scaffold_images";
-@import "active_scaffold_extensions";
-@import "active_scaffold_colors";
-@import "jquery-ui.css";
-@import "jquery-ui/datepicker.css";
+@import "active_scaffold";
+@import "jquery-ui";
+@import "jquery-ui/datepicker";
 @import 'blue-theme';
-@import 'codemirror/lib/codemirror.css';
-@import 'codemirror.css';
+@import 'codemirror/lib/codemirror';
 @import 'custom/*';
 @import 'active_scaffold_overrides';
 @import "font-awesome";
 @import "glyphicon";
-@import 'chronoline/chronoline.css';
+@import 'chronoline/chronoline';
 @import 'chronoline_override';

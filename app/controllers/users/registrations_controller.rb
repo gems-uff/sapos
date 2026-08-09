@@ -6,12 +6,12 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # GET /resource/sign_up
   def new
-    return redirect_to new_user_session_path
+    redirect_to new_user_session_path
   end
 
   # POST /resource
   def create
-    return redirect_to new_user_session_path
+    redirect_to new_user_session_path
   end
 
   # GET /resource/edit
@@ -26,7 +26,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   # DELETE /resource
   def destroy
-    return redirect_to root_path
+    redirect_to root_path
   end
 
   # GET /resource/cancel

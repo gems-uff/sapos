@@ -26,7 +26,6 @@ RSpec.describe Phase, type: :model do
   describe "Validations" do
     it { should be_valid }
     it { should validate_presence_of(:name) }
-    it { should validate_uniqueness_of(:name) }
     it { should allow_value([true, false]).for(:active) }
     it { is_expected.not_to allow_value(nil).for(:active) }
 

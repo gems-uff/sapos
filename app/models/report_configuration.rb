@@ -18,7 +18,7 @@ class ReportConfiguration < ApplicationRecord
 
   mount_uploader :image, ImageUploader
 
-  enum signature_type: { no_signature: 0, manual: 1, qr_code: 2 }
+  enum :signature_type, { no_signature: 0, manual: 1, qr_code: 2 }
 
   def initialize_dup(other)
     super

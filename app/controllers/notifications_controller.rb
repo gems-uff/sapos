@@ -7,8 +7,6 @@ class NotificationsController < ApplicationController
   include SharedPdfConcern
 
   authorize_resource
-  skip_authorization_check only: [:notify]
-  skip_before_action :authenticate_user!, only: :notify
   before_action :permit_query_params
   helper PdfHelper
   helper EnrollmentsPdfHelper
@@ -124,32 +122,6 @@ class NotificationsController < ApplicationController
     end
 
     render action: "simulate"
-  end
-
-  def notify
-    Notifier.logger.info "Sending Registered Notifications"
-
-    Notifier.logger.info "[Notifications] #{Time.now.to_fs} - Notifications from DB"
-    notifications = []
-    notifications_attachments = {}
-
-    # Get the next execution time arel table
-    next_execution = Notification.arel_table[:next_execution]
-
-    # Find notifications that should run
-    Notification.where.not(frequency: Notification::MANUAL)
-      .where(next_execution.lt(Time.now)).each do |notification|
-        result = prepare_attachments(notification.execute)
-        notifications.concat(result[:notifications])
-        notifications_attachments.merge!(result[:notifications_attachments])
-      end
-
-    Notifier.send_emails({
-      notifications: notifications,
-      notifications_attachments: notifications_attachments
-    })
-
-    render inline: "Ok", content_type: "text/html"
   end
 
   private

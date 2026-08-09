@@ -24,7 +24,7 @@ module ClassSchedulesPdfHelper
 
     class_schedule_print_table(
         pdf, table_width, table[:header], table[:data], table[:star], true
-    )
+      )
   end
 
   def class_schedule_print_table(pdf, table_width, header, data, star, footer)

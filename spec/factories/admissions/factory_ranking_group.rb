@@ -10,6 +10,6 @@ FactoryBot.define do
     "admissions/ranking_group"
   ] do
     ranking_config
-    name { "AC"}
+    name { "AC" }
   end
 end

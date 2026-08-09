@@ -1,0 +1,17 @@
+# Rotas HTML alem dos indices: execucao de consulta e telas de registro
+# individual. Os ids sao de registros existentes em homologacao.
+#
+# Os /simulate executam a consulta de verdade (Query.run_read_only_query) e sao
+# o UNICO ponto da varredura que exercita o ramo Mysql2. Rodam com
+# skip_update: true, entao nao escrevem nem enviam e-mail -- diferente de
+# execute_now, que faz as duas coisas.
+/notifications/1/simulate
+/notifications/2/simulate
+/notifications/3/simulate
+/assertions/1/simulate
+/assertions/3/simulate
+/students/2129
+/enrollments/2903
+/course_classes/621
+/queries/1
+/notifications/1

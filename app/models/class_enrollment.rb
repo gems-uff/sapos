@@ -99,11 +99,7 @@ class ClassEnrollment < ApplicationRecord
   end
 
   def course_has_grade
-    if self.try(:course_class).try(:course).try(:course_type).blank?
-      true
-    else
-      self.course_class.course.course_type.has_score
-    end
+    self.try(:course_class).try(:course).try(:course_type).blank? || self.course_class.course.course_type.has_score
   end
 
   def grade=(new_grade)

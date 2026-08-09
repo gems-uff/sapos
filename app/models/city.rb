@@ -31,16 +31,16 @@ class City < ApplicationRecord
     cities = cities.joins(:state) if country.present? || state.present?
     cities = cities.joins(state: :country).where(
       "`countries`.`name` LIKE :country
-      ", {country: country}
+      ", { country: country }
     ) if country.present?
     cities = cities.where(
       "`states`.`name` LIKE :state
         OR `states`.`code` LIKE :state
-      ", {state: state}
+      ", { state: state }
     ) if state.present?
     cities.where(
-      "`cities`.`name` LIKE :city 
-      ", {city: city}
+      "`cities`.`name` LIKE :city
+      ", { city: city }
     )
   end
 

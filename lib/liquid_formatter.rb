@@ -89,6 +89,22 @@ class AlignBlock < Liquid::Block
 end
 
 class LiquidFormatter
+  # Applies an escape of CodeEvaluator::ESCAPES to the output of every {{ }},
+  # so that the markup of the template is left untouched and only the data
+  # that fills it becomes text.
+  #
+  # Liquid hands an array to the filter before joining it, so the items are
+  # escaped one by one to keep the output that liquid produces without it.
+  def self.escape_filter(escaper)
+    ->(output) do
+      case output
+      when nil then output
+      when Array then output.map { |item| escaper.call(item.to_s) }
+      else escaper.call(output.to_s)
+      end
+    end
+  end
+
   @attributes = {}
 
   def initialize(hash)
@@ -106,13 +122,21 @@ class LiquidFormatter
     end
   end
 
-  def format(code)
+  # Renders a template, escaping the data when it is read as markup.
+  #
+  # The body of an assertion is printed as markup by prawn (:pdf) and the body
+  # of a notification is delivered as html (:html). A recipient and a subject
+  # are headers, not markup, and are rendered without any escape.
+  def format(code, escape_data: nil)
     env = Liquid::Environment.new
     env.register_filter(SaposLiquidFilters)
     env.register_tag("emails", RoleEmail)
     env.register_tag("language", LanguageTag)
     env.register_tag("align", AlignBlock)
     @template = Liquid::Template.parse(code, environment: env)
-    @template.render(@attributes)
+    context = Liquid::Context.build(environment: env, environments: @attributes)
+    escaper = CodeEvaluator.escaper(escape_data)
+    context.global_filter = LiquidFormatter.escape_filter(escaper) if escaper
+    @template.render(context)
   end
 end

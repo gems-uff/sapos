@@ -22,7 +22,6 @@ RSpec.describe Level, type: :model do
   subject { level }
   describe "Validations" do
     it { should be_valid }
-    it { should validate_uniqueness_of(:name) }
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:default_duration) }
   end

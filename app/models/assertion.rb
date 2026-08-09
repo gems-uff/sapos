@@ -47,7 +47,7 @@ class Assertion < ApplicationRecord
     }.merge(Hash[unique_columns.zip(rows.first.values_at(*unique_columns.map { |col| columns.index(col) }))])
 
     formatter = CodeEvaluator.create_formatter(bindings, self.template_type)
-    formatter.format(self.assertion_template)
+    formatter.format(self.assertion_template, escape_data: :pdf)
   end
 
 

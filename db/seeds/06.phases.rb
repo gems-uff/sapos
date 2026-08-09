@@ -37,4 +37,3 @@ DeferralType.create([
     phase: Phase.find_by_name(deferral_type[:phase_name])
   })
 end)
-

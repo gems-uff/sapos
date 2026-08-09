@@ -134,8 +134,8 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for pcd options" do
-      expect(page.all("select#record_pcd_ option").map(&:text)).to eq ['Não declarado'] +I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
-      expect(page.all("select#record_pcd_ option").map(&:value)).to eq [''] + I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
+      expect(page.all("select#record_pcd_ option").map(&:text)).to eq ["Não declarado"] + I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
+      expect(page.all("select#record_pcd_ option").map(&:value)).to eq [""] + I18n.t("active_scaffold.admissions/form_template.generate_fields.deficiencies").values
     end
 
     it "should have a textarea for obs pcd" do
@@ -151,13 +151,13 @@ RSpec.describe "Student features", type: :feature do
     end
 
     it "should have a selection for skin_color options" do
-      expect(page.all("select#record_skin_color_ option").map(&:text)).to eq ['Não declarado'] + I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
-      expect(page.all("select#record_skin_color_ option").map(&:value)).to eq [''] + I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
+      expect(page.all("select#record_skin_color_ option").map(&:text)).to eq ["Não declarado"] + I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
+      expect(page.all("select#record_skin_color_ option").map(&:value)).to eq [""] + I18n.t("active_scaffold.admissions/form_template.generate_fields.skin_colors").values
     end
 
     it "should have a selection for gender options" do
-      expect(page.all("select#record_gender_ option").map(&:text)).to eq ['Não declarado'] + I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
-      expect(page.all("select#record_gender_ option").map(&:value)).to eq [''] + I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
+      expect(page.all("select#record_gender_ option").map(&:text)).to eq ["Não declarado"] + I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
+      expect(page.all("select#record_gender_ option").map(&:value)).to eq [""] + I18n.t("active_scaffold.admissions/form_template.generate_fields.genders").values
     end
 
     it "should have a selection for civil_status options" do

@@ -2,6 +2,17 @@ inherit_gem:
   rubocop-rails_config:
     - config/rails.yml
 
+AllCops:
+  Exclude:
+    # Migration e artefato historico: uma vez aplicada, nao se reescreve. Formatar
+    # as antigas so suja o git blame delas, e sao 56 dos 154 arquivos com ofensa.
+    # Migration nova sai do gerador do Rails ja no formato dele, nao no nosso.
+    - "db/migrate/**/*"
+    - "db/schema.rb"
+    - "bin/**/*"
+    - "vendor/**/*"
+    - "node_modules/**/*"
+
 Style/StringLiterals:
   EnforcedStyle: double_quotes
 

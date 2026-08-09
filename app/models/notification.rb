@@ -208,7 +208,7 @@ class Notification < ApplicationRecord
             notification_id: self.id,
             to: formatter.format(self.to_template),
             subject: formatter.format(self.subject_template),
-            body: formatter.format(self.body_template)
+            body: formatter.format(self.body_template, escape_data: :html)
           }
 
           attachments = {}
@@ -239,7 +239,7 @@ class Notification < ApplicationRecord
               notification_id: self.id,
               to: formatter.format(self.to_template),
               subject: formatter.format(self.subject_template),
-              body: formatter.format(self.body_template)
+              body: formatter.format(self.body_template, escape_data: :html)
           }
         end
       end
@@ -264,10 +264,22 @@ class Notification < ApplicationRecord
     override_params.merge(params)
   end
 
+  # Reads the date of a query, as it is written in the simulation form.
+  #
+  # The form is filled in the brazilian order, but a parameter whose value is
+  # a date and a time reaches here written as "2026-07-01 00:00:00 -0300",
+  # which the brazilian order cannot read. Both are accepted: Date.parse also
+  # reads the day first, so a date that was already read keeps its meaning.
+  def parse_query_date(qdate)
+    Date.strptime(qdate, "%d/%m/%Y")
+  rescue Date::Error
+    Date.parse(qdate)
+  end
+
   def get_query_date_derivations(qdate)
     if qdate.is_a? String
       return {} if qdate.blank?
-      qdate = Date.strptime(qdate, "%d/%m/%Y")
+      qdate = parse_query_date(qdate)
     end
     this_semester = YearSemester.on_date qdate
     last_semester = this_semester - 1

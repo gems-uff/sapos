@@ -101,7 +101,7 @@ class Admissions::FormCondition < ActiveRecord::Base
   def to_label
     return "#{self.field} #{self.condition} #{self.value}" if self.mode == CONDITION
     sep = self.mode == AND ? " & " : " | "
-    self.form_conditions.map{ |x| "(#{x.to_label})" }.join(sep)
+    self.form_conditions.map { |x| "(#{x.to_label})" }.join(sep)
   end
 
   def initialize_dup(other)

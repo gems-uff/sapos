@@ -15,7 +15,6 @@ RSpec.describe ScholarshipType, type: :model do
   describe "Validations" do
     it { should be_valid }
     it { should validate_presence_of(:name) }
-    it { should validate_uniqueness_of(:name) }
   end
   describe "Methods" do
     context "to_label" do

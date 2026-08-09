@@ -11,7 +11,8 @@
   &nbsp;&nbsp;
   <%= render "queries/show_sql", sql_query: @query_sql %>
   <% if @messages.any? %>
-    <a id="generate-pdf-link" class="btn btn-primary" href="javascript:void(0)">
+    <a id="generate-pdf-link" class="btn btn-primary" href="javascript:void(0)"
+       data-query-params="<%= params[:query_params].to_json %>">
       <i class="fa fa-file-pdf-o" title='<%= I18n.t("active_scaffold.assertion.generate_pdf") %>'></i>
     </a>
   <% end %>
@@ -34,24 +35,26 @@
     </p>
   </div>
 
-  <table class="assertion-results showtable listed-records-table">
-    <thead>
-    <tr>
-      <% @query_result[:columns].each do |column| %>
-        <th><%= column %></th>
-      <% end %>
-    </tr>
-    </thead>
-    <tbody>
-    <% @query_result[:rows].each do |row| %>
+  <div class="results-scroll">
+    <table class="assertion-results showtable listed-records-table">
+      <thead>
       <tr>
-        <% row.each do |value| %>
-          <td><%= value %></td>
+        <% @query_result[:columns].each do |column| %>
+          <th><%= column %></th>
         <% end %>
       </tr>
-    <% end %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+      <% @query_result[:rows].each do |row| %>
+        <tr>
+          <% row.each do |value| %>
+            <td><%= value %></td>
+          <% end %>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+  </div>
 
   <%= toggable_area("Pré-visualização", enabled: true, visible: true) do %>
     <textarea><%=@assertion.format_text(@args)%></textarea>
@@ -75,10 +78,14 @@
         });
 
         $("#generate-pdf-link").click(function () {
+            // Os parametros vem por data-attribute, e nao interpolados aqui
+            // dentro: no atributo o escape do ERB e obrigatorio, enquanto no
+            // corpo do script dependeria de escape_html_entities_in_json.
+            var query_params = JSON.parse($(this).attr('data-query-params') || '{}');
             var form = $('<form>', {
                 'action': '<%= assertion_pdf_assertion_path(@assertion, format: :pdf) %>',
                 'method': 'GET'
-            }).append($.map(<%= params[:query_params].to_json.html_safe %>, function(value, key) {
+            }).append($.map(query_params, function(value, key) {
                 return $('<input>', {
                     'type': 'hidden',
                     'name': 'query_params[' + key + ']',
