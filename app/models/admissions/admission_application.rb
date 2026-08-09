@@ -589,7 +589,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       enrollment_value = enrollment.send(attrib)
       if enrollment_value.present? && process_value != enrollment_value
         message = "#{enrollment.class.record_i18n_attr(attrib)} alterado."
-        value_s = attrib != :admission_date ? enrollment_value.to_label : enrollment_value.to_fs(:default)
+        value_s = attrib != :admission_date ? enrollment_value.to_label :
+          I18n.localize(enrollment_value, format: :default)
         message += " Valor anterior: #{value_s}"
         update_log << message
       end

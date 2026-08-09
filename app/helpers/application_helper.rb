@@ -40,10 +40,22 @@ module ApplicationHelper
     I18n.localize(date, format: :monthyear2)
   end
 
+  # Formata uma data no padrao brasileiro (%d/%m/%Y).
+  #
+  # A conversao para Date e deliberada, nao defensiva: o I18n escolhe o formato
+  # pela classe do argumento, e time.formats.default e o formato longo por
+  # extenso ("sabado, 08 de agosto de 2026, 14:30 h"). Sem o to_date, uma coluna
+  # datetime -- affiliations.start_date, por exemplo -- sairia nesse formato em
+  # vez de 08/08/2026.
+  #
+  # A fonte do formato e sempre o arquivo de locale (config/locales/
+  # datetime.pt-BR.yml). Nao use to_fs(:default) no codigo da aplicacao: ele le
+  # de Date::DATE_FORMATS, em config/initializers/datetime.rb, que e outra fonte
+  # -- e as duas ja divergem para Time.
   def date_br(date, options = {})
     options[:blank_text] ||= I18n.t("rescue_blank_text")
     return options[:blank_text] if date.nil?
-    I18n.localize(date, format: :default)
+    I18n.localize(date.to_date, format: :default)
   end
 
   def read_attribute(record, attribute_name)

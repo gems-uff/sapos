@@ -73,8 +73,8 @@ module ProfessorsHelper
       tr_class = count.even? ? "even-record" : ""
       body += "<tr class=\"record #{tr_class}\">
                 <td>#{affiliation.institution.name}</td>
-                <td>#{date_br(affiliation.start_date&.to_date)}</td>
-                <td>#{date_br(affiliation.end_date&.to_date)}</td>
+                <td>#{date_br(affiliation.start_date)}</td>
+                <td>#{date_br(affiliation.end_date)}</td>
               </tr>"
     end
 
