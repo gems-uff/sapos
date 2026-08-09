@@ -1,6 +1,8 @@
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
+# frozen_string_literal: true
+
 require "spec_helper"
 
 RSpec.describe SharedXlsConcern, type: :concern do
@@ -17,7 +19,7 @@ RSpec.describe SharedXlsConcern, type: :concern do
       tempfile.binmode
       tempfile.write(render_course_classes_summary_xls([class_enrollment1, class_enrollment2]))
       tempfile.rewind
-      ActionDispatch::Http::UploadedFile.new(tempfile: tempfile,filename: "test.xlsx")
+      ActionDispatch::Http::UploadedFile.new(tempfile: tempfile, filename: "test.xlsx")
     end
 
     it "returns a hash with enrollment numbers as keys" do
