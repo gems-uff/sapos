@@ -154,7 +154,7 @@ jobs:
       code-quality: write
     steps:
       - name: Download coverage artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.1.3
         with:
           name: coverage-report-ruby
       - uses: actions/upload-code-coverage@v1
