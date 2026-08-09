@@ -66,8 +66,10 @@ real — ver "Regras de segurança"). Uma pasta por versão capturada, nomeada
 `<data>_v<versão>_<rótulo>`, com `html/`, `extra/` e `bin/` dentro:
 
 - `<data>` — dia da captura (`AAAA-MM-DD`), para ordenar cronologicamente.
-- `<versão>` — a do cabeçalho, no alto à direita (`Versão 7.15.21-27-gc0e804a2`),
-  que identifica o
+- `<versão>` — a do cabeçalho, no alto à direita (`Versão 7.15.21-27-gc0e804a2`).
+  Ela aparece **antes da autenticação**, então um `curl -sL "$SAPOS_STAGING_URL/users/sign_in"`
+  já a devolve; não é preciso subir navegador só para conferir qual build está
+  no ar. Ela identifica o
   código exato.
 - `<rótulo>` — o que aquela versão é (`producao`, `rails72`, `security_updates`).
 
