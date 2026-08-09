@@ -109,6 +109,13 @@ jobs:
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
           files: coverage/.resultset.json
 
+      - name: Upload coverage artifact
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-ruby
+          path: coverage/coverage.xml
+
   smoke-test:
     runs-on: ubuntu-latest
 
@@ -137,3 +144,21 @@ jobs:
 
       - name: Run smoke test
         run: bundle exec rake smoke_test:all
+
+  upload-coverage-ruby:
+    needs: test
+    if: ${{ !cancelled() && needs.test.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      code-quality: write
+    steps:
+      - name: Download coverage artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report-ruby
+      - uses: actions/upload-code-coverage@v1
+        with:
+          file: coverage.xml
+          language: Ruby
+          label: code-coverage-agent
