@@ -72,4 +72,28 @@ RSpec.describe ProfessorsHelper, type: :helper do
       expect(html).to include("even-record")
     end
   end
+
+  # As duas tabelas montadas a mao neste helper abriam <tboby>, erro de
+  # digitacao. O navegador expulsava o elemento desconhecido e criava um <tbody>
+  # sozinho, entao a tela nunca quebrou -- mas o HTML era invalido e a classe
+  # que marca o corpo das tabelas de show se perdia junto.
+  describe "as tabelas montadas a mao" do
+    let(:professor) { FactoryBot.create(:professor) }
+
+    it "serves a valid tbody in the institutions table" do
+      FactoryBot.create(
+        :affiliation, professor: professor,
+        start_date: Time.zone.local(2018, 3, 1), end_date: nil
+      )
+      html = helper.professor_institutions_show_column(professor, {})
+
+      expect(html).to include("<tbody class=\"records\">")
+      expect(html).not_to include("tboby")
+    end
+
+    it "renders a dash when the professor advises nobody" do
+      expect(helper.professor_advisements_with_points_show_column(professor, {}))
+        .to eq "-"
+    end
+  end
 end

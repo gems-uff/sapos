@@ -55,7 +55,7 @@ module ProfessorsHelper
             <th>#{I18n.t("activerecord.attributes.professor.advisement_points")}</th>
           </tr>
         </thead>
-        <tboby class=\"records\">
+        <tbody class=\"records\">
         #{body}
         </tbody>
       </table>"
@@ -87,7 +87,7 @@ module ProfessorsHelper
             <th>#{I18n.t("activerecord.attributes.affiliation.end_date")}</th>
           </tr>
         </thead>
-        <tboby class=\"records\">
+        <tbody class=\"records\">
         #{body}
         </tbody>
       </table>"
