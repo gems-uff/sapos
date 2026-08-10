@@ -31,7 +31,7 @@ gem "recaptcha", require: "recaptcha/rails"
 gem "dotenv-rails", require: "dotenv/load"   # ENV a partir de .env (recaptcha etc.)
 
 # ─── UI administrativa / scaffolding ─────────────────────────────────────
-gem "active_scaffold", "~> 4.1.6"        # upgrade em saltos de minor; trava a serie 4.1 (#621)
+gem "active_scaffold", "~> 4.2.3"        # upgrade em saltos de minor; trava a serie 4.2 (#621)
 gem "active_scaffold_duplicate"
 gem "recordselect"
 gem "simple-navigation"                  # menu (config/navigation.rb)
