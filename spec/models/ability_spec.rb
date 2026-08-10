@@ -244,13 +244,14 @@ RSpec.describe Ability, type: :model do
       expect(ability).not_to be_able_to(:edit_professor, Paper)
     end
 
-    # initialize_professors builds its conditions straight from user.professor,
-    # with no `present?` guard (initialize_courses has one). A missing association
-    # degrades the condition to `professor: nil`, which grants rather than denies.
-    # It is inert today only because Grant#professor and Paper#owner are
-    # `optional: false`, so no record can match -- the guard is missing, the
-    # exposure is not. These examples pin the safe outcome so that a future model
-    # change making the association optional fails here instead of in production.
+    # initialize_professors builds its ownership conditions from user.professor,
+    # now behind an `if user.professor.present?` guard (mirroring initialize_courses).
+    # Without it, a missing association would degrade the condition to
+    # `professor: nil`, which grants rather than denies. Grant#professor and
+    # Paper#owner are `optional: false`, so no orphaned record can exist today, but
+    # the guard is what keeps a future optional association from turning into an
+    # authorization hole. These examples pin the safe outcome: the professor still
+    # reads the domain but owns nothing.
     context "when the user has the role but no professor record" do
       subject(:ability) { ability_for(Role::ROLE_PROFESSOR) }
 
@@ -327,6 +328,11 @@ RSpec.describe Ability, type: :model do
       it "is denied the student pages" do
         expect(ability).not_to be_able_to(:show, :student_enrollment)
         expect(ability).not_to be_able_to(:enroll, :student_enrollment)
+      end
+
+      it "cannot generate assertions and does not raise" do
+        assertion = Assertion.new(student_can_generate: true)
+        expect(ability).not_to be_able_to(:generate_assertion, assertion)
       end
     end
   end
