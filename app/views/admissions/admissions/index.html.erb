@@ -21,7 +21,7 @@
                 admission_url(process.simple_id), method: :get %>
             <div class="deadline">
               <%= I18n.t("admissions.admissions.index.deadline") %>
-              <%= process.end_date %>
+              <%= date_br(process.end_date) %>
             </div>
           </div>
         <% end %>

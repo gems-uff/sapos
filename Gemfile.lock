@@ -520,6 +520,9 @@ GEM
       json
       zeitwerk
     simplecov (1.0.3)
+    simplecov-cobertura (4.0.0)
+      rexml
+      simplecov (~> 1.0)
     sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
       logger
@@ -634,6 +637,7 @@ DEPENDENCIES
   shoulda-matchers
   simple-navigation
   simplecov
+  simplecov-cobertura
   sprockets-rails
   sqlite3 (>= 2.9.5)
   tzinfo-data

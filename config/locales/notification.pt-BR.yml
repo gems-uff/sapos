@@ -39,6 +39,7 @@ pt-BR:
           query_with_enrollments_id_alias_column_required: "requer que a Consulta possua com campo com alias enrollments_id"
           manual_frequency_requires_notification_offset_to_be_zero: ": Quando a Frequência for Manual, deixar Offset da Notificação com valor 0"
           cannot_create_new_erb_template: "Não é possível fazer alterações em template ERB. Converta para Liquid e altere o formato"
+          invalid_query_date: "Não foi possível ler a data de consulta \"%{date}\". A simulação abaixo usou a data padrão da notificação."
 
     models:
       notification:

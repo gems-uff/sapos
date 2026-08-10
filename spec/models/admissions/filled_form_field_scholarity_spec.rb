@@ -145,6 +145,62 @@ RSpec.describe Admissions::FilledFormFieldScholarity, type: :model do
   end
 
   describe "Methods" do
-    # ToDo: test to_label
+    # O to_label monta o texto com um join, que chama to_s em cada item. Enquanto
+    # Date#to_s estava sobrescrito globalmente, a data saia no formato brasileiro
+    # de graca; sem o patch, sairia a forma ISO do Ruby. A suite executava estas
+    # linhas e nao acusou nada, porque nada assertava o texto -- por isso os
+    # exemplos abaixo olham a string inteira.
+    describe "to_label" do
+      # Sem persistir: to_label so le atributos, e assim os exemplos independem
+      # das associacoes montadas no before(:all) acima.
+      def scholarity(**attrs)
+        Admissions::FilledFormFieldScholarity.new({
+          level: "Mestrado", status: "Completo", institution: "UFF",
+          course: "Computação", location: "Niteroi/RJ", grade: "9",
+          start_date: Date.new(2018, 3, 1), end_date: Date.new(2021, 12, 31)
+        }.merge(attrs))
+      end
+
+      it "formats the period in the brazilian format" do
+        expect(scholarity.to_label).to eq(
+          "Mestrado - Completo - UFF - Computação - Niteroi/RJ - 9 " \
+          "(01/03/2018 - 31/12/2021)"
+        )
+      end
+
+      it "formats a period with only the start date" do
+        expect(scholarity(end_date: nil).to_label).to end_with("(01/03/2018)")
+      end
+
+      it "formats a period with only the end date" do
+        expect(scholarity(start_date: nil).to_label).to end_with("(31/12/2021)")
+      end
+
+      it "omits the period when there is no date" do
+        label = scholarity(start_date: nil, end_date: nil).to_label
+        expect(label).to eq(
+          "Mestrado - Completo - UFF - Computação - Niteroi/RJ - 9"
+        )
+        expect(label).not_to include("(")
+      end
+
+      it "keeps a date out of the ISO format that Ruby uses by default" do
+        expect(scholarity.to_label).not_to include("2018-03-01")
+      end
+
+      it "translates level and status through the given maps" do
+        label = scholarity(level: "2", status: "1").to_label(
+          values: { "2" => "Doutorado" }, statuses: { "1" => "Incompleto" }
+        )
+        expect(label).to start_with("Doutorado - Incompleto - UFF")
+      end
+
+      it "skips the blank parts without leaving a dangling separator" do
+        label = scholarity(location: nil, grade: nil).to_label
+        expect(label).to eq(
+          "Mestrado - Completo - UFF - Computação (01/03/2018 - 31/12/2021)"
+        )
+      end
+    end
   end
 end

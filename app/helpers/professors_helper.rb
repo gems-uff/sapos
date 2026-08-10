@@ -55,7 +55,7 @@ module ProfessorsHelper
             <th>#{I18n.t("activerecord.attributes.professor.advisement_points")}</th>
           </tr>
         </thead>
-        <tboby class=\"records\">
+        <tbody class=\"records\">
         #{body}
         </tbody>
       </table>"
@@ -73,8 +73,8 @@ module ProfessorsHelper
       tr_class = count.even? ? "even-record" : ""
       body += "<tr class=\"record #{tr_class}\">
                 <td>#{affiliation.institution.name}</td>
-                <td>#{affiliation.start_date}</td>
-                <td>#{affiliation.end_date}</td>
+                <td>#{date_br(affiliation.start_date)}</td>
+                <td>#{date_br(affiliation.end_date)}</td>
               </tr>"
     end
 
@@ -87,7 +87,7 @@ module ProfessorsHelper
             <th>#{I18n.t("activerecord.attributes.affiliation.end_date")}</th>
           </tr>
         </thead>
-        <tboby class=\"records\">
+        <tbody class=\"records\">
         #{body}
         </tbody>
       </table>"

@@ -102,7 +102,15 @@ class StudentEnrollmentController < ApplicationController
         .and(ClassSchedule.arel_table[:semester].eq(params[:semester]))
       )
       if @semester.nil?
-        raise CanCan::AccessDenied.new
+        # Semestre sem calendário cadastrado é percurso legítimo — o aluno
+        # chegou antes de a coordenação abrir o período. Acusá-lo de tentativa
+        # de acesso indevido, como o AccessDenied fazia, é falso e assusta.
+        return redirect_to student_enrollment_path(@enrollment.id),
+          alert: I18n.t(
+            "student_enrollment.alert.unavailable_semester",
+            year: params[:year],
+            semester: params[:semester]
+          )
       end
       if check_time && ! @semester.enroll_open?
         return redirect_to student_enrollment_path(@enrollment.id),

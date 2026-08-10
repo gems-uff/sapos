@@ -5,8 +5,19 @@
 require "spec_helper"
 
 require "simplecov"
+require "simplecov-cobertura"
 SimpleCov.start "rails" do
   # enable_coverage_for_eval
+
+  # Precisa ser MultiFormatter: `formatter X` substitui a lista, e o padrao do
+  # simplecov e o HTMLFormatter -- declarar so o Cobertura apagaria o
+  # coverage/index.html, que e o relatorio que se le localmente. O
+  # .resultset.json nao depende de formatter nenhum; quem o escreve e o
+  # ResultMerger.
+  formatter SimpleCov::Formatter::MultiFormatter.new([
+    SimpleCov::Formatter::HTMLFormatter,
+    SimpleCov::Formatter::CoberturaFormatter,
+  ])
 end unless ENV["SKIP_COVERAGE"]
 
 ENV["RAILS_ENV"] ||= "test"

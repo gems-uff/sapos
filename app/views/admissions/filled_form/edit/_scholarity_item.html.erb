@@ -90,12 +90,18 @@
 
 function scholarity_item_activate_js(sid) {
   $(`#${sid} .remove-scholarity input[type=hidden]`).addClass("<%= filled_class %>");
-  $(`#${sid} .scholarity-location .city-field`).on("change", function() {
+  // Mesmo cuidado dos outros compostos: o escondido é o que o servidor valida,
+  // e valor que entra sem evento o deixaria para trás. Daí o input e o submit.
+  function update_location_value() {
     let value = $(`#${sid} .scholarity-location .city-field`)
       .map((i, el) => $(el).val()).toArray().reverse()
       .join(", ")
     $(`#${sid} .scholarity-location .hidden`).val(value)
-  })
+  }
+
+  $(`#${sid} .scholarity-location .city-field`)
+    .on("change input", update_location_value)
+  $(`#${sid}`).closest("form").on("submit", update_location_value)
 
   $(`#${sid} .scholarity-location input[name="city"]`).autocomplete({
     source: autocomplete_search("<%= city_form_autocompletes_path %>", (request) => {

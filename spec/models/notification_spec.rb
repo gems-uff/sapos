@@ -168,6 +168,12 @@ RSpec.describe Notification, type: :model do
         expect(derivations("")).to eq({})
       end
 
+      it "refuses a date that cannot be read in any order" do
+        # O controller da simulação conta com isso para avisar o usuário em vez
+        # de deixar a página cair.
+        expect { derivations("31/31/2026") }.to raise_error(Date::Error)
+      end
+
       it "does not read the day as the month" do
         # 31/12 cannot be read in the other order, so it pins down the order
         expect(derivations("31/12/2026")).to include(

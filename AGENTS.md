@@ -19,6 +19,15 @@ corrija na wiki.
 
 - Uma issue, um ramo `issue_NNN`, sempre baseado na `main`. Detalhes do ciclo em
   `CONTRIBUTING.md`.
+- **O assunto do commit começa por `Issue #NNN: `**, com o número da issue do
+  ramo. O GitHub transforma o número em link, e o assunto é o que aparece na
+  lista de commits e no `git log --oneline`. Depois do prefixo sobram cerca de
+  60 colunas: imperativo, sem ponto final, e o porquê no corpo. Commit que não
+  pertence a issue nenhuma — convenção, skill, infraestrutura — vai sem prefixo.
+- **Cite a issue só pelo prefixo, sem `Fixes` nem `Closes`.** Essas palavras
+  fecham a issue assim que o commit chega na `main`, e fechar é decisão do passo
+  de release, separada de rotular: issue entregue pela metade leva o label e
+  continua aberta (ver a skill `release`).
 - **Exceção:** vulnerabilidade não ganha issue pública — enumerar o problema
   expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica.
 - Critério de pronto: `bundle exec rspec` inteiro verde (~9 min, ~2260 exemplos).
@@ -97,6 +106,11 @@ responde 500 no papel Aluno, ignore"; "`--flatten` é obrigatório, senão a bbo
 vazia"). Não passa *quando* foi medido, em que versão, qual issue descobriu, nem
 que o problema já foi corrigido — isso o `git log` já guarda, e na skill só
 cresce.
+
+Esse contexto tem para onde ir: **comentário na issue**. Medida de antes e
+depois, versão em que o defeito aparecia, caminho que a rodada usou para
+reproduzir, armadilha que custou tempo — tudo isso é útil, e ali fica junto do
+trabalho que o originou, ao alcance de quem for reabrir o assunto.
 
 Duas consequências práticas:
 
