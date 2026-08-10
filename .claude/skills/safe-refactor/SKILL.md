@@ -58,10 +58,25 @@ Quando o caminho é inalcançável no ambiente de teste (por exemplo, código qu
 roda sob outro banco), ainda vale um teste com dublê fixando as APIs de que ele
 depende — não prova o comportamento, mas pega deriva de assinatura.
 
-### 4. Verifique que o teste novo não é vazio
+### 4. Verifique que o teste não é vazio
 
-Quebre o código de propósito, confirme que o teste falha **no exemplo esperado**,
-e desfaça. Teste que passa dos dois jeitos não protege nada. Custa segundos.
+Quebre o código de propósito, confirme que o teste falha **no exemplo esperado e
+pela mensagem esperada**, e desfaça. Vale para o teste que você acabou de
+escrever e para o que você supõe já cobrir a mudança. Teste que passa dos dois
+jeitos não protege nada. Custa segundos.
+
+Duas maneiras de essa checagem mentir:
+
+- **Sabotagem não representativa.** Estragar um trecho de que o exemplo não
+  depende não prova nada. Se o dado escolhido não atravessa o caminho alterado —
+  uma consulta *sem parâmetro* para testar o repasse de parâmetros —, o arquivo
+  é gerado e o teste passa mesmo com a sabotagem no lugar. Monte o dado de modo
+  que só o percurso completo produza o resultado esperado: um valor distintivo
+  digitado na entrada e conferido na saída.
+- **Vermelho pelo motivo errado.** Contagem de falhas não basta, leia a
+  mensagem. Timeout do Capybara, erro de carga e página que não abre aparecem
+  como vermelho e passam por sabotagem bem-sucedida — e aí você conclui que o
+  teste protege algo que ele nem enxerga.
 
 ### 5. Baseline
 

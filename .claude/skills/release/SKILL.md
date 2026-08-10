@@ -88,6 +88,13 @@ gh issue close <N> --reason completed
 ```
 
 - Cor `0e8a16` para todo label de versão — é o que dá o verde uniforme na lista.
+- **Crie o label mesmo que a versão não feche issue nenhuma.** Assim a existência
+  do label não depende do conteúdo da versão, e não há como confundir "não tinha
+  issue" com "esqueci de criar" ao olhar a lista depois. O link do corpo da
+  release (passo 6) resolve para uma consulta vazia, que é o resultado correto.
+- **Confira a lista com `--limit` folgado.** O repositório passa de 200 labels, e
+  o padrão do `gh label list` trunca — uma varredura truncada some justamente com
+  os labels mais recentes e faz parecer que ninguém rotula há várias versões.
 - **Rotular e fechar são decisões separadas.** Uma issue entregue em parte leva o
   label e **continua aberta** — o label diz "saiu nesta versão", não "acabou". Só
   feche o que a versão de fato encerra.

@@ -97,6 +97,9 @@ group :test do
   gem "shoulda-matchers"
   gem "database_cleaner-active_record"
   gem "simplecov"
+  # O Cobertura XML e o formato que a API de cobertura do GitHub aceita; o
+  # simplecov sozinho so escreve HTML e o .resultset.json.
+  gem "simplecov-cobertura"
   gem "pdf-reader", require: "pdf/reader"   # le o texto do PDF no golden-master
 end
 

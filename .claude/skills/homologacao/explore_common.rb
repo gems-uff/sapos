@@ -42,6 +42,46 @@ def login(driver, wait)
   puts "login ok -> #{driver.current_url}"
 end
 
+# O papel ativo (actual_role) fica GRAVADO no usuario e atravessa execucoes: uma
+# sonda que nao troca herda o que a ultima captura deixou. Como a captura do
+# aluno costuma rodar por ultimo, a sonda seguinte navega como aluno e nao acha
+# link de edicao nenhum -- e o sintoma parece "a tela sumiu", nao "papel errado".
+def papel_ativo(driver)
+  driver.execute_script(
+    "var s = document.querySelector(\"form[action*='change_role'] select[name='role_id']\");" \
+    "return s ? s.options[s.selectedIndex].text.trim() : null;"
+  )
+rescue StandardError
+  nil
+end
+
+# O combo so e renderizado para contas com dois ou mais papeis.
+def switch_role!(driver, wait, role_name)
+  driver.navigate.to("#{BASE}/")
+  wait.until { driver.execute_script("return document.readyState") == "complete" }
+  select_el = begin
+    driver.find_element(css: "form[action*='change_role'] select[name='role_id']")
+  rescue Selenium::WebDriver::Error::NoSuchElementError
+    abort "Combo de troca de papel ausente. A conta #{USER} precisa de pelo " \
+          "menos dois papeis para que ele seja renderizado."
+  end
+  disponiveis = select_el.find_elements(tag_name: "option").map { |o| o.text.strip }
+  unless disponiveis.include?(role_name)
+    abort "Papel #{role_name.inspect} nao esta entre os da conta: #{disponiveis.inspect}"
+  end
+
+  Selenium::WebDriver::Support::Select.new(select_el).select_by(:text, role_name)
+  # O select tem onchange: this.form.submit(), entao a troca ja foi submetida.
+  wait.until { driver.execute_script("return document.readyState") == "complete" }
+
+  # Conferir e o ponto: POST aceito nao garante papel trocado.
+  driver.navigate.to("#{BASE}/")
+  wait.until { driver.execute_script("return document.readyState") == "complete" }
+  ativo = papel_ativo(driver)
+  abort "Troca de papel nao pegou: esperado #{role_name.inspect}, ativo #{ativo.inspect}" if ativo != role_name
+  puts "papel ativo: #{ativo}"
+end
+
 def settle(driver, wait)
   wait.until { driver.execute_script("return document.readyState") == "complete" }
   wait.until { driver.execute_script("return (typeof jQuery === 'undefined') || jQuery.active === 0") }
