@@ -11,6 +11,7 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
   before_action :check_if_process_is_open_to_new, only: [:new, :create]
   before_action :check_if_process_is_open_to_edit, only: [:edit, :update]
   before_action :prepare_new_admission_application, only: [:new, :create]
+  before_action :check_submitted_record, only: [:create, :update]
 
   active_scaffold :active_scaffold_workaround # Load helpers
 
@@ -134,6 +135,24 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
         admission_id: @admission_process.simple_id,
       )
       @submission_method = :post
+    end
+
+    # Submissão que chega sem o parâmetro record — upload interrompido, duplo
+    # clique em "Modificar inscrição". Sem isso, o params.require(:record)
+    # estoura e o candidato recebe a página crua de 400 do Rails, sem entender
+    # o que houve nem o que fazer.
+    def check_submitted_record
+      return if params[:record].present?
+
+      target = if @admission_application&.token.present?
+        admission_apply_path(
+          admission_id: @admission_process.simple_id,
+          id: @admission_application.token
+        )
+      else
+        new_admission_apply_path(admission_id: @admission_process.simple_id)
+      end
+      redirect_to target, alert: I18n.t("errors.admissions.empty_submission")
     end
 
     def prepare_edit_update_application(creating: false)

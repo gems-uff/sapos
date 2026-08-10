@@ -29,6 +29,30 @@ Steps 5 and 6 are done by the maintainer only, after reviewing the pull request.
 
 **Security issues are the exception.** Do not open a public issue for a vulnerability: describing it publicly exposes the attack before the fix is released. Work on a branch created directly from _main_, with a generic description, and release it like any other fix.
 
+## Commit messages
+
+Start the subject with `Issue #NNN: `, using the number of the branch's issue.
+GitHub turns the number into a link, and the subject is what shows up in the
+commit list and in `git log --oneline`. After the prefix, keep the subject
+around 60 characters, in the imperative mood and with no trailing period, and
+use the body to explain why the change was needed:
+
+```
+Issue #655: Distinguish semester without schedule from access denied
+
+The controller raised CanCan::AccessDenied when no ClassSchedule existed for
+the requested term. A student who simply arrived before the calendar was
+registered was accused of an intrusion attempt.
+```
+
+A commit that belongs to no issue — a convention, a skill, infrastructure —
+goes without the prefix.
+
+Reference the issue with the prefix alone. Do not write `Fixes #NNN` or
+`Closes #NNN`: GitHub closes the issue as soon as such a commit reaches _main_,
+and closing is decided during the release, separately from labelling. An issue
+delivered in part gets the version label and stays open.
+
 ## Testing
 
 A contribution is ready when the whole suite is green:

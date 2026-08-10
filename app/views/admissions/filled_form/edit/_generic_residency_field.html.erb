@@ -43,12 +43,18 @@
 <script>
 
 $(document).ready(function() {
-  $(`#<%= options[:id] %> .residency-field`).on("change", function() {
+  // Mesmo cuidado do campo de cidade: o escondido é o que o servidor valida, e
+  // valor que entra sem evento (autofill, gerenciador de senha, script) o
+  // deixaria para trás. Daí remontar também no input e no submit.
+  function update_residency_value() {
     let value = $(`#<%= options[:id] %> .residency-field`)
       .map((i, el) => $(el).val()).toArray()
       .join(" <$> ")
     $(`#<%= options[:id] %> .hidden`).val(value)
-  })
+  }
+
+  $(`#<%= options[:id] %> .residency-field`).on("change input", update_residency_value)
+  $(`#<%= options[:id] %>`).closest("form").on("submit", update_residency_value)
 })
 
 </script>

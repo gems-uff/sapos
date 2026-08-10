@@ -19,7 +19,7 @@
       <% if enrollment.thesis_defense_date.present? %>
         <li>
           <span class="attr"><%= t "activerecord.attributes.enrollment.thesis_defense_date" %></span>
-          <span class="value"><%= enrollment.thesis_defense_date %>
+          <span class="value"><%= date_br(enrollment.thesis_defense_date) %>
         </li>
       <% end %>
       <% if enrollment.thesis_defense_date.present? %>
@@ -36,6 +36,7 @@
       <%= render partial: "enrollments/show_defense_committee_table", locals: {
         thesis_defense_committee_professors: thesis_defense_committee_professors,
         thesis_defense_date: enrollment.thesis_defense_date,
+        dismissal_date: dismissal.date,
       } %>
     <% end %>
   </details>

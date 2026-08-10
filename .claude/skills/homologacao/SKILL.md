@@ -59,6 +59,12 @@ Entre 2 e 5 o banco **não pode ser reimportado**. Uma réplica nova traria
 edições feitas em produção no meio do caminho, e diferenças de dado apareceriam
 como se fossem de código.
 
+Pelo mesmo motivo, as listas de rotas têm de ser as **mesmas** nos dois lados. Se
+uma delas mudar no meio do ciclo — rota acrescentada, rota removida —, capture o
+"depois" com a lista que produziu o "antes" (`git show <commit>:<arquivo>` para
+um caminho fora do repositório) e só então adote a nova. Sem isso a comparação
+acusa a rota que você mexeu, misturada com o que ela deveria medir.
+
 ### Onde as capturas ficam
 
 Tudo mora em `~/capturas-sapos-staging/`, **fora do repositório** (contêm dado
@@ -66,7 +72,10 @@ real — ver "Regras de segurança"). Uma pasta por versão capturada, nomeada
 `<data>_v<versão>_<rótulo>`, com `html/`, `extra/` e `bin/` dentro:
 
 - `<data>` — dia da captura (`AAAA-MM-DD`), para ordenar cronologicamente.
-- `<versão>` — a do rodapé (`Versão 7.15.21-27-gc0e804a2`), que identifica o
+- `<versão>` — a do cabeçalho, no alto à direita (`Versão 7.15.21-27-gc0e804a2`).
+  Ela aparece **antes da autenticação**, então um `curl -sL "$SAPOS_STAGING_URL/users/sign_in"`
+  já a devolve; não é preciso subir navegador só para conferir qual build está
+  no ar. Ela identifica o
   código exato.
 - `<rótulo>` — o que aquela versão é (`producao`, `rails72`, `security_updates`).
 
@@ -78,7 +87,7 @@ set -a; source ~/.sapos_staging_env; set +a
 S=.claude/skills/homologacao
 CAP=~/capturas-sapos-staging
 
-# Ajuste as duas versões à rodada. Nomeie pela versão do rodapé de cada deploy.
+# Ajuste as duas versões à rodada. Nomeie pela versão do cabeçalho de cada deploy.
 ANTES=$CAP/<data>_v<versão>_<rótulo>
 DEPOIS=$CAP/<data>_v<versão>_<rótulo>
 
@@ -129,8 +138,8 @@ diretório de saída e avisa quando herdou — confira esse arquivo antes de com
 
 ## Como a comparação é feita
 
-- **Texto de página** — hash do texto visível, com o rodapé de versão
-  neutralizado. Datas **não** são normalizadas de propósito: mudança de formato
+- **Texto de página** — hash do texto visível, com a faixa de versão do cabeçalho
+  neutralizada. Datas **não** são normalizadas de propósito: mudança de formato
   de data é uma das regressões procuradas.
 - **Screenshot** — PNG de página inteira, comparado pixel a pixel, porque texto
   igual não é tela igual: asset que sumiu, CSS que quebrou e layout deslocado não
@@ -155,7 +164,7 @@ Um comparador quebrado também devolve "nenhuma diferença", e é o mesmo result
 que "nada regrediu". Três checagens separam os dois, e nenhuma é opcional:
 
 - **Contagem sem normalizar.** O `compare_html.rb` imprime quantas páginas
-  diferem **sem** neutralizar o rodapé. Como as duas versões têm strings de
+  diferem **sem** neutralizar o cabeçalho. Como as duas versões têm strings de
   versão diferentes, esse número tem que ser alto. Zero ali, junto com zero no
   resultado principal, é comparador quebrado.
 - **Contagem por pixel.** Vale o mesmo: com duas versões diferentes, zero página
@@ -197,6 +206,25 @@ Regras da passada: só `new`/`edit` **sem salvar** onde der; a única escrita
 persistida é em tabela de apoio com rótulo `ZZ-TESTE-HOMOLOG`, apagada ao fim;
 e-mail só com a trava `redirect_email` conferida.
 
+**Chame `switch_role!` no início de toda sonda.** O papel ativo atravessa
+execuções tanto aqui quanto na captura, e a captura do aluno costuma ser a
+última — a sonda seguinte navega como aluno e não acha link de edição nenhum. O
+sintoma mente: parece "a tela sumiu", não "papel errado".
+
+**Chegue à tela como o usuário chega.** Navegar direto para a rota de uma ação do
+active_scaffold monta a tela sem o link de ação que o JS dela procura, e o script
+estoura sozinho (`find_action_link(...)` devolve `undefined`). O erro é da sonda e
+some quando se clica a ação a partir da lista.
+
+**Drene o log de console entre fluxos** (ler é que drena). Um fluxo que sai pelo
+caminho de erro sem ler o console empurra os próprios erros para o relatório do
+fluxo seguinte, que os reporta como se fossem da tela dele.
+
+**Conte elementos dentro do container, não por padrão de nome.** Um seletor por
+nome que não casa devolve sempre o mesmo número: a medida fica idêntica nos dois
+lados e cega a qualquer regressão. Meça algo que **mude** quando você mexe na
+tela, e confira que mudou, antes de confiar na comparação.
+
 ### Zero diferença na estática não é evidência sobre widget
 
 Widget que só existe depois de um clique **não está na foto** — nenhuma rota da
@@ -216,6 +244,18 @@ forçar, registre o que ficou por medir em vez de deixar a homologação parecer
 completa.
 
 ## Preparando o ambiente para o papel de aluno
+
+**O banco de homologação é regerado por dump de produção de tempos em tempos.**
+Todo dado inserido por uma rodada some nessas horas, e com ele as rotas do
+`routes_aluno.txt`, que deixam de responder. Trate esse conjunto como algo a
+**refazer**, não a preservar: rodar
+`preparar_aluno_de_teste.rb --confirmar` recria o que faltar, deixa em paz o que
+existe, e imprime as linhas prontas para o `routes_aluno.txt` — os ids mudam a
+cada regeração. Rodar sem necessidade não custa nada.
+
+Os dois primeiros passos abaixo continuam manuais de propósito, pela armadilha
+descrita adiante; o script cobre do terceiro em diante e para com instruções se
+o aluno não existir.
 
 As telas do aluno precisam de três coisas que a réplica de produção não traz
 prontas. **A ordem não é indiferente.**
@@ -238,6 +278,17 @@ um usuário com aquele e-mail, o que torna o passo 1 a primeira trava.
 
 O combo de troca de papel só aparece depois do passo 2 (ele exige dois papéis);
 é ele que o `--role` do `capture_html.rb` usa.
+
+### Se precisar do formulário público de inscrição
+
+A réplica não tem processo seletivo aberto, e **todos os processos dela vêm com
+`require_session` ligado** — que faz o `prepare_new_admission_application`
+desviar antes de o pedido chegar ao controller. São dois campos a mexer, não só
+a data. O `abrir_processo_seletivo.rb` abre, exercita e reverte os dois na mesma
+execução, conferindo o que gravou.
+
+Prefira exercitar o **create**: ele só precisa do processo aberto, enquanto o
+update exigiria o token de uma inscrição de candidato real.
 
 ### Se não houver período de inscrição aberto
 
@@ -293,6 +344,18 @@ Aparecem nos dois lados da comparação e devem ser ignorados como achado — ma
 mesmo.** Entrada que voltou a responder 200 sai desta lista no mesmo commit; ruído
 que apareceu, entra. "Ruído conhecido" que envelhece manda ignorar um 500 que, se
 voltar, é regressão de verdade — e essa é a única defesa contra isso.
+
+### Duas rotas divergem sempre, porque a captura escreve nelas
+
+`/reports` lista os documentos gerados e `/versions` é o log de auditoria. A
+própria varredura alimenta os dois: baixar histórico e boletim assinados cria um
+registro por chamada, e cada `--role` grava `actual_role` no usuário, que o log
+audita. O lado "depois" ganha linhas que o "antes" não tem, e elas são da rodada,
+não da mudança.
+
+São diferença de **conteúdo**, não de status, então não entram na lista acima.
+Antes de investigar qualquer uma, olhe a autoria e o horário das linhas novas: se
+forem da conta de captura, no intervalo da rodada, são pegada do instrumento.
 
 ### Não confunda template oculto com erro na tela
 

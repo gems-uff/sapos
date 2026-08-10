@@ -50,9 +50,13 @@ class Admissions::FilledFormFieldScholarity < ActiveRecord::Base
       self.location, self.grade
     ].reject(&:blank?).join(" - ")
 
+    # O join chama to_s em cada item. Enquanto Date#to_s estava sobrescrito
+    # globalmente, isso bastava para sair 01/03/2018; sem o patch, sairia a
+    # forma ISO do Ruby (2018-03-01).
     date = [
       self.start_date, self.end_date
-    ].reject(&:blank?).join(" - ")
+    ].reject(&:blank?).collect { |d| I18n.localize(d, format: :default) }
+      .join(" - ")
 
     result = "#{result} (#{date})" if date.present?
     result

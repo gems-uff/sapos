@@ -270,6 +270,37 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
       end
     end
 
+    describe "dismissed without thesis defense date" do
+      before(:each) do
+        @enrollment5 = FactoryBot.create(
+          :enrollment, enrollment_number: "M03", student: @student1,
+          level: @level2, enrollment_status: @enrollment_status1,
+          admission_date: YearSemester.current.semester_begin - 3.years,
+          thesis_defense_date: nil
+        )
+        @destroy_later << FactoryBot.create(
+          :thesis_defense_committee_participation,
+          enrollment: @enrollment5, professor: @professor1
+        )
+        @destroy_later << FactoryBot.create(
+          :dismissal, enrollment: @enrollment5, dismissal_reason: @dismissal_reason1,
+          date: 6.months.ago.at_beginning_of_month
+        )
+        @destroy_later << @enrollment5
+        login_as(@student_user)
+        visit student_enrollment_path(@enrollment5.id)
+      end
+
+      it "should show the defense committee, using the dismissal date for the affiliation" do
+        within(".dismissal-show-box") do
+          expect(page).to have_content "Banca Avaliadora"
+          expect(page.all("tbody tr").size).to eq 1
+          expect(page).to have_content "Erica"
+          expect(page).to have_content "UFF"
+        end
+      end
+    end
+
     describe "with new enrollment request option" do
       before(:all) do
         @class_schedule.enrollment_start = 3.days.ago

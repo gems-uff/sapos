@@ -50,12 +50,20 @@
 <script>
 
 $(document).ready(function() {
-  $(`#<%= options[:id] %> .city-field`).on("change", function() {
+  // O escondido é o que o servidor valida; os três visíveis são só a interface.
+  // Remontar no change não basta: valor que entra sem evento (autofill do
+  // navegador, gerenciador de senha, script) deixava o escondido para trás, e o
+  // candidato recebia "não pode ficar em branco" num campo preenchido na tela.
+  // Por isso também remonta no input e, sobretudo, no submit do formulário.
+  function update_city_value() {
     let value = $(`#<%= options[:id] %> .city-field`)
       .map((i, el) => $(el).val()).toArray().reverse()
       .join(" <$> ")
     $(`#<%= options[:id] %> .hidden`).val(value)
-  })
+  }
+
+  $(`#<%= options[:id] %> .city-field`).on("change input", update_city_value)
+  $(`#<%= options[:id] %>`).closest("form").on("submit", update_city_value)
 
   $(`#<%= options[:id] %> input[name="city"]`).autocomplete({
     source: autocomplete_search("<%= city_form_autocompletes_path %>", (request) => {
