@@ -49,17 +49,17 @@ class EnrollmentHoldsController < ApplicationController
   end
 
   def self.condition_for_active_column(column, value, like_pattern)
-    return "" if value.blank?
+    return nil if value.blank?
     ids = EnrollmentHold.currently_active_ids
     case value
     when "1"
       return "1 = 2" if ids.blank?
       "enrollment_holds.id IN (#{ids.join(',')})"
     when "0"
-      return "" if ids.blank?
+      return nil if ids.blank?
       "enrollment_holds.id NOT IN (#{ids.join(',')})"
     else
-      ""
+      nil
     end
   end
 end

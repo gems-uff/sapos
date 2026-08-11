@@ -3,7 +3,13 @@
   scope = field.object_name["record".size..]
   column = Admissions::FilledFormFieldsController.active_scaffold_config.columns[:file]
   options = active_scaffold_input_options(column, scope, :object => field.object)
-  options[:required] = configuration["required"] ? true : false
+  # Navegador nao pre-preenche input de arquivo, entao campo que JA tem arquivo
+  # continua vazio para o HTML5. Manter required nele impede a submissao do
+  # formulario inteiro -- e como o input fica escondido quando ha arquivo, nem o
+  # balao de validacao aparece. A obrigatoriedade continua valendo no servidor,
+  # que enxerga o que esta gravado.
+  options[:required] = configuration["required"].present? &&
+    field.object.file.blank?
   file_id = "file_#{SecureRandom.random_number(1_000_000)}"
   options[:class] = filled_class
 %>
