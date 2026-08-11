@@ -3,6 +3,11 @@
   values = form_field.get_values_map("values")
   options = {}
   other_options = { class: filled_class }
+  # A exigencia acompanha a configuracao, nao o ramo de default escolhido: antes
+  # so o ramo do prompt marcava required, e nos outros o campo saia obrigatorio
+  # na tela sem nada barrando ate o servidor. Onde nao ha opcao em branco o
+  # atributo e inocuo, porque o select nunca fica vazio.
+  other_options[:required] = "required" if configuration["required"]
   if configuration["default_check"]
     if values[configuration["default"]].present?
       options[:selected] = configuration["default"]
@@ -15,7 +20,6 @@
       options[:include_blank] = true
     elsif configuration["required"]
       options[:prompt] = configuration["default"]
-      other_options[:required] = "required"
     else
       options[:include_blank] = configuration["default"]
     end

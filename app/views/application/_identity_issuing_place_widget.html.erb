@@ -6,9 +6,14 @@
   classnames << "text-input" if !classnames.include? "text-input"
 %>
 
+<%# O widget monta o input no lugar do active_scaffold, entao e ele que precisa
+    repassar o required de options. Sem isso o campo sai marcado como
+    obrigatorio na tela mas sem exigencia nenhuma para o navegador, e so o
+    servidor recusa -- depois de descartar os anexos ja enviados. %>
 <%= text_field_tag(
   text_name, value,
-  id: text_id, class: classnames, maxlength: 255, size: 30
+  id: text_id, class: classnames, maxlength: 255, size: 30,
+  required: options[:required]
 ) %>
 
 <script>

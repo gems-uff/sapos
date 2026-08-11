@@ -144,7 +144,7 @@ class ScholarshipDurationsController < ApplicationController
       when "not_active" then
         sql = query_inactive_scholarships
       else
-        return ""
+        return nil
       end
 
       [sql, Time.now, Time.now]

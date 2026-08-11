@@ -56,7 +56,7 @@ module EnrollmentRequestSearchConcern
       when ClassEnrollmentRequest::REQUESTED then
         sql = "#{not_exists} (#{invalid}) and #{exists} (#{not_valid})"
       else
-        return ""
+        return nil
       end
       [sql]
     end
