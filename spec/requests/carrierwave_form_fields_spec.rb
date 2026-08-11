@@ -84,6 +84,135 @@ RSpec.describe "Carrierwave form fields", type: :request do
     end
   end
 
+  # Os exemplos acima cobrem a RENDERIZACAO do campo. Este cobre a GRAVACAO, que
+  # e outro caminho: o candidato submete o formulario com o anexo e o arquivo
+  # tem de chegar ao disco. Nenhum exemplo da suite passava por aqui, e foi a
+  # pergunta que a homologacao nao conseguiu responder sobre registro real --
+  # candidatura da replica tem arquivo pre-existente, campo obrigatorio e
+  # restricao de extensao, e cada uma dessas camadas mascara a medida.
+  describe "POST create with an attachment" do
+    before(:each) do
+      @template = FactoryBot.create(:form_template, name: "Inscrição")
+      @campo_arquivo = FactoryBot.create(
+        :form_field, form_template: @template, name: "Currículo",
+        field_type: Admissions::FormField::FILE
+      )
+      @process = FactoryBot.create(
+        :admission_process, name: "Mestrado 2026.2",
+        simple_url: "mestrado-anexo", form_template: @template,
+        start_date: Date.today - 10.days,
+        end_date: Date.today + 10.days,
+        edit_date: Date.today + 20.days
+      )
+    end
+
+    def submete
+      post admission_apply_index_path(admission_id: @process.simple_id), params: {
+        commit: "Enviar inscrição",
+        record: {
+          name: "ZZ-TESTE Candidato", email: "zzteste@ic.uff.br",
+          filled_form_attributes: {
+            form_template_id: @template.id, enable_submission: "1",
+            fields_attributes: { "0" => {
+              form_field_id: @campo_arquivo.id,
+              file: Rack::Test::UploadedFile.new(
+                Rails.root.join("spec", "fixtures", "user.png"), "image/png"
+              )
+            } }
+          }
+        }
+      }
+    end
+
+    it "creates the application" do
+      expect { submete }.to change {
+        Admissions::AdmissionApplication.count
+      }.by(1)
+    end
+
+    it "stores the attached file" do
+      submete
+      campo = Admissions::AdmissionApplication.last.filled_form.fields
+        .find { |f| f.form_field_id == @campo_arquivo.id }
+
+      expect(campo.file).to be_present
+      expect(campo.file.file.filename).to eq "user.png"
+    end
+  end
+
+  # Substituir e remover anexo de candidatura ja existente. Estes dois sao os
+  # que a homologacao NAO consegue medir sobre registro real: o nome exibido e
+  # um hash da URL de download, a contagem de controles nao muda numa
+  # substituicao, e o registro da replica ainda tem campo obrigatorio e
+  # restricao de extensao por cima. Aqui a asserção e sobre o modelo, sem
+  # ambiguidade.
+  describe "PUT update on an existing attachment" do
+    before(:each) do
+      role = FactoryBot.create(:role_administrador)
+      sign_in create_confirmed_user([role], "anexo_admin@ic.uff.br")
+      @template = FactoryBot.create(:form_template, name: "Inscrição")
+      @campo_arquivo = FactoryBot.create(
+        :form_field, form_template: @template, name: "Currículo",
+        field_type: Admissions::FormField::FILE
+      )
+      @process = FactoryBot.create(
+        :admission_process, name: "Mestrado 2026.2",
+        simple_url: "mestrado-troca", form_template: @template,
+        staff_can_edit: true,
+        start_date: Date.today - 10.days, end_date: Date.today + 10.days
+      )
+      @application = FactoryBot.create(
+        :admission_application, admission_process: @process,
+        filled_form: FactoryBot.create(
+          :filled_form, form_template: @template, is_filled: true
+        )
+      )
+      @application.filled_form.prepare_missing_fields
+      @application.filled_form.save!
+      @filled_form = @application.filled_form.reload
+      @campo = @filled_form.fields.find { |f|
+        f.form_field_id == @campo_arquivo.id
+      }
+      @campo.file = Rack::Test::UploadedFile.new(
+        Rails.root.join("spec", "fixtures", "user.png"), "image/png"
+      )
+      @campo.save!
+    end
+
+    def atualiza(campos)
+      put admission_application_path(@application), params: {
+        can_edit_override: "1", override: "1",
+        record: { filled_form_attributes: {
+          id: @filled_form.id, enable_submission: "1",
+          fields_attributes: { "0" => {
+            id: @campo.id, form_field_id: @campo_arquivo.id
+          }.merge(campos) }
+        } }
+      }
+    end
+
+    it "starts with the first file" do
+      expect(@campo.reload.file.file.filename).to eq "user.png"
+    end
+
+    # O nome tem de mudar: comparar presenca nao distingue substituicao de
+    # "continua o arquivo antigo".
+    it "replaces the file with the newly sent one" do
+      outro = File.join(Dir.mktmpdir, "outro.png")
+      FileUtils.cp(Rails.root.join("spec", "fixtures", "user.png"), outro)
+
+      atualiza(file: Rack::Test::UploadedFile.new(outro, "image/png"))
+
+      expect(@campo.reload.file.file.filename).to eq "outro.png"
+    end
+
+    it "removes the file when remove_file is sent" do
+      atualiza(remove_file: "true")
+
+      expect(@campo.reload.file).not_to be_present
+    end
+  end
+
   describe "student photo" do
     before(:each) do
       @role_adm = FactoryBot.create(:role_administrador)
