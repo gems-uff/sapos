@@ -207,6 +207,38 @@ Comparar é diferenciar os dois JSON. Para medir o que ele não mede, acrescente
 seção **e recapture os dois lados**: sonda alterada no meio da rodada mede o
 instrumento, não a aplicação.
 
+### Medir por leitura o que o formulário exige
+
+Nem toda pergunta sobre formulário precisa de escrita. O que a página **exige de
+quem preenche** está no HTML renderizado, e se lê sem submeter nada — o que torna
+a medida repetível nos dois lados, em qualquer ordem, sem restaurar banco. É o
+que o `probe_formulario.rb` faz sobre a candidatura.
+
+```bash
+EXPLORE_OUT=$ANTES/leitura bundle exec ruby $S/probe_formulario.rb        # descobre os registros
+EXPLORE_OUT=$DEPOIS/leitura bundle exec ruby $S/probe_formulario.rb 859   # ids escolhidos
+```
+
+A medida central é a **divergência entre duas obrigatoriedades que se confundem**:
+o `<li>` ganha a classe `required` quando a *configuração do template* pede o
+campo; o atributo no input é o que o *navegador* exige. Campo que a configuração
+pede e o navegador não exige passa da tela para o servidor e volta recusado. Ler
+só o atributo não distingue isso de campo opcional.
+
+Três coisas que essa leitura ensina, e valem para qualquer sonda de formulário:
+
+- **Compare por grupo, não por input.** Campo composto — cidade/estado/país,
+  rua/número — é um campo com três inputs e um `required` só, por desenho. Input
+  a input, os outros dois aparecem como defeito. O grupo está coberto se
+  **qualquer** input dele exigir.
+- **Registro que não tem o caso não serve de exemplar.** Campo de arquivo que não
+  é obrigatório na configuração não demonstra nada sobre `required` em campo de
+  arquivo, por mais arquivo que tenha gravado. Escolher o registro é parte da
+  medida, não preliminar dela.
+- **Página que não montou o formulário devolve lista vazia**, e zero se lê como
+  "nada exigido" em vez de "não medi". Recuse a medida e registre o que havia na
+  página; boa parte das candidaturas da réplica cai nesse caso.
+
 O `explore_common.rb` desta pasta é o ponto de partida para sonda nova: sobe o
 Chrome headless, loga lendo as mesmas env vars da captura e dá helpers de
 screenshot e de erro de console. Escreva os passos da rodada como scripts curtos
