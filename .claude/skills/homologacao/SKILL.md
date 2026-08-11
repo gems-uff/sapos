@@ -195,12 +195,25 @@ Faça uma passada exploratória sempre que o upgrade mexer em asset (jquery-ui),
 sanitizador, Devise, active_scaffold ou o adaptador MySQL. É complementar, não
 substitui a estática.
 
-O `explore_common.rb` desta pasta é o ponto de partida: sobe o Chrome headless,
-loga lendo as mesmas env vars da captura e dá helpers de screenshot e de erro de
-console. Escreva os passos da rodada como scripts curtos ao lado dele, apontando
-`EXPLORE_OUT` para o diretório da rodada — os screenshots contêm dado real e não
-podem cair no repositório. A extensão do Chrome pode estar indisponível; Selenium
-headless + screenshots avaliadas por visão contorna isso.
+O `probe_widgets.rb` desta pasta já cobre o caso mais comum: estilo computado de
+CodeMirror, tema das listas, `record_select` e datepicker — a mesma medida nos
+dois lados, num JSON por rodada.
+
+```bash
+EXPLORE_OUT=$ANTES/exploratorio ROTULO=antes bundle exec ruby $S/probe_widgets.rb
+```
+
+Comparar é diferenciar os dois JSON. Para medir o que ele não mede, acrescente
+seção **e recapture os dois lados**: sonda alterada no meio da rodada mede o
+instrumento, não a aplicação.
+
+O `explore_common.rb` desta pasta é o ponto de partida para sonda nova: sobe o
+Chrome headless, loga lendo as mesmas env vars da captura e dá helpers de
+screenshot e de erro de console. Escreva os passos da rodada como scripts curtos
+ao lado dele, apontando `EXPLORE_OUT` para o diretório da rodada — os
+screenshots contêm dado real e não podem cair no repositório. A extensão do
+Chrome pode estar indisponível; Selenium headless + screenshots avaliadas por
+visão contorna isso.
 
 Regras da passada: só `new`/`edit` **sem salvar** onde der; a única escrita
 persistida é em tabela de apoio com rótulo `ZZ-TESTE-HOMOLOG`, apagada ao fim;

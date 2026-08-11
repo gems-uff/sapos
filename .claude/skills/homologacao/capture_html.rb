@@ -221,9 +221,18 @@ begin
       e[:kind] == :failed && !(e[:error] == "net::ERR_ABORTED" && e[:type] == "Document")
     end
 
+    # Tela de formulario do active_scaffold instala guarda de "alteracoes nao
+    # salvas" no beforeunload. Ao navegar para a rota seguinte o Chrome recusa
+    # exibir o painel (nao houve gesto do usuario) e registra SEVERE -- ja
+    # dentro da janela de captura da rota seguinte, com a URL da ANTERIOR no
+    # texto. E artefato da varredura navegar sozinha, nao erro da tela: aparece
+    # em qualquer rota que venha depois de um /new ou /edit. Sem este filtro,
+    # acrescentar rota de formulario cega o contador de console da vizinha.
+    beforeunload = "beforeunload' confirmation panel"
     console = drain(driver, :browser)
                 .select { |m| m.level == "SEVERE" }
                 .map { |m| m.message.to_s.lines.first.to_s.strip }
+                .reject { |m| m.include?(beforeunload) }
                 .uniq
 
     title = driver.title.to_s rescue ""
