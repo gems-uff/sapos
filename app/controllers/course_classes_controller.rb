@@ -35,6 +35,10 @@ class CourseClassesController < ApplicationController
       page: true,
       type: :member,
       parameters: { format: :xlsx }
+    config.action_links.add "import_grades_xls",
+      label: "<i title='Importar Notas' class='fa fa-upload'></i>".html_safe,
+      type: :member,
+      position: :replace
 
 
     config.list.sorting = { name: "ASC", id: "DESC" }
@@ -149,6 +153,21 @@ class CourseClassesController < ApplicationController
     end
   end
 
+  def import_grades_xls
+    @course_class = CourseClass.find(params[:id])
+    if params[:confirm] == "1" && params[:changes].present?
+      apply_xls_import_changes(JSON.parse(params[:changes]))
+      flash[:info] = "Notas importadas com sucesso!"
+      redirect_to course_classes_path and return
+    elsif request.post? && params[:spreadsheet].present?
+      @results = build_xls_import_preview(params[:spreadsheet])
+      render :import_grades_xls_results and return
+    end
+    respond_to do |format|
+      format.html { render layout: false if request.xhr? }
+    end
+  end
+
   protected
     def before_update_save(record)
       return unless
@@ -176,5 +195,94 @@ class CourseClassesController < ApplicationController
       Thread.current[:constraint_columns]["class_enrollment-subform"]
         .delete(:enrollment)
     rescue
+    end
+
+    def build_xls_import_preview(file)
+      grade_of_disapproval_for_absence = CustomVariable.grade_of_disapproval_for_absence
+      minimum_grade_for_approval = CustomVariable.minimum_grade_for_approval
+      rows = parse_rows_xls(file)
+
+      results = []
+      rows.each do |enrollment_number, data|
+        enrollment = Enrollment.find_by(enrollment_number: enrollment_number)
+        unless enrollment
+          results << { enrollment_number: enrollment_number, status: "not_found" }
+          next
+        end
+        class_enrollment = @course_class.class_enrollments.find_by(enrollment: enrollment)
+        unless class_enrollment
+          results << { enrollment_number: enrollment_number, status: :not_enrolled }
+          next
+        end
+
+        if data[:grade].present?
+          final_grade = data[:grade]
+        else
+          final_grade = class_enrollment.grade
+        end
+        if data[:situation].present?
+          final_situation = data[:situation]
+        else
+          final_situation = class_enrollment.situation
+        end
+        if data[:attendance].present?
+          final_attendance = data[:attendance] == ClassEnrollment::ATTENDANCE_TRUE
+        else
+          final_attendance = class_enrollment.attendance
+        end
+        if !final_attendance
+          final_grade = grade_of_disapproval_for_absence
+          final_situation = ClassEnrollment::DISAPPROVED
+        elsif final_grade.to_f >= minimum_grade_for_approval
+          final_situation = ClassEnrollment::APPROVED
+        end
+        if data[:obs].present?
+          final_obs = data[:obs]
+        else
+          final_obs = class_enrollment.obs
+        end
+
+
+        results << {
+          enrollment_number: enrollment_number,
+          class_enrollment_id: class_enrollment.id,
+          status: "pending",
+
+          current_grade: class_enrollment[:grade],
+          imported_grade: data[:grade],
+          final_grade: final_grade,
+          grade_diff: data[:grade].to_s != final_grade.to_s,
+
+          imported_attendance: data[:attendance],
+          final_attendance: final_attendance,
+          attendance_diff: data[:attendance].present? && data[:attendance] != final_attendance,
+
+          current_situation: class_enrollment[:situation],
+          imported_situation: data[:situation],
+          final_situation: final_situation,
+          situation_diff: data[:situation].present? && data[:situation] != final_situation,
+
+          final_obs: final_obs
+
+        }
+      end
+      results
+    end
+
+    def apply_xls_import_changes(changes)
+      changes.each do |change|
+        Rails.logger.debug("apply_xls_import_changes changes: #{changes.inspect}")
+        next unless change["status"] == "pending"
+        class_enrollment = @course_class.class_enrollments.find_by(id: change["class_enrollment_id"])
+        next unless class_enrollment
+        class_enrollment.grade = change["final_grade"]
+        class_enrollment.disapproved_by_absence = !change["final_attendance"]
+        class_enrollment.situation = change["final_situation"]
+        class_enrollment.obs = change["final_obs"]
+        unless class_enrollment.save
+          Rails.logger.debug class_enrollment.errors.full_messages.inspect
+          Rails.logger.debug class_enrollment.errors.details.inspect
+        end
+      end
     end
 end
