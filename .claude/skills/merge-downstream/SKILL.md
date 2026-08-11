@@ -72,6 +72,32 @@ remoção num arquivo que o lado de cima tinha acabado de acrescentar — pior a
 quando a linha perdida nem estava na região do conflito, o que indica que o
 arquivo inteiro foi substituído por uma das versões em vez de mesclado.
 
+## Quando o pai 2 não parece a main
+
+Antes de acusar o merge, confira se a estranheza não é do processo de release
+daqui. Ele é **fast-forward puro** (ver a skill `release`): a `main` nunca recebe
+merge, ela é avançada por cima do ramo — que, esse sim, tinha mergeado a `main`
+dentro de si. Cada fast-forward **redireciona a cadeia de primeiro pai da
+`main`** para dentro daquele ramo, e o que era topo da `main` passa a ficar do
+lado do segundo pai.
+
+A consequência engana: `git log --first-parent main` deixa de mostrar commits que
+foram topo da `main` de verdade. Um merge legítimo, feito quando aquele commit
+era o topo, passa a parecer que mergeou um ramo qualquer — e às vezes o commit
+ainda por cima se chama "Merge branch 'main' into issue_NNN" de **outra** issue,
+o que reforça a impressão errada.
+
+Duas perguntas resolvem, e nenhuma delas é o `--first-parent`:
+
+```
+git merge-base --is-ancestor <pai2> main   # aquilo chegou a estar na main?
+git reflog show origin/main                # o que a ref apontava, e quando
+```
+
+O reflog data cada janela, então dá para dizer se o merge pegou o topo da hora ou
+uma versão já vencida — e quanto tempo de atraso, que é a informação que
+interessa.
+
 Para saber se alguma coisa do lado de cima se perdeu, olhe a diferença líquida
 contra o **pai 2** (não contra o topo atual da `main`, que já andou). Arquivo que
 só acrescenta linha não pode ter perdido nada; a atenção vai para os que removem.
