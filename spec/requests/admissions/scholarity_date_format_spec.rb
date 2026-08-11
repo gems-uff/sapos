@@ -52,7 +52,7 @@ RSpec.describe "Admissions scholarity date format", type: :request do
     )
     Nokogiri::HTML(response.body)
       .css("input[name*='scholarities_attributes'][name*='_date']")
-      .map { |i| i["value"] }.compact.reject(&:empty?)
+      .filter_map { |i| i["value"].presence }
   end
 
   it "renders the form" do
