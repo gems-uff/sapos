@@ -83,6 +83,6 @@ class ReportsController < ApplicationController
     end
 
     def cant_download?(record)
-      record.carrierwave_file.blank?
+      record.carrierwave_file.blank? || record.expired?
     end
 end

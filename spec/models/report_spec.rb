@@ -21,4 +21,26 @@ RSpec.describe Report, type: :model do
   describe "validations" do
     it { should validate_presence_of(:file_name) }
   end
+
+  describe "#expired?" do
+    it "is true when expires_at is in the past" do
+      report.expires_at = Date.yesterday
+      expect(report.expired?).to be true
+    end
+
+    it "is false on the expiration date itself (valid until that day)" do
+      report.expires_at = Date.today
+      expect(report.expired?).to be false
+    end
+
+    it "is false when expires_at is in the future" do
+      report.expires_at = Date.tomorrow
+      expect(report.expired?).to be false
+    end
+
+    it "is false when expires_at is nil" do
+      report.expires_at = nil
+      expect(report.expired?).to be false
+    end
+  end
 end
