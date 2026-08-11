@@ -18,6 +18,10 @@ class Report < ApplicationRecord
     carrierwave_file.delete
   end
 
+  def expired?
+    expires_at.present? && expires_at < Date.today
+  end
+
   def expires_at_or_invalid
     if self.invalidated_at.present?
       I18n.t("activerecord.attributes.report.invalidated")
