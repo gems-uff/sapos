@@ -94,7 +94,7 @@ module EnrollmentSearchConcern
       when "1" then
         sql = "enrollments.id in (#{query_active_scholarships})"
       else
-        return ""
+        return nil
       end
       [sql, Time.now, Time.now]
     end
@@ -107,13 +107,13 @@ module EnrollmentSearchConcern
       when "1" then
         sql = "enrollments.id in (#{query_advisements})"
       else
-        return ""
+        return nil
       end
       [sql]
     end
 
     def custom_condition_for_accomplishments_column(column, value, like_pattern)
-      return "" if value[:phase].blank?
+      return nil if value[:phase].blank?
       date = value.nil? ? value : "#{value[:year]}-#{
         (value[:month].size == 1) ? "0" + value[:month] : value[:month]
       }-#{(value[:day].size == 1) ? "0" + value[:day] : value[:day]}"
@@ -146,7 +146,7 @@ module EnrollmentSearchConcern
       when "active" then
         sql = "enrollments.id not in (#{query_inactive_enrollment})"
       else
-        return ""
+        return nil
       end
       [sql, Time.now]
     end
@@ -154,7 +154,7 @@ module EnrollmentSearchConcern
     def custom_condition_for_course_class_year_semester_column(
       column, value, like_pattern
     )
-      return [] if value[:year].empty? &&
+      return nil if value[:year].empty? &&
         value[:semester].empty? &&
         value[:course].empty?
       result = []
@@ -186,7 +186,7 @@ module EnrollmentSearchConcern
     end
 
     def custom_condition_for_delayed_phase_column(column, value, like_pattern)
-      return "" if value[:phase].blank?
+      return nil if value[:phase].blank?
       date = value.nil? ? value : Date.parse(
         "#{value[:year]}/#{value[:month]}/#{value[:day]}"
       )
@@ -199,7 +199,7 @@ module EnrollmentSearchConcern
     end
 
     def custom_condition_for_enrollment_hold_column(column, value, like_pattern)
-      return "" if value[:hold].blank? || value[:hold].to_i == 0
+      return nil if value[:hold].blank? || value[:hold].to_i == 0
       case value[:active]
       when "1"
         ids = EnrollmentHold.currently_active_enrollment_ids

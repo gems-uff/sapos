@@ -67,6 +67,16 @@ pt-BR:
     cant_destroy_record: "Não é possível excluir %{record}"
     click_to_reset: "Clique aqui para remover o filtro criado"
     close: "Fechar"
+    date_picker_options:
+      firstDay: 0
+      isRTL: false
+      showMonthAfterYear: false
+      weekHeader: 'Sem'
+    datetime_picker_options:
+      closeText: 'Fechar'
+      currentText: 'Agora'
+      timeText: 'Hora'
+      timezoneText: 'Fuso horário'
     create: "Salvar"
     validate: "Validar"
     save: "Salvar"
