@@ -154,7 +154,7 @@ module EnrollmentSearchConcern
     def custom_condition_for_course_class_year_semester_column(
       column, value, like_pattern
     )
-      return [] if value[:year].empty? &&
+      return nil if value[:year].empty? &&
         value[:semester].empty? &&
         value[:course].empty?
       result = []
