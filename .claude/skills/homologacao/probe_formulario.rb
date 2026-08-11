@@ -52,6 +52,32 @@ def campos_da_pagina(driver)
     // inputs, e so um deles leva required por desenho. Comparar input a input
     // acusaria os outros dois como defeito. O grupo e o <li>.
     var lis = Array.prototype.slice.call(form.querySelectorAll('li.form-element'));
+
+    // Nem toda exigencia usa o required do HTML5. Campo de radio, por exemplo,
+    // registra funcao em customFormValidations e barra por la -- esta exigido,
+    // por outro mecanismo. Contar so o atributo o acusaria de defeito.
+    // As funcoes referenciam os elementos por id; ler a fonte delas diz quais
+    // campos estao cobertos, sem precisar chama-las (chamar mutaria o estado).
+    var cobertos = {};
+    var registro = window.customFormValidations || {};
+    for (var chave in registro) {
+      (registro[chave] || []).forEach(function (fn) {
+        var src = Function.prototype.toString.call(fn);
+        (src.match(/#[A-Za-z0-9_-]+/g) || []).forEach(function (tok) {
+          cobertos[tok.slice(1)] = true;
+        });
+      });
+    }
+    function temValidacaoPropria(li) {
+      if (!li) return false;
+      if (li.id && cobertos[li.id]) return true;
+      var comId = li.querySelectorAll('[id]');
+      for (var i = 0; i < comId.length; i++) {
+        if (cobertos[comId[i].id]) return true;
+      }
+      return false;
+    }
+
     var out = [];
     Array.prototype.forEach.call(
       form.querySelectorAll('input, textarea, select'), function (el) {
@@ -73,6 +99,7 @@ def campos_da_pagina(driver)
           // ninguem esta exigindo" -- que e o defeito procurado.
           config_required: li ? li.classList.contains('required') : null,
           grupo: li ? lis.indexOf(li) : -1,
+          validacao_propria: temValidacaoPropria(li),
           required: el.hasAttribute('required'),
           escondido: el.offsetParent === null,
           formato: formato,
@@ -89,11 +116,16 @@ def diagnostico_pagina(driver)
   driver.execute_script(<<~JS)
     var err = document.querySelector('.errorExplanation, .error-message');
     var h = document.querySelector('h1, h2');
+    var texto = (document.body.innerText || '');
     return {
       url: location.pathname + location.search,
       tem_form_as: !!document.querySelector('form.as_form'),
       titulo: h ? h.textContent.trim().slice(0, 80) : null,
-      erro: err && err.offsetParent !== null ? err.innerText.trim().slice(0, 120) : null
+      erro: err && err.offsetParent !== null ? err.innerText.trim().slice(0, 120) : null,
+      // O parcial devolve esta string, sem i18n, quando override_authorized? e
+      // falso -- ou seja, quando o processo esta com staff_can_edit desligado.
+      // A edicao administrativa nao existe ali, e isso e desenho.
+      acesso_invalido: texto.indexOf('Acesso inválido') >= 0
     };
   JS
 end
@@ -133,26 +165,42 @@ begin
     if campos.empty?
       diag = diagnostico_pagina(driver)
       relatorio[:sem_formulario][id] = diag
-      puts "  #{id}: sem campos -- form_as=#{diag['tem_form_as']} " \
-           "titulo=#{diag['titulo'].inspect} erro=#{diag['erro'].inspect}"
+      motivo = if diag["acesso_invalido"]
+        "acesso invalido -- staff_can_edit desligado no processo (desenho)"
+      else
+        "form_as=#{diag['tem_form_as']} erro=#{diag['erro'].inspect}"
+      end
+      puts "  #{id}: sem campos -- #{motivo}"
       next
     end
 
     expedicao = campos.select { |c| c["rotulo"].to_s.match?(/expedi/i) }
     arquivos = campos.select { |c| c["tipo"] == "file" }
     com_arquivo = arquivos.select { |c| c["tem_arquivo"] }
-    # O defeito procurado: o grupo e obrigatorio pela configuracao e NENHUM dos
-    # inputs dele exige no navegador. Basta um exigir para o campo estar coberto.
-    divergentes = campos.reject { |c| c["grupo"] == -1 }
-                        .group_by { |c| c["grupo"] }
-                        .filter_map { |_g, itens|
+    # O defeito procurado: o grupo e obrigatorio pela configuracao e NINGUEM
+    # exige no navegador -- nem o required do HTML5 em algum de seus inputs, nem
+    # validacao propria registrada. Basta um dos dois para o campo estar coberto.
+    grupos = campos.reject { |c| c["grupo"] == -1 }.group_by { |c| c["grupo"] }
+    descobertos = grupos.filter_map { |_g, itens|
       next unless itens.first["config_required"]
       next if itens.any? { |c| c["required"] }
+      tem_arquivo = itens.any? { |c| c["tem_arquivo"] }
+      # Cada motivo EXPLICA a ausencia; sem motivo, ninguem esta exigindo.
+      motivo =
+        if tem_arquivo
+          "arquivo ja gravado -- o navegador nao pre-preenche input de arquivo, " \
+          "entao required aqui travaria a submissao; a exigencia fica no servidor"
+        elsif itens.any? { |c| c["validacao_propria"] }
+          "validacao propria registrada no grupo -- o que ela checa NAO e " \
+          "visivel por leitura; confirme com probe_escrita.rb"
+        end
       { rotulo: itens.first["rotulo"],
         tipos: itens.map { |c| c["tipo"] }.uniq,
         entradas: itens.length,
-        tem_arquivo: itens.any? { |c| c["tem_arquivo"] } }
+        motivo: motivo }
     }
+    divergentes = descobertos.select { |d| d[:motivo].nil? }
+    explicados = descobertos.reject { |d| d[:motivo].nil? }
 
     resumo = {
       campos: campos.length,
@@ -161,6 +209,7 @@ begin
           config_required: c["config_required"], required: c["required"] }
       },
       divergentes: divergentes,
+      explicados: explicados,
       arquivos: arquivos.length,
       arquivos_com_conteudo: com_arquivo.length,
       arquivos_obrigatorios_com_conteudo: com_arquivo.count { |c| c["config_required"] },
@@ -177,8 +226,12 @@ begin
       resumo[:datas_iso].length, resumo[:datas_br], resumo[:required_escondidos]
     )
     resumo[:divergentes].each do |d|
-      puts format("           divergente: %-55s %s%s", d[:rotulo].inspect,
-                  d[:tipos].join("/"), d[:tem_arquivo] ? " [com arquivo]" : "")
+      puts format("           DIVERGENTE: %-50s %s", d[:rotulo].inspect,
+                  d[:tipos].join("/"))
+    end
+    resumo[:explicados].each do |d|
+      puts format("           explicado:  %-50s %s", d[:rotulo].inspect,
+                  d[:motivo].split(" -- ").first)
     end
 
     # Exemplar so vale se o registro EXERCITA o caso. Campo de arquivo que nao e

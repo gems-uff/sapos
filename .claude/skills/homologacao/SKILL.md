@@ -237,7 +237,26 @@ Três coisas que essa leitura ensina, e valem para qualquer sonda de formulário
   medida, não preliminar dela.
 - **Página que não montou o formulário devolve lista vazia**, e zero se lê como
   "nada exigido" em vez de "não medi". Recuse a medida e registre o que havia na
-  página; boa parte das candidaturas da réplica cai nesse caso.
+  página. Na réplica, a maioria das candidaturas cai nisso e a causa é uma só: o
+  parcial devolve a string `Acesso inválido` quando o processo está com
+  `staff_can_edit` desligado. É desenho — escolha outra candidatura.
+
+**Nem toda exigência é o `required` do HTML5**, e a leitura sozinha não distingue.
+Parte dos campos é barrada por função registrada em `customFormValidations`, que
+o `apply/edit.html.erb` roda na submissão. Ler o atributo e concluir "ninguém
+exige" acusa esses campos de um defeito que não têm. O que a leitura consegue
+dizer é se *existe* validação própria no grupo — a fonte da função referencia os
+elementos por id —, não o que ela verifica. Duas medidas para não refazer:
+
+- **Radio confere presença**: quando o campo é obrigatório, o parcial registra
+  validação que reprova se nada estiver marcado. Está coberto.
+- **Arquivo não confere presença**: a validação dele checa tamanho e extensão, e
+  retorna vazio quando não há arquivo. Campo de arquivo obrigatório sem `required`
+  e sem arquivo gravado é lacuna de verdade, não campo coberto.
+
+Campo de arquivo **com** arquivo gravado sem `required` é o esperado: o navegador
+não pré-preenche input de arquivo, e marcar `required` ali trava a submissão
+inteira em silêncio. A exigência fica no servidor.
 
 O `explore_common.rb` desta pasta é o ponto de partida para sonda nova: sobe o
 Chrome headless, loga lendo as mesmas env vars da captura e dá helpers de
