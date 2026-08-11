@@ -76,8 +76,28 @@ git push origin 7.15.21
 Sempre anotada (`-a`), nunca leve. A mensagem é o próprio número da versão.
 
 A tag não é decorativa: `config/environment.rb:12` deriva `APP_VERSION` de
-`git describe --tag --always` em tempo de execução, então é ela que aparece no
-rodapé da aplicação.
+`git describe --tag --always` **no boot da aplicação**, então é ela que aparece
+no rodapé.
+
+#### Mover uma tag: o rodapé passa a mentir a favor
+
+Versão que ainda não foi para produção pode ter a tag movida em vez de virar
+versão nova — apaga local e remota, recria anotada, empurra. O que isso cria é
+uma armadilha silenciosa no deploy.
+
+**Quem faz o deploy precisa buscar a tag movida antes**, com
+`git fetch --tags --force` (ou `git fetch origin +refs/tags/<versão>:refs/tags/<versão>`).
+Um `git fetch --tags` comum **não** atualiza tag que já existe localmente.
+
+Sem isso, o checkout de destino continua na tag antiga — e, porque o
+`git describe` roda lá, sobre as refs de lá, **o rodapé exibe a versão nova
+enquanto a aplicação serve o código velho**. É pior do que rodapé errado: o
+sinal em que se confia para conferir o deploy passa a confirmar o engano.
+Já aconteceu, em homologação, e só apareceu porque uma sonda mediu o
+comportamento em vez de ler o rodapé.
+
+Confira o deploy por **comportamento**, não por rodapé: uma medida que separe a
+versão nova da anterior — a skill `homologacao` serve para isso.
 
 ### 5. Label e issues
 

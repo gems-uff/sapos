@@ -53,7 +53,13 @@
             <% elsif field[:type] == :text %>
               <%= f.text_field field[:name], field[:options] %>
             <% elsif field[:type] == :date %>
-              <%= f.text_field field[:name], field[:options] %>
+              <%# start_date e end_date sao colunas date. Sem o value explicito,
+                  o text_field emite Date#to_s, que no Rails 7 e sempre ISO --
+                  e a validacao logo abaixo exige DD/MM/YYYY, entao o campo
+                  voltaria reprovando um valor escrito pelo proprio sistema. %>
+              <%= f.text_field field[:name], field[:options].merge(
+                    value: date_br(f.object[field[:name]], blank_text: "")
+                  ) %>
             <% elsif field[:type] == :location %>
               <div class="scholarity-location">
                 <%

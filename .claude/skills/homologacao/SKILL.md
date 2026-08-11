@@ -195,12 +195,110 @@ Faça uma passada exploratória sempre que o upgrade mexer em asset (jquery-ui),
 sanitizador, Devise, active_scaffold ou o adaptador MySQL. É complementar, não
 substitui a estática.
 
-O `explore_common.rb` desta pasta é o ponto de partida: sobe o Chrome headless,
-loga lendo as mesmas env vars da captura e dá helpers de screenshot e de erro de
-console. Escreva os passos da rodada como scripts curtos ao lado dele, apontando
-`EXPLORE_OUT` para o diretório da rodada — os screenshots contêm dado real e não
-podem cair no repositório. A extensão do Chrome pode estar indisponível; Selenium
-headless + screenshots avaliadas por visão contorna isso.
+O `probe_widgets.rb` desta pasta já cobre o caso mais comum: estilo computado de
+CodeMirror, tema das listas, `record_select` e datepicker — a mesma medida nos
+dois lados, num JSON por rodada.
+
+```bash
+EXPLORE_OUT=$ANTES/exploratorio ROTULO=antes bundle exec ruby $S/probe_widgets.rb
+```
+
+Comparar é diferenciar os dois JSON. Para medir o que ele não mede, acrescente
+seção **e recapture os dois lados**: sonda alterada no meio da rodada mede o
+instrumento, não a aplicação.
+
+### Medir por leitura o que o formulário exige
+
+Nem toda pergunta sobre formulário precisa de escrita. O que a página **exige de
+quem preenche** está no HTML renderizado, e se lê sem submeter nada — o que torna
+a medida repetível nos dois lados, em qualquer ordem, sem restaurar banco. É o
+que o `probe_formulario.rb` faz sobre a candidatura.
+
+```bash
+EXPLORE_OUT=$ANTES/leitura bundle exec ruby $S/probe_formulario.rb        # descobre os registros
+EXPLORE_OUT=$DEPOIS/leitura bundle exec ruby $S/probe_formulario.rb 859   # ids escolhidos
+```
+
+A medida central é a **divergência entre duas obrigatoriedades que se confundem**:
+o `<li>` ganha a classe `required` quando a *configuração do template* pede o
+campo; o atributo no input é o que o *navegador* exige. Campo que a configuração
+pede e o navegador não exige passa da tela para o servidor e volta recusado. Ler
+só o atributo não distingue isso de campo opcional.
+
+Três coisas que essa leitura ensina, e valem para qualquer sonda de formulário:
+
+- **Compare por grupo, não por input.** Campo composto — cidade/estado/país,
+  rua/número — é um campo com três inputs e um `required` só, por desenho. Input
+  a input, os outros dois aparecem como defeito. O grupo está coberto se
+  **qualquer** input dele exigir.
+- **Registro que não tem o caso não serve de exemplar.** Campo de arquivo que não
+  é obrigatório na configuração não demonstra nada sobre `required` em campo de
+  arquivo, por mais arquivo que tenha gravado. Escolher o registro é parte da
+  medida, não preliminar dela.
+- **Página que não montou o formulário devolve lista vazia**, e zero se lê como
+  "nada exigido" em vez de "não medi". Recuse a medida e registre o que havia na
+  página. Na réplica, a maioria das candidaturas cai nisso e a causa é uma só: o
+  parcial devolve a string `Acesso inválido` quando o processo está com
+  `staff_can_edit` desligado. É desenho — escolha outra candidatura.
+
+**Nem toda exigência é o `required` do HTML5**, e a leitura sozinha não distingue.
+Parte dos campos é barrada por função registrada em `customFormValidations`, que
+o `apply/edit.html.erb` roda na submissão. Ler o atributo e concluir "ninguém
+exige" acusa esses campos de um defeito que não têm. O que a leitura consegue
+dizer é se *existe* validação própria no grupo — a fonte da função referencia os
+elementos por id —, não o que ela verifica. Duas medidas para não refazer:
+
+- **Radio confere presença**: quando o campo é obrigatório, o parcial registra
+  validação que reprova se nada estiver marcado. Está coberto.
+- **Arquivo não confere presença**: a validação dele checa tamanho e extensão, e
+  retorna vazio quando não há arquivo. Campo de arquivo obrigatório sem `required`
+  e sem arquivo gravado é lacuna de verdade, não campo coberto.
+
+Campo de arquivo **com** arquivo gravado sem `required` é o esperado: o navegador
+não pré-preenche input de arquivo, e marcar `required` ali trava a submissão
+inteira em silêncio. A exigência fica no servidor.
+
+### Submeter o formulário, que é o que a leitura não alcança
+
+Ler prova o que a página **exige**; só submeter prova o que ela **faz**. O
+`probe_submissao.rb` preenche o formulário público de candidatura inteiro,
+deixa **um** campo em branco e tenta enviar — medindo se o navegador barra e em
+qual campo.
+
+```bash
+bundle exec ruby $S/abrir_processo_seletivo.rb abrir 5
+EXPLORE_OUT=$OUT bundle exec ruby $S/probe_submissao.rb              # só o bloqueio, não escreve
+EXPLORE_OUT=$OUT bundle exec ruby $S/probe_submissao.rb --confirmar  # submete e apaga o que criou
+bundle exec ruby $S/abrir_processo_seletivo.rb fechar 5
+```
+
+O modo padrão não cria nada e já serve de regressão barata: obrigatório que
+deixou de ser exigido no cliente aparece como **não bloqueou**, ou como bloqueio
+num campo diferente do esperado — por isso o relatório traz `barrou_no_alvo`, e
+não só `bloqueou`.
+
+**Não bloquear tem dois desfechos, e confundi-los esconde o defeito.** Navegador
+que barra sequer posta: a URL continua em `/apply/new`. Se postou, ou o servidor
+aceitou, ou recusou e re-renderizou — e aí a URL vira `/apply` **sem criar
+registro**, o que passa fácil por "foi bloqueado". O relatório separa os três.
+
+Três medidas que custam uma rodada cada:
+
+- **A busca do active_scaffold é por campo: `?search[name]=`.** Um `?search=`
+  solto não filtra nada e devolve a lista inteira, que se lê como "não achei".
+- **A lista padrão de candidaturas vem filtrada.** Registro recém-criado pode
+  não aparecer nela; procure pelo marcador `ZZ-TESTE-HOMOLOG`, não pela lista.
+- **O campo de foto aceita só jpg.** Mandar pdf nele reprova na validação
+  própria, com mensagem nomeando o campo — e o relatório acusa um bloqueio que é
+  do instrumento, não do sistema.
+
+O `explore_common.rb` desta pasta é o ponto de partida para sonda nova: sobe o
+Chrome headless, loga lendo as mesmas env vars da captura e dá helpers de
+screenshot e de erro de console. Escreva os passos da rodada como scripts curtos
+ao lado dele, apontando `EXPLORE_OUT` para o diretório da rodada — os
+screenshots contêm dado real e não podem cair no repositório. A extensão do
+Chrome pode estar indisponível; Selenium headless + screenshots avaliadas por
+visão contorna isso.
 
 Regras da passada: só `new`/`edit` **sem salvar** onde der; a única escrita
 persistida é em tabela de apoio com rótulo `ZZ-TESTE-HOMOLOG`, apagada ao fim;

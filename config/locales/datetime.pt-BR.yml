@@ -193,3 +193,5 @@ pt-BR:
       hour:   "Hora"
       minute: "Minuto"
       second: "Segundo"
+      millisec: "Milissegundo"
+      microsec: "Microssegundo"
