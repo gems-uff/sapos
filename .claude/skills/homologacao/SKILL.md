@@ -258,6 +258,40 @@ Campo de arquivo **com** arquivo gravado sem `required` é o esperado: o navegad
 não pré-preenche input de arquivo, e marcar `required` ali trava a submissão
 inteira em silêncio. A exigência fica no servidor.
 
+### Submeter o formulário, que é o que a leitura não alcança
+
+Ler prova o que a página **exige**; só submeter prova o que ela **faz**. O
+`probe_submissao.rb` preenche o formulário público de candidatura inteiro,
+deixa **um** campo em branco e tenta enviar — medindo se o navegador barra e em
+qual campo.
+
+```bash
+bundle exec ruby $S/abrir_processo_seletivo.rb abrir 5
+EXPLORE_OUT=$OUT bundle exec ruby $S/probe_submissao.rb              # só o bloqueio, não escreve
+EXPLORE_OUT=$OUT bundle exec ruby $S/probe_submissao.rb --confirmar  # submete e apaga o que criou
+bundle exec ruby $S/abrir_processo_seletivo.rb fechar 5
+```
+
+O modo padrão não cria nada e já serve de regressão barata: obrigatório que
+deixou de ser exigido no cliente aparece como **não bloqueou**, ou como bloqueio
+num campo diferente do esperado — por isso o relatório traz `barrou_no_alvo`, e
+não só `bloqueou`.
+
+**Não bloquear tem dois desfechos, e confundi-los esconde o defeito.** Navegador
+que barra sequer posta: a URL continua em `/apply/new`. Se postou, ou o servidor
+aceitou, ou recusou e re-renderizou — e aí a URL vira `/apply` **sem criar
+registro**, o que passa fácil por "foi bloqueado". O relatório separa os três.
+
+Três medidas que custam uma rodada cada:
+
+- **A busca do active_scaffold é por campo: `?search[name]=`.** Um `?search=`
+  solto não filtra nada e devolve a lista inteira, que se lê como "não achei".
+- **A lista padrão de candidaturas vem filtrada.** Registro recém-criado pode
+  não aparecer nela; procure pelo marcador `ZZ-TESTE-HOMOLOG`, não pela lista.
+- **O campo de foto aceita só jpg.** Mandar pdf nele reprova na validação
+  própria, com mensagem nomeando o campo — e o relatório acusa um bloqueio que é
+  do instrumento, não do sistema.
+
 O `explore_common.rb` desta pasta é o ponto de partida para sonda nova: sobe o
 Chrome headless, loga lendo as mesmas env vars da captura e dá helpers de
 screenshot e de erro de console. Escreva os passos da rodada como scripts curtos
