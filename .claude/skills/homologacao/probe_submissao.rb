@@ -128,7 +128,10 @@ end
 # que, e bloqueio no campo errado passaria por sucesso.
 def invalidos(driver)
   driver.execute_script(<<~JS)
+    // A pagina de sucesso nao tem formulario. Sem esta guarda, o proprio
+    // instrumento estoura justamente quando a submissao deu certo.
     var form = document.querySelector('form.as_form') || document.querySelector('form');
+    if (!form) return [];
     return Array.prototype.slice.call(form.querySelectorAll(':invalid'))
       .filter(function (e) { return e.tagName !== 'FORM'; })
       .map(function (e) {
@@ -219,7 +222,8 @@ begin
   # servidor, que e outra coisa.
   barrando = invalidos(driver)
   valido_antes = driver.execute_script(
-    "return (document.querySelector('form.as_form') || document.querySelector('form')).checkValidity()"
+    "var f = document.querySelector('form.as_form') || document.querySelector('form');" \
+    "return f ? f.checkValidity() : null"
   )
   bloqueou = enviar(driver, wait)
   # Nao bloqueou tem dois desfechos, e confundi-los esconde o defeito: ou o
