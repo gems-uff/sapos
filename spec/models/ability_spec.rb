@@ -313,15 +313,25 @@ RSpec.describe Ability, type: :model do
     end
 
     # Advisement demands the professor be authorized at the enrollment level, so
-    # the authorization comes along even though no rule here looks at it. The
-    # reload is not cosmetic: validating the enrollment loads its advisements,
-    # and the rules read that same collection -- without it the association stays
-    # cached empty and every advisement rule silently misses.
+    # the authorization comes along even though no rule here looks at it.
+    #
+    # Both reloads are load-bearing, and neither is obvious:
+    #
+    # - the professor is shared by the whole group, so an earlier example may
+    #   have left its advisement_authorizations loaded. Advisement validates
+    #   through that very collection, and a stale one fails the validation. It
+    #   fails only under MariaDB: SQLite reuses the ids freed by the rollback, so
+    #   the cached authorization keeps pointing at a level id that the next
+    #   example happens to create again, and the staleness cancels itself out.
+    # - validating the enrollment loads its advisements, and the rules read that
+    #   same collection -- without the reload it stays cached empty and every
+    #   advisement rule silently misses.
     def enrollment_advised_by(professor)
       enrollment = FactoryBot.create(:enrollment)
       FactoryBot.create(
         :advisement_authorization, professor: professor, level: enrollment.level
       )
+      professor.advisement_authorizations.reload
       FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
       enrollment.reload
     end
