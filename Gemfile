@@ -17,7 +17,7 @@ gem "nokogiri", ">= 1.18.9"              # piso de seguranca (parser HTML/XML)
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # ─── Assets / front-end ──────────────────────────────────────────────────
-gem "dartsass-sprockets"                 # compilador sass; AS 4.1.6 trocou libsass por dart-sass (#621)
+gem "dartsass-sprockets"                 # compilador sass; a 4.3 do AS deixou de puxa-lo, mantemos o pin direto (#621)
 gem "coffee-rails"
 gem "jquery-rails"
 gem "jquery-ui-rails", "~> 8.0"          # major mexe no layout de assets e o AS ramifica por versao (#638)
@@ -31,7 +31,7 @@ gem "recaptcha", require: "recaptcha/rails"
 gem "dotenv-rails", require: "dotenv/load"   # ENV a partir de .env (recaptcha etc.)
 
 # ─── UI administrativa / scaffolding ─────────────────────────────────────
-gem "active_scaffold", "~> 4.2.3"        # upgrade em saltos de minor; trava a serie 4.2 (#621)
+gem "active_scaffold", "~> 4.3.1"        # upgrade em saltos de minor; trava a serie 4.3 (#621)
 gem "active_scaffold_duplicate"
 gem "recordselect"
 gem "simple-navigation"                  # menu (config/navigation.rb)
