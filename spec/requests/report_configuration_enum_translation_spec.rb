@@ -58,8 +58,10 @@ RSpec.describe "ReportConfiguration enum translation", type: :request do
 
   describe "GET edit" do
     it "renders the signature type options translated, not the raw enum keys" do
-      # A factory nao preenche x/y/scale, que o modelo exige por presenca.
-      record = FactoryBot.create(:report_configuration, scale: 100, x: 10, y: 10)
+      # A factory nao preenche x/y/scale, que o modelo exige por presenca. scale
+      # e decimal(10,8) -> so cabe ate 99.99999999 no MariaDB estrito; 1 basta, e
+      # e o valor que o feature spec de report_configurations ja usa.
+      record = FactoryBot.create(:report_configuration, scale: 1, x: 0, y: 0)
 
       get edit_report_configuration_path(record)
 
