@@ -97,7 +97,7 @@ jobs:
       - name: Registrar a seed
         if: always()
         run: |
-          seed=$(grep -oE 'Randomized with seed [0-9]+' rspec.log | head -1 | grep -oE '[0-9]+$')
+          seed=$(grep -oE 'Randomized with seed [0-9]+' rspec.log 2>/dev/null | head -1 | grep -oE '[0-9]+$') || true
           echo "### Seed do RSpec: \`${seed:-desconhecida}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "Reproduzir localmente:" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"

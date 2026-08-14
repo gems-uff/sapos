@@ -229,19 +229,7 @@ RSpec.describe "Notifications features", type: :feature do
       expect(ActionMailer::Base.deliveries.last.subject).to eq "SAPOS: boletim em anexo"
     end
 
-    # The attachment goes out EMPTY through the rake task -- see issue #632.
-    # The fix for #547 taught the controller copy of prepare_attachments to pass
-    # filename, signature_type and watermark, but never reached the rake copy,
-    # which still calls render_enrollments_grades_report_pdf with a single
-    # argument. From outside a controller, render_to_string returns nil, so
-    # file_contents ends up empty and nothing is raised.
-    #
-    # No one is affected: the feature has been unused in production since early
-    # 2025, when students started generating the report themselves with a QR
-    # code. #632 decides whether the option is removed or the task is fixed.
-    # This example pins the current behavior so that either decision breaks it
-    # and forces a rewrite.
-    it "currently attaches an EMPTY grades report (see #632)" do
+    it "attaches the grades report PDF (see #632)" do
       @notification3.next_execution = 5.days.ago
       @notification3.save!
       Rake::Task["maintenance:trigger_notifications"].invoke
@@ -249,7 +237,8 @@ RSpec.describe "Notifications features", type: :feature do
       attachment = ActionMailer::Base.deliveries.last.attachments.first
       expect(attachment).to be_present
       expect(attachment.filename).to include("BOLETIM")
-      expect(attachment.body.raw_source.bytesize).to eq 0
+      expect(attachment.decoded).to start_with("%PDF")
+      expect(attachment.decoded.bytesize).to be > 1000
     end
 
     it "should send notifications without attachment" do
