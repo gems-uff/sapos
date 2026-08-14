@@ -148,4 +148,43 @@ RSpec.describe "Courses features", type: :feature do
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Algebra"]
     end
   end
+
+  describe "pagination preserves filter", js: true do
+    before(:all) do
+      @destroy_pagination = []
+      # Need >15 records matching a filter to trigger pagination (per_page defaults to 15).
+      # Create 16 courses with a unique name prefix so the name filter yields 2 pages.
+      16.times do |i|
+        @destroy_pagination << FactoryBot.create(
+          :course, name: "Paginação #{i}", code: "PAG#{i}",
+          credits: 4, workload: 60, course_type: @course_type1, available: true
+        )
+      end
+    end
+    after(:all) do
+      @destroy_pagination.each(&:delete)
+      @destroy_pagination.clear
+    end
+
+    before(:each) do
+      login_as(@user)
+      visit url_path
+      click_link_and_wait "Buscar"
+      fill_in "Nome", with: "Paginação"
+      click_button_and_wait "Buscar"
+    end
+
+    it "should include search params in page link hrefs" do
+      # Regression: without the fix, href was /courses?page=2 (no search),
+      # causing the browser to serve a cached 304 from a previous filter when
+      # the user switched filters and clicked page 2 (issue #660).
+      pagination_link = find("a.as_paginate", text: "2")
+      expect(pagination_link[:href]).to include("search")
+    end
+
+    it "should show matching records when navigating to page 2 with filter active" do
+      click_link_and_wait "2"
+      expect(page.all("tr td.name-column").map(&:text)).to all(include("Paginação"))
+    end
+  end
 end
