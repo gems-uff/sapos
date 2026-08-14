@@ -147,5 +147,4 @@ class NotificationsController < ApplicationController
       )
       params[:query_params] || {}
     end
-
 end
