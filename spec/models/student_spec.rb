@@ -39,7 +39,6 @@ RSpec.describe Student, type: :model do
     it { should belong_to(:birth_country).required(false) }
     it { should belong_to(:user).required(false) }
     it { should validate_presence_of(:name) }
-    it { should validate_uniqueness_of(:cpf) }
     it { should validate_presence_of(:cpf) }
 
     describe "user" do

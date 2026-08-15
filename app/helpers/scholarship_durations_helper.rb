@@ -146,7 +146,7 @@ module ScholarshipDurationsHelper
         name: "search[suspended][end_year]"
     }
     current_year = Date.today.year
-    
+
     html = label_tag(
       "search[suspended][use]",
       I18n.t("activerecord.attributes.scholarship_duration.suspended_start_label"),

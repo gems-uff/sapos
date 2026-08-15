@@ -25,7 +25,7 @@ RSpec.describe "Notifications features", type: :feature do
     @destroy_all << FactoryBot.create(:enrollment, enrollment_number: "D02", student: @student1, level: @level1, enrollment_status: @enrollment_status1, admission_date: YearSemester.current.semester_begin - 3.years)
 
     @destroy_all << @query1 = FactoryBot.create(:query, name: "students", sql: "select * from students")
-    @query2 = FactoryBot.build(:query, name: "queries", sql: "select name, sql, :ano_semestre_atual as temp from queries")
+    @query2 = FactoryBot.build(:query, name: "queries", sql: "select name, `sql`, :ano_semestre_atual as temp from queries")
     @destroy_all << @query2.params.build(name: "ano_semestre_atual", value_type: "Integer", default_value: "")
     @query2.save!
     @destroy_all << @query3 = FactoryBot.create(:query, name: "enrollments", sql: "select id as enrollments_id from enrollments")
@@ -94,14 +94,14 @@ RSpec.describe "Notifications features", type: :feature do
     end
 
     it "should have a codemirror for body template" do
-      expect(page).to have_selector("#record_body_template_ + .CodeMirror", visible: true)
+      expect(page).to have_selector("#record_body_template_ + .codemirror-toolbar + .CodeMirror", visible: true)
     end
 
     it "should have a codemirror to view selected query" do
       find(:select, "record_query_").find(:option, text: "queries").select_option
       expect(page).to have_css("#record_query_container .CodeMirror-code", text: <<~TEXT.chomp
         1
-        select name, sql, :ano_semestre_atual as temp from queries
+        select name, `sql`, :ano_semestre_atual as temp from queries
       TEXT
       )
 
@@ -153,20 +153,109 @@ RSpec.describe "Notifications features", type: :feature do
     end
   end
 
-  describe "notify" do
+  # Issue #624: só a carga direta reproduz. Sem o action link do ActiveScaffold
+  # no DOM, link.prop("search") é undefined, o .replace estoura e o script morre
+  # antes de inicializar o datepicker.
+  describe "simulate page loaded directly", js: true do
+    before(:each) do
+      login_as(@user)
+      visit "/notifications/#{@record.id}/simulate"
+    end
+
+    it "should initialize datepicker on date param fields" do
+      expect(page).to have_css("input._param_type_date.hasDatepicker")
+    end
+  end
+
+  # Issue #640: uma URL longa e um token sem espaco, e portanto sem ponto de
+  # quebra. A largura minima da celula "Corpo" vira a largura do token inteiro e,
+  # sem restricao de largura na tabela, a pagina inteira passa a rolar na
+  # horizontal -- o cabecalho e o menu, dimensionados a 100% da viewport,
+  # terminam antes do conteudo.
+  describe "simulate page with a long body", js: true do
+    let(:long_url) do
+      "https://www.example.com/documentos/regras/" +
+        ("REGRAS_DE_PRORROGACAO_E_QUALIFICACAO_" * 6)
+    end
+
+    before(:each) do
+      @destroy_later << @long_body_record = FactoryBot.create(
+        :notification, query: @query1, title: "corpo longo",
+        to_template: "sapos-teste@ic.uff.br", subject_template: "Prazo",
+        body_template: "Prezado aluno,\n\nConsulte as regras em:\n\n#{long_url}\n"
+      )
+      login_as(@user)
+      page.driver.browser.manage.window.resize_to(1280, 900)
+      visit url_path
+      find("#as_#{plural_name}-simulate-#{@long_body_record.id}-link").click
+    end
+
+    it "should not make the page scroll horizontally" do
+      expect(page).to have_css("table.notification-results tbody tr")
+
+      overflow = page.evaluate_script(
+        "document.documentElement.scrollWidth - document.documentElement.clientWidth"
+      )
+      expect(overflow).to be <= 0
+    end
+  end
+
+  # Notifications used to be triggered by GET /notifications/notify, an
+  # unauthenticated endpoint. Production drives them through the daily cron
+  # (bundle exec rails maintenance:run), so the rake task is what these
+  # examples exercise.
+  describe "maintenance:trigger_notifications" do
+    before(:all) do
+      require "rake"
+      Rails.application.load_tasks if Rake::Task.tasks.empty?
+    end
+
+    before(:each) do
+      Rake::Task["maintenance:trigger_notifications"].reenable
+      # Os objetos vem do before(:all) e sobrevivem aos exemplos, guardando o
+      # next_execution que o exemplo anterior atribuiu -- mas o banco voltou ao
+      # valor original pelo rollback. Como notifications.next_execution e
+      # datetime sem precisao fracionaria, em MySQL/MariaDB dois `5.days.ago`
+      # dentro do mesmo segundo sao o mesmo valor: o dirty tracking nao ve
+      # mudanca, o save! vira no-op e a notificacao fica fora da janela do rake,
+      # sem e-mail nenhum. O SQLite guarda a fracao de segundo e escondia isso.
+      [@notification3, @notification4].each(&:reload)
+    end
+
     it "should send notifications with attachment" do
       @notification3.next_execution = 5.days.ago
       @notification3.save!
-      visit "/notifications/notify"
-      expect(page).to have_content "Ok"
+      Rake::Task["maintenance:trigger_notifications"].invoke
       expect(ActionMailer::Base.deliveries.last.subject).to eq "SAPOS: boletim em anexo"
+    end
+
+    # The attachment goes out EMPTY through the rake task -- see issue #632.
+    # The fix for #547 taught the controller copy of prepare_attachments to pass
+    # filename, signature_type and watermark, but never reached the rake copy,
+    # which still calls render_enrollments_grades_report_pdf with a single
+    # argument. From outside a controller, render_to_string returns nil, so
+    # file_contents ends up empty and nothing is raised.
+    #
+    # No one is affected: the feature has been unused in production since early
+    # 2025, when students started generating the report themselves with a QR
+    # code. #632 decides whether the option is removed or the task is fixed.
+    # This example pins the current behavior so that either decision breaks it
+    # and forces a rewrite.
+    it "currently attaches an EMPTY grades report (see #632)" do
+      @notification3.next_execution = 5.days.ago
+      @notification3.save!
+      Rake::Task["maintenance:trigger_notifications"].invoke
+
+      attachment = ActionMailer::Base.deliveries.last.attachments.first
+      expect(attachment).to be_present
+      expect(attachment.filename).to include("BOLETIM")
+      expect(attachment.body.raw_source.bytesize).to eq 0
     end
 
     it "should send notifications without attachment" do
       @notification4.next_execution = 5.days.ago
       @notification4.save!
-      visit "/notifications/notify"
-      expect(page).to have_content "Ok"
+      Rake::Task["maintenance:trigger_notifications"].invoke
       expect(ActionMailer::Base.deliveries.last.subject).to eq "SAPOS: lembrar de etapa"
     end
   end

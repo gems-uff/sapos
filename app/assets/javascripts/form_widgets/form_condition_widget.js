@@ -15,6 +15,24 @@ function create_form_condition(options) {
 
   let errors = options.errors ?? {}
 
+  // `name` e `id` vem de atributos do DOM, e o HTML abaixo e montado por
+  // concatenacao: interpolar direto reinterpretaria o texto como marcacao.
+  // Construir o input pelo jQuery escapa por construcao.
+  let hidden_input = function(input_name, value) {
+    // Interpolar em string mantem o mesmo resultado de antes quando o valor e
+    // undefined; passar undefined ao jQuery faria dele um getter, e o atributo
+    // simplesmente nao seria escrito.
+    //
+    // `autocomplete` fica fora do hash de propriedades de proposito: quando a
+    // chave coincide com um metodo de $.fn -- e o jQuery UI define
+    // $.fn.autocomplete -- o jQuery CHAMA o metodo em vez de escrever o
+    // atributo, e o autocomplete estoura com "cannot call methods prior to
+    // initialization". O .attr() escreve o atributo sem essa ambiguidade.
+    return $("<input/>", {
+      type: "hidden", name: `${input_name}`, value: `${value}`
+    }).attr("autocomplete", "off").outerHTML()
+  }
+
   let report = options.report ?? function(){
     report_change(attributes, errors)
     if (parent_attributes == null) {
@@ -48,18 +66,18 @@ function create_form_condition(options) {
         delete errors[key]
       })
       $(`#${id} > .sub`).html(`
-        <input type="hidden" name="${name}" value="" autocomplete="off">
+        ${hidden_input(name, "")}
         <div class="item-error form-field-config-error"></div>
       `)
     } else {
       let header = `
-        <input type="hidden" name="${name}[mode]" value="${value}" autocomplete="off">
-        <input type="hidden" name="${name}[form_conditions][0]" value="" autocomplete="off">
+        ${hidden_input(`${name}[mode]`, value)}
+        ${hidden_input(`${name}[form_conditions][0]`, "")}
       `
       let remove_item = ``
       let error_report = ``
       if (attributes.id != undefined) {
-        header += `<input type="hidden" name="${name}[id]" value="${attributes.id}" autocomplete="off">`
+        header += hidden_input(`${name}[id]`, attributes.id)
       }
       if (parent_attributes != null) {
         remove_item += `<a class="destroy" href="#">Remove</a>`

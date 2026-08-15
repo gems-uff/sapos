@@ -194,7 +194,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     when I18n.t("#{I18N_BASE}.is_filled_options.false")
       ["`admission_applications`.`filled_form_id` not in (#{filled_form})"]
     else
-      ""
+      nil
     end
   end
 
@@ -211,13 +211,13 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     when I18n.t("#{I18N_BASE}.pendency_options.false")
       [candidate_arel[:id].not_in(pendencies_query).to_sql]
     else
-      ""
+      nil
     end
   end
 
   def self.condition_for_status_column(column, value, like_pattern)
     candidate_arel = Admissions::AdmissionApplication.arel_table
-    return "" if value.blank?
+    return nil if value.blank?
     if value.to_i.to_s == value
       value = value.to_i
       user_id = value.abs
@@ -240,7 +240,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
 
   def self.condition_for_mapping_column(column, value, like_pattern)
     candidate_arel = Admissions::AdmissionApplication.arel_table
-    return "" if value.blank?
+    return nil if value.blank?
     if value == "student"
       [candidate_arel[:student_id].not_eq(nil).to_sql]
     elsif value == "enrollment"
@@ -250,7 +250,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
         candidate_arel[:enrollment_id].eq(nil)
       ).to_sql]
     else
-      ""
+      nil
     end
   end
 

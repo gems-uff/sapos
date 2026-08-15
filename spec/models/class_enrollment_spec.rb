@@ -284,7 +284,7 @@ RSpec.describe ClassEnrollment, type: :model do
         @destroy_later << enrollment = FactoryBot.create(:enrollment, student: student, enrollment_number: "M01")
         @destroy_later << FactoryBot.create(:class_schedule, year: course_class.year, semester: course_class.semester, period_start: 1.day.ago, enrollment_insert: 1.day.from_now, enrollment_remove: 1.day.from_now)
 
-        @destroy_later << class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
+        @destroy_later << FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
         deliveries = ActionMailer::Base.deliveries
         expect(deliveries.last.to).to eq([course_class.professor.email])
         expect(deliveries.last.subject).to eq("Inscrição de M01 - ana na turma Alquimia - 2026/2 foi realizada")
@@ -313,7 +313,7 @@ RSpec.describe ClassEnrollment, type: :model do
         @destroy_later << enrollment = FactoryBot.create(:enrollment, student: student, enrollment_number: "M01")
         @destroy_later << FactoryBot.create(:class_schedule, year: course_class.year, semester: course_class.semester, period_start: 3.day.ago, enrollment_insert: 1.day.ago, enrollment_remove: 1.day.ago)
 
-        @destroy_later << class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
+        @destroy_later << FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
         deliveries = ActionMailer::Base.deliveries
         if deliveries.present?
           expect(deliveries.last.to).not_to eq([course_class.professor.email])

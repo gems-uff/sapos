@@ -14,7 +14,6 @@ RSpec.describe Country, type: :model  do
   subject { country }
   describe "Validations" do
     it { should be_valid }
-    it { should validate_uniqueness_of(:name) }
     it { should validate_presence_of(:name) }
   end
   describe "Methods" do

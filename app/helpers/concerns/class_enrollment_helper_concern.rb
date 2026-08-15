@@ -121,6 +121,6 @@ module ClassEnrollmentHelperConcern
     if can?(:post_grades, record) && cannot?(:update_all_fields, record)
       return { style: "display:none;" }
     end
-    return { style: "width: 190px;" } if controller_name != "class_enrollments"
+    { style: "width: 190px;" } if controller_name != "class_enrollments"
   end
 end

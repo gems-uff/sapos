@@ -5,5 +5,4 @@
 
 class Admissions::AdmissionProcessDrop < ActiveRecordAttributesDrop
   define_drop_accessor :title
-
 end

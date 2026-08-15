@@ -58,7 +58,7 @@ class StudentsController < ApplicationController
     }
     config.columns[:civil_status].form_ui = :select
     config.columns[:civil_status].options = {
-      options: ["Não declarado","Solteiro(a)", "Casado(a)"]
+      options: ["Não declarado", "Solteiro(a)", "Casado(a)"]
     }
     config.columns[:skin_color].form_ui = :select
     config.columns[:skin_color].options = {

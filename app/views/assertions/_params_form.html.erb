@@ -59,8 +59,8 @@
 
       $("._onchange_param_field").change(function () {
           var link = $($(this).data("link-target"));
-          var p = link.prop("search").replace(/^\?/, "");
-          var params = queryStringToHash(p);
+          var p = (link.prop("search") || "").replace(/^\?/, "");
+          var params = queryStringToHash(p) || {};
           var params_elements = $("._onchange_param_field");
           for (var i = 0, len = params_elements.length; i < len; i++) {
               var current_param = $(params_elements[i]);

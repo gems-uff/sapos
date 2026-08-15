@@ -46,14 +46,9 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
     it { should be_valid }
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:email) }
-    context "when allow_multiple_applications is false" do
-      before { @admission_process.allow_multiple_applications = false }
-      it { should validate_uniqueness_of(:email).scoped_to(:admission_process_id) }
-    end
-    #context "when allow_multiple_applications is false" do
-   #   before { @admission_process.allow_multiple_applications = true }
-   #   it { should_not validate_uniqueness_of(:email).scoped_to(:admission_process_id) }
-   # end
+    # Uniqueness of :email (scoped to admission_process, case- and accent-
+    # insensitive) is covered in spec/models/uniqueness_spec.rb (neutral) and
+    # spec/models/uniqueness_collation_spec.rb (MariaDB only).
     describe "number_of_letters_in_filled_form" do
       context "should be valid when" do
         it "filled_form is blank" do
@@ -111,7 +106,7 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
   end
   # ToDo: test scopes
   # ToDo: test before_save
- 
+
 
   describe "Methods" do
     # ToDo: pendency_condition
@@ -133,7 +128,47 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
     # ToDo: students
     # ToDo: assign_form
     # ToDo: update_student
-    # ToDo: update_enrollment
+    # A data anterior entra na observacao da matricula por interpolacao, e era
+    # formatada pelo monkey-patch global de Date#to_s (#625). A regiao estava
+    # sem cobertura nenhuma quando o patch saiu.
+    describe "update_enrollment" do
+      let(:process) do
+        FactoryBot.create(
+          :admission_process, :with_letter_template,
+          admission_date: Date.new(2021, 12, 31)
+        )
+      end
+      let(:application) do
+        Admissions::AdmissionApplication.new(
+          name: "Ana", email: "ana@email.com", admission_process: process,
+          filled_form: FactoryBot.create(:filled_form)
+        )
+      end
+      let(:enrollment) do
+        FactoryBot.create(:enrollment, admission_date: Date.new(2018, 3, 1))
+      end
+
+      it "logs the previous admission date in the brazilian format" do
+        application.update_enrollment(enrollment)
+        expect(enrollment.obs).to include("Valor anterior: 01/03/2018")
+      end
+
+      it "keeps the previous admission date out of the ISO format" do
+        application.update_enrollment(enrollment)
+        expect(enrollment.obs).not_to include("2018-03-01")
+      end
+
+      it "takes the admission date of the process" do
+        application.update_enrollment(enrollment)
+        expect(enrollment.admission_date).to eq Date.new(2021, 12, 31)
+      end
+
+      it "logs nothing when the date of the enrollment already matches" do
+        enrollment.update!(admission_date: Date.new(2021, 12, 31))
+        application.update_enrollment(enrollment)
+        expect(enrollment.obs).to be_blank
+      end
+    end
     # ToDo: undo_consolidation
     # ToDo: phase_name
     # ToDo: identifier

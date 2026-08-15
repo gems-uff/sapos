@@ -157,7 +157,7 @@ Rails.application.routes.draw do
     record_select_routes
   end
 
-  
+
 
   resources :scholarship_durations do
     concerns :active_scaffold
@@ -283,10 +283,6 @@ Rails.application.routes.draw do
     member do
       post "execute_now"
       get "simulate"
-    end
-
-    collection do
-      get "notify"
     end
   end
 

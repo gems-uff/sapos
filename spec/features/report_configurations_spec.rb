@@ -86,6 +86,47 @@ RSpec.describe "ReportConfigurations features", type: :feature do
     end
   end
 
+  # O ambiente de teste desliga a protecao contra CSRF, entao o exemplo de
+  # insercao gera o PDF mesmo que nenhum token seja enviado. Este grupo a liga
+  # de verdade, porque a pre-visualizacao e o unico ponto do sistema que submete
+  # um formulario clonado dentro de um iframe, fora do AJAX -- ali o rails-ujs
+  # nao entra e o header X-CSRF-Token nao existe. Sem o campo escondido que o
+  # clone passou a carregar, o servidor recusa a requisicao e o download nunca
+  # acontece.
+  #
+  # A flag precisa ser ligada antes de a pagina ser carregada: `csrf_meta_tags`
+  # nao emite nada enquanto a protecao estiver desligada, e e daquela meta tag
+  # que o clone le o token.
+  describe "preview with forgery protection", js: true do
+    before(:each) do
+      @previous_protection = ActionController::Base.allow_forgery_protection
+      ActionController::Base.allow_forgery_protection = true
+      login_as(@user)
+      visit url_path
+      click_link_and_wait "Adicionar"
+    end
+
+    after(:each) do
+      ActionController::Base.allow_forgery_protection = @previous_protection
+    end
+
+    it "should send the CSRF token when previewing" do
+      within("#as_#{plural_name}-create--form") do
+        fill_in "Nome", with: "Relatório"
+        fill_in "Escala", with: "1"
+        fill_in "X", with: "0"
+        fill_in "Y", with: "0"
+        fill_in "Prioridade", with: "1"
+        fill_in "Header", with: "UFF"
+      end
+
+      click_link_and_wait "Visualizar"
+
+      wait_for_download
+      expect(download).to match(/Visualizar\.pdf/)
+    end
+  end
+
   describe "edit page", js: true do
     before(:each) do
       login_as(@user)

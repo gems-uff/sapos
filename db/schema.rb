@@ -284,7 +284,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_11_120000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "query_id", null: false
-    t.string "assertion_template"
+    t.text "assertion_template"
     t.boolean "student_can_generate", default: false
     t.integer "expiration_in_months"
     t.string "template_type", default: "Liquid"
@@ -951,6 +951,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_11_120000) do
     t.integer "invalidated_by_id"
     t.datetime "invalidated_at"
     t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
+    t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
     t.index ["invalidated_by_id"], name: "index_reports_on_invalidated_by_id"
   end
 
@@ -1084,9 +1085,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_11_120000) do
     t.string "photo", limit: 255
     t.integer "birth_country_id"
     t.integer "user_id", limit: 8
+    t.string "gender"
     t.string "skin_color"
     t.string "pcd"
-    t.string "gender"
     t.string "humanitarian_policy"
     t.text "obs_pcd"
     t.text "obs_gender"
@@ -1163,4 +1164,21 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_11_120000) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "course_research_lines", "courses"
+  add_foreign_key "course_research_lines", "research_lines"
+  add_foreign_key "enrollments", "research_lines", on_delete: :nullify
+  add_foreign_key "grants", "professors"
+  add_foreign_key "paper_professors", "papers"
+  add_foreign_key "paper_professors", "professors"
+  add_foreign_key "paper_students", "papers"
+  add_foreign_key "paper_students", "students"
+  add_foreign_key "papers", "professors", column: "owner_id"
+  add_foreign_key "professor_research_lines", "professors"
+  add_foreign_key "professor_research_lines", "research_lines"
+  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
+  add_foreign_key "reports", "users", column: "generated_by_id"
+  add_foreign_key "reports", "users", column: "invalidated_by_id"
+  add_foreign_key "research_lines", "research_areas"
+  add_foreign_key "user_roles", "roles"
+  add_foreign_key "user_roles", "users"
 end

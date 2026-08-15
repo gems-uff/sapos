@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # lib/tasks/smoke_test.rake
 namespace :smoke_test do
   desc "Verifica se o delivery_method é :sendmail e se o binário está disponível e executável"

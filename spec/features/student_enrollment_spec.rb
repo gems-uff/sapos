@@ -45,7 +45,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
 
     @destroy_all << FactoryBot.create(:course_research_area, course: @course3, research_area: @research_area3)
     @destroy_all << FactoryBot.create(:course_research_area, course: @course5, research_area: @research_area3)
-    
+
     @destroy_all << @professor1 = FactoryBot.create(:professor, name: "Erica", cpf: "3")
     @destroy_all << @professor2 = FactoryBot.create(:professor, name: "Fiona", cpf: "2")
     @destroy_all << @professor3 = FactoryBot.create(:professor, name: "Gi", cpf: "1")
@@ -266,6 +266,37 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
             "Número da Bolsa", "Agência", "Data de Início", "Data Limite de Concessão", "Data de Encerramento"
           ]
           expect(page.all("table:nth-of-type(1) tbody tr").size).to eq 1
+        end
+      end
+    end
+
+    describe "dismissed without thesis defense date" do
+      before(:each) do
+        @enrollment5 = FactoryBot.create(
+          :enrollment, enrollment_number: "M03", student: @student1,
+          level: @level2, enrollment_status: @enrollment_status1,
+          admission_date: YearSemester.current.semester_begin - 3.years,
+          thesis_defense_date: nil
+        )
+        @destroy_later << FactoryBot.create(
+          :thesis_defense_committee_participation,
+          enrollment: @enrollment5, professor: @professor1
+        )
+        @destroy_later << FactoryBot.create(
+          :dismissal, enrollment: @enrollment5, dismissal_reason: @dismissal_reason1,
+          date: 6.months.ago.at_beginning_of_month
+        )
+        @destroy_later << @enrollment5
+        login_as(@student_user)
+        visit student_enrollment_path(@enrollment5.id)
+      end
+
+      it "should show the defense committee, using the dismissal date for the affiliation" do
+        within(".dismissal-show-box") do
+          expect(page).to have_content "Banca Avaliadora"
+          expect(page.all("tbody tr").size).to eq 1
+          expect(page).to have_content "Erica"
+          expect(page).to have_content "UFF"
         end
       end
     end

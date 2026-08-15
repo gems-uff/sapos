@@ -54,6 +54,7 @@ pt-BR:
       invalid_enrollment: Matrícula %{enrollment} inválida
       dismissed_enrollment: Matrícula %{enrollment} desligada
       invalid_semester: Semestre %{year}.%{semester} inválido
+      unavailable_semester: O período %{year}.%{semester} ainda não está disponível para inscrição
       closed_enrollment: O período de inscrições no semestre %{year}.%{semester} fechou
 
     notice:

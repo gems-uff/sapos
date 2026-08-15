@@ -47,4 +47,3 @@ user = User.new do |u|
 end
 user.skip_confirmation!
 user.save!
-

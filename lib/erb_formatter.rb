@@ -15,15 +15,15 @@ class ErbFormatter
 
 
   def var(val)
-    @attributes[val]
+    escape_data(@attributes[val])
   end
 
   def records
     unless @records
       @records = []
-      keys = var(:columns)
-      var(:rows).each do |row|
-        @records << Hash[keys.zip(row)]
+      keys = @attributes[:columns]
+      @attributes[:rows].each do |row|
+        @records << Hash[keys.zip(escape_data(row))]
       end
     end
     @records
@@ -36,7 +36,26 @@ class ErbFormatter
 
   alias_method :l, :localize
 
-  def format(code)
+  # Renders a template, escaping the data when it is read as markup.
+  #
+  # See LiquidFormatter#format: erb templates cannot be created anymore, but
+  # the ones that already exist read the same data and are printed and
+  # delivered through the same path, so they escape it as well. The names of
+  # the columns are keys, not data, and are kept as they are.
+  def format(code, escape_data: nil)
+    @escaper = CodeEvaluator.escaper(escape_data)
+    @records = nil
     eval(Erubi::Engine.new(code).src)
   end
+
+  private
+    def escape_data(value)
+      return value if @escaper.nil?
+      case value
+      when String then @escaper.call(value)
+      when Array then value.map { |item| escape_data(item) }
+      when Hash then value.transform_values { |item| escape_data(item) }
+      else value
+      end
+    end
 end

@@ -125,7 +125,7 @@ module EnrollmentRequestsHelper
       body += "<tr class=\"record #{tr_class}\">
                   <td>#{comment.user.to_label}</td>
                   <td>#{comment.message}</td>
-                  <td>#{comment.created_at}</td>
+                  <td>#{I18n.l(comment.created_at, format: :defaultdatetime)}</td>
                 </tr>"
     end
 

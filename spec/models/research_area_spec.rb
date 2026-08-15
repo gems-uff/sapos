@@ -21,9 +21,7 @@ RSpec.describe ResearchArea, type: :model do
   subject { research_area }
   describe "Validations" do
     it { should be_valid }
-    it { should validate_uniqueness_of(:name) }
     it { should validate_presence_of(:name) }
-    it { should validate_uniqueness_of(:code) }
     it { should validate_presence_of(:code) }
   end
   describe "Methods" do

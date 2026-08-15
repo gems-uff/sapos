@@ -77,15 +77,29 @@ RSpec.describe "UserRoles features", type: :feature do
       expect(page.all("tr td.user-column").map(&:text)).to eq ["carol", "bia", "bia", "ana", "ana", "ana"]
     end
 
+    # A asserção olha a coluna Papel, e não a Usuário: a ordenação é
+    # `ORDER BY roles.name` sem desempate (user_roles_controller.rb), então a
+    # ordem ENTRE as linhas de um mesmo papel é indefinida -- os três usuários
+    # de Coordenação podem sair em qualquer ordem. Afirmar a coluna Usuário aqui
+    # afirmava justamente o que o banco não garante, e o CI acusou em MariaDB
+    # com a ordem trocada dentro do grupo (o agrupamento por papel estava certo).
     it "should order by role name, asc, when clicked" do
       click_link_and_wait "Papel"
-      expect(page.all("tr td.user-column").map(&:text)).to eq ["ana", "bia", "ana",  "carol", "bia", "ana"]
+      expect(page.all("tr td.role-column").map(&:text)).to eq [
+        "Administrador", "Administrador",
+        "Coordenação", "Coordenação", "Coordenação",
+        "Professor"
+      ]
     end
 
     it "should order by role name, desc, when clicked twice" do
       click_link_and_wait "Papel"
       click_link_and_wait "Papel"
-      expect(page.all("tr td.user-column").map(&:text)).to eq ["ana", "ana", "carol", "bia", "ana", "bia"]
+      expect(page.all("tr td.role-column").map(&:text)).to eq [
+        "Professor",
+        "Coordenação", "Coordenação", "Coordenação",
+        "Administrador", "Administrador"
+      ]
     end
   end
 end

@@ -9,8 +9,8 @@ module EmailTemplatesHelper
       :body, "record_body_#{record.id}", "liquid", options.merge(
         value: record.body || I18n.t("email_template.body.default")
       ),
-      set_size=35,
-      line_wrapping=true
+      35,
+      true
     )
   end
 

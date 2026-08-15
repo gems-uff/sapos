@@ -6,6 +6,6 @@
 FactoryBot.define do
   factory :query do
     name { "MyString" }
-    sql { "SELECT * FROM USERS" }
+    sql { "SELECT * FROM users" }
   end
 end

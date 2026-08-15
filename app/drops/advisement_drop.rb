@@ -6,5 +6,4 @@
 class AdvisementDrop < ActiveRecordAttributesDrop
   define_drop_relationship :professor, ProfessorDrop
   define_drop_relationship :enrollment, EnrollmentDrop
-
 end

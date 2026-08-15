@@ -29,12 +29,12 @@ class State < ApplicationRecord
     states = State
     states = states.joins(:country).where(
       "`countries`.`name` LIKE :country
-      ", {country: country}
+      ", { country: country }
     ) if country.present?
     states.where(
       "`states`.`name` LIKE :state
         OR `states`.`code` LIKE :state
-      ", {state: state}
+      ", { state: state }
     )
   end
 

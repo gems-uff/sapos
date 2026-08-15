@@ -14,7 +14,7 @@ class Users::ConfirmationsController < Devise::ConfirmationsController
   # GET /resource/confirmation?confirmation_token=abcdef
   def show
     user = User.find_by(confirmation_token: params[:confirmation_token])
-    email_before = user.email
+    email_before = user&.email
     super do |user|
       if email_before != user.email && user.errors.empty?
         if student = user.student

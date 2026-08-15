@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
@@ -100,7 +102,7 @@ RSpec.describe Notification, type: :model do
       context "should be valid when" do
         it "email is individual and query has enrollments_id column alias" do
           notification.has_grades_report_pdf_attachment = true
-          notification.sql_query = "SELECT ENROLLMENTS.ID AS enrollments_id FROM ENROLLMENTS"
+          notification.sql_query = "SELECT enrollments.id AS enrollments_id FROM enrollments"
           notification.individual = true
           expect(notification).to have(0).errors_on :has_grades_report_pdf_attachment
         end
@@ -109,20 +111,20 @@ RSpec.describe Notification, type: :model do
       context "should have error when" do
         it "email individual is not individual" do
           notification.has_grades_report_pdf_attachment = true
-          notification.sql_query = "SELECT ENROLLMENTS.ID AS enrollments_id FROM ENROLLMENTS"
+          notification.sql_query = "SELECT enrollments.id AS enrollments_id FROM enrollments"
           notification.individual = false
           expect(notification).to have_error(:individual_required).on :has_grades_report_pdf_attachment
         end
 
         it "query has not enrollments_id column alias" do
           notification.has_grades_report_pdf_attachment = true
-          notification.sql_query = "SELECT ENROLLMENTS.ID FROM ENROLLMENTS"
+          notification.sql_query = "SELECT enrollments.id FROM enrollments"
           notification.individual = true
           expect(notification).to have_error(:query_with_enrollments_id_alias_column_required).on :has_grades_report_pdf_attachment
         end
         it "email is not individual and query has not enrollments_id column alias" do
           notification.has_grades_report_pdf_attachment = true
-          notification.sql_query = "SELECT ENROLLMENTS.ID FROM ENROLLMENTS"
+          notification.sql_query = "SELECT enrollments.id FROM enrollments"
           notification.individual = false
           expect(notification).to have(2).errors_on :has_grades_report_pdf_attachment
         end
@@ -131,6 +133,55 @@ RSpec.describe Notification, type: :model do
   end
 
   describe "Methods" do
+    describe "get_query_date_derivations" do
+      # The simulation form sends the date of the query as a string, and the
+      # value of a parameter does not always reach here in the same format.
+      def derivations(qdate)
+        notification.get_query_date_derivations(qdate)
+      end
+
+      it "reads a date written in the brazilian order" do
+        expect(derivations("01/07/2026")).to include(
+          ano_semestre_atual: 2026, numero_semestre_atual: 1
+        )
+      end
+
+      it "reads a date written as year, month and day" do
+        expect(derivations("2026-07-01")).to include(
+          ano_semestre_atual: 2026, numero_semestre_atual: 1
+        )
+      end
+
+      it "reads a date that carries a time and a time zone" do
+        expect(derivations("2026-07-01 00:00:00 -0300")).to include(
+          ano_semestre_atual: 2026, numero_semestre_atual: 1
+        )
+      end
+
+      it "reads a date that is not a string" do
+        expect(derivations(Time.zone.parse("2026-07-01"))).to include(
+          ano_semestre_atual: 2026, numero_semestre_atual: 1
+        )
+      end
+
+      it "returns no derivation when there is no date" do
+        expect(derivations("")).to eq({})
+      end
+
+      it "refuses a date that cannot be read in any order" do
+        # O controller da simulação conta com isso para avisar o usuário em vez
+        # de deixar a página cair.
+        expect { derivations("31/31/2026") }.to raise_error(Date::Error)
+      end
+
+      it "does not read the day as the month" do
+        # 31/12 cannot be read in the other order, so it pins down the order
+        expect(derivations("31/12/2026")).to include(
+          ano_semestre_atual: 2026, numero_semestre_atual: 2
+        )
+      end
+    end
+
     describe "calculate_next_notification_date" do
       describe "for daily frequency" do
         it "should be 01/04 if today is 01/03" do
@@ -224,6 +275,45 @@ RSpec.describe Notification, type: :model do
           notification.frequency = Notification::ANNUAL
           expect(notification.calculate_next_notification_date(time: Time.parse("2014/06/27"))).to eq(Time.parse("2015/01/01"))
         end
+      end
+    end
+
+    describe "execute" do
+      # A body is delivered as html, so the data that fills it is escaped. A
+      # recipient and a subject are headers, not markup: escaping them would
+      # break an address such as "Fulano <fulano@uff.br>".
+      let(:rows) { [["Fulano <fulano@uff.br>", "O uso de <strong>"]] }
+      let(:columns) { ["email", "titulo"] }
+
+      def execute_with(templates)
+        notification = FactoryBot.create(
+          :notification, query: @query, individual: true, **templates
+        )
+        @destroy_later << notification
+        allow(notification.query).to receive(:execute).and_return(
+          { rows: rows, columns: columns, query: "" }
+        )
+        notification.execute(skip_update: true)[:notifications].first
+      end
+
+      it "escapes the data of the body" do
+        message = execute_with(body_template: "Tese: {{ titulo }}")
+        expect(message[:body]).to eq("Tese: O uso de &lt;strong&gt;")
+      end
+
+      it "keeps the markup that the template wrote in the body" do
+        message = execute_with(body_template: "<strong>{{ titulo }}</strong>")
+        expect(message[:body]).to eq("<strong>O uso de &lt;strong&gt;</strong>")
+      end
+
+      it "does not escape the recipient" do
+        message = execute_with(to_template: "{{ email }}")
+        expect(message[:to]).to eq("Fulano <fulano@uff.br>")
+      end
+
+      it "does not escape the subject" do
+        message = execute_with(subject_template: "Tese: {{ titulo }}")
+        expect(message[:subject]).to eq("Tese: O uso de <strong>")
       end
     end
   end

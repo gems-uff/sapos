@@ -7,8 +7,6 @@ class NotificationsController < ApplicationController
   include SharedPdfConcern
 
   authorize_resource
-  skip_authorization_check only: [:notify]
-  skip_before_action :authenticate_user!, only: :notify
   before_action :permit_query_params
   helper PdfHelper
   helper EnrollmentsPdfHelper
@@ -63,12 +61,13 @@ class NotificationsController < ApplicationController
     config.columns[:query_offset].description = I18n.t(
       "active_scaffold.notification.query_offset_description"
     )
-    config.columns[:query].update_columns = [:query]
+    config.columns[:query].send_form_on_update_column = true
+    config.columns[:query].update_columns = [:body_template, :query]
     config.columns[:template_type].form_ui = :select
     config.columns[:template_type].options = {
       options: Notification::TEMPLATE_TYPES,
     }
-    #config.columns[:to_template].description = "Use {% emails Secretaria %} para todos emails de usuários da secretaria."
+    # config.columns[:to_template].description = "Use {% emails Secretaria %} para todos emails de usuários da secretaria."
 
 
     config.create.label = :create_notification_label
@@ -93,7 +92,7 @@ class NotificationsController < ApplicationController
   def simulate
     @notification = Notification.find(params[:id])
     # Execute notification with current parameters
-    args = @notification.prepare_params_and_derivations(get_query_params)
+    args = prepare_simulation_args
     result = @notification.execute(skip_update: true, override_params: args)
     @messages = result[:notifications]
     @query_sql = result[:query]
@@ -125,33 +124,23 @@ class NotificationsController < ApplicationController
     render action: "simulate"
   end
 
-  def notify
-    Notifier.logger.info "Sending Registered Notifications"
-
-    Notifier.logger.info "[Notifications] #{Time.now.to_fs} - Notifications from DB"
-    notifications = []
-    notifications_attachments = {}
-
-    # Get the next execution time arel table
-    next_execution = Notification.arel_table[:next_execution]
-
-    # Find notifications that should run
-    Notification.where.not(frequency: Notification::MANUAL)
-      .where(next_execution.lt(Time.now)).each do |notification|
-        result = prepare_attachments(notification.execute)
-        notifications.concat(result[:notifications])
-        notifications_attachments.merge!(result[:notifications_attachments])
-      end
-
-    Notifier.send_emails({
-      notifications: notifications,
-      notifications_attachments: notifications_attachments
-    })
-
-    render inline: "Ok", content_type: "text/html"
-  end
-
   private
+    # Data mal digitada na tela de simulação é erro de preenchimento, não
+    # defeito: avisa e simula com a data padrão da notificação, em vez de
+    # derrubar a página.
+    def prepare_simulation_args
+      query_params = get_query_params
+      @notification.prepare_params_and_derivations(query_params)
+    rescue Date::Error
+      flash.now[:alert] = I18n.t(
+        "activerecord.errors.models.notification.invalid_query_date",
+        date: query_params[:data_consulta]
+      )
+      @notification.prepare_params_and_derivations(
+        query_params.except(:data_consulta)
+      )
+    end
+
     def get_query_params
       return params[:query_params].to_unsafe_h if params[:query_params].is_a?(
         ActionController::Parameters
