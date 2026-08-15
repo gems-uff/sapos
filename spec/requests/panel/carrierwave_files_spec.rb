@@ -124,8 +124,9 @@ RSpec.describe "Painel :: Coletor de lixo", type: :request do
       post run_mark_and_sweep_carrierwave_files_path
       expect(CarrierwaveOrphanFile.where(carrierwave_file_id: orphan.id)).to exist
 
-      expect { post delete_all_carrierwave_files_path }
-        .to change { ar_file.where(id: orphan.id).count }.from(1).to(0)
+      expect do
+        post delete_all_carrierwave_files_path
+      end.to change { ar_file.where(id: orphan.id).count }.from(1).to(0)
 
       expect(response).to redirect_to(carrierwave_files_path)
       expect(CarrierwaveOrphanFile.where(carrierwave_file_id: orphan.id))
@@ -144,8 +145,9 @@ RSpec.describe "Painel :: Coletor de lixo", type: :request do
       orphan = create_orphan_file("e")
       post run_mark_and_sweep_carrierwave_files_path
 
-      expect { delete carrierwave_file_path(orphan) }
-        .to change { ar_file.where(id: orphan.id).count }.from(1).to(0)
+      expect do
+        delete carrierwave_file_path(orphan)
+      end.to change { ar_file.where(id: orphan.id).count }.from(1).to(0)
 
       expect(CarrierwaveOrphanFile.where(carrierwave_file_id: orphan.id))
         .not_to exist

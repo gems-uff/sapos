@@ -23,13 +23,13 @@ RSpec.describe "Cobertura das referencias de carrier_wave_files", type: :model d
   # nao gerar falso positivo com uploaders de bibliotecas. Devolve pares
   # [classe_do_model, coluna].
   def app_mounted_columns
-    Dir[Rails.root.join("app/models/**/*.rb")].flat_map do |path|
-      columns = File.read(path).scan(/mount_uploader\s+:(\w+)/).flatten
+    root = Rails.root.join("app", "models")
+    root.glob("**/*.rb").flat_map do |path|
+      columns = path.read.scan(/mount_uploader\s+:(\w+)/).flatten
       next [] if columns.empty?
 
-      relative = path.to_s.sub("#{Rails.root}/app/models/", "").sub(/\.rb\z/, "")
-      klass = relative.camelize.constantize
-      columns.map { |column| [klass, column] }
+      name = path.relative_path_from(root).to_s.delete_suffix(".rb").camelize
+      columns.map { |column| [name.constantize, column] }
     end
   end
 
