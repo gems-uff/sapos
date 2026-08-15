@@ -5,6 +5,7 @@
 
 class Admissions::FilledFormField < ActiveRecord::Base
   has_paper_trail
+  include CarrierWaveFileCleanup
 
   serialize :list, coder: YAML
 
@@ -20,6 +21,10 @@ class Admissions::FilledFormField < ActiveRecord::Base
   validates :form_field, presence: true
 
   mount_uploader :file, FormFileUploader
+
+  def mount_uploader_name
+    :file
+  end
 
   validate :that_either_value_or_file_is_filled
   validate :that_value_follows_configuration_rules
