@@ -12,6 +12,7 @@ module ClassScheduleHelperConcern
     star = false
     first = 1
     last = 5
+    # debugger
     course_classes.each do |course_class|
       course_class.allocations.each do |allocation|
         index = I18n.translate("date.day_names").index(allocation.day)
@@ -64,14 +65,13 @@ module ClassScheduleHelperConcern
         end
         star = true
       end
-
+      # debugger
       course[-1] = rescue_blank_text(course_class.professors_elements, method_call: :name)
       if ! course_type.on_demand || keep_on_demand
         table_data << course
       else
-        (
-          on_demand_professors[course_class.course_id] ||= []
-        ) << course_class.professors
+        on_demand_professors[course_class.course_id] ||= []
+        on_demand_professors[course_class.course_id] += course_class.professors
       end
     end
 

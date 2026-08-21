@@ -135,7 +135,7 @@ class ClassEnrollmentRequestsController < ApplicationController
     }
 
     add_professor_search_column(config)
-    config.columns[:professor].includes = { course_class: :professor }
+    config.columns[:professor].includes = { course_class: :professors }
 
     config.field_search.columns = [
       :action,

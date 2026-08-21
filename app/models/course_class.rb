@@ -8,7 +8,6 @@ class CourseClass < ApplicationRecord
   has_paper_trail
 
   belongs_to :course, optional: false
-  # belongs_to :professor, optional: false
   has_many :course_class_professors, dependent: :destroy
   has_many :professors, through: :course_class_professors
 
@@ -19,7 +18,6 @@ class CourseClass < ApplicationRecord
   has_many :enrollment_requests, through: :class_enrollment_requests
 
   validates :course, presence: true
-  # validates :professor, presence: true
   validates :year, presence: true
   validates :semester,
     presence: true,

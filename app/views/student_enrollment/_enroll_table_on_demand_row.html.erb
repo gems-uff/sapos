@@ -26,11 +26,10 @@
   professor_options = options.merge(
     tdclass: "cell-#{table[:header][0][-1].downcase}"
   )
-
   on_demand_name = "course_ids[#{row[0][:course_id]}][professor]"
   on_demand_options = {}
   on_demand_options = { selected: select_professor.id } if !select_professor.nil?
-  on_demand_options = { selected: cer.course_class.professor.id } if !cer.nil?
+  on_demand_options = { selected: cer.course_class.professors } if !cer.nil?
   on_demand_options[:include_blank] = I18n.t(
     "student_enrollment.enroll.on_demand_select"
   )

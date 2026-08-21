@@ -17,7 +17,8 @@ module StudentEnrollmentHelper
       )
         cer = temp_cer
         row[0][:id] = cer.course_class_id
-        row[-1] = cer.course_class.professor.name
+
+        row[-1] = cer.course_class.professors_names
       end
     end
     cer

@@ -116,7 +116,6 @@ class EmailTemplate < ApplicationRecord
       subject: I18n.t(
         "notifications.class_enrollment.email_to_professor.subject"
       ),
-      # to: "{{ record.course_class.professors.first.email }}",
       to: "{{ record.course_class.professors_emails }}",
       variables: {
         record: ClassEnrollmentDrop

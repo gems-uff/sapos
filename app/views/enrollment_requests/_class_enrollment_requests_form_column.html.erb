@@ -27,6 +27,7 @@
       <%= t "enrollment_request.effected_change" %>
     </span>
     <input type="hidden" name="record[class_enrollment_requests][0]" value="">
+    <% # debugger %>
     <% table = prepare_class_schedule_table(
       @record.class_enrollment_requests.collect(&:course_class), [], [],
       keep_on_demand = true
