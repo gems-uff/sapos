@@ -61,33 +61,11 @@ module CourseClassesHelper
   end
 
   def professor_form_column(record, options)
-    # puts "🔴 course_classes_helper:professors_form_column"; debugger
     if can?(:post_grades, record) && cannot?(:update_all_fields, record)
       options[:disabled] = true
     end
     column = active_scaffold_config.columns[:professors]
     active_scaffold_input_select(column, record, options)
-    # active_scaffold_input_for(active_scaffold_config.columns[:professors], record, options)
-    # puts "🔴 course_classes_helper:professors_form_column"; debugger
-
-    # options[:controller] = "professors"
-    # puts "🔴 course_classes_helper:professors_form_column"; debugger
-    # options[:multiple] = true
-    # # puts "🔴 course_classes_helper:professors_form_column"; debugger
-    # options[:controller] = :professors
-    # puts "🔴 course_classes_helper:professors_form_column"; debugger
-    # record_select_field :professors, record, options
-    # puts "🔴 course_classes_helper:professors_form_column"; debugger
-    # professor_options = Professor.order(:name).map { |professor| [professor.name, professor.id] }
-
-    # select(
-    #   :record,
-    #   :professor_ids,
-    #   options_for_select(professor_options, record.professors.pluck(:id)),
-    #   { include_blank: false },
-    #   options.merge(multiple: true)
-    # )
-    # record_select_field :professor, record.professors || Professor.new, options
   end
 
   def year_form_column(record, options)
