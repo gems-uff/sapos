@@ -59,4 +59,40 @@ module ClassSchedulesPdfHelper
       # star_text += "*"
     end
   end
+
+  def class_schedule_list_pdf(pdf, options = {})
+    list = prepare_class_schedule_list(options[:course_classes], options[:on_demand])
+
+    pdf.move_down 15
+    pdf.text "<b>#{
+      I18n.t("pdf_content.class_schedule.class_schedule_list.courses_offered")
+    }: #{list.size}</b>", inline_format: true
+    pdf.move_down 10
+
+    list.each do |item|
+      pdf.text "<b>#{item[:name]}</b>", inline_format: true
+      pdf.indent(10) do
+        if item[:no_schedule]
+          pdf.text I18n.t(
+            "activerecord.attributes.class_schedule.table.noschedule"
+          )
+        else
+          class_schedule_day_groups(item[:allocations]).each do |group|
+            pdf.text class_schedule_allocation_label(group)
+          end
+        end
+        if item[:professor].present?
+          pdf.text "#{I18n.t(
+            "activerecord.attributes.class_schedule.table.professor"
+          )}: #{item[:professor]}"
+        end
+      end
+      pdf.move_down 8
+    end
+
+    unless CustomVariable.class_schedule_text.blank?
+      pdf.move_down 5
+      pdf.text CustomVariable.class_schedule_text
+    end
+  end
 end

@@ -215,6 +215,15 @@ RSpec.describe "Saídas em PDF e XLSX", type: :request do
       )
     end
 
+    it "mantém o conteúdo do baseline da versão acessível" do
+      get class_schedule_list_class_schedule_path(@class_schedule, format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "class_schedule_list", response.body, format: :pdf
+      )
+    end
+
     it "mantém o conteúdo do baseline da listagem de turmas" do
       # Sem ano e semestre a ação recusa e redireciona (flash de erro em
       # pdf_content.class_schedule.class_schedule_pdf). O active_scaffold guarda

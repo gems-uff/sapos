@@ -197,4 +197,42 @@ RSpec.describe "ClassSchedules features", type: :feature do
       expect(download).to match(/QUADRO DE HORÁRIOS \(2022_1\)\.pdf/)
     end
   end
+
+  describe "class_schedule_list page" do
+    before(:each) do
+      login_as(@user)
+      professor = FactoryBot.create(:professor, name: "Ana Paula")
+      course = FactoryBot.create(:course, name: "Estruturas de Dados")
+      @course_class = FactoryBot.create(
+        :course_class, year: 2022, semester: 1,
+        course: course, professor: professor
+      )
+      allocation = FactoryBot.create(
+        :allocation, course_class: @course_class, day: "Terça",
+        start_time: 10, end_time: 12, room: "208"
+      )
+      # Ordem inversa da criação: FKs de course_class apontam para
+      # professor/course, e allocation aponta para course_class.
+      @destroy_later << allocation
+      @destroy_later << @course_class
+      @destroy_later << course
+      @destroy_later << professor
+      visit url_path
+    end
+
+    it "should show a link next to the PDF download" do
+      expect(page).to have_css(
+        "#as_#{plural_name}-class_schedule_list-#{@record.id}-link"
+      )
+    end
+
+    it "should download the accessible schedule as a pdf document", js: true do
+      find("#as_#{plural_name}-class_schedule_list-#{@record.id}-link").click
+
+      wait_for_download
+      expect(download).to match(
+        /Quadro de Horários \(versão acessível\) \(2022_1\)\.pdf/
+      )
+    end
+  end
 end

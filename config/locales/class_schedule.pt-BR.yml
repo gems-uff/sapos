@@ -34,3 +34,7 @@ pt-BR:
         title: "QUADRO DE HORÁRIOS"
         link: "Quadro de Horários"
         year_semester_error: 'Selecione Ano/Semestre na busca!'
+      class_schedule_list:
+        title: "Quadro de Horários (versão acessível)"
+        link: "Versão acessível"
+        courses_offered: "Disciplinas ofertadas"
