@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
+ActiveRecord::Schema[7.2].define(version: 2026_08_24_130000) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -185,6 +185,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.integer "enrollment_status_id"
     t.string "enrollment_number_field"
     t.date "admission_date"
+    t.string "used_vacancy_type_field"
+    t.string "homologated_affirmative_policies_field"
     t.index ["enrollment_status_id"], name: "index_admission_processes_on_enrollment_status_id"
     t.index ["form_template_id"], name: "index_admission_processes_on_form_template_id"
     t.index ["letter_template_id"], name: "index_admission_processes_on_letter_template_id"
@@ -243,6 +245,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.integer "level_id"
     t.datetime "created_at", precision: nil, null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.datetime "start_date"
+    t.datetime "end_date"
     t.index ["level_id"], name: "index_advisement_authorizations_on_level_id"
     t.index ["professor_id"], name: "index_advisement_authorizations_on_professor_id"
   end
@@ -284,7 +288,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "query_id", null: false
-    t.text "assertion_template"
+    t.string "assertion_template"
     t.boolean "student_can_generate", default: false
     t.integer "expiration_in_months"
     t.string "template_type", default: "Liquid"
@@ -301,6 +305,15 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.string "content_type"
     t.integer "size"
     t.index ["medium_hash"], name: "index_carrier_wave_files_on_medium_hash"
+  end
+
+  create_table "carrierwave_orphan_files", force: :cascade do |t|
+    t.integer "carrierwave_file_id", null: false
+    t.string "original_model"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["carrierwave_file_id"], name: "index_carrierwave_orphan_files_on_carrierwave_file_id", unique: true
+    t.index ["original_model"], name: "index_carrierwave_orphan_files_on_original_model"
   end
 
   create_table "cities", force: :cascade do |t|
@@ -532,6 +545,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.integer "research_area_id"
     t.text "obs_to_academic_transcript"
     t.integer "research_line_id"
+    t.string "used_vacancy_type"
+    t.string "homologated_affirmative_policies"
     t.index ["enrollment_number"], name: "index_enrollments_on_enrollment_number"
     t.index ["enrollment_status_id"], name: "index_enrollments_on_enrollment_status_id"
     t.index ["level_id"], name: "index_enrollments_on_level_id"
@@ -564,6 +579,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.string "file"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["file"], name: "index_filled_form_fields_on_file"
     t.index ["filled_form_id"], name: "index_filled_form_fields_on_filled_form_id"
     t.index ["form_field_id"], name: "index_filled_form_fields_on_form_field_id"
   end
@@ -826,8 +842,8 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
 
   create_table "program_levels", force: :cascade do |t|
     t.integer "level", null: false
-    t.date "start_date", null: false
-    t.date "end_date"
+    t.datetime "start_date", null: false
+    t.datetime "end_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "ordinance"
@@ -873,8 +889,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.string "behavior_on_invalid_condition", default: "Erro - apenas em seletores"
     t.string "behavior_on_invalid_ranking", default: "Erro"
     t.boolean "candidate_can_see", default: false, null: false
+    t.integer "group_field_id"
     t.index ["form_condition_id"], name: "index_ranking_configs_on_form_condition_id"
     t.index ["form_template_id"], name: "index_ranking_configs_on_form_template_id"
+    t.index ["group_field_id"], name: "index_ranking_configs_on_group_field_id"
     t.index ["machine_field_id"], name: "index_ranking_configs_on_machine_field_id"
     t.index ["position_field_id"], name: "index_ranking_configs_on_position_field_id"
   end
@@ -926,6 +944,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.integer "signature_type", default: 0
     t.integer "expiration_in_months"
     t.boolean "use_at_assertion", default: false, null: false
+    t.index ["image"], name: "index_report_configurations_on_image"
   end
 
   create_table "reports", force: :cascade do |t|
@@ -939,7 +958,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.integer "invalidated_by_id"
     t.datetime "invalidated_at"
     t.index ["carrierwave_file_id"], name: "index_reports_on_carrierwave_file_id"
-    t.index ["generated_by_id"], name: "index_reports_on_generated_by_id"
     t.index ["invalidated_by_id"], name: "index_reports_on_invalidated_by_id"
   end
 
@@ -1073,9 +1091,9 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.string "photo", limit: 255
     t.integer "birth_country_id"
     t.integer "user_id", limit: 8
-    t.string "gender"
     t.string "skin_color"
     t.string "pcd"
+    t.string "gender"
     t.string "humanitarian_policy"
     t.text "obs_pcd"
     t.text "obs_gender"
@@ -1084,6 +1102,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.index ["birth_state_id"], name: "index_students_on_state_id"
     t.index ["city_id"], name: "index_students_on_city_id"
     t.index ["cpf"], name: "index_students_on_cpf"
+    t.index ["photo"], name: "index_students_on_photo"
     t.index ["user_id"], name: "index_students_on_user_id"
   end
 
@@ -1151,6 +1170,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
+  add_foreign_key "assertions", "queries"
   add_foreign_key "course_research_lines", "courses"
   add_foreign_key "course_research_lines", "research_lines"
   add_foreign_key "enrollments", "research_lines", on_delete: :nullify

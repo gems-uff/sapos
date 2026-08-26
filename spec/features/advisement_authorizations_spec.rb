@@ -48,7 +48,7 @@ RSpec.describe "Advisements features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Credenciamentos"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Orientador", "Nível", ""
+        "Orientador", "Nível", "Data de credenciamento", "Data de descredenciamento", ""
       ]
     end
 
@@ -69,6 +69,9 @@ RSpec.describe "Advisements features", type: :feature do
       expect(page).to have_content "Adicionar Credenciamento"
       fill_record_select("professor_", "professors", "Helena")
       find(:select, "record_level_").find(:option, text: @level2.name).select_option
+      find("#record_start_date_").click
+      page.execute_script("$('#record_start_date_').datepicker('setDate', new Date(2020, 0, 1))")
+      page.execute_script("$('#ui-datepicker-div').hide()")
       click_button_and_wait "Salvar"
       expect(page).to have_no_css(".as_form")
       expect(page).to have_css("tr:nth-child(1) td.professor-column", text: "Helena")
@@ -104,6 +107,19 @@ RSpec.describe "Advisements features", type: :feature do
       expect(page).to have_css("#as_#{plural_name}-list-#{@record.id}-row td.level-column", text: "Doutorado")
       @record.level = @level2
       @record.save!
+    end
+
+    it "should be able to de-accredit a professor by setting the end date" do
+      find("#record_start_date_#{@record.id}").click
+      page.execute_script("$('#record_start_date_#{@record.id}').datepicker('setDate', new Date(2020, 0, 1))")
+      page.execute_script("$('#ui-datepicker-div').hide()")
+      find("#record_end_date_#{@record.id}").click
+      page.execute_script("$('#record_end_date_#{@record.id}').datepicker('setDate', new Date(2020, 5, 1))")
+      page.execute_script("$('#ui-datepicker-div').hide()")
+      click_button_and_wait "Atualizar"
+      expect(page).to have_no_css(".as_form")
+      expect(@record.reload.end_date).not_to be_nil
+      @record.update!(start_date: Time.now, end_date: nil)
     end
   end
 

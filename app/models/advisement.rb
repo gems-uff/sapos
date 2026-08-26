@@ -101,12 +101,15 @@ class Advisement < ApplicationRecord
   def enrollment_has_authorized_advisor
     return unless CustomVariable.enable_advisor_accreditation_validation
     return if enrollment.blank? || enrollment.level.blank?
-    return if professor.present? && professor.advisement_authorizations.any? { |auth| auth.level == enrollment.level }
+    # Aluno desligado não tem orientação em curso: não faz sentido exigir
+    # credenciamento vigente do orientador, que pode ter sido encerrado depois.
+    return if enrollment.dismissal.present?
+    return if professor.present? && professor.advisement_authorizations.any? { |auth| auth.level == enrollment.level && auth.active_on?(Date.current) }
 
     advisements = enrollment.advisements.reject(&:marked_for_destruction?)
     has_authorized = advisements.any? do |a|
       a.professor.present? &&
-        a.professor.advisement_authorizations.any? { |auth| auth.level == enrollment.level }
+        a.professor.advisement_authorizations.any? { |auth| auth.level == enrollment.level && auth.active_on?(Date.current) }
     end
 
     errors.add(:base, :no_advisor_with_level) unless has_authorized
