@@ -75,4 +75,18 @@ RSpec.describe "Reports download gate", type: :request do
       expect(response).to redirect_to(download_path(medium_hash: file.medium_hash))
     end
   end
+
+  describe "invalidating an expired report" do
+    it "still purges the stored file (expiration must not block invalidation)" do
+      report = FactoryBot.create(
+        :report, user: @user, carrierwave_file: carrierwave_file,
+        expires_at: Date.yesterday
+      )
+
+      put invalidate_report_path(report)
+
+      expect(report.reload.carrierwave_file).to be_nil
+      expect(report.invalidated_at).to be_present
+    end
+  end
 end

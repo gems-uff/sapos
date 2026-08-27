@@ -46,7 +46,7 @@ class ReportsController < ApplicationController
                    type: :member,
                    method: :put,
                    confirm: "Tem certeza que deseja invalidar este documento?",
-                   ignore_method: :cant_download?
+                   ignore_method: :already_invalidated?
   end
 
   def before_create_save(record)
@@ -83,6 +83,10 @@ class ReportsController < ApplicationController
     end
 
     def cant_download?(record)
-      record.carrierwave_file.blank? || record.expired?
+      already_invalidated?(record) || record.expired?
+    end
+
+    def already_invalidated?(record)
+      record.carrierwave_file.blank?
     end
 end
