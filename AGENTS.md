@@ -95,6 +95,9 @@ humanos e para outros agentes.
 - `homologacao` — quando nem isso alcança: compara o SAPOS antes e depois em
   homologação, capturando telas, PDFs e planilhas nas duas versões, contra o
   mesmo banco.
+- `merge-downstream` — traz a `main` para dentro de um ramo de issue e confere se
+  ela entrou inteira, inclusive o que o git não vê. Use ao atualizar ramo
+  atrasado, ao revisar merge alheio, ou antes de aceitar um ramo para release.
 - `release` — fecha o ciclo: merge fast-forward na `main`, tag anotada, label e
   issues no GitHub, release publicada. O deploy em si continua sendo do mantenedor.
 
