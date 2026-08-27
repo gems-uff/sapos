@@ -15,5 +15,11 @@ pt-BR:
         one: "Credenciamento"
         other: "Credenciamentos"
 
+    errors:
+      models:
+        advisement_authorization:
+          end_date_before_start_date: "A data de descredenciamento não pode ser anterior à data de credenciamento"
+          active_authorization_exists: "Já existe um credenciamento ativo para este orientador neste nível"
+
   active_scaffold:
     create_advisement_authorization_label: "Adicionar Credenciamento"

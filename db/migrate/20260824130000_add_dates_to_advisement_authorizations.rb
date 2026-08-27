@@ -5,8 +5,8 @@
 
 class AddDatesToAdvisementAuthorizations < ActiveRecord::Migration[7.1]
   def up
-    add_column :advisement_authorizations, :start_date, :datetime
-    add_column :advisement_authorizations, :end_date, :datetime
+    add_column :advisement_authorizations, :start_date, :date
+    add_column :advisement_authorizations, :end_date, :date
 
     # Credenciamentos que já existiam não têm data informada; a melhor
     # aproximação disponível é quando a linha entrou no banco. Todos ficam

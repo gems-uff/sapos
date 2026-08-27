@@ -108,18 +108,31 @@ RSpec.describe "Advisements features", type: :feature do
       @record.level = @level2
       @record.save!
     end
+  end
+
+  describe "de-accreditation page", js: true do
+    # Registro dedicado (professor sem credenciamento prévio) para não mutar o
+    # @record compartilhado do before(:all); @destroy_later o remove no fim de
+    # cada exemplo, já que specs de feature não têm rollback de transação.
+    before(:each) do
+      @destroy_later << @deaccredit_record = FactoryBot.create(
+        :advisement_authorization, professor: @professor4, level: @level2
+      )
+      login_as(@user)
+      visit url_path
+      find("#as_#{plural_name}-edit-#{@deaccredit_record.id}-link").click
+    end
 
     it "should be able to de-accredit a professor by setting the end date" do
-      find("#record_start_date_#{@record.id}").click
-      page.execute_script("$('#record_start_date_#{@record.id}').datepicker('setDate', new Date(2020, 0, 1))")
+      find("#record_start_date_#{@deaccredit_record.id}").click
+      page.execute_script("$('#record_start_date_#{@deaccredit_record.id}').datepicker('setDate', new Date(2020, 0, 1))")
       page.execute_script("$('#ui-datepicker-div').hide()")
-      find("#record_end_date_#{@record.id}").click
-      page.execute_script("$('#record_end_date_#{@record.id}').datepicker('setDate', new Date(2020, 5, 1))")
+      find("#record_end_date_#{@deaccredit_record.id}").click
+      page.execute_script("$('#record_end_date_#{@deaccredit_record.id}').datepicker('setDate', new Date(2020, 5, 1))")
       page.execute_script("$('#ui-datepicker-div').hide()")
       click_button_and_wait "Atualizar"
       expect(page).to have_no_css(".as_form")
-      expect(@record.reload.end_date).not_to be_nil
-      @record.update!(start_date: Time.now, end_date: nil)
+      expect(@deaccredit_record.reload.end_date).not_to be_nil
     end
   end
 

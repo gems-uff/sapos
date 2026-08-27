@@ -36,13 +36,7 @@ class AdvisementAuthorization < ApplicationRecord
   private
     def end_date_after_start_date
       return if end_date.blank? || start_date.blank?
-      if end_date < start_date
-        errors.add(
-          :end_date,
-          "A data de descredenciamento não pode ser anterior à " \
-          "data de credenciamento"
-        )
-      end
+      errors.add(:end_date, :end_date_before_start_date) if end_date < start_date
     end
 
     # Um professor não pode ter dois credenciamentos abertos no mesmo nível:
@@ -52,11 +46,6 @@ class AdvisementAuthorization < ApplicationRecord
       exists = AdvisementAuthorization
         .where(professor_id: professor_id, level_id: level_id, end_date: nil)
         .where.not(id: id).exists?
-      if exists
-        errors.add(
-          :base,
-          "Já existe um credenciamento ativo para este orientador neste nível"
-        )
-      end
+      errors.add(:base, :active_authorization_exists) if exists
     end
 end
