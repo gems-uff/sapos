@@ -168,6 +168,15 @@ class Ability
         can :update, PaperStudent, paper: { owner: user.professor }
         can :destroy, PaperProfessor, paper: { owner: user.professor }
         can :destroy, PaperStudent, paper: { owner: user.professor }
+        # An ownerless parent is not an orphaned record: Paper#owner is
+        # `optional: false`, so none ever reaches the database. It is the
+        # in-memory paper of the subform -- when an authorship row is added to a
+        # paper that is still unsaved, active_scaffold builds the parent through
+        # `new_model`, which does not go through PapersController#do_new, the
+        # very hook that would assign the owner. Without these two rules the
+        # row's remove link degrades into an access-denied notice.
+        can :destroy, PaperProfessor, paper: { owner: nil }
+        can :destroy, PaperStudent, paper: { owner: nil }
         can :destroy, Paper, owner: user.professor
       end
     end

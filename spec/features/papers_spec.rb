@@ -147,6 +147,57 @@ RSpec.describe "Papers features", type: :feature do
     end
   end
 
+  # Os demais exemplos entram como administrador, que passa por `can :manage` e
+  # nao exercita nenhuma regra de posse do Ability. Quem usa esta tela de
+  # verdade e o professor, cadastrando os proprios artigos -- e e so no papel
+  # dele que as regras de PaperProfessor e PaperStudent decidem alguma coisa.
+  describe "authorship subform as professor", js: true do
+    # A linha de autoria vai no artigo que ja existe, de proposito: artigo novo
+    # aqui entraria na lista e quebraria o exemplo de ordenacao sempre que o
+    # sorteio puser este grupo na frente daquele.
+    before(:all) do
+      @role_professor = FactoryBot.create(:role_professor)
+      @professor_user = create_confirmed_user(
+        [@role_professor], "docente@ic.uff.br", "Ana", "A1b2c3d4!", professor: @professor1
+      )
+      @own_row = FactoryBot.create(:paper_professor,
+        paper: @record, professor: @professor2
+      )
+    end
+
+    before(:each) { login_as(@professor_user) }
+
+    # A linha nasce de uma ida ao servidor -- o "Criar Outro" chama
+    # edit_associated sem id, e o artigo pai sai de `new_model`, que nao passa
+    # pelo do_new do controller, o unico lugar que atribui o owner. A gem entao
+    # pergunta `can? :destroy` sobre uma linha cujo artigo esta sem dono, e so
+    # desenha o link se a resposta for sim; senao troca por um span vazio, e a
+    # linha recem-criada fica sem como sair do formulario.
+    %w[paper_professors paper_students].each do |association|
+      it "removes a #{association} row added to a paper that is still unsaved" do
+        visit url_path
+        click_link_and_wait "Adicionar"
+        subform = "as_#{plural_name}-99999999999-#{association}-subform"
+
+        click_link_and_wait "#{subform}-div-create-another"
+        row = find("##{subform}-list tbody.sub-form-record")
+        expect(row).to have_link("Remover")
+
+        row.click_link("Remover")
+        expect(page).to have_no_css("##{subform}-list tbody.sub-form-record")
+      end
+    end
+
+    it "removes an authorship row of a paper it already owns" do
+      visit url_path
+      find("#as_#{plural_name}-edit-#{@record.id}-link").click
+      subform = "as_#{plural_name}-#{@record.id}-paper_professors-subform"
+
+      row = find("##{subform}-list tbody.sub-form-record")
+      expect(row).to have_link("Remover")
+    end
+  end
+
   describe "edit page", js: true do
     before(:each) do
       login_as(@user)
