@@ -81,16 +81,22 @@ module SharedPdfConcern
   end
 
   def prepare_attachments(notification_result)
-    notification_result[:notifications].each do |message|
+    messages = notification_result[:notifications].select do |message|
       attachments = notification_result[:notifications_attachments][message]
-      next if attachments.blank?
-      if attachments[:grades_report_pdf]
-        enrollment = Enrollment.find(message[:enrollments_id])
-        filename = "grades_report.pdf"
-        signature_type = 0
-        attachments[:grades_report_pdf][:file_contents] =
-          render_enrollments_grades_report_pdf(enrollment, filename, signature_type, watermark: true)
-      end
+      attachments.present? && attachments[:grades_report_pdf]
+    end
+    # Preload every enrollment in one query instead of one Enrollment.find per
+    # message: a notification can fan out to hundreds of students.
+    enrollments = Enrollment.where(
+      id: messages.map { |message| message[:enrollments_id] }
+    ).index_by(&:id)
+    messages.each do |message|
+      attachments = notification_result[:notifications_attachments][message]
+      enrollment = enrollments[message[:enrollments_id].to_i]
+      filename = "grades_report.pdf"
+      signature_type = 0
+      attachments[:grades_report_pdf][:file_contents] =
+        render_enrollments_grades_report_pdf(enrollment, filename, signature_type, watermark: true)
     end
     notification_result
   end
