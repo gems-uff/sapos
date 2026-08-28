@@ -47,7 +47,8 @@ class CarrierwaveFilesController < ApplicationController
       confirm: I18n.t("panel.garbage_collector.confirm_delete_all"),
       type: :collection,
       crud_type: :delete,
-      position: :top
+      position: :top,
+      dynamic_parameters: -> { search_params.present? ? { search: search_params } : {} }
 
     config.action_links.add :run_mark_and_sweep,
       label: I18n.t("panel.garbage_collector.run_mark_and_sweep"),
@@ -68,6 +69,12 @@ class CarrierwaveFilesController < ApplicationController
 
   def delete_all
     raise CanCan::AccessDenied.new if cannot?(:destroy, CarrierWave::Storage::ActiveRecord::ActiveRecordFile)
+
+    # Um filtro que chega no POST (via dynamic_parameters do action link) e
+    # persistido na sessao, de onde o do_search abaixo o le. O guard evita o outro
+    # ramo de store_search_params_into_session, que APAGA o filtro salvo quando
+    # params[:search] esta vazio.
+    store_search_params_into_session if params[:search].present?
 
     each_record_in_page { }
     filtered_records = find_page(

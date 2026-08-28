@@ -138,6 +138,73 @@ RSpec.describe "Painel :: Coletor de lixo", type: :request do
 
       expect(response).to redirect_to(carrierwave_files_path)
     end
+
+    # Regressao: com um filtro aplicado, "Excluir Todos" apaga SO os orfaos
+    # filtrados -- nao a lista inteira. Os dois orfaos tem original_filename
+    # distinto (f-orfao-manter... e f-orfao-remover...), entao o filtro de texto
+    # por "remover" casa so um deles.
+    it "apaga so os orfaos filtrados quando o filtro vem no POST" do
+      manter = create_orphan_file("manter")
+      remover = create_orphan_file("remover")
+      post run_mark_and_sweep_carrierwave_files_path
+
+      expect do
+        post delete_all_carrierwave_files_path,
+          params: { search: { original_filename: "remover" } }
+      end.to change { ar_file.where(id: remover.id).count }.from(1).to(0)
+
+      expect(ar_file.where(id: manter.id)).to exist
+      expect(CarrierwaveOrphanFile.where(carrierwave_file_id: manter.id)).to exist
+      expect(CarrierwaveOrphanFile.where(carrierwave_file_id: remover.id))
+        .not_to exist
+    end
+
+    it "apaga so os orfaos filtrados quando o filtro esta na sessao" do
+      manter = create_orphan_file("manter")
+      remover = create_orphan_file("remover")
+      post run_mark_and_sweep_carrierwave_files_path
+
+      # Guarda o filtro na sessao (mesma chave as:carrierwave_files) e dispara o
+      # delete_all sem repassar params -- ele deve ler o filtro da sessao.
+      get carrierwave_files_path, params: { search: { original_filename: "remover" } }
+
+      expect do
+        post delete_all_carrierwave_files_path
+      end.to change { ar_file.where(id: remover.id).count }.from(1).to(0)
+
+      expect(ar_file.where(id: manter.id)).to exist
+      expect(CarrierwaveOrphanFile.where(carrierwave_file_id: manter.id)).to exist
+    end
+
+    # Mesma regressao, mas filtrando pela coluna virtual "Modelo Original"
+    # (search_sql "", condicao via condition_for_original_model_column). O
+    # original_model so existe apos o Mark-and-Sweep cruzar com versions.
+    it "apaga so os orfaos filtrados quando o filtro e por modelo original" do
+      student_orphan = create_orphan_file("do-student")
+      Version.create!(
+        item_type: "Student", item_id: 111, event: "update",
+        object: "---\nphoto: #{student_orphan.medium_hash}\n"
+      )
+      config_orphan = create_orphan_file("do-config")
+      Version.create!(
+        item_type: "ReportConfiguration", item_id: 222, event: "update",
+        object: "---\nimage: #{config_orphan.medium_hash}\n"
+      )
+      post run_mark_and_sweep_carrierwave_files_path
+      expect(
+        CarrierwaveOrphanFile.find_by(carrierwave_file_id: student_orphan.id)
+          .original_model
+      ).to eq("Student")
+
+      expect do
+        post delete_all_carrierwave_files_path,
+          params: { search: { original_model: "student" } }
+      end.to change { ar_file.where(id: student_orphan.id).count }.from(1).to(0)
+
+      expect(ar_file.where(id: config_orphan.id)).to exist
+      expect(CarrierwaveOrphanFile.where(carrierwave_file_id: config_orphan.id))
+        .to exist
+    end
   end
 
   describe "DELETE de um unico arquivo (do_destroy)" do
