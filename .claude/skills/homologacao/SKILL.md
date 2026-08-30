@@ -301,6 +301,14 @@ Três medidas que custam uma rodada cada:
   própria, com mensagem nomeando o campo — e o relatório acusa um bloqueio que é
   do instrumento, não do sistema.
 
+**Antes de escrever sonda para uma correção que veio de fora, prove que o caminho
+dela executa aqui.** Procure a chamada, a configuração que a liga, a condição que
+a guarda — e confirme que o padrão existe em algum lugar do projeto, porque busca
+vazia não é evidência. Sonda para caminho inalcançável devolve "sem diferença", e
+isso se lê como "não regrediu": é pior do que não medir, porque consome a rodada e
+entrega falsa garantia. Correção que não alcança este sistema entra no relatório
+como tal, sem instrumento.
+
 O `explore_common.rb` desta pasta é o ponto de partida para sonda nova: sobe o
 Chrome headless, loga lendo as mesmas env vars da captura e dá helpers de
 screenshot e de erro de console. Escreva os passos da rodada como scripts curtos

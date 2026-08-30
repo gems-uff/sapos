@@ -8,6 +8,9 @@ description: Lança uma nova versão do SAPOS — merge na main, tag anotada, la
 Sequência para transformar um ramo pronto em versão publicada. O passo final —
 o deploy em produção — **é do mantenedor**; a skill vai até a release no GitHub.
 
+É o último passo do ciclo descrito em `revisar-pr`, e chega-se aqui pelo caminho
+dela — que também descreve as saídas em que **não** se lança.
+
 ## Pré-requisitos
 
 Não comece sem isto:
