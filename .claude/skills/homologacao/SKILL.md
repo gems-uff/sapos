@@ -44,18 +44,22 @@ Carregue com `set -a; source ~/.sapos_staging_env; set +a` antes de cada script.
 
 ## Ordem de execução
 
-A ordem importa. Escrita contamina a comparação, então vem por último.
+A ordem importa: escrita muda o que a captura enxerga, então cada lado escreve
+**antes** de ser fotografado, nunca entre as duas fotos.
 
 1. **Deploy da versão atual de produção** em homologação.
-2. **Captura "antes"** — os três conjuntos, em diretórios separados.
-3. **Ações de escrita** que você queira exercitar (disparo de notificação, por
-   exemplo), e **recaptura** dos conjuntos afetados, para que os dois lados
-   reflitam o mesmo estado.
-4. **Deploy da versão nova.**
-5. **Captura "depois"**, idêntica.
-6. **Comparação.**
+2. **Passada de escrita no lado "antes"** — ver "Passada de escrita". Os scripts
+   se limpam sozinhos, então o lado volta ao estado em que começou.
+3. **Captura "antes"** — os três conjuntos, em diretórios separados.
+4. **Ações de escrita adicionais** que a rodada queira exercitar e que **não** se
+   limpam (disparo de notificação, por exemplo), e **recaptura** dos conjuntos
+   afetados, para que os dois lados reflitam o mesmo estado.
+5. **Deploy da versão nova.**
+6. **Passada de escrita no lado "depois"**, idêntica à do passo 2.
+7. **Captura "depois"**, idêntica à do passo 3.
+8. **Comparação** — as capturas e os JSON das duas passadas de escrita.
 
-Entre 2 e 5 o banco **não pode ser reimportado**. Uma réplica nova traria
+Entre 3 e 7 o banco **não pode ser reimportado**. Uma réplica nova traria
 edições feitas em produção no meio do caminho, e diferenças de dado apareceriam
 como se fossem de código.
 
@@ -219,6 +223,11 @@ EXPLORE_OUT=$ANTES/leitura bundle exec ruby $S/probe_formulario.rb        # desc
 EXPLORE_OUT=$DEPOIS/leitura bundle exec ruby $S/probe_formulario.rb 859   # ids escolhidos
 ```
 
+**No "depois", passe TODOS os ids que o "antes" mediu**, não só o exemplar
+principal. Sem id a sonda redescobre os registros e mede um conjunto diferente;
+o diff então acusa registro que existe de um lado só, e isso é o instrumento
+falando, não a aplicação. Os ids medidos estão no JSON do "antes".
+
 A medida central é a **divergência entre duas obrigatoriedades que se confundem**:
 o `<li>` ganha a classe `required` quando a *configuração do template* pede o
 campo; o atributo no input é o que o *navegador* exige. Campo que a configuração
@@ -292,6 +301,14 @@ Três medidas que custam uma rodada cada:
   própria, com mensagem nomeando o campo — e o relatório acusa um bloqueio que é
   do instrumento, não do sistema.
 
+**Antes de escrever sonda para uma correção que veio de fora, prove que o caminho
+dela executa aqui.** Procure a chamada, a configuração que a liga, a condição que
+a guarda — e confirme que o padrão existe em algum lugar do projeto, porque busca
+vazia não é evidência. Sonda para caminho inalcançável devolve "sem diferença", e
+isso se lê como "não regrediu": é pior do que não medir, porque consome a rodada e
+entrega falsa garantia. Correção que não alcança este sistema entra no relatório
+como tal, sem instrumento.
+
 O `explore_common.rb` desta pasta é o ponto de partida para sonda nova: sobe o
 Chrome headless, loga lendo as mesmas env vars da captura e dá helpers de
 screenshot e de erro de console. Escreva os passos da rodada como scripts curtos
@@ -322,6 +339,61 @@ fluxo seguinte, que os reporta como se fossem da tela dele.
 nome que não casa devolve sempre o mesmo número: a medida fica idêntica nos dois
 lados e cega a qualquer regressão. Meça algo que **mude** quando você mexe na
 tela, e confira que mudou, antes de confiar na comparação.
+
+### Passada de escrita — obrigatória quando a rodada precede uma release
+
+A comparação inteira é de leitura: ela prova que as telas continuam iguais, e não
+prova que **salvar** continua funcionando. A skill `release` exige essa passada
+antes de lançar; **faça-a como parte da rodada, sem esperar pedido.**
+
+**Rode nos dois lados, como tudo o mais.** Um só lado responde "salvar funciona
+agora?", que é portão de release; os dois respondem "a mudança quebrou o salvar?",
+que é a pergunta desta skill. Sem o lado "antes", ciclo que falha é ambíguo — pode
+já estar assim —, e é exatamente essa ambiguidade que a rodada existe para
+eliminar.
+
+Onde ela entra na ordem: **antes da captura de cada lado** (passos 2 e 6), e
+nunca entre a captura "antes" e a "depois". Os dois
+scripts se limpam sozinhos — foto que sobe e sai, candidatura que é criada e
+apagada —, então cada lado volta ao estado em que começou e as capturas dos dois
+lados enxergam a mesma coisa. O rastro que sobra é linha em `/versions` e
+`/reports`, que já divergem sempre por causa da própria varredura.
+
+```bash
+# passo 0: confira redirect_email (ver "Regras de segurança"). Trava em "".
+# LADO=$ANTES antes de capturar o antes; LADO=$DEPOIS antes de capturar o depois.
+EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/probe_escrita.rb              # diagnostico
+EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/probe_escrita.rb --confirmar  # ciclo de foto
+
+bundle exec ruby $S/abrir_processo_seletivo.rb abrir 5
+EXPLORE_OUT=$LADO/submissao_escrita bundle exec ruby $S/probe_submissao.rb --confirmar
+bundle exec ruby $S/abrir_processo_seletivo.rb fechar 5
+
+diff $ANTES/escrita/probe_escrita.json $DEPOIS/escrita/probe_escrita.json
+```
+
+Numa rodada em que o lado "antes" não foi corrido — porque a versão antiga já saiu
+do ar, por exemplo —, a passada no lado novo ainda vale como portão de release.
+Só não a leia como comparação: falha ali exige conferir a versão anterior antes de
+culpar a mudança.
+
+O que cada um cobre, e o que ler no relatório:
+
+- `probe_escrita.rb --confirmar` — formulário administrativo com upload
+  CarrierWave sobre o aluno de teste: sobe foto, salva, confere, remove, salva,
+  confere. O veredito é `voltou_ao_estado_inicial: true`, com
+  `upload_persistiu` e `remocao_persistiu` verdadeiros. Falso em qualquer um
+  deles é caminho de escrita quebrado, não ruído.
+- `probe_submissao.rb --confirmar` — formulário público de candidatura de ponta
+  a ponta: `criou: true` na fase 2 e `restantes com o marcador: 0` na limpeza.
+  **Resíduo na réplica é defeito da rodada**, não da aplicação: se sobrar
+  registro com o marcador, apague antes de seguir.
+
+O que a passada **não** cobre, e por isso não se conclui dela: disparo de e-mail.
+Só exercite e-mail quando a mudança tocar Devise, `lib/notifier.rb`, template de
+mensagem ou a entrega — e aí siga as "Regras de segurança", que pedem o valor
+vivo de `redirect_email` antes de qualquer disparo. Upgrade que não toca nada
+disso não justifica destravar a variável numa réplica de produção.
 
 ### Zero diferença na estática não é evidência sobre widget
 
@@ -478,7 +550,8 @@ E cruze com a rede: sem resposta não-2xx no log de performance **e** sem 500 no
 
 ## Regras de segurança
 
-- **Somente leitura** durante as capturas, exceto no passo 3, deliberado.
+- **Somente leitura** durante as capturas. A escrita acontece nos passos 2, 4 e 6
+  da ordem de execução, deliberada e sempre fora da janela entre as duas fotos.
 - **Antes de disparar notificação**, rode o `simulate` e conte as mensagens.
   Notificação `individual` gera uma mensagem por linha do resultado — uma
   consulta ampla enche a caixa de quem recebe. As de prefixo `CORD` mandam um

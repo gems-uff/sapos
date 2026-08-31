@@ -13,9 +13,9 @@
 # demonstra por leitura, com probe_formulario.rb, que nao escreve e por isso
 # roda antes e depois sem restaurar nada.
 #
-# ESTADO: o diagnostico (passo 1) ja rodou de ponta a ponta. O ciclo de escrita
-# (passo 2, --confirmar) ainda nao. Rode o diagnostico primeiro e leia o
-# relatorio antes de confiar no ciclo.
+# Rode o diagnostico primeiro e leia o relatorio: ele diz se a candidatura
+# escolhida tem o caso que se quer medir. Ciclo de escrita sobre registro que
+# nao tem arquivo gravado devolve zero sem que isso queira dizer nada.
 #
 # Uso:
 #   set -a; source ~/.sapos_staging_env; set +a
