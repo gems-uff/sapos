@@ -83,6 +83,9 @@ corrija na wiki.
 Em `.claude/skills/`. O Claude Code as descobre sozinho; a lista existe para
 humanos e para outros agentes.
 
+- `revisar-pr` — a espinha do ciclo de um PR: ler a issue e o diff, decidir o que
+  é nosso e o que volta para o autor, cobrir o que falta, medir, homologar e
+  lançar. Aponta para as demais; comece por ela ao pegar um PR ou retomar um ramo.
 - `safe-refactor` — mede a mudança pela suíte local: cobre a lacuna, roda antes,
   muda, roda depois, compara. Primeiro recurso em refatoração, correção de bug,
   feature ou upgrade de dependência.
