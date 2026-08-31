@@ -10,7 +10,7 @@ ruby "~> 3.4.10"
 
 # ─── Framework e servidor ────────────────────────────────────────────────
 gem "rails", "~> 7.2.3", ">= 7.2.3.2"    # piso de seguranca (CVE-2026-66066)
-gem "rack", "~> 2.2.23"                  # o 3.x entra junto com o salto do Rails
+gem "rack", "~> 3.2.7"                     # serie 3 para o Rails 8; rack-session/rackup sobem juntos (transitivos)
 gem "sprockets-rails"                    # asset pipeline
 gem "bootsnap", require: false           # cache de boot (config/boot.rb)
 gem "nokogiri", ">= 1.18.9"              # piso de seguranca (parser HTML/XML)
