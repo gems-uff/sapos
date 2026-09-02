@@ -599,7 +599,6 @@ DEPENDENCIES
   prawn-table
   pry
   puma (~> 7.2, >= 7.2.1)
-  rack (~> 3.2.7)
   rails (~> 8.0.5, >= 8.0.5.1)
   rails-erd
   recaptcha
