@@ -426,7 +426,7 @@ RSpec.describe Enrollment, type: :model do
         ["2013", "1", courses[5], nil, "registered"],
         ["2013", "2", courses[5], nil, "registered"]
       ].each do |year, semester, course, grade, situation|
-        @destroy_all << course_class = FactoryBot.create(:course_class, year: year, semester: semester, course: course, professor: @professor)
+        @destroy_all << course_class = FactoryBot.create(:course_class, year: year, semester: semester, course: course, professors: [@professor])
         @destroy_all << class_enrollment = FactoryBot.create(:class_enrollment, enrollment: @enrollment, course_class: course_class)
         class_enrollment.situation = I18n.translate(
           "activerecord.attributes.class_enrollment.situations.#{situation}"
@@ -468,9 +468,9 @@ RSpec.describe Enrollment, type: :model do
           @destroy_later << course2 = FactoryBot.create(:course, course_type: course_type)
           @destroy_later << course3 = FactoryBot.create(:course, course_type: course_type)
 
-          @destroy_later << class1 = FactoryBot.create(:course_class, year: "2021", semester: "1", course: course1, professor: @professor)
-          @destroy_later << class2 = FactoryBot.create(:course_class, year: "2021", semester: "1", course: course2, professor: @professor)
-          @destroy_later << class3 = FactoryBot.create(:course_class, year: "2021", semester: "1", course: course3, professor: @professor)
+          @destroy_later << class1 = FactoryBot.create(:course_class, year: "2021", semester: "1", course: course1, professors: [@professor])
+          @destroy_later << class2 = FactoryBot.create(:course_class, year: "2021", semester: "1", course: course2, professors: [@professor])
+          @destroy_later << class3 = FactoryBot.create(:course_class, year: "2021", semester: "1", course: course3, professors: [@professor])
 
           enrollment = FactoryBot.create(:enrollment, student: @student, level: @level)
 
@@ -501,10 +501,10 @@ RSpec.describe Enrollment, type: :model do
           @destroy_later << course3 = FactoryBot.create(:course, course_type: course_type)
           @destroy_later << course4 = FactoryBot.create(:course, course_type: course_type)
 
-          @destroy_later << class1 = FactoryBot.create(:course_class, year: "2021", semester: "1", course: course1, professor: @professor)
-          @destroy_later << class2 = FactoryBot.create(:course_class, year: "2021", semester: "1", course: course2, professor: @professor)
-          @destroy_later << class3 = FactoryBot.create(:course_class, year: "2021", semester: "1", course: course3, professor: @professor)
-          @destroy_later << class4 = FactoryBot.create(:course_class, year: "2021", semester: "2", course: course4, professor: @professor)
+          @destroy_later << class1 = FactoryBot.create(:course_class, year: "2021", semester: "1", course: course1, professors: [@professor])
+          @destroy_later << class2 = FactoryBot.create(:course_class, year: "2021", semester: "1", course: course2, professors: [@professor])
+          @destroy_later << class3 = FactoryBot.create(:course_class, year: "2021", semester: "1", course: course3, professors: [@professor])
+          @destroy_later << class4 = FactoryBot.create(:course_class, year: "2021", semester: "2", course: course4, professors: [@professor])
 
           @destroy_later << enrollment = FactoryBot.create(:enrollment, student: @student, level: @level)
 
@@ -535,13 +535,13 @@ RSpec.describe Enrollment, type: :model do
       @courseX2 = FactoryBot.create(:course, course_type: @course_type)
       @courseX3 = FactoryBot.create(:course, course_type: @course_type)
       @courseX4 = FactoryBot.create(:course, course_type: @course_type)
-      @class1 = FactoryBot.create(:course_class, year: "2012", semester: "1", course: @courseX1, professor: @professor)
-      @class2 = FactoryBot.create(:course_class, year: "2012", semester: "1", course: @courseX2, professor: @professor)
-      @class3 = FactoryBot.create(:course_class, year: "2012", semester: "2", course: @courseX3, professor: @professor)
-      @class4 = FactoryBot.create(:course_class, year: "2013", semester: "1", course: @courseX4, professor: @professor)
-      @class5 = FactoryBot.create(:course_class, year: "2013", semester: "1", course: @course1, professor: @professor)
-      @class6 = FactoryBot.create(:course_class, year: "2013", semester: "2", course: @course1, professor: @professor)
-      @class7 = FactoryBot.create(:course_class, year: "2013", semester: "2", course: @course2, professor: @professor)
+      @class1 = FactoryBot.create(:course_class, year: "2012", semester: "1", course: @courseX1, professors: [@professor])
+      @class2 = FactoryBot.create(:course_class, year: "2012", semester: "1", course: @courseX2, professors: [@professor])
+      @class3 = FactoryBot.create(:course_class, year: "2012", semester: "2", course: @courseX3, professors: [@professor])
+      @class4 = FactoryBot.create(:course_class, year: "2013", semester: "1", course: @courseX4, professors: [@professor])
+      @class5 = FactoryBot.create(:course_class, year: "2013", semester: "1", course: @course1, professors: [@professor])
+      @class6 = FactoryBot.create(:course_class, year: "2013", semester: "2", course: @course1, professors: [@professor])
+      @class7 = FactoryBot.create(:course_class, year: "2013", semester: "2", course: @course2, professors: [@professor])
     end
     after(:all) do
       @class7.delete

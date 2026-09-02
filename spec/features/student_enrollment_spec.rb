@@ -76,14 +76,14 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "D01", student: @student1, level: @level1, enrollment_status: @enrollment_status1)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "D02", student: @student1, level: @level1, enrollment_status: @enrollment_status1)
 
-    @destroy_all << @course_class1 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: 2022, semester: 1)
-    @destroy_all << @course_class2 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: 2022, semester: 2)
-    @destroy_all << @course_class3 = FactoryBot.create(:course_class, name: "Algebra", course: @course2, professor: @professor1, year: 2021, semester: 1)
-    @destroy_all << @course_class4 = FactoryBot.create(:course_class, name: "Versionamento", course: @course3, professor: @professor2, year: 2022, semester: 2)
-    @destroy_all << @course_class5 = FactoryBot.create(:course_class, name: "Defesa", course: @course4, professor: @professor3, year: 2022, semester: 2)
-    @destroy_all << @course_class6 = FactoryBot.create(:course_class, name: "Mineração de Repositórios", course: @course5, professor: @professor2, year: 2022, semester: 2)
-    @destroy_all << @course_class7 = FactoryBot.create(:course_class, name: "Pesquisa", course: @course6, professor: @professor3, year: 2022, semester: 2)
-    @destroy_all << @course_class8 = FactoryBot.create(:course_class, name: "Programação", course: @course7, professor: @professor1, year: 2022, semester: 2)
+    @destroy_all << @course_class1 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professors: [@professor1], year: 2022, semester: 1)
+    @destroy_all << @course_class2 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professors: [@professor1], year: 2022, semester: 2)
+    @destroy_all << @course_class3 = FactoryBot.create(:course_class, name: "Algebra", course: @course2, professors: [@professor1], year: 2021, semester: 1)
+    @destroy_all << @course_class4 = FactoryBot.create(:course_class, name: "Versionamento", course: @course3, professors: [@professor2], year: 2022, semester: 2)
+    @destroy_all << @course_class5 = FactoryBot.create(:course_class, name: "Defesa", course: @course4, professors: [@professor3], year: 2022, semester: 2)
+    @destroy_all << @course_class6 = FactoryBot.create(:course_class, name: "Mineração de Repositórios", course: @course5, professors: [@professor2], year: 2022, semester: 2)
+    @destroy_all << @course_class7 = FactoryBot.create(:course_class, name: "Pesquisa", course: @course6, professors: [@professor3], year: 2022, semester: 2)
+    @destroy_all << @course_class8 = FactoryBot.create(:course_class, name: "Programação", course: @course7, professors: [@professor1], year: 2022, semester: 2)
 
     @destroy_all << FactoryBot.create(:allocation, course_class: @course_class2, day: "Segunda", start_time: 11, end_time: 13)
     @destroy_all << FactoryBot.create(:allocation, course_class: @course_class2, day: "Segunda", start_time: 14, end_time: 16)
@@ -635,7 +635,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
         last_course_class = CourseClass.last
         expect(last_course_class.name).to eq "Pesquisa"
         expect(last_course_class.course.id).to eq @course6.id
-        expect(last_course_class.professor.id).to eq @professor1.id
+        expect(last_course_class.professors.first.id).to eq @professor1.id
         expect(last_course_class.year).to eq 2022
         expect(last_course_class.semester).to eq 2
 
