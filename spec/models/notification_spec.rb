@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) Universidade Federal Fluminense (UFF).
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
@@ -164,6 +166,12 @@ RSpec.describe Notification, type: :model do
 
       it "returns no derivation when there is no date" do
         expect(derivations("")).to eq({})
+      end
+
+      it "refuses a date that cannot be read in any order" do
+        # O controller da simulação conta com isso para avisar o usuário em vez
+        # de deixar a página cair.
+        expect { derivations("31/31/2026") }.to raise_error(Date::Error)
       end
 
       it "does not read the day as the month" do

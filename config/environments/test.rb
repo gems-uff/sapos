@@ -61,7 +61,7 @@ Rails.application.configure do
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
 
-  config.logger = ActiveSupport::Logger.new(STDOUT) if ENV['LOGS_ENABLED']
+  config.logger = ActiveSupport::Logger.new(STDOUT) if ENV["LOGS_ENABLED"]
   config.log_level = :debug
 
   # Annotate rendered view with file names.

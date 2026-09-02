@@ -61,7 +61,7 @@ RSpec.describe "Queries features", type: :feature do
       expect(page).to have_content "Adicionar Consulta"
       within("#as_#{plural_name}-create--form") do
         fill_in "record_name_", with: "enrollments"
-        codemirror = find("#record_sql_ + .CodeMirror").click
+        find("#record_sql_ + .CodeMirror").click
         wait_for_ajax
         select_all_keys
         page.driver.browser.action.send_keys(
@@ -110,6 +110,24 @@ RSpec.describe "Queries features", type: :feature do
     it "should be able to show query result" do
       expect(page.all("table.query-results tbody tr").size).to eq 3
       expect(page.all("table.query-results thead th").map(&:text)).to eq ["name", "sql"]
+    end
+  end
+
+  # Issue #624: só a carga direta reproduz. Sem o action link do ActiveScaffold
+  # no DOM, link.prop("search") é undefined, o .replace estoura e o script morre
+  # antes de inicializar o datepicker.
+  describe "execute page with date param loaded directly", js: true do
+    before(:each) do
+      query = Query.new(name: "data_param", sql: "select :data as col")
+      query.params.build(name: "data", value_type: "Date", default_value: "")
+      query.save!
+      @destroy_later << query
+      login_as(@user)
+      visit "/queries/#{query.id}/execute"
+    end
+
+    it "should initialize datepicker on date param fields" do
+      expect(page).to have_css("input._param_type_date.hasDatepicker")
     end
   end
 

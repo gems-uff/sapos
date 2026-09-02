@@ -67,12 +67,12 @@ RSpec.describe ClassSchedule, type: :model do
         grades_deadline: now + 6.days
       )
     end
-    after(:all) do
-      @closed.delete
-      @open_remove.delete
-      @open_insert.delete
-      @open_main.delete
-    end
+  after(:all) do
+    @closed.delete
+    @open_remove.delete
+    @open_insert.delete
+    @open_main.delete
+  end
   describe "Methods" do
     describe "to_label" do
       it "should return YYYY.S" do
@@ -364,4 +364,3 @@ RSpec.describe ClassSchedule, type: :model do
     end
   end
 end
-

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_07_02_125133) do
+ActiveRecord::Schema[7.2].define(version: 2026_08_21_090038) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -373,7 +373,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_02_125133) do
   create_table "course_classes", force: :cascade do |t|
     t.string "name", limit: 255
     t.integer "course_id"
-    t.integer "professor_id"
     t.integer "year"
     t.integer "semester"
     t.datetime "created_at", precision: nil, null: false
@@ -381,7 +380,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_02_125133) do
     t.boolean "not_schedulable", default: false, null: false
     t.string "obs_schedule"
     t.index ["course_id"], name: "index_course_classes_on_course_id"
-    t.index ["professor_id"], name: "index_course_classes_on_professor_id"
   end
 
   create_table "course_research_areas", force: :cascade do |t|

@@ -23,9 +23,9 @@ module NotificationsHelper
         value: record.body_template ||
         I18n.t("active_scaffold.notification.body_template_default_liquid")
       ),
-      set_size = 35,
-      line_wrapping = true,
-      local = "notifications",
+      35,
+      true,
+      "notifications",
       columns: columns,
       unique_columns: unique_columns,
       roles: roles,

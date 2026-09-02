@@ -179,6 +179,16 @@ RSpec.describe "Enrollments features", type: :feature do
       click_button_and_wait "Atualizar"
       expect(page).to have_css("tr:nth-child(2) td.enrollment_number-column", text: "M05")
     end
+
+    # O subform de Bolsas ficou sem o campo do código da bolsa quando
+    # ScholarshipDurationsController passou a declarar config.subform.columns,
+    # que por padrão copia as colunas de update: sobraram só as datas e a
+    # observação, e não havia como cadastrar bolsa pela tela da matrícula.
+    it "should have a record_select widget for the scholarship in the scholarship_durations subform" do
+      subform = find("table[id$='scholarship_durations-subform-list']")
+      expect(subform).to have_css("th.scholarship-column")
+      expect(subform).to have_css("input.scholarship-input.recordselect", visible: :all)
+    end
   end
 
   describe "search page", js: true do

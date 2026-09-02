@@ -26,8 +26,30 @@ Leia no nível certo: **guia de upgrade e notas de versão**, não o CHANGELOG
 completo de cada gem. O que interessa são as mudanças de comportamento e as
 remoções, não as features novas e opcionais.
 
+**Procure primeiro a página de migração da lib, e só caia no changelog se ela não
+existir.** Projeto grande mantém uma, versionada e escrita para quem está subindo:
+o Rails tem o *Upgrading Ruby on Rails* nos guides, mais as notas de versão de
+cada série; outras libs guardam a mesma coisa num `UPGRADING.md`/`MIGRATION.md` no
+repositório, numa seção "Upgrade" do README ou no corpo da release do GitHub. Vale
+a busca explícita antes de abrir o changelog: essa página traz o **o que fazer**
+ao lado da mudança, que o changelog apenas menciona.
+
+Duas cautelas ao usar o guia:
+
+- **É cumulativo.** Pular versões obriga a ler também os guias das intermediárias;
+  o da série de destino pressupõe que as anteriores foram aplicadas.
+- **Ele fala do framework, não deste projeto.** O que ele lista como "faça isto"
+  ainda passa pela busca dirigida abaixo: boa parte não se aplica, e é justamente
+  isso que encurta o trabalho.
+
 Para cada item, faça uma busca dirigida no código. A maioria não vai se aplicar,
 e isso é resultado: encurta a lista do que precisa ser testado à mão.
+
+**O changelog diz a intenção; o diff diz o que mudou.** Quando um item parecer
+tocar o projeto, leia o diff da própria dependência antes de concluir —
+`gh api repos/<owner>/<repo>/compare/v<antiga>...v<nova>` devolve commits e patch.
+Entrada que anuncia "adicionamos X" pode ser lógica que apenas **mudou de lugar**,
+sem efeito nenhum na tela; o texto sozinho não distingue as duas coisas.
 
 **Duas armadilhas nesse passo:**
 
@@ -58,10 +80,31 @@ Quando o caminho é inalcançável no ambiente de teste (por exemplo, código qu
 roda sob outro banco), ainda vale um teste com dublê fixando as APIs de que ele
 depende — não prova o comportamento, mas pega deriva de assinatura.
 
-### 4. Verifique que o teste novo não é vazio
+### 4. Verifique que o teste não é vazio
 
-Quebre o código de propósito, confirme que o teste falha **no exemplo esperado**,
-e desfaça. Teste que passa dos dois jeitos não protege nada. Custa segundos.
+Quebre o código de propósito, confirme que o teste falha **no exemplo esperado e
+pela mensagem esperada**, e desfaça. Vale para o teste que você acabou de
+escrever e para o que você supõe já cobrir a mudança. Teste que passa dos dois
+jeitos não protege nada. Custa segundos.
+
+Três maneiras de essa checagem mentir:
+
+- **Simular a versão antiga de cabeça.** Num upgrade de gem, "como era antes" não
+  se reconstrói de memória nem do changelog: as duas versões **convivem no disco**
+  (`~/.rvm/gems/*/gems/<gem>-<versão>/`), e o código da anterior é a única
+  simulação válida. Substituir o método novo por uma aproximação escrita à mão
+  produz uma versão que nunca existiu — e o vermelho que ela dá "confirma" um
+  comportamento antigo imaginário.
+- **Sabotagem não representativa.** Estragar um trecho de que o exemplo não
+  depende não prova nada. Se o dado escolhido não atravessa o caminho alterado —
+  uma consulta *sem parâmetro* para testar o repasse de parâmetros —, o arquivo
+  é gerado e o teste passa mesmo com a sabotagem no lugar. Monte o dado de modo
+  que só o percurso completo produza o resultado esperado: um valor distintivo
+  digitado na entrada e conferido na saída.
+- **Vermelho pelo motivo errado.** Contagem de falhas não basta, leia a
+  mensagem. Timeout do Capybara, erro de carga e página que não abre aparecem
+  como vermelho e passam por sabotagem bem-sucedida — e aí você conclui que o
+  teste protege algo que ele nem enxerga.
 
 ### 5. Baseline
 

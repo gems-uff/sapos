@@ -181,5 +181,4 @@ module Admissions::AdmissionApplicationsHelper
     return result if result != "<not found>"
     super
   end
-
 end

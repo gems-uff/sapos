@@ -102,7 +102,15 @@ class StudentEnrollmentController < ApplicationController
         .and(ClassSchedule.arel_table[:semester].eq(params[:semester]))
       )
       if @semester.nil?
-        raise CanCan::AccessDenied.new
+        # Semestre sem calendário cadastrado é percurso legítimo — o aluno
+        # chegou antes de a coordenação abrir o período. Acusá-lo de tentativa
+        # de acesso indevido, como o AccessDenied fazia, é falso e assusta.
+        return redirect_to student_enrollment_path(@enrollment.id),
+          alert: I18n.t(
+            "student_enrollment.alert.unavailable_semester",
+            year: params[:year],
+            semester: params[:semester]
+          )
       end
       if check_time && ! @semester.enroll_open?
         return redirect_to student_enrollment_path(@enrollment.id),
@@ -192,7 +200,9 @@ class StudentEnrollmentController < ApplicationController
     end
 
     def save_enrollment_request_and_redirect
-      message = enrollment_request_params[:message]
+      # A tela sempre submete o textarea, ainda que vazio, mas o método não deve
+      # depender disso: sem a chave, o `message.empty?` mais abaixo estourava.
+      message = enrollment_request_params[:message].to_s
       request_change = @enrollment_request.assign_course_class_ids(
         prepare_course_class_ids, @semester
       )

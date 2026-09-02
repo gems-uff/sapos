@@ -19,9 +19,40 @@ corrija na wiki.
 
 - Uma issue, um ramo `issue_NNN`, sempre baseado na `main`. Detalhes do ciclo em
   `CONTRIBUTING.md`.
+- **O assunto do commit começa por `Issue #NNN: `**, com o número da issue do
+  ramo. O GitHub transforma o número em link, e o assunto é o que aparece na
+  lista de commits e no `git log --oneline`. Depois do prefixo sobram cerca de
+  60 colunas: imperativo, sem ponto final, e o porquê no corpo. Commit que não
+  pertence a issue nenhuma — convenção, skill, infraestrutura — vai sem prefixo.
+- **Cite a issue só pelo prefixo, sem `Fixes` nem `Closes`.** Essas palavras
+  fecham a issue assim que o commit chega na `main`, e fechar é decisão do passo
+  de release, separada de rotular: issue entregue pela metade leva o label e
+  continua aberta (ver a skill `release`).
 - **Exceção:** vulnerabilidade não ganha issue pública — enumerar o problema
   expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica.
-- Critério de pronto: `bundle exec rspec` inteiro verde (~12 min, ~2189 exemplos).
+- Critério de pronto: `bundle exec rspec` inteiro verde (~9 min, ~2260 exemplos).
+  Rode **sem** `SKIP_COVERAGE=1` ao menos uma vez antes de fechar: é a
+  configuração real da suíte, e o caminho do simplecov só é exercitado assim.
+- **Verde numa ordem não é verde.** A ordem dos exemplos é sorteada. Ao
+  investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
+  irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo
+  culpado sozinho. O CI registra a seed no resumo do job.
+- **Prefira `before(:each)`: o rollback da transação limpa sozinho.** O
+  `before(:all)` existe só para amortizar montagem cara entre muitos exemplos, e
+  o ganho depende do tamanho do grupo — medido: em grupo de 6 exemplos não muda
+  nada (0,78 s contra 0,79 s), em grupo de 69 corta pela metade (1,16 s contra
+  2,36 s). Em grupo pequeno ele só traz fragilidade.
+- **O que o `before(:all)` cria é commitado** e atravessaria a fronteira entre
+  grupos, inclusive o que as factories criam por associação. Uma varredura ao fim
+  de cada arquivo apaga o que sobrou, então **não escreva limpeza manual em
+  `after(:all)`** — foi ela que errou em 90 arquivos (#643). A suíte avisa no fim
+  se algo escapar, `LEAK_AUDIT=1` diz de qual grupo veio, `LEAK_CHECK=strict`
+  transforma o aviso em falha.
+- **Envolver o contexto em transação parece o conserto e não é.** Passa inteira
+  em SQLite e quebra sete exemplos em MariaDB: `Query#run_read_only_query` abre
+  cliente próprio e a rake task de notificações é outro processo — nenhum dos
+  dois enxerga dado não commitado. Por isso a varredura vem **depois** do grupo,
+  não em transação em volta dele.
 - **Não commite por conta própria.** Deixe a mudança pronta na árvore de
   trabalho, mostre o diff e o resultado da suíte, e espere o mantenedor revisar.
   Commit, tag e push são dele — inclusive nos passos de baby-step, onde é fácil
@@ -38,6 +69,9 @@ corrija na wiki.
 - **Não afirme impacto em produção sem verificar com o mantenedor.** O repositório
   não diz quais funcionalidades estão em uso. Issue é pública e irreversível;
   descreva o que foi medido no código e pergunte o resto.
+- **Tudo que é acessível pelo usuário conta como em uso.** Não condicione
+  validação a "se essa tela for usada": não há tela dispensável, e a pergunta só
+  serve para encolher o escopo do que se vai verificar.
 - Convenção de trabalho vale para qualquer agente e vive **aqui**, versionada. A
   memória local do Claude Code não acompanha troca de máquina — guarde nela só o
   que for específico de uma sessão ou do ambiente.
@@ -49,17 +83,54 @@ corrija na wiki.
 Em `.claude/skills/`. O Claude Code as descobre sozinho; a lista existe para
 humanos e para outros agentes.
 
+- `revisar-pr` — a espinha do ciclo de um PR: ler a issue e o diff, decidir o que
+  é nosso e o que volta para o autor, cobrir o que falta, medir, homologar e
+  lançar. Aponta para as demais; comece por ela ao pegar um PR ou retomar um ramo.
 - `safe-refactor` — mede a mudança pela suíte local: cobre a lacuna, roda antes,
   muda, roda depois, compara. Primeiro recurso em refatoração, correção de bug,
   feature ou upgrade de dependência.
+- `dependencias` — critério para declarar gem no `Gemfile` (restrição cobre
+  exatamente o motivo, e o motivo fica escrito) e para conduzir campanha de
+  atualização. Use antes de mexer em restrição de versão ou planejar um salto.
 - `suite-mariadb` — sobe um MariaDB local fiel ao de produção e roda a suíte
   contra ele em vez do SQLite. Use ao mexer em SQL, unicidade, ordenação ou
   migration.
 - `homologacao` — quando nem isso alcança: compara o SAPOS antes e depois em
   homologação, capturando telas, PDFs e planilhas nas duas versões, contra o
   mesmo banco.
+- `merge-downstream` — traz a `main` para dentro de um ramo de issue e confere se
+  ela entrou inteira, inclusive o que o git não vê. Use ao atualizar ramo
+  atrasado, ao revisar merge alheio, ou antes de aceitar um ramo para release.
 - `release` — fecha o ciclo: merge fast-forward na `main`, tag anotada, label e
   issues no GitHub, release publicada. O deploy em si continua sendo do mantenedor.
+
+### Skill é procedimento, não diário de bordo
+
+Ao anotar aprendizado numa skill, o teste é: **uma rodada futura faria algo
+diferente por causa desta linha?** Passa o mecanismo e a consequência ("a rota X
+responde 500 no papel Aluno, ignore"; "`--flatten` é obrigatório, senão a bbox vem
+vazia"). Não passa *quando* foi medido, em que versão, qual issue descobriu, nem
+que o problema já foi corrigido — isso o `git log` já guarda, e na skill só
+cresce.
+
+Esse contexto tem para onde ir: **comentário na issue**. Medida de antes e
+depois, versão em que o defeito aparecia, caminho que a rodada usou para
+reproduzir, armadilha que custou tempo — tudo isso é útil, e ali fica junto do
+trabalho que o originou, ao alcance de quem for reabrir o assunto.
+
+Duas consequências práticas:
+
+- **Não empilhe rodadas.** Anotação nova sobre o mesmo assunto **substitui** a
+  antiga; não vira parágrafo "já corrigido, não procure mais". Lista de ruído
+  conhecido é revisada na rodada em que se usa, e entrada que sumiu sai no mesmo
+  commit.
+- **Exemplo com número de versão apodrece.** Já aconteceu: as restrições citadas
+  aqui como reais divergiram do `Gemfile` e passaram a enganar quem lia. Prefira
+  a forma genérica; quando o concreto for necessário, cite o arquivo em vez de
+  copiar o valor.
+
+Script reusável é conteúdo legítimo de skill, e mora **na pasta da skill** — nunca
+referenciado por caminho de uma captura datada, que é descartável.
 
 ## Atualização de dependências
 

@@ -6,7 +6,7 @@
 FactoryBot.define do
   factory :paper do
     period { "2021 - 2024" }
-    reference { "Autor. Artigo. Ano"}
+    reference { "Autor. Artigo. Ano" }
     kind { "Periódico" }
     doi_issn_event { "10000000" }
     owner { create(:professor) }

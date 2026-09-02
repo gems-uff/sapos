@@ -3,7 +3,10 @@
   filled_field_mode = :file
   column = Admissions::FilledFormFieldsController.active_scaffold_config.columns[:file]
   options = active_scaffold_input_options(column, scope, :object => field.object)
-  options[:required] = configuration["required"] ? true : false
+  # Mesmo motivo do _generic_file_field: foto ja enviada nao repovoa o input, e
+  # required nele travaria a submissao sem exibir mensagem.
+  options[:required] = configuration["required"].present? &&
+    field.object.file.blank?
   basename = options[:name][..-("file".size + 3)]
   data_url = ""
   if field.object.file.file.present? && field.object.file.file.file.respond_to?(:medium_hash)

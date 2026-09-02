@@ -53,7 +53,13 @@
             <% elsif field[:type] == :text %>
               <%= f.text_field field[:name], field[:options] %>
             <% elsif field[:type] == :date %>
-              <%= f.text_field field[:name], field[:options] %>
+              <%# start_date e end_date sao colunas date. Sem o value explicito,
+                  o text_field emite Date#to_s, que no Rails 7 e sempre ISO --
+                  e a validacao logo abaixo exige DD/MM/YYYY, entao o campo
+                  voltaria reprovando um valor escrito pelo proprio sistema. %>
+              <%= f.text_field field[:name], field[:options].merge(
+                    value: date_br(f.object[field[:name]], blank_text: "")
+                  ) %>
             <% elsif field[:type] == :location %>
               <div class="scholarity-location">
                 <%
@@ -90,12 +96,18 @@
 
 function scholarity_item_activate_js(sid) {
   $(`#${sid} .remove-scholarity input[type=hidden]`).addClass("<%= filled_class %>");
-  $(`#${sid} .scholarity-location .city-field`).on("change", function() {
+  // Mesmo cuidado dos outros compostos: o escondido é o que o servidor valida,
+  // e valor que entra sem evento o deixaria para trás. Daí o input e o submit.
+  function update_location_value() {
     let value = $(`#${sid} .scholarity-location .city-field`)
       .map((i, el) => $(el).val()).toArray().reverse()
       .join(", ")
     $(`#${sid} .scholarity-location .hidden`).val(value)
-  })
+  }
+
+  $(`#${sid} .scholarity-location .city-field`)
+    .on("change input", update_location_value)
+  $(`#${sid}`).closest("form").on("submit", update_location_value)
 
   $(`#${sid} .scholarity-location input[name="city"]`).autocomplete({
     source: autocomplete_search("<%= city_form_autocompletes_path %>", (request) => {

@@ -3,6 +3,13 @@ name: "Ruby on Rails CI"
 
 on: [push, pull_request]
 
+# No job writes to the repository contents: only checkout, setup and artifact
+# upload. The qlty upload uses secrets.QLTY_COVERAGE_TOKEN; the GitHub coverage
+# upload uses the GITHUB_TOKEN, and the code-quality:write it needs is granted
+# in that job alone -- it writes coverage data, never the repository.
+permissions:
+  contents: read
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -72,14 +79,82 @@ jobs:
       - name: Set up database schema
         run: bundle exec rake db:schema:load --trace
 
+      # O rubocop está no Gemfile desde sempre e nenhum workflow o executava --
+      # tanto que ficou quebrado por um bump de gem sem ninguém notar (#644). Com
+      # as ofensas em zero, o gate é sustentável. Roda antes da suíte porque é
+      # rápido e falha barato.
+      - name: Lint
+        run: bundle exec rubocop
+
       - name: Run tests
-        run: bundle exec rspec
+        run: |
+          set -o pipefail
+          bundle exec rspec | tee rspec.log
+
+      # A ordem dos exemplos e sorteada, e a suite ja teve dependencia de ordem
+      # (#643). Sem a seed, um vermelho e irreproduzivel; com ela, o
+      # `rspec --seed <n> --bisect` isola o exemplo culpado sozinho.
+      - name: Registrar a seed
+        if: always()
+        run: |
+          seed=""
+          if [ -f rspec.log ]; then
+            seed=$(grep -oE 'Randomized with seed [0-9]+' rspec.log | head -1 | grep -oE '[0-9]+$' || true)
+          fi
+          echo "### Seed do RSpec: \`${seed:-desconhecida}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "Reproduzir localmente:" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "bundle exec rspec --seed ${seed:-0}" >> "$GITHUB_STEP_SUMMARY"
+          echo "bundle exec rspec --seed ${seed:-0} --bisect   # se for dependencia de ordem" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish code coverage
         uses: qltysh/qlty-action/coverage@v1
         with:
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
           files: coverage/.resultset.json
+
+      # A cobertura nativa do GitHub roda em paralelo com o qlty durante o
+      # periodo de prova. Quando ela tiver produzido dado, o passo do qlty acima,
+      # o secret QLTY_COVERAGE_TOKEN e os GitHub Apps do qlty saem juntos.
+      #
+      # O upload em si e outro job: a acao exige code-quality:write, e este job
+      # nao precisa dessa permissao para rodar a suite. PR de fork nao consegue
+      # escrever no repositorio base, dai a guarda.
+      - name: Upload the Cobertura report
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report-ruby
+          path: coverage/coverage.xml
+
+  upload-coverage:
+    needs: test
+    if: ${{ !cancelled() && needs.test.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      code-quality: write
+
+    steps:
+      - name: Download the Cobertura report
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report-ruby
+
+      # fail-on-error: false de proposito enquanto durar a prova. A cobertura
+      # nativa esta em preview publico e a acao, por padrao, derruba o passo e
+      # ainda espera ate 160 s pelo processamento -- uma instabilidade do servico
+      # deixaria o CI vermelho sem nada a ver com o codigo. O erro continua
+      # aparecendo como anotacao no log.
+      - name: Publish code coverage to GitHub
+        uses: actions/upload-code-coverage@v1
+        with:
+          file: coverage.xml
+          language: Ruby
+          label: code-coverage/simplecov
+          fail-on-error: false
 
   smoke-test:
     runs-on: ubuntu-latest

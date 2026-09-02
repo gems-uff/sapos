@@ -8,6 +8,9 @@ description: Lança uma nova versão do SAPOS — merge na main, tag anotada, la
 Sequência para transformar um ramo pronto em versão publicada. O passo final —
 o deploy em produção — **é do mantenedor**; a skill vai até a release no GitHub.
 
+É o último passo do ciclo descrito em `revisar-pr`, e chega-se aqui pelo caminho
+dela — que também descreve as saídas em que **não** se lança.
+
 ## Pré-requisitos
 
 Não comece sem isto:
@@ -15,9 +18,25 @@ Não comece sem isto:
 - Suíte completa verde no ramo (`bundle exec rspec`, ~12 min).
 - Homologação feita, quando a mudança toca o que a suíte não alcança (skill
   `homologacao`).
-- Passada manual do mantenedor em staging, quando houver caminho de escrita, PDF,
-  planilha ou e-mail envolvido — a captura automatizada é só leitura.
+- **Passada de escrita em staging**, quando houver caminho de escrita, PDF,
+  planilha ou e-mail envolvido — a captura da homologação é só leitura, e prova
+  que as telas continuam iguais, não que salvar continua funcionando. Ela é parte
+  da rodada de homologação (ver a seção "Passada de escrita" naquela skill) e
+  **não depende de pedido do mantenedor**: chegar aqui sem ela é chegar sem
+  pré-requisito. O que continua sendo dele é o juízo sobre o que mais exercitar à
+  mão, não a execução.
 - `main` sincronizada com `origin/main`: `git rev-list --left-right --count origin/main...main` → `0 0`.
+- **Árvore de trabalho limpa: `git status --short` vazio.** Se houver qualquer
+  coisa não commitada, **pare e avise o mantenedor antes do merge** — mostrando o
+  quê, e perguntando se entra nesta versão ou fica para a próxima. A decisão é
+  dele; o que não pode é ele descobrir depois da release publicada, quando entrar
+  já custa outra versão.
+
+  Isso vale inclusive para o que o próprio agente escreveu durante o ciclo:
+  anotação em skill, roteiro, script de sonda. Ter avisado no meio do caminho, ao
+  criar o arquivo, **não conta** — o aviso tem que estar aqui, junto da decisão
+  de lançar. É por esse caminho que anotação de skill fica de fora da versão que
+  a produziu.
 
 ## Passos
 
@@ -62,12 +81,31 @@ git tag -a 7.15.21 -m "7.15.21"
 git push origin 7.15.21
 ```
 
-Sempre anotada (`-a`), nunca leve. As tags antigas têm mensagem vazia e a
-`7.15.19` tem o próprio número; use o número.
+Sempre anotada (`-a`), nunca leve. A mensagem é o próprio número da versão.
 
 A tag não é decorativa: `config/environment.rb:12` deriva `APP_VERSION` de
-`git describe --tag --always` em tempo de execução, então é ela que aparece no
-rodapé da aplicação.
+`git describe --tag --always` **no boot da aplicação**, então é ela que aparece
+no rodapé.
+
+#### Mover uma tag: o rodapé passa a mentir a favor
+
+Versão que ainda não foi para produção pode ter a tag movida em vez de virar
+versão nova — apaga local e remota, recria anotada, empurra. O que isso cria é
+uma armadilha silenciosa no deploy.
+
+**Quem faz o deploy precisa buscar a tag movida antes**, com
+`git fetch --tags --force` (ou `git fetch origin +refs/tags/<versão>:refs/tags/<versão>`).
+Um `git fetch --tags` comum **não** atualiza tag que já existe localmente.
+
+Sem isso, o checkout de destino continua na tag antiga — e, porque o
+`git describe` roda lá, sobre as refs de lá, **o rodapé exibe a versão nova
+enquanto a aplicação serve o código velho**. É pior do que rodapé errado: o
+sinal em que se confia para conferir o deploy passa a confirmar o engano.
+Já aconteceu, em homologação, e só apareceu porque uma sonda mediu o
+comportamento em vez de ler o rodapé.
+
+Confira o deploy por **comportamento**, não por rodapé: uma medida que separe a
+versão nova da anterior — a skill `homologacao` serve para isso.
 
 ### 5. Label e issues
 
@@ -78,9 +116,16 @@ gh issue close <N> --reason completed
 ```
 
 - Cor `0e8a16` para todo label de versão — é o que dá o verde uniforme na lista.
+- **Crie o label mesmo que a versão não feche issue nenhuma.** Assim a existência
+  do label não depende do conteúdo da versão, e não há como confundir "não tinha
+  issue" com "esqueci de criar" ao olhar a lista depois. O link do corpo da
+  release (passo 6) resolve para uma consulta vazia, que é o resultado correto.
+- **Confira a lista com `--limit` folgado.** O repositório passa de 200 labels, e
+  o padrão do `gh label list` trunca — uma varredura truncada some justamente com
+  os labels mais recentes e faz parecer que ninguém rotula há várias versões.
 - **Rotular e fechar são decisões separadas.** Uma issue entregue em parte leva o
-  label e continua aberta (a #621 tem `7.15.19` e segue aberta). Só feche o que
-  a versão de fato encerra.
+  label e **continua aberta** — o label diz "saiu nesta versão", não "acabou". Só
+  feche o que a versão de fato encerra.
 - Fechamento é `completed`, sem comentário de encerramento — é o padrão do
   repositório.
 
@@ -122,9 +167,8 @@ gh issue list --label 7.15.21 --state all
 
 ### 8. Deploy — do mantenedor
 
-**Passe a tag certa.** Uma versão errada exibida em produção já foi rastreada
-até a tag passada no deploy, não ao Passenger. Depois de subir, confira o rodapé
-da aplicação.
+**Passe a tag certa.** Versão errada no rodapé de produção costuma ser a tag
+passada no deploy, não o Passenger. Depois de subir, confira o rodapé.
 
 ## Depois da release
 

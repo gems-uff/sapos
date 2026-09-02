@@ -1,0 +1,107 @@
+── página 1 ──
+RESU M O SEM ESTR A L
+
+ NOME DA DISCIPLINA SEMESTRE/ANO AULAS DADAS
+
+ Engenharia de Software 1º/2020
+ Nº Matrícula Nome do Aluno Nota Freq S/I Situação Obs.:
+ Final
+
+ 1 M2020001 Ana Conceição 9.0 S Aprovado
+
+* aluno bolsista
+
+
+
+
+
+
+ _________________________________________________________
+ João Pereira
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ SAPOS - Terça, 15 de Junho de 2021, 10:30 h
+── página 2 ──
+L I S TA D E E - M A I L S
+ NOME DA DISCIPLINA SEMESTRE/ANO AULAS DADAS
+
+ Engenharia de Software 1º/2020
+
+ Nº Matrícula Nome do Aluno E-mail do Aluno
+ 1 M2020001 Ana Conceição
+
+* aluno bolsista
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ SAPOS - Terça, 15 de Junho de 2021, 10:30 h

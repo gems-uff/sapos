@@ -8,6 +8,9 @@
 /notifications/1/simulate
 /notifications/2/simulate
 /notifications/3/simulate
+# Data de consulta que nenhum formato le. A tela deve abrir com aviso e usar a
+# data padrao da notificacao -- pagina de erro aqui e regressao.
+/notifications/1/simulate?query_params[data_consulta]=31/31/2026
 /assertions/1/simulate
 /assertions/3/simulate
 /students/2129
@@ -15,3 +18,54 @@
 /course_classes/621
 /queries/1
 /notifications/1
+# Colunas de show que so aparecem na tela do registro, nao no indice.
+# Afiliacoes do professor: as colunas sao datetime, nao date -- e o caso em que
+# o I18n escolhe o formato longo por extenso se a data nao for convertida antes.
+# Este professor tem data de inicio preenchida e data de fim vazia, entao a
+# mesma tela exercita o valor presente e o ausente.
+/professors/124
+# Comentarios da solicitacao, com data e hora.
+/enrollment_requests/2850
+# Telas de FORMULARIO (new/edit). A lista nao tinha nenhuma, e e nelas que o
+# active_scaffold mexe mais: controle de arquivo, coluna sem permissao, subform,
+# refresh_link. Indice nao exercita nada disso. GET em new/edit nao escreve.
+#
+# Aluno COM foto carregada: e o unico ramo que monta o bloco de remocao de
+# arquivo. O outro ramo, sem arquivo, so tem o input -- por isso os dois.
+/students/2129/edit
+/students/new
+# Doze campos de arquivo renderizados por active_scaffold_input_carrierwave_fix,
+# a copia adaptada do bridge que vive no application_helper. E o unico caminho
+# da varredura que passa por ela. Precisa do override: sem fase, a tela para em
+# "Acesso invalido" antes de montar o formulario. O bloco de campos e montado em
+# memoria (fields.new, atribuicao sem save), entao a rota continua so leitura.
+/admission_applications/1502/edit?override=true
+# Sete colunas datetime_picker na mesma tela: e onde o timepicker do jquery-ui
+# aparece. Lembre que a foto estatica NAO abre widget -- esta rota cobre a
+# pagina, nao o calendario; o widget e medido na camada exploratoria.
+/class_schedules/new
+# Data em date_picker (expedicao de identidade).
+/professors/124/edit
+# Formularios com subform.
+/enrollments/2903/edit
+/course_classes/621/edit
+
+# Busca de campo com a opcao NEUTRA, que e o estado inicial de todo formulario
+# de busca. O condition_for da coluna devolve cedo, sem condicao nenhuma, e a
+# lista NAO pode se anunciar filtrada: a faixa "Clique aqui para remover o
+# filtro criado" tem que estar AUSENTE do texto.
+/enrollments?search[active]=
+/enrollments?search[course_class_year_semester][year]=&search[course_class_year_semester][semester]=&search[course_class_year_semester][course]=
+/admission_applications?search[is_filled]=
+# O contraponto, e ele nao e opcional: com filtro de verdade a faixa TEM que
+# aparecer. Sem estas duas, as tres de cima passariam identicas tambem num
+# sistema que tivesse perdido a faixa por completo -- medida que nao muda e
+# medida cega.
+/enrollments?search[course_class_year_semester][year]=2024&search[course_class_year_semester][semester]=&search[course_class_year_semester][course]=
+/admission_applications?search[is_filled]=Sim
+
+# Nao adianta acrescentar /admission_applications/<id> para ver o rotulo de
+# escolaridade: a secao "Dados" da tela de show carrega sob demanda, e a
+# varredura estatica registra so a casca -- 1,4 KB de texto, sem uma data. O
+# rotulo com o periodo aparece em /admission_processes/4/complete_pdf, que ja
+# esta no routes_binary.txt.

@@ -1,5 +1,13 @@
 <h4> <%= @notification.to_label %> </h4>
 
+<%# O layout nao renderiza flash: sem isto o aviso da data ilegivel e setado e
+    nunca chega aos olhos de quem simulou. %>
+<% if flash[:alert] %>
+  <div id="errorExplanation" class="errorExplanation">
+    <p><%= flash[:alert] %></p>
+  </div>
+<% end %>
+
 <%= render "notifications/params_form", resource: @notification, query_params: @query_params %>
 
 <div class="actions" style="display: block; margin: 10px 0 0 0;">

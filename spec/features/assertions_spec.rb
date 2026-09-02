@@ -144,6 +144,82 @@ RSpec.describe "Assertions features", type: :feature do
       click_link_and_wait "SQL"
       expect(page).to have_css("#generated_sql", visible: true, text: "select 1 as col")
     end
+
+    it "should generate the pdf from the simulation" do
+      expect(page).to have_css("#generate-pdf-link")
+
+      find("#generate-pdf-link").click
+
+      wait_for_download
+      expect(download).to match(/\.pdf\z/)
+    end
+  end
+
+  # O botao de PDF monta um formulario GET em JavaScript e o submete, repassando
+  # os parametros da simulacao. Eles vem de um data-attribute, e nao interpolados
+  # no corpo do script: no atributo o escape do ERB e obrigatorio.
+  #
+  # A consulta aqui PRECISA ter parametro. Com uma consulta sem parametro o
+  # clique baixa um PDF de qualquer jeito, mesmo que o data-attribute nao seja
+  # lido -- foi o que aconteceu na primeira versao deste teste, que passava com
+  # o atributo renomeado. So o valor digitado chegando ao PDF prova o percurso.
+  describe "generate pdf carrying the simulation parameters", js: true do
+    before(:each) do
+      query = Query.new(name: "nome_param", sql: "select :nome as col")
+      query.params.build(
+        name: "nome", value_type: "String", default_value: "PADRAO"
+      )
+      query.save!
+      @destroy_later << query
+      @destroy_later << @param_assertion = Assertion.create!(
+        name: "Declaracao parametrizada", query: query,
+        template_type: "Liquid", assertion_template: "Valor: {{ col }}",
+        student_can_generate: false
+      )
+      login_as(@user)
+      visit url_path
+      find("#as_#{plural_name}-simulate-#{@param_assertion.id}-link").click
+    end
+
+    it "should carry the typed parameter into the generated pdf" do
+      field = "assertion_#{@param_assertion.id}_nome"
+      fill_in field, with: "TOKENDOPDF"
+      # O change e o que repassa o valor para a query string do action link; o
+      # blur do Capybara nao e garantia de dispara-lo.
+      page.execute_script("$('##{field}').trigger('change')")
+
+      click_link_and_wait "Simular"
+      expect(page).to have_css("table.assertion-results tbody td", text: "TOKENDOPDF")
+
+      find("#generate-pdf-link").click
+      wait_for_download
+
+      text = PDF::Reader.new(download).pages.map(&:text).join("\n")
+      expect(text).to include("TOKENDOPDF")
+    end
+  end
+
+  # Issue #624: só a carga direta reproduz. Sem o action link do ActiveScaffold
+  # no DOM, link.prop("search") é undefined, o .replace estoura e o script morre
+  # antes de inicializar o datepicker.
+  describe "simulate page with date param loaded directly", js: true do
+    before(:each) do
+      query = Query.new(name: "data_param", sql: "select :data as col")
+      query.params.build(name: "data", value_type: "Date", default_value: "")
+      query.save!
+      @destroy_later << query
+      @destroy_later << @date_assertion = Assertion.create!(
+        name: "Declaracao data", query: query,
+        template_type: "Liquid", assertion_template: "Corpo",
+        student_can_generate: false
+      )
+      login_as(@user)
+      visit "/assertions/#{@date_assertion.id}/simulate"
+    end
+
+    it "should initialize datepicker on date param fields" do
+      expect(page).to have_css("input._param_type_date.hasDatepicker")
+    end
   end
 
   # Issue #640: mesmo defeito da simulacao de notificacao -- um valor longo sem

@@ -52,6 +52,21 @@
     clone.attr("method", "post");
 
     clone.attr("action", $(link_selector).attr("href"));
+
+    // O formulario do active_scaffold e remoto, entao o Rails nao embute o
+    // campo authenticity_token: o token viaja no header X-CSRF-Token que o
+    // rails-ujs monta na hora do AJAX. O clone e submetido como formulario
+    // comum dentro do iframe, fora do AJAX, e chegaria sem token nenhum.
+    // Ler a meta tag so funciona a partir da propria origem, que e o que
+    // mantem a protecao de pe.
+    var csrf_token = $('meta[name="csrf-token"]').attr("content");
+    if (csrf_token) {
+      clone.find('input[name="authenticity_token"]').remove();
+      $("<input>", {
+        type: "hidden", name: "authenticity_token", value: csrf_token
+      }).appendTo(clone);
+    }
+
     for (descriptor in move) {
       clone.find(descriptor).remove();
       var element = $(descriptor);

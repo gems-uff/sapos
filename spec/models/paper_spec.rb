@@ -39,7 +39,6 @@ RSpec.describe Paper, type: :model do
     it { should validate_presence_of(:doi_issn_event) }
     it { should validate_presence_of(:reason_justify) }
     # ToDo: professor cannot edit other papers
-
   end
   describe "Methods" do
     describe "to_label" do

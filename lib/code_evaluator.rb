@@ -2,7 +2,7 @@
 # This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
 
 # frozen_string_literal: true
- 
+
 module CodeEvaluator
   # Escapes that turn the data of a template into text, one per destination.
   #
@@ -56,7 +56,7 @@ module CodeEvaluator
   private
     def self.dropify_bindings(bindings, drops)
       drops ||= {}
-      new_bindings = bindings.map { |k, v| CodeEvaluator.load_drop(drops, k, v) }.to_h
+      new_bindings = bindings.to_h { |k, v| CodeEvaluator.load_drop(drops, k, v) }
       new_bindings["variables"] = VariablesDrop.new unless new_bindings.key?("variables")
       new_bindings
     end

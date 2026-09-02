@@ -1,0 +1,110 @@
+@import 'variables';
+
+/*
+Alinha a jQuery UI a paleta do SAPOS.
+
+Por que existe: o active_scaffold empacota um tema proprio da jQuery UI
+(vendor/assets/stylesheets/jquery-ui-theme.css.erb) -- o "ui-lightness" da era
+1.8, de cabecalho laranja. Ate a 4.0.13 o SAPOS nao passava por ele, porque
+importava os quatro parciais um a um; ao consolidar em `@import
+"active_scaffold"` (#621), o tema entrou junto e o calendario ficou laranja.
+Nao foi mudanca da jQuery UI: a jquery-ui-rails 7 e 8 trazem o mesmo tema
+cinza, e a propria 4.0.13 ja carregava o arquivo laranja -- o que mudou foi por
+onde o CSS entra.
+
+Nao da para desligar na origem: `ActiveScaffold.jquery_ui_included?` responde
+pela mera presenca da constante Jquery::Ui, e a 4.1.6 absorveu o
+active_scaffold_colors.scss dentro do active_scaffold.scss -- pular o tema
+custaria as cores da lista.
+
+POR QUE ESPECIFICIDADE, E NAO ORDEM. Os dois temas da jQuery UI (o cinza da
+jquery-ui-rails e o laranja do active_scaffold) nao entram pelo Sass: chegam por
+`require_asset`, e o Sprockets os concatena DEPOIS de todo o CSS compilado.
+Medido: o laranja cai no byte ~129 mil de um arquivo de ~140 mil, enquanto o
+Sass termina por volta do 65 mil. Nem mover este arquivo para o fim do glob nem
+declara-lo como `*= require` no manifesto o ultrapassa -- ambos foram tentados.
+Dai o prefixo `html`, que soma um seletor de elemento e vence por
+especificidade, qualquer que seja a ordem de concatenacao.
+
+Os sprites sao PNG e nao se recolorem por CSS. A jquery-ui-rails traz seis
+cores (444444, 555555, 777620, 777777, cc0000, ffffff) e o active_scaffold mais
+cinco; nenhuma e o azul do SAPOS. Sobre o cabecalho azul usamos o branco, que e
+o mesmo que o tema laranja ja fazia -- contraste bom, nenhuma imagem nova.
+*/
+
+/* Cabecalho de widget: e o que pinta a barra do calendario */
+html .ui-widget-header {
+  border: 1px solid $sapos_azul_escuro;
+  background: $sapos_azul;
+  color: $sapos_branco;
+  font-weight: bold;
+}
+html .ui-widget-header a { color: $sapos_branco; }
+
+/* Corpo do widget */
+html .ui-widget-content {
+  border: 1px solid $sapos_azul_borda;
+  background: $sapos_branco;
+  color: $sapos_cinza_texto;
+}
+html .ui-widget-content a { color: $sapos_azul; }
+
+/* Estado padrao: os dias do calendario. O tema laranja pinta de azul-piscina
+   (#1c94c4) sobre fundo cinza; aqui fica o azul do SAPOS. */
+html .ui-state-default,
+html .ui-widget-content .ui-state-default,
+html .ui-widget-header .ui-state-default {
+  border: 1px solid $sapos_azul_borda;
+  background: #f6f6f6;
+  font-weight: normal;
+  color: $sapos_azul;
+}
+html .ui-state-default a,
+html .ui-state-default a:link,
+html .ui-state-default a:visited { color: $sapos_azul; text-decoration: none; }
+
+/* Hover e foco */
+html .ui-state-hover,
+html .ui-widget-content .ui-state-hover,
+html .ui-widget-header .ui-state-hover,
+html .ui-state-focus,
+html .ui-widget-content .ui-state-focus,
+html .ui-widget-header .ui-state-focus {
+  border: 1px solid $sapos_azul_campo;
+  background: $sapos_azul_foco;
+  font-weight: normal;
+  color: $sapos_azul_escuro;
+}
+html .ui-state-hover a,
+html .ui-state-hover a:hover { color: $sapos_azul_escuro; text-decoration: none; }
+
+/* Ativo: o dia selecionado */
+html .ui-state-active,
+html .ui-widget-content .ui-state-active,
+html .ui-widget-header .ui-state-active {
+  border: 1px solid $sapos_azul;
+  background: $sapos_azul_palido;
+  font-weight: bold;
+  color: $sapos_azul_escuro;
+}
+html .ui-state-active a,
+html .ui-state-active a:link,
+html .ui-state-active a:visited { color: $sapos_azul_escuro; text-decoration: none; }
+
+/* Icones: sobre o cabecalho azul, o sprite branco. Os demais estados ficam com
+   o cinza escuro da jquery-ui-rails, que combina melhor que o laranja.
+
+   A ORDEM DESTE BLOCO IMPORTA. As setas do calendario ficam dentro do
+   cabecalho e, ao mesmo tempo, dentro do corpo do widget -- o
+   #ui-datepicker-div carrega .ui-widget-content e o .ui-datepicker-header
+   carrega .ui-widget-header. Os dois seletores tem a MESMA especificidade
+   (0,2,1), entao quem decide e a ordem: a regra do cabecalho vem por ultimo
+   para vencer. E o mesmo arranjo do tema original da gem. Inverter deixa a
+   seta cinza sobre o fundo azul -- medido. */
+html .ui-icon,
+html .ui-widget-content .ui-icon { background-image: image-url('jquery-ui/ui-icons_444444_256x240.png'); }
+html .ui-state-default .ui-icon { background-image: image-url('jquery-ui/ui-icons_444444_256x240.png'); }
+html .ui-state-hover .ui-icon,
+html .ui-state-focus .ui-icon { background-image: image-url('jquery-ui/ui-icons_555555_256x240.png'); }
+html .ui-state-active .ui-icon { background-image: image-url('jquery-ui/ui-icons_444444_256x240.png'); }
+html .ui-widget-header .ui-icon { background-image: image-url('jquery-ui/ui-icons_ffffff_256x240.png'); }

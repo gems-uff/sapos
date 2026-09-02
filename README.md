@@ -31,14 +31,15 @@ This project was initiated by professors Leonardo Murta and Vanessa Braganholo a
 
 # Additional contributors
 
-* Celso da Cruz Carneiro Ribeiro (usage feedback)
-* Simone de Lima Martins (usage feedback)
-* Helio Augusto Garcia de Andrade (usage feedback)
-* Teresa Cancela (usage feedback)
-* Viviane Moura Aceti Alves (usage feedback)
 * Carol Cruz (text revision)
+* Celso da Cruz Carneiro Ribeiro (usage feedback)
+* Gabriel Campos da Silva (usage feedback)
+* Helio Augusto Garcia de Andrade (usage feedback)
 * Juliana Serra Affonso (design)
 * Pedro Henrique Pegado Ribeiro (logo designer)
+* Simone de Lima Martins (usage feedback)
+* Teresa Cancela (usage feedback)
+* Viviane Moura Aceti Alves (usage feedback)
 
 # Documentation
 

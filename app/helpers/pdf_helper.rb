@@ -136,7 +136,12 @@ module PdfHelper
         if options[:qr_code_signature]
           qrcode_url = download_by_identifier_reports_url(identifier: @qrcode_identifier)
           qrcode_signature_warning = I18n.t("pdf_content.enrollment.footer.qrcode_signature_warning")
-          signed_at = "#{I18n.t("pdf_content.enrollment.footer.signed_by_qrcode")} #{I18n.l(Time.now, format: :defaultdatetime)} (Horário de Brasília)"
+          # Time.zone.now, nao Time.now: a linha AFIRMA "Horario de Brasilia", e
+          # Time.now devolve a hora do sistema. Num servidor em UTC o documento
+          # assinado sairia tres horas adiantado dizendo ser horario local. O
+          # config.time_zone = "Brasilia" ja esta em config/application.rb; era
+          # so nao ignora-lo.
+          signed_at = "#{I18n.t("pdf_content.enrollment.footer.signed_by_qrcode")} #{I18n.l(Time.zone.now, format: :defaultdatetime)} (Horário de Brasília)"
           you_can_also_access = I18n.t("pdf_content.enrollment.footer.you_can_also_access")
 
           all_sentences = [qrcode_signature_warning, signed_at, you_can_also_access, qrcode_url]

@@ -32,20 +32,20 @@ class Major < ApplicationRecord
     majors = majors.joins(:institution).where(
       "`institutions`.`name` LIKE :institution
       OR `institutions`.`code` LIKE :institution
-      ", {institution: institution}
+      ", { institution: institution }
     ) if institution.present?
     majors = majors.joins(:level).where(
       "`levels`.`name` LIKE :level
-      ", {level: level}
+      ", { level: level }
     ) if level.present?
     majors = majors.where(
       "`majors`.`name` LIKE :major
-      ", {major: major}
+      ", { major: major }
     )
     if majors.empty? && ignore_association
       majors = Major.where(
         "`majors`.`name` LIKE :major
-        ", {major: major}
+        ", { major: major }
       )
     end
     majors

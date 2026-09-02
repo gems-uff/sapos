@@ -24,10 +24,10 @@ class GrantsController < ApplicationController
   end
 
   protected
-  def do_new
-    super
-    unless current_user.professor.blank?
-      @record.professor = current_user.professor
+    def do_new
+      super
+      unless current_user.professor.blank?
+        @record.professor = current_user.professor
+      end
     end
-  end
 end

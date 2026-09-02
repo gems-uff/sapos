@@ -4,7 +4,6 @@
 # frozen_string_literal: true
 
 module Admissions::Ability
-
   ADMISSION_PROCESS_CONFIG = [
     Admissions::AdmissionProcess,
     Admissions::AdmissionProcessPhase,
