@@ -168,7 +168,7 @@ Ao mexer nesses pontos, valide em homologação — verde local não basta.
 ## Monkey-patches
 
 `config/initializers/` contém correções que dependem de interno do Rails e do
-active_scaffold: `fix_rails7_date_format.rb`, `fix_url_for.rb`,
+active_scaffold: `fix_url_for.rb`,
 `recordselect_patch.rb`, `fix_rails61_active_scaffold_dependent_error.rb` e
 `active_scaffold_disable_null_comparators.rb`. São os primeiros suspeitos em
 qualquer upgrade de Rails.
