@@ -16,12 +16,14 @@
 %>
 
 <table class="enroll-table">
+  <% # debugger %>
   <thead>
     <tr>
       <% if enrollment_request.persisted? %>
           <th> <%= t "student_enrollment.enroll.class_status" %> </th>
       <% end %>
       <th> <%= t "student_enrollment.enroll.do_enroll" %> </th>
+      <% # debugger %>
       <% table[:header][0].drop(1).each do |head| %>
         <th class="cell-<%= head.downcase %>"> <%= head %> </th>
       <% end %>
@@ -51,6 +53,7 @@
             form: form } %>
         <% end %>
         <% if row[0][:on_demand] %>
+          <% # debugger %>
           <%= render partial: "enroll_table_on_demand_row", locals: {
             semester: semester,
             enrollment_request: enrollment_request,

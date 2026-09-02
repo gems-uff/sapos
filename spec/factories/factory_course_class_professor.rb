@@ -6,10 +6,8 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :course_class do
-    course
-    professors { [association(:professor)] }
-    year { "2013" }
-    semester { "1" }
+  factory :course_class_professor do
+    course_class
+    professor
   end
 end

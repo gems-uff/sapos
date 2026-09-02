@@ -95,7 +95,8 @@ class ClassEnrollmentRequest < ApplicationRecord
 
   def professor
     return nil unless course_class = self.course_class
-    course_class.professor.to_label if course_class.professor
+    course_class.professors_names if course_class.professors
+    # course_class.professors.first.to_label if course_class.professors
   end
 
   def set_status!(new_status)

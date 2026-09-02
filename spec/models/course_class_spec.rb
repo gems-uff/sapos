@@ -10,8 +10,10 @@ RSpec.describe CourseClass, type: :model do
   it { should have_many(:class_enrollments).dependent(:destroy) }
   it { should have_many(:class_enrollment_requests).dependent(:destroy) }
   it { should have_many(:allocations).dependent(:destroy) }
+  it { should have_many(:course_class_professors).dependent(:destroy) }
   it { should have_many(:enrollments).through(:class_enrollments) }
   it { should have_many(:enrollment_requests).through(:class_enrollment_requests) }
+  it { should have_many(:professors).through(:course_class_professors) }
 
   before(:all) do
     @destroy_later = []
@@ -26,7 +28,7 @@ RSpec.describe CourseClass, type: :model do
   let(:course_class) do
     CourseClass.new(
       course: course,
-      professor: professor,
+      professors: [professor],
       year: 2023,
       semester: 1
     )
@@ -35,10 +37,16 @@ RSpec.describe CourseClass, type: :model do
   describe "Validations" do
     it { should be_valid }
     it { should belong_to(:course).required(true) }
-    it { should belong_to(:professor).required(true) }
     it { should validate_presence_of(:year) }
     it { should validate_presence_of(:semester) }
     it { should validate_inclusion_of(:semester).in_array(YearSemester::SEMESTERS) }
+
+    it "is invalid without professors" do
+      course_class.professors = []
+
+      expect(course_class).to be_invalid
+      expect(course_class.errors[:professors]).to include(I18n.t("errors.messages.blank"))
+    end
 
     # ToDo: find a way to test current_user in the model -- or change the model to not rely on it
     # describe "professor_changed_only_valid_fields" do

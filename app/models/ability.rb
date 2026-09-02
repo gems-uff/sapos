@@ -218,17 +218,17 @@ class Ability
 
         if CustomVariable.professor_login_can_post_grades == "yes_all_semesters"
           can [:update, :post_grades], ClassEnrollment, course_class: {
-            professor: user.professor
+            course_class_professors: { professor: user.professor }
           }
-          can [:update, :post_grades, :read_pendencies], CourseClass, professor: user.professor
+          can [:update, :post_grades, :read_pendencies], CourseClass, course_class_professors: { professor: user.professor }
         elsif CustomVariable.professor_login_can_post_grades == "yes"
           can [:update, :post_grades], ClassEnrollment, course_class: {
-            professor: user.professor,
+            course_class_professors: { professor: user.professor },
             year: YearSemester.current.year,
             semester: YearSemester.current.semester
           }
           can [:update, :post_grades, :read_pendencies], CourseClass,
-            professor: user.professor,
+            course_class_professors: { professor: user.professor },
             year: YearSemester.current.year,
             semester: YearSemester.current.semester
         end

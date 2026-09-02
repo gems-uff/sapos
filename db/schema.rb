@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
+ActiveRecord::Schema[7.2].define(version: 2026_08_21_090038) do
   create_table "accomplishments", force: :cascade do |t|
     t.integer "enrollment_id"
     t.integer "phase_id"
@@ -360,10 +360,19 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.string "nationality", default: "-"
   end
 
+  create_table "course_class_professors", force: :cascade do |t|
+    t.integer "course_class_id", null: false
+    t.integer "professor_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_class_id", "professor_id"], name: "index_course_class_professors_on_course_class_and_professor", unique: true
+    t.index ["course_class_id"], name: "index_course_class_professors_on_course_class_id"
+    t.index ["professor_id"], name: "index_course_class_professors_on_professor_id"
+  end
+
   create_table "course_classes", force: :cascade do |t|
     t.string "name", limit: 255
     t.integer "course_id"
-    t.integer "professor_id"
     t.integer "year"
     t.integer "semester"
     t.datetime "created_at", precision: nil, null: false
@@ -371,7 +380,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.boolean "not_schedulable", default: false, null: false
     t.string "obs_schedule"
     t.index ["course_id"], name: "index_course_classes_on_course_id"
-    t.index ["professor_id"], name: "index_course_classes_on_professor_id"
   end
 
   create_table "course_research_areas", force: :cascade do |t|

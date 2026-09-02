@@ -31,12 +31,12 @@ RSpec.describe "Allocations features", type: :feature do
     @destroy_all << @professor3 = FactoryBot.create(:professor, name: "Gi", cpf: "1")
     @destroy_all << @professor4 = FactoryBot.create(:professor, name: "Helena", cpf: "4")
 
-    @destroy_all << @course_class1 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: 2022, semester: 1)
-    @destroy_all << @course_class2 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: 2022, semester: 2)
-    @destroy_all << @course_class3 = FactoryBot.create(:course_class, name: "Algebra", course: @course2, professor: @professor1, year: 2021, semester: 2)
-    @destroy_all << @course_class4 = FactoryBot.create(:course_class, name: "Versionamento", course: @course3, professor: @professor2, year: 2022, semester: 2)
-    @destroy_all << @course_class6 = FactoryBot.create(:course_class, name: "Mineração de Repositórios", course: @course5, professor: @professor2, year: 2022, semester: 2)
-    @destroy_all << @course_class7 = FactoryBot.create(:course_class, name: "Programação", course: @course7, professor: @professor1, year: 2022, semester: 2)
+    @destroy_all << @course_class1 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professors: [@professor1], year: 2022, semester: 1)
+    @destroy_all << @course_class2 = FactoryBot.create(:course_class, name: "Algebra", course: @course1, professors: [@professor1], year: 2022, semester: 2)
+    @destroy_all << @course_class3 = FactoryBot.create(:course_class, name: "Algebra", course: @course2, professors: [@professor1], year: 2021, semester: 2)
+    @destroy_all << @course_class4 = FactoryBot.create(:course_class, name: "Versionamento", course: @course3, professors: [@professor2], year: 2022, semester: 2)
+    @destroy_all << @course_class6 = FactoryBot.create(:course_class, name: "Mineração de Repositórios", course: @course5, professors: [@professor2], year: 2022, semester: 2)
+    @destroy_all << @course_class7 = FactoryBot.create(:course_class, name: "Programação", course: @course7, professors: [@professor1], year: 2022, semester: 2)
 
     @destroy_all << FactoryBot.create(:allocation, course_class: @course_class2, day: "Segunda", start_time: 11, end_time: 13)
     @destroy_all << FactoryBot.create(:allocation, course_class: @course_class2, day: "Segunda", start_time: 14, end_time: 16)

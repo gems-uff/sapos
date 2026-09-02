@@ -15,7 +15,8 @@ class Professor < ApplicationRecord
   has_many :research_areas, through: :professor_research_areas
   has_many :professor_research_lines, dependent: :destroy
   has_many :research_lines, through: :professor_research_lines
-  has_many :course_classes, dependent: :restrict_with_exception
+  has_many :course_class_professors, dependent: :restrict_with_exception
+  has_many :course_classes, dependent: :restrict_with_exception, through: :course_class_professors
   has_many :thesis_defense_committee_participations,
     dependent: :restrict_with_exception
   has_many :thesis_defense_committee_enrollments,
