@@ -18,6 +18,18 @@ module CarrierWaveFileCleanup
     after_destroy :cleanup_destroyed_carrier_wave_file
   end
 
+  module ClassMethods
+    def delete_unreferenced_carrier_wave_file(hash)
+      return if hash.blank?
+      cw_file = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.find_by(medium_hash: hash)
+      return unless cw_file
+      referenced = Student.where(photo: hash).exists? ||
+                   ReportConfiguration.where(image: hash).exists? ||
+                   Admissions::FilledFormField.where(file: hash).exists?
+      cw_file.delete unless referenced
+    end
+  end
+
   private
     def store_old_carrier_wave_hash
       col = mount_uploader_name.to_s
@@ -40,16 +52,4 @@ module CarrierWaveFileCleanup
       return unless @carrier_wave_hash_for_destroy
       self.class.delete_unreferenced_carrier_wave_file(@carrier_wave_hash_for_destroy)
     end
-
-  module ClassMethods
-    def delete_unreferenced_carrier_wave_file(hash)
-      return if hash.blank?
-      cw_file = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.find_by(medium_hash: hash)
-      return unless cw_file
-      referenced = Student.where(photo: hash).exists? ||
-                   ReportConfiguration.where(image: hash).exists? ||
-                   Admissions::FilledFormField.where(file: hash).exists?
-      cw_file.delete unless referenced
-    end
-  end
 end

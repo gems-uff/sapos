@@ -93,31 +93,30 @@ class CarrierwaveFilesController < ApplicationController
   end
 
   protected
-
-  # Also removes the orphan tracking row so it does not dangle until the next
-  # mark-and-sweep scan.
-  def do_destroy(record = nil)
-    record ||= destroy_find_record
-    super(record)
-    if successful? && record
-      CarrierwaveOrphanFile.where(carrierwave_file_id: record.id).delete_all
+    # Also removes the orphan tracking row so it does not dangle until the next
+    # mark-and-sweep scan.
+    def do_destroy(record = nil)
+      record ||= destroy_find_record
+      super(record)
+      if successful? && record
+        CarrierwaveOrphanFile.where(carrierwave_file_id: record.id).delete_all
+      end
     end
-  end
 
-  def conditions_for_collection
-    ["carrier_wave_files.id IN (SELECT carrierwave_file_id FROM carrierwave_orphan_files)"]
-  end
-
-  def self.condition_for_original_model_column(column, value, like_pattern)
-    return nil if value.blank?
-    term = "%#{value.downcase}%"
-    matching_ids = CarrierwaveOrphanFile
-      .where("LOWER(original_model) LIKE ?", term)
-      .pluck(:carrierwave_file_id)
-    if matching_ids.present?
-      ["carrier_wave_files.id IN (?)", matching_ids]
-    else
-      ["1 = 0"]
+    def conditions_for_collection
+      ["carrier_wave_files.id IN (SELECT carrierwave_file_id FROM carrierwave_orphan_files)"]
     end
-  end
+
+    def self.condition_for_original_model_column(column, value, like_pattern)
+      return nil if value.blank?
+      term = "%#{value.downcase}%"
+      matching_ids = CarrierwaveOrphanFile
+        .where("LOWER(original_model) LIKE ?", term)
+        .pluck(:carrierwave_file_id)
+      if matching_ids.present?
+        ["carrier_wave_files.id IN (?)", matching_ids]
+      else
+        ["1 = 0"]
+      end
+    end
 end

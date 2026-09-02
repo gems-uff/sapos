@@ -252,7 +252,6 @@ SimpleNavigation::Configuration.run do |navigation|
       submenu.item :admission_data, selection_processes_path, if: can_read?(:admission_data)
     end
 
-    
     config_models = [
       User, Role, CustomVariable, Version, EmailTemplate
     ]
