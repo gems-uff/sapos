@@ -263,9 +263,9 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
       @destroy_all << course_effected = FactoryBot.create(:course, course_type: @course_type)
       @destroy_all << course_invalid = FactoryBot.create(:course, course_type: @course_type)
       @destroy_all << course_valid = FactoryBot.create(:course, course_type: @course_type)
-      @destroy_all << course_class_effected = FactoryBot.create(:course_class, course: course_effected, professor: @professor)
-      @destroy_all << course_class_invalid = FactoryBot.create(:course_class, course: course_invalid, professor: @professor)
-      @destroy_all << course_class_valid = FactoryBot.create(:course_class, course: course_valid, professor: @professor)
+      @destroy_all << course_class_effected = FactoryBot.create(:course_class, course: course_effected, professors: [@professor])
+      @destroy_all << course_class_invalid = FactoryBot.create(:course_class, course: course_invalid, professors: [@professor])
+      @destroy_all << course_class_valid = FactoryBot.create(:course_class, course: course_valid, professors: [@professor])
       @destroy_all << class_enrollment = FactoryBot.create(
         :class_enrollment, enrollment: enrollment, course_class: course_class_effected)
       @destroy_all << enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)
