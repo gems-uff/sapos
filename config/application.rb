@@ -31,6 +31,13 @@ module Sapos
     #   https://guides.rubyonrails.org/configuring.html#versioned-default-values
     config.load_defaults 7.1
 
+    # O 7.1 fixa to_time_preserves_timezone em :offset, e o Rails 8.0 avisa que o
+    # 8.1 passa a :zone de todo modo. Adotamos :zone aqui para que a mudanca seja
+    # medida agora, com a suite inteira como rede, em vez de entrar junto com o
+    # salto do proximo major. Os dois pontos de chamada sao lib/liquid_formatter.rb
+    # e lib/erb_formatter.rb, cobertos por spec/lib/liquid_formatter_spec.rb.
+    config.active_support.to_time_preserves_timezone = :zone
+
     # ActiveScaffold defines callbacks for actions not always present in all controllers.
     # Rails 7.1 raised this to true by default, causing AbstractController::ActionNotFound.
     config.action_controller.raise_on_missing_callback_actions = false
