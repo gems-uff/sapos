@@ -159,7 +159,6 @@ parte, a diferença é real. Código que os testes nunca executam:
 - `Query.run_read_only_query` (`app/models/query.rb`) ramifica por adaptador; o
   bloco `Mysql2` abre um cliente próprio e usa a configuração
   `<env>_read_only`. Protegido por specs com stub em `spec/models/query_spec.rb`.
-- `config/initializers/recordselect_patch.rb` reabre `AbstractMysqlAdapter`.
 - `db/seeds/02.reports_notifications.rb` tem um bloco atrás de `unless is_sqlite`
   que só carrega em MySQL.
 
@@ -169,7 +168,7 @@ Ao mexer nesses pontos, valide em homologação — verde local não basta.
 
 `config/initializers/` contém correções que dependem de interno do Rails e do
 active_scaffold: `fix_url_for.rb`,
-`recordselect_patch.rb`, `fix_rails61_active_scaffold_dependent_error.rb` e
+`fix_rails61_active_scaffold_dependent_error.rb` e
 `active_scaffold_disable_null_comparators.rb`. São os primeiros suspeitos em
 qualquer upgrade de Rails.
 
