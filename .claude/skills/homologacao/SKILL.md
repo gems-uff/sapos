@@ -335,6 +335,14 @@ some quando se clica a ação a partir da lista.
 caminho de erro sem ler o console empurra os próprios erros para o relatório do
 fluxo seguinte, que os reporta como se fossem da tela dele.
 
+**Booleano do active_scaffold se lê no `checked`, nunca no campo oculto.** A
+lista renderiza cada booleano como o par do Rails — um `input[type=hidden]` com
+valor `0` mais um `input[type=checkbox]` —, então o oculto vale `0` em **toda**
+linha, marcada ou não. Ler o oculto responde "nenhum registro tem a flag" para
+qualquer coluna, e o falso negativo parece medida: leva a criar na réplica um
+caso que ela já tinha. O `innerText` da célula também não serve — vem vazio nos
+dois estados.
+
 **Conte elementos dentro do container, não por padrão de nome.** Um seletor por
 nome que não casa devolve sempre o mesmo número: a medida fica idêntica nos dois
 lados e cega a qualquer regressão. Meça algo que **mude** quando você mexe na

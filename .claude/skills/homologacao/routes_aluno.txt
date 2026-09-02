@@ -7,11 +7,20 @@
 # preparar_aluno_de_teste.rb --confirmar: ele recria o conjunto e imprime as
 # linhas com os ids novos, prontas para substituir as daqui.
 #
-# A tela de inscricao exige janela aberta: sem isso ela redireciona com "o
-# periodo de inscricoes fechou" e a captura registra o redirecionamento, nao a
-# tela.
+# A tela de inscricao exige JANELA ABERTA para mostrar linha alguma:
+# display_class_schedule_table_row? reprova toda linha quando nem
+# main_enroll_open? nem adjust_enroll_insert_open? valem. Ela NAO redireciona
+# nesse caso -- renderiza com a tabela vazia, so o cabecalho, o que passa por
+# "tela capturada" sem exercitar nada. Confira as datas na propria tela antes de
+# confiar na captura.
 /enrollment/3074
+# Semestre da replica cuja janela ja fechou: serve de controle, tabela vazia.
 /enrollment/3074/enroll/2026-2
+# Semestre com janela ABERTA, criado por abrir_quadro_de_horarios.rb. E a unica
+# rota da varredura que renderiza as linhas de disciplina por demanda (o parcial
+# _enroll_table_on_demand_row), e a replica tem dois tipos on_demand reais --
+# Estudo Orientado e Pesquisa de Dissertacao e Tese.
+/enrollment/3074/enroll/2027-1
 # Semestre sem Quadro de Horarios cadastrado: o aluno que abre o periodo antes
 # de a coordenacao cadastrar o calendario. Se um dia existir quadro para 2030.1,
 # troque o ano -- a rota so vale enquanto nao houver quadro para o ano citado.
