@@ -77,7 +77,7 @@ group :development, :test do
   # que o Capybara sobe nos feature specs (Capybara.server em rails_helper).
   # O teto e o 8.0.0 por causa desse segundo uso.
   gem "puma", "~> 7.2", ">= 7.2.1"
-  gem "sqlite3", ">= 2.9.5"              # banco de dev/test; piso 2.9.5: CVE-2026-54620
+  gem "sqlite3", ">= 2.9.6"              # banco de dev/test; piso 2.9.6: GHSA-mwm8-39rw-8826
   gem "awesome_print"
   gem "binding_of_caller"
   gem "better_errors"
