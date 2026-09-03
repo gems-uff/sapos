@@ -170,7 +170,6 @@ class Ability
       can :destroy, PaperProfessor, paper: { owner: nil }
       can :destroy, PaperStudent, paper: { owner: nil }
       can :destroy, Paper, owner: user.professor
-      can :import_grades_xls, CourseClass, professor: user.professor
     end
   end
 
@@ -228,7 +227,7 @@ class Ability
             year: YearSemester.current.year,
             semester: YearSemester.current.semester
           }
-          can [:update, :post_grades, :read_pendencies], CourseClass,
+          can [:update, :post_grades, :read_pendencies, :import_grades_xls], CourseClass,
             professor: user.professor,
             year: YearSemester.current.year,
             semester: YearSemester.current.semester

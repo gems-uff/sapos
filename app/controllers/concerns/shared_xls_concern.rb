@@ -61,7 +61,7 @@ module SharedXlsConcern
 
     original_filename = file.original_filename.to_s
     extension = File.extname(original_filename).downcase
-    valid_filename = %w[.xlsx .xls].include?(extension) &&
+    valid_filename = extension == ".xlsx" &&
       !original_filename.include?("/") &&
       !original_filename.include?("\\")
     raise ArgumentError, "Invalid file name" unless valid_filename
