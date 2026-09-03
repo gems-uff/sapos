@@ -72,9 +72,15 @@ corrija na wiki.
 - **Tudo que é acessível pelo usuário conta como em uso.** Não condicione
   validação a "se essa tela for usada": não há tela dispensável, e a pergunta só
   serve para encolher o escopo do que se vai verificar.
-- Convenção de trabalho vale para qualquer agente e vive **aqui**, versionada. A
-  memória local do Claude Code não acompanha troca de máquina — guarde nela só o
-  que for específico de uma sessão ou do ambiente.
+- **Antes de guardar um fato, pergunte: outro agente, noutra máquina, com só o
+  `git clone`, conseguiria?** Se sim, é convenção e vive versionada — **aqui**, ou
+  na skill a que pertence. A memória local do Claude Code não atravessa máquina:
+  guarde nela só o que morre com ela — caminho local, comportamento do sandbox,
+  estado de uma sessão. Id de registro sintético em homologação, por exemplo, é
+  versionado (`routes_aluno.txt`), não memória.
+- **Não duplique na memória o que já está versionado.** As duas cópias divergem
+  na primeira mudança, e a que engana é justamente a que ninguém revisa. Se o
+  fato já está no repositório, a memória certa é nenhuma.
 - **Quando um comando falhar por bloqueio de sandbox, tente novamente fora do
   sandbox.** Isso dispara a pergunta de permissão; o usuário decide se executa.
 
@@ -159,7 +165,6 @@ parte, a diferença é real. Código que os testes nunca executam:
 - `Query.run_read_only_query` (`app/models/query.rb`) ramifica por adaptador; o
   bloco `Mysql2` abre um cliente próprio e usa a configuração
   `<env>_read_only`. Protegido por specs com stub em `spec/models/query_spec.rb`.
-- `config/initializers/recordselect_patch.rb` reabre `AbstractMysqlAdapter`.
 - `db/seeds/02.reports_notifications.rb` tem um bloco atrás de `unless is_sqlite`
   que só carrega em MySQL.
 
@@ -168,8 +173,8 @@ Ao mexer nesses pontos, valide em homologação — verde local não basta.
 ## Monkey-patches
 
 `config/initializers/` contém correções que dependem de interno do Rails e do
-active_scaffold: `fix_rails7_date_format.rb`, `fix_url_for.rb`,
-`recordselect_patch.rb`, `fix_rails61_active_scaffold_dependent_error.rb` e
+active_scaffold: `fix_url_for.rb`,
+`fix_rails61_active_scaffold_dependent_error.rb` e
 `active_scaffold_disable_null_comparators.rb`. São os primeiros suspeitos em
 qualquer upgrade de Rails.
 

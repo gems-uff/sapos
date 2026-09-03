@@ -335,6 +335,14 @@ some quando se clica a ação a partir da lista.
 caminho de erro sem ler o console empurra os próprios erros para o relatório do
 fluxo seguinte, que os reporta como se fossem da tela dele.
 
+**Booleano do active_scaffold se lê no `checked`, nunca no campo oculto.** A
+lista renderiza cada booleano como o par do Rails — um `input[type=hidden]` com
+valor `0` mais um `input[type=checkbox]` —, então o oculto vale `0` em **toda**
+linha, marcada ou não. Ler o oculto responde "nenhum registro tem a flag" para
+qualquer coluna, e o falso negativo parece medida: leva a criar na réplica um
+caso que ela já tinha. O `innerText` da célula também não serve — vem vazio nos
+dois estados.
+
 **Conte elementos dentro do container, não por padrão de nome.** Um seletor por
 nome que não casa devolve sempre o mesmo número: a medida fica idêntica nos dois
 lados e cega a qualquer regressão. Meça algo que **mude** quando você mexe na
@@ -423,9 +431,11 @@ Todo dado inserido por uma rodada some nessas horas, e com ele as rotas do
 existe, e imprime as linhas prontas para o `routes_aluno.txt` — os ids mudam a
 cada regeração. Rodar sem necessidade não custa nada.
 
-Os dois primeiros passos abaixo continuam manuais de propósito, pela armadilha
-descrita adiante; o script cobre do terceiro em diante e para com instruções se
-o aluno não existir.
+O script cobre o conjunto inteiro, na ordem certa, e confere cada etapa. Os dois
+primeiros passos já foram manuais, pela armadilha descrita adiante; deixaram de
+ser quando a conta de captura passou a ser criada pelo script de migração da
+réplica — é a existência dela que arma a trava, então o script agora exige a
+conta e aborta sem ela, em vez de confiar em quem executa.
 
 As telas do aluno precisam de três coisas que a réplica de produção não traz
 prontas. **A ordem não é indiferente.**
