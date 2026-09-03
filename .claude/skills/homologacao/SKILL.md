@@ -431,9 +431,11 @@ Todo dado inserido por uma rodada some nessas horas, e com ele as rotas do
 existe, e imprime as linhas prontas para o `routes_aluno.txt` — os ids mudam a
 cada regeração. Rodar sem necessidade não custa nada.
 
-Os dois primeiros passos abaixo continuam manuais de propósito, pela armadilha
-descrita adiante; o script cobre do terceiro em diante e para com instruções se
-o aluno não existir.
+O script cobre o conjunto inteiro, na ordem certa, e confere cada etapa. Os dois
+primeiros passos já foram manuais, pela armadilha descrita adiante; deixaram de
+ser quando a conta de captura passou a ser criada pelo script de migração da
+réplica — é a existência dela que arma a trava, então o script agora exige a
+conta e aborta sem ela, em vez de confiar em quem executa.
 
 As telas do aluno precisam de três coisas que a réplica de produção não traz
 prontas. **A ordem não é indiferente.**
