@@ -148,4 +148,56 @@ RSpec.describe "Courses features", type: :feature do
       expect(page.all("tr td.name-column").map(&:text)).to eq ["Algebra"]
     end
   end
+
+  # Issue #660: a busca guardada na sessao so era gravada na primeira
+  # requisicao que criava a chave; da segunda em diante a troca de filtro se
+  # perdia, e o pedido seguinte -- paginar ou ordenar -- vinha com o filtro
+  # anterior. A causa esta em config/initializers/fix_session_store_dirty_tracking.rb.
+  #
+  # O que reproduz o defeito e a TROCA de filtro: sob um filtro so, a sessao
+  # ainda guarda o valor da primeira gravacao e a pagina 2 sai correta por
+  # acidente.
+  describe "filter switching", js: true do
+    before(:each) do
+      16.times do |i|
+        FactoryBot.create(
+          :course, name: "Turma A #{i}", code: "TA#{i}",
+          credits: 4, workload: 60, course_type: @course_type1, available: true
+        )
+        FactoryBot.create(
+          :course, name: "Turma B #{i}", code: "TB#{i}",
+          credits: 4, workload: 60, course_type: @course_type1, available: true
+        )
+      end
+      login_as(@user)
+      visit url_path
+      search_by_name "Turma A"
+      search_by_name "Turma B"
+    end
+
+    def search_by_name(name)
+      click_link_and_wait "Buscar"
+      fill_in "Nome", with: name
+      click_button_and_wait "Buscar"
+    end
+
+    def listed_names
+      page.all("tr td.name-column").map(&:text)
+    end
+
+    it "should keep the new filter when paginating" do
+      click_link_and_wait "2"
+      expect(listed_names).to all(include("Turma B"))
+    end
+
+    it "should keep the new filter when sorting a column" do
+      click_link_and_wait page.all("a.as_sort").first.text
+      expect(listed_names).to all(include("Turma B"))
+    end
+
+    it "should keep the new filter when coming back to the list" do
+      visit url_path
+      expect(listed_names).to all(include("Turma B"))
+    end
+  end
 end
