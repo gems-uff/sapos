@@ -564,6 +564,39 @@ RSpec.describe Ability, type: :model do
         expect(ability).not_to be_able_to(:generate_assertion, assertion, "M1")
       end
     end
+
+    # O contexto acima monta o usuario em memoria, como o resto do arquivo. Este
+    # persiste, porque o estado nao vem de salvar um User invalido -- as duas
+    # validacoes de User (role_is_student_if_the_student_field_is_filled e a
+    # irma dela) recusariam isso. Ele vem de apagar o Student depois, e a
+    # exclusao nao salva o User: nenhuma validacao dele roda.
+    #
+    # `delete` no lugar de `destroy` reproduz de proposito as versoes anteriores
+    # ao before_destroy Student#handle_user_role_removal, que hoje retiraria o
+    # papel junto. E o caminho que produz o estado no campo.
+    context "when the student record was deleted afterwards" do
+      subject(:ability) do
+        student = FactoryBot.create(:student, name: "Discente orfao")
+        user = create_confirmed_user(
+          [FactoryBot.create(:role_aluno)], "orfao@ic.uff.br", "Ana",
+          "A1b2c3d4!", student: student
+        )
+        student.delete
+        Ability.new(user.reload)
+      end
+
+      # A guarda nao muda o que o usuario ve -- as duas versoes dao 500 --, e
+      # sim a natureza da falha: sem ela o `can?` nao responde, estoura
+      # NoMethodError sobre nil, que e defeito de programacao e notifica.
+      it "answers no instead of raising" do
+        assertion = Assertion.new(student_can_generate: true)
+
+        expect { ability.can?(:generate_assertion, assertion, "M01") }
+          .not_to raise_error
+        expect(ability).not_to be_able_to(:generate_assertion, assertion, "M01")
+        expect(ability).not_to be_able_to(:assertion_pdf, Assertion)
+      end
+    end
   end
 
   describe "action aliases" do
