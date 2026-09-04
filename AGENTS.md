@@ -167,6 +167,20 @@ parte, a diferença é real. Código que os testes nunca executam:
   `<env>_read_only`. Protegido por specs com stub em `spec/models/query_spec.rb`.
 - `db/seeds/02.reports_notifications.rb` tem um bloco atrás de `unless is_sqlite`
   que só carrega em MySQL.
+- **A suíte não carrega os seeds, e é lá que o SQL das consultas executa.**
+  `Query#ensure_valid_params` é um `validate` que **roda a consulta**, então o
+  `save!` do seed submete cada SQL ao banco. Migration que renomeia ou derruba
+  coluna quebra ali — e em nenhum outro ponto da suíte, que nunca semeia. Daí o
+  `rake seeds:check` (banco descartável, ~7 s) e o job `seed` do CI, que o roda
+  em MariaDB; rode-o localmente ao mexer em esquema. O job é separado de
+  propósito: semear o banco do job `test` o contaminaria.
+- **O que o `seeds:check` alcança é só a consulta versionada.** Cada instalação
+  tem consultas próprias, criadas pela tela, que o repositório não conhece e que
+  são a maioria. Para essas existe o `rake queries:check`, que executa as
+  consultas **gravadas naquele banco** e lista as que não casam mais com o
+  esquema. Rode-o nas instalações reais antes e depois de migration que mexa em
+  coluna: consulta quebrada só se manifesta quando alguém abre o relatório ou a
+  notificação dispara, o que pode levar meses.
 - **Validação guardada por `current_user` quase não roda.** O `current_user`
   visível nos modelos vem do active_scaffold e é preenchido **por requisição**;
   fora de uma, ele é nil. `User#roles_valid?` abre com
