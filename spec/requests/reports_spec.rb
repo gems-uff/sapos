@@ -76,6 +76,10 @@ RSpec.describe "Reports download gate", type: :request do
     end
   end
 
+  # A rota de invalidacao nunca consultou cant_download?, nem antes nem agora:
+  # ignore_method so e lido no view. Este exemplo prende o caminho ponta a
+  # ponta, mas responde igual nas duas versoes -- quem prova a mudanca do link
+  # e o grupo seguinte.
   describe "invalidating an expired report" do
     it "still purges the stored file (expiration must not block invalidation)" do
       report = FactoryBot.create(
@@ -87,6 +91,58 @@ RSpec.describe "Reports download gate", type: :request do
 
       expect(report.reload.carrierwave_file).to be_nil
       expect(report.invalidated_at).to be_present
+    end
+  end
+
+  # Os dois links da listagem escondem-se por ignore_method, que o
+  # active_scaffold chama em skip_action_link? -- um helper de view, nao um
+  # filtro de controlador. Nenhuma requisicao a /reports/:id/download ou
+  # /invalidate enxerga essa decisao, entao a unica forma de cobri-la e ler a
+  # listagem renderizada. Sem este grupo, trocar o ignore_method do link de
+  # invalidar por cant_download? volta a esconde-lo em todo documento vencido
+  # com a suite inteira verde.
+  describe "action links on the list page" do
+    def list_body
+      get reports_path
+      expect(response).to have_http_status(:ok)
+      response.body
+    end
+
+    it "hides download but keeps invalidate for an expired report with file" do
+      report = FactoryBot.create(
+        :report, user: @user, carrierwave_file: carrierwave_file,
+        expires_at: Date.yesterday
+      )
+
+      body = list_body
+
+      expect(body).not_to include("as_reports-download-#{report.id}-link")
+      expect(body).to include("as_reports-invalidate-#{report.id}-link")
+    end
+
+    it "keeps both links for a valid report with file" do
+      report = FactoryBot.create(
+        :report, user: @user, carrierwave_file: carrierwave_file,
+        expires_at: 1.year.from_now
+      )
+
+      body = list_body
+
+      expect(body).to include("as_reports-download-#{report.id}-link")
+      expect(body).to include("as_reports-invalidate-#{report.id}-link")
+    end
+
+    # Sem arquivo nao ha o que baixar nem o que apagar, e invalidate! estoura
+    # em carrierwave_file.delete se chegar la.
+    it "hides both links once the file is gone" do
+      report = FactoryBot.create(
+        :report, user: @user, carrierwave_file: nil, expires_at: 1.year.from_now
+      )
+
+      body = list_body
+
+      expect(body).not_to include("as_reports-download-#{report.id}-link")
+      expect(body).not_to include("as_reports-invalidate-#{report.id}-link")
     end
   end
 end
