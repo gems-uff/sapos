@@ -66,6 +66,18 @@ corrija na wiki.
   (`git log --all --grep="<numero>"`). Não é só evitar duplicata: é ali que está o
   contexto que torna a issue nova útil — decisão de produto já tomada, tentativa
   revertida, correção que só alcançou parte do código.
+- **Issue nasce com o campo Type preenchido:** `gh issue create --type Bug`, ou
+  `gh issue edit <N> --type Feature` para corrigir depois. Os três valores em uso
+  são `Bug` (algo quebrado ou errado diante do que a tela ou o código promete),
+  `Feature` (capacidade nova ou mudança de comportamento pedida) e `Task`
+  (dependência, infraestrutura, documentação, refatoração, teste). Na dúvida entre
+  Bug e Feature, pergunte se existe comportamento prometido sendo violado: se não
+  existe, é Feature.
+- **Type classifica o assunto; label diz a versão — não misture os dois.** O label
+  temático foi aposentado quando o Type passou a existir: manter as duas
+  taxonomias é mantê-las divergindo, e a que engana é justamente a que ninguém
+  revisa. O único label que uma issue recebe é o da versão em que ela saiu,
+  aplicado no passo de release.
 - **Não afirme impacto em produção sem verificar com o mantenedor.** O repositório
   não diz quais funcionalidades estão em uso. Issue é pública e irreversível;
   descreva o que foi medido no código e pergunte o resto.
