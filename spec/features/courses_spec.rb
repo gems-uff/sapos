@@ -149,42 +149,55 @@ RSpec.describe "Courses features", type: :feature do
     end
   end
 
-  describe "pagination preserves filter", js: true do
-    before(:all) do
-      @destroy_pagination = []
-      # Need >15 records matching a filter to trigger pagination (per_page defaults to 15).
-      # Create 16 courses with a unique name prefix so the name filter yields 2 pages.
+  # Issue #660: a busca guardada na sessao so era gravada na primeira
+  # requisicao que criava a chave; da segunda em diante a troca de filtro se
+  # perdia, e o pedido seguinte -- paginar ou ordenar -- vinha com o filtro
+  # anterior. A causa esta em config/initializers/fix_session_store_dirty_tracking.rb.
+  #
+  # O que reproduz o defeito e a TROCA de filtro: sob um filtro so, a sessao
+  # ainda guarda o valor da primeira gravacao e a pagina 2 sai correta por
+  # acidente.
+  describe "filter switching", js: true do
+    before(:each) do
       16.times do |i|
-        @destroy_pagination << FactoryBot.create(
-          :course, name: "Paginação #{i}", code: "PAG#{i}",
+        FactoryBot.create(
+          :course, name: "Turma A #{i}", code: "TA#{i}",
+          credits: 4, workload: 60, course_type: @course_type1, available: true
+        )
+        FactoryBot.create(
+          :course, name: "Turma B #{i}", code: "TB#{i}",
           credits: 4, workload: 60, course_type: @course_type1, available: true
         )
       end
-    end
-    after(:all) do
-      @destroy_pagination.each(&:delete)
-      @destroy_pagination.clear
-    end
-
-    before(:each) do
       login_as(@user)
       visit url_path
+      search_by_name "Turma A"
+      search_by_name "Turma B"
+    end
+
+    def search_by_name(name)
       click_link_and_wait "Buscar"
-      fill_in "Nome", with: "Paginação"
+      fill_in "Nome", with: name
       click_button_and_wait "Buscar"
     end
 
-    it "should include search params in page link hrefs" do
-      # Regression: without the fix, href was /courses?page=2 (no search),
-      # causing the browser to serve a cached 304 from a previous filter when
-      # the user switched filters and clicked page 2 (issue #660).
-      pagination_link = find("a.as_paginate", text: "2")
-      expect(pagination_link[:href]).to include("search")
+    def listed_names
+      page.all("tr td.name-column").map(&:text)
     end
 
-    it "should show matching records when navigating to page 2 with filter active" do
+    it "should keep the new filter when paginating" do
       click_link_and_wait "2"
-      expect(page.all("tr td.name-column").map(&:text)).to all(include("Paginação"))
+      expect(listed_names).to all(include("Turma B"))
+    end
+
+    it "should keep the new filter when sorting a column" do
+      click_link_and_wait page.all("a.as_sort").first.text
+      expect(listed_names).to all(include("Turma B"))
+    end
+
+    it "should keep the new filter when coming back to the list" do
+      visit url_path
+      expect(listed_names).to all(include("Turma B"))
     end
   end
 end

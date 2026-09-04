@@ -256,42 +256,35 @@ RSpec.describe "CourseClasses features", type: :feature do
     end
   end
 
-  describe "pagination preserves filter", js: true do
-    before(:all) do
-      @destroy_pagination = []
-      # per_page defaults to 15; 6 course_classes with year=2022 already exist.
-      # Create 10 more so year=2022 yields 16 results and pagination appears.
-      10.times do |i|
-        @destroy_pagination << FactoryBot.create(
-          :course_class, name: "Paginação #{i}", course: @course1,
+  # Ver a nota em spec/features/courses_spec.rb: e a troca de filtro que
+  # reproduz a #660. Aqui a tela e a de Turmas, que foi onde o defeito apareceu.
+  describe "filter switching", js: true do
+    before(:each) do
+      16.times do |i|
+        FactoryBot.create(
+          :course_class, name: "Turma A #{i}", course: @course1,
+          professor: @professor1, year: 2022, semester: 2
+        )
+        FactoryBot.create(
+          :course_class, name: "Turma B #{i}", course: @course1,
           professor: @professor1, year: 2022, semester: 2
         )
       end
-    end
-    after(:all) do
-      @destroy_pagination.each(&:delete)
-      @destroy_pagination.clear
-    end
-
-    before(:each) do
       login_as(@user)
       visit url_path
+      search_by_name "Turma A"
+      search_by_name "Turma B"
+    end
+
+    def search_by_name(name)
       click_link_and_wait "Buscar"
-      find(:select, "search_year").find(:option, text: "2022").select_option
+      fill_in "Nome", with: name
       click_button_and_wait "Buscar"
     end
 
-    it "should include search params in page link hrefs" do
-      # Regression: without the fix, href was /course_classes?page=2 (no search),
-      # causing the browser to serve a cached 304 from a previous filter when
-      # the user switched filters and clicked page 2 (issue #660).
-      pagination_link = find("a.as_paginate", text: "2")
-      expect(pagination_link[:href]).to include("search")
-    end
-
-    it "should show year=2022 records when navigating to page 2 with year filter active" do
+    it "should keep the new filter when paginating" do
       click_link_and_wait "2"
-      expect(page.all("tr td.year-column").map(&:text)).to all(eq("2022"))
+      expect(page.all("tr td.name-column").map(&:text)).to all(include("Turma B"))
     end
   end
 end
