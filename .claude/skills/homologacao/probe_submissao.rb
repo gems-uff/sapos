@@ -179,12 +179,22 @@ def apaga_criadas(driver, wait, marca)
     link = driver.find_elements(id: did).first
     next if link.nil?
     driver.execute_script("arguments[0].click()", link)
-    sleep 1
-    begin
-      driver.switch_to.alert.accept
-    rescue Selenium::WebDriver::Error::NoSuchAlertError
-      nil
+    # A confirmacao e um alert NATIVO, mas nao aparece instantaneamente. Esperar
+    # 1s fixo e engolir NoSuchAlertError deixa o registro vivo em silencio -- e
+    # a contagem seguinte ainda assim volta zero, entao a limpeza mente. Espera
+    # ate ~5s e diz quando nao confirmou.
+    confirmou = false
+    10.times do
+      sleep 0.5
+      begin
+        driver.switch_to.alert.accept
+        confirmou = true
+        break
+      rescue Selenium::WebDriver::Error::NoSuchAlertError
+        next
+      end
     end
+    puts "  AVISO: exclusao de #{did} nao confirmada (sem alert)" unless confirmou
     sleep 3
     settle(driver, wait)
   end
@@ -271,9 +281,27 @@ begin
         aviso: flash ? flash.innerText.replace(/\\s+/g, ' ').trim().slice(0, 200) : null
       };
     JS
-    relatorio[:fase2] = { criou: !ainda, resultado: resultado, invalidos: invalidos(driver) }
+    # Sair do formulario NAO e ter criado. Se o servidor recusou e re-renderizou,
+    # a URL tambem muda -- e o `erro` na pagina e o que separa os dois casos.
+    # Confundi-los reporta "criou: true" sobre uma submissao rejeitada, e a
+    # rodada conclui que o formulario publico funciona quando ele nao foi
+    # exercitado ate o fim.
+    postou = !ainda
+    recusado = postou && !resultado["erro"].to_s.strip.empty?
+    criou = postou && !recusado
+    relatorio[:fase2] = {
+      postou: postou, recusado_no_servidor: recusado, criou: criou,
+      resultado: resultado, invalidos: invalidos(driver)
+    }
     shot(driver, "submissao_fase2")
-    puts "FASE 2 -- criou: #{!ainda} | #{resultado['aviso'].inspect}"
+    puts "FASE 2 -- postou: #{postou} | recusado no servidor: #{recusado} | " \
+         "criou: #{criou}"
+    if recusado
+      puts "  motivo: #{resultado['erro'].to_s.slice(0, 120)}"
+      puts "  (\"Email ja existe\" = sobrou candidatura marcada de rodada anterior;" \
+           " o marcador tambem e o valor do e-mail, entao ela bloqueia a proxima)"
+
+    end
 
     unless MANTER
       restantes = apaga_criadas(driver, wait, MARCA)
