@@ -211,6 +211,33 @@ Comparar é diferenciar os dois JSON. Para medir o que ele não mede, acrescente
 seção **e recapture os dois lados**: sonda alterada no meio da rodada mede o
 instrumento, não a aplicação.
 
+### Estado que atravessa requisições
+
+A varredura estática carrega cada rota do zero, então **nada nela mede sessão**:
+filtro, ordenação e página que se perdem entre uma requisição e a seguinte
+passam pelas rotas todas sem um pixel de diferença. O `probe_sessao.rb` cobre
+isso na tela de Turmas — filtra, pagina, ordena e volta à lista, na mesma sessão.
+
+```bash
+EXPLORE_OUT=$LADO/sessao bundle exec ruby $S/probe_sessao.rb
+```
+
+Três coisas que essa medida ensina, e que valem para qualquer sonda de sessão:
+
+- **É a TROCA de filtro que mede.** Sob um filtro só, a página 2 sai correta
+  mesmo com a sessão quebrada, porque a busca guardada ainda é a certa. Uma
+  sonda que filtra uma vez e pagina devolve verde sempre.
+- **A primeira busca da sessão é privilegiada**, então a sonda abre sessão nova
+  antes de medir. Sem isso, quem congela é a busca que a própria descoberta de
+  dados fez, e as duas rodadas medem coisas diferentes.
+- **Zero linhas não é veredito.** Lista vazia pode ser "o filtro não pegou" ou
+  "o servidor está filtrando outra coisa". A sonda lê o `data-search` da faixa
+  de filtro do active_scaffold — o ano que o **servidor** diz estar aplicando —
+  e é esse campo, não a contagem, que se compara entre os dois lados.
+
+O relatório traz, por passo, `ano_filtrado_pelo_servidor` e `filtro_correto`.
+Comparar é diferenciar os dois JSON.
+
 ### Medir por leitura o que o formulário exige
 
 Nem toda pergunta sobre formulário precisa de escrita. O que a página **exige de
