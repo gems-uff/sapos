@@ -10,10 +10,9 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
 
   def index
     @admission_processes = Admissions::AdmissionProcess.open.where(visible: true)
-    @has_search_results = optional_admission_application_params.present?
-    @admission_application = Admissions::AdmissionApplication.new(
-      optional_admission_application_params
-    )
+    valores = recover_form_values
+    @has_search_results = valores.present?
+    @admission_application = Admissions::AdmissionApplication.new(valores)
   end
 
   def show
@@ -22,13 +21,13 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
         admission_id: @admission_process.simple_id
       )
     end
-    application_params = optional_admission_application_params
+    application_params = recover_form_values
     @has_search_results = application_params.present?
     @admission_application = Admissions::AdmissionApplication.new(
       admission_process: @admission_process
     )
     if @has_search_results
-      @admission_application.assign_attributes(optional_admission_application_params)
+      @admission_application.assign_attributes(application_params)
     end
   end
 
@@ -120,15 +119,22 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
       )
     end
   rescue FindException => e
+    # O codigo de identificacao e a CREDENCIAL da inscricao: com ele a tela
+    # /admissions/<processo>/apply/<token> abre, e em processo sem
+    # require_session ele basta, de qualquer navegador. Repeti-lo na query
+    # string do redirect o leva para o log de acesso do servidor, para o
+    # historico do navegador e para qualquer link que o candidato compartilhe
+    # ao pedir ajuda -- e isso acontece tambem quando o token esta CORRETO e
+    # quem falhou foi o captcha, que expira sozinho.
+    #
+    # O find_by_email abaixo ja separava os dois: a URL que ele monta, e que vai
+    # por mensagem, leva so o e-mail. Aqui os valores viajam pelo flash, que
+    # mora na sessao, e a URL nao carrega nenhum deles.
+    flash[:recover] = admission_application_params.slice(:email, :token).to_h
     if source.blank?
-      redirect_to admissions_path(
-        params: admission_application_params
-      ), alert: e.message
+      redirect_to admissions_path, alert: e.message
     else
-      redirect_to admission_path(
-        id: source,
-        params: admission_application_params
-      ), alert: e.message
+      redirect_to admission_path(id: source), alert: e.message
     end
   end
 
@@ -203,6 +209,17 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
 
     def optional_admission_application_params
       params.permit(:email, :token)
+    end
+
+    # De onde o formulario de recuperacao se repreenche. A query string ainda
+    # vale -- e o caminho do find_by_email, que manda o link por mensagem --,
+    # mas a recusa do #find passa os valores pelo flash, para nao deixar a
+    # credencial na URL.
+    def recover_form_values
+      parametros = optional_admission_application_params
+      return parametros.to_h if parametros.present?
+
+      (flash[:recover] || {}).slice("email", "token")
     end
 end
 
