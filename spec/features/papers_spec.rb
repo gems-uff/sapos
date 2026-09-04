@@ -160,9 +160,8 @@ RSpec.describe "Papers features", type: :feature do
       @professor_user = create_confirmed_user(
         [@role_professor], "docente@ic.uff.br", "Ana", "A1b2c3d4!", professor: @professor1
       )
-      @own_row = FactoryBot.create(:paper_professor,
-        paper: @record, professor: @professor2
-      )
+      FactoryBot.create(:paper_professor, paper: @record, professor: @professor2)
+      FactoryBot.create(:paper_student, paper: @record, student: @student1)
     end
 
     before(:each) { login_as(@professor_user) }
@@ -188,13 +187,18 @@ RSpec.describe "Papers features", type: :feature do
       end
     end
 
-    it "removes an authorship row of a paper it already owns" do
-      visit url_path
-      find("#as_#{plural_name}-edit-#{@record.id}-link").click
-      subform = "as_#{plural_name}-#{@record.id}-paper_professors-subform"
+    # Na edicao o artigo tem id, o pai vem de find_if_allowed com o dono real e
+    # quem decide e `paper: { owner: user.professor }`. Sao regras diferentes das
+    # de cima, entao os dois casos precisam dos dois lados da autoria.
+    %w[paper_professors paper_students].each do |association|
+      it "removes a #{association} row of a paper it already owns" do
+        visit url_path
+        find("#as_#{plural_name}-edit-#{@record.id}-link").click
+        subform = "as_#{plural_name}-#{@record.id}-#{association}-subform"
 
-      row = find("##{subform}-list tbody.sub-form-record")
-      expect(row).to have_link("Remover")
+        row = find("##{subform}-list tbody.sub-form-record")
+        expect(row).to have_link("Remover")
+      end
     end
   end
 
