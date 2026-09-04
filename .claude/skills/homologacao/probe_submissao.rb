@@ -165,10 +165,24 @@ def enviar(driver, wait)
 end
 
 def apaga_criadas(driver, wait, marca)
+  # ESTA SONDA RODA ANONIMA -- o formulario publico dispensa sessao. Mas a
+  # limpeza usa tela ADMINISTRATIVA, e sem login ela cai no /users/sign_in:
+  # nao acha link de exclusao (nao apaga nada) e nao acha linha com o marcador
+  # (conta zero). O relatorio entao dizia "restantes: 0" tendo contado a tela de
+  # login, e a candidatura sobrevivia -- bloqueando a rodada seguinte com
+  # "Email ja existe", porque o marcador tambem e o valor do e-mail.
+  login(driver, wait)
+  switch_role!(driver, wait, "Administrador")
+
   # A busca do active_scaffold e por campo: ?search[name]=, nao ?search=.
   driver.navigate.to("#{BASE}/admission_applications?search[name]=#{marca}")
   settle(driver, wait)
   sleep 2
+  if driver.current_url.include?("sign_in")
+    abort "LIMPEZA ABORTADA: a lista caiu no login. Nada foi apagado, e a " \
+          "candidatura marcada continua na replica -- apague-a antes da " \
+          "proxima rodada."
+  end
   ids = driver.execute_script(<<~JS)
     return Array.prototype.slice.call(document.querySelectorAll('tr'))
       .filter(function (tr) { return tr.innerText.indexOf('ZZ-TESTE-HOMOLOG') >= 0; })
@@ -198,9 +212,13 @@ def apaga_criadas(driver, wait, marca)
     sleep 3
     settle(driver, wait)
   end
+  # Recontar em pagina recarregada: contar na mesma pagina que acabou de apagar
+  # devolve zero mesmo quando a exclusao nao pegou no servidor.
   driver.navigate.to("#{BASE}/admission_applications?search[name]=#{marca}")
   settle(driver, wait)
   sleep 2
+  abort "LIMPEZA ABORTADA: a lista caiu no login na reconferencia." if driver.current_url.include?("sign_in")
+
   driver.execute_script(<<~JS)
     return Array.prototype.slice.call(document.querySelectorAll('tr'))
       .filter(function (tr) { return tr.innerText.indexOf('ZZ-TESTE-HOMOLOG') >= 0; }).length;
