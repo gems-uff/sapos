@@ -43,4 +43,29 @@ RSpec.describe Report, type: :model do
       expect(report.expired?).to be false
     end
   end
+
+  # O escopo decide o que a rotina de limpeza apaga; o predicado decide o que o
+  # download recusa. Concordam hoje porque saem do mesmo expiry_cutoff, e este
+  # grupo e o que impede que voltem a divergir: cobre o limite pelos dois lados
+  # de uma vez, inclusive o proprio dia do vencimento, que e a unica data em que
+  # um erro de `<` para `<=` apareceria.
+  describe ".expired" do
+    let(:datas) { { Date.yesterday => true, Date.today => false, Date.tomorrow => false, nil => false } }
+
+    it "seleciona exatamente os registros que #expired? aprova" do
+      criados = datas.keys.index_with do |data|
+        FactoryBot.create(:report, expires_at: data)
+      end
+
+      vencidos = Report.expired.pluck(:id)
+
+      datas.each do |data, esperado|
+        registro = criados[data]
+        expect(vencidos.include?(registro.id)).to eq(esperado),
+          "escopo divergiu em expires_at=#{data.inspect}"
+        expect(registro.expired?).to eq(esperado),
+          "predicado divergiu em expires_at=#{data.inspect}"
+      end
+    end
+  end
 end
