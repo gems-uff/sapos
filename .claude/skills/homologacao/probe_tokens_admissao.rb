@@ -63,6 +63,7 @@ def recuperar(driver, wait, token, email)
   driver.find_element(css: "input[name='admissions_admission_application[email]']").send_keys(email)
   campo = driver.find_element(css: "input[name='admissions_admission_application[token]']")
   campo.send_keys(token)
+  marcar_recaptcha(driver, wait)
   campo.submit
   settle(driver, wait)
   # A pagina de recusa monta a mensagem depois do settle; sem esta folga a
@@ -77,6 +78,34 @@ end
 # faria a sonda dizer "abriu" mesmo quando a tela foi negada.
 def desviou?(driver)
   driver.current_url.split("?").first.end_with?("/admissions")
+end
+
+# "No CAPTCHA" das chaves de teste quer dizer sem DESAFIO de imagem, nao sem
+# clique: o widget ainda nasce desmarcado e o campo g-recaptcha-response fica
+# VAZIO ate alguem marcar a caixa. Submeter sem marcar e recusado igual, e o
+# sintoma ("reCAPTCHA invalido") e o mesmo de chave errada -- o que faz perder
+# tempo procurando no servidor um defeito que esta na sonda.
+#
+# A caixa vive dentro do iframe do Google; marcar exige entrar nele e voltar.
+# Quando nao ha widget na pagina (instancia com o captcha desligado por
+# configuracao), nao ha nada a fazer e a funcao sai calada.
+def marcar_recaptcha(driver, wait)
+  frame = driver.find_elements(css: "iframe[src*='recaptcha/api2/anchor']").first
+  return if frame.nil?
+
+  driver.switch_to.frame(frame)
+  begin
+    caixa = wait.until { driver.find_elements(css: "#recaptcha-anchor, .recaptcha-checkbox").first }
+    caixa.click
+  ensure
+    driver.switch_to.default_content
+  end
+  Selenium::WebDriver::Wait.new(timeout: 20).until do
+    driver.execute_script(
+      "var f = document.querySelector('[name=\"g-recaptcha-response\"]');" \
+      "return f ? f.value.length > 0 : true;"
+    )
+  end
 end
 
 def recaptcha_barrou?(driver)
