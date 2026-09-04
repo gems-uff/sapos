@@ -9,8 +9,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby "~> 3.4.10"
 
 # ─── Framework e servidor ────────────────────────────────────────────────
-gem "rails", "~> 7.2.3", ">= 7.2.3.2"    # piso de seguranca (CVE-2026-66066)
-gem "rack", "~> 2.2.23"                  # o 3.x entra junto com o salto do Rails
+gem "rails", "~> 8.0.5", ">= 8.0.5.1"    # piso de seguranca (CVE-2026-66066)
 gem "sprockets-rails"                    # asset pipeline
 gem "bootsnap", require: false           # cache de boot (config/boot.rb)
 gem "nokogiri", ">= 1.18.9"              # piso de seguranca (parser HTML/XML)
@@ -54,13 +53,13 @@ gem "redcarpet"                          # Markdown (pagina de creditos)
 
 # ─── Upload de arquivos ──────────────────────────────────────────────────
 gem "carrierwave", ">= 3.0.7"            # piso de seguranca
-gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-activerecord.git", branch: "rails7"
+gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-activerecord.git", branch: "rails8"
 
 # ─── Dominio / infraestrutura de app ─────────────────────────────────────
 gem "paper_trail"                        # versionamento/auditoria
 gem "activerecord-session_store"         # sessao no banco (initializers/session_store.rb)
 gem "rufus-scheduler"                    # agendamento de notificacoes
-gem "validates_timeliness", "~> 7.1"     # validacao de datas; teto so no major
+gem "validates_timeliness", "~> 8.0"     # validacao de datas; o major acompanha o do Rails (8.x pede activemodel 8)
 gem "exception_notification"             # notifica excecoes
 
 # ─── Ambientes ───────────────────────────────────────────────────────────
@@ -78,7 +77,7 @@ group :development, :test do
   # que o Capybara sobe nos feature specs (Capybara.server em rails_helper).
   # O teto e o 8.0.0 por causa desse segundo uso.
   gem "puma", "~> 7.2", ">= 7.2.1"
-  gem "sqlite3", ">= 2.9.5"              # banco de dev/test; piso 2.9.5: CVE-2026-54620
+  gem "sqlite3", ">= 2.9.6"              # banco de dev/test; piso 2.9.6: GHSA-mwm8-39rw-8826
   gem "awesome_print"
   gem "binding_of_caller"
   gem "better_errors"

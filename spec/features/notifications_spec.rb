@@ -229,19 +229,7 @@ RSpec.describe "Notifications features", type: :feature do
       expect(ActionMailer::Base.deliveries.last.subject).to eq "SAPOS: boletim em anexo"
     end
 
-    # The attachment goes out EMPTY through the rake task -- see issue #632.
-    # The fix for #547 taught the controller copy of prepare_attachments to pass
-    # filename, signature_type and watermark, but never reached the rake copy,
-    # which still calls render_enrollments_grades_report_pdf with a single
-    # argument. From outside a controller, render_to_string returns nil, so
-    # file_contents ends up empty and nothing is raised.
-    #
-    # No one is affected: the feature has been unused in production since early
-    # 2025, when students started generating the report themselves with a QR
-    # code. #632 decides whether the option is removed or the task is fixed.
-    # This example pins the current behavior so that either decision breaks it
-    # and forces a rewrite.
-    it "currently attaches an EMPTY grades report (see #632)" do
+    it "attaches the fully rendered grades report PDF (see #632)" do
       @notification3.next_execution = 5.days.ago
       @notification3.save!
       Rake::Task["maintenance:trigger_notifications"].invoke
@@ -249,7 +237,22 @@ RSpec.describe "Notifications features", type: :feature do
       attachment = ActionMailer::Base.deliveries.last.attachments.first
       expect(attachment).to be_present
       expect(attachment.filename).to include("BOLETIM")
-      expect(attachment.body.raw_source.bytesize).to eq 0
+
+      # Caracterização do caminho do cron/rake, o que gerava o anexo de 0 byte
+      # (#632). Em vez de conferir só o cabeçalho de bytes, lemos o PDF: abrir com
+      # o PDF::Reader ja falha em anexo vazio ou truncado, e a extracao de texto
+      # prova que o conteudo e mesmo o boletim daquele aluno, renderizado inteiro.
+      # Nao fixamos a contagem exata de paginas (depende do dado do fixture); o
+      # rodape com data/hora varia a cada execucao, entao asseramos marcadores
+      # estaveis do corpo em vez do texto inteiro, dispensando normalizar o
+      # carimbo de hora. O prawn desenha o cabecalho com espacamento entre
+      # caracteres ("BO L ET I M..."), entao removemos o espaco em branco dos dois
+      # lados antes de comparar.
+      pdf = PDF::Reader.new(StringIO.new(attachment.decoded))
+      expect(pdf.page_count).to be >= 1
+      text = pdf.pages.map(&:text).join(" ").gsub(/\s+/, "")
+      expect(text).to include("BOLETIMESCOLAR")
+      expect(text).to include(@student1.name.gsub(/\s+/, ""))
     end
 
     it "should send notifications without attachment" do

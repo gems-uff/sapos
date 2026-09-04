@@ -49,7 +49,7 @@ namespace :maintenance do
     # Find notifications that should run
     Notification.where.not(frequency: Notification::MANUAL)
                 .where(next_execution.lt(Time.now)).each do |notification|
-      result = prepare_attachments(notification.execute)
+      result = attachment_renderer.prepare_attachments(notification.execute)
       notifications.concat(result[:notifications])
       notifications_attachments.merge!(result[:notifications_attachments])
     end
@@ -63,35 +63,44 @@ namespace :maintenance do
   end
 
   private
-    # The rendering modules live in a class of their own on purpose. Calling
-    # `include` from inside a method body of this file would include them into
-    # Object, which leaks into every object in the process -- harmless for a
-    # cron run that exits right after, but it breaks any other code sharing the
-    # process, the test suite included.
-    #
     # The class is built on first use, not at the top level of this file: rake
     # loads every rakefile before running any task, so a top-level body would
     # resolve SharedPdfConcern before the environment is loaded, and Zeitwerk
     # cannot autoload it yet. That raises NameError on *every* rake invocation,
     # not just on this task.
+    #
+    # ApplicationController.renderer runs render_to_string inside a real
+    # controller context -- the view context that SharedPdfConcern requires and
+    # that AbstractController::Rendering did not provide (#632: render_to_string
+    # returned nil and the attachment came out empty). A cron process has no
+    # warden, so Devise's current_user would raise; rendering as a guest
+    # (current_user = nil) makes can? return false and leaves signature override
+    # as nil, which is the correct behaviour. clear_helpers requires declaring
+    # the same PDF helpers as the web path, otherwise new_document and friends
+    # are undefined in the view.
     def attachment_renderer
-      @attachment_renderer ||= Class.new do
-        include SharedPdfConcern
-        include AbstractController::Rendering
-      end.new
-    end
-
-    def prepare_attachments(notification_result)
-      renderer = attachment_renderer
-      notification_result[:notifications].each do |message|
-        attachments = notification_result[:notifications_attachments][message]
-        next if attachments.blank?
-        if attachments[:grades_report_pdf]
-          enrollment = Enrollment.find(message[:enrollments_id])
-          attachments[:grades_report_pdf][:file_contents] =
-            renderer.render_enrollments_grades_report_pdf(enrollment)
+      @attachment_renderer ||= begin
+        guest = Class.new(ApplicationController) do
+          helper PdfHelper
+          helper EnrollmentsPdfHelper
+          def current_user = nil
+          # The template guards the signature_type override behind
+          # can?(:override_report_signature_type). Without a real user CanCan
+          # would deny it, leaving the default QR-code config active and
+          # causing Report.create!(user: nil) to fail the "Gerado por" validation.
+          # Granting only this one action is safe: the renderer is never exposed
+          # to web requests and current_user is nil (no persisted Report is
+          # created for the cron-generated PDF).
+          def can?(action, *) = action == :override_report_signature_type
+          def cannot?(action, *) = action != :override_report_signature_type
         end
+        renderer = guest.renderer
+        Class.new do
+          include SharedPdfConcern
+          define_method(:render_to_string) do |*args, **kwargs|
+            renderer.render(*args, **kwargs)
+          end
+        end.new
       end
-      notification_result
     end
 end

@@ -207,4 +207,140 @@ RSpec.describe PdfHelper, type: :helper do
       end.not_to raise_error
     end
   end
+
+  describe "watermark_band" do
+    # A4 in points, which is what new_document asks prawn for.
+    let(:width) { 595.28 }
+    let(:height) { 841.89 }
+    let(:band_height) { 30 }
+    let(:radians) { PdfHelper::WATERMARK_ANGLE * Math::PI / 180 }
+
+    it "centers the band on the page" do
+      band = helper.watermark_band(width, height, band_height)
+
+      expect(band[:center]).to eq([width / 2, height / 2])
+      expect(band[:left] + (band[:width] / 2)).to be_within(0.001)
+        .of(width / 2)
+      expect(band[:top] - (band[:height] / 2)).to be_within(0.001)
+        .of(height / 2)
+    end
+
+    it "makes the band as long as the paper allows at the stamp angle" do
+      band = helper.watermark_band(width, height, band_height)
+      horizontal = band[:width] * Math.cos(radians).abs
+      vertical = band[:width] * Math.sin(radians).abs
+      margin = 2 * PdfHelper::WATERMARK_PAPER_MARGIN
+
+      expect(horizontal).to be <= width - margin + 0.001
+      expect(vertical).to be <= height - margin + 0.001
+      # One of the two sides is what limits the band, so it reaches that side
+      # instead of stopping short of the paper.
+      expect(
+        [horizontal / (width - margin), vertical / (height - margin)].max
+      ).to be_within(0.001).of(1)
+    end
+
+    it "is limited by the width of the paper when the text lies flat" do
+      band = helper.watermark_band(width, height, band_height, 0)
+
+      expect(band[:width]).to be_within(0.001)
+        .of(width - (2 * PdfHelper::WATERMARK_PAPER_MARGIN))
+    end
+
+    it "is limited by the height of the paper when the text stands upright" do
+      band = helper.watermark_band(width, height, band_height, 90)
+
+      expect(band[:width]).to be_within(0.001)
+        .of(height - (2 * PdfHelper::WATERMARK_PAPER_MARGIN))
+    end
+  end
+
+  describe "the watermark of a document" do
+    # The watermark had no coverage and its placement was a pair of fixed
+    # coordinates, so nothing noticed that the ink sat below and to the left of
+    # the center of the paper. The position is only observable in the rendered
+    # PDF, so these specs read the glyph positions back from it.
+    def render_document(signature_type:, watermark: true, **options)
+      helper.new_document(
+        "watermark.pdf", "Boletim",
+        watermark: watermark,
+        pdf_config: ReportConfiguration.new(signature_type: signature_type),
+        **options
+      ) { |pdf| pdf.text "conteúdo do documento" }
+    end
+
+    # The phrase is rotated, so the extraction returns one run per glyph and it
+    # cannot be matched as a string. Two things tell those glyphs apart from the
+    # text of the document: each is a single character, and they are the runs
+    # that the same document without the watermark does not have. The size of
+    # the font does not tell them apart — the extraction reports it already
+    # multiplied by the rotation.
+    def single_character_runs(document)
+      page = PDF::Reader.new(StringIO.new(document)).pages.first
+      page.runs.filter_map do |run|
+        next unless run.text.length == 1
+        [run.text, run.x.round(2), run.y.round(2)]
+      end
+    end
+
+    def watermark_glyphs(signature_type, **options)
+      with_watermark = single_character_runs(
+        render_document(signature_type: signature_type, **options)
+      )
+      without_watermark = single_character_runs(
+        render_document(
+          signature_type: signature_type, watermark: false, **options
+        )
+      )
+      with_watermark - without_watermark
+    end
+
+    def watermark_center(signature_type, **options)
+      glyphs = watermark_glyphs(signature_type, **options)
+      expect(glyphs).not_to be_empty
+      xs = glyphs.map { |(_, x, _)| x }
+      ys = glyphs.map { |(_, _, y)| y }
+      [(xs.min + xs.max) / 2.0, (ys.min + ys.max) / 2.0]
+    end
+
+    # A4, which is what new_document asks prawn for.
+    let(:page_center) { [595.28 / 2, 841.89 / 2] }
+
+    it "prints the watermark when the document asks for it" do
+      expect(watermark_glyphs(:no_signature)).not_to be_empty
+    end
+
+    it "does not print it when the document does not ask for it" do
+      document = render_document(
+        signature_type: :no_signature, watermark: false
+      )
+      expect(single_character_runs(document)).to be_empty
+    end
+
+    it "centers the watermark on the paper" do
+      # One glyph of tolerance: a run carries the origin of its glyph, not the
+      # extent of the ink, so the box of the origins is short by about one
+      # glyph in each direction.
+      center = watermark_center(:no_signature)
+      expect(center[0]).to be_within(20).of(page_center[0])
+      expect(center[1]).to be_within(20).of(page_center[1])
+    end
+
+    it "centers it on paper that the phrase barely fits" do
+      # Landscape A4 is the case where the phrase does not fit the paper at the
+      # angle of the stamp, so the band shrinks it. What must not change is
+      # where the ink sits.
+      center = watermark_center(:no_signature, page_layout: :landscape)
+
+      expect(center[0]).to be_within(20).of(page_center[1])
+      expect(center[1]).to be_within(20).of(page_center[0])
+    end
+
+    it "keeps it in place when the signature footer changes the margins" do
+      # The bottom margin grows to fit the signature footer, so a watermark
+      # placed relative to the text box moves with it. The paper does not move.
+      expect(watermark_center(:manual))
+        .to eq(watermark_center(:no_signature))
+    end
+  end
 end

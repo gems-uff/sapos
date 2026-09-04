@@ -117,6 +117,14 @@ RSpec.describe Ability, type: :model do
       expect(ability).to be_able_to(:read_pendencies, ClassEnrollmentRequest)
     end
 
+    # The advisement pendencies belong to the professor branch of
+    # initialize_courses; its else clause takes them back from everyone else,
+    # even from a manager who otherwise manages the whole course domain.
+    it "does not read advisement pendencies" do
+      expect(ability).not_to be_able_to(:read_advisement_pendencies, EnrollmentRequest)
+      expect(ability).not_to be_able_to(:read_pendencies, EnrollmentRequest)
+    end
+
     it "manages users but not custom variables" do
       expect(ability).to be_able_to(:manage, User)
       expect(ability).to be_able_to(:manage, EmailTemplate)
@@ -244,13 +252,205 @@ RSpec.describe Ability, type: :model do
       expect(ability).not_to be_able_to(:edit_professor, Paper)
     end
 
-    # initialize_professors builds its conditions straight from user.professor,
-    # with no `present?` guard (initialize_courses has one). A missing association
-    # degrades the condition to `professor: nil`, which grants rather than denies.
-    # It is inert today only because Grant#professor and Paper#owner are
-    # `optional: false`, so no record can match -- the guard is missing, the
-    # exposure is not. These examples pin the safe outcome so that a future model
-    # change making the association optional fails here instead of in production.
+    it "changes only the authorship rows of the papers it owns" do
+      own = FactoryBot.create(:paper, owner: @professor)
+      other = FactoryBot.create(:paper, owner: @other_professor)
+      own_professor_row = FactoryBot.create(:paper_professor, paper: own)
+      own_student_row = FactoryBot.create(:paper_student, paper: own)
+      other_professor_row = FactoryBot.create(:paper_professor, paper: other)
+      other_student_row = FactoryBot.create(:paper_student, paper: other)
+
+      expect(ability).to be_able_to(:create, PaperProfessor)
+      expect(ability).to be_able_to(:create, PaperStudent)
+      expect(ability).to be_able_to(:update, own_professor_row)
+      expect(ability).to be_able_to(:destroy, own_professor_row)
+      expect(ability).to be_able_to(:update, own_student_row)
+      expect(ability).to be_able_to(:destroy, own_student_row)
+
+      expect(ability).not_to be_able_to(:update, other_professor_row)
+      expect(ability).not_to be_able_to(:destroy, other_professor_row)
+      expect(ability).not_to be_able_to(:update, other_student_row)
+      expect(ability).not_to be_able_to(:destroy, other_student_row)
+    end
+
+    # An ownerless paper never reaches the database -- Paper#owner is
+    # `optional: false`. What does exist is the in-memory paper of the subform:
+    # adding an authorship row to a paper that is still unsaved makes
+    # ActiveScaffold::Actions::Subform#do_edit_associated build the parent through
+    # `new_model`, which skips PapersController#do_new -- the very hook that would
+    # assign the owner. It is that row the gem asks `can? :destroy` about, to
+    # choose between the "remove" link and an access-denied notice.
+    it "removes the authorship rows of an unsaved paper, as the subform builds them" do
+      unsaved = Paper.new
+      professor_row = unsaved.paper_professors.build
+      student_row = unsaved.paper_students.build
+
+      expect(unsaved.owner).to be_nil
+      expect(ability).to be_able_to(:destroy, professor_row)
+      expect(ability).to be_able_to(:destroy, student_row)
+    end
+
+    it "generates assertions for any student, as long as the assertion allows it" do
+      expect(ability).to be_able_to(:assertion_pdf, Assertion)
+      expect(ability).to be_able_to(
+        :generate_assertion, Assertion.new(student_can_generate: true), "M1"
+      )
+      expect(ability).not_to be_able_to(
+        :generate_assertion, Assertion.new(student_can_generate: false), "M1"
+      )
+    end
+
+    # The grades report is reachable through the :read alias, so the rule that
+    # actually decides is the `cannot` block in initialize_students.
+    it "does not generate the grades report when the enrollment status forbids it" do
+      allowed = FactoryBot.create(:enrollment)
+      blocked = FactoryBot.create(:enrollment, enrollment_status: FactoryBot.create(
+        :enrollment_status, professor_can_generate_report: false
+      ))
+
+      expect(ability).to be_able_to(:grades_report_pdf, allowed)
+      expect(ability).not_to be_able_to(:grades_report_pdf, blocked)
+    end
+
+    # Advisement demands the professor be authorized at the enrollment level, so
+    # the authorization comes along even though no rule here looks at it.
+    #
+    # Both reloads are load-bearing, and neither is obvious:
+    #
+    # - the professor is shared by the whole group, so an earlier example may
+    #   have left its advisement_authorizations loaded. Advisement validates
+    #   through that very collection, and a stale one fails the validation. It
+    #   fails only under MariaDB: SQLite reuses the ids freed by the rollback, so
+    #   the cached authorization keeps pointing at a level id that the next
+    #   example happens to create again, and the staleness cancels itself out.
+    # - validating the enrollment loads its advisements, and the rules read that
+    #   same collection -- without the reload it stays cached empty and every
+    #   advisement rule silently misses.
+    def enrollment_advised_by(professor)
+      enrollment = FactoryBot.create(:enrollment)
+      FactoryBot.create(
+        :advisement_authorization, professor: professor, level: enrollment.level
+      )
+      professor.advisement_authorizations.reload
+      FactoryBot.create(:advisement, professor: professor, enrollment: enrollment)
+      enrollment.reload
+    end
+
+    it "changes only the enrollment requests of its own advisees" do
+      advised = enrollment_advised_by(@professor)
+      stranger = enrollment_advised_by(@other_professor)
+      own_request = FactoryBot.create(:enrollment_request, enrollment: advised)
+      other_request = FactoryBot.create(:enrollment_request, enrollment: stranger)
+
+      expect(ability).to be_able_to(:read_advisement_pendencies, EnrollmentRequest)
+      expect(ability).to be_able_to(:update, own_request)
+      expect(ability).not_to be_able_to(:update, other_request)
+
+      # Declared after the grants, so they override them even for the advisor.
+      expect(ability).not_to be_able_to(:create, EnrollmentRequest)
+      expect(ability).not_to be_able_to(:destroy, own_request)
+    end
+
+    it "does not reopen a class enrollment request already effected" do
+      advised = enrollment_advised_by(@professor)
+      own_request = FactoryBot.create(:enrollment_request, enrollment: advised)
+
+      pending = ClassEnrollmentRequest.new(
+        enrollment_request: own_request, status: ClassEnrollmentRequest::REQUESTED
+      )
+      effected = ClassEnrollmentRequest.new(
+        enrollment_request: own_request, status: ClassEnrollmentRequest::EFFECTED
+      )
+
+      expect(ability).to be_able_to(:update, pending)
+      expect(ability).not_to be_able_to(:update, effected)
+    end
+
+    # CustomVariable.professor_login_can_post_grades decides the only writes a
+    # professor has over a class. Each of its three outcomes builds a different
+    # set of rules, and the value is read while the Ability is being built --
+    # hence the stub before the subject is first touched.
+    describe "posting grades" do
+      def course_class_for(professor, year:, semester:)
+        CourseClass.new(professor: professor, year: year, semester: semester)
+      end
+
+      before(:each) do
+        current = YearSemester.current
+        @own_class = course_class_for(
+          @professor, year: current.year, semester: current.semester
+        )
+        @own_old_class = course_class_for(@professor, year: current.year - 1, semester: 1)
+        @other_class = course_class_for(
+          @other_professor, year: current.year, semester: current.semester
+        )
+      end
+
+      context "when it allows every semester" do
+        before(:each) do
+          allow(CustomVariable).to receive(:professor_login_can_post_grades)
+            .and_return("yes_all_semesters")
+        end
+
+        it "posts grades on its own classes, whatever the semester" do
+          expect(ability).to be_able_to(:post_grades, @own_class)
+          expect(ability).to be_able_to(:post_grades, @own_old_class)
+          expect(ability).to be_able_to(:read_pendencies, @own_class)
+          expect(ability).to be_able_to(
+            :post_grades, ClassEnrollment.new(course_class: @own_class)
+          )
+        end
+
+        it "posts no grades on a class of another professor" do
+          expect(ability).not_to be_able_to(:post_grades, @other_class)
+          expect(ability).not_to be_able_to(
+            :post_grades, ClassEnrollment.new(course_class: @other_class)
+          )
+        end
+      end
+
+      context "when it allows only the current semester" do
+        before(:each) do
+          allow(CustomVariable).to receive(:professor_login_can_post_grades)
+            .and_return("yes")
+        end
+
+        it "posts grades on its own class of the current semester only" do
+          expect(ability).to be_able_to(:post_grades, @own_class)
+          expect(ability).to be_able_to(
+            :post_grades, ClassEnrollment.new(course_class: @own_class)
+          )
+          expect(ability).not_to be_able_to(:post_grades, @own_old_class)
+          expect(ability).not_to be_able_to(:post_grades, @other_class)
+        end
+      end
+
+      context "when it does not allow it" do
+        before(:each) do
+          allow(CustomVariable).to receive(:professor_login_can_post_grades)
+            .and_return("no")
+        end
+
+        it "reads the class and writes nothing" do
+          expect(ability).to be_able_to(:read, @own_class)
+          expect(ability).not_to be_able_to(:post_grades, @own_class)
+          expect(ability).not_to be_able_to(:update, @own_class)
+          expect(ability).not_to be_able_to(:read_pendencies, @own_class)
+          expect(ability).not_to be_able_to(
+            :post_grades, ClassEnrollment.new(course_class: @own_class)
+          )
+        end
+      end
+    end
+
+    # initialize_professors builds its ownership conditions from user.professor,
+    # behind an `if user.professor.present?` guard (mirroring initialize_courses).
+    # Without it, a missing association degrades every condition to `professor: nil`
+    # / `owner: nil`, which grants rather than denies -- and the paper rules do
+    # match on a nil owner, by design, for the unsaved parent of the subform. The
+    # guard is what keeps that deliberate opening from reaching a user with no
+    # professor of his own. These examples pin the safe outcome: the professor
+    # still reads the domain but owns nothing.
     context "when the user has the role but no professor record" do
       subject(:ability) { ability_for(Role::ROLE_PROFESSOR) }
 
@@ -265,9 +465,14 @@ RSpec.describe Ability, type: :model do
         expect(ability).not_to be_able_to(:destroy, paper)
       end
 
-      it "cannot reach records with no owner, because none can exist" do
-        expect(Grant.new(professor: nil)).not_to be_valid
-        expect(Paper.new(owner: nil)).not_to be_valid
+      it "owns no authorship row either, saved or unsaved" do
+        paper = FactoryBot.create(:paper, owner: @professor)
+        row = FactoryBot.create(:paper_professor, paper: paper)
+
+        expect(ability).not_to be_able_to(:update, row)
+        expect(ability).not_to be_able_to(:destroy, row)
+        expect(ability).not_to be_able_to(:destroy, Paper.new.paper_professors.build)
+        expect(ability).not_to be_able_to(:destroy, Paper.new.paper_students.build)
       end
     end
   end
@@ -321,12 +526,75 @@ RSpec.describe Ability, type: :model do
       expect(ability).not_to be_able_to(:academic_transcript_pdf, @other_enrollment)
     end
 
+    # The controller authorizes with the enrollment number taken from the query
+    # params, so the second argument is what separates one student from another.
+    it "generates assertions only for its own enrollment numbers" do
+      assertion = Assertion.new(student_can_generate: true)
+      closed = Assertion.new(student_can_generate: false)
+
+      expect(ability).to be_able_to(:assertion_pdf, Assertion)
+      expect(ability).to be_able_to(
+        :generate_assertion, assertion, @enrollment.enrollment_number
+      )
+      expect(ability).not_to be_able_to(
+        :generate_assertion, assertion, @other_enrollment.enrollment_number
+      )
+      expect(ability).not_to be_able_to(
+        :generate_assertion, closed, @enrollment.enrollment_number
+      )
+    end
+
     context "when the role is set but no student record is linked" do
       subject(:ability) { ability_for(Role::ROLE_ALUNO) }
 
       it "is denied the student pages" do
         expect(ability).not_to be_able_to(:show, :student_enrollment)
         expect(ability).not_to be_able_to(:enroll, :student_enrollment)
+      end
+
+      # The guard sits on the whole ROLE_ALUNO branch of initialize_documents,
+      # so :assertion_pdf goes with it. That is what AssertionsController checks
+      # first, through authorize_resource: denying it turns what would be a
+      # NoMethodError inside the :generate_assertion block into a clean refusal.
+      it "cannot generate assertions and does not raise" do
+        assertion = Assertion.new(student_can_generate: true)
+
+        expect(ability).not_to be_able_to(:assertion_pdf, Assertion)
+        expect(ability).not_to be_able_to(:generate_assertion, assertion)
+        expect(ability).not_to be_able_to(:generate_assertion, assertion, "M1")
+      end
+    end
+
+    # O contexto acima monta o usuario em memoria, como o resto do arquivo. Este
+    # persiste, porque o estado nao vem de salvar um User invalido -- as duas
+    # validacoes de User (role_is_student_if_the_student_field_is_filled e a
+    # irma dela) recusariam isso. Ele vem de apagar o Student depois, e a
+    # exclusao nao salva o User: nenhuma validacao dele roda.
+    #
+    # `delete` no lugar de `destroy` reproduz de proposito as versoes anteriores
+    # ao before_destroy Student#handle_user_role_removal, que hoje retiraria o
+    # papel junto. E o caminho que produz o estado no campo.
+    context "when the student record was deleted afterwards" do
+      subject(:ability) do
+        student = FactoryBot.create(:student, name: "Discente orfao")
+        user = create_confirmed_user(
+          [FactoryBot.create(:role_aluno)], "orfao@ic.uff.br", "Ana",
+          "A1b2c3d4!", student: student
+        )
+        student.delete
+        Ability.new(user.reload)
+      end
+
+      # A guarda nao muda o que o usuario ve -- as duas versoes dao 500 --, e
+      # sim a natureza da falha: sem ela o `can?` nao responde, estoura
+      # NoMethodError sobre nil, que e defeito de programacao e notifica.
+      it "answers no instead of raising" do
+        assertion = Assertion.new(student_can_generate: true)
+
+        expect { ability.can?(:generate_assertion, assertion, "M01") }
+          .not_to raise_error
+        expect(ability).not_to be_able_to(:generate_assertion, assertion, "M01")
+        expect(ability).not_to be_able_to(:assertion_pdf, Assertion)
       end
     end
   end
