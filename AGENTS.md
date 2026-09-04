@@ -68,11 +68,12 @@ corrija na wiki.
   revertida, correção que só alcançou parte do código.
 - **Issue nasce com o campo Type preenchido:** `gh issue create --type Bug`, ou
   `gh issue edit <N> --type Feature` para corrigir depois. Os três valores em uso
-  são `Bug` (algo quebrado ou errado diante do que a tela ou o código promete),
-  `Feature` (capacidade nova ou mudança de comportamento pedida) e `Task`
-  (dependência, infraestrutura, documentação, refatoração, teste). Na dúvida entre
-  Bug e Feature, pergunte se existe comportamento prometido sendo violado: se não
-  existe, é Feature.
+  são `Bug` (o sistema faz mal o que já faz), `Feature` (capacidade nova ou
+  mudança de comportamento pedida) e `Task` (dependência, infraestrutura,
+  documentação, refatoração, teste). Na dúvida entre Bug e Feature, olhe o efeito
+  sobre quem usa, não o tamanho do conserto: trabalho perdido, configuração
+  existente ignorada, dado exposto a quem não devia e usuário sem saída são Bug —
+  mesmo quando corrigir exige construir o que ainda não existe.
 - **Type classifica o assunto; label diz a versão — não misture os dois.** O label
   temático foi aposentado quando o Type passou a existir: manter as duas
   taxonomias é mantê-las divergindo, e a que engana é justamente a que ninguém
