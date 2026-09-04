@@ -186,10 +186,6 @@ GEM
       actionmailer (>= 5.0)
       devise (>= 4.6)
     diff-lcs (1.6.2)
-    dotenv (3.2.0)
-    dotenv-rails (3.2.0)
-      dotenv (= 3.2.0)
-      railties (>= 6.1)
     drb (2.2.3)
     erb (6.0.7)
     erubi (1.13.1)
@@ -581,7 +577,6 @@ DEPENDENCIES
   debug
   devise (~> 5.0, >= 5.0.4)
   devise_invitable
-  dotenv-rails
   exception_notification
   factory_bot_rails
   font-awesome-rails

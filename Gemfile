@@ -27,7 +27,6 @@ gem "devise", "~> 5.0", ">= 5.0.4"       # major de auth exige migracao: decisao
 gem "devise_invitable"
 gem "cancancan"
 gem "recaptcha", require: "recaptcha/rails"
-gem "dotenv-rails", require: "dotenv/load"   # ENV a partir de .env (recaptcha etc.)
 
 # ─── UI administrativa / scaffolding ─────────────────────────────────────
 gem "active_scaffold", "~> 4.3.2"        # upgrade em saltos de minor; trava a serie 4.3 (#621)
