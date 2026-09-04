@@ -28,10 +28,14 @@ class Report < ApplicationRecord
     "#{self.user.name} - #{I18n.l(self.created_at, format: '%d/%m/%Y %H:%M')}"
   end
 
+  # Sem arquivo nao ha o que apagar. A chamada estourava NoMethodError em
+  # carrierwave_file.delete *depois* do update!, deixando o registro gravado
+  # como invalidado e a requisicao em 500. O `&.` mantem invalidate! seguro
+  # pelos dois caminhos que o AGENTS.md distingue: a tela e o console.
   def invalidate!(user:)
-    carrierwave_file = self.carrierwave_file
+    file = self.carrierwave_file
     self.update!(carrierwave_file_id: nil, invalidated_by: user, invalidated_at: Time.now)
-    carrierwave_file.delete
+    file&.delete
   end
 
   def expired?

@@ -68,4 +68,32 @@ RSpec.describe Report, type: :model do
       end
     end
   end
+
+  describe "#invalidate!" do
+    let(:user) { report.user }
+
+    it "apaga o arquivo armazenado e registra quem invalidou" do
+      file = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.create!(
+        original_filename: "documento.pdf", content_type: "application/pdf",
+        binary: "conteudo", medium_hash: SecureRandom.hex(16)
+      )
+      report.update!(carrierwave_file: file)
+
+      report.invalidate!(user: user)
+
+      expect(report.reload.carrierwave_file).to be_nil
+      expect(report.invalidated_by).to eq(user)
+      expect(CarrierWave::Storage::ActiveRecord::ActiveRecordFile.exists?(file.id)).to be false
+    end
+
+    # Chamada por console num documento cuja limpeza ja rodou. Antes disso o
+    # update! commitava e o carrierwave_file.delete seguinte estourava, deixando
+    # o registro marcado como invalidado por uma chamada que levantou excecao.
+    it "nao estoura quando o arquivo ja foi removido" do
+      report.update!(carrierwave_file: nil)
+
+      expect { report.invalidate!(user: user) }.not_to raise_error
+      expect(report.reload.invalidated_by).to eq(user)
+    end
+  end
 end

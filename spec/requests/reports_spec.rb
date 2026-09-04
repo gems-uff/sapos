@@ -92,6 +92,39 @@ RSpec.describe "Reports download gate", type: :request do
       expect(report.reload.carrierwave_file).to be_nil
       expect(report.invalidated_at).to be_present
     end
+
+    # A guarda da acao repete a condicao que esconde o link porque o link
+    # esconder nao fecha a rota. Sem ela um PUT repetido reescrevia o par
+    # invalidated_by/invalidated_at -- o unico registro de quem invalidou --
+    # antes de estourar em 500.
+    it "refuses a second invalidation instead of overwriting who did it" do
+      report = FactoryBot.create(
+        :report, user: @user, carrierwave_file: carrierwave_file,
+        expires_at: Date.yesterday
+      )
+      put invalidate_report_path(report)
+      primeiro = report.reload.attributes.slice("invalidated_by_id", "invalidated_at")
+
+      outro = create_confirmed_user([@role_adm], "outro_gate@ic.uff.br")
+      sign_out @user
+      sign_in outro
+      put invalidate_report_path(report)
+
+      expect(response).to redirect_to(reports_path)
+      expect(report.reload.attributes.slice("invalidated_by_id", "invalidated_at"))
+        .to eq(primeiro)
+    end
+
+    it "refuses to invalidate a report the cleanup routine already emptied" do
+      report = FactoryBot.create(
+        :report, user: @user, carrierwave_file: nil, expires_at: Date.yesterday
+      )
+
+      put invalidate_report_path(report)
+
+      expect(response).to redirect_to(reports_path)
+      expect(report.reload.invalidated_at).to be_nil
+    end
   end
 
   # Os dois links da listagem escondem-se por ignore_method, que o
@@ -132,8 +165,8 @@ RSpec.describe "Reports download gate", type: :request do
       expect(body).to include("as_reports-invalidate-#{report.id}-link")
     end
 
-    # Sem arquivo nao ha o que baixar nem o que apagar, e invalidate! estoura
-    # em carrierwave_file.delete se chegar la.
+    # Sem arquivo nao ha o que baixar nem o que apagar; a acao de invalidar
+    # recusa pela mesma condicao, e o grupo acima cobre isso pela rota.
     it "hides both links once the file is gone" do
       report = FactoryBot.create(
         :report, user: @user, carrierwave_file: nil, expires_at: 1.year.from_now

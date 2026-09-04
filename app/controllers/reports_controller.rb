@@ -46,7 +46,7 @@ class ReportsController < ApplicationController
                    type: :member,
                    method: :put,
                    confirm: "Tem certeza que deseja invalidar este documento?",
-                   ignore_method: :already_invalidated?
+                   ignore_method: :file_removed?
   end
 
   def before_create_save(record)
@@ -67,6 +67,17 @@ class ReportsController < ApplicationController
   end
 
   def invalidate
+    # ignore_method esconde o link na listagem, mas a rota segue aberta. Sem
+    # esta guarda, um PUT direto num documento que ja perdeu o arquivo
+    # reinvalidava o registro -- sobrescrevendo quem invalidou e quando, que e
+    # o que a tela de detalhes mostra -- e depois caia em 500 ao tentar apagar
+    # arquivo que nao existe mais. A condicao e a mesma que esconde o link, de
+    # modo que a tela e a rota digam a mesma coisa.
+    if file_removed?(@report)
+      return redirect_to reports_path,
+                         alert: "Este documento já foi invalidado ou expirado."
+    end
+
     @report.invalidate!(user: current_user)
 
     redirect_to reports_path, notice: "Documento invalidado com sucesso."
@@ -83,10 +94,14 @@ class ReportsController < ApplicationController
     end
 
     def cant_download?(record)
-      already_invalidated?(record) || record.expired?
+      file_removed?(record) || record.expired?
     end
 
-    def already_invalidated?(record)
+    # Mede o arquivo, nao a invalidacao: a rotina de limpeza tambem zera o
+    # carrierwave_file de um documento vencido, e nesse caso invalidated_at
+    # continua nulo. As duas situacoes tem a mesma consequencia -- nao ha o que
+    # baixar nem o que apagar -- e e por isso que a condicao e uma so.
+    def file_removed?(record)
       record.carrierwave_file.blank?
     end
 end
