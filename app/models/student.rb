@@ -6,6 +6,7 @@
 # Represents a Student
 class Student < ApplicationRecord
   has_paper_trail
+  include CarrierWaveFileCleanup
 
   mount_uploader :photo, ProfileUploader
 

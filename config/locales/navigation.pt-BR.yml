@@ -92,5 +92,10 @@ pt-BR:
       report_configuration: Configurações de Relatório
       program_level: Conceito CAPES
 
+    panel:
+      label: Painel (Beta)
+      garbage_collector: Coleta de Lixo
+      admission_data: Gerenciamento de Seleção
+
     logout:
       label: 'Logout'
