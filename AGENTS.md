@@ -167,6 +167,18 @@ parte, a diferença é real. Código que os testes nunca executam:
   `<env>_read_only`. Protegido por specs com stub em `spec/models/query_spec.rb`.
 - `db/seeds/02.reports_notifications.rb` tem um bloco atrás de `unless is_sqlite`
   que só carrega em MySQL.
+- **Validação guardada por `current_user` quase não roda.** O `current_user`
+  visível nos modelos vem do active_scaffold e é preenchido **por requisição**;
+  fora de uma, ele é nil. `User#roles_valid?` abre com
+  `return if current_user.blank?`, então na suíte a linha do `return` executa
+  centenas de vezes e o corpo, poucas — as de erro de escalação de papel, nenhuma.
+
+A consequência sai do teste e alcança o reparo de dado: **a mesma alteração feita
+pela tela e por script produz estados diferentes.** Desmarcar o último papel de um
+usuário pela tela cai no corpo do `roles_valid?`, que repõe o papel Desconhecido;
+o mesmo `update` por console ou rake deixa o usuário sem papel nenhum e com
+`actual_role` nulo. Para consertar dado que a aplicação sabe consertar, prefira a
+tela, ou replique o caminho dela por inteiro.
 
 Ao mexer nesses pontos, valide em homologação — verde local não basta.
 
