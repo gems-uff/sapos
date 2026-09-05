@@ -189,11 +189,29 @@ Ao mexer nesses pontos, valide em homologação — verde local não basta.
 
 ## Monkey-patches
 
-`config/initializers/` contém correções que dependem de interno do Rails e do
-active_scaffold: `fix_url_for.rb`,
-`fix_rails61_active_scaffold_dependent_error.rb` e
-`active_scaffold_disable_null_comparators.rb`. São os primeiros suspeitos em
-qualquer upgrade de Rails.
+`config/initializers/` mistura configuração comum com correções que dependem de
+interno de gem. Estas são as que dependem — primeiros suspeitos num upgrade, e
+cada uma explica o porquê no próprio cabeçalho:
+
+- Rails e active_scaffold: `fix_url_for.rb`,
+  `fix_rails61_active_scaffold_dependent_error.rb`,
+  `active_scaffold_disable_null_comparators.rb`,
+  `fix_session_store_dirty_tracking.rb` (`prepend` no `find_session` privado do
+  `ActiveRecordStore`) e o `LogTruncater` escondido dentro de
+  `filter_parameter_logging.rb`, que chama o `sql` original por `super_method`.
+- Prawn: `prawn-grouping.rb`, cópia de patch de terceiro que usa `state.page` e
+  `@bounding_box`. Suspeito num upgrade do Prawn, não do Rails.
+
+`schema_plus_alternative.rb` é o que olhar primeiro: reabre
+`ActiveRecord::Migration` e transforma `add_foreign_key` e `remove_foreign_key`
+em no-op, para que a migration de 2013 do schema_plus — assinatura multi-coluna,
+incompatível com a do Rails — ainda replique. O silêncio não distingue quem
+chama: o `db/schema.rb` declara 17 chaves estrangeiras e o `db/test.sqlite3`
+carregado a partir dele não tem nenhuma.
+
+`can_destroy.rb`, `i18n_model.rb` e `types.rb` também abrem classe do Rails, mas
+só acrescentam método — o risco ali é colisão de nome, não mudança de
+comportamento.
 
 ## Dados sensíveis
 
