@@ -194,7 +194,6 @@ interno de gem. Estas são as que dependem — primeiros suspeitos num upgrade, 
 cada uma explica o porquê no próprio cabeçalho:
 
 - Rails e active_scaffold: `fix_url_for.rb`,
-  `fix_rails61_active_scaffold_dependent_error.rb`,
   `active_scaffold_disable_null_comparators.rb`,
   `fix_session_store_dirty_tracking.rb` (`prepend` no `find_session` privado do
   `ActiveRecordStore`) e o `LogTruncater` escondido dentro de
