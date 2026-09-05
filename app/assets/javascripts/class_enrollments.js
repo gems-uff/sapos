@@ -6,7 +6,7 @@ $(function() {
       if (course_has_grade == "true") {
         var grade_of_disapproval_for_absence = this.getAttribute("grade_of_disapproval_for_absence");
         if (grade_of_disapproval_for_absence != "") {
-          var grade = target_row.find(".grade-input").val();
+          var grade = target_row.find(".grade-input").val().replace(/\s+/g, '').replace(",", ".");
           if (grade == "" || parseFloat(grade)== 0){
             target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
           }
@@ -46,8 +46,15 @@ $(function() {
     var cursorPos = input.selectionStart;
     var oldLength = input.value.length;
     var digits = $(this).val().replace(/\D/g, '');
-    if (digits === '') return;
+    if (digits === ''){
+      var registered_label = this.getAttribute('data_registered');
+      changeSituationInput($(this), registered_label);
+      return;
+    }
     var number = parseInt(digits, 10);
+    if (number > 100){
+      number = 100;
+    }
     var formatted = (number / 10).toFixed(1).replace('.', ',');
     $(this).val(formatted);
     var newLength = formatted.length;
@@ -56,15 +63,13 @@ $(function() {
     input.setSelectionRange(newCursorPos,newCursorPos);
     var minimum_grade = this.getAttribute('minimum_grade_for_approval');
     var actual_grade = parseFloat(formatted.replace(',','.'));
-    if(actual_grade <= 10){ /* sanity check */
-      if(actual_grade >= minimum_grade){
-        var approved_label = this.getAttribute('data_approved');
-        changeSituationInput($(this),approved_label);
-      }
-      else{
-        var disapproved_label = this.getAttribute('data_disapproved');
-        changeSituationInput($(this),disapproved_label);
-      }
+    if(actual_grade >= minimum_grade){
+      var approved_label = this.getAttribute('data_approved');
+      changeSituationInput($(this),approved_label);
+    }
+    else{
+      var disapproved_label = this.getAttribute('data_disapproved');
+      changeSituationInput($(this),disapproved_label);
     }
   });
   $(document).on('keydown','.grade-input',function(e){

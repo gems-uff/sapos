@@ -44,6 +44,7 @@ module ClassEnrollmentHelperConcern
       maxlength: 5, class: "grade-input numeric-input text-input",
       data_approved: ClassEnrollment::APPROVED,
       data_disapproved: ClassEnrollment::DISAPPROVED,
+      data_registered: ClassEnrollment::REGISTERED,
       grade_placeholder: I18n.t("activerecord.attributes.class_enrollment.placeholder_grade"),
       minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0)
     })

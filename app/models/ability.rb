@@ -220,7 +220,7 @@ class Ability
           can [:update, :post_grades], ClassEnrollment, course_class: {
             professor: user.professor
           }
-          can [:update, :post_grades, :read_pendencies], CourseClass, professor: user.professor
+          can [:update, :post_grades, :read_pendencies, :import_grades_xls], CourseClass, professor: user.professor
         elsif CustomVariable.professor_login_can_post_grades == "yes"
           can [:update, :post_grades], ClassEnrollment, course_class: {
             professor: user.professor,

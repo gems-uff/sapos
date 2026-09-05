@@ -158,6 +158,43 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
 
       expect(response.body).to include("Aluno não inscrito")
     end
+
+    it "ignora valores forjados no payload de confirmacao, usando os calculados no servidor" do
+      enviar(inscricao, nota: "8,7")
+
+      post import_grades_xls_course_class_path(turma), params: {
+        confirm: "1",
+        changes: [{
+          class_enrollment_id: inscricao.id, status: "pending",
+          final_grade: "999", final_attendance: true,
+          final_situation: ClassEnrollment::APPROVED, final_obs: "forjado"
+        }].to_json
+      }
+
+      expect(inscricao.reload.grade).to eq(87)
+      expect(inscricao.reload.obs).not_to eq("forjado")
+    end
+
+    it "nao marca divergencia quando a nota final bate com a informada" do
+      enviar(inscricao, nota: "6,5", situacao: ClassEnrollment::APPROVED)
+
+      conteudo = Nokogiri::HTML(response.body)
+      celula_nota_nova = conteudo.css("tbody td")[4]
+      expect(celula_nota_nova.text).not_to include("*")
+    end
+
+    it "rebaixa a situacao quando a nota informada nao sustenta o aprovado da planilha" do
+      enviar(inscricao, nota: "1,0", situacao: ClassEnrollment::APPROVED)
+      confirmar_o_que_foi_previsto
+
+      expect(inscricao.reload.situation).to eq(ClassEnrollment::DISAPPROVED)
+    end
+
+    it "ignora situacao invalida vinda da planilha e mantem a atual" do
+      enviar(inscricao, nota: "8,7", situacao: "Cancelado")
+
+      expect(response.body).to include("não é uma situação válida")
+    end
   end
 
   context "como professor" do

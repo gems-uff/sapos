@@ -156,8 +156,14 @@ class CourseClassesController < ApplicationController
   def import_grades_xls
     @course_class = CourseClass.find(params[:id])
     authorize! :import_grades_xls, @course_class
-    if params[:confirm] == "1" && params[:changes].present?
-      saved_count = apply_xls_import_changes(JSON.parse(params[:changes]))
+    if params[:confirm] == "1"
+      stored_results = session[xls_import_session_key(@course_class)]
+      if stored_results.blank?
+        flash[:error] = "Nenhuma nota foi importada."
+        redirect_to course_classes_path and return
+      end
+      saved_count = apply_xls_import_changes(stored_results)
+      session.delete(xls_import_session_key(@course_class))
       if saved_count > 0
         flash[:info] = "#{saved_count} Notas importadas com sucesso!"
       else
@@ -168,6 +174,7 @@ class CourseClassesController < ApplicationController
     elsif request.post? && params[:spreadsheet].present?
       begin
         @results = build_xls_import_preview(params[:spreadsheet])
+        session[xls_import_session_key(@course_class)] = @results
         render :import_grades_xls_results and return
       rescue ArgumentError
         flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_error")
@@ -208,6 +215,10 @@ class CourseClassesController < ApplicationController
     rescue
     end
 
+    def xls_import_session_key(course_class)
+      "xls_import_grades_#{course_class.id}"
+    end
+
     def build_xls_import_preview(file)
       grade_of_disapproval_for_absence = CustomVariable.grade_of_disapproval_for_absence
       minimum_grade_for_approval = CustomVariable.minimum_grade_for_approval
@@ -227,14 +238,21 @@ class CourseClassesController < ApplicationController
         end
 
         if data[:grade].present?
-          final_grade = data[:grade].to_s.tr(",", ".").to_f * 10
+          imported_grade_scaled = data[:grade].to_s.tr(",", ".").to_f * 10
+          final_grade = imported_grade_scaled
         else
+          imported_grade_scaled = nil
           final_grade = class_enrollment.grade
         end
-        if data[:situation].present?
+        if data[:situation].present? && ClassEnrollment::SITUATIONS.include?(data[:situation])
           final_situation = data[:situation]
+          invalid_situation = false
+        elsif data[:situation].present?
+          final_situation = class_enrollment.situation
+          invalid_situation = true
         else
           final_situation = class_enrollment.situation
+          invalid_situation = false
         end
         if data[:attendance].present?
           final_attendance = data[:attendance] == ClassEnrollment::ATTENDANCE_TRUE
@@ -244,8 +262,8 @@ class CourseClassesController < ApplicationController
         if !final_attendance
           final_grade = grade_of_disapproval_for_absence
           final_situation = ClassEnrollment::DISAPPROVED
-        elsif final_grade.to_f >= minimum_grade_for_approval
-          final_situation = ClassEnrollment::APPROVED
+        elsif final_grade.present?
+          final_situation = final_grade.to_f >= minimum_grade_for_approval ? ClassEnrollment::APPROVED : ClassEnrollment::DISAPPROVED
         end
         if data[:obs].present?
           final_obs = data[:obs]
@@ -253,6 +271,7 @@ class CourseClassesController < ApplicationController
           final_obs = class_enrollment.obs
         end
 
+        final_grade_view = final_grade.present? ? (final_grade.to_f / 10.0).to_s.tr(".", ",") : nil
 
         results << {
           enrollment_number: enrollment_number,
@@ -262,16 +281,18 @@ class CourseClassesController < ApplicationController
           current_grade: class_enrollment.grade_to_view.to_s.tr(".", ","),
           imported_grade: data[:grade],
           final_grade: final_grade,
-          grade_diff: data[:grade].to_s != final_grade.to_s,
+          final_grade_view: final_grade_view,
+          grade_diff: imported_grade_scaled.present? && imported_grade_scaled != final_grade.to_f,
 
           imported_attendance: data[:attendance],
           final_attendance: final_attendance,
-          attendance_diff: data[:attendance].present? && data[:attendance] != final_attendance,
+          attendance_diff: data[:attendance].present? && (data[:attendance] == ClassEnrollment::ATTENDANCE_TRUE) != final_attendance,
 
           current_situation: class_enrollment[:situation],
           imported_situation: data[:situation],
           final_situation: final_situation,
-          situation_diff: data[:situation].present? && data[:situation] != final_situation,
+          situation_diff: data[:situation].present? && ClassEnrollment::SITUATIONS.include?(data[:situation]) && data[:situation] != final_situation,
+          invalid_situation: invalid_situation,
 
           final_obs: final_obs
 
@@ -282,17 +303,19 @@ class CourseClassesController < ApplicationController
 
     def apply_xls_import_changes(changes)
       saved_count = 0
-      changes.each do |change|
-        Rails.logger.debug("apply_xls_import_changes changes: #{changes.inspect}")
-        next unless change["status"] == "pending"
-        class_enrollment = @course_class.class_enrollments.find_by(id: change["class_enrollment_id"])
+      changes.each do |raw_change|
+        change = raw_change.with_indifferent_access
+        next unless change[:status] == "pending"
+        class_enrollment = @course_class.class_enrollments.find_by(id: change[:class_enrollment_id])
         next unless class_enrollment
-        class_enrollment.grade = change["final_grade"]
-        class_enrollment.disapproved_by_absence = !change["final_attendance"]
-        class_enrollment.situation = change["final_situation"]
-        class_enrollment.obs = change["final_obs"]
+        class_enrollment.grade = change[:final_grade]
+        class_enrollment.disapproved_by_absence = !change[:final_attendance]
+        class_enrollment.situation = change[:final_situation]
+        class_enrollment.obs = change[:final_obs]
         if class_enrollment.save
           saved_count += 1
+        else
+          Rails.logger.debug class_enrollment.errors.full_messages.inspect
         end
       end
       saved_count

@@ -146,6 +146,43 @@ RSpec.describe "ClassEnrollments features", type: :feature do
       expect(page).to have_field("Nota", with: "1,0")
     end
 
+    it "asks before overwriting a low but nonzero grade when marking disapproved by absence" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "05"
+      end
+      expect(page).to have_field("Nota", with: "0,5")
+
+      accept_confirm do
+        find(:css, "#record_disapproved_by_absence_").set(true)
+      end
+
+      expect(page).to have_field("Nota", with: "1,0")
+    end
+
+    it "resets the student situation when the grade field is cleared" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "60"
+      end
+      expect(page).to have_field("Nota", with: "6,0")
+
+      within(".as_form") do
+        find_field("Nota").set("")
+      end
+
+      expect(page.find(:select, "record_situation_").value).to eq(ClassEnrollment::REGISTERED)
+    end
+
+    it "caps the grade at 10,0 when the typed value exceeds the maximum" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "9999"
+      end
+
+      expect(page).to have_field("Nota", with: "10,0")
+    end
+
     it "should have a justification_grade_not_count_in_gpr without a label" do
       page.send_keys :escape
       expect(page).to have_css("#record_justification_grade_not_count_in_gpr")

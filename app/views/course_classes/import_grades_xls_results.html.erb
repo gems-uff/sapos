@@ -80,7 +80,7 @@
             </td>
 
             <td>
-              <%= result[:final_grade].presence || "—" %>
+              <%= result[:final_grade_view].presence || "—" %>
 
               <% if result[:grade_diff] %>
                 <span style="color:#b00;" title="A nota calculada diverge da nota informada na planilha. Verifique a consistência entre nota e situação.">*</span>
@@ -92,7 +92,9 @@
               <% if result[:status] == "pending" && !result[:final_attendance] %>
                 <span style="background:#e2e3e5; color:#41464b; font-size:0.75em; padding:1px 3px; border-radius:3px;">por falta</span>
               <% end %>
-               <% if result[:situation_diff] %>
+              <% if result[:invalid_situation] %>
+                <span style="color:#b00;" title="A situação informada na planilha (&quot;<%= result[:imported_situation] %>&quot;) não é uma situação válida e foi ignorada. A situação atual foi mantida.">#</span>
+              <% elsif result[:situation_diff] %>
                 <span style="color:#b00;" title="A situação calculada diverge da situação informada na planilha. Verifique a consistência entre nota, frequência e situação.">*</span>
               <% end %>
             </td>
@@ -115,7 +117,6 @@
     <%= form_tag import_grades_xls_course_class_path(@course_class), method: :post do %>
 
       <%= hidden_field_tag :confirm, "1" %>
-      <%= hidden_field_tag :changes, @results.to_json %>
 
       <%= submit_tag "Aceitar", class: "as_action" %>
 
