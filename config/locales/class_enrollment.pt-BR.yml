@@ -36,6 +36,9 @@ pt-BR:
         advisor: "Orientador"
         has_advisor: "Possui orientador?"
         created_at: "Data de Inscrição"
+        placeholder_grade: "_,_"
+        confirm_grade_overwrite: "Já existe uma nota digitada (actual_grade). Deseja substituí-la com a nota de reprovação por falta (grade_for_disapproval)?"
+        
 
     errors:
       models:

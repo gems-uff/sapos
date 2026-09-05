@@ -475,6 +475,71 @@ RSpec.describe Ability, type: :model do
         expect(ability).not_to be_able_to(:destroy, Paper.new.paper_students.build)
       end
     end
+
+    context "grade import policy" do
+      before(:all) do
+        @import_professor = FactoryBot.create(:professor)
+        @other_import_professor = FactoryBot.create(:professor)
+        @own_class_current_semester = FactoryBot.create(
+          :course_class, professor: @import_professor,
+          year: YearSemester.current.year, semester: YearSemester.current.semester
+        )
+        @own_class_past_semester = FactoryBot.create(
+          :course_class, professor: @import_professor,
+          year: YearSemester.current.year - 1, semester: YearSemester.current.semester
+        )
+        @other_class = FactoryBot.create(
+          :course_class, professor: @other_import_professor,
+          year: YearSemester.current.year, semester: YearSemester.current.semester
+        )
+      end
+
+      after(:all) do
+        CourseClass.destroy_all
+        Professor.where(id: [@import_professor.id, @other_import_professor.id]).destroy_all
+      end
+
+      before(:each) do
+        @original_policy = CustomVariable.find_by(variable: "professor_login_can_post_grades")&.value
+      end
+
+      after(:each) do
+        variable = CustomVariable.find_or_initialize_by(variable: "professor_login_can_post_grades")
+        variable.value = @original_policy
+        variable.save(validate: false)
+      end
+
+      def set_policy(value)
+        variable = CustomVariable.find_or_initialize_by(variable: "professor_login_can_post_grades")
+        variable.value = value
+        variable.save(validate: false)
+      end
+
+      subject(:ability) { ability_for(Role::ROLE_PROFESSOR, professor: @import_professor) }
+
+      it "is denied entirely when the policy is off" do
+        set_policy("no")
+
+        expect(ability).not_to be_able_to(:import_grades_xls, @own_class_current_semester)
+        expect(ability).not_to be_able_to(:import_grades_xls, @other_class)
+      end
+
+      it "is allowed only for the professor's own class in the current semester, when the policy is 'yes'" do
+        set_policy("yes")
+
+        expect(ability).to be_able_to(:import_grades_xls, @own_class_current_semester)
+        expect(ability).not_to be_able_to(:import_grades_xls, @own_class_past_semester)
+        expect(ability).not_to be_able_to(:import_grades_xls, @other_class)
+      end
+
+      it "is allowed for the professor's own class in any semester, when the policy is 'yes_all_semesters'" do
+        set_policy("yes_all_semesters")
+
+        expect(ability).to be_able_to(:import_grades_xls, @own_class_current_semester)
+        expect(ability).to be_able_to(:import_grades_xls, @own_class_past_semester)
+        expect(ability).not_to be_able_to(:import_grades_xls, @other_class)
+      end
+    end
   end
 
   describe "student" do

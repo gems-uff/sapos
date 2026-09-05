@@ -1,0 +1,10 @@
+<%= form_tag import_grades_xls_course_class_path(@course_class), multipart: true, class: "as_form update", "data-loading": true do %>
+    <h4 style="text-align: center;"> <%= I18n.t("xls_content.course_class.import_grades_xls_title", course: @course_class.label_with_course) %></h4>
+    <div style="padding-top: 0.3em;display: flex; align-items: center; justify-content: center; width: 100%; gap: 20px;">
+        <div style="margin: 0 auto; display: flex; align-items: center; gap: 10px;">
+            <label style="font-weight: bold; font-size: 0.9em; padding-right: 5px;"><%= I18n.t("xls_content.course_class.spreadsheet_label") %>:</label>
+            <%= file_field_tag :spreadsheet, required: true %>
+            <%= submit_tag I18n.t("xls_content.course_class.upload_button"), class: "submit",style: "margin: 0;" ,data: {disable_with: I18n.t("xls_content.course_class.upload_loading")} %>
+        </div>
+    </div>
+<% end %>
