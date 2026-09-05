@@ -141,20 +141,10 @@ referenciado por caminho de uma captura datada, que é descartável.
 
 ## Atualização de dependências
 
-- Uma gem por passo: `bundle update --conservative <gem>`, suíte completa,
-  commit individual. Se quebrar, o commit aponta a gem exata.
-- Alvo é o patch mais atual da mesma série minor/major. Nunca subir major ou
-  minor de carona — isso é decisão separada.
-- **Confira a versão resolvida no `Gemfile.lock`; não confie no `~>`.** Num
-  update de segurança, `"~> 7.2.0"` resolveu para 7.2.3 em vez de 7.2.3.1 — a
-  versão sem a correção — e a suíte verde não acusaria nada. Quando a intenção
-  é piso de segurança, declare-o: `gem "rails", "~> 7.2.3", ">= 7.2.3.1"`.
-- Gem transitiva não entra no `Gemfile` só para travar série. Use
-  `bundle update <gem> --patch`, que restringe o bump sem tocar no arquivo.
-- Higiene em lote (muitas gems atrasadas em patch) é exceção à regra de um passo
-  por gem: `bundle update --patch --strict`, suíte, e bissecção **só se quebrar**.
-  O `--strict` importa — sem ele o nível de patch é apenas preferência e o
-  bundler pode subir além.
+Uma gem por passo, alvo no patch mais atual da mesma série; **nunca subir major
+ou minor de carona** — isso é decisão separada. O resto — piso de segurança,
+conferência do `Gemfile.lock`, `--strict`, higiene em lote — está na skill
+`dependencias`.
 
 ## Pontos cegos da suíte
 
