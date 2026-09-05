@@ -99,29 +99,17 @@ corrija na wiki.
 
 ## Skills do repositório
 
-Em `.claude/skills/`. O Claude Code as descobre sozinho; a lista existe para
-humanos e para outros agentes.
+Em `.claude/skills/`. O Claude Code as descobre sozinho, e cada uma traz a
+própria descrição; este índice existe para humanos e para outros agentes, na
+ordem do ciclo.
 
-- `revisar-pr` — a espinha do ciclo de um PR: ler a issue e o diff, decidir o que
-  é nosso e o que volta para o autor, cobrir o que falta, medir, homologar e
-  lançar. Aponta para as demais; comece por ela ao pegar um PR ou retomar um ramo.
-- `safe-refactor` — mede a mudança pela suíte local: cobre a lacuna, roda antes,
-  muda, roda depois, compara. Primeiro recurso em refatoração, correção de bug,
-  feature ou upgrade de dependência.
-- `dependencias` — critério para declarar gem no `Gemfile` (restrição cobre
-  exatamente o motivo, e o motivo fica escrito) e para conduzir campanha de
-  atualização. Use antes de mexer em restrição de versão ou planejar um salto.
-- `suite-mariadb` — sobe um MariaDB local fiel ao de produção e roda a suíte
-  contra ele em vez do SQLite. Use ao mexer em SQL, unicidade, ordenação ou
-  migration.
-- `homologacao` — quando nem isso alcança: compara o SAPOS antes e depois em
-  homologação, capturando telas, PDFs e planilhas nas duas versões, contra o
-  mesmo banco.
-- `merge-downstream` — traz a `main` para dentro de um ramo de issue e confere se
-  ela entrou inteira, inclusive o que o git não vê. Use ao atualizar ramo
-  atrasado, ao revisar merge alheio, ou antes de aceitar um ramo para release.
-- `release` — fecha o ciclo: merge fast-forward na `main`, tag anotada, label e
-  issues no GitHub, release publicada. O deploy em si continua sendo do mantenedor.
+- `revisar-pr` — conduz um PR do começo ao fim. **Comece por ela**; aponta para as demais.
+- `safe-refactor` — mede a mudança pela suíte local, antes e depois.
+- `dependencias` — declarar gem no `Gemfile` e conduzir atualização.
+- `suite-mariadb` — roda a suíte contra MariaDB em vez do SQLite.
+- `homologacao` — compara o SAPOS antes e depois em homologação.
+- `merge-downstream` — traz a `main` para dentro de um ramo de issue.
+- `release` — merge, tag, label, issues e release publicada.
 
 ### Skill é procedimento, não diário de bordo
 
