@@ -32,7 +32,7 @@ module ClassEnrollmentHelperConcern
           nil : CustomVariable.grade_of_disapproval_for_absence.to_f / 10.0
       }",
       course_has_grade: "#{record.course_has_grade}",
-      overwrite_confirm_msg: I18n.t("activerecord.attributes.class_enrollment.confirm_grade_overwrite"),
+      overwrite_confirm_msg: I18n.t("helpers.class_enrollments.confirm_grade_overwrite"),
       data_disapproved: ClassEnrollment::DISAPPROVED
     })
     check_box(:record, :disapproved_by_absence_to_view, options)
@@ -45,7 +45,7 @@ module ClassEnrollmentHelperConcern
       data_approved: ClassEnrollment::APPROVED,
       data_disapproved: ClassEnrollment::DISAPPROVED,
       data_registered: ClassEnrollment::REGISTERED,
-      grade_placeholder: I18n.t("activerecord.attributes.class_enrollment.placeholder_grade"),
+      grade_placeholder: I18n.t("helpers.class_enrollments.placeholder_grade"),
       minimum_grade_for_approval: (CustomVariable.minimum_grade_for_approval.to_f / 10.0)
     })
     text_field(:record, :grade_to_view, options)

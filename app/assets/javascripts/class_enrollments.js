@@ -11,7 +11,7 @@ $(function() {
             target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
           }
           else if (parseFloat(grade) != parseFloat(grade_of_disapproval_for_absence)){
-            var msg = this.getAttribute('overwrite_confirm_msg').replace('actual_grade',grade.replace('.',',')).replace('grade_for_disapproval',grade_of_disapproval_for_absence.replace('.',','));
+            var msg = this.getAttribute('overwrite_confirm_msg').replace('%{actual_grade}', grade.replace('.', ',')).replace('%{grade_for_disapproval}', grade_of_disapproval_for_absence.replace('.', ','));
             if(confirm(msg)){
               target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
             }
@@ -82,7 +82,7 @@ $(function() {
         var nextEl = gradeInputs.eq(nextIndex);
         nextEl.focus();
         /* 10ms timeout to make sure the select() works properly */
-        setTimeout(function(){ 
+        setTimeout(function(){
           nextEl.select();
         }, 10);
       }

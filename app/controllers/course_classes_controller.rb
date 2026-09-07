@@ -36,7 +36,7 @@ class CourseClassesController < ApplicationController
       type: :member,
       parameters: { format: :xlsx }
     config.action_links.add "import_grades_xls",
-      label: "<i title='Importar Notas' class='fa fa-upload'></i>".html_safe,
+      label: "<i title='#{I18n.t("xls_content.course_class.import_grades_xls_label")}' class='fa fa-upload'></i>".html_safe,
       type: :member,
       position: :replace
 
@@ -159,15 +159,15 @@ class CourseClassesController < ApplicationController
     if params[:confirm] == "1"
       stored_results = session[xls_import_session_key(@course_class)]
       if stored_results.blank?
-        flash[:error] = "Nenhuma nota foi importada."
+        flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_nothing_saved")
         redirect_to course_classes_path and return
       end
       saved_count = apply_xls_import_changes(stored_results)
       session.delete(xls_import_session_key(@course_class))
       if saved_count > 0
-        flash[:info] = "#{saved_count} Notas importadas com sucesso!"
+        flash[:info] = I18n.t("xls_content.course_class.import_grades_xls_success", count: saved_count)
       else
-        flash[:error] = "Nenhuma nota foi importada."
+        flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_nothing_saved")
       end
 
       redirect_to course_classes_path and return
