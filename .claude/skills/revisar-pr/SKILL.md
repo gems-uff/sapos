@@ -42,6 +42,22 @@ etapas anteriores. Vale para as issues relacionadas e fechadas também
 (`gh issue list --state all --search`, `git log --all --grep`). Sem isso é fácil
 tratar como novo um trecho que já foi validado, ou refazer discussão encerrada.
 
+Dispare também `/code-review xhigh <N>` — ele roda em background pelo tempo dos
+passos 1 a 3, e o número do PR lhe dá os comentários do autor, que são contexto.
+Ele lê os arquivos do checkout, então precisa do ramo em disco.
+
+- **`xhigh`, não menos.** Níveis abaixo podem cair numa variante de passada
+  única, com menos ângulos e sem a varredura final de lacunas.
+- **Nunca `--comment` nem `--fix`.** O primeiro publica no PR; o segundo aplica
+  na árvore fora dos checkpoints, e `/rewind` não desfaz.
+- **Não há verificação e há piso de achados.** O que ele devolve é candidato, não
+  achado — quem tria é o passo 4; o fim da lista costuma ser o piso, não descoberta.
+
+Ele pega o que escapa da leitura linear: argumento em posição errada, `includes`
+que não preenche a associação que a view lê, objeto gravado no banco que a
+migration não acompanha. Não alcança o que depende de produção nem cobra
+homologação — isso continua nos passos 5 e 8.
+
 ## 2. Diga que tipo de PR é este, antes de medir
 
 Correção, feature ou upgrade — a classificação define o que conta como resultado,
@@ -50,6 +66,24 @@ qual é antes de rodar**: sem a lista de diferenças esperadas feita de antemão
 fácil olhar para uma diferença inesperada e racionalizá-la como intencional.
 
 ## 3. Ler o diff — e, em upgrade, o diff certo
+
+**Leia o diff você mesmo, e anote os seus candidatos** — não delegue isto ao
+`/code-review`. A leitura mecânica é boa no que se decide dentro do arquivo:
+argumento em posição errada, `includes` que não preenche a associação lida, guarda
+que virou inerte. Quatro classes de candidato **só saem da sua leitura**, porque
+dependem de coisas que não estão no repositório:
+
+- **O efeito nas instalações reais** — quantas consultas gravadas param de casar
+  com o esquema, quantas notificações dependem delas, quais têm disparo agendado.
+  É `rake queries:check` nas instalações, e é o achado de maior peso que uma
+  revisão produz.
+- **A cobertura que a issue pede**, e não a que existe. Máquina reclama de teste
+  ausente como nit, quando ausente; ela não sabe o que a issue prometeu.
+- **O que o merge vai encontrar** — o que a `main` andou, qual spec dela deixa de
+  compilar contra a modelagem nova, onde o conflito real vai cair.
+- **Decisão de produto** — se a mudança de cardinalidade de um relatório está
+  certa, se o pedido que você mesmo fez ao autor era razoável. Isso não é achado,
+  é julgamento, e retratar-se em público é parte do trabalho.
 
 O diff do PR mostra o que o autor escreveu. Quando o PR mexe no `Gemfile`, o que
 decide a revisão é o que mudou **na dependência**, e aí valem as notas do passo 1
@@ -67,16 +101,82 @@ Duas coisas que só aparecem em revisão de upgrade:
   precisa ser declarada" — e é o tipo de item que passa despercebido e só quebra
   no deploy.
 
-## 4. Prove que o caminho é alcançável aqui
+## 4. Triar os candidatos
 
-Antes de escrever teste ou sonda para uma correção que veio de fora, confirme que
-o código dela executa neste sistema: procure a chamada, a configuração que a liga,
-a condição que a guarda. Busca vazia não basta — confirme que o padrão existe em
-algum lugar do projeto.
+O que sai do `/code-review` e da sua leitura são **candidatos**, não achados.
+Candidato que vai ao autor sem prova gasta o tempo dele e a sua credibilidade;
+candidato descartado sem prova deixa um defeito no ar. Os dois erros se evitam do
+mesmo jeito, e a ordem abaixo é o que faz a triagem sair barata:
 
-**Instrumento para caminho inalcançável devolve "sem diferença", e isso se lê como
-"não regrediu".** É pior do que não medir: consome tempo e produz falsa garantia.
-Correção que não alcança este sistema entra no relatório como tal, sem sonda.
+1. **Um comando.** Para cada candidato, pergunte se um `grep` ou um `rails runner`
+   fecha o caso. A maioria fecha, e é aqui que o trabalho acontece.
+2. **Um agente**, quando a tentativa acima não fechou. O que ele compra é contexto
+   descartável para a iteração — montar cenário, autenticar papel, ler fonte de
+   gem —, que no seu contexto ficaria para sempre. **Um basta:** o que separa
+   achado de falso positivo é a prova com controle, não a quantidade de opiniões
+   sobre o mesmo trecho.
+3. **Duas reproduções que se contradizem:** rode as duas antes de discutir. Em
+   geral uma falha o próprio controle, ou as duas medem cenários diferentes.
+   Discussão é o instrumento de quando não se pode rodar o experimento — aqui se
+   pode.
+
+### Os três vereditos
+
+- **Confirmado** — reprodução que falha na árvore atual.
+- **Plausível** — o mecanismo é real e você não confirmou. Diga **o que
+  confirmaria**: é esse campo que roteia o candidato para o teste do passo 5, para
+  a `suite-mariadb`, para a `homologacao` ou para uma pergunta ao mantenedor.
+- **Refutado** — a linha que torna o defeito impossível, ou reprodução mostrando
+  que a falha alegada não ocorre.
+
+**Plausível é dial de confiança, não de gravidade.** Se você confirmou tudo que
+era checável, o veredito não é plausível ainda que o defeito seja pequeno —
+gravidade se diz na prosa. Rebaixar por gravidade faz o leitor reabrir verificação
+já encerrada.
+
+**Um veredito por afirmação.** Candidato que empacota mecanismo, gatilho e
+consequência precisa de veredito em cada um: "mecanismo sim, gatilho não,
+consequência sim por outra porta" é resposta frequente e legítima. Rótulo único
+para o conjunto esconde qual parte o autor tem de consertar.
+
+### Regras da prova
+
+- **Prova sem controle não prova.** Mostre que o cenário sem o defeito se comporta
+  de outro jeito, e pergunte: este script falharia igual se o defeito não
+  existisse?
+- **Confirme que o caminho é alcançável neste sistema** — sobretudo em correção
+  que veio de fora. Procure a chamada, a configuração que a liga, a condição que a
+  guarda; busca vazia não basta, confirme que o padrão existe em algum lugar do
+  projeto. **Instrumento para caminho inalcançável devolve "sem diferença", e isso
+  se lê como "não regrediu"**: pior que não medir, porque consome tempo e produz
+  falsa garantia. Correção que não alcança este sistema é refutada, e entra no
+  relatório como tal — sem teste e sem sonda.
+- **Afirmação de consequência exige varredura executada, não lida.** Rode cada
+  consumidor com os dois valores. Os que escapam a quem só lê: exportação,
+  template Liquid — e o que o drop expõe, que pode não incluir o método —,
+  consulta gravada em SQL, e `.nil?` ou `||` sobre o retorno.
+- **Não envolva a reprodução em transação quando o que está sob teste envolve
+  transação.** Bloco aninhado não cria savepoint, engole o rollback interno, e
+  você mede o oposto do que o código faz. Limpe por truncation, ou meça sem
+  envelope.
+- **O "antes" se mede no merge-base, não na `main`** — ramo atrasado mediria o PR
+  somado ao que a `main` andou. Worktree em `git merge-base origin/main HEAD`,
+  `cp config/database.yml.example config/database.yml` (o real não é versionado, e
+  sem ele o ambiente não sobe) e `rake db:schema:load`. É também como se descobre
+  que **um candidato já valia antes do PR**: não é regressão, e a mensagem ao autor
+  muda de "você quebrou" para "isto piorou aqui, conserta agora ou vira issue?".
+- **Achado de permissão se prova por requisição, não por modelo:** o
+  `current_user` vem do active_scaffold e é nil fora de uma. Request spec em
+  `spec/requests/`, com **dois controles** — que a tela não oferece o campo (o
+  usuário não deveria poder) e que alterar uma **coluna** pelo mesmo caminho é
+  barrado (a validação está viva, então "passou" não é porque o mecanismo morreu).
+  Sem os dois, o vermelho não distingue defeito de cenário mal montado.
+- **Um usuário tem um papel ativo por vez** (`Ability`, `roles = { actual_role =>
+  true }`), e atribuir papel depois de criar o usuário deixa `actual_role` no valor
+  antigo. Permissão que não aparece costuma ser isso, e não caminho inalcançável —
+  confira antes de concluir que o candidato é impossível.
+- **Candidato que só se sustenta por defeito de outro arquivo vira item próprio.**
+  Não use defeito alheio para escorar o que está em pauta.
 
 ## 5. Lacunas de teste e de sonda
 
@@ -104,6 +204,24 @@ lugar da causa, o número de ajustes reescreveria os commits do autor, ou falta
 contexto que só ele tem.
 
 **Para e pergunta ao mantenedor** quando a dúvida é de produto, não de código.
+
+**Ao devolver, mande os testes junto — não só a prosa.** As reproduções do passo 4
+já afirmam o comportamento correto e falham enquanto o defeito existir, então
+commitá-las no ramo do autor deixa a suíte dele vermelha até o conserto. Isso é
+mais útil que descrição, e não é acusação: o teste **é a especificação do
+conserto**, e vale dizer isso no comentário. Empurrar em ramo de terceiro é
+decisão do mantenedor — deixe pronto e peça.
+
+Duas condições. O teste vai limpo, com nome e lugar de spec do projeto, sem
+resquício do script exploratório que o gerou. E **feedback em uma rodada**: junte
+tudo — confirmados, refutados, o que não é regressão e o que ficou em aberto —
+em vez de comentar achado a achado, que faz o autor perseguir alvo móvel.
+
+**Vulnerabilidade introduzida pelo próprio PR pode ser discutida nele**, porque
+não há sistema no ar exposto: o defeito nasce no merge. Já vulnerabilidade
+**pré-existente**, achada de passagem, a gente corrige de imediato e sem issue
+pública — é a regra do `AGENTS.md`, e enumerar o ataque antes da correção é o que
+ela evita.
 
 Duas coisas que **não** justificam devolver, e viram registro escrito: desvio de
 convenção de mensagem de commit, e achado adjacente fora do escopo do PR — este
