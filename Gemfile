@@ -9,7 +9,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby "~> 3.4.10"
 
 # ─── Framework e servidor ────────────────────────────────────────────────
-gem "rails", "~> 8.0.5", ">= 8.0.5.1"    # piso de seguranca (CVE-2026-66066)
+gem "rails", "~> 8.1.3", ">= 8.1.3.1"    # piso de seguranca (CVE-2026-66066)
 gem "sprockets-rails"                    # asset pipeline
 gem "bootsnap", require: false           # cache de boot (config/boot.rb)
 gem "nokogiri", ">= 1.18.9"              # piso de seguranca (parser HTML/XML)

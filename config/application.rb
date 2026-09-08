@@ -28,17 +28,37 @@ module Sapos
     # Defaults versionados do framework:
     #   https://guides.rubyonrails.org/configuring.html#versioned-default-values
     #
-    # Das seis flags que a subida de 7.1 para 8.0 mexe, uma so muda algo aqui:
-    # Regexp.timeout = 1s. As outras cinco sao inocuas neste projeto -- o commit
-    # que fez a subida registra a verificacao de cada uma. A que merece nota por
-    # depender do ambiente e o yjit: nem o Ruby de desenvolvimento nem o de
-    # producao tem YJIT compilado (`defined?(RubyVM::YJIT)` devolve nil nos dois),
-    # entao ligar a flag nao liga JIT nenhum. Num Ruby com YJIT, ligaria.
-    config.load_defaults 8.0
+    # A subida de 8.0 para 8.1 traz seis flags novas; a varredura do codigo mostra
+    # que nenhuma quebra algo aqui:
+    #   - active_record.raise_on_missing_required_finder_order_columns = true: so
+    #     levanta erro em modelo sem primary key e sem implicit_order_column; todo
+    #     modelo daqui e id-keyed, entao nao pega ninguem.
+    #   - action_controller.action_on_path_relative_redirect = :raise: so pega
+    #     redirect_to com string relativa literal; os redirects daqui usam helper
+    #     de rota ou objeto de modelo.
+    #   - action_controller.escape_json_responses = false: desliga o escape no
+    #     renderer de `render json:`. E independente do escape_html_entities_in_json
+    #     = true (abaixo), que rege o to_json do ActiveSupport e permanece ligado.
+    #   - active_support.escape_js_separators_in_json = false: escape de U+2028/
+    #     U+2029 em JSON, efeito despreziavel.
+    #   - action_view.render_tracker = :ruby: rastreio de dependencia entre
+    #     templates em desenvolvimento, sem efeito em runtime.
+    #   - action_view.remove_hidden_field_autocomplete = true: tira autocomplete=off
+    #     de input hidden, cosmetico.
+    config.load_defaults 8.1
 
     # ActiveScaffold defines callbacks for actions not always present in all controllers.
     # Rails 7.1 raised this to true by default, causing AbstractController::ActionNotFound.
     config.action_controller.raise_on_missing_callback_actions = false
+
+    # O patch de seguranca CVE-2026-66066 (Rails 8.1.3.1) faz o Active Storage
+    # resolver o variant transformer ja no boot, para bloquear os loaders nao
+    # confiaveis do libvips. O default :vips exige entao o gem vips/libvips na
+    # inicializacao -- que nem o ambiente de desenvolvimento nem o CI tem. O SAPOS
+    # nao usa variantes do Active Storage (upload e via carrierwave, que puxa o
+    # image_processing so por transitividade), entao :disabled seleciona o
+    # NullTransformer, que nao carrega gem de imagem nenhum. Sem efeito funcional.
+    config.active_storage.variant_processor = :disabled
 
 
     # Allow the notifier to send emails
