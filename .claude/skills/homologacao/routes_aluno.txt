@@ -7,19 +7,36 @@
 # preparar_aluno_de_teste.rb --confirmar: ele recria o conjunto e imprime as
 # linhas com os ids novos, prontas para substituir as daqui.
 #
-# A tela de inscricao exige janela aberta: sem isso ela redireciona com "o
-# periodo de inscricoes fechou" e a captura registra o redirecionamento, nao a
-# tela.
-/enrollment/3074
-/enrollment/3074/enroll/2026-2
+# A tela de inscricao exige JANELA ABERTA para mostrar linha alguma:
+# display_class_schedule_table_row? reprova toda linha quando nem
+# main_enroll_open? nem adjust_enroll_insert_open? valem. Ela NAO redireciona
+# nesse caso -- renderiza com a tabela vazia, so o cabecalho, o que passa por
+# "tela capturada" sem exercitar nada. Confira as datas na propria tela antes de
+# confiar na captura.
+/enrollment/3130
+# Semestre da replica cuja janela ja fechou: serve de controle, tabela vazia.
+/enrollment/3130/enroll/2026-2
+# Semestre com janela ABERTA. E a unica rota da varredura que renderiza as
+# linhas de disciplina por demanda (o parcial _enroll_table_on_demand_row), e a
+# replica tem dois tipos on_demand reais: Estudo Orientado e Pesquisa de
+# Dissertacao e Tese. A replica NUNCA traz janela aberta -- o quadro mais recente
+# dela e de um semestre ja encerrado --, entao a rodada cria este quadro com
+# `abrir_quadro_de_horarios.rb 2027 1 --confirmar`.
+#
+# ARMADILHA: o script recusa duplicar quadro do mesmo ano/semestre, e ele cria a
+# janela abrindo HOJE e fechando em poucos dias. Um 2027.1 deixado por rodada
+# anterior ja esta com a janela fechada, o script recusa recriar, e a tela
+# renderiza a tabela VAZIA -- que se captura como se fosse tela boa. Confira as
+# datas na propria tela; se estiverem no passado, apague o quadro e recrie.
+/enrollment/3130/enroll/2027-1
 # Semestre sem Quadro de Horarios cadastrado: o aluno que abre o periodo antes
 # de a coordenacao cadastrar o calendario. Se um dia existir quadro para 2030.1,
 # troque o ano -- a rota so vale enquanto nao houver quadro para o ano citado.
-/enrollment/3074/enroll/2030-1
+/enrollment/3130/enroll/2030-1
 # Matricula desligada, com banca e SEM data de defesa: combinacao que a replica
 # nao tem, e que o preparar_matricula_desligada.rb cria. Tem que ser do aluno de
 # teste e vista pelo papel Aluno: a tela do admin para a mesma matricula passa
 # por outro caminho e nao serve de evidencia.
-/enrollment/3075
+/enrollment/3131
 /pendencies
 /

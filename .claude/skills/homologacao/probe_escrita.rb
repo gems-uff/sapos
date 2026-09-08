@@ -13,9 +13,9 @@
 # demonstra por leitura, com probe_formulario.rb, que nao escreve e por isso
 # roda antes e depois sem restaurar nada.
 #
-# ESTADO: o diagnostico (passo 1) ja rodou de ponta a ponta. O ciclo de escrita
-# (passo 2, --confirmar) ainda nao. Rode o diagnostico primeiro e leia o
-# relatorio antes de confiar no ciclo.
+# Rode o diagnostico primeiro e leia o relatorio: ele diz se a candidatura
+# escolhida tem o caso que se quer medir. Ciclo de escrita sobre registro que
+# nao tem arquivo gravado devolve zero sem que isso queira dizer nada.
 #
 # Uso:
 #   set -a; source ~/.sapos_staging_env; set +a
@@ -57,7 +57,15 @@
 require_relative "explore_common"
 
 CONFIRMAR = ARGV.include?("--confirmar")
-ALUNO_TESTE = ENV.fetch("SAPOS_ALUNO_TESTE", "2230")
+# O id do aluno de teste MUDA a cada regeracao da replica, e o padrao aqui
+# envelhece calado: quando ele passa a apontar para um aluno real, o ciclo de
+# escrita aborta pela guarda do nome -- que e o comportamento certo, mas o
+# sintoma ("o registro N nao e o aluno de teste") nao diz onde achar o novo.
+# Ache-o pela lista de Alunos, que usa a busca SIMPLES e nao a por campo:
+# clique em "Buscar", preencha `input[name='search']` com ZZ-TESTE-HOMOLOG, e o
+# id vem no atributo id da linha (as_students-list-<id>-row). Ou passe
+# SAPOS_ALUNO_TESTE sem editar este arquivo.
+ALUNO_TESTE = ENV.fetch("SAPOS_ALUNO_TESTE", "2258")
 CANDIDATURA = ENV.fetch("SAPOS_CANDIDATURA_DIAG", "1502")
 FIXTURE = File.expand_path("../../../spec/fixtures/user.png", __dir__)
 

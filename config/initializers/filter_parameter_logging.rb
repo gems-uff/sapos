@@ -5,8 +5,15 @@
 # Configure parameters to be filtered from the log file. Use this to limit dissemination of
 # sensitive information. See the ActiveSupport::ParameterFilter documentation for supported
 # notations and behaviors.
+# O filtro casa por SUBSTRING do nome do parametro, e alcanca tambem a query
+# string, porque o Rails loga `request.filtered_path`. O :email entra aqui
+# porque endereco de candidato e de aluno aparece em query string de tela
+# publica -- e log de aplicacao nao e lugar de dado pessoal. (O log de acesso do
+# servidor web nao passa por este filtro; por isso credencial nao deve ir para
+# a URL em primeiro lugar.)
 Rails.application.config.filter_parameters += [
   :passw, :secret, :token, :_key, :crypt, :salt, :certificate, :otp, :ssn,
+  :email,
 ]
 
 # Override of ActiveRecord::LogSubscriber::sql to force the filtering of all sql queries that contain carrier_wave_files

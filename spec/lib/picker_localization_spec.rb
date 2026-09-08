@@ -50,4 +50,16 @@ RSpec.describe "jQuery UI picker localization" do
   it "starts the week on the day the Brazilian calendar starts" do
     expect(localization).to match(/"firstDay":0/)
   end
+
+  # A 4.3.1 do active_scaffold corrigiu a montagem das opcoes do picker, que
+  # convertia tudo em string ("Fix date picker options translated as strings,
+  # preserving boolean and integer values"). Importa porque o pt-BR declara
+  # duas opcoes booleanas, e em JavaScript a string "false" e verdadeira: com
+  # isRTL virando "false" o calendario abre em layout da direita para a
+  # esquerda. Nada disso aparece na suite -- o valor vai interpolado num asset
+  # -- nem quebra o precompile, so a tela.
+  it "keeps the boolean options as booleans, not as strings" do
+    expect(localization).to match(/"isRTL":false/)
+    expect(localization).to match(/"showMonthAfterYear":false/)
+  end
 end
