@@ -104,7 +104,17 @@ class Query < ApplicationRecord
         :sql, :sql_has_an_undefined_parameter, parametro: variable_name
       )
     rescue Exception => e
-      self.errors.add(:sql, :sql_execution_generated_an_error, erro: e.message)
+      self.errors.add(
+        :sql, :sql_execution_generated_an_error, erro: utf8_message(e)
+      )
     end
+  end
+
+  # O driver do SQLite devolve a mensagem de erro em ASCII-8BIT. Interpola-la no
+  # texto do locale, que e UTF-8, levanta Encoding::CompatibilityError -- e essa
+  # excecao substitui a original, escondendo justamente o que se precisa ler
+  # ("no such column: ..."). O scrub cobre byte que nao forme UTF-8 valido.
+  def utf8_message(error)
+    error.message.dup.force_encoding(Encoding::UTF_8).scrub
   end
 end

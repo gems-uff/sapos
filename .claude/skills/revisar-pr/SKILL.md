@@ -113,7 +113,15 @@ vira issue própria (pesquise as existentes antes, inclusive fechadas).
 
 Suíte completa pela `safe-refactor`, com a contagem de exemplos comparada à
 baseline — verde com menos exemplos é teste que sumiu. Confira também o CI na
-ponta do ramo: ele roda o que a máquina local não roda.
+ponta do ramo: ele roda o que a máquina local não roda, e roda em MariaDB — é a
+medida que alcança os pontos cegos que o `AGENTS.md` lista. A contagem dele é
+maior que a local; compare-a com a do CI na baseline, não com a sua.
+
+**`gh pr checks <N>` sai com código não-zero enquanto há check pendente** (e
+também quando algum falha), então tratar saída não-zero como erro transitório a
+engolir faz o laço de espera girar calado, e o silêncio fica indistinguível de
+"ainda rodando". Pendente *é* o estado, não uma falha ao consultá-lo: decida pelo
+texto da saída, nunca pelo código de retorno.
 
 `suite-mariadb` quando o diff toca SQL, unicidade, ordenação ou migration; verde
 em SQLite não diz nada sobre esses pontos.

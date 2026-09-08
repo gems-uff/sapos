@@ -25,11 +25,16 @@ require "rspec/core" if Rails.env.test?
 
 module Sapos
   class Application < Rails::Application
-    # Initialize configuration defaults for originally generated Rails version.
-    # Using defaults of rails < 5, since it was the original generated version.
-    #   Consider checking which defaults we should update:
+    # Defaults versionados do framework:
     #   https://guides.rubyonrails.org/configuring.html#versioned-default-values
-    config.load_defaults 7.1
+    #
+    # Das seis flags que a subida de 7.1 para 8.0 mexe, uma so muda algo aqui:
+    # Regexp.timeout = 1s. As outras cinco sao inocuas neste projeto -- o commit
+    # que fez a subida registra a verificacao de cada uma. A que merece nota por
+    # depender do ambiente e o yjit: nem o Ruby de desenvolvimento nem o de
+    # producao tem YJIT compilado (`defined?(RubyVM::YJIT)` devolve nil nos dois),
+    # entao ligar a flag nao liga JIT nenhum. Num Ruby com YJIT, ligaria.
+    config.load_defaults 8.0
 
     # ActiveScaffold defines callbacks for actions not always present in all controllers.
     # Rails 7.1 raised this to true by default, causing AbstractController::ActionNotFound.
