@@ -66,43 +66,50 @@ corrija na wiki.
   (`git log --all --grep="<numero>"`). Não é só evitar duplicata: é ali que está o
   contexto que torna a issue nova útil — decisão de produto já tomada, tentativa
   revertida, correção que só alcançou parte do código.
+- **Issue nasce com o campo Type preenchido:** `gh issue create --type Bug`, ou
+  `gh issue edit <N> --type Feature` para corrigir depois. Os três valores em uso
+  são `Bug` (o sistema faz mal o que já faz), `Feature` (capacidade nova ou
+  mudança de comportamento pedida) e `Task` (dependência, infraestrutura,
+  documentação, refatoração, teste). Na dúvida entre Bug e Feature, olhe o efeito
+  sobre quem usa, não o tamanho do conserto: trabalho perdido, configuração
+  existente ignorada, dado exposto a quem não devia e usuário sem saída são Bug —
+  mesmo quando corrigir exige construir o que ainda não existe.
+- **Type classifica o assunto; label diz a versão — não misture os dois.** O label
+  temático foi aposentado quando o Type passou a existir: manter as duas
+  taxonomias é mantê-las divergindo, e a que engana é justamente a que ninguém
+  revisa. O único label que uma issue recebe é o da versão em que ela saiu,
+  aplicado no passo de release.
 - **Não afirme impacto em produção sem verificar com o mantenedor.** O repositório
   não diz quais funcionalidades estão em uso. Issue é pública e irreversível;
   descreva o que foi medido no código e pergunte o resto.
 - **Tudo que é acessível pelo usuário conta como em uso.** Não condicione
   validação a "se essa tela for usada": não há tela dispensável, e a pergunta só
   serve para encolher o escopo do que se vai verificar.
-- Convenção de trabalho vale para qualquer agente e vive **aqui**, versionada. A
-  memória local do Claude Code não acompanha troca de máquina — guarde nela só o
-  que for específico de uma sessão ou do ambiente.
+- **Antes de guardar um fato, pergunte: outro agente, noutra máquina, com só o
+  `git clone`, conseguiria?** Se sim, é convenção e vive versionada — **aqui**, ou
+  na skill a que pertence. A memória local do Claude Code não atravessa máquina:
+  guarde nela só o que morre com ela — caminho local, comportamento do sandbox,
+  estado de uma sessão. Id de registro sintético em homologação, por exemplo, é
+  versionado (`routes_aluno.txt`), não memória.
+- **Não duplique na memória o que já está versionado.** As duas cópias divergem
+  na primeira mudança, e a que engana é justamente a que ninguém revisa. Se o
+  fato já está no repositório, a memória certa é nenhuma.
 - **Quando um comando falhar por bloqueio de sandbox, tente novamente fora do
   sandbox.** Isso dispara a pergunta de permissão; o usuário decide se executa.
 
 ## Skills do repositório
 
-Em `.claude/skills/`. O Claude Code as descobre sozinho; a lista existe para
-humanos e para outros agentes.
+Em `.claude/skills/`. O Claude Code as descobre sozinho, e cada uma traz a
+própria descrição; este índice existe para humanos e para outros agentes, na
+ordem do ciclo.
 
-- `revisar-pr` — a espinha do ciclo de um PR: ler a issue e o diff, decidir o que
-  é nosso e o que volta para o autor, cobrir o que falta, medir, homologar e
-  lançar. Aponta para as demais; comece por ela ao pegar um PR ou retomar um ramo.
-- `safe-refactor` — mede a mudança pela suíte local: cobre a lacuna, roda antes,
-  muda, roda depois, compara. Primeiro recurso em refatoração, correção de bug,
-  feature ou upgrade de dependência.
-- `dependencias` — critério para declarar gem no `Gemfile` (restrição cobre
-  exatamente o motivo, e o motivo fica escrito) e para conduzir campanha de
-  atualização. Use antes de mexer em restrição de versão ou planejar um salto.
-- `suite-mariadb` — sobe um MariaDB local fiel ao de produção e roda a suíte
-  contra ele em vez do SQLite. Use ao mexer em SQL, unicidade, ordenação ou
-  migration.
-- `homologacao` — quando nem isso alcança: compara o SAPOS antes e depois em
-  homologação, capturando telas, PDFs e planilhas nas duas versões, contra o
-  mesmo banco.
-- `merge-downstream` — traz a `main` para dentro de um ramo de issue e confere se
-  ela entrou inteira, inclusive o que o git não vê. Use ao atualizar ramo
-  atrasado, ao revisar merge alheio, ou antes de aceitar um ramo para release.
-- `release` — fecha o ciclo: merge fast-forward na `main`, tag anotada, label e
-  issues no GitHub, release publicada. O deploy em si continua sendo do mantenedor.
+- `revisar-pr` — conduz um PR do começo ao fim. **Comece por ela**; aponta para as demais.
+- `safe-refactor` — mede a mudança pela suíte local, antes e depois.
+- `dependencias` — declarar gem no `Gemfile` e conduzir atualização.
+- `suite-mariadb` — roda a suíte contra MariaDB em vez do SQLite.
+- `homologacao` — compara o SAPOS antes e depois em homologação.
+- `merge-downstream` — traz a `main` para dentro de um ramo de issue.
+- `release` — merge, tag, label, issues e release publicada.
 
 ### Skill é procedimento, não diário de bordo
 
@@ -134,20 +141,10 @@ referenciado por caminho de uma captura datada, que é descartável.
 
 ## Atualização de dependências
 
-- Uma gem por passo: `bundle update --conservative <gem>`, suíte completa,
-  commit individual. Se quebrar, o commit aponta a gem exata.
-- Alvo é o patch mais atual da mesma série minor/major. Nunca subir major ou
-  minor de carona — isso é decisão separada.
-- **Confira a versão resolvida no `Gemfile.lock`; não confie no `~>`.** Num
-  update de segurança, `"~> 7.2.0"` resolveu para 7.2.3 em vez de 7.2.3.1 — a
-  versão sem a correção — e a suíte verde não acusaria nada. Quando a intenção
-  é piso de segurança, declare-o: `gem "rails", "~> 7.2.3", ">= 7.2.3.1"`.
-- Gem transitiva não entra no `Gemfile` só para travar série. Use
-  `bundle update <gem> --patch`, que restringe o bump sem tocar no arquivo.
-- Higiene em lote (muitas gems atrasadas em patch) é exceção à regra de um passo
-  por gem: `bundle update --patch --strict`, suíte, e bissecção **só se quebrar**.
-  O `--strict` importa — sem ele o nível de patch é apenas preferência e o
-  bundler pode subir além.
+Uma gem por passo, alvo no patch mais atual da mesma série; **nunca subir major
+ou minor de carona** — isso é decisão separada. O resto — piso de segurança,
+conferência do `Gemfile.lock`, `--strict`, higiene em lote — está na skill
+`dependencias`.
 
 ## Pontos cegos da suíte
 
@@ -159,19 +156,61 @@ parte, a diferença é real. Código que os testes nunca executam:
 - `Query.run_read_only_query` (`app/models/query.rb`) ramifica por adaptador; o
   bloco `Mysql2` abre um cliente próprio e usa a configuração
   `<env>_read_only`. Protegido por specs com stub em `spec/models/query_spec.rb`.
-- `config/initializers/recordselect_patch.rb` reabre `AbstractMysqlAdapter`.
 - `db/seeds/02.reports_notifications.rb` tem um bloco atrás de `unless is_sqlite`
   que só carrega em MySQL.
+- **A suíte não carrega os seeds, e é lá que o SQL das consultas executa.**
+  `Query#ensure_valid_params` é um `validate` que **roda a consulta**, então o
+  `save!` do seed submete cada SQL ao banco. Migration que renomeia ou derruba
+  coluna quebra ali — e em nenhum outro ponto da suíte, que nunca semeia. Daí o
+  `rake seeds:check` (banco descartável, ~7 s) e o job `seed` do CI, que o roda
+  em MariaDB; rode-o localmente ao mexer em esquema. O job é separado de
+  propósito: semear o banco do job `test` o contaminaria.
+- **O que o `seeds:check` alcança é só a consulta versionada.** Cada instalação
+  tem consultas próprias, criadas pela tela, que o repositório não conhece e que
+  são a maioria. Para essas existe o `rake queries:check`, que executa as
+  consultas **gravadas naquele banco** e lista as que não casam mais com o
+  esquema. Rode-o nas instalações reais antes e depois de migration que mexa em
+  coluna: consulta quebrada só se manifesta quando alguém abre o relatório ou a
+  notificação dispara, o que pode levar meses.
+- **Validação guardada por `current_user` quase não roda.** O `current_user`
+  visível nos modelos vem do active_scaffold e é preenchido **por requisição**;
+  fora de uma, ele é nil. `User#roles_valid?` abre com
+  `return if current_user.blank?`, então na suíte a linha do `return` executa
+  centenas de vezes e o corpo, poucas — as de erro de escalação de papel, nenhuma.
+
+A consequência sai do teste e alcança o reparo de dado: **a mesma alteração feita
+pela tela e por script produz estados diferentes.** Desmarcar o último papel de um
+usuário pela tela cai no corpo do `roles_valid?`, que repõe o papel Desconhecido;
+o mesmo `update` por console ou rake deixa o usuário sem papel nenhum e com
+`actual_role` nulo. Para consertar dado que a aplicação sabe consertar, prefira a
+tela, ou replique o caminho dela por inteiro.
 
 Ao mexer nesses pontos, valide em homologação — verde local não basta.
 
 ## Monkey-patches
 
-`config/initializers/` contém correções que dependem de interno do Rails e do
-active_scaffold: `fix_rails7_date_format.rb`, `fix_url_for.rb`,
-`recordselect_patch.rb`, `fix_rails61_active_scaffold_dependent_error.rb` e
-`active_scaffold_disable_null_comparators.rb`. São os primeiros suspeitos em
-qualquer upgrade de Rails.
+`config/initializers/` mistura configuração comum com correções que dependem de
+interno de gem. Estas são as que dependem — primeiros suspeitos num upgrade, e
+cada uma explica o porquê no próprio cabeçalho:
+
+- Rails e active_scaffold: `fix_url_for.rb`,
+  `active_scaffold_disable_null_comparators.rb`,
+  `fix_session_store_dirty_tracking.rb` (`prepend` no `find_session` privado do
+  `ActiveRecordStore`) e o `LogTruncater` escondido dentro de
+  `filter_parameter_logging.rb`, que chama o `sql` original por `super_method`.
+- Prawn: `prawn-grouping.rb`, cópia de patch de terceiro que usa `state.page` e
+  `@bounding_box`. Suspeito num upgrade do Prawn, não do Rails.
+
+`schema_plus_alternative.rb` é o que olhar primeiro: reabre
+`ActiveRecord::Migration` e transforma `add_foreign_key` e `remove_foreign_key`
+em no-op, para que a migration de 2013 do schema_plus — assinatura multi-coluna,
+incompatível com a do Rails — ainda replique. O silêncio não distingue quem
+chama: o `db/schema.rb` declara 17 chaves estrangeiras e o `db/test.sqlite3`
+carregado a partir dele não tem nenhuma.
+
+`can_destroy.rb`, `i18n_model.rb` e `types.rb` também abrem classe do Rails, mas
+só acrescentam método — o risco ali é colisão de nome, não mudança de
+comportamento.
 
 ## Dados sensíveis
 

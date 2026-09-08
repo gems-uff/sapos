@@ -1,14 +1,28 @@
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
-
+# Referência das opções:
+# https://docs.github.com/en/code-security/dependabot/working-with-dependabot/dependabot-options-reference
+#
+# O Dependabot tem duas máquinas independentes, e este arquivo configura só uma
+# delas:
+#
+# - Version updates: PR de gem atrasada. Desligados aqui pelo
+#   `open-pull-requests-limit: 0`. A atualização é conduzida à mão pela skill
+#   `dependencias` -- uma gem por passo, alvo no patch mais atual da série --, e
+#   o PR do Dependabot propõe o último publicado, major inclusive, que é
+#   justamente o que a convenção recusa.
+# - Security updates: PR de dependência com CVE. Ligados no nível do
+#   repositório, não aqui, e **não** estão sujeitos ao limite acima. Continuam
+#   chegando contra a `main`.
+#
+# Não declare `target-branch`: com ele presente, este bloco deixa de valer para
+# os security updates, que são o único canal automático ainda ativo. O ramo
+# `bugfixes` que ele apontava não existe mais -- hoje só há a `main` como
+# baseline, e uma `issue_NNN` por issue.
 version: 2
 updates:
-  - package-ecosystem: "bundler" # See documentation for possible values
-    directory: "/" # Location of package manifests
-    target-branch: "bugfixes"
+  - package-ecosystem: "bundler"
+    directory: "/" # onde está o Gemfile; precisa ser o caminho do manifesto
+    # Obrigatório no esquema, e inerte enquanto o limite for 0: sem version
+    # update para agendar, a cadência não tem o que disparar.
     schedule:
       interval: "daily"
-    # Disable version updates
     open-pull-requests-limit: 0

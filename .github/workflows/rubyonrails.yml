@@ -184,3 +184,58 @@ jobs:
 
       - name: Run smoke test
         run: bundle exec rake smoke_test:all
+
+  # Os seeds sao o unico lugar que executa o SQL das consultas guardadas:
+  # Query#ensure_valid_params e um `validate` que roda a consulta, entao o
+  # `save!` do seed a submete ao banco. Migration que renomeia ou derruba coluna
+  # quebra aqui e em nenhum outro ponto da suite -- que nunca carrega os seeds.
+  #
+  # Job separado de proposito: rodar os seeds no banco do job `test` o
+  # contaminaria, e a suite passaria a depender de dado de seed.
+  #
+  # Roda em MariaDB porque e o banco de producao, e porque so nele carrega o
+  # bloco atras de `unless is_sqlite` em db/seeds/02.reports_notifications.rb.
+  seed:
+    runs-on: ubuntu-latest
+
+    services:
+      mariadb:
+        image: mariadb:10.5
+        env:
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      RAILS_ENV: test
+      SEED_CHECK_DATABASE_URL: "mysql2://root:root@127.0.0.1:3306/sapos_seed_check?encoding=utf8mb4&collation=utf8mb4_unicode_ci"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install MariaDB client and headers
+        run: sudo apt-get update && sudo apt-get install -y mariadb-client libmariadb-dev
+
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          cache-version: 3
+
+      - name: Configure database.yml
+        run: cp config/database.yml.example config/database.yml
+
+      - name: Create the seed-check database with production's collation
+        run: |
+          mysql -h 127.0.0.1 -u root -proot -e "
+            CREATE DATABASE sapos_seed_check CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+          "
+
+      - name: Load schema and run seeds
+        run: bundle exec rake seeds:check

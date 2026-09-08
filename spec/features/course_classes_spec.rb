@@ -255,4 +255,36 @@ RSpec.describe "CourseClasses features", type: :feature do
       expect(download).to match(/Resumo Semestral - Defesa\(2022-2\)\.xlsx/)
     end
   end
+
+  # Ver a nota em spec/features/courses_spec.rb: e a troca de filtro que
+  # reproduz a #660. Aqui a tela e a de Turmas, que foi onde o defeito apareceu.
+  describe "filter switching", js: true do
+    before(:each) do
+      16.times do |i|
+        FactoryBot.create(
+          :course_class, name: "Turma A #{i}", course: @course1,
+          professor: @professor1, year: 2022, semester: 2
+        )
+        FactoryBot.create(
+          :course_class, name: "Turma B #{i}", course: @course1,
+          professor: @professor1, year: 2022, semester: 2
+        )
+      end
+      login_as(@user)
+      visit url_path
+      search_by_name "Turma A"
+      search_by_name "Turma B"
+    end
+
+    def search_by_name(name)
+      click_link_and_wait "Buscar"
+      fill_in "Nome", with: name
+      click_button_and_wait "Buscar"
+    end
+
+    it "should keep the new filter when paginating" do
+      click_link_and_wait "2"
+      expect(page.all("tr td.name-column").map(&:text)).to all(include("Turma B"))
+    end
+  end
 end

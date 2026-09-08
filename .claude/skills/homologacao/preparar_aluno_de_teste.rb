@@ -9,15 +9,24 @@
 # routes_aluno.txt param de responder ate o conjunto ser refeito. Rodar sem
 # necessidade nao custa nada: cada etapa confere antes e pula o que achar.
 #
-# O QUE ELE GARANTE:
-#   1. matricula regular, para as telas de inscricao;
-#   2. matricula desligada, com banca e SEM data de defesa -- combinacao que a
+# O QUE ELE GARANTE, na ordem em que tem de acontecer:
+#   1. o aluno sintetico, com o e-mail da conta de captura;
+#   2. o papel Aluno ACRESCENTADO a conta, e a conta associada ao aluno;
+#   3. matricula regular, para as telas de inscricao;
+#   4. matricula desligada, com banca e SEM data de defesa -- combinacao que a
 #      replica nunca tem, e que a tela do proprio aluno precisa.
 #
-# O QUE ELE NAO FAZ, de proposito: criar o aluno e associa-lo a conta de
-# captura. Ver "Preparando o ambiente para o papel de aluno" no SKILL.md -- a
-# ordem errada ali faz o rescue do Enrollment#create_user! apagar a conta de
-# captura. Se o aluno nao existir, este script para e diz o que fazer a mao.
+# POR QUE A ORDEM E ESSA. O after_create da matricula chama
+# Enrollment#create_user!, cujo rescue faz
+# `User.where(email: student.first_email).destroy_all` -- com o e-mail da conta
+# de captura, isso apagaria a propria conta. O que impede e o passo 1: como
+# Student#has_user? ja e verdadeiro pela mera existencia de um usuario com
+# aquele e-mail (student.rb), o can_have_new_user? corta antes, o create_user!
+# devolve false e o rescue nunca e alcancado. Criar o aluno primeiro nao e
+# preferencia de ordem: e a trava.
+#
+# Por isso o passo 1 confere que a conta existe ANTES de criar o aluno, e aborta
+# se nao existir -- criar o aluno sem a conta armaria exatamente a bomba.
 #
 # Uso:
 #   set -a; source ~/.sapos_staging_env; set +a
@@ -45,6 +54,11 @@ if !BASE.include?("staging") && !ARGV.include?("--force")
 end
 
 ALUNO = "ZZ-TESTE-HOMOLOG"
+# CPF e so presenca + unicidade no modelo; um valor marcado evita colidir com
+# dado real da replica e se reconhece na tela.
+CPF_ALUNO = "99999999999"
+ROLE_ALUNO = 5          # Role::ROLE_ALUNO
+ROLE_ADMINISTRADOR = 6  # Role::ROLE_ADMINISTRADOR
 REGULAR = "ZZTESTEHOMOLOG1"
 DESLIGADA = "ZZ-TESTE-HOMOLOG-DESLIGADA"
 ADMISSAO = Date.today << 36
@@ -52,7 +66,9 @@ DESLIGAMENTO = Date.today << 12
 SEMESTRE_SEM_QUADRO = "2030-1"
 
 puts "Conjunto do aluno de teste em #{BASE}"
-puts "  aluno:              #{ALUNO}"
+puts "  conta de captura:   #{USER} (tem de existir antes; e a trava)"
+puts "  aluno:              #{ALUNO} (e-mail = o da conta)"
+puts "  papel:              Aluno ACRESCENTADO a conta, Administrador preservado"
 puts "  matricula regular:  #{REGULAR}"
 puts "  matricula desligada: #{DESLIGADA} (desligamento #{DESLIGAMENTO.strftime('%m/%Y')}, sem data de defesa)"
 unless confirmar
@@ -150,6 +166,72 @@ def gravar(driver)
   sleep 3
 end
 
+# O papel ativo (actual_role) atravessa execucoes: uma sonda anterior que trocou
+# para Aluno deixa este script sem acesso a /students e /users, e o sintoma mente
+# -- o formulario "some" em vez de dizer "papel errado".
+def garante_administrador(driver, wait)
+  driver.navigate.to("#{BASE}/")
+  settle(driver, wait)
+  sel = driver.find_elements(
+    css: "form[action*='change_role'] select[name='role_id']"
+  ).first
+  return puts("  (conta com um papel so -- seguindo)") if sel.nil?
+  Selenium::WebDriver::Support::Select.new(sel).select_by(:text, "Administrador")
+  settle(driver, wait)
+end
+
+# Devolve o id da conta de captura, ou nil. E a trava do passo 1: sem conta, o
+# aluno nao pode ser criado com esse e-mail.
+def id_da_conta(driver, wait, email)
+  driver.navigate.to("#{BASE}/users?sort=id&sort_direction=DESC")
+  settle(driver, wait)
+  sleep 2
+  driver.execute_script(<<~JS)
+    var achado = null;
+    document.querySelectorAll('tr.record').forEach(function (tr) {
+      if (tr.innerText.indexOf(#{email.inspect}) < 0) return;
+      var a = tr.querySelector("a[id*='-edit-']");
+      if (a) achado = (a.id.match(/-edit-(\\d+)-link/) || [])[1];
+    });
+    return achado;
+  JS
+end
+
+def criar_aluno(driver, wait, nome, email)
+  driver.navigate.to("#{BASE}/students/new")
+  settle(driver, wait)
+  driver.find_element(id: "record_name_").send_keys(nome)
+  driver.find_element(id: "record_email_").send_keys(email)
+  driver.find_element(id: "record_cpf_").send_keys(CPF_ALUNO)
+  gravar(driver)
+  settle(driver, wait)
+end
+
+# Abre o formulario do usuario pela LISTA, e nao pela rota direta: o
+# active_scaffold monta a edicao inline, e os ids dos campos levam o id do
+# registro (record_student_<id>).
+def abrir_edicao_usuario(driver, wait, uid)
+  driver.navigate.to("#{BASE}/users?sort=id&sort_direction=DESC")
+  settle(driver, wait)
+  sleep 2
+  link = driver.find_elements(id: "as_users-edit-#{uid}-link").first
+  abort "nao achei o link de edicao do usuario #{uid}" if link.nil?
+  driver.execute_script("arguments[0].click()", link)
+  sleep 3
+  settle(driver, wait)
+end
+
+def papeis_marcados(driver)
+  driver.execute_script(<<~JS)
+    var out = {};
+    document.querySelectorAll("input[name='record[roles][]']").forEach(function (e) {
+      var m = e.id.match(/user_role_(\\d+)/);
+      if (m) out[m[1]] = e.checked;
+    });
+    return out;
+  JS
+end
+
 def criar_matricula(driver, wait, numero, aluno)
   driver.navigate.to("#{BASE}/enrollments/new")
   settle(driver, wait)
@@ -184,8 +266,79 @@ begin
   campo.submit
   wait.until { !driver.current_url.include?("sign_in") }
   puts "login ok como #{USER}"
+  garante_administrador(driver, wait)
 
-  puts "\n1/4 matricula regular"
+  puts "\n1/6 conta de captura (trava dos passos seguintes)"
+  uid = id_da_conta(driver, wait, USER)
+  if uid.nil?
+    abort <<~FIM
+      Nao achei conta com o e-mail #{USER} em #{BASE}.
+      Ela tem de existir ANTES do aluno: e a existencia dela que faz
+      Student#has_user? ser verdadeiro e impede o rescue do
+      Enrollment#create_user! de apagar a propria conta ao criar a matricula.
+      Crie a conta (o script de migracao da homologacao ja faz isso) e rode de novo.
+    FIM
+  end
+  puts "  conta id #{uid}"
+
+  # A pergunta que importa nao e "existe aluno com o marcador?" -- a replica
+  # pode ter varios, de rodadas antigas, e `achar` devolveria o primeiro por id
+  # decrescente, que nao e necessariamente o associado. A autoridade e a
+  # ASSOCIACAO da conta: e ela que as telas do aluno consultam.
+  puts "\n2/6 aluno sintetico"
+  abrir_edicao_usuario(driver, wait, uid)
+  ja_associado = driver.find_elements(id: "record_student_#{uid}")
+                       .first&.attribute("value").to_s
+  if ja_associado.include?(ALUNO)
+    puts "  conta ja associada a #{ja_associado.inspect} -- nada a criar"
+  else
+    criar_aluno(driver, wait, ALUNO, USER)
+    id_aluno = achar(driver, wait, "students", ALUNO)
+    abort "NAO consegui criar o aluno #{ALUNO}" if id_aluno.nil?
+    puts "  criado (id #{id_aluno})"
+  end
+
+  puts "\n3/6 papel Aluno e associacao na conta"
+  abrir_edicao_usuario(driver, wait, uid)
+  antes = papeis_marcados(driver)
+  unless antes[ROLE_ADMINISTRADOR.to_s]
+    abort "A conta #{USER} nao tem o papel Administrador. Nao vou mexer nela: " \
+          "sem esse papel a propria captura perde acesso."
+  end
+  if antes[ROLE_ALUNO.to_s]
+    puts "  papel Aluno ja marcado"
+  else
+    cb = driver.find_element(id: "user_role_#{ROLE_ALUNO}")
+    driver.execute_script("arguments[0].click()", cb)
+    puts "  papel Aluno acrescentado (Administrador preservado)"
+  end
+  campo_aluno = driver.find_elements(id: "record_student_#{uid}").first
+  if campo_aluno && campo_aluno.attribute("value").to_s.include?(ALUNO)
+    puts "  ja associada a #{campo_aluno.attribute('value')}"
+  elsif campo_aluno
+    puts "  associando: #{record_select(driver, wait, "record_student_#{uid}", ALUNO)}"
+  else
+    puts "  AVISO: campo de aluno ausente no formulario do usuario"
+  end
+  gravar(driver)
+  settle(driver, wait)
+
+  # Conferir e o ponto: gravacao aceita nao garante papel mantido. Perder o
+  # Administrador aqui tranca a conta fora das telas administrativas, e ela nao
+  # teria como se consertar sozinha.
+  abrir_edicao_usuario(driver, wait, uid)
+  depois = papeis_marcados(driver)
+  assoc = driver.find_elements(id: "record_student_#{uid}").first&.attribute("value").to_s
+  unless depois[ROLE_ADMINISTRADOR.to_s]
+    abort "PERDI o papel Administrador da conta #{USER}. Reponha a mao antes de seguir."
+  end
+  puts "  confere -> Administrador: #{depois[ROLE_ADMINISTRADOR.to_s]} | " \
+       "Aluno: #{depois[ROLE_ALUNO.to_s]} | aluno associado: #{assoc.inspect}"
+  unless depois[ROLE_ALUNO.to_s] && assoc.include?(ALUNO)
+    abort "A conta nao ficou com papel Aluno e aluno associado; as telas do aluno nao vao responder."
+  end
+
+  puts "\n4/6 matricula regular"
   id_regular = achar(driver, wait, "enrollments", REGULAR)
   if id_regular
     puts "  ja existe (id #{id_regular})"
@@ -196,7 +349,7 @@ begin
     puts "  criada (id #{id_regular})"
   end
 
-  puts "\n2/4 matricula desligada"
+  puts "\n5/6 matricula desligada"
   id_desligada = achar(driver, wait, "enrollments", DESLIGADA)
   if id_desligada
     puts "  ja existe (id #{id_desligada})"
@@ -209,7 +362,7 @@ begin
 
   # O desligamento tem tela propria porque o campo aninhado no formulario da
   # matricula nao efetiva (issue #291).
-  puts "\n3/4 desligamento"
+  puts "\n6/6 desligamento"
   if achar(driver, wait, "dismissals", DESLIGADA)
     puts "  ja existe"
   else
@@ -224,7 +377,7 @@ begin
     puts achar(driver, wait, "dismissals", DESLIGADA) ? "  criado" : "  NAO confirmei o desligamento"
   end
 
-  puts "\n4/4 banca"
+  puts "\n   banca"
   if achar(driver, wait, "thesis_defense_committee_participations", DESLIGADA)
     puts "  ja existe"
   else

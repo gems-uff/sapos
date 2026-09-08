@@ -157,19 +157,28 @@ class Ability
       cannot :edit_professor, Grant
       cannot :edit_professor, Paper
       can :create, Grant
-      can :update, Grant, professor: user.professor
-      can :destroy, Grant, professor: user.professor
       can :create, Paper
-      can :update, Paper, owner: user.professor
       can :create, PaperProfessor
       can :create, PaperStudent
-      can :update, PaperProfessor, paper: { owner: user.professor }
-      can :update, PaperStudent, paper: { owner: user.professor }
-      can :destroy, PaperProfessor, paper: { owner: user.professor }
-      can :destroy, PaperStudent, paper: { owner: user.professor }
-      can :destroy, PaperProfessor, paper: { owner: nil }
-      can :destroy, PaperStudent, paper: { owner: nil }
-      can :destroy, Paper, owner: user.professor
+      if user.professor.present?
+        can :update, Grant, professor: user.professor
+        can :destroy, Grant, professor: user.professor
+        can :update, Paper, owner: user.professor
+        can :update, PaperProfessor, paper: { owner: user.professor }
+        can :update, PaperStudent, paper: { owner: user.professor }
+        can :destroy, PaperProfessor, paper: { owner: user.professor }
+        can :destroy, PaperStudent, paper: { owner: user.professor }
+        # An ownerless parent is not an orphaned record: Paper#owner is
+        # `optional: false`, so none ever reaches the database. It is the
+        # in-memory paper of the subform -- when an authorship row is added to a
+        # paper that is still unsaved, active_scaffold builds the parent through
+        # `new_model`, which does not go through PapersController#do_new, the
+        # very hook that would assign the owner. Without these two rules the
+        # row's remove link degrades into an access-denied notice.
+        can :destroy, PaperProfessor, paper: { owner: nil }
+        can :destroy, PaperStudent, paper: { owner: nil }
+        can :destroy, Paper, owner: user.professor
+      end
     end
   end
 
@@ -261,7 +270,7 @@ class Ability
     if roles[Role::ROLE_COORDENACAO]
       cannot :manage, ReportConfiguration
     end
-    if roles[Role::ROLE_ALUNO]
+    if roles[Role::ROLE_ALUNO] && user.student.present?
       can :assertion_pdf, Assertion
       can :generate_assertion, Assertion do |assertion, matricula_aluno|
         assertion.student_can_generate && matricula_aluno.in?(user.student.enrollments.pluck(:enrollment_number))

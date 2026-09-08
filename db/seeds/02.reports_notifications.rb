@@ -139,14 +139,14 @@ queries = [
           INNER JOIN enrollment_statuses ON enrollment_statuses.id = enrollments.enrollment_status_id
       WHERE due_date <= :data_consulta
       AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
-      AND enrollment_statuses.name = "Regular" /* Alunos regulares */
+      AND enrollment_statuses.name = 'Regular' /* Alunos regulares */
       AND completion_date IS NULL
       /* Somente banca, EQ ou prova de inglês */
       AND (
-        phases.name = "Pedido de Banca"
-        OR phases.name = "Prova de Inglês"
+        phases.name = 'Pedido de Banca'
+        OR phases.name = 'Prova de Inglês'
         OR (
-          phases.name = "Exame de Qualificação"
+          phases.name = 'Exame de Qualificação'
           AND (enrollments.obs IS NULL OR enrollments.obs NOT LIKE '%PEQ%')
         )
       )
@@ -215,14 +215,14 @@ queries = [
            INNER JOIN phases ON phases.id = phase_completions.phase_id
       WHERE due_date<=:data_consulta
       AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
-      AND enrollment_statuses.name = "Regular"
+      AND enrollment_statuses.name = 'Regular'
       AND completion_date IS NULL
       /* Somente banca, EQ ou prova de inglês */
       AND (
-        phases.name = "Pedido de Banca"
-        OR phases.name = "Prova de Inglês"
+        phases.name = 'Pedido de Banca'
+        OR phases.name = 'Prova de Inglês'
         OR (
-          phases.name = "Exame de Qualificação"
+          phases.name = 'Exame de Qualificação'
           AND (enrollments.obs IS NULL OR enrollments.obs NOT LIKE '%PEQ%')
         )
       )
@@ -270,9 +270,9 @@ queries = [
           INNER JOIN enrollment_statuses ON enrollment_statuses.id = enrollments.enrollment_status_id
       WHERE completion_date<=:data_consulta
       AND enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
-      AND pc_phases.name = "Pedido de Banca"
-      AND a_phases.name = "Pedido de Banca"
-      AND enrollment_statuses.name = "Regular"
+      AND pc_phases.name = 'Pedido de Banca'
+      AND a_phases.name = 'Pedido de Banca'
+      AND enrollment_statuses.name = 'Regular'
       /* Desconsidera alunos que foram aprovados condicionalmente.
       Para esses casos, o desligamento só ocorre quando a ata
       com a validação das restrições é engregue */
@@ -316,7 +316,7 @@ queries = [
                                    FROM dismissals
                                    WHERE date < :data_consulta)
       AND admission_date < :data_consulta
-      AND enrollment_statuses.name = "Regular"
+      AND enrollment_statuses.name = 'Regular'
       AND enrollments.level_id = levels.id
       AND enrollments.enrollment_status_id = enrollment_statuses.id
       GROUP BY level_id
@@ -421,9 +421,9 @@ queries = [
                        WHERE ce.course_class_id = cc.id
                        AND c.id = cc.course_id
                        And c.course_type_id = ct.id
-                       AND ct.name = "Seminário"
-                       AND (ce.situation = "Aprovado" OR ce.situation = "Incompleto"))
-      AND es.name = "Regular"
+                       AND ct.name = 'Seminário'
+                       AND (ce.situation = 'Aprovado' OR ce.situation = 'Incompleto'))
+      AND es.name = 'Regular'
       ORDER BY admission_date
     SQL
   },
@@ -513,14 +513,14 @@ queries = [
       INNER JOIN enrollment_statuses es ON es.id = e.enrollment_status_id
       LEFT JOIN (advisements a, professors p) ON (e.id = a.enrollment_id AND p.id = a.professor_id AND a.main_advisor = true)
       /* aluno regular */
-      WHERE es.name = "Regular"
+      WHERE es.name = 'Regular'
       /* não foi desligado */
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
       /* não pediu banca */
       AND e.id NOT IN (SELECT enrollment_id
                        FROM accomplishments
                        INNER JOIN phases ON phases.id = accomplishments.phase_id
-                       WHERE phases.name = "Pedido de Banca")
+                       WHERE phases.name = 'Pedido de Banca')
       /* não está trancado */
       AND e.id NOT IN (SELECT eh.enrollment_id
                        FROM enrollment_holds eh
@@ -539,8 +539,8 @@ queries = [
                        AND cer.course_class_id = cc.id
                        AND cc.year = :ano_semestre_atual
                        AND cc.semester = :numero_semestre_atual
-                       AND cer.status = "Solicitada"
-                       AND cer.action = "Adição")
+                       AND cer.status = 'Solicitada'
+                       AND cer.action = 'Adição')
       ORDER BY s.name
     SQL
   },
@@ -564,10 +564,10 @@ queries = [
       AND e.enrollment_status_id = es.id
       AND e.level_id = l.id
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
-      AND es.name = "Regular"
-      AND l.name = "Mestrado"
-      AND (ct.name = "Tópicos Avançados" OR ct.name = "Estudo Orientado")
-      AND ce.situation != "Reprovado"
+      AND es.name = 'Regular'
+      AND l.name = 'Mestrado'
+      AND (ct.name = 'Tópicos Avançados' OR ct.name = 'Estudo Orientado')
+      AND ce.situation != 'Reprovado'
       GROUP BY s.name, e.enrollment_number
       HAVING SUM(c.credits) > 12
       ORDER BY s.name
@@ -593,10 +593,10 @@ queries = [
       AND e.enrollment_status_id = es.id
       AND e.level_id = l.id
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
-      AND es.name = "Regular"
-      AND l.name = "Doutorado"
-      AND ct.name = "Tópicos Avançados"
-      AND ce.situation != "Reprovado"
+      AND es.name = 'Regular'
+      AND l.name = 'Doutorado'
+      AND ct.name = 'Tópicos Avançados'
+      AND ce.situation != 'Reprovado'
       GROUP BY s.name, e.enrollment_number
       HAVING SUM(c.credits) > 8
       ORDER BY s.name
@@ -618,13 +618,13 @@ queries = [
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
       AND e.enrollment_status_id = es.id
       AND e.level_id = l.id
-      AND es.name = "Regular"
-      AND l.name = "Doutorado"
+      AND es.name = 'Regular'
+      AND l.name = 'Doutorado'
       AND ce.enrollment_id = e.id
       AND ct.has_score = 1
       AND ct.id = c.course_type_id
       /* Tópicos */
-      AND ct.name = "Tópicos Avançados"
+      AND ct.name = 'Tópicos Avançados'
       AND c.id = cc.course_id
       AND cc.id = ce.course_class_id
       AND cc.professor_id = p.id
@@ -667,17 +667,17 @@ queries = [
       AND e.level_id = l.id
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
       /* Aluno regular */
-      AND es.name = "Regular"
+      AND es.name = 'Regular'
       /* Aluno de doutorado */
-      AND l.name = "Doutorado"
+      AND l.name = 'Doutorado'
       /* Bolsista CAPES */
       AND e.id IN (SELECT sd.enrollment_id
                    FROM scholarship_durations sd, scholarships s, sponsors sp, scholarship_types st
                    WHERE sd.scholarship_id = s.id
                    AND s.sponsor_id = sp.id
                    AND s.scholarship_type_id = st.id
-                   AND sp.name = "CAPES"
-                   AND st.name = "PROEX"
+                   AND sp.name = 'CAPES'
+                   AND st.name = 'PROEX'
           AND sd.cancel_date IS NULL)
       /* Não cursou dois Estágio em Docência */
       AND e.id NOT IN (SELECT en.id
@@ -686,8 +686,8 @@ queries = [
                 AND c.id = cc.course_id
                 AND cc.id = ce.course_class_id
                 AND en.id = ce.enrollment_id
-                AND (ce.situation = "Aprovado" OR ce.situation = "Incompleto")
-                AND ct.name = "Estágio em Docência"
+                AND (ce.situation = 'Aprovado' OR ce.situation = 'Incompleto')
+                AND ct.name = 'Estágio em Docência'
                 GROUP BY enrollment_number
                 HAVING count(*) >= 2)
       /* Não está inscrito esse período */
@@ -697,8 +697,8 @@ queries = [
                 AND c.id = cc.course_id
                 AND cc.id = ce.course_class_id
                 AND en.id = ce.enrollment_id
-                AND ce.situation = "Incompleto"
-                AND ct.name = "Estágio em Docência"
+                AND ce.situation = 'Incompleto'
+                AND ct.name = 'Estágio em Docência'
                 )
       ORDER BY s.name
     SQL
@@ -748,9 +748,9 @@ queries = [
 
       UNION
 
-      SELECT s.scholarship_number, "não alocada" AS "data_termino",
+      SELECT s.scholarship_number, 'não alocada' AS "data_termino",
              s.end_date AS "validade_da_bolsa",
-             "não alocada" AS "validade_alocacao"
+             'não alocada' AS "validade_alocacao"
       FROM scholarships s
       WHERE s.id NOT
       IN (
@@ -763,7 +763,7 @@ queries = [
 
       UNION
 
-      SELECT s.scholarship_number, "alocada a aluno desligado" AS "data_termino",
+      SELECT s.scholarship_number, 'alocada a aluno desligado' AS "data_termino",
              s.end_date AS "validade_da_bolsa",
              sd.end_date AS "validade_alocacao"
       FROM scholarships s, scholarship_durations sd
@@ -836,7 +836,7 @@ queries = [
       WHERE s.id = e.student_id
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
       AND e.enrollment_status_id = es.id
-      AND es.name = "Regular"
+      AND es.name = 'Regular'
       AND e.id NOT IN (SELECT a.enrollment_id FROM advisements a) /* Não tem orientador */
 
       /* se estiver inscrito em dissertação esse período */
@@ -847,7 +847,7 @@ queries = [
             AND c.course_type_id = ct.id
             AND cc.year = :ano_semestre_atual
             AND cc.semester = :numero_semestre_atual
-            AND ct.name = "Pesquisa de Dissertação e Tese")
+            AND ct.name = 'Pesquisa de Dissertação e Tese')
       ORDER BY s.name
     SQL
   },
@@ -862,7 +862,7 @@ queries = [
                          FROM dismissals)
       AND s.id = e.student_id
       AND e.enrollment_status_id = es.id
-      AND es.name = "Regular"
+      AND es.name = 'Regular'
       ORDER BY s.name
     SQL
   },
@@ -876,12 +876,12 @@ queries = [
           courses c, course_types ct
       WHERE cc.professor_id = p.id
       AND ce.course_class_id = cc.id
-      AND ce.situation = "Incompleto"
+      AND ce.situation = 'Incompleto'
       AND c.id = cc.course_id
       AND c.course_type_id = ct.id
       /* Não é Tese nem Dissertação */
       /* mas pode ser Pesquisa de Tese ou de Dissertação */
-      AND ct.name <> "Defesa de Dissertação e Tese"
+      AND ct.name <> 'Defesa de Dissertação e Tese'
       ORDER BY p.name
     SQL
   },
@@ -944,21 +944,21 @@ queries = [
       WHERE s.id = e.student_id
         AND e.enrollment_status_id = es.id
         AND e.level_id = l.id
-        AND es.name = "Regular"
-        AND l.name = "Mestrado"
+        AND es.name = 'Regular'
+        AND l.name = 'Mestrado'
         AND ce.enrollment_id = e.id
         AND ct.has_score = 1
         AND ct.id = c.course_type_id
         AND c.id = cc.course_id
         AND cc.id = ce.course_class_id
-        AND ce.situation !=  "Incompleto"
-        AND (e.obs NOT LIKE "%%HISTORICO INCOMPLETO%%" OR e.obs IS NULL)
+        AND ce.situation !=  'Incompleto'
+        AND (e.obs NOT LIKE '%%HISTORICO INCOMPLETO%%' OR e.obs IS NULL)
         /* ou está ativo, ou foi desligado por titulação */
         AND ((e.id NOT IN (SELECT enrollment_id from dismissals)) OR
           (e.id IN (SELECT d.enrollment_id
                     FROM dismissals d, dismissal_reasons dr
                     WHERE d.dismissal_reason_id = dr.id
-                    AND dr.name = "Titulação")))
+                    AND dr.name = 'Titulação')))
       GROUP BY s.name, e.enrollment_number
       ORDER BY cr DESC
     SQL
@@ -979,21 +979,21 @@ queries = [
       WHERE s.id = e.student_id
         AND e.enrollment_status_id = es.id
         AND e.level_id = l.id
-        AND es.name = "Regular"
-        AND l.name = "Doutorado"
+        AND es.name = 'Regular'
+        AND l.name = 'Doutorado'
         AND ce.enrollment_id = e.id
         AND ct.has_score = 1
         AND ct.id = c.course_type_id
         AND c.id = cc.course_id
         AND cc.id = ce.course_class_id
-        AND ce.situation !=  "Incompleto"
-        AND (e.obs NOT LIKE "%%HISTORICO INCOMPLETO%%" OR e.obs IS NULL)
+        AND ce.situation !=  'Incompleto'
+        AND (e.obs NOT LIKE '%%HISTORICO INCOMPLETO%%' OR e.obs IS NULL)
         /* ou está ativo, ou foi desligado por titulação */
         AND ((e.id NOT IN (SELECT enrollment_id from dismissals)) OR
           (e.id IN (SELECT d.enrollment_id
                     FROM dismissals d, dismissal_reasons dr
                     WHERE d.dismissal_reason_id = dr.id
-                    AND dr.name = "Titulação")))
+                    AND dr.name = 'Titulação')))
       GROUP BY s.name, e.enrollment_number
       ORDER BY cr DESC
     SQL
@@ -1012,15 +1012,15 @@ queries = [
       AND e.level_id = l.id
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
       /* Aluno regular */
-      AND es.name = "Regular"
+      AND es.name = 'Regular'
       /* Aluno de mestrado */
-      AND l.name = "Mestrado"
+      AND l.name = 'Mestrado'
       /* Nunca se matriculou em pesquisa de dissertação */
       AND e.id NOT IN (SELECT enrollment_id
                        FROM class_enrollments ce, course_classes cc, courses c, course_types ct
                        WHERE ce.course_class_id = cc.id
                        AND c.course_type_id = ct.id
-                       AND ct.name = "Pesquisa de Dissertação e Tese"
+                       AND ct.name = 'Pesquisa de Dissertação e Tese'
                        AND c.id = cc.course_id)
       /* Já completou os créditos */
       AND e.id IN (SELECT en.id
@@ -1030,7 +1030,7 @@ queries = [
                    AND cc.id = ce.course_class_id
                    AND c.id = cc.course_id
                    AND ct.id = c.course_type_id
-                   AND ce.situation = "Aprovado"
+                   AND ce.situation = 'Aprovado'
                    GROUP BY en.id
                    HAVING SUM( c.credits ) >= 24)
       GROUP BY s.name, e.enrollment_number, e.admission_date
@@ -1106,9 +1106,9 @@ queries = [
       AND c.course_type_id = ct.id
       AND e.enrollment_status_id = es.id
       AND e.id NOT IN (SELECT d.enrollment_id FROM dismissals d) /* Aluno ativo */
-      AND es.name = "Regular" /* Aluno regular */
+      AND es.name = 'Regular' /* Aluno regular */
       AND ct.has_score = 1 /* disciplina com nota */
-      AND ct.name != "Estágio em Docência" /* estágio de docência não conta */
+      AND ct.name != 'Estágio em Docência' /* estágio de docência não conta */
       AND cc.year = :ano_semestre_atual
       AND cc.semester = :numero_semestre_atual
       /* Bolsista */
@@ -1123,8 +1123,8 @@ queries = [
                 AND ce2.course_class_id = cc2.id
                 AND cc2.course_id = c2.id
                 AND c2.course_type_id = ct2.id
-                AND ce2.situation != "Reprovado" /* não conta disciplinas que o aluno foi reprovado */
-                AND ct2.name != "Estágio em Docência" /* não conta estágio de docência */
+                AND ce2.situation != 'Reprovado' /* não conta disciplinas que o aluno foi reprovado */
+                AND ct2.name != 'Estágio em Docência' /* não conta estágio de docência */
                 GROUP BY e2.id
                 HAVING SUM(c2.credits) < 24)
       GROUP BY s.name, e.enrollment_number
@@ -1184,9 +1184,9 @@ queries = [
       AND c.course_type_id = ct.id
       AND e.enrollment_status_id = es.id
       AND e.id NOT IN (SELECT d.enrollment_id FROM dismissals d) /* Aluno ativo */
-      AND es.name = "Regular" /* Aluno regular */
+      AND es.name = 'Regular' /* Aluno regular */
       AND ct.has_score = 1 /* disciplina com nota */
-      AND ct.name != "Estágio em Docência" /* estágio de docência não conta */
+      AND ct.name != 'Estágio em Docência' /* estágio de docência não conta */
       AND cc.year = :ano_semestre_atual
       AND cc.semester = :numero_semestre_atual
       /* Não bolsista */
@@ -1201,8 +1201,8 @@ queries = [
                    AND ce2.course_class_id = cc2.id
                    AND cc2.course_id = c2.id
                    AND c2.course_type_id = ct2.id
-                   AND ce2.situation != "Reprovado" /* não conta disciplinas que o aluno foi reprovado */
-                   AND ct2.name != "Estágio em Docência" /* não conta estágio de docência */
+                   AND ce2.situation != 'Reprovado' /* não conta disciplinas que o aluno foi reprovado */
+                   AND ct2.name != 'Estágio em Docência' /* não conta estágio de docência */
                    GROUP BY e2.id
                    HAVING SUM(c2.credits) < 24)
       GROUP BY s.name, e.enrollment_number
@@ -1237,7 +1237,7 @@ queries = [
            course_classes cc, enrollment_statuses es
       WHERE s.id = e.student_id
         AND e.enrollment_status_id = es.id
-        AND es.name = "Regular"
+        AND es.name = 'Regular'
         AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
         AND ce.enrollment_id = e.id
         AND c.id = cc.course_id
@@ -1262,16 +1262,16 @@ queries = [
       WHERE s.id = e.student_id
         AND e.enrollment_status_id = es.id
         AND e.level_id = l.id
-        AND es.name = "Regular"
-        AND l.name = "Mestrado"
+        AND es.name = 'Regular'
+        AND l.name = 'Mestrado'
         AND ce.enrollment_id = e.id
         AND ct.has_score = 1
         AND ct.id = c.course_type_id
         AND c.id = cc.course_id
         AND cc.id = ce.course_class_id
-        AND ce.situation !=  "Incompleto"
+        AND ce.situation !=  'Incompleto'
         AND e.id NOT IN (SELECT enrollment_id from dismissals)
-        AND e.admission_date="2022-08-01"
+        AND e.admission_date='2022-08-01'
         /* eh bolsista */
         AND e.id IN (SELECT enrollment_id FROM scholarship_durations WHERE cancel_date IS NULL)
       GROUP BY s.name, e.enrollment_number
@@ -1293,16 +1293,16 @@ queries = [
       WHERE s.id = e.student_id
         AND e.enrollment_status_id = es.id
         AND e.level_id = l.id
-        AND es.name = "Regular"
-        AND l.name = "Doutorado"
+        AND es.name = 'Regular'
+        AND l.name = 'Doutorado'
         AND ce.enrollment_id = e.id
         AND ct.has_score = 1
         AND ct.id = c.course_type_id
         AND c.id = cc.course_id
         AND cc.id = ce.course_class_id
-        AND ce.situation !=  "Incompleto"
+        AND ce.situation !=  'Incompleto'
         AND e.id NOT IN (SELECT enrollment_id from dismissals)
-        AND e.admission_date="2020-08-01"
+        AND e.admission_date='2020-08-01'
         /* eh bolsista */
         AND e.id IN (SELECT enrollment_id FROM scholarship_durations WHERE cancel_date IS NULL)
       GROUP BY s.name, e.enrollment_number
@@ -1320,7 +1320,7 @@ queries = [
       AND e.enrollment_status_id = es.id
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
       /* Aluno regular */
-      AND es.name = "Regular"
+      AND es.name = 'Regular'
       /* Bolsista */
       AND e.id IN (SELECT enrollment_id
             FROM scholarship_durations
@@ -1336,13 +1336,13 @@ queries = [
       /* Numero de alunos matriculados em cada nivel por semestre */
       SELECT l.name AS NIVEL,
              e.admission_date AS DATA_MATRICULA,
-             "Total Matriculados" AS STATUS,
+             'Total Matriculados' AS STATUS,
              COUNT(*) AS NUM_ALUNOS
       FROM enrollments e, levels l, enrollment_statuses es
       WHERE l.id = e.level_id
       AND e.enrollment_status_id = es.id
-      AND es.name = "Regular"
-      AND e.admission_date > "2010-01-01"
+      AND es.name = 'Regular'
+      AND e.admission_date > '2010-01-01'
       GROUP BY l.name, e.admission_date
 
       UNION
@@ -1354,8 +1354,8 @@ queries = [
       AND e.enrollment_status_id = es.id
       AND d.dismissal_reason_id = dr.id
       AND l.id = e.level_id
-      AND es.name = "Regular"
-      AND e.admission_date > "2010-01-01"
+      AND es.name = 'Regular'
+      AND e.admission_date > '2010-01-01'
       GROUP BY l.name, e.admission_date, dr.name
     SQL
   },
@@ -1369,9 +1369,9 @@ queries = [
       WHERE s.id = e.student_id
       AND e.level_id = l.id
       AND e.enrollment_status_id = es.id
-      AND l.name = "Doutorado"
+      AND l.name = 'Doutorado'
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
-      AND es.name = "Regular" /* Aluno Regular */
+      AND es.name = 'Regular' /* Aluno Regular */
       /* Não tem orientador */
       AND e.id NOT IN (SELECT a.enrollment_id FROM advisements a)
       ORDER BY s.name
@@ -1395,14 +1395,14 @@ queries = [
         AND sd.scholarship_id = sc.id
         AND e.level_id = l.id
         AND e.enrollment_status_id = es.id
-        AND es.name = "Regular"
-        AND l.name = "Doutorado"
+        AND es.name = 'Regular'
+        AND l.name = 'Doutorado'
         AND ce.enrollment_id = e.id
         AND ct.has_score = 1
         AND ct.id = c.course_type_id
         AND c.id = cc.course_id
         AND cc.id = ce.course_class_id
-        AND ce.situation !=  "Incompleto"
+        AND ce.situation !=  'Incompleto'
         AND e.id NOT IN (SELECT enrollment_id from dismissals)
         /* eh bolsista */
         AND sd.cancel_date IS NULL
@@ -1424,10 +1424,10 @@ queries = [
       AND e.level_id = l.id
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
       /* Aluno regular */
-      AND es.name = "Regular"
+      AND es.name = 'Regular'
       /* Aluno de mestrado */
-      AND l.name = "Mestrado"
-      AND (e.obs NOT LIKE "%%BASICAS OK%%" OR e.obs IS NULL)
+      AND l.name = 'Mestrado'
+      AND (e.obs NOT LIKE '%%BASICAS OK%%' OR e.obs IS NULL)
       AND
       /* Não cursou ou está cursando uma básica de alguma área */
       (e.id NOT IN (SELECT en.id
@@ -1437,8 +1437,8 @@ queries = [
                     AND c.id = cc.course_id
                     AND cc.id = ce.course_class_id
                     AND en.id = ce.enrollment_id
-                    AND (ce.situation = "Aprovado" OR ce.situation = "Incompleto")
-                    AND ct.name = "Obrigatória de Linha de Pesquisa"
+                    AND (ce.situation = 'Aprovado' OR ce.situation = 'Incompleto')
+                    AND ct.name = 'Obrigatória de Linha de Pesquisa'
                     GROUP BY enrollment_number
                     HAVING count(*) >= 1)
       OR
@@ -1450,8 +1450,8 @@ queries = [
                    AND ct.id = c.course_type_id
                    AND c.id = cc.course_id
                    AND cc.id = ce.course_class_id
-                   AND (ce.situation =  "Aprovado" OR ce.situation = "Incompleto")
-                   AND ct.name = "Obrigatória de Curso"
+                   AND (ce.situation =  'Aprovado' OR ce.situation = 'Incompleto')
+                   AND ct.name = 'Obrigatória de Curso'
                    GROUP BY enrollment_number
                    HAVING COUNT( * ) >=2)
       OR
@@ -1463,8 +1463,8 @@ queries = [
                 AND ct.id = c.course_type_id
                 AND c.id = cc.course_id
                 AND cc.id = ce.course_class_id
-                AND (ce.situation =  "Aprovado" OR ce.situation = "Incompleto")
-                AND ct.name = "Seminário"
+                AND (ce.situation =  'Aprovado' OR ce.situation = 'Incompleto')
+                AND ct.name = 'Seminário'
               )
       )
       AND
@@ -1477,7 +1477,7 @@ queries = [
                AND cc.id = ce.course_class_id
                AND c.id = cc.course_id
                AND ct.id = c.course_type_id
-               AND (ce.situation = "Aprovado" OR ce.situation = "Incompleto")
+               AND (ce.situation = 'Aprovado' OR ce.situation = 'Incompleto')
                GROUP BY en.id
                HAVING SUM( c.credits ) >= 32)
       GROUP BY s.name, e.enrollment_number, e.admission_date
@@ -1494,7 +1494,7 @@ queries = [
       WHERE e.id NOT IN (SELECT enrollment_id FROM dismissals)
       AND e.enrollment_status_id = es.id
       AND s.id = e.student_id
-      AND es.name = "Regular"
+      AND es.name = 'Regular'
       ORDER BY s.name
     SQL
   },
@@ -1525,7 +1525,7 @@ queries = [
       FROM enrollments e, students s, enrollment_statuses es
       WHERE e.id NOT IN (SELECT enrollment_id FROM dismissals)
       AND e.enrollment_status_id = es.id
-      AND es.name = "Regular"
+      AND es.name = 'Regular'
       AND s.id = e.student_id
       AND :data_consulta > 1
       ORDER BY s.name
@@ -1550,7 +1550,7 @@ queries = [
       AND enrollments.enrollment_status_id = enrollment_statuses.id
       AND students.id = enrollments.student_id
       AND admission_date < :data_consulta
-      AND enrollment_statuses.name = "Regular"
+      AND enrollment_statuses.name = 'Regular'
       AND enrollments.level_id = levels.id
       GROUP BY level_id, sex
     SQL
@@ -1567,7 +1567,7 @@ queries = [
                                    FROM dismissals)
       AND enrollments.enrollment_status_id = enrollment_statuses.id
       AND students.id = enrollments.student_id
-      AND enrollment_statuses.name = "Regular"
+      AND enrollment_statuses.name = 'Regular'
       AND enrollments.level_id = levels.id
       /* Bolsista */
       AND enrollments.id IN (SELECT enrollment_id
@@ -1588,7 +1588,7 @@ queries = [
                                    FROM dismissals)
       AND enrollments.enrollment_status_id = enrollment_statuses.id
       AND students.id = enrollments.student_id
-      AND enrollment_statuses.name = "Regular"
+      AND enrollment_statuses.name = 'Regular'
       AND enrollments.level_id = levels.id
       AND students.birth_state_id = states.id
       AND states.country_id = countries.id
@@ -1614,7 +1614,7 @@ queries = [
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
       /* Etapa é pedido de banca */
       AND a.phase_id = ph.id
-      AND ph.name = "Pedido de Banca"
+      AND ph.name = 'Pedido de Banca'
       AND ad.enrollment_id = e.id
       AND ad.professor_id = p.id
       AND p.name LIKE :nome_professor
@@ -1652,7 +1652,7 @@ queries = [
       AND a.professor_id = p.id
       AND e.id IN (SELECT enrollment_id FROM dismissals)
       AND e.thesis_defense_date IS NOT NULL
-      AND e.thesis_defense_date >= "2016-01-01"
+      AND e.thesis_defense_date >= '2016-01-01'
       ORDER BY e.thesis_defense_date
     SQL
   },
@@ -1675,9 +1675,9 @@ queries = [
            LEFT OUTER JOIN advisements ON advisements.enrollment_id = enrollments.id
            INNER JOIN professors ON professors.id = advisements.professor_id
       WHERE enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
-      AND enrollment_statuses.name = "Regular"
+      AND enrollment_statuses.name = 'Regular'
       /* Apenas alunos de doutorado */
-      AND levels.name = "Doutorado"
+      AND levels.name = 'Doutorado'
       /* Listas apenas Orientador Principal */
       AND advisements.main_advisor = 1
       /* Bolsista */
@@ -1688,16 +1688,16 @@ queries = [
 
       UNION
       /* Alunos bolsistas de doutorado ainda sem orientador */
-      SELECT students.name AS name, "--" AS prof_name
+      SELECT students.name AS name, '--' AS prof_name
       FROM enrollments
            INNER JOIN enrollment_statuses ON enrollment_statuses.id = enrollments.enrollment_status_id
            INNER JOIN levels ON levels.id = enrollments.level_id
            INNER JOIN students ON students.id = enrollments.student_id
       WHERE
       enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
-      AND enrollment_statuses.name = "Regular"
+      AND enrollment_statuses.name = 'Regular'
       /* Apenas alunos de doutorado */
-      AND levels.name = "Doutorado"
+      AND levels.name = 'Doutorado'
       /* Bolsista */
       AND enrollments.id IN (SELECT enrollment_id
                              FROM scholarship_durations
@@ -1728,9 +1728,9 @@ queries = [
            LEFT OUTER JOIN advisements ON advisements.enrollment_id = enrollments.id
            INNER JOIN professors ON professors.id = advisements.professor_id
       WHERE enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
-      AND enrollment_statuses.name = "Regular"
+      AND enrollment_statuses.name = 'Regular'
       /* Apenas alunos de mestrado */
-      AND levels.name = "Mestrado"
+      AND levels.name = 'Mestrado'
       /* Listas apenas Orientador Principal */
       AND advisements.main_advisor = 1
       /* Bolsista */
@@ -1742,16 +1742,16 @@ queries = [
       UNION
 
       /* Alunos bolsistas de mestrado ainda sem orientador */
-      SELECT students.name AS name, "--" AS prof_name
+      SELECT students.name AS name, '--' AS prof_name
       FROM enrollments
            INNER JOIN enrollment_statuses ON enrollment_statuses.id = enrollments.enrollment_status_id
            INNER JOIN levels ON levels.id = enrollments.level_id
            INNER JOIN students ON students.id = enrollments.student_id
       WHERE
       enrollments.id NOT IN (SELECT dismissals.enrollment_id from dismissals)
-      AND enrollment_statuses.name = "Regular"
+      AND enrollment_statuses.name = 'Regular'
       /* Apenas alunos de mestrado */
-      AND levels.name = "Mestrado"
+      AND levels.name = 'Mestrado'
       /* Bolsista */
       AND enrollments.id IN (SELECT enrollment_id
                              FROM scholarship_durations
@@ -1781,12 +1781,12 @@ queries = [
       WHERE s.id = e.student_id
         AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
         AND e.enrollment_status_id = es.id
-        AND es.name = "Regular"
+        AND es.name = 'Regular'
         AND ce.enrollment_id = e.id
         AND ct.id = c.course_type_id
         AND c.id = cc.course_id
         AND cc.id = ce.course_class_id
-        AND ce.situation = "Reprovado"
+        AND ce.situation = 'Reprovado'
         AND cc.year >= 2019
         /* Bolsista */
         AND e.id IN (SELECT enrollment_id
@@ -1826,13 +1826,13 @@ queries = [
       WHERE s.id = e.student_id
         AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
         AND e.enrollment_status_id = es.id
-        AND es.name = "Avulso"
+        AND es.name = 'Avulso'
         AND ce.enrollment_id = e.id
         AND ct.has_score = 1
         AND ct.id = c.course_type_id
         AND c.id = cc.course_id
         AND cc.id = ce.course_class_id
-        AND ce.situation != "Incompleto"
+        AND ce.situation != 'Incompleto'
         AND cc.year = :ano
         AND cc.semester = :semestre
       ORDER BY s.name
@@ -1865,8 +1865,8 @@ queries = [
     notifications: [],
     sql: <<~SQL
       SELECT * FROM versions
-      WHERE item_type = "Accomplishment"
-      AND object LIKE "%%879%%";
+      WHERE item_type = 'Accomplishment'
+      AND object LIKE '%%879%%';
     SQL
   },
   { name: "Conferência Inscrição em Disciplina",
@@ -1901,7 +1901,7 @@ queries = [
       AND c.id=cc.course_id
       AND e.enrollment_status_id = es.id
       /* alunos regulares e avulsos */
-      AND (es.name = "Regular" OR es.name = "Avulso")
+      AND (es.name = 'Regular' OR es.name = 'Avulso')
       AND ce.enrollment_id = e.id
       AND ct.id = c.course_type_id
       AND c.id = cc.course_id
@@ -1946,7 +1946,7 @@ queries = [
       WHERE
         enrollments.student_id = students.id
         AND enrollments.enrollment_status_id = enrollment_statuses.id
-        AND enrollment_statuses.name = "Regular"
+        AND enrollment_statuses.name = 'Regular'
         AND enrollments.admission_date < :data_consulta
         AND enrollments.id NOT IN (SELECT enrollment_id
                                    FROM dismissals
@@ -1973,15 +1973,15 @@ queries = [
         AND e.id IN (SELECT d.enrollment_id
                      FROM dismissals d, dismissal_reasons dr
                      WHERE d.dismissal_reason_id = dr.id
-                     AND dr.name = "Rendimento")
+                     AND dr.name = 'Rendimento')
         AND e.enrollment_status_id = es.id
-        AND es.name = "Regular"
+        AND es.name = 'Regular'
         AND ce.enrollment_id = e.id
         AND ct.has_score = 1
         AND ct.id = c.course_type_id
         AND c.id = cc.course_id
         AND cc.id = ce.course_class_id
-        AND ce.situation !=  "Incompleto"
+        AND ce.situation !=  'Incompleto'
       GROUP BY s.name, e.enrollment_number, cc.year, cc.semester
       HAVING SUM(ce.grade * c.credits)/SUM(c.credits) < 59.5
       ORDER BY cc.year, cc.semester, e.enrollment_number
@@ -2003,9 +2003,9 @@ queries = [
       LEFT JOIN courses c ON c.id = cc.course_id
       LEFT JOIN course_types ct ON (ct.id = c.course_type_id
                             AND ct.has_score = 1 /* Disciplinas com nota */
-                AND (ct.name <> "Estágio em Docência") /* Desconsidera Estágio de Docência */)
+                AND (ct.name <> 'Estágio em Docência') /* Desconsidera Estágio de Docência */)
       WHERE e.id NOT IN (SELECT enrollment_id FROM dismissals) /* Somente ativos */
-      AND es.name = "Regular" /* Somente regulares */
+      AND es.name = 'Regular' /* Somente regulares */
       GROUP BY s.name, e.enrollment_number
       HAVING IFNULL(SUM(c.credits),0) < 24
       ORDER BY s.name
@@ -2023,13 +2023,13 @@ queries = [
       WHERE c.id = cc.course_id
       AND ct.id = c.course_type_id
       AND ct.has_score = 1 /* Disciplinas com nota */
-      AND ct.name <> "Estágio em Docência" /* Desconsidera */
-      AND ct.name <> "Estudo Orientado" /* Desconsidera */
+      AND ct.name <> 'Estágio em Docência' /* Desconsidera */
+      AND ct.name <> 'Estudo Orientado' /* Desconsidera */
       AND cc.id IN (SELECT ce.course_class_id
                     FROM class_enrollments ce
                     GROUP BY ce.course_class_id
                     HAVING COUNT(ce.id) >= 3)
-      AND LOWER(cc.name) NOT LIKE "%%aproveitamento%%"
+      AND LOWER(cc.name) NOT LIKE '%%aproveitamento%%'
       GROUP BY cc.year, cc.semester
       ORDER BY cc.year, cc.semester
     SQL
@@ -2043,12 +2043,12 @@ queries = [
       SELECT s.name as Nome,
              e.enrollment_number as Matrícula,
              a.conclusion_date as "data pedido banca",
-             "sem data de defesa" as Problema
+             'sem data de defesa' as Problema
       FROM enrollments e, students s, accomplishments a, phases p
       WHERE s.id = e.student_id
       AND a.enrollment_id = e.id
       AND a.phase_id = p.id
-      AND p.name = "Pedido de Banca" /* Etapa é pedido de banca */
+      AND p.name = 'Pedido de Banca' /* Etapa é pedido de banca */
       AND e.thesis_defense_date IS NULL
 
       UNION
@@ -2057,12 +2057,12 @@ queries = [
       SELECT s.name as Nome,
              e.enrollment_number as Matrícula,
              a.conclusion_date as "data pedido banca",
-             "não foi desligado" as Problema
+             'não foi desligado' as Problema
       FROM enrollments e, students s, accomplishments a, phases p
       WHERE s.id = e.student_id
       AND a.enrollment_id = e.id
       AND a.phase_id = p.id
-      AND p.name = "Pedido de Banca" /* Etapa é pedido de banca */
+      AND p.name = 'Pedido de Banca' /* Etapa é pedido de banca */
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
     SQL
   },
@@ -2128,13 +2128,13 @@ queries = [
       AND e.id = ce.enrollment_id
       AND e.enrollment_status_id = es.id
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
-      AND es.name = "Regular" /* Aluno Regular */
+      AND es.name = 'Regular' /* Aluno Regular */
       AND ce.course_class_id = cc.id
       AND cc.course_id = c.id
       AND c.course_type_id = ct.id
       AND cc.year = :ano_semestre_atual
       AND cc.semester = :numero_semestre_atual
-      AND ct.name = "Estudo Orientado"
+      AND ct.name = 'Estudo Orientado'
       AND (ce.obs IS NULL OR ce.obs NOT LIKE '%PROPOSTA OK%') /* e não tiver "PROPOSTA OK" na inscrição */
       ORDER BY s.name
     SQL
@@ -2223,12 +2223,12 @@ queries = [
       INNER JOIN enrollments e ON s.id = e.student_id
       INNER JOIN enrollment_statuses es ON es.id = e.enrollment_status_id
       LEFT JOIN (enrollment_requests er_sol, class_enrollment_requests cer_sol, course_classes cc_sol)
-          ON (e.id = er_sol.enrollment_id AND er_sol.id = cer_sol.enrollment_request_id AND cer_sol.course_class_id = cc_sol.id AND cer_sol.status = "Solicitada" AND cc_sol.year = :ano_semestre_atual AND cc_sol.semester = :numero_semestre_atual)
+          ON (e.id = er_sol.enrollment_id AND er_sol.id = cer_sol.enrollment_request_id AND cer_sol.course_class_id = cc_sol.id AND cer_sol.status = 'Solicitada' AND cc_sol.year = :ano_semestre_atual AND cc_sol.semester = :numero_semestre_atual)
       LEFT JOIN (enrollment_requests er_val, class_enrollment_requests cer_val, course_classes cc_val)
-          ON (e.id = er_val.enrollment_id AND er_val.id = cer_val.enrollment_request_id AND cer_val.course_class_id = cc_val.id AND cer_val.status = "Válida" AND cc_val.year = :ano_semestre_atual AND cc_val.semester = :numero_semestre_atual)
+          ON (e.id = er_val.enrollment_id AND er_val.id = cer_val.enrollment_request_id AND cer_val.course_class_id = cc_val.id AND cer_val.status = 'Válida' AND cc_val.year = :ano_semestre_atual AND cc_val.semester = :numero_semestre_atual)
       LEFT JOIN (class_enrollments ce, course_classes cc)
           ON (e.id = ce.enrollment_id AND ce.course_class_id = cc.id AND cc.year = :ano_semestre_atual AND cc.semester = :numero_semestre_atual)
-      WHERE es.name = "Regular" /* Aluno regular */
+      WHERE es.name = 'Regular' /* Aluno regular */
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)  /* Aluno ativo */
       GROUP BY e.id
       ORDER BY s.name
@@ -2247,7 +2247,7 @@ queries = [
       AND e.enrollment_status_id = es.id
       AND e.id = ce.enrollment_id
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals) /* Aluno ativo */
-      AND es.name = "Avulso" /* Aluno avulso */
+      AND es.name = 'Avulso' /* Aluno avulso */
       GROUP BY s.id
       HAVING COUNT(*) > 4
       ORDER BY s.name
@@ -2273,7 +2273,7 @@ queries = [
       AND enrollments.enrollment_status_id = enrollment_statuses.id
       AND enrollments.level_id = levels.id
       AND enrollments.student_id = students.id
-      AND enrollment_statuses.name = "Regular"
+      AND enrollment_statuses.name = 'Regular'
       GROUP BY level_id, sex
     SQL
   },
@@ -2286,13 +2286,13 @@ queries = [
       SELECT l.name AS NIVEL,
              s.sex AS SEXO,
              e.admission_date AS DATA_MATRICULA,
-             "Total Matriculados" AS STATUS,
+             'Total Matriculados' AS STATUS,
              COUNT(*) AS NUM_ALUNOS
       FROM enrollments e, levels l, students s, enrollment_statuses es
       WHERE l.id = e.level_id
       AND e.enrollment_status_id = es.id
-      AND es.name = "Regular"
-      AND e.admission_date > "2010-01-01"
+      AND es.name = 'Regular'
+      AND e.admission_date > '2010-01-01'
       AND e.student_id = s.id
       GROUP BY l.name, s.sex, e.admission_date
 
@@ -2310,8 +2310,8 @@ queries = [
       AND d.dismissal_reason_id = dr.id
       AND l.id = e.level_id
       AND e.enrollment_status_id = es.id
-      AND es.name = "Regular"
-      AND e.admission_date > "2010-01-01"
+      AND es.name = 'Regular'
+      AND e.admission_date > '2010-01-01'
       AND e.student_id = s.id
       GROUP BY l.name, s.sex, e.admission_date, dr.name
     SQL
@@ -2333,8 +2333,8 @@ queries = [
       SELECT cc.name AS "Disciplina",
              p.name AS "Professor",
              COUNT(*) AS "Total de alunos",
-             SUM(case when es.name = "Regular" then 1 else 0 end) AS "Alunos regulares",
-             SUM(case when es.name = "Avulso" then 1 else 0 end) AS "Alunos avulsos"
+             SUM(case when es.name = 'Regular' then 1 else 0 end) AS "Alunos regulares",
+             SUM(case when es.name = 'Avulso' then 1 else 0 end) AS "Alunos avulsos"
       FROM course_classes cc, professors p, class_enrollments ce, enrollments e,
            enrollment_statuses es, courses c, course_types ct
       WHERE cc.year = :ano_semestre_atual
@@ -2344,13 +2344,13 @@ queries = [
       AND c.course_type_id = ct.id
       AND e.enrollment_status_id = es.id
       AND (
-        ct.name = "Tópicos Avançados"
-        OR ct.name = "Obrigatória de Curso"
-        OR ct.name = "Obrigatória de Linha de Pesquisa"
-        OR ct.name = "Optativa"
+        ct.name = 'Tópicos Avançados'
+        OR ct.name = 'Obrigatória de Curso'
+        OR ct.name = 'Obrigatória de Linha de Pesquisa'
+        OR ct.name = 'Optativa'
       )
       AND cc.id = ce.course_class_id
-      AND ce.situation = "Incompleto"
+      AND ce.situation = 'Incompleto'
       AND ce.enrollment_id = e.id
       GROUP BY cc.name
       ORDER BY cc.name
@@ -2395,7 +2395,7 @@ unless is_sqlite
 
         /* aluno que não se inscreveu em seminários */
         SELECT e2.id AS "enrollment_id",
-              "seminários" AS "requirement"
+              'seminários' AS "requirement"
         FROM enrollments e2
         WHERE e2.id NOT IN (SELECT ce3.enrollment_id
                 FROM class_enrollments ce3, course_classes cc3, courses c3,
@@ -2403,13 +2403,13 @@ unless is_sqlite
                 WHERE ce3.course_class_id = cc3.id
                   AND cc3.course_id = c3.id
                   AND c3.course_type_id = ct3.id
-                  AND ct3.name = "Seminário")
+                  AND ct3.name = 'Seminário')
 
         UNION
 
         /* aluno de doutorado ou aluno de mestrado (currículo novo) que não completou os 24 créditos  */
         SELECT e2.id AS "enrollment_id",
-              "24 creditos (EDI e EDII não contam crédito)" AS "requirement"
+              '24 creditos (EDI e EDII não contam crédito)' AS "requirement"
         FROM enrollments e2, class_enrollments ce2, course_classes cc2,
             courses c2, levels l2
         WHERE e2.id = ce2.enrollment_id
@@ -2418,18 +2418,18 @@ unless is_sqlite
         AND e2.level_id = l2.id
         /* aluno de doutorado ou aluno de mestrado que entrou a partir de 2021 ou que optou pelo novo regimento */
         AND (
-          l2.name = "Doutorado"
+          l2.name = 'Doutorado'
           OR (
-            l2.name = "Mestrado"
+            l2.name = 'Mestrado'
             AND (
               YEAR(e2.admission_date) >= 2021
-              OR (e2.obs IS NOT NULL AND e2.obs LIKE "%%regimento%%16/12/2020%%")
+              OR (e2.obs IS NOT NULL AND e2.obs LIKE '%%regimento%%16/12/2020%%')
             )
           )
         )
-        AND ce2.situation = "Aprovado" /* disciplinas que o aluno foi aprovado */
+        AND ce2.situation = 'Aprovado' /* disciplinas que o aluno foi aprovado */
         AND c2.course_type_id NOT IN (SELECT course_types.id FROM course_types
-                                      WHERE course_types.name = "Estágio em Docência") /* estágio de docência não conta */
+                                      WHERE course_types.name = 'Estágio em Docência') /* estágio de docência não conta */
         GROUP BY e2.id
         HAVING SUM(c2.credits) < 24
 
@@ -2437,7 +2437,7 @@ unless is_sqlite
 
         /* aluno de mestrado (currículo antigo) que não completou os 32 créditos  */
         SELECT e2.id AS "enrollment_id",
-              "32 creditos (EDI e EDII não contam crédito)" AS "requirement"
+              '32 creditos (EDI e EDII não contam crédito)' AS "requirement"
         FROM enrollments e2, class_enrollments ce2, course_classes cc2,
             courses c2, levels l2
         WHERE e2.id = ce2.enrollment_id
@@ -2445,12 +2445,12 @@ unless is_sqlite
         AND cc2.course_id = c2.id
         AND e2.level_id = l2.id
         /* aluno de mestrado que entrou antes de 2021 e que não optou pelo novo regimento */
-        AND l2.name = "Mestrado"
+        AND l2.name = 'Mestrado'
         AND YEAR(e2.admission_date) < 2021
-        AND (e2.obs IS NULL OR e2.obs NOT LIKE "%%regimento%%16/12/2020%%")
-        AND ce2.situation = "Aprovado" /* disciplinas que o aluno foi aprovado */
+        AND (e2.obs IS NULL OR e2.obs NOT LIKE '%%regimento%%16/12/2020%%')
+        AND ce2.situation = 'Aprovado' /* disciplinas que o aluno foi aprovado */
         AND c2.course_type_id NOT IN (SELECT course_types.id FROM course_types
-                                      WHERE course_types.name = "Estágio em Docência") /* estágio de docência não conta */
+                                      WHERE course_types.name = 'Estágio em Docência') /* estágio de docência não conta */
         GROUP BY e2.id
         HAVING SUM(c2.credits) < 32
 
@@ -2458,7 +2458,7 @@ unless is_sqlite
 
         /* aluno de doutorado (currículo antigo) que não teve duas básicas com nota > 7 */
         SELECT e2.id AS "enrollment_id",
-              "duas básicas > 7 (curriculo antigo)" AS "requirement"
+              'duas básicas > 7 (curriculo antigo)' AS "requirement"
         FROM enrollments e2, levels l2
         WHERE e2.student_id NOT IN (SELECT e3.student_id
                                     FROM enrollments e3, class_enrollments ce3,
@@ -2467,23 +2467,23 @@ unless is_sqlite
                                     AND ce3.course_class_id = cc3.id
                                     AND cc3.course_id = c3.id
                                     AND c3.course_type_id = ct3.id
-                                    AND ct3.name = "Obrigatória de Curso" /* básica do curso */
-                                    AND ce3.situation =  "Aprovado" /* disciplinas que o aluno foi aprovado */
+                                    AND ct3.name = 'Obrigatória de Curso' /* básica do curso */
+                                    AND ce3.situation =  'Aprovado' /* disciplinas que o aluno foi aprovado */
                                     AND ce3.grade >= 70 /* nota > 7 */
                                     GROUP BY e3.student_id
                                     HAVING COUNT(*) >= 2)
         /* aluno de doutorado matriculado antes de 2021 e não optou pelo novo regimento */
         AND e2.level_id = l2.id
-        AND l2.name = "Doutorado"
+        AND l2.name = 'Doutorado'
         AND YEAR(e2.admission_date) < 2021
-        AND (e2.obs IS NULL OR e2.obs NOT LIKE "%%regimento%%16/12/2020%%")
-        AND (e2.obs IS NULL OR (e2.obs NOT LIKE "%%BASICAS > 7 OK%%" AND e2.obs NOT LIKE "%%BASICAS OK%%")) /* não cursou externamente as básicas */
+        AND (e2.obs IS NULL OR e2.obs NOT LIKE '%%regimento%%16/12/2020%%')
+        AND (e2.obs IS NULL OR (e2.obs NOT LIKE '%%BASICAS > 7 OK%%' AND e2.obs NOT LIKE '%%BASICAS OK%%')) /* não cursou externamente as básicas */
 
         UNION
 
         /* aluno de mestrado (currículo antigo) ou aluno de doutorado (currículo novo) que não teve aprovação em duas básicas */
         SELECT e2.id AS "enrollment_id",
-              "duas básicas" AS "requirement"
+              'duas básicas' AS "requirement"
         FROM enrollments e2, levels l2
         WHERE e2.student_id NOT IN (SELECT e3.student_id
                                     FROM enrollments e3, class_enrollments ce3,
@@ -2492,8 +2492,8 @@ unless is_sqlite
                                     AND ce3.course_class_id = cc3.id
                                     AND cc3.course_id = c3.id
                                     AND c3.course_type_id = ct3.id
-                                    AND ct3.name = "Obrigatória de Curso" /* básica do curso */
-                                    AND ce3.situation =  "Aprovado" /* disciplinas que o aluno foi aprovado */
+                                    AND ct3.name = 'Obrigatória de Curso' /* básica do curso */
+                                    AND ce3.situation =  'Aprovado' /* disciplinas que o aluno foi aprovado */
                                     GROUP BY e3.student_id
                                     HAVING COUNT(*) >= 2)
         /* aluno de doutorado matriculado depois de 2021 ou optou pelo novo regimento
@@ -2501,28 +2501,28 @@ unless is_sqlite
         AND e2.level_id = l2.id
         AND (
           (
-            l2.name = "Doutorado"
+            l2.name = 'Doutorado'
             AND (
               YEAR(e2.admission_date) >= 2021
-              OR (e2.obs IS NOT NULL AND e2.obs LIKE "%%regimento%%16/12/2020%%")
+              OR (e2.obs IS NOT NULL AND e2.obs LIKE '%%regimento%%16/12/2020%%')
             )
           )
           OR (
-            l2.name = "Mestrado"
+            l2.name = 'Mestrado'
             AND YEAR(e2.admission_date) < 2021
-            AND (e2.obs IS NULL OR e2.obs NOT LIKE "%%regimento%%16/12/2020%%")
+            AND (e2.obs IS NULL OR e2.obs NOT LIKE '%%regimento%%16/12/2020%%')
           )
         )
         AND (
           e2.obs IS NULL
-          OR (e2.obs NOT LIKE "%%BASICAS > 7 OK%%" AND e2.obs NOT LIKE "%%BASICAS OK%%")
+          OR (e2.obs NOT LIKE '%%BASICAS > 7 OK%%' AND e2.obs NOT LIKE '%%BASICAS OK%%')
         ) /* não cursou externamente as básicas */
 
         UNION
 
         /* aluno de mestrado (currículo novo) que não teve aprovação em uma básica */
         SELECT e2.id AS "enrollment_id",
-              "uma básica" AS "requirement"
+              'uma básica' AS "requirement"
         FROM enrollments e2, levels l2
         WHERE e2.id NOT IN (SELECT ce3.enrollment_id
                             FROM class_enrollments ce3, course_classes cc3,
@@ -2530,24 +2530,24 @@ unless is_sqlite
                             WHERE ce3.course_class_id = cc3.id
                             AND cc3.course_id = c3.id
                             AND c3.course_type_id = ct3.id
-                            AND ct3.name = "Obrigatória de Curso" /* básica do curso */
-                            AND ce3.situation =  "Aprovado" /* disciplinas que o aluno foi aprovado */
+                            AND ct3.name = 'Obrigatória de Curso' /* básica do curso */
+                            AND ce3.situation =  'Aprovado' /* disciplinas que o aluno foi aprovado */
                             GROUP BY ce3.enrollment_id
                             HAVING COUNT(*) >= 1)
         /* aluno de mestrado matriculado depois de 2021 ou que optou pelo novo regimento */
         AND e2.level_id = l2.id
-        AND l2.name = "Mestrado"
+        AND l2.name = 'Mestrado'
         AND (
           YEAR(e2.admission_date) >= 2021
-          OR (e2.obs IS NOT NULL AND e2.obs LIKE "%%regimento%%16/12/2020%%")
+          OR (e2.obs IS NOT NULL AND e2.obs LIKE '%%regimento%%16/12/2020%%')
         )
-        AND (e2.obs IS NULL OR e2.obs NOT LIKE "%%BASICAS OK%%") /* não cursou externamente as básicas */
+        AND (e2.obs IS NULL OR e2.obs NOT LIKE '%%BASICAS OK%%') /* não cursou externamente as básicas */
 
         UNION
 
         /* aluno de mestrado que não teve aprovação em uma obrigatória de linha de pesquisa */
         SELECT e2.id AS "enrollment_id",
-              "uma obrigatória de linha de pesquisa" AS "requirement"
+              'uma obrigatória de linha de pesquisa' AS "requirement"
         FROM enrollments e2, levels l2
         WHERE e2.id NOT IN (SELECT ce3.enrollment_id
                             FROM class_enrollments ce3, course_classes cc3,
@@ -2555,12 +2555,12 @@ unless is_sqlite
                             WHERE ce3.course_class_id = cc3.id
                             AND cc3.course_id = c3.id
                             AND c3.course_type_id = ct3.id
-                            AND ct3.name = "Obrigatória de Linha de Pesquisa" /* obrigatória de linha de pesquisa */
-                            AND ce3.situation =  "Aprovado" /* disciplinas que o aluno foi aprovado */
+                            AND ct3.name = 'Obrigatória de Linha de Pesquisa' /* obrigatória de linha de pesquisa */
+                            AND ce3.situation =  'Aprovado' /* disciplinas que o aluno foi aprovado */
                             GROUP BY ce3.enrollment_id
                             HAVING COUNT(*) >= 1)
         AND e2.level_id = l2.id
-        AND l2.name = "Mestrado") r /* aluno de mestrado */
+        AND l2.name = 'Mestrado') r /* aluno de mestrado */
 
         WHERE s.id = e.student_id
         AND e.id = ce.enrollment_id
@@ -2570,8 +2570,8 @@ unless is_sqlite
         AND e.enrollment_status_id = es.id
         AND c.course_type_id = ct.id
         AND e.id NOT IN (SELECT d.enrollment_id FROM dismissals d) /* Aluno ativo */
-        AND es.name = "Regular" /* Aluno regular */
-        AND ct.name = "Pesquisa de Dissertação e Tese" /* Já se inscreveu em pesquisa de tese ou dissertação */
+        AND es.name = 'Regular' /* Aluno regular */
+        AND ct.name = 'Pesquisa de Dissertação e Tese' /* Já se inscreveu em pesquisa de tese ou dissertação */
         ORDER BY nome
       SQL
     },
@@ -2602,19 +2602,19 @@ unless is_sqlite
                cc.year,
                cc.semester,
                round(((SUM(ce.grade * c.credits)/SUM(c.credits))/10), 1) AS cr_periodo,
-               "CR < 6" AS motivo
+               'CR < 6' AS motivo
         FROM students s, enrollments e, class_enrollments ce, courses c,
              course_types ct, course_classes cc, enrollment_statuses es
         WHERE s.id = e.student_id
         AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
         AND e.enrollment_status_id = es.id
-        AND es.name = "Regular"
+        AND es.name = 'Regular'
         AND ce.enrollment_id = e.id
         AND ct.has_score = 1
         AND ct.id = c.course_type_id
         AND c.id = cc.course_id
         AND cc.id = ce.course_class_id
-        AND ce.situation != "Incompleto"
+        AND ce.situation != 'Incompleto'
         AND ce.grade_not_count_in_gpr = False
         GROUP BY s.name, e.enrollment_number, cc.year, cc.semester
         HAVING SUM(ce.grade * c.credits)/SUM(c.credits) < 59.5
@@ -2626,18 +2626,18 @@ unless is_sqlite
                e.enrollment_number,
                cc.year,
                cc.semester,
-               "--" AS cr_periodo,
-               "2 reprovações" AS motivo
+               '--' AS cr_periodo,
+               '2 reprovações' AS motivo
         FROM students s, enrollments e, class_enrollments ce,
              courses c, course_classes cc, enrollment_statuses es
         WHERE s.id = e.student_id
         AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
         AND e.enrollment_status_id = es.id
-        AND es.name = "Regular"
+        AND es.name = 'Regular'
         AND ce.enrollment_id = e.id
         AND c.id = cc.course_id
         AND cc.id = ce.course_class_id
-        AND ce.situation = "Reprovado"
+        AND ce.situation = 'Reprovado'
         GROUP BY s.name, e.enrollment_number
         HAVING COUNT(*) >= 2
 
@@ -2648,19 +2648,19 @@ unless is_sqlite
                cc.year,
                cc.semester,
                round(((SUM(ce.grade * c.credits)/SUM(c.credits))/10), 1) AS cr_periodo,
-               "CR < 7 em dois períodos consecutivos" AS motivo
+               'CR < 7 em dois períodos consecutivos' AS motivo
         FROM students s, enrollments e, class_enrollments ce,
              courses c, course_types ct, course_classes cc, enrollment_statuses es
         WHERE s.id = e.student_id
         AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
         AND e.enrollment_status_id = es.id
-        AND es.name = "Regular"
+        AND es.name = 'Regular'
         AND ce.enrollment_id = e.id
         AND ct.has_score = 1
         AND ct.id = c.course_type_id
         AND c.id = cc.course_id
         AND cc.id = ce.course_class_id
-        AND ce.situation != "Incompleto"
+        AND ce.situation != 'Incompleto'
         AND ce.grade_not_count_in_gpr = False
         AND cc.year = :ano_semestre_atual
         AND cc.semester = :numero_semestre_atual
@@ -2670,13 +2670,13 @@ unless is_sqlite
                      course_types ct, course_classes cc, enrollment_statuses es
                      WHERE e.id NOT IN (SELECT enrollment_id FROM dismissals)
                      AND e.enrollment_status_id = es.id
-                     AND es.name = "Regular"
+                     AND es.name = 'Regular'
                      AND ce.enrollment_id = e.id
                      AND ct.has_score = 1
                      AND ct.id = c.course_type_id
                      AND c.id = cc.course_id
                      AND cc.id = ce.course_class_id
-                     AND ce.situation != "Incompleto"
+                     AND ce.situation != 'Incompleto'
                      AND ce.grade_not_count_in_gpr = False
                      AND cc.year = :ano_ultimo_semestre
                      AND cc.semester = :numero_ultimo_semestre
@@ -2698,8 +2698,8 @@ unless is_sqlite
         WHERE e.id = d.enrollment_id
         AND d.dismissal_reason_id = dr.id
         AND e.enrollment_status_id = es.id
-        AND dr.name = "Titulação"
-        AND es.name = "Regular"
+        AND dr.name = 'Titulação'
+        AND es.name = 'Regular'
         GROUP BY admission_date, level_id
         ORDER BY admission_date
       SQL
@@ -2715,8 +2715,8 @@ unless is_sqlite
         WHERE e.id = d.enrollment_id
         AND d.dismissal_reason_id = dr.id
         AND e.enrollment_status_id = es.id
-        AND dr.name = "Titulação"
-        AND es.name = "Regular"
+        AND dr.name = 'Titulação'
+        AND es.name = 'Regular'
         GROUP BY YEAR( d.date ) , level_id
       SQL
     },
@@ -2732,8 +2732,8 @@ unless is_sqlite
         WHERE e.id = d.enrollment_id
         AND e.enrollment_status_id = es.id
         AND d.dismissal_reason_id = dr.id
-        AND es.name = "Regular"
-        AND dr.name = "Titulação"
+        AND es.name = 'Regular'
+        AND dr.name = 'Titulação'
         AND e.student_id = s.id
         AND e.level_id = l.id
         ORDER BY YEAR, NIVEL, NOME
@@ -2751,8 +2751,8 @@ unless is_sqlite
         WHERE e.id = d.enrollment_id
         AND d.dismissal_reason_id = dr.id
         AND e.enrollment_status_id = es.id
-        AND dr.name = "Titulação"
-        AND es.name = "Regular"
+        AND dr.name = 'Titulação'
+        AND es.name = 'Regular'
         AND s.id = e.student_id
         GROUP BY YEAR( d.date ) , level_id, s.sex
       SQL
@@ -2767,8 +2767,8 @@ unless is_sqlite
         WHERE e.id = d.enrollment_id
         AND e.enrollment_status_id = es.id
         AND d.dismissal_reason_id = dr.id
-        AND es.name = "Regular"
-        AND dr.name = "Titulação"
+        AND es.name = 'Regular'
+        AND dr.name = 'Titulação'
         GROUP BY YEAR( d.date ) , level_id
       SQL
     },
@@ -2790,7 +2790,7 @@ unless is_sqlite
         AND states.country_id = c.id
         AND e.enrollment_status_id = es.id
           /* Aluno Regular */
-        AND es.name = "Regular"
+        AND es.name = 'Regular'
 
         /* Aluno estava ativo num determinado ano */
         /* Não foi desligado antes desse ano */
@@ -2802,7 +2802,7 @@ unless is_sqlite
         AND s.birth_state_id NOT IN (SELECT s2.id
                                     FROM states s2, countries c2
                                     WHERE s2.country_id = c2.id
-                                    AND c2.name = "Brasil")
+                                    AND c2.name = 'Brasil')
         ORDER BY s.name
       SQL
     },
@@ -2830,7 +2830,7 @@ unless is_sqlite
         AND e.id = d.enrollment_id
         AND d.dismissal_reason_id = dr.id
         AND e.enrollment_status_id = es.id
-        AND es.name = "Regular" /* Alunos regulares */
+        AND es.name = 'Regular' /* Alunos regulares */
         AND YEAR(d.date) = :ano
 
         UNION
@@ -2839,13 +2839,13 @@ unless is_sqlite
         SELECT s.name as "nome",
               e.enrollment_number as "matrícula",
               l.name as "nível",
-              "Aluno ativo" as "situação",
-              "N/A" as "data de desligamento"
+              'Aluno ativo' as "situação",
+              'N/A' as "data de desligamento"
         FROM students s, enrollments e, enrollment_statuses es, levels l
         WHERE s.id = e.student_id
         AND e.level_id = l.id
         AND e.enrollment_status_id = es.id
-        AND es.name = "Regular" /* Alunos regulares */
+        AND es.name = 'Regular' /* Alunos regulares */
         AND YEAR(e.admission_date) <= :ano /* não entrou depois do ano informado */
         AND e.id NOT IN (SELECT d.enrollment_id
                         FROM dismissals d
@@ -2866,8 +2866,8 @@ unless is_sqlite
         AND d.dismissal_reason_id = dr.id
         AND e.enrollment_status_id = es.id
         AND s.sex = 'F'
-        AND dr.name = "Titulação"
-        AND es.name = "Regular"
+        AND dr.name = 'Titulação'
+        AND es.name = 'Regular'
         GROUP BY YEAR( d.date ) , level_id
       SQL
     },
@@ -2991,12 +2991,12 @@ unless is_sqlite
         WHERE s.id = e.student_id
         AND a.enrollment_id = e.id
         AND a.phase_id = p.id
-        AND p.name = "Pedido de Banca" /* Etapa é pedido de banca */
+        AND p.name = 'Pedido de Banca' /* Etapa é pedido de banca */
         AND (a.obs IS NULL OR a.obs NOT LIKE '%VF OK%')
         AND e.id NOT IN (SELECT enrollment_id
                          FROM dismissals d, dismissal_reasons dr
                          WHERE d.dismissal_reason_id = dr.id
-                         AND dr.name = "Prazo") /* Não foi desligado ainda por prazo */
+                         AND dr.name = 'Prazo') /* Não foi desligado ainda por prazo */
         /* passou mais que 90 dias da defesa OU (mais que 30 E não foi aprovado com restrição) */
         AND ((DATEDIFF(:data_consulta, e.thesis_defense_date) > 90)
             OR ((a.obs IS NULL OR a.obs NOT LIKE '%ACR%') AND (DATEDIFF(:data_consulta, e.thesis_defense_date) > 30)))
@@ -3045,12 +3045,12 @@ unless is_sqlite
         AND ad.professor_id = p.id
         AND a.enrollment_id = e.id
         AND a.phase_id = ph.id
-        AND ph.name = "Pedido de Banca" /* Etapa é pedido de banca */
+        AND ph.name = 'Pedido de Banca' /* Etapa é pedido de banca */
         AND (a.obs IS NULL OR a.obs NOT LIKE '%VF OK%')
         AND e.id NOT IN (SELECT d.enrollment_id
                          FROM dismissals d, dismissal_reasons dr
                          WHERE d.dismissal_reason_id = dr.id
-                         AND dr.name = "Prazo") /* Não foi desligado ainda por prazo */
+                         AND dr.name = 'Prazo') /* Não foi desligado ainda por prazo */
         /* passou mais que 90 dias da defesa OU (mais que 30 E não foi aprovado com restrição) */
         AND ((DATEDIFF(:data_consulta, e.thesis_defense_date) > 90)
         OR ((a.obs IS NULL OR a.obs NOT LIKE '%ACR%') AND (DATEDIFF(:data_consulta, e.thesis_defense_date) > 30)))
@@ -3061,7 +3061,7 @@ unless is_sqlite
       params: [],
       notifications: [],
       sql: <<~SQL
-        SELECT DISTINCT CONCAT("1", REPLACE(REPLACE(p.cpf, ".", ""), "-", "")), p.email, p.name
+        SELECT DISTINCT CONCAT('1', REPLACE(REPLACE(p.cpf, '.', ''), '-', '')), p.email, p.name
         FROM advisement_authorizations aa, professors p
         WHERE aa.professor_id = p.id
         ORDER BY p.name
