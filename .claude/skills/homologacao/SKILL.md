@@ -44,18 +44,22 @@ Carregue com `set -a; source ~/.sapos_staging_env; set +a` antes de cada script.
 
 ## Ordem de execução
 
-A ordem importa. Escrita contamina a comparação, então vem por último.
+A ordem importa: escrita muda o que a captura enxerga, então cada lado escreve
+**antes** de ser fotografado, nunca entre as duas fotos.
 
 1. **Deploy da versão atual de produção** em homologação.
-2. **Captura "antes"** — os três conjuntos, em diretórios separados.
-3. **Ações de escrita** que você queira exercitar (disparo de notificação, por
-   exemplo), e **recaptura** dos conjuntos afetados, para que os dois lados
-   reflitam o mesmo estado.
-4. **Deploy da versão nova.**
-5. **Captura "depois"**, idêntica.
-6. **Comparação.**
+2. **Passada de escrita no lado "antes"** — ver "Passada de escrita". Os scripts
+   se limpam sozinhos, então o lado volta ao estado em que começou.
+3. **Captura "antes"** — os três conjuntos, em diretórios separados.
+4. **Ações de escrita adicionais** que a rodada queira exercitar e que **não** se
+   limpam (disparo de notificação, por exemplo), e **recaptura** dos conjuntos
+   afetados, para que os dois lados reflitam o mesmo estado.
+5. **Deploy da versão nova.**
+6. **Passada de escrita no lado "depois"**, idêntica à do passo 2.
+7. **Captura "depois"**, idêntica à do passo 3.
+8. **Comparação** — as capturas e os JSON das duas passadas de escrita.
 
-Entre 2 e 5 o banco **não pode ser reimportado**. Uma réplica nova traria
+Entre 3 e 7 o banco **não pode ser reimportado**. Uma réplica nova traria
 edições feitas em produção no meio do caminho, e diferenças de dado apareceriam
 como se fossem de código.
 
@@ -207,6 +211,66 @@ Comparar é diferenciar os dois JSON. Para medir o que ele não mede, acrescente
 seção **e recapture os dois lados**: sonda alterada no meio da rodada mede o
 instrumento, não a aplicação.
 
+### Estado que atravessa requisições
+
+A varredura estática carrega cada rota do zero, então **nada nela mede sessão**:
+filtro, ordenação e página que se perdem entre uma requisição e a seguinte
+passam pelas rotas todas sem um pixel de diferença. O `probe_sessao.rb` cobre
+isso na tela de Turmas — filtra, pagina, ordena e volta à lista, na mesma sessão.
+
+```bash
+EXPLORE_OUT=$LADO/sessao bundle exec ruby $S/probe_sessao.rb
+```
+
+Três coisas que essa medida ensina, e que valem para qualquer sonda de sessão:
+
+- **É a TROCA de filtro que mede.** Sob um filtro só, a página 2 sai correta
+  mesmo com a sessão quebrada, porque a busca guardada ainda é a certa. Uma
+  sonda que filtra uma vez e pagina devolve verde sempre.
+- **A primeira busca da sessão é privilegiada**, então a sonda abre sessão nova
+  antes de medir. Sem isso, quem congela é a busca que a própria descoberta de
+  dados fez, e as duas rodadas medem coisas diferentes.
+- **Zero linhas não é veredito.** Lista vazia pode ser "o filtro não pegou" ou
+  "o servidor está filtrando outra coisa". A sonda lê o `data-search` da faixa
+  de filtro do active_scaffold — o ano que o **servidor** diz estar aplicando —
+  e é esse campo, não a contagem, que se compara entre os dois lados.
+
+O relatório traz, por passo, `ano_filtrado_pelo_servidor` e `filtro_correto`.
+Comparar é diferenciar os dois JSON.
+
+### Tokens de inscrição na sessão
+
+O `probe_tokens_admissao.rb` mede a outra ponta do estado que atravessa
+requisições: processo com `require_session` só deixa abrir a inscrição no
+navegador que a recuperou, e a prova é o token guardado na sessão.
+
+```bash
+EXPLORE_OUT=$LADO/tokens bundle exec ruby $S/probe_tokens_admissao.rb
+```
+
+**Hoje ela não mede nada na réplica, e isso é esperado:** a homologação roda em
+ambiente *production*, onde `should_use_recaptcha` é true, e o `#find` valida o
+reCAPTCHA antes de procurar a inscrição. Selenium headless não passa, nenhum
+token entra na sessão, e a sonda **recusa a medida** em vez de reportar
+"desviou em tudo" — que se leria como defeito da aplicação. Medir de verdade
+exige uma instância com o reCAPTCHA desligado; é decisão do mantenedor.
+
+Três coisas que a sonda carrega e que valem para qualquer medida de autorização:
+
+- **Escolher o exemplar é parte da medida.** A réplica tem processos com e sem
+  `require_session`, e a coluna não aparece na lista de processos. Candidatura de
+  processo sem a trava abre para qualquer navegador: a sonda diria "abriu" nos
+  dois lados, e isso se leria como correção funcionando.
+- **O controle vem primeiro.** Abrir a inscrição *sem* ter recuperado nada tem de
+  ser negado; se não for, a sonda recusa a medida em vez de seguir.
+- **A negação não tem elemento de alerta.** A mensagem sai no corpo da página,
+  sem classe de alerta nenhuma — um seletor `.alert` devolve false sempre, e a
+  sonda concluiria "abriu" mesmo com a tela negada. O que decide é a URL: negado,
+  o controller manda para `/admissions`.
+
+**Não imprima a URL de recusa do `#find`:** ela devolve token e e-mail do
+candidato na query string.
+
 ### Medir por leitura o que o formulário exige
 
 Nem toda pergunta sobre formulário precisa de escrita. O que a página **exige de
@@ -218,6 +282,11 @@ que o `probe_formulario.rb` faz sobre a candidatura.
 EXPLORE_OUT=$ANTES/leitura bundle exec ruby $S/probe_formulario.rb        # descobre os registros
 EXPLORE_OUT=$DEPOIS/leitura bundle exec ruby $S/probe_formulario.rb 859   # ids escolhidos
 ```
+
+**No "depois", passe TODOS os ids que o "antes" mediu**, não só o exemplar
+principal. Sem id a sonda redescobre os registros e mede um conjunto diferente;
+o diff então acusa registro que existe de um lado só, e isso é o instrumento
+falando, não a aplicação. Os ids medidos estão no JSON do "antes".
 
 A medida central é a **divergência entre duas obrigatoriedades que se confundem**:
 o `<li>` ganha a classe `required` quando a *configuração do template* pede o
@@ -292,6 +361,14 @@ Três medidas que custam uma rodada cada:
   própria, com mensagem nomeando o campo — e o relatório acusa um bloqueio que é
   do instrumento, não do sistema.
 
+**Antes de escrever sonda para uma correção que veio de fora, prove que o caminho
+dela executa aqui.** Procure a chamada, a configuração que a liga, a condição que
+a guarda — e confirme que o padrão existe em algum lugar do projeto, porque busca
+vazia não é evidência. Sonda para caminho inalcançável devolve "sem diferença", e
+isso se lê como "não regrediu": é pior do que não medir, porque consome a rodada e
+entrega falsa garantia. Correção que não alcança este sistema entra no relatório
+como tal, sem instrumento.
+
 O `explore_common.rb` desta pasta é o ponto de partida para sonda nova: sobe o
 Chrome headless, loga lendo as mesmas env vars da captura e dá helpers de
 screenshot e de erro de console. Escreva os passos da rodada como scripts curtos
@@ -318,10 +395,73 @@ some quando se clica a ação a partir da lista.
 caminho de erro sem ler o console empurra os próprios erros para o relatório do
 fluxo seguinte, que os reporta como se fossem da tela dele.
 
+**Booleano do active_scaffold se lê no `checked`, nunca no campo oculto.** A
+lista renderiza cada booleano como o par do Rails — um `input[type=hidden]` com
+valor `0` mais um `input[type=checkbox]` —, então o oculto vale `0` em **toda**
+linha, marcada ou não. Ler o oculto responde "nenhum registro tem a flag" para
+qualquer coluna, e o falso negativo parece medida: leva a criar na réplica um
+caso que ela já tinha. O `innerText` da célula também não serve — vem vazio nos
+dois estados.
+
 **Conte elementos dentro do container, não por padrão de nome.** Um seletor por
 nome que não casa devolve sempre o mesmo número: a medida fica idêntica nos dois
 lados e cega a qualquer regressão. Meça algo que **mude** quando você mexe na
 tela, e confira que mudou, antes de confiar na comparação.
+
+### Passada de escrita — obrigatória quando a rodada precede uma release
+
+A comparação inteira é de leitura: ela prova que as telas continuam iguais, e não
+prova que **salvar** continua funcionando. A skill `release` exige essa passada
+antes de lançar; **faça-a como parte da rodada, sem esperar pedido.**
+
+**Rode nos dois lados, como tudo o mais.** Um só lado responde "salvar funciona
+agora?", que é portão de release; os dois respondem "a mudança quebrou o salvar?",
+que é a pergunta desta skill. Sem o lado "antes", ciclo que falha é ambíguo — pode
+já estar assim —, e é exatamente essa ambiguidade que a rodada existe para
+eliminar.
+
+Onde ela entra na ordem: **antes da captura de cada lado** (passos 2 e 6), e
+nunca entre a captura "antes" e a "depois". Os dois
+scripts se limpam sozinhos — foto que sobe e sai, candidatura que é criada e
+apagada —, então cada lado volta ao estado em que começou e as capturas dos dois
+lados enxergam a mesma coisa. O rastro que sobra é linha em `/versions` e
+`/reports`, que já divergem sempre por causa da própria varredura.
+
+```bash
+# passo 0: confira redirect_email (ver "Regras de segurança"). Trava em "".
+# LADO=$ANTES antes de capturar o antes; LADO=$DEPOIS antes de capturar o depois.
+EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/probe_escrita.rb              # diagnostico
+EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/probe_escrita.rb --confirmar  # ciclo de foto
+
+bundle exec ruby $S/abrir_processo_seletivo.rb abrir 5
+EXPLORE_OUT=$LADO/submissao_escrita bundle exec ruby $S/probe_submissao.rb --confirmar
+bundle exec ruby $S/abrir_processo_seletivo.rb fechar 5
+
+diff $ANTES/escrita/probe_escrita.json $DEPOIS/escrita/probe_escrita.json
+```
+
+Numa rodada em que o lado "antes" não foi corrido — porque a versão antiga já saiu
+do ar, por exemplo —, a passada no lado novo ainda vale como portão de release.
+Só não a leia como comparação: falha ali exige conferir a versão anterior antes de
+culpar a mudança.
+
+O que cada um cobre, e o que ler no relatório:
+
+- `probe_escrita.rb --confirmar` — formulário administrativo com upload
+  CarrierWave sobre o aluno de teste: sobe foto, salva, confere, remove, salva,
+  confere. O veredito é `voltou_ao_estado_inicial: true`, com
+  `upload_persistiu` e `remocao_persistiu` verdadeiros. Falso em qualquer um
+  deles é caminho de escrita quebrado, não ruído.
+- `probe_submissao.rb --confirmar` — formulário público de candidatura de ponta
+  a ponta: `criou: true` na fase 2 e `restantes com o marcador: 0` na limpeza.
+  **Resíduo na réplica é defeito da rodada**, não da aplicação: se sobrar
+  registro com o marcador, apague antes de seguir.
+
+O que a passada **não** cobre, e por isso não se conclui dela: disparo de e-mail.
+Só exercite e-mail quando a mudança tocar Devise, `lib/notifier.rb`, template de
+mensagem ou a entrega — e aí siga as "Regras de segurança", que pedem o valor
+vivo de `redirect_email` antes de qualquer disparo. Upgrade que não toca nada
+disso não justifica destravar a variável numa réplica de produção.
 
 ### Zero diferença na estática não é evidência sobre widget
 
@@ -351,9 +491,11 @@ Todo dado inserido por uma rodada some nessas horas, e com ele as rotas do
 existe, e imprime as linhas prontas para o `routes_aluno.txt` — os ids mudam a
 cada regeração. Rodar sem necessidade não custa nada.
 
-Os dois primeiros passos abaixo continuam manuais de propósito, pela armadilha
-descrita adiante; o script cobre do terceiro em diante e para com instruções se
-o aluno não existir.
+O script cobre o conjunto inteiro, na ordem certa, e confere cada etapa. Os dois
+primeiros passos já foram manuais, pela armadilha descrita adiante; deixaram de
+ser quando a conta de captura passou a ser criada pelo script de migração da
+réplica — é a existência dela que arma a trava, então o script agora exige a
+conta e aborta sem ela, em vez de confiar em quem executa.
 
 As telas do aluno precisam de três coisas que a réplica de produção não traz
 prontas. **A ordem não é indiferente.**
@@ -478,7 +620,8 @@ E cruze com a rede: sem resposta não-2xx no log de performance **e** sem 500 no
 
 ## Regras de segurança
 
-- **Somente leitura** durante as capturas, exceto no passo 3, deliberado.
+- **Somente leitura** durante as capturas. A escrita acontece nos passos 2, 4 e 6
+  da ordem de execução, deliberada e sempre fora da janela entre as duas fotos.
 - **Antes de disparar notificação**, rode o `simulate` e conte as mensagens.
   Notificação `individual` gera uma mensagem por linha do resultado — uma
   consulta ampla enche a caixa de quem recebe. As de prefixo `CORD` mandam um

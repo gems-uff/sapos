@@ -8,6 +8,9 @@ description: Lança uma nova versão do SAPOS — merge na main, tag anotada, la
 Sequência para transformar um ramo pronto em versão publicada. O passo final —
 o deploy em produção — **é do mantenedor**; a skill vai até a release no GitHub.
 
+É o último passo do ciclo descrito em `revisar-pr`, e chega-se aqui pelo caminho
+dela — que também descreve as saídas em que **não** se lança.
+
 ## Pré-requisitos
 
 Não comece sem isto:
@@ -15,8 +18,13 @@ Não comece sem isto:
 - Suíte completa verde no ramo (`bundle exec rspec`, ~12 min).
 - Homologação feita, quando a mudança toca o que a suíte não alcança (skill
   `homologacao`).
-- Passada manual do mantenedor em staging, quando houver caminho de escrita, PDF,
-  planilha ou e-mail envolvido — a captura automatizada é só leitura.
+- **Passada de escrita em staging**, quando houver caminho de escrita, PDF,
+  planilha ou e-mail envolvido — a captura da homologação é só leitura, e prova
+  que as telas continuam iguais, não que salvar continua funcionando. Ela é parte
+  da rodada de homologação (ver a seção "Passada de escrita" naquela skill) e
+  **não depende de pedido do mantenedor**: chegar aqui sem ela é chegar sem
+  pré-requisito. O que continua sendo dele é o juízo sobre o que mais exercitar à
+  mão, não a execução.
 - `main` sincronizada com `origin/main`: `git rev-list --left-right --count origin/main...main` → `0 0`.
 - **Árvore de trabalho limpa: `git status --short` vazio.** Se houver qualquer
   coisa não commitada, **pare e avise o mantenedor antes do merge** — mostrando o

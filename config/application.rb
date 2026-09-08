@@ -11,13 +11,30 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+# O active_scaffold 4.3 registra o initializer 'active_scaffold.testing', que
+# chama RSpec.configure ao subir o app sempre que defined?(RSpec) (engine.rb). O
+# guard é frouxo: num boot que não passa pelo binário do rspec -- rake, console,
+# assets:precompile em RAILS_ENV=test -- o Bundler.require acima carrega o grupo
+# :test e define o módulo RSpec, mas RSpec.configure (do rspec-core) só existe
+# quando o rspec-core é carregado, e o binário do rspec é quem o carrega primeiro.
+# Sem ele o initialize! estoura com NoMethodError e derruba db:schema:load,
+# db:migrate e afins (foi o que quebrou o CI, #621). Carregar o rspec-core quando
+# o grupo :test está ativo garante o método antes de qualquer engine initializer.
+# Em produção o grupo :test não entra, a condição é falsa, e nada disso carrega.
+require "rspec/core" if Rails.env.test?
+
 module Sapos
   class Application < Rails::Application
-    # Initialize configuration defaults for originally generated Rails version.
-    # Using defaults of rails < 5, since it was the original generated version.
-    #   Consider checking which defaults we should update:
+    # Defaults versionados do framework:
     #   https://guides.rubyonrails.org/configuring.html#versioned-default-values
-    config.load_defaults 7.1
+    #
+    # Das seis flags que a subida de 7.1 para 8.0 mexe, uma so muda algo aqui:
+    # Regexp.timeout = 1s. As outras cinco sao inocuas neste projeto -- o commit
+    # que fez a subida registra a verificacao de cada uma. A que merece nota por
+    # depender do ambiente e o yjit: nem o Ruby de desenvolvimento nem o de
+    # producao tem YJIT compilado (`defined?(RubyVM::YJIT)` devolve nil nos dois),
+    # entao ligar a flag nao liga JIT nenhum. Num Ruby com YJIT, ligaria.
+    config.load_defaults 8.0
 
     # ActiveScaffold defines callbacks for actions not always present in all controllers.
     # Rails 7.1 raised this to true by default, causing AbstractController::ActionNotFound.
