@@ -38,10 +38,15 @@ e quem ler depois entende por que aquele conserto apareceu do nada.
 
 ```
 git fetch origin
-git rev-list --left-right --count main...origin/<ramo>   # atrás / à frente
-git log --oneline origin/<ramo>..main                    # o que vai entrar
-git diff --numstat origin/<ramo>...main                  # em que arquivos
+git rev-list --left-right --count origin/main...HEAD   # atrás / à frente
+git log --oneline HEAD..origin/main                    # o que vai entrar
+git diff --numstat HEAD...origin/main                  # em que arquivos
 ```
+
+Tudo contra `origin/main` e `HEAD`, nunca contra a `main` local nem contra
+`origin/<ramo>`: o `git fetch` não avança a `main` local, e ramo vindo de fork
+não tem `origin/<ramo>` nenhum — se a origin tiver um homônimo, os três comandos
+resolvem contra o ramo errado sem reclamar.
 
 Cruze a lista de arquivos que a `main` mexeu com a dos que o ramo mexeu. A
 interseção é onde pode haver conflito de verdade — e é onde olhar primeiro
