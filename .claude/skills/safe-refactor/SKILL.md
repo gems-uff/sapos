@@ -49,7 +49,13 @@ e isso é resultado: encurta a lista do que precisa ser testado à mão.
 tocar o projeto, leia o diff da própria dependência antes de concluir —
 `gh api repos/<owner>/<repo>/compare/v<antiga>...v<nova>` devolve commits e patch.
 Entrada que anuncia "adicionamos X" pode ser lógica que apenas **mudou de lugar**,
-sem efeito nenhum na tela; o texto sozinho não distingue as duas coisas.
+sem efeito nenhum na tela; o texto sozinho não distingue as duas coisas. Quando o
+`gh api` não serve — gem fora do GitHub, tag que não bate com a versão publicada,
+rede filtrada —, resta comparar o fonte instalado das duas versões
+(`~/.rvm/gems/*/gems/<gem>-<versão>*/`; gem nativa leva sufixo de plataforma no
+nome do diretório). É menos que o diff do repositório: a árvore instalada traz só
+o que o gemspec empacota — sem `spec/`, muitas vezes sem changelog, nunca com
+mensagem de commit —, e a versão antiga só está lá enquanto ninguém a removeu.
 
 **Duas armadilhas nesse passo:**
 
@@ -90,9 +96,10 @@ jeitos não protege nada. Custa segundos.
 Três maneiras de essa checagem mentir:
 
 - **Simular a versão antiga de cabeça.** Num upgrade de gem, "como era antes" não
-  se reconstrói de memória nem do changelog: as duas versões **convivem no disco**
-  (`~/.rvm/gems/*/gems/<gem>-<versão>/`), e o código da anterior é a única
-  simulação válida. Substituir o método novo por uma aproximação escrita à mão
+  se reconstrói de memória nem do changelog: **o código da versão anterior é a
+  única simulação válida** — do diretório dela
+  (`~/.rvm/gems/*/gems/<gem>-<versão>*/`) enquanto ainda estiver instalada, ou do
+  fonte publicado. Substituir o método novo por uma aproximação escrita à mão
   produz uma versão que nunca existiu — e o vermelho que ela dá "confirma" um
   comportamento antigo imaginário.
 - **Sabotagem não representativa.** Estragar um trecho de que o exemplo não
