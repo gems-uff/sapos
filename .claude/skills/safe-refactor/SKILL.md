@@ -140,7 +140,8 @@ Aqui o critério muda, e é você quem decide:
 - **Feature** — a diferença esperada é o comportamento novo, e o código antigo
   deveria seguir igual.
 
-Nos dois últimos casos, **declare antes de rodar quais diferenças você espera**.
+Nos três casos, **declare antes de rodar quais diferenças você espera** — na
+refatoração a lista é vazia, e escrevê-la vazia já é a declaração.
 Sem essa lista feita de antemão, é fácil olhar para uma diferença inesperada e
 racionalizá-la como intencional.
 
