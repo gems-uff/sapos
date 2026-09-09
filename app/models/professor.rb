@@ -136,6 +136,15 @@ class Professor < ApplicationRecord
     "#{self.name}"
   end
 
+  # True when the professor holds an accreditation valid on +date+ for +level+.
+  # Iterates the loaded association in memory on purpose, so advisements being
+  # validated with not-yet-saved (nested) authorizations are still considered.
+  def accredited_on?(level, date = Date.current)
+    advisement_authorizations.any? do |auth|
+      auth.level == level && auth.active_on?(date)
+    end
+  end
+
   def changed_to_different_user
     if (user_id_changed?) && (!user_id.blank?) && (!user_id_was.blank?)
       errors.add(:user, :changed_to_different_user)

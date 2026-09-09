@@ -136,7 +136,7 @@ class StudentEnrollmentController < ApplicationController
         .where(course_types: { on_demand: true })
       @advisement_authorizations = Professor
         .joins(:advisement_authorizations)
-        .where(advisement_authorizations: { end_date: nil })
+        .merge(AdvisementAuthorization.on_date(Date.current))
         .order(:name).distinct
       @enrollment_request = EnrollmentRequest.find_or_initialize_by(
         enrollment: @enrollment,

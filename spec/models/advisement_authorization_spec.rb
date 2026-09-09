@@ -56,6 +56,20 @@ RSpec.describe AdvisementAuthorization, type: :model do
         other = FactoryBot.build(:advisement_authorization, professor: professor, level: other_level, end_date: nil)
         expect(other).to be_valid
       end
+      it "does not raise a spurious duplicate error when professor and level are blank" do
+        # Sem professor/nível, a checagem não deve casar outras linhas em branco:
+        # o erro esperado é o de presença, não o de credenciamento ativo duplicado.
+        # A linha-fantasma (professor/nível nulos) só existe forçando o save sem
+        # validação; sem a guarda, `where(professor_id: nil, level_id: nil)` a
+        # casaria e o segundo registro em branco herdaria o erro de duplicidade.
+        ghost = AdvisementAuthorization.new(professor: nil, level: nil, start_date: Time.now, end_date: nil)
+        ghost.save(validate: false)
+        other = AdvisementAuthorization.new(professor: nil, level: nil, start_date: Time.now, end_date: nil)
+        other.valid?
+        expect(other.errors[:base]).not_to include(
+          I18n.t("activerecord.errors.models.advisement_authorization.active_authorization_exists")
+        )
+      end
     end
   end
 
@@ -69,6 +83,31 @@ RSpec.describe AdvisementAuthorization, type: :model do
                                      start_date: Time.now - 2.days, end_date: Time.now - 1.day)
         expect(AdvisementAuthorization.active).to include(active)
         expect(AdvisementAuthorization.active).not_to include(inactive)
+      end
+    end
+
+    describe "on_date" do
+      it "includes an open period already started" do
+        auth = FactoryBot.create(:advisement_authorization, professor: professor, level: level,
+                                 start_date: Date.current - 1.day, end_date: nil)
+        expect(AdvisementAuthorization.on_date(Date.current)).to include(auth)
+      end
+      it "excludes an open period whose start_date is in the future" do
+        # Este é o descasamento que o filtro de vigência corrige: end_date nil
+        # não basta; o credenciamento só passa a valer a partir do start_date.
+        auth = FactoryBot.create(:advisement_authorization, professor: professor, level: level,
+                                 start_date: Date.current + 1.day, end_date: nil)
+        expect(AdvisementAuthorization.on_date(Date.current)).not_to include(auth)
+      end
+      it "includes the end_date day itself (inclusive upper bound)" do
+        auth = FactoryBot.create(:advisement_authorization, professor: professor, level: level,
+                                 start_date: Date.current - 2.days, end_date: Date.current)
+        expect(AdvisementAuthorization.on_date(Date.current)).to include(auth)
+      end
+      it "excludes a period already closed before the date" do
+        auth = FactoryBot.create(:advisement_authorization, professor: professor, level: level,
+                                 start_date: Date.current - 2.days, end_date: Date.current - 1.day)
+        expect(AdvisementAuthorization.on_date(Date.current)).not_to include(auth)
       end
     end
   end
