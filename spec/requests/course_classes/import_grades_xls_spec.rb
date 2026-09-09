@@ -8,7 +8,8 @@ require "rails_helper"
 # Estes exemplos descrevem o que a importacao de notas precisa fazer. Os do
 # contexto "como administrador" e "como professor" ja passam, e ficam como
 # guarda: a cadeia de calculo, a escala da nota e a autorizacao por turma sao o
-# que eles travam.
+# que eles travam. Os do contexto "defeitos em aberto" falham -- sao o criterio
+# de aceitacao do proximo conserto, e cada um diz junto qual e a causa.
 RSpec.describe "Importacao de notas por planilha", type: :request do
   let(:course_type) { FactoryBot.create(:course_type, has_score: true) }
   let(:course) { FactoryBot.create(:course, course_type: course_type) }
@@ -275,6 +276,163 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
 
       enviar(inscricao, nota: "9,0")
       confirmar
+
+      expect(inscricao.reload.grade).to be_nil
+    end
+  end
+
+  # Estes falham. Sao os defeitos que a rodada de revisao confirmou por
+  # reproducao, e ficam aqui como criterio de aceitacao do proximo conserto.
+  context "defeitos em aberto" do
+    before(:each) do
+      role = FactoryBot.create(:role_administrador)
+      sign_in create_confirmed_user([role], "admin@ic.uff.br")
+      variavel_customizada("grade_of_disapproval_for_absence", "1,0")
+    end
+
+    # A comparacao com ATTENDANCE_TRUE ("S") e exata, e nada sinaliza o valor
+    # que nao casa -- ao contrario da coluna de situacao, que tem
+    # invalid_situation. Qualquer outra grafia ("Sim", "s", "P", "1") e lida
+    # como ausencia: a nota da planilha e descartada, entra
+    # grade_of_disapproval_for_absence, a situacao vira "Reprovado" e a tela
+    # anuncia sucesso.
+    it "nao reprova por falta com valor de frequencia que nao reconhece" do
+      enviar(inscricao, nota: "8,7", frequencia: "Sim")
+      confirmar
+
+      expect(inscricao.reload.disapproved_by_absence).to be_falsey
+    end
+
+    it "preserva a nota da planilha quando a frequencia vem em outra grafia" do
+      enviar(inscricao, nota: "8,7", frequencia: "Sim")
+      confirmar
+
+      expect(inscricao.reload.grade).to eq(87)
+    end
+
+    # String#to_f devolve 0.0 para o que nao comeca por numero, e a celula e
+    # present?, entao "-", "N/A" ou "falta" entram como 0,0 e o recalculo poe
+    # "Reprovado". Zero que nunca apareceu na planilha.
+    it "nao transforma nota nao numerica em zero" do
+      enviar(inscricao, nota: "N/A")
+      confirmar
+
+      expect(inscricao.reload.grade).not_to eq(0)
+    end
+
+    # O rescue cobre ArgumentError, que parse_rows_xls levanta antes de abrir o
+    # arquivo. Quem renomeia um .xls ou um .csv para .xlsx passa da lista branca
+    # e o roo levanta Zip::Error de dentro, que ninguem trata.
+    it "avisa em vez de estourar quando o .xlsx nao e um zip valido" do
+      falso = Tempfile.new(["falso", ".xlsx"])
+      falso.write("nao sou um zip")
+      falso.rewind
+      post import_grades_xls_course_class_path(turma), params: {
+        spreadsheet: Rack::Test::UploadedFile.new(
+          falso.path, nil, false, original_filename: "falso.xlsx"
+        )
+      }
+
+      expect(response.status).to be < 500
+    end
+
+    # params[:confirm] e conferido antes de request.post?, e a rota aceita GET.
+    # Requisicao GET nao passa pela verificacao de token do
+    # protect_from_forgery, entao a gravacao fica alcancavel por um GET
+    # disparado de fora, enquanto houver previa pendente na sessao.
+    it "nao aplica a importacao por GET" do
+      enviar(inscricao, nota: "8,7")
+
+      get import_grades_xls_course_class_path(turma), params: { confirm: "1" }
+
+      expect(inscricao.reload.grade).to be_nil
+    end
+
+    # grade_not_count_in_gpr e o que permite "Aprovado" com nota abaixo do
+    # minimo, com justificativa -- e o recalculo da importacao passa por cima
+    # dele, mesmo quando a coluna de nota vem vazia.
+    it "nao desfaz o aprovado com nota que nao conta no CR" do
+      inscricao.update!(
+        grade: 10, situation: ClassEnrollment::APPROVED,
+        grade_not_count_in_gpr: true,
+        justification_grade_not_count_in_gpr: "convalidacao"
+      )
+      enviar(inscricao, nota: nil, situacao: ClassEnrollment::APPROVED)
+      confirmar
+
+      expect(inscricao.reload.situation).to eq(ClassEnrollment::APPROVED)
+    end
+
+    # Em disciplina sem nota, a reprovacao por falta poe
+    # grade_of_disapproval_for_absence na nota, e a validacao
+    # grade_filled_for_course_without_score recusa o registro inteiro. A
+    # previa mostra a linha como "Pronto".
+    it "importa a reprovacao por falta em disciplina sem nota" do
+      tipo = FactoryBot.create(:course_type, has_score: false)
+      turma_sem_nota = FactoryBot.create(
+        :course_class, course: FactoryBot.create(:course, course_type: tipo)
+      )
+      sem_nota = FactoryBot.create(
+        :class_enrollment, course_class: turma_sem_nota,
+        grade: nil, situation: ClassEnrollment::REGISTERED
+      )
+      post import_grades_xls_course_class_path(turma_sem_nota), params: {
+        spreadsheet: pauta_de_linhas([
+          linha(sem_nota, nota: nil, frequencia: ClassEnrollment::ATTENDANCE_FALSE)
+        ])
+      }
+      confirmar(turma_sem_nota)
+
+      expect(sem_nota.reload.disapproved_by_absence).to eq(true)
+    end
+
+    # apply_xls_import_changes manda os erros de validacao para
+    # Rails.logger.debug e devolve so a contagem do que entrou. Com 2 linhas,
+    # uma valida e uma recusada, a tela anuncia "1 nota(s) importada(s) com
+    # sucesso!" e nao ha como saber qual ficou de fora.
+    it "diz que alguma linha nao foi gravada" do
+      recusada = FactoryBot.create(
+        :class_enrollment, course_class: turma,
+        grade: nil, situation: ClassEnrollment::REGISTERED
+      )
+      post import_grades_xls_course_class_path(turma), params: {
+        spreadsheet: pauta_de_linhas([
+          linha(inscricao, nota: "8,7"),
+          linha(recusada, nota: "99,0")
+        ])
+      }
+      confirmar
+
+      expect(flash[:error]).to be_present
+    end
+
+    # O laco de apply_xls_import_changes grava registro a registro, sem
+    # transacao. O gatilho concreto e o after_save da propria inscricao:
+    # notify_student_and_advisor termina em mail.deliver!, sincrono, uma vez por
+    # aluno dentro da mesma requisicao -- SMTP que cai no meio da pauta deixa
+    # gravada a parte que ja passou, e nada registra onde parou.
+    it "nao aplica metade da importacao quando uma linha estoura" do
+      segunda = FactoryBot.create(
+        :class_enrollment, course_class: turma,
+        grade: nil, situation: ClassEnrollment::REGISTERED
+      )
+      envios = 0
+      allow(Notifier).to receive(:send_emails) do
+        envios += 1
+        raise Net::SMTPServerBusy, "conexao caiu no meio da pauta" if envios == 2
+      end
+
+      post import_grades_xls_course_class_path(turma), params: {
+        spreadsheet: pauta_de_linhas([
+          linha(inscricao, nota: "8,7"),
+          linha(segunda, nota: "9,0")
+        ])
+      }
+      begin
+        confirmar
+      rescue Net::SMTPServerBusy
+        nil
+      end
 
       expect(inscricao.reload.grade).to be_nil
     end

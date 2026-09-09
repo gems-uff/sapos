@@ -160,6 +160,25 @@ RSpec.describe "ClassEnrollments features", type: :feature do
       expect(page).to have_field("Nota", with: "1,0")
     end
 
+    # O JS troca '%{actual_grade}' e '%{grade_for_disapproval}' na mensagem, e o
+    # locale escreve os dois nomes sem os delimitadores -- entao nenhum dos dois
+    # replace encontra o que procura e o professor le o nome do marcador em vez
+    # da nota. A mensagem e consumida por JS, nao por I18n.t com argumentos,
+    # entao pode levar %{} no yml sem risco de MissingInterpolationArgument.
+    it "names the two grades in the overwrite confirmation" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "05"
+      end
+      expect(page).to have_field("Nota", with: "0,5")
+
+      mensagem = accept_confirm do
+        find(:css, "#record_disapproved_by_absence_").set(true)
+      end
+
+      expect(mensagem).to include("0,5").and include("1,0")
+    end
+
     it "resets the student situation when the grade field is cleared" do
       page.send_keys :escape
       within(".as_form") do
