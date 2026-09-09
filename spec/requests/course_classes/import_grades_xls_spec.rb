@@ -5,9 +5,10 @@
 
 require "rails_helper"
 
-# Estes exemplos descrevem o que a importacao de notas precisa fazer, e hoje
-# falham -- sao o criterio de aceitacao do conserto, nao um retrato do que esta
-# implementado. Cada bloco diz, junto, qual e o defeito que o faz falhar.
+# Estes exemplos descrevem o que a importacao de notas precisa fazer. Os do
+# contexto "como administrador" e "como professor" ja passam, e ficam como
+# guarda: a cadeia de calculo, a escala da nota e a autorizacao por turma sao o
+# que eles travam.
 RSpec.describe "Importacao de notas por planilha", type: :request do
   let(:course_type) { FactoryBot.create(:course_type, has_score: true) }
   let(:course) { FactoryBot.create(:course, course_type: course_type) }
@@ -27,18 +28,22 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
     end
   end
 
-  # Reproduz a pauta que o proprio sistema exporta, com a coluna de nota
+  # Uma linha da pauta que o proprio sistema exporta, com a coluna de nota
   # preenchida por fora -- o caminho descrito na issue.
-  def pauta(class_enrollment, nota:, frequencia: ClassEnrollment::ATTENDANCE_TRUE,
-            situacao: nil, arquivo: "pauta.xlsx")
+  def linha(class_enrollment, nota:, frequencia: ClassEnrollment::ATTENDANCE_TRUE,
+            situacao: nil, obs: nil)
+    [
+      1, class_enrollment.enrollment.enrollment_number, "aluno", "aluno@test.com",
+      nota, frequencia, situacao || class_enrollment.situation, obs, "Nao",
+      I18n.l(class_enrollment.created_at, format: :defaultdatetime)
+    ]
+  end
+
+  def pauta_de_linhas(linhas, arquivo: "pauta.xlsx")
     pacote = Axlsx::Package.new
     pacote.workbook.add_worksheet(name: "Pauta da Turma") do |sheet|
       sheet.add_row cabecalho
-      sheet.add_row [
-        1, class_enrollment.enrollment.enrollment_number, "aluno", "aluno@test.com",
-        nota, frequencia, situacao || class_enrollment.situation, nil, "Nao",
-        I18n.l(class_enrollment.created_at, format: :defaultdatetime)
-      ]
+      linhas.each { |uma| sheet.add_row uma }
     end
     tempfile = Tempfile.new(["pauta", File.extname(arquivo)])
     tempfile.binmode
@@ -47,23 +52,33 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
     Rack::Test::UploadedFile.new(tempfile.path, nil, false, original_filename: arquivo)
   end
 
+  def pauta(class_enrollment, arquivo: "pauta.xlsx", **kwargs)
+    pauta_de_linhas([linha(class_enrollment, **kwargs)], arquivo: arquivo)
+  end
+
   def enviar(class_enrollment, **kwargs)
     post import_grades_xls_course_class_path(turma),
       params: { spreadsheet: pauta(class_enrollment, **kwargs) }
   end
 
-  def confirmar_o_que_foi_previsto
-    payload = Nokogiri::HTML(response.body).css('input[name="changes"]').first
-    post import_grades_xls_course_class_path(turma),
-      params: { confirm: "1", changes: payload&.[]("value") }
+  # A previa fica guardada na sessao; o passo de confirmacao nao carrega payload
+  # nenhum, e e justamente isso que impede o navegador de ditar o que e gravado.
+  def confirmar(turma_alvo = turma)
+    post import_grades_xls_course_class_path(turma_alvo), params: { confirm: "1" }
+  end
+
+  def variavel_customizada(nome, valor)
+    variavel = CustomVariable.find_or_initialize_by(variable: nome)
+    variavel.value = valor
+    variavel.save(validate: false)
   end
 
   def politica_de_lancamento(valor)
-    variavel = CustomVariable.find_or_initialize_by(
-      variable: "professor_login_can_post_grades"
-    )
-    variavel.value = valor
-    variavel.save(validate: false)
+    variavel_customizada("professor_login_can_post_grades", valor)
+  end
+
+  def celulas_da_previa
+    Nokogiri::HTML(response.body).css("tbody td").map { |td| td.text.strip }
   end
 
   context "como administrador" do
@@ -74,43 +89,42 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
 
     # A situacao vem da planilha como "Incompleto" -- e o que o proprio export
     # escreve para quem ainda nao tem nota. Cabe a importacao recalcular para
-    # "Aprovado" a partir da nota, e hoje ela nao recalcula: compara a nota da
-    # planilha ("8,7", escala de exibicao) com minimum_grade_for_approval (60,
-    # escala interna). Como nao recalcula, a validacao recusa nota com situacao
-    # "Incompleto"; e como apply_xls_import_changes ignora o retorno de save,
-    # o erro vira uma linha de log e a tela anuncia sucesso.
+    # "Aprovado" a partir da nota, e para isso os dois lados da comparacao tem
+    # de estar na mesma escala: a planilha entrega "8,7" (exibicao) e
+    # minimum_grade_for_approval devolve 60 (interna, x10). Sem o recalculo a
+    # validacao recusaria nota com situacao "Incompleto".
     it "grava a nota preenchida na planilha" do
       enviar(inscricao, nota: "8,7")
-      confirmar_o_que_foi_previsto
+      confirmar
 
       expect(inscricao.reload.grade).to eq(87)
     end
 
     it "recalcula a situacao a partir da nota" do
       enviar(inscricao, nota: "8,7")
-      confirmar_o_que_foi_previsto
+      confirmar
 
       expect(inscricao.reload.situation).to eq(ClassEnrollment::APPROVED)
     end
 
     it "nao anuncia sucesso quando nada foi gravado" do
       enviar(inscricao, nota: "8,7")
-      confirmar_o_que_foi_previsto
+      confirmar
 
       anunciou_sucesso = flash[:info].present?
       expect(anunciou_sucesso).to eq(inscricao.reload.grade.present?)
     end
 
-    # Coluna "Freq S/I" vazia cai em class_enrollment.attendance, que nao existe
-    # no modelo -- ha disapproved_by_absence e attendance_to_label.
+    # Coluna "Freq S/I" vazia nao pode cair em class_enrollment.attendance, que
+    # nao existe no modelo -- ha disapproved_by_absence e attendance_to_label.
     it "aceita planilha com a coluna de frequencia em branco" do
       enviar(inscricao, nota: "8,7", frequencia: nil)
 
       expect(response.status).to be < 500
     end
 
-    # parse_rows_xls levanta ArgumentError e ninguem trata. A chave de locale
-    # import_grades_xls_error existe e nao tem consumidor.
+    # parse_rows_xls levanta ArgumentError, e a acao tem de traduzir isso na
+    # chave de locale import_grades_xls_error em vez de deixar subir.
     it "avisa em vez de estourar quando o arquivo nao e planilha" do
       texto = Tempfile.new(["nota", ".txt"])
       texto.write("nao sou uma planilha")
@@ -124,29 +138,28 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
       expect(response.status).to be < 500
     end
 
-    # A lista branca aceita .xls, mas o roo 3.x so le OOXML; ler BIFF exigiria a
-    # gem roo-xls, que nao esta no Gemfile.lock. O rotulo do formulario ja diz
-    # apenas ".xlsx".
+    # O roo 3.x so le OOXML; ler BIFF exigiria a gem roo-xls, que nao esta no
+    # Gemfile.lock. Por isso .xls fica fora da lista branca -- o rotulo do
+    # formulario ja diz apenas ".xlsx".
     it "recusa .xls com aviso, e nao com erro de servidor" do
       enviar(inscricao, nota: "8,7", arquivo: "pauta.xls")
 
       expect(response.status).to be < 500
     end
 
-    # current_grade sai de class_enrollment[:grade], que e o inteiro cru, e a
-    # nota nova sai da planilha na escala de exibicao: a tabela mostra "87" ao
-    # lado de "9,0".
+    # A nota nova sai da planilha na escala de exibicao, entao a nota atual tem
+    # de sair de grade_to_view e nao do inteiro cru -- senao a tabela mostra
+    # "87" ao lado de "9,0".
     it "mostra nota atual e nota nova na mesma escala" do
       inscricao.update!(grade: 87, situation: ClassEnrollment::APPROVED)
       enviar(inscricao, nota: "9,0", situacao: ClassEnrollment::APPROVED)
 
-      celulas = Nokogiri::HTML(response.body).css("tbody td").map { |td| td.text.strip }
-      expect(celulas[2]).to eq("8,7")
+      expect(celulas_da_previa[2]).to eq("8,7")
     end
 
-    # O status vem como simbolo (:not_enrolled) enquanto os outros dois sao
-    # strings, e a view compara com string: a celula sai vazia e o aviso de
-    # aluno nao inscrito nunca aparece.
+    # O status tem de ser string como os outros dois ("not_found", "pending"),
+    # porque e assim que a view compara; simbolo deixa a celula vazia e o aviso
+    # de aluno nao inscrito nunca aparece.
     it "identifica na previa o aluno que nao esta inscrito na turma" do
       outra_turma = FactoryBot.create(:course_class, course: course)
       de_fora = FactoryBot.create(
@@ -185,7 +198,7 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
 
     it "rebaixa a situacao quando a nota informada nao sustenta o aprovado da planilha" do
       enviar(inscricao, nota: "1,0", situacao: ClassEnrollment::APPROVED)
-      confirmar_o_que_foi_previsto
+      confirmar
 
       expect(inscricao.reload.situation).to eq(ClassEnrollment::DISAPPROVED)
     end
@@ -208,43 +221,60 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
       )
     end
 
+    # A autorizacao tem de ser avaliada sobre a turma, nao sobre a classe:
     # authorize_resource roda antes da acao, quando @course_class ainda e nil, e
-    # por isso autoriza a classe CourseClass em vez da turma; a condicao
-    # professor: user.professor nunca chega a ser avaliada. O corpo da acao faz
-    # CourseClass.find(params[:id]) sem nenhuma conferencia, e o payload de
-    # confirmacao volta do navegador e e gravado como veio -- por isso o ataque
-    # dispensa planilha.
+    # o CanCan nao tem como avaliar "professor: user.professor" sobre uma classe
+    # -- deixa passar. Por isso a acao carrega a turma e chama authorize! sobre
+    # ela.
+    #
+    # A recusa aparece como 500, porque CanCan::AccessDenied nao tem mapeamento
+    # em rescue_responses (mesmo registro de spec/requests/assertion_authorization_spec.rb).
+    #
+    # O envio da pauta e o passo que precisa ser barrado: e por ele que a previa
+    # entra na sessao, e sem previa na sessao o passo de confirmacao nao tem o
+    # que gravar. Afirmar so o segundo passo daria verde mesmo com a autorizacao
+    # arrancada.
+    it "nao deixa professor de outra turma nem chegar a previa" do
+      politica_de_lancamento("yes_all_semesters")
+      entrar_como(outro_professor, "outro@ic.uff.br")
+
+      enviar(inscricao, nota: "9,0")
+
+      expect(response.status).to eq(500)
+    end
+
     it "nao deixa professor de outra turma gravar nota" do
       politica_de_lancamento("yes_all_semesters")
       entrar_como(outro_professor, "outro@ic.uff.br")
 
-      post import_grades_xls_course_class_path(turma), params: {
-        confirm: "1",
-        changes: [{
-          class_enrollment_id: inscricao.id, status: "pending",
-          final_grade: "9.0", final_attendance: true,
-          final_situation: ClassEnrollment::APPROVED, final_obs: "de fora"
-        }].to_json
-      }
+      enviar(inscricao, nota: "9,0")
+      confirmar
 
       expect(inscricao.reload.grade).to be_nil
     end
 
-    # A regra foi parar em Ability#initialize_professors, solta da politica
-    # professor_login_can_post_grades que condiciona todo o resto do lancamento
-    # de notas em initialize_courses.
+    # Controle: o titular da turma, com a politica ligada, atravessa os dois
+    # passos. Sem ele, o vermelho acima nao distingue autorizacao viva de
+    # cenario mal montado.
+    it "deixa o titular da turma gravar quando a politica permite" do
+      politica_de_lancamento("yes_all_semesters")
+      entrar_como(professor_da_turma, "titular@ic.uff.br")
+
+      enviar(inscricao, nota: "9,0")
+      confirmar
+
+      expect(inscricao.reload.grade).to eq(90)
+    end
+
+    # A regra vive em Ability#initialize_courses, condicionada a
+    # professor_login_can_post_grades como todo o resto do lancamento de notas
+    # -- e nao solta em initialize_professors, onde a politica nao alcanca.
     it "respeita a politica que desliga o lancamento de notas por professor" do
       politica_de_lancamento("no")
       entrar_como(professor_da_turma, "titular@ic.uff.br")
 
-      post import_grades_xls_course_class_path(turma), params: {
-        confirm: "1",
-        changes: [{
-          class_enrollment_id: inscricao.id, status: "pending",
-          final_grade: "9.0", final_attendance: true,
-          final_situation: ClassEnrollment::APPROVED, final_obs: nil
-        }].to_json
-      }
+      enviar(inscricao, nota: "9,0")
+      confirmar
 
       expect(inscricao.reload.grade).to be_nil
     end
