@@ -11,6 +11,12 @@ module PdfHelper
   HEIGHT = 90
   FOOTER_TOP_MARGIN = 2
 
+  WATERMARK_ANGLE = 60
+  WATERMARK_FONT_SIZE = 25
+  # Folga entre a marca d'água e a borda do papel. Sem ela, o papel em que a
+  # frase mal cabe — A4 em paisagem, medido — encosta a tinta na borda.
+  WATERMARK_PAPER_MARGIN = 0.5.cm
+
   def header(pdf, title, pdf_config, options = {}, &block)
     if pdf_config.nil?
       # report, transcript, grades_report, schedule
@@ -379,19 +385,33 @@ module PdfHelper
       end
       if options[:watermark] && pdf_config.signature_type != "qr_code"
         pdf.create_stamp("watermark") do
-          pdf.rotate(60, origin: [0, 0]) do
+          # canvas dá as coordenadas da PÁGINA. A marca não pode se apoiar na
+          # caixa de texto: as margens do documento são assimétricas e a de
+          # baixo ainda cresce para caber o rodapé de assinatura, então apoiada
+          # nela a marca subiria junto com o rodapé.
+          pdf.canvas do
             pdf.fill_color "993333"
-            pdf.font("FreeMono", size: 25) do
-              pdf.draw_text(
-                I18n.t("pdf_content.watermark"), at: [0, 0]
+            pdf.font("FreeMono", size: WATERMARK_FONT_SIZE) do
+              band = watermark_band(
+                pdf.bounds.width, pdf.bounds.height, pdf.font.height
               )
+              pdf.rotate(WATERMARK_ANGLE, origin: band[:center]) do
+                pdf.text_box(
+                  I18n.t("pdf_content.watermark"),
+                  at: [band[:left], band[:top]],
+                  width: band[:width],
+                  height: band[:height],
+                  align: :center,
+                  valign: :center,
+                  single_line: true,
+                  overflow: :shrink_to_fit
+                )
+              end
             end
             pdf.fill_color "000000"
           end
         end
-        pdf.repeat(:all) do
-          pdf.stamp_at "watermark", [80, 0]
-        end
+        pdf.repeat(:all) { pdf.stamp("watermark") }
       end
     end
 
@@ -545,6 +565,35 @@ module PdfHelper
     data = download_by_identifier_reports_url(identifier: @qrcode_identifier)
 
     pdf.print_qr_code(data, extent: options[:size] || 80, align: :center)
+  end
+
+  # Faixa em que a marca d'água é escrita: atravessa o centro da página no
+  # ângulo do carimbo, com o maior comprimento que o papel permite nesse ângulo.
+  # Centrar o texto na faixa e girar a faixa em torno do centro da página
+  # centra a marca no papel — qualquer que seja o comprimento da frase, que
+  # muda quando alguém edita ou traduz `pdf_content.watermark`, e qualquer que
+  # seja o tamanho do papel.
+  #
+  # A faixa é mais comprida que a página, e por isso começa fora dela (`left`
+  # negativo em A4): quem a limita é a diagonal, depois do giro.
+  def watermark_band(page_width, page_height, band_height,
+                     angle = WATERMARK_ANGLE)
+    radians = angle * Math::PI / 180
+    available_width = page_width - (2 * WATERMARK_PAPER_MARGIN)
+    available_height = page_height - (2 * WATERMARK_PAPER_MARGIN)
+    # Divisão por zero devolve Infinity, então o ângulo reto (sem componente
+    # horizontal) e o ângulo nulo caem no lado que de fato limita a faixa.
+    width = [
+      available_width / Math.cos(radians).abs,
+      available_height / Math.sin(radians).abs
+    ].min
+    {
+      width: width,
+      height: band_height,
+      left: (page_width - width) / 2.0,
+      top: (page_height + band_height) / 2.0,
+      center: [page_width / 2.0, page_height / 2.0]
+    }
   end
 
   def setup_pdf_config(pdf_type, options)

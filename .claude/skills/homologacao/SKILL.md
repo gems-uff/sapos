@@ -211,6 +211,66 @@ Comparar é diferenciar os dois JSON. Para medir o que ele não mede, acrescente
 seção **e recapture os dois lados**: sonda alterada no meio da rodada mede o
 instrumento, não a aplicação.
 
+### Estado que atravessa requisições
+
+A varredura estática carrega cada rota do zero, então **nada nela mede sessão**:
+filtro, ordenação e página que se perdem entre uma requisição e a seguinte
+passam pelas rotas todas sem um pixel de diferença. O `probe_sessao.rb` cobre
+isso na tela de Turmas — filtra, pagina, ordena e volta à lista, na mesma sessão.
+
+```bash
+EXPLORE_OUT=$LADO/sessao bundle exec ruby $S/probe_sessao.rb
+```
+
+Três coisas que essa medida ensina, e que valem para qualquer sonda de sessão:
+
+- **É a TROCA de filtro que mede.** Sob um filtro só, a página 2 sai correta
+  mesmo com a sessão quebrada, porque a busca guardada ainda é a certa. Uma
+  sonda que filtra uma vez e pagina devolve verde sempre.
+- **A primeira busca da sessão é privilegiada**, então a sonda abre sessão nova
+  antes de medir. Sem isso, quem congela é a busca que a própria descoberta de
+  dados fez, e as duas rodadas medem coisas diferentes.
+- **Zero linhas não é veredito.** Lista vazia pode ser "o filtro não pegou" ou
+  "o servidor está filtrando outra coisa". A sonda lê o `data-search` da faixa
+  de filtro do active_scaffold — o ano que o **servidor** diz estar aplicando —
+  e é esse campo, não a contagem, que se compara entre os dois lados.
+
+O relatório traz, por passo, `ano_filtrado_pelo_servidor` e `filtro_correto`.
+Comparar é diferenciar os dois JSON.
+
+### Tokens de inscrição na sessão
+
+O `probe_tokens_admissao.rb` mede a outra ponta do estado que atravessa
+requisições: processo com `require_session` só deixa abrir a inscrição no
+navegador que a recuperou, e a prova é o token guardado na sessão.
+
+```bash
+EXPLORE_OUT=$LADO/tokens bundle exec ruby $S/probe_tokens_admissao.rb
+```
+
+**Hoje ela não mede nada na réplica, e isso é esperado:** a homologação roda em
+ambiente *production*, onde `should_use_recaptcha` é true, e o `#find` valida o
+reCAPTCHA antes de procurar a inscrição. Selenium headless não passa, nenhum
+token entra na sessão, e a sonda **recusa a medida** em vez de reportar
+"desviou em tudo" — que se leria como defeito da aplicação. Medir de verdade
+exige uma instância com o reCAPTCHA desligado; é decisão do mantenedor.
+
+Três coisas que a sonda carrega e que valem para qualquer medida de autorização:
+
+- **Escolher o exemplar é parte da medida.** A réplica tem processos com e sem
+  `require_session`, e a coluna não aparece na lista de processos. Candidatura de
+  processo sem a trava abre para qualquer navegador: a sonda diria "abriu" nos
+  dois lados, e isso se leria como correção funcionando.
+- **O controle vem primeiro.** Abrir a inscrição *sem* ter recuperado nada tem de
+  ser negado; se não for, a sonda recusa a medida em vez de seguir.
+- **A negação não tem elemento de alerta.** A mensagem sai no corpo da página,
+  sem classe de alerta nenhuma — um seletor `.alert` devolve false sempre, e a
+  sonda concluiria "abriu" mesmo com a tela negada. O que decide é a URL: negado,
+  o controller manda para `/admissions`.
+
+**Não imprima a URL de recusa do `#find`:** ela devolve token e e-mail do
+candidato na query string.
+
 ### Medir por leitura o que o formulário exige
 
 Nem toda pergunta sobre formulário precisa de escrita. O que a página **exige de
@@ -335,6 +395,14 @@ some quando se clica a ação a partir da lista.
 caminho de erro sem ler o console empurra os próprios erros para o relatório do
 fluxo seguinte, que os reporta como se fossem da tela dele.
 
+**Booleano do active_scaffold se lê no `checked`, nunca no campo oculto.** A
+lista renderiza cada booleano como o par do Rails — um `input[type=hidden]` com
+valor `0` mais um `input[type=checkbox]` —, então o oculto vale `0` em **toda**
+linha, marcada ou não. Ler o oculto responde "nenhum registro tem a flag" para
+qualquer coluna, e o falso negativo parece medida: leva a criar na réplica um
+caso que ela já tinha. O `innerText` da célula também não serve — vem vazio nos
+dois estados.
+
 **Conte elementos dentro do container, não por padrão de nome.** Um seletor por
 nome que não casa devolve sempre o mesmo número: a medida fica idêntica nos dois
 lados e cega a qualquer regressão. Meça algo que **mude** quando você mexe na
@@ -423,9 +491,11 @@ Todo dado inserido por uma rodada some nessas horas, e com ele as rotas do
 existe, e imprime as linhas prontas para o `routes_aluno.txt` — os ids mudam a
 cada regeração. Rodar sem necessidade não custa nada.
 
-Os dois primeiros passos abaixo continuam manuais de propósito, pela armadilha
-descrita adiante; o script cobre do terceiro em diante e para com instruções se
-o aluno não existir.
+O script cobre o conjunto inteiro, na ordem certa, e confere cada etapa. Os dois
+primeiros passos já foram manuais, pela armadilha descrita adiante; deixaram de
+ser quando a conta de captura passou a ser criada pelo script de migração da
+réplica — é a existência dela que arma a trava, então o script agora exige a
+conta e aborta sem ela, em vez de confiar em quem executa.
 
 As telas do aluno precisam de três coisas que a réplica de produção não traz
 prontas. **A ordem não é indiferente.**
