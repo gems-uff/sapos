@@ -38,10 +38,15 @@ e quem ler depois entende por que aquele conserto apareceu do nada.
 
 ```
 git fetch origin
-git rev-list --left-right --count main...origin/<ramo>   # atrás / à frente
-git log --oneline origin/<ramo>..main                    # o que vai entrar
-git diff --numstat origin/<ramo>...main                  # em que arquivos
+git rev-list --left-right --count origin/main...HEAD   # atrás / à frente
+git log --oneline HEAD..origin/main                    # o que vai entrar
+git diff --numstat HEAD...origin/main                  # em que arquivos
 ```
+
+Tudo contra `origin/main` e `HEAD`, nunca contra a `main` local nem contra
+`origin/<ramo>`: o `git fetch` não avança a `main` local, e ramo vindo de fork
+não tem `origin/<ramo>` nenhum — se a origin tiver um homônimo, os três comandos
+resolvem contra o ramo errado sem reclamar.
 
 Cruze a lista de arquivos que a `main` mexeu com a dos que o ramo mexeu. A
 interseção é onde pode haver conflito de verdade — e é onde olhar primeiro
@@ -126,13 +131,20 @@ mora neste projeto:
 - **Método de gem que o ramo passou a chamar.** Compare a assinatura entre a
   versão em que o ramo foi escrito e a que a `main` trouxe. Cuidado ao comparar
   com `grep -A`: a janela pega o método vizinho e acusa diferença onde não há.
+- **Spec que a `main` trouxe contra modelagem que o ramo mudou.** Os dois lados
+  passam separados — o spec novo não conhece a modelagem do ramo, e a suíte do
+  ramo não tinha esse spec —, e só a suíte completa depois do merge acusa. Vale
+  também para o ramo que já está em dia: "em dia" é afirmação sobre o instante
+  da medida, e o spec pode chegar na `main` depois dela. Aqui não há versão a
+  ressincronizar: decida quem está certo, o spec ou a modelagem, e conserte o
+  lado errado antes do merge.
 
-Achando um, o conserto é ressincronizar com a versão em uso reaplicando a
-mudança própria — e **deixar uma guarda**, senão o próximo upgrade repete tudo.
-`spec/lib/active_scaffold_overrides_spec.rb` é o modelo: a cópia só pode
-acrescentar linhas ao original, então toda linha do original aparece nela na
-mesma ordem; linha que a gem mude some da sequência e o teste falha no upgrade,
-que é quando ainda dá para decidir.
+Achando um dos quatro primeiros, o conserto é ressincronizar com a versão em uso
+reaplicando a mudança própria — e **deixar uma guarda**, senão o próximo upgrade
+repete tudo. `spec/lib/active_scaffold_overrides_spec.rb` (hoje só no ramo
+`issue_587`) é o modelo: a cópia só pode acrescentar linhas ao original, então
+toda linha do original aparece nela na mesma ordem; linha que a gem mude some da
+sequência e o teste falha no upgrade, que é quando ainda dá para decidir.
 
 ## O `Gemfile.lock`
 
