@@ -104,11 +104,12 @@ própria descrição; este índice existe para humanos e para outros agentes, na
 ordem do ciclo.
 
 - `revisar-pr` — conduz um PR do começo ao fim. **Comece por ela**; aponta para as demais.
-- `safe-refactor` — mede a mudança pela suíte local, antes e depois.
+- `merge-downstream` — traz a `main` para dentro de um ramo de issue.
 - `dependencias` — declarar gem no `Gemfile` e conduzir atualização.
+- `provar-candidato` — dá veredito a suspeita de defeito: confirmado, refutado ou plausível.
+- `safe-refactor` — mede a mudança pela suíte local, antes e depois.
 - `suite-mariadb` — roda a suíte contra MariaDB em vez do SQLite.
 - `homologacao` — compara o SAPOS antes e depois em homologação.
-- `merge-downstream` — traz a `main` para dentro de um ramo de issue.
 - `release` — merge, tag, label, issues e release publicada.
 
 ### Skill é procedimento, não diário de bordo
