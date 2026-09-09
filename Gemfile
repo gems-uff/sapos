@@ -45,6 +45,7 @@ gem "prawn-qrcode"
 # ─── Planilhas (XLSX) ────────────────────────────────────────────────────
 gem "caxlsx"
 gem "caxlsx_rails"
+gem "roo"
 
 # ─── Relatorios / templates ──────────────────────────────────────────────
 gem "liquid"                             # templates de relatorio/notificacao

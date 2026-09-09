@@ -397,5 +397,23 @@ RSpec.describe CustomVariable, type: :model do
         expect(CustomVariable.enable_advisor_accreditation_validation).to eq(false)
       end
     end
+
+    context "enable panel" do
+      it "should return false when it is defined to no" do
+        config = CustomVariable.find_by_variable(:enable_panel)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :enable_panel, value: "no")
+
+        expect(CustomVariable.enable_panel).to eq(false)
+      end
+
+      it "should return true when it is defined to yes" do
+        config = CustomVariable.find_by_variable(:enable_panel)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :enable_panel, value: "yes")
+
+        expect(CustomVariable.enable_panel).to eq(true)
+      end
+    end
   end
 end
