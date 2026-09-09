@@ -171,7 +171,7 @@ RSpec.describe Admissions::AdmissionReportGroupAvulsoCourses, type: :model do
         periods = values_for(columns, PERIOD_HEADER).split("; ")
         grades = values_for(columns, GRADE_HEADER).split("; ")
 
-        mapping = courses.zip(periods, grades).map { |c, p, g| [c, [p, g]] }.to_h
+        mapping = courses.zip(periods, grades).to_h { |c, p, g| [c, [p, g]] }
         expect(mapping["Curso A"]).to eq(["2027/1", "7"])
         expect(mapping["Curso B"]).to eq(["2027/2", "9"])
       end
@@ -220,89 +220,88 @@ RSpec.describe Admissions::AdmissionReportGroupAvulsoCourses, type: :model do
       end
     end
   end
-    describe "prepare_group_row across multiple applications (same report_group instance)" do
-    def row_value(row, header)
-      row.find { |c| c[:column][:header] == header }[:value]
-    end
- 
-    it "does not leak one candidate's disciplines into another candidate's row" do
-      student_a = FactoryBot.create(:student)
-      ce_a = build_class_enrollment(
-        course_name: "Curso do A", year: "2027", semester: "1", status: @avulso_status
-      )
-      ce_a.enrollment.update!(student: student_a)
-      stub_grades({ ce_a.id => 8 })
-      application_a = application_with_students([student_a])
- 
-      student_b = FactoryBot.create(:student)
-      ce_b = build_class_enrollment(
-        course_name: "Curso do B", year: "2027", semester: "2", status: @avulso_status
-      )
-      ce_b.enrollment.update!(student: student_b)
-      stub_grades({ ce_a.id => 8, ce_b.id => 4 })
-      application_b = application_with_students([student_b])
- 
-      report_group.prepare_config
- 
-      row_a = report_group.prepare_group_row(application_a)
-      row_b = report_group.prepare_group_row(application_b)
- 
-      expect(row_value(row_a, COURSE_HEADER)).to eq("Curso do A")
-      expect(row_value(row_a, GRADE_HEADER)).to eq("8")
-      expect(row_value(row_b, COURSE_HEADER)).to eq("Curso do B")
-      expect(row_value(row_b, GRADE_HEADER)).to eq("4")
-    end
- 
-    it "keeps the first candidate's already-captured row unchanged after processing the second candidate" do
-      student_a = FactoryBot.create(:student)
-      ce_a = build_class_enrollment(
-        course_name: "Curso do A", year: "2027", semester: "1", status: @avulso_status
-      )
-      ce_a.enrollment.update!(student: student_a)
- 
-      student_b = FactoryBot.create(:student)
-      ce_b = build_class_enrollment(
-        course_name: "Curso do B", year: "2027", semester: "2", status: @avulso_status
-      )
-      ce_b.enrollment.update!(student: student_b)
- 
-      stub_grades({ ce_a.id => 8, ce_b.id => 4 })
- 
-      report_group.prepare_config
- 
-      row_a = report_group.prepare_group_row(application_with_students([student_a]))
-      row_a_course_snapshot = row_value(row_a, COURSE_HEADER)
-      row_a_grade_snapshot = row_value(row_a, GRADE_HEADER)
- 
-      # processa o segundo candidato DEPOIS de já ter capturado a linha do
-      # primeiro, como o gerador de relatório faz linha a linha
-      report_group.prepare_group_row(application_with_students([student_b]))
- 
-      expect(row_value(row_a, COURSE_HEADER)).to eq(row_a_course_snapshot)
-      expect(row_value(row_a, GRADE_HEADER)).to eq(row_a_grade_snapshot)
-      expect(row_value(row_a, COURSE_HEADER)).to eq("Curso do A")
-      expect(row_value(row_a, GRADE_HEADER)).to eq("8")
-    end
- 
-    it "does not accumulate disciplines from a previous candidate for one with no avulso enrollments" do
-      student_a = FactoryBot.create(:student)
-      ce_a = build_class_enrollment(
-        course_name: "Curso do A", year: "2027", semester: "1", status: @avulso_status
-      )
-      ce_a.enrollment.update!(student: student_a)
-      stub_grades({ ce_a.id => 8 })
- 
-      student_b = FactoryBot.create(:student) # sem nenhuma matrícula avulso
- 
-      report_group.prepare_config
- 
-      report_group.prepare_group_row(application_with_students([student_a]))
-      row_b = report_group.prepare_group_row(application_with_students([student_b]))
- 
-      expect(row_value(row_b, COURSE_HEADER)).to eq("")
-      expect(row_value(row_b, PERIOD_HEADER)).to eq("")
-      expect(row_value(row_b, GRADE_HEADER)).to eq("")
-    end
+  describe "prepare_group_row across multiple applications (same report_group instance)" do
+  def row_value(row, header)
+    row.find { |c| c[:column][:header] == header }[:value]
   end
 
+  it "does not leak one candidate's disciplines into another candidate's row" do
+    student_a = FactoryBot.create(:student)
+    ce_a = build_class_enrollment(
+      course_name: "Curso do A", year: "2027", semester: "1", status: @avulso_status
+    )
+    ce_a.enrollment.update!(student: student_a)
+    stub_grades({ ce_a.id => 8 })
+    application_a = application_with_students([student_a])
+
+    student_b = FactoryBot.create(:student)
+    ce_b = build_class_enrollment(
+      course_name: "Curso do B", year: "2027", semester: "2", status: @avulso_status
+    )
+    ce_b.enrollment.update!(student: student_b)
+    stub_grades({ ce_a.id => 8, ce_b.id => 4 })
+    application_b = application_with_students([student_b])
+
+    report_group.prepare_config
+
+    row_a = report_group.prepare_group_row(application_a)
+    row_b = report_group.prepare_group_row(application_b)
+
+    expect(row_value(row_a, COURSE_HEADER)).to eq("Curso do A")
+    expect(row_value(row_a, GRADE_HEADER)).to eq("8")
+    expect(row_value(row_b, COURSE_HEADER)).to eq("Curso do B")
+    expect(row_value(row_b, GRADE_HEADER)).to eq("4")
+  end
+
+  it "keeps the first candidate's already-captured row unchanged after processing the second candidate" do
+    student_a = FactoryBot.create(:student)
+    ce_a = build_class_enrollment(
+      course_name: "Curso do A", year: "2027", semester: "1", status: @avulso_status
+    )
+    ce_a.enrollment.update!(student: student_a)
+
+    student_b = FactoryBot.create(:student)
+    ce_b = build_class_enrollment(
+      course_name: "Curso do B", year: "2027", semester: "2", status: @avulso_status
+    )
+    ce_b.enrollment.update!(student: student_b)
+
+    stub_grades({ ce_a.id => 8, ce_b.id => 4 })
+
+    report_group.prepare_config
+
+    row_a = report_group.prepare_group_row(application_with_students([student_a]))
+    row_a_course_snapshot = row_value(row_a, COURSE_HEADER)
+    row_a_grade_snapshot = row_value(row_a, GRADE_HEADER)
+
+    # processa o segundo candidato DEPOIS de já ter capturado a linha do
+    # primeiro, como o gerador de relatório faz linha a linha
+    report_group.prepare_group_row(application_with_students([student_b]))
+
+    expect(row_value(row_a, COURSE_HEADER)).to eq(row_a_course_snapshot)
+    expect(row_value(row_a, GRADE_HEADER)).to eq(row_a_grade_snapshot)
+    expect(row_value(row_a, COURSE_HEADER)).to eq("Curso do A")
+    expect(row_value(row_a, GRADE_HEADER)).to eq("8")
+  end
+
+  it "does not accumulate disciplines from a previous candidate for one with no avulso enrollments" do
+    student_a = FactoryBot.create(:student)
+    ce_a = build_class_enrollment(
+      course_name: "Curso do A", year: "2027", semester: "1", status: @avulso_status
+    )
+    ce_a.enrollment.update!(student: student_a)
+    stub_grades({ ce_a.id => 8 })
+
+    student_b = FactoryBot.create(:student) # sem nenhuma matrícula avulso
+
+    report_group.prepare_config
+
+    report_group.prepare_group_row(application_with_students([student_a]))
+    row_b = report_group.prepare_group_row(application_with_students([student_b]))
+
+    expect(row_value(row_b, COURSE_HEADER)).to eq("")
+    expect(row_value(row_b, PERIOD_HEADER)).to eq("")
+    expect(row_value(row_b, GRADE_HEADER)).to eq("")
+  end
+end
 end
