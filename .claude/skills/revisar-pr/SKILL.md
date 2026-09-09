@@ -173,7 +173,7 @@ vira issue própria (pesquise as existentes antes, inclusive fechadas).
 A cobertura nova é só do caminho "assumimos nós", e por isso depois do passo 4:
 escrita antes da decisão, ela se perde se o PR voltar para o autor. As
 reproduções do passo 3 são outra coisa — essas já existem, e são elas que viajam;
-ao devolver, é aqui que elas ganham forma de spec do projeto, pelas duas regras
+ao devolver, é aqui que elas ganham forma de spec do projeto, pelas regras
 abaixo.
 
 O que a mudança toca e a suíte não executa vira teste, pela `safe-refactor` —
@@ -184,6 +184,23 @@ Revisão inverte a ordem da `safe-refactor`: a mudança **já existe**, então n
 para escrever o teste contra o código velho. A saída é escrever contra o
 comportamento novo e provar o vermelho **simulando a versão anterior** — com o
 código dela, nunca com uma aproximação escrita à mão.
+
+**A reprodução também tem de ficar verde quando o defeito sair.** O vermelho de
+hoje prova que ela alcança o defeito; só o controle prova que ela é satisfazível
+— desligue a linha culpada e confira que passa. Sem isso viaja asserção que
+nenhum conserto atende, e o autor perde a rodada tentando: linha de gabarito
+entrando na contagem, ordem que o navegador não garante, mensagem de erro citada
+ao pé da letra.
+
+**Reprodução de rodada anterior volta a ser suspeita.** Rode as antigas antes de
+ler o diff novo, e para cada uma que passou pergunte *por que* passou: o defeito
+foi consertado, ou o conserto abriu caminho que devolve antes de chegar ao ponto
+medido? Guarda de precondição, `return` de estado vazio e autorização avaliada
+sobre a classe em vez da instância deixam o exemplo verde sem tocar no que ele
+guardava. O teste é o mesmo de sempre: desligue a linha do conserto e confira que
+o exemplo cai. Quem passava pelo motivo errado se reescreve — e junto com ele o
+comentário que descrevia o defeito no presente, senão a rodada seguinte lê a
+descrição como se o defeito ainda estivesse lá.
 
 ## 6. Medir
 
