@@ -30,9 +30,16 @@ corrija na wiki.
   continua aberta (ver a skill `release`).
 - **Exceção:** vulnerabilidade não ganha issue pública — enumerar o problema
   expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica.
-- Critério de pronto: `bundle exec rspec` inteiro verde (~9 min, ~2260 exemplos).
-  Rode **sem** `SKIP_COVERAGE=1` ao menos uma vez antes de fechar: é a
-  configuração real da suíte, e o caminho do simplecov só é exercitado assim.
+- Critério de pronto: `bundle exec rspec` inteiro verde. Rode **sem**
+  `SKIP_COVERAGE=1` ao menos uma vez antes de fechar: é a configuração real da
+  suíte, e o caminho do simplecov só é exercitado assim.
+- **Os feature specs rodam em Firefox por padrão e em Chrome no CI também.**
+  `SELENIUM_BROWSER=chrome` troca localmente; o CI roda os dois em matriz. O
+  Firefox é o default porque faz a mesma suíte em menos da metade do tempo; o
+  Chrome fica no CI porque é o navegador da maioria dos usuários. Vermelho num
+  navegador só é sinal, não ruído — foi para isso que a matriz existe. Na
+  homologação (skill `homologacao`) o default é o Chrome, o único que expõe
+  console e log de rede pelo WebDriver.
 - **Verde numa ordem não é verde.** A ordem dos exemplos é sorteada. Ao
   investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
   irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo

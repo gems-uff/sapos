@@ -145,9 +145,11 @@ diretório de saída e avisa quando herdou — confira esse arquivo antes de com
 
 ### Capturando por navegador
 
-`SELENIUM_BROWSER=firefox` troca o Chrome pelo Firefox em **todos** os scripts
-desta pasta (o driver vem do `navegador.rb`) e também na suíte
-(`spec/rails_helper.rb` honra a mesma variável). O geckodriver vem pelo Selenium
+O default aqui é o **Chrome**, ao contrário da suíte: é o único que expõe
+console e log de rede pelo WebDriver, e são esses os sinais mais baratos da
+comparação. `SELENIUM_BROWSER=firefox` troca pelo Firefox em **todos** os
+scripts desta pasta (o driver vem do `navegador.rb`); a suíte honra a mesma
+variável, com o default invertido. O geckodriver vem pelo Selenium
 Manager do `selenium-webdriver`; não há gem a acrescentar.
 
 Quando vale: parte do que o Rails emite é contorno de bug de navegador — o

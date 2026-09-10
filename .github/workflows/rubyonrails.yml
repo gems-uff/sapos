@@ -14,6 +14,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    # A suite roda nos dois navegadores que a aplicacao encontra: Chrome, que e o
+    # da maioria dos usuarios, e Firefox, que e o default local (mais rapido) e o
+    # unico que acusa regressao em contorno de bug dele -- o autocomplete="off"
+    # nos hidden, que o Rails 8.1 removeu, era um. Os jobs sao independentes:
+    # um vermelho nao cancela o outro, para que se saiba se a falha e de um
+    # navegador so.
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chrome, firefox]
+    name: test (${{ matrix.browser }})
+
     # Production runs on MariaDB, so CI does too. SQLite stays available for
     # local development (it needs no database server), but the collation there
     # is binary and does not match production; only MariaDB exercises the
@@ -33,6 +45,7 @@ jobs:
 
     env:
       RAILS_ENV: test
+      SELENIUM_BROWSER: ${{ matrix.browser }}
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       # The column collation comes from the CREATE DATABASE below; the
       # connection collation from this URL. Both match production.
@@ -42,10 +55,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v5
 
+      # O driver de cada navegador vem pelo Selenium Manager, embutido no
+      # selenium-webdriver, que casa a versao com a do navegador instalado.
       - uses: browser-actions/setup-chrome@v2
+        if: matrix.browser == 'chrome'
         with:
           install-dependencies: true
           install-chromedriver: false
+
+      - uses: browser-actions/setup-firefox@v1
+        if: matrix.browser == 'firefox'
 
       # Before setup-ruby: the mysql2 gem is a native extension and needs the
       # client development headers to compile during bundle install. The client
@@ -101,14 +120,18 @@ jobs:
           if [ -f rspec.log ]; then
             seed=$(grep -oE 'Randomized with seed [0-9]+' rspec.log | head -1 | grep -oE '[0-9]+$' || true)
           fi
-          echo "### Seed do RSpec: \`${seed:-desconhecida}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Seed do RSpec (${{ matrix.browser }}): \`${seed:-desconhecida}\`" >> "$GITHUB_STEP_SUMMARY"
           echo "Reproduzir localmente:" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
-          echo "bundle exec rspec --seed ${seed:-0}" >> "$GITHUB_STEP_SUMMARY"
-          echo "bundle exec rspec --seed ${seed:-0} --bisect   # se for dependencia de ordem" >> "$GITHUB_STEP_SUMMARY"
+          echo "SELENIUM_BROWSER=${{ matrix.browser }} bundle exec rspec --seed ${seed:-0}" >> "$GITHUB_STEP_SUMMARY"
+          echo "SELENIUM_BROWSER=${{ matrix.browser }} bundle exec rspec --seed ${seed:-0} --bisect   # se for dependencia de ordem" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
+      # Cobertura sai de um navegador so: as duas rodadas exercitam o mesmo Ruby,
+      # e publicar as duas contaria o mesmo codigo duas vezes. O Chrome fica com
+      # ela para o historico continuar comparavel com o de antes da matriz.
       - name: Publish code coverage
+        if: matrix.browser == 'chrome'
         uses: qltysh/qlty-action/coverage@v1
         with:
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
@@ -122,7 +145,7 @@ jobs:
       # nao precisa dessa permissao para rodar a suite. PR de fork nao consegue
       # escrever no repositorio base, dai a guarda.
       - name: Upload the Cobertura report
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+        if: matrix.browser == 'chrome' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report-ruby

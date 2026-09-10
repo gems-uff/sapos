@@ -195,15 +195,19 @@ RSpec.configure do |config|
   # rspec-rails.
   config.infer_base_class_for_anonymous_controllers = false
 
-  # SELENIUM_BROWSER escolhe o navegador (chrome, o default, ou firefox); BROWSER
+  # SELENIUM_BROWSER escolhe o navegador: firefox (o default) ou chrome. BROWSER
   # com qualquer valor mostra a janela em vez de rodar headless. O driver de cada
   # um vem pelo Selenium Manager do selenium-webdriver, sem gem extra.
   #
-  # Rodar a suite em Firefox de vez em quando vale por um motivo concreto: parte
-  # do que o Rails emite existe como contorno de bug de navegador (o
-  # autocomplete="off" nos hidden, por exemplo, e contorno de um bug do Firefox),
-  # e so o navegador que tinha o bug consegue acusar a regressao.
-  SELENIUM_BROWSER = (ENV["SELENIUM_BROWSER"] || "chrome").to_sym
+  # Firefox e o default local porque a mesma suite roda nele em menos da metade
+  # do tempo (medido: 4 min 23 s contra ~10 min em Chrome, mesmo arquivo 10,5 s
+  # contra 23,7 s). O CI roda os dois em matriz, e e la que o Chrome -- o
+  # navegador da maioria dos usuarios -- continua sendo exercitado; localmente,
+  # SELENIUM_BROWSER=chrome. Ter os dois vale por um motivo concreto: parte do
+  # que o Rails emite e contorno de bug de navegador (o autocomplete="off" nos
+  # hidden era contorno de um bug do Firefox), e so o navegador que tinha o bug
+  # acusa a regressao.
+  SELENIUM_BROWSER = (ENV["SELENIUM_BROWSER"] || "firefox").to_sym
   Capybara.register_driver :selenium do |app|
     case SELENIUM_BROWSER
     when :firefox
