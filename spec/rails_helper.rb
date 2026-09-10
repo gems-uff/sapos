@@ -195,38 +195,69 @@ RSpec.configure do |config|
   # rspec-rails.
   config.infer_base_class_for_anonymous_controllers = false
 
+  # SELENIUM_BROWSER escolhe o navegador (chrome, o default, ou firefox); BROWSER
+  # com qualquer valor mostra a janela em vez de rodar headless. O driver de cada
+  # um vem pelo Selenium Manager do selenium-webdriver, sem gem extra.
+  #
+  # Rodar a suite em Firefox de vez em quando vale por um motivo concreto: parte
+  # do que o Rails emite existe como contorno de bug de navegador (o
+  # autocomplete="off" nos hidden, por exemplo, e contorno de um bug do Firefox),
+  # e so o navegador que tinha o bug consegue acusar a regressao.
+  SELENIUM_BROWSER = (ENV["SELENIUM_BROWSER"] || "chrome").to_sym
   Capybara.register_driver :selenium do |app|
-    options = Selenium::WebDriver::Chrome::Options.new
-    options.args << "--headless=new" unless ENV["BROWSER"]
-    options.args << "--no-sandbox"
-    options.args << "--disable-gpu"
-    options.args << "--disable-dev-shm-usage"
-    options.args << "--disable-features=BackForwardCache"
+    case SELENIUM_BROWSER
+    when :firefox
+      options = Selenium::WebDriver::Firefox::Options.new
+      options.args << "-headless" unless ENV["BROWSER"]
+      # O equivalente do CDP Page.setDownloadBehavior do Chrome: gravar no
+      # diretorio dos DownloadHelpers sem perguntar e sem abrir o visualizador
+      # de PDF embutido. A lista de tipos e a dos downloads da aplicacao.
+      options.add_preference("browser.download.folderList", 2)
+      options.add_preference("browser.download.dir", DownloadHelpers::PATH.to_s)
+      options.add_preference("browser.download.useDownloadDir", true)
+      options.add_preference("browser.download.manager.showWhenStarting", false)
+      options.add_preference("browser.helperApps.neverAsk.saveToDisk",
+        %w[application/pdf application/octet-stream
+           application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+           application/vnd.ms-excel text/xlsx text/csv application/zip].join(","))
+      options.add_preference("pdfjs.disabled", true)
+      options.add_preference("intl.accept_languages", "pt-BR")
+      Capybara::Selenium::Driver.new(app, browser: :firefox, options: options)
+    when :chrome
+      options = Selenium::WebDriver::Chrome::Options.new
+      options.args << "--headless=new" unless ENV["BROWSER"]
+      options.args << "--no-sandbox"
+      options.args << "--disable-gpu"
+      options.args << "--disable-dev-shm-usage"
+      options.args << "--disable-features=BackForwardCache"
 
-    prefs = {
-      "download.default_directory" => DownloadHelpers::PATH.to_s,
-      "download.prompt_for_download" => false,
-      "plugins.always_open_pdf_externally" => true,
-      "safebrowsing.enabled" => true,
-      "profile.default_content_settings.popups" => 0,
-      "download.directory_upgrade" => true
-    }
-    options.add_preference(:download, prefs["download.default_directory"])
-    options.add_preference(:prefs, prefs)
-    options.add_preference(:browser, set_download_behavior: { behavior: "allow" })
+      prefs = {
+        "download.default_directory" => DownloadHelpers::PATH.to_s,
+        "download.prompt_for_download" => false,
+        "plugins.always_open_pdf_externally" => true,
+        "safebrowsing.enabled" => true,
+        "profile.default_content_settings.popups" => 0,
+        "download.directory_upgrade" => true
+      }
+      options.add_preference(:download, prefs["download.default_directory"])
+      options.add_preference(:prefs, prefs)
+      options.add_preference(:browser, set_download_behavior: { behavior: "allow" })
 
-    driver = Capybara::Selenium::Driver.new(
-      app,
-      browser: :chrome,
-      options: options
-    )
+      driver = Capybara::Selenium::Driver.new(
+        app,
+        browser: :chrome,
+        options: options
+      )
 
-    driver.browser.execute_cdp("Page.setDownloadBehavior",
-    behavior: "allow",
-    downloadPath: DownloadHelpers::PATH.to_s
-    )
+      driver.browser.execute_cdp("Page.setDownloadBehavior",
+      behavior: "allow",
+      downloadPath: DownloadHelpers::PATH.to_s
+      )
 
-    driver
+      driver
+    else
+      raise "SELENIUM_BROWSER=#{SELENIUM_BROWSER}: use chrome ou firefox"
+    end
   end
 
   Capybara.default_max_wait_time = 20

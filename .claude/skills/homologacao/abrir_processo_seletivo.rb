@@ -27,6 +27,7 @@
 # update exigiria o token de uma inscricao de candidato real.
 
 require "selenium-webdriver"
+require_relative "navegador"
 require "date"
 require "json"
 require "tmpdir"
@@ -41,11 +42,7 @@ PROCESSO_ID = (ARGV[1] || 5).to_i
 ESTADO = File.join(Dir.tmpdir, "sapos_processo_#{PROCESSO_ID}.json")
 abort "uso: abrir_processo_seletivo.rb abrir|fechar [<id>]" unless %w[abrir fechar].include?(ACAO)
 
-options = Selenium::WebDriver::Chrome::Options.new
-options.add_argument("--headless=new")
-options.add_argument("--window-size=1600,2400")
-options.add_argument("--lang=pt-BR")
-driver = Selenium::WebDriver.for(:chrome, options: options)
+driver = novo_driver(largura: 1600, altura: 2400, logs: false)
 wait = Selenium::WebDriver::Wait.new(timeout: 60)
 
 def settle(driver, wait)
