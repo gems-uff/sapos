@@ -163,7 +163,20 @@ atualização (gem, de → para) **sem citar CVE nem descrever o ataque**.
 ```bash
 gh release list --limit 3          # a nova deve aparecer como Latest
 gh issue list --label 7.15.21 --state all
+gh issue list --label 7.15.21 --state open
 ```
+
+**A última consulta tem que vir vazia — ou cada linha que sobrar precisa de um
+comentário na própria issue dizendo o que ficou de fora.** Rotulada e aberta é o
+estado legítimo da entrega parcial (passo 5), e sem o comentário ele é
+indistinguível do esquecimento: quem vier depois lê o label como "saiu" e o
+aberto como "falta", sem meio de decidir qual dos dois vale. Quem paga é quem
+pesca a issue para trabalhar e descobre no meio do caminho que já estava pronta.
+
+**Confira também o lado que nenhum label denuncia:** issue atendida pela versão
+que não recebeu rótulo nenhum. A separação entre issues atendidas e apenas
+citadas, feita no passo 1, é o gabarito — cada issue atendida ali tem que
+aparecer na consulta por label.
 
 ### 8. Deploy — do mantenedor
 

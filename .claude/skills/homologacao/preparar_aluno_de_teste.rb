@@ -36,6 +36,7 @@
 # routes_aluno.txt, com os ids que existem agora -- eles mudam a cada regeracao.
 
 require "selenium-webdriver"
+require_relative "navegador"
 require "date"
 
 def env!(name)
@@ -76,11 +77,7 @@ unless confirmar
   exit 0
 end
 
-options = Selenium::WebDriver::Chrome::Options.new
-options.add_argument("--headless=new")
-options.add_argument("--window-size=1440,2400")
-options.add_argument("--lang=pt-BR")
-driver = Selenium::WebDriver.for(:chrome, options: options)
+driver = novo_driver(largura: 1440, altura: 2400, logs: false)
 wait = Selenium::WebDriver::Wait.new(timeout: 60)
 
 def settle(driver, wait)

@@ -13,6 +13,7 @@
 #   ruby capture_binary.rb <dir_saida> [arquivo_rotas]
 
 require "selenium-webdriver"
+require_relative "navegador"
 require "net/http"
 require "uri"
 require "json"
@@ -47,9 +48,7 @@ def slug(route)
   route.sub(%r{\A/}, "").gsub(%r{[/.]}, "_")
 end
 
-options = Selenium::WebDriver::Chrome::Options.new
-options.add_argument("--headless=new")
-driver = Selenium::WebDriver.for(:chrome, options: options)
+driver = novo_driver(logs: false)
 wait = Selenium::WebDriver::Wait.new(timeout: 60)
 
 cookie_header = nil
