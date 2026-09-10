@@ -105,10 +105,14 @@ jobs:
       - name: Lint
         run: bundle exec rubocop
 
+      # --profile: os dez exemplos mais lentos de cada navegador ficam no log. A
+      # matriz mostrou o Firefox 1,5x mais lento que o Chrome no runner (e 2x
+      # mais rapido no Mac); so o perfil diz se a diferenca e uniforme, da
+      # plataforma, ou concentrada em poucos specs, que e onde se mexe.
       - name: Run tests
         run: |
           set -o pipefail
-          bundle exec rspec | tee rspec.log
+          bundle exec rspec --profile 10 | tee rspec.log
 
       # A ordem dos exemplos e sorteada, e a suite ja teve dependencia de ordem
       # (#643). Sem a seed, um vermelho e irreproduzivel; com ela, o
