@@ -207,7 +207,14 @@ cada uma explica o porquê no próprio cabeçalho:
 em no-op, para que a migration de 2013 do schema_plus — assinatura multi-coluna,
 incompatível com a do Rails — ainda replique. O silêncio não distingue quem
 chama: o `db/schema.rb` declara 17 chaves estrangeiras e o `db/test.sqlite3`
-carregado a partir dele não tem nenhuma.
+carregado a partir dele não tem nenhuma. O no-op está na `Migration`, não no
+adaptador: `db:schema:load` produz zero chaves também em MariaDB, e `db:migrate`
+num banco vazio não é rota alternativa — ele carrega o `schema.rb` e marca as
+versões em vez de executar as migrations. Quem for **regenerar o `db/schema.rb`**
+sente isso: o dump de qualquer banco montado localmente sai sem o bloco de
+`add_foreign_key`, que tem de ser reposto à mão. E o dump tem de sair de SQLite:
+o de MariaDB acrescenta `charset:` e `collation:` em cada tabela, e o arquivo
+versionado é neutro de adaptador.
 
 `can_destroy.rb`, `i18n_model.rb` e `types.rb` também abrem classe do Rails, mas
 só acrescentam método — o risco ali é colisão de nome, não mudança de

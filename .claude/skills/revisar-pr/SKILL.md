@@ -70,6 +70,10 @@ número do PR lhe dá também os comentários do autor.
   na árvore fora dos checkpoints, e `/rewind` não desfaz.
 - Ele não verifica o que devolve, e o fim da lista costuma ser piso de achados,
   não descoberta. Quem tria é o passo 3.
+- **Ele mede: roda specs e recarrega o banco de teste.** Sobreposto à suíte do
+  passo 6, contamina a rodada — a falha aparece como regressão do PR e é
+  contenção no SQLite. Espere-o terminar antes de medir, ou meça antes de
+  dispará-lo.
 
 ## 2. Ler o diff
 
