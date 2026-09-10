@@ -115,7 +115,7 @@ GEM
       debug_inspector (>= 1.2.0)
     bootsnap (1.24.6)
       msgpack (~> 1.2)
-    brakeman (8.0.5)
+    brakeman (8.0.6)
       racc
     builder (3.3.0)
     bundler-audit (0.9.3)
@@ -191,12 +191,13 @@ GEM
     drb (2.2.3)
     erb (6.0.7)
     erubi (1.13.1)
-    et-orbi (1.4.1)
+    et-orbi (1.4.2)
       tzinfo
     exception_notification (4.6.0)
       actionmailer (>= 5.2, < 9)
       activesupport (>= 5.2, < 9)
-    execjs (2.10.1)
+    execjs (2.10.2)
+      json (>= 2)
     factory_bot (6.6.0)
       activesupport (>= 6.1.0)
     factory_bot_rails (6.5.1)
@@ -277,7 +278,7 @@ GEM
     msgpack (1.8.4)
     mysql2 (0.5.7)
       bigdecimal
-    net-imap (0.6.6)
+    net-imap (0.6.7)
       date
       net-protocol
     net-pop (0.1.2)
@@ -398,7 +399,7 @@ GEM
       io-console (~> 0.5)
     request_store (1.7.0)
       rack (>= 1.4)
-    responders (3.2.0)
+    responders (3.2.1)
       actionpack (>= 7.0)
       railties (>= 7.0)
     rexml (3.4.4)
