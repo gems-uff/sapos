@@ -2,11 +2,18 @@
 
 # lib/tasks/smoke_test.rake
 
-# A 8.1 deixou de aceitar `ActionMailer::Base.mail(...)` como chamada de classe: o
-# method_missing de classe do ActionMailer nao despacha mais :mail como action, e a
-# chamada estoura com NoMethodError. O smoke test precisa entao de um mailer
-# concreto com action nomeada -- esta classe existe so para exercitar o caminho
-# Rails -> sendmail no deploy, e por isso mora aqui, e nao em app/mailers.
+# A 8.1 deixou de despachar `ActionMailer::Base.mail(...)` como chamada de classe.
+# A mudanca nao esta no ActionMailer: seu `method_missing` de classe e byte a byte
+# o mesmo da 8.0.5.1. Esta no actionpack -- `AbstractController::Base.action_methods`
+# deixou de reincluir os metodos publicos sombreados da propria classe (caiu o
+# `methods.concat(public_instance_methods(false))`). Com isso :mail sai do
+# conjunto, o method_missing cai no `super` e a chamada estoura com NoMethodError.
+# Quem for atras disso num upgrade futuro precisa diffar o actionpack.
+#
+# O smoke test precisa entao de um mailer concreto com action nomeada. Esta classe
+# existe so para exercitar o caminho Rails -> sendmail no deploy, e por isso mora
+# aqui, e nao em app/mailers; quem a executa e o job `smoke-test` do CI, em
+# RAILS_ENV=production e com sendmail de verdade.
 class SmokeTestMailer < ActionMailer::Base
   def deploy_validation
     mail(
