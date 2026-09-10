@@ -173,26 +173,30 @@ CVE conhecida costuma ser uma só, e já documentada no `Gemfile`.
 
 ## Parte 3 — O que a suíte verde não prova
 
-Medido neste projeto: os feature specs de PDF e planilha **conferem apenas o nome
-do arquivo baixado**.
+**Conteúdo de PDF e planilha está coberto** pelo golden-master de
+`spec/requests/goldens/`, que compara o texto extraído do PDF e a matriz de
+células do XLSX com baselines versionados em `spec/goldens/`. Toda view
+`.pdf.prawn` e `.xlsx.axlsx` tem baseline ou, no caso da declaração, um feature
+spec que lê o texto do PDF. Um upgrade de `prawn`, `prawn-table`, `caxlsx`,
+`rubyzip` ou `pdf-reader` que mude o que o documento **diz** quebra a suíte.
+Mudança intencional se aceita com `GOLDEN=overwrite`, conferindo o diff dos
+baselines antes.
 
-```ruby
-expect(download).to match(/Histórico Escolar - Ana\.pdf/)
-expect(download).to match(/Resumo Semestral - Defesa\(2022-2\)\.xlsx/)
-```
+O que continua fora do alcance da suíte:
 
-São 13 views `.pdf.prawn` e 1 `.xlsx.axlsx`, e nenhuma asserção toca o conteúdo.
-`prawn`, `prawn-rails`, `prawn-table` e `caxlsx` podem mudar largura de coluna,
-quebra de página e métrica de fonte com a suíte inteira verde. O `liquid` está
-melhor servido — `spec/lib/liquid_formatter_spec.rb` e
-`spec/helpers/pdf_helper_spec.rb` cobrem a lógica no nível de unidade.
-
-Ao mexer nessas gems, verde local não basta: use a skill `homologacao`. Cobrir a
-lacuna de verdade exigiria extrair texto do binário (`pdf-reader`; comparar bytes
-não funciona, o prawn embute timestamp e a ordem dos objetos varia) — trabalho com
-valor próprio, e issue própria.
+- **Layout.** Largura de coluna, quebra de página que não reordena texto,
+  métrica de fonte e aparência do CSS. Só a skill `homologacao` enxerga isso.
+- **Build local de assets.** Um `public/assets` existente sombreia a compilação
+  viva, e `spec/support/asset_freshness.rb` recompila quando fonte **ou
+  `Gemfile.lock`** ficam mais novos que o manifesto. Ao subir `sprockets`,
+  `dartsass-sprockets` ou `sass-embedded`, confira que a mensagem `[assets] ...
+  recompilando` apareceu no início da suíte; sem ela, o CSS testado é o da versão
+  anterior.
+- **Transitivas sem caminho de código.** `image_processing` e `ssrf_filter` vêm
+  com o `carrierwave`, mas nenhum uploader processa imagem nem baixa por URL
+  remota. Subir essas duas não exercita nada; não há o que testar.
 
 E há uma dependência sem número de versão para raciocinar:
-`carrierwave-activerecord` vem de um ramo (`rails7`) de um fork do gems-uff. O lock
-fixa um SHA, então o dia a dia é estável, mas `bundle update` nessa gem busca o
-*head* do ramo — seja lá o que estiver lá.
+`carrierwave-activerecord` vem de um ramo de um fork do gems-uff (o nome do ramo
+está no `Gemfile`). O lock fixa um SHA, então o dia a dia é estável, mas
+`bundle update` nessa gem busca o *head* do ramo — seja lá o que estiver lá.
