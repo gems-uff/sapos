@@ -74,8 +74,10 @@ end
 group :development, :test do
   # Producao roda Apache + Passenger; o puma serve ao `rails s` e ao servidor
   # que o Capybara sobe nos feature specs (Capybara.server em rails_helper).
-  # O teto e o 8.0.0 por causa desse segundo uso.
-  gem "puma", "~> 7.2", ">= 7.2.1"
+  # A serie fica travada por esse segundo uso: o Capybara instancia
+  # Puma::Server e chama binder e log_writer diretamente, e e major que mexe
+  # nessas superficies. O piso e a correcao do protocolo PROXY.
+  gem "puma", "~> 8.0", ">= 8.0.2"
   gem "sqlite3", ">= 2.9.6"              # banco de dev/test; piso 2.9.6: GHSA-mwm8-39rw-8826
   gem "awesome_print"
   gem "binding_of_caller"
