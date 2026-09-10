@@ -241,6 +241,26 @@ Comparar é diferenciar os dois JSON. Para medir o que ele não mede, acrescente
 seção **e recapture os dois lados**: sonda alterada no meio da rodada mede o
 instrumento, não a aplicação.
 
+### Voltar e submeter — o bug que o `autocomplete="off"` contornava
+
+O `probe_voltar_e_submeter.rb` mede o mecanismo do bug de navegador que fez o
+Rails pôr `autocomplete="off"` em todo hidden (e que o 8.1 deixou de emitir):
+abre o formulário de login, navega para outra página, **volta**, compara os
+hidden antes e depois, e submete com e-mail inexistente — nada grava (trackable
+só grava em sucesso) e nada trava (lockable conta por conta, e a conta não
+existe). Repete `n` vezes porque o bug era esporádico.
+
+```bash
+EXPLORE_OUT=$LADO/voltar SELENIUM_BROWSER=firefox bundle exec ruby $S/probe_voltar_e_submeter.rb 10
+EXPLORE_OUT=$LADO/voltar bundle exec ruby $S/probe_voltar_e_submeter.rb 10   # Chrome, controle
+```
+
+Lê-se `alterados` (quantas voltas mudaram um hidden) e `reacoes`: a normal é a
+recusa de credencial do Devise; `token_invalido` é a mensagem
+`errors.invalid_form_token`, e cada uma dessas também **mandou e-mail de
+anomalia** pelo `expired_session`. A resposta do POST chega depois do submit:
+a sonda espera a mensagem aparecer antes de ler, senão mede a página anterior.
+
 ### Estado que atravessa requisições
 
 A varredura estática carrega cada rota do zero, então **nada nela mede sessão**:
