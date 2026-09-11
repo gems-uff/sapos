@@ -1,7 +1,15 @@
 # This workflow will install a prebuilt Ruby version, install dependencies, and run tests.
 name: "Ruby on Rails CI"
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  # Vigia semanal do audit. Uma CVE nova torna o Gemfile.lock vulnerável sem que
+  # ninguém mude uma linha, e os outros gatilhos só disparam no push. Neste
+  # gatilho roda SÓ o audit (ver os `if` nos jobs): suíte e lint não mudam sem
+  # código, e rodá-los aqui gastaria runner para repetir o último resultado.
+  schedule:
+    - cron: "0 9 * * 1"
 
 # No job writes to the repository contents: only checkout, setup and artifact
 # upload. The qlty upload uses secrets.QLTY_COVERAGE_TOKEN; the GitHub coverage
@@ -11,7 +19,72 @@ permissions:
   contents: read
 
 jobs:
+  # Checagens que não dependem de navegador nem de banco, num job próprio e em
+  # paralelo com a suíte, sem `needs`. Dentro da matriz elas rodavam duas vezes
+  # com o mesmo resultado e, pior, um vermelho barato (ofensa de rubocop, CVE
+  # nova) abortava os dois jobs antes de `Run tests`: a rodada terminava sem
+  # dizer nada sobre a suíte. Separado, cada sinal fica vermelho sozinho, e quem
+  # lê o painel sabe qual dos dois é o problema. Encadear com `needs` traria o
+  # problema de volta e atrasaria a suíte; portão, se quiser, é branch
+  # protection exigindo os dois status (#682).
+  checks:
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      # Sem MariaDB aqui, o mysql2 (grupo production) não tem por que compilar;
+      # o audit lê o Gemfile.lock inteiro de qualquer forma, grupos incluídos.
+      BUNDLE_WITHOUT: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          cache-version: 3
+
+      # O Gemfile não declara piso de segurança (">= x.y.z"): piso envelhece
+      # calado quando sai a correção seguinte, e passa a afirmar cobertura que
+      # não existe. O que garante que o lock não carrega CVE conhecida é esta
+      # checagem, contra a base de advisories baixada na hora. Ela também
+      # acusa o rebaixamento silencioso do resolvedor, que era o argumento do
+      # piso. É o único passo que roda no gatilho `schedule`.
+      - name: Audit
+        run: bundle exec bundle-audit check --update
+
+      # O rubocop está no Gemfile desde sempre e nenhum workflow o executava --
+      # tanto que ficou quebrado por um bump de gem sem ninguém notar (#644). Com
+      # as ofensas em zero, o gate é sustentável.
+      - name: Lint
+        if: github.event_name != 'schedule'
+        run: bundle exec rubocop
+
+      # Mesmo caso do rubocop antes da #644: no Gemfile, em workflow nenhum. Roda
+      # em modo relatório (--no-exit-on-warn) enquanto os avisos existentes não
+      # forem triados pelo mantenedor; com um config/brakeman.ignore anotado,
+      # tira-se a opção e ele vira portão. Sem o relatório aqui, aviso novo só
+      # apareceria para quem rodasse à mão.
+      - name: Brakeman
+        if: github.event_name != 'schedule'
+        run: bundle exec brakeman -q --no-pager --no-exit-on-warn
+
+      # O eager load lê colunas pelo active_scaffold ao carregar cada controller,
+      # então precisa de esquema; o SQLite do database.yml.example basta. A #680
+      # pôs lib/ no eager load, e é esta checagem que acusa se algo ali deixar
+      # de carregar -- localmente ela só roda quando alguém lembra.
+      - name: Configure database.yml
+        if: github.event_name != 'schedule'
+        run: cp config/database.yml.example config/database.yml
+
+      - name: Zeitwerk
+        if: github.event_name != 'schedule'
+        run: bundle exec rake db:schema:load zeitwerk:check
+
   test:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
 
     # A suite roda nos dois navegadores que a aplicacao encontra: Chrome, que e o
@@ -98,22 +171,9 @@ jobs:
       - name: Set up database schema
         run: bundle exec rake db:schema:load --trace
 
-      # O Gemfile não declara piso de segurança (">= x.y.z"): piso envelhece
-      # calado quando sai a correção seguinte, e passa a afirmar cobertura que
-      # não existe. O que garante que o lock não carrega CVE conhecida é esta
-      # checagem, contra a base de advisories baixada na hora. Ela também
-      # acusa o rebaixamento silencioso do resolvedor, que era o argumento do
-      # piso. Roda antes da suíte porque é rápida e falha barato.
-      - name: Audit
-        run: bundle exec bundle-audit check --update
-
-      # O rubocop está no Gemfile desde sempre e nenhum workflow o executava --
-      # tanto que ficou quebrado por um bump de gem sem ninguém notar (#644). Com
-      # as ofensas em zero, o gate é sustentável. Roda antes da suíte porque é
-      # rápido e falha barato.
-      - name: Lint
-        run: bundle exec rubocop
-
+      # Audit e Lint moram no job `checks`, acima: aqui só a suíte, para que um
+      # vermelho de checagem não esconda o resultado dela.
+      #
       # --profile: os dez exemplos mais lentos de cada navegador ficam no log. A
       # matriz mostrou o Firefox 1,5x mais lento que o Chrome no runner (e 2x
       # mais rapido no Mac); so o perfil diz se a diferenca e uniforme, da
@@ -193,6 +253,7 @@ jobs:
           fail-on-error: false
 
   smoke-test:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
 
     env:
@@ -232,6 +293,7 @@ jobs:
   # Roda em MariaDB porque e o banco de producao, e porque so nele carrega o
   # bloco atras de `unless is_sqlite` em db/seeds/02.reports_notifications.rb.
   seed:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
 
     services:
