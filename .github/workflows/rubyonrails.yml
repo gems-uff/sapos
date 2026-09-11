@@ -98,6 +98,15 @@ jobs:
       - name: Set up database schema
         run: bundle exec rake db:schema:load --trace
 
+      # O Gemfile não declara piso de segurança (">= x.y.z"): piso envelhece
+      # calado quando sai a correção seguinte, e passa a afirmar cobertura que
+      # não existe. O que garante que o lock não carrega CVE conhecida é esta
+      # checagem, contra a base de advisories baixada na hora. Ela também
+      # acusa o rebaixamento silencioso do resolvedor, que era o argumento do
+      # piso. Roda antes da suíte porque é rápida e falha barato.
+      - name: Audit
+        run: bundle exec bundle-audit check --update
+
       # O rubocop está no Gemfile desde sempre e nenhum workflow o executava --
       # tanto que ficou quebrado por um bump de gem sem ninguém notar (#644). Com
       # as ofensas em zero, o gate é sustentável. Roda antes da suíte porque é

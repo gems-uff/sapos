@@ -8,11 +8,14 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 # seguranca, e a 3.4 serve ao Rails 8 -- sobrevive a esse salto.
 ruby "~> 3.4.10"
 
+# Nao ha piso de seguranca (">= x.y.z") neste arquivo. Piso envelhece calado
+# quando sai a correcao seguinte; o que garante que o lock nao carrega CVE
+# conhecida e o bundle-audit, que o CI roda contra a base de advisories do dia.
+
 # ─── Framework e servidor ────────────────────────────────────────────────
-gem "rails", "~> 8.1.3", ">= 8.1.3.1"    # piso de seguranca (CVE-2026-66066)
+gem "rails", "~> 8.1.3"                  # minor do Rails e migracao: decisao a parte
 gem "sprockets-rails"                    # asset pipeline
 gem "bootsnap", require: false           # cache de boot (config/boot.rb)
-gem "nokogiri", ">= 1.18.9"              # piso de seguranca (parser HTML/XML)
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # ─── Assets / front-end ──────────────────────────────────────────────────
@@ -23,7 +26,7 @@ gem "jquery-ui-rails", "~> 8.0"          # major mexe no layout de assets e o AS
 gem "font-awesome-rails"
 
 # ─── Autenticacao e autorizacao ──────────────────────────────────────────
-gem "devise", "~> 5.0", ">= 5.0.4"       # major de auth exige migracao: decisao a parte
+gem "devise", "~> 5.0"                   # major de auth exige migracao: decisao a parte
 gem "devise_invitable"
 gem "cancancan"
 gem "recaptcha", require: "recaptcha/rails"
@@ -51,7 +54,7 @@ gem "liquid"                             # templates de relatorio/notificacao
 gem "redcarpet"                          # Markdown (pagina de creditos)
 
 # ─── Upload de arquivos ──────────────────────────────────────────────────
-gem "carrierwave", ">= 3.0.7"            # piso de seguranca
+gem "carrierwave"
 gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-activerecord.git", branch: "rails8"
 
 # ─── Dominio / infraestrutura de app ─────────────────────────────────────
@@ -76,9 +79,9 @@ group :development, :test do
   # que o Capybara sobe nos feature specs (Capybara.server em rails_helper).
   # A serie fica travada por esse segundo uso: o Capybara instancia
   # Puma::Server e chama binder e log_writer diretamente, e e major que mexe
-  # nessas superficies. O piso e a correcao do protocolo PROXY.
-  gem "puma", "~> 8.0", ">= 8.0.2"
-  gem "sqlite3", ">= 2.9.6"              # banco de dev/test; piso 2.9.6: GHSA-mwm8-39rw-8826
+  # nessas superficies.
+  gem "puma", "~> 8.0"
+  gem "sqlite3"                          # banco de dev/test
   gem "awesome_print"
   gem "binding_of_caller"
   gem "better_errors"
