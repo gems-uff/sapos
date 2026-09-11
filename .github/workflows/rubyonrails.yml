@@ -62,14 +62,13 @@ jobs:
         if: github.event_name != 'schedule'
         run: bundle exec rubocop
 
-      # Mesmo caso do rubocop antes da #644: no Gemfile, em workflow nenhum. Roda
-      # em modo relatório (--no-exit-on-warn) enquanto os avisos existentes não
-      # forem triados pelo mantenedor; com um config/brakeman.ignore anotado,
-      # tira-se a opção e ele vira portão. Sem o relatório aqui, aviso novo só
-      # apareceria para quem rodasse à mão.
+      # Mesmo caso do rubocop antes da #644: no Gemfile, em workflow nenhum. Os
+      # avisos que sobraram da triagem estão em config/brakeman.ignore, cada um
+      # com a nota do porquê; aviso novo, ou aviso conhecido que mudou de forma,
+      # fica vermelho aqui. Para rever a lista: `bundle exec brakeman -I`.
       - name: Brakeman
         if: github.event_name != 'schedule'
-        run: bundle exec brakeman -q --no-pager --no-exit-on-warn
+        run: bundle exec brakeman -q --no-pager
 
       # O eager load lê colunas pelo active_scaffold ao carregar cada controller,
       # então precisa de esquema; o SQLite do database.yml.example basta. A #680

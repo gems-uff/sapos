@@ -7,11 +7,6 @@ class AssertionsController < ApplicationController
   include SharedPdfConcern
 
   authorize_resource
-  before_action :permit_query_params
-
-  def permit_query_params
-    params[:query_params].permit! unless params[:query_params].nil?
-  end
 
   active_scaffold :assertion do |config|
     config.action_links.add "simulate",
@@ -92,10 +87,15 @@ class AssertionsController < ApplicationController
   end
 
   private
+    # Só as chaves que a consulta declara passam, mais matricula_aluno, que a
+    # autorização de generate_assertion lê antes de a consulta rodar. Os
+    # valores seguem para Query#map_params como parâmetros ligados, mas esta
+    # entrada é alcançável por aluno e professor, e não há por que aceitar o
+    # que a consulta não pede -- era o que o permit! de antes fazia.
     def get_query_params
-      return params[:query_params].to_unsafe_h if params[:query_params].is_a?(
-        ActionController::Parameters
-      )
-      params[:query_params] || {}
+      raw = params[:query_params]
+      return {}.with_indifferent_access unless raw.is_a?(ActionController::Parameters)
+      allowed = @assertion.query.params.map(&:name) + ["matricula_aluno"]
+      raw.permit(*allowed).to_h
     end
 end

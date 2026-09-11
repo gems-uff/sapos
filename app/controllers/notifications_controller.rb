@@ -7,13 +7,8 @@ class NotificationsController < ApplicationController
   include SharedPdfConcern
 
   authorize_resource
-  before_action :permit_query_params
   helper PdfHelper
   helper EnrollmentsPdfHelper
-
-  def permit_query_params
-    params[:query_params].permit! unless params[:query_params].nil?
-  end
 
   active_scaffold :"notification" do |config|
     config.action_links.add(
@@ -81,7 +76,7 @@ class NotificationsController < ApplicationController
 
   def execute_now
     process_action_link_action do |notification|
-      result = notification.execute(override_params: get_query_params)
+      result = notification.execute(override_params: get_query_params(notification))
       Notifier.send_emails(prepare_attachments(result))
       self.successful = true
 
@@ -129,7 +124,7 @@ class NotificationsController < ApplicationController
     # defeito: avisa e simula com a data padrão da notificação, em vez de
     # derrubar a página.
     def prepare_simulation_args
-      query_params = get_query_params
+      query_params = get_query_params(@notification)
       @notification.prepare_params_and_derivations(query_params)
     rescue Date::Error
       flash.now[:alert] = I18n.t(
@@ -141,10 +136,15 @@ class NotificationsController < ApplicationController
       )
     end
 
-    def get_query_params
-      return params[:query_params].to_unsafe_h if params[:query_params].is_a?(
-        ActionController::Parameters
-      )
-      params[:query_params] || {}
+    # Só as chaves que a consulta declara passam, mais data_consulta, a
+    # derivação que o formulário de simulação envia e de onde as demais
+    # (semestre e ano atual e anterior) são calculadas no modelo. Os valores
+    # seguem para a consulta como parâmetros ligados, mas o permit! de antes
+    # aceitava qualquer chave, e não há por que aceitar o que a consulta não pede.
+    def get_query_params(notification)
+      raw = params[:query_params]
+      return {}.with_indifferent_access unless raw.is_a?(ActionController::Parameters)
+      allowed = notification.query.params.map(&:name) + Notification::DERIVATION_DEFS.keys
+      raw.permit(*allowed).to_h
     end
 end
