@@ -86,6 +86,11 @@ class NotificationsController < ApplicationController
 
   def simulate
     @notification = Notification.find(params[:id])
+    # A view lê os valores por @query_values, nunca por params[:query_params]:
+    # o hash cru não é permitido e converter em hash ou JSON levanta
+    # UnfilteredParameters -- foi o 500 que a homologação acusou com data
+    # inválida numa consulta que devolve linhas.
+    @query_values = get_query_params(@notification)
     # Execute notification with current parameters
     args = prepare_simulation_args
     result = @notification.execute(skip_update: true, override_params: args)
@@ -124,7 +129,7 @@ class NotificationsController < ApplicationController
     # defeito: avisa e simula com a data padrão da notificação, em vez de
     # derrubar a página.
     def prepare_simulation_args
-      query_params = get_query_params(@notification)
+      query_params = @query_values.dup
       @notification.prepare_params_and_derivations(query_params)
     rescue Date::Error
       flash.now[:alert] = I18n.t(

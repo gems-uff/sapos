@@ -19,7 +19,12 @@ RSpec.describe "Parâmetros de consulta: só as chaves declaradas passam", type:
   before(:each) do
     @role_adm = FactoryBot.create(:role_administrador)
     sign_in create_confirmed_user([@role_adm], "query_params_admin@ic.uff.br")
-    @query = FactoryBot.create(:query, name: "alunos", sql: "select * from students")
+    # A consulta DEVOLVE uma linha de propósito: as views de simulação têm
+    # blocos que só renderizam com resultado (o botão de PDF da declaração, o
+    # link "Notificar agora"), e foi num deles que a homologação acusou 500 --
+    # params[:query_params] cru, não permitido, convertido em hash na view. Com
+    # consulta vazia o spec passava e o defeito seguia.
+    @query = FactoryBot.create(:query, name: "alunos", sql: "select 'linha' as coluna")
     FactoryBot.create(:query_param, query: @query, name: "_a", value_type: "String", default_value: "")
   end
 
@@ -53,6 +58,17 @@ RSpec.describe "Parâmetros de consulta: só as chaves declaradas passam", type:
       get simulate_assertion_path(@assertion)
       expect(response).to have_http_status(:ok)
     end
+
+    it "renderiza com resultado e leva ao botão de PDF só as chaves permitidas" do
+      get simulate_assertion_path(@assertion), params: {
+        query_params: { _a: "x", nao_declarada: "y" }
+      }
+
+      expect(response).to have_http_status(:ok)
+      botao = Nokogiri::HTML(response.body).at_css("[data-query-params]")
+      expect(botao).not_to be_nil
+      expect(JSON.parse(botao["data-query-params"])).to eq("_a" => "x")
+    end
   end
 
   describe "notificação (simulate)" do
@@ -81,6 +97,19 @@ RSpec.describe "Parâmetros de consulta: só as chaves declaradas passam", type:
       expect(keys).not_to include("nao_declarada")
       # As derivações continuam sendo calculadas a partir de data_consulta.
       expect(keys).to include("ano_semestre_atual", "numero_semestre_atual")
+    end
+
+    it "renderiza com resultado e data inválida, mostrando a data digitada e o link de notificar" do
+      get simulate_notification_path(@notification), params: {
+        query_params: { _a: "x", data_consulta: "31/31/2026", nao_declarada: "y" }
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("31/31/2026")
+      link = Nokogiri::HTML(response.body).at_css("a.execute_now")
+      expect(link).not_to be_nil
+      expect(link["href"]).to include("query_params%5B_a%5D=x")
+      expect(link["href"]).not_to include("nao_declarada")
     end
   end
 end

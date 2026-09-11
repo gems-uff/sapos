@@ -41,7 +41,10 @@ class AssertionsController < ApplicationController
 
   def simulate
     @assertion = Assertion.find(params[:id])
-    @args = @assertion.query.map_params(get_query_params)
+    # A view lê os valores por @query_values, nunca por params[:query_params]:
+    # o hash cru não é permitido e converter em JSON levanta UnfilteredParameters.
+    @query_values = get_query_params
+    @args = @assertion.query.map_params(@query_values)
     result = @assertion.query_results(@args)
     @messages = result[:rows] || []
     @query_sql = result[:query]
