@@ -8,7 +8,16 @@
 // mesmo CSS repetido em sete campos de dois programas. A sanitizacao do campo
 // HTML poda <style>, entao a regra passa a morar aqui, onde e da aplicacao e
 // vale para todo template, e os blocos remendados podem ser apagados.
-.admission-inner li.form-element.required dt label:after {
+//
+// Vale em toda tela que renderiza o template preenchido, nao so na publica:
+// a edicao de candidatura pelo administrador tambem tinha o asterisco pelo
+// remendo, e a homologacao mede as duas. O parcial _filled_form_template emite
+// um <div class="filled-form-html-id"> antes dos campos, e e ele que ancora o
+// seletor de irmaos; o segundo ramo alcanca os campos agrupados, que ficam
+// dentro de um li.sub-form e nao sao irmaos diretos do marcador.
+.admission-inner li.form-element.required dt label:after,
+.filled-form-html-id ~ li.form-element.required dt label:after,
+.filled-form-html-id ~ li.sub-form li.form-element.required dt label:after {
   content: "*";
   color: red;
 }
