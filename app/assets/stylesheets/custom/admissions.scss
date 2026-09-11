@@ -2,6 +2,17 @@
   padding: 1em !important;
 }
 
+// Asterisco nos rotulos dos campos obrigatorios do formulario de candidatura.
+// O active_scaffold so poe o rotulo em negrito, e nas instalacoes reais a falta
+// foi remendada com um bloco <style> dentro de campos HTML do template, o
+// mesmo CSS repetido em sete campos de dois programas. A sanitizacao do campo
+// HTML poda <style>, entao a regra passa a morar aqui, onde e da aplicacao e
+// vale para todo template, e os blocos remendados podem ser apagados.
+.admission-inner li.form-element.required dt label:after {
+  content: "*";
+  color: red;
+}
+
 .admission-inner .count {
   padding-bottom: 1em;
 }
