@@ -104,30 +104,14 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
       end
     end
   end
-  # ToDo: test scopes
+  # Escopos, consolidação, cartas, condições e aluno correspondente:
+  # admission_application_consolidation_spec.rb. Cópia para o aluno e envio de
+  # formulários (update_student, assign_form):
+  # admission_application_update_student_spec.rb.
   # ToDo: test before_save
 
-
   describe "Methods" do
-    # ToDo: pendency_condition
-    # ToDo: phase_condition
     # ToDo: to_label
-    # ToDo: requested_letters
-    # ToDo: filled_letters
-    # ToDo: missing_letters?
-    # ToDo: prepare_missing_letters
-    # ToDo: satisfies_condition
-    # ToDo: attribute_as_field
-    # ToDo: fields_hash
-    # ToDo: consolidate_phase
-    # ToDo: consolidate_phase!
-    # ToDo: descriptive_status
-    # ToDo: candidate_can_edit
-    # ToDo: students_by_cpf
-    # ToDo: students_by_email
-    # ToDo: students
-    # ToDo: assign_form
-    # ToDo: update_student
     # A data anterior entra na observacao da matricula por interpolacao, e era
     # formatada pelo monkey-patch global de Date#to_s (#625). A regiao estava
     # sem cobertura nenhuma quando o patch saiu.
@@ -169,10 +153,8 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
         expect(enrollment.obs).to be_blank
       end
     end
-    # ToDo: undo_consolidation
     # ToDo: phase_name
     # ToDo: identifier
-    # ToDo: can_edit_itself
     # ToDo: ordered_rankings
   end
 end

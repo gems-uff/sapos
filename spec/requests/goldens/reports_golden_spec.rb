@@ -269,6 +269,106 @@ RSpec.describe "Saídas em PDF e XLSX", type: :request do
     end
   end
 
+  # O processo vazio acima protege o cabeçalho; o conteúdo dos relatórios vem
+  # dos grupos (dados de carta, fases em ordem inversa, campos, cartas, ranking
+  # e consolidação), que só aparecem com candidaturas completas. Este cenário
+  # tem duas: uma com tudo preenchido e outra só com a inscrição, para o
+  # relatório mostrar também as células vazias e o "não encontrado".
+  #
+  # Tudo que sai no papel é fixado: o código de identificação é gerado ao acaso
+  # pelo modelo, então vem dado; o hash do anexo é o MD5 do conteúdo, estável.
+  describe "processo de admissão com fases, cartas e ranking" do
+    before(:each) do
+      template = create_admission_template("Inscrição Completa", {
+        "nota" => Admissions::FormField::NUMBER,
+        "anexo" => Admissions::FormField::FILE,
+      })
+      letter_template = create_admission_template(
+        "Carta de Recomendação", { "texto" => Admissions::FormField::TEXT },
+        template_type: Admissions::FormTemplate::RECOMMENDATION_LETTER
+      )
+      @full_process = create_closed_admission_process(
+        template, simple_url: "golden-completo", name: "Mestrado Golden",
+        year: 2021, semester: 1, letter_template: letter_template
+      )
+      phase1 = add_phase(
+        @full_process, 1, name: "Análise",
+        shared_form: create_admission_template("Ficha", { "obs" => Admissions::FormField::STRING }),
+        member_form: create_admission_template("Parecer", { "parecer" => Admissions::FormField::STRING }),
+        candidate_form: create_admission_template("Complemento", { "extra" => Admissions::FormField::STRING }),
+        consolidation_form: create_consolidation_template("Consolidação", {
+          "dobro" => code_field("{{ fields.nota | times: 2 }}"),
+        })
+      )
+      phase2 = add_phase(
+        @full_process, 2, name: "Entrevista",
+        shared_form: create_admission_template("Entrevista", { "nota_entrevista" => Admissions::FormField::NUMBER })
+      )
+      reviewer = professor_user("golden-reviewer@ic.uff.br")
+
+      ana = create_application(
+        @full_process, name: "Ana Conceição", email: "ana.golden@example.com",
+        token: "GOLDEN-AAAAAA-000001", admission_phase: phase2,
+        fields: {
+          "nota" => "8.5",
+          "anexo" => { file: Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/user.png"), "image/png") },
+        }
+      )
+      letter = ana.letter_requests.create!(name: "Prof. Recomendador", email: "rec@example.com", telephone: "2199")
+      letter.filled_form.update!(is_filled: true)
+      fill_fields(letter.filled_form, { "texto" => "Recomendo sem reservas." })
+      ana.letter_requests.create!(name: "Prof. Silencioso", email: "sil@example.com")
+      create_phase_result(ana, phase1, Admissions::AdmissionPhaseResult::SHARED, fields: { "obs" => "Perfil forte" })
+      create_phase_result(ana, phase1, Admissions::AdmissionPhaseResult::CANDIDATE, fields: { "extra" => "Publicação aceita" })
+      create_evaluation(ana, phase1, reviewer, fields: { "parecer" => "Aprovar" })
+      FactoryBot.create(
+        :admission_pendency, admission_application: ana, admission_phase: phase1,
+        mode: Admissions::AdmissionPendency::MEMBER, user: reviewer, status: Admissions::AdmissionPendency::OK
+      )
+      ana.consolidate_phase!(phase1)
+      create_phase_result(ana, phase2, Admissions::AdmissionPhaseResult::SHARED, fields: { "nota_entrevista" => "9" })
+
+      create_application(
+        @full_process, name: "Bento Souza", email: "bento.golden@example.com",
+        token: "GOLDEN-BBBBBB-000002", fields: { "nota" => "6" }
+      )
+      @full_process.update!(min_letters: 1, max_letters: 2)
+
+      ranking = FactoryBot.create(:ranking_config, name: "Geral", default_column: "nota")
+      ranking.ranking_columns.first.update!(order: Admissions::RankingColumn::DESC)
+      FactoryBot.create(
+        :admission_process_ranking, admission_process: @full_process, ranking_config: ranking, order: 1
+      ).generate_ranking
+    end
+
+    it "mantém o conteúdo do baseline resumido" do
+      get short_pdf_admission_process_path(@full_process, format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "admission_process_full_short", response.body, format: :pdf
+      )
+    end
+
+    it "mantém o conteúdo do baseline completo" do
+      get complete_pdf_admission_process_path(@full_process, format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "admission_process_full_complete", response.body, format: :pdf
+      )
+    end
+
+    it "mantém as células do baseline em XLSX" do
+      get complete_xls_admission_process_path(@full_process, format: :xlsx)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "admission_process_full_complete_xls", response.body, format: :xlsx
+      )
+    end
+  end
+
   # A prévia não tem rota GET: é POST, monta um ReportConfiguration em memória a
   # partir de record_params e renderiza sem persistir. record_id -1 é o sinal de
   # "registro novo" que o controller usa.
