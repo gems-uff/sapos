@@ -143,7 +143,65 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     it "should have a disapproved by absence widget" do
       page.send_keys :escape
       find(:css, "#record_disapproved_by_absence_").set(true)
-      expect(page).to have_field("Nota", with: "1")
+      expect(page).to have_field("Nota", with: "1,0")
+    end
+
+    it "asks before overwriting a low but nonzero grade when marking disapproved by absence" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "05"
+      end
+      expect(page).to have_field("Nota", with: "0,5")
+
+      accept_confirm do
+        find(:css, "#record_disapproved_by_absence_").set(true)
+      end
+
+      expect(page).to have_field("Nota", with: "1,0")
+    end
+
+    # O JS troca '%{actual_grade}' e '%{grade_for_disapproval}' na mensagem, e o
+    # locale escreve os dois nomes sem os delimitadores -- entao nenhum dos dois
+    # replace encontra o que procura e o professor le o nome do marcador em vez
+    # da nota. A mensagem e consumida por JS, nao por I18n.t com argumentos,
+    # entao pode levar %{} no yml sem risco de MissingInterpolationArgument.
+    it "names the two grades in the overwrite confirmation" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "05"
+      end
+      expect(page).to have_field("Nota", with: "0,5")
+
+      mensagem = accept_confirm do
+        find(:css, "#record_disapproved_by_absence_").set(true)
+      end
+
+      expect(mensagem).to include("0,5").and include("1,0")
+    end
+
+    it "resets the student situation when the grade field is cleared" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "60"
+      end
+      expect(page).to have_field("Nota", with: "6,0")
+
+      within(".as_form") do
+        grade_field = find_field("Nota")
+        grade_field.click
+        grade_field.send_keys([:control, "a"], :backspace)
+      end
+
+      expect(page).to have_field("record_situation_", with: ClassEnrollment::REGISTERED)
+    end
+
+    it "caps the grade at 10,0 when the typed value exceeds the maximum" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "9999"
+      end
+
+      expect(page).to have_field("Nota", with: "10,0")
     end
 
     it "should have a justification_grade_not_count_in_gpr without a label" do
@@ -172,7 +230,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     it "should be able to edit student" do
       page.driver.browser.action.send_keys(:escape).perform
       within(".as_form") do
-        fill_in "Nota", with: "6"
+        fill_in "Nota", with: "60"
       end
       click_button_and_wait "Atualizar"
       expect(page).to have_css("td.grade_label-column", text: "6.0")

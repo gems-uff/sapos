@@ -27,6 +27,7 @@ class CustomVariable < ApplicationRecord
     "quadrennial_period" => :text,
     "instance_name" => :text,
     "enable_advisor_accreditation_validation" => :text,
+    "import_grades_session_timeout" => :text
   }
 
   validates :variable, presence: true
@@ -126,6 +127,11 @@ class CustomVariable < ApplicationRecord
     config = CustomVariable.find_by_variable(:enable_advisor_accreditation_validation)
     return true if config.blank? || config.value.blank?
     config.value.strip.downcase != "no"
+  end
+
+  def self.import_grades_session_timeout
+    config = CustomVariable.find_by_variable(:import_grades_session_timeout)
+    config.blank? || config.value.blank? ? 45.minutes : config.value.to_i
   end
 
   def to_label

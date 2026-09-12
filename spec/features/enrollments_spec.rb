@@ -191,6 +191,53 @@ RSpec.describe "Enrollments features", type: :feature do
     end
   end
 
+  # O cabecalho do subform horizontal decide as colunas de nota pelo pai, em
+  # _horizontal_subform_header.html.erb: "parent_record.respond_to?(:course)".
+  # Na tela da Turma o pai e uma CourseClass, a turma toda e da mesma disciplina
+  # e a decisao vale para a lista inteira. Na tela da Matricula o pai e uma
+  # Enrollment, que nao responde a :course, entao os dois <th> de nota saem
+  # sempre -- enquanto o hide_form_column_if do ClassEnrollmentsController e
+  # avaliado por registro e o CSS ".class_enrollments-sub-form td:has(> dl[style
+  # *='display: none'])" remove a celula daquela linha. Aluno com uma disciplina
+  # com nota e outra sem fica com linhas de larguras diferentes.
+  describe "class_enrollments subform on the enrollment form", js: true do
+    before(:each) do
+      tipo_sem_nota = FactoryBot.create(
+        :course_type, name: "Estagio", has_score: false, schedulable: true
+      )
+      disciplina_sem_nota = FactoryBot.create(
+        :course, name: "Estagio", code: "EST-1", credits: 0, workload: 30,
+        course_type: tipo_sem_nota
+      )
+      turma_sem_nota = FactoryBot.create(
+        :course_class, name: "Estagio", course: disciplina_sem_nota,
+        professor: @professor1, year: 2021, semester: 1
+      )
+      inscricao_sem_nota = FactoryBot.create(
+        :class_enrollment, enrollment: @enrollment2,
+        course_class: turma_sem_nota, situation: ClassEnrollment::REGISTERED
+      )
+      # Na ordem em que precisam sair: a inscricao antes da turma que ela cita.
+      @destroy_later.concat(
+        [inscricao_sem_nota, turma_sem_nota, disciplina_sem_nota, tipo_sem_nota]
+      )
+
+      login_as(@user)
+      visit url_path
+      find("#as_#{plural_name}-edit-#{@enrollment2.id}-link").click
+    end
+
+    it "gives every row the same number of cells" do
+      subform = find("table[id$='class_enrollments-subform-list']")
+      # A lista traz uma <tr> de gabarito, sem celula nenhuma; so as linhas de
+      # registro interessam.
+      larguras = subform.all("tbody tr")
+        .map { |linha| linha.all("td").size }.reject(&:zero?)
+      expect(larguras.uniq.size).to eq(1),
+        "linhas do subform com larguras diferentes: #{larguras.inspect}"
+    end
+  end
+
   describe "search page", js: true do
     before(:each) do
       login_as(@user)
