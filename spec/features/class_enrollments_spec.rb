@@ -190,7 +190,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
         find_field("Nota").set("")
       end
 
-      expect(page.find(:select, "record_situation_").value).to eq(ClassEnrollment::REGISTERED)
+      expect(page).to have_field("record_situation_", with: ClassEnrollment::REGISTERED)
     end
 
     it "caps the grade at 10,0 when the typed value exceeds the maximum" do
