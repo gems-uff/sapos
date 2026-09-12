@@ -31,7 +31,7 @@ class AdmissionsWorkflowLoader
   FIXTURE = Rails.root.join("spec", "fixtures", "admissions", "workflows.json")
 
   def self.constants_of(klass, keys)
-    keys.to_h { |key| [key, klass.const_get(key.upcase)] }
+    keys.index_with { |key| klass.const_get(key.upcase) }
   end
 
   FIELD_TYPES = constants_of(Admissions::FormField, %w[

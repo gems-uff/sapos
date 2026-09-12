@@ -267,7 +267,6 @@ RSpec.describe "Admissions::AdmissionProcesses#consolidate_phase", type: :reques
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("action_link.close()")
     end
-
   end
 
   describe "telas auxiliares" do
