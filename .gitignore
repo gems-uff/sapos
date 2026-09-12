@@ -65,3 +65,6 @@ nbproject/
 .DS_Store
 /.env
 .vscode/
+
+# Configuração local do Claude Code (por máquina, não versionada)
+.claude/settings.local.json
