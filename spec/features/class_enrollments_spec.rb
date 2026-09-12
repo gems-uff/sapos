@@ -187,7 +187,9 @@ RSpec.describe "ClassEnrollments features", type: :feature do
       expect(page).to have_field("Nota", with: "6,0")
 
       within(".as_form") do
-        find_field("Nota").set("")
+        grade_field = find_field("Nota")
+        grade_field.click
+        grade_field.send_keys([:control, "a"], :backspace)
       end
 
       expect(page).to have_field("record_situation_", with: ClassEnrollment::REGISTERED)
