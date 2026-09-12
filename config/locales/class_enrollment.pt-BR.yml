@@ -77,4 +77,4 @@ pt-BR:
   helpers:
     class_enrollments:
       placeholder_grade: "_,_"
-      confirm_grade_overwrite: "Já existe uma nota digitada (actual_grade). Deseja substituí-la com a nota de reprovação por falta (grade_for_disapproval)?"
+      confirm_grade_overwrite: "Já existe uma nota digitada (%{actual_grade}). Deseja substituí-la com a nota de reprovação por falta (%{grade_for_disapproval})?"

@@ -35,8 +35,10 @@ class CourseClassesController < ApplicationController
       page: true,
       type: :member,
       parameters: { format: :xlsx }
+
     config.action_links.add "import_grades_xls",
       label: "<i title='#{I18n.t("xls_content.course_class.import_grades_xls_label")}' class='fa fa-upload'></i>".html_safe,
+      page: true,
       type: :member,
       position: :replace
 
@@ -156,16 +158,71 @@ class CourseClassesController < ApplicationController
   def import_grades_xls
     @course_class = CourseClass.find(params[:id])
     authorize! :import_grades_xls, @course_class
-    if params[:confirm] == "1"
+    if request.post? && params[:confirm] == "1"
       stored_results = session[xls_import_session_key(@course_class)]
-      if stored_results.blank?
+      if stored_results.blank? || stored_results[:rows].blank?
         flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_nothing_saved")
         redirect_to course_classes_path and return
       end
-      saved_count = apply_xls_import_changes(stored_results)
+
+      if stored_results[:stored_at] < CustomVariable.import_grades_session_timeout.ago
+        session.delete(xls_import_session_key(@course_class))
+        flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_expired")
+        redirect_to import_grades_xls_course_class_path(@course_class) and return
+      end
+
+      recomputed = stored_results[:rows].map do |row|
+        class_enrollment = @course_class.class_enrollments.find_by(id: row[:class_enrollment_id])
+        unless class_enrollment
+          next { enrollment_number: row[:enrollment_number], class_enrollment_id: row[:class_enrollment_id], status: "not_enrolled", diverged: true }
+        end
+
+        data = {
+          grade: row[:imported_grade],
+          situation: row[:imported_situation],
+          attendance: row[:imported_attendance],
+          obs: row[:imported_obs]
+        }
+        result = compute_import_row(row[:enrollment_number], class_enrollment, data, false)
+        result[:diverged] = (
+          class_enrollment.grade != row[:snapshot_grade] ||
+          class_enrollment.situation != row[:snapshot_situation] ||
+          class_enrollment.disapproved_by_absence != row[:snapshot_attendance] ||
+          class_enrollment.grade_not_count_in_gpr != row[:snapshot_grade_not_count_in_gpr]
+        )
+        result
+      end
+
+      if recomputed.any? { |r| r[:diverged] }
+        @results = recomputed
+        @duplicate_enrollment_numbers = []
+        store_import_preview(recomputed, stored_at: stored_results[:stored_at])
+        flash.now[:warning] = I18n.t("xls_content.course_class.import_grades_xls_results.data_changed_warning")
+        render :import_grades_xls_results and return
+      end
+
+      changes = recomputed.map do |r|
+        {
+          status: r[:status],
+          class_enrollment_id: r[:class_enrollment_id],
+          enrollment_number: r[:enrollment_number],
+          final_grade: r[:final_grade],
+          final_attendance: r[:final_attendance],
+          final_situation: r[:final_situation],
+          final_obs: r[:final_obs]
+        }
+      end
+
+      saved_count, failed, notification_failures = apply_xls_import_changes(changes)
       session.delete(xls_import_session_key(@course_class))
-      if saved_count > 0
+      if failed.any?
+        flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_partial_failure",
+        details: failed.map { |f| "#{f[:enrollment_number]}: #{f[:errors].join(", ")}" }.join("; "))
+      elsif saved_count > 0
         flash[:info] = I18n.t("xls_content.course_class.import_grades_xls_success", count: saved_count)
+        if notification_failures.any?
+          flash[:warning] = I18n.t("xls_content.course_class.import_grades_xls_notification_failure", enrollment_numbers: notification_failures.join(", "))
+        end
       else
         flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_nothing_saved")
       end
@@ -173,8 +230,8 @@ class CourseClassesController < ApplicationController
       redirect_to course_classes_path and return
     elsif request.post? && params[:spreadsheet].present?
       begin
-        @results = build_xls_import_preview(params[:spreadsheet])
-        session[xls_import_session_key(@course_class)] = @results
+        @results, @duplicate_enrollment_numbers = build_xls_import_preview(params[:spreadsheet])
+        store_import_preview(@results)
         render :import_grades_xls_results and return
       rescue ArgumentError
         flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_error")
@@ -220,9 +277,7 @@ class CourseClassesController < ApplicationController
     end
 
     def build_xls_import_preview(file)
-      grade_of_disapproval_for_absence = CustomVariable.grade_of_disapproval_for_absence
-      minimum_grade_for_approval = CustomVariable.minimum_grade_for_approval
-      rows = parse_rows_xls(file)
+      rows, duplicate_enrollment_numbers = parse_rows_xls(file)
 
       results = []
       rows.each do |enrollment_number, data|
@@ -231,93 +286,175 @@ class CourseClassesController < ApplicationController
           results << { enrollment_number: enrollment_number, status: "not_found" }
           next
         end
+        if duplicate_enrollment_numbers.include?(enrollment_number)
+          results << { enrollment_number: enrollment_number, status: "duplicate" }
+          next
+        end
         class_enrollment = @course_class.class_enrollments.find_by(enrollment: enrollment)
         unless class_enrollment
           results << { enrollment_number: enrollment_number, status: "not_enrolled" }
           next
         end
 
-        if data[:grade].present?
-          imported_grade_scaled = data[:grade].to_s.tr(",", ".").to_f * 10
+        results << compute_import_row(enrollment_number, class_enrollment, data, false)
+      end
+      [results, duplicate_enrollment_numbers]
+    end
+
+    def compute_import_row(enrollment_number, class_enrollment, data, duplicate_in_spreadsheet)
+      grade_of_disapproval_for_absence = CustomVariable.grade_of_disapproval_for_absence
+      minimum_grade_for_approval = CustomVariable.minimum_grade_for_approval
+
+      if data[:grade].present?
+        normalized_grade = data[:grade].to_s.strip.tr(",", ".")
+        if normalized_grade.match?(/\A\d+(\.\d+)?\z/)
+          imported_grade_scaled = normalized_grade.to_f * 10
           final_grade = imported_grade_scaled
+          invalid_grade = false
         else
           imported_grade_scaled = nil
           final_grade = class_enrollment.grade
+          invalid_grade = true
         end
-        if data[:situation].present? && ClassEnrollment::SITUATIONS.include?(data[:situation])
-          final_situation = data[:situation]
-          invalid_situation = false
-        elsif data[:situation].present?
-          final_situation = class_enrollment.situation
-          invalid_situation = true
-        else
-          final_situation = class_enrollment.situation
-          invalid_situation = false
-        end
-        if data[:attendance].present?
-          final_attendance = data[:attendance] == ClassEnrollment::ATTENDANCE_TRUE
-        else
-          final_attendance = !class_enrollment.disapproved_by_absence
-        end
-        if !final_attendance
-          final_grade = grade_of_disapproval_for_absence
-          final_situation = ClassEnrollment::DISAPPROVED
-        elsif final_grade.present?
-          final_situation = final_grade.to_f >= minimum_grade_for_approval ? ClassEnrollment::APPROVED : ClassEnrollment::DISAPPROVED
-        end
-        if data[:obs].present?
-          final_obs = data[:obs]
-        else
-          final_obs = class_enrollment.obs
-        end
-
-        final_grade_view = final_grade.present? ? (final_grade.to_f / 10.0).to_s.tr(".", ",") : nil
-
-        results << {
-          enrollment_number: enrollment_number,
-          class_enrollment_id: class_enrollment.id,
-          status: "pending",
-
-          current_grade: class_enrollment.grade_to_view.to_s.tr(".", ","),
-          imported_grade: data[:grade],
-          final_grade: final_grade,
-          final_grade_view: final_grade_view,
-          grade_diff: imported_grade_scaled.present? && imported_grade_scaled != final_grade.to_f,
-
-          imported_attendance: data[:attendance],
-          final_attendance: final_attendance,
-          attendance_diff: data[:attendance].present? && (data[:attendance] == ClassEnrollment::ATTENDANCE_TRUE) != final_attendance,
-
-          current_situation: class_enrollment[:situation],
-          imported_situation: data[:situation],
-          final_situation: final_situation,
-          situation_diff: data[:situation].present? && ClassEnrollment::SITUATIONS.include?(data[:situation]) && data[:situation] != final_situation,
-          invalid_situation: invalid_situation,
-
-          final_obs: final_obs
-
-        }
+      else
+        imported_grade_scaled = nil
+        final_grade = class_enrollment.grade
+        invalid_grade = false
       end
-      results
+
+      if data[:situation].present? && ClassEnrollment::SITUATIONS.include?(data[:situation])
+        final_situation = data[:situation]
+        invalid_situation = false
+      elsif data[:situation].present?
+        final_situation = class_enrollment.situation
+        invalid_situation = true
+      else
+        final_situation = class_enrollment.situation
+        invalid_situation = false
+      end
+
+      if data[:attendance].present? && [ClassEnrollment::ATTENDANCE_TRUE, ClassEnrollment::ATTENDANCE_FALSE].include?(data[:attendance])
+        final_attendance = data[:attendance] == ClassEnrollment::ATTENDANCE_TRUE
+        invalid_attendance = false
+      elsif data[:attendance].present?
+        final_attendance = !class_enrollment.disapproved_by_absence
+        invalid_attendance = true
+      else
+        final_attendance = !class_enrollment.disapproved_by_absence
+        invalid_attendance = false
+      end
+
+      if !final_attendance
+        final_situation = ClassEnrollment::DISAPPROVED
+        final_grade = grade_of_disapproval_for_absence if class_enrollment.course_has_grade
+      elsif final_grade.present? && !class_enrollment.grade_not_count_in_gpr?
+        final_situation = final_grade.to_f >= minimum_grade_for_approval ? ClassEnrollment::APPROVED : ClassEnrollment::DISAPPROVED
+      end
+
+      final_obs = data[:obs].present? ? data[:obs] : class_enrollment.obs
+      final_grade_view = final_grade.present? ? (final_grade.to_f / 10.0).to_s.tr(".", ",") : nil
+
+      {
+        enrollment_number: enrollment_number,
+        class_enrollment_id: class_enrollment.id,
+        status: "pending",
+
+        current_grade: class_enrollment.grade_to_view.to_s.tr(".", ","),
+        current_grade_raw: class_enrollment.grade,
+        imported_grade: data[:grade],
+        final_grade: final_grade,
+        final_grade_view: final_grade_view,
+        grade_diff: imported_grade_scaled.present? && imported_grade_scaled != final_grade.to_f,
+        invalid_grade: invalid_grade,
+        current_grade_not_count_in_gpr_raw: class_enrollment.grade_not_count_in_gpr,
+
+        imported_attendance: data[:attendance],
+        current_attendance_raw: class_enrollment.disapproved_by_absence,
+        final_attendance: final_attendance,
+        attendance_diff: data[:attendance].present? && (data[:attendance] == ClassEnrollment::ATTENDANCE_TRUE) != final_attendance,
+        invalid_attendance: invalid_attendance,
+
+        current_situation: class_enrollment[:situation],
+        imported_situation: data[:situation],
+        final_situation: final_situation,
+        situation_diff: data[:situation].present? && ClassEnrollment::SITUATIONS.include?(data[:situation]) && data[:situation] != final_situation,
+        invalid_situation: invalid_situation,
+
+        duplicate_in_spreadsheet: duplicate_in_spreadsheet,
+
+        final_obs: final_obs,
+        imported_obs: data[:obs],
+        diverged: false
+      }
+    end
+
+    def store_import_preview(results, stored_at: Time.current)
+      session[xls_import_session_key(@course_class)] = {
+        stored_at: stored_at,
+        rows: results.filter_map do |r|
+          next unless r[:status] == "pending"
+          {
+            enrollment_number: r[:enrollment_number],
+            class_enrollment_id: r[:class_enrollment_id],
+            imported_grade: r[:imported_grade],
+            imported_situation: r[:imported_situation],
+            imported_attendance: r[:imported_attendance],
+            imported_obs: r[:imported_obs],
+            snapshot_grade: r[:current_grade_raw],
+            snapshot_situation: r[:current_situation],
+            snapshot_attendance: r[:current_attendance_raw],
+            snapshot_grade_not_count_in_gpr: r[:current_grade_not_count_in_gpr_raw]
+          }
+        end
+      }
     end
 
     def apply_xls_import_changes(changes)
       saved_count = 0
-      changes.each do |raw_change|
-        change = raw_change.with_indifferent_access
-        next unless change[:status] == "pending"
-        class_enrollment = @course_class.class_enrollments.find_by(id: change[:class_enrollment_id])
-        next unless class_enrollment
-        class_enrollment.grade = change[:final_grade]
-        class_enrollment.disapproved_by_absence = !change[:final_attendance]
-        class_enrollment.situation = change[:final_situation]
-        class_enrollment.obs = change[:final_obs]
-        if class_enrollment.save
-          saved_count += 1
-        else
-          Rails.logger.debug class_enrollment.errors.full_messages.inspect
+      failed = []
+      updated_enrollments = []
+      ClassEnrollment.transaction do
+        changes.each do |raw_change|
+          change = raw_change.with_indifferent_access
+          next unless change[:status] == "pending"
+          class_enrollment = @course_class.class_enrollments.find_by(id: change[:class_enrollment_id])
+          next unless class_enrollment
+          class_enrollment.grade = change[:final_grade]
+          class_enrollment.disapproved_by_absence = !change[:final_attendance]
+          class_enrollment.situation = change[:final_situation]
+          class_enrollment.obs = change[:final_obs]
+          class_enrollment.skip_notification = true
+          if class_enrollment.save
+            saved_count += 1
+            updated_enrollments << class_enrollment
+          else
+            failed << {
+              enrollment_number: change[:enrollment_number],
+              errors: class_enrollment.errors.full_messages
+            }
+          end
+        end
+        raise ActiveRecord::Rollback if failed.any?
+      end
+      notification_failures = []
+      if failed.any?
+        saved_count = 0
+      else
+        notification_failures = notify_import_changed(updated_enrollments)
+      end
+      [saved_count, failed, notification_failures]
+    end
+
+    def notify_import_changed(enrollments)
+      notification_failures = []
+      enrollments.each do |class_enrollment|
+        class_enrollment.skip_notification = false
+        begin
+          class_enrollment.send(:notify_student_and_advisor)
+        rescue Net::SMTPError, Net::OpenTimeout, Net::ReadTimeout
+          notification_failures << class_enrollment.enrollment.enrollment_number
         end
       end
-      saved_count
+      notification_failures
     end
 end

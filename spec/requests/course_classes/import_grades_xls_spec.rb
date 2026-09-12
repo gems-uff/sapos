@@ -82,6 +82,77 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
     Nokogiri::HTML(response.body).css("tbody td").map { |td| td.text.strip }
   end
 
+  # Estas mecanicas ja funcionam: o recalculo na confirmacao usa o estado
+  # atual do banco, nao o que a previa mostrou, e a previa expira depois de
+  # um tempo. Os exemplos abaixo travam os dois comportamentos.
+  context "revalidacao da previa ao confirmar" do
+    before(:each) do
+      role = FactoryBot.create(:role_administrador)
+      sign_in create_confirmed_user([role], "admin@ic.uff.br")
+    end
+
+    # Entre o envio da planilha e a confirmacao, o registro pode ter mudado
+    # por outra via -- edicao manual, outra importacao, outro navegador. A
+    # confirmacao recalcula a partir do estado atual do banco; quando esse
+    # recalculo diverge do que a previa mostrou, a importacao nao e aplicada
+    # as cegas -- a tela volta com aviso, e quem confirma decide de novo
+    # sobre dados atualizados, nao sobre a fotografia antiga.
+    it "nao aplica a previa quando o registro mudou no banco antes da confirmacao" do
+      enviar(inscricao, nota: "8,7")
+
+      # simula uma edicao concorrente, fora do fluxo de importacao
+      inscricao.update!(grade: 50, situation: ClassEnrollment::DISAPPROVED)
+
+      confirmar
+
+      expect(inscricao.reload.grade).to eq(50)
+      expect(flash[:warning]).to be_present
+      expect(response.body).to include(
+        I18n.t("xls_content.course_class.import_grades_xls_results.data_changed_warning")
+      )
+    end
+
+    # Depois do aviso de divergencia, a previa continua na sessao com o
+    # estado atualizado -- nao se perde, so pede confirmacao de novo. Sem
+    # nova mudanca concorrente no meio, a segunda confirmacao aplica
+    # normalmente.
+    it "aplica na segunda confirmacao quando nao ha nova divergencia" do
+      enviar(inscricao, nota: "8,7")
+      inscricao.update!(grade: 10, situation: ClassEnrollment::DISAPPROVED)
+
+      confirmar
+      confirmar
+
+      expect(inscricao.reload.grade).to eq(87)
+    end
+
+    # A previa nao expira por conta propria, mas nao pode ficar valida para
+    # sempre: quem abre a tela e demora alem do tempo limite tem de refazer
+    # o envio, para nao confirmar contra um estado de banco que pode ser de
+    # horas antes.
+    it "recusa a confirmacao quando a previa passou do tempo limite" do
+      enviar(inscricao, nota: "8,7")
+
+      travel_to(Time.current + CustomVariable.import_grades_session_timeout + 1.second) do
+        confirmar
+      end
+
+      expect(inscricao.reload.grade).to be_nil
+      expect(flash[:error]).to eq(I18n.t("xls_content.course_class.import_grades_xls_expired"))
+    end
+
+    # Controle: dentro do tempo limite, a mesma previa continua valida.
+    it "aceita a confirmacao dentro do tempo limite" do
+      enviar(inscricao, nota: "8,7")
+
+      travel_to(Time.current + CustomVariable.import_grades_session_timeout - 1.second) do
+        confirmar
+      end
+
+      expect(inscricao.reload.grade).to eq(87)
+    end
+  end
+
   context "como administrador" do
     before(:each) do
       role = FactoryBot.create(:role_administrador)
@@ -411,7 +482,7 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
     # notify_student_and_advisor termina em mail.deliver!, sincrono, uma vez por
     # aluno dentro da mesma requisicao -- SMTP que cai no meio da pauta deixa
     # gravada a parte que ja passou, e nada registra onde parou.
-    it "nao aplica metade da importacao quando uma linha estoura" do
+    it "salva as notas mesmo quando o envio de e-mail falha no meio da pauta" do
       segunda = FactoryBot.create(
         :class_enrollment, course_class: turma,
         grade: nil, situation: ClassEnrollment::REGISTERED
@@ -428,11 +499,21 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
           linha(segunda, nota: "9,0")
         ])
       }
-      begin
-        confirmar
-      rescue Net::SMTPServerBusy
-        nil
-      end
+      confirmar
+
+      expect(inscricao.reload.grade).to eq(87)
+      expect(segunda.reload.grade).to eq(90)
+      expect(flash[:warning]).to be_present
+    end
+
+    it "nao aplica nenhuma ocorrencia de matricula duplicada na planilha" do
+      post import_grades_xls_course_class_path(turma), params: {
+        spreadsheet: pauta_de_linhas([
+          linha(inscricao, nota: "8,7"),
+          linha(inscricao, nota: "5,0")
+        ])
+      }
+      confirmar
 
       expect(inscricao.reload.grade).to be_nil
     end

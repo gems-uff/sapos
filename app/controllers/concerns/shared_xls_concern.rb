@@ -2,6 +2,7 @@
 
 require "axlsx"
 require "roo"
+require "zip"
 
 module SharedXlsConcern
   extend ActiveSupport::Concern
@@ -66,7 +67,12 @@ module SharedXlsConcern
       !original_filename.include?("\\")
     raise ArgumentError, "Invalid file name" unless valid_filename
 
-    spreadsheet = Roo::Spreadsheet.open(file.tempfile.path, extension: extension.delete_prefix("."))
+    spreadsheet =
+    begin
+      Roo::Spreadsheet.open(file.tempfile.path, extension: extension.delete_prefix("."))
+    rescue Zip::Error
+      raise ArgumentError, "Invalid file content"
+    end
     sheet = spreadsheet.sheet(0)
     header_row = sheet.row(1).map { |value| value.to_s.strip }
 
@@ -78,13 +84,15 @@ module SharedXlsConcern
     raise ArgumentError, "Invalid file format" if enrollment_index.nil? || grade_index.nil?
 
     rows = {}
-    return rows if sheet.last_row < 2
+    duplicate_enrollment_numbers = []
+    return [rows, duplicate_enrollment_numbers] if sheet.last_row < 2
     (2..sheet.last_row).each do |row_number|
       row = sheet.row(row_number)
       next if row.blank?
       enrollment_number = row[enrollment_index]&.to_s
       next if enrollment_number.blank?
 
+      duplicate_enrollment_numbers << enrollment_number if rows.key?(enrollment_number)
       rows[enrollment_number] = {
         grade: extract_cell(row, grade_index),
         attendance: extract_cell(row, attendance_index),
@@ -92,6 +100,6 @@ module SharedXlsConcern
         obs: extract_cell(row, obs_index)
       }
     end
-    rows
+    [rows, duplicate_enrollment_numbers.uniq]
   end
 end

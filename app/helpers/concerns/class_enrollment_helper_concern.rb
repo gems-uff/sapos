@@ -39,7 +39,6 @@ module ClassEnrollmentHelperConcern
   end
 
   def custom_grade_form_column(record, options)
-    return "" if !record.course_has_grade
     options = options.merge({
       maxlength: 5, class: "grade-input numeric-input text-input",
       data_approved: ClassEnrollment::APPROVED,

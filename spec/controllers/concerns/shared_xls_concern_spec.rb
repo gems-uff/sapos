@@ -30,18 +30,18 @@ RSpec.describe SharedXlsConcern, type: :concern do
     end
 
     it "returns a hash with enrollment numbers as keys" do
-      result = parse_rows_xls(xlsx_file)
+      result, _ = parse_rows_xls(xlsx_file)
       expect(result).to be_a(Hash)
       expect(result.keys).to include("101", "102")
     end
 
     it "returns the grade value for filled cells" do
-      result = parse_rows_xls(xlsx_file)
+      result, _ = parse_rows_xls(xlsx_file)
       expect(result["101"][:grade]).to eq("8.7")
     end
 
     it "returns nil for empty grade cells" do
-      result = parse_rows_xls(xlsx_file)
+      result, _ = parse_rows_xls(xlsx_file)
       expect(result["102"][:grade]).to be_nil
     end
 

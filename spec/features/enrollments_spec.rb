@@ -233,7 +233,6 @@ RSpec.describe "Enrollments features", type: :feature do
       # registro interessam.
       larguras = subform.all("tbody tr")
         .map { |linha| linha.all("td").size }.reject(&:zero?)
-
       expect(larguras.uniq.size).to eq(1),
         "linhas do subform com larguras diferentes: #{larguras.inspect}"
     end

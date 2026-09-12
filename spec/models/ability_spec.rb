@@ -477,7 +477,7 @@ RSpec.describe Ability, type: :model do
     end
 
     context "grade import policy" do
-      before(:all) do
+      before(:each) do
         @import_professor = FactoryBot.create(:professor)
         @other_import_professor = FactoryBot.create(:professor)
         @own_class_current_semester = FactoryBot.create(
@@ -494,25 +494,8 @@ RSpec.describe Ability, type: :model do
         )
       end
 
-      after(:all) do
-        CourseClass.destroy_all
-        Professor.where(id: [@import_professor.id, @other_import_professor.id]).destroy_all
-      end
-
-      before(:each) do
-        @original_policy = CustomVariable.find_by(variable: "professor_login_can_post_grades")&.value
-      end
-
-      after(:each) do
-        variable = CustomVariable.find_or_initialize_by(variable: "professor_login_can_post_grades")
-        variable.value = @original_policy
-        variable.save(validate: false)
-      end
-
       def set_policy(value)
-        variable = CustomVariable.find_or_initialize_by(variable: "professor_login_can_post_grades")
-        variable.value = value
-        variable.save(validate: false)
+        allow(CustomVariable).to receive(:professor_login_can_post_grades).and_return(value)
       end
 
       subject(:ability) { ability_for(Role::ROLE_PROFESSOR, professor: @import_professor) }
