@@ -211,4 +211,51 @@ RSpec.describe Student, type: :model do
       expect(user.actual_role).to eq(Role::ROLE_ADMINISTRADOR)
     end
   end
+  describe "After update" do
+    it "should propagate a name change to the associated user" do
+      @destroy_later << user = FactoryBot.create(:user, :student, name: "JOAO CARLOS DOS SANTOS", email: "abc@def.com")
+      student.email = "abc@def.com"
+      student.user = user
+      student.save(validate: false)
+      @destroy_later << student
+
+      student.update(name: "Joao Carlos dos Santos")
+
+      expect(user.reload.name).to eq("Joao Carlos dos Santos")
+    end
+
+    it "should not raise when the student has no associated user" do
+      student.save!
+      @destroy_later << student
+
+      expect { student.update(name: "Joao Carlos dos Santos") }.not_to raise_error
+    end
+
+    it "should not touch the user when a different attribute changes" do
+      @destroy_later << user = FactoryBot.create(:user, :student, name: "Ana", email: "abc@def.com")
+      student.email = "abc@def.com"
+      student.user = user
+      student.save(validate: false)
+      @destroy_later << student
+
+      expect(user).not_to receive(:update)
+      student.update(cpf: "b123.456.789-10")
+    end
+
+    it "should keep the student update even when syncing the name to the user fails" do
+      @destroy_later << user = FactoryBot.create(:user, :student, name: "Ana", email: "abc@def.com")
+      student.email = "abc@def.com"
+      student.user = user
+      student.save(validate: false)
+      @destroy_later << student
+
+      allow(user).to receive(:update).and_return(false)
+      allow(user).to receive_message_chain(:errors, :full_messages).and_return(["Name is invalid"])
+      expect(Rails.logger).to receive(:warn).with(/failed to sync name to User/)
+
+      expect { student.update(name: "Joao Carlos dos Santos") }.not_to raise_error
+      expect(student.reload.name).to eq("Joao Carlos dos Santos")
+      expect(user.reload.name).to eq("Ana")
+    end
+  end
 end

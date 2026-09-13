@@ -35,6 +35,8 @@ class Student < ApplicationRecord
   validates :cpf, presence: true, uniqueness: true
   validate :changed_to_different_user
 
+  after_update :sync_name_to_user, if: :saved_change_to_name?
+
   before_destroy :handle_user_role_removal
 
   accepts_nested_attributes_for :student_majors, allow_destroy: true
@@ -110,6 +112,15 @@ class Student < ApplicationRecord
     end
 
   private
+    def sync_name_to_user
+      return unless user
+      unless user&.update(name: name)
+        Rails.logger.warn(
+          "Student##{id}: failed to sync name to User##{user.id}: #{user.errors.full_messages.join(", ")}"
+        )
+      end
+    end
+
     def handle_user_role_removal
       return unless user.present?
 
