@@ -20,6 +20,7 @@ require "selenium-webdriver"
 require "json"
 require "fileutils"
 require "digest"
+require_relative "navegador"
 
 # A partir do Ruby 3.4 a csv deixou de ser default gem e passou a bundled gem:
 # sob "bundle exec" ela sai do load path se nao estiver no Gemfile. O CSV aqui e
@@ -63,21 +64,31 @@ routes = routes.first(limit) if limit&.positive?
 FileUtils.mkdir_p(File.join(out_dir, "png"))
 FileUtils.mkdir_p(File.join(out_dir, "txt"))
 
-options = Selenium::WebDriver::Chrome::Options.new
-options.add_argument("--headless=new")
-options.add_argument("--window-size=1440,2000")
-options.add_argument("--hide-scrollbars")
-options.add_argument("--force-device-scale-factor=1")
-options.add_argument("--lang=pt-BR")
-options.add_option("goog:loggingPrefs", { browser: "ALL", performance: "ALL" })
-
-driver = Selenium::WebDriver.for(:chrome, options: options)
+driver = novo_driver(largura: 1440, altura: 2000)
+# Registrado em arquivo proprio, como o papel: compare so navegador contra o
+# mesmo navegador. E sem console nao ha console_errors -- zero ali e ausencia de
+# instrumento, nao de erro; o aviso fica gravado junto.
+File.write(File.join(out_dir, "navegador.txt"),
+  "#{NAVEGADOR}\n#{console_disponivel? ? "" : "console e rede NAO medidos neste navegador (status sim, pela pagina)\n"}")
+warn "AVISO: #{NAVEGADOR} nao expoe console nem log de rede; console_errors, broken_requests e failed_requests sairao 0 por falta de instrumento. O status vem da pagina." unless console_disponivel?
 wait = Selenium::WebDriver::Wait.new(timeout: 60)
 
 def drain(driver, kind)
   driver.logs.get(kind)
 rescue StandardError
   []
+end
+
+# Status HTTP pela propria pagina (PerformanceNavigationTiming#responseStatus,
+# API padrao que Chrome e Firefox expoem). E o fallback de quando nao ha log de
+# performance -- o Firefox -- e nao substitui o log no Chrome, para a medida de
+# la continuar a mesma.
+def nav_status(driver)
+  driver.execute_script(
+    "var e = performance.getEntriesByType('navigation')[0]; return e ? e.responseStatus : null;"
+  )
+rescue StandardError
+  nil
 end
 
 # Troca o papel ativo pelo combo do cabecalho -- o mesmo caminho do usuario, e
@@ -207,6 +218,7 @@ begin
 
     events = network_events(drain(driver, :performance))
     doc = events.find { |e| e[:kind] == :response && e[:type] == "Document" }
+    doc_status = doc ? doc[:status] : nav_status(driver)
     broken = events.select { |e| e[:kind] == :response && e[:status].to_i >= 400 }
     # Um net::ERR_ABORTED sobre um Document, numa varredura que navega rota a
     # rota, e a requisicao da pagina ANTERIOR cancelada pela navegacao atual --
@@ -264,7 +276,7 @@ begin
 
     results << {
       route: route,
-      status: doc ? doc[:status] : nil,
+      status: doc_status,
       ms: elapsed_ms,
       title: title,
       text_sha: Digest::SHA256.hexdigest(normalized)[0, 16],
@@ -284,7 +296,7 @@ begin
     }
 
     flag = if error then "ERRO"
-           elsif doc && doc[:status].to_i >= 400 then "HTTP #{doc[:status]}"
+           elsif doc_status.to_i >= 400 then "HTTP #{doc_status}"
            elsif broken.any? || failed.any? then "assets"
            elsif console.any? then "console"
            else "ok"

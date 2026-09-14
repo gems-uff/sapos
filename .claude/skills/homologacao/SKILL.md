@@ -29,6 +29,9 @@ não há como separar diferença de código de diferença de ambiente.
   Ele usa o driver do `PATH` quando o major casa com o do Chrome, e só então
   recorre ao `~/.cache/selenium` (ou a um download). Um cache desatualizado não é,
   por si, problema.
+- Firefox instalado, se a rodada for capturar também nele (ver "Capturando por
+  navegador"). O geckodriver o Selenium Manager resolve sozinho:
+  `... selenium-manager --browser firefox --output json`.
 - Um arquivo de credenciais **fora do repositório**, com `chmod 600`, contendo as
   três variáveis. Elas ficam juntas de propósito: amarrar a URL às credenciais
   evita apontar uma senha de homologação para outro ambiente.
@@ -140,6 +143,35 @@ gravado no usuário (`actual_role`) e **atravessa execuções**: uma captura sem
 aluno, sem erro nenhum. O script grava o papel usado em `papel.txt` dentro do
 diretório de saída e avisa quando herdou — confira esse arquivo antes de comparar.
 
+### Capturando por navegador
+
+O default aqui é o **Chrome**, ao contrário da suíte: é o único que expõe
+console e log de rede pelo WebDriver, e são esses os sinais mais baratos da
+comparação. `SELENIUM_BROWSER=firefox` troca pelo Firefox em **todos** os
+scripts desta pasta (o driver vem do `navegador.rb`); a suíte honra a mesma
+variável, com o default invertido. O geckodriver vem pelo Selenium
+Manager do `selenium-webdriver`; não há gem a acrescentar.
+
+Quando vale: parte do que o Rails emite é contorno de bug de navegador — o
+`autocomplete="off"` nos hidden é contorno de um bug do Firefox que sobrescrevia
+o primeiro campo escondido da forma —, e só o navegador que tinha o bug acusa a
+regressão. Um upgrade que mexe nesse tipo de coisa pede o "antes" e o "depois"
+também em Firefox.
+
+Duas regras:
+
+- **Navegador contra o mesmo navegador.** Screenshot e estilo computado diferem
+  entre os dois por natureza; capture cada navegador em diretório próprio
+  (`$LADO/firefox/html`, por exemplo) e compare Firefox com Firefox. O
+  `capture_html.rb` grava o navegador em `navegador.txt` ao lado do `papel.txt`
+  — confira os dois antes de comparar.
+- **O Firefox não expõe console nem log de rede pelo WebDriver.** Nele
+  `console_errors`, `broken_requests` e `failed_requests` saem **0 por falta de
+  instrumento**, não por ausência de erro; o `navegador.txt` registra isso.
+  Esses três sinais só votam na captura em Chrome. O **status HTTP** vota nos
+  dois: sem log de performance a captura o lê da própria página
+  (`PerformanceNavigationTiming#responseStatus`), então um 500 aparece igual.
+
 ## Como a comparação é feita
 
 - **Texto de página** — hash do texto visível, com a faixa de versão do cabeçalho
@@ -210,6 +242,26 @@ EXPLORE_OUT=$ANTES/exploratorio ROTULO=antes bundle exec ruby $S/probe_widgets.r
 Comparar é diferenciar os dois JSON. Para medir o que ele não mede, acrescente
 seção **e recapture os dois lados**: sonda alterada no meio da rodada mede o
 instrumento, não a aplicação.
+
+### Voltar e submeter — o bug que o `autocomplete="off"` contornava
+
+O `probe_voltar_e_submeter.rb` mede o mecanismo do bug de navegador que fez o
+Rails pôr `autocomplete="off"` em todo hidden (e que o 8.1 deixou de emitir):
+abre o formulário de login, navega para outra página, **volta**, compara os
+hidden antes e depois, e submete com e-mail inexistente — nada grava (trackable
+só grava em sucesso) e nada trava (lockable conta por conta, e a conta não
+existe). Repete `n` vezes porque o bug era esporádico.
+
+```bash
+EXPLORE_OUT=$LADO/voltar SELENIUM_BROWSER=firefox bundle exec ruby $S/probe_voltar_e_submeter.rb 10
+EXPLORE_OUT=$LADO/voltar bundle exec ruby $S/probe_voltar_e_submeter.rb 10   # Chrome, controle
+```
+
+Lê-se `alterados` (quantas voltas mudaram um hidden) e `reacoes`: a normal é a
+recusa de credencial do Devise; `token_invalido` é a mensagem
+`errors.invalid_form_token`, e cada uma dessas também **mandou e-mail de
+anomalia** pelo `expired_session`. A resposta do POST chega depois do submit:
+a sonda espera a mensagem aparecer antes de ler, senão mede a página anterior.
 
 ### Estado que atravessa requisições
 
@@ -428,7 +480,9 @@ lados enxergam a mesma coisa. O rastro que sobra é linha em `/versions` e
 `/reports`, que já divergem sempre por causa da própria varredura.
 
 ```bash
-# passo 0: confira redirect_email (ver "Regras de segurança"). Trava em "".
+# passo 0: o valor VIVO de redirect_email (ver "Regras de segurança"). Sai 0 na
+# trava (""), 1 com endereco (redireciona), 2 AUSENTE (nil: PERIGO, nao escreva).
+EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/conferir_redirect_email.rb
 # LADO=$ANTES antes de capturar o antes; LADO=$DEPOIS antes de capturar o depois.
 EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/probe_escrita.rb              # diagnostico
 EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/probe_escrita.rb --confirmar  # ciclo de foto

@@ -1,0 +1,172 @@
+── página 1 ──
+Re l a t ó r io C o m p le t o d e In scrições
+
+Inscrições para Mestrado Golden (2021.1)
+
+Início: 06/05/2021
+Encerramento: 05/06/2021
+Total de Inscritos: 2
+
+Código de Identificação: GOLDEN-AAAAAA-000001
+Nome Completo: Ana Conceição
+Email: ana.golden@example.com
+
+Recomendações solicitadas: 2
+Recomendações preenchidas: 1
+ Campo Valor
+
+ Geral
+ Posição/Geral 1
+
+ Seletor/Geral Máquina de Ranking
+ Entrevista - Compartilhado
+
+ nota_entrevista 9
+ Análise - Consolidação
+
+ dobro 17.0
+
+ Análise - Candidato
+ extra Publicação aceita
+
+ Análise - golden-reviewer
+ parecer Aprovar
+
+ Análise - Compartilhado
+ obs Perfil forte
+
+ Candidato
+ nota 8.5
+
+ anexo
+ user.png
+
+
+ Carta de Recomendação 1
+ Nome do Indicado Prof. Recomendador
+
+ Email do Indicado rec@example.com
+ Telefone do Indicado 2199
+
+ texto Recomendo sem reservas.
+ Carta de Recomendação 2
+
+ Nome do Indicado Prof. Silencioso
+ Email do Indicado sil@example.com
+
+ Telefone do Indicado
+ texto
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SAPOS - Terça, 15 de Junho de 2021, 10:30 h
+── página 2 ──
+Código de Identificação: GOLDEN-BBBBBB-000002
+Nome Completo: Bento Souza
+Email: bento.golden@example.com
+
+Recomendações solicitadas: 0
+Recomendações preenchidas: 0
+
+ Campo Valor
+ Geral
+
+ Posição/Geral 2
+ Seletor/Geral Máquina de Ranking
+
+ Entrevista - Compartilhado
+ nota_entrevista não encontrado>
+
+ Análise - Consolidação
+ dobro não encontrado>
+
+ Análise - Candidato
+
+ extra não encontrado>
+ Análise - golden-reviewer
+
+ parecer não encontrado>
+ Análise - Compartilhado
+
+ obs não encontrado>
+ Candidato
+
+ nota 6
+ anexo não encontrado>
+
+ Carta de Recomendação 1
+ Nome do Indicado
+
+ Email do Indicado
+ Telefone do Indicado
+
+ texto
+
+ Carta de Recomendação 2
+ Nome do Indicado
+
+ Email do Indicado
+ Telefone do Indicado
+
+ texto
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SAPOS - Terça, 15 de Junho de 2021, 10:30 h
