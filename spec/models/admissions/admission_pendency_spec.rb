@@ -43,10 +43,5 @@ RSpec.describe Admissions::AdmissionPendency, type: :model do
   end
   # ToDo: test scopes
 
-  describe "Methods" do
-    # ToDo: status_value
-    # ToDo: candidate_pendencies
-    # ToDo: member_pendencies
-    # ToDo: shared_pendencies
-  end
+  # Escopos e métodos de classe: admission_phase_pendencies_spec.rb.
 end

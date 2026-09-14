@@ -1,0 +1,1390 @@
+{
+ "about": "Três formas de processo seletivo, sem programa real: tipos de campo, modos de avaliação, condições e rankings que o SAPOS oferece, um exemplar de cada. Chaves simbólicas (field_type, mode, condition, order, behavior) são traduzidas pelo carregador para as constantes dos modelos.",
+ "admission_processes": [
+  {
+   "year": 2026,
+   "semester": 1,
+   "admission_date": "2026-08-01",
+   "allow_multiple_applications": false,
+   "require_session": true,
+   "visible": true,
+   "enrollment_number_field": "CPF",
+   "enrollment_status": "Regular",
+   "form_template_id": 1,
+   "letter_template_id": null,
+   "min_letters": null,
+   "max_letters": null,
+   "id": 1,
+   "name": "Processo com avaliação compartilhada",
+   "level": "Mestrado",
+   "staff_can_edit": false,
+   "staff_can_undo": false
+  },
+  {
+   "year": 2026,
+   "semester": 1,
+   "admission_date": "2026-08-01",
+   "allow_multiple_applications": false,
+   "require_session": true,
+   "visible": true,
+   "enrollment_number_field": "CPF",
+   "enrollment_status": "Regular",
+   "form_template_id": 1,
+   "letter_template_id": null,
+   "min_letters": null,
+   "max_letters": null,
+   "id": 2,
+   "name": "Processo com avaliação individual",
+   "level": "Doutorado",
+   "staff_can_edit": true,
+   "staff_can_undo": true
+  },
+  {
+   "year": 2026,
+   "semester": 1,
+   "admission_date": "2026-08-01",
+   "allow_multiple_applications": false,
+   "require_session": true,
+   "visible": true,
+   "enrollment_number_field": "CPF",
+   "enrollment_status": "Regular",
+   "form_template_id": 1,
+   "letter_template_id": 2,
+   "min_letters": 2,
+   "max_letters": 2,
+   "id": 3,
+   "name": "Processo com cartas de recomendação",
+   "level": "Mestrado",
+   "staff_can_edit": true,
+   "staff_can_undo": true
+  }
+ ],
+ "form_templates": [
+  {
+   "id": 1,
+   "name": "Inscrição",
+   "template_type": "admission_form",
+   "fields": [
+    {
+     "order": 1,
+     "name": "Cabeçalho",
+     "field_type": "html",
+     "configuration": {
+      "html": "<div>Campos com <span style=\"color:red;\">*</span> são obrigatórios.</div>"
+     },
+     "id": 101,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 2,
+     "name": "Dados pessoais",
+     "field_type": "group",
+     "id": 102,
+     "sync": null,
+     "configuration": null,
+     "description": null
+    },
+    {
+     "order": 3,
+     "name": "Nome completo",
+     "field_type": "student_field",
+     "sync": "name",
+     "configuration": {
+      "field": "name",
+      "required": true
+     },
+     "id": 103,
+     "description": null
+    },
+    {
+     "order": 4,
+     "name": "Email",
+     "field_type": "student_field",
+     "sync": "email",
+     "configuration": {
+      "field": "email",
+      "required": true
+     },
+     "id": 104,
+     "description": null
+    },
+    {
+     "order": 5,
+     "name": "Data de nascimento",
+     "field_type": "student_field",
+     "configuration": {
+      "field": "birthdate",
+      "required": true
+     },
+     "id": 105,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 6,
+     "name": "CPF",
+     "field_type": "student_field",
+     "configuration": {
+      "field": "cpf",
+      "required": true
+     },
+     "id": 106,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 7,
+     "name": "Sexo",
+     "field_type": "student_field",
+     "configuration": {
+      "field": "sex",
+      "required": true,
+      "values": [
+       "Feminino",
+       "Masculino",
+       "Não declarado"
+      ]
+     },
+     "id": 107,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 8,
+     "name": "Naturalidade",
+     "field_type": "student_field",
+     "configuration": {
+      "field": "special_birth_city",
+      "required": true
+     },
+     "id": 108,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 9,
+     "name": "Endereço",
+     "field_type": "student_field",
+     "configuration": {
+      "field": "special_address",
+      "required": true
+     },
+     "id": 109,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 10,
+     "name": "Formação",
+     "field_type": "student_field",
+     "configuration": {
+      "field": "special_majors",
+      "values": [
+       "Graduação",
+       "Mestrado"
+      ],
+      "statuses": [
+       "Em andamento",
+       "Concluído"
+      ],
+      "scholarity_start_date_required": true
+     },
+     "id": 110,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 11,
+     "name": "Foto",
+     "field_type": "student_field",
+     "configuration": {
+      "field": "photo",
+      "values": [
+       "jpg"
+      ]
+     },
+     "id": 111,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 12,
+     "name": "Resumo",
+     "field_type": "text",
+     "configuration": {
+      "rows": "5",
+      "cols": "60"
+     },
+     "id": 112,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 13,
+     "name": "Ano de conclusão",
+     "field_type": "string",
+     "id": 113,
+     "sync": null,
+     "configuration": null,
+     "description": null
+    },
+    {
+     "order": 14,
+     "name": "Nota de prova",
+     "field_type": "number",
+     "id": 114,
+     "sync": null,
+     "configuration": null,
+     "description": null
+    },
+    {
+     "order": 15,
+     "name": "Solicita bolsa?",
+     "field_type": "select",
+     "configuration": {
+      "required": true,
+      "values": [
+       "Não",
+       "Sim, ainda não sou aluno",
+       "Sim, já sou aluno"
+      ]
+     },
+     "id": 115,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 16,
+     "name": "Linha de pesquisa",
+     "field_type": "select",
+     "configuration": {
+      "required": true,
+      "values": [
+       "Linha 1",
+       "Linha 2"
+      ]
+     },
+     "id": 116,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 17,
+     "name": "Idiomas",
+     "field_type": "collection_checkbox",
+     "configuration": {
+      "values": [
+       "Inglês",
+       "Espanhol",
+       "Francês"
+      ],
+      "minselection": "1",
+      "maxselection": "2"
+     },
+     "id": 117,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 18,
+     "name": "Diploma",
+     "field_type": "file",
+     "configuration": {
+      "required": true,
+      "values": [
+       "pdf"
+      ]
+     },
+     "id": 118,
+     "sync": null,
+     "description": null
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "name": "Carta de recomendação",
+   "template_type": "recommendation_letter",
+   "fields": [
+    {
+     "order": 1,
+     "name": "Relação com o candidato",
+     "field_type": "string",
+     "configuration": {
+      "required": true
+     },
+     "id": 201,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 2,
+     "name": "Avaliação",
+     "field_type": "radio",
+     "configuration": {
+      "required": true,
+      "values": [
+       "Fraca",
+       "Boa",
+       "Excelente"
+      ]
+     },
+     "id": 202,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 3,
+     "name": "Comentários",
+     "field_type": "text",
+     "id": 203,
+     "sync": null,
+     "configuration": null,
+     "description": null
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "name": "Homologação",
+   "template_type": "admission_form",
+   "fields": [
+    {
+     "order": 1,
+     "name": "Optante por cota racial",
+     "field_type": "single_checkbox",
+     "configuration": {
+      "values": [
+       "Sim"
+      ],
+      "default_check": false
+     },
+     "id": 301,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 2,
+     "name": "PcD",
+     "field_type": "single_checkbox",
+     "id": 302,
+     "sync": null,
+     "configuration": null,
+     "description": null
+    },
+    {
+     "order": 3,
+     "name": "Homologação",
+     "field_type": "radio",
+     "configuration": {
+      "required": true,
+      "values": [
+       "Deferida",
+       "Indeferida"
+      ]
+     },
+     "id": 303,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 4,
+     "name": "Motivo",
+     "field_type": "text",
+     "id": 304,
+     "sync": null,
+     "configuration": null,
+     "description": null
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "name": "Consolidação da homologação",
+   "template_type": "consolidation_form",
+   "fields": [
+    {
+     "order": 1,
+     "name": "Aviso de deferimento",
+     "field_type": "email",
+     "configuration": {
+      "to": "{{ application.email }}",
+      "subject": "Candidatura homologada",
+      "body": "{{ application.name }}\n\nSua candidatura foi homologada.",
+      "condition": {
+       "mode": "condition",
+       "field": "Homologação",
+       "condition": "equals",
+       "value": "Deferida"
+      },
+      "template_type": "liquid"
+     },
+     "id": 401,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 2,
+     "name": "Aviso de indeferimento",
+     "field_type": "email",
+     "configuration": {
+      "to": "{{ application.email }}",
+      "subject": "Candidatura não homologada",
+      "body": "{{ application.name }}\n\nSua candidatura não foi homologada.\n\n{{ fields[\"Motivo\"] }}",
+      "condition": {
+       "mode": "condition",
+       "field": "Homologação",
+       "condition": "equals",
+       "value": "Indeferida"
+      },
+      "template_type": "liquid"
+     },
+     "id": 402,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 3,
+     "name": "Idade",
+     "field_type": "code",
+     "configuration": {
+      "code": "{%- assign parts = fields['Data de nascimento'] | split: '/' -%}\n{%- assign iso = parts[2] | append: '-' | append: parts[1] | append: '-' | append: parts[0] -%}\n{%- assign birth = iso | date: '%s' -%}\n{%- assign now = 'now' | date: '%s' -%}\n{{- now | minus: birth | times: 1.0 | divided_by: 31557600 -}}",
+      "code_type": "number",
+      "template_type": "liquid"
+     },
+     "id": 403,
+     "sync": null,
+     "description": null
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "name": "Avaliação compartilhada",
+   "template_type": "admission_form",
+   "fields": [
+    {
+     "order": 1,
+     "name": "Nota de formação",
+     "field_type": "number",
+     "configuration": {
+      "required": true
+     },
+     "id": 501,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 2,
+     "name": "Nota de produção",
+     "field_type": "number",
+     "configuration": {
+      "required": true
+     },
+     "id": 502,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 3,
+     "name": "Nota de experiência",
+     "field_type": "number",
+     "configuration": {
+      "required": true
+     },
+     "id": 503,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 4,
+     "name": "Parecer",
+     "field_type": "text",
+     "id": 504,
+     "sync": null,
+     "configuration": null,
+     "description": null
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "name": "Consolidação compartilhada",
+   "template_type": "consolidation_form",
+   "fields": [
+    {
+     "order": 1,
+     "name": "Nota final",
+     "field_type": "code",
+     "configuration": {
+      "code": "{{- fields['Nota de formação'] | times: 8 | plus: fields['Nota de produção'] | plus: fields['Nota de experiência'] | divided_by: 10.0 | round: 2 -}}",
+      "code_type": "number",
+      "template_type": "liquid"
+     },
+     "id": 601,
+     "sync": null,
+     "description": null
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "name": "Avaliação individual",
+   "template_type": "admission_form",
+   "fields": [
+    {
+     "order": 1,
+     "name": "Nota de formação",
+     "field_type": "number",
+     "configuration": {
+      "required": true
+     },
+     "id": 701,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 2,
+     "name": "Nota de experiência",
+     "field_type": "number",
+     "configuration": {
+      "required": true
+     },
+     "id": 702,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 3,
+     "name": "Nota de projeto",
+     "field_type": "number",
+     "configuration": {
+      "required": true
+     },
+     "id": 703,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 4,
+     "name": "Parecer",
+     "field_type": "text",
+     "id": 704,
+     "sync": null,
+     "configuration": null,
+     "description": null
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "name": "Consolidação individual",
+   "template_type": "consolidation_form",
+   "fields": [
+    {
+     "order": 1,
+     "name": "Média de formação",
+     "field_type": "code",
+     "configuration": {
+      "code": "{{- committees | avg: 'Nota de formação' | round: 2 -}}",
+      "code_type": "number",
+      "template_type": "liquid"
+     },
+     "id": 801,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 2,
+     "name": "Média de experiência",
+     "field_type": "code",
+     "configuration": {
+      "code": "{{- committees | avg: 'Nota de experiência' | round: 2 -}}",
+      "code_type": "number",
+      "template_type": "liquid"
+     },
+     "id": 802,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 3,
+     "name": "Média de projeto",
+     "field_type": "code",
+     "configuration": {
+      "code": "{{- committees | avg: 'Nota de projeto' | round: 2 -}}",
+      "code_type": "number",
+      "template_type": "liquid"
+     },
+     "id": 803,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 4,
+     "name": "Nota final",
+     "field_type": "code",
+     "configuration": {
+      "code": "{%- assign sum = fields['Média de formação'] | plus: fields['Média de experiência'] | plus: fields['Média de projeto'] -%}\n{{- sum | divided_by: 3.0 | round: 2 -}}",
+      "code_type": "number",
+      "template_type": "liquid"
+     },
+     "id": 804,
+     "sync": null,
+     "description": null
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "name": "Entrevista",
+   "template_type": "admission_form",
+   "fields": [
+    {
+     "order": 1,
+     "name": "Nota de apresentação",
+     "field_type": "number",
+     "configuration": {
+      "required": true
+     },
+     "id": 901,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 2,
+     "name": "Nota de arguição",
+     "field_type": "number",
+     "configuration": {
+      "required": true
+     },
+     "id": 902,
+     "sync": null,
+     "description": null
+    },
+    {
+     "order": 3,
+     "name": "Situação sugerida",
+     "field_type": "select",
+     "configuration": {
+      "values": [
+       "Regular",
+       "Especial"
+      ]
+     },
+     "id": 903,
+     "sync": null,
+     "description": null
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "name": "Consolidação da entrevista",
+   "template_type": "consolidation_form",
+   "fields": [
+    {
+     "order": 1,
+     "name": "Nota final",
+     "field_type": "code",
+     "configuration": {
+      "code": "{{- fields['Nota de apresentação'] | plus: fields['Nota de arguição'] -}}",
+      "code_type": "number",
+      "template_type": "liquid"
+     },
+     "id": 1001,
+     "sync": null,
+     "description": null
+    }
+   ]
+  }
+ ],
+ "admission_phases": [
+  {
+   "candidate_can_edit": false,
+   "candidate_can_see_member": false,
+   "candidate_can_see_shared": false,
+   "candidate_can_see_consolidation": false,
+   "committee_can_see_other_individual": false,
+   "member_form_id": null,
+   "shared_form_id": 3,
+   "candidate_form_id": null,
+   "keep_in_phase_condition": null,
+   "id": 1,
+   "name": "Homologação",
+   "can_edit_candidate": true,
+   "consolidation_form_id": 4,
+   "approval_condition": {
+    "mode": "condition",
+    "field": "Homologação",
+    "condition": "equals",
+    "value": "Deferida"
+   },
+   "process_links": [
+    {
+     "admission_process_id": 1,
+     "order": 1,
+     "partial_consolidation": true
+    },
+    {
+     "admission_process_id": 2,
+     "order": 1,
+     "partial_consolidation": true
+    },
+    {
+     "admission_process_id": 3,
+     "order": 1,
+     "partial_consolidation": true
+    }
+   ]
+  },
+  {
+   "candidate_can_edit": false,
+   "candidate_can_see_member": false,
+   "candidate_can_see_shared": false,
+   "candidate_can_see_consolidation": false,
+   "committee_can_see_other_individual": false,
+   "member_form_id": null,
+   "shared_form_id": 5,
+   "candidate_form_id": null,
+   "keep_in_phase_condition": null,
+   "id": 2,
+   "name": "Avaliação compartilhada",
+   "can_edit_candidate": false,
+   "consolidation_form_id": 6,
+   "approval_condition": {
+    "mode": "condition",
+    "field": "Nota final",
+    "condition": "ge",
+    "value": "6"
+   },
+   "process_links": [
+    {
+     "admission_process_id": 1,
+     "order": 2,
+     "partial_consolidation": false
+    }
+   ]
+  },
+  {
+   "candidate_can_edit": false,
+   "candidate_can_see_member": false,
+   "candidate_can_see_shared": false,
+   "candidate_can_see_consolidation": false,
+   "committee_can_see_other_individual": true,
+   "member_form_id": 7,
+   "shared_form_id": null,
+   "candidate_form_id": null,
+   "keep_in_phase_condition": null,
+   "id": 3,
+   "name": "Avaliação individual",
+   "can_edit_candidate": false,
+   "consolidation_form_id": 8,
+   "approval_condition": {
+    "mode": "and",
+    "form_conditions": [
+     {
+      "mode": "condition",
+      "field": "Nota final",
+      "condition": "ge",
+      "value": "6"
+     },
+     {
+      "mode": "condition",
+      "field": "Média de projeto",
+      "condition": "ge",
+      "value": "6"
+     }
+    ]
+   },
+   "process_links": [
+    {
+     "admission_process_id": 2,
+     "order": 2,
+     "partial_consolidation": false
+    }
+   ]
+  },
+  {
+   "candidate_can_edit": false,
+   "candidate_can_see_member": false,
+   "candidate_can_see_shared": false,
+   "candidate_can_see_consolidation": false,
+   "committee_can_see_other_individual": false,
+   "member_form_id": null,
+   "shared_form_id": 5,
+   "candidate_form_id": null,
+   "keep_in_phase_condition": null,
+   "id": 4,
+   "name": "Avaliação por linha",
+   "can_edit_candidate": false,
+   "consolidation_form_id": 6,
+   "approval_condition": {
+    "mode": "condition",
+    "field": "Nota final",
+    "condition": "ge",
+    "value": "6"
+   },
+   "process_links": [
+    {
+     "admission_process_id": 3,
+     "order": 2,
+     "partial_consolidation": false
+    }
+   ]
+  },
+  {
+   "candidate_can_edit": false,
+   "candidate_can_see_member": false,
+   "candidate_can_see_shared": false,
+   "candidate_can_see_consolidation": false,
+   "committee_can_see_other_individual": false,
+   "member_form_id": null,
+   "shared_form_id": 9,
+   "candidate_form_id": null,
+   "keep_in_phase_condition": null,
+   "id": 5,
+   "name": "Entrevista",
+   "can_edit_candidate": false,
+   "consolidation_form_id": 10,
+   "approval_condition": {
+    "mode": "condition",
+    "field": "Nota final",
+    "condition": "ge",
+    "value": "6"
+   },
+   "process_links": [
+    {
+     "admission_process_id": 3,
+     "order": 3,
+     "partial_consolidation": false
+    }
+   ]
+  }
+ ],
+ "admission_committees": [
+  {
+   "id": 1,
+   "name": "Comitê de homologação",
+   "members_count": 1,
+   "form_condition": null,
+   "phase_ids": [
+    1
+   ]
+  },
+  {
+   "id": 2,
+   "name": "Comitê de avaliação",
+   "members_count": 5,
+   "form_condition": null,
+   "phase_ids": [
+    2,
+    3
+   ]
+  },
+  {
+   "id": 3,
+   "name": "Comitê da linha 1",
+   "members_count": 3,
+   "form_condition": {
+    "mode": "condition",
+    "field": "Linha de pesquisa",
+    "condition": "equals",
+    "value": "Linha 1"
+   },
+   "phase_ids": [
+    4,
+    5
+   ]
+  },
+  {
+   "id": 4,
+   "name": "Comitê da linha 2",
+   "members_count": 3,
+   "form_condition": {
+    "mode": "condition",
+    "field": "Linha de pesquisa",
+    "condition": "equals",
+    "value": "Linha 2"
+   },
+   "phase_ids": [
+    4,
+    5
+   ]
+  }
+ ],
+ "ranking_configs": [
+  {
+   "behavior_on_invalid_condition": "exception_on_machine",
+   "behavior_on_invalid_ranking": "exception_ranking",
+   "id": 1,
+   "name": "Vagas",
+   "form_condition": {
+    "mode": "condition",
+    "field": "Nota final",
+    "condition": "ge",
+    "value": "6"
+   },
+   "ranking_columns": [
+    {
+     "name": "Nota final",
+     "order": "desc"
+    },
+    {
+     "name": "Nota de formação",
+     "order": "desc"
+    },
+    {
+     "name": "Idade",
+     "order": "desc"
+    }
+   ],
+   "ranking_groups": [
+    {
+     "name": "Geral",
+     "vacancies": 40
+    },
+    {
+     "name": "PcD",
+     "vacancies": 1
+    }
+   ],
+   "ranking_processes": [
+    {
+     "order": 1,
+     "step": 1,
+     "vacancies": 30,
+     "group": "Geral",
+     "ranking_machine": {
+      "id": 1,
+      "name": "Ampla concorrência",
+      "form_condition": {
+       "mode": "and",
+       "form_conditions": [
+        {
+         "mode": "condition",
+         "field": "Homologação",
+         "condition": "equals",
+         "value": "Deferida"
+        },
+        {
+         "mode": "condition",
+         "field": "Solicita bolsa?",
+         "condition": "neq",
+         "value": "Sim, já sou aluno"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "order": 2,
+     "step": 1,
+     "vacancies": 10,
+     "group": "Geral",
+     "ranking_machine": {
+      "id": 2,
+      "name": "Cota racial",
+      "form_condition": {
+       "mode": "and",
+       "form_conditions": [
+        {
+         "mode": "condition",
+         "field": "Homologação",
+         "condition": "equals",
+         "value": "Deferida"
+        },
+        {
+         "mode": "condition",
+         "field": "Optante por cota racial",
+         "condition": "equals",
+         "value": "1"
+        },
+        {
+         "mode": "condition",
+         "field": "Solicita bolsa?",
+         "condition": "neq",
+         "value": "Sim, já sou aluno"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "order": 3,
+     "step": 1,
+     "vacancies": 1,
+     "group": "PcD",
+     "ranking_machine": {
+      "id": 3,
+      "name": "Cota PcD",
+      "form_condition": {
+       "mode": "and",
+       "form_conditions": [
+        {
+         "mode": "condition",
+         "field": "Homologação",
+         "condition": "equals",
+         "value": "Deferida"
+        },
+        {
+         "mode": "condition",
+         "field": "PcD",
+         "condition": "equals",
+         "value": "1"
+        },
+        {
+         "mode": "condition",
+         "field": "Solicita bolsa?",
+         "condition": "neq",
+         "value": "Sim, já sou aluno"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "order": 4,
+     "step": 2,
+     "vacancies": null,
+     "group": "Geral",
+     "ranking_machine": {
+      "id": 1,
+      "name": "Ampla concorrência",
+      "form_condition": {
+       "mode": "and",
+       "form_conditions": [
+        {
+         "mode": "condition",
+         "field": "Homologação",
+         "condition": "equals",
+         "value": "Deferida"
+        },
+        {
+         "mode": "condition",
+         "field": "Solicita bolsa?",
+         "condition": "neq",
+         "value": "Sim, já sou aluno"
+        }
+       ]
+      }
+     }
+    }
+   ],
+   "process_links": [
+    {
+     "admission_process_id": 1,
+     "admission_phase_id": 2,
+     "order": 1
+    },
+    {
+     "admission_process_id": 3,
+     "admission_phase_id": 5,
+     "order": 1
+    }
+   ]
+  },
+  {
+   "behavior_on_invalid_condition": "exception_on_machine",
+   "behavior_on_invalid_ranking": "exception_ranking",
+   "id": 2,
+   "name": "Vagas por média",
+   "form_condition": {
+    "mode": "and",
+    "form_conditions": [
+     {
+      "mode": "condition",
+      "field": "Nota final",
+      "condition": "ge",
+      "value": "6"
+     },
+     {
+      "mode": "condition",
+      "field": "Média de projeto",
+      "condition": "ge",
+      "value": "6"
+     }
+    ]
+   },
+   "ranking_columns": [
+    {
+     "name": "Nota final",
+     "order": "desc"
+    },
+    {
+     "name": "Média de projeto",
+     "order": "desc"
+    },
+    {
+     "name": "Média de experiência",
+     "order": "desc"
+    },
+    {
+     "name": "Idade",
+     "order": "desc"
+    }
+   ],
+   "ranking_groups": [
+    {
+     "name": "Geral",
+     "vacancies": 40
+    },
+    {
+     "name": "PcD",
+     "vacancies": 1
+    }
+   ],
+   "ranking_processes": [
+    {
+     "order": 1,
+     "step": 1,
+     "vacancies": 30,
+     "group": "Geral",
+     "ranking_machine": {
+      "id": 1,
+      "name": "Ampla concorrência",
+      "form_condition": {
+       "mode": "and",
+       "form_conditions": [
+        {
+         "mode": "condition",
+         "field": "Homologação",
+         "condition": "equals",
+         "value": "Deferida"
+        },
+        {
+         "mode": "condition",
+         "field": "Solicita bolsa?",
+         "condition": "neq",
+         "value": "Sim, já sou aluno"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "order": 2,
+     "step": 1,
+     "vacancies": 10,
+     "group": "Geral",
+     "ranking_machine": {
+      "id": 2,
+      "name": "Cota racial",
+      "form_condition": {
+       "mode": "and",
+       "form_conditions": [
+        {
+         "mode": "condition",
+         "field": "Homologação",
+         "condition": "equals",
+         "value": "Deferida"
+        },
+        {
+         "mode": "condition",
+         "field": "Optante por cota racial",
+         "condition": "equals",
+         "value": "1"
+        },
+        {
+         "mode": "condition",
+         "field": "Solicita bolsa?",
+         "condition": "neq",
+         "value": "Sim, já sou aluno"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "order": 3,
+     "step": 1,
+     "vacancies": 1,
+     "group": "PcD",
+     "ranking_machine": {
+      "id": 3,
+      "name": "Cota PcD",
+      "form_condition": {
+       "mode": "and",
+       "form_conditions": [
+        {
+         "mode": "condition",
+         "field": "Homologação",
+         "condition": "equals",
+         "value": "Deferida"
+        },
+        {
+         "mode": "condition",
+         "field": "PcD",
+         "condition": "equals",
+         "value": "1"
+        },
+        {
+         "mode": "condition",
+         "field": "Solicita bolsa?",
+         "condition": "neq",
+         "value": "Sim, já sou aluno"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "order": 4,
+     "step": 2,
+     "vacancies": null,
+     "group": "Geral",
+     "ranking_machine": {
+      "id": 1,
+      "name": "Ampla concorrência",
+      "form_condition": {
+       "mode": "and",
+       "form_conditions": [
+        {
+         "mode": "condition",
+         "field": "Homologação",
+         "condition": "equals",
+         "value": "Deferida"
+        },
+        {
+         "mode": "condition",
+         "field": "Solicita bolsa?",
+         "condition": "neq",
+         "value": "Sim, já sou aluno"
+        }
+       ]
+      }
+     }
+    }
+   ],
+   "process_links": [
+    {
+     "admission_process_id": 2,
+     "admission_phase_id": 3,
+     "order": 1
+    }
+   ]
+  },
+  {
+   "behavior_on_invalid_condition": "exception_on_machine",
+   "behavior_on_invalid_ranking": "exception_ranking",
+   "id": 3,
+   "name": "Bolsas",
+   "form_condition": {
+    "mode": "and",
+    "form_conditions": [
+     {
+      "mode": "condition",
+      "field": "Homologação",
+      "condition": "equals",
+      "value": "Deferida"
+     },
+     {
+      "mode": "or",
+      "form_conditions": [
+       {
+        "mode": "condition",
+        "field": "Solicita bolsa?",
+        "condition": "contains",
+        "value": "Sim, já sou aluno"
+       },
+       {
+        "mode": "and",
+        "form_conditions": [
+         {
+          "mode": "condition",
+          "field": "Posição/Vagas",
+          "condition": "not_null",
+          "value": null
+         },
+         {
+          "mode": "condition",
+          "field": "Solicita bolsa?",
+          "condition": "equals",
+          "value": "Sim, ainda não sou aluno"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "ranking_columns": [
+    {
+     "name": "Nota final",
+     "order": "desc"
+    },
+    {
+     "name": "Idade",
+     "order": "desc"
+    }
+   ],
+   "ranking_groups": [],
+   "ranking_processes": [
+    {
+     "order": 1,
+     "step": 1,
+     "vacancies": null,
+     "group": null,
+     "ranking_machine": {
+      "id": 4,
+      "name": "Bolsa",
+      "form_condition": null
+     }
+    }
+   ],
+   "process_links": [
+    {
+     "admission_process_id": 1,
+     "admission_phase_id": 2,
+     "order": 2
+    }
+   ]
+  },
+  {
+   "behavior_on_invalid_condition": "exception_on_machine",
+   "behavior_on_invalid_ranking": "exception_ranking",
+   "id": 4,
+   "name": "Bolsas sem coluna",
+   "form_condition": {
+    "mode": "and",
+    "form_conditions": [
+     {
+      "mode": "condition",
+      "field": "Homologação",
+      "condition": "equals",
+      "value": "Deferida"
+     },
+     {
+      "mode": "condition",
+      "field": "Pedido de bolsa",
+      "condition": "equals",
+      "value": "Sim"
+     }
+    ]
+   },
+   "ranking_columns": [],
+   "ranking_groups": [],
+   "ranking_processes": [
+    {
+     "order": 1,
+     "step": 1,
+     "vacancies": null,
+     "group": null,
+     "ranking_machine": {
+      "id": 4,
+      "name": "Bolsa",
+      "form_condition": null
+     }
+    }
+   ],
+   "process_links": [
+    {
+     "admission_process_id": 3,
+     "admission_phase_id": 5,
+     "order": 2
+    }
+   ]
+  }
+ ]
+}

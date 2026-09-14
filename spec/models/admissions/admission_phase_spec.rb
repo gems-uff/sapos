@@ -44,13 +44,6 @@ RSpec.describe Admissions::AdmissionPhase, type: :model do
     it { should be_valid }
     it { should validate_presence_of(:name) }
   end
-  describe "Duplication" do
-    # ToDo: initialize_dup
-  end
-  describe "Methods" do
-    # ToDo: committee_users_for_candidate
-    # ToDo: update_pendencies
-    # ToDo: create_pendencies_for_candidate
-    # ToDo: prepare_application_forms
-  end
+  # Duplicação, comitês, pendências e formulários de fase:
+  # admission_phase_pendencies_spec.rb.
 end
