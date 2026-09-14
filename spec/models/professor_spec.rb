@@ -291,6 +291,35 @@ RSpec.describe Professor, type: :model do
         expect(professor.advisement_point(enrollment)).to eql(1.0)
       end
     end
+
+    describe "accredited_on?" do
+      let(:level) { FactoryBot.build(:level) }
+      it "is true with an open authorization already started at the level" do
+        professor.advisement_authorizations.build(level: level, start_date: Date.current - 1.day)
+        expect(professor.accredited_on?(level)).to be true
+      end
+      it "is false when the only authorization at the level is closed" do
+        professor.advisement_authorizations.build(
+          level: level, start_date: Date.current - 2.days, end_date: Date.current - 1.day
+        )
+        expect(professor.accredited_on?(level)).to be false
+      end
+      it "is false when the authorization has not started yet" do
+        professor.advisement_authorizations.build(level: level, start_date: Date.current + 1.day)
+        expect(professor.accredited_on?(level)).to be false
+      end
+      it "is false at a level the professor is not accredited for" do
+        professor.advisement_authorizations.build(level: level, start_date: Date.current - 1.day)
+        expect(professor.accredited_on?(FactoryBot.build(:level))).to be false
+      end
+      it "considers not-yet-saved (nested) authorizations, not only persisted ones" do
+        # A validação de orientador roda sobre associações em memória; o helper
+        # precisa enxergar o credenciamento recém-construído, ainda não salvo.
+        professor.advisement_authorizations.build(level: level, start_date: Date.current - 1.day)
+        expect(professor.new_record?).to be true
+        expect(professor.accredited_on?(level)).to be true
+      end
+    end
   end
 
   describe "Before destroy" do

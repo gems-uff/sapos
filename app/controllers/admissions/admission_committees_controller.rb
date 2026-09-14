@@ -68,7 +68,10 @@ class Admissions::AdmissionCommitteesController < ApplicationController
   end
 
   def populate_authorized
-    populate_members(User.joins(professor: :advisement_authorizations).distinct)
+    populate_members(
+      User.joins(professor: :advisement_authorizations)
+        .merge(AdvisementAuthorization.on_date(Date.current)).distinct
+    )
   end
 
   def populate_professors

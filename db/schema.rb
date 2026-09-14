@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_20_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_24_130000) do
   create_table "accomplishments", force: :cascade do |t|
     t.date "conclusion_date"
     t.datetime "created_at", precision: nil, null: false
@@ -243,6 +243,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_20_000000) do
     t.integer "level_id"
     t.integer "professor_id"
     t.datetime "updated_at", precision: nil, null: false
+    t.date "start_date"
+    t.date "end_date"
     t.index ["level_id"], name: "index_advisement_authorizations_on_level_id"
     t.index ["professor_id"], name: "index_advisement_authorizations_on_professor_id"
   end
