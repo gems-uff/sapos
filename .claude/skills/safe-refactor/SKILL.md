@@ -26,8 +26,36 @@ Leia no nível certo: **guia de upgrade e notas de versão**, não o CHANGELOG
 completo de cada gem. O que interessa são as mudanças de comportamento e as
 remoções, não as features novas e opcionais.
 
+**Procure primeiro a página de migração da lib, e só caia no changelog se ela não
+existir.** Projeto grande mantém uma, versionada e escrita para quem está subindo:
+o Rails tem o *Upgrading Ruby on Rails* nos guides, mais as notas de versão de
+cada série; outras libs guardam a mesma coisa num `UPGRADING.md`/`MIGRATION.md` no
+repositório, numa seção "Upgrade" do README ou no corpo da release do GitHub. Vale
+a busca explícita antes de abrir o changelog: essa página traz o **o que fazer**
+ao lado da mudança, que o changelog apenas menciona.
+
+Duas cautelas ao usar o guia:
+
+- **É cumulativo.** Pular versões obriga a ler também os guias das intermediárias;
+  o da série de destino pressupõe que as anteriores foram aplicadas.
+- **Ele fala do framework, não deste projeto.** O que ele lista como "faça isto"
+  ainda passa pela busca dirigida abaixo: boa parte não se aplica, e é justamente
+  isso que encurta o trabalho.
+
 Para cada item, faça uma busca dirigida no código. A maioria não vai se aplicar,
 e isso é resultado: encurta a lista do que precisa ser testado à mão.
+
+**O changelog diz a intenção; o diff diz o que mudou.** Quando um item parecer
+tocar o projeto, leia o diff da própria dependência antes de concluir —
+`gh api repos/<owner>/<repo>/compare/v<antiga>...v<nova>` devolve commits e patch.
+Entrada que anuncia "adicionamos X" pode ser lógica que apenas **mudou de lugar**,
+sem efeito nenhum na tela; o texto sozinho não distingue as duas coisas. Quando o
+`gh api` não serve — gem fora do GitHub, tag que não bate com a versão publicada,
+rede filtrada —, resta comparar o fonte instalado das duas versões
+(`~/.rvm/gems/*/gems/<gem>-<versão>*/`; gem nativa leva sufixo de plataforma no
+nome do diretório). É menos que o diff do repositório: a árvore instalada traz só
+o que o gemspec empacota — sem `spec/`, muitas vezes sem changelog, nunca com
+mensagem de commit —, e a versão antiga só está lá enquanto ninguém a removeu.
 
 **Duas armadilhas nesse passo:**
 
@@ -65,8 +93,15 @@ pela mensagem esperada**, e desfaça. Vale para o teste que você acabou de
 escrever e para o que você supõe já cobrir a mudança. Teste que passa dos dois
 jeitos não protege nada. Custa segundos.
 
-Duas maneiras de essa checagem mentir:
+Três maneiras de essa checagem mentir:
 
+- **Simular a versão antiga de cabeça.** Num upgrade de gem, "como era antes" não
+  se reconstrói de memória nem do changelog: **o código da versão anterior é a
+  única simulação válida** — do diretório dela
+  (`~/.rvm/gems/*/gems/<gem>-<versão>*/`) enquanto ainda estiver instalada, ou do
+  fonte publicado. Substituir o método novo por uma aproximação escrita à mão
+  produz uma versão que nunca existiu — e o vermelho que ela dá "confirma" um
+  comportamento antigo imaginário.
 - **Sabotagem não representativa.** Estragar um trecho de que o exemplo não
   depende não prova nada. Se o dado escolhido não atravessa o caminho alterado —
   uma consulta *sem parâmetro* para testar o repasse de parâmetros —, o arquivo
@@ -112,7 +147,8 @@ Aqui o critério muda, e é você quem decide:
 - **Feature** — a diferença esperada é o comportamento novo, e o código antigo
   deveria seguir igual.
 
-Nos dois últimos casos, **declare antes de rodar quais diferenças você espera**.
+Nos três casos, **declare antes de rodar quais diferenças você espera** — na
+refatoração a lista é vazia, e escrevê-la vazia já é a declaração.
 Sem essa lista feita de antemão, é fácil olhar para uma diferença inesperada e
 racionalizá-la como intencional.
 

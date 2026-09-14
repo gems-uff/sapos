@@ -165,10 +165,24 @@ def enviar(driver, wait)
 end
 
 def apaga_criadas(driver, wait, marca)
+  # ESTA SONDA RODA ANONIMA -- o formulario publico dispensa sessao. Mas a
+  # limpeza usa tela ADMINISTRATIVA, e sem login ela cai no /users/sign_in:
+  # nao acha link de exclusao (nao apaga nada) e nao acha linha com o marcador
+  # (conta zero). O relatorio entao dizia "restantes: 0" tendo contado a tela de
+  # login, e a candidatura sobrevivia -- bloqueando a rodada seguinte com
+  # "Email ja existe", porque o marcador tambem e o valor do e-mail.
+  login(driver, wait)
+  switch_role!(driver, wait, "Administrador")
+
   # A busca do active_scaffold e por campo: ?search[name]=, nao ?search=.
   driver.navigate.to("#{BASE}/admission_applications?search[name]=#{marca}")
   settle(driver, wait)
   sleep 2
+  if driver.current_url.include?("sign_in")
+    abort "LIMPEZA ABORTADA: a lista caiu no login. Nada foi apagado, e a " \
+          "candidatura marcada continua na replica -- apague-a antes da " \
+          "proxima rodada."
+  end
   ids = driver.execute_script(<<~JS)
     return Array.prototype.slice.call(document.querySelectorAll('tr'))
       .filter(function (tr) { return tr.innerText.indexOf('ZZ-TESTE-HOMOLOG') >= 0; })
@@ -179,18 +193,32 @@ def apaga_criadas(driver, wait, marca)
     link = driver.find_elements(id: did).first
     next if link.nil?
     driver.execute_script("arguments[0].click()", link)
-    sleep 1
-    begin
-      driver.switch_to.alert.accept
-    rescue Selenium::WebDriver::Error::NoSuchAlertError
-      nil
+    # A confirmacao e um alert NATIVO, mas nao aparece instantaneamente. Esperar
+    # 1s fixo e engolir NoSuchAlertError deixa o registro vivo em silencio -- e
+    # a contagem seguinte ainda assim volta zero, entao a limpeza mente. Espera
+    # ate ~5s e diz quando nao confirmou.
+    confirmou = false
+    10.times do
+      sleep 0.5
+      begin
+        driver.switch_to.alert.accept
+        confirmou = true
+        break
+      rescue Selenium::WebDriver::Error::NoSuchAlertError
+        next
+      end
     end
+    puts "  AVISO: exclusao de #{did} nao confirmada (sem alert)" unless confirmou
     sleep 3
     settle(driver, wait)
   end
+  # Recontar em pagina recarregada: contar na mesma pagina que acabou de apagar
+  # devolve zero mesmo quando a exclusao nao pegou no servidor.
   driver.navigate.to("#{BASE}/admission_applications?search[name]=#{marca}")
   settle(driver, wait)
   sleep 2
+  abort "LIMPEZA ABORTADA: a lista caiu no login na reconferencia." if driver.current_url.include?("sign_in")
+
   driver.execute_script(<<~JS)
     return Array.prototype.slice.call(document.querySelectorAll('tr'))
       .filter(function (tr) { return tr.innerText.indexOf('ZZ-TESTE-HOMOLOG') >= 0; }).length;
@@ -271,9 +299,27 @@ begin
         aviso: flash ? flash.innerText.replace(/\\s+/g, ' ').trim().slice(0, 200) : null
       };
     JS
-    relatorio[:fase2] = { criou: !ainda, resultado: resultado, invalidos: invalidos(driver) }
+    # Sair do formulario NAO e ter criado. Se o servidor recusou e re-renderizou,
+    # a URL tambem muda -- e o `erro` na pagina e o que separa os dois casos.
+    # Confundi-los reporta "criou: true" sobre uma submissao rejeitada, e a
+    # rodada conclui que o formulario publico funciona quando ele nao foi
+    # exercitado ate o fim.
+    postou = !ainda
+    recusado = postou && !resultado["erro"].to_s.strip.empty?
+    criou = postou && !recusado
+    relatorio[:fase2] = {
+      postou: postou, recusado_no_servidor: recusado, criou: criou,
+      resultado: resultado, invalidos: invalidos(driver)
+    }
     shot(driver, "submissao_fase2")
-    puts "FASE 2 -- criou: #{!ainda} | #{resultado['aviso'].inspect}"
+    puts "FASE 2 -- postou: #{postou} | recusado no servidor: #{recusado} | " \
+         "criou: #{criou}"
+    if recusado
+      puts "  motivo: #{resultado['erro'].to_s.slice(0, 120)}"
+      puts "  (\"Email ja existe\" = sobrou candidatura marcada de rodada anterior;" \
+           " o marcador tambem e o valor do e-mail, entao ela bloqueia a proxima)"
+
+    end
 
     unless MANTER
       restantes = apaga_criadas(driver, wait, MARCA)

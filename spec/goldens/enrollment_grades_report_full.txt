@@ -1,0 +1,84 @@
+── página 1 ──
+BO L ET I M E S C OL A R / P ÓS - GR A D UAÇ ÃO
+
+
+ALUNO: Ana Conceição
+
+MATRÍCULA: M2020001 NACIONALIDADE: Não informado DATA NASCIMENTO: 10/05/1990
+IDENTIDADE: 12.345.678-9 ÓRGÃO EXPEDIDOR: Não informado ESTADO EXPEDIDOR: Rio de Janeiro
+
+C.P.F.: 000.000.000-00
+
+
+CURSO: Mestrado
+
+
+ÁREA DE CONCENTRAÇÃO: Não informado
+
+MÊS/ANO DE INGRESSO NO CURSO: Março/2020
+
+
+MÊS/ANO DE DESLIGAMENTO DO CURSO: Março/2021 MOTIVO: Titulação
+
+DISCIPLINAS CURSADAS COM APROVEITAMENTO
+
+ NOTA / NÚMERO CARGA
+ CÓDIGO DENOMINAÇÃO CONCEITO DE HORÁRIA PERÍODO SITUAÇÃO
+ CRÉDITOS
+ TCC00001 Engenharia de Software 9.0 4 60h 1/2020 Aprovado
+
+ RESUMO DO PERÍODO 9.0 4 60h
+
+ TCC00002 Tópicos Especiais * 2 30h 2/2020 Aprovado
+ TCC00003 Seminários * 2 30h 2/2020 Aprovado
+
+ RESUMO DO PERÍODO 4 60h
+ TOTAL 9.0 8 120h
+
+* DISCIPLINAS QUE NÃO CONTABILIZAM NOTA / JUSTIFICATIVA:
+
+TCC00002 / Disciplina isolada
+TCC00003 / Não informado
+
+TESE / DISSERTAÇÃO - TÍTULO: Rastreabilidade em Sistemas de Software
+
+
+DATA DA DEFESA: 15/03/2021 JULGAMENTO: Aprovado
+
+ORIENTADOR(ES): João Pereira
+
+
+MEMBROS DA BANCA EXAMINADORA / INSTITUIÇÃO DE ORIGEM:
+Maria Silva / Universidade Federal Fluminense
+Carlos Souza / Universidade Federal Fluminense
+
+
+OBSERVAÇÕES: Aluno com aproveitamento de créditos.
+
+ETAPAS OBRIGATÓRIAS CONCLUÍDAS
+
+---------/---- Exame de Qualificação
+Dezembro/2020 Proficiência em Inglês
+
+PRORROGAÇÕES
+
+Janeiro/2021 Prorrogação de Defesa
+BOLSAS
+
+ NÚMERO AGÊNCIA DATA DE INÍCIO DATA LIMITE ENCERRAMENTO
+
+ B2020002 CNPq Março/2020 Fevereiro/2021 Dezembro/2020
+ Suspensão ativa Junho-2020 Julho-2020 -
+
+ Suspensão inativa Setembro-2020 Setembro-2020 -
+
+
+
+
+
+
+
+
+
+
+SAPOS - Terça, 15 de Junho de 2021, 10:30 h

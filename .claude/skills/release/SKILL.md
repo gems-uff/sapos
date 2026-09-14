@@ -5,8 +5,12 @@ description: Lança uma nova versão do SAPOS — merge na main, tag anotada, la
 
 # Release do SAPOS
 
-Sequência para transformar um ramo pronto em versão publicada. O passo final —
-o deploy em produção — **é do mantenedor**; a skill vai até a release no GitHub.
+Sequência para transformar um ramo pronto em versão publicada. O deploy em
+produção **é do mantenedor**; o último passo da skill é avisá-lo de que a tag
+está pronta, e nada fica depois desse aviso.
+
+É o último passo do ciclo descrito em `revisar-pr`, e chega-se aqui pelo caminho
+dela — que também descreve as saídas em que **não** se lança.
 
 ## Pré-requisitos
 
@@ -15,8 +19,13 @@ Não comece sem isto:
 - Suíte completa verde no ramo (`bundle exec rspec`, ~12 min).
 - Homologação feita, quando a mudança toca o que a suíte não alcança (skill
   `homologacao`).
-- Passada manual do mantenedor em staging, quando houver caminho de escrita, PDF,
-  planilha ou e-mail envolvido — a captura automatizada é só leitura.
+- **Passada de escrita em staging**, quando houver caminho de escrita, PDF,
+  planilha ou e-mail envolvido — a captura da homologação é só leitura, e prova
+  que as telas continuam iguais, não que salvar continua funcionando. Ela é parte
+  da rodada de homologação (ver a seção "Passada de escrita" naquela skill) e
+  **não depende de pedido do mantenedor**: chegar aqui sem ela é chegar sem
+  pré-requisito. O que continua sendo dele é o juízo sobre o que mais exercitar à
+  mão, não a execução.
 - `main` sincronizada com `origin/main`: `git rev-list --left-right --count origin/main...main` → `0 0`.
 - **Árvore de trabalho limpa: `git status --short` vazio.** Se houver qualquer
   coisa não commitada, **pare e avise o mantenedor antes do merge** — mostrando o
@@ -120,6 +129,11 @@ gh issue close <N> --reason completed
   feche o que a versão de fato encerra.
 - Fechamento é `completed`, sem comentário de encerramento — é o padrão do
   repositório.
+- **Issue já fechada também leva o label.** Mudança que quase não altera a
+  aplicação pode entrar na `main` sem disparar release, e o mantenedor fecha a
+  issue nessa hora; ela sai na próxima versão junto com outras. O passo 1 a
+  lista pelo intervalo de commits, e o `gh issue edit --add-label` funciona em
+  issue fechada. Sem o label, a consulta da release não a mostra.
 
 ### 6. Release no GitHub
 
@@ -155,15 +169,45 @@ atualização (gem, de → para) **sem citar CVE nem descrever o ataque**.
 ```bash
 gh release list --limit 3          # a nova deve aparecer como Latest
 gh issue list --label 7.15.21 --state all
+gh issue list --label 7.15.21 --state open
 ```
 
-### 8. Deploy — do mantenedor
+**A última consulta tem que vir vazia — ou cada linha que sobrar precisa de um
+comentário na própria issue dizendo o que ficou de fora.** Rotulada e aberta é o
+estado legítimo da entrega parcial (passo 5), e sem o comentário ele é
+indistinguível do esquecimento: quem vier depois lê o label como "saiu" e o
+aberto como "falta", sem meio de decidir qual dos dois vale. Quem paga é quem
+pesca a issue para trabalhar e descobre no meio do caminho que já estava pronta.
 
-**Passe a tag certa.** Versão errada no rodapé de produção costuma ser a tag
-passada no deploy, não o Passenger. Depois de subir, confira o rodapé.
+**Confira também o lado que nenhum label denuncia:** issue atendida pela versão
+que não recebeu rótulo nenhum. A separação entre issues atendidas e apenas
+citadas, feita no passo 1, é o gabarito — cada issue atendida ali tem que
+aparecer na consulta por label.
 
-## Depois da release
+**Apague o ramo lançado, GitHub e local, ainda neste passo:**
 
-- Apague o ramo lançado (GitHub e local), e pode `git fetch --prune`.
-- Se a release fecha alerta do Dependabot, ele só re-varre o ramo padrão — o
-  quadro de alertas leva alguns minutos para refletir o push.
+```bash
+git push origin --delete <ramo>
+git branch -d <ramo>
+```
+
+Depois do fast-forward do passo 3 o ramo aponta para um commit que a `main` já
+contém, então nada se perde.
+
+Se a release fecha alerta do Dependabot, ele só re-varre o ramo padrão — o
+quadro de alertas leva alguns minutos para refletir o push. Não conclua que o
+alerta ficou aberto antes disso.
+
+### 8. Avise o mantenedor de que a tag está pronta para o deploy
+
+É o último passo, e é uma mensagem, não uma ação no repositório. Ela diz:
+
+- **A tag a passar no deploy**, pelo número. Versão errada no rodapé de
+  produção costuma ser a tag passada no deploy, não o Passenger.
+- Se a tag foi **movida** (passo 4), que o destino precisa de
+  `git fetch --tags --force` antes, senão o rodapé mente a favor.
+- **Como conferir o deploy por comportamento**, e não só pelo rodapé: a medida
+  que separa esta versão da anterior, tirada da homologação.
+
+O deploy e a conferência são do mantenedor. A skill termina aqui; não há seção
+"depois da release" porque o que ficasse ali não seria executado.

@@ -8,30 +8,31 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 # seguranca, e a 3.4 serve ao Rails 8 -- sobrevive a esse salto.
 ruby "~> 3.4.10"
 
+# Nao ha piso de seguranca (">= x.y.z") neste arquivo. Piso envelhece calado
+# quando sai a correcao seguinte; o que garante que o lock nao carrega CVE
+# conhecida e o bundle-audit, que o CI roda contra a base de advisories do dia.
+
 # ─── Framework e servidor ────────────────────────────────────────────────
-gem "rails", "~> 7.2.3", ">= 7.2.3.2"    # piso de seguranca (CVE-2026-66066)
-gem "rack", "~> 2.2.23"                  # o 3.x entra junto com o salto do Rails
+gem "rails", "~> 8.1.3"                  # minor do Rails e migracao: decisao a parte
 gem "sprockets-rails"                    # asset pipeline
 gem "bootsnap", require: false           # cache de boot (config/boot.rb)
-gem "nokogiri", ">= 1.18.9"              # piso de seguranca (parser HTML/XML)
 gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 # ─── Assets / front-end ──────────────────────────────────────────────────
-gem "dartsass-sprockets"                 # compilador sass; AS 4.1.6 trocou libsass por dart-sass (#621)
+gem "dartsass-sprockets"                 # compilador sass; a 4.3 do AS deixou de puxa-lo, mantemos o pin direto (#621)
 gem "coffee-rails"
 gem "jquery-rails"
 gem "jquery-ui-rails", "~> 8.0"          # major mexe no layout de assets e o AS ramifica por versao (#638)
 gem "font-awesome-rails"
 
 # ─── Autenticacao e autorizacao ──────────────────────────────────────────
-gem "devise", "~> 5.0", ">= 5.0.4"       # major de auth exige migracao: decisao a parte
+gem "devise", "~> 5.0"                   # major de auth exige migracao: decisao a parte
 gem "devise_invitable"
 gem "cancancan"
 gem "recaptcha", require: "recaptcha/rails"
-gem "dotenv-rails", require: "dotenv/load"   # ENV a partir de .env (recaptcha etc.)
 
 # ─── UI administrativa / scaffolding ─────────────────────────────────────
-gem "active_scaffold", "~> 4.2.3"        # upgrade em saltos de minor; trava a serie 4.2 (#621)
+gem "active_scaffold", "~> 4.3.2"        # upgrade em saltos de minor; trava a serie 4.3 (#621)
 gem "active_scaffold_duplicate"
 gem "recordselect"
 gem "simple-navigation"                  # menu (config/navigation.rb)
@@ -53,14 +54,14 @@ gem "liquid"                             # templates de relatorio/notificacao
 gem "redcarpet"                          # Markdown (pagina de creditos)
 
 # ─── Upload de arquivos ──────────────────────────────────────────────────
-gem "carrierwave", ">= 3.0.7"            # piso de seguranca
-gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-activerecord.git", branch: "rails7"
+gem "carrierwave"
+gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-activerecord.git", branch: "rails8"
 
 # ─── Dominio / infraestrutura de app ─────────────────────────────────────
 gem "paper_trail"                        # versionamento/auditoria
 gem "activerecord-session_store"         # sessao no banco (initializers/session_store.rb)
 gem "rufus-scheduler"                    # agendamento de notificacoes
-gem "validates_timeliness", "~> 7.1"     # validacao de datas; teto so no major
+gem "validates_timeliness", "~> 8.0"     # validacao de datas; o major acompanha o do Rails (8.x pede activemodel 8)
 gem "exception_notification"             # notifica excecoes
 
 # ─── Ambientes ───────────────────────────────────────────────────────────
@@ -76,9 +77,11 @@ end
 group :development, :test do
   # Producao roda Apache + Passenger; o puma serve ao `rails s` e ao servidor
   # que o Capybara sobe nos feature specs (Capybara.server em rails_helper).
-  # O teto e o 8.0.0 por causa desse segundo uso.
-  gem "puma", "~> 7.2", ">= 7.2.1"
-  gem "sqlite3", ">= 2.9.5"              # banco de dev/test; piso 2.9.5: CVE-2026-54620
+  # A serie fica travada por esse segundo uso: o Capybara instancia
+  # Puma::Server e chama binder e log_writer diretamente, e e major que mexe
+  # nessas superficies.
+  gem "puma", "~> 8.0"
+  gem "sqlite3"                          # banco de dev/test
   gem "awesome_print"
   gem "binding_of_caller"
   gem "better_errors"

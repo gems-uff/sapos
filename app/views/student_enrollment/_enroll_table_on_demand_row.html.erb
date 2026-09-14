@@ -6,7 +6,12 @@
     cer.present?
   )
 
-  check_box_name = "course_ids[#{row[0][:course_id]}][selected]"
+  # Colchetes separados: o form builder embrulha o método em
+  # enrollment_request[...], então o name final é
+  # enrollment_request[course_ids][<id>][selected] -- aninhamento que o parser
+  # do rack 3 exige. Embutir os colchetes na chave (course_ids[<id>][selected])
+  # gerava enrollment_request[course_ids[<id>][selected]], que só o rack 2 lia.
+  check_box_name = "course_ids][#{row[0][:course_id]}][selected"
   check_box_options = {
     id: "table_row_demand_#{row_index}",
     skip_default_ids: false,
@@ -27,7 +32,7 @@
     tdclass: "cell-#{table[:header][0][-1].downcase}"
   )
 
-  on_demand_name = "course_ids[#{row[0][:course_id]}][professor]"
+  on_demand_name = "course_ids][#{row[0][:course_id]}][professor"
   on_demand_options = {}
   on_demand_options = { selected: select_professor.id } if !select_professor.nil?
   on_demand_options = { selected: cer.course_class.professor.id } if !cer.nil?

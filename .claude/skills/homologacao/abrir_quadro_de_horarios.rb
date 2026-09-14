@@ -22,6 +22,7 @@
 # e AUSENTE envia ao destinatario real.
 
 require "selenium-webdriver"
+require_relative "navegador"
 require "date"
 
 def env!(name)
@@ -74,11 +75,7 @@ unless confirmar
   exit 0
 end
 
-options = Selenium::WebDriver::Chrome::Options.new
-options.add_argument("--headless=new")
-options.add_argument("--window-size=1440,2000")
-options.add_argument("--lang=pt-BR")
-driver = Selenium::WebDriver.for(:chrome, options: options)
+driver = novo_driver(largura: 1440, altura: 2000, logs: false)
 wait = Selenium::WebDriver::Wait.new(timeout: 60)
 
 def settle(driver, wait)
@@ -97,6 +94,23 @@ begin
   campo.submit
   wait.until { !driver.current_url.include?("sign_in") }
   puts "login ok como #{USER}"
+
+  # O papel ativo (actual_role) fica GRAVADO no usuario e atravessa execucoes.
+  # Uma sonda anterior que trocou para Aluno deixa este script sem acesso a
+  # /class_schedules, e o sintoma MENTE: o formulario "some" e o find_element do
+  # campo de ano estoura, em vez de dizer "papel errado". No servidor isso vira
+  # CanCan::AccessDenied em class_schedules#index e #new -- e, como a aplicacao
+  # notifica excecao por e-mail, um par de avisos que parece defeito do sistema.
+  sel = driver.find_elements(
+    css: "form[action*='change_role'] select[name='role_id']"
+  ).first
+  if sel.nil?
+    puts "combo de papel ausente (conta com um papel so) -- seguindo"
+  else
+    Selenium::WebDriver::Support::Select.new(sel).select_by(:text, "Administrador")
+    wait.until { driver.execute_script("return document.readyState") == "complete" }
+    puts "papel ativo: Administrador"
+  end
 
   # Duplicar quadro do mesmo semestre confunde o ClassSchedule.find_by do
   # controller; melhor recusar do que criar o segundo.
