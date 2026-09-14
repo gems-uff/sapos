@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_20_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_13_000000) do
   create_table "accomplishments", force: :cascade do |t|
     t.date "conclusion_date"
     t.datetime "created_at", precision: nil, null: false
@@ -292,7 +292,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_20_000000) do
   end
 
   create_table "carrier_wave_files", force: :cascade do |t|
-    t.binary "binary"
+    t.binary "binary", limit: 4294967295
     t.string "content_type"
     t.datetime "created_at", precision: nil, null: false
     t.string "medium_hash", limit: 255

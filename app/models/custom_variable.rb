@@ -9,6 +9,9 @@ class CustomVariable < ApplicationRecord
 
   SAPOS_MAIL = "sapos@sapos.ic.uff.br"
 
+  DEFAULT_MAX_UPLOAD_SIZE_MB = 15
+  MAX_ALLOWED_UPLOAD_SIZE_MB = 4096
+
   VARIABLES = {
     "single_advisor_points" => :text,
     "multiple_advisor_points" => :text,
@@ -27,6 +30,7 @@ class CustomVariable < ApplicationRecord
     "quadrennial_period" => :text,
     "instance_name" => :text,
     "enable_advisor_accreditation_validation" => :text,
+    "max_upload_size_mb" => :text
   }
 
   validates :variable, presence: true
@@ -132,6 +136,16 @@ class CustomVariable < ApplicationRecord
     self.variable.to_s
   end
 
+  def self.max_upload_size_mb
+    config = CustomVariable.find_by_variable(:max_upload_size_mb)
+    value = config.blank? ? nil : config.value.to_s
+    if value.present? && value.match?(/\A[1-9]\d*\z/) && value.to_i <= MAX_ALLOWED_UPLOAD_SIZE_MB
+      value.to_i
+    else
+      DEFAULT_MAX_UPLOAD_SIZE_MB
+    end
+  end
+
   private
     def self.parse_range(config, default)
       return default if config.blank? || config.value.blank?
@@ -179,6 +193,13 @@ class CustomVariable < ApplicationRecord
             minimum_grade_for_approval: (minimum.to_f / 10.0).to_s
           }
         ) if (!self.value.blank?) && ((grade * 10.0).to_i >= minimum)
+      when "max_upload_size_mb"
+        return if self.value.blank?
+        valid_format = self.value.to_s.match?(/\A[1-9]\d*\z/)
+        within_limit = valid_format && self.value.to_i <= MAX_ALLOWED_UPLOAD_SIZE_MB
+        unless within_limit
+          self.errors.add(:value, :max_upload_size_mb_invalid, max: MAX_ALLOWED_UPLOAD_SIZE_MB)
+        end
       end
     end
 

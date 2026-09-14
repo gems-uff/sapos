@@ -397,5 +397,69 @@ RSpec.describe CustomVariable, type: :model do
         expect(CustomVariable.enable_advisor_accreditation_validation).to eq(false)
       end
     end
+    context "max upload size mb" do
+      it "should return 15 when there is no variable defined" do
+        config = CustomVariable.find_by_variable(:max_upload_size_mb)
+        config.delete unless config.nil?
+
+        expect(CustomVariable.max_upload_size_mb).to eq(15)
+      end
+
+      it "should return 15 when the value is blank" do
+        config = CustomVariable.find_by_variable(:max_upload_size_mb)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :max_upload_size_mb, value: "")
+
+        expect(CustomVariable.max_upload_size_mb).to eq(15)
+      end
+
+      it "should return 20 when it is defined to 20" do
+        config = CustomVariable.find_by_variable(:max_upload_size_mb)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :max_upload_size_mb, value: "20")
+
+        expect(CustomVariable.max_upload_size_mb).to eq(20)
+      end
+
+      it "should return 4096 when it is defined to the maximum allowed" do
+        config = CustomVariable.find_by_variable(:max_upload_size_mb)
+        config.delete unless config.nil?
+        @destroy_later << CustomVariable.create!(variable: :max_upload_size_mb, value: "4096")
+
+        expect(CustomVariable.max_upload_size_mb).to eq(4096)
+      end
+    end
+    context "Validations for max_upload_size_mb" do
+      before(:each) do
+        config = CustomVariable.find_by_variable(:max_upload_size_mb)
+        config.delete unless config.nil?
+      end
+
+      it "is invalid when value is zero" do
+        cv = CustomVariable.new(variable: :max_upload_size_mb, value: "0")
+        expect(cv).not_to be_valid
+        expect(cv.errors[:value]).to include("deve ser um número inteiro entre 1 e 4096")
+      end
+
+      it "is invalid when value is negative" do
+        cv = CustomVariable.new(variable: :max_upload_size_mb, value: "-5")
+        expect(cv).not_to be_valid
+      end
+
+      it "is invalid when value is not a number" do
+        cv = CustomVariable.new(variable: :max_upload_size_mb, value: "abc")
+        expect(cv).not_to be_valid
+      end
+
+      it "is invalid when value exceeds 4096" do
+        cv = CustomVariable.new(variable: :max_upload_size_mb, value: "4097")
+        expect(cv).not_to be_valid
+      end
+
+      it "is valid when value is within range" do
+        cv = CustomVariable.new(variable: :max_upload_size_mb, value: "100")
+        expect(cv).to be_valid
+      end
+    end
   end
 end
