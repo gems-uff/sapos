@@ -90,6 +90,7 @@ class ClassSchedulesController < ApplicationController
     @year = schedule.year
     @semester = schedule.semester
     @course_classes = CourseClass.where(year: @year, semester: @semester)
+      .includes(:allocations, :professor, course: :course_type)
     @on_demand = Course.joins(:course_type)
       .where(course_types: { on_demand: true })
 

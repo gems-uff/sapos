@@ -70,7 +70,8 @@ module ClassSchedulesPdfHelper
     pdf.move_down 10
 
     list.each_with_index do |item, index|
-      pdf.text "<b>#{index + 1} - #{item[:name]}</b>", inline_format: true
+      pdf.text "<b>#{index + 1} - #{item[:name].gsub("<", "&lt;")}</b>",
+        inline_format: true
       pdf.indent(10) do
         if item[:no_schedule]
           pdf.text I18n.t(
