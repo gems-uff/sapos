@@ -8,7 +8,9 @@ require "rails_helper"
 # Estes exemplos descrevem o que a importacao de notas precisa fazer. Os tres
 # primeiros contextos ja passam, e ficam como guarda: a cadeia de calculo, a
 # escala da nota, os valores que a planilha pode trazer e a autorizacao por
-# turma sao o que eles travam.
+# turma sao o que eles travam. O ultimo contexto, "defeitos em aberto", falha --
+# sao o criterio de aceitacao do proximo conserto, e cada um diz junto qual e a
+# causa.
 RSpec.describe "Importacao de notas por planilha", type: :request do
   let(:course_type) { FactoryBot.create(:course_type, has_score: true) }
   let(:course) { FactoryBot.create(:course, course_type: course_type) }
@@ -516,6 +518,191 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
       confirmar
 
       expect(inscricao.reload.grade).to be_nil
+    end
+  end
+
+  # Estes falham. Sao os defeitos que esta rodada de revisao confirmou por
+  # reproducao, e ficam aqui como criterio de aceitacao do proximo conserto.
+  # Cada um foi medido com controle: o cenario sem o defeito se comporta de
+  # outro jeito, e a assercao fica verde quando a causa e desligada.
+  context "defeitos em aberto" do
+    before(:each) do
+      role = FactoryBot.create(:role_administrador)
+      sign_in create_confirmed_user([role], "admin@ic.uff.br")
+    end
+
+    # CustomVariable.import_grades_session_timeout devolve 45.minutes -- uma
+    # ActiveSupport::Duration -- quando a variavel nao existe, e config.value.to_i
+    # -- um Integer -- quando existe. Quem chama faz `.ago`, que Duration tem e
+    # Integer nao: configurar a variavel derruba toda confirmacao com
+    # NoMethodError. Nenhum exemplo da suite configura a variavel, entao a CI
+    # fica verde. Falta decidir tambem a unidade: o default diz minutos, o
+    # `.to_i` cru diria segundos.
+    it "nao estoura quando o tempo limite esta configurado" do
+      variavel_customizada("import_grades_session_timeout", "60")
+      enviar(inscricao, nota: "8,7")
+
+      confirmar
+
+      expect(response.status).to be < 500
+    end
+
+    it "grava a nota quando o tempo limite esta configurado" do
+      variavel_customizada("import_grades_session_timeout", "60")
+      enviar(inscricao, nota: "8,7")
+
+      confirmar
+
+      expect(inscricao.reload.grade).to eq(87)
+    end
+
+    # A coluna de nota e inteira, na escala interna (x10), entao so uma casa
+    # decimal cabe. O regex de conferencia aceita quantas vierem, e a
+    # importacao entrega um Float a `ClassEnrollment#grade=`, que converte
+    # apenas String: o valor passa direto para a coluna inteira e trunca.
+    # Medido: "0,29" faz a previa anunciar "Nota nova 0,29", o registro ficar
+    # com 0,2 e a tela dizer "1 nota(s) importada(s) com sucesso!".
+    #
+    # Valor com mais de uma casa e para ser recusado, como os nao numericos --
+    # nao arredondado, para que a nota gravada seja sempre a que alguem
+    # escreveu. O controle e o exemplo "grava a nota preenchida na planilha",
+    # com uma casa, no contexto de administrador.
+    it "recusa nota com mais de uma casa decimal em vez de truncar" do
+      enviar(inscricao, nota: "0,29", situacao: ClassEnrollment::REGISTERED)
+      confirmar
+
+      expect(inscricao.reload.grade).to be_nil
+    end
+
+    it "nao anuncia na previa a nota com mais de uma casa decimal" do
+      enviar(inscricao, nota: "0,29", situacao: ClassEnrollment::REGISTERED)
+
+      expect(celulas_da_previa[4]).not_to include("0,29")
+    end
+
+    # A previa e o unico lugar onde da para conferir antes de gravar, e com a
+    # transacao uma linha recusada desfaz a pauta inteira. Por isso "Pronto" tem
+    # de significar "esta linha grava": nota fora de 0..10 nao grava
+    # (grade_gt_100), e a linha aparece como pronta.
+    it "nao marca como pronta a linha com nota acima do maximo" do
+      enviar(inscricao, nota: "99,0", situacao: ClassEnrollment::REGISTERED)
+
+      expect(celulas_da_previa[1]).not_to eq(
+        I18n.t("xls_content.course_class.import_grades_xls_results.status_pending")
+      )
+    end
+
+    # Mesmo ponto, por outra causa: coluna de nota vazia com situacao "Aprovado"
+    # na planilha passa pelo recalculo intocada (o `elsif final_grade.present?`
+    # nao roda) e cai em grade_for_situation na gravacao. A previa mostra
+    # "Pronto", "Nota nova --", "Situacao nova Aprovado".
+    it "nao marca como pronta a linha que a validacao vai recusar" do
+      enviar(inscricao, nota: nil, situacao: ClassEnrollment::APPROVED)
+
+      expect(celulas_da_previa[1]).not_to eq(
+        I18n.t("xls_content.course_class.import_grades_xls_results.status_pending")
+      )
+    end
+
+    # O flash de erro e posto e o redirect leva para a tela de upload -- que nao
+    # renderiza flash, e nao e view de active_scaffold, entao o _messages da gem
+    # nao roda. O layout imprime so `notice`. O professor ve o formulario vazio
+    # de novo, sem uma palavra sobre o que houve. Vale para as duas mensagens
+    # novas: arquivo invalido e previa expirada.
+    it "mostra na tela o erro de arquivo invalido" do
+      texto = Tempfile.new(["nota", ".txt"])
+      texto.write("nao sou uma planilha")
+      texto.rewind
+      post import_grades_xls_course_class_path(turma), params: {
+        spreadsheet: Rack::Test::UploadedFile.new(
+          texto.path, nil, false, original_filename: "nota.txt"
+        )
+      }
+      follow_redirect!
+
+      expect(response.body).to include(
+        I18n.t("xls_content.course_class.import_grades_xls_error")
+      )
+    end
+
+    # parse_rows_xls acumula em rows[enrollment_number], e build_xls_import_preview
+    # confere "nao encontrada" ANTES de "duplicada". Matricula repetida que nao
+    # existe no banco e reportada como inexistente, escondendo a duplicidade --
+    # que e o que o professor tem de corrigir na planilha. Controle: a mesma
+    # matricula repetida, existente, sai como duplicada.
+    it "reporta como duplicada a matricula repetida que nao existe no banco" do
+      post import_grades_xls_course_class_path(turma), params: {
+        spreadsheet: pauta_de_linhas([
+          [1, "NAO-EXISTE", "aluno", "a@t.com", "8,7",
+           ClassEnrollment::ATTENDANCE_TRUE, nil, nil, "Nao", "01/01/2026 00:00"],
+          [2, "NAO-EXISTE", "aluno", "a@t.com", "5,0",
+           ClassEnrollment::ATTENDANCE_TRUE, nil, nil, "Nao", "01/01/2026 00:00"]
+        ])
+      }
+
+      expect(response.body).to include(
+        I18n.t("xls_content.course_class.import_grades_xls_results.status_duplicate")
+      )
+    end
+
+    # notify_import_changed pega Net::SMTPError, Net::OpenTimeout e
+    # Net::ReadTimeout. Servidor de e-mail fora do ar levanta
+    # Errno::ECONNREFUSED, e nome que nao resolve levanta SocketError -- nenhum
+    # dos dois e subclasse dos tres. A transacao ja commitou quando a
+    # notificacao roda, entao a excecao sobe depois da gravacao: o usuario
+    # recebe 500 sobre uma importacao que deu certo, a previa ja saiu da sessao,
+    # e ele reenvia, notificando de novo quem ja recebeu.
+    #
+    # Controle: o exemplo do SMTP, logo acima, mostra que a falha tratada vira
+    # aviso e nao derruba a requisicao.
+    it "nao estoura quando o servidor de e-mail recusa a conexao" do
+      allow(Notifier).to receive(:send_emails).and_raise(Errno::ECONNREFUSED)
+      enviar(inscricao, nota: "8,7")
+
+      confirmar
+
+      expect(response.status).to be < 500
+    end
+
+    # Duas grafias da mesma matricula. O que conta como "mesma" e decisao da
+    # collation do banco, nao do String#hash do Ruby: em producao
+    # (utf8mb4_unicode_ci) "m01" e "M01 " sao a matricula "M01" -- caixa
+    # ignorada, espaco no fim ignorado --, e o enrollment_number sai de
+    # parse_rows_xls sem strip, ao contrario das outras colunas. Entao duas
+    # chaves distintas no Hash resolvem para a mesma inscricao: a duplicidade
+    # nao e detectada, a previa mostra duas linhas "Pronto" para um aluno so, e
+    # a gravacao aplica as duas em ordem -- a ultima vence.
+    #
+    # Medido em MariaDB 10.5, pauta com "M01" (8,7) e "m01" (1,0):
+    #
+    #   previa:   2 linhas "Pronto", notas "8,7" e "1,0", 0 duplicadas
+    #   resumo:   "2 registros prontos para importacao."
+    #   gravado:  nota=1,0  situacao="Reprovado"
+    #   tela:     "2 nota(s) importada(s) com sucesso!"
+    #
+    # O exemplo so roda no adaptador de producao: no SQLite as duas grafias sao
+    # dois valores diferentes, nenhuma das duas acha o registro, e o cenario nao
+    # existe para ser medido. Mesma concessao do spec/config/schema_dump_spec.rb,
+    # de sinal trocado. A suite local em SQLite pula este exemplo; o job `test`
+    # da CI roda em MariaDB com a collation de producao, e e la que ele vale.
+    if ActiveRecord::Base.connection.adapter_name == "Mysql2"
+      it "detecta como duplicada a matricula que aparece em duas grafias" do
+        inscricao  # a matricula do fixture e "M01"
+        numero = inscricao.enrollment.enrollment_number
+
+        post import_grades_xls_course_class_path(turma), params: {
+          spreadsheet: pauta_de_linhas([
+            linha(inscricao, nota: "8,7"),
+            [1, numero.downcase, "aluno", "aluno@test.com", "1,0",
+             ClassEnrollment::ATTENDANCE_TRUE, ClassEnrollment::REGISTERED,
+             nil, "Nao", I18n.l(inscricao.created_at, format: :defaultdatetime)]
+          ])
+        }
+
+        expect(response.body).to include(
+          I18n.t("xls_content.course_class.import_grades_xls_results.status_duplicate")
+        )
+      end
     end
   end
 end
