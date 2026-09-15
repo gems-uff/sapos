@@ -42,6 +42,10 @@
 <% else %>
   <%= filled_form.hidden_field :enable_submission, value: "1" %>
 <% end %>
+<% if can_disable_submission %>
+  <li class="filled-form-fieldset-wrapper">
+    <fieldset id="<%= filled_class %>-fieldset" disabled>
+<% end %>
 <% groups.each do |gfield, gtag, fields| %>
   <% if gfield.present? %>
     <li class="sub-form">
@@ -62,16 +66,20 @@
     <% end %>
   <% end %>
 <% end %>
+<% if can_disable_submission %>
+    </fieldset>
+  </li>
+<% end %>
 
 <script>
 $(document).ready(function() {
   <% if can_disable_submission %>
+    let fieldset = document.getElementById("<%= filled_class %>-fieldset");
     if (!$(`#<%= filled_class %>-toggle`).is(":checked")) {
-      $(".<%= filled_class %>:input").prop('disabled', true);
       $(".<%= filled_class %>-link").addClass("disabled-links")
     }
     $(`#<%= filled_class %>-toggle`).on("change", function(e){
-      $(".<%= filled_class %>:input").prop('disabled', !this.checked);
+      fieldset.disabled = !this.checked
       $(".<%= filled_class %>-link").toggleClass("disabled-links")
     })
   <% end %>

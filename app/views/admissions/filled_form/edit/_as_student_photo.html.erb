@@ -39,7 +39,7 @@
 <script>
 $(document).ready(function() {
   $(`#<%= file_id %> .carrierwave_controls input`).addClass("<%= filled_class %>");
-  carrierwave_webcam(".webcam-photo")
+  carrierwave_webcam("[data-id='<%= options[:id] %>']")
 
   function validateFile(file) {
     if (!file) {
