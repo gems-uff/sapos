@@ -65,12 +65,12 @@ module ClassSchedulesPdfHelper
 
     pdf.move_down 15
     pdf.text "<b>#{
-      I18n.t("pdf_content.class_schedule.class_schedule_list.courses_offered")
+      I18n.t("pdf_content.class_schedule.class_schedule_list.classes_offered")
     }: #{list.size}</b>", inline_format: true
     pdf.move_down 10
 
-    list.each do |item|
-      pdf.text "<b>#{item[:name]}</b>", inline_format: true
+    list.each_with_index do |item, index|
+      pdf.text "<b>#{index + 1} - #{item[:name]}</b>", inline_format: true
       pdf.indent(10) do
         if item[:no_schedule]
           pdf.text I18n.t(
