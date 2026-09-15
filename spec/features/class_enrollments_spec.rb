@@ -160,11 +160,12 @@ RSpec.describe "ClassEnrollments features", type: :feature do
       expect(page).to have_field("Nota", with: "1,0")
     end
 
-    # O JS troca '%{actual_grade}' e '%{grade_for_disapproval}' na mensagem, e o
-    # locale escreve os dois nomes sem os delimitadores -- entao nenhum dos dois
-    # replace encontra o que procura e o professor le o nome do marcador em vez
-    # da nota. A mensagem e consumida por JS, nao por I18n.t com argumentos,
-    # entao pode levar %{} no yml sem risco de MissingInterpolationArgument.
+    # O JS troca '%{actual_grade}' e '%{grade_for_disapproval}' na mensagem por
+    # String#replace, entao o locale tem de escrever os delimitadores -- senao
+    # nenhum dos dois replace encontra o que procura e o professor le o nome do
+    # marcador em vez da nota. A mensagem e consumida por JS, nao por I18n.t
+    # com argumentos, entao %{} no yml nao arrisca
+    # MissingInterpolationArgument.
     it "names the two grades in the overwrite confirmation" do
       page.send_keys :escape
       within(".as_form") do
@@ -186,11 +187,13 @@ RSpec.describe "ClassEnrollments features", type: :feature do
       end
       expect(page).to have_field("Nota", with: "6,0")
 
-      within(".as_form") do
-        grade_field = find_field("Nota")
-        grade_field.click
-        grade_field.send_keys([:control, "a"], :backspace)
-      end
+      # Selecionar tudo depende de plataforma: Ctrl+A no Linux, Cmd+A no macOS
+      # (onde Ctrl+A e "ir para o inicio da linha", e o backspace seguinte nao
+      # apaga nada). A selecao por JS vale nos dois.
+      page.execute_script(
+        "var e = document.querySelector('.grade-input'); e.focus(); e.select();"
+      )
+      page.find(".grade-input").send_keys(:backspace)
 
       expect(page).to have_field("record_situation_", with: ClassEnrollment::REGISTERED)
     end

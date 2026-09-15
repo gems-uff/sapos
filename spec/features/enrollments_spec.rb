@@ -194,12 +194,12 @@ RSpec.describe "Enrollments features", type: :feature do
   # O cabecalho do subform horizontal decide as colunas de nota pelo pai, em
   # _horizontal_subform_header.html.erb: "parent_record.respond_to?(:course)".
   # Na tela da Turma o pai e uma CourseClass, a turma toda e da mesma disciplina
-  # e a decisao vale para a lista inteira. Na tela da Matricula o pai e uma
-  # Enrollment, que nao responde a :course, entao os dois <th> de nota saem
-  # sempre -- enquanto o hide_form_column_if do ClassEnrollmentsController e
-  # avaliado por registro e o CSS ".class_enrollments-sub-form td:has(> dl[style
-  # *='display: none'])" remove a celula daquela linha. Aluno com uma disciplina
-  # com nota e outra sem fica com linhas de larguras diferentes.
+  # e a decisao vale para a lista inteira: os dois <th> de nota saem quando a
+  # disciplina nao tem nota, e o _form_association_record omite as celulas
+  # correspondentes. Na tela da Matricula o pai e uma Enrollment, que nao
+  # responde a :course -- ali os <th> ficam, e as celulas tambem tem de ficar,
+  # mesmo escondidas, senao o aluno com uma disciplina com nota e outra sem fica
+  # com linhas de larguras diferentes. Este exemplo trava essa consequencia.
   describe "class_enrollments subform on the enrollment form", js: true do
     before(:each) do
       tipo_sem_nota = FactoryBot.create(
