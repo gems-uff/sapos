@@ -1,0 +1,23 @@
+<thead>
+  <tr>
+    <%
+    columns ||= active_scaffold_config_for(record_class).subform.columns
+    course_has_grade = true
+    if record_class == ClassEnrollment && parent_record.respond_to?(:course)
+      course_has_grade = parent_record.course.try(:course_type).try(:has_score)
+      course_has_grade = true if course_has_grade.nil?
+    end
+    columns.each_column(for: record_class, crud_type: :read) do |column|
+      next unless column.is_a? ActiveScaffold::DataStructures::Column
+      next unless in_subform?(column, parent_record, parent_column)
+      next if !course_has_grade && [:grade, :grade_not_count_in_gpr].include?(column.name)
+      hidden = column_renders_as(column) == :hidden
+      -%>
+      <th class="<%= "#{column.name}-column #{'required' if column.required?} #{'hidden' if hidden}" %>">
+        <label><%= subform_label(column, hidden) %></label>
+        <%= column_description(column, nil, scope) %>
+      </th>
+    <% end -%>
+    <th></th>
+  </tr>
+</thead>

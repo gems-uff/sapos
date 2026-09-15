@@ -1,0 +1,11 @@
+<%
+  header_record_class = show_blank_record&.class || column.association.klass
+  homogeneous_course = !(header_record_class == ClassEnrollment && !parent_record.respond_to?(:course))
+-%>
+<% if !homogeneous_course %><div class="not-homogeneous-course"><% end %>
+<%= render(partial: 'active_scaffold_overrides/horizontal_subform', locals: {
+    parent_record: parent_record, column: column, associated: associated,
+    scope: scope, show_blank_record: show_blank_record,
+    local_assigns: local_assigns
+  }) %>
+<% if !homogeneous_course %></div><% end %>
