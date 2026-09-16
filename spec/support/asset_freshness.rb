@@ -21,7 +21,12 @@ module AssetFreshness
   # node_modules tambem esta em config.assets.paths, mas fica de fora: sao
   # milhares de arquivos, e o que muda ali vem de package.json, que raramente
   # muda sozinho.
-  SOURCE_GLOBS = ["app/assets/**/*", "vendor/assets/**/*"].freeze
+  #
+  # O Gemfile.lock entra porque as gems que compilam os assets (sprockets,
+  # dartsass-sprockets, sass-embedded) mudam a saida sem que fonte algum mude.
+  # Sem ele, um upgrade dessas gems roda os feature specs contra o CSS compilado
+  # pela versao anterior -- e passa.
+  SOURCE_GLOBS = ["app/assets/**/*", "vendor/assets/**/*", "Gemfile.lock"].freeze
 
   class << self
     # Roda antes do boot, entao Rails.root ainda nao existe: a raiz vem do
@@ -37,7 +42,11 @@ module AssetFreshness
 
       puts "[assets] public/assets esta atrasado em relacao a " \
            "#{Pathname.new(newest).relative_path_from(root)}; recompilando"
-      recompile!(root)
+      # Quando o gatilho e o lock, o cache do sprockets em tmp/cache/assets
+      # tambem e suspeito: sua chave nao inclui a versao de toda gem que
+      # participa da compilacao. Apagar tudo e o unico jeito de garantir que a
+      # saida veio das gems novas.
+      recompile!(root, clobber: File.basename(newest) == "Gemfile.lock")
     end
 
     private
@@ -52,10 +61,11 @@ module AssetFreshness
           .max_by { |path| File.mtime(path) }
       end
 
-      def recompile!(root)
+      def recompile!(root, clobber: false)
+        tasks = clobber ? %w[assets:clobber assets:precompile] : %w[assets:precompile]
         ok = system(
           { "RAILS_ENV" => "test" },
-          "bundle", "exec", "rake", "assets:precompile",
+          "bundle", "exec", "rake", *tasks,
           chdir: root.to_s, out: File::NULL
         )
         return if ok

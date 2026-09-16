@@ -369,12 +369,12 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     cpf = self.filled_form.try(:find_cpf_field).try(:value)
     return Student.none if cpf.blank?
     cpf = cpf.delete(".").delete("-").strip
-    Student.where('
+    Student.where("
       TRIM(REPLACE(
-        REPLACE(`students`.`cpf`, ".", ""),
-        "-", ""
+        REPLACE(`students`.`cpf`, '.', ''),
+        '-', ''
       )) = :cpf
-    ', { cpf: cpf })
+    ", { cpf: cpf })
   end
 
   def students_by_email

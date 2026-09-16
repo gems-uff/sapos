@@ -1,0 +1,142 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "15d0444902dae99739cd148aaab0378bad42ac3ddd73e4ac1036eddfa79946db",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/admissions/form_fields/_configuration_form_column.html.erb",
+      "line": 79,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "JSON.dump(Admissions::FormCondition::OPTIONS.map do\n [k, v[:values]]\n end)",
+      "render_path": [
+        {
+          "type": "template",
+          "name": "admissions/consolidation_form_fields/_configuration_form_column",
+          "line": 1,
+          "file": "app/views/admissions/consolidation_form_fields/_configuration_form_column.html.erb",
+          "rendered": {
+            "name": "admissions/form_fields/_configuration_form_column",
+            "file": "app/views/admissions/form_fields/_configuration_form_column.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "admissions/form_fields/_configuration_form_column"
+      },
+      "user_input": "Admissions::FormCondition::OPTIONS.map",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Constante de i18n (FormCondition::OPTIONS) serializada para o JavaScript do widget de condicao. Nenhum dado de usuario ou de banco; o brakeman confunde record_i18n_attr com atributo de modelo."
+    },
+    {
+      "warning_type": "Dangerous Eval",
+      "warning_code": 13,
+      "fingerprint": "15f71dee421bbb4e90ab4a3087bff6209334f49071ebd8aaab4f74b82161a923",
+      "check_name": "Evaluation",
+      "message": "Dynamic code evaluation",
+      "file": "lib/code_evaluator.rb",
+      "line": 47,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_eval/",
+      "code": "binding.eval(code)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "CodeEvaluator",
+        "method": "self.evaluate_code"
+      },
+      "user_input": null,
+      "confidence": "Weak",
+      "cwe_id": [
+        913,
+        95
+      ],
+      "note": "Por desenho: template de tipo Ruby escrito por administrador ou coordenacao em campo de formula do processo seletivo. Template novo desse tipo e recusado por FormField#cannot_create_new_erb_template; so os legados executam. O caminho sem eval e o Liquid; a migracao dos legados e a remocao do motor estao na issue #684."
+    },
+    {
+      "warning_type": "Dangerous Eval",
+      "warning_code": 13,
+      "fingerprint": "d6fc8cb71b364a1af8f1b4694dc614278bd5c9914f8c1c52546e2aa0c2e25ff4",
+      "check_name": "Evaluation",
+      "message": "Dynamic code evaluation",
+      "file": "lib/erb_formatter.rb",
+      "line": 48,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_eval/",
+      "code": "eval(Erubi::Engine.new(code).src)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ErbFormatter",
+        "method": "format"
+      },
+      "user_input": null,
+      "confidence": "Weak",
+      "cwe_id": [
+        913,
+        95
+      ],
+      "note": "Por desenho: template ERB legado de declaracao, notificacao e e-mail, escrito por administrador ou coordenacao. Template ERB novo e recusado por cannot_create_new_erb_template em Assertion, EmailTemplate e FormField; so os legados executam. O caminho sem eval e o Liquid; a migracao dos legados e a remocao do motor estao na issue #684."
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "e84e21d7a6223e222a053ccf3d50fbcffadbd767b114cbc756414a9cde935594",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/admissions/form_conditions/_association_widget.html.erb",
+      "line": 17,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "JSON.dump(Admissions::FormCondition::OPTIONS.map do\n [k, v[:values]]\n end)",
+      "render_path": [
+        {
+          "type": "template",
+          "name": "admissions/form_conditions/_widget_form_column",
+          "line": 5,
+          "file": "app/views/admissions/form_conditions/_widget_form_column.html.erb",
+          "rendered": {
+            "name": "admissions/form_conditions/_association_widget",
+            "file": "app/views/admissions/form_conditions/_association_widget.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "admissions/form_conditions/_association_widget"
+      },
+      "user_input": "Admissions::FormCondition::OPTIONS.map",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "Mesmo caso do _configuration_form_column: JSON.dump de constante de i18n para o JavaScript. Nenhum dado de usuario ou de banco."
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "f463069c660847c5f7bc6f541829af9d6c9e0e792ac7c8c2578235195a69b3cb",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/admissions/admission_processes_controller.rb",
+      "line": 345,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:record).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Admissions::AdmissionProcessesController",
+        "method": "do_custom_report_generate"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "cwe_id": [
+        915
+      ],
+      "note": "O hash so transita pela sessao do relatorio customizado e, ao voltar, e reaplicado por update_record_from_params do active_scaffold, que filtra pelas colunas configuradas em AdmissionReportConfigsController. permit! aqui so serializa; a atribuicao real e filtrada."
+    }
+  ],
+  "brakeman_version": "8.0.6"
+}
