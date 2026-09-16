@@ -51,12 +51,23 @@ begin
     erro_visivel(driver)
   end
 
-  # Nome do usuario da conta de captura, lido no proprio formulario dele.
+  # Mesma armadilha da sonda do aluno: depois de salvar, a navegacao seguinte
+  # as vezes demora mais que a espera. Segunda tentativa, limite curto.
   abrir_usuario = lambda do
-    driver.navigate.to("#{BASE}/users/#{USER_ID}/edit")
-    settle(driver, wait)
-    wait.until { driver.find_elements(css: 'input[name="record[name]"]').any? }
+    2.times do |tentativa|
+      driver.navigate.to("#{BASE}/users/#{USER_ID}/edit")
+      settle(driver, wait)
+      begin
+        Selenium::WebDriver::Wait.new(timeout: 20).until do
+          driver.find_elements(css: 'input[name="record[name]"]').any?
+        end
+        return true
+      rescue Selenium::WebDriver::Error::TimeoutError
+        raise if tentativa == 1
+      end
+    end
   end
+
   nome_usuario = lambda do
     abrir_usuario.call
     driver.execute_script(

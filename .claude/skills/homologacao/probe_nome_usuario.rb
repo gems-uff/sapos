@@ -49,13 +49,23 @@ begin
   # sonda pode herdar o papel Aluno da ultima captura e nao achar tela nenhuma.
   switch_role!(driver, wait, "Administrador")
 
-  # Espera o campo, nao so o readyState: depois de salvar, o settle pode voltar
-  # com o formulario ainda nao renderizado, e a leitura seguinte devolve nil --
-  # que se le como "nao restaurou" num lado que restaurou.
+  # Depois de salvar, o navegador as vezes fica preso na saida da pagina (o
+  # console registra o "beforeunload" bloqueado) e a navegacao seguinte demora
+  # mais que a espera. Uma segunda tentativa resolve, e o limite continua curto:
+  # espera longa aqui esconde pagina que nao montou.
   abrir_aluno = lambda do
-    driver.navigate.to("#{BASE}/students/#{ALUNO_TESTE}/edit")
-    settle(driver, wait)
-    wait.until { driver.find_elements(css: 'input[name="record[name]"]').any? }
+    2.times do |tentativa|
+      driver.navigate.to("#{BASE}/students/#{ALUNO_TESTE}/edit")
+      settle(driver, wait)
+      begin
+        Selenium::WebDriver::Wait.new(timeout: 20).until do
+          driver.find_elements(css: 'input[name="record[name]"]').any?
+        end
+        return true
+      rescue Selenium::WebDriver::Error::TimeoutError
+        raise if tentativa == 1
+      end
+    end
   end
 
   estado_aluno = lambda do
@@ -97,7 +107,10 @@ begin
         var email = linhas[i].querySelector('td.email-column');
         if (email && email.innerText.trim().toLowerCase() === alvo) {
           var nome = linhas[i].querySelector('td.name-column');
-          var m = /-(\d+)-row$/.exec(linhas[i].id);
+          // \\d, nao \d: heredoc do Ruby come a barra de escape desconhecida,
+          // e /-(d+)-row$/ nunca casa -- user_id sairia nil e a restauracao do
+          // nome do usuario, adiante, nao dispararia.
+          var m = /-(\\d+)-row$/.exec(linhas[i].id);
           return { id: linhas[i].id, user_id: m ? m[1] : null,
                    nome: nome ? nome.innerText.trim() : null };
         }
