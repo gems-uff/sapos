@@ -5,6 +5,8 @@
 
 # Represents a Student
 class Student < ApplicationRecord
+  include ::UserNameSyncConcern
+
   has_paper_trail
 
   mount_uploader :photo, ProfileUploader
@@ -34,8 +36,6 @@ class Student < ApplicationRecord
   validates :name, presence: true
   validates :cpf, presence: true, uniqueness: true
   validate :changed_to_different_user
-
-  after_update :sync_name_to_user, if: :saved_change_to_name?
 
   before_destroy :handle_user_role_removal
 
@@ -112,22 +112,6 @@ class Student < ApplicationRecord
     end
 
   private
-    # A gravacao pula a validacao de proposito. As validacoes de User tratam de
-    # papel e de associacao, nunca do nome, e reprovam o save sempre que quem
-    # edita o aluno esta abaixo do usuario dele em Role::ORDER -- secretaria
-    # editando aluno que tambem e administrador, por exemplo. Validar aqui
-    # devolveria justamente a divergencia que a #657 existe para eliminar, e em
-    # silencio: o aluno salva, o usuario nao. O paper_trail registra a mudanca
-    # do mesmo jeito.
-    #
-    # O guarda e sobre a associacao, nao sobre user_id: ponteiro pendurado deixa
-    # user_id preenchido com user nil.
-    def sync_name_to_user
-      return if user.blank?
-      user.name = name
-      user.save(validate: false)
-    end
-
     def handle_user_role_removal
       return unless user.present?
 

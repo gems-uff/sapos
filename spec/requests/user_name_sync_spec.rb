@@ -5,16 +5,17 @@
 
 require "rails_helper"
 
-# Student#sync_name_to_user grava o usuario do registro, e as validacoes de User
+# UserNameSyncConcern grava o usuario do registro, e as validacoes de User
 # dependem de current_user, que so existe dentro de uma requisicao (ver "Pontos
 # cegos da suite" no AGENTS.md). Em spec de modelo o current_user e nil,
 # User#roles_valid? retorna na primeira linha e o corpo que barra a gravacao
 # nunca roda -- ou seja, o spec de modelo exercita o unico cenario que nao
 # acontece em producao. Estes exemplos passam pela tela.
-RSpec.describe "Propagacao do nome do aluno para o usuario", type: :request do
+RSpec.describe "Propagacao do nome para o usuario associado", type: :request do
   before(:each) do
     @role_desconhecido = FactoryBot.create(:role_desconhecido)
     @role_aluno = FactoryBot.create(:role_aluno)
+    @role_professor = FactoryBot.create(:role_professor)
     @role_secretaria = FactoryBot.create(:role_secretaria)
     @role_administrador = FactoryBot.create(:role_administrador)
   end
@@ -77,6 +78,53 @@ RSpec.describe "Propagacao do nome do aluno para o usuario", type: :request do
       expect(user.errors[:base]).to include(
         I18n.t("activerecord.errors.models.user.invalid_role")
       )
+    end
+  end
+
+  describe "professor" do
+    it "propaga mesmo quando o usuario tem papel acima do de quem edita" do
+      secretaria = create_confirmed_user([@role_secretaria], "sec3@ic.uff.br", "Secretaria")
+      professor = nil
+      user = usuario_com_papeis([@role_professor, @role_administrador], "p1") do |u|
+        professor = Professor.create!(
+          name: "JOAO CARLOS DOS SANTOS", cpf: "p1",
+          email: "usuario_p1@ic.uff.br", user: u
+        )
+      end
+      sign_in secretaria
+
+      put professor_path(professor), params: { record: { name: "Joao Carlos dos Santos" } }
+
+      expect(professor.reload.name).to eq("Joao Carlos dos Santos")
+      expect(user.reload.name).to eq("Joao Carlos dos Santos")
+    end
+  end
+
+  # A ligacao de um usuario que ja existia a um registro que ja existia e o
+  # segundo gatilho da propagacao, e a tela de usuarios e onde ela acontece:
+  # o campo de aluno e um record_select que grava students.user_id. O
+  # formulario manda junto o nome antigo do usuario, e a propagacao ainda assim
+  # prevalece -- a gravacao do aluno vem depois da do usuario.
+  describe "ligacao pela tela de usuarios" do
+    it "corrige o nome do usuario ao ligar um aluno existente" do
+      administrador = create_confirmed_user([@role_administrador], "adm1@ic.uff.br", "Administrador")
+      user = create_confirmed_user([], "usuario_l1@ic.uff.br", "NOME VELHO DO USUARIO")
+      student = Student.create!(
+        name: "Joao Carlos dos Santos", cpf: "l1", email: "usuario_l1@ic.uff.br"
+      )
+      FactoryBot.create(:user_role, user: user, role: @role_aluno)
+      sign_in administrador
+
+      put user_path(user), params: {
+        record: {
+          name: "NOME VELHO DO USUARIO",
+          email: "usuario_l1@ic.uff.br",
+          student: student.id
+        }
+      }
+
+      expect(student.reload.user_id).to eq(user.id)
+      expect(user.reload.name).to eq("Joao Carlos dos Santos")
     end
   end
 end

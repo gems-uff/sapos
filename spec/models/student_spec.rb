@@ -212,7 +212,7 @@ RSpec.describe Student, type: :model do
     end
   end
 
-  describe "After update" do
+  describe "After save" do
     it "should propagate a name change to the associated user" do
       @destroy_later << user = FactoryBot.create(:user, :student, name: "JOAO CARLOS DOS SANTOS", email: "abc@def.com")
       student.email = "abc@def.com"
@@ -230,6 +230,19 @@ RSpec.describe Student, type: :model do
       @destroy_later << student
 
       expect { student.update(name: "Joao Carlos dos Santos") }.not_to raise_error
+    end
+
+    it "should propagate the name when an existing user is linked to the student" do
+      @destroy_later << user = FactoryBot.create(
+        :user, :student, name: "NOME VELHO DO USUARIO", email: "abc@def.com"
+      )
+      student.email = "abc@def.com"
+      student.save(validate: false)
+      @destroy_later << student
+
+      student.update(user: user)
+
+      expect(user.reload.name).to eq("Ana")
     end
 
     it "should not touch the user when a different attribute changes" do
