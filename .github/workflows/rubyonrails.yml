@@ -82,6 +82,15 @@ jobs:
         if: github.event_name != 'schedule'
         run: bundle exec rake db:schema:load zeitwerk:check
 
+      # O guarda de spec/config/schema_dump_spec.rb so roda em SQLite: o arquivo
+      # versionado e dump de SQLite, e o de MariaDB acrescenta charset/collation
+      # por tabela. O job `test` roda MariaDB, entao la ele nunca executa -- e um
+      # schema.rb editado a mao passava batido pelo CI inteiro. Este job ja e
+      # SQLite e ja carregou o schema acima; sobra rodar o exemplo.
+      - name: Schema dump
+        if: github.event_name != 'schedule'
+        run: bundle exec rspec spec/config/schema_dump_spec.rb
+
   test:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
