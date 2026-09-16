@@ -211,6 +211,7 @@ RSpec.describe Student, type: :model do
       expect(user.actual_role).to eq(Role::ROLE_ADMINISTRADOR)
     end
   end
+
   describe "After update" do
     it "should propagate a name change to the associated user" do
       @destroy_later << user = FactoryBot.create(:user, :student, name: "JOAO CARLOS DOS SANTOS", email: "abc@def.com")
@@ -238,24 +239,30 @@ RSpec.describe Student, type: :model do
       student.save(validate: false)
       @destroy_later << student
 
-      expect(user).not_to receive(:update)
-      student.update(cpf: "b123.456.789-10")
+      expect(user).not_to receive(:save)
+      expect(student.update(cpf: "b123.456.789-10")).to be true
     end
 
-    it "should keep the student update even when syncing the name to the user fails" do
+    # As validacoes de User nao olham o nome: elas reprovam o registro por papel
+    # e por associacao. Se a propagacao as respeitasse, o nome do usuario ficaria
+    # parado justamente nos casos que a #657 quer consertar.
+    it "should propagate the name even when the user fails its own validations" do
+      @destroy_later << role_professor = FactoryBot.create(:role_professor)
       @destroy_later << user = FactoryBot.create(:user, :student, name: "Ana", email: "abc@def.com")
+      @destroy_later << FactoryBot.create(:user_role, user: user, role: role_professor)
       student.email = "abc@def.com"
       student.user = user
       student.save(validate: false)
       @destroy_later << student
 
-      allow(user).to receive(:update).and_return(false)
-      allow(user).to receive_message_chain(:errors, :full_messages).and_return(["Name is invalid"])
-      expect(Rails.logger).to receive(:warn).with(/failed to sync name to User/)
+      # Controle: o usuario esta mesmo invalido -- tem papel de professor e nao
+      # tem registro de professor. Sem esta linha, o verde abaixo tambem seria
+      # compativel com uma validacao que simplesmente deixou de existir.
+      expect(user.reload).not_to be_valid
 
-      expect { student.update(name: "Joao Carlos dos Santos") }.not_to raise_error
-      expect(student.reload.name).to eq("Joao Carlos dos Santos")
-      expect(user.reload.name).to eq("Ana")
+      student.update(name: "Joao Carlos dos Santos")
+
+      expect(user.reload.name).to eq("Joao Carlos dos Santos")
     end
   end
 end

@@ -112,13 +112,20 @@ class Student < ApplicationRecord
     end
 
   private
+    # A gravacao pula a validacao de proposito. As validacoes de User tratam de
+    # papel e de associacao, nunca do nome, e reprovam o save sempre que quem
+    # edita o aluno esta abaixo do usuario dele em Role::ORDER -- secretaria
+    # editando aluno que tambem e administrador, por exemplo. Validar aqui
+    # devolveria justamente a divergencia que a #657 existe para eliminar, e em
+    # silencio: o aluno salva, o usuario nao. O paper_trail registra a mudanca
+    # do mesmo jeito.
+    #
+    # O guarda e sobre a associacao, nao sobre user_id: ponteiro pendurado deixa
+    # user_id preenchido com user nil.
     def sync_name_to_user
-      return unless user
-      unless user&.update(name: name)
-        Rails.logger.warn(
-          "Student##{id}: failed to sync name to User##{user.id}: #{user.errors.full_messages.join(", ")}"
-        )
-      end
+      return if user.blank?
+      user.name = name
+      user.save(validate: false)
     end
 
     def handle_user_role_removal
