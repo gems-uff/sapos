@@ -87,6 +87,22 @@ RSpec.describe Enrollment, type: :model do
           enrollment.advisements.build(professor: professor, main_advisor: true)
           expect(enrollment).to have_error(:no_advisor_with_level).on :base
         end
+        # O subform nao apaga a linha na hora: marca para destruir e ela segue
+        # na associacao ate o save. Sem descartar as marcadas, o unico
+        # credenciado continuava valendo como orientador e a remocao passava
+        # calada -- a matricula ficava sem ninguem habilitado no nivel.
+        it "the only advisor with authorization was removed in the subform" do
+          authorized = FactoryBot.build(:professor)
+          authorized.advisement_authorizations.build(level: enrollment.level)
+          other = FactoryBot.build(:professor)
+          removed = enrollment.advisements.build(professor: authorized, main_advisor: true)
+          enrollment.advisements.build(professor: other, main_advisor: false)
+
+          expect(enrollment).to have(0).errors_on :base
+
+          removed.mark_for_destruction
+          expect(enrollment).to have_error(:no_advisor_with_level).on :base
+        end
       end
       context "should not have advisor level error when" do
         it "at least one advisor has authorization at enrollment level" do
