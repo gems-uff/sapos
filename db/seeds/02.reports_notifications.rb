@@ -2193,6 +2193,7 @@ queries = [
              COUNT(DISTINCT(e.id)) as "orientandos"
       FROM advisement_authorizations aa, professors p, advisements a, levels l, enrollments e
       WHERE aa.professor_id = p.id
+      AND aa.end_date IS NULL
       AND p.id = a.professor_id
       AND a.enrollment_id = e.id
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
@@ -3064,6 +3065,7 @@ unless is_sqlite
         SELECT DISTINCT CONCAT('1', REPLACE(REPLACE(p.cpf, '.', ''), '-', '')), p.email, p.name
         FROM advisement_authorizations aa, professors p
         WHERE aa.professor_id = p.id
+        AND aa.end_date IS NULL
         ORDER BY p.name
       SQL
     },

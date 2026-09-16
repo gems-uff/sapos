@@ -9,5 +9,6 @@ FactoryBot.define do
   factory :advisement_authorization do
     professor
     level
+    start_date { Time.now }
   end
 end

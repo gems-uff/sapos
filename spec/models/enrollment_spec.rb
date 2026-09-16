@@ -87,12 +87,26 @@ RSpec.describe Enrollment, type: :model do
           enrollment.advisements.build(professor: professor, main_advisor: true)
           expect(enrollment).to have_error(:no_advisor_with_level).on :base
         end
+        it "the only advisor's authorization at the level has been closed (de-accredited)" do
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level,
+                                                    start_date: Time.now - 2.days, end_date: Time.now - 1.day)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          expect(enrollment).to have_error(:no_advisor_with_level).on :base
+        end
+        it "the only advisor's authorization at the level has not started yet (future start_date)" do
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level,
+                                                    start_date: Date.current + 1.day, end_date: nil)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          expect(enrollment).to have_error(:no_advisor_with_level).on :base
+        end
       end
       context "should not have advisor level error when" do
         it "at least one advisor has authorization at enrollment level" do
           professor1 = FactoryBot.build(:professor)
           professor2 = FactoryBot.build(:professor)
-          professor2.advisement_authorizations.build(level: enrollment.level)
+          professor2.advisement_authorizations.build(level: enrollment.level, start_date: Time.now)
           enrollment.advisements.build(professor: professor1, main_advisor: true)
           enrollment.advisements.build(professor: professor2, main_advisor: false)
           expect(enrollment).to have(0).errors_on :base
@@ -101,6 +115,14 @@ RSpec.describe Enrollment, type: :model do
           @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "no")
           professor = FactoryBot.build(:professor)
           enrollment.advisements.build(professor: professor, main_advisor: true)
+          expect(enrollment).to have(0).errors_on :base
+        end
+        it "the enrollment is dismissed even though the only advisor's authorization has been closed" do
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level,
+                                                    start_date: Time.now - 2.days, end_date: Time.now - 1.day)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: @admission_date + 4.years)
           expect(enrollment).to have(0).errors_on :base
         end
       end
