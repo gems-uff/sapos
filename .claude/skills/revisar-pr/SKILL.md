@@ -151,6 +151,12 @@ está obsoleto a ponto de o merge custar mais que refazer. Sai da leitura do pas
 resto do ciclo. Fechar PR de terceiro é decisão do mantenedor: leve o motivo e o
 que sustenta.
 
+**Ao devolver, tire o label `staging-ready`** (`gh pr edit <N> --remove-label
+staging-ready`). É com ele que o autor sinaliza que o PR está pronto para o
+mantenedor revisar e homologar, e é por ele que o mantenedor acha a fila. PR
+devolvido que continua marcado volta para a fila como se nada tivesse
+acontecido; quem repõe o label é o autor, quando terminar a rodada.
+
 **Ao devolver, mande as reproduções junto — não só a prosa.** As do passo 3 já
 afirmam o comportamento correto e falham enquanto o defeito existir, e no ramo do
 autor deixariam a suíte dele vermelha até o conserto. Isso é mais útil que
