@@ -61,11 +61,11 @@ relacionadas e fechadas. É neles que está a decisão de produto já tomada, a
 tentativa revertida e o que já foi homologado antes; sem isso é fácil tratar como
 novo um trecho já validado, ou refazer discussão encerrada.
 
-Dispare o `/code-review xhigh <N>` e siga o passo 2 enquanto ele roda — o
+Dispare o `/code-review max <N>` e siga o passo 2 enquanto ele roda — o
 número do PR lhe dá também os comentários do autor.
 
-- **`xhigh`, não menos:** abaixo disso ele pode cair numa variante de passada
-  única, sem a varredura final de lacunas.
+- **`max`, não menos:** abaixo de `xhigh` ele pode cair numa variante de passada
+  única, sem a varredura final de lacunas, e `max` é o teto.
 - **Nunca `--comment` nem `--fix`.** O primeiro publica no PR; o segundo aplica
   na árvore fora dos checkpoints, e `/rewind` não desfaz.
 - Ele não verifica o que devolve, e o fim da lista costuma ser piso de achados,
@@ -74,6 +74,13 @@ número do PR lhe dá também os comentários do autor.
   passo 6, contamina a rodada — a falha aparece como regressão do PR e é
   contenção no SQLite. Espere-o terminar antes de medir, ou meça antes de
   dispará-lo.
+- **Ele limpa a árvore ao fechar, e não distingue de quem é o arquivo.** Arquivo
+  não rastreado que apareceu durante a rodada some — inclusive a reprodução que
+  você acabou de escrever, e sem aviso: só se descobre ao rodar o spec.
+  Escreva-a no scratchpad da sessão e copie para `spec/` na hora de rodar.
+- **"Terminou" pode não ser o fim.** A notificação de fim vem mesmo com varredura
+  de segundo plano dele ainda viva: ele volta, manda um adendo — e limpa a árvore
+  de novo. Confira que ele está `completed` antes de tratar a lista como fechada.
 
 ## 2. Ler o diff
 
@@ -123,6 +130,11 @@ config/database.yml` (o real não é versionado, e sem ele o ambiente não sobe)
 dependência ele nunca é) e `rake db:schema:load`. É também como se descobre que **um candidato já valia antes
 do PR**: não é regressão, e a mensagem ao autor muda de "você quebrou" para "isto
 piorou aqui, conserta agora ou vira issue?".
+
+A worktree é para quando o **ambiente** difere — PR que mexe no `Gemfile`, lock
+diferente. Quando só o código mudou, o controle mais barato **e mais preciso** é
+`git checkout <merge-base> -- <arquivo>` e rodar de novo: isola o hunk, não o
+commit inteiro, e dispensa `bundle install` e carga de esquema.
 
 Crie a worktree **fora** do repositório e remova-a com `git worktree remove` ao
 fechar o passo 6: dentro dele ela derruba a precondição de árvore limpa da
@@ -180,11 +192,24 @@ vira issue própria (pesquise as existentes antes, inclusive fechadas).
 
 ## 5. Cobrir as lacunas
 
-A cobertura nova é só do caminho "assumimos nós", e por isso depois do passo 4:
-escrita antes da decisão, ela se perde se o PR voltar para o autor. As
-reproduções do passo 3 são outra coisa — essas já existem, e são elas que viajam;
-ao devolver, é aqui que elas ganham forma de spec do projeto, pelas regras
-abaixo.
+A cobertura nova vem depois do passo 4, porque só ali se sabe para onde ela vai.
+Devolver o PR **não** a joga fora: em ramo do próprio repositório ela viaja junto
+com as reproduções, no mesmo commit, e o autor recebe as duas coisas. Em fork sem
+`maintainerCanModify` só a prosa chega — aí sim escrevê-la antes da decisão é
+trabalho perdido. As reproduções do passo 3 são outra coisa — essas já existem, e
+são elas que viajam; ao devolver, é aqui que elas ganham forma de spec do
+projeto, pelas regras abaixo.
+
+**O commit vai vermelho, e isso se diz na mensagem.** Reprodução que viaja deixa o
+CI do ramo vermelho até o conserto — é o desenho, não quebra nova. Sem essa frase
+no corpo do commit, a rodada seguinte lê o vermelho como regressão e sai
+consertando o teste.
+
+**Meça o que a cobertura do próprio PR alcança, antes de escrever a sua.** Reverta
+cada parte da mudança e rode os exemplos que o PR acrescenta: a parte cuja
+reversão não derruba exemplo nenhum não está coberta — e é onde a regressão passa
+sem a suíte notar. Num PR de quatro partes, três podem vir sem um único exemplo,
+com a suíte fechando verde.
 
 O que a mudança toca e a suíte não executa vira teste, pela `safe-refactor` —
 inclusive a checagem de que o teste não é vazio. O que nem a suíte alcança vira
