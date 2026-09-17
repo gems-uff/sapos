@@ -212,6 +212,7 @@ RSpec.configure do |config|
     case SELENIUM_BROWSER
     when :firefox
       options = Selenium::WebDriver::Firefox::Options.new
+      options.binary = ENV["FIREFOX_BINARY"] if ENV["FIREFOX_BINARY"].present?
       options.args << "-headless" unless ENV["BROWSER"]
       # O equivalente do CDP Page.setDownloadBehavior do Chrome: gravar no
       # diretorio dos DownloadHelpers sem perguntar e sem abrir o visualizador

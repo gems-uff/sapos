@@ -176,7 +176,14 @@ class Enrollment < ApplicationRecord
   def enrollment_has_authorized_advisor
     return unless CustomVariable.enable_advisor_accreditation_validation
     return if advisements.blank? || level.blank?
-    has_authorized = advisements.any? do |a|
+    # A linha que o subform marcou para remover ainda esta na associacao, e
+    # contava como orientador: tirar o unico credenciado pela tela passava sem
+    # erro, e a matricula ficava sem ninguem habilitado no nivel. O irmao desta
+    # validacao, Advisement#enrollment_has_authorized_advisor, ja descartava as
+    # marcadas -- aqui ficou de fora.
+    remaining = advisements.reject(&:marked_for_destruction?)
+    return if remaining.blank?
+    has_authorized = remaining.any? do |a|
       a.professor.present? &&
         a.professor.advisement_authorizations.any? { |auth| auth.level == level }
     end
