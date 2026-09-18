@@ -127,17 +127,24 @@ produz o diagnóstico mais enganoso.
 ## A instância pode já estar de pé — e o sandbox mente sobre isso
 
 Antes de montar, veja se a instância de uma rodada anterior não continua viva. E
-faça essa checagem **por TCP**, não pelo socket:
+faça essa checagem **fora do sandbox**:
 
 ```bash
 $M/bin/mysql -h 127.0.0.1 -P 3307 -u root -e "SELECT @@version, @@sql_mode;"
 ```
 
-**O sandbox bloqueia conexão a socket unix.** Uma checagem via `--socket=` de
-dentro dele devolve `ERROR 2002 (HY000) ... (1)` — o `(1)` é "operation not
-permitted", e não "servidor não existe", que é o `(2)`. Confundir os dois leva a
-"re-subir" um servidor que já está de pé, e daí o log denuncia o que de fato
-aconteceu:
+**Dentro do sandbox a pergunta não tem resposta.** Ele recusa tanto socket unix
+quanto conexão TCP a 127.0.0.1, e as duas devolvem `ERROR 2002 (HY000) ... (1)`.
+O `(1)` é "operation not permitted" — o sandbox negando, não o servidor
+faltando. Trocar o socket por TCP não contorna: o erro é o mesmo. Fora do
+sandbox a resposta distingue, e é só ali que ela vale: servidor desligado
+devolve `(36)`, servidor de pé responde à consulta.
+
+Vale para a instância inteira, não só para essa checagem — subir o `mysqld_safe`,
+consultar, rodar a suíte e desligar tudo sai do sandbox.
+
+Ler o `(1)` como "não está de pé" leva a "re-subir" um servidor vivo, e daí o log
+denuncia o que de fato aconteceu:
 
 ```
 [ERROR] mariadbd: Can't lock aria control file ... error: 35
