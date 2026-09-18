@@ -19,6 +19,7 @@
       not_enrolled_count = @results.count { |r| r[:status] == "not_enrolled" }
       duplicate_count = @results.count { |r| r[:status] == "duplicate" }
       inconsistent_count = @results.count { |r| r[:status] == "pending" && (r[:grade_diff] || r[:situation_diff]) }
+      invalid_count = @results.count { |r| r[:status] == "invalid" }
       has_invalid_situation = false
       has_invalid_grade = false
       has_invalid_attendance = false
@@ -51,6 +52,12 @@
         <% if inconsistent_count > 0 %>
           <span style="color:#b00">
             <%= inconsistent_count %> <%= I18n.t("xls_content.course_class.import_grades_xls_results.summary_inconsistent") %>
+          </span>
+        <% end %>
+
+        <% if invalid_count > 0 %>
+          <span style="color:#b00">
+            <%= invalid_count %> <%= I18n.t("xls_content.course_class.import_grades_xls_results.summary_invalid") %>
           </span>
         <% end %>
       </p>
@@ -93,7 +100,13 @@
                 <span style="color:#b00;"><%= I18n.t("xls_content.course_class.import_grades_xls_results.status_not_enrolled") %></span>
 
               <% when "duplicate" %>
-                <span style="color:#b00;"><%= I18n.t("xls_content.course_class.import_grades_xls_results.status_duplicate") %></span>
+                <span style="color:#b00;">
+                  <%= I18n.t("xls_content.course_class.import_grades_xls_results.status_duplicate") %>
+                  (<%= I18n.t("xls_content.course_class.import_grades_xls_results.status_duplicate_occurrences", count: result[:occurrence_count]) %>)
+                </span>
+
+              <% when "invalid" %>
+                <span style="color:#b00;"><%= I18n.t("xls_content.course_class.import_grades_xls_results.status_invalid") %></span>
               <% end %>
             </td>
 
@@ -106,7 +119,11 @@
             </td>
 
             <td>
-              <%= result[:final_grade_view].presence || "—" %>
+              <% if result[:status] == "invalid" %>
+                —
+              <% else %>
+                <%= result[:final_grade_view].presence || "—" %>
+              <% end %>
               <% if result[:invalid_grade] %>
                 <span style="color:#b00;" title="<%= I18n.t("xls_content.course_class.import_grades_xls_results.invalid_grade_tooltip", grade: result[:imported_grade]) %>">#</span>
                 <% has_invalid_grade = true %>
@@ -116,7 +133,11 @@
             </td>
 
             <td>
-              <%= result[:final_situation].presence || "—" %>
+              <% if result[:status] == "invalid" %>
+                —
+              <% else %>
+                <%= result[:final_situation].presence || "—" %>
+              <% end %>
               <% if result[:status] == "pending" && !result[:final_attendance] %>
                 <span style="background:#e2e3e5; color:#41464b; font-size:0.75em; padding:1px 3px; border-radius:3px;"><%= I18n.t("xls_content.course_class.import_grades_xls_results.disapproved_by_absence_badge") %></span>
               <% end %>
@@ -134,7 +155,11 @@
             </td>
 
             <td>
-              <%= result[:final_obs].presence || "—" %>
+              <% if result[:validation_errors].present? %>
+                <div style="color:#b00; font-size:0.85em;">
+                  <%= result[:validation_errors].join("; ") %>
+                </div>
+              <% end %>
             </td>
 
           </tr>
@@ -167,9 +192,11 @@
 
       <%= hidden_field_tag :confirm, "1" %>
 
+      <%= hidden_field_tag :token, @token %>
+
       <%= submit_tag I18n.t("xls_content.course_class.import_grades_xls_results.accept_button"), class: "as_action" %>
 
-      <%= link_to I18n.t("xls_content.course_class.import_grades_xls_results.cancel_button"), course_classes_path, class: "as_cancel" %>
+      <%= link_to I18n.t("xls_content.course_class.import_grades_xls_results.cancel_button"), import_grades_xls_course_class_path(@course_class, cancel: 1, token: @token), class: "as_cancel" %>
 
     <% end %>
 

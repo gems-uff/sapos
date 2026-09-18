@@ -83,23 +83,22 @@ module SharedXlsConcern
     obs_index = header_row.index(I18n.t("xls_content.course_class.summary.obs"))
     raise ArgumentError, "Invalid file format" if enrollment_index.nil? || grade_index.nil?
 
-    rows = {}
-    duplicate_enrollment_numbers = []
-    return [rows, duplicate_enrollment_numbers] if sheet.last_row < 2
+    rows = []
+    return rows if sheet.last_row < 2
     (2..sheet.last_row).each do |row_number|
       row = sheet.row(row_number)
       next if row.blank?
-      enrollment_number = row[enrollment_index]&.to_s
+      enrollment_number = extract_cell(row, enrollment_index)
       next if enrollment_number.blank?
 
-      duplicate_enrollment_numbers << enrollment_number if rows.key?(enrollment_number)
-      rows[enrollment_number] = {
+      rows << {
+        enrollment_number: enrollment_number,
         grade: extract_cell(row, grade_index),
         attendance: extract_cell(row, attendance_index),
         situation: extract_cell(row, situation_index),
         obs: extract_cell(row, obs_index)
       }
     end
-    [rows, duplicate_enrollment_numbers.uniq]
+    rows
   end
 end

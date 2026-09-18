@@ -157,6 +157,72 @@ RSpec.describe "CourseClasses features", type: :feature do
     end
   end
 
+  describe "class enrollments sub-form", js: true do
+    context "when the course has no score" do
+      before(:each) do
+        tipo_sem_nota = FactoryBot.create(:course_type, name: "Sem Nota", has_score: false, schedulable: true, show_class_name: false, allow_multiple_classes: false, on_demand: false)
+        curso_sem_nota = FactoryBot.create(:course, name: "Curso Sem Nota", code: "SN1", course_type: tipo_sem_nota, available: true)
+        @destroy_later << turma_sem_nota = FactoryBot.create(:course_class, name: "Turma Sem Nota", course: curso_sem_nota, professor: @professor1, year: 2022, semester: 2)
+        @destroy_later << aluno = FactoryBot.create(:student, name: "Aluno Sem Nota")
+        @destroy_later << matricula = FactoryBot.create(:enrollment, enrollment_number: "MSN1", student: aluno, level: @level1, enrollment_status: @enrollment_status)
+        @destroy_later << FactoryBot.create(:class_enrollment, enrollment: matricula, course_class: turma_sem_nota, grade: nil, situation: ClassEnrollment::REGISTERED)
+
+        login_as(@user)
+        visit url_path
+        find("#as_#{plural_name}-edit-#{turma_sem_nota.id}-link").click
+      end
+
+      it "does not show a grade column header" do
+        expect(page).to have_no_css(".class_enrollments-sub-form th.grade-column")
+      end
+
+      it "does not show a grade input" do
+        expect(page).to have_no_css(".class_enrollments-sub-form .grade-input")
+      end
+    end
+
+    context "arrow key navigation" do
+      before(:each) do
+        @destroy_later << turma = FactoryBot.create(:course_class, name: "Turma com notas", course: @course1, professor: @professor1, year: 2022, semester: 2)
+        @destroy_later << aluno_a = FactoryBot.create(:student, name: "Aluno A")
+        @destroy_later << aluno_b = FactoryBot.create(:student, name: "Aluno B")
+        @destroy_later << matricula_a = FactoryBot.create(:enrollment, enrollment_number: "MA1", student: aluno_a, level: @level1, enrollment_status: @enrollment_status)
+        @destroy_later << matricula_b = FactoryBot.create(:enrollment, enrollment_number: "MB1", student: aluno_b, level: @level1, enrollment_status: @enrollment_status)
+        @destroy_later << FactoryBot.create(:class_enrollment, enrollment: matricula_a, course_class: turma, grade: nil, situation: ClassEnrollment::REGISTERED)
+        @destroy_later << FactoryBot.create(:class_enrollment, enrollment: matricula_b, course_class: turma, grade: nil, situation: ClassEnrollment::REGISTERED)
+
+        login_as(@user)
+        visit url_path
+        find("#as_#{plural_name}-edit-#{turma.id}-link").click
+      end
+
+      it "moves focus to the next grade field on arrow down" do
+        campos = page.all(".class_enrollments-sub-form .grade-input", visible: true)
+        campos[0].click
+        campos[0].send_keys(:down)
+
+        expect(page.evaluate_script("document.activeElement")).to eq(campos[1])
+      end
+
+      it "moves focus to the previous grade field on arrow up" do
+        campos = page.all(".class_enrollments-sub-form .grade-input", visible: true)
+        campos[1].click
+        campos[1].send_keys(:up)
+
+        expect(page.evaluate_script("document.activeElement")).to eq(campos[0])
+      end
+
+      it "does not move focus past the last grade field" do
+        campos = page.all(".class_enrollments-sub-form .grade-input", visible: true)
+        ultimo = campos.last
+        ultimo.click
+        ultimo.send_keys(:down)
+
+        expect(page.evaluate_script("document.activeElement")).to eq(ultimo)
+      end
+    end
+  end
+
   describe "search page", js: true do
     before(:each) do
       login_as(@user)

@@ -131,7 +131,7 @@ class CustomVariable < ApplicationRecord
 
   def self.import_grades_session_timeout
     config = CustomVariable.find_by_variable(:import_grades_session_timeout)
-    config.blank? || config.value.blank? ? 45.minutes : config.value.to_i
+    config.blank? || config.value.blank? ? 45.minutes : config.value.to_i.minutes
   end
 
   def to_label

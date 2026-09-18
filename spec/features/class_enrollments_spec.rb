@@ -268,6 +268,20 @@ RSpec.describe "ClassEnrollments features", type: :feature do
       page.send_keys :escape
       expect_to_have_record_select(page, "course_class_", "course_classes")
     end
+
+    it "sets Aprovado when a passing grade is typed" do
+      page.send_keys :escape
+      within(".as_form") { fill_in "Nota", with: CustomVariable.minimum_grade_for_approval }
+
+      expect(page).to have_field("record_situation_", with: ClassEnrollment::APPROVED)
+    end
+
+    it "sets Reprovado when a failing grade is typed" do
+      page.send_keys :escape
+      within(".as_form") { fill_in "Nota", with: (CustomVariable.minimum_grade_for_approval - 1) }
+
+      expect(page).to have_field("record_situation_", with: ClassEnrollment::DISAPPROVED)
+    end
   end
 
   # grade_not_count_in_gpr e o que permite "Aprovado" com nota abaixo do minimo,

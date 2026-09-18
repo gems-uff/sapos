@@ -8,7 +8,7 @@ require "spec_helper"
 RSpec.describe SharedXlsConcern, type: :concern do
   include SharedXlsConcern
 
-  describe "parse_rows_xlsx" do
+  describe "parse_rows_xls" do
     let(:course_type) { FactoryBot.create(:course_type, has_score: true) }
     let(:course) { FactoryBot.create(:course, course_type: course_type) }
     let(:course_class) { FactoryBot.create(:course_class, course: course) }
@@ -29,20 +29,21 @@ RSpec.describe SharedXlsConcern, type: :concern do
       ActionDispatch::Http::UploadedFile.new(tempfile: tempfile, filename: "test.xlsx")
     end
 
-    it "returns a hash with enrollment numbers as keys" do
-      result, _ = parse_rows_xls(xlsx_file)
-      expect(result).to be_a(Hash)
-      expect(result.keys).to include("101", "102")
+    it "returns an array with enrollment numbers" do
+      result = parse_rows_xls(xlsx_file)
+      expect(result.map { |row| row[:enrollment_number] }).to include("101", "102")
     end
 
     it "returns the grade value for filled cells" do
-      result, _ = parse_rows_xls(xlsx_file)
-      expect(result["101"][:grade]).to eq("8.7")
+      result = parse_rows_xls(xlsx_file)
+      row = result.find { |row| row[:enrollment_number] == "101" }
+      expect(row[:grade]).to eq("8.7")
     end
 
     it "returns nil for empty grade cells" do
-      result, _ = parse_rows_xls(xlsx_file)
-      expect(result["102"][:grade]).to be_nil
+      result = parse_rows_xls(xlsx_file)
+      row = result.find { |row| row[:enrollment_number] == "102" }
+      expect(row[:grade]).to be_nil
     end
 
     it "raises ArgumentError for a non-upload object" do

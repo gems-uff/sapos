@@ -7,7 +7,7 @@ $(function() {
         var grade_of_disapproval_for_absence = this.getAttribute("grade_of_disapproval_for_absence");
         if (grade_of_disapproval_for_absence != "") {
           var grade = target_row.find(".grade-input").val().replace(/\s+/g, '').replace(",", ".");
-          if (grade == "" || parseFloat(grade)== 0){
+          if (grade == ""){
             target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
           }
           else if (parseFloat(grade) != parseFloat(grade_of_disapproval_for_absence)){
@@ -26,6 +26,17 @@ $(function() {
         changeSituationInput(target_row,disapproved_label);
       }
     }
+  });
+  $(document).on('change', '.grade_not_count_in_gpr-input', function() {
+    if (this.checked) return;
+
+    var row = $(this).closest('tr');
+
+    if (row.find('.disapproved_by_absence-input').is(':checked')) return;
+
+    var gradeInput = row.find('.grade-input');
+
+    if (gradeInput.val() !== ''){ gradeInput.trigger('input');}
   });
   function changeSituationInput(context,situation){
     var row = context.closest('tr');
@@ -61,6 +72,12 @@ $(function() {
     var newCursorPos = cursorPos + (newLength - oldLength);
     newCursorPos = Math.max(0, Math.min(newCursorPos,newLength));
     input.setSelectionRange(newCursorPos,newCursorPos);
+    var target_row = $(this).closest("tr");
+    var not_count_checkbox = target_row.find(".grade_not_count_in_gpr-input");
+    if (not_count_checkbox.length && not_count_checkbox.is(":checked")) {
+      return;
+    }
+
     var minimum_grade = this.getAttribute('minimum_grade_for_approval');
     var actual_grade = parseFloat(formatted.replace(',','.'));
     if(actual_grade >= minimum_grade){
@@ -85,6 +102,16 @@ $(function() {
         setTimeout(function(){
           nextEl.select();
         }, 10);
+      }
+    }
+    else if (e.which == 8 || e.which == 46){
+      var input = this;
+      if (input.selectionStart !== input.selectionEnd){
+        return;
+      }      
+      if ($(this).val() === '0,0' || $(this).val() === '0.0'){
+        e.preventDefault();
+        $(this).val('').trigger('input');
       }
     }
   });

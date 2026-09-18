@@ -13,7 +13,6 @@
   tr_id = "association-#{options[:id]}"
   layout ||= ui_options[:layout] || config.subform.layout
 
-  homogeneous_course = !(record.class == ClassEnrollment && !parent_record.respond_to?(:course))
 
   if layout == :vertical
     record_tag ||= :div
@@ -54,8 +53,7 @@
 
     next unless in_subform?(column, parent_record, record_column)
 
-    hidden, = form_column_is_hidden?(column, record, scope)
-    next if hidden && homogeneous_course
+    next if subform_column_omitted?(column, parent_record)
     
     columns_length += 1
     show_actions = true
