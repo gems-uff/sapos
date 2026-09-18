@@ -109,7 +109,7 @@ $(function() {
       if (input.selectionStart !== input.selectionEnd){
         return;
       }      
-      if ($(this).val() === '0,0' || $(this).val() === '0.0'){
+      if (/^0[,.]\d$/.test($(this).val())){
         e.preventDefault();
         $(this).val('').trigger('input');
       }
