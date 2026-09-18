@@ -304,19 +304,42 @@ class CourseClassesController < ApplicationController
     def build_xls_import_preview(file)
       parsed_rows = parse_rows_xls(file)
 
+      enrollment_numbers = parsed_rows.map { |data| data[:enrollment_number] }
+
+      enrollments_by_number = Enrollment
+      .where(enrollment_number: enrollment_numbers)
+      .to_a
+      .group_by { |enrollment| enrollment.enrollment_number.to_s.strip.downcase }
+      .transform_values(&:first)
+
+      enrollments = enrollments_by_number.values
+
+      class_enrollments_by_enrollment_id = @course_class
+      .class_enrollments
+      .where(enrollment_id: enrollments.map(&:id))
+      .to_a
+      .group_by(&:enrollment_id)
+      .transform_values(&:first)
+
       resolved_rows = parsed_rows.map do |data|
         enrollment_number = data[:enrollment_number]
-        enrollment = Enrollment.find_by(enrollment_number: enrollment_number)
-        class_enrollment = enrollment && @course_class.class_enrollments.find_by(enrollment: enrollment)
+        normalized_enrollment_number = enrollment_number.to_s.strip.downcase
+        enrollment = enrollments_by_number[normalized_enrollment_number]
+        class_enrollment = enrollment && class_enrollments_by_enrollment_id[enrollment.id]
         group_key =
-          if class_enrollment
-            "class_enrollment:#{class_enrollment.id}"
-          elsif enrollment
-            "enrollment:#{enrollment.id}"
-          else
-            "unmatched:#{enrollment_number.to_s.strip.downcase}"
-          end
-        data.merge(enrollment: enrollment, class_enrollment: class_enrollment, group_key: group_key)
+        if class_enrollment
+          "class_enrollment:#{class_enrollment.id}"
+        elsif enrollment
+          "enrollment:#{enrollment.id}"
+        else
+          "unmatched:#{enrollment_number.to_s.strip.downcase}"
+        end
+
+        data.merge(
+          enrollment: enrollment,
+          class_enrollment: class_enrollment,
+          group_key: group_key
+        )
       end
 
       occurrence_counts = resolved_rows.each_with_object(Hash.new(0)) { |r, h| h[r[:group_key]] += 1 }
