@@ -143,7 +143,115 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     it "should have a disapproved by absence widget" do
       page.send_keys :escape
       find(:css, "#record_disapproved_by_absence_").set(true)
-      expect(page).to have_field("Nota", with: "1")
+      expect(page).to have_field("Nota", with: "1,0")
+    end
+
+    it "asks before overwriting a low but nonzero grade when marking disapproved by absence" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "05"
+      end
+      expect(page).to have_field("Nota", with: "0,5")
+
+      accept_confirm do
+        find(:css, "#record_disapproved_by_absence_").set(true)
+      end
+
+      expect(page).to have_field("Nota", with: "1,0")
+    end
+
+    # O JS troca '%{actual_grade}' e '%{grade_for_disapproval}' na mensagem por
+    # String#replace, entao o locale tem de escrever os delimitadores -- senao
+    # nenhum dos dois replace encontra o que procura e o professor le o nome do
+    # marcador em vez da nota. A mensagem e consumida por JS, nao por I18n.t
+    # com argumentos, entao %{} no yml nao arrisca
+    # MissingInterpolationArgument.
+    it "names the two grades in the overwrite confirmation" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "05"
+      end
+      expect(page).to have_field("Nota", with: "0,5")
+
+      mensagem = accept_confirm do
+        find(:css, "#record_disapproved_by_absence_").set(true)
+      end
+
+      expect(mensagem).to include("0,5").and include("1,0")
+    end
+
+    # O ramo "nota vazia ou zero" do tratador de reprovacao por falta troca sem
+    # perguntar, e `parseFloat(grade) == 0` poe o 0,0 dentro dele. Zero e uma
+    # nota digitada como qualquer outra, e a issue pediu prompt "se ja tiver
+    # alguma nota digitada la". O 0,5 da rodada anterior ja passa pelo prompt;
+    # o 0,0 nao -- e accept_confirm levanta ModalNotFound quando nao ha dialogo,
+    # que e como este exemplo falha hoje.
+    it "asks before overwriting a grade of zero when marking disapproved by absence" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "00"
+      end
+      expect(page).to have_field("Nota", with: "0,0")
+
+      mensagem = accept_confirm do
+        find(:css, "#record_disapproved_by_absence_").set(true)
+      end
+
+      expect(mensagem).to include("0,0")
+    end
+
+    it "resets the student situation when the grade field is cleared" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "60"
+      end
+      expect(page).to have_field("Nota", with: "6,0")
+
+      # Selecionar tudo depende de plataforma: Ctrl+A no Linux, Cmd+A no macOS
+      # (onde Ctrl+A e "ir para o inicio da linha", e o backspace seguinte nao
+      # apaga nada). A selecao por JS vale nos dois, e e a unica forma de
+      # esvaziar o campo -- ver o exemplo do backspace logo abaixo.
+      page.execute_script(
+        "var e = document.querySelector('.grade-input'); e.focus(); e.select();"
+      )
+      page.find(".grade-input").send_keys(:backspace)
+
+      expect(page).to have_field("record_situation_", with: ClassEnrollment::REGISTERED)
+    end
+
+    # O handler de input reformata a cada tecla, e uma nota de um digito volta
+    # formatada com dois ("6," -> "0,6", "0," -> "0,0"). Apagando da direita
+    # para a esquerda o zero e reposto a cada backspace: o campo empaca em
+    # "0,0" e a situacao em "Reprovado". Medido, partindo de "6,0" com o cursor
+    # no fim: "0,6", "0,0", "0,0", "0,0"...
+    #
+    # Isso importa porque apagar e o gesto de quem errou a nota: o professor
+    # que digita 6,0 sem querer e aperta backspace fica com zero e reprovacao
+    # gravaveis, em vez de campo vazio e "Incompleto". O caminho de volta para
+    # "Incompleto" so existe por selecionar-tudo -- e o exemplo acima e o
+    # unico que passa por ele.
+    it "clears the grade field with repeated backspaces" do
+      page.send_keys :escape
+      within(".as_form") { fill_in "Nota", with: "60" }
+      expect(page).to have_field("Nota", with: "6,0")
+
+      page.execute_script(
+        "var e = document.querySelector('.grade-input');" \
+        "e.focus(); e.setSelectionRange(e.value.length, e.value.length);"
+      )
+      campo = page.find(".grade-input")
+      6.times { campo.send_keys(:backspace) }
+
+      expect(page).to have_field("Nota", with: "")
+    end
+
+    it "caps the grade at 10,0 when the typed value exceeds the maximum" do
+      page.send_keys :escape
+      within(".as_form") do
+        fill_in "Nota", with: "9999"
+      end
+
+      expect(page).to have_field("Nota", with: "10,0")
     end
 
     it "should have a justification_grade_not_count_in_gpr without a label" do
@@ -160,6 +268,58 @@ RSpec.describe "ClassEnrollments features", type: :feature do
       page.send_keys :escape
       expect_to_have_record_select(page, "course_class_", "course_classes")
     end
+
+    it "sets Aprovado when a passing grade is typed" do
+      page.send_keys :escape
+      within(".as_form") { fill_in "Nota", with: CustomVariable.minimum_grade_for_approval }
+
+      expect(page).to have_field("record_situation_", with: ClassEnrollment::APPROVED)
+    end
+
+    it "sets Reprovado when a failing grade is typed" do
+      page.send_keys :escape
+      within(".as_form") { fill_in "Nota", with: (CustomVariable.minimum_grade_for_approval - 1) }
+
+      expect(page).to have_field("record_situation_", with: ClassEnrollment::DISAPPROVED)
+    end
+  end
+
+  # grade_not_count_in_gpr e o que permite "Aprovado" com nota abaixo do minimo,
+  # com justificativa: grade_for_situation pula a checagem quando ele esta
+  # presente. O recalculo da importacao passou a respeitar isso
+  # (course_classes_controller, `&& !class_enrollment.grade_not_count_in_gpr?`);
+  # o handler de input do class_enrollments.js nao, e reescreve a situacao a
+  # cada tecla so pela comparacao com o minimo.
+  #
+  # Medido, com nota 1,0, situacao "Aprovado" e "nao contabilizar" marcado:
+  # redigitar a mesma nota vira "Reprovado" debaixo do cursor. A decisao de
+  # secretaria se desfaz sem aviso, e quem nao repara salva o contrario do que
+  # quis.
+  describe "grade not counting in GPR", js: true do
+    before(:each) do
+      @destroy_later << @convalidada = FactoryBot.create(
+        :class_enrollment, enrollment: @enrollment4, course_class: @course_class4,
+        grade: 10, situation: ClassEnrollment::APPROVED,
+        grade_not_count_in_gpr: true,
+        justification_grade_not_count_in_gpr: "Convalidacao"
+      )
+      login_as(@user)
+      visit url_path
+      find("#as_#{plural_name}-edit-#{@convalidada.id}-link").click
+      page.send_keys :escape
+    end
+
+    it "keeps the situation chosen by the secretary when the grade is retyped" do
+      expect(page.find(".situation-input").value).to eq(ClassEnrollment::APPROVED)
+
+      page.execute_script(
+        "var e = document.querySelector('.grade-input'); e.focus(); e.select();"
+      )
+      page.find(".grade-input").send_keys("10")
+      expect(page).to have_field("Nota", with: "1,0")
+
+      expect(page.find(".situation-input").value).to eq(ClassEnrollment::APPROVED)
+    end
   end
 
   describe "edit page", js: true do
@@ -172,7 +332,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     it "should be able to edit student" do
       page.driver.browser.action.send_keys(:escape).perform
       within(".as_form") do
-        fill_in "Nota", with: "6"
+        fill_in "Nota", with: "60"
       end
       click_button_and_wait "Atualizar"
       expect(page).to have_css("td.grade_label-column", text: "6.0")
