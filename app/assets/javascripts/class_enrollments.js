@@ -10,7 +10,7 @@ $(function() {
           if (grade == ""){
             target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
           }
-          else if (parseFloat(grade) != parseFloat(grade_of_disapproval_for_absence)){
+          else{
             var msg = this.getAttribute('overwrite_confirm_msg').replace('%{actual_grade}', grade.replace('.', ',')).replace('%{grade_for_disapproval}', grade_of_disapproval_for_absence.replace('.', ','));
             if(confirm(msg)){
               target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
