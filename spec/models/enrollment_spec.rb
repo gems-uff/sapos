@@ -87,11 +87,19 @@ RSpec.describe Enrollment, type: :model do
           enrollment.advisements.build(professor: professor, main_advisor: true)
           expect(enrollment).to have_error(:no_advisor_with_level).on :base
         end
-        # O subform nao apaga a linha na hora: marca para destruir e ela segue
-        # na associacao ate o save. Sem descartar as marcadas, o unico
-        # credenciado continuava valendo como orientador e a remocao passava
-        # calada -- a matricula ficava sem ninguem habilitado no nivel.
-        it "the only advisor with authorization was removed in the subform" do
+        # Sem descartar as marcadas para destruicao, o unico credenciado
+        # continua valendo como orientador e a remocao passa calada -- a
+        # matricula fica sem ninguem habilitado no nivel. Trocar o `reject` por
+        # `advisements.to_a` derruba este exemplo, que e o controle dele.
+        #
+        # O nome fala em subform por engano, e o engano custou uma rodada de
+        # homologacao: a tela de matricula NAO marca para destruicao. O link
+        # "Remover" apaga o <tr> e nao emite `_destroy`, entao a associacao
+        # chega ao save ja sem a linha, e por ali a validacao recusa mesmo sem
+        # o `reject`. Medido nos dois lados: recusam igual. Este exemplo cobre
+        # quem marque para destruicao em Ruby -- hoje, defesa, nao um fluxo de
+        # tela conhecido.
+        it "the only advisor with authorization was marked for destruction" do
           authorized = FactoryBot.build(:professor)
           authorized.advisement_authorizations.build(level: enrollment.level)
           other = FactoryBot.build(:professor)
