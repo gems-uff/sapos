@@ -16,6 +16,7 @@ pt-BR:
           grade_of_disapproval_for_absence_not_lt_minimum_grade_for_approval: "da nota de reprovação por falta %{grade_of_disapproval_for_absence} precisa ser menor que o valor da nota mínima para aprovação %{minimum_grade_for_approval}"
           validate_destroy_of_minimum_grade_for_approval: "Para poder excluir a nota mínima para aprovação (que assumirá o valor padrão 6,0), é necessário que a nota de reprovação por falta seja menor que 6,0 ou que seja excluída"
           check_duplicate: "a variável %{variable} já existe e não pode ser duplicada"
+          max_upload_size_mb_invalid: "deve ser um número inteiro entre 1 e %{max}"
 
     models:
       custom_variable:
