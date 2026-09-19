@@ -114,4 +114,55 @@ module ClassScheduleHelperConcern
       data: table_data,
     }
   end
+
+  def prepare_class_schedule_list(course_classes, on_demand)
+    list_data = []
+    on_demand_professors = {}
+
+    course_classes.each do |course_class|
+      next if course_class.not_schedulable
+
+      course_type = course_class.course.course_type
+      next unless course_type.schedulable
+
+      if course_type.on_demand
+        (
+          on_demand_professors[course_class.course_id] ||= []
+        ) << course_class.professor
+        next
+      end
+
+      allocations = course_class.allocations.map do |allocation|
+        {
+          day: allocation.day,
+          start_time: allocation.start_time,
+          end_time: allocation.end_time,
+          room: allocation.room
+        }
+      end
+
+      list_data << {
+        name: course_class.name_with_class,
+        professor: rescue_blank_text(course_class.professor, method_call: :name),
+        no_schedule: allocations.empty?,
+        allocations: allocations
+      }
+    end
+
+    on_demand.each do |course|
+      found_professors = on_demand_professors[course.id]
+      next unless found_professors.present? || course.available
+
+      list_data << {
+        name: course.name,
+        professor: "",
+        no_schedule: true,
+        allocations: []
+      }
+    end
+
+    list_data.sort_by! { |item| I18n.transliterate(item[:name]) }
+
+    list_data
+  end
 end
