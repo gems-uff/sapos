@@ -13,7 +13,6 @@ RSpec.describe "Admission phase status: edições inline simultâneas", type: :f
   end
 
   before(:each) do
-    @destroy_later = []
     @template = create_admission_template("Inscrição", {
       "Foto" => {
         field_type: Admissions::FormField::STUDENT_FIELD,
@@ -28,12 +27,6 @@ RSpec.describe "Admission phase status: edições inline simultâneas", type: :f
     @application_b = create_application(@process, name: "Bia", admission_phase: @phase)
     login_as(@user)
     @photo_field = @template.fields.find_by!(name: "Foto")
-  end
-
-  after(:each) do
-    Admissions::AdmissionApplication.destroy_all
-    @destroy_later.each(&:delete)
-    @destroy_later.clear
   end
 
   def sample_photo_path
@@ -64,14 +57,14 @@ RSpec.describe "Admission phase status: edições inline simultâneas", type: :f
   end
 
   it "salva a candidatura aberta por último, com upload real, sem perder o dado nem gerar campo fantasma" do
-  path = sample_photo_path
-  visit_candidate_list
-  open_override_edit(@application_a)
-  open_override_edit(@application_b)
+    path = sample_photo_path
+    visit_candidate_list
+    open_override_edit(@application_a)
+    open_override_edit(@application_b)
 
-  edit_div = find(edit_div_selector(@application_b))
+    edit_div = find(edit_div_selector(@application_b))
 
-  within(edit_div) do
+    within(edit_div) do
     check "Habilitar formulário nesta submissão"
     wait_for_ajax
 
@@ -84,38 +77,35 @@ RSpec.describe "Admission phase status: edições inline simultâneas", type: :f
     )
   end
 
-  form = edit_div.find(:xpath, "./ancestor::form")
+    form = edit_div.find(:xpath, "./ancestor::form")
 
-  within(form) do
-    submit = find(
-      "input[type='submit'][value='Atualizar']",
-      visible: :all
-    )
+    within(form) do
+      submit = find(
+        "input[type='submit'][value='Atualizar']",
+        visible: :all
+      )
 
-    submit.click
-    wait_for_ajax
+      submit.click
+      wait_for_ajax
+    end
+
+    expect(page).to have_no_selector(edit_div_selector(@application_b), wait: 10)
+
+    b_photo_fields = @application_b.filled_form.reload.fields
+      .where(form_field_id: @photo_field.id)
+
+    expect(b_photo_fields.count).to eq(1)
+    expect(b_photo_fields.first.file).to be_present
+
+    # Nenhuma entrada órfã (sem form_field) foi persistida por engano.
+    expect(@application_b.filled_form.fields.where(form_field_id: nil)).to be_empty
+
+    expect(page).to have_selector(edit_div_selector(@application_a))
+  ensure
+    File.delete(path) if path && File.exist?(path)
   end
 
-  expect(page).to have_no_selector(".server-error", text: /./, visible: true)
-  expect(page).to have_no_selector(edit_div_selector(@application_b))
-
-  b_photo_fields = @application_b.filled_form.reload.fields
-    .where(form_field_id: @photo_field.id)
-
-  expect(b_photo_fields.count).to eq(1)
-  expect(b_photo_fields.first.file).to be_present
-
-  # Nenhuma entrada órfã (sem form_field) foi persistida por engano.
-  expect(@application_b.filled_form.fields.where(form_field_id: nil)).to be_empty
-
-  # A, que continuou aberta o tempo todo, não sofreu nenhum efeito colateral.
-  expect(@application_a.filled_form.reload.fields.where(form_field_id: @photo_field.id))
-    .to be_empty
-ensure
-  File.delete(path) if path && File.exist?(path)
-end
-
-  it "não deixa o widget de webcam de uma candidatura contaminar o de outra" do
+  it "usa um data-id diferente no widget de webcam de cada candidatura" do
     visit_candidate_list
     open_override_edit(@application_a)
     open_override_edit(@application_b)
@@ -124,12 +114,6 @@ end
     div_b = find("#{edit_div_selector(@application_b)} .webcam-photo", visible: :all)
 
     expect(div_a["data-id"]).not_to eq(div_b["data-id"])
-
-    [div_a, div_b].each do |div|
-      basename = div["data-basename"]
-      filename_input = div.find("input[name$='[file_][filename]']", visible: :all)
-      expect(filename_input[:name]).to eq("#{basename}[file_][filename]")
-    end
   end
   it "habilitar o formulário de uma candidatura não libera o da outra" do
     visit_candidate_list

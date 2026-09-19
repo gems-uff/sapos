@@ -18,7 +18,7 @@
       current_group << filled_hash[field.id]
     end
   end
-  filled_class = "filledform-#{Random.rand(10000)}"
+  filled_class = "filledform-#{SecureRandom.random_number(1_000_000)}"
 %>
 <script>
   if (!window.customFormValidations) {
@@ -43,8 +43,7 @@
   <%= filled_form.hidden_field :enable_submission, value: "1" %>
 <% end %>
 <% if can_disable_submission %>
-  <li class="filled-form-fieldset-wrapper">
-    <fieldset id="<%= filled_class %>-fieldset" disabled>
+  <fieldset id="<%= filled_class %>-fieldset" class="filled-form-fieldset" disabled>
 <% end %>
 <% groups.each do |gfield, gtag, fields| %>
   <% if gfield.present? %>
@@ -67,8 +66,7 @@
   <% end %>
 <% end %>
 <% if can_disable_submission %>
-    </fieldset>
-  </li>
+  </fieldset>
 <% end %>
 
 <script>
