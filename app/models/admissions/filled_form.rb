@@ -31,7 +31,7 @@ class Admissions::FilledForm < ActiveRecord::Base
   belongs_to :form_template, optional: false,
     class_name: "Admissions::FormTemplate"
 
-  accepts_nested_attributes_for :fields, allow_destroy: true
+  accepts_nested_attributes_for :fields, allow_destroy: true, reject_if: proc { |attrs| attrs["id"].blank? && attrs["form_field_id"].blank? }
 
   def to_label
     key = "activerecord.attributes.admissions/filled_form.filled_status"
@@ -167,6 +167,7 @@ class Admissions::FilledForm < ActiveRecord::Base
 
   def erase_non_filled_file_fields
     self.fields.each do |field|
+      next if field.form_field.nil?
       if field.form_field.is_file_field?
         if field.persisted?
           field.reload

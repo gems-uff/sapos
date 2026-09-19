@@ -49,7 +49,7 @@ $(document).ready(function() {
     <% if configuration["minselection"].to_i >= 1 %>
       window.customFormValidations["<%= filled_class %>"].push(function() {
         let hidden_input = $("#<%= collection_id %> input[type=hidden]").get(0)
-        if (hidden_input.disabled) {
+        if (hidden_input.matches(":disabled")) {
           return true
         }
         let checkboxes = $('#<%= collection_id %> input:checkbox:checked');

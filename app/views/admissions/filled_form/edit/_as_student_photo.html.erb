@@ -39,7 +39,7 @@
 <script>
 $(document).ready(function() {
   $(`#<%= file_id %> .carrierwave_controls input`).addClass("<%= filled_class %>");
-  carrierwave_webcam(".webcam-photo")
+  carrierwave_webcam("[data-id='<%= options[:id] %>']")
 
   function validateFile(file) {
     if (!file) {
@@ -68,7 +68,7 @@ $(document).ready(function() {
 
   window.customFormValidations["<%= filled_class %>"].push(function() {
     let input = $(`#<%= file_id %> input[type="file"]`).get(0)
-    if (input.disabled) {
+    if (input.matches(":disabled")) {
       return true;
     }
     error_msg = validateFile(input.files[0]);
