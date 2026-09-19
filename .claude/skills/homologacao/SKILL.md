@@ -658,6 +658,13 @@ São diferença de **conteúdo**, não de status, então não entram na lista ac
 Antes de investigar qualquer uma, olhe a autoria e o horário das linhas novas: se
 forem da conta de captura, no intervalo da rodada, são pegada do instrumento.
 
+**Sonda que liga o aluno de teste a alguém faz a página desse alguém divergir.**
+O cenário do `probe_orientador_credenciado.rb`, por exemplo, põe o aluno de teste
+na tabela de orientandos de um professor real: a rota dele sai de "-" para uma
+linha com o marcador, e isso aparece como a maior diferença de pixel da rodada.
+Antes de investigar uma rota que divergiu sozinha, procure o marcador
+`ZZ-TESTE-HOMOLOG` no diff do texto — achando, é pegada, não regressão.
+
 ### Não confunda template oculto com erro na tela
 
 O active_scaffold deixa no DOM, **oculto**, um painel

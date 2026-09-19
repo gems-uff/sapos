@@ -114,6 +114,24 @@ def professor_no_campo(driver, matricula, chave)
   )
 end
 
+# O subform e montado por JS depois do load, entao um GET seguido de leitura
+# imediata pode devolver MENOS linhas do que o banco tem -- e "sumiu uma linha"
+# e exatamente o sinal que esta sonda interpreta como "salvou". Medido: leu 1
+# onde havia 2, e o veredito saiu invertido. Le ate duas leituras seguidas
+# concordarem.
+def linhas_estaveis(driver, wait, matricula, tentativas: 5)
+  anterior = nil
+  tentativas.times do
+    driver.navigate.to("#{BASE}/enrollments/#{matricula}/edit")
+    settle(driver, wait)
+    sleep 1
+    atual = linhas_de_orientacao(driver, matricula).reject { |l| l["nova"] }
+    return atual if anterior && anterior.map { |l| l["id"] }.sort == atual.map { |l| l["id"] }.sort
+    anterior = atual
+  end
+  anterior
+end
+
 def salvar(driver, wait)
   botao = driver.find_elements(css: "form input[type=submit], form button[type=submit]").find(&:displayed?)
   raise "sem botao de salvar visivel no formulario" if botao.nil?
@@ -226,9 +244,7 @@ begin
     end
     salvar(driver, wait)
     relatorio[:fase1][:erro_ao_salvar] = erro_visivel(driver)
-    driver.navigate.to("#{BASE}/enrollments/#{MATRICULA}/edit")
-    settle(driver, wait)
-    persistidas = linhas_de_orientacao(driver, MATRICULA).reject { |l| l["nova"] }
+    persistidas = linhas_estaveis(driver, wait, MATRICULA)
     relatorio[:fase1][:persistidas] = persistidas.size
     relatorio[:fase1][:ok] = persistidas.size == 2
     puts "  persistidas: #{persistidas.size} | erro: #{relatorio[:fase1][:erro_ao_salvar].inspect}"
@@ -266,12 +282,13 @@ begin
     end
     settle(driver, wait)
     salvar(driver, wait)
+    sleep 1
     erro = erro_visivel(driver)
-    driver.navigate.to("#{BASE}/enrollments/#{MATRICULA}/edit")
-    settle(driver, wait)
-    restantes = linhas_de_orientacao(driver, MATRICULA).reject { |l| l["nova"] }
+    url_pos_save = driver.current_url
+    restantes = linhas_estaveis(driver, wait, MATRICULA)
     ainda_tem_a = restantes.any? { |l| l["professor"].to_s.include?(prof_a[0, 12]) }
     relatorio[:fase2].merge!(
+      url_pos_save: url_pos_save,
       erro_visivel: erro,
       bloqueou: !erro.nil?,
       credenciada_ainda_presente: ainda_tem_a,
