@@ -73,3 +73,8 @@ pt-BR:
         subject: "Alteração da nota de {{ record.enrollment.to_label }} em {{ record.course_class.label_for_email_subject }}"
       email_to_professor_enrollment:
         subject: "{% if destroyed %}Remoção de inscrição de {% else %}Inscrição de {% endif %}{{ record.enrollment.to_label }} na turma {{ record.course_class.label_for_email_subject }} foi realizada"
+
+  helpers:
+    class_enrollments:
+      placeholder_grade: "_,_"
+      confirm_grade_overwrite: "Já existe uma nota digitada (%{actual_grade}). Deseja substituí-la com a nota de reprovação por falta (%{grade_for_disapproval})?"

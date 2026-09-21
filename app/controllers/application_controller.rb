@@ -26,6 +26,8 @@ class ApplicationController < ActionController::Base
 
   clear_helpers
 
+  helper SubformColumnsHelper
+
   # Defines which controller and action should be shown when the base
   # URL is acessed (root route in routes.rb).
   def root
