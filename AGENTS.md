@@ -44,6 +44,12 @@ corrija na wiki.
   investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
   irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo
   culpado sozinho. O CI registra a seed no resumo do job.
+- **Vermelho logo depois de trocar de ramo pode ser o banco de teste velho.** O
+  `maintain_test_schema!` não recarrega o `db/test.sqlite3` quando a troca de
+  ramo muda o esquema, então ele fica com as colunas do ramo anterior e o
+  `spec/config/schema_dump_spec.rb` acusa uma divergência que não existe no
+  código. `rm db/test.sqlite3 && RAILS_ENV=test rake db:schema:load` resolve. No
+  CI não acontece: lá o banco nasce a cada job.
 - **Prefira `before(:each)`: o rollback da transação limpa sozinho.** O
   `before(:all)` existe só para amortizar montagem cara entre muitos exemplos, e
   o ganho depende do tamanho do grupo — medido: em grupo de 6 exemplos não muda
