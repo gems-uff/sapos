@@ -412,4 +412,44 @@ RSpec.describe Professor, type: :model do
       expect(user.actual_role).to eq(Role::ROLE_ADMINISTRADOR)
     end
   end
+
+  describe "After save" do
+    it "should propagate a name change to the associated user" do
+      @destroy_later << user = FactoryBot.create(:user, name: "JOAO CARLOS DOS SANTOS")
+      professor.user = user
+      professor.save(validate: false)
+      @destroy_later << professor
+
+      professor.update(name: "Joao Carlos dos Santos")
+
+      expect(user.reload.name).to eq("Joao Carlos dos Santos")
+    end
+
+    it "should not raise when the professor has no associated user" do
+      professor.save!
+      @destroy_later << professor
+
+      expect { professor.update(name: "Joao Carlos dos Santos") }.not_to raise_error
+    end
+
+    it "should propagate the name when an existing user is linked to the professor" do
+      @destroy_later << user = FactoryBot.create(:user, name: "NOME VELHO DO USUARIO")
+      professor.save!
+      @destroy_later << professor
+
+      professor.update(user: user)
+
+      expect(user.reload.name).to eq("professor")
+    end
+
+    it "should not touch the user when a different attribute changes" do
+      @destroy_later << user = FactoryBot.create(:user, name: "Ana")
+      professor.user = user
+      professor.save(validate: false)
+      @destroy_later << professor
+
+      expect(user).not_to receive(:save)
+      expect(professor.update(enrollment_number: "P2")).to be true
+    end
+  end
 end

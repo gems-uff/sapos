@@ -101,6 +101,30 @@ RSpec.describe Enrollment, type: :model do
           enrollment.advisements.build(professor: professor, main_advisor: true)
           expect(enrollment).to have_error(:no_advisor_with_level).on :base
         end
+        # Sem descartar as marcadas para destruicao, o unico credenciado
+        # continua valendo como orientador e a remocao passa calada -- a
+        # matricula fica sem ninguem habilitado no nivel. Trocar o `reject` por
+        # `advisements.to_a` derruba este exemplo, que e o controle dele.
+        #
+        # O nome fala em subform por engano, e o engano custou uma rodada de
+        # homologacao: a tela de matricula NAO marca para destruicao. O link
+        # "Remover" apaga o <tr> e nao emite `_destroy`, entao a associacao
+        # chega ao save ja sem a linha, e por ali a validacao recusa mesmo sem
+        # o `reject`. Medido nos dois lados: recusam igual. Este exemplo cobre
+        # quem marque para destruicao em Ruby -- hoje, defesa, nao um fluxo de
+        # tela conhecido.
+        it "the only advisor with authorization was marked for destruction" do
+          authorized = FactoryBot.build(:professor)
+          authorized.advisement_authorizations.build(level: enrollment.level, start_date: Date.current)
+          other = FactoryBot.build(:professor)
+          removed = enrollment.advisements.build(professor: authorized, main_advisor: true)
+          enrollment.advisements.build(professor: other, main_advisor: false)
+
+          expect(enrollment).to have(0).errors_on :base
+
+          removed.mark_for_destruction
+          expect(enrollment).to have_error(:no_advisor_with_level).on :base
+        end
       end
       context "should not have advisor level error when" do
         it "at least one advisor has authorization at enrollment level" do

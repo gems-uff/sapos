@@ -179,7 +179,14 @@ class Enrollment < ApplicationRecord
     # Aluno desligado não tem orientação em curso: não faz sentido exigir
     # credenciamento vigente do orientador, que pode ter sido encerrado depois.
     return if dismissal.present?
-    has_authorized = advisements.any? do |a|
+    # A linha que o subform marcou para remover ainda esta na associacao, e
+    # contava como orientador: tirar o unico credenciado pela tela passava sem
+    # erro, e a matricula ficava sem ninguem habilitado no nivel. O irmao desta
+    # validacao, Advisement#enrollment_has_authorized_advisor, ja descartava as
+    # marcadas -- aqui ficou de fora.
+    remaining = advisements.reject(&:marked_for_destruction?)
+    return if remaining.blank?
+    has_authorized = remaining.any? do |a|
       a.professor.present? && a.professor.accredited_on?(level)
     end
     errors.add(:base, :no_advisor_with_level) unless has_authorized
