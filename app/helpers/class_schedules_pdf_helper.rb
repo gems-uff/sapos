@@ -13,6 +13,7 @@ module ClassSchedulesPdfHelper
     )
     table[:header][0] = table[:header][0].drop(1).collect { |h| "<b>#{h}</b>" }
     table[:data] = table[:data].collect { |row| row.drop(1) }
+    actual = table[:actual].collect { |row| row.drop(1) }
 
     table_width = [286]
     count = table[:last] - table[:first] + 1
@@ -23,11 +24,14 @@ module ClassSchedulesPdfHelper
     table_width << (520 - day_width * count)
 
     class_schedule_print_table(
-        pdf, table_width, table[:header], table[:data], table[:star], true
+        pdf, table_width, table[:header], table[:data], table[:star], true,
+        actual
       )
   end
 
-  def class_schedule_print_table(pdf, table_width, header, data, star, footer)
+  def class_schedule_print_table(
+    pdf, table_width, header, data, star, footer, actual = nil
+  )
     simple_pdf_table(pdf, table_width, header, data, {}, true) do |table|
       table.column(0).align = :left
       table.column(0).valign = :center
@@ -36,9 +40,24 @@ module ClassSchedulesPdfHelper
       table.column(-1).align = :left
       table.column(-1).valign = :center
       table.column(-1).padding = [-2, 4, 2, 4]
+
+      apply_class_schedule_actual_text(table, actual) if actual
     end
 
     class_schedule_text_print(pdf, star) if footer
+  end
+
+  # Faz cada célula de dia "falar" via ActualText a frase montada em
+  # prepare_class_schedule_table. O cabeçalho é a linha 0 (header: true), então
+  # os dados começam na linha 1; célula sem frase (nil) fica muda.
+  def apply_class_schedule_actual_text(table, actual)
+    actual.each_with_index do |spoken_row, row_index|
+      spoken_row.each_with_index do |phrase, col_index|
+        next if phrase.nil?
+
+        table.cells[row_index + 1, col_index].actual_text = phrase
+      end
+    end
   end
 
   def class_schedule_text_print(pdf, star)
