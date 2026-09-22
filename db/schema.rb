@@ -240,11 +240,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_130000) do
 
   create_table "advisement_authorizations", force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
+    t.date "end_date"
     t.integer "level_id"
     t.integer "professor_id"
-    t.datetime "updated_at", precision: nil, null: false
     t.date "start_date"
-    t.date "end_date"
+    t.datetime "updated_at", precision: nil, null: false
     t.index ["level_id"], name: "index_advisement_authorizations_on_level_id"
     t.index ["professor_id"], name: "index_advisement_authorizations_on_professor_id"
   end

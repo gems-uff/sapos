@@ -199,6 +199,62 @@ RSpec.describe Professor, type: :model do
         end
       end
     end
+    # Reproduções abertas na revisão do PR #690: continuam vermelhas até o
+    # conserto. O PR passou a filtrar vigência nos dois controllers de seleção
+    # de orientador e nas duas consultas dos seeds, mas aqui não -- a guarda das
+    # linhas 65 e 118 de professor.rb é `advisement_authorizations.empty?`, e as
+    # três subconsultas (85-86, 97-98, 124-125) são
+    # `IN (SELECT professor_id FROM advisement_authorizations)` sem cláusula
+    # nenhuma. A regra combinada: pontua só quem tem credenciamento VIGENTE, em
+    # qualquer nível; o meio ponto vale quando há mais de um vigente.
+    describe "advisement points for a de-accredited professor" do
+      # A ordem importa: a validação do próprio PR impede criar orientação para
+      # quem já está descredenciado. O caso real é o inverso -- o professor
+      # orientava credenciado e o período foi encerrado depois, que é
+      # exatamente quando os pontos deveriam parar de contar.
+      before(:each) do
+        @destroy_later << @deacc = FactoryBot.create(:professor)
+        @destroy_later << @deacc_enrollment = FactoryBot.create(:enrollment)
+        @destroy_later << auth = FactoryBot.create(
+          :advisement_authorization, professor: @deacc,
+          level: @deacc_enrollment.level,
+          start_date: Date.current - 2.years, end_date: nil
+        )
+        @destroy_later << FactoryBot.create(
+          :advisement, professor: @deacc, enrollment: @deacc_enrollment
+        )
+        auth.update!(end_date: Date.current - 1.day)
+        @deacc.reload
+        @deacc_enrollment.reload
+      end
+
+      it "stops counting points once the accreditation period is closed" do
+        expect(@deacc.advisement_points).to eql("0.0")
+      end
+
+      it "stops counting the point of a single enrollment" do
+        expect(@deacc.advisement_point(@deacc_enrollment)).to eql(0.0)
+      end
+
+      # O dano não é só no descredenciado: enquanto ele continua contando como
+      # orientador habilitado, o coorientador ainda credenciado leva meio ponto
+      # em vez de um.
+      it "does not halve the point of the advisor who is still accredited" do
+        @destroy_later << current = FactoryBot.create(:professor)
+        @destroy_later << FactoryBot.create(
+          :advisement_authorization, professor: current,
+          level: @deacc_enrollment.level, start_date: Date.current - 1.day
+        )
+        @deacc_enrollment.reload
+        @destroy_later << FactoryBot.create(
+          :advisement, professor: current, enrollment: @deacc_enrollment,
+          main_advisor: false
+        )
+
+        expect(current.advisement_point(@deacc_enrollment)).to eql(1.0)
+      end
+    end
+
     describe "advisement_point" do
       context "should return 0 when" do
         it "the professor has no advisement_authorizations" do

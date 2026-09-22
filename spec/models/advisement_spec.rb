@@ -28,7 +28,7 @@ RSpec.describe Advisement, type: :model do
   let(:level) { FactoryBot.build(:level) }
   let(:professor) do
     prof = FactoryBot.build(:professor)
-    prof.advisement_authorizations.build(level: level, start_date: Time.now)
+    prof.advisement_authorizations.build(level: level, start_date: Date.current)
     prof
   end
   let(:enrollment) { FactoryBot.build(:enrollment, level: level) }
@@ -99,7 +99,7 @@ RSpec.describe Advisement, type: :model do
         @destroy_later << professor1 = FactoryBot.create(:professor)
         @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
         @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level,
-                                            start_date: Time.now - 2.days, end_date: Time.now - 1.day)
+                                            start_date: Date.current - 2.days, end_date: Date.current - 1.day)
         advisement = Advisement.new(professor: professor1, enrollment: enrollment, main_advisor: true)
         expect(advisement).to have_error(:no_advisor_with_level).on(:base)
       end
@@ -109,7 +109,7 @@ RSpec.describe Advisement, type: :model do
         @destroy_later << professor1 = FactoryBot.create(:professor)
         @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
         @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level,
-                                            start_date: Time.now - 2.days, end_date: Time.now - 1.day)
+                                            start_date: Date.current - 2.days, end_date: Date.current - 1.day)
         @destroy_later << FactoryBot.create(:dismissal, enrollment: enrollment)
         enrollment.reload
         advisement = Advisement.new(professor: professor1, enrollment: enrollment, main_advisor: true)
