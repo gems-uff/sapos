@@ -55,7 +55,7 @@ class Ability
 
   def initialize(user)
     alias_action :list, :row, :show_search, :render_field, :class_schedule_pdf,
-      :class_schedule_list, :to_pdf, :summary_pdf, :summary_xls,
+      :to_pdf, :summary_pdf, :summary_xls,
       :academic_transcript_pdf, :grades_report_pdf,
       :browse, :simulate, :set_query_date, :cities, :states,
       :preview, :builtin, :help, to: :read

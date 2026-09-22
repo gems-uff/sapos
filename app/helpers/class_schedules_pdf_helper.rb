@@ -13,6 +13,7 @@ module ClassSchedulesPdfHelper
     )
     table[:header][0] = table[:header][0].drop(1).collect { |h| "<b>#{h}</b>" }
     table[:data] = table[:data].collect { |row| row.drop(1) }
+    actual = table[:actual].collect { |row| row.drop(1) }
 
     table_width = [286]
     count = table[:last] - table[:first] + 1
@@ -23,11 +24,14 @@ module ClassSchedulesPdfHelper
     table_width << (520 - day_width * count)
 
     class_schedule_print_table(
-        pdf, table_width, table[:header], table[:data], table[:star], true
+        pdf, table_width, table[:header], table[:data], table[:star], true,
+        actual
       )
   end
 
-  def class_schedule_print_table(pdf, table_width, header, data, star, footer)
+  def class_schedule_print_table(
+    pdf, table_width, header, data, star, footer, actual = nil
+  )
     simple_pdf_table(pdf, table_width, header, data, {}, true) do |table|
       table.column(0).align = :left
       table.column(0).valign = :center
@@ -36,9 +40,24 @@ module ClassSchedulesPdfHelper
       table.column(-1).align = :left
       table.column(-1).valign = :center
       table.column(-1).padding = [-2, 4, 2, 4]
+
+      apply_class_schedule_actual_text(table, actual) if actual
     end
 
     class_schedule_text_print(pdf, star) if footer
+  end
+
+  # Faz cada célula de dia "falar" via ActualText a frase montada em
+  # prepare_class_schedule_table. O cabeçalho é a linha 0 (header: true), então
+  # os dados começam na linha 1; célula sem frase (nil) fica muda.
+  def apply_class_schedule_actual_text(table, actual)
+    actual.each_with_index do |spoken_row, row_index|
+      spoken_row.each_with_index do |phrase, col_index|
+        next if phrase.nil?
+
+        table.cells[row_index + 1, col_index].actual_text = phrase
+      end
+    end
   end
 
   def class_schedule_text_print(pdf, star)
@@ -57,43 +76,6 @@ module ClassSchedulesPdfHelper
         CustomVariable.class_schedule_text
       }</b>", inline_format: true
       # star_text += "*"
-    end
-  end
-
-  def class_schedule_list_pdf(pdf, options = {})
-    list = prepare_class_schedule_list(options[:course_classes], options[:on_demand])
-
-    pdf.move_down 15
-    pdf.text "<b>#{
-      I18n.t("pdf_content.class_schedule.class_schedule_list.classes_offered")
-    }: #{list.size}</b>", inline_format: true
-    pdf.move_down 10
-
-    list.each_with_index do |item, index|
-      pdf.text "<b>#{index + 1} - #{item[:name].gsub("<", "&lt;")}</b>",
-        inline_format: true
-      pdf.indent(10) do
-        if item[:no_schedule]
-          pdf.text I18n.t(
-            "activerecord.attributes.class_schedule.table.noschedule"
-          )
-        else
-          class_schedule_day_groups(item[:allocations]).each do |group|
-            pdf.text class_schedule_allocation_label(group)
-          end
-        end
-        if item[:professor].present?
-          pdf.text "#{I18n.t(
-            "activerecord.attributes.class_schedule.table.professor"
-          )}: #{item[:professor]}"
-        end
-      end
-      pdf.move_down 8
-    end
-
-    unless CustomVariable.class_schedule_text.blank?
-      pdf.move_down 5
-      pdf.text CustomVariable.class_schedule_text
     end
   end
 end

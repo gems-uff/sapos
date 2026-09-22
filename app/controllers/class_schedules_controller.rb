@@ -30,14 +30,6 @@ class ClassSchedulesController < ApplicationController
       type: :member,
       parameters: { format: :pdf }
 
-    config.action_links.add "class_schedule_list",
-      label: "<i title='#{
-        I18n.t("pdf_content.class_schedule.class_schedule_list.link")
-      }' class='fa fa-universal-access'></i>".html_safe,
-      page: true,
-      type: :member,
-      parameters: { format: :pdf }
-
     config.actions.exclude :deleted_records
 
     config.columns[:year].form_ui = :select
@@ -79,26 +71,6 @@ class ClassSchedulesController < ApplicationController
         title = I18n.t("pdf_content.class_schedule.class_schedule_pdf.title")
         send_data render_class_schedules_class_schedule_pdf(year, semester),
           filename: "#{title} (#{year}_#{semester}).pdf",
-          type: "application/pdf"
-      end
-    end
-  end
-
-  def class_schedule_list
-    schedule = ClassSchedule.find(params[:id])
-
-    @year = schedule.year
-    @semester = schedule.semester
-    @course_classes = CourseClass.where(year: @year, semester: @semester)
-      .includes(:allocations, :professor, course: :course_type)
-    @on_demand = Course.joins(:course_type)
-      .where(course_types: { on_demand: true })
-
-    respond_to do |format|
-      format.pdf do
-        title = I18n.t("pdf_content.class_schedule.class_schedule_list.title")
-        send_data render_to_string(formats: [:pdf]),
-          filename: "#{title} (#{@year}_#{@semester}).pdf",
           type: "application/pdf"
       end
     end

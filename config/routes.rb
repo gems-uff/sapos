@@ -73,7 +73,6 @@ Rails.application.routes.draw do
     concerns :active_scaffold
     member do
       get "class_schedule_pdf"
-      get "class_schedule_list"
     end
   end
 
