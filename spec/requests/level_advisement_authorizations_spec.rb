@@ -174,7 +174,7 @@ RSpec.describe "Credenciamentos pelo subform de Nível", type: :request do
         record: {
           name: name,
           default_duration: @level.default_duration.to_s,
-          advisement_authorizations: periodos.to_h { |p| [p[:id], p] }
+          advisement_authorizations: periodos.index_by { |p| p[:id] }
         }
       }
     end
