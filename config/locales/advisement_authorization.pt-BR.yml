@@ -7,11 +7,22 @@ pt-BR:
       advisement_authorization:
         level: "Nível"
         professor: "Orientador"
+        start_date: "Data de credenciamento"
+        end_date: "Data de término do credenciamento"
 
     models:
       advisement_authorization:
         one: "Credenciamento"
         other: "Credenciamentos"
+
+    errors:
+      models:
+        advisement_authorization:
+          overlapping_authorization: "Já existe um credenciamento deste orientador neste nível que se sobrepõe a este período"
+          attributes:
+            end_date:
+              on_or_after: "não pode ser anterior à Data de credenciamento"
+              invalid_date: "não é uma data válida"
 
   active_scaffold:
     create_advisement_authorization_label: "Adicionar Credenciamento"

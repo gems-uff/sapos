@@ -64,7 +64,9 @@ class Professor < ApplicationRecord
 
   # It was considered that active advisements were enrollments without dismissals reasons
   def advisement_points(level_id = nil)
-    return "#{0.0}" if self.advisement_authorizations.empty?
+    # Pontua quem está credenciado hoje, em qualquer nível: o descredenciado
+    # não pontua nem na matrícula em que o coorientador ainda é vigente.
+    return "#{0.0}" unless self.accredited?
 
     enrollments = Enrollment.joins([
       "LEFT OUTER JOIN dismissals ON enrollments.id = dismissals.enrollment_id",
@@ -78,29 +80,19 @@ class Professor < ApplicationRecord
       enrollments = enrollments.where(level_id: level_id.to_i)
     end
 
-    enrollments_with_single_advisor = enrollments.where(
-      "1 = (
-        SELECT COUNT(*)
-        FROM advisements
-        WHERE advisements.enrollment_id = enrollments.id
-        AND advisements.professor_id in (
-          SELECT advisement_authorizations.professor_id
-          FROM advisement_authorizations
-        )
-      )"
-    )
+    # Conta, para cada matrícula, quantos orientadores têm credenciamento
+    # VIGENTE hoje -- não quantos já foram credenciados algum dia. É
+    # correlacionada com a matrícula da consulta externa, por isso entra como
+    # texto; o to_sql vem de uma relação montada pelo Rails, sem entrada do
+    # usuário.
+    authorized_advisors = Advisement
+      .where("advisements.enrollment_id = enrollments.id")
+      .where(professor_id: AdvisementAuthorization.on_date(Date.current).select(:professor_id))
+      .select("COUNT(*)")
+      .to_sql
 
-    enrollments_with_multiple_advisors = enrollments.where(
-      "1 < (
-        SELECT COUNT(*)
-        FROM advisements
-        WHERE advisements.enrollment_id = enrollments.id
-        AND advisements.professor_id in (
-          SELECT advisement_authorizations.professor_id
-          FROM advisement_authorizations
-        )
-      )"
-    )
+    enrollments_with_single_advisor = enrollments.where("1 = (#{authorized_advisors})")
+    enrollments_with_multiple_advisors = enrollments.where("1 < (#{authorized_advisors})")
 
     points = 0.0
     points += (
@@ -117,15 +109,13 @@ class Professor < ApplicationRecord
   end
 
   def advisement_point(enrollment)
-    return 0.0 if self.advisement_authorizations.empty?
+    # A mesma regra de advisement_points, para as duas somarem igual:
+    # credenciamento vigente em qualquer nível, não no nível da matrícula.
+    return 0.0 unless self.accredited?
     return 0.0 if enrollment.advisements.where(professor_id: self.id).empty?
     return 0.0 if enrollment.dismissal
     authorized_advisors = enrollment.advisements
-      .joins(:professor)
-      .where("professors.id in (
-        SELECT advisement_authorizations.professor_id
-        FROM advisement_authorizations
-      )")
+      .where(professor_id: AdvisementAuthorization.on_date(Date.current).select(:professor_id))
       .count
     if authorized_advisors.to_i == 1
       CustomVariable.single_advisor_points
@@ -136,6 +126,20 @@ class Professor < ApplicationRecord
 
   def to_label
     "#{self.name}"
+  end
+
+  # True when the professor holds an accreditation valid on +date+ at any level.
+  def accredited?(date = Date.current)
+    advisement_authorizations.any? { |auth| auth.active_on?(date) }
+  end
+
+  # True when the professor holds an accreditation valid on +date+ for +level+.
+  # Iterates the loaded association in memory on purpose, so advisements being
+  # validated with not-yet-saved (nested) authorizations are still considered.
+  def accredited_on?(level, date = Date.current)
+    advisement_authorizations.any? do |auth|
+      auth.level == level && auth.active_on?(date)
+    end
   end
 
   def changed_to_different_user
