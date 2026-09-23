@@ -48,7 +48,7 @@ RSpec.describe "Advisements features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Credenciamentos"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Orientador", "Nível", "Data de credenciamento", "Data de descredenciamento", ""
+        "Orientador", "Nível", "Data de credenciamento", "Data de término do credenciamento", ""
       ]
     end
 

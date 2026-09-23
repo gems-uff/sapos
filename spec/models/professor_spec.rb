@@ -150,16 +150,16 @@ RSpec.describe Professor, type: :model do
           @destroy_later << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level1)
           @destroy_later << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level2)
 
-          @destroy_later << enrollment1 = FactoryBot.create(:enrollment, level: @level1)
-          @destroy_later << enrollment2 = FactoryBot.create(:enrollment, level: @level2)
+          @destroy_later << @enrollment1 = FactoryBot.create(:enrollment, level: @level1)
+          @destroy_later << @enrollment2 = FactoryBot.create(:enrollment, level: @level2)
 
-          @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: enrollment1)
-          @destroy_later << FactoryBot.create(:advisement, professor: @professor2, enrollment: enrollment2)
-          enrollment1.reload
-          enrollment2.reload
-          @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: enrollment2, main_advisor: false)
-          @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: enrollment1, main_advisor: false)
-          @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: enrollment2, main_advisor: false)
+          @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: @enrollment1)
+          @destroy_later << FactoryBot.create(:advisement, professor: @professor2, enrollment: @enrollment2)
+          @enrollment1.reload
+          @enrollment2.reload
+          @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: @enrollment2, main_advisor: false)
+          @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment1, main_advisor: false)
+          @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment2, main_advisor: false)
         end
 
         it "should return 1.5 total points to authorized professor with one single and one multiple advisements" do
@@ -197,18 +197,21 @@ RSpec.describe Professor, type: :model do
         it "should return 0.0 level-2 points to professor not autorized in level-2" do
           expect(@professor3.advisement_points(@level2.id)).to eql("0.0")
         end
+
+        # A pontuação por matrícula tem de somar o mesmo que a pontuação por
+        # nível: professor1 é credenciado só no nível 1 e leva meio ponto no
+        # nível 2 pelo exemplo acima.
+        it "should return 0.5 for the enrollment co-advised outside the accredited level" do
+          expect(@professor1.advisement_point(@enrollment2)).to eql(0.5)
+        end
       end
     end
-    # Reproduções abertas na revisão do PR #690: continuam vermelhas até o
-    # conserto. O PR passou a filtrar vigência nos dois controllers de seleção
-    # de orientador e nas duas consultas dos seeds, mas aqui não -- a guarda das
-    # linhas 65 e 118 de professor.rb é `advisement_authorizations.empty?`, e as
-    # três subconsultas (85-86, 97-98, 124-125) são
-    # `IN (SELECT professor_id FROM advisement_authorizations)` sem cláusula
-    # nenhuma. A regra combinada: pontua só quem tem credenciamento VIGENTE, em
-    # qualquer nível; o meio ponto vale quando há mais de um vigente.
+    # Pontua só quem tem credenciamento VIGENTE hoje, em qualquer nível; o meio
+    # ponto vale quando a matrícula tem mais de um orientador vigente. Ter sido
+    # credenciado algum dia não basta, nem para pontuar, nem para dividir o
+    # ponto de quem ainda está credenciado.
     describe "advisement points for a de-accredited professor" do
-      # A ordem importa: a validação do próprio PR impede criar orientação para
+      # A ordem importa: a validação de Advisement impede criar orientação para
       # quem já está descredenciado. O caso real é o inverso -- o professor
       # orientava credenciado e o período foi encerrado depois, que é
       # exatamente quando os pontos deveriam parar de contar.
@@ -236,10 +239,7 @@ RSpec.describe Professor, type: :model do
         expect(@deacc.advisement_point(@deacc_enrollment)).to eql(0.0)
       end
 
-      # O dano não é só no descredenciado: enquanto ele continua contando como
-      # orientador habilitado, o coorientador ainda credenciado leva meio ponto
-      # em vez de um.
-      it "does not halve the point of the advisor who is still accredited" do
+      def add_accredited_co_advisor
         @destroy_later << current = FactoryBot.create(:professor)
         @destroy_later << FactoryBot.create(
           :advisement_authorization, professor: current,
@@ -250,8 +250,24 @@ RSpec.describe Professor, type: :model do
           :advisement, professor: current, enrollment: @deacc_enrollment,
           main_advisor: false
         )
+        current
+      end
+
+      # O descredenciado também não conta para dividir: o coorientador ainda
+      # credenciado leva o ponto inteiro, e não meio.
+      it "does not halve the point of the advisor who is still accredited" do
+        current = add_accredited_co_advisor
 
         expect(current.advisement_point(@deacc_enrollment)).to eql(1.0)
+      end
+
+      # Com um coorientador vigente a matrícula conta como de orientador único,
+      # mas o ponto é só de quem está credenciado.
+      it "stops counting points when a co-advisor is still accredited" do
+        current = add_accredited_co_advisor
+
+        expect(current.advisement_points).to eql("1.0")
+        expect(@deacc.advisement_points).to eql("0.0")
       end
     end
 
