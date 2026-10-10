@@ -12,24 +12,24 @@
   <%= render "queries/show_sql", sql_query: @query_sql %>
   <% if @messages.any? %>
     <a id="generate-pdf-link" class="btn btn-primary" href="javascript:void(0)"
-       data-query-params="<%= params[:query_params].to_json %>">
+       data-query-params="<%= @query_values.to_json %>">
       <i class="fa fa-file-pdf-o" title='<%= I18n.t("active_scaffold.assertion.generate_pdf") %>'></i>
     </a>
   <% end %>
 </div>
 
-<% if @messages.size.zero? && params[:query_params].try(:[], :data_consulta).nil? %>
+<% if @messages.size.zero? && @query_values.try(:[], :data_consulta).nil? %>
   <div style="margin: 10px 0">Faça uma simulação</div>
 
-<% elsif @messages.size.zero? && params[:query_params].try(:[], :data_consulta) %>
+<% elsif @messages.size.zero? && @query_values.try(:[], :data_consulta) %>
   <div style="margin: 10px 0">Esta consulta não retornou nenhum resultado</div>
 <% else %>
   <div class="actions" style="display: block">
     <p class="simulate_query_date">
       <span>
-      <% if params[:query_params].try(:[], :data_consulta) %>
+      <% if @query_values.try(:[], :data_consulta) %>
         <%= I18n.t("active_scaffold.notification.query_date") %>:
-          <%= params[:query_params][:data_consulta] %>
+          <%= @query_values[:data_consulta] %>
       <% end %>
       </span>
     </p>

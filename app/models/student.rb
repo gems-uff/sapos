@@ -5,6 +5,8 @@
 
 # Represents a Student
 class Student < ApplicationRecord
+  include ::UserNameSyncConcern
+
   has_paper_trail
   include CarrierWaveFileCleanup
 

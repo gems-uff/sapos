@@ -211,4 +211,71 @@ RSpec.describe Student, type: :model do
       expect(user.actual_role).to eq(Role::ROLE_ADMINISTRADOR)
     end
   end
+
+  describe "After save" do
+    it "should propagate a name change to the associated user" do
+      @destroy_later << user = FactoryBot.create(:user, :student, name: "JOAO CARLOS DOS SANTOS", email: "abc@def.com")
+      student.email = "abc@def.com"
+      student.user = user
+      student.save(validate: false)
+      @destroy_later << student
+
+      student.update(name: "Joao Carlos dos Santos")
+
+      expect(user.reload.name).to eq("Joao Carlos dos Santos")
+    end
+
+    it "should not raise when the student has no associated user" do
+      student.save!
+      @destroy_later << student
+
+      expect { student.update(name: "Joao Carlos dos Santos") }.not_to raise_error
+    end
+
+    it "should propagate the name when an existing user is linked to the student" do
+      @destroy_later << user = FactoryBot.create(
+        :user, :student, name: "NOME VELHO DO USUARIO", email: "abc@def.com"
+      )
+      student.email = "abc@def.com"
+      student.save(validate: false)
+      @destroy_later << student
+
+      student.update(user: user)
+
+      expect(user.reload.name).to eq("Ana")
+    end
+
+    it "should not touch the user when a different attribute changes" do
+      @destroy_later << user = FactoryBot.create(:user, :student, name: "Ana", email: "abc@def.com")
+      student.email = "abc@def.com"
+      student.user = user
+      student.save(validate: false)
+      @destroy_later << student
+
+      expect(user).not_to receive(:save)
+      expect(student.update(cpf: "b123.456.789-10")).to be true
+    end
+
+    # As validacoes de User nao olham o nome: elas reprovam o registro por papel
+    # e por associacao. Se a propagacao as respeitasse, o nome do usuario ficaria
+    # parado justamente nos casos que a #657 quer consertar.
+    it "should propagate the name even when the user fails its own validations" do
+      @destroy_later << role_professor = FactoryBot.create(:role_professor)
+      @destroy_later << user = FactoryBot.create(:user, :student, name: "Ana", email: "abc@def.com")
+      @destroy_later << FactoryBot.create(:user_role, user: user, role: role_professor)
+      student.email = "abc@def.com"
+      student.user = user
+      student.save(validate: false)
+      @destroy_later << student
+
+      # Controle: o usuario esta mesmo invalido -- tem papel de professor e nao
+      # tem registro de professor. Sem esta linha, o verde abaixo tambem seria
+      # compativel com uma validacao que simplesmente deixou de existir.
+      expect(user.reload).not_to be_valid
+
+      student.update(name: "Joao Carlos dos Santos")
+
+      expect(user.reload.name).to eq("Joao Carlos dos Santos")
+    end
+  end
 end

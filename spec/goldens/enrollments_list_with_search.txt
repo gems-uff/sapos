@@ -1,0 +1,81 @@
+── página 1 ──
+R e la t ó r io d e Ma trícu las
+
+ Campo Valor
+Número de Matrícula M2020001
+
+Nome do Aluno Ana Conceição
+Nível Mestrado
+
+Tipo de Matrícula Regular
+Data de Admissão Março/2020
+
+Ativo? Todas
+Realização de Etapa Exame de Qualificação até 15 de Junho de 2021
+
+Disciplina em 2020/1
+ Nome do Aluno Número de Matrícula Data de Admissão Desligamento
+
+Ana Conceição M2020001 01/03/2020
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+SAPOS - Terça, 15 de Junho de 2021, 10:30 h

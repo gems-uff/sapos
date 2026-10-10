@@ -1,1 +1,9 @@
-<%= configuration["html"].html_safe %>
+<%# O HTML vem da configuracao do campo, escrita por coordenacao ou
+    administrador, e e servido ao candidato, que e anonimo. html_safe cru
+    transformaria uma conta interna comprometida em XSS armazenado contra todo
+    candidato. O scrubber de poda do Loofah mantem paragrafos, listas, links,
+    tabelas e imagens e remove script, style e iframe COM o conteudo,
+    manipuladores on* e URLs javascript:. A lista padrao do sanitize nao serve
+    aqui: ela derruba <table>, que estes blocos usam, e deixa o texto do script
+    no lugar da tag, visivel ao candidato. %>
+<%= sanitize(configuration["html"], scrubber: Loofah::Scrubbers::Prune.new) %>

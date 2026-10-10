@@ -7,6 +7,7 @@
 #   require_relative "explore_common"   # a partir de um script na mesma pasta
 
 require "selenium-webdriver"
+require_relative "navegador"
 require "json"
 require "fileutils"
 
@@ -21,14 +22,7 @@ OUT = ENV["EXPLORE_OUT"] ||
 FileUtils.mkdir_p(OUT)
 
 def build_driver
-  options = Selenium::WebDriver::Chrome::Options.new
-  options.add_argument("--headless=new")
-  options.add_argument("--window-size=1440,1600")
-  options.add_argument("--hide-scrollbars")
-  options.add_argument("--force-device-scale-factor=1")
-  options.add_argument("--lang=pt-BR")
-  options.add_option("goog:loggingPrefs", { browser: "ALL", performance: "ALL" })
-  Selenium::WebDriver.for(:chrome, options: options)
+  novo_driver(largura: 1440, altura: 1600)
 end
 
 def login(driver, wait)

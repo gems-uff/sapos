@@ -30,13 +30,26 @@ corrija na wiki.
   continua aberta (ver a skill `release`).
 - **Exceção:** vulnerabilidade não ganha issue pública — enumerar o problema
   expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica.
-- Critério de pronto: `bundle exec rspec` inteiro verde (~9 min, ~2260 exemplos).
-  Rode **sem** `SKIP_COVERAGE=1` ao menos uma vez antes de fechar: é a
-  configuração real da suíte, e o caminho do simplecov só é exercitado assim.
+- Critério de pronto: `bundle exec rspec` inteiro verde. Rode **sem**
+  `SKIP_COVERAGE=1` ao menos uma vez antes de fechar: é a configuração real da
+  suíte, e o caminho do simplecov só é exercitado assim.
+- **Os feature specs rodam em Firefox por padrão e em Chrome no CI também.**
+  `SELENIUM_BROWSER=chrome` troca localmente; o CI roda os dois em matriz. O
+  Firefox é o default porque faz a mesma suíte em menos da metade do tempo; o
+  Chrome fica no CI porque é o navegador da maioria dos usuários. Vermelho num
+  navegador só é sinal, não ruído — foi para isso que a matriz existe. Na
+  homologação (skill `homologacao`) o default é o Chrome, o único que expõe
+  console e log de rede pelo WebDriver.
 - **Verde numa ordem não é verde.** A ordem dos exemplos é sorteada. Ao
   investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
   irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo
   culpado sozinho. O CI registra a seed no resumo do job.
+- **Vermelho logo depois de trocar de ramo pode ser o banco de teste velho.** O
+  `maintain_test_schema!` não recarrega o `db/test.sqlite3` quando a troca de
+  ramo muda o esquema, então ele fica com as colunas do ramo anterior e o
+  `spec/config/schema_dump_spec.rb` acusa uma divergência que não existe no
+  código. `rm db/test.sqlite3 && RAILS_ENV=test rake db:schema:load` resolve. No
+  CI não acontece: lá o banco nasce a cada job.
 - **Prefira `before(:each)`: o rollback da transação limpa sozinho.** O
   `before(:all)` existe só para amortizar montagem cara entre muitos exemplos, e
   o ganho depende do tamanho do grupo — medido: em grupo de 6 exemplos não muda
@@ -143,9 +156,11 @@ referenciado por caminho de uma captura datada, que é descartável.
 ## Atualização de dependências
 
 Uma gem por passo, alvo no patch mais atual da mesma série; **nunca subir major
-ou minor de carona** — isso é decisão separada. O resto — piso de segurança,
-conferência do `Gemfile.lock`, `--strict`, higiene em lote — está na skill
-`dependencias`.
+ou minor de carona** — isso é decisão separada. **Piso de segurança (`>=`) não se
+declara no `Gemfile`:** ele envelhece calado quando sai a correção seguinte. Quem
+garante que o lock não carrega CVE conhecida é o `bundle-audit`, que o CI roda
+contra a base de advisories do dia. O resto — conferência do `Gemfile.lock`,
+`--strict`, higiene em lote — está na skill `dependencias`.
 
 ## Pontos cegos da suíte
 
@@ -207,7 +222,14 @@ cada uma explica o porquê no próprio cabeçalho:
 em no-op, para que a migration de 2013 do schema_plus — assinatura multi-coluna,
 incompatível com a do Rails — ainda replique. O silêncio não distingue quem
 chama: o `db/schema.rb` declara 17 chaves estrangeiras e o `db/test.sqlite3`
-carregado a partir dele não tem nenhuma.
+carregado a partir dele não tem nenhuma. O no-op está na `Migration`, não no
+adaptador: `db:schema:load` produz zero chaves também em MariaDB, e `db:migrate`
+num banco vazio não é rota alternativa — ele carrega o `schema.rb` e marca as
+versões em vez de executar as migrations. Quem for **regenerar o `db/schema.rb`**
+sente isso: o dump de qualquer banco montado localmente sai sem o bloco de
+`add_foreign_key`, que tem de ser reposto à mão. E o dump tem de sair de SQLite:
+o de MariaDB acrescenta `charset:` e `collation:` em cada tabela, e o arquivo
+versionado é neutro de adaptador.
 
 `can_destroy.rb`, `i18n_model.rb` e `types.rb` também abrem classe do Rails, mas
 só acrescentam método — o risco ali é colisão de nome, não mudança de
