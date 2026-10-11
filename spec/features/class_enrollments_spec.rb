@@ -209,8 +209,8 @@ RSpec.describe "ClassEnrollments features", type: :feature do
 
       # Selecionar tudo depende de plataforma: Ctrl+A no Linux, Cmd+A no macOS
       # (onde Ctrl+A e "ir para o inicio da linha", e o backspace seguinte nao
-      # apaga nada). A selecao por JS vale nos dois, e e a unica forma de
-      # esvaziar o campo -- ver o exemplo do backspace logo abaixo.
+      # apaga nada). A selecao por JS vale nos dois; o caminho de apagar tecla
+      # por tecla tem exemplo proprio, logo abaixo.
       page.execute_script(
         "var e = document.querySelector('.grade-input'); e.focus(); e.select();"
       )
@@ -220,16 +220,11 @@ RSpec.describe "ClassEnrollments features", type: :feature do
     end
 
     # O handler de input reformata a cada tecla, e uma nota de um digito volta
-    # formatada com dois ("6," -> "0,6", "0," -> "0,0"). Apagando da direita
-    # para a esquerda o zero e reposto a cada backspace: o campo empaca em
-    # "0,0" e a situacao em "Reprovado". Medido, partindo de "6,0" com o cursor
-    # no fim: "0,6", "0,0", "0,0", "0,0"...
-    #
-    # Isso importa porque apagar e o gesto de quem errou a nota: o professor
-    # que digita 6,0 sem querer e aperta backspace fica com zero e reprovacao
-    # gravaveis, em vez de campo vazio e "Incompleto". O caminho de volta para
-    # "Incompleto" so existe por selecionar-tudo -- e o exemplo acima e o
-    # unico que passa por ele.
+    # formatada com dois ("6," -> "0,6"). Sem tratamento proprio do backspace,
+    # o zero seria reposto a cada tecla e o campo empacaria em "0,0", com a
+    # situacao em "Reprovado". Apagar e o gesto de quem errou a nota: o campo
+    # tem de chegar vazio, e a situacao a "Incompleto". Medido: sem o ramo de
+    # backspace do class_enrollments.js, este exemplo cai.
     it "clears the grade field with repeated backspaces" do
       page.send_keys :escape
       within(".as_form") { fill_in "Nota", with: "60" }
@@ -286,15 +281,15 @@ RSpec.describe "ClassEnrollments features", type: :feature do
 
   # grade_not_count_in_gpr e o que permite "Aprovado" com nota abaixo do minimo,
   # com justificativa: grade_for_situation pula a checagem quando ele esta
-  # presente. O recalculo da importacao passou a respeitar isso
-  # (course_classes_controller, `&& !class_enrollment.grade_not_count_in_gpr?`);
-  # o handler de input do class_enrollments.js nao, e reescreve a situacao a
-  # cada tecla so pela comparacao com o minimo.
+  # presente. O recalculo da importacao respeita isso
+  # (course_classes_controller, `&& !class_enrollment.grade_not_count_in_gpr?`),
+  # e o handler de input do class_enrollments.js tambem: com "nao contabilizar"
+  # marcado, ele nao reescreve a situacao pela comparacao com o minimo.
   #
-  # Medido, com nota 1,0, situacao "Aprovado" e "nao contabilizar" marcado:
-  # redigitar a mesma nota vira "Reprovado" debaixo do cursor. A decisao de
-  # secretaria se desfaz sem aviso, e quem nao repara salva o contrario do que
-  # quis.
+  # Sem essa guarda, com nota 1,0, situacao "Aprovado" e "nao contabilizar"
+  # marcado, redigitar a mesma nota viraria "Reprovado" debaixo do cursor: a
+  # decisao de secretaria se desfaria sem aviso. Medido: sem a guarda do JS,
+  # os exemplos abaixo caem.
   describe "grade not counting in GPR", js: true do
     before(:each) do
       @destroy_later << @convalidada = FactoryBot.create(
@@ -306,6 +301,7 @@ RSpec.describe "ClassEnrollments features", type: :feature do
       login_as(@user)
       visit url_path
       find("#as_#{plural_name}-edit-#{@convalidada.id}-link").click
+      expect(page).to have_css(".as_form .grade-input")
       page.send_keys :escape
     end
 

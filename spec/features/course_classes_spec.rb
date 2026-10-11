@@ -170,6 +170,7 @@ RSpec.describe "CourseClasses features", type: :feature do
         login_as(@user)
         visit url_path
         find("#as_#{plural_name}-edit-#{turma_sem_nota.id}-link").click
+        expect(page).to have_css(".class_enrollments-sub-form")
       end
 
       it "does not show a grade column header" do

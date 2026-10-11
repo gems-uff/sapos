@@ -5,12 +5,12 @@
 
 require "rails_helper"
 
-# Estes exemplos descrevem o que a importacao de notas precisa fazer. Os tres
-# primeiros contextos ja passam, e ficam como guarda: a cadeia de calculo, a
-# escala da nota, os valores que a planilha pode trazer e a autorizacao por
-# turma sao o que eles travam. O ultimo contexto, "defeitos em aberto", falha --
-# sao o criterio de aceitacao do proximo conserto, e cada um diz junto qual e a
-# causa.
+# Estes exemplos descrevem o que a importacao de notas precisa fazer. Quase
+# todos ja passam, e ficam como guarda: a cadeia de calculo, a escala da nota,
+# os valores que a planilha pode trazer, a autorizacao por turma e o que a
+# previa recusa sao o que eles travam. O ultimo contexto, "defeitos em aberto",
+# falha -- e o criterio de aceitacao do proximo conserto, e cada exemplo diz
+# junto qual e a causa.
 RSpec.describe "Importacao de notas por planilha", type: :request do
   let(:course_type) { FactoryBot.create(:course_type, has_score: true) }
   let(:course) { FactoryBot.create(:course, course_type: course_type) }
@@ -65,8 +65,11 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
 
   # A previa fica guardada na sessao; o passo de confirmacao nao carrega payload
   # nenhum, e e justamente isso que impede o navegador de ditar o que e gravado.
+  # Leva so o token da previa que a tela mostrou, como o botao "Aceitar".
   def confirmar(turma_alvo = turma)
-    post import_grades_xls_course_class_path(turma_alvo), params: { confirm: "1" }
+    token = Nokogiri::HTML(response.body).at_css("input[name=token]")&.[]("value")
+    post import_grades_xls_course_class_path(turma_alvo),
+      params: { confirm: "1", token: token }
   end
 
   def variavel_customizada(nome, valor)
@@ -458,28 +461,6 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
       expect(sem_nota.reload.disapproved_by_absence).to eq(true)
     end
 
-    # Linha recusada pela validacao tem de aparecer na tela, com a matricula e
-    # o motivo -- nao so no log. E, como o laco grava dentro de uma transacao,
-    # a recusa de uma linha desfaz as outras: nada fica aplicado pela metade.
-    it "diz que alguma linha nao foi gravada" do
-      recusada = FactoryBot.create(
-        :class_enrollment, course_class: turma,
-        grade: nil, situation: ClassEnrollment::REGISTERED
-      )
-      post import_grades_xls_course_class_path(turma), params: {
-        spreadsheet: pauta_de_linhas([
-          linha(inscricao, nota: "8,7"),
-          linha(recusada, nota: "99,0")
-        ])
-      }
-      confirmar
-
-      expect(flash[:error]).to be_present
-      # A transacao e o que impede a aplicacao pela metade. Sem esta linha o
-      # exemplo passa mesmo com a transacao arrancada -- medido.
-      expect(inscricao.reload.grade).to be_nil
-    end
-
     # A notificacao saiu de dentro da gravacao: o laco salva com
     # skip_notification e so depois, fora da transacao, chama
     # notify_student_and_advisor. Por isso SMTP que cai no meio da pauta nao
@@ -521,23 +502,19 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
     end
   end
 
-  # Estes falham. Sao os defeitos que esta rodada de revisao confirmou por
-  # reproducao, e ficam aqui como criterio de aceitacao do proximo conserto.
-  # Cada um foi medido com controle: o cenario sem o defeito se comporta de
-  # outro jeito, e a assercao fica verde quando a causa e desligada.
-  context "defeitos em aberto" do
+  # O que a previa recusa e como a confirmacao reage. Cada exemplo foi medido
+  # com controle quando ainda era reproducao: fica vermelho com a causa de
+  # volta.
+  context "recusas e avisos da previa" do
     before(:each) do
       role = FactoryBot.create(:role_administrador)
       sign_in create_confirmed_user([role], "admin@ic.uff.br")
     end
 
-    # CustomVariable.import_grades_session_timeout devolve 45.minutes -- uma
-    # ActiveSupport::Duration -- quando a variavel nao existe, e config.value.to_i
-    # -- um Integer -- quando existe. Quem chama faz `.ago`, que Duration tem e
-    # Integer nao: configurar a variavel derruba toda confirmacao com
-    # NoMethodError. Nenhum exemplo da suite configura a variavel, entao a CI
-    # fica verde. Falta decidir tambem a unidade: o default diz minutos, o
-    # `.to_i` cru diria segundos.
+    # import_grades_session_timeout e em minutos, e o getter devolve Duration
+    # tanto no default quanto com a variavel configurada -- quem chama faz
+    # `.ago`, que Integer nao tem. Sao os unicos exemplos que configuram a
+    # variavel.
     it "nao estoura quando o tempo limite esta configurado" do
       variavel_customizada("import_grades_session_timeout", "60")
       enviar(inscricao, nota: "8,7")
@@ -557,16 +534,11 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
     end
 
     # A coluna de nota e inteira, na escala interna (x10), entao so uma casa
-    # decimal cabe. O regex de conferencia aceita quantas vierem, e a
-    # importacao entrega um Float a `ClassEnrollment#grade=`, que converte
-    # apenas String: o valor passa direto para a coluna inteira e trunca.
-    # Medido: "0,29" faz a previa anunciar "Nota nova 0,29", o registro ficar
-    # com 0,2 e a tela dizer "1 nota(s) importada(s) com sucesso!".
-    #
-    # Valor com mais de uma casa e para ser recusado, como os nao numericos --
-    # nao arredondado, para que a nota gravada seja sempre a que alguem
-    # escreveu. O controle e o exemplo "grava a nota preenchida na planilha",
-    # com uma casa, no contexto de administrador.
+    # decimal cabe -- e `ClassEnrollment#grade=` converte apenas String, de
+    # modo que um Float com mais casas truncaria em silencio. Valor com mais de
+    # uma casa e recusado, como os nao numericos, e nao arredondado: a nota
+    # gravada e sempre a que alguem escreveu. O controle e o exemplo "grava a
+    # nota preenchida na planilha", com uma casa, no contexto de administrador.
     it "recusa nota com mais de uma casa decimal em vez de truncar" do
       enviar(inscricao, nota: "0,29", situacao: ClassEnrollment::REGISTERED)
       confirmar
@@ -580,10 +552,10 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
       expect(celulas_da_previa[4]).not_to include("0,29")
     end
 
-    # A previa e o unico lugar onde da para conferir antes de gravar, e com a
-    # transacao uma linha recusada desfaz a pauta inteira. Por isso "Pronto" tem
-    # de significar "esta linha grava": nota fora de 0..10 nao grava
-    # (grade_gt_100), e a linha aparece como pronta.
+    # A previa e o unico lugar onde da para conferir antes de gravar, entao
+    # "Pronto" significa "esta linha grava". A previa roda as validacoes do
+    # modelo sobre os valores finais e marca como invalida a linha que a
+    # gravacao recusaria: aqui, nota fora de 0..10 (grade_gt_100).
     it "nao marca como pronta a linha com nota acima do maximo" do
       enviar(inscricao, nota: "99,0", situacao: ClassEnrollment::REGISTERED)
 
@@ -592,10 +564,9 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
       )
     end
 
-    # Mesmo ponto, por outra causa: coluna de nota vazia com situacao "Aprovado"
-    # na planilha passa pelo recalculo intocada (o `elsif final_grade.present?`
-    # nao roda) e cai em grade_for_situation na gravacao. A previa mostra
-    # "Pronto", "Nota nova --", "Situacao nova Aprovado".
+    # Mesmo ponto, por outra causa: coluna de nota vazia com situacao
+    # "Aprovado" passa pelo recalculo intocada (o `elsif final_grade.present?`
+    # nao roda), e so a validacao do modelo (grade_for_situation) a recusa.
     it "nao marca como pronta a linha que a validacao vai recusar" do
       enviar(inscricao, nota: nil, situacao: ClassEnrollment::APPROVED)
 
@@ -604,11 +575,9 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
       )
     end
 
-    # O flash de erro e posto e o redirect leva para a tela de upload -- que nao
-    # renderiza flash, e nao e view de active_scaffold, entao o _messages da gem
-    # nao roda. O layout imprime so `notice`. O professor ve o formulario vazio
-    # de novo, sem uma palavra sobre o que houve. Vale para as duas mensagens
-    # novas: arquivo invalido e previa expirada.
+    # O erro volta para a tela de upload, que nao e view de active_scaffold --
+    # o _messages da gem nao roda ali. Sem a mensagem, o professor ve o
+    # formulario vazio de novo, sem uma palavra sobre o que houve.
     it "mostra na tela o erro de arquivo invalido" do
       texto = Tempfile.new(["nota", ".txt"])
       texto.write("nao sou uma planilha")
@@ -625,11 +594,9 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
       )
     end
 
-    # parse_rows_xls acumula em rows[enrollment_number], e build_xls_import_preview
-    # confere "nao encontrada" ANTES de "duplicada". Matricula repetida que nao
-    # existe no banco e reportada como inexistente, escondendo a duplicidade --
-    # que e o que o professor tem de corrigir na planilha. Controle: a mesma
-    # matricula repetida, existente, sai como duplicada.
+    # A duplicidade e conferida antes da existencia: matricula repetida que nao
+    # existe no banco sai como duplicada, que e o que o professor tem de
+    # corrigir na planilha.
     it "reporta como duplicada a matricula repetida que nao existe no banco" do
       post import_grades_xls_course_class_path(turma), params: {
         spreadsheet: pauta_de_linhas([
@@ -645,16 +612,10 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
       )
     end
 
-    # notify_import_changed pega Net::SMTPError, Net::OpenTimeout e
-    # Net::ReadTimeout. Servidor de e-mail fora do ar levanta
-    # Errno::ECONNREFUSED, e nome que nao resolve levanta SocketError -- nenhum
-    # dos dois e subclasse dos tres. A transacao ja commitou quando a
-    # notificacao roda, entao a excecao sobe depois da gravacao: o usuario
-    # recebe 500 sobre uma importacao que deu certo, a previa ja saiu da sessao,
-    # e ele reenvia, notificando de novo quem ja recebeu.
-    #
-    # Controle: o exemplo do SMTP, logo acima, mostra que a falha tratada vira
-    # aviso e nao derruba a requisicao.
+    # A notificacao roda depois da gravacao. Servidor de e-mail fora do ar
+    # (Errno::ECONNREFUSED) nao e erro de SMTP, e se subisse o usuario
+    # receberia 500 sobre uma importacao que deu certo -- e reenviaria,
+    # notificando de novo quem ja recebeu.
     it "nao estoura quando o servidor de e-mail recusa a conexao" do
       allow(Notifier).to receive(:send_emails).and_raise(Errno::ECONNREFUSED)
       enviar(inscricao, nota: "8,7")
@@ -667,18 +628,10 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
     # Duas grafias da mesma matricula. O que conta como "mesma" e decisao da
     # collation do banco, nao do String#hash do Ruby: em producao
     # (utf8mb4_unicode_ci) "m01" e "M01 " sao a matricula "M01" -- caixa
-    # ignorada, espaco no fim ignorado --, e o enrollment_number sai de
-    # parse_rows_xls sem strip, ao contrario das outras colunas. Entao duas
-    # chaves distintas no Hash resolvem para a mesma inscricao: a duplicidade
-    # nao e detectada, a previa mostra duas linhas "Pronto" para um aluno so, e
-    # a gravacao aplica as duas em ordem -- a ultima vence.
-    #
-    # Medido em MariaDB 10.5, pauta com "M01" (8,7) e "m01" (1,0):
-    #
-    #   previa:   2 linhas "Pronto", notas "8,7" e "1,0", 0 duplicadas
-    #   resumo:   "2 registros prontos para importacao."
-    #   gravado:  nota=1,0  situacao="Reprovado"
-    #   tela:     "2 nota(s) importada(s) com sucesso!"
+    # ignorada, espaco no fim ignorado. Por isso a duplicidade e conferida
+    # sobre a inscricao resolvida, nao sobre a string da celula; sem isso a
+    # previa mostraria duas linhas "Pronto" para um aluno so, e a ultima
+    # venceria na gravacao.
     #
     # O exemplo so roda no adaptador de producao: no SQLite as duas grafias sao
     # dois valores diferentes, nenhuma das duas acha o registro, e o cenario nao
@@ -703,6 +656,287 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
           I18n.t("xls_content.course_class.import_grades_xls_results.status_duplicate")
         )
       end
+    end
+  end
+
+  # O token amarra a confirmacao a previa que a tela mostrou. Duas abas na
+  # mesma turma dividem a chave da sessao: sem ele, confirmar na aba antiga
+  # aplicaria a planilha da aba nova, que ninguem conferiu ali.
+  context "previa por aba e cancelamento" do
+    before(:each) do
+      role = FactoryBot.create(:role_administrador)
+      sign_in create_confirmed_user([role], "admin@ic.uff.br")
+    end
+
+    def token_da_previa
+      Nokogiri::HTML(response.body).at_css("input[name=token]")["value"]
+    end
+
+    it "recusa a confirmacao da previa que outra aba substituiu" do
+      enviar(inscricao, nota: "8,7")
+      token_antigo = token_da_previa
+      enviar(inscricao, nota: "5,0")
+
+      post import_grades_xls_course_class_path(turma),
+        params: { confirm: "1", token: token_antigo }
+
+      expect(inscricao.reload.grade).to be_nil
+      expect(flash[:error]).to eq(
+        I18n.t("xls_content.course_class.import_grades_xls_stale_preview")
+      )
+    end
+
+    it "grava a previa confirmada com o proprio token" do
+      enviar(inscricao, nota: "8,7")
+
+      post import_grades_xls_course_class_path(turma),
+        params: { confirm: "1", token: token_da_previa }
+
+      expect(inscricao.reload.grade).to eq(87)
+    end
+
+    # "Cancelar" tira a previa da sessao. Sem isso ela fica la ate alguem
+    # confirmar aquela turma, ocupando a coluna `sessions.data`, que tem teto.
+    it "descarta a previa ao cancelar" do
+      enviar(inscricao, nota: "8,7")
+      token = token_da_previa
+
+      get import_grades_xls_course_class_path(turma, cancel: 1, token: token)
+      post import_grades_xls_course_class_path(turma),
+        params: { confirm: "1", token: token }
+
+      expect(inscricao.reload.grade).to be_nil
+    end
+  end
+
+  # Estes falham. Sao os defeitos que esta rodada de revisao confirmou por
+  # reproducao, e ficam aqui como criterio de aceitacao do proximo conserto.
+  # Cada um foi medido com controle: com a causa desligada, o exemplo passa.
+  #
+  # Os tres primeiros descrevem a regra de confirmacao decidida na issue: lanca
+  # o que esta pronto, numa transacao so, e diz quantas linhas ficaram
+  # pendentes. Nao citam o texto da mensagem, so os numeros que ela tem de
+  # trazer.
+  context "defeitos em aberto" do
+    before(:each) do
+      role = FactoryBot.create(:role_administrador)
+      sign_in create_confirmed_user([role], "admin@ic.uff.br")
+    end
+
+    def outra_inscricao
+      FactoryBot.create(
+        :class_enrollment, course_class: turma,
+        grade: nil, situation: ClassEnrollment::REGISTERED
+      )
+    end
+
+    def mensagens
+      flash.to_h.values.join(" ")
+    end
+
+    def pauta_de_abas(abas)
+      pacote = Axlsx::Package.new
+      abas.each do |nome, linhas|
+        pacote.workbook.add_worksheet(name: nome) do |sheet|
+          next if linhas.nil?
+          sheet.add_row cabecalho
+          linhas.each { |uma| sheet.add_row uma }
+        end
+      end
+      arquivo_enviado(pacote.to_stream.read)
+    end
+
+    def arquivo_enviado(conteudo)
+      tempfile = Tempfile.new(["pauta", ".xlsx"])
+      tempfile.binmode
+      tempfile.write(conteudo)
+      tempfile.rewind
+      Rack::Test::UploadedFile.new(tempfile.path, nil, false, original_filename: "pauta.xlsx")
+    end
+
+    # Hoje a confirmacao de previa com linha recusada nao grava nada, e
+    # responde com t(".import_grades_xls_rejected_rows"), chave que nao existe
+    # no locale -- o professor le "Translation missing". A regra decidida e
+    # outra: as linhas prontas sao lancadas, as recusadas ficam pendentes, e a
+    # mensagem diz quantas foram e quantas faltam. Aqui sao 3 e 2.
+    it "lanca as linhas prontas e diz quantas ficaram pendentes" do
+      prontas = [inscricao, outra_inscricao, outra_inscricao]
+      recusadas = [outra_inscricao, outra_inscricao]
+      post import_grades_xls_course_class_path(turma), params: {
+        spreadsheet: pauta_de_linhas(
+          prontas.map { |uma| linha(uma, nota: "8,7") } +
+          recusadas.map { |uma| linha(uma, nota: "99,0") }
+        )
+      }
+      confirmar
+
+      expect(prontas.map { |uma| uma.reload.grade }).to eq([87, 87, 87])
+      expect(recusadas.map { |uma| uma.reload.grade }).to eq([nil, nil])
+      expect(mensagens).to match(/\b3\b/).and match(/\b2\b/)
+    end
+
+    # Linha que nao traz nada a lancar -- nota em branco, o resto igual ao que
+    # o sistema ja tem -- sai na previa como "Pronto" e entra na contagem: com
+    # uma nota preenchida e duas em branco, a tela anuncia "3 nota(s)
+    # importada(s)". Essas linhas sao alunos pendentes, nao lancados.
+    it "nao conta como lancada a linha sem nada a lancar" do
+      em_branco = [outra_inscricao, outra_inscricao]
+      post import_grades_xls_course_class_path(turma), params: {
+        spreadsheet: pauta_de_linhas(
+          [linha(inscricao, nota: "8,7")] +
+          em_branco.map { |uma| linha(uma, nota: nil) }
+        )
+      }
+      status = Nokogiri::HTML(response.body).css("tbody tr").map do |tr|
+        tr.css("td")[1].text.strip
+      end
+      confirmar
+
+      expect(status[1..]).not_to include(status[0])
+      expect(inscricao.reload.grade).to eq(87)
+      expect(mensagens).to match(/\b1\b/).and match(/\b2\b/)
+    end
+
+    # As linhas prontas vao numa transacao so: se uma delas falha ao gravar,
+    # nenhuma e lancada, e a tela diz que nada foi lancado. Hoje cada linha
+    # grava na propria transacao, e o professor le sucesso e erro juntos, com
+    # metade da pauta gravada. A falha e simulada no momento de gravar,
+    # depois da previa e da revalidacao, que e quando ela acontece de verdade.
+    it "nao lanca nenhuma linha pronta quando uma delas falha ao gravar" do
+      segunda = outra_inscricao
+      post import_grades_xls_course_class_path(turma), params: {
+        spreadsheet: pauta_de_linhas([
+          linha(inscricao, nota: "8,7"),
+          linha(segunda, nota: "9,0")
+        ])
+      }
+      allow_any_instance_of(ClassEnrollment).to receive(:create_or_update)
+        .and_wrap_original do |original, *args, **kwargs, &block|
+          next false if original.receiver.id == segunda.id
+          original.call(*args, **kwargs, &block)
+        end
+      confirmar
+
+      expect([inscricao.reload.grade, segunda.reload.grade]).to eq([nil, nil])
+      expect(flash[:error]).to be_present
+      expect(flash[:info]).to be_blank
+    end
+
+    # A importacao le a primeira aba, nao a "Pauta da Turma". O Excel poe a
+    # copia de uma aba antes da original, e o professor que guardou a pauta
+    # antiga assim tem a copia lida no lugar dela: a tela anuncia "1 nota(s)
+    # importada(s)" e nada e gravado.
+    it "le a aba Pauta da Turma mesmo quando ela nao e a primeira" do
+      post import_grades_xls_course_class_path(turma), params: {
+        spreadsheet: pauta_de_abas(
+          "Pauta da Turma (2)" => [linha(inscricao, nota: nil)],
+          "Pauta da Turma" => [linha(inscricao, nota: "8,7")]
+        )
+      }
+      confirmar
+
+      expect(inscricao.reload.grade).to eq(87)
+    end
+
+    # Planilha cuja pauta esta vazia -- o professor apagou tudo antes de
+    # colar -- responde com erro 500.
+    it "avisa em vez de estourar quando a pauta esta vazia" do
+      post import_grades_xls_course_class_path(turma), params: {
+        spreadsheet: pauta_de_abas("Pauta da Turma" => nil)
+      }
+
+      expect(response).to redirect_to(import_grades_xls_course_class_path(turma))
+      expect(flash[:error]).to be_present
+    end
+
+    # A conferencia de divergencia olha nota, situacao, frequencia e "nao
+    # contabilizar no CR", mas nao a observacao. A planilha traz a obs que
+    # estava no sistema quando foi exportada; se alguem a edita entre a previa
+    # e a confirmacao, a confirmacao a regrava por cima, sem aviso.
+    it "nao regrava por cima a observacao editada depois da previa" do
+      inscricao.update_columns(obs: "Observacao exportada")
+      enviar(inscricao, nota: "8,7", obs: "Observacao exportada")
+      inscricao.update_columns(obs: "Observacao editada no sistema")
+      confirmar
+
+      expect(inscricao.reload.obs).to eq("Observacao editada no sistema")
+      expect(flash[:warning]).to be_present
+    end
+
+    # A pauta exportada grava a matricula como numero quando ela so tem
+    # digitos: "0123" vira 123 na planilha, e a importacao da mesma planilha,
+    # sem mudanca nenhuma, nao acha o aluno.
+    it "reconhece a matricula da pauta que o proprio sistema exportou" do
+      inscricao.enrollment.update_columns(enrollment_number: "0123")
+      get summary_xls_course_class_path(turma, format: :xlsx)
+      exportada = response.body.dup
+
+      post import_grades_xls_course_class_path(turma),
+        params: { spreadsheet: arquivo_enviado(exportada) }
+
+      expect(celulas_da_previa[0]).to eq("0123")
+      expect(celulas_da_previa[1]).not_to eq(
+        I18n.t("xls_content.course_class.import_grades_xls_results.status_not_found")
+      )
+    end
+
+    # Os outros caminhos de lancamento -- a tela da turma, a da inscricao e a
+    # da matricula -- avisam o professor da turma por e-mail quando nota,
+    # situacao ou frequencia mudam. A importacao avisa aluno e orientador, mas
+    # nao o professor.
+    it "avisa o professor da turma das notas lancadas" do
+      professor = FactoryBot.create(:professor, email: "professor@example.com")
+      turma.update!(professor: professor)
+      destinatarios = []
+      allow(Notifier).to receive(:send_emails) do |notifications:|
+        destinatarios.concat(notifications.map { |uma| uma[:to] })
+      end
+
+      enviar(inscricao, nota: "8,7")
+      confirmar
+
+      expect(destinatarios).to include("professor@example.com")
+    end
+
+    # Com frequencia "I", a importacao troca a nota da planilha pela
+    # grade_of_disapproval_for_absence. Com a variavel vazia, a nota vira nil,
+    # e a linha e recusada ("Nota deve ser menor que 6,0 para situacao
+    # Reprovado"). A tela, no mesmo caso, so troca a nota quando a variavel
+    # esta preenchida (class_enrollments.js).
+    it "lanca a falta com a nota da planilha quando nao ha nota de reprovacao por falta" do
+      CustomVariable.where(variable: "grade_of_disapproval_for_absence").delete_all
+      enviar(inscricao, nota: "3,0", frequencia: ClassEnrollment::ATTENDANCE_FALSE)
+      confirmar
+
+      inscricao.reload
+      expect(inscricao.grade).to eq(30)
+      expect(inscricao.disapproved_by_absence).to eq(true)
+      expect(inscricao.situation).to eq(ClassEnrollment::DISAPPROVED)
+    end
+
+    # A coluna "Obs." da previa passou a mostrar so os erros de validacao, e o
+    # `final_obs` saiu da celula: a observacao que a planilha traz -- e que a
+    # confirmacao grava -- nao aparece mais em lugar nenhum da previa.
+    # Controle: com a celula da versao anterior, passa.
+    it "mostra na previa a observacao que vai ser gravada" do
+      enviar(inscricao, nota: "8,7", obs: "Observacao da planilha")
+
+      expect(celulas_da_previa[6]).to include("Observacao da planilha")
+    end
+
+    # A view da previa imprime flash[:warning] num bloco proprio, e o layout
+    # passou a imprimir todo o flash. O aviso de divergencia sai duas vezes,
+    # uma acima da navegacao e outra dentro da previa. Controle: com o layout
+    # anterior, sai uma vez.
+    it "mostra o aviso de divergencia uma vez so" do
+      enviar(inscricao, nota: "8,7")
+      inscricao.update_columns(grade: 50)
+      confirmar
+
+      aviso = I18n.t(
+        "xls_content.course_class.import_grades_xls_results.data_changed_warning"
+      )
+      expect(response.body.scan(aviso).size).to eq(1)
     end
   end
 end
