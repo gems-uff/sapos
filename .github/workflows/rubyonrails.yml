@@ -70,6 +70,16 @@ jobs:
         if: github.event_name != 'schedule'
         run: bundle exec brakeman -q --no-pager
 
+      # O node_modules é versionado de propósito (é de lá que o Sprockets tira o
+      # CodeMirror, e nenhum guia de instalação pede yarn), mas nada obrigava
+      # quem subia a versão no package.json a rodar o yarn install e commitar a
+      # pasta -- e ela ficou duas versões atrás do lock sem ninguém notar. Esta
+      # checagem não precisa de node, de rede nem de banco: compara o que os
+      # quatro arquivos versionados declaram.
+      - name: JavaScript
+        if: github.event_name != 'schedule'
+        run: bundle exec rake javascript:check
+
       # O eager load lê colunas pelo active_scaffold ao carregar cada controller,
       # então precisa de esquema; o SQLite do database.yml.example basta. A #680
       # pôs lib/ no eager load, e é esta checagem que acusa se algo ali deixar

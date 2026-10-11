@@ -177,7 +177,37 @@ CVE conhecida costuma ser uma só, e a base diz exatamente qual versão a corrig
 A mesma checagem roda no job `test` do CI; se ela passa lá e aqui, o lock está
 limpo, sem depender de ninguém lembrar de subir um piso.
 
-## Parte 3 — O que a suíte verde não prova
+## Parte 3 — A dependência JS não passa pelo Bundler
+
+Há uma só (`codemirror`, no `package.json`) e ela é servida de um jeito que não
+se parece com gem nenhuma: o `node_modules` é **versionado**. O
+`config/initializers/assets.rb` põe a pasta no asset load path do Sprockets, e é
+de lá que o `application.js` carrega o editor. Nada ali é gerado por nós — é o
+tarball publicado, descompactado. Por isso nenhum guia de instalação pede node
+ou yarn: quem instala faz `bundle install` e `assets:precompile`, e a pasta
+commitada é o que sustenta isso.
+
+Atualizar é `yarn install` e commitar **tudo** o que mudar em `node_modules/`,
+inclusive o `.yarn-integrity`. Só quem atualiza precisa de node.
+
+```
+bundle exec rake javascript:check
+```
+
+Confere se a pasta versionada ainda casa com o `package.json` e o `yarn.lock`, e
+falha nos dois sentidos: lock à frente da pasta (alguém subiu a versão e não
+rodou o `yarn install`) e pasta à frente do lock. Não precisa de node, de rede
+nem de banco — lê quatro arquivos que já vêm no `git clone`. Roda no job
+`checks` do CI, que é onde o erro precisa aparecer, porque ele se comete num PR.
+
+Ela pega divergência de **versão**, não de conteúdo: arquivo editado à mão
+dentro de `node_modules/codemirror` passa batido.
+
+**Não ponha `/node_modules/` no `.gitignore`.** Já esteve lá e não fazia nada —
+`.gitignore` só alcança arquivo não rastreado — enquanto sugeria a quem lia que
+a pasta era descartável.
+
+## Parte 4 — O que a suíte verde não prova
 
 **Conteúdo de PDF e planilha está coberto** pelo golden-master de
 `spec/requests/goldens/`, que compara o texto extraído do PDF e a matriz de

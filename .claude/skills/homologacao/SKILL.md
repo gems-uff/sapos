@@ -616,6 +616,13 @@ captura consiga exercitar tanto a inscrição quanto o período de ajustes.
 - **`execute_script` derruba o chromedriver na tela de novo Quadro de Horários**
   (medido duas vezes seguidas). Nas telas com datepicker, prefira
   `find_element` e `page_source` a JS injetado.
+- **O "Remover" do subform não marca para destruição: ele apaga a linha.** O link
+  tira o `<tr>` do DOM e não deixa nenhum input `_destroy` — a remoção viaja por
+  omissão, e o active_scaffold substitui a associação pelo conjunto submetido
+  (não há `accepts_nested_attributes_for` para ela). Consequência para quem for
+  medir validação: **por esta tela nada fica `marked_for_destruction?`**, então
+  código guardado por essa condição não é exercitado daqui, e sonda montada sobre
+  ela mede o caminho errado.
 - **Confirme pela lista, nunca pela ausência de erro na tela** — ver o 500 abaixo,
   que grava o registro e mostra "Internal Error" ao mesmo tempo.
 
@@ -651,6 +658,13 @@ São diferença de **conteúdo**, não de status, então não entram na lista ac
 Antes de investigar qualquer uma, olhe a autoria e o horário das linhas novas: se
 forem da conta de captura, no intervalo da rodada, são pegada do instrumento.
 
+**Sonda que liga o aluno de teste a alguém faz a página desse alguém divergir.**
+O cenário do `probe_orientador_credenciado.rb`, por exemplo, põe o aluno de teste
+na tabela de orientandos de um professor real: a rota dele sai de "-" para uma
+linha com o marcador, e isso aparece como a maior diferença de pixel da rodada.
+Antes de investigar uma rota que divergiu sozinha, procure o marcador
+`ZZ-TESTE-HOMOLOG` no diff do texto — achando, é pegada, não regressão.
+
 ### Não confunda template oculto com erro na tela
 
 O active_scaffold deixa no DOM, **oculto**, um painel
@@ -671,6 +685,13 @@ JS
 
 E cruze com a rede: sem resposta não-2xx no log de performance **e** sem 500 no
 `log/production.log` do servidor, o erro está na sua sonda, não na aplicação.
+
+**A recusa de gravação não sai em `.errorExplanation` nem em `.error-message`.**
+Ela vem num bloco próprio, encabeçado por "Não foi possível gravar", e repetido
+dentro do subform que causou o erro. Sonda que procura só pelas classes clássicas
+devolve `nil` numa tela que recusou — e `nil` ali se lê como "salvou", que é o
+veredito oposto. Procure pelo texto, exigindo visibilidade, e tire screenshot: é
+ela que desempata quando a leitura do DOM e o resultado discordam.
 
 ## Regras de segurança
 

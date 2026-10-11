@@ -18,15 +18,21 @@
 module AssetFreshness
   MANIFEST_GLOB = "public/assets/.sprockets-manifest-*.json"
 
-  # node_modules tambem esta em config.assets.paths, mas fica de fora: sao
-  # milhares de arquivos, e o que muda ali vem de package.json, que raramente
-  # muda sozinho.
+  # node_modules tambem esta em config.assets.paths, e e de la que vem o
+  # CodeMirror. A pasta inteira fica de fora porque sao milhares de arquivos,
+  # mas ela nao pode ficar sem vigia: o .yarn-integrity serve de sentinela, ja
+  # que o yarn install o reescreve sempre que mexe na arvore. Um arquivo
+  # registra o que milhares registrariam. O package.json entra pelo mesmo
+  # motivo, para o caso de a faixa mudar antes da instalacao.
   #
   # O Gemfile.lock entra porque as gems que compilam os assets (sprockets,
   # dartsass-sprockets, sass-embedded) mudam a saida sem que fonte algum mude.
   # Sem ele, um upgrade dessas gems roda os feature specs contra o CSS compilado
   # pela versao anterior -- e passa.
-  SOURCE_GLOBS = ["app/assets/**/*", "vendor/assets/**/*", "Gemfile.lock"].freeze
+  SOURCE_GLOBS = [
+    "app/assets/**/*", "vendor/assets/**/*", "Gemfile.lock",
+    "package.json", "node_modules/.yarn-integrity"
+  ].freeze
 
   class << self
     # Roda antes do boot, entao Rails.root ainda nao existe: a raiz vem do
