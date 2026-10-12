@@ -6,7 +6,6 @@ module SharedXlsConcern
   extend ActiveSupport::Concern
 
   def render_course_classes_summary_xls(class_enrollments)
-    Axlsx.escape_formulas = false
     p = Axlsx::Package.new
     wb = p.workbook
     wb.add_worksheet(name: "Pauta da Turma") do |sheet|
