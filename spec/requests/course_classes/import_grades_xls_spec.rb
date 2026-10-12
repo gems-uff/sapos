@@ -914,6 +914,155 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
       expect(inscricao.situation).to eq(ClassEnrollment::DISAPPROVED)
     end
 
+
+    # Mesmo defeito da matricula, na coluna de obs: a exportacao grava "1.50"
+    # como o numero 1.5, e a importacao da mesma planilha, sem mudanca
+    # nenhuma, regrava a obs como "1.5".
+    it "preserva a observacao numerica da pauta que o proprio sistema exportou" do
+      inscricao.update_columns(obs: "1.50")
+      get summary_xls_course_class_path(turma, format: :xlsx)
+      exportada = response.body.dup
+
+      post import_grades_xls_course_class_path(turma),
+        params: { spreadsheet: arquivo_enviado(exportada) }
+      confirmar
+
+      expect(inscricao.reload.obs).to eq("1.50")
+    end
+
+    # A previa marca com "*" a nota recalculada que diverge da informada, mas a
+    # legenda do "*" so aparece quando alguma *situacao* diverge: ela depende
+    # de has_situation_diff, que a coluna de nota nunca liga. Aqui a nota 3,0
+    # com frequencia "I" vira a nota de reprovacao por falta, e a situacao
+    # "Reprovado" da planilha bate com a recalculada.
+    it "explica o asterisco da nota que diverge da informada" do
+      variavel_customizada("grade_of_disapproval_for_absence", "1,0")
+      enviar(inscricao, nota: "3,0", frequencia: ClassEnrollment::ATTENDANCE_FALSE,
+             situacao: ClassEnrollment::DISAPPROVED)
+
+      expect(celulas_da_previa[4]).to include("*")
+      expect(Nokogiri::HTML(response.body).text).to include(
+        I18n.t("xls_content.course_class.import_grades_xls_results.situation_diff_legend")
+      )
+    end
+
+    # O roo e aberto sem `cell_max`, e o laco percorre ate `sheet.last_row`.
+    # Uma celula perdida na linha 100.001 -- uma frequencia arrastada sem
+    # querer -- faz a importacao ler cem mil linhas antes de responder; com a
+    # celula numa coluna distante, cada linha ainda vem com a largura dela, e
+    # um arquivo de 5 KB prende um worker por dezenas de minutos. Nenhuma pauta
+    # tem cem mil alunos: a planilha tem de ser recusada com aviso, sem ser
+    # percorrida.
+    it "recusa com aviso a planilha muito maior que uma pauta" do
+      pacote = Axlsx::Package.new
+      pacote.workbook.add_worksheet(name: "Pauta da Turma") do |sheet|
+        sheet.add_row cabecalho
+        sheet.add_row linha(inscricao, nota: "8,7")
+      end
+      conteudo = mover_segunda_linha(pacote.to_stream.read, para: 100_001)
+
+      post import_grades_xls_course_class_path(turma),
+        params: { spreadsheet: arquivo_enviado(conteudo) }
+
+      expect(response).to redirect_to(import_grades_xls_course_class_path(turma))
+      expect(flash[:error]).to be_present
+    end
+
+    # A previa inteira vai para a sessao, que o ActiveRecordStore grava na
+    # coluna `sessions.data`. Ela e `text`, e em MariaDB TEXT tem 65.535 bytes:
+    # acima disso o commit da sessao levanta SessionOverflowError e o envio
+    # responde 500. O SQLite nao tem o limite, por isso o exemplo mede o
+    # tamanho gravado em vez de esperar o erro.
+    it "cabe na coluna da sessao a previa de uma turma grande" do
+      inscricoes = Array.new(80) { outra_inscricao }
+      obs = "x" * 600
+      post import_grades_xls_course_class_path(turma), params: {
+        spreadsheet: pauta_de_linhas(inscricoes.map { |uma| linha(uma, nota: "8,7", obs: obs) })
+      }
+
+      expect(tamanho_da_sessao).to be < 65_535
+    end
+
+    # A chave da previa e por turma, e quase nenhuma saida a apaga: sair da
+    # tela, ser recusado ou reenviar a deixam la; a expiracao so e conferida na
+    # confirmacao. Previas abandonadas se acumulam ate a sessao estourar, e dai
+    # todo envio responde 500 ate o usuario sair do sistema.
+    it "nao acumula na sessao as previas abandonadas" do
+      13.times do
+        outra_turma = FactoryBot.create(:course_class, course: course)
+        inscricoes = Array.new(10) do
+          FactoryBot.create(:class_enrollment, course_class: outra_turma,
+                            grade: nil, situation: ClassEnrollment::REGISTERED)
+        end
+        post import_grades_xls_course_class_path(outra_turma), params: {
+          spreadsheet: pauta_de_linhas(inscricoes.map { |uma| linha(uma, nota: "8,7", obs: "y" * 400) })
+        }
+        get course_classes_path
+      end
+
+      expect(tamanho_da_sessao).to be < 65_535
+    end
+
+    # A conferencia do token e `params[:token].present? && ...`: um POST sem
+    # token pula a conferencia e grava a previa que estiver na sessao, de
+    # qualquer aba.
+    it "recusa a confirmacao sem token" do
+      enviar(inscricao, nota: "8,7")
+
+      post import_grades_xls_course_class_path(turma), params: { confirm: "1" }
+
+      expect(inscricao.reload.grade).to be_nil
+    end
+
+    # A falha de notificacao vira so a matricula no aviso; a excecao nao vai
+    # para lugar nenhum, e quem investiga o servidor de e-mail nao acha rastro.
+    it "registra no log a excecao do envio de e-mail" do
+      allow(Notifier).to receive(:send_emails).and_raise(Errno::ECONNREFUSED)
+      allow(Rails.logger).to receive(:error).and_call_original
+      enviar(inscricao, nota: "8,7")
+
+      confirmar
+
+      expect(Rails.logger).to have_received(:error).with(/ECONNREFUSED|Connection refused/)
+    end
+
+    # O Excel grava o resultado de formula com 17 digitos significativos.
+    # Medido no Excel: `=MEDIA(6,1;7,3)` aparece como 6,7 na celula e vai para
+    # o arquivo como 6.6999999999999993, que o roo le como 6.699999999999999.
+    # O regex de nota recusa, e a linha sai "Invalida". Media por formula e o
+    # jeito mais comum de chegar a nota final na planilha.
+    it "aceita a nota calculada por formula no Excel" do
+      enviar(inscricao, nota: 6.699999999999999)
+      confirmar
+
+      expect(inscricao.reload.grade).to eq(67)
+    end
+
+    def tamanho_da_sessao
+      ActiveRecord::Base.connection.select_value(
+        "SELECT MAX(LENGTH(data)) FROM sessions"
+      ).to_i
+    end
+
+    # Leva a segunda linha da aba para a linha `para`, reescrevendo o XML: o
+    # axlsx nao deixa pular linha, e gerar cem mil linhas vazias so para
+    # chegar la tornaria o exemplo lento.
+    def mover_segunda_linha(conteudo, para:)
+      entrada = Zip::File.open_buffer(StringIO.new(conteudo))
+      saida = Zip::OutputStream.write_buffer do |zip|
+        entrada.each do |parte|
+          texto = parte.get_input_stream.read
+          if parte.name == "xl/worksheets/sheet1.xml"
+            texto = texto.gsub('<row r="2"', %(<row r="#{para}"))
+              .gsub(/r="([A-Z]+)2"/) { %(r="#{$1}#{para}") }
+          end
+          zip.put_next_entry(parte.name)
+          zip.write(texto)
+        end
+      end
+      saida.string
+    end
+
     # A coluna "Obs." da previa passou a mostrar so os erros de validacao, e o
     # `final_obs` saiu da celula: a observacao que a planilha traz -- e que a
     # confirmacao grava -- nao aparece mais em lugar nenhum da previa.

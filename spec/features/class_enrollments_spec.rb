@@ -316,6 +316,70 @@ RSpec.describe "ClassEnrollments features", type: :feature do
 
       expect(page.find(".situation-input").value).to eq(ClassEnrollment::APPROVED)
     end
+
+    # Desmarcar "nao contabilizar" devolve a situacao ao calculo pela nota: o
+    # handler dispara `input` na nota, e 1,0 fica abaixo do minimo.
+    it "recomputes the situation when grade not counting in GPR is unchecked" do
+      find(:css, ".grade_not_count_in_gpr-input").set(false)
+
+      expect(page).to have_field(class: "situation-input", with: ClassEnrollment::DISAPPROVED)
+    end
+
+    # Estes falham. O handler de input poe "Incompleto" assim que o campo
+    # fica vazio, antes de chegar a guarda do grade_not_count_in_gpr, e o
+    # handler de falta troca a nota mas deixa a guarda manter "Aprovado".
+    # Controle: com o ramo de campo vazio depois da guarda, e com o handler de
+    # falta pondo "Reprovado" ao trocar a nota, passam.
+    context "defeitos em aberto" do
+      # Apagar a nota de uma convalidacao nao desfaz a aprovacao: "Aprovado"
+      # sem nota e valido quando a nota nao conta no CR, e "Atualizar" gravaria
+      # "Incompleto".
+      it "keeps the situation chosen by the secretary when the grade is cleared" do
+        page.execute_script(
+          "var e = document.querySelector('.grade-input'); e.focus(); e.select();"
+        )
+        page.find(".grade-input").send_keys(:backspace)
+        expect(page).to have_field("Nota", with: "")
+
+        expect(page.find(".situation-input").value).to eq(ClassEnrollment::APPROVED)
+      end
+
+      # Marcar falta leva a nota a de reprovacao por falta, mas a situacao fica
+      # "Aprovado", e o save e recusado por
+      # disapproved_by_absence_for_situation_aproved.
+      it "sets Reprovado when disapproved by absence is checked" do
+        accept_confirm do
+          find(:css, ".disapproved_by_absence-input").set(true)
+        end
+
+        expect(page).to have_field(class: "situation-input", with: ClassEnrollment::DISAPPROVED)
+      end
+    end
+  end
+
+  # Este falha. Aberto em pagina cheia -- nova aba, ou URL direta --, o
+  # formulario da inscricao nao esta dentro de um <tr>; o handler de falta
+  # procura a nota por `closest("tr")`, nao acha, e quebra com TypeError. Na
+  # main ele achava o campo pelo id, e a nota de reprovacao por falta era
+  # preenchida. Controle: com o class_enrollments.js da main, passa.
+  describe "full page edit form", js: true do
+    before(:each) do
+      @destroy_later << @em_pagina_cheia = FactoryBot.create(
+        :class_enrollment, enrollment: @enrollment4, course_class: @course_class4,
+        grade: nil, situation: ClassEnrollment::REGISTERED
+      )
+      login_as(@user)
+      visit "#{url_path}/#{@em_pagina_cheia.id}/edit"
+      expect(page).to have_css(".as_form .grade-input")
+    end
+
+    context "defeitos em aberto" do
+      it "fills the grade of disapproval when disapproved by absence is checked" do
+        find(:css, ".disapproved_by_absence-input").set(true)
+
+        expect(page).to have_field("Nota", with: /\d/)
+      end
+    end
   end
 
   describe "edit page", js: true do
