@@ -22,6 +22,6 @@
 
 <script>
   $(document).ready(function() {
-    carrierwave_webcam(".webcam-photo");
+    carrierwave_webcam("[data-id='<%= options[:id] %>']");
   });
 </script>
