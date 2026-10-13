@@ -33,9 +33,9 @@
     </script>
     <%= yield %>
   <% else %>
-    <div id='container' class='<%= signed_in_class %>'>
-      <div id='header'>
-        <div id='logo'>
+    <div id="container" class="<%= signed_in_class %>">
+      <div id="header">
+        <div id="logo">
           <%= link_to root_path do %>
             <%= image_tag 'logoSapos.png' %>
           <% end %>
@@ -56,13 +56,16 @@
           </div>
         </div>
       </div>
-      <span class="notice"><%= notice %></span>
-      <div id='top_navigation' <%= display_none_if_logged_out %>>
+      <% flash.each do |type, message| %>
+        <% next if message.blank? %>
+        <span class="notice notice-<%= type %>"><%= message %></span>
+      <% end %>
+      <div id="top_navigation" <%= display_none_if_logged_out %>>
         <%= optional_navigation level: 1 %>
       </div>
-      <div id='main'>
-        <div id='sub_navigation' <%= display_none_if_logged_out %>><%= optional_navigation level: 2 %></div>
-        <div id='content'>
+      <div id="main">
+        <div id="sub_navigation" <%= display_none_if_logged_out %>><%= optional_navigation level: 2 %></div>
+        <div id="content">
           <%= yield %>
         </div>
       </div>
