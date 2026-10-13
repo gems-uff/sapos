@@ -72,6 +72,12 @@ uma delas mudar no meio do ciclo — rota acrescentada, rota removida —, captu
 um caminho fora do repositório) e só então adote a nova. Sem isso a comparação
 acusa a rota que você mexeu, misturada com o que ela deveria medir.
 
+**A réplica padrão vem sem a tabela `versions`**: o `migrate.sh` do servidor só
+a copia com o parâmetro `full`. Mudança que lê o paper_trail — migration que
+reconstrói histórico a partir das versões, tela de log — homologada sobre a
+réplica padrão roda sobre tabela vazia e passa sem medir nada. Peça ao
+mantenedor a réplica `full` antes do passo 1.
+
 ### Onde as capturas ficam
 
 Tudo mora em `~/capturas-sapos-staging/`, **fora do repositório** (contêm dado
