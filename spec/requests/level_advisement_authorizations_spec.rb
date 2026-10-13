@@ -151,6 +151,48 @@ RSpec.describe "Credenciamentos pelo subform de Nível", type: :request do
     end
   end
 
+  # Reprodução aberta na revisão do PR #690: vermelha até o conserto. A data de
+  # término inconvertível, que o modelo já recusa, passa quando chega numa
+  # linha NOVA do subform. O date_picker do active_scaffold converte a entrada
+  # para nil e anota um :invalid, mas a linha nova é validada de novo antes de
+  # gravar -- pelo writer da associação na edição, pelo valid? do Nível na
+  # criação --, e esse valid? limpa o erro. O validates_date então vê nil, que
+  # o allow_blank aceita, e grava um credenciamento em aberto: o oposto do que
+  # quem digitou queria. A tela própria de credenciamentos e a linha já
+  # existente do subform recusam a mesma entrada.
+  describe "data de término inconvertível numa linha nova" do
+    ["31/02/2026", "2020", "banana"].each do |entrada|
+      it "não cria o Nível com o período em aberto: #{entrada.inspect}" do
+        post levels_path, params: {
+          record: {
+            name: "Nível da sonda",
+            default_duration: "24",
+            advisement_authorizations: {
+              "1000" => periodo(Date.new(2020, 1, 1), nil).merge(end_date: entrada)
+            }
+          }
+        }
+
+        expect(AdvisementAuthorization.where(professor: @professor)).to be_empty
+      end
+
+      it "não acrescenta ao Nível o período em aberto: #{entrada.inspect}" do
+        level = FactoryBot.create(:level)
+        put level_path(level), params: {
+          record: {
+            name: level.name,
+            default_duration: level.default_duration.to_s,
+            advisement_authorizations: {
+              "1000" => periodo(Date.new(2020, 1, 1), nil).merge(end_date: entrada)
+            }
+          }
+        }
+
+        expect(AdvisementAuthorization.where(professor: @professor)).to be_empty
+      end
+    end
+  end
+
   # A main não tinha regra de unicidade, e a migration que criou as datas
   # deixou abertas todas as linhas antigas. Duas linhas do mesmo professor e
   # nível viram dois períodos abertos sobrepostos, gravados sem passar pela
