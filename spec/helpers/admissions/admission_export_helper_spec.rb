@@ -46,4 +46,13 @@ RSpec.describe Admissions::AdmissionExportHelper, type: :helper do
     xlsx.default_sheet = "admission_processes"
     expect(xlsx.row(1)).to include("level__name", "enrollment_status__name")
   end
+
+  it "keeps values starting with = as plain text, not formulas" do
+    process = FactoryBot.create(:admission_process, name: "=SOMA(1;2)")
+
+    xlsx = open_edital_xlsx(described_class.export_zip(process))
+
+    xlsx.default_sheet = "admission_processes"
+    expect(xlsx.row(2)[xlsx.row(1).index("name")]).to eq("=SOMA(1;2)")
+  end
 end

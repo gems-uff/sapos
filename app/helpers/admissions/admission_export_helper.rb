@@ -148,19 +148,15 @@ module Admissions::AdmissionExportHelper
 
   # --- Spreadsheet building ------------------------------------------------
 
+  # Every row is added with escape_formulas: true. Without it caxlsx writes a :string
+  # value starting with "=" as a formula, and the value is lost on import (e.g. the
+  # "=" of a form condition). Escaped, it is stored as a plain string, byte for byte.
   def build_xlsx(process, data, long_values, exported_at)
-    previous_escape = Axlsx.escape_formulas
-    # Keep cell values byte-for-byte (no leading-quote injection on "=", "+", "-", "@")
-    # so the spreadsheet round-trips losslessly. Cells are written as :string anyway,
-    # so Excel never evaluates them as formulas.
-    Axlsx.escape_formulas = false
     package = Axlsx::Package.new
     workbook = package.workbook
     add_meta_sheet(workbook, process, data, exported_at)
     table_definitions(data).each { |definition| add_table_sheet(workbook, definition, long_values) }
     package.to_stream.read
-  ensure
-    Axlsx.escape_formulas = previous_escape
   end
 
   # One descriptor per worksheet: which table becomes which sheet, with which records.
@@ -192,6 +188,7 @@ module Admissions::AdmissionExportHelper
       table_definition("filled_form_field_scholarities", Admissions::FilledFormFieldScholarity, data[:filled_form_field_scholarities]),
       table_definition("admission_applications", Admissions::AdmissionApplication, data[:admission_applications],
         "student__name" => ->(r) { r.student&.name },
+        "student__cpf" => ->(r) { r.student&.cpf },
         "enrollment__number" => ->(r) { r.enrollment&.enrollment_number }),
       table_definition("letter_requests", Admissions::LetterRequest, data[:letter_requests]),
       table_definition("admission_phase_evaluations", Admissions::AdmissionPhaseEvaluation, data[:admission_phase_evaluations],
@@ -212,7 +209,7 @@ module Admissions::AdmissionExportHelper
 
   def add_meta_sheet(workbook, process, data, exported_at)
     workbook.add_worksheet(name: "meta") do |sheet|
-      sheet.add_row(%w[key value], types: %i[string string])
+      sheet.add_row(%w[key value], types: %i[string string], escape_formulas: true)
       rows = {
         "format_version" => FORMAT_VERSION,
         "exported_at" => exported_at.iso8601,
@@ -221,7 +218,7 @@ module Admissions::AdmissionExportHelper
         "admission_process_title" => process.title,
       }
       data.each { |key, records| rows["count__#{key}"] = records.size }
-      rows.each { |key, value| sheet.add_row([key, value.to_s], types: %i[string string]) }
+      rows.each { |key, value| sheet.add_row([key, value.to_s], types: %i[string string], escape_formulas: true) }
     end
   end
 
@@ -231,7 +228,7 @@ module Admissions::AdmissionExportHelper
     header = columns + extras.keys
     string_types = Array.new(header.size, :string)
     workbook.add_worksheet(name: sheet_name(definition[:name])) do |sheet|
-      sheet.add_row(header, types: string_types)
+      sheet.add_row(header, types: string_types, escape_formulas: true)
       definition[:records].each do |record|
         row = columns.map do |column|
           cell_value(serialize_cell(record, column), definition[:name], record, column, long_values)
@@ -239,7 +236,7 @@ module Admissions::AdmissionExportHelper
         extras.each do |key, getter|
           row << cell_value(stringify(getter.call(record)), definition[:name], record, key, long_values)
         end
-        sheet.add_row(row, types: string_types)
+        sheet.add_row(row, types: string_types, escape_formulas: true)
       end
     end
   end
