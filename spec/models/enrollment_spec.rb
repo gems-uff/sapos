@@ -113,6 +113,17 @@ RSpec.describe Enrollment, type: :model do
         # o `reject`. Medido nos dois lados: recusam igual. Este exemplo cobre
         # quem marque para destruicao em Ruby -- hoje, defesa, nao um fluxo de
         # tela conhecido.
+        # Decisão da revisão do PR #690: desligamento não isenta da regra, que
+        # passa a ser avaliada na data dele. Aqui o credenciamento acabou antes
+        # de o aluno sair.
+        it "the enrollment is dismissed after the only advisor's accreditation had ended" do
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level,
+                                                    start_date: @admission_date - 1.year, end_date: @admission_date + 10.days)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: @admission_date + 4.years)
+          expect(enrollment).to have_error(:no_advisor_with_level).on :base
+        end
         it "the only advisor with authorization was marked for destruction" do
           authorized = FactoryBot.build(:professor)
           authorized.advisement_authorizations.build(level: enrollment.level, start_date: Date.current)
@@ -141,12 +152,16 @@ RSpec.describe Enrollment, type: :model do
           enrollment.advisements.build(professor: professor, main_advisor: true)
           expect(enrollment).to have(0).errors_on :base
         end
-        it "the enrollment is dismissed even though the only advisor's authorization has been closed" do
+        # Decisão da revisão do PR #690: em matrícula desligada a regra é
+        # avaliada na data do desligamento, não hoje. O irmão deste exemplo,
+        # com o desligamento depois do fim do credenciamento, está no contexto
+        # de erro acima.
+        it "the enrollment is dismissed and the advisor was accredited on the dismissal date, though closed since" do
           professor = FactoryBot.build(:professor)
           professor.advisement_authorizations.build(level: enrollment.level,
-                                                    start_date: Date.current - 2.days, end_date: Date.current - 1.day)
+                                                    start_date: @admission_date - 1.year, end_date: @admission_date + 10.days)
           enrollment.advisements.build(professor: professor, main_advisor: true)
-          enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: @admission_date + 4.years)
+          enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: @admission_date + 5.days)
           expect(enrollment).to have(0).errors_on :base
         end
       end
