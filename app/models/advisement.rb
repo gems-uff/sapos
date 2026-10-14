@@ -101,14 +101,17 @@ class Advisement < ApplicationRecord
   def enrollment_has_authorized_advisor
     return unless CustomVariable.enable_advisor_accreditation_validation
     return if enrollment.blank? || enrollment.level.blank?
-    # Aluno desligado não tem orientação em curso: não faz sentido exigir
-    # credenciamento vigente do orientador, que pode ter sido encerrado depois.
-    return if enrollment.dismissal.present?
-    return if professor.present? && professor.accredited_on?(enrollment.level)
+    date = enrollment.advisor_accreditation_date
+    return if professor.present? && professor.accredited_on?(enrollment.level, date)
 
+    # enrollment.advisements relê do banco, e lá a orientação em edição ainda
+    # tem o professor antigo -- sem a substituição, ele é quem satisfaz a
+    # regra, e trocar o único orientador credenciado por um não credenciado
+    # passa sem erro. Mesma substituição de enrollment_has_main_advisor, acima.
     advisements = enrollment.advisements.reject(&:marked_for_destruction?)
+    advisements = advisements.map { |a| a == self ? self : a }
     has_authorized = advisements.any? do |a|
-      a.professor.present? && a.professor.accredited_on?(enrollment.level)
+      a.professor.present? && a.professor.accredited_on?(enrollment.level, date)
     end
 
     errors.add(:base, :no_advisor_with_level) unless has_authorized

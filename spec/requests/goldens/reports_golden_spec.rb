@@ -137,7 +137,7 @@ RSpec.describe "Saídas em PDF e XLSX", type: :request do
   describe "relatório de orientações" do
     before(:each) do
       # Sem o credenciamento no nível da matrícula o Advisement é inválido
-      # ("Ao menos um orientador deve ter credenciamento no nível da matrícula").
+      # (erro no_advisor_with_level).
       FactoryBot.create(
         :advisement_authorization, professor: @professor, level: @level
       )
