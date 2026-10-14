@@ -39,18 +39,18 @@ class CourseClassesController < ApplicationController
 
     config.list.sorting = { name: "ASC", id: "DESC" }
     config.list.columns = [
-      :name, :course, :professor, :year, :semester, :class_enrollments_count
+      :name, :course, :professors, :year, :semester, :class_enrollments_count
     ]
     config.show.columns = [
-      :year, :semester, :name, :course, :professor, :allocations,
+      :year, :semester, :name, :course, :professors, :allocations,
       :class_enrollments_count, :class_enrollments, :enrollments
     ]
     config.create.columns = [
-      :name, :course, :professor, :year, :semester, :obs_schedule,
+      :name, :course, :professors, :year, :semester, :obs_schedule,
       :not_schedulable, :allocations
     ]
     config.update.columns = [
-      :name, :course, :professor, :year, :semester, :obs_schedule,
+      :name, :course, :professors, :year, :semester, :obs_schedule,
       :not_schedulable, :class_enrollments, :allocations
     ]
 
@@ -58,18 +58,21 @@ class CourseClassesController < ApplicationController
 
     config.actions.swap :search, :field_search
     config.field_search.columns = [
-      :name, :year, :semester, :professor, :course, :enrollments
+      :name, :year, :semester, :professors, :course, :enrollments
     ]
 
-    config.columns[:professor].search_sql = "professors.name"
-    config.columns[:professor].search_ui = :text
+    config.columns[:professors].includes = [:professors]
+    config.columns[:course].includes = [:course]
+
+    config.columns[:professors].search_sql = "professors.name"
+    config.columns[:professors].search_ui = :text
     config.columns[:course].search_sql = "courses.name"
     config.columns[:course].search_ui = :text
     config.columns[:name].search_ui = :text
     config.columns[:enrollments].search_ui = :record_select
     config.columns[:course].form_ui = :record_select
     config.columns[:course].options[:params] = { available: true }
-    config.columns[:professor].form_ui = :record_select
+    config.columns[:professors].form_ui = :record_select
     config.columns[:year].form_ui = :select
     config.columns[:semester].form_ui = :select
     config.columns[:semester].options = {

@@ -38,7 +38,7 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
     before(:all) do
       @destroy_all = []
       @course = FactoryBot.create(:course, course_type: @course_type)
-      @course_class = prepare_course_class([[0, 9, 11], [2, 9, 11]], @destroy_all, course: @course, professor: @professor)
+      @course_class = prepare_course_class([[0, 9, 11], [2, 9, 11]], @destroy_all, course: @course, professors: [@professor])
       @enrollment = FactoryBot.create(
         :enrollment,
         level: @level,
@@ -147,7 +147,7 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
               :must_represent_the_same_enrollment_and_class).on :class_enrollment
           end
           it "class_enrollment is associated to a different course_class" do
-            @destroy_later << course_class_other = FactoryBot.create(:course_class, professor: @professor)
+            @destroy_later << course_class_other = FactoryBot.create(:course_class, professors: [@professor])
             class_enrollment_request.status = ClassEnrollmentRequest::EFFECTED
             @destroy_later << class_enrollment_request.class_enrollment = FactoryBot.create(
               :class_enrollment, enrollment: @enrollment, course_class: course_class_other)
@@ -198,12 +198,12 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
           expect(class_enrollment_request.allocations).to eq("")
         end
         it "should return an empty string when course class does not have allocations" do
-          class_enrollment_request.course_class = prepare_course_class([], @destroy_later, professor: @professor)
+          class_enrollment_request.course_class = prepare_course_class([], @destroy_later, professors: [@professor])
           expect(class_enrollment_request.allocations).to eq("")
         end
         it "should return a semicolon separated string when course class has allocations" do
           days = I18n.translate("date.day_names")
-          class_enrollment_request.course_class = prepare_course_class([[0, 9, 11], [2, 14, 16]], @destroy_later, professor: @professor)
+          class_enrollment_request.course_class = prepare_course_class([[0, 9, 11], [2, 14, 16]], @destroy_later, professors: [@professor])
           expect(class_enrollment_request.allocations).to eq("#{days[0]} (9-11); #{days[2]} (14-16)")
         end
       end
@@ -212,16 +212,18 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
           class_enrollment_request.course_class = nil
           expect(class_enrollment_request.professor).to eq(nil)
         end
-        it "should return nil when the professor of the course class is nil" do
-          course_class = prepare_course_class([], @destroy_later, professor: @professor)
-          course_class.professor = nil
+        it "should return an empty string when the course class does not have professors" do
+          # nome anterior do teste should return nil when the professor of the course class is nil
+          # nome atual do teste should return an empty string when the course class does not have professors
+          course_class = prepare_course_class([], @destroy_later, professors: [@professor])
+          course_class.professors = []
           class_enrollment_request.course_class = course_class
-          expect(class_enrollment_request.professor).to eq(nil)
+          expect(class_enrollment_request.professor).to eq("")
         end
         it "should return the name of the professor of the course class" do
           professor = FactoryBot.build(:professor)
-          course_class = prepare_course_class([], @destroy_later, professor: @professor)
-          course_class.professor = professor
+          course_class = prepare_course_class([], @destroy_later, professors: [@professor])
+          course_class.professors = [professor]
           class_enrollment_request.course_class = course_class
           expect(class_enrollment_request.professor).to eq(professor.to_label)
         end
@@ -261,9 +263,9 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
       @destroy_all << course_effected = FactoryBot.create(:course, course_type: @course_type)
       @destroy_all << course_invalid = FactoryBot.create(:course, course_type: @course_type)
       @destroy_all << course_valid = FactoryBot.create(:course, course_type: @course_type)
-      @destroy_all << course_class_effected = FactoryBot.create(:course_class, course: course_effected, professor: @professor)
-      @destroy_all << course_class_invalid = FactoryBot.create(:course_class, course: course_invalid, professor: @professor)
-      @destroy_all << course_class_valid = FactoryBot.create(:course_class, course: course_valid, professor: @professor)
+      @destroy_all << course_class_effected = FactoryBot.create(:course_class, course: course_effected, professors: [@professor])
+      @destroy_all << course_class_invalid = FactoryBot.create(:course_class, course: course_invalid, professors: [@professor])
+      @destroy_all << course_class_valid = FactoryBot.create(:course_class, course: course_valid, professors: [@professor])
       @destroy_all << class_enrollment = FactoryBot.create(
         :class_enrollment, enrollment: enrollment, course_class: course_class_effected)
       @destroy_all << enrollment_request = FactoryBot.build(:enrollment_request, enrollment: enrollment)

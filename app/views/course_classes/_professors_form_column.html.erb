@@ -1,0 +1,20 @@
+<dl>
+    <dt>
+        <label for="record_professors_<%= record.id %>"><%= t('activerecord.attributes.course_class.professors') %></label>
+    </dt>
+    <dd>
+        <% options ||= active_scaffold_input_options(column, scope) %>
+        <% options[:object] = record %>
+        <% if can?(:post_grades, record) && cannot?(:update_all_fields, record) %>
+            <% record.professors.each do |professor| %>
+                <ul class="unstyled">
+                    <li>
+                        <p><%= professor.name %></p>
+                    </li>
+                </ul>
+            <% end %>
+        <% else %>
+            <%= active_scaffold_input_for(active_scaffold_config.columns[:professors], record, options) %>
+        <% end %>
+    </dd>
+</dl>

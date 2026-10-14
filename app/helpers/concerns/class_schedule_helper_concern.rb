@@ -64,14 +64,12 @@ module ClassScheduleHelperConcern
         end
         star = true
       end
-
-      course[-1] = rescue_blank_text(course_class.professor, method_call: :name)
+      course[-1] = rescue_blank_text(course_class.professors_elements, method_call: :name)
       if ! course_type.on_demand || keep_on_demand
         table_data << course
       else
-        (
-          on_demand_professors[course_class.course_id] ||= []
-        ) << course_class.professor
+        on_demand_professors[course_class.course_id] ||= []
+        on_demand_professors[course_class.course_id] += course_class.professors
       end
     end
 

@@ -56,13 +56,13 @@ RSpec.describe "CourseClasses features", type: :feature do
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status)
 
-    @destroy_all << FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: 2022, semester: 1)
-    @destroy_all << FactoryBot.create(:course_class, name: "Algebra", course: @course1, professor: @professor1, year: 2022, semester: 2)
-    @destroy_all << FactoryBot.create(:course_class, name: "Algebra", course: @course2, professor: @professor1, year: 2021, semester: 2)
-    @destroy_all << @course_class4 = FactoryBot.create(:course_class, name: "Versionamento", course: @course3, professor: @professor2, year: 2022, semester: 2)
-    @destroy_all << @record = FactoryBot.create(:course_class, name: "Defesa", course: @course4, professor: @professor3, year: 2022, semester: 2)
-    @destroy_all << FactoryBot.create(:course_class, name: "Mineração de Repositórios", course: @course5, professor: @professor2, year: 2022, semester: 2)
-    @destroy_all << FactoryBot.create(:course_class, name: "Pesquisa", course: @course6, professor: @professor3, year: 2022, semester: 2)
+    @destroy_all << FactoryBot.create(:course_class, name: "Algebra", course: @course1, professors: [@professor1], year: 2022, semester: 1)
+    @destroy_all << FactoryBot.create(:course_class, name: "Algebra", course: @course1, professors: [@professor1], year: 2022, semester: 2)
+    @destroy_all << FactoryBot.create(:course_class, name: "Algebra", course: @course2, professors: [@professor1], year: 2021, semester: 2)
+    @destroy_all << @course_class4 = FactoryBot.create(:course_class, name: "Versionamento", course: @course3, professors: [@professor2], year: 2022, semester: 2)
+    @destroy_all << @record = FactoryBot.create(:course_class, name: "Defesa", course: @course4, professors: [@professor3], year: 2022, semester: 2)
+    @destroy_all << FactoryBot.create(:course_class, name: "Mineração de Repositórios", course: @course5, professors: [@professor2], year: 2022, semester: 2)
+    @destroy_all << FactoryBot.create(:course_class, name: "Pesquisa", course: @course6, professors: [@professor3], year: 2022, semester: 2)
 
     @destroy_all << FactoryBot.create(:class_enrollment, enrollment: @enrollment1, course_class: @course_class4)
   end
@@ -85,7 +85,7 @@ RSpec.describe "CourseClasses features", type: :feature do
     it "should show table" do
       expect(page).to have_content "Turmas"
       expect(page.all("tr th").map(&:text)).to eq [
-        "Nome", "Disciplina", "Professor", "Ano", "Semestre", "Alunos Inscritos", ""
+        "Nome", "Disciplina", "Professores", "Ano", "Semestre", "Alunos Inscritos", ""
       ]
     end
 
@@ -109,7 +109,7 @@ RSpec.describe "CourseClasses features", type: :feature do
         find(:select, "record_year_").find(:option, text: YearSemester.current.year.to_s).select_option
         find(:select, "record_semester_").find(:option, text: YearSemester.current.semester.to_s).select_option
       end
-      fill_record_select("professor_", "professors", "Helena")
+      fill_record_select("professors_", "professors", "Helena")
       fill_record_select("course_", "courses", "Programação")
       click_button_and_wait "Salvar"
       expect(page).to have_no_css(".as_form")
@@ -131,7 +131,7 @@ RSpec.describe "CourseClasses features", type: :feature do
     end
 
     it "should have a record_select widget for professors" do
-      expect_to_have_record_select(page, "professor_", "professors")
+      expect_to_have_record_select(page, "professors_", "professors")
     end
 
     it "should have a record_select widget for courses" do

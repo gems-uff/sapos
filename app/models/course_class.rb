@@ -8,7 +8,10 @@ class CourseClass < ApplicationRecord
   has_paper_trail
 
   belongs_to :course, optional: false
-  belongs_to :professor, optional: false
+  has_many :course_class_professors, dependent: :destroy
+  has_many :professors, through: :course_class_professors,
+    before_add: :mark_professors_changed,
+    before_remove: :mark_professors_changed
 
   has_many :class_enrollments, dependent: :destroy
   has_many :class_enrollment_requests, dependent: :destroy
@@ -17,7 +20,6 @@ class CourseClass < ApplicationRecord
   has_many :enrollment_requests, through: :class_enrollment_requests
 
   validates :course, presence: true
-  validates :professor, presence: true
   validates :year, presence: true
   validates :semester,
     presence: true,
@@ -25,6 +27,7 @@ class CourseClass < ApplicationRecord
   validate :professor_changed_only_valid_fields,
     if: -> { can?(:post_grades, self) && cannot?(:update_all_fields, self) }
 
+  validate :must_have_at_least_one_professor
 
   attr_reader :changed_from_course_class
   before_save :set_changed_from_course_class
@@ -63,6 +66,23 @@ class CourseClass < ApplicationRecord
   def class_enrollments_count
     self.class_enrollments.count
   end
+
+  def professors_names
+    self.professors.map(&:name).join(", ")
+  end
+
+  def professors_emails
+    self.professors.map(&:email).join(", ")
+  end
+
+  def professors_ids
+    self.professors.map(&:id)
+  end
+
+  def professors_elements
+    self.professors.to_a
+  end
+
 
   def name_with_class
     append_obs_schedule = ""
@@ -106,7 +126,10 @@ class CourseClass < ApplicationRecord
       .and(course_type_arel[:schedulable].eq(true)))
 
       if user.professor.present?
-        query = query.where(course_class_arel[:professor_id].eq(user.professor.id))
+        course_class_professors_arel = CourseClassProfessor.arel_table.dup
+        query = query.join(course_class_professors_arel)
+        .on(course_class_arel[:id].eq(course_class_professors_arel[:course_class_id]))
+        .where(course_class_professors_arel[:professor_id].eq(user.professor.id))
       end
 
       return [course_class_arel[:id].in(query.project(course_class_arel[:id])).to_sql]
@@ -119,11 +142,27 @@ class CourseClass < ApplicationRecord
       campos_modificaveis = []
       campos_modificados  = self.changed
 
+      if professors_association_changed?
+        campos_modificados = campos_modificados + ["professors"]
+      end
+
       campos_modificados.each do |campo_modificado|
         if !campos_modificaveis.include?(campo_modificado)
           errors.add(:base, :changes_to_disallowed_fields)
         end
       end
+    end
+
+    def professors_association_changed?
+      @professors_association_changed == true
+    end
+
+    def mark_professors_changed(*)
+      @professors_association_changed = true
+    end
+
+    def must_have_at_least_one_professor
+      errors.add(:professors, :blank) if professors.empty?
     end
 
     delegate :can?, :cannot?, to: :ability
