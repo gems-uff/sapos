@@ -9,7 +9,9 @@ class CourseClass < ApplicationRecord
 
   belongs_to :course, optional: false
   has_many :course_class_professors, dependent: :destroy
-  has_many :professors, through: :course_class_professors
+  has_many :professors, through: :course_class_professors,
+    before_add: :mark_professors_changed,
+    before_remove: :mark_professors_changed
 
   has_many :class_enrollments, dependent: :destroy
   has_many :class_enrollment_requests, dependent: :destroy
@@ -142,11 +144,23 @@ class CourseClass < ApplicationRecord
       campos_modificaveis = []
       campos_modificados  = self.changed
 
+      if professors_association_changed?
+        campos_modificados = campos_modificados + ["professors"]
+      end
+
       campos_modificados.each do |campo_modificado|
         if !campos_modificaveis.include?(campo_modificado)
           errors.add(:base, :changes_to_disallowed_fields)
         end
       end
+    end
+
+    def professors_association_changed?
+      @professors_association_changed == true
+    end
+
+    def mark_professors_changed(*)
+      @professors_association_changed = true
     end
 
     def must_have_at_least_one_professor
