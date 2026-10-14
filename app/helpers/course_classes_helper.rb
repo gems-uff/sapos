@@ -60,14 +60,6 @@ module CourseClassesHelper
     record_select_field :course, record.course || Course.new, options
   end
 
-  def professor_form_column(record, options)
-    if can?(:post_grades, record) && cannot?(:update_all_fields, record)
-      options[:disabled] = true
-    end
-    column = active_scaffold_config.columns[:professors]
-    active_scaffold_input_select(column, record, options)
-  end
-
   def year_form_column(record, options)
     if can?(:post_grades, record) && cannot?(:update_all_fields, record)
       options[:disabled] = true
