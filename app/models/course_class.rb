@@ -80,9 +80,7 @@ class CourseClass < ApplicationRecord
   end
 
   def professors_elements
-    self.professors.map do |professor|
-      professor
-    end
+    self.professors.to_a
   end
 
 
