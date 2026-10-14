@@ -67,7 +67,7 @@ RSpec.describe AdvisementAuthorization, type: :model do
         other = AdvisementAuthorization.new(professor: nil, level: nil, start_date: Date.current, end_date: nil)
         other.valid?
         expect(other.errors[:base]).not_to include(
-          I18n.t("activerecord.errors.models.advisement_authorization.overlapping_authorization")
+          I18n.t("activerecord.errors.models.advisement_authorization.overlapping_period")
         )
       end
     end

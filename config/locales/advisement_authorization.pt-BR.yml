@@ -18,7 +18,7 @@ pt-BR:
     errors:
       models:
         advisement_authorization:
-          overlapping_authorization: "Já existe um credenciamento deste orientador neste nível que se sobrepõe a este período"
+          overlapping_period: "Já existe um credenciamento deste orientador neste nível que se sobrepõe a este período"
           attributes:
             end_date:
               on_or_after: "não pode ser anterior à Data de credenciamento"

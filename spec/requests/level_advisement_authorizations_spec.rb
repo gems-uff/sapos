@@ -138,6 +138,22 @@ RSpec.describe "Credenciamentos pelo subform de Nível", type: :request do
       end
     end
 
+    # Trocar o professor de uma linha e lançar, para o professor antigo, outra
+    # com as mesmas datas, no mesmo envio. A cópia no banco da linha que saiu
+    # do professor ainda é dele, e não pode acusar sobreposição: o que diz se
+    # a linha foi tocada tem de olhar o subform inteiro, não só as linhas que
+    # já são do professor novo.
+    it "troca o professor de uma linha e reaproveita as datas para o antigo" do
+      outro = FactoryBot.create(:professor)
+      atualizar_nivel([
+        periodo(Date.new(2020, 1, 1), Date.new(2020, 12, 31), id: @existente.id).merge(professor: outro.id.to_s),
+        periodo(Date.new(2020, 1, 1), Date.new(2020, 12, 31))
+      ])
+
+      expect(@existente.reload.professor).to eq(outro)
+      expect(AdvisementAuthorization.where(professor: @professor, level: @level).count).to eq(1)
+    end
+
     # Remover um período e lançar outro que ocupa as mesmas datas, na mesma
     # submissão: a linha removida não pode barrar a nova.
     it "troca um período por outro que ocupa as mesmas datas" do

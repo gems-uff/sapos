@@ -12,3 +12,8 @@ pt-BR:
       program_level:
         one: Conceito CAPES
         other: Conceito CAPES
+
+    errors:
+      models:
+        program_level:
+          overlapping_period: "Já existe um conceito CAPES que se sobrepõe a este período"
