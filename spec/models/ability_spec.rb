@@ -372,7 +372,7 @@ RSpec.describe Ability, type: :model do
     # hence the stub before the subject is first touched.
     describe "posting grades" do
       def course_class_for(professor, year:, semester:)
-        CourseClass.new(professor: professor, year: year, semester: semester)
+        CourseClass.new(professors: [professor], year: year, semester: semester)
       end
 
       before(:each) do
