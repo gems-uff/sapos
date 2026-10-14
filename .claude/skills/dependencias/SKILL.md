@@ -1,6 +1,6 @@
 ---
 name: dependencias
-description: Decide como declarar uma gem no Gemfile e como conduzir uma atualização de dependências. Use ao adicionar gem, mexer em restrição de versão, avaliar se um pin ainda se justifica, ou planejar uma campanha de atualização (patch, minor, piso de segurança).
+description: Decide como declarar uma gem no Gemfile e como conduzir uma atualização de dependências. Use ao adicionar gem, mexer em restrição de versão, avaliar se um pin ainda se justifica, ou planejar uma campanha de atualização (patch, minor, correção de CVE).
 ---
 
 # Dependências: declarar e atualizar
@@ -49,16 +49,19 @@ e nada mais.
 |---|---|---|
 | só o nome | `gem "prawn"` | sem política; quem manda é o lock |
 | `~> x.y.z` | `rails "~> 7.2.3"` | série minor travada, patch livre |
-| `~> x.y` + `>= x.y.z` | `devise "~> 5.0", ">= 5.0.4"` | major adotado; piso registrado |
-| `>= x` sem teto | `nokogiri ">= 1.18.9"` | piso de segurança, teto nenhum |
+| `~> x.y` | `devise "~> 5.0"` | major adotado; o próximo é decisão à parte |
+| `>= x.y.z` | — | piso; **não se usa** (ver abaixo) |
 | versão exata | — | congelamento; hoje sem uso no projeto |
 | `git:` + `branch:` | `carrierwave-activerecord` | versão não vem do rubygems |
 
-O par `~>` + `>=` faz **dois trabalhos distintos**: o til é teto ("não me
-surpreenda"), o `>=` é piso ("nunca abaixo da versão corrigida"). O piso explícito
-não é redundante — `~> 7.2.3` *permite* o 7.2.3.1 mas não o *obriga*, e num update
-de segurança a resolução já escolheu a versão sem a correção. Quando a intenção é
-piso de segurança, declare-o.
+**Piso de segurança não se declara.** O argumento a favor era real — `~> 7.2.3`
+*permite* o 7.2.3.1 mas não o *obriga*, e num update de segurança a resolução
+pode escolher a versão sem a correção. Mas o piso envelhece calado: quando sai a
+correção seguinte, ele continua abaixo dela e passa a afirmar uma cobertura que
+não existe, e ninguém revisa piso. O mecanismo que não envelhece é o `bundle-audit` no CI, que
+compara o lock com a base de advisories baixada na hora e acusa também o
+rebaixamento silencioso do resolvedor. A CVE fica registrada onde ela mora: na
+base de advisories e na mensagem do commit que subiu a gem, não numa restrição.
 
 ### O critério
 
@@ -78,8 +81,8 @@ de autenticação, por exemplo, que costuma exigir migração de dados —, o ce
 ### O que não fazer
 
 - **Pinar por simetria.** As gems sem restrição não são desleixo; são a forma
-  idiomática. Uniformizar as ~45 seria andar contra a convenção, criar 45 pisos
-  que envelhecem a cada patch, e diluir o sinal dos `>=` que realmente escondem CVE.
+  idiomática. Uniformizar as ~45 seria andar contra a convenção e criar 45
+  restrições que envelhecem a cada patch sem dizer nada a quem lê.
 - **Pinar gem transitiva para travar série.** Use `bundle update <gem> --patch`.
 - **Pinar em vez de usar flag.** Política de atualização é do comando, não do arquivo.
 
@@ -107,8 +110,9 @@ nada: carrega um arquivo de nome diferente do da gem.
   minor de carona — isso é decisão separada.
 - **Confira a versão resolvida no `Gemfile.lock`; não confie no `~>`.** Num
   update de segurança, `"~> 7.2.0"` resolveu para 7.2.3 em vez de 7.2.3.1 — a
-  versão sem a correção — e a suíte verde não acusaria nada. Quando a intenção
-  é piso de segurança, declare-o: `gem "rails", "~> 7.2.3", ">= 7.2.3.1"`.
+  versão sem a correção — e a suíte verde não acusaria nada. Quem acusa é o
+  `bundle exec bundle-audit check --update`: rode-o depois do update, antes de
+  dar o passo por concluído. O CI repete a checagem.
 - Gem transitiva não entra no `Gemfile` só para travar série. Use
   `bundle update <gem> --patch`, que restringe o bump sem tocar no arquivo.
 - Higiene em lote (muitas gems atrasadas em patch) é exceção à regra de um passo
@@ -169,30 +173,66 @@ bundle exec bundle-audit check --update
 ```
 
 Antes de argumentar que uma série "não recebe mais patch de segurança", meça. A
-CVE conhecida costuma ser uma só, e já documentada no `Gemfile`.
+CVE conhecida costuma ser uma só, e a base diz exatamente qual versão a corrige.
+A mesma checagem roda no job `test` do CI; se ela passa lá e aqui, o lock está
+limpo, sem depender de ninguém lembrar de subir um piso.
 
-## Parte 3 — O que a suíte verde não prova
+## Parte 3 — A dependência JS não passa pelo Bundler
 
-Medido neste projeto: os feature specs de PDF e planilha **conferem apenas o nome
-do arquivo baixado**.
+Há uma só (`codemirror`, no `package.json`) e ela é servida de um jeito que não
+se parece com gem nenhuma: o `node_modules` é **versionado**. O
+`config/initializers/assets.rb` põe a pasta no asset load path do Sprockets, e é
+de lá que o `application.js` carrega o editor. Nada ali é gerado por nós — é o
+tarball publicado, descompactado. Por isso nenhum guia de instalação pede node
+ou yarn: quem instala faz `bundle install` e `assets:precompile`, e a pasta
+commitada é o que sustenta isso.
 
-```ruby
-expect(download).to match(/Histórico Escolar - Ana\.pdf/)
-expect(download).to match(/Resumo Semestral - Defesa\(2022-2\)\.xlsx/)
+Atualizar é `yarn install` e commitar **tudo** o que mudar em `node_modules/`,
+inclusive o `.yarn-integrity`. Só quem atualiza precisa de node.
+
+```
+bundle exec rake javascript:check
 ```
 
-São 13 views `.pdf.prawn` e 1 `.xlsx.axlsx`, e nenhuma asserção toca o conteúdo.
-`prawn`, `prawn-rails`, `prawn-table` e `caxlsx` podem mudar largura de coluna,
-quebra de página e métrica de fonte com a suíte inteira verde. O `liquid` está
-melhor servido — `spec/lib/liquid_formatter_spec.rb` e
-`spec/helpers/pdf_helper_spec.rb` cobrem a lógica no nível de unidade.
+Confere se a pasta versionada ainda casa com o `package.json` e o `yarn.lock`, e
+falha nos dois sentidos: lock à frente da pasta (alguém subiu a versão e não
+rodou o `yarn install`) e pasta à frente do lock. Não precisa de node, de rede
+nem de banco — lê quatro arquivos que já vêm no `git clone`. Roda no job
+`checks` do CI, que é onde o erro precisa aparecer, porque ele se comete num PR.
 
-Ao mexer nessas gems, verde local não basta: use a skill `homologacao`. Cobrir a
-lacuna de verdade exigiria extrair texto do binário (`pdf-reader`; comparar bytes
-não funciona, o prawn embute timestamp e a ordem dos objetos varia) — trabalho com
-valor próprio, e issue própria.
+Ela pega divergência de **versão**, não de conteúdo: arquivo editado à mão
+dentro de `node_modules/codemirror` passa batido.
+
+**Não ponha `/node_modules/` no `.gitignore`.** Já esteve lá e não fazia nada —
+`.gitignore` só alcança arquivo não rastreado — enquanto sugeria a quem lia que
+a pasta era descartável.
+
+## Parte 4 — O que a suíte verde não prova
+
+**Conteúdo de PDF e planilha está coberto** pelo golden-master de
+`spec/requests/goldens/`, que compara o texto extraído do PDF e a matriz de
+células do XLSX com baselines versionados em `spec/goldens/`. Toda view
+`.pdf.prawn` e `.xlsx.axlsx` tem baseline ou, no caso da declaração, um feature
+spec que lê o texto do PDF. Um upgrade de `prawn`, `prawn-table`, `caxlsx`,
+`rubyzip` ou `pdf-reader` que mude o que o documento **diz** quebra a suíte.
+Mudança intencional se aceita com `GOLDEN=overwrite`, conferindo o diff dos
+baselines antes.
+
+O que continua fora do alcance da suíte:
+
+- **Layout.** Largura de coluna, quebra de página que não reordena texto,
+  métrica de fonte e aparência do CSS. Só a skill `homologacao` enxerga isso.
+- **Build local de assets.** Um `public/assets` existente sombreia a compilação
+  viva, e `spec/support/asset_freshness.rb` recompila quando fonte **ou
+  `Gemfile.lock`** ficam mais novos que o manifesto. Ao subir `sprockets`,
+  `dartsass-sprockets` ou `sass-embedded`, confira que a mensagem `[assets] ...
+  recompilando` apareceu no início da suíte; sem ela, o CSS testado é o da versão
+  anterior.
+- **Transitivas sem caminho de código.** `image_processing` e `ssrf_filter` vêm
+  com o `carrierwave`, mas nenhum uploader processa imagem nem baixa por URL
+  remota. Subir essas duas não exercita nada; não há o que testar.
 
 E há uma dependência sem número de versão para raciocinar:
-`carrierwave-activerecord` vem de um ramo (`rails7`) de um fork do gems-uff. O lock
-fixa um SHA, então o dia a dia é estável, mas `bundle update` nessa gem busca o
-*head* do ramo — seja lá o que estiver lá.
+`carrierwave-activerecord` vem de um ramo de um fork do gems-uff (o nome do ramo
+está no `Gemfile`). O lock fixa um SHA, então o dia a dia é estável, mas
+`bundle update` nessa gem busca o *head* do ramo — seja lá o que estiver lá.

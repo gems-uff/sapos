@@ -5,8 +5,9 @@ description: Lança uma nova versão do SAPOS — merge na main, tag anotada, la
 
 # Release do SAPOS
 
-Sequência para transformar um ramo pronto em versão publicada. O passo final —
-o deploy em produção — **é do mantenedor**; a skill vai até a release no GitHub.
+Sequência para transformar um ramo pronto em versão publicada. O deploy em
+produção **é do mantenedor**; o último passo da skill é avisá-lo de que a tag
+está pronta, e nada fica depois desse aviso.
 
 É o último passo do ciclo descrito em `revisar-pr`, e chega-se aqui pelo caminho
 dela — que também descreve as saídas em que **não** se lança.
@@ -128,6 +129,11 @@ gh issue close <N> --reason completed
   feche o que a versão de fato encerra.
 - Fechamento é `completed`, sem comentário de encerramento — é o padrão do
   repositório.
+- **Issue já fechada também leva o label.** Mudança que quase não altera a
+  aplicação pode entrar na `main` sem disparar release, e o mantenedor fecha a
+  issue nessa hora; ela sai na próxima versão junto com outras. O passo 1 a
+  lista pelo intervalo de commits, e o `gh issue edit --add-label` funciona em
+  issue fechada. Sem o label, a consulta da release não a mostra.
 
 ### 6. Release no GitHub
 
@@ -178,13 +184,30 @@ que não recebeu rótulo nenhum. A separação entre issues atendidas e apenas
 citadas, feita no passo 1, é o gabarito — cada issue atendida ali tem que
 aparecer na consulta por label.
 
-### 8. Deploy — do mantenedor
+**Apague o ramo lançado, GitHub e local, ainda neste passo:**
 
-**Passe a tag certa.** Versão errada no rodapé de produção costuma ser a tag
-passada no deploy, não o Passenger. Depois de subir, confira o rodapé.
+```bash
+git push origin --delete <ramo>
+git branch -d <ramo>
+```
 
-## Depois da release
+Depois do fast-forward do passo 3 o ramo aponta para um commit que a `main` já
+contém, então nada se perde.
 
-- Apague o ramo lançado (GitHub e local), e pode `git fetch --prune`.
-- Se a release fecha alerta do Dependabot, ele só re-varre o ramo padrão — o
-  quadro de alertas leva alguns minutos para refletir o push.
+Se a release fecha alerta do Dependabot, ele só re-varre o ramo padrão — o
+quadro de alertas leva alguns minutos para refletir o push. Não conclua que o
+alerta ficou aberto antes disso.
+
+### 8. Avise o mantenedor de que a tag está pronta para o deploy
+
+É o último passo, e é uma mensagem, não uma ação no repositório. Ela diz:
+
+- **A tag a passar no deploy**, pelo número. Versão errada no rodapé de
+  produção costuma ser a tag passada no deploy, não o Passenger.
+- Se a tag foi **movida** (passo 4), que o destino precisa de
+  `git fetch --tags --force` antes, senão o rodapé mente a favor.
+- **Como conferir o deploy por comportamento**, e não só pelo rodapé: a medida
+  que separa esta versão da anterior, tirada da homologação.
+
+O deploy e a conferência são do mantenedor. A skill termina aqui; não há seção
+"depois da release" porque o que ficasse ali não seria executado.

@@ -119,15 +119,17 @@ module Sapos
     # config.action_controller.permit_all_parameters = true
     # config.action_controller.action_on_unpermitted_parameters = :raise
 
-    config.eager_load_paths << Rails.root.join("lib")
+    # autoload_lib poe lib/ no autoload E no eager load, ignorando o que nao e
+    # codigo Ruby com nome de constante (assets, .rake). Substitui duas linhas
+    # manuais: uma acrescentava um Pathname ao eager_load_paths, e o Rails
+    # confere pertinencia num Set de Strings -- o Pathname nunca casava, e lib/
+    # era so autoloaded, nunca eager loaded, nem em producao. Premissas fixadas
+    # em spec/config/autoload_lib_spec.rb.
+    config.autoload_lib(ignore: %w[assets tasks])
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
-
-    # Custom directories with classes and modules you want to be autoloadable.
-    # config.autoload_paths += %W(#{config.root}/extras)
-    config.autoload_paths << "#{config.root}/lib"
-
 
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.

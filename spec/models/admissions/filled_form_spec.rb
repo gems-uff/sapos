@@ -39,14 +39,5 @@ RSpec.describe Admissions::FilledForm, type: :model do
     it { should validate_presence_of(:form_template) }
   end
 
-  describe "Methods" do
-    # ToDo: test to_label
-    # ToDo: test to_fields_hash
-    # ToDo: test prepare_missing_fields
-    # ToDo: test sync_fields_before
-    # ToDo: test sync_fields_after
-    # ToDo: test consolidate
-    # ToDo: test find_cpf_field
-    # ToDo: test erase_non_filled_file_fields
-  end
+  # Métodos: filled_form_consolidate_spec.rb.
 end

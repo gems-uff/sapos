@@ -78,14 +78,5 @@ RSpec.describe Admissions::FormCondition, type: :model do
       other.destroy
     end
   end
-  describe "Methods" do
-    # ToDo: test recursive_simple_validation
-    # ToDo: test update_pendencies
-    # ToDo: test to_label
-    # ToDo: test compare
-    # ToDo: test check_truth
-    # ToDo: test new_from_hash
-    # ToDo: test to_hash
-    # ToDo: test widget
-  end
+  # Métodos: form_condition_check_truth_spec.rb.
 end

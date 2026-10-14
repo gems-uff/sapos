@@ -5,6 +5,8 @@
 
 # Represents a Professor
 class Professor < ApplicationRecord
+  include ::UserNameSyncConcern
+
   has_paper_trail
 
   has_many :advisements, dependent: :restrict_with_exception
