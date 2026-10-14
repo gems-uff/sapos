@@ -20,6 +20,10 @@
 # credenciados" trocou aspas duplas por simples em 7.15.35. Consulta editada
 # pela tela é da instalação: fica como está e é listada, para ser revista à mão.
 #
+# A reescrita só alcança a consulta com o nome das do seed. Cada instalação
+# também tem consultas próprias sobre advisement_authorizations, criadas pela
+# tela, que o seed não conhece -- são listadas ao fim do up, para revisão.
+#
 # Grava com update_column: o Query valida executando o SQL, e regravar um texto
 # não precisa rodar a consulta de cada instalação. Que o SQL novo executa é
 # coberto pelo seeds:check do CI, em MariaDB, que grava o mesmo texto pelo seed.
@@ -79,11 +83,13 @@ class FilterAccreditationValidityInSeededQueries < ActiveRecord::Migration[7.1]
   SQL
 
   def up
-    rewrite(STUDENTS_PER_PROFESSOR,
+    handled = []
+    handled.concat rewrite(STUDENTS_PER_PROFESSOR,
       from: [STUDENTS_PER_PROFESSOR_OLD], to: STUDENTS_PER_PROFESSOR_NEW)
-    rewrite(ACCREDITED_PROFESSORS,
+    handled.concat rewrite(ACCREDITED_PROFESSORS,
       from: [ACCREDITED_PROFESSORS_OLD, ACCREDITED_PROFESSORS_OLD_DOUBLE_QUOTES],
       to: ACCREDITED_PROFESSORS_NEW)
+    report_unreached(handled)
   end
 
   def down
@@ -94,15 +100,25 @@ class FilterAccreditationValidityInSeededQueries < ActiveRecord::Migration[7.1]
   end
 
   private
+    # Devolve os ids que tratou -- reescritos ou já listados por nome --, para
+    # report_unreached não repetir a consulta personalizada numa segunda linha.
     def rewrite(name, from:, to:)
       known = from.map { |sql| normalize(sql) }
-      Query.where(name: name).find_each do |query|
+      Query.where(name: name).find_each.map do |query|
         if known.include?(normalize(query.sql))
           query.update_column(:sql, to)
         else
           say "Consulta ##{query.id} (#{query.name}) foi personalizada: " \
             "revise o filtro de vigência do credenciamento à mão"
         end
+        query.id
+      end
+    end
+
+    def report_unreached(handled)
+      Query.where("sql LIKE ?", "%advisement_authorizations%").where.not(id: handled).find_each do |query|
+        say "Consulta ##{query.id} (#{query.name}) lê advisement_authorizations e não foi " \
+          "reescrita: revise o filtro de vigência do credenciamento à mão"
       end
     end
 
