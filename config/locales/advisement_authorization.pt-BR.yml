@@ -9,6 +9,7 @@ pt-BR:
         professor: "Orientador"
         start_date: "Data de credenciamento"
         end_date: "Data de término do credenciamento"
+        active: "Vigente"
 
     models:
       advisement_authorization:
