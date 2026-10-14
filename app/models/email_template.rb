@@ -179,7 +179,6 @@ class EmailTemplate < ApplicationRecord
       template_type: "Liquid",
       path: File.join("course_classes", "mailer", "email_to_professor.text.liquid"),
       subject: I18n.t("notifications.course_class.email_to_professor.subject"),
-      # to: "{{ record.professors.first.email }}",
       to: "{{ record.professors_emails }}",
       variables: {
         record: CourseClassDrop
