@@ -245,7 +245,7 @@ class StudentEnrollmentController < ApplicationController
 
       course = Course.find(course_id)
       if course.present?
-        course_class = CourseClass.create(
+        course_class = CourseClass.new(
           attributes.merge({ name: course.name })
         )
 
