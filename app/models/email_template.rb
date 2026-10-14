@@ -188,8 +188,7 @@ class EmailTemplate < ApplicationRecord
       template_type: "Liquid",
       path: File.join("deferrals", "mailer", "email_to_advisor.text.liquid"),
       subject: I18n.t("notifications.deferral.email_to_advisor.subject"),
-      # to: "{{ advisement.professors.first.email }}",
-      to: "{{ advisement.professors_emails }}",
+      to: "{{ advisement.professor.email }}",
       variables: {
         record: DeferralDrop,
         advisement: AdvisementDrop
