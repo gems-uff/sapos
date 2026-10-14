@@ -212,8 +212,11 @@ cada uma explica o porquê no próprio cabeçalho:
 - Rails e active_scaffold: `fix_url_for.rb`,
   `active_scaffold_disable_null_comparators.rb`,
   `fix_session_store_dirty_tracking.rb` (`prepend` no `find_session` privado do
-  `ActiveRecordStore`) e o `LogTruncater` escondido dentro de
-  `filter_parameter_logging.rb`, que chama o `sql` original por `super_method`.
+  `ActiveRecordStore`), `active_scaffold_date_picker_raw_value.rb` (`prepend`
+  em `ActiveScaffold::AttributeParams`, porque o bridge `date_picker` só
+  define o método que ele sobrescreve depois dos initializers) e o
+  `LogTruncater` escondido dentro de `filter_parameter_logging.rb`, que chama
+  o `sql` original por `super_method`.
 - Prawn: `prawn-grouping.rb`, cópia de patch de terceiro que usa `state.page` e
   `@bounding_box`. Suspeito num upgrade do Prawn, não do Rails.
 
