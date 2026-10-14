@@ -96,4 +96,25 @@ RSpec.describe Report, type: :model do
       expect(report.reload.invalidated_by).to eq(user)
     end
   end
+
+  # #invalidate! e a rotina de limpeza (#696) passam pelo mesmo metodo, e o
+  # que ele tem de garantir e atomicidade: se apagar o arquivo falhar, o
+  # update! que zerou carrierwave_file_id tem de ser desfeito. Senao o report
+  # fica sem arquivo e a linha em carrier_wave_files fica orfa, sem rotina que
+  # a varra.
+  describe "#release_file!" do
+    it "desfaz o update quando apagar o arquivo falha" do
+      file = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.create!(
+        original_filename: "documento.pdf", content_type: "application/pdf",
+        binary: "conteudo", medium_hash: SecureRandom.hex(16)
+      )
+      report.update!(carrierwave_file: file)
+      allow_any_instance_of(CarrierWave::Storage::ActiveRecord::ActiveRecordFile)
+        .to receive(:delete).and_raise(ActiveRecord::ActiveRecordError)
+
+      expect { report.release_file! }.to raise_error(ActiveRecord::ActiveRecordError)
+
+      expect(report.reload.carrierwave_file_id).to eq(file.id)
+    end
+  end
 end
