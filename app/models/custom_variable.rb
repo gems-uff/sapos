@@ -27,6 +27,7 @@ class CustomVariable < ApplicationRecord
     "quadrennial_period" => :text,
     "instance_name" => :text,
     "enable_advisor_accreditation_validation" => :text,
+    "avulso_enrollment_status_name" => :text,
   }
 
   validates :variable, presence: true
@@ -47,6 +48,11 @@ class CustomVariable < ApplicationRecord
   def self.identity_issuing_country
     config = CustomVariable.find_by_variable(:identity_issuing_country)
     config.blank? ? "" : config.value
+  end
+
+  def self.avulso_enrollment_status_name
+    config = CustomVariable.find_by_variable(:avulso_enrollment_status_name)
+    config.blank? ? "Avulso" : config.value
   end
 
   def self.class_schedule_text
