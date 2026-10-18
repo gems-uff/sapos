@@ -73,9 +73,17 @@ corrija na wiki.
   ramo novo: crie só quando pedirem.
 - Documentação e comentário falam em **"mantenedor"**, não em nome próprio —
   o papel sobrevive a quem o exerce.
-- **Antes de abrir issue, pesquise as existentes — inclusive as fechadas:**
-  `gh issue list --state all --search "<termo>"`, variando termos em português e
-  inglês. Achando issue relacionada, leia também os commits que a fecharam
+- **Antes de abrir issue, pesquise as existentes — inclusive as fechadas —**
+  com o [issuefinder](https://github.com/gems-uff/issuefinder) sobre o rascunho
+  da issue nova: `uv run --project ../issuefinder issuefinder query -f
+  <rascunho>`, de dentro do checkout. Ele compara pelo sentido, entre português
+  e inglês, e pelos tokens exatos (classe de erro, nome de método, caminho), e
+  sincroniza as issues antes de responder. Fica num diretório irmão do
+  checkout; se faltar, clone-o ali (`gh repo clone gems-uff/issuefinder
+  ../issuefinder`). O ambiente e o modelo dele (cerca de 3 GB) ficam fora do
+  checkout, então configurá-lo pede o aval de quem conduz a sessão; até lá,
+  pesquise com `gh issue list --state all --search "<termo>"`, variando termos
+  em português e inglês. Achando issue relacionada, leia também os commits que a fecharam
   (`git log --all --grep="<numero>"`). Não é só evitar duplicata: é ali que está o
   contexto que torna a issue nova útil — decisão de produto já tomada, tentativa
   revertida, correção que só alcançou parte do código.
