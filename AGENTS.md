@@ -164,11 +164,14 @@ referenciado por caminho de uma captura datada, que é descartável.
 ## Atualização de dependências
 
 Uma gem por passo, alvo no patch mais atual da mesma série; **nunca subir major
-ou minor de carona** — isso é decisão separada. **Piso de segurança (`>=`) não se
+ou minor de carona** — isso é decisão separada. A exceção é a campanha: a cauda
+(transitivas, ferramentas de desenvolvimento e teste) anda em lote por nível,
+com `--strict` como teto rígido e bissecção se ficar vermelho, enquanto o
+núcleo continua uma gem por passo. **Piso de segurança (`>=`) não se
 declara no `Gemfile`:** ele envelhece calado quando sai a correção seguinte. Quem
 garante que o lock não carrega CVE conhecida é o `bundle-audit`, que o CI roda
 contra a base de advisories do dia. O resto — conferência do `Gemfile.lock`,
-`--strict`, higiene em lote — está na skill `dependencias`.
+`--strict`, a campanha — está na skill `dependencias`.
 
 ## Pontos cegos da suíte
 
