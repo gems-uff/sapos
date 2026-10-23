@@ -73,9 +73,17 @@ corrija na wiki.
   ramo novo: crie só quando pedirem.
 - Documentação e comentário falam em **"mantenedor"**, não em nome próprio —
   o papel sobrevive a quem o exerce.
-- **Antes de abrir issue, pesquise as existentes — inclusive as fechadas:**
-  `gh issue list --state all --search "<termo>"`, variando termos em português e
-  inglês. Achando issue relacionada, leia também os commits que a fecharam
+- **Antes de abrir issue, pesquise as existentes — inclusive as fechadas —**
+  com o [issuefinder](https://github.com/gems-uff/issuefinder) sobre o rascunho
+  da issue nova: `uv run --project ../issuefinder issuefinder query -f
+  <rascunho>`, de dentro do checkout. Ele compara pelo sentido, entre português
+  e inglês, e pelos tokens exatos (classe de erro, nome de método, caminho), e
+  sincroniza as issues antes de responder. Fica num diretório irmão do
+  checkout; se faltar, clone-o ali (`gh repo clone gems-uff/issuefinder
+  ../issuefinder`). O ambiente e o modelo dele (cerca de 3 GB) ficam fora do
+  checkout, então configurá-lo pede o aval de quem conduz a sessão; até lá,
+  pesquise com `gh issue list --state all --search "<termo>"`, variando termos
+  em português e inglês. Achando issue relacionada, leia também os commits que a fecharam
   (`git log --all --grep="<numero>"`). Não é só evitar duplicata: é ali que está o
   contexto que torna a issue nova útil — decisão de produto já tomada, tentativa
   revertida, correção que só alcançou parte do código.
@@ -156,11 +164,14 @@ referenciado por caminho de uma captura datada, que é descartável.
 ## Atualização de dependências
 
 Uma gem por passo, alvo no patch mais atual da mesma série; **nunca subir major
-ou minor de carona** — isso é decisão separada. **Piso de segurança (`>=`) não se
+ou minor de carona** — isso é decisão separada. A exceção é a campanha: a cauda
+(transitivas, ferramentas de desenvolvimento e teste) anda em lote por nível,
+com `--strict` como teto rígido e bissecção se ficar vermelho, enquanto o
+núcleo continua uma gem por passo. **Piso de segurança (`>=`) não se
 declara no `Gemfile`:** ele envelhece calado quando sai a correção seguinte. Quem
 garante que o lock não carrega CVE conhecida é o `bundle-audit`, que o CI roda
 contra a base de advisories do dia. O resto — conferência do `Gemfile.lock`,
-`--strict`, higiene em lote — está na skill `dependencias`.
+`--strict`, a campanha — está na skill `dependencias`.
 
 ## Pontos cegos da suíte
 
