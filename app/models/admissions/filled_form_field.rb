@@ -279,6 +279,7 @@ class Admissions::FilledFormField < ActiveRecord::Base
   end
 
   def add_error(error, **options)
+    return if self.form_field.nil?
     attribute = :value
     if self.form_field.field_type == Admissions::FormField::FILE
       attribute = :file

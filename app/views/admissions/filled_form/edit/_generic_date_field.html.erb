@@ -40,7 +40,7 @@
 
     window.customFormValidations["<%= filled_class %>"].push(function() {
       let input = $(`#<%= field_id %> input`).get(0);
-      if (input.disabled) {
+      if (input.matches(":disabled")) {
         return true;
       }
       error_msg = validateDateField($(input).val());
