@@ -59,4 +59,26 @@ RSpec.describe "maintenance:remove_expired_reports", type: :task do
     expect(vencido.reload.invalidated_at).to be_nil
     expect(vencido.invalidated_by).to be_nil
   end
+
+  # Nenhuma FK garante que carrierwave_file_id aponte para uma linha que ainda
+  # existe (#696): a instalacao de homologacao chegou com carrier_wave_files
+  # vazia e um report vencido apontando para o nada. O "quebrado" e criado
+  # antes do "valido" para que o find_each, que percorre por id, passe por ele
+  # primeiro -- e e isso que prova que a task continua depois dele em vez de
+  # abortar.
+  it "nao aborta quando um vencido aponta para um arquivo que nao existe mais" do
+    quebrado = report_with_file(Date.yesterday)
+    CarrierWave::Storage::ActiveRecord::ActiveRecordFile
+      .where(id: quebrado.carrierwave_file_id).delete_all
+    valido = report_with_file(Date.yesterday)
+    arquivo_do_valido = valido.carrierwave_file_id
+
+    expect { Rake::Task["maintenance:remove_expired_reports"].invoke }.not_to raise_error
+
+    expect(quebrado.reload.carrierwave_file_id).to be_nil
+    expect(valido.reload.carrierwave_file_id).to be_nil
+    expect(
+      CarrierWave::Storage::ActiveRecord::ActiveRecordFile.exists?(arquivo_do_valido)
+    ).to be false
+  end
 end

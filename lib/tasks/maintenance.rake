@@ -31,11 +31,7 @@ namespace :maintenance do
     # documento esta vencido.
     expired_reports = Report.expired.where.not(carrierwave_file_id: nil)
 
-    expired_reports.map do |expired_report|
-      carrierwave_file = expired_report.carrierwave_file
-      expired_report.update!(carrierwave_file_id: nil)
-      carrierwave_file.delete
-    end
+    expired_reports.find_each(&:release_file!)
 
     Rails.logger.info "[Reports] #{Time.now.to_fs} Finished removing reports"
   end

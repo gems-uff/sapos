@@ -28,14 +28,31 @@ class Report < ApplicationRecord
     "#{self.user.name} - #{I18n.l(self.created_at, format: '%d/%m/%Y %H:%M')}"
   end
 
-  # Sem arquivo nao ha o que apagar. A chamada estourava NoMethodError em
-  # carrierwave_file.delete *depois* do update!, deixando o registro gravado
-  # como invalidado e a requisicao em 500. O `&.` mantem invalidate! seguro
-  # pelos dois caminhos que o AGENTS.md distingue: a tela e o console.
+  # Libera o armazenamento do documento. A limpeza de vencidos
+  # (maintenance:remove_expired_reports) e invalidate! passam por aqui para
+  # nao divergirem.
+  #
+  # Nenhuma FK garante que carrierwave_file_id aponte para uma linha que ainda
+  # existe -- schema_plus_alternative.rb anula o add_foreign_key --, dai o `&.`:
+  # sem ele, o NoMethodError derrubava a rake antes das notificacoes (#696).
+  #
+  # A transacao faz os dois passos acontecerem juntos ou nenhum. Sem ela, uma
+  # falha ao apagar depois do update! deixaria o report sem arquivo e a linha
+  # em carrier_wave_files orfa, que nenhuma rotina varre.
+  def release_file!(**attributes)
+    transaction do
+      file = self.carrierwave_file
+      if file.nil? && carrierwave_file_id.present?
+        Rails.logger.warn "[Reports] Report #{id}: carrierwave_file_id " \
+                           "#{carrierwave_file_id} sem linha em carrier_wave_files"
+      end
+      self.update!(carrierwave_file_id: nil, **attributes)
+      file&.delete
+    end
+  end
+
   def invalidate!(user:)
-    file = self.carrierwave_file
-    self.update!(carrierwave_file_id: nil, invalidated_by: user, invalidated_at: Time.now)
-    file&.delete
+    release_file!(invalidated_by: user, invalidated_at: Time.now)
   end
 
   def expired?
