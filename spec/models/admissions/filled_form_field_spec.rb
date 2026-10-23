@@ -498,8 +498,58 @@ RSpec.describe Admissions::FilledFormField, type: :model do
           end
         end
       end
+      describe "size_of_file" do
+        before(:each) do
+          @form_field.field_type = Admissions::FormField::FILE
+          @form_field.configuration = "{}"
+          filled_form_field.value = nil
+          filled_form_field.file = Rack::Test::UploadedFile.new(
+            Rails.root.join("spec/fixtures/user.png"), "image/png"
+          )
+        end
+
+        def stub_file_size(bytes)
+          allow(filled_form_field.file).to receive(:file).and_return(double(size: bytes))
+        end
+
+        after(:each) do
+          config = CustomVariable.find_by_variable(:max_upload_size_mb)
+          config&.delete
+        end
+
+        it "is valid when the file is smaller than the default limit (15MB)" do
+          config = CustomVariable.find_by_variable(:max_upload_size_mb)
+          config&.delete
+          stub_file_size(14.megabytes)
+          expect(filled_form_field).to be_valid
+        end
+
+        it "is invalid when the file is larger than the default limit (15MB)" do
+          config = CustomVariable.find_by_variable(:max_upload_size_mb)
+          config&.delete
+          stub_file_size(16.megabytes)
+          expect(filled_form_field).to(
+            have_field_error(:filesize).on(:file).with_parameters(count: 15)
+          )
+        end
+
+        it "uses the configured max_upload_size_mb instead of the default" do
+          CustomVariable.find_by_variable(:max_upload_size_mb)&.delete
+          CustomVariable.create!(variable: :max_upload_size_mb, value: "20")
+          stub_file_size(18.megabytes)
+          expect(filled_form_field).to be_valid
+        end
+
+        it "is invalid when the file exceeds the configured max_upload_size_mb" do
+          CustomVariable.find_by_variable(:max_upload_size_mb)&.delete
+          CustomVariable.create!(variable: :max_upload_size_mb, value: "20")
+          stub_file_size(21.megabytes)
+          expect(filled_form_field).to(
+            have_field_error(:filesize).on(:file).with_parameters(count: 20)
+          )
+        end
+      end
       # ToDo: validate file field (Admissions::FormField::FILE)
-      # - size_of_file
       # - validate_file_field
       # - Admissions::FormField::STUDENT_FIELD with field == "photo"
     end
