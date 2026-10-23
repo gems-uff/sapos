@@ -173,6 +173,13 @@ class Enrollment < ApplicationRecord
     end
   end
 
+  # Data em que a regra de credenciamento vale para esta matrícula: a do
+  # desligamento, se houver, senão hoje. Decisão da revisão do PR #690 --
+  # matrícula desligada não fica isenta, é avaliada no dia em que o aluno saiu.
+  def advisor_accreditation_date
+    dismissal&.date || Date.current
+  end
+
   def enrollment_has_authorized_advisor
     return unless CustomVariable.enable_advisor_accreditation_validation
     return if advisements.blank? || level.blank?
@@ -183,9 +190,9 @@ class Enrollment < ApplicationRecord
     # marcadas -- aqui ficou de fora.
     remaining = advisements.reject(&:marked_for_destruction?)
     return if remaining.blank?
+    date = advisor_accreditation_date
     has_authorized = remaining.any? do |a|
-      a.professor.present? &&
-        a.professor.advisement_authorizations.any? { |auth| auth.level == level }
+      a.professor.present? && a.professor.accredited_on?(level, date)
     end
     errors.add(:base, :no_advisor_with_level) unless has_authorized
   end
