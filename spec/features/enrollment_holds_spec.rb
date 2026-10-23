@@ -34,7 +34,7 @@ RSpec.describe "EnrollmentHolds features", type: :feature do
     @destroy_all << @course_type_cer = FactoryBot.create(:course_type)
     @destroy_all << @course_cer = FactoryBot.create(:course, course_type: @course_type_cer)
     @destroy_all << @professor_cer = FactoryBot.create(:professor)
-    @destroy_all << @course_class_cer = FactoryBot.create(:course_class, course: @course_cer, professor: @professor_cer, year: YearSemester.current.year, semester: YearSemester.current.semester)
+    @destroy_all << @course_class_cer = FactoryBot.create(:course_class, course: @course_cer, professors: [@professor_cer], year: YearSemester.current.year, semester: YearSemester.current.semester)
     @destroy_all << @enrollment_request_cer = FactoryBot.create(:enrollment_request, enrollment: @enrollment5, year: YearSemester.current.year, semester: YearSemester.current.semester)
     @destroy_all << @cer = @enrollment_request_cer.class_enrollment_requests.create!(
       course_class: @course_class_cer,

@@ -61,7 +61,7 @@ RSpec.describe "Saídas em PDF e XLSX", type: :request do
     @course_class = FactoryBot.create(
       :course_class,
       course: @course,
-      professor: @professor,
+      professors: [@professor],
       year: 2020,
       semester: 1
     )
