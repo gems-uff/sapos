@@ -398,4 +398,25 @@ RSpec.describe CustomVariable, type: :model do
       end
     end
   end
+
+  # Este falha. import_grades_session_timeout e lido com `to_i`, e a tela de
+  # variaveis aceita qualquer texto: "0", "abc" e "0,5" viram zero minuto, e
+  # toda confirmacao de importacao de notas expira na hora; "1h" vira um
+  # minuto. O valor tem de ser recusado ao gravar, como as outras variaveis
+  # que tem formato.
+  context "defeitos em aberto" do
+    ["0", "abc", "0,5", "1h"].each do |valor|
+      it "recusa #{valor.inspect} como tempo limite da importacao de notas" do
+        variavel = CustomVariable.new(variable: "import_grades_session_timeout", value: valor)
+
+        expect(variavel).not_to be_valid
+      end
+    end
+
+    it "aceita um numero inteiro de minutos como tempo limite da importacao de notas" do
+      variavel = CustomVariable.new(variable: "import_grades_session_timeout", value: "45")
+
+      expect(variavel).to be_valid
+    end
+  end
 end
