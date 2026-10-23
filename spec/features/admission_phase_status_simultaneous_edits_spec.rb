@@ -105,6 +105,25 @@ RSpec.describe "Admission phase status: edições inline simultâneas", type: :f
     File.delete(path) if path && File.exist?(path)
   end
 
+  # O caminho da #677 de ponta a ponta: B salva com o formulario do candidato
+  # desligado enquanto A continua aberta. Sem o conserto, o widget de A vaza
+  # para B um par de hidden sem form_field_id, o nested attributes monta um campo
+  # orfao, a submissao fica invalida e o render dela estoura em
+  # erase_non_filled_file_fields -- a linha nao fecha e nada e salvo.
+  it "salva a candidatura aberta por último com o formulário do candidato desligado" do
+    visit_candidate_list
+    open_override_edit(@application_a)
+    open_override_edit(@application_b)
+
+    form = find(edit_div_selector(@application_b)).find(:xpath, "./ancestor::form")
+    within(form) do
+      find("input[type='submit'][value='Atualizar']", visible: :all).click
+    end
+
+    expect(page).to have_no_selector(edit_div_selector(@application_b))
+    expect(Admissions::FilledFormField.where(form_field_id: nil)).to be_empty
+  end
+
   it "usa um data-id diferente no widget de webcam de cada candidatura" do
     visit_candidate_list
     open_override_edit(@application_a)
