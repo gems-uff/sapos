@@ -204,6 +204,32 @@ RSpec.describe "Saídas em PDF e XLSX", type: :request do
       @class_schedule = FactoryBot.create(
         :class_schedule, year: 2020, semester: 1
       )
+
+      # Turma com horário real, além da @course_class compartilhada (sem
+      # alocação, caso do asterisco). Sem isto o baseline nunca exercita a
+      # frase falada por ActualText — só o texto de "a combinar".
+      scheduled_professor = FactoryBot.create(
+        :professor, name: "Beatriz Farias"
+      )
+      scheduled_course = FactoryBot.create(
+        :course,
+        name: "Aprendizado de Máquina",
+        code: "TCC00002",
+        course_type: @course_type,
+        credits: 4,
+        workload: 60
+      )
+      @scheduled_course_class = FactoryBot.create(
+        :course_class,
+        course: scheduled_course,
+        professor: scheduled_professor,
+        year: 2020,
+        semester: 1
+      )
+      FactoryBot.create(
+        :allocation, course_class: @scheduled_course_class, day: "Terça",
+        start_time: 10, end_time: 12, room: "208"
+      )
     end
 
     it "mantém o conteúdo do baseline por período" do

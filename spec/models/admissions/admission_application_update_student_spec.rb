@@ -214,7 +214,7 @@ RSpec.describe Admissions::AdmissionApplication, "cópia para o aluno e envio de
     it "marca a inscrição como enviada e sincroniza o nome quando a submissão está habilitada" do
       @application.assign_form({
         filled_form_attributes: filled_form_params(@application.filled_form, { "nota" => "9", "nome" => "Ana Maria" }),
-      })
+      }, check_candidate_permission: true)
       expect(@application.filled_form.is_filled).to be true
       expect(value_of(@application.filled_form, "nota")).to eq("9")
       expect(@application.name).to eq("Ana Maria")
@@ -224,7 +224,7 @@ RSpec.describe Admissions::AdmissionApplication, "cópia para o aluno e envio de
     it "não marca como enviada quando a submissão não veio habilitada" do
       @application.assign_form({
         filled_form_attributes: filled_form_params(@application.filled_form, { "nota" => "9", "nome" => "Ana" }, enable: "0"),
-      })
+      }, check_candidate_permission: true)
       expect(@application.filled_form.is_filled).to be false
       expect(value_of(@application.filled_form, "nota")).to eq("9")
     end
@@ -233,7 +233,7 @@ RSpec.describe Admissions::AdmissionApplication, "cópia para o aluno e envio de
       @process.update!(min_letters: 2, max_letters: 2)
       @application.assign_form({
         filled_form_attributes: filled_form_params(@application.filled_form, { "nota" => "9", "nome" => "Ana" }),
-      })
+      }, check_candidate_permission: true)
       expect(@application.filled_form.is_filled).to be false
       expect(@application.errors[:base]).not_to be_empty
     end
@@ -247,7 +247,7 @@ RSpec.describe Admissions::AdmissionApplication, "cópia para o aluno e envio de
           "0" => { id: sent.id, filled_form_attributes: filled_form_params(sent.filled_form, {}) },
           "1" => { id: kept.id, filled_form_attributes: filled_form_params(kept.filled_form, {}, enable: "0") },
         },
-      }, has_letter_forms: true)
+      }, has_letter_forms: true, can_edit_override: true)
       letters = @application.letter_requests.index_by(&:id)
       expect(letters[sent.id].filled_form.is_filled).to be true
       expect(letters[kept.id].filled_form.is_filled).to be false
