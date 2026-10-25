@@ -7,13 +7,16 @@ require "spec_helper"
 require "rails_helper"
 
 RSpec.describe ClassScheduleHelperConcern, type: :helper do
-  # prepare_class_schedule_table chama rescue_blank_text, definido em
-  # ApplicationHelper -- garantir a mixagem em vez de depender da inclusao
-  # automatica de helpers do rspec-rails.
-  before { helper.extend(ApplicationHelper) }
-
+  # A coluna vem do cabeçalho devolvido, e não da fórmula do próprio concern:
+  # assim o spec acusa frase falada que não bate com o dia que o vidente lê.
   def day_column(table, day)
-    I18n.translate("date.day_names").index(day) + 2 - table[:first]
+    table[:header][0].index(day)
+  end
+
+  def day_columns(table)
+    (table[:first]..table[:last]).map do |index|
+      day_column(table, I18n.translate("date.day_names")[index])
+    end
   end
 
   describe "class_schedule_spoken_allocation" do
@@ -79,13 +82,10 @@ RSpec.describe ClassScheduleHelperConcern, type: :helper do
       noschedule = I18n.t("activerecord.attributes.class_schedule.table.noschedule")
       name = table[:data].first[1]
 
-      # Todo dia continua com asterisco visível, mas nenhuma célula de dia
-      # fala: são 5 células estreitas lado a lado com glifo real (o "*"), e
-      # extração de texto por posição de glifo intercala os vizinhos no meio de
-      # uma frase longa. A célula do nome é larga e não tem essa disputa.
+      # Todo dia continua com asterisco visível e sem frase própria; a frase
+      # vai uma vez só, na célula do nome.
       expect(table[:actual].first[1]).to eq("#{name}. #{noschedule}")
-      (table[:first]..table[:last]).each do |index|
-        col = index + 2 - table[:first]
+      day_columns(table).each do |col|
         expect(table[:data].first[col]).to eq("*\n ")
         expect(table[:actual].first[col]).to be_nil
       end
@@ -118,8 +118,7 @@ RSpec.describe ClassScheduleHelperConcern, type: :helper do
       noschedule = I18n.t("activerecord.attributes.class_schedule.table.noschedule")
 
       expect(table[:actual].first[1]).to eq("Tópicos Avançados. #{noschedule}")
-      (table[:first]..table[:last]).each do |index|
-        col = index + 2 - table[:first]
+      day_columns(table).each do |col|
         expect(table[:actual].first[col]).to be_nil
       end
     end

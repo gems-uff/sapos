@@ -49,7 +49,8 @@ module ClassSchedulesPdfHelper
 
   # Faz cada célula de dia "falar" via ActualText a frase montada em
   # prepare_class_schedule_table. O cabeçalho é a linha 0 (header: true), então
-  # os dados começam na linha 1; célula sem frase (nil) fica muda.
+  # os dados começam na linha 1; célula sem frase (nil) fica sem ActualText e é
+  # lida pelo que desenha.
   def apply_class_schedule_actual_text(table, actual)
     actual.each_with_index do |spoken_row, row_index|
       spoken_row.each_with_index do |phrase, col_index|

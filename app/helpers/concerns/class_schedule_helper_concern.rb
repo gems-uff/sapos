@@ -38,7 +38,7 @@ module ClassScheduleHelperConcern
 
     # Cada linha é o par [visível, falado]: o visível é o que o vidente lê na
     # célula; o falado é a frase que o leitor de tela deve anunciar via
-    # ActualText (nil em célula que se descreve sozinha ou muda). Os dois viajam
+    # ActualText (nil em célula que se lê pelo que desenha). Os dois viajam
     # juntos pela ordenação no fim, para não desalinharem.
     rows = []
     on_demand_professors = {}
@@ -67,21 +67,15 @@ module ClassScheduleHelperConcern
       end
 
       course = course.map { |x| x.kind_of?(Array) ? x.join("\n") : x }
-      spoken = spoken.map do |x|
-        x.kind_of?(Array) ? (x.empty? ? nil : x.join(". ")) : nil
-      end
+      spoken = spoken.map { |x| x.empty? ? nil : x.join(". ") }
 
       if course_class.allocations.empty?
         (first..last).each do |index|
           course[index + 2 - first] = "*\n "
         end
-        # A frase não vai em nenhuma célula de dia: são 5 células estreitas
-        # lado a lado, cada uma com um glifo real (o próprio "*") -- e
-        # extração de texto por posição de glifo (pdf-reader, e por extensão
-        # qualquer leitor que dependa disso) intercala os glifos reais das
-        # vizinhas no meio da frase longa. Uma célula sem conteúdo próximo
-        # concorrendo não sofre isso: por isso a frase entra na célula do
-        # nome, larga e sem vizinho disputando a mesma linha dentro dela.
+        # A frase vai na célula do nome, uma vez por linha, e não nas células
+        # de asterisco, que continuam sem ActualText e são lidas como "*". Foi
+        # este formato que a validação com leitor de tela aprovou na issue.
         #
         # Nome CRU (name_with_class), não course[1]: este último pode vir de
         # name_with_class_formated_to_reports, que escapa "<" para "&lt;" por
@@ -120,11 +114,15 @@ module ClassScheduleHelperConcern
         id: nil, course_id: course.id,
         on_demand: true, professors: professors
       }
-      course_data[1] = course.name
+      # Mesmo escape de name_with_class_formated_to_reports: a célula do PDF
+      # tem inline_format.
+      course_data[1] = used_to_render_a_pdf_report ?
+        course.name.gsub("<", "&lt;") :
+        course.name
       (first..last).each do |index|
         course_data[index + 2 - first] = "*\n "
       end
-      spoken_data[1] = "#{course_data[1]}. #{noschedule}"
+      spoken_data[1] = "#{course.name}. #{noschedule}"
       course_data[-1] = ""
       star = true
       demand_rows << [course_data, spoken_data]

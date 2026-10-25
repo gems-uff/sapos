@@ -238,6 +238,9 @@ cada uma explica o porquê no próprio cabeçalho:
   `filter_parameter_logging.rb`, que chama o `sql` original por `super_method`.
 - Prawn: `prawn-grouping.rb`, cópia de patch de terceiro que usa `state.page` e
   `@bounding_box`. Suspeito num upgrade do Prawn, não do Rails.
+- prawn-table: `prawn_actual_text.rb` (`prepend` no `draw_content` privado de
+  `Prawn::Table::Cell::Text`, mais o `@pdf` da célula e o `renderer` do Prawn),
+  que faz o quadro de horários falar ao leitor de tela.
 
 `schema_plus_alternative.rb` é o que olhar primeiro: reabre
 `ActiveRecord::Migration` e transforma `add_foreign_key` e `remove_foreign_key`
