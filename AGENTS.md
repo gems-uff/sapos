@@ -95,6 +95,17 @@ corrija na wiki.
   sobre quem usa, não o tamanho do conserto: trabalho perdido, configuração
   existente ignorada, dado exposto a quem não devia e usuário sem saída são Bug —
   mesmo quando corrigir exige construir o que ainda não existe.
+- **Reprodução de defeito: vermelha no PR devolvido, `pending` na issue.** Ao
+  devolver um PR, a reprodução entra quebrando o ramo do autor — o vermelho é o
+  alerta (ver a skill `revisar-pr`). Defeito que vira issue tem a reprodução na
+  `main` com `pending: "issue #NNN"`: ela falha hoje sem deixar a suíte vermelha,
+  e quando o conserto chega o RSpec acusa o pending que passou ("Expected pending
+  … to fail") — é a hora de tirar a marca. O controle do cenário entra junto,
+  **sem** `pending`: o pending aceita qualquer falha, inclusive cenário que nem
+  monta, e só o controle verde prova que ele falha pela issue. Só entra assim
+  reprodução determinística — pending instável vira vermelho no dia em que passa
+  por acaso. A que depende de código fora da `main` (um PR aberto) fica no corpo
+  da issue até o merge.
 - **Type classifica o assunto; label diz a versão — não misture os dois.** O label
   temático foi aposentado quando o Type passou a existir: manter as duas
   taxonomias é mantê-las divergindo, e a que engana é justamente a que ninguém
