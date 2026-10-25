@@ -48,12 +48,13 @@ class AdvisementAuthorization < ApplicationRecord
     "#{level.name}"
   end
 
-  # True when the accreditation period contains +date+. An open period
-  # (end_date nil) has not been closed, so it covers any date from start_date on.
-  # The end_date day itself still counts as active (inclusive), matching the
-  # on_date scope.
+  # True when the accreditation period contains +date+ -- or, given a range of
+  # dates, any day of it. An open period (end_date nil) has not been closed, so
+  # it covers any date from start_date on. The end_date day itself still counts
+  # as active (inclusive), matching the on_date scope.
   def active_on?(date)
     return false if start_date.blank?
-    start_date.to_date <= date && (end_date.nil? || date <= end_date.to_date)
+    first, last = date.is_a?(Range) ? [date.begin, date.end] : [date, date]
+    start_date.to_date <= last && (end_date.nil? || first <= end_date.to_date)
   end
 end

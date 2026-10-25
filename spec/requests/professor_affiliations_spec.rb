@@ -92,4 +92,37 @@ RSpec.describe "Filiações pelo subform de Professor", type: :request do
 
     expect(@professor.affiliations.reload).to be_empty
   end
+
+  # Com as colunas de filiação em datetime, cujo cast é leniente ("31/02/2026"
+  # vira 03/03/2026), o active_scaffold_date_picker_raw_value.rb não podia
+  # entregar o texto cru: a revalidação da linha limpava o :invalid do
+  # date_picker e o término chegava nil -- na linha nova gravava filiação
+  # aberta, e na existente reabria a encerrada. Gravar 03/03/2026 também não
+  # atende, é data que ninguém digitou. Para os formatos que só divergem na
+  # grafia, gravar o dia digitado atende tanto quanto recusar.
+  describe "término que o date_picker não entende" do
+    { "31/02/2026" => nil, "15.03.2024" => Date.new(2024, 3, 15), "2024-03-15" => Date.new(2024, 3, 15) }
+      .each do |entrada, dia_digitado|
+        it "não acrescenta a filiação como aberta: #{entrada.inspect}" do
+          atualizar_professor([
+            filiacao(@uff, Date.new(2015, 1, 1), nil).merge(end_date: entrada)
+          ])
+
+          gravadas = @professor.affiliations.reload.map { |f| f.end_date&.to_date }
+          expect([[], [dia_digitado].compact]).to include(gravadas)
+        end
+
+        it "não reabre a filiação encerrada: #{entrada.inspect}" do
+          encerrada = FactoryBot.create(
+            :affiliation, professor: @professor, institution: @uff,
+            start_date: Time.zone.local(2015, 1, 1), end_date: Time.zone.local(2020, 1, 1)
+          )
+          atualizar_professor([
+            filiacao(@uff, Date.new(2015, 1, 1), nil, id: encerrada.id).merge(end_date: entrada)
+          ])
+
+          expect([Date.new(2020, 1, 1), dia_digitado].compact).to include(encerrada.reload.end_date&.to_date)
+        end
+      end
+  end
 end

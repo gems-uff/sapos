@@ -218,6 +218,29 @@ RSpec.describe AdvisementAuthorization, type: :model do
         auth = FactoryBot.build(:advisement_authorization, start_date: Date.current - 2.days, end_date: Date.current - 1.day)
         expect(auth.active_on?(Date.current)).to be false
       end
+
+      # O mês do desligamento chega como intervalo: vale qualquer dia dele, e
+      # as duas pontas são inclusivas.
+      describe "with a range of dates" do
+        let(:june) { Date.new(2021, 6, 1).all_month }
+
+        it "is true when the period starts on the last day of the range" do
+          auth = FactoryBot.build(:advisement_authorization, start_date: Date.new(2021, 6, 30), end_date: nil)
+          expect(auth.active_on?(june)).to be true
+        end
+        it "is true when the period ends on the first day of the range" do
+          auth = FactoryBot.build(:advisement_authorization, start_date: Date.new(2020, 1, 1), end_date: Date.new(2021, 6, 1))
+          expect(auth.active_on?(june)).to be true
+        end
+        it "is false when the period starts after the range" do
+          auth = FactoryBot.build(:advisement_authorization, start_date: Date.new(2021, 7, 1), end_date: nil)
+          expect(auth.active_on?(june)).to be false
+        end
+        it "is false when the period ends before the range" do
+          auth = FactoryBot.build(:advisement_authorization, start_date: Date.new(2020, 1, 1), end_date: Date.new(2021, 5, 31))
+          expect(auth.active_on?(june)).to be false
+        end
+      end
     end
   end
 end

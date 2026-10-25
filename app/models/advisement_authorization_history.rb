@@ -45,7 +45,7 @@ class AdvisementAuthorizationHistory
     self
   end
 
-  # Matrículas desligadas sem orientador credenciado no nível na data do
+  # Matrículas desligadas sem orientador credenciado no nível no mês do
   # desligamento -- a regra de Enrollment#enrollment_has_authorized_advisor,
   # que recusaria a próxima edição delas.
   def dismissed_without_accredited_advisor
@@ -178,9 +178,6 @@ class AdvisementAuthorizationHistory
 
     def uncovered?(enrollment)
       return false if enrollment.level.nil? || enrollment.advisements.empty?
-      date = enrollment.advisor_accreditation_date
-      enrollment.advisements.none? do |advisement|
-        advisement.professor&.accredited_on?(enrollment.level, date)
-      end
+      !enrollment.any_accredited_advisor?(enrollment.advisements)
     end
 end

@@ -133,9 +133,10 @@ class Professor < ApplicationRecord
     advisement_authorizations.any? { |auth| auth.active_on?(date) }
   end
 
-  # True when the professor holds an accreditation valid on +date+ for +level+.
-  # Iterates the loaded association in memory on purpose, so advisements being
-  # validated with not-yet-saved (nested) authorizations are still considered.
+  # True when the professor holds an accreditation valid on +date+ for +level+;
+  # +date+ may also be a range, and then any day of it counts. Iterates the
+  # loaded association in memory on purpose, so advisements being validated
+  # with not-yet-saved (nested) authorizations are still considered.
   def accredited_on?(level, date = Date.current)
     advisement_authorizations.any? do |auth|
       auth.level == level && auth.active_on?(date)

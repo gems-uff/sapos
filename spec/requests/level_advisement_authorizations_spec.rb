@@ -167,15 +167,13 @@ RSpec.describe "Credenciamentos pelo subform de Nível", type: :request do
     end
   end
 
-  # Reprodução aberta na revisão do PR #690: vermelha até o conserto. A data de
-  # término inconvertível, que o modelo já recusa, passa quando chega numa
-  # linha NOVA do subform. O date_picker do active_scaffold converte a entrada
-  # para nil e anota um :invalid, mas a linha nova é validada de novo antes de
-  # gravar -- pelo writer da associação na edição, pelo valid? do Nível na
-  # criação --, e esse valid? limpa o erro. O validates_date então vê nil, que
-  # o allow_blank aceita, e grava um credenciamento em aberto: o oposto do que
-  # quem digitou queria. A tela própria de credenciamentos e a linha já
-  # existente do subform recusam a mesma entrada.
+  # Numa linha NOVA do subform, o date_picker do active_scaffold converte a
+  # entrada que não entende para nil e anota um :invalid, mas a linha é
+  # validada de novo antes de gravar -- pelo writer da associação na edição,
+  # pelo valid? do Nível na criação --, e esse valid? limpa o erro. O
+  # validates_date via nil, que o allow_blank aceita, e gravava um
+  # credenciamento em aberto: o oposto do que quem digitou queria. Daí
+  # active_scaffold_date_picker_raw_value.rb, que entrega o texto ao modelo.
   describe "data de término inconvertível numa linha nova" do
     ["31/02/2026", "2020", "banana"].each do |entrada|
       it "não cria o Nível com o período em aberto: #{entrada.inspect}" do
@@ -209,11 +207,51 @@ RSpec.describe "Credenciamentos pelo subform de Nível", type: :request do
     end
   end
 
-  # A main não tinha regra de unicidade, e a migration que criou as datas
-  # deixou abertas todas as linhas antigas. Duas linhas do mesmo professor e
-  # nível viram dois períodos abertos sobrepostos, gravados sem passar pela
-  # validação nova -- daí o save(validate: false).
-  describe "duplicata herdada da main" do
+  # O mesmo caminho, com entrada que o date_picker recusa -- ele só entende
+  # dd/mm/aaaa -- e o cast do atributo entende. Quando o patch só entregava o
+  # texto cru se o cast também falhasse, "15.03.2024" e "2024-03-15" chegavam
+  # como nil e gravavam em aberto. Recusar ou gravar o dia digitado atendem;
+  # só o período em aberto é errado.
+  describe "data de término em outro formato numa linha nova" do
+    ["15.03.2024", "2024-03-15"].each do |entrada|
+      it "não cria o Nível com o período em aberto: #{entrada.inspect}" do
+        post levels_path, params: {
+          record: {
+            name: "Nível da sonda",
+            default_duration: "24",
+            advisement_authorizations: {
+              "1000" => periodo(Date.new(2020, 1, 1), nil).merge(end_date: entrada)
+            }
+          }
+        }
+
+        expect(AdvisementAuthorization.where(professor: @professor).pluck(:end_date))
+          .to be_empty.or eq([Date.new(2024, 3, 15)])
+      end
+
+      it "não acrescenta ao Nível o período em aberto: #{entrada.inspect}" do
+        level = FactoryBot.create(:level)
+        put level_path(level), params: {
+          record: {
+            name: level.name,
+            default_duration: level.default_duration.to_s,
+            advisement_authorizations: {
+              "1000" => periodo(Date.new(2020, 1, 1), nil).merge(end_date: entrada)
+            }
+          }
+        }
+
+        expect(AdvisementAuthorization.where(professor: @professor).pluck(:end_date))
+          .to be_empty.or eq([Date.new(2024, 3, 15)])
+      end
+    end
+  end
+
+  # Dois períodos abertos sobrepostos do mesmo professor e nível, gravados sem
+  # passar pela validação -- daí o save(validate: false). A reconstrução da
+  # migration funde as duplicatas que a main permitia, mas script e console
+  # ainda gravam sem validar, e o Nível não pode ficar preso por isso.
+  describe "períodos sobrepostos gravados sem validação" do
     before(:each) do
       @level = FactoryBot.create(:level)
       @antigo = herdado(Date.new(2015, 1, 1))
@@ -293,6 +331,42 @@ RSpec.describe "Credenciamentos pelo subform de Nível", type: :request do
       ])
 
       expect(@novo.reload.end_date).to be_nil
+    end
+  end
+
+  # O padrão mostrava os credenciamentos pelo to_label, só o nome do nível, e
+  # com o histórico a lista virava "Mestrado, Mestrado, … (N)" contando os
+  # períodos encerrados.
+  describe "lista e show do Nível" do
+    before(:each) do
+      @level = FactoryBot.create(:level)
+      @outro = FactoryBot.create(:professor)
+      FactoryBot.create(:advisement_authorization, professor: @professor, level: @level,
+                        start_date: Date.new(2015, 1, 1), end_date: Date.new(2017, 12, 31))
+      FactoryBot.create(:advisement_authorization, professor: @professor, level: @level,
+                        start_date: Date.new(2018, 1, 1))
+      FactoryBot.create(:advisement_authorization, professor: @outro, level: @level,
+                        start_date: Date.new(2019, 1, 1))
+    end
+
+    it "conta na lista só os credenciamentos vigentes" do
+      get levels_path
+
+      celula = Nokogiri::HTML(response.body)
+        .at_css("tr#as_levels-list-#{@level.id}-row td.advisement_authorizations-column")
+      expect(celula.text.strip).to eq("2")
+    end
+
+    it "mostra no show cada período com orientador e datas" do
+      get level_path(@level)
+
+      linhas = Nokogiri::HTML(response.body).css("dd.advisement_authorizations-view tbody tr")
+        .map { |tr| tr.css("td").map { |td| td.text.strip } }
+      expect(linhas).to contain_exactly(
+        [@professor.name, "01/01/2015", "31/12/2017"],
+        [@professor.name, "01/01/2018", I18n.t("rescue_blank_text")],
+        [@outro.name, "01/01/2019", I18n.t("rescue_blank_text")]
+      )
     end
   end
 end

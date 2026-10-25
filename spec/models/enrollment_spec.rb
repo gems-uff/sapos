@@ -101,6 +101,16 @@ RSpec.describe Enrollment, type: :model do
           enrollment.advisements.build(professor: professor, main_advisor: true)
           expect(enrollment).to have_error(:no_advisor_with_level).on :base
         end
+        # O limite da regra do mês do desligamento, no contexto abaixo: o
+        # credenciamento que só começa no mês seguinte não vale para ele.
+        it "the advisor was accredited only after the dismissal month" do
+          month = Date.new(2021, 6, 1)
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level, start_date: month.next_month)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: month)
+          expect(enrollment).to have_error(:no_advisor_with_level).on :base
+        end
         # Sem descartar as marcadas para destruicao, o unico credenciado
         # continua valendo como orientador e a remocao passa calada -- a
         # matricula fica sem ninguem habilitado no nivel. Trocar o `reject` por
@@ -153,7 +163,7 @@ RSpec.describe Enrollment, type: :model do
           expect(enrollment).to have(0).errors_on :base
         end
         # Decisão da revisão do PR #690: em matrícula desligada a regra é
-        # avaliada na data do desligamento, não hoje. O irmão deste exemplo,
+        # avaliada no mês do desligamento, não hoje. O irmão deste exemplo,
         # com o desligamento depois do fim do credenciamento, está no contexto
         # de erro acima.
         it "the enrollment is dismissed and the advisor was accredited on the dismissal date, though closed since" do
@@ -162,6 +172,30 @@ RSpec.describe Enrollment, type: :model do
                                                     start_date: @admission_date - 1.year, end_date: @admission_date + 10.days)
           enrollment.advisements.build(professor: professor, main_advisor: true)
           enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: @admission_date + 5.days)
+          expect(enrollment).to have(0).errors_on :base
+        end
+        # O desligamento só guarda mês e ano -- a tela de Desligamentos grava
+        # o dia 1 --, então a regra vale para o mês inteiro: basta
+        # credenciamento vigente em algum dia dele. Avaliada só no dia 1, ela
+        # reprovava o credenciado a partir do dia 10. O controle, com o
+        # credenciamento começando no mês seguinte, está no contexto de erro.
+        it "the advisor was accredited only later in the dismissal month" do
+          month = Date.new(2021, 6, 1)
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level, start_date: month + 9.days)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: month)
+          expect(enrollment).to have(0).errors_on :base
+        end
+        # O outro lado da mesma regra: credenciamento encerrado no meio do mês
+        # ainda cobre o desligamento.
+        it "the advisor's accreditation ended earlier in the dismissal month" do
+          month = Date.new(2021, 6, 1)
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level,
+                                                    start_date: month - 1.year, end_date: month + 14.days)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: month)
           expect(enrollment).to have(0).errors_on :base
         end
       end

@@ -61,7 +61,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << @affiliation3 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor3, start_date: 3.year.ago, end_date: nil)
 
     # Credenciados desde antes da admissão: a matrícula M01 é desligada há um
-    # ano, e a regra vale na data do desligamento.
+    # ano, e a regra vale no mês do desligamento.
     [@professor1, @professor2, @professor3].product([@level1, @level2]).each do |professor, level|
       @destroy_all << FactoryBot.create(:advisement_authorization, professor: professor, level: level,
                                         start_date: 10.years.ago.to_date)

@@ -18,10 +18,17 @@ RSpec.describe AdvisementAuthorizationHistory, type: :model do
     Time.zone.local(year, month, day, 12)
   end
 
+  # O início que a main não tinha. A migration só torna a coluna NOT NULL
+  # depois da reconstrução, mas o esquema dos testes já é o final: a linha
+  # antiga leva esta data, e a reconstrução tem de sobrescrevê-la.
+  def undated
+    Date.new(1900, 1, 1)
+  end
+
   # Linha como a main a deixava: sem datas, e sem versão de criação.
   def live(professor, level, created_at)
     PaperTrail.request(enabled: false) do
-      AdvisementAuthorization.new(professor: professor, level: level, created_at: created_at)
+      AdvisementAuthorization.new(professor: professor, level: level, created_at: created_at, start_date: undated)
         .tap { |row| row.save!(validate: false) }
     end
   end
@@ -179,7 +186,7 @@ RSpec.describe AdvisementAuthorizationHistory, type: :model do
       live(professor, other_level, at(2016, 1, 1))
 
       expect { rebuild }.not_to change(PaperTrail::Version, :count)
-      expect(AdvisementAuthorization.where(start_date: nil)).to be_empty
+      expect(AdvisementAuthorization.where(start_date: undated)).to be_empty
       expect(AdvisementAuthorization.all).to all(be_valid)
     end
   end
@@ -197,9 +204,14 @@ RSpec.describe AdvisementAuthorizationHistory, type: :model do
       enrollment
     end
 
-    it "lists only dismissed enrollments with no advisor accredited on the dismissal date" do
+    it "lists only dismissed enrollments with no advisor accredited in the dismissal month" do
       uncovered = dismissed(Date.new(2017, 6, 1))
       dismissed(Date.new(2014, 6, 1))
+      # O desligamento só guarda mês e ano: o credenciado a partir do dia 10
+      # cobre o aluno que saiu naquele mês.
+      later = FactoryBot.create(:professor)
+      FactoryBot.create(:advisement_authorization, professor: later, level: level, start_date: Date.new(2017, 6, 10))
+      dismissed(Date.new(2017, 6, 1), advisor: later)
       dismissed(Date.new(2017, 6, 1), advisor: nil)
       dismissed(nil)
 

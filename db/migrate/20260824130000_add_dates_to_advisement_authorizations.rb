@@ -13,12 +13,15 @@ class AddDatesToAdvisementAuthorizations < ActiveRecord::Migration[7.1]
     AdvisementAuthorization.reset_column_information
 
     history = AdvisementAuthorizationHistory.new.rebuild!
+    # Toda linha sai datada da reconstrução. Linha sem início derrubaria o
+    # show de Professor, que ordena por ele, e leria como não credenciada.
+    change_column_null :advisement_authorizations, :start_date, false
     say "Credenciamentos: #{history.inserted} períodos encerrados reconstruídos, " \
       "#{history.removed_duplicates.size} duplicatas fundidas, " \
       "#{history.skipped_periods} períodos de professor ou nível já apagado descartados"
     report "Versões do paper_trail ilegíveis, ignoradas", history.unreadable_version_ids
     report "Credenciamentos criados sem remoção registrada nem linha no banco", history.vanished_item_ids
-    report "Matrículas desligadas sem orientador credenciado no nível na data do desligamento " \
+    report "Matrículas desligadas sem orientador credenciado no nível no mês do desligamento " \
       "-- revisar com a secretaria", history.dismissed_without_accredited_advisor
   end
 

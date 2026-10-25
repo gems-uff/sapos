@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_23_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
   create_table "accomplishments", force: :cascade do |t|
     t.date "conclusion_date"
     t.datetime "created_at", precision: nil, null: false
@@ -243,7 +243,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_120000) do
     t.date "end_date"
     t.integer "level_id"
     t.integer "professor_id"
-    t.date "start_date"
+    t.date "start_date", null: false
     t.datetime "updated_at", precision: nil, null: false
     t.index ["level_id"], name: "index_advisement_authorizations_on_level_id"
     t.index ["professor_id"], name: "index_advisement_authorizations_on_professor_id"
@@ -261,10 +261,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_23_120000) do
 
   create_table "affiliations", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.datetime "end_date"
+    t.date "end_date"
     t.integer "institution_id"
     t.integer "professor_id"
-    t.datetime "start_date"
+    t.date "start_date"
     t.datetime "updated_at", null: false
     t.index ["institution_id"], name: "index_affiliations_on_institution_id"
     t.index ["professor_id"], name: "index_affiliations_on_professor_id"

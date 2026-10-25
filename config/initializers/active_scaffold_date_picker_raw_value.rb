@@ -9,10 +9,13 @@
 # aceita) e a linha grava como período em aberto.
 #
 # Quando o modelo valida a coluna com validates_timeliness, entregamos o texto
-# cru e apagamos o :invalid: quem julga é o modelo, com uma mensagem só. Só se
-# o cast do próprio atributo também rejeitar o texto -- o de datetime é
-# leniente ("31/02/2026" vira 03/03/2026) e aceitaria uma data que ninguém
-# digitou. Fora desses casos, nada muda.
+# cru e apagamos o :invalid: quem julga é o modelo, com uma mensagem só. O cast
+# de date recusa o dia que não existe ("31/02/2026") e aceita a grafia que o
+# date_picker não entende ("15.03.2024", "2024-03-15") com o dia digitado.
+#
+# Por isso coluna validada assim tem de ser date: o cast de datetime é
+# leniente, "31/02/2026" viraria 03/03/2026, uma data que ninguém digitou. As
+# de affiliations eram datetime e foram convertidas para date por esse motivo.
 #
 # É prepend porque o bridge cria o método por alias_method depois dos
 # initializers, e sobrescreveria um def comum.
@@ -29,8 +32,7 @@ module ActiveScaffoldDatePickerRawValue
   private
     def raw_value_on_unparseable_date(converted, record, column, value)
       return converted unless converted.nil? && value.present? &&
-        record.class.validators_on(column.name).any?(ValidatesTimeliness::Validator) &&
-        record.class.type_for_attribute(column.name.to_s).cast(value).nil?
+        record.class.validators_on(column.name).any?(ValidatesTimeliness::Validator)
 
       record.errors.delete(column.name, :invalid)
       value

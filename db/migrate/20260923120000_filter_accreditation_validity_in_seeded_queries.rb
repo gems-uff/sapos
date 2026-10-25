@@ -115,8 +115,11 @@ class FilterAccreditationValidityInSeededQueries < ActiveRecord::Migration[7.1]
       end
     end
 
+    # A coluna vai pelo Arel, que a põe entre aspas: SQL é palavra reservada
+    # no MariaDB, e o nome cru dá erro de sintaxe -- o SQLite aceita.
     def report_unreached(handled)
-      Query.where("sql LIKE ?", "%advisement_authorizations%").where.not(id: handled).find_each do |query|
+      unreached = Query.where(Query.arel_table[:sql].matches("%advisement_authorizations%"))
+      unreached.where.not(id: handled).find_each do |query|
         say "Consulta ##{query.id} (#{query.name}) lê advisement_authorizations e não foi " \
           "reescrita: revise o filtro de vigência do credenciamento à mão"
       end
