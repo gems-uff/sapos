@@ -188,7 +188,7 @@ de passagem, segue a regra do `AGENTS.md` — correção imediata, sem issue pú
 
 Duas coisas que **não** justificam devolver, e viram registro escrito: desvio de
 convenção de mensagem de commit, e achado adjacente fora do escopo do PR — este
-vira issue própria (pesquise as existentes antes, inclusive fechadas).
+vira issue própria (pesquise as existentes antes, como o `AGENTS.md` manda).
 
 ## 5. Cobrir as lacunas
 
