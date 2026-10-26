@@ -8,22 +8,22 @@
 # linhas para a mesma data.
 #
 # - scope: colunas que definem o grupo.
-# - parent/siblings: o pai cujo subform manda várias linhas no mesmo envio, e
-#   a coleção dele. Sem subform, omita os dois.
+# - parents: os pais cujo subform manda várias linhas no mesmo envio, cada um
+#   com a sua coleção ({ level: :advisement_authorizations }). Sem subform,
+#   omita.
 # - end_inclusive: se o dia do end_date ainda vale; tem de casar com o on_date.
 module PeriodConcern
   extend ActiveSupport::Concern
 
   included do
-    class_attribute :period_scope, :period_parent, :period_siblings,
-      :period_end_inclusive, instance_writer: false
+    class_attribute :period_scope, :period_parents, :period_end_inclusive,
+      instance_writer: false
   end
 
   class_methods do
-    def period(scope:, end_inclusive:, parent: nil, siblings: nil)
+    def period(scope:, end_inclusive:, parents: {})
       self.period_scope = scope
-      self.period_parent = parent
-      self.period_siblings = siblings
+      self.period_parents = parents
       self.period_end_inclusive = end_inclusive
       validate :no_overlapping_period, if: :period_changed?
     end
@@ -53,8 +53,8 @@ module PeriodConcern
     # em que estar no subform dele é o que põe a linha no grupo.
     def period_scope_incomplete?
       period_scope.any? do |column|
-        self[column].blank? &&
-          !(column == period_parent_key && public_send(period_parent).present?)
+        parent = period_parent_keys[column]
+        self[column].blank? && !(parent && public_send(parent).present?)
       end
     end
 
@@ -62,31 +62,40 @@ module PeriodConcern
     # com o banco recusaria mover a fronteira entre dois períodos no mesmo
     # envio. "Alterada" se decide no subform inteiro, antes de filtrar pelo
     # grupo; senão a cópia do banco de uma linha que trocou de professor
-    # acusaria sobreposição. As demais vêm do banco, porque a coleção em
-    # memória pode estar velha. Linha removida do subform já foi apagada pelo
-    # writer da associação antes da validação.
+    # acusaria sobreposição. Cada linha do subform é comparada sem a chave do
+    # pai dele, que ela compartilha mesmo antes de o pai ser gravado. As
+    # demais vêm do banco, porque a coleção em memória pode estar velha. Linha
+    # removida do subform já foi apagada pelo writer da associação antes da
+    # validação.
     def other_periods
-      edited = period_form_rows.select { |row| row.new_record? || row.changed? }
-      pending = edited.select do |row|
-        (period_scope - [period_parent_key]).all? { |column| row[column] == self[column] }
+      edited = period_form_rows.select { |row, _key| row.new_record? || row.changed? }
+      pending = edited.filter_map do |row, key|
+        row if (period_scope - [key]).all? { |column| row[column] == self[column] }
       end
       conditions = period_scope.index_with { |column| self[column] }
       return pending if conditions.values.any?(&:blank?)
-      stored = self.class.where(conditions).where.not(id: [id, *edited.map(&:id)].compact)
+      edited_ids = edited.map { |row, _key| row.id }
+      stored = self.class.where(conditions).where.not(id: [id, *edited_ids].compact)
       stored.to_a + pending
     end
 
+    # Pares [linha, chave do pai] de todo subform em que este registro pode
+    # estar. Só o do pai que está sendo editado tem linhas carregadas.
     def period_form_rows
-      return [] if period_parent.nil?
-      parent = public_send(period_parent)
-      return [] if parent.nil?
-      parent.association(period_siblings).target
-        .reject { |row| row.equal?(self) || (id.present? && row.id == id) }
+      period_parents.flat_map do |parent_name, siblings|
+        parent = public_send(parent_name)
+        next [] if parent.nil?
+        key = period_parent_keys.key(parent_name)
+        parent.association(siblings).target
+          .reject { |row| row.equal?(self) || (id.present? && row.id == id) }
+          .map { |row| [row, key] }
+      end
     end
 
-    def period_parent_key
-      return nil if period_parent.nil?
-      self.class.reflect_on_association(period_parent).foreign_key.to_sym
+    def period_parent_keys
+      period_parents.keys.index_by do |parent_name|
+        self.class.reflect_on_association(parent_name).foreign_key.to_sym
+      end
     end
 
     def overlaps?(other)

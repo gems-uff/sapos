@@ -101,9 +101,9 @@ RSpec.describe Affiliation, type: :model do
       end
     end
 
-    # As colunas de filiação são datetime, cujo cast passa por Time.zone.parse
-    # e aceita mais que o date_picker -- "31/02/2026" vira 03/03/2026. Por isso
-    # só a entrada que nenhum parser entende serve aqui.
+    # Atribuída direto ao modelo, a entrada que o cast de date descarta vira
+    # nil. O validates_date a julga pelo texto cru e reprova, em vez de deixar
+    # o nil passar como período em aberto.
     context "An unparseable end date" do
       it "is rejected instead of saved as an open period" do
         aff = FactoryBot.build :affiliation, end_date: nil
@@ -117,14 +117,17 @@ RSpec.describe Affiliation, type: :model do
   context "Scope" do
     context "date_professor" do
       let!(:professor) { FactoryBot.create :professor }
-      let!(:affiliation_active) { FactoryBot.create :affiliation, professor: professor, start_date: Time.now, end_date: nil }
+      # As colunas são date, e o escopo recebe Date, como os chamadores da
+      # aplicação. Com Time.now, entre 21h e meia-noite de Brasília a coluna
+      # guardava o dia local e a consulta comparava com o dia em UTC.
+      let!(:affiliation_active) { FactoryBot.create :affiliation, professor: professor, start_date: Date.current, end_date: nil }
       let!(:affiliation_inactive) do
-        FactoryBot.create :affiliation, professor: professor, start_date: Time.now - 1.day, end_date: Time.now
+        FactoryBot.create :affiliation, professor: professor, start_date: Date.current - 1.day, end_date: Date.current
       end
 
 
-      it { expect(Affiliation.professor_date(professor, Time.now).last).to eq(affiliation_active) }
-      it { expect(Affiliation.professor_date(professor, Time.now - 1.days).last).to eq(affiliation_inactive) }
+      it { expect(Affiliation.professor_date(professor, Date.current).last).to eq(affiliation_active) }
+      it { expect(Affiliation.professor_date(professor, Date.current - 1.day).last).to eq(affiliation_inactive) }
     end
   end
 end

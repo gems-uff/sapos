@@ -83,8 +83,8 @@ RSpec.describe "Filiações pelo subform de Professor", type: :request do
   end
 
   # A mesma reprodução do subform de Nível: data inconvertível numa linha nova
-  # não pode virar período em aberto. Só a entrada que nenhum parser entende:
-  # a coluna é datetime, cujo cast aceita mais que o date_picker.
+  # não pode virar período em aberto. Aqui, a entrada que nenhum parser
+  # entende; as que o cast entende e o date_picker não ficam no bloco abaixo.
   it "não acrescenta a filiação com término inconvertível como aberta" do
     atualizar_professor([
       filiacao(@uff, Date.new(2015, 1, 1), nil).merge(end_date: "banana")
@@ -93,13 +93,13 @@ RSpec.describe "Filiações pelo subform de Professor", type: :request do
     expect(@professor.affiliations.reload).to be_empty
   end
 
-  # Com as colunas de filiação em datetime, cujo cast é leniente ("31/02/2026"
-  # vira 03/03/2026), o active_scaffold_date_picker_raw_value.rb não podia
-  # entregar o texto cru: a revalidação da linha limpava o :invalid do
-  # date_picker e o término chegava nil -- na linha nova gravava filiação
-  # aberta, e na existente reabria a encerrada. Gravar 03/03/2026 também não
-  # atende, é data que ninguém digitou. Para os formatos que só divergem na
-  # grafia, gravar o dia digitado atende tanto quanto recusar.
+  # A revalidação da linha limpa o :invalid do date_picker, e o término que
+  # ele não entende chegaria nil: na linha nova gravaria filiação aberta, e na
+  # existente reabriria a encerrada. O active_scaffold_date_picker_raw_value.rb
+  # entrega o texto ao modelo, e o cast de date recusa o dia que não existe
+  # ("31/02/2026"); o de datetime, que estas colunas já tiveram, o empurrava
+  # para 03/03/2026, data que ninguém digitou. Para os formatos que só divergem
+  # na grafia, gravar o dia digitado atende tanto quanto recusar.
   describe "término que o date_picker não entende" do
     { "31/02/2026" => nil, "15.03.2024" => Date.new(2024, 3, 15), "2024-03-15" => Date.new(2024, 3, 15) }
       .each do |entrada, dia_digitado|

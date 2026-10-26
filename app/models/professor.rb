@@ -12,7 +12,12 @@ class Professor < ApplicationRecord
   has_many :advisements, dependent: :restrict_with_exception
   has_many :enrollments, through: :advisements
   has_many :scholarships, dependent: :restrict_with_exception
-  has_many :advisement_authorizations, dependent: :restrict_with_exception
+  # O histórico de credenciamento impede excluir o professor, mas a linha que
+  # sai do subform de Professor é apagada, como no de Nível. Sem o callback, o
+  # writer da associação seguiria o dependent e anularia professor_id: o
+  # credenciamento ficaria órfão, sem a versão de remoção no paper_trail.
+  has_many :advisement_authorizations, dependent: :restrict_with_exception,
+    before_remove: :destroy_removed_authorization
   has_many :professor_research_areas, dependent: :destroy
   has_many :research_areas, through: :professor_research_areas
   has_many :professor_research_lines, dependent: :destroy
@@ -150,6 +155,10 @@ class Professor < ApplicationRecord
   end
 
   private
+    def destroy_removed_authorization(authorization)
+      authorization.destroy! if authorization.persisted?
+    end
+
     def handle_user_role_removal
       return unless user.present?
 

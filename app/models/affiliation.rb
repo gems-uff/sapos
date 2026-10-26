@@ -18,7 +18,7 @@ class Affiliation < ApplicationRecord
   # então encerrar a filiação aberta e abrir a nova cabe num envio só -- a
   # validação anterior lia o banco e exigia dois.
   period scope: [:professor_id],
-    parent: :professor, siblings: :affiliations,
+    parents: { professor: :affiliations },
     end_inclusive: false
 
   scope :on_date, ->(date) { where("DATE(start_date) <= ? AND (DATE(end_date) > ? OR end_date IS null)", date, date) }

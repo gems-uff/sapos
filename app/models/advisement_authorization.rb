@@ -25,9 +25,10 @@ class AdvisementAuthorization < ApplicationRecord
   # nível: o histórico é uma sequência de períodos disjuntos. O término é
   # inclusivo, coerente com #active_on? e #on_date: um período que termina em
   # 31/12 e outro que começa em 01/01 são disjuntos, mas dois que compartilham
-  # um dia valeriam os dois nele.
+  # um dia valeriam os dois nele. Os credenciamentos se editam em lote nos
+  # subforms de Nível e de Professor.
   period scope: [:professor_id, :level_id],
-    parent: :level, siblings: :advisement_authorizations,
+    parents: { level: :advisement_authorizations, professor: :advisement_authorizations },
     end_inclusive: true
 
   # Rows whose accreditation period contains +date+ — the SQL analog of
