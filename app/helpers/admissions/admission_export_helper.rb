@@ -16,9 +16,8 @@ require "set"
 #   - files/long_values/ : overflow for cell values above the xlsx 32k char limit,
 #                    referenced from the cell by the "@@FILE:" sentinel.
 #
-# The companion import (see AdmissionImportHelper, próxima etapa) reads edital.xlsx,
-# recreates the records translating the original ids through an id map and reattaches
-# the files from files/.
+# The companion AdmissionImportHelper reads edital.xlsx, recreates the records
+# translating the original ids through an id map and reattaches the files from files/.
 module Admissions::AdmissionExportHelper
   FORMAT_VERSION = 1
   # Excel hard limit is 32767 chars per cell; stay safely below it.

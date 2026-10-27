@@ -39,6 +39,7 @@ class AdmissionDataController < ApplicationController
 
     config.action_links.add :import,
       label: "<i title='#{I18n.t("panel.admission_data.import")}' class='fa fa-upload'></i>".html_safe,
+      page: true,
       type: :collection
 
     config.action_links.add :purge,
@@ -61,9 +62,21 @@ class AdmissionDataController < ApplicationController
     redirect_to selection_processes_path
   end
 
+  # GET renders the upload form; POST processes it and renders the report in the
+  # same view (no redirect, so the uploaded report survives a validation error).
   def import
-    flash[:info] = I18n.t("panel.admission_data.coming_soon")
-    redirect_to selection_processes_path
+    return unless request.post?
+
+    file = params[:file]
+    if file.blank?
+      flash.now[:alert] = I18n.t("panel.admission_data.import_no_file")
+      return
+    end
+
+    @report = Admissions::AdmissionImportHelper.import_zip(file.read, dry_run: params[:dry_run].present?)
+  rescue => e
+    Rails.logger.error("Admission import failed: #{e.class}: #{e.message}\n#{e.backtrace&.first(20)&.join("\n")}")
+    flash.now[:alert] = I18n.t("panel.admission_data.import_error", message: "#{e.class}: #{e.message}")
   end
 
   def purge

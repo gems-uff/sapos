@@ -63,7 +63,9 @@ RSpec.describe Admissions::AdmissionImportHelper, type: :helper do
 
   let(:file_bytes) { "%PDF-1.4 conteúdo de teste".b }
   let(:medium_hash) { "#{Digest::MD5.hexdigest(file_bytes)}.pdf" }
-  let(:long_value) { "x" * 40_000 }
+  # Accented on purpose, like original_filename below: the zip hands both back
+  # as binary, and SQLite refuses to save a binary string with an accent.
+  let(:long_value) { "ação " * 8_000 }
 
   let!(:member) { FactoryBot.create(:user) }
   let!(:form_template) { FactoryBot.create(:form_template, name: "Inscrição") }
@@ -103,7 +105,7 @@ RSpec.describe Admissions::AdmissionImportHelper, type: :helper do
     # Neither value nor uploaded file through the uploader: the file column is set raw below.
     upload = FactoryBot.build(:filled_form_field, filled_form: filled_form, form_field: file_field, value: nil)
     upload.save!(validate: false)
-    storage.create!(medium_hash: medium_hash, original_filename: "doc.pdf", content_type: "application/pdf",
+    storage.create!(medium_hash: medium_hash, original_filename: "currículo.pdf", content_type: "application/pdf",
       size: file_bytes.bytesize, binary: file_bytes)
     upload.update_column(:file, medium_hash)
     FactoryBot.create(:admission_application, admission_process: process, filled_form: filled_form,
@@ -203,7 +205,11 @@ RSpec.describe Admissions::AdmissionImportHelper, type: :helper do
     expect(restored.admission_phase.admission_committees.first.users).to eq([member])
     expect(restored.rankings.first.ranking_config.form_template).to be_present
     expect(restored.rankings.first.filled_form.form_template).to eq(restored.rankings.first.ranking_config.form_template)
-    expect(storage.find_by(medium_hash: medium_hash).binary).to eq(file_bytes)
+    expect(restored.filled_form.fields.find_by(form_field: restored.admission_process.form_template.fields
+      .find_by(name: "Nome")).value).to eq(long_value)
+    stored = storage.find_by(medium_hash: medium_hash)
+    expect(stored.binary).to eq(file_bytes)
+    expect(stored.original_filename).to eq("currículo.pdf")
   end
 
   it "refuses to import a process that still exists" do
@@ -218,6 +224,9 @@ RSpec.describe Admissions::AdmissionImportHelper, type: :helper do
 
   it "drops the records of a user missing in this database" do
     zip
+    dropped = [
+      Admissions::AdmissionCommitteeMember, Admissions::AdmissionPhaseEvaluation, Admissions::AdmissionPendency,
+    ].map { |klass| "#{klass.where(user: member).count} em #{klass.table_name}" }
     purge_process
     # Lookup is by email: another email is a user this database doesn't have.
     archived_email = member.email
@@ -228,7 +237,10 @@ RSpec.describe Admissions::AdmissionImportHelper, type: :helper do
     expect(report.errors).to be_empty
     expect(Admissions::AdmissionPhaseEvaluation.count).to eq(0)
     expect(Admissions::FilledForm.where(form_template: phase.member_form).count).to eq(0)
-    expect(report.warnings.join).to include(archived_email)
+    # One warning per user, not one per dropped row.
+    expect(report.warnings.grep(/#{Regexp.escape(archived_email)}/)).to eq([
+      "usuário #{archived_email} não encontrado nesta base; registros descartados: #{dropped.join(", ")}",
+    ])
   end
 
   it "refuses to create Ruby/ERB code this database doesn't know" do

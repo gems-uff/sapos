@@ -106,14 +106,14 @@ module Admissions::AdmissionImportHelper
       xlsx_bytes = read_entry(xlsx_entry)
       zip.each do |entry|
         next unless entry.file?
-        next if entry.name == XLSX_ENTRY
 
-        if entry.name.start_with?(LONG_VALUES_PREFIX)
-          name = entry.name.delete_prefix(LONG_VALUES_PREFIX)
-          long_values[name] = read_entry(entry)
-        elsif entry.name.start_with?(FILES_PREFIX)
-          name = entry.name.delete_prefix(FILES_PREFIX)
-          files[name] = read_entry(entry)
+        name = utf8(entry.name, "o nome da entrada #{entry.name.inspect}")
+        next if name == XLSX_ENTRY
+
+        if name.start_with?(LONG_VALUES_PREFIX)
+          long_values[name.delete_prefix(LONG_VALUES_PREFIX)] = utf8(read_entry(entry), "o valor longo #{name}")
+        elsif name.start_with?(FILES_PREFIX)
+          files[name.delete_prefix(FILES_PREFIX)] = read_entry(entry)
         end
         # Anything else in the archive (stray entries) is ignored.
       end
@@ -128,6 +128,16 @@ module Admissions::AdmissionImportHelper
       raise ImportError, "entrada '#{entry.name}' excede o tamanho máximo permitido (#{MAX_ENTRY_BYTES} bytes)"
     end
     entry.get_input_stream.read
+  end
+
+  # The zip hands entries back as binary, but the export wrote names and long
+  # values as UTF-8. Left binary, the first accent breaks the save: SQLite's
+  # adapter transcodes a binary string to UTF-8 and raises on any byte above 127.
+  def utf8(bytes, what)
+    string = bytes.dup.force_encoding(Encoding::UTF_8)
+    raise ImportError, "#{what} não está em UTF-8" unless string.valid_encoding?
+
+    string
   end
 
   # --- Workbook reading --------------------------------------------------
@@ -371,8 +381,10 @@ module Admissions::AdmissionImportHelper
       end
 
       # Drops the rows of users missing here, and the filled form of a dropped
-      # evaluation with its fields, so no orphan form is left behind.
+      # evaluation with its fields, so no orphan form is left behind. One warning
+      # per user, with the count per table: a real process drops hundreds of rows.
       def exclude_rows_of_missing_users
+        dropped = Hash.new { |hash, email| hash[email] = Hash.new(0) }
         USER_TABLES.each do |table|
           @rows[table].each do |row|
             next if to_id(row["user_id"]).nil? || user_id(row)
@@ -380,9 +392,12 @@ module Admissions::AdmissionImportHelper
             @excluded[table] << to_id(row["id"])
             filled_form_id = to_id(row["filled_form_id"])
             @excluded["filled_forms"] << filled_form_id if filled_form_id
-            add_warning("#{table} id #{row["id"]}: usuário #{row["user__email"].presence || "sem e-mail"} " \
-              "não encontrado nesta base; registro descartado")
+            dropped[row["user__email"].presence || "sem e-mail"][table] += 1
           end
+        end
+        dropped.each do |email, counts|
+          summary = counts.map { |table, count| "#{count} em #{table}" }.join(", ")
+          add_warning("usuário #{email} não encontrado nesta base; registros descartados: #{summary}")
         end
         exclude_children("filled_form_fields", "filled_form_id", "filled_forms")
         exclude_children("filled_form_field_scholarities", "filled_form_field_id", "filled_form_fields")
