@@ -37,23 +37,22 @@ module AdmissionsRankingHelpers
       end
     end
 
-    # Ensure form fields exist for the columns and have the requested type
+    # The candidates' values live in one template of their own: a filled form
+    # only accepts fields of its template. A field keeps the type requested by
+    # the column or, when none is given, the type of a field of the same name
+    # the spec created beforehand.
+    values_template = FactoryBot.create(:form_template)
     fields = {}
     created_form_fields = []
-    column_specs.each do |spec|
-      f = Admissions::FormField.find_by(name: spec[:name])
-      if f
-        if spec[:type].present? && f.field_type != spec[:type]
-          f.update!(field_type: spec[:type])
-        end
-      else
-        attrs = { name: spec[:name] }
-        attrs[:field_type] = spec[:type] if spec[:type].present?
-        f = FactoryBot.create(:form_field, **attrs)
-        created_form_fields << f
+    field_for = lambda do |name, type = nil|
+      fields[name] ||= begin
+        type = type.presence || Admissions::FormField.find_by(name: name)&.field_type
+        attrs = { name: name, form_template: values_template }
+        attrs[:field_type] = type if type.present?
+        FactoryBot.create(:form_field, **attrs).tap { |f| created_form_fields << f }
       end
-      fields[spec[:name]] = f
     end
+    column_specs.each { |spec| field_for.call(spec[:name], spec[:type]) }
 
     # Ensure ranking_config has the requested ranking_columns and that the
     # ordering is set when provided.
@@ -97,12 +96,15 @@ module AdmissionsRankingHelpers
     values.each_with_index do |val, idx|
       email = emails && emails[idx] ? emails[idx] : "candidate#{Time.now.to_i}#{rand(1000)}#{idx}@example.com"
       name = names && names[idx] ? names[idx] : "Candidate#{idx}"
-      app = FactoryBot.create(:admission_application, admission_process: admission_process, email: email, name: name)
+      app = FactoryBot.create(
+        :admission_application, admission_process: admission_process, email: email, name: name,
+        filled_form: FactoryBot.create(:filled_form, form_template: values_template)
+      )
       to_destroy << app
 
       if val.is_a?(Hash)
         val.each do |col_name, v|
-          ff = fields[col_name.to_s] || FactoryBot.create(:form_field, name: col_name.to_s)
+          ff = field_for.call(col_name.to_s)
           fff = FactoryBot.create(:filled_form_field, filled_form: app.filled_form, form_field: ff, value: v)
           to_destroy << fff
         end

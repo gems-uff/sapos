@@ -28,7 +28,7 @@ RSpec.describe Advisement, type: :model do
   let(:level) { FactoryBot.build(:level) }
   let(:professor) do
     prof = FactoryBot.build(:professor)
-    prof.advisement_authorizations.build(level: level)
+    prof.advisement_authorizations.build(level: level, start_date: Date.current)
     prof
   end
   let(:enrollment) { FactoryBot.build(:enrollment, level: level) }
@@ -94,6 +94,48 @@ RSpec.describe Advisement, type: :model do
         expect(advisement).to have_error(:no_advisor_with_level).on(:base)
       end
 
+      it "should have error when the advisor's authorization at the level has been closed (de-accredited)" do
+        @destroy_later << level = FactoryBot.create(:level)
+        @destroy_later << professor1 = FactoryBot.create(:professor)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
+        @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level,
+                                            start_date: Date.current - 2.days, end_date: Date.current - 1.day)
+        advisement = Advisement.new(professor: professor1, enrollment: enrollment, main_advisor: true)
+        expect(advisement).to have_error(:no_advisor_with_level).on(:base)
+      end
+
+      # Decisão da revisão do PR #690: aluno desligado não fica isento, a regra
+      # é avaliada no mês do desligamento. O credenciamento pode ter sido
+      # encerrado depois sem afetar a matrícula arquivada, mas ela não aceita
+      # orientador que não era credenciado quando o aluno saiu -- nem matrícula
+      # com desligamento futuro deixa de ser checada.
+      describe "on a dismissed enrollment" do
+        before(:each) do
+          @destroy_later << @level = FactoryBot.create(:level)
+          @destroy_later << @professor1 = FactoryBot.create(:professor)
+          @destroy_later << @enrollment = FactoryBot.create(:enrollment, level: @level)
+          admission = @enrollment.admission_date
+          @destroy_later << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level,
+                                              start_date: admission - 1.year, end_date: admission + 10.days)
+        end
+
+        def advisement_dismissed_on(date)
+          @destroy_later << FactoryBot.create(:dismissal, enrollment: @enrollment, date: date)
+          @enrollment.reload
+          Advisement.new(professor: @professor1, enrollment: @enrollment, main_advisor: true)
+        end
+
+        it "should not have error when the advisor was accredited on the dismissal date, though closed since" do
+          advisement = advisement_dismissed_on(@enrollment.admission_date + 5.days)
+          expect(advisement).to have(0).errors_on(:base)
+        end
+
+        it "should have error when the advisor's accreditation had ended before the dismissal date" do
+          advisement = advisement_dismissed_on(@enrollment.admission_date + 4.years)
+          expect(advisement).to have_error(:no_advisor_with_level).on(:base)
+        end
+      end
+
       it "should not have error when the accreditation validation is disabled" do
         @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "no")
         @destroy_later << level = FactoryBot.create(:level)
@@ -101,6 +143,24 @@ RSpec.describe Advisement, type: :model do
         @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
         advisement = Advisement.new(professor: professor1, enrollment: enrollment, main_advisor: true)
         expect(advisement).to have(0).errors_on(:base)
+      end
+
+      # A validação relê do banco as orientações da matrícula, e lá a
+      # orientação em edição ainda tem o professor antigo. Sem pôr a versão em
+      # memória no lugar, era ele que satisfazia a regra: pela tela de
+      # Orientações, trocar o único orientador credenciado por um que não é
+      # passava sem erro, e a matrícula só acusava na próxima edição dela.
+      it "should have error when the only accredited advisor is replaced by one not accredited at the level" do
+        @destroy_later << level = FactoryBot.create(:level)
+        @destroy_later << accredited = FactoryBot.create(:professor)
+        @destroy_later << other = FactoryBot.create(:professor)
+        @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level)
+        @destroy_later << FactoryBot.create(:advisement_authorization, professor: accredited, level: level)
+        @destroy_later << FactoryBot.create(:advisement, professor: accredited, enrollment: enrollment, main_advisor: true)
+
+        advisement = Advisement.find_by(enrollment: enrollment)
+        advisement.professor = other
+        expect(advisement).to have_error(:no_advisor_with_level).on(:base)
       end
     end
 
@@ -115,6 +175,37 @@ RSpec.describe Advisement, type: :model do
         @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor1, level: level)
         advisement = Advisement.new(professor: professor1, enrollment: enrollment, main_advisor: true)
         expect(advisement).to have_error(:research_area_different_from_professors).on(:base)
+      end
+
+      # O defeito de enrollment_has_authorized_advisor, nesta regra: relidas do
+      # banco, as orientações traziam a em edição com o professor antigo, e
+      # trocar pela tela de Orientações o único orientador da área por outro
+      # professor passava sem erro.
+      describe "when the only advisor in the research area is replaced" do
+        before(:each) do
+          @destroy_later << level = FactoryBot.create(:level)
+          @destroy_later << @research_area = FactoryBot.create(:research_area)
+          @destroy_later << in_area = FactoryBot.create(:professor)
+          @destroy_later << FactoryBot.create(:professor_research_area, professor: in_area, research_area: @research_area)
+          @destroy_later << enrollment = FactoryBot.create(:enrollment, level: level, research_area: @research_area)
+          [in_area, @other = FactoryBot.create(:professor)].each do |professor|
+            @destroy_later << professor
+            @destroy_later << FactoryBot.create(:advisement_authorization, professor: professor, level: level)
+          end
+          @destroy_later << FactoryBot.create(:advisement, professor: in_area, enrollment: enrollment, main_advisor: true)
+          @advisement = Advisement.find_by(enrollment: enrollment)
+        end
+
+        it "should have error when the new advisor is not in the research area" do
+          @advisement.professor = @other
+          expect(@advisement).to have_error(:research_area_different_from_professors).on(:base)
+        end
+
+        it "should not have error when the new advisor is in the research area" do
+          @destroy_later << FactoryBot.create(:professor_research_area, professor: @other, research_area: @research_area)
+          @advisement.professor = Professor.find(@other.id)
+          expect(@advisement).to have(0).errors_on(:base)
+        end
       end
     end
   end
