@@ -26,6 +26,8 @@ class Admissions::FilledFormField < ActiveRecord::Base
     :file
   end
 
+  validate :that_form_field_belongs_to_the_template,
+    if: -> { self.new_record? || self.form_field_id_changed? }
   validate :that_either_value_or_file_is_filled
   validate :that_value_follows_configuration_rules
   validate :size_of_file
@@ -55,6 +57,15 @@ class Admissions::FilledFormField < ActiveRecord::Base
     when Admissions::FormField::TEXT, Admissions::FormField::NUMBER, Admissions::FormField::DATE
       self.value = configuration["default"] if self.value.nil?
     end
+  end
+
+  # O campo vem do formulario que o cliente submete: um form_field de outro
+  # template gravaria valor que nenhuma tela oferece e que, pelo nome, tomaria
+  # o lugar do campo verdadeiro em to_fields_hash.
+  def that_form_field_belongs_to_the_template
+    return if self.form_field.nil? || self.filled_form.nil?
+    return if self.form_field.form_template_id == self.filled_form.form_template_id
+    self.errors.add(:form_field, :invalid)
   end
 
   def that_either_value_or_file_is_filled

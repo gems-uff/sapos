@@ -15,7 +15,11 @@ driver = build_driver
 wait = Selenium::WebDriver::Wait.new(timeout: 30)
 begin
   login(driver, wait)
-  switch_role!(driver, wait, "Administrador")
+  # Logo depois de reimportar a replica a conta tem um papel so, e o combo so
+  # aparece com dois -- quem acrescenta o segundo e o preparar_aluno_de_teste.rb,
+  # que ja escreve e por isso vem depois deste script.
+  combo = driver.find_elements(css: "form[action*='change_role'] select[name='role_id']")
+  switch_role!(driver, wait, "Administrador") if combo.any?
   driver.navigate.to("#{BASE}/custom_variables?per_page=200")
   settle(driver, wait)
 
@@ -24,6 +28,12 @@ begin
       return Array.from(tr.querySelectorAll("td")).map(function (td) { return td.innerText.trim(); });
     });
   JS
+  # Lista vazia e "nao li", nao "variavel ausente": papel sem acesso a tela
+  # devolve zero linhas, e isso se leria como PERIGO.
+  if linhas.empty?
+    puts "Tela de Variaveis sem linhas (papel ativo: #{papel_ativo(driver).inspect}). Medida recusada."
+    exit 3
+  end
   alvo = linhas.find { |cells| cells.any? { |c| c == "redirect_email" } }
 
   if alvo.nil?
