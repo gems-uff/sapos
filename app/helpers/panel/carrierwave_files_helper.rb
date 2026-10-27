@@ -13,8 +13,13 @@ module Panel::CarrierwaveFilesHelper
 
   def self.find_carrierwave_orphan_ids
     cw = CarrierWave::Storage::ActiveRecord::ActiveRecordFile
+    files = cw.arel_table
+    # Arel cita tabela e coluna em vez de interpolá-las na SQL: os nomes vêm da
+    # constante, mas a interpolação reprova o brakeman no CI.
     referenced_ids = CARRIERWAVE_REFERENCES.flat_map do |table, column, key|
-      cw.joins("INNER JOIN #{table} ON #{table}.#{column} = carrier_wave_files.#{key}").pluck(:id)
+      referencing = Arel::Table.new(table)
+      join = files.join(referencing).on(referencing[column].eq(files[key]))
+      cw.joins(join.join_sources).pluck(:id)
     end
     cw.where.not(id: referenced_ids).pluck(:id)
   end

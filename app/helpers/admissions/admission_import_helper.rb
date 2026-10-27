@@ -65,27 +65,29 @@ module Admissions::AdmissionImportHelper
   # An ImportError aborts the import (nothing is written) and lands in
   # report.errors; any other exception propagates.
   def import_zip(io, dry_run: false)
+    # Built before the protected block, so the rescue always has a report.
     report = Report.new(
       dry_run: dry_run, process_id: nil, created: Hash.new(0), reused: Hash.new(0),
       warnings: [], errors: []
     )
-    archive = read_archive(io)
-    meta, sheets = with_workbook(archive[:xlsx]) do |workbook|
-      [validate_meta!(read_meta(workbook)), SHEETS.index_with { |name| read_sheet(workbook, name) }]
+    begin
+      archive = read_archive(io)
+      meta, sheets = with_workbook(archive[:xlsx]) do |workbook|
+        [validate_meta!(read_meta(workbook)), SHEETS.index_with { |name| read_sheet(workbook, name) }]
+      end
+      # requires_new: inside a caller's transaction a joined block would swallow the
+      # Rollback without undoing anything; a savepoint makes dry_run and errors undo.
+      ActiveRecord::Base.transaction(requires_new: true) do
+        Importer.new(meta, sheets, archive[:files], archive[:long_values], report).run
+        raise ActiveRecord::Rollback if dry_run
+      end
+      report.warnings.uniq!
+    rescue ImportError => e
+      report.created.clear
+      report.reused.clear
+      report.process_id = nil
+      report.errors << e.message
     end
-    # requires_new: inside a caller's transaction a joined block would swallow the
-    # Rollback without undoing anything; a savepoint makes dry_run and errors undo.
-    ActiveRecord::Base.transaction(requires_new: true) do
-      Importer.new(meta, sheets, archive[:files], archive[:long_values], report).run
-      raise ActiveRecord::Rollback if dry_run
-    end
-    report.warnings.uniq!
-    report
-  rescue ImportError => e
-    report.created.clear
-    report.reused.clear
-    report.process_id = nil
-    report.errors << e.message
     report
   end
 
