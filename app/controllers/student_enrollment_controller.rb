@@ -131,7 +131,7 @@ class StudentEnrollmentController < ApplicationController
         semester: @semester.semester,
       ).includes(:allocations)
       .includes(course: [ :course_type ])
-      .includes(course_class_professors: :professor)
+      .includes(:professors)
       @on_demand = Course.includes(:course_type)
         .where(course_types: { on_demand: true })
       @advisement_authorizations = Professor
