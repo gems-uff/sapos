@@ -45,6 +45,10 @@ RSpec.describe "CourseClassProfessorEscalation", type: :request do
       year: YearSemester.current.year,
       semester: YearSemester.current.semester
     )
+
+    CustomVariable.create!(
+        variable: "professor_login_can_post_grades", value: "yes_all_semesters"
+      )
   end
 
   describe "authenticated access" do
@@ -171,7 +175,7 @@ RSpec.describe "CourseClassProfessorEscalation", type: :request do
           }
         }
         # Assert that the second professor was not added
-        expect(response).to have_http_status(:internal_server_error)
+        expect(response).to have_http_status(:ok)
         expect(@course_class.reload.professors).to contain_exactly(@professor_1, @professor_2)
       end
 
@@ -183,7 +187,7 @@ RSpec.describe "CourseClassProfessorEscalation", type: :request do
           }
         }
         # Assert that the professor was not changed
-        expect(response).to have_http_status(:internal_server_error)
+        expect(response).to have_http_status(:ok)
         expect(@course_class.reload.professors).to contain_exactly(@professor_1, @professor_2)
       end
 
@@ -195,7 +199,7 @@ RSpec.describe "CourseClassProfessorEscalation", type: :request do
           }
         }
         # Assert that the second professor was not removed
-        expect(response).to have_http_status(:internal_server_error)
+        expect(response).to have_http_status(:ok)
         expect(@course_class.reload.professors).to contain_exactly(@professor_1, @professor_2)
       end
     end
@@ -282,7 +286,7 @@ RSpec.describe "CourseClassProfessorEscalation", type: :request do
           }
         }
         # Assert that the year and semester were not changed
-        expect(response).to have_http_status(:internal_server_error)
+        expect(response).to have_http_status(:ok)
         expect(@course_class.reload.year).to eq(YearSemester.current.year)
         expect(@course_class.reload.semester).to eq(YearSemester.current.semester)
       end
@@ -441,6 +445,47 @@ RSpec.describe "CourseClassProfessorEscalation", type: :request do
         expect(@class_enrollment.reload.grade).to eq(nil)
         expect(@class_enrollment.reload.situation).to eq(ClassEnrollment::REGISTERED)
       end
+    end
+  end
+
+  describe "CourseClass: professor não reescreve a lista de professores" do
+    before(:each) do
+      sign_in @professor1_user
+      @professor1_user.update!(actual_role: Role::ROLE_PROFESSOR)
+
+      CustomVariable.create!(
+        variable: "professor_login_can_post_grades", value: "yes_all_semesters"
+      )
+    end
+
+    it "controle: o formulário de edição não oferece o campo de professores" do
+      get edit_course_class_path(@course_class)
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(@professor_1.name)
+      expect(response.body).not_to match(/name="record\[professors\]/)
+    end
+
+    it "controle: mudar uma coluna pelo mesmo caminho é barrado" do
+      put course_class_path(@course_class), params: { record: { year: "2022" } }
+      expect(@course_class.reload.year).to eq(YearSemester.current.year)
+    end
+
+    it "não adiciona professor à turma por parâmetro forjado" do
+      put course_class_path(@course_class), params: {
+        record: { professors: [@professor_1.id.to_s, @professor_2.id.to_s, @professor_3.id.to_s] }
+      }
+      expect(@course_class.reload.professors.map(&:id)).to eq([@professor_1.id, @professor_2.id]),
+        "professores agora são #{@course_class.reload.professors.map(&:name).inspect}"
+    end
+
+    it "não remove professor da turma por parâmetro forjado" do
+      @course_class.professors = [@professor_1, @professor_2]
+      @course_class.save!
+      put course_class_path(@course_class), params: {
+        record: { professors: [@professor_1.id.to_s] }
+      }
+      expect(@course_class.reload.professors.map(&:id)).to include(@professor_2.id),
+        "colega removido; sobraram #{@course_class.reload.professors.map(&:name).inspect}"
     end
   end
 end
