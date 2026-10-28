@@ -73,6 +73,7 @@ class CourseClassesController < ApplicationController
     config.columns[:course].form_ui = :record_select
     config.columns[:course].options[:params] = { available: true }
     config.columns[:professors].form_ui = :record_select
+    config.columns[:professors].send_form_on_update_column = true
     config.columns[:year].form_ui = :select
     config.columns[:semester].form_ui = :select
     config.columns[:semester].options = {
