@@ -1,6 +1,6 @@
 ---
 name: dependencias
-description: Decide como declarar uma gem no Gemfile e como conduzir uma atualização de dependências. Use ao adicionar gem, mexer em restrição de versão, avaliar se um pin ainda se justifica, ou planejar uma campanha de atualização (patch, minor, correção de CVE).
+description: Decide como declarar uma gem no Gemfile e como conduzir uma atualização de dependências — uma gem por passo, ou uma campanha que move a cauda em lote por nível e o núcleo gem a gem. Use ao adicionar gem, mexer em restrição de versão, avaliar se um pin ainda se justifica, ou planejar e conduzir uma campanha de atualização (pontos de uso, patch, minor, o experimento dos majors, correção de CVE).
 ---
 
 # Dependências: declarar e atualizar
@@ -115,8 +115,10 @@ nada: carrega um arquivo de nome diferente do da gem.
   dar o passo por concluído. O CI repete a checagem.
 - Gem transitiva não entra no `Gemfile` só para travar série. Use
   `bundle update <gem> --patch`, que restringe o bump sem tocar no arquivo.
-- Higiene em lote (muitas gems atrasadas em patch) é exceção à regra de um passo
-  por gem: `bundle update --patch --strict`, suíte, e bissecção **só se quebrar**.
+- A exceção à regra de um passo por gem é a campanha (abaixo): a cauda anda em
+  lote por nível — `bundle update --patch --strict`, depois `--minor
+  --strict` —, com bissecção **só se quebrar**; o núcleo continua uma gem por
+  passo.
 
 ### `--strict` quer dizer duas coisas
 
@@ -163,8 +165,92 @@ ramo para a sondagem** — ramo só quando algo for ficar, e aí valem issue e r
 `issue_NNN` da convenção.
 
 Vermelho é informação barata: aborta e pronto. Verde **não** é autorização para
-entrar tudo junto — separe o bloco de dev/test (rubocop, pry, simplecov: chato e
-seguro) do bloco de runtime, e volte ao baby-step para o segundo.
+entrar tudo junto: o que entra em lote e o que vai gem a gem é o regime da
+campanha (abaixo), e o bloco de dev/test (rubocop, pry, simplecov: chato e
+seguro) vai separado do de runtime.
+
+### Campanha
+
+Uma campanha põe o `Gemfile.lock` em dia de uma vez: antes de um trecho de
+trabalho que deve partir de dependências atuais, ou quando o `bundle-audit` e
+os alertas do Dependabot se acumulam. Uma issue (Task) a acompanha, cada
+degrau é uma sessão que termina com um comentário de resultados nela, e os
+degraus vão nesta ordem: os pontos de uso, os patches, os minors, os majors.
+
+**O regime.** A regra do passo (`AGENTS.md`) vale para o núcleo; a cauda anda
+em lote.
+
+- **Núcleo:** a gem sobre a qual o código é construído — os pontos de uso dela
+  se espalham por muitos arquivos, ou a suíte alcança poucos deles, ou os
+  minors dela trazem migração documentada. Uma gem por passo, até o minor mais
+  novo da série, lendo antes todos os changelogs entre a versão travada e o
+  alvo, e o guia de atualização. O passo se divide no minor cujo changelog
+  anuncia migração (API removida, configuração que muda, default novo do
+  framework), e esse minor é um passo à parte, com issue própria. Num framework
+  em que todo minor é migração, como o Rails e o active_scaffold, a regra dá um
+  minor por vez.
+- **Cauda:** todo o resto — gem transitiva que o código não nomeia, ferramenta
+  de desenvolvimento e teste, plugin do rubocop. Um lote por nível, todos os
+  patches e depois todos os minors, sempre com `--strict` (o teto rígido da
+  tabela acima), o diff do `Gemfile.lock` lido entrada a entrada, e bissecção
+  só se ficar vermelho.
+- **Major** nunca entra em lote: os majors são primeiro um experimento
+  (abaixo), e cada um que entra é um passo à parte.
+
+Quais gems são núcleo se mede no primeiro degrau e fica escrito na issue da
+campanha; não se supõe.
+
+**1. Os pontos de uso.** Cobertura de linhas do SAPOS não diz nada sobre uma
+gem; o que importa é se a suíte executa as linhas que a usam. Em Ruby não há
+import por arquivo — o `Bundler.require` carrega toda gem no boot —, então o
+ponto de uso é a linha que nomeia uma constante da gem (`Prawn::Document`,
+`Axlsx::Package`) ou chama o DSL que ela injeta nos modelos e controllers.
+`git grep -n -w '<Constante>' -- app lib config` dá os pontos, e o
+`coverage/.resultset.json` que o simplecov escreve depois de `bundle exec
+rspec` (sem `SKIP_COVERAGE`) diz quais linhas de cada arquivo rodaram. Ponto
+que a suíte não alcança é onde um update quebra sem vermelho: ele diz qual
+conferência da parte 4 o degrau deve, e onde escrever teste de caracterização
+antes de mexer numa gem do núcleo. Gem transitiva não tem ponto de uso
+próprio: no `Gemfile.lock`, as gems sob as quais ela aparece são as que a
+trazem, e os pontos delas é que a verificam.
+
+**2. O inventário por nível.** `bundle outdated` pelado lista o que existe; o
+nível de cada salto se lê das duas versões, e o que o `Gemfile` não deixa
+entrar é decisão, não lote (ver "Diagnóstico").
+
+**3. O lote.** `bundle update --patch --strict` num degrau e `bundle update
+--minor --strict` no seguinte. O commit lista cada gem que andou. Um diff do
+lock com gem fora do nível (um minor no lote de patch) é lote vermelho: o
+`--strict` faltou.
+
+**4. Lote vermelho se bissecta** (delta debugging): a partir do lock da base
+(`git checkout Gemfile.lock && bundle install`), refaça o lote com a primeira
+metade dos nomes (`bundle update --patch --strict <gem> <gem> ...`); a metade
+que continua vermelha se divide de novo, até sobrar uma gem. Ela sai do lote e
+vira passo à parte, no regime do núcleo; o resto do lote entra.
+
+**5. Cada degrau**, lote ou gem: a suíte inteira antes e depois
+(`safe-refactor`; sem `SKIP_COVERAGE` ao menos uma vez), o `bundle-audit check
+--update`, o `rake javascript:check` quando o JS muda, e as conferências da
+parte 4 que os pontos de uso pedirem — o golden-master e a `homologacao`
+quando anda gem que desenha documento ou página, a recompilação dos assets
+quando anda gem de asset. Um commit por lote e um por gem do núcleo, cada
+mensagem listando o que andou e o que foi lido e medido.
+
+**6. Os majors: primeiro um experimento**, numa árvore descartável, nunca no
+checkout (`git worktree add --detach <rascunho>/majors main`). Na árvore,
+afrouxe a restrição do `Gemfile`, `bundle update <gem> --conservative`, e a
+suíte; agrupe as falhas pela mensagem do erro. Quando uma mensagem cobre quase
+tudo, ela é uma primeira camada que esconde o resto: conserte-a na árvore
+descartável, rode de novo, e repita até sobrar o esperado ou um custo de
+verdade (o método Mikado: o objetivo na árvore descartável, os pré-requisitos
+anotados, de volta à base). Quando a série antiga avisa o que a nova remove
+(as deprecações do Rails), a suíte na base com os avisos visíveis dá a
+superfície da migração nos caminhos que ela executa. Nada do experimento entra
+como está: ele termina num relatório na issue da campanha — por major, o que
+quebrou, quanto custaria e o que vem antes. O major que sai verde e lido vira
+passo à parte; o que pede migração vira issue própria, com os pré-requisitos
+no corpo.
 
 ### `bundle audit` antes de teorizar
 

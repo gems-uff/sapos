@@ -40,9 +40,9 @@ $(document).ready(function() {
       const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/;
       groups = value.match(regex)
       if (!groups || isNaN(Date.parse(`${groups[3]}-${groups[2]}-${groups[1]}`))) {
-        return `<%= form_field.name %> <%= I18n.t(
+        return <%= raw [form_field.name, I18n.t(
           "activerecord.errors.models.admissions/filled_form_field.invalid_date",
-        ) %>`
+        )].join(" ").to_json %>
       }
       return "" ;
     }

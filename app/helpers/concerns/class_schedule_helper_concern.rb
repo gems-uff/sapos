@@ -32,7 +32,15 @@ module ClassScheduleHelperConcern
       "activerecord.attributes.class_schedule.table.professor"
     )}"
 
-    table_data = []
+    noschedule = I18n.t(
+      "activerecord.attributes.class_schedule.table.noschedule"
+    )
+
+    # Cada linha é o par [visível, falado]: o visível é o que o vidente lê na
+    # célula; o falado é a frase que o leitor de tela deve anunciar via
+    # ActualText (nil em célula que se lê pelo que desenha). Os dois viajam
+    # juntos pela ordenação no fim, para não desalinharem.
+    rows = []
     on_demand_professors = {}
 
     course_classes.each do |course_class|
@@ -42,6 +50,7 @@ module ClassScheduleHelperConcern
       next unless course_type.schedulable
 
       course = header[0].map { |x| [] }
+      spoken = header[0].map { |x| [] }
 
       course[0] = {
         id: course_class.id, course_id: course_class.course_id,
@@ -54,26 +63,37 @@ module ClassScheduleHelperConcern
       course_class.allocations.each do |allocation|
         index = I18n.translate("date.day_names").index(allocation.day)
         course[index + 2 - first] << allocation.to_shortlabel
+        spoken[index + 2 - first] << class_schedule_spoken_allocation(allocation)
       end
 
       course = course.map { |x| x.kind_of?(Array) ? x.join("\n") : x }
+      spoken = spoken.map { |x| x.empty? ? nil : x.join(". ") }
 
       if course_class.allocations.empty?
         (first..last).each do |index|
           course[index + 2 - first] = "*\n "
         end
+        # A frase vai na célula do nome, uma vez por linha, e não nas células
+        # de asterisco, que continuam sem ActualText e são lidas como "*". Foi
+        # este formato que a validação com leitor de tela aprovou na issue.
+        #
+        # Nome CRU (name_with_class), não course[1]: este último pode vir de
+        # name_with_class_formated_to_reports, que escapa "<" para "&lt;" por
+        # causa do inline_format da célula visível. O ActualText é string
+        # Unicode pura, sem inline_format, então o "&lt;" seria falado literal.
+        spoken[1] = "#{course_class.name_with_class}. #{noschedule}"
         star = true
       end
       course[-1] = rescue_blank_text(course_class.professors_elements, method_call: :name)
       if ! course_type.on_demand || keep_on_demand
-        table_data << course
+        rows << [course, spoken]
       else
         on_demand_professors[course_class.course_id] ||= []
         on_demand_professors[course_class.course_id] += course_class.professors
       end
     end
 
-    demand_data = []
+    demand_rows = []
 
     on_demand.each do |course|
       professors = advisement_authorizations
@@ -87,29 +107,50 @@ module ClassScheduleHelperConcern
       next unless found_professors.present? || course.available
 
       course_data = header[0].map { |x| "" }
+      spoken_data = header[0].map { |x| nil }
       course_data[0] = {
         id: nil, course_id: course.id,
         on_demand: true, professors: professors
       }
-      course_data[1] = course.name
+      # Mesmo escape de name_with_class_formated_to_reports: a célula do PDF
+      # tem inline_format.
+      course_data[1] = used_to_render_a_pdf_report ?
+        course.name.gsub("<", "&lt;") :
+        course.name
       (first..last).each do |index|
         course_data[index + 2 - first] = "*\n "
       end
+      spoken_data[1] = "#{course.name}. #{noschedule}"
       course_data[-1] = ""
       star = true
-      demand_data << course_data
+      demand_rows << [course_data, spoken_data]
     end
 
-    table_data += demand_data
+    rows += demand_rows
 
-    table_data.sort_by! { |e| I18n.transliterate(e[1]) }
+    rows.sort_by! { |visible, _spoken| I18n.transliterate(visible[1]) }
 
     {
       star: star,
       first: first,
       last: last,
       header: header,
-      data: table_data,
+      data: rows.map { |visible, _spoken| visible },
+      actual: rows.map { |_visible, spoken| spoken },
     }
+  end
+
+  # Frase que o leitor de tela anuncia numa célula de dia: dia da semana no
+  # singular, faixa de horas e sala. Os horários são inteiros (0..23), como no
+  # to_shortlabel, então "11h às 13h" cobre o dado real.
+  def class_schedule_spoken_allocation(allocation)
+    label = "#{allocation.day}, " \
+      "#{allocation.start_time}h às #{allocation.end_time}h"
+    if allocation.room.present?
+      label += ", #{I18n.t(
+        "activerecord.attributes.allocation.room"
+      )}: #{allocation.room}"
+    end
+    label
   end
 end

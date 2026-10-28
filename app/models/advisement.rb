@@ -85,10 +85,7 @@ class Advisement < ApplicationRecord
 
   def enrollment_has_main_advisor
     return if enrollment.blank?
-    advisements = enrollment.advisements.reject(&:marked_for_destruction?)
-
-    advisements = advisements.map { |a| a == self ? self : a }
-
+    advisements = enrollment_advisements
     advisements << self if new_record? && advisements.exclude?(self)
 
     return if advisements.blank? && main_advisor
@@ -101,23 +98,17 @@ class Advisement < ApplicationRecord
   def enrollment_has_authorized_advisor
     return unless CustomVariable.enable_advisor_accreditation_validation
     return if enrollment.blank? || enrollment.level.blank?
-    return if professor.present? && professor.advisement_authorizations.any? { |auth| auth.level == enrollment.level }
+    return if enrollment.any_accredited_advisor?([self])
+    return if enrollment.any_accredited_advisor?(enrollment_advisements)
 
-    advisements = enrollment.advisements.reject(&:marked_for_destruction?)
-    has_authorized = advisements.any? do |a|
-      a.professor.present? &&
-        a.professor.advisement_authorizations.any? { |auth| auth.level == enrollment.level }
-    end
-
-    errors.add(:base, :no_advisor_with_level) unless has_authorized
+    errors.add(:base, :no_advisor_with_level)
   end
 
   def verify_research_area_with_advisors
     return if enrollment.blank? || enrollment.research_area.blank?
     return if professor.research_areas.include?(enrollment.research_area)
 
-    advisements = enrollment.advisements.reject(&:marked_for_destruction?)
-    has_research_area = advisements.any? do |a|
+    has_research_area = enrollment_advisements.any? do |a|
       a.professor.research_areas.include?(enrollment.research_area)
     end
 
@@ -134,4 +125,15 @@ class Advisement < ApplicationRecord
     ]
     Notifier.send_emails(notifications: emails)
   end
+
+  private
+    # As orientações da matrícula como ficariam gravadas: sem as que o subform
+    # marcou para remover, e com esta no lugar da cópia que enrollment.advisements
+    # relê do banco -- lá a orientação em edição ainda tem o professor antigo,
+    # e sem a troca é ele quem satisfaz as regras: trocar o único orientador
+    # credenciado, ou o único da área, por outro professor passaria sem erro.
+    def enrollment_advisements
+      advisements = enrollment.advisements.reject(&:marked_for_destruction?)
+      advisements.map { |a| a == self ? self : a }
+    end
 end

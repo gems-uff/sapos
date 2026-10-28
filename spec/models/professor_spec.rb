@@ -150,16 +150,16 @@ RSpec.describe Professor, type: :model do
           @destroy_later << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level1)
           @destroy_later << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level2)
 
-          @destroy_later << enrollment1 = FactoryBot.create(:enrollment, level: @level1)
-          @destroy_later << enrollment2 = FactoryBot.create(:enrollment, level: @level2)
+          @destroy_later << @enrollment1 = FactoryBot.create(:enrollment, level: @level1)
+          @destroy_later << @enrollment2 = FactoryBot.create(:enrollment, level: @level2)
 
-          @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: enrollment1)
-          @destroy_later << FactoryBot.create(:advisement, professor: @professor2, enrollment: enrollment2)
-          enrollment1.reload
-          enrollment2.reload
-          @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: enrollment2, main_advisor: false)
-          @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: enrollment1, main_advisor: false)
-          @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: enrollment2, main_advisor: false)
+          @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: @enrollment1)
+          @destroy_later << FactoryBot.create(:advisement, professor: @professor2, enrollment: @enrollment2)
+          @enrollment1.reload
+          @enrollment2.reload
+          @destroy_later << FactoryBot.create(:advisement, professor: @professor1, enrollment: @enrollment2, main_advisor: false)
+          @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment1, main_advisor: false)
+          @destroy_later << FactoryBot.create(:advisement, professor: @professor3, enrollment: @enrollment2, main_advisor: false)
         end
 
         it "should return 1.5 total points to authorized professor with one single and one multiple advisements" do
@@ -197,8 +197,80 @@ RSpec.describe Professor, type: :model do
         it "should return 0.0 level-2 points to professor not autorized in level-2" do
           expect(@professor3.advisement_points(@level2.id)).to eql("0.0")
         end
+
+        # A pontuação por matrícula tem de somar o mesmo que a pontuação por
+        # nível: professor1 é credenciado só no nível 1 e leva meio ponto no
+        # nível 2 pelo exemplo acima.
+        it "should return 0.5 for the enrollment co-advised outside the accredited level" do
+          expect(@professor1.advisement_point(@enrollment2)).to eql(0.5)
+        end
       end
     end
+    # Pontua só quem tem credenciamento VIGENTE hoje, em qualquer nível; o meio
+    # ponto vale quando a matrícula tem mais de um orientador vigente. Ter sido
+    # credenciado algum dia não basta, nem para pontuar, nem para dividir o
+    # ponto de quem ainda está credenciado.
+    describe "advisement points for a de-accredited professor" do
+      # A ordem importa: a validação de Advisement impede criar orientação para
+      # quem já está descredenciado. O caso real é o inverso -- o professor
+      # orientava credenciado e o período foi encerrado depois, que é
+      # exatamente quando os pontos deveriam parar de contar.
+      before(:each) do
+        @destroy_later << @deacc = FactoryBot.create(:professor)
+        @destroy_later << @deacc_enrollment = FactoryBot.create(:enrollment)
+        @destroy_later << auth = FactoryBot.create(
+          :advisement_authorization, professor: @deacc,
+          level: @deacc_enrollment.level,
+          start_date: Date.current - 2.years, end_date: nil
+        )
+        @destroy_later << FactoryBot.create(
+          :advisement, professor: @deacc, enrollment: @deacc_enrollment
+        )
+        auth.update!(end_date: Date.current - 1.day)
+        @deacc.reload
+        @deacc_enrollment.reload
+      end
+
+      it "stops counting points once the accreditation period is closed" do
+        expect(@deacc.advisement_points).to eql("0.0")
+      end
+
+      it "stops counting the point of a single enrollment" do
+        expect(@deacc.advisement_point(@deacc_enrollment)).to eql(0.0)
+      end
+
+      def add_accredited_co_advisor
+        @destroy_later << current = FactoryBot.create(:professor)
+        @destroy_later << FactoryBot.create(
+          :advisement_authorization, professor: current,
+          level: @deacc_enrollment.level, start_date: Date.current - 1.day
+        )
+        @deacc_enrollment.reload
+        @destroy_later << FactoryBot.create(
+          :advisement, professor: current, enrollment: @deacc_enrollment,
+          main_advisor: false
+        )
+        current
+      end
+
+      # O descredenciado também não conta para dividir: o coorientador ainda
+      # credenciado leva o ponto inteiro, e não meio.
+      it "does not halve the point of the advisor who is still accredited" do
+        current = add_accredited_co_advisor
+
+        expect(current.advisement_point(@deacc_enrollment)).to eql(1.0)
+      end
+
+      # Com um coorientador vigente a matrícula conta como de orientador único,
+      # mas o ponto é só de quem está credenciado.
+      it "stops counting points when a co-advisor is still accredited" do
+        current = add_accredited_co_advisor
+
+        expect(current.advisement_points).to eql("1.0")
+        expect(@deacc.advisement_points).to eql("0.0")
+      end
+    end
+
     describe "advisement_point" do
       context "should return 0 when" do
         it "the professor has no advisement_authorizations" do
@@ -289,6 +361,35 @@ RSpec.describe Professor, type: :model do
         @destroy_later << FactoryBot.create(:advisement, professor: other_professor, enrollment: enrollment, main_advisor: false)
 
         expect(professor.advisement_point(enrollment)).to eql(1.0)
+      end
+    end
+
+    describe "accredited_on?" do
+      let(:level) { FactoryBot.build(:level) }
+      it "is true with an open authorization already started at the level" do
+        professor.advisement_authorizations.build(level: level, start_date: Date.current - 1.day)
+        expect(professor.accredited_on?(level)).to be true
+      end
+      it "is false when the only authorization at the level is closed" do
+        professor.advisement_authorizations.build(
+          level: level, start_date: Date.current - 2.days, end_date: Date.current - 1.day
+        )
+        expect(professor.accredited_on?(level)).to be false
+      end
+      it "is false when the authorization has not started yet" do
+        professor.advisement_authorizations.build(level: level, start_date: Date.current + 1.day)
+        expect(professor.accredited_on?(level)).to be false
+      end
+      it "is false at a level the professor is not accredited for" do
+        professor.advisement_authorizations.build(level: level, start_date: Date.current - 1.day)
+        expect(professor.accredited_on?(FactoryBot.build(:level))).to be false
+      end
+      it "considers not-yet-saved (nested) authorizations, not only persisted ones" do
+        # A validação de orientador roda sobre associações em memória; o helper
+        # precisa enxergar o credenciamento recém-construído, ainda não salvo.
+        professor.advisement_authorizations.build(level: level, start_date: Date.current - 1.day)
+        expect(professor.new_record?).to be true
+        expect(professor.accredited_on?(level)).to be true
       end
     end
   end
