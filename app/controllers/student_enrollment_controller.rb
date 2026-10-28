@@ -250,7 +250,11 @@ class StudentEnrollmentController < ApplicationController
         )
 
         if professor_id.present?
-          professor = Professor.find(professor_id)
+          professor = Professor.find_by(id: professor_id)
+          raise ValidationException, I18n.t(
+            "student_enrollment.enroll.errors.invalid_professor",
+            course: course.name
+          ) if professor.nil?
           course_class.professors << professor
         end
         course_class.save
