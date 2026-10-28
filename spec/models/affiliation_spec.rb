@@ -60,19 +60,74 @@ RSpec.describe Affiliation, type: :model do
         it { expect(affiliation_inactive_invalid).to be_invalid }
       end
     end
+
+    # Um professor tem uma filiação por vez: duas que se cruzam fariam o
+    # on_date casar duas instituições para a mesma data. O término é
+    # exclusivo, como no on_date.
+    context "Periods that overlap" do
+      let(:professor) { FactoryBot.create :professor }
+      before(:each) do
+        FactoryBot.create :affiliation, professor: professor,
+                          start_date: Time.zone.local(2015, 1, 1), end_date: Time.zone.local(2020, 1, 1)
+      end
+
+      it "rejects a closed period that crosses an existing closed one" do
+        other = FactoryBot.build :affiliation, professor: professor,
+                                 start_date: Time.zone.local(2018, 1, 1), end_date: Time.zone.local(2019, 1, 1)
+        expect(other).to have_error(:overlapping_period).on(:base)
+      end
+
+      # Controle do exemplo acima: com término exclusivo, começar no dia em que
+      # a anterior termina não cruza.
+      it "accepts a period that starts on the day the previous one ends" do
+        other = FactoryBot.build :affiliation, professor: professor,
+                                 start_date: Time.zone.local(2020, 1, 1), end_date: nil
+        expect(other).to be_valid
+      end
+
+      it "accepts a crossing period of another professor" do
+        other = FactoryBot.build :affiliation, start_date: Time.zone.local(2018, 1, 1), end_date: nil
+        expect(other).to be_valid
+      end
+
+      # Só o período alterado é julgado: uma filiação que já se cruzava e que
+      # ninguém tocou nas datas continua editável.
+      it "still saves an untouched overlapping record when only the institution changes" do
+        legado = FactoryBot.build :affiliation, professor: professor,
+                                  start_date: Time.zone.local(2018, 1, 1), end_date: nil
+        legado.save!(validate: false)
+        legado.institution = FactoryBot.create :institution
+        expect(legado).to be_valid
+      end
+    end
+
+    # Atribuída direto ao modelo, a entrada que o cast de date descarta vira
+    # nil. O validates_date a julga pelo texto cru e reprova, em vez de deixar
+    # o nil passar como período em aberto.
+    context "An unparseable end date" do
+      it "is rejected instead of saved as an open period" do
+        aff = FactoryBot.build :affiliation, end_date: nil
+        aff.end_date = "banana"
+        expect(aff.end_date).to be_nil, "o cast já descartou a entrada"
+        expect(aff).to have_error(:invalid_date).on(:end_date)
+      end
+    end
   end
 
   context "Scope" do
     context "date_professor" do
       let!(:professor) { FactoryBot.create :professor }
-      let!(:affiliation_active) { FactoryBot.create :affiliation, professor: professor, start_date: Time.now, end_date: nil }
+      # As colunas são date, e o escopo recebe Date, como os chamadores da
+      # aplicação. Com Time.now, entre 21h e meia-noite de Brasília a coluna
+      # guardava o dia local e a consulta comparava com o dia em UTC.
+      let!(:affiliation_active) { FactoryBot.create :affiliation, professor: professor, start_date: Date.current, end_date: nil }
       let!(:affiliation_inactive) do
-        FactoryBot.create :affiliation, professor: professor, start_date: Time.now - 1.day, end_date: Time.now
+        FactoryBot.create :affiliation, professor: professor, start_date: Date.current - 1.day, end_date: Date.current
       end
 
 
-      it { expect(Affiliation.professor_date(professor, Time.now).last).to eq(affiliation_active) }
-      it { expect(Affiliation.professor_date(professor, Time.now - 1.days).last).to eq(affiliation_inactive) }
+      it { expect(Affiliation.professor_date(professor, Date.current).last).to eq(affiliation_active) }
+      it { expect(Affiliation.professor_date(professor, Date.current - 1.day).last).to eq(affiliation_inactive) }
     end
   end
 end

@@ -186,9 +186,13 @@ vez de comentar achado a achado, que faz o autor perseguir alvo móvel.
 não há sistema no ar exposto: o defeito nasce no merge. Já a pré-existente, achada
 de passagem, segue a regra do `AGENTS.md` — correção imediata, sem issue pública.
 
-Duas coisas que **não** justificam devolver, e viram registro escrito: desvio de
-convenção de mensagem de commit, e achado adjacente fora do escopo do PR — este
-vira issue própria (pesquise as existentes antes, inclusive fechadas).
+Duas coisas que **não** justificam devolver: desvio de convenção de mensagem de
+commit, que vira registro escrito, e achado adjacente fora do escopo do PR.
+**Achado adjacente pequeno e relacionado se corrige no próprio ramo**, com
+reprodução e controle como qualquer outro, e entra no comentário de fechamento.
+Issue própria é só para o que é grande ou não tem relação com o PR — aí pesquise
+as existentes antes, como o `AGENTS.md` manda. Uma issue por achado miúdo enche a
+fila sem que ninguém ganhe com isso.
 
 ## 5. Cobrir as lacunas
 

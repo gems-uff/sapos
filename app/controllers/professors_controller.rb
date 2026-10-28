@@ -76,7 +76,7 @@ class ProfessorsController < ApplicationController
       :siape, :scholarships, :academic_title_level,
       :academic_title_institution, :academic_title_country,
       :academic_title_date, :obs, :professor_research_areas, :professor_research_lines,
-      :affiliations
+      :affiliations, :advisement_authorizations
     ]
 
     config.create.columns = form_columns
