@@ -13,7 +13,7 @@ class RemoveProfessorFromCourseClasses < ActiveRecord::Migration[7.1]
   end
 
   def down
-    add_reference :course_classes, :professor, index: true
+    add_reference :course_classes, :professor, type: :integer, index: true
 
     CourseClassProfessor.find_each do |course_class_professor|
       CourseClass.where(
