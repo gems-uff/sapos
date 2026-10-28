@@ -263,11 +263,11 @@ RSpec.describe "CourseClasses features", type: :feature do
       16.times do |i|
         FactoryBot.create(
           :course_class, name: "Turma A #{i}", course: @course1,
-          professor: @professor1, year: 2022, semester: 2
+          professors: [@professor1], year: 2022, semester: 2
         )
         FactoryBot.create(
           :course_class, name: "Turma B #{i}", course: @course1,
-          professor: @professor1, year: 2022, semester: 2
+          professors: [@professor1], year: 2022, semester: 2
         )
       end
       login_as(@user)

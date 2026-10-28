@@ -210,7 +210,7 @@ RSpec.describe ClassEnrollmentRequest, type: :model do
       describe "professor" do
         it "should return nil when course class is nil" do
           class_enrollment_request.course_class = nil
-          expect(class_enrollment_request.professor).to eq(nil)
+          expect(class_enrollment_request.professor).to eq("")
         end
         it "should return an empty string when the course class does not have professors" do
           # nome anterior do teste should return nil when the professor of the course class is nil
