@@ -86,6 +86,38 @@ RSpec.describe Admissions::FormField, type: :model do
           expect(form_field).to have(1).errors_on :base
         end
       end
+      # Ruby e ERB chegam a eval (CodeEvaluator.evaluate_code e create_formatter);
+      # Liquid nao. Codigo novo dos dois primeiros nao pode nascer pela tela.
+      context "for code-carrying field types" do
+        def code_field(field_type, template_type)
+          form_field.field_type = field_type
+          form_field.configuration = JSON.dump(
+            template_type: template_type, code: "<%= 6 * 7 %>",
+            to: "a@b.c", subject: "s", body: "<%= 6 * 7 %>"
+          )
+          form_field
+        end
+
+        it "refuses new Ruby code in a code field" do
+          expect(code_field(Admissions::FormField::CODE, "Ruby"))
+            .to have_error(:cannot_create_new_erb_template).on :base
+        end
+
+        it "refuses new ERB code in a code field" do
+          expect(code_field(Admissions::FormField::CODE, "ERB"))
+            .to have_error(:cannot_create_new_erb_template).on :base
+        end
+
+        it "refuses new ERB code in an email field" do
+          expect(code_field(Admissions::FormField::EMAIL, "ERB"))
+            .to have_error(:cannot_create_new_erb_template).on :base
+        end
+
+        it "accepts new Liquid code in a code field" do
+          expect(code_field(Admissions::FormField::CODE, "Liquid"))
+            .not_to have_error(:cannot_create_new_erb_template).on :base
+        end
+      end
     end
   end
 

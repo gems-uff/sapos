@@ -314,8 +314,9 @@ class Admissions::FormField < ActiveRecord::Base
     [false]
   else
     if self.field_type == Admissions::FormField::CODE
+      # CodeEvaluator.evaluate_code avalia Ruby e ERB; so o Liquid fica de fora.
       [
-        config["template_type"] == "Ruby",
+        ["Ruby", "ERB"].include?(config["template_type"]),
         I18n.transliterate(config["code"] || "").downcase
       ]
     elsif self.field_type == Admissions::FormField::EMAIL
