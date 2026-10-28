@@ -26,8 +26,9 @@ namespace :maintenance do
   task remove_expired_reports: [:environment] do
     Rails.logger.info "[Reports] #{Time.now.to_fs} Removing expired reports from DB"
     # O corte da validade e Report.expiry_cutoff, nao uma data repetida aqui: o
-    # download ja recusa o documento vencido (#631), e esta rotina e so a
-    # liberacao do armazenamento. As duas decisoes tem de concordar sobre qual
+    # download ja recusa o documento vencido (#631), e esta rotina so desliga o
+    # documento do arquivo -- o armazenamento e liberado pelo coletor de orfaos
+    # (ver Report#release_file!). As duas decisoes tem de concordar sobre qual
     # documento esta vencido.
     expired_reports = Report.expired.where.not(carrierwave_file_id: nil)
 

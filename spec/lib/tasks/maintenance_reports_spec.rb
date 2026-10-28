@@ -6,11 +6,15 @@
 require "rails_helper"
 
 # Depois da #631 quem recusa o download e Report#expired?, e esta rotina ficou
-# sendo so a liberacao do armazenamento. As duas decisoes precisam concordar
-# sobre qual documento esta vencido, e concordam por sairem de
+# sendo so o desligamento do documento do arquivo. As duas decisoes precisam
+# concordar sobre qual documento esta vencido, e concordam por sairem de
 # Report.expiry_cutoff -- o escopo aqui, o predicado no controlador. Este
 # arquivo prende a rotina a esse escopo: sem ele, a data podia voltar a ser
 # escrita a mao na rake e ninguem notaria.
+#
+# A linha em carrier_wave_files fica em todos os exemplos: a storage deduplica
+# pelo conteudo, a linha pode ter outro dono, e so o coletor de orfaos (#597)
+# apaga -- ver Report#release_file!.
 RSpec.describe "maintenance:remove_expired_reports", type: :task do
   before(:all) do
     require "rake"
@@ -45,7 +49,7 @@ RSpec.describe "maintenance:remove_expired_reports", type: :task do
     expect(futuro.reload.carrierwave_file_id).to be_present
     expect(
       CarrierWave::Storage::ActiveRecord::ActiveRecordFile.exists?(arquivo_do_vencido)
-    ).to be false
+    ).to be true
   end
 
   # A limpeza nao invalida: quem passou por aqui fica sem arquivo e com
@@ -60,12 +64,13 @@ RSpec.describe "maintenance:remove_expired_reports", type: :task do
     expect(vencido.invalidated_by).to be_nil
   end
 
-  # Nenhuma FK garante que carrierwave_file_id aponte para uma linha que ainda
-  # existe (#696): a instalacao de homologacao chegou com carrier_wave_files
-  # vazia e um report vencido apontando para o nada. O "quebrado" e criado
-  # antes do "valido" para que o find_each, que percorre por id, passe por ele
-  # primeiro -- e e isso que prova que a task continua depois dele em vez de
-  # abortar.
+  # carrierwave_file_id pode apontar para uma linha que nao existe (#696): a FK
+  # so existe em banco que passou pelas migrations, nao no carregado do
+  # schema.rb (suite, CI) nem em replica carregada por dump sem checagem, e foi
+  # assim que a homologacao chegou com carrier_wave_files vazia e um report
+  # vencido apontando para o nada. O "quebrado" e criado antes do "valido" para
+  # que o find_each, que percorre por id, passe por ele primeiro -- e e isso que
+  # prova que a task continua depois dele em vez de abortar.
   it "nao aborta quando um vencido aponta para um arquivo que nao existe mais" do
     quebrado = report_with_file(Date.yesterday)
     CarrierWave::Storage::ActiveRecord::ActiveRecordFile
@@ -79,6 +84,6 @@ RSpec.describe "maintenance:remove_expired_reports", type: :task do
     expect(valido.reload.carrierwave_file_id).to be_nil
     expect(
       CarrierWave::Storage::ActiveRecord::ActiveRecordFile.exists?(arquivo_do_valido)
-    ).to be false
+    ).to be true
   end
 end

@@ -28,27 +28,21 @@ class Report < ApplicationRecord
     "#{self.user.name} - #{I18n.l(self.created_at, format: '%d/%m/%Y %H:%M')}"
   end
 
-  # Libera o armazenamento do documento. A limpeza de vencidos
+  # Desliga o documento do arquivo. A limpeza de vencidos
   # (maintenance:remove_expired_reports) e invalidate! passam por aqui para
   # nao divergirem.
   #
-  # Nenhuma FK garante que carrierwave_file_id aponte para uma linha que ainda
-  # existe -- schema_plus_alternative.rb anula o add_foreign_key --, dai o `&.`:
-  # sem ele, o NoMethodError derrubava a rake antes das notificacoes (#696).
+  # A linha em carrier_wave_files fica. A storage identifica o arquivo pelo
+  # MD5 do conteudo, entao bytes iguais -- a declaracao gerada aqui e o mesmo
+  # PDF anexado a uma inscricao -- sao UMA linha, com mais de um dono; quem a
+  # apagava daqui apagava o anexo do outro. Nenhum ponto de escrita decide
+  # se a linha ainda tem dono: isso e do coletor de orfaos (#597), o unico
+  # que apaga, depois de varrer todas as colunas que referenciam a tabela.
   #
-  # A transacao faz os dois passos acontecerem juntos ou nenhum. Sem ela, uma
-  # falha ao apagar depois do update! deixaria o report sem arquivo e a linha
-  # em carrier_wave_files orfa, que nenhuma rotina varre.
+  # Zerar a referencia vale mesmo quando ela aponta para linha que nao existe
+  # (#696): e o que havia para consertar, e nao ha mais nada a fazer com ela.
   def release_file!(**attributes)
-    transaction do
-      file = self.carrierwave_file
-      if file.nil? && carrierwave_file_id.present?
-        Rails.logger.warn "[Reports] Report #{id}: carrierwave_file_id " \
-                           "#{carrierwave_file_id} sem linha em carrier_wave_files"
-      end
-      self.update!(carrierwave_file_id: nil, **attributes)
-      file&.delete
-    end
+    self.update!(**attributes, carrierwave_file_id: nil)
   end
 
   def invalidate!(user:)

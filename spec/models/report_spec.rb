@@ -72,7 +72,7 @@ RSpec.describe Report, type: :model do
   describe "#invalidate!" do
     let(:user) { report.user }
 
-    it "apaga o arquivo armazenado e registra quem invalidou" do
+    it "desliga o arquivo e registra quem invalidou" do
       file = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.create!(
         original_filename: "documento.pdf", content_type: "application/pdf",
         binary: "conteudo", medium_hash: SecureRandom.hex(16)
@@ -83,7 +83,7 @@ RSpec.describe Report, type: :model do
 
       expect(report.reload.carrierwave_file).to be_nil
       expect(report.invalidated_by).to eq(user)
-      expect(CarrierWave::Storage::ActiveRecord::ActiveRecordFile.exists?(file.id)).to be false
+      expect(CarrierWave::Storage::ActiveRecord::ActiveRecordFile.exists?(file.id)).to be true
     end
 
     # Chamada por console num documento cuja limpeza ja rodou. Antes disso o
@@ -97,24 +97,24 @@ RSpec.describe Report, type: :model do
     end
   end
 
-  # #invalidate! e a rotina de limpeza (#696) passam pelo mesmo metodo, e o
-  # que ele tem de garantir e atomicidade: se apagar o arquivo falhar, o
-  # update! que zerou carrierwave_file_id tem de ser desfeito. Senao o report
-  # fica sem arquivo e a linha em carrier_wave_files fica orfa, sem rotina que
-  # a varra.
+  # #invalidate! e a rotina de limpeza (#696) passam pelo mesmo metodo. O que
+  # ele garante e que a linha em carrier_wave_files NAO e apagada: a storage
+  # deduplica pelo conteudo, a mesma linha pode ser o anexo de uma inscricao,
+  # e quem apaga e so o coletor de orfaos (#597). Se alguem reintroduzir o
+  # delete aqui, e este exemplo que cai.
   describe "#release_file!" do
-    it "desfaz o update quando apagar o arquivo falha" do
+    it "desliga o report do arquivo e deixa a linha para o coletor" do
       file = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.create!(
         original_filename: "documento.pdf", content_type: "application/pdf",
         binary: "conteudo", medium_hash: SecureRandom.hex(16)
       )
       report.update!(carrierwave_file: file)
-      allow_any_instance_of(CarrierWave::Storage::ActiveRecord::ActiveRecordFile)
-        .to receive(:delete).and_raise(ActiveRecord::ActiveRecordError)
 
-      expect { report.release_file! }.to raise_error(ActiveRecord::ActiveRecordError)
+      report.release_file!
 
-      expect(report.reload.carrierwave_file_id).to eq(file.id)
+      expect(report.reload.carrierwave_file_id).to be_nil
+      expect(report.invalidated_at).to be_nil
+      expect(CarrierWave::Storage::ActiveRecord::ActiveRecordFile.exists?(file.id)).to be true
     end
   end
 end
