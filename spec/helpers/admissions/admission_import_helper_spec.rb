@@ -258,6 +258,46 @@ RSpec.describe Admissions::AdmissionImportHelper, type: :helper do
     expect(Admissions::AdmissionProcess.count).to eq(0)
   end
 
+  # refuse_duplicate! procura o id original, mas a importacao cria ids novos:
+  # reenviar o formulario (F5 na pagina do relatorio) importa uma segunda copia.
+  it "refuses to import the same archive twice" do
+    zip
+    purge_process
+    import(zip)
+
+    report = import(zip)
+
+    expect(report.errors).not_to be_empty
+    expect(Admissions::AdmissionProcess.count).to eq(1)
+  end
+
+  # A exportacao escreve o valor como esta, e a importacao trata qualquer celula
+  # que comece pela sentinela como ponteiro para files/long_values/.
+  it "restores an answer that starts with the long value sentinel" do
+    answer = "#{Admissions::AdmissionExportHelper::LONG_VALUE_SENTINEL}resposta do candidato"
+    application.filled_form.fields.find_by(form_field: text_field).update_column(:value, answer)
+    zip
+    purge_process
+
+    report = import(zip)
+
+    expect(report.errors).to be_empty
+    expect(imported_application.filled_form.fields.find_by(form_field: text_field).value).to eq(answer)
+  end
+
+  # A exportacao colhe as fases so de process.phases; uma fase desvinculada do
+  # edital depois de ter resultados fica fora do arquivo.
+  it "restores the results of a phase unlinked from the process" do
+    process_phase.destroy!
+    zip
+    purge_process
+
+    report = import(zip)
+
+    expect(report.errors).to be_empty
+    expect(imported_application.results.first.admission_phase_id).to eq(phase.id)
+  end
+
   it "writes nothing on a dry run" do
     zip
     purge_process

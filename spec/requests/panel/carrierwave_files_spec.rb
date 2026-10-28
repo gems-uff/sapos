@@ -221,6 +221,35 @@ RSpec.describe "Painel :: Coletor de lixo", type: :request do
     end
   end
 
+  # O armazenamento deduplica por conteudo: quem sobe os mesmos bytes de um orfao
+  # recebe a mesma linha, com o mesmo id, e a marcacao da varredura anterior
+  # continua apontando para ela. Uma exclusao que confia na marcacao, ou no id
+  # pedido, apaga arquivo com dono. Se as acoes de excluir sairem do painel, estes
+  # exemplos saem com elas.
+  describe "exclusao pelo painel so alcanca arquivo sem dono" do
+    it "Excluir Todos poupa o arquivo que voltou a ter dono depois da varredura" do
+      orphan = create_orphan_file("reenviado")
+      post run_mark_and_sweep_carrierwave_files_path
+      student = FactoryBot.create(:student)
+      student.update!(photo: png_upload("orfao-reenviado"))
+      expect(student.read_attribute(:photo)).to eq(orphan.medium_hash)
+
+      post delete_all_carrierwave_files_path
+
+      expect(ar_file.where(id: orphan.id)).to exist
+    end
+
+    it "a exclusao individual poupa o arquivo com dono pedido pelo id" do
+      student = FactoryBot.create(:student)
+      student.update!(photo: png_upload("viva"))
+      file = ar_file.find_by(medium_hash: student.read_attribute(:photo))
+
+      delete carrierwave_file_path(file)
+
+      expect(ar_file.where(id: file.id)).to exist
+    end
+  end
+
   describe "autorizacao" do
     it "nega as acoes custom para quem nao gerencia o painel", :sem_admin do
       # Papel sem privilegios e sem exigir associacao (professor/aluno exigem).
