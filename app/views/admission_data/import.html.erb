@@ -1,0 +1,74 @@
+<div class="active-scaffold">
+  <h2><%= I18n.t("panel.admission_data.import_title") %></h2>
+  <p><%= I18n.t("panel.admission_data.import_description") %></p>
+
+  <%# O layout nao renderiza flash: sem isto o aviso de "sem arquivo" ou de erro
+      fica so no log, e quem importou nao ve nada. %>
+  <% if flash[:alert] %>
+    <div id="errorExplanation" class="errorExplanation">
+      <p><%= flash[:alert] %></p>
+    </div>
+  <% end %>
+
+  <%= form_tag import_selection_processes_path, multipart: true, method: :post do %>
+    <ol class="customform form">
+      <li class="form-element">
+        <dl>
+          <dt><label for="file"><%= I18n.t("panel.admission_data.import_file_label") %></label></dt>
+          <dd><%= file_field_tag :file, accept: ".zip" %></dd>
+        </dl>
+      </li>
+      <li class="form-element">
+        <dl>
+          <dt><label for="dry_run"><%= I18n.t("panel.admission_data.import_dry_run_label") %></label></dt>
+          <dd><%= check_box_tag :dry_run, "1", true %></dd>
+        </dl>
+      </li>
+    </ol>
+    <p class="form-footer">
+      <%= submit_tag I18n.t("panel.admission_data.import_submit") %>
+      <%= link_to as_(:cancel), selection_processes_path %>
+    </p>
+  <% end %>
+
+  <% if @report %>
+    <h3>
+      <%= @report.dry_run ? I18n.t("panel.admission_data.import_report_title_dry_run") : I18n.t("panel.admission_data.import_report_title") %>
+    </h3>
+
+    <% if @report.errors.any? %>
+      <ul class="import-errors messages">
+        <% @report.errors.each do |error| %>
+          <li class="error-message message"><%= error %></li>
+        <% end %>
+      </ul>
+    <% else %>
+      <table class="import-report listed-records-table">
+        <thead>
+          <tr>
+            <th><%= I18n.t("panel.admission_data.import_table_header") %></th>
+            <th><%= I18n.t("panel.admission_data.import_created_header") %></th>
+            <th><%= I18n.t("panel.admission_data.import_reused_header") %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @report.tables.sort.each do |table| %>
+            <tr>
+              <td><%= table %></td>
+              <td><%= @report.created[table] %></td>
+              <td><%= @report.reused[table] %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <% if @report.warnings.any? %>
+        <ul class="import-warnings messages">
+          <% @report.warnings.each do |warning| %>
+            <li class="warning-message message"><%= warning %></li>
+          <% end %>
+        </ul>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

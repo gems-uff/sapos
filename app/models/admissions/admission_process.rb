@@ -155,6 +155,37 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
     "#{self.title}"
   end
 
+  def total_file_size
+    filled_form_ids_sql = <<-SQL.squish
+      SELECT filled_form_id FROM admission_applications
+      WHERE admission_process_id = :process_id AND filled_form_id IS NOT NULL
+      UNION
+      SELECT lr.filled_form_id FROM letter_requests lr
+      INNER JOIN admission_applications aa ON aa.id = lr.admission_application_id
+      WHERE aa.admission_process_id = :process_id AND lr.filled_form_id IS NOT NULL
+      UNION
+      SELECT ape.filled_form_id FROM admission_phase_evaluations ape
+      INNER JOIN admission_applications aa ON aa.id = ape.admission_application_id
+      WHERE aa.admission_process_id = :process_id AND ape.filled_form_id IS NOT NULL
+      UNION
+      SELECT apr.filled_form_id FROM admission_phase_results apr
+      INNER JOIN admission_applications aa ON aa.id = apr.admission_application_id
+      WHERE aa.admission_process_id = :process_id AND apr.filled_form_id IS NOT NULL
+      UNION
+      SELECT arr.filled_form_id FROM admission_ranking_results arr
+      INNER JOIN admission_applications aa ON aa.id = arr.admission_application_id
+      WHERE aa.admission_process_id = :process_id AND arr.filled_form_id IS NOT NULL
+    SQL
+
+    size_in_bytes = CarrierWave::Storage::ActiveRecord::ActiveRecordFile
+      .joins("INNER JOIN filled_form_fields ON filled_form_fields.file = carrier_wave_files.medium_hash")
+      .where("filled_form_fields.filled_form_id IN (#{filled_form_ids_sql})", process_id: self.id)
+      .where.not(filled_form_fields: { file: [nil, ""] })
+      .sum(:size) || 0
+
+    (size_in_bytes.to_f / 1.megabyte).round(2)
+  end
+
   def check_partial_consolidation_conditions(phase_id, pendencies_in_current)
     i18n_prefix = "active_scaffold.admissions/admission_process.consolidate_phase"
     admission_process_phase = self.phases.where(
