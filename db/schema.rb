@@ -326,7 +326,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["enrollment_request_id"], name: "index_class_enrollment_requests_on_enrollment_request_id"
   end
 
-  create_table "class_enrollments", force: :cascade do |t|
+  create_table "class_enrollments", id: :integer, force: :cascade do |t|
     t.integer "course_class_id"
     t.datetime "created_at", precision: nil, null: false
     t.boolean "disapproved_by_absence", default: false, null: false
@@ -341,7 +341,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["enrollment_id"], name: "index_class_enrollments_on_enrollment_id"
   end
 
-  create_table "class_schedules", force: :cascade do |t|
+  create_table "class_schedules", id: :integer, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "enrollment_end", precision: nil
     t.datetime "enrollment_insert", precision: nil
@@ -362,18 +362,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
+  create_table "course_class_professors", force: :cascade do |t|
+    t.integer "course_class_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "professor_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_class_id", "professor_id"], name: "index_course_class_professors_on_course_class_and_professor", unique: true
+    t.index ["course_class_id"], name: "index_course_class_professors_on_course_class_id"
+    t.index ["professor_id"], name: "index_course_class_professors_on_professor_id"
+  end
+
   create_table "course_classes", force: :cascade do |t|
     t.integer "course_id"
     t.datetime "created_at", precision: nil, null: false
     t.string "name", limit: 255
     t.boolean "not_schedulable", default: false, null: false
     t.string "obs_schedule"
-    t.integer "professor_id"
     t.integer "semester"
     t.datetime "updated_at", precision: nil, null: false
     t.integer "year"
     t.index ["course_id"], name: "index_course_classes_on_course_id"
-    t.index ["professor_id"], name: "index_course_classes_on_professor_id"
   end
 
   create_table "course_research_areas", force: :cascade do |t|
@@ -394,7 +402,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["research_line_id"], name: "index_course_research_lines_on_research_line_id"
   end
 
-  create_table "course_types", force: :cascade do |t|
+  create_table "course_types", id: :integer, force: :cascade do |t|
     t.boolean "allow_multiple_classes", default: false, null: false
     t.datetime "created_at", precision: nil, null: false
     t.boolean "has_score", default: false, null: false
@@ -405,7 +413,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
-  create_table "courses", force: :cascade do |t|
+  create_table "courses", id: :integer, force: :cascade do |t|
     t.boolean "available", default: true, null: false
     t.string "code", limit: 255
     t.text "content"
@@ -418,7 +426,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["course_type_id"], name: "index_courses_on_course_type_id"
   end
 
-  create_table "custom_variables", force: :cascade do |t|
+  create_table "custom_variables", id: :integer, force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
     t.string "description", limit: 255
     t.datetime "updated_at", precision: nil, null: false
@@ -449,7 +457,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["enrollment_id"], name: "index_deferrals_on_enrollment_id"
   end
 
-  create_table "dismissal_reasons", force: :cascade do |t|
+  create_table "dismissal_reasons", id: :integer, force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
     t.text "description"
     t.string "name", limit: 255
@@ -469,7 +477,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["enrollment_id"], name: "index_dismissals_on_enrollment_id"
   end
 
-  create_table "email_templates", force: :cascade do |t|
+  create_table "email_templates", id: :integer, force: :cascade do |t|
     t.text "body"
     t.datetime "created_at", null: false
     t.boolean "enabled", default: true, null: false
@@ -480,7 +488,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "enrollment_holds", force: :cascade do |t|
+  create_table "enrollment_holds", id: :integer, force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
     t.integer "enrollment_id"
     t.integer "number_of_semesters", default: 1
@@ -500,7 +508,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["user_id"], name: "index_enrollment_request_comments_on_user_id"
   end
 
-  create_table "enrollment_requests", force: :cascade do |t|
+  create_table "enrollment_requests", id: :integer, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "enrollment_id"
     t.datetime "last_staff_change_at", precision: nil
@@ -512,7 +520,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["enrollment_id"], name: "index_enrollment_requests_on_enrollment_id"
   end
 
-  create_table "enrollment_statuses", force: :cascade do |t|
+  create_table "enrollment_statuses", id: :integer, force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
     t.string "name", limit: 255
     t.boolean "professor_can_generate_report", default: true
@@ -520,7 +528,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.boolean "user", default: false, null: false
   end
 
-  create_table "enrollments", force: :cascade do |t|
+  create_table "enrollments", id: :integer, force: :cascade do |t|
     t.date "admission_date"
     t.datetime "created_at", precision: nil, null: false
     t.string "enrollment_number", limit: 255
@@ -542,7 +550,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["student_id"], name: "index_enrollments_on_student_id"
   end
 
-  create_table "filled_form_field_scholarities", force: :cascade do |t|
+  create_table "filled_form_field_scholarities", id: :integer, force: :cascade do |t|
     t.string "course"
     t.datetime "created_at", null: false
     t.date "end_date"
@@ -570,7 +578,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["form_field_id"], name: "index_filled_form_fields_on_form_field_id"
   end
 
-  create_table "filled_forms", force: :cascade do |t|
+  create_table "filled_forms", id: :integer, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "form_template_id"
     t.boolean "is_filled", default: false, null: false
@@ -578,7 +586,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["form_template_id"], name: "index_filled_forms_on_form_template_id"
   end
 
-  create_table "form_conditions", force: :cascade do |t|
+  create_table "form_conditions", id: :integer, force: :cascade do |t|
     t.string "condition"
     t.datetime "created_at", null: false
     t.string "field"
@@ -590,7 +598,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["parent_id"], name: "index_form_conditions_on_parent_id"
   end
 
-  create_table "form_fields", force: :cascade do |t|
+  create_table "form_fields", id: :integer, force: :cascade do |t|
     t.text "configuration"
     t.datetime "created_at", null: false
     t.string "description"
@@ -645,7 +653,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["filled_form_id"], name: "index_letter_requests_on_filled_form_id"
   end
 
-  create_table "levels", force: :cascade do |t|
+  create_table "levels", id: :integer, force: :cascade do |t|
     t.string "course_name", limit: 255
     t.datetime "created_at", precision: nil, null: false
     t.integer "default_duration", default: 0
@@ -665,7 +673,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["level_id"], name: "index_majors_on_level_id"
   end
 
-  create_table "notification_logs", force: :cascade do |t|
+  create_table "notification_logs", id: :integer, force: :cascade do |t|
     t.string "attachments_file_names"
     t.text "body"
     t.datetime "created_at", precision: nil, null: false
@@ -677,7 +685,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["notification_id"], name: "index_notification_logs_on_notification_id"
   end
 
-  create_table "notifications", force: :cascade do |t|
+  create_table "notifications", id: :integer, force: :cascade do |t|
     t.text "body_template"
     t.datetime "created_at", precision: nil, null: false
     t.string "frequency", limit: 255
@@ -713,7 +721,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["student_id"], name: "index_paper_students_on_student_id"
   end
 
-  create_table "papers", force: :cascade do |t|
+  create_table "papers", id: :integer, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "doi_issn_event"
     t.string "kind"
@@ -762,7 +770,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["phase_id"], name: "index_phase_durations_on_phase_id"
   end
 
-  create_table "phases", force: :cascade do |t|
+  create_table "phases", id: :integer, force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.datetime "created_at", precision: nil, null: false
     t.string "description", limit: 255
@@ -790,7 +798,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["research_line_id"], name: "index_professor_research_lines_on_research_line_id"
   end
 
-  create_table "professors", force: :cascade do |t|
+  create_table "professors", id: :integer, force: :cascade do |t|
     t.integer "academic_title_country_id"
     t.date "academic_title_date"
     t.integer "academic_title_institution_id"
@@ -826,7 +834,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["user_id"], name: "index_professors_on_user_id"
   end
 
-  create_table "program_levels", force: :cascade do |t|
+  create_table "program_levels", id: :integer, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.date "end_date"
     t.integer "level", null: false
@@ -864,7 +872,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["ranking_config_id"], name: "index_ranking_columns_on_ranking_config_id"
   end
 
-  create_table "ranking_configs", force: :cascade do |t|
+  create_table "ranking_configs", id: :integer, force: :cascade do |t|
     t.string "behavior_on_invalid_condition", default: "Erro - apenas em seletores"
     t.string "behavior_on_invalid_ranking", default: "Erro"
     t.boolean "candidate_can_see", default: false, null: false
@@ -911,7 +919,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["ranking_machine_id"], name: "index_ranking_processes_on_ranking_machine_id"
   end
 
-  create_table "report_configurations", force: :cascade do |t|
+  create_table "report_configurations", id: :integer, force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
     t.integer "expiration_in_months"
     t.string "image", limit: 255
@@ -930,7 +938,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.integer "y"
   end
 
-  create_table "reports", force: :cascade do |t|
+  create_table "reports", id: :integer, force: :cascade do |t|
     t.integer "carrierwave_file_id"
     t.datetime "created_at", null: false
     t.date "expires_at"
@@ -953,7 +961,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
-  create_table "research_lines", force: :cascade do |t|
+  create_table "research_lines", id: :integer, force: :cascade do |t|
     t.boolean "available", default: true
     t.datetime "created_at", null: false
     t.string "name"
@@ -982,7 +990,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["scholarship_id"], name: "index_scholarship_durations_on_scholarship_id"
   end
 
-  create_table "scholarship_suspensions", force: :cascade do |t|
+  create_table "scholarship_suspensions", id: :integer, force: :cascade do |t|
     t.boolean "active", default: true, null: false
     t.datetime "created_at", precision: nil, null: false
     t.date "end_date"
@@ -1046,7 +1054,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["student_id"], name: "index_student_majors_on_student_id"
   end
 
-  create_table "students", force: :cascade do |t|
+  create_table "students", id: :integer, force: :cascade do |t|
     t.string "address", limit: 255
     t.integer "birth_city_id"
     t.integer "birth_country_id"
@@ -1107,7 +1115,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["user_id"], name: "index_user_roles_on_user_id"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", id: :integer, force: :cascade do |t|
     t.integer "actual_role"
     t.datetime "confirmation_sent_at", precision: nil
     t.string "confirmation_token", limit: 255

@@ -46,7 +46,7 @@ RSpec.describe EnrollmentRequest, type: :model do
     before(:all) do
       @destroy_all = []
       @course = FactoryBot.create(:course, course_type: @course_type)
-      @course_class = prepare_course_class([[0, 9, 11], [2, 9, 11]], @destroy_all, course: @course, professor: @professor)
+      @course_class = prepare_course_class([[0, 9, 11], [2, 9, 11]], @destroy_all, course: @course, professors: [@professor])
     end
     after(:all) do
       @destroy_all.each(&:delete)
@@ -124,14 +124,14 @@ RSpec.describe EnrollmentRequest, type: :model do
       end
       describe "that_allocations_do_not_match" do
         it "should not add error impossible_allocation when allocations match in different dates" do
-          another_course_class = prepare_course_class([[1, 9, 11], [3, 9, 11]], @destroy_later, professor: @professor)
+          another_course_class = prepare_course_class([[1, 9, 11], [3, 9, 11]], @destroy_later, professors: [@professor])
           enrollment_request.class_enrollment_requests.build(course_class: another_course_class)
           enrollment_request.student_saving = true
           expect(enrollment_request).to be_valid
         end
         context "should add error impossible_allocation when" do
           it "another course class in the request intersects an allocation" do
-            another_course_class = prepare_course_class([[0, 14, 16], [2, 8, 10]], @destroy_later, professor: @professor)
+            another_course_class = prepare_course_class([[0, 14, 16], [2, 8, 10]], @destroy_later, professors: [@professor])
             enrollment_request.class_enrollment_requests.build(
               course_class: another_course_class
             )
@@ -141,7 +141,7 @@ RSpec.describe EnrollmentRequest, type: :model do
             ).with_parameters(day: I18n.translate("date.day_names")[2], start: "8", end: "10").on :base
           end
           it "another course class in the request intersects an allocation through the other side" do
-            another_course_class = prepare_course_class([[0, 14, 16], [2, 10, 12]], @destroy_later, professor: @professor)
+            another_course_class = prepare_course_class([[0, 14, 16], [2, 10, 12]], @destroy_later, professors: [@professor])
             enrollment_request.class_enrollment_requests.build(
               course_class: another_course_class
             )
@@ -151,7 +151,7 @@ RSpec.describe EnrollmentRequest, type: :model do
             ).with_parameters(day: I18n.translate("date.day_names")[2], start: "10", end: "12").on :base
           end
           it "another course class in the request has the same allocation" do
-            another_course_class = prepare_course_class([[0, 9, 11], [2, 14, 16]], @destroy_later, professor: @professor)
+            another_course_class = prepare_course_class([[0, 9, 11], [2, 14, 16]], @destroy_later, professors: [@professor])
             enrollment_request.class_enrollment_requests.build(
               course_class: another_course_class
             )
@@ -171,7 +171,7 @@ RSpec.describe EnrollmentRequest, type: :model do
       end
       describe "status" do
         before(:each) do
-          @destroy_later << course2 = FactoryBot.create(:course_class, professor: @professor)
+          @destroy_later << course2 = FactoryBot.create(:course_class, professors: [@professor])
           @cer2 = enrollment_request.class_enrollment_requests.build(
             course_class: course2
           )
@@ -289,7 +289,7 @@ RSpec.describe EnrollmentRequest, type: :model do
       end
       describe "course_class_ids" do
         it "should return a list of insertion class enrollment request ids" do
-          @destroy_later << course_class = FactoryBot.create(:course_class, professor: @professor)
+          @destroy_later << course_class = FactoryBot.create(:course_class, professors: [@professor])
           another_cer = enrollment_request.class_enrollment_requests.build(
             status: ClassEnrollmentRequest::VALID, course_class: course_class, action: ClassEnrollmentRequest::INSERT
           )
@@ -301,7 +301,7 @@ RSpec.describe EnrollmentRequest, type: :model do
           expect(enrollment_request.course_class_ids).to include(@cer.course_class_id, another_cer.course_class_id)
         end
         it "should not return removal class enrollment request ids in the list" do
-          @destroy_later << course_class = FactoryBot.create(:course_class, professor: @professor)
+          @destroy_later << course_class = FactoryBot.create(:course_class, professors: [@professor])
           another_cer = enrollment_request.class_enrollment_requests.build(
             status: ClassEnrollmentRequest::VALID, course_class: course_class, action: ClassEnrollmentRequest::REMOVE
           )
@@ -316,8 +316,8 @@ RSpec.describe EnrollmentRequest, type: :model do
       end
       describe "assign_course_class_ids and save_request" do
         before(:each) do
-          @destroy_later << @course_class2 = FactoryBot.create(:course_class, professor: @professor)
-          @destroy_later << @course_class3 = FactoryBot.create(:course_class, professor: @professor)
+          @destroy_later << @course_class2 = FactoryBot.create(:course_class, professors: [@professor])
+          @destroy_later << @course_class3 = FactoryBot.create(:course_class, professors: [@professor])
           @destroy_later << @cer2 = enrollment_request.class_enrollment_requests.build(
             status: ClassEnrollmentRequest::VALID, course_class: @course_class2, action: ClassEnrollmentRequest::INSERT
           )
@@ -426,12 +426,12 @@ RSpec.describe EnrollmentRequest, type: :model do
         end
         context "class schedule restrictions" do
           before(:each) do
-            @destroy_later << @course_class4 = FactoryBot.create(:course_class, professor: @professor)
-            @destroy_later << @course_class5 = FactoryBot.create(:course_class, professor: @professor)
-            @destroy_later << @course_class6 = FactoryBot.create(:course_class, professor: @professor)
-            @destroy_later << @course_class7 = FactoryBot.create(:course_class, professor: @professor)
-            @destroy_later << @course_class8 = FactoryBot.create(:course_class, professor: @professor)
-            @destroy_later << @course_class9 = FactoryBot.create(:course_class, professor: @professor)
+            @destroy_later << @course_class4 = FactoryBot.create(:course_class, professors: [@professor])
+            @destroy_later << @course_class5 = FactoryBot.create(:course_class, professors: [@professor])
+            @destroy_later << @course_class6 = FactoryBot.create(:course_class, professors: [@professor])
+            @destroy_later << @course_class7 = FactoryBot.create(:course_class, professors: [@professor])
+            @destroy_later << @course_class8 = FactoryBot.create(:course_class, professors: [@professor])
+            @destroy_later << @course_class9 = FactoryBot.create(:course_class, professors: [@professor])
             @destroy_later << @cer3 = enrollment_request.class_enrollment_requests.build(
               status: ClassEnrollmentRequest::EFFECTED, course_class: @course_class3,
               action: ClassEnrollmentRequest::INSERT
@@ -714,8 +714,8 @@ RSpec.describe EnrollmentRequest, type: :model do
       @destroy_scenario << FactoryBot.create(:advisement, professor: @advisor, enrollment: enrollment3)
       @destroy_scenario << course1 = FactoryBot.create(:course, course_type: @course_type)
       @destroy_scenario << course2 = FactoryBot.create(:course, course_type: @course_type)
-      @destroy_scenario << course_class1 = FactoryBot.create(:course_class, course: course1, professor: @professor)
-      @destroy_scenario << course_class2 = FactoryBot.create(:course_class, course: course2, professor: @professor)
+      @destroy_scenario << course_class1 = FactoryBot.create(:course_class, course: course1, professors: [@professor])
+      @destroy_scenario << course_class2 = FactoryBot.create(:course_class, course: course2, professors: [@professor])
       @destroy_scenario << @with_valid = FactoryBot.build(:enrollment_request, enrollment: enrollment1)
       @destroy_scenario << @with_valid.class_enrollment_requests.build(
         status: ClassEnrollmentRequest::VALID, course_class: course_class1
