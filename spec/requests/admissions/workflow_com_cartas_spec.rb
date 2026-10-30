@@ -25,19 +25,6 @@ RSpec.describe "Fluxo do processo seletivo: com cartas e comitês por linha", ty
     allow(Notifier).to receive(:send_emails)
   end
 
-  def position_and_machine(ranking_link, application)
-    result = Admissions::AdmissionRankingResult.find_by(
-      ranking_config: ranking_link.ranking_config, admission_application: application
-    )
-    return nil if result.nil? || result.filled_position.value.blank?
-    [result.filled_position.value.to_i, result.filled_machine.value]
-  end
-
-  def consolidation_value(application, phase, field_name)
-    result = application.results.find_by(admission_phase: phase, mode: Admissions::AdmissionPhaseResult::CONSOLIDATION)
-    result.filled_form.fields.find { |f| f.form_field.name == field_name }.value
-  end
-
   it "percorre cartas, homologação, avaliação por linha, entrevista e ranking" do
     expect(@process.min_letters).to eq(2)
     expect(@workflow.phase_links.map { |l| l.admission_phase.name }).to eq(["Homologação", "Avaliação por linha", "Entrevista"])
@@ -105,7 +92,7 @@ RSpec.describe "Fluxo do processo seletivo: com cartas e comitês por linha", ty
     sign_out @linha2.first
 
     sign_in @admin
-    @process.update!(end_date: Date.yesterday)
+    @process.update!(end_date: Date.today - 1)
     message = consolidate_phase_as_staff(@process, @avaliacao)
     expect(message).to include(I18n.t("active_scaffold.admissions/admission_process.consolidate_phase.approved", count: 2))
     expect(message).to include(I18n.t("active_scaffold.admissions/admission_process.consolidate_phase.reproved", count: 1))

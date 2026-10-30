@@ -8,7 +8,8 @@ require "rails_helper"
 # Fluxo de ponta a ponta do processo seletivo (#681), segunda forma: a
 # avaliação é INDIVIDUAL, um formulário por membro do comitê, e a consolidação
 # tira a média dos pareceres; a aprovação exige duas condições ao mesmo tempo;
-# o ranking de vagas tem quatro colunas de desempate, a última a idade; e o
+# o ranking de vagas tem quatro colunas de desempate, a última a data de
+# nascimento (mais velho primeiro); e o
 # edital permite desfazer a consolidação.
 #
 # Configuração em spec/fixtures/admissions/workflows.json, processo 2.
@@ -22,19 +23,6 @@ RSpec.describe "Fluxo do processo seletivo: avaliação individual", type: :requ
     @secretary = @workflow.committee_users[1].first
     @evaluators = @workflow.committee_users[2]
     allow(Notifier).to receive(:send_emails)
-  end
-
-  def position_and_machine(ranking_link, application)
-    result = Admissions::AdmissionRankingResult.find_by(
-      ranking_config: ranking_link.ranking_config, admission_application: application
-    )
-    return nil if result.nil? || result.filled_position.value.blank?
-    [result.filled_position.value.to_i, result.filled_machine.value]
-  end
-
-  def consolidation_value(application, phase, field_name)
-    result = application.results.find_by(admission_phase: phase, mode: Admissions::AdmissionPhaseResult::CONSOLIDATION)
-    result.filled_form.fields.find { |f| f.form_field.name == field_name }.value
   end
 
   it "avalia por membro, consolida pela média, classifica com desempate e desfaz" do
@@ -95,7 +83,7 @@ RSpec.describe "Fluxo do processo seletivo: avaliação individual", type: :requ
 
     # ── Consolidação: médias, nota final e a dupla condição ─────────────────
     sign_in @admin
-    @process.update!(end_date: Date.yesterday)
+    @process.update!(end_date: Date.today - 1)
     message = consolidate_phase_as_staff(@process, @avaliacao)
     expect(message).to include(I18n.t("active_scaffold.admissions/admission_process.consolidate_phase.approved", count: 3))
     expect(message).to include(I18n.t("active_scaffold.admissions/admission_process.consolidate_phase.reproved", count: 1))
@@ -110,10 +98,10 @@ RSpec.describe "Fluxo do processo seletivo: avaliação individual", type: :requ
     expect(hugo.reload.status).to eq(Admissions::AdmissionApplication::REPROVED)
     expect([gil, iris, joana].map { |a| a.reload.status }).to all(eq(Admissions::AdmissionApplication::APPROVED))
 
-    # ── Ranking: empate total entre Gil e Joana, decidido pela idade ────────
+    # ── Ranking: empate entre Gil e Joana, decidido pelo nascimento ────────
     vagas = @workflow.ranking_links.first
     expect(vagas.ranking_config.ranking_columns.map(&:name))
-      .to eq(["Nota final", "Média de projeto", "Média de experiência", "Idade"])
+      .to eq(["Nota final", "Média de projeto", "Média de experiência", "Data de nascimento"])
     expect(position_and_machine(vagas, gil)).to eq([1, "Ampla concorrência"])
     expect(position_and_machine(vagas, joana)).to eq([2, "Ampla concorrência"])
     expect(position_and_machine(vagas, iris)).to eq([3, "Ampla concorrência"])

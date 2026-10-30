@@ -449,7 +449,7 @@
      "name": "Idade",
      "field_type": "code",
      "configuration": {
-      "code": "{%- assign parts = fields['Data de nascimento'] | split: '/' -%}\n{%- assign iso = parts[2] | append: '-' | append: parts[1] | append: '-' | append: parts[0] -%}\n{%- assign birth = iso | date: '%s' -%}\n{%- assign now = 'now' | date: '%s' -%}\n{{- now | minus: birth | times: 1.0 | divided_by: 31557600 -}}",
+      "code": "{%- assign parts = fields['Data de nascimento'] | split: '/' -%}\n{%- assign iso = parts[2] | append: '-' | append: parts[1] | append: '-' | append: parts[0] -%}\n{%- assign birth = iso | append: 'T00:00:00Z' | date: '%s' -%}\n{%- assign reference = process.end_date | date: '%s' -%}\n{{- reference | minus: birth | times: 1.0 | divided_by: 31557600 -}}",
       "code_type": "number",
       "template_type": "liquid"
      },
@@ -936,8 +936,8 @@
      "order": "desc"
     },
     {
-     "name": "Idade",
-     "order": "desc"
+     "name": "Data de nascimento",
+     "order": "asc"
     }
    ],
    "ranking_groups": [
@@ -1121,8 +1121,8 @@
      "order": "desc"
     },
     {
-     "name": "Idade",
-     "order": "desc"
+     "name": "Data de nascimento",
+     "order": "asc"
     }
    ],
    "ranking_groups": [
@@ -1306,6 +1306,12 @@
         ]
        }
       ]
+     },
+     {
+      "mode": "condition",
+      "field": "Nota final",
+      "condition": "not_null",
+      "value": null
      }
     ]
    },
@@ -1315,8 +1321,8 @@
      "order": "desc"
     },
     {
-     "name": "Idade",
-     "order": "desc"
+     "name": "Data de nascimento",
+     "order": "asc"
     }
    ],
    "ranking_groups": [],
