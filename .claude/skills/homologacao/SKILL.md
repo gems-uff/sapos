@@ -604,8 +604,9 @@ O combo de troca de papel só aparece depois do passo 2 (ele exige dois papéis)
 A réplica não tem processo seletivo aberto, e **todos os processos dela vêm com
 `require_session` ligado** — que faz o `prepare_new_admission_application`
 desviar antes de o pedido chegar ao controller. São dois campos a mexer, não só
-a data. O `abrir_processo_seletivo.rb` abre, exercita e reverte os dois na mesma
-execução, conferindo o que gravou.
+a data de fim; e três quando o processo é novo, com o início ainda no futuro. O
+`abrir_processo_seletivo.rb abrir` guarda os originais e abre; o `fechar` os
+restaura e confere o que gravou.
 
 Prefira exercitar o **create**: ele só precisa do processo aberto, enquanto o
 update exigiria o token de uma inscrição de candidato real.
