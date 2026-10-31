@@ -710,7 +710,7 @@ RSpec.describe Admissions::AdmissionProcessRanking, type: :model do
             values: [
               { Col1: "100", racial: "0", pcd: "0" },
               { Col1: "90", racial: "1", pcd: "0" },
-              { Col1: "80", racial: "1", pcd: "1" },
+              { Col1: "80", racial: "0", pcd: "1" },
               { Col1: "70", pcd: "0" }
             ],
             columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
