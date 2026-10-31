@@ -57,53 +57,41 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
         readjust_process_vacancies[process.id] = 0
         remaing_vacancies > 0
       end
-      candidates.each_with_index do |candidate, index|
-        next if !candidate[:__position].nil?
-        processes.each do |process|
-          # Another process of the same group may have exhausted it
-          next if process.calculate_remaining(groups, process_vacancies) <= 0
-          if candidate[:__candidate].satisfies_condition(
-            process.ranking_machine.form_condition,
-            fields: candidate[:__fields],
-            should_raise: machine_should_raise
-          )
-            machine = process.ranking_machine.name
-            machine = "#{machine}/#{step}" if step != 1
-            candidate_position = position
-            self.set_candidate_position(candidate, process, position, machine)
-            position += 1
-            if !process.decrease_vacancies_and_check_remaining!(groups, process_vacancies)
-              processes.delete(process)
-            end
-            # Check ties
-            ((index + 1)..(candidates.size - 1)).each do |next_index|
-              next_candidate = candidates[next_index]
-              # The candidates are sorted: the first one not tied ends the ties
-              break if Admissions::AdmissionProcessRanking.compare_candidates(
-                columns, candidate, next_candidate
-              ) != 0
-              # A candidate already ranked keeps its position, but does not end the ties
-              next if !next_candidate[:__position].nil?
-              if next_candidate[:__candidate].satisfies_condition(
-                process.ranking_machine.form_condition,
-                fields: next_candidate[:__fields],
+      # Candidates tied in every column are ranked together. Each one enters the
+      # first process it satisfies that either has a vacancy or was entered by
+      # another of them, even beyond its vacancies: the excess is taken from the
+      # next step. Those of the same process share a position, and the processes
+      # keep their order.
+      candidates.chunk_while do |first, second|
+        Admissions::AdmissionProcessRanking.compare_candidates(columns, first, second) == 0
+      end.each do |tied|
+        entered = {}
+        tied.each do |candidate|
+          next if !candidate[:__position].nil?
+          process = processes.find do |p|
+            (entered.key?(p) || p.calculate_remaining(groups, process_vacancies) > 0) &&
+              candidate[:__candidate].satisfies_condition(
+                p.ranking_machine.form_condition,
+                fields: candidate[:__fields],
                 should_raise: machine_should_raise
               )
-                self.set_candidate_position(next_candidate, process, candidate_position, machine)
-                position += 1
-                ngroups = groups
-                nprocess_vacancies = process_vacancies
-                if process_vacancies[process.id] == 0 || (process.group.present? && groups[process.group] == 0)
-                  ngroups = readjust_groups
-                  nprocess_vacancies = readjust_process_vacancies
-                end
-                if !process.decrease_vacancies_and_check_remaining!(ngroups, nprocess_vacancies)
-                  processes.delete(process)
-                end
-              end
-            end
-            break
           end
+          next if process.nil?
+          if process.calculate_remaining(groups, process_vacancies) > 0
+            process.decrease_vacancies_and_check_remaining!(groups, process_vacancies)
+          else
+            process.decrease_vacancies_and_check_remaining!(readjust_groups, readjust_process_vacancies)
+          end
+          (entered[process] ||= []) << candidate
+        end
+        processes.each do |process|
+          next if !entered.key?(process)
+          machine = process.ranking_machine.name
+          machine = "#{machine}/#{step}" if step != 1
+          entered[process].each do |candidate|
+            self.set_candidate_position(candidate, process, position, machine)
+          end
+          position += entered[process].size
         end
       end
       readjust_groups.each do |key, value|
