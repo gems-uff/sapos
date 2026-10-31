@@ -152,4 +152,20 @@ RSpec.describe "Admission apply: texto configurado nas mensagens de validação"
 
     expect(page.evaluate_script("window.__injetado")).to be_nil
   end
+
+  it "recusa a data com ano de dois dígitos", :aggregate_failures do
+    visit new_admission_apply_path(admission_id: @process.simple_id)
+
+    set_text(names[:date], "10/05/98")
+    set_text(names[:student_date], "10/05/98")
+    run_validations
+    expect_literal_message(:date)
+    expect_literal_message(:student_date)
+
+    set_text(names[:date], "10/05/1998")
+    set_text(names[:student_date], "10/05/1998")
+    run_validations
+    expect(messages(names[:date])).to be_empty
+    expect(messages(names[:student_date])).to be_empty
+  end
 end

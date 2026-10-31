@@ -184,7 +184,8 @@ class Admissions::FilledFormField < ActiveRecord::Base
 
   def validate_date_field(configuration)
     return if self.value.blank?
-    format_ok = self.value.match(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/)
+    # A year of two digits would be read as one of the first century
+    format_ok = self.value.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)
     parseable = Date.strptime(self.value, "%d/%m/%Y") rescue false
     if !format_ok || !parseable
       add_error(:invalid_date)
