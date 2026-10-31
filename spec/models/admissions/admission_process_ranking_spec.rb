@@ -623,6 +623,32 @@ RSpec.describe Admissions::AdmissionProcessRanking, type: :model do
           expect_ranking_machines(@ranking_config, candidates, ["AC", "AC/2", "Racial", "AC/2", nil])
         end
 
+        it "takes the excess of a tie from the group in the next step" do
+          @general_group.update!(vacancies: 4)
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" },
+              { Col1: "80", racial: "0", pcd: "0" },
+              { Col1: "70", racial: "0", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: 1, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: nil, group: "general", order: 2, step: 2, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          admission_process_ranking.generate_ranking
+          # 4 vacancies: 1 in the first step, 1 excess of the tie, 2 left for the second
+          expect_ranking_positions(@ranking_config, candidates, [1, 1, 3, 4, nil])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "AC", "AC/2", "AC/2", nil])
+        end
+
         it "ranks tied candidates of different processes in the order of the processes" do
           candidates = create_ranked_candidates(
             admission_process: @admission_process,

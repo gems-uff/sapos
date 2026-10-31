@@ -61,7 +61,6 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
     groups = {}
     process_vacancies = {}
     readjust_groups = {}
-    readjust_process_vacancies = {}
     rconfig.ranking_groups.each do |g|
       groups[g.name] = g.total_vacancies
       readjust_groups[g.name] = 0
@@ -87,7 +86,6 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
       processes = rconfig.ranking_processes.where(step: step).order(:order).select do |process|
         remaing_vacancies = process.calculate_remaining(groups, process_vacancies)
         process_vacancies[process.id] = remaing_vacancies
-        readjust_process_vacancies[process.id] = 0
         remaing_vacancies > 0
       end
       # Candidates tied in every column are ranked together. Each one enters the
@@ -111,9 +109,11 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
           end
           next if process.nil?
           if process.calculate_remaining(groups, process_vacancies) > 0
-            process.decrease_vacancies_and_check_remaining!(groups, process_vacancies)
+            process.decrease_vacancies!(groups, process_vacancies)
           else
-            process.decrease_vacancies_and_check_remaining!(readjust_groups, readjust_process_vacancies)
+            # Each process belongs to a single step: only its group carries the
+            # excess to the next one
+            process.decrease_group!(readjust_groups)
           end
           (entered[process] ||= []) << candidate
         end
@@ -130,10 +130,6 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
       readjust_groups.each do |key, value|
         groups[key] += value
         readjust_groups[key] = 0
-      end
-      readjust_process_vacancies.each do |key, value|
-        process_vacancies[key] += value
-        readjust_process_vacancies[key] = 0
       end
     end
     candidates
