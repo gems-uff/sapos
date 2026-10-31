@@ -32,6 +32,7 @@ RSpec.describe Admissions::RankingProcess, type: :model do
   subject { ranking_process }
   describe "Validations" do
     it { should be_valid }
+    it { should validate_presence_of(:step) }
   end
 
   describe "Methods" do

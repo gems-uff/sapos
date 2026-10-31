@@ -11,6 +11,8 @@ class Admissions::RankingProcess < ActiveRecord::Base
   belongs_to :ranking_machine, optional: false,
     class_name: "Admissions::RankingMachine"
 
+  validates :step, presence: true
+
   def to_label
     "#{self.ranking_machine.name} #{self.vacancies}-#{self.group}"
   end
