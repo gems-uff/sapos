@@ -66,6 +66,15 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
       groups[g.name] = g.total_vacancies
       readjust_groups[g.name] = 0
     end
+    # Configurations saved before the validation of groups, or a group renamed
+    # on its own, would leave a process without a limit of group
+    rconfig.ranking_processes.each do |process|
+      next if process.group.blank? || groups.key?(process.group)
+      raise Exceptions::MissingGroupException.new(I18n.t(
+        "errors.admissions/admission_process_ranking.group_not_found",
+        group: process.group
+      ))
+    end
 
     machine_should_raise = [
       Admissions::RankingConfig::EXCEPTION_CONDITION,

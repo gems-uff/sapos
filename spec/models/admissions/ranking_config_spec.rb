@@ -59,6 +59,23 @@ RSpec.describe Admissions::RankingConfig, type: :model do
       expect(ranking_config).not_to be_valid
       expect(ranking_config).to have_error(:too_short).with_parameters(count: 1).on :ranking_processes
     end
+    it "should validate that the group of each process is one of its groups" do
+      ranking_config.ranking_groups.build(name: "Geral", vacancies: 3)
+      ranking_config.ranking_processes.first.group = "geral"
+      expect(ranking_config).not_to be_valid
+      expect(ranking_config).to have_error(:group_not_found).with_parameters(group: "geral").on :ranking_processes
+    end
+    it "should accept a process whose group is one of its groups" do
+      ranking_config.ranking_groups.build(name: "Geral", vacancies: 3)
+      ranking_config.ranking_processes.first.group = "Geral"
+      expect(ranking_config).to be_valid
+    end
+    it "should not accept a process whose group is being destroyed" do
+      ranking_config.ranking_groups.build(name: "Geral", vacancies: 3).mark_for_destruction
+      ranking_config.ranking_processes.first.group = "Geral"
+      expect(ranking_config).not_to be_valid
+      expect(ranking_config).to have_error(:group_not_found).with_parameters(group: "Geral").on :ranking_processes
+    end
     it { should validate_presence_of(:behavior_on_invalid_condition) }
     it { should validate_inclusion_of(:behavior_on_invalid_condition).in_array(Admissions::RankingConfig::BEHAVIOR_ON_INVALID_CONDITIONS) }
     it { should validate_presence_of(:behavior_on_invalid_ranking) }

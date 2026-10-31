@@ -761,6 +761,23 @@ RSpec.describe Admissions::AdmissionProcessRanking, type: :model do
           expect_ranking_machines(@ranking_config, candidates, ["AC", "AC"])
         end
 
+        it "raises when a process names a group the configuration does not have" do
+          create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [{ Col1: "100", racial: "0", pcd: "0" }],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: nil, group: "General", order: 1, step: 1, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          expect { admission_process_ranking.generate_ranking }.to raise_error(
+            Exceptions::MissingGroupException, /General/
+          )
+        end
+
         it "keeps the results of another admission process with the same configuration" do
           other_process = FactoryBot.create(:admission_process)
           @destroy_later << other_process
