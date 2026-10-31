@@ -220,10 +220,20 @@ RSpec.describe Admissions::AdmissionReportConfig, "montagem da tabela", type: :m
 
     it "ordena pelas colunas de ranking e põe no fim quem não tem a coluna" do
       report = report_with([[Admissions::AdmissionReportGroup::MAIN]])
-      report.ranking_columns.build(name: "nota", order: Admissions::RankingColumn::DESC)
-      expect(report.prepare_table(@process)[:applications]).to eq([@ana, @bia])
+      report.ranking_columns.build(name: "nota", order: Admissions::RankingColumn::ASC)
+      expect(report.prepare_table(@process)[:applications]).to eq([@bia, @ana])
+      # Bia vem antes pela nota, mas não tem "obs", que só Ana tem
       report.ranking_columns.build(name: "obs", order: Admissions::RankingColumn::ASC)
       expect(report.prepare_table(@process)[:applications]).to eq([@ana, @bia])
+    end
+
+    it "ordena por um campo que o template do próprio relatório calcula" do
+      consolidation = create_consolidation_template("Relatório", {
+        "dobro" => code_field("{{ fields.nota | times: 2 }}"),
+      })
+      report = report_with([[Admissions::AdmissionReportGroup::MAIN]], form_template: consolidation)
+      report.ranking_columns.build(name: "dobro", order: Admissions::RankingColumn::ASC)
+      expect(report.prepare_table(@process)[:applications]).to eq([@bia, @ana])
     end
 
     describe "sem colunas de ordenação próprias" do
@@ -240,6 +250,29 @@ RSpec.describe Admissions::AdmissionReportConfig, "montagem da tabela", type: :m
         @beto = create_application(@process, name: "Beto", fields: {})
         report = report_with([[Admissions::AdmissionReportGroup::MAIN]])
         expect(report.prepare_table(@process)[:applications]).to eq([@bia, @ana, @beto, @davi])
+      end
+
+      it "põe no fim quem tem a coluna do ranking vazia" do
+        @process.update!(min_letters: 0)
+        @carla = create_application(@process, name: "Carla", fields: { "nota" => "" })
+        report = report_with([[Admissions::AdmissionReportGroup::MAIN]])
+        expect(report.prepare_table(@process)[:applications]).to eq([@bia, @ana, @carla])
+      end
+
+      it "desempata pelo nome quem empata nas colunas do ranking" do
+        @process.update!(min_letters: 0)
+        @aldo = create_application(@process, name: "Aldo", fields: { "nota" => "6" })
+        report = report_with([[Admissions::AdmissionReportGroup::MAIN]])
+        expect(report.prepare_table(@process)[:applications]).to eq([@aldo, @bia, @ana])
+      end
+
+      it "ordena os nomes sem distinguir maiúscula e acento" do
+        @process.update!(min_letters: 0)
+        @erica = create_application(@process, name: "Érica", fields: {})
+        @davi = create_application(@process, name: "Davi", fields: {})
+        @beto = create_application(@process, name: "beto", fields: {})
+        report = report_with([[Admissions::AdmissionReportGroup::MAIN]])
+        expect(report.prepare_table(@process)[:applications]).to eq([@bia, @ana, @beto, @davi, @erica])
       end
 
       it "usa o primeiro ranking do edital, e não os seguintes" do
