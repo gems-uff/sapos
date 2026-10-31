@@ -94,23 +94,24 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
         remaing_vacancies > 0
       end
       # Candidates tied in every column are ranked together. Each one enters the
-      # first process it satisfies that either has a vacancy or was entered by
-      # another of them, even beyond its vacancies: the excess is taken from the
-      # next step. Those of the same process share a position, and the processes
-      # keep their order.
+      # first process it satisfies among those with a vacancy, of their own and
+      # of their group, when the tie is reached: once another of them takes the
+      # last one, the others still enter beyond the vacancies, and the excess
+      # is taken from the next step. Those of the same process share a
+      # position, and the processes keep their order.
       candidates.chunk_while do |first, second|
         Admissions::AdmissionProcessRanking.compare_candidates(columns, first, second) == 0
       end.each do |tied|
+        open = processes.select { |p| p.calculate_remaining(groups, process_vacancies) > 0 }
         entered = {}
         tied.each do |candidate|
           next if !candidate[:__position].nil?
-          process = processes.find do |p|
-            (entered.key?(p) || p.calculate_remaining(groups, process_vacancies) > 0) &&
-              candidate[:__candidate].satisfies_condition(
-                p.ranking_machine.form_condition,
-                fields: candidate[:__fields],
-                should_raise: machine_should_raise
-              )
+          process = open.find do |p|
+            candidate[:__candidate].satisfies_condition(
+              p.ranking_machine.form_condition,
+              fields: candidate[:__fields],
+              should_raise: machine_should_raise
+            )
           end
           next if process.nil?
           if process.calculate_remaining(groups, process_vacancies) > 0

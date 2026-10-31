@@ -649,6 +649,32 @@ RSpec.describe Admissions::AdmissionProcessRanking, type: :model do
           expect_ranking_machines(@ranking_config, candidates, ["AC", "AC", "AC/2", "AC/2", nil])
         end
 
+        it "opens the group to tied candidates of a process it had vacancies for" do
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "1", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "1" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: 1, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: 1, group: "pcd", order: 2, step: 1, ranking_machine: @racial_machine },
+              { vacancies: 1, group: "pcd", order: 3, step: 1, ranking_machine: @pcd_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          ranked = admission_process_ranking.generate_ranking.map { |c| c[:__candidate] }
+          # The tied candidates are sorted in creation order: the scenario needs
+          # the first one to take the last vacancy of the group
+          expect(ranked.index(candidates[1])).to be < ranked.index(candidates[2])
+          expect_ranking_positions(@ranking_config, candidates, [1, 2, 3])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "Racial", "PCD"])
+        end
+
         it "ranks tied candidates of different processes in the order of the processes" do
           candidates = create_ranked_candidates(
             admission_process: @admission_process,
