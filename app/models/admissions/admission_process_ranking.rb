@@ -78,14 +78,17 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
             # Check ties
             ((index + 1)..(candidates.size - 1)).each do |next_index|
               next_candidate = candidates[next_index]
+              # The candidates are sorted: the first one not tied ends the ties
+              break if Admissions::AdmissionProcessRanking.compare_candidates(
+                columns, candidate, next_candidate
+              ) != 0
+              # A candidate already ranked keeps its position, but does not end the ties
+              next if !next_candidate[:__position].nil?
               if next_candidate[:__candidate].satisfies_condition(
                 process.ranking_machine.form_condition,
                 fields: next_candidate[:__fields],
                 should_raise: machine_should_raise
               )
-                break if Admissions::AdmissionProcessRanking.compare_candidates(
-                  columns, candidate, next_candidate
-                ) != 0
                 self.set_candidate_position(next_candidate, process, candidate_position, machine)
                 position += 1
                 ngroups = groups
