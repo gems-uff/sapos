@@ -29,6 +29,30 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
   end
 
   def generate_ranking
+    # A failure keeps the results of the previous run
+    self.class.transaction do
+      self.clear_results
+      self.rank_candidates
+    end
+  end
+
+  # Candidates that the previous run ranked and this one does not must not keep
+  # their position and machine
+  def clear_results
+    rconfig = self.ranking_config
+    result_fields = [rconfig.position_field_id, rconfig.machine_field_id]
+    Admissions::AdmissionRankingResult.where(
+      ranking_config_id: rconfig.id,
+      admission_application_id: self.admission_process.admission_applications.select(:id)
+    ).includes(filled_form: :fields).each do |result|
+      result.filled_form.fields.each do |field|
+        field.update!(value: nil) if result_fields.include?(field.form_field_id)
+      end
+      result.filled_form.update!(is_filled: false)
+    end
+  end
+
+  def rank_candidates
     rconfig = self.ranking_config
     admission_applications = self.admission_process.admission_applications
     columns = self.ranking_config.ranking_columns.all

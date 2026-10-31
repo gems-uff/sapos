@@ -700,6 +700,95 @@ RSpec.describe Admissions::AdmissionProcessRanking, type: :model do
           expect_ranking_positions(@ranking_config, candidates, [1, 3, 2, 4])
           expect_ranking_machines(@ranking_config, candidates, ["AC", "AC/2", "Racial", "AC/2"])
         end
+
+        it "clears the results of a previous run before ranking again" do
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" },
+              { Col1: "80", racial: "0", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: nil, group: "general", order: 1, step: 1, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+          admission_process_ranking.generate_ranking
+          expect_ranking_positions(@ranking_config, candidates, [1, 2, 3])
+
+          @general_group.update!(vacancies: 2)
+          Admissions::AdmissionProcessRanking.new(
+            ranking_config: Admissions::RankingConfig.find(@ranking_config.id),
+            admission_process: @admission_process
+          ).generate_ranking
+          expect_ranking_positions(@ranking_config, candidates, [1, 2, nil])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "AC", nil])
+        end
+
+        it "keeps the results of the previous run when ranking again fails" do
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: nil, group: "general", order: 1, step: 1, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+          admission_process_ranking.generate_ranking
+
+          @ranking_config.update!(behavior_on_invalid_ranking: Admissions::RankingConfig::EXCEPTION_RANKING)
+          create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [{ racial: "0", pcd: "0" }],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            destroy_later: @destroy_later
+          )
+          ranking_again = Admissions::AdmissionProcessRanking.new(
+            ranking_config: Admissions::RankingConfig.find(@ranking_config.id),
+            admission_process: Admissions::AdmissionProcess.find(@admission_process.id)
+          )
+          expect { ranking_again.generate_ranking }.to raise_error(Exceptions::MissingFieldException)
+          expect_ranking_positions(@ranking_config, candidates, [1, 2])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "AC"])
+        end
+
+        it "keeps the results of another admission process with the same configuration" do
+          other_process = FactoryBot.create(:admission_process)
+          @destroy_later << other_process
+          others = create_ranked_candidates(
+            admission_process: other_process,
+            ranking_config: @ranking_config,
+            values: [{ Col1: "100", racial: "0", pcd: "0" }],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: nil, group: "general", order: 1, step: 1, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+          Admissions::AdmissionProcessRanking.new(
+            ranking_config: @ranking_config, admission_process: other_process
+          ).generate_ranking
+          create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [{ Col1: "90", racial: "0", pcd: "0" }],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            destroy_later: @destroy_later
+          )
+
+          admission_process_ranking.generate_ranking
+          expect_ranking_positions(@ranking_config, others, [1])
+          expect_ranking_machines(@ranking_config, others, ["AC"])
+        end
       end
     end
     describe "set_candidate_position" do
