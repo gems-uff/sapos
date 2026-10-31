@@ -31,23 +31,28 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
   def generate_ranking
     # A failure keeps the results of the previous run
     self.class.transaction do
-      self.clear_results
-      self.rank_candidates
+      # Two runs at once could both create the result of a candidate
+      Admissions::RankingConfig.lock.find(self.ranking_config_id)
+      candidates = self.rank_candidates
+      self.clear_results(candidates)
+      candidates
     end
   end
 
-  # Candidates that the previous run ranked and this one does not must not keep
-  # their position and machine
-  def clear_results
+  # Candidates that the previous run ranked and this one does not lose their
+  # position and machine, as if never ranked: an empty field would still be
+  # read by conditions and other rankings. Those ranked again keep theirs, and
+  # are written only where something changed.
+  def clear_results(candidates)
     rconfig = self.ranking_config
-    result_fields = [rconfig.position_field_id, rconfig.machine_field_id]
+    ranked = candidates.filter_map { |c| c[:__ranking_result].id if !c[:__position].nil? }
     Admissions::AdmissionRankingResult.where(
       ranking_config_id: rconfig.id,
       admission_application_id: self.admission_process.admission_applications.select(:id)
-    ).includes(filled_form: :fields).each do |result|
-      result.filled_form.fields.each do |field|
-        field.update!(value: nil) if result_fields.include?(field.form_field_id)
-      end
+    ).where.not(id: ranked).each do |result|
+      result.filled_form.fields.where(
+        form_field_id: [rconfig.position_field_id, rconfig.machine_field_id]
+      ).destroy_all
       result.filled_form.update!(is_filled: false)
     end
   end

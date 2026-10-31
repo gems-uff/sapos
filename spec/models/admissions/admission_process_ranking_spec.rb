@@ -728,6 +728,9 @@ RSpec.describe Admissions::AdmissionProcessRanking, type: :model do
         end
 
         it "clears the results of a previous run before ranking again" do
+          # Saved, so that the results reach the fields of the applications
+          admission_process_ranking.save!
+          @destroy_later << admission_process_ranking
           candidates = create_ranked_candidates(
             admission_process: @admission_process,
             ranking_config: @ranking_config,
@@ -752,6 +755,43 @@ RSpec.describe Admissions::AdmissionProcessRanking, type: :model do
           ).generate_ranking
           expect_ranking_positions(@ranking_config, candidates, [1, 2, nil])
           expect_ranking_machines(@ranking_config, candidates, ["AC", "AC", nil])
+          # Like a candidate never ranked: no position or machine at all, not
+          # empty ones, which conditions and other rankings would still read
+          dropped = Admissions::AdmissionApplication.find(candidates[2].id).fields_hash
+          expect(dropped).not_to include("#{Admissions::RankingConfig::POSITION}/#{@ranking_config.name}")
+          expect(dropped).not_to include("#{Admissions::RankingConfig::MACHINE}/#{@ranking_config.name}")
+        end
+
+        it "does not rewrite the results that do not change when ranking again" do
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: nil, group: "general", order: 1, step: 1, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+          admission_process_ranking.generate_ranking
+          written_at = lambda do
+            candidates.map do |candidate|
+              result = Admissions::AdmissionRankingResult.find_by(
+                admission_application_id: candidate.id, ranking_config_id: @ranking_config.id
+              )
+              [result.filled_position.updated_at, result.filled_machine.updated_at, result.filled_form.updated_at]
+            end
+          end
+          before = written_at.call
+
+          Admissions::AdmissionProcessRanking.new(
+            ranking_config: Admissions::RankingConfig.find(@ranking_config.id),
+            admission_process: Admissions::AdmissionProcess.find(@admission_process.id)
+          ).generate_ranking
+          expect(written_at.call).to eq(before)
         end
 
         it "keeps the results of the previous run when ranking again fails" do
