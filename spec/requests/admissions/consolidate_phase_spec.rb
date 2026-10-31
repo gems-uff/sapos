@@ -169,6 +169,25 @@ RSpec.describe "Admissions::AdmissionProcesses#consolidate_phase", type: :reques
       expect(positions).to eq({ first.id => "1", second.id => "2" })
     end
 
+    it "recusa antes de mexer nos candidatos quando um ranking da fase não pode rodar" do
+      ranking = FactoryBot.create(:ranking_config, name: "Geral", default_column: "nota")
+      # Como ficaria uma configuração anterior à validação dos grupos
+      ranking.ranking_processes.first.update_column(:group, "Sumido")
+      FactoryBot.create(
+        :admission_process_ranking, admission_process: @process, ranking_config: ranking,
+        admission_phase: @phase1, order: 1
+      )
+      approved = candidate("8")
+      reproved = candidate("4")
+
+      consolidate(@phase1)
+
+      expect(flash[:error]).to include("Sumido")
+      expect(approved.reload.admission_phase).to eq(@phase1)
+      expect(approved.status).to be_nil
+      expect(reproved.reload.status).to be_nil
+    end
+
     context "com pendências na fase" do
       before(:each) do
         @phase1.update!(shared_form: create_admission_template("Ficha", { "obs" => Admissions::FormField::STRING }))
