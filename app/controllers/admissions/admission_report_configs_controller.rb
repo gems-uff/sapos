@@ -23,6 +23,9 @@ class Admissions::AdmissionReportConfigsController < ApplicationController
     config.columns[:groups].show_blank_record = false
     config.columns[:ranking_columns].show_blank_record = false
     config.columns[:ranking_columns].allow_add_existing = false
+    config.columns[:ranking_columns].description = I18n.t(
+      "active_scaffold.admissions/admission_report_config.ranking_columns_description"
+    )
 
     config.columns[:group_column_tabular].form_ui = :select
     config.columns[:group_column_tabular].options = {

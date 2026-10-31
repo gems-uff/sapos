@@ -98,7 +98,7 @@ RSpec.describe Admissions::AdmissionReportConfig, "montagem da tabela", type: :m
         Admissions::AdmissionReportGroup::LETTER,
       ])
       expect(report.groups.select(&:in_simple).size).to eq(2)
-      expect(report.ranking_columns.map(&:name)).to eq(["name"])
+      expect(report.ranking_columns).to be_empty
       expect(report.group_column_tabular).to eq(Admissions::AdmissionReportConfig::MERGE)
       expect(report).to be_new_record
 
@@ -114,8 +114,9 @@ RSpec.describe Admissions::AdmissionReportConfig, "montagem da tabela", type: :m
       @config[:base_url] = "http://sapos.test"
     end
 
-    it "lista só as inscrições enviadas, em ordem de nome" do
-      expect(@config[:applications]).to eq([@ana, @bia])
+    it "lista só as inscrições enviadas, na ordem do ranking de seleção" do
+      # A coluna do ranking é "nota" ascendente: Bia (6) vem antes de Ana (8)
+      expect(@config[:applications]).to eq([@bia, @ana])
     end
 
     it "monta o cabeçalho com dados principais, cartas, fases em ordem inversa, campos e cartas" do
@@ -217,12 +218,45 @@ RSpec.describe Admissions::AdmissionReportConfig, "montagem da tabela", type: :m
       expect(report.prepare_table(@process)[:applications]).to eq([@ana])
     end
 
-    it "ordena pelas colunas de ranking e descarta quem não tem a coluna" do
+    it "ordena pelas colunas de ranking e põe no fim quem não tem a coluna" do
       report = report_with([[Admissions::AdmissionReportGroup::MAIN]])
       report.ranking_columns.build(name: "nota", order: Admissions::RankingColumn::DESC)
       expect(report.prepare_table(@process)[:applications]).to eq([@ana, @bia])
       report.ranking_columns.build(name: "obs", order: Admissions::RankingColumn::ASC)
-      expect(report.prepare_table(@process)[:applications]).to eq([@ana])
+      expect(report.prepare_table(@process)[:applications]).to eq([@ana, @bia])
+    end
+
+    describe "sem colunas de ordenação próprias" do
+      it "segue o ranking de seleção, inclusive para quem não passa na precondição" do
+        @ranking.update!(form_condition: field_condition("nota", Admissions::FormCondition::GE, "7"))
+        report = report_with([[Admissions::AdmissionReportGroup::MAIN]])
+        expect(report.prepare_table(@process)[:applications]).to eq([@bia, @ana])
+      end
+
+      it "põe no fim, em ordem de nome, quem não tem as colunas do ranking" do
+        @process.update!(min_letters: 0)
+        # Inscritos depois de Ana e Bia, e fora da ordem alfabética entre si
+        @davi = create_application(@process, name: "Davi", fields: {})
+        @beto = create_application(@process, name: "Beto", fields: {})
+        report = report_with([[Admissions::AdmissionReportGroup::MAIN]])
+        expect(report.prepare_table(@process)[:applications]).to eq([@bia, @ana, @beto, @davi])
+      end
+
+      it "usa o primeiro ranking do edital, e não os seguintes" do
+        bolsa = FactoryBot.create(:ranking_config, name: "Bolsa", default_column: "nota")
+        bolsa.ranking_columns.first.update!(order: Admissions::RankingColumn::DESC)
+        FactoryBot.create(:admission_process_ranking, admission_process: @process, ranking_config: bolsa, order: 2)
+        report = report_with([[Admissions::AdmissionReportGroup::MAIN]])
+        expect(report.prepare_table(@process)[:applications]).to eq([@bia, @ana])
+      end
+
+      it "ordena por nome quando o edital não tem ranking" do
+        @process.update!(min_letters: 0)
+        @beto = create_application(@process, name: "Beto", fields: { "nota" => "7" })
+        @process.rankings.destroy_all
+        report = report_with([[Admissions::AdmissionReportGroup::MAIN]])
+        expect(report.prepare_table(Admissions::AdmissionProcess.find(@process.id))[:applications]).to eq([@ana, @beto, @bia])
+      end
     end
 
     it "consolida um template do relatório por candidato e o mostra como seção" do
