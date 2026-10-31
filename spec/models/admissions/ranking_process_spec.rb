@@ -67,6 +67,10 @@ RSpec.describe Admissions::RankingProcess, type: :model do
         ranking_process.decrease_group!(groups)
         expect(groups).to eq("AC" => 3)
       end
+      it "raises for a group it does not know" do
+        ranking_process.group = "Geral"
+        expect { ranking_process.decrease_group!({ "AC" => 3 }) }.to raise_error(KeyError, /Geral/)
+      end
     end
   end
 end

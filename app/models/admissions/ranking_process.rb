@@ -33,8 +33,10 @@ class Admissions::RankingProcess < ActiveRecord::Base
     self.decrease_group!(groups)
   end
 
+  # A group the hash does not know raises: ignoring it would leave the process
+  # without the limit of its group
   def decrease_group!(groups)
-    return if self.group.blank? || groups[self.group].nil?
-    groups[self.group] -= 1
+    return if self.group.blank?
+    groups[self.group] = groups.fetch(self.group) - 1
   end
 end
