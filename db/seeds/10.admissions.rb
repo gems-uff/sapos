@@ -268,7 +268,7 @@ race_condition.form_conditions.build({ mode: "Condição", field: "Optante negro
 race_condition.form_conditions.build({ mode: "Condição", field: "Candidato solicita bolsa de estudos?", condition: "!=", value: "Sim (já sou aluno de mestrado do Programa e quero concorrer a uma bolsa)" })
 race_selection = Admissions::RankingMachine.create!({
   name: "Racial",
-  form_condition: pcd_condition
+  form_condition: race_condition
 })
 
 scholarship_selection = Admissions::RankingMachine.create!({
