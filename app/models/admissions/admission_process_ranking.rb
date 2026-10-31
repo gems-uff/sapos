@@ -60,6 +60,8 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
       candidates.each_with_index do |candidate, index|
         next if !candidate[:__position].nil?
         processes.each do |process|
+          # Another process of the same group may have exhausted it
+          next if process.calculate_remaining(groups, process_vacancies) <= 0
           if candidate[:__candidate].satisfies_condition(
             process.ranking_machine.form_condition,
             fields: candidate[:__fields],
