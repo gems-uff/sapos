@@ -8,6 +8,7 @@ class Student < ApplicationRecord
   include ::UserNameSyncConcern
 
   has_paper_trail
+  include CarrierWaveFileCleanup
 
   mount_uploader :photo, ProfileUploader
 

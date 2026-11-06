@@ -305,6 +305,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["medium_hash"], name: "index_carrier_wave_files_on_medium_hash"
   end
 
+  create_table "carrierwave_orphan_files", force: :cascade do |t|
+    t.integer "carrierwave_file_id", null: false
+    t.datetime "created_at", null: false
+    t.string "original_model"
+    t.datetime "updated_at", null: false
+    t.index ["carrierwave_file_id"], name: "index_carrierwave_orphan_files_on_carrierwave_file_id", unique: true
+    t.index ["original_model"], name: "index_carrierwave_orphan_files_on_original_model"
+  end
+
   create_table "cities", force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
     t.string "name", limit: 255
@@ -566,6 +575,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.string "list"
     t.datetime "updated_at", null: false
     t.text "value"
+    t.index ["file"], name: "index_filled_form_fields_on_file"
     t.index ["filled_form_id"], name: "index_filled_form_fields_on_filled_form_id"
     t.index ["form_field_id"], name: "index_filled_form_fields_on_form_field_id"
   end
@@ -928,6 +938,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.boolean "use_at_transcript", default: false, null: false
     t.integer "x"
     t.integer "y"
+    t.index ["image"], name: "index_report_configurations_on_image"
   end
 
   create_table "reports", force: :cascade do |t|
@@ -1086,6 +1097,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.index ["birth_state_id"], name: "index_students_on_state_id"
     t.index ["city_id"], name: "index_students_on_city_id"
     t.index ["cpf"], name: "index_students_on_cpf"
+    t.index ["photo"], name: "index_students_on_photo"
     t.index ["user_id"], name: "index_students_on_user_id"
   end
 
