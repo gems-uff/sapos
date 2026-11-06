@@ -7,12 +7,9 @@ require "spec_helper"
 
 RSpec.describe "Admission phase status: edições inline simultâneas", type: :feature, js: true do
   include AdmissionsScenarioHelpers
-  before(:all) do
+  before(:each) do
     @role_adm = FactoryBot.create(:role_administrador)
     @user = create_confirmed_user([@role_adm])
-  end
-
-  before(:each) do
     @template = create_admission_template("Inscrição", {
       "Foto" => {
         field_type: Admissions::FormField::STUDENT_FIELD,
@@ -30,9 +27,7 @@ RSpec.describe "Admission phase status: edições inline simultâneas", type: :f
   end
 
   def sample_photo_path
-    path = Rails.root.join("tmp", "spec_sample_photo_#{SecureRandom.hex(4)}.jpg")
-    File.binwrite(path, "\xFF\xD8\xFF\xE0".b + ("x" * 200))
-    path
+    Rails.root.join("spec", "fixtures", "user.png")
   end
 
   def visit_candidate_list
@@ -53,11 +48,10 @@ RSpec.describe "Admission phase status: edições inline simultâneas", type: :f
       find(".edit-override").click
     end
 
-    expect(page).to have_selector(edit_div_selector(application), wait: 10)
+    expect(page).to have_selector(edit_div_selector(application))
   end
 
   it "salva a candidatura aberta por último, com upload real, sem perder o dado nem gerar campo fantasma" do
-    path = sample_photo_path
     visit_candidate_list
     open_override_edit(@application_a)
     open_override_edit(@application_b)
@@ -72,7 +66,7 @@ RSpec.describe "Admission phase status: edições inline simultâneas", type: :f
 
     attach_file(
       file_input[:id],
-      path,
+      sample_photo_path,
       make_visible: true
     )
   end
@@ -89,7 +83,7 @@ RSpec.describe "Admission phase status: edições inline simultâneas", type: :f
       wait_for_ajax
     end
 
-    expect(page).to have_no_selector(edit_div_selector(@application_b), wait: 10)
+    expect(page).to have_no_selector(edit_div_selector(@application_b))
 
     b_photo_fields = @application_b.filled_form.reload.fields
       .where(form_field_id: @photo_field.id)
@@ -101,8 +95,6 @@ RSpec.describe "Admission phase status: edições inline simultâneas", type: :f
     expect(@application_b.filled_form.fields.where(form_field_id: nil)).to be_empty
 
     expect(page).to have_selector(edit_div_selector(@application_a))
-  ensure
-    File.delete(path) if path && File.exist?(path)
   end
 
   # O caminho da #677 de ponta a ponta: B salva com o formulario do candidato
