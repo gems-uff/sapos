@@ -41,7 +41,12 @@ não há como separar diferença de código de diferença de ambiente.
 export SAPOS_STAGING_URL=https://.../staging
 export SAPOS_STAGING_USER=...
 export SAPOS_STAGING_PASS='...'   # aspas SIMPLES: protegem espaço, $, ! e crase
+export SAPOS_STAGING_SSH=...         # host do ssh do servidor de homologação
+export SAPOS_STAGING_INSTANCE=...    # usuário unix da instância (aplicação em ~/instance)
 ```
+
+As duas últimas servem às sondas que precisam do servidor, não só da tela —
+hoje, a limpeza do `probe_submissao.rb`.
 
 Carregue com `set -a; source ~/.sapos_staging_env; set +a` antes de cada script.
 
@@ -527,7 +532,15 @@ O que cada um cobre, e o que ler no relatório:
 - `probe_submissao.rb --confirmar` — formulário público de candidatura de ponta
   a ponta: `criou: true` na fase 2 e `restantes com o marcador: 0` na limpeza.
   **Resíduo na réplica é defeito da rodada**, não da aplicação: se sobrar
-  registro com o marcador, apague antes de seguir.
+  registro com o marcador, apague antes de seguir. A limpeza pela tela apaga a
+  candidatura, mas não o formulário preenchido dela — a candidatura só faz
+  `belongs_to` dele, sem `dependent`, e a tela de formulários não tem exclusão.
+  Por isso a sonda apaga o formulário órfão no servidor (`rails runner` por
+  ssh, com `SAPOS_STAGING_SSH` e `SAPOS_STAGING_INSTANCE`), e a linha
+  `formularios orfaos com o marcador` tem de dizer `restantes 0`. `NAO
+  VERIFICADO` deixa um formulário de ~50 campos para trás a cada rodada, e a
+  contagem de `/filled_forms` e `/filled_form_fields` passa a divergir entre as
+  fotos.
 - `probe_salvar_candidatura.rb <ids>` — quando a mudança toca o salvar da
   edição de candidatura (`assign_form`, formulários de fase, validação de
   `FilledFormField`). Salva a edição com override **sem mudar valor**, uma vez
