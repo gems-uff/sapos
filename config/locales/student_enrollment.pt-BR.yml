@@ -40,6 +40,7 @@ pt-BR:
       on_demand_select: Selecione
       errors:
         select_on_demand_professor: É necessário selecionar um professor para %{course}
+        invalid_professor: O professor selecionado para %{course} não é válido
 
       message:
         author: "%{author} enviou:"

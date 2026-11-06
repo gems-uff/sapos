@@ -72,7 +72,7 @@ RSpec.describe "Enrollments features", type: :feature do
 
     @destroy_all << @course_type1 = FactoryBot.create(:course_type, name: "Obrigatória", has_score: true, schedulable: true, show_class_name: false, allow_multiple_classes: false, on_demand: false)
     @destroy_all << @course2 = FactoryBot.create(:course, name: "Algebra", code: "C1-old", credits: 4, workload: 60, course_type: @course_type1, available: false)
-    @destroy_all << @course_class3 = FactoryBot.create(:course_class, name: "Algebra", course: @course2, professor: @professor1, year: 2021, semester: 1)
+    @destroy_all << @course_class3 = FactoryBot.create(:course_class, name: "Algebra", course: @course2, professors: [@professor1], year: 2021, semester: 1)
     @destroy_all << FactoryBot.create(:class_enrollment, enrollment: @enrollment2, course_class: @course_class3, grade: 80, situation: ClassEnrollment::APPROVED)
 
     @destroy_all << FactoryBot.create(:enrollment_hold, enrollment: @enrollment1, year: YearSemester.current.year, semester: YearSemester.current.semester, number_of_semesters: 1)
