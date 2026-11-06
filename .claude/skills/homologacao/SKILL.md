@@ -41,7 +41,12 @@ não há como separar diferença de código de diferença de ambiente.
 export SAPOS_STAGING_URL=https://.../staging
 export SAPOS_STAGING_USER=...
 export SAPOS_STAGING_PASS='...'   # aspas SIMPLES: protegem espaço, $, ! e crase
+export SAPOS_STAGING_SSH=...         # host do ssh do servidor de homologação
+export SAPOS_STAGING_INSTANCE=...    # usuário unix da instância (aplicação em ~/instance)
 ```
+
+As duas últimas servem às sondas que precisam do servidor, não só da tela —
+hoje, a limpeza do `probe_submissao.rb`.
 
 Carregue com `set -a; source ~/.sapos_staging_env; set +a` antes de cada script.
 
@@ -71,6 +76,12 @@ uma delas mudar no meio do ciclo — rota acrescentada, rota removida —, captu
 "depois" com a lista que produziu o "antes" (`git show <commit>:<arquivo>` para
 um caminho fora do repositório) e só então adote a nova. Sem isso a comparação
 acusa a rota que você mexeu, misturada com o que ela deveria medir.
+
+**A réplica padrão vem sem a tabela `versions`**: o `migrate.sh` do servidor só
+a copia com o parâmetro `full`. Mudança que lê o paper_trail — migration que
+reconstrói histórico a partir das versões, tela de log — homologada sobre a
+réplica padrão roda sobre tabela vazia e passa sem medir nada. Peça ao
+mantenedor a réplica `full` antes do passo 1.
 
 ### Onde as capturas ficam
 
@@ -379,6 +390,16 @@ Campo de arquivo **com** arquivo gravado sem `required` é o esperado: o navegad
 não pré-preenche input de arquivo, e marcar `required` ali trava a submissão
 inteira em silêncio. A exigência fica no servidor.
 
+O **texto** das mensagens dessas validações também se lê sem submeter, e é o
+que o `probe_mensagens_validacao.rb` faz: na edição com override, liga os
+toggles só no navegador, monta o estado que reprova cada validação (data
+inválida, radio e checkbox desmarcados, arquivo grande e depois de extensão
+estranha), chama as funções e lê a mensagem de cada campo, junto com os erros
+de console ao carregar a página. Use quando a mudança tocar o JavaScript dos
+parciais de `filled_form/edit` — script de campo que quebra ao carregar aparece
+ali, e em nenhuma foto. Passe no "depois" os mesmos ids do "antes"; só as
+candidaturas de processo com `staff_can_edit` montam o formulário.
+
 ### Submeter o formulário, que é o que a leitura não alcança
 
 Ler prova o que a página **exige**; só submeter prova o que ela **faz**. O
@@ -481,7 +502,9 @@ lados enxergam a mesma coisa. O rastro que sobra é linha em `/versions` e
 
 ```bash
 # passo 0: o valor VIVO de redirect_email (ver "Regras de segurança"). Sai 0 na
-# trava (""), 1 com endereco (redireciona), 2 AUSENTE (nil: PERIGO, nao escreva).
+# trava (""), 1 com endereco (redireciona), 2 AUSENTE (nil: PERIGO, nao escreva),
+# 3 sem medida (a tela nao listou nada). Roda tambem com a conta de papel unico
+# que a reimportacao deixa, entao vem antes do preparar_aluno_de_teste.rb.
 EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/conferir_redirect_email.rb
 # LADO=$ANTES antes de capturar o antes; LADO=$DEPOIS antes de capturar o depois.
 EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/probe_escrita.rb              # diagnostico
@@ -509,7 +532,23 @@ O que cada um cobre, e o que ler no relatório:
 - `probe_submissao.rb --confirmar` — formulário público de candidatura de ponta
   a ponta: `criou: true` na fase 2 e `restantes com o marcador: 0` na limpeza.
   **Resíduo na réplica é defeito da rodada**, não da aplicação: se sobrar
-  registro com o marcador, apague antes de seguir.
+  registro com o marcador, apague antes de seguir. A limpeza pela tela apaga a
+  candidatura, mas não o formulário preenchido dela — a candidatura só faz
+  `belongs_to` dele, sem `dependent`, e a tela de formulários não tem exclusão.
+  Por isso a sonda apaga o formulário órfão no servidor (`rails runner` por
+  ssh, com `SAPOS_STAGING_SSH` e `SAPOS_STAGING_INSTANCE`), e a linha
+  `formularios orfaos com o marcador` tem de dizer `restantes 0`. `NAO
+  VERIFICADO` deixa um formulário de ~50 campos para trás a cada rodada, e a
+  contagem de `/filled_forms` e `/filled_form_fields` passa a divergir entre as
+  fotos.
+- `probe_salvar_candidatura.rb <ids>` — quando a mudança toca o salvar da
+  edição de candidatura (`assign_form`, formulários de fase, validação de
+  `FilledFormField`). Salva a edição com override **sem mudar valor**, uma vez
+  com os formulários desligados e outra com o de inscrição ligado, e lê o estado
+  pela tela de exibição antes e depois. Compara-se `resultado` e `estado_mudou`
+  entre os lados. "Barrado no navegador" com o formulário de inscrição ligado
+  costuma ser dado real: campo com `required` nativo vazio, que o candidato
+  deixou em branco antes de o template passar a exigir.
 
 O que a passada **não** cobre, e por isso não se conclui dela: disparo de e-mail.
 Só exercite e-mail quando a mudança tocar Devise, `lib/notifier.rb`, template de
@@ -578,8 +617,9 @@ O combo de troca de papel só aparece depois do passo 2 (ele exige dois papéis)
 A réplica não tem processo seletivo aberto, e **todos os processos dela vêm com
 `require_session` ligado** — que faz o `prepare_new_admission_application`
 desviar antes de o pedido chegar ao controller. São dois campos a mexer, não só
-a data. O `abrir_processo_seletivo.rb` abre, exercita e reverte os dois na mesma
-execução, conferindo o que gravou.
+a data de fim; e três quando o processo é novo, com o início ainda no futuro. O
+`abrir_processo_seletivo.rb abrir` guarda os originais e abre; o `fechar` os
+restaura e confere o que gravou.
 
 Prefira exercitar o **create**: ele só precisa do processo aberto, enquanto o
 update exigiria o token de uma inscrição de candidato real.

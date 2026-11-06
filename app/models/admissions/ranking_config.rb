@@ -52,6 +52,20 @@ class Admissions::RankingConfig < ActiveRecord::Base
     inclusion: { in: BEHAVIOR_ON_INVALID_CONDITIONS }
   validates :behavior_on_invalid_ranking, presence: true,
     inclusion: { in: BEHAVIOR_ON_INVALID_RANKINGS }
+  validate :that_process_groups_exist
+
+  # The ranking matches a process to its group by the exact name: a process
+  # with an unknown group would have no limit of group
+  def that_process_groups_exist
+    names = nil
+    self.ranking_processes.reject(&:marked_for_destruction?).each do |process|
+      next if process.group.blank?
+      # Loaded only when needed: once loaded, the association stays cached
+      names ||= self.ranking_groups.reject(&:marked_for_destruction?).map(&:name)
+      next if names.include?(process.group)
+      errors.add(:ranking_processes, :group_not_found, group: process.group)
+    end
+  end
 
 
   accepts_nested_attributes_for :form_template, allow_destroy: false

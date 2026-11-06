@@ -94,6 +94,41 @@ module ProfessorsHelper
     resp.html_safe
   end
 
+  # O :advisement_authorizations padrão usa to_label (só o nome do nível), sem
+  # período -- com mais de três linhas o associated_limit pode esconder
+  # justamente a vigente. Mesmo molde de professor_institutions_show_column.
+  def professor_advisement_authorizations_show_column(record, options)
+    authorizations = record.advisement_authorizations.sort_by(&:start_date)
+    return "-" if authorizations.empty?
+
+    body = ""
+    count = 0
+    authorizations.each do |authorization|
+      count += 1
+      tr_class = count.even? ? "even-record" : ""
+      body += "<tr class=\"record #{tr_class}\">
+                <td>#{h(authorization.level.name)}</td>
+                <td>#{date_br(authorization.start_date)}</td>
+                <td>#{date_br(authorization.end_date)}</td>
+              </tr>"
+    end
+
+    resp =
+      "<table class=\"showtable listed-records-table\">
+        <thead>
+          <tr>
+            <th>#{I18n.t("activerecord.attributes.advisement_authorization.level")}</th>
+            <th>#{I18n.t("activerecord.attributes.advisement_authorization.start_date")}</th>
+            <th>#{I18n.t("activerecord.attributes.advisement_authorization.end_date")}</th>
+          </tr>
+        </thead>
+        <tbody class=\"records\">
+        #{body}
+        </tbody>
+      </table>"
+    resp.html_safe
+  end
+
   def permit_rs_browse_params
     [:page, :update, :utf8]
   end

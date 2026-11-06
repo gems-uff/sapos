@@ -234,6 +234,77 @@ RSpec.describe Admissions::AdmissionProcessRanking, type: :model do
           expect_ranking_machines(@ranking_config, candidates, ["AC", "AC", "PCD", "AC/2", nil, nil])
         end
 
+        it "does not exceed the group when another process of the same step exhausts it" do
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" },
+              { Col1: "80", racial: "0", pcd: "0" },
+              { Col1: "70", racial: "1", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: nil, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: 1, group: "general", order: 2, step: 1, ranking_machine: @racial_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          admission_process_ranking.generate_ranking
+          expect_ranking_positions(@ranking_config, candidates, [1, 2, 3, nil])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "AC", "AC", nil])
+        end
+
+        it "does not exceed the group when three processes of the same step share it" do
+          @general_group.update!(vacancies: 2)
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" },
+              { Col1: "80", racial: "1", pcd: "0" },
+              { Col1: "70", racial: "0", pcd: "1" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: nil, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: 1, group: "general", order: 2, step: 1, ranking_machine: @racial_machine },
+              { vacancies: 1, group: "general", order: 3, step: 1, ranking_machine: @pcd_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          admission_process_ranking.generate_ranking
+          expect_ranking_positions(@ranking_config, candidates, [1, 2, nil, nil])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "AC", nil, nil])
+        end
+
+        it "fills the reserved process when the processes fit in the group (control)" do
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" },
+              { Col1: "80", racial: "0", pcd: "0" },
+              { Col1: "70", racial: "1", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: 2, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: 1, group: "general", order: 2, step: 1, ranking_machine: @racial_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          admission_process_ranking.generate_ranking
+          expect_ranking_positions(@ranking_config, candidates, [1, 2, nil, 3])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "AC", nil, "Racial"])
+        end
+
         it "considers different ranking machines" do
           candidates = create_ranked_candidates(
             admission_process: @admission_process,
@@ -466,6 +537,366 @@ RSpec.describe Admissions::AdmissionProcessRanking, type: :model do
           expect(ranked_candidates.size).to eq(candidates.size)
           expect_ranking_positions(@ranking_config, candidates, [1, 1, 1, 1, 1, 6, nil, nil, 7, nil, nil])
           expect_ranking_machines(@ranking_config, candidates, ["AC", "AC", "AC", "AC", "AC", "Racial", nil, nil, "Racial", nil, nil])
+        end
+
+        it "does not reassign on a tie a candidate ranked in a previous step" do
+          @general_group.update!(vacancies: 4)
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "1", pcd: "0" },
+              { Col1: "80", racial: "0", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: 1, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: 1, group: "general", order: 2, step: 1, ranking_machine: @racial_machine },
+              { vacancies: nil, group: "general", order: 3, step: 2, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          ranked = admission_process_ranking.generate_ranking.map { |c| c[:__candidate] }
+          # The tied candidates are sorted in creation order: the scenario needs the
+          # non-reserved one first.
+          expect(ranked.index(candidates[1])).to be < ranked.index(candidates[2])
+          expect_ranking_positions(@ranking_config, candidates, [1, 3, 2, 4])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "AC/2", "Racial", "AC/2"])
+        end
+
+        it "does not reassign on a tie a candidate ranked earlier in the same step" do
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "1", pcd: "1" },
+              { Col1: "90", racial: "0", pcd: "1" },
+              { Col1: "90", racial: "1", pcd: "1" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: 1, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: 1, group: "general", order: 2, step: 1, ranking_machine: @racial_machine },
+              { vacancies: 1, group: "pcd", order: 3, step: 1, ranking_machine: @pcd_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          ranked = admission_process_ranking.generate_ranking.map { |c| c[:__candidate] }
+          # The tied candidates are sorted in creation order: the scenario needs the
+          # one without the racial reservation between the other two.
+          expect(candidates[1..].map { |c| ranked.index(c) }).to eq([1, 2, 3])
+          expect_ranking_positions(@ranking_config, candidates, [1, 2, 4, 2])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "Racial", "PCD", "Racial"])
+        end
+
+        it "keeps counting ties past a candidate already ranked in the middle of them" do
+          @general_group.update!(vacancies: 4)
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "1", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" },
+              { Col1: "80", racial: "0", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: 1, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: 1, group: "general", order: 2, step: 1, ranking_machine: @racial_machine },
+              { vacancies: nil, group: "general", order: 3, step: 2, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          ranked = admission_process_ranking.generate_ranking.map { |c| c[:__candidate] }
+          # The tied candidates are sorted in creation order: the scenario needs the
+          # reserved one between the other two.
+          expect(candidates[1..3].map { |c| ranked.index(c) }).to eq([1, 2, 3])
+          expect_ranking_positions(@ranking_config, candidates, [1, 3, 2, 3, nil])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "AC/2", "Racial", "AC/2", nil])
+        end
+
+        it "takes the excess of a tie from the group in the next step" do
+          @general_group.update!(vacancies: 4)
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" },
+              { Col1: "80", racial: "0", pcd: "0" },
+              { Col1: "70", racial: "0", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: 1, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: nil, group: "general", order: 2, step: 2, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          admission_process_ranking.generate_ranking
+          # 4 vacancies: 1 in the first step, 1 excess of the tie, 2 left for the second
+          expect_ranking_positions(@ranking_config, candidates, [1, 1, 3, 4, nil])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "AC", "AC/2", "AC/2", nil])
+        end
+
+        it "opens the group to tied candidates of a process it had vacancies for" do
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "1", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "1" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: 1, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: 1, group: "pcd", order: 2, step: 1, ranking_machine: @racial_machine },
+              { vacancies: 1, group: "pcd", order: 3, step: 1, ranking_machine: @pcd_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          ranked = admission_process_ranking.generate_ranking.map { |c| c[:__candidate] }
+          # The tied candidates are sorted in creation order: the scenario needs
+          # the first one to take the last vacancy of the group
+          expect(ranked.index(candidates[1])).to be < ranked.index(candidates[2])
+          expect_ranking_positions(@ranking_config, candidates, [1, 2, 3])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "Racial", "PCD"])
+        end
+
+        it "ranks tied candidates of different processes in the order of the processes" do
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "1" },
+              { Col1: "90", racial: "1", pcd: "1" },
+              { Col1: "80", racial: "1", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: 1, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: 1, group: "general", order: 2, step: 1, ranking_machine: @racial_machine },
+              { vacancies: 1, group: "pcd", order: 3, step: 1, ranking_machine: @pcd_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          ranked = admission_process_ranking.generate_ranking.map { |c| c[:__candidate] }
+          # The tied candidates are sorted in creation order: the scenario needs the
+          # one without the racial reservation first.
+          expect(ranked.index(candidates[1])).to be < ranked.index(candidates[2])
+          expect_ranking_positions(@ranking_config, candidates, [1, 3, 2, nil])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "PCD", "Racial", nil])
+        end
+
+        it "does not evaluate the machine condition past the tied candidates" do
+          @ranking_config.update!(behavior_on_invalid_condition: Admissions::RankingConfig::EXCEPTION_ON_MACHINE)
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "1", pcd: "0" },
+              { Col1: "80", racial: "0", pcd: "1" },
+              { Col1: "70", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: 1, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: 1, group: "pcd", order: 2, step: 1, ranking_machine: @pcd_machine },
+              { vacancies: 1, group: "general", order: 3, step: 2, ranking_machine: @racial_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          # The last candidate has no racial field, which would raise if evaluated
+          admission_process_ranking.generate_ranking
+          expect_ranking_positions(@ranking_config, candidates, [1, 3, 2, nil])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "Racial/2", "PCD", nil])
+        end
+
+        it "keeps the reserved candidate when there is no tie (control)" do
+          @general_group.update!(vacancies: 4)
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" },
+              { Col1: "89", racial: "1", pcd: "0" },
+              { Col1: "80", racial: "0", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: 1, group: "general", order: 1, step: 1, ranking_machine: @ac_machine },
+              { vacancies: 1, group: "general", order: 2, step: 1, ranking_machine: @racial_machine },
+              { vacancies: nil, group: "general", order: 3, step: 2, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          admission_process_ranking.generate_ranking
+          expect_ranking_positions(@ranking_config, candidates, [1, 3, 2, 4])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "AC/2", "Racial", "AC/2"])
+        end
+
+        it "clears the results of a previous run before ranking again" do
+          # Saved, so that the results reach the fields of the applications
+          admission_process_ranking.save!
+          @destroy_later << admission_process_ranking
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" },
+              { Col1: "80", racial: "0", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: nil, group: "general", order: 1, step: 1, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+          admission_process_ranking.generate_ranking
+          expect_ranking_positions(@ranking_config, candidates, [1, 2, 3])
+
+          @general_group.update!(vacancies: 2)
+          Admissions::AdmissionProcessRanking.new(
+            ranking_config: Admissions::RankingConfig.find(@ranking_config.id),
+            admission_process: @admission_process
+          ).generate_ranking
+          expect_ranking_positions(@ranking_config, candidates, [1, 2, nil])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "AC", nil])
+          # Like a candidate never ranked: no position or machine at all, not
+          # empty ones, which conditions and other rankings would still read
+          dropped = Admissions::AdmissionApplication.find(candidates[2].id).fields_hash
+          expect(dropped).not_to include("#{Admissions::RankingConfig::POSITION}/#{@ranking_config.name}")
+          expect(dropped).not_to include("#{Admissions::RankingConfig::MACHINE}/#{@ranking_config.name}")
+        end
+
+        it "does not rewrite the results that do not change when ranking again" do
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: nil, group: "general", order: 1, step: 1, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+          admission_process_ranking.generate_ranking
+          written_at = lambda do
+            candidates.map do |candidate|
+              result = Admissions::AdmissionRankingResult.find_by(
+                admission_application_id: candidate.id, ranking_config_id: @ranking_config.id
+              )
+              [result.filled_position.updated_at, result.filled_machine.updated_at, result.filled_form.updated_at]
+            end
+          end
+          before = written_at.call
+
+          Admissions::AdmissionProcessRanking.new(
+            ranking_config: Admissions::RankingConfig.find(@ranking_config.id),
+            admission_process: Admissions::AdmissionProcess.find(@admission_process.id)
+          ).generate_ranking
+          expect(written_at.call).to eq(before)
+        end
+
+        it "keeps the results of the previous run when ranking again fails" do
+          candidates = create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [
+              { Col1: "100", racial: "0", pcd: "0" },
+              { Col1: "90", racial: "0", pcd: "0" }
+            ],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: nil, group: "general", order: 1, step: 1, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+          admission_process_ranking.generate_ranking
+
+          @ranking_config.update!(behavior_on_invalid_ranking: Admissions::RankingConfig::EXCEPTION_RANKING)
+          create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [{ racial: "0", pcd: "0" }],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            destroy_later: @destroy_later
+          )
+          ranking_again = Admissions::AdmissionProcessRanking.new(
+            ranking_config: Admissions::RankingConfig.find(@ranking_config.id),
+            admission_process: Admissions::AdmissionProcess.find(@admission_process.id)
+          )
+          expect { ranking_again.generate_ranking }.to raise_error(Exceptions::MissingFieldException)
+          expect_ranking_positions(@ranking_config, candidates, [1, 2])
+          expect_ranking_machines(@ranking_config, candidates, ["AC", "AC"])
+        end
+
+        it "raises when a process names a group the configuration does not have" do
+          create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [{ Col1: "100", racial: "0", pcd: "0" }],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: nil, group: "General", order: 1, step: 1, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+
+          expect { admission_process_ranking.generate_ranking }.to raise_error(
+            Exceptions::MissingGroupException, /General/
+          )
+        end
+
+        it "keeps the results of another admission process with the same configuration" do
+          other_process = FactoryBot.create(:admission_process)
+          @destroy_later << other_process
+          others = create_ranked_candidates(
+            admission_process: other_process,
+            ranking_config: @ranking_config,
+            values: [{ Col1: "100", racial: "0", pcd: "0" }],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            processes: [
+              { vacancies: nil, group: "general", order: 1, step: 1, ranking_machine: @ac_machine }
+            ],
+            destroy_later: @destroy_later
+          )
+          Admissions::AdmissionProcessRanking.new(
+            ranking_config: @ranking_config, admission_process: other_process
+          ).generate_ranking
+          create_ranked_candidates(
+            admission_process: @admission_process,
+            ranking_config: @ranking_config,
+            values: [{ Col1: "90", racial: "0", pcd: "0" }],
+            columns: [{ name: "Col1", order: Admissions::RankingColumn::DESC, type: Admissions::FormField::NUMBER }],
+            destroy_later: @destroy_later
+          )
+
+          admission_process_ranking.generate_ranking
+          expect_ranking_positions(@ranking_config, others, [1])
+          expect_ranking_machines(@ranking_config, others, ["AC"])
         end
       end
     end

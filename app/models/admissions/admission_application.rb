@@ -408,6 +408,37 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     check_candidate_permission: false,
     committee_permission_user: nil
   )
+    # Os parametros so alcancam o que a tela oferece a quem submete. Cada
+    # formulario de fase vai para o objeto que prepare_application_forms marca
+    # como editavel, e o resto e descartado; o formulario principal e as cartas
+    # seguem can_edit_main_form?. O template e o formulario preenchido de cada
+    # objeto sao os do servidor, nunca os que vem nos parametros.
+    params = params.to_h.with_indifferent_access
+    phase_params = {
+      results: params.delete(:results_attributes),
+      evaluations: params.delete(:evaluations_attributes),
+    }
+    rankings_params = params.delete(:rankings_attributes)
+    if self.can_edit_main_form?(can_edit_override:, check_candidate_permission:)
+      if params[:filled_form_attributes].present?
+        params[:filled_form_attributes] = sanitize_filled_form_params(
+          self.filled_form, params[:filled_form_attributes]
+        )
+      end
+      if params[:letter_requests_attributes].present?
+        params[:letter_requests_attributes] = sanitize_nested_filled_forms(
+          params[:letter_requests_attributes], self.letter_requests
+        )
+      end
+    else
+      params.delete(:filled_form_attributes)
+      params.delete(:letter_requests_attributes)
+    end
+    if can_edit_override && rankings_params.present?
+      params[:rankings_attributes] = sanitize_nested_filled_forms(
+        rankings_params, self.rankings
+      )
+    end
     self.assign_attributes(params)
     all_forms = []
     all_phase_forms = []
@@ -446,8 +477,21 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
         app_forms[:phase_forms].each do |phase_form|
           # Do not solve pendency if form was not available to user
           next if !phase_form[:can_edit_form]
-          # Do not solve pendency if it was not created by assign_attributes
-          next if phase_form[:from_build]
+          entry = phase_form_params(phase_params[phase_form[:field]], phase_form)
+          # Do not solve pendency if the user did not submit this form
+          next if entry.nil?
+          if entry[:filled_form_attributes].present?
+            # prepare_application_forms ja montou um campo vazio para cada
+            # campo do template; o campo enviado sem id viraria um segundo.
+            filled_form = phase_form[:object].filled_form
+            filled_form.fields.reset
+            phase_form[:object].assign_attributes(
+              filled_form_attributes: sanitize_filled_form_params(
+                filled_form, entry[:filled_form_attributes]
+              )
+            )
+            filled_form.prepare_missing_fields
+          end
           # Do not solve pendency if form submission was disabled
           next if phase_form[:object].filled_form.try(:enable_submission) != "1"
           phase_form[:was_filled] = phase_form[:object].filled_form.is_filled
@@ -667,7 +711,59 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       .order(Arel.sql("`admission_process_rankings`.`order` ASC"))
   end
 
+  # Se quem submete pode editar o formulario principal e as cartas. E a mesma
+  # regra para a tela, que decide o que oferece, e para assign_form, que decide
+  # o que aceita.
+  def can_edit_main_form?(can_edit_override: false, check_candidate_permission: false)
+    if check_candidate_permission
+      self.admission_phase_id.nil? || self.admission_phase.candidate_can_edit
+    else
+      can_edit_override || self.admission_phase.try(:can_edit_candidate) || false
+    end
+  end
+
   private
+    def nested_entries(entries)
+      entries.is_a?(Hash) ? entries.values : Array(entries)
+    end
+
+    # A entrada dos parametros que corresponde ao objeto do formulario de fase:
+    # pelo id, quando vem, ou pela fase e pelo modo (ou membro), quando nao vem.
+    def phase_form_params(entries, phase_form)
+      object = phase_form[:object]
+      nested_entries(entries).find do |entry|
+        next entry[:id].to_s == object.id.to_s if entry[:id].present?
+        next false if entry[:admission_phase_id].to_s != object.admission_phase_id.to_s
+        if phase_form[:field] == :evaluations
+          entry[:user_id].to_s == object.user_id.to_s
+        else
+          entry[:mode] == object.mode
+        end
+      end
+    end
+
+    def sanitize_filled_form_params(filled_form, attributes)
+      attributes = attributes.except(:form_template_id, :is_filled)
+      if filled_form&.persisted?
+        attributes[:id] = filled_form.id
+      else
+        attributes.delete(:id)
+      end
+      attributes
+    end
+
+    def sanitize_nested_filled_forms(entries, owners)
+      nested_entries(entries).map do |entry|
+        next entry if entry[:filled_form_attributes].blank?
+        owner = owners.find { |o| o.persisted? && o.id.to_s == entry[:id].to_s } if entry[:id].present?
+        entry.merge(
+          filled_form_attributes: sanitize_filled_form_params(
+            owner&.filled_form, entry[:filled_form_attributes]
+          )
+        )
+      end
+    end
+
     def generate_token
       18.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }
         .insert(6, "-").insert(13, "-").join("")

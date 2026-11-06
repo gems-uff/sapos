@@ -20,6 +20,7 @@ class Dismissal < ApplicationRecord
     on_or_after_message: :date_before_enrollment_admission_date
 
   validate :if_enrollment_has_not_scholarship
+  validate :enrollment_keeps_accredited_advisor
 
   month_year_date :date
 
@@ -40,5 +41,19 @@ class Dismissal < ApplicationRecord
     if any_active_scholarship
       errors.add(:enrollment, :enrollment_has_scholarship)
     end
+  end
+
+  # Na matrícula desligada, a regra de credenciamento vale no mês do
+  # desligamento (Enrollment#enrollment_has_authorized_advisor). Gravado por
+  # esta tela, o desligamento não passa pela validação da matrícula, que
+  # ficaria inválida e só acusaria na próxima edição, longe de quem a causou.
+  def enrollment_keeps_accredited_advisor
+    return unless CustomVariable.enable_advisor_accreditation_validation
+    return if enrollment.blank? || enrollment.level.blank? || date.blank?
+    advisements = enrollment.advisements.reject(&:marked_for_destruction?)
+    return if advisements.empty?
+    period = enrollment.advisor_accreditation_period(date)
+    return if enrollment.any_accredited_advisor?(advisements, period)
+    errors.add(:enrollment, :no_advisor_with_level)
   end
 end

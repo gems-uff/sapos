@@ -567,7 +567,10 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     end
 
     def before_update_save(record)
-      can_edit_override = params[:can_edit_override]
+      # O campo escondido so diz que a edicao foi aberta em modo override; quem
+      # pode usa-lo e o papel. Sem override o formulario manda o campo vazio.
+      can_edit_override = params[:can_edit_override].present? &&
+        override_authorized?(record)
       record.assign_form(
         admission_application_params,
         has_letter_forms: true,

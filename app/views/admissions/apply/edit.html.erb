@@ -3,7 +3,7 @@
   no_phase = @admission_application.admission_phase_id.nil?
   show_groups = !no_phase
   can_edit = @admission_application.candidate_can_edit
-  can_edit_main = no_phase || @admission_application.admission_phase.candidate_can_edit
+  can_edit_main = @admission_application.can_edit_main_form?(check_candidate_permission: true)
   form_id = "apply_form"
 %>
 

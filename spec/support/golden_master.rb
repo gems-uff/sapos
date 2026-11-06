@@ -62,11 +62,20 @@ module GoldenMaster
     end
   end
 
-  # Texto por página, na ordem em que o prawn o colocou.
+  # Texto por página, na ordem em que o prawn o colocou. O texto desenhado e o
+  # ActualText entram em separado (ver spec/support/pdf_actual_text.rb): lidos
+  # juntos, a frase falada esconde o glifo e o baseline deixa de vigiá-lo.
   def pdf_representation(content)
-    reader = PDF::Reader.new(StringIO.new(content))
+    spoken = PdfActualText.actual_texts(content)
+    reader = PDF::Reader.new(
+      StringIO.new(PdfActualText.without_actual_text(content))
+    )
     reader.pages.map.with_index(1) do |page, number|
-      "── página #{number} ──\n#{normalize(page.text)}"
+      text = "── página #{number} ──\n#{normalize(page.text)}"
+      phrases = spoken[number - 1]
+      next text if phrases.empty?
+
+      "#{text}\n── página #{number}, ActualText ──\n#{phrases.join("\n")}"
     end.join("\n")
   end
 

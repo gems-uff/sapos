@@ -55,4 +55,38 @@ RSpec.describe "StudentEnrollmentController", type: :request do
       )
     end
   end
+
+  describe "GET enroll advisor list only offers currently accredited professors" do
+    # A lista de orientadores da tela de matrícula precisa casar com a validação:
+    # oferecer só quem está credenciado na data de hoje (start_date já iniciado e
+    # sem descredenciamento), e não apenas quem tem end_date nulo. O seletor só
+    # aparece numa linha de curso on-demand, com a janela de inscrição aberta.
+    before(:each) do
+      FactoryBot.create(
+        :class_schedule, year: 2026, semester: 2,
+        enrollment_start: 3.days.ago, enrollment_end: 3.days.from_now
+      )
+      on_demand_type = FactoryBot.create(:course_type, on_demand: true)
+      FactoryBot.create(:course, course_type: on_demand_type)
+
+      current = FactoryBot.create(:professor, name: "OrientadorVigente")
+      FactoryBot.create(:advisement_authorization, professor: current, level: @level,
+                        start_date: Date.current - 1.day, end_date: nil)
+      closed = FactoryBot.create(:professor, name: "OrientadorEncerrado")
+      FactoryBot.create(:advisement_authorization, professor: closed, level: @level,
+                        start_date: Date.current - 2.days, end_date: Date.current - 1.day)
+      future = FactoryBot.create(:professor, name: "OrientadorFuturo")
+      FactoryBot.create(:advisement_authorization, professor: future, level: @level,
+                        start_date: Date.current + 1.day, end_date: nil)
+    end
+
+    it "shows the accredited advisor and hides the de-accredited and not-yet-started ones" do
+      get "/enrollment/#{@enrollment.id}/enroll/2026-2"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("OrientadorVigente")
+      expect(response.body).not_to include("OrientadorEncerrado")
+      expect(response.body).not_to include("OrientadorFuturo")
+    end
+  end
 end

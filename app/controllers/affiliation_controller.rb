@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AffiliationController < ApplicationController
+  include CurrentPeriodSearchConcern
+
   authorize_resource
 
   active_scaffold :affiliation do |config|
@@ -15,6 +17,12 @@ class AffiliationController < ApplicationController
     config.columns[:institution].form_ui = :record_select
     config.columns[:start_date].form_ui = :date_picker
     config.columns[:end_date].form_ui = :date_picker
+
+    config.actions.swap :search, :field_search
+    config.field_search.columns = [:professor, :institution, :active]
+    config.columns[:professor].search_ui = :record_select
+    config.columns[:institution].search_ui = :record_select
+    add_current_period_search_column(config)
   end
   record_select(
     per_page: 10,

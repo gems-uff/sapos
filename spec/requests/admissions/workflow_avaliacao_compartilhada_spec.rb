@@ -30,19 +30,6 @@ RSpec.describe "Fluxo do processo seletivo: avaliação compartilhada", type: :r
     allow(Notifier).to receive(:send_emails) { |notifications:| @sent.concat(notifications) }
   end
 
-  def position_and_machine(ranking_link, application)
-    result = Admissions::AdmissionRankingResult.find_by(
-      ranking_config: ranking_link.ranking_config, admission_application: application
-    )
-    return nil if result.nil? || result.filled_position.value.blank?
-    [result.filled_position.value.to_i, result.filled_machine.value]
-  end
-
-  def consolidation_value(application, phase, field_name)
-    result = application.results.find_by(admission_phase: phase, mode: Admissions::AdmissionPhaseResult::CONSOLIDATION)
-    result.filled_form.fields.find { |f| f.form_field.name == field_name }.value
-  end
-
   it "percorre inscrição, homologação, avaliação, ranking e relatórios" do
     expect(@workflow.missing_fields).to eq([])
     expect(@workflow.phase_links.map { |l| [l.admission_phase.name, l.partial_consolidation] })
@@ -108,7 +95,12 @@ RSpec.describe "Fluxo do processo seletivo: avaliação compartilhada", type: :r
     indeferido = @sent.find { |n| n[:subject] == "Candidatura não homologada" }
     expect(indeferido[:to]).to eq("davi@example.com")
     expect(indeferido[:body]).to include("Diploma ausente")
-    expect(consolidation_value(ana, @homologacao, "Idade").to_f).to be_within(1).of(((Date.today - Date.new(1998, 5, 10)) / 365.25).to_f)
+    # Idade no fim das inscrições, e não no dia da consolidação, com as duas
+    # datas lidas em UTC: o resultado não depende do fuso do servidor. A
+    # tolerância é menor que um dia. Os rankings desempatam pela data de
+    # nascimento, que não depende de data de referência nenhuma.
+    expect(consolidation_value(ana, @homologacao, "Idade").to_f)
+      .to be_within(0.001).of(((@process.end_date - Date.new(1998, 5, 10)) / 365.25).to_f)
 
     [ana, bento, clara, fabio].each do |application|
       expect(application.pendencies.where(admission_phase: @avaliacao, mode: Admissions::AdmissionPendency::SHARED).pluck(:user_id))
@@ -136,7 +128,7 @@ RSpec.describe "Fluxo do processo seletivo: avaliação compartilhada", type: :r
     expect(flash[:error]).to eq(I18n.t("active_scaffold.admissions/admission_process.consolidate_phase.open_process_error"))
     expect(ana.reload.status).to be_nil
 
-    @process.update!(end_date: Date.yesterday)
+    @process.update!(end_date: Date.today - 1)
     message = consolidate_phase_as_staff(@process, @avaliacao)
     expect(message).to include(I18n.t("active_scaffold.admissions/admission_process.consolidate_phase.approved", count: 3))
     expect(message).to include(I18n.t("active_scaffold.admissions/admission_process.consolidate_phase.reproved", count: 1))
@@ -160,7 +152,8 @@ RSpec.describe "Fluxo do processo seletivo: avaliação compartilhada", type: :r
     end
 
     # Vagas: só nota final ≥ 6; quem já é aluno não concorre a vaga. As cotas
-    # só entram quando a ampla concorrência esgota, o que não acontece aqui.
+    # só entram quando a ampla concorrência esgota, o que não acontece aqui
+    # (workflow_segunda_passagem_spec.rb esgota).
     expect(position_and_machine(vagas, ana)).to eq([1, "Ampla concorrência"])
     expect(position_and_machine(vagas, bento)).to eq([2, "Ampla concorrência"])
     expect(position_and_machine(vagas, fabio)).to be_nil

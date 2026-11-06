@@ -82,10 +82,6 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
       operation: Admissions::AdmissionReportGroup::EXCLUDE,
       pdf_format: Admissions::AdmissionReportGroup::TABLE,
     )
-    self.ranking_columns.build(
-      name: "name",
-      order: Admissions::RankingColumn::ASC
-    )
     self
   end
 
@@ -100,20 +96,53 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
       mode: Admissions::AdmissionReportGroup::MAIN_LETTER,
       operation: Admissions::AdmissionReportGroup::EXCLUDE
     )
-    self.ranking_columns.build(
-      name: "name",
-      order: Admissions::RankingColumn::ASC
-    )
     self
   end
 
+  # Without ordering columns of its own, the report follows the selection
+  # ranking, the first ranking of the process. Ties go by name, and
+  # applications missing a column, or with it blank, go to the end in the order
+  # of names, instead of leaving the report. The fields consolidated by the
+  # report template are given in fields_by_application.
+  def sort_applications(admission_process, applications, fields_by_application = {})
+    columns = self.ranking_columns.to_a.presence ||
+      admission_process.rankings.order(:order, :id).first&.ranking_config&.ranking_columns.to_a ||
+      []
+    with_columns = []
+    missing = []
+    applications.each do |application|
+      fields = fields_by_application[application.id] || application.fields_hash
+      result = { __application: application }
+      complete = columns.all? do |column|
+        field = fields[column.name]
+        next false if field.nil? || field.simple_value.blank?
+        result[column.name] = column.convert(field)
+        !result[column.name].nil?
+      end
+      (complete ? with_columns : missing) << (complete ? result : application)
+    end
+    sorted = with_columns.sort do |first, second|
+      comparison = Admissions::AdmissionProcessRanking.compare_candidates(columns, first, second)
+      next comparison if comparison != 0
+      self.name_key(first[:__application]) <=> self.name_key(second[:__application])
+    end
+    sorted.map { |result| result[:__application] } + missing.sort_by { |a| self.name_key(a) }
+  end
+
+  # Ignores case and accents, so that "Érica" sorts with the other E
+  def name_key(application)
+    I18n.transliterate(application.name.to_s).downcase
+  end
+
   def prepare_table(admission_process)
+    fields_by_application = {}
     applications = admission_process.admission_applications.filter do |application|
       next false if !self.show_partial_candidates && !application.filled_form.is_filled
       # Consolidate
       field_objects = nil
       if self.form_template.present?
         field_objects = application.fields_hash
+        fields_by_application[application.id] = field_objects
         vars = { process: admission_process, application: application }
         filled_form = Admissions::FilledForm.new(
           is_filled: false, form_template: self.form_template
@@ -129,31 +158,7 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
       )
     end
 
-    if self.ranking_columns.present?
-      columns = self.ranking_columns
-      applications = applications.filter_map do |application|
-        fields = application.fields_hash
-        result = {
-          __application: application,
-          __fields: fields
-        }
-        skip = false
-        columns.each do |column|
-          field = column.convert(fields[column.name])
-          if field.nil?
-            skip = true
-            break
-          end
-          result[column.name] = field
-        end
-        next if skip
-        result
-      end.sort do |first, second|
-        Admissions::AdmissionProcessRanking.compare_candidates(columns, first, second)
-      end.map do |application_hash|
-        application_hash[:__application]
-      end
-    end
+    applications = self.sort_applications(admission_process, applications, fields_by_application)
 
     config = {
       header: [],

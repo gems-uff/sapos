@@ -138,7 +138,7 @@ RSpec.describe "Advisements features", type: :feature do
       fill_record_select("enrollment_", "enrollments", "M04")
       find(:css, "#record_main_advisor_").set(true)
       click_button_and_wait "Salvar"
-      expect(page).to have_content "Ao menos um orientador deve ter credenciamento no nível da matrícula"
+      expect(page).to have_content "Ao menos um orientador deve ter credenciamento vigente no nível da matrícula"
     end
 
     it "should show error when advisor research area is different from enrollment" do

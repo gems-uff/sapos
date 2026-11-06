@@ -60,6 +60,15 @@ RSpec.describe "Field search with neutral options", type: :request do
     "/scholarship_durations" => {
       "active" => { active: "all" }
     },
+    "/advisement_authorizations" => {
+      "active" => { active: "" }
+    },
+    "/affiliation" => {
+      "active" => { active: "" }
+    },
+    "/program_levels" => {
+      "active" => { active: "" }
+    },
     "/admission_applications" => {
       "is_filled" => { is_filled: "" },
       "pendency" => { pendency: "" },

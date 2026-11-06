@@ -26,3 +26,4 @@ pt-BR:
   errors:
     admissions/admission_process_ranking:
       field_not_found: Campo "%{field}" usado em %{source} não existe
+      group_not_found: Grupo "%{group}" usado em processo de ranking não existe nos grupos de vagas

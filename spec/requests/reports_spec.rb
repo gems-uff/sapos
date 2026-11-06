@@ -81,7 +81,7 @@ RSpec.describe "Reports download gate", type: :request do
   # ponta, mas responde igual nas duas versoes -- quem prova a mudanca do link
   # e o grupo seguinte.
   describe "invalidating an expired report" do
-    it "still purges the stored file (expiration must not block invalidation)" do
+    it "still releases the stored file (expiration must not block invalidation)" do
       report = FactoryBot.create(
         :report, user: @user, carrierwave_file: carrierwave_file,
         expires_at: Date.yesterday

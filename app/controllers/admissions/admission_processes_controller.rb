@@ -185,6 +185,12 @@ class Admissions::AdmissionProcessesController < ApplicationController
     )
     return if @exception.present?
 
+    rankings = @admission_process.rankings
+      .where(admission_phase_id: params[:consolidate_phase_id].to_i)
+      .order(:order)
+    # A ranking that cannot run fails before any candidate is consolidated
+    rankings.each(&:check_groups!)
+
     @buckets[:reproved][:candidates].each do |candidate|
       candidate.update!(status: Admissions::AdmissionApplication::REPROVED)
     end
@@ -205,10 +211,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
       end
     end
 
-    @admission_process.rankings
-      .where(admission_phase_id: params[:consolidate_phase_id].to_i)
-      .order(:order)
-      .each(&:generate_ranking)
+    rankings.each(&:generate_ranking)
 
     if index < phases.size - 1
       next_phase_id = phases[index + 1]

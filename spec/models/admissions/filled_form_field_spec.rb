@@ -315,6 +315,11 @@ RSpec.describe Admissions::FilledFormField, type: :model do
           filled_form_field.value = "01/30/2024"
           expect(filled_form_field).to have_field_error(:invalid_date).on :value
         end
+        it "invalid when the year does not have four digits" do
+          @form_field.field_type = Admissions::FormField::DATE
+          filled_form_field.value = "10/05/98"
+          expect(filled_form_field).to have_field_error(:invalid_date).on :value
+        end
       end
       describe "student fields" do
         describe "special_city should be" do

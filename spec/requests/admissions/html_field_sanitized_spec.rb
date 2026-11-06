@@ -54,4 +54,26 @@ RSpec.describe "Admissions: campo HTML sanitizado no formulário público", type
     expect(body).not_to include("onerror")
     expect(body).not_to include("javascript:alert")
   end
+
+  # O atributo style passa pelo filtro de CSS do Loofah, que tokeniza com a gem
+  # crass: propriedade de formatação fica, url() e propriedade fora da lista caem.
+  it "mantém CSS de formatação no atributo style e remove url() e propriedade fora da lista" do
+    @template.fields.first.update!(configuration: {
+      html: '<p style="color: red; font-weight: bold">a</p>' \
+            '<p style="background: url(javascript:alert(3))">b</p>' \
+            '<p style="color: blue; background-image: url(https://example.invalid/y.png)">c</p>' \
+            '<p style="behavior: url(x.htc); color: green">d</p>'
+    }.to_json)
+
+    get new_admission_apply_path(admission_id: @process.simple_id)
+
+    body = response.body
+    expect(body).to include('<p style="color:red;font-weight:bold;">a</p>')
+    expect(body).to include("<p>b</p>")
+    expect(body).to include('<p style="color:blue;">c</p>')
+    expect(body).to include('<p style="color:green;">d</p>')
+    expect(body).not_to include("alert(3)")
+    expect(body).not_to include("example.invalid")
+    expect(body).not_to include("x.htc")
+  end
 end
