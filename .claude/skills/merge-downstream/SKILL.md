@@ -32,11 +32,21 @@ isolados, o texto não se sobrepor em lugar nenhum, o git não acusar nada — e
 combinação estar quebrada. Isso é conflito semântico, e ele **nasce no merge**:
 antes dele o defeito não existia em lugar nenhum.
 
-Daí a consequência prática: **quem faz o merge resolve, antes do push.** Não vira
-item na lista de pendências de quem escreveu o código, porque não havia defeito
-no código de ninguém. Vale corrigir em commit próprio, sobre o merge, com a
-explicação na mensagem — o merge continua verificável contra o merge automático,
-e quem ler depois entende por que aquele conserto apareceu do nada.
+Daí a consequência prática: **quem faz o merge resolve, antes do push, no
+próprio merge.** Não vira item na lista de pendências de quem escreveu o código,
+porque não havia defeito no código de ninguém. Conflito se resolve no merge,
+tenha o git o visto ou não: a resolução vai no commit de merge, e o corpo da
+mensagem diz o que conflitou e como foi resolvido. Sem isso, quem lê depois toma
+uma resolução num arquivo que o git mesclou sozinho por conteúdo perdido à mão.
+Nada se perde por ela estar ali: o merge automático se reconstrói a qualquer
+momento a partir dos dois pais, e a diferença entre os dois é exatamente a
+resolução (as seções abaixo, e o `conferir_merge.sh`).
+
+O commit de merge é do mantenedor, como todo commit (`AGENTS.md`). Quando o
+conflito semântico só aparece depois de o merge estar gravado (a suíte do
+fechamento, por exemplo) e ele ainda não foi empurrado, a resolução entra nele
+com `git commit --amend`; depois do push, só por cima, em commit próprio com a
+explicação.
 
 ## Antes: medir a distância
 
@@ -66,6 +76,19 @@ No mesmo ensaio, procure a reprodução que a `main` guarda para a issue do ramo
 (`git grep -n 'pending: "issue #NNN"' origin/main -- spec`, com o número do
 ramo): é o que vai ficar vermelho depois do merge se o ramo consertou o defeito
 — ver "O que o git não vê".
+
+O merge em si é `git merge --no-commit origin/main`: o git para antes de gravar,
+e a resolução — de texto ou semântica, a marca de pending que cai, o
+`Gemfile.lock` — entra no commit de merge. Antes de pedir o commit, compare o
+que está no índice com o merge automático (a mesma comparação da seção
+seguinte, sobre o índice em vez de um commit) e mostre-o com `git status` e
+`git diff --cached`:
+
+```
+git diff $(git merge-tree --write-tree HEAD MERGE_HEAD | head -1) $(git write-tree)
+```
+
+O `conferir_merge.sh` precisa do merge gravado: roda depois do commit.
 
 ## Depois: o que o humano digitou
 
@@ -171,8 +194,8 @@ mora neste projeto:
   reprodução de defeito vive na `main` com `pending: "issue #NNN"`; o ramo
   conserta a NNN sem conhecer essa reprodução. Depois do merge o exemplo passa, e
   o RSpec acusa o pending que passou ("Expected pending … to fail") — vermelho
-  que não existia em nenhum dos dois lados. A marca sai no próprio merge ou num
-  commit logo depois; o exemplo fica, como regressão, e o controle do cenário,
+  que não existia em nenhum dos dois lados. A marca sai no próprio merge,
+  como toda resolução; o exemplo fica, como regressão, e o controle do cenário,
   que já entrou sem `pending`, não muda. Entrega pela metade é a exceção: o
   cenário que o ramo não conserta mantém a marca. O `git grep` de antes do merge
   mostra o que vai cair, e o script repete a busca no merge com as issues que
