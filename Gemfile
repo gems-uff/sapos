@@ -60,7 +60,6 @@ gem "carrierwave-activerecord", git: "https://github.com/gems-uff/carrierwave-ac
 # ─── Dominio / infraestrutura de app ─────────────────────────────────────
 gem "paper_trail"                        # versionamento/auditoria
 gem "activerecord-session_store"         # sessao no banco (initializers/session_store.rb)
-gem "rufus-scheduler"                    # agendamento de notificacoes
 gem "validates_timeliness", "~> 8.0"     # validacao de datas; o major acompanha o do Rails (8.x pede activemodel 8)
 gem "exception_notification"             # notifica excecoes
 
