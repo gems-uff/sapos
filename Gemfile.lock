@@ -384,7 +384,7 @@ GEM
       rbs (>= 4.0.0)
       tsort
     recaptcha (5.21.2)
-    recordselect (4.0.14)
+    recordselect (4.0.16)
       rails (>= 4.0.0)
     redcarpet (3.6.1)
     regexp_parser (2.12.0)
