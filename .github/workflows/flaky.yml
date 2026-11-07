@@ -51,13 +51,13 @@ jobs:
 
       # A seed ja fica no log arquivado, mas achar exige baixar o artefato. No
       # resumo do job ela esta a um clique -- e e o que torna um vermelho
-      # reproduzivel com `rspec --seed <n> --bisect` (#643).
-      - name: Registrar a seed
-        if: always()
+      # reproduzivel com `rspec --seed <n> --bisect` (#643). O mesmo piso de
+      # contagem do CI: rodada com exemplos a menos nao conta como verde.
+      - name: Registrar a contagem e a seed
+        if: ${{ !cancelled() }}
         run: |
-          log="test-log-trial-${{ matrix.trial }}.log"
-          seed=$(grep -oE 'Randomized with seed [0-9]+' "$log" | head -1 | grep -oE '[0-9]+$')
-          echo "Trial ${{ matrix.trial }} -- seed \`${seed:-desconhecida}\`" >> "$GITHUB_STEP_SUMMARY"
+          bash .github/scripts/rspec-summary.sh "test-log-trial-${{ matrix.trial }}.log" \
+            "trial ${{ matrix.trial }}" "bundle exec rspec"
 
       - name: Upload logs
         if: always()

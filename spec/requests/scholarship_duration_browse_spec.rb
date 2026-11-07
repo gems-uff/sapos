@@ -22,4 +22,16 @@ RSpec.describe "Browse de alocacoes de bolsa", type: :request do
     item = Nokogiri::HTML(response.body).at_css("li#rs#{alocacao.id}")
     expect(item.text.strip).to eq(alocacao.to_label)
   end
+
+  # O exemplo acima e o controle: sem termo o browse responde. Com termo, a busca
+  # de texto inteiro percorre as colunas de texto sem qualifica-las pela tabela,
+  # e o record_select_includes junta enrollments e scholarships, que tambem tem
+  # coluna obs: "ambiguous column name: obs" em SQLite, o mesmo em MariaDB.
+  it "responde a busca com termo", pending: "issue #739" do
+    FactoryBot.create(:scholarship_duration)
+
+    get browse_scholarship_durations_path, params: { search: "a" }, xhr: true
+
+    expect(response).to have_http_status(:ok)
+  end
 end

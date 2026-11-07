@@ -42,15 +42,37 @@ você passa o ciclo inteiro medindo um ramo obsoleto. Ele reseta o ramo local �
 confira antes que não haja commit seu ali.
 
 ```bash
-gh pr view <N> --json title,state,headRefName,mergeable,commits,statusCheckRollup,isCrossRepository,maintainerCanModify
+gh pr view <N> --json title,state,headRefName,mergeable,commits,statusCheckRollup,isCrossRepository,maintainerCanModify,closingIssuesReferences
 git fetch --all --prune
 gh pr checkout <N> --force                  # tudo daqui para a frente lê a árvore
 git log --oneline origin/main..HEAD         # o que o PR traz
 git log --oneline HEAD..origin/main         # o que falta da main entrar
+git merge-tree --write-tree origin/main HEAD   # conflito com a main, sem tocar a árvore
 ```
 
 A segunda lista vazia é o que se quer. Se não estiver, `merge-downstream` antes de
 qualquer medida: base desatualizada mede a defasagem, não o PR.
+
+O `merge-tree` responde já se o merge conflita: com conflito, sai com código 1 e
+lista os arquivos; a primeira linha é a árvore resultante, e `git show
+<árvore>:<arquivo>` mostra o arquivo como o merge o deixaria. Ele só vê conflito
+de texto — o que o merge quebra sem conflitar é assunto do passo 2.
+
+O `closingIssuesReferences` lista as issues que o merge fecharia. Qualquer uma ali
+contraria a regra do `AGENTS.md` — issue se cita só pelo prefixo, e fechar é do
+passo de release —: peça ao autor que tire o `Fixes`/`Closes`. Corpo que cita a
+issue sem palavra de fechamento não aparece ali, e não precisa de nada. A
+mensagem de commit fecha a issue ao chegar na `main` por conta própria; confira-a
+também:
+
+```bash
+git log --format=%B origin/main..HEAD | grep -inE '\b(close[sd]?|fix(e[sd])?|resolve[sd]?):? *#[0-9]+'
+```
+
+**"Tudo daqui para a frente lê a árvore" inclui as skills.** Ramo anterior a uma
+skill, ou a uma mudança nela, fica depois do checkout sem ela no disco, ou com a
+versão velha: as skills que esta aponta, e os scripts que moram nelas, se leem
+pela `main` (`git show origin/main:.claude/skills/<nome>/SKILL.md`).
 
 PR de fork traz o ramo num remote do autor: o `maintainerCanModify` do `gh pr
 view` acima diz se o mantenedor consegue empurrar ali a reprodução que o passo 3
@@ -109,7 +131,8 @@ porque dependem do que o repositório não guarda:
 - **O que o merge vai encontrar** — qual spec da `main` deixa de compilar contra a
   modelagem nova. Os dois lados passam verdes em separado, e só a suíte completa
   depois do merge acusa; o detalhe está na `merge-downstream`. Vale também com o
-  ramo em dia, então não espere o roteamento do passo 1 para olhar.
+  ramo em dia e com o `merge-tree` do passo 1 limpo, então não espere o
+  roteamento do passo 1 para olhar.
 
 Quando o PR mexe no `Gemfile`, o que decide a revisão é o que mudou **na
 dependência**, não o que o autor escreveu: valem as notas do passo 1 da
@@ -249,10 +272,33 @@ medida que alcança os pontos cegos que o `AGENTS.md` lista. A contagem de exemp
 dele é maior que a local; compare-a com a do CI na baseline, não com a sua.
 
 **`gh pr checks <N>` sai com código não-zero enquanto há check pendente** (e
-também quando algum falha), então tratar saída não-zero como erro transitório a
-engolir faz o laço de espera girar calado, e o silêncio fica indistinguível de
-"ainda rodando". Pendente *é* o estado, não uma falha ao consultá-lo: decida pelo
-texto da saída, nunca pelo código de retorno.
+também quando algum falha, e quando o ramo não tem check nenhum — PR anterior ao
+workflow), então tratar saída não-zero como erro transitório a engolir faz o laço
+de espera girar calado, e o silêncio fica indistinguível de "ainda rodando".
+Pendente *é* o estado, não uma falha ao consultá-lo: decida pelo texto da saída,
+nunca pelo código de retorno.
+
+**Vermelho num navegador só é sinal, não ruído** (`AGENTS.md`) — mas antes de
+cobrá-lo do PR, compare com a mesma perna na `main` (`gh run list --workflow
+rubyonrails.yml --branch main --limit 1`, job `test (<navegador>)`): vermelho lá
+também não é do PR. O resumo de cada perna traz a seed e o comando que a repete
+localmente. Três categorias, e a diferença importa:
+
+1. **Teste que supõe um navegador.** Foco, ordem de evento, tempo de animação,
+   espaço e quebra de linha que cada um normaliza a seu modo: o teste afirma o
+   que a aplicação nunca prometeu. Conserta-se o teste.
+2. **Defeito que o outro navegador escondia.** JS que só um motor tolera,
+   atributo que só um honra, contorno de bug de navegador que a mudança removeu
+   — o `autocomplete="off"` nos hidden, que o Rails emitia por causa do Firefox.
+   É defeito de verdade, e é para isso que a matriz existe: vira reprodução que
+   falha naquele navegador, pelas regras do passo 5.
+3. **Artefato do ambiente.** Driver que não casa com o navegador que o runner
+   instalou, navegador atualizado entre duas execuções, timeout de
+   infraestrutura. Não é veredito sobre a mudança.
+
+Descarte a terceira primeiro: é a mais fácil de causar sem perceber, e a que
+produz o diagnóstico mais enganoso. Mas ela se prova — pela perna da `main`, ou
+repetindo a perna —, não se presume: sem prova, o vermelho continua sinal.
 
 `suite-mariadb` quando o diff toca SQL, unicidade, ordenação ou migration; verde
 em SQLite não diz nada sobre esses pontos. Migration que mexe em coluna pede
@@ -284,5 +330,6 @@ procedimento, não diário de bordo".
 
 Uma obrigação antes de considerar o PR encerrado: **conclusão sua que caiu por
 evidência nova se corrige onde foi escrita.** Se virou mensagem de commit ainda
-não empurrada, reescreva o commit — o teste pode sobreviver com outro
-enquadramento, a justificativa errada não pode virar história.
+não empurrada, aponte ao mantenedor o que mudar na mensagem — reescrever o commit
+é dele, como todo commit (`AGENTS.md`). O teste pode sobreviver com outro
+enquadramento; a justificativa errada não pode virar história.
