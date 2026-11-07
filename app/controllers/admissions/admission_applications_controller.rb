@@ -532,11 +532,6 @@ class Admissions::AdmissionApplicationsController < ApplicationController
           end
         end
       end
-    rescue ActiveRecord::StaleObjectError
-      @student = @original_student
-      @enrollment = @original_enrollment
-      @student.errors.add(:base, as_(:version_inconsistency))
-      self.successful = false
     rescue ActiveRecord::RecordNotSaved => exception
       @student = @original_student
       @enrollment = @original_enrollment

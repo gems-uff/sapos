@@ -26,22 +26,10 @@ class ApplicationController < ActionController::Base
 
   clear_helpers
 
-  # Defines which controller and action should be shown when the base
-  # URL is acessed (root route in routes.rb).
+  # Todo usuario autenticado le a pagina inicial (Ability), e e o
+  # LandingController#index que escolhe a tela de cada papel.
   def root
-    if can? :read, :landing
-      return if redirect_to(controller: "landing", action: "index")
-    end
-    [
-      Enrollment, Professor, ScholarshipDuration,
-      Phase, Course, City, User, Student
-    ].each do |model|
-      if can? :read, model
-        return if redirect_to(
-          controller: model.name.underscore.pluralize.downcase, action: "index"
-        )
-      end
-    end
+    redirect_to(controller: "landing", action: "index")
   end
 
   private

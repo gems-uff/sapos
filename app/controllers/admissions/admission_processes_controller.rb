@@ -349,14 +349,6 @@ class Admissions::AdmissionProcessesController < ApplicationController
       end
     end
 
-    def consolidate_phase_respond_on_iframe
-      flash[:info] = @message
-      flash[:error] = @exception
-      responds_to_parent do
-        render action: "on_consolidate_phase", formats: [:js], layout: false
-      end
-    end
-
     def consolidate_phase_respond_to_html
       flash[:info] = @message
       flash[:error] = @exception
@@ -369,13 +361,6 @@ class Admissions::AdmissionProcessesController < ApplicationController
       do_refresh_list
       @popstate = true
       render action: "on_consolidate_phase", formats: [:js]
-    end
-
-    def calculate_ranking_respond_on_iframe
-      flash[:error] = @errors
-      responds_to_parent do
-        render action: "on_calculate_ranking", formats: [:js], layout: false
-      end
     end
 
     def calculate_ranking_respond_to_html

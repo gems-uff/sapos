@@ -7,10 +7,6 @@ module EnrollmentSearchConcern
   extend ActiveSupport::Concern
 
   class_methods do
-    def add_enrollment_number_search_column(config)
-      config.columns[:enrollment_number].search_ui = :select
-    end
-
     def add_student_search_column(config)
       config.columns[:student].search_sql = "enrollments.student_id"
       config.columns[:student].search_ui = :select

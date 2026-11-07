@@ -251,12 +251,6 @@ class Notification < ApplicationRecord
     }
   end
 
-  def set_params_for_exhibition(override_params)
-    params = self.prepare_params_and_derivations(override_params)
-    self.query.map_params(params)
-    true
-  end
-
   def prepare_params_and_derivations(override_params)
     override_params[:data_consulta] ||= self.query_date
     qdate = override_params[:data_consulta]
@@ -310,10 +304,6 @@ class Notification < ApplicationRecord
     #      end
     #
     false
-  end
-
-  def get_simulation_query_date
-    self.where(active: true).find { |p| p.name == "data_consulta" }.simulation_value
   end
 
   def self.disable_erb_validation!
