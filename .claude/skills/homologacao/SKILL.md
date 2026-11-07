@@ -58,7 +58,9 @@ A ordem importa: escrita muda o que a captura enxerga, então cada lado escreve
 1. **Deploy da versão atual de produção** em homologação.
 2. **Passada de escrita no lado "antes"** — ver "Passada de escrita". Os scripts
    se limpam sozinhos, então o lado volta ao estado em que começou.
-3. **Captura "antes"** — os três conjuntos, em diretórios separados.
+3. **Captura "antes"** — os três conjuntos, em diretórios separados. Com
+   instrumento novo, duas vezes seguidas: é o controle A/A (ver "Verifique o
+   instrumento, não só o sistema").
 4. **Ações de escrita adicionais** que a rodada queira exercitar e que **não** se
    limpam (disparo de notificação, por exemplo), e **recaptura** dos conjuntos
    afetados, para que os dois lados reflitam o mesmo estado.
@@ -208,7 +210,10 @@ Duas regras:
 ## Verifique o instrumento, não só o sistema
 
 Um comparador quebrado também devolve "nenhuma diferença", e é o mesmo resultado
-que "nada regrediu". Três checagens separam os dois, e nenhuma é opcional:
+que "nada regrediu". As checagens abaixo separam os dois. As cinco primeiras valem
+em toda rodada; as duas últimas, sempre que o instrumento for novo — lista de
+rotas, navegador ou papel que nenhuma rodada anterior capturou, ou script de
+captura ou de comparação alterado desde a última vez que passou por elas.
 
 - **Contagem sem normalizar.** O `compare_html.rb` imprime quantas páginas
   diferem **sem** neutralizar o cabeçalho. Como as duas versões têm strings de
@@ -221,6 +226,71 @@ que "nada regrediu". Três checagens separam os dois, e nenhuma é opcional:
   perfeitamente entre "antes" e "depois" — passa por "sem diferença" sem nunca
   ter sido vista. O `capture_html.rb` avisa (`SESSAO PERDIDA`) comparando a URL
   final; se o aviso aparecer, aquelas rotas não valem como evidência.
+- **Rota sem captura num dos lados é "não comparada", nunca igual.** Os
+  comparadores acusam só parte disso: o `compare_html.rb` lista a rota que falta
+  num dos `results.json` (`so no antes`, `so no depois`) e a que ficou sem PNG;
+  o `compare_binary.rb`, só a que falta no "depois". O resto passa calado. Rota
+  cuja navegação falhou nos dois lados grava texto vazio nos dois, e vazio casa
+  com vazio; PDF ou planilha que não saiu em nenhum dos lados fica com zero
+  artefatos nos dois, e o comparador não imprime linha nenhuma. Confira à mão,
+  em cada par:
+
+  ```bash
+  ruby -rjson -e '
+    a, b = ARGV.map { |f| JSON.parse(File.read(f)).to_h { |r| [r["route"], r] } }
+    puts "so no depois: #{(b.keys - a.keys).join(", ")}"
+    { "antes" => a, "depois" => b }.each do |lado, rotas|
+      rotas.each_value do |r|
+        puts "#{lado} #{r["route"]}: #{r["error"] || "0 artefatos"}" if r["error"] || r["artifacts"] == 0
+      end
+    end' $ANTES/bin/results_binary.json $DEPOIS/bin/results_binary.json
+  ```
+
+  O mesmo comando serve para `html/results.json` e `extra/results.json`, onde
+  só o erro conta. No binário, toda resposta que não é 200 sai com zero
+  artefatos, então o ruído conhecido aparece ali também. E rota que respondeu o
+  mesmo erro nos dois lados comparou a página de erro, não a tela: fora do ruído
+  conhecido, também é não comparada. O que não foi comparado entra no relatório,
+  com o motivo.
+- **Toda diferença declarada tem de aparecer.** A lista de diferenças esperadas
+  (passo 8 da `safe-refactor`; numa revisão, passo 2 da `revisar-pr`) é também
+  checagem do instrumento. Diferença declarada que não aparece na comparação
+  mostra que o instrumento não a alcança — não que a mudança ficou sem efeito.
+  Antes de concluir, meça pelo caminho que alcança: rota acrescentada às listas
+  nos dois lados, sonda da camada exploratória, e para widget ver "Zero diferença
+  na estática não é evidência sobre widget".
+- **Controle A/A.** Com instrumento novo, capture o "antes" duas vezes seguidas,
+  no mesmo deploy e sem escrita entre elas (`$ANTES/aa/{html,extra,bin}` para a
+  segunda), e compare as duas. Mesmo código, mesmo banco: o que diferir ali
+  varia entre duas execuções idênticas, e toda diferença do mesmo tipo no A/B é
+  suspeita até ser entendida. O esperado no A/A é pouco — `/reports` e
+  `/versions`, que a captura alimenta (ver "Duas rotas divergem sempre"), e o
+  rodapé com a hora de geração dos PDFs. As contagens de sanidade do
+  `compare_html.rb`, que medem a troca de versão, caem para perto de zero, e ali
+  isso é o correto. Qualquer
+  outra diferença se corrige no instrumento ou entra em "Ruído conhecido" com a
+  causa, antes de ler o A/B.
+- **Diferença plantada.** Com instrumento novo, prove que o comparador acusa o
+  que deve: copie uma captura, plante uma diferença na cópia e compare a
+  original com ela, de modo que a plantada seja a única diferença que existe.
+  `<rota>` é o nome de um arquivo qualquer de `html/txt/`, sem extensão, e
+  `<doc>` um diretório de `bin/pages/` que tenha PNG:
+
+  ```bash
+  P=$ANTES-plantada; cp -R $ANTES $P
+  echo "LINHA PLANTADA" >> $P/html/txt/<rota>.txt
+  magick $P/html/png/<rota>.png -fill red -draw "rectangle 20,20 120,120" $P/html/png/<rota>.png
+  magick $P/bin/pages/<doc>/p-000.png -fill red -draw "rectangle 20,20 120,120" $P/bin/pages/<doc>/p-000.png
+  ruby $S/compare_html.rb   $ANTES/html $P/html
+  ruby $S/compare_binary.rb $ANTES/bin  $P/bin
+  rm -rf $P
+  ```
+
+  Passa quando o `compare_html.rb` acusa exatamente aquela rota em "texto
+  diferente" e num grupo de pixel só dela, e o `compare_binary.rb` exatamente
+  aquela página — e as contagens de `[sanidade]` saem 1, não altas, porque os
+  dois lados são a mesma captura. A cópia tem dado real — ela fica na pasta das
+  capturas e sai ao fim.
 
 ## Camada exploratória (interativa) — o que a varredura estática não alcança
 
