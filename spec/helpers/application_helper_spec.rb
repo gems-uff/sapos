@@ -26,7 +26,7 @@ RSpec.describe ApplicationHelper, type: :helper do
     # -- affiliations.start_date, por exemplo -- sairia como
     # "Quinta, 01 de Março de 2018, 14:30 h".
     it "formats a Time as a date, not as the long format of time" do
-      expect(helper.date_br(Time.new(2018, 3, 1, 14, 30))).to eq "01/03/2018"
+      expect(helper.date_br(Time.zone.local(2018, 3, 1, 14, 30))).to eq "01/03/2018"
     end
 
     it "formats a DateTime as a date" do

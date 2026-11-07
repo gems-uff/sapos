@@ -48,7 +48,7 @@ RSpec.describe ErbFormatter, "nos cantos" do
 
   it "localiza uma data escrita como texto, pelo atalho l com formato" do
     expect(ErbFormatter.new({}).format("<%= l('2026-03-10', :short) %>"))
-      .to eq(I18n.localize(Time.parse("2026-03-10"), format: :short))
+      .to eq(I18n.localize(Time.zone.parse("2026-03-10"), format: :short))
   end
 
   it "escapa os valores de um Hash e mantem as chaves" do

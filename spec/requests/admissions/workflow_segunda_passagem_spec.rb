@@ -64,7 +64,7 @@ RSpec.describe "Fluxo do processo seletivo: segunda passagem e bolsas", type: :r
 
     # Quem ficou sem avaliação é reprovado pela pendência e chega à geração
     # dos rankings sem nota final.
-    @process.update!(end_date: Date.today - 1)
+    @process.update!(end_date: Date.current - 1)
     sign_in @admin
     consolidate_phase_as_staff(@process, @avaliacao, shared_pendency: "reprove")
     sign_out @admin

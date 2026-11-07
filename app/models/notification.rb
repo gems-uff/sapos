@@ -140,11 +140,11 @@ class Notification < ApplicationRecord
 
   def calculate_next_notification_date(options = {})
     time = options[:time]
-    time ||= Time.now
+    time ||= Time.current
     case self.frequency
     when SEMIANNUAL
-      first_semester = Time.parse("03/01", time)
-      second_semester = Time.parse("08/01", time)
+      first_semester = Time.zone.parse("03/01", time)
+      second_semester = Time.zone.parse("08/01", time)
       dates = [
         second_semester - 1.year,
         first_semester, second_semester,
@@ -152,7 +152,7 @@ class Notification < ApplicationRecord
         second_semester + 1.year
       ]
     when ANNUAL
-      dates = (-2..2).map { |n| Time.parse("01/01", time) + n.year }
+      dates = (-2..2).map { |n| Time.zone.parse("01/01", time) + n.year }
     when MONTHLY
       dates = (-2..2).map { |n| time.beginning_of_month + n.month }
     when WEEKLY
@@ -180,7 +180,7 @@ class Notification < ApplicationRecord
     else
       next_date ||= self.query.params.find { |p| p.name == "data_consulta" }
         .try(:default_value).try(:to_date)
-      next_date ||= Date.today
+      next_date ||= Date.current
     end
     next_date +
       StringTimeDelta.parse(self.query_offset) -

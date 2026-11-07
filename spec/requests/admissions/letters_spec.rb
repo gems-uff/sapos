@@ -18,7 +18,7 @@ RSpec.describe "Carta de recomendacao pela rota publica", type: :request do
     )
     @process = FactoryBot.create(
       :admission_process, simple_url: "mestrado-cartas", letter_template: @letter_template,
-      start_date: Date.today - 10.days, end_date: Date.today + 10.days
+      start_date: Date.current - 10.days, end_date: Date.current + 10.days
     )
     application = FactoryBot.create(:admission_application, admission_process: @process, name: "Candidata Carta")
     @carta = FactoryBot.create(
@@ -79,7 +79,7 @@ RSpec.describe "Carta de recomendacao pela rota publica", type: :request do
   end
 
   it "recusa a carta de processo fechado para inscricao e para edicao" do
-    @process.update!(start_date: Date.today - 30.days, end_date: Date.today - 20.days, edit_date: Date.today - 10.days)
+    @process.update!(start_date: Date.current - 30.days, end_date: Date.current - 20.days, edit_date: Date.current - 10.days)
 
     get carta_path
 

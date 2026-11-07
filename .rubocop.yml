@@ -18,3 +18,13 @@ Style/StringLiterals:
 
 Style/HashSyntax:
   EnforcedShorthandSyntax: either
+
+# Um relogio so: o da aplicacao (config.time_zone), que e o mesmo pelo qual o
+# ActiveRecord converte o que le e grava. Time.now, Date.today e Time.parse leem
+# o fuso do sistema operacional e so acertam quando ele coincide com o da
+# aplicacao (#738). O rubocop-rails_config deixa os dois desligados.
+Rails/TimeZone:
+  Enabled: true
+
+Rails/Date:
+  Enabled: true

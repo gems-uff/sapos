@@ -126,7 +126,7 @@ RSpec.describe LiquidFormatter, type: :model do
 
     it "localiza uma data escrita como texto" do
       expect(render("{{ '2026-03-10' | localize }}"))
-        .to eq(I18n.localize(Time.parse("2026-03-10"), format: :default))
+        .to eq(I18n.localize(Time.zone.parse("2026-03-10"), format: :default))
     end
 
     it "tira a media" do

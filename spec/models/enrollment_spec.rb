@@ -276,21 +276,21 @@ RSpec.describe Enrollment, type: :model do
       end
       describe "have scholarship(s) but none of them are active today" do
         it "should return false" do
-          scholar1 = FactoryBot.build(:scholarship, start_date: Date.today - 2.years, end_date: Date.today + 2.years)
-          scholar2 = FactoryBot.build(:scholarship, start_date: Date.today - 2.years, end_date: Date.today + 2.years)
-          enrollment.scholarship_durations.build(start_date: Date.today - 12.months, end_date: Date.today - 6.months,
-                                                 cancel_date: Date.today - 6.months, scholarship: scholar1)
-          enrollment.scholarship_durations.build(start_date: Date.today + 6.months, end_date: Date.today + 12.months,
-                                                 cancel_date: Date.today + 12.months, scholarship: scholar2)
+          scholar1 = FactoryBot.build(:scholarship, start_date: Date.current - 2.years, end_date: Date.current + 2.years)
+          scholar2 = FactoryBot.build(:scholarship, start_date: Date.current - 2.years, end_date: Date.current + 2.years)
+          enrollment.scholarship_durations.build(start_date: Date.current - 12.months, end_date: Date.current - 6.months,
+                                                 cancel_date: Date.current - 6.months, scholarship: scholar1)
+          enrollment.scholarship_durations.build(start_date: Date.current + 6.months, end_date: Date.current + 12.months,
+                                                 cancel_date: Date.current + 12.months, scholarship: scholar2)
           expect(enrollment.has_active_scholarship_now?).to be false
         end
       end
       describe "has an active scholarship today" do
         it "should return true" do
-          scholar = FactoryBot.build(:scholarship, start_date: Date.today - 2.years, end_date: Date.today + 2.years)
+          scholar = FactoryBot.build(:scholarship, start_date: Date.current - 2.years, end_date: Date.current + 2.years)
 
-          enrollment.scholarship_durations.build(start_date: Date.today - 6.months, end_date: Date.today + 6.months,
-                                                 cancel_date: Date.today + 6.months, scholarship: scholar)
+          enrollment.scholarship_durations.build(start_date: Date.current - 6.months, end_date: Date.current + 6.months,
+                                                 cancel_date: Date.current + 6.months, scholarship: scholar)
           expect(enrollment.has_active_scholarship_now?).to be true
         end
       end
@@ -487,7 +487,7 @@ RSpec.describe Enrollment, type: :model do
           @destroy_later << FactoryBot.create(:accomplishment, enrollment: @enrollment_accomplished, phase: @two_semesters_phase,
                                              conclusion_date: 1.day.ago)
 
-          result = Enrollment.with_all_phases_accomplished_on(Date.today)
+          result = Enrollment.with_all_phases_accomplished_on(Date.current)
 
           expected_result = [@enrollment_accomplished.id].sort
           expect(result.sort).to eql(expected_result.sort)

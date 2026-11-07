@@ -73,9 +73,9 @@ RSpec.describe "Admission apply: texto configurado nas mensagens de validação"
     @process = FactoryBot.create(
       :admission_process, name: "Mestrado", simple_url: "mensagens-#{SecureRandom.hex(4)}",
       form_template: template,
-      start_date: Date.today - 10.days,
-      end_date: Date.today + 10.days,
-      edit_date: Date.today + 20.days
+      start_date: Date.current - 10.days,
+      end_date: Date.current + 10.days,
+      edit_date: Date.current + 20.days
     )
   end
 

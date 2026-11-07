@@ -15,8 +15,8 @@ RSpec.describe "Acesso do candidato a inscricao", type: :request do
     @process = FactoryBot.create(
       :admission_process, name: "Mestrado Acesso", simple_url: "mestrado-acesso",
       form_template: @template, require_session: true,
-      start_date: Date.today - 10.days, end_date: Date.today + 10.days,
-      edit_date: Date.today + 20.days
+      start_date: Date.current - 10.days, end_date: Date.current + 10.days,
+      edit_date: Date.current + 20.days
     )
   end
 
@@ -107,8 +107,8 @@ RSpec.describe "Acesso do candidato a inscricao", type: :request do
         @fechado = FactoryBot.create(
           :admission_process, name: "Mestrado Encerrado", simple_url: "mestrado-encerrado",
           form_template: @template,
-          start_date: Date.today - 30.days, end_date: Date.today - 20.days,
-          edit_date: Date.today - 10.days
+          start_date: Date.current - 30.days, end_date: Date.current - 20.days,
+          edit_date: Date.current - 10.days
         )
         @app = inscricao(@fechado)
       end

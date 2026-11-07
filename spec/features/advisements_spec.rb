@@ -37,7 +37,7 @@ RSpec.describe "Advisements features", type: :feature do
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status, research_area: @research_area1)
 
-    @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment1, date: Date.today, dismissal_reason: @dismissal_reason)
+    @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment1, date: Date.current, dismissal_reason: @dismissal_reason)
 
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level2)
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level2)

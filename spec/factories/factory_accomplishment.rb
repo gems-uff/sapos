@@ -11,7 +11,7 @@ FactoryBot.define do
     enrollment
     after(:build) do |obj|
       if obj.conclusion_date.nil?
-        obj.conclusion_date = Date.today
+        obj.conclusion_date = Date.current
       end
       if obj.phase.levels.empty?
         level = FactoryBot.create(:level)
