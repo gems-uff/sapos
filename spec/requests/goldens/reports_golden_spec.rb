@@ -241,6 +241,23 @@ RSpec.describe "Saídas em PDF e XLSX", type: :request do
       )
     end
 
+    # O texto da variável class_schedule_text entra numa nota própria, com um
+    # asterisco a mais quando já houve a nota de "sem horário". Nenhum baseline
+    # tinha a variável preenchida (#720).
+    it "mantém o conteúdo do baseline com o texto da variável do quadro" do
+      FactoryBot.create(
+        :custom_variable, variable: "class_schedule_text",
+        value: "Aulas presenciais no bloco E."
+      )
+
+      get class_schedule_pdf_class_schedule_path(@class_schedule, format: :pdf)
+
+      expect(response).to have_http_status(:ok)
+      expect_matches_golden(
+        "class_schedule_with_text", response.body, format: :pdf
+      )
+    end
+
     it "mantém o conteúdo do baseline da listagem de turmas" do
       # Sem ano e semestre a ação recusa e redireciona (flash de erro em
       # pdf_content.class_schedule.class_schedule_pdf). O active_scaffold guarda

@@ -122,4 +122,90 @@ RSpec.describe "Admissions::AdmissionApplications map_student transaction",
       expect(@admission_application.enrollment).to be_nil
     end
   end
+
+  # A criacao esta coberta acima. Os caminhos abaixo -- aluno e matricula ja
+  # ligados, aluno existente vinculado por id e o resgate de registro nao
+  # salvo -- passam pelos send(:before_update_save) dos controllers do
+  # active_scaffold e pelos rescues, que nenhum exemplo percorria (#720).
+  describe "POST map_student_form_create_update sobre registros existentes" do
+    before(:each) do
+      @aluno = Student.create!(name: "Aluno Antigo", cpf: "map-student-cpf-2")
+      @matricula = Enrollment.create!(
+        student: @aluno, enrollment_number: "M-antiga", level: @level,
+        enrollment_status: @enrollment_status, admission_date: Date.new(2024, 1, 1)
+      )
+    end
+
+    it "atualiza o aluno e a matricula ja ligados, sem criar outros" do
+      @admission_application.update!(student: @aluno, enrollment: @matricula)
+
+      expect do
+        do_map_student(
+          record_student: { name: "Aluno Renomeado", cpf: "map-student-cpf-2" },
+          record_enrollment: valid_enrollment_params.merge(enrollment_number: "M-nova")
+        )
+      end.to change { Student.count }.by(0).and change { Enrollment.count }.by(0)
+
+      expect(@aluno.reload.name).to eq("Aluno Renomeado")
+      expect(@matricula.reload.enrollment_number).to eq("M-nova")
+    end
+
+    it "vincula o aluno existente indicado e cria so a matricula" do
+      expect do
+        post map_student_form_create_update_admission_application_path(@admission_application),
+          params: {
+            student_id: @aluno.id,
+            record_student: { name: "Aluno Antigo", cpf: "map-student-cpf-2" },
+            record_enrollment: valid_enrollment_params
+          }
+      end.to change { Student.count }.by(0).and change { Enrollment.count }.by(1)
+
+      @admission_application.reload
+      expect(@admission_application.student).to eq(@aluno)
+      expect(@admission_application.enrollment.student).to eq(@aluno)
+    end
+
+    it "nao persiste nada quando a gravacao de um associado falha" do
+      allow_any_instance_of(Student).to receive(:save_associated!)
+        .and_raise(ActiveRecord::RecordNotSaved.new("falhou"))
+
+      expect do
+        do_map_student(
+          record_student: valid_student_params,
+          record_enrollment: valid_enrollment_params
+        )
+      end.to change { Student.count }.by(0).and change { Enrollment.count }.by(0)
+
+      expect(@admission_application.reload.student).to be_nil
+    end
+  end
+
+  # Depois de self.successful = true, as linhas "self.successful = successful? ||
+  # [valid?, associated_valid?].all?" curto-circuitam: a validacao do aluno e da
+  # matricula nunca roda ali. O invalido so e barrado pelo save!, cujo
+  # RecordInvalid cai no rescue generico, que poe a mensagem crua da excecao no
+  # flash, alem do erro no campo.
+  describe "POST map_student_form_create_update com aluno invalido" do
+    before(:each) do
+      do_map_student(
+        record_student: valid_student_params.merge(cpf: "", name: "Nome Digitado"),
+        record_enrollment: valid_enrollment_params
+      )
+      # A resposta esta trocada por head :ok neste arquivo; o que o formulario
+      # mostraria e o @student que o controller deixa para a view.
+      @aluno = controller.instance_variable_get(:@student)
+    end
+
+    # Controle: nada e gravado, e o formulario volta com o digitado e o erro no
+    # campo, antes e depois do conserto.
+    it "nao grava e devolve o aluno com o erro no campo" do
+      expect(@admission_application.reload.student).to be_nil
+      expect(@aluno.name).to eq("Nome Digitado")
+      expect(@aluno.errors[:cpf]).to be_present
+    end
+
+    it "nao repete o erro como mensagem crua de excecao", pending: "issue #731" do
+      expect(flash[:error]).to be_nil
+    end
+  end
 end
