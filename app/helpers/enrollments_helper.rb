@@ -117,9 +117,9 @@ module EnrollmentsHelper
         I18n.t("activerecord.attributes.enrollment.delayed_phase_date"),
         style: "margin: 0px 15px"
       ) +
-      select_day(Date.today.day, local_options, day_html_options) +
-      select_month(Date.today.month, local_options, month_html_options) +
-      select_year(Date.today.year, local_options, year_html_options)
+      select_day(Date.current.day, local_options, day_html_options) +
+      select_month(Date.current.month, local_options, month_html_options) +
+      select_year(Date.current.year, local_options, year_html_options)
     )
   end
 
@@ -144,9 +144,9 @@ module EnrollmentsHelper
         I18n.t("activerecord.attributes.enrollment.accomplishment_date"),
         style: "margin: 0px 15px"
       ) +
-      select_day(Date.today.day, local_options, day_html_options) +
-      select_month(Date.today.month, local_options, month_html_options) +
-      select_year(Date.today.year, local_options, year_html_options)
+      select_day(Date.current.day, local_options, day_html_options) +
+      select_month(Date.current.month, local_options, month_html_options) +
+      select_year(Date.current.year, local_options, year_html_options)
     )
   end
 

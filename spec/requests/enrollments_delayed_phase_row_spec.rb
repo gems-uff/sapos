@@ -18,7 +18,7 @@ RSpec.describe "Linha de etapas atrasadas na busca de matriculas", type: :reques
     fase = FactoryBot.create(:phase, name: nome_da_etapa)
     FactoryBot.create(:phase_duration, phase: fase, level: nivel)
     FactoryBot.create(:enrollment, level: nivel, admission_date: Date.new(2020, 3, 1))
-    hoje = Date.today
+    hoje = Date.current
     get enrollments_path, params: { search: { delayed_phase: {
       phase: "all", year: hoje.year.to_s, month: hoje.month.to_s, day: hoje.day.to_s
     } } }

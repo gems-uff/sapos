@@ -97,8 +97,8 @@ module ApplicationHelper
       extra[:multiparameter]
     extra[:force_send] ||= extra[:force_send].nil? ? false : extra[:force_send]
     year_range = CustomVariable.month_year_range
-    start_year = Time.now.year - year_range[0]
-    end_year = Time.now.year + year_range[1]
+    start_year = Time.current.year - year_range[0]
+    end_year = Time.current.year + year_range[1]
     start_year, end_year = end_year, start_year if year_range[2]
     date_options = {
       discard_day: true,

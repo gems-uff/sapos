@@ -8,7 +8,7 @@ require "spec_helper"
 RSpec.describe ProgramLevel, type: :model do
   it { should be_able_to_be_destroyed }
 
-  let(:program_level) { ProgramLevel.new(level: 1, start_date: Date.today) }
+  let(:program_level) { ProgramLevel.new(level: 1, start_date: Date.current) }
   subject { program_level }
 
   describe "Validations" do

@@ -22,7 +22,7 @@ RSpec.describe Dismissal, type: :model do
     Dismissal.new(
       dismissal_reason: dismissal_reason,
       enrollment: enrollment,
-      date: Date.today
+      date: Date.current
     )
   end
   subject { dismissal }
@@ -117,7 +117,7 @@ RSpec.describe Dismissal, type: :model do
   describe "Methods" do
     describe "to_label" do
       it "should return the expected string" do
-        dismissal_date = Date.today.to_fs
+        dismissal_date = Date.current.to_fs
         dismissal.date = dismissal_date
         expect(dismissal.to_label).to eql(dismissal_date)
       end

@@ -226,7 +226,7 @@ RSpec.describe "Admissions::AdmissionProcesses#consolidate_phase", type: :reques
     end
 
     it "é recusada enquanto o edital está aberto" do
-      @process.update!(end_date: Date.today + 1.day, edit_date: Date.today + 2.days)
+      @process.update!(end_date: Date.current + 1.day, edit_date: Date.current + 2.days)
       candidate("8")
       consolidate(@phase1)
       expect(flash[:error]).to eq(I18n.t("#{I18N}.open_process_error"))

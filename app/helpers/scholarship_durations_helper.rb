@@ -145,7 +145,7 @@ module ScholarshipDurationsHelper
         id: "suspended_end_year",
         name: "search[suspended][end_year]"
     }
-    current_year = Date.today.year
+    current_year = Date.current.year
 
     html = label_tag(
       "search[suspended][use]",

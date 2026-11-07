@@ -86,7 +86,7 @@ RSpec.describe "Ramos do historico e do boletim em PDF", type: :request do
     report = Report.order(:id).last
     expect(report.user).to eq(@admin)
     expect(report.file_name).to include("Aluna Ramos")
-    expect(report.expires_at).to eq(Date.today + 2.months)
+    expect(report.expires_at).to eq(Date.current + 2.months)
     expect(report.identifier).to be_present
   end
 end

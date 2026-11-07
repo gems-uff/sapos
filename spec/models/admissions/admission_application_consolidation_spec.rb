@@ -315,12 +315,12 @@ RSpec.describe Admissions::AdmissionApplication, "consolidação de fase", type:
     end
 
     it "devolve :new para inscrição não enviada em processo aberto" do
-      @process.update!(end_date: Date.today + 5.days, edit_date: Date.today + 10.days)
+      @process.update!(end_date: Date.current + 5.days, edit_date: Date.current + 10.days)
       expect(create_application(@process, filled: false).candidate_can_edit).to eq([:new, {}])
     end
 
     it "devolve :edit para inscrição enviada em processo ainda editável" do
-      @process.update!(end_date: Date.today - 1.day, edit_date: Date.today + 10.days)
+      @process.update!(end_date: Date.current - 1.day, edit_date: Date.current + 10.days)
       expect(application_with_grade("8", phase: nil).candidate_can_edit).to eq([:edit, {}])
     end
 

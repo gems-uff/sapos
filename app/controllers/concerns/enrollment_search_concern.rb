@@ -92,7 +92,7 @@ module EnrollmentSearchConcern
       else
         return nil
       end
-      [sql, Time.now, Time.now]
+      [sql, Time.current, Time.current]
     end
 
     def custom_condition_for_has_advisor_column(column, value, like_pattern)
@@ -149,7 +149,7 @@ module EnrollmentSearchConcern
       else
         return nil
       end
-      [sql, Time.now]
+      [sql, Time.current]
     end
 
     def custom_condition_for_course_class_year_semester_column(

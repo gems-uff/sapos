@@ -181,7 +181,7 @@ RSpec.describe "Scholarships features", type: :feature do
 
     it "should be able to search for available scholarships considering scholarship_durations" do
       find(:css, "#search_available_use").set(true)
-      select_month_year("date", Date.today)
+      select_month_year("date", Date.current)
       click_button_and_wait "Buscar"
       expect(page.all("tr td.scholarship_number-column").map(&:text)).to eq ["B1", "B2"]
     end

@@ -4,7 +4,7 @@ FactoryBot.define do
   factory :report do
     association :user, factory: :user
     file_name { "report_#{SecureRandom.hex(4)}.pdf" }
-    created_at { Time.now }
+    created_at { Time.current }
     expires_at { 1.year.from_now }
   end
 end

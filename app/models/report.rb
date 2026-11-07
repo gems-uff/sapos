@@ -19,7 +19,7 @@ class Report < ApplicationRecord
   # convidaria a divergencia de volta. spec/models/report_spec.rb prende escopo
   # e predicado ao mesmo corte.
   def self.expiry_cutoff
-    Date.today
+    Date.current
   end
 
   scope :expired, -> { where(expires_at: ...expiry_cutoff) }
@@ -46,7 +46,7 @@ class Report < ApplicationRecord
   end
 
   def invalidate!(user:)
-    release_file!(invalidated_by: user, invalidated_at: Time.now)
+    release_file!(invalidated_by: user, invalidated_at: Time.current)
   end
 
   def expired?

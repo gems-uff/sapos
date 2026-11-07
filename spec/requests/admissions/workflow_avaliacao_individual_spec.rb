@@ -83,7 +83,7 @@ RSpec.describe "Fluxo do processo seletivo: avaliação individual", type: :requ
 
     # ── Consolidação: médias, nota final e a dupla condição ─────────────────
     sign_in @admin
-    @process.update!(end_date: Date.today - 1)
+    @process.update!(end_date: Date.current - 1)
     message = consolidate_phase_as_staff(@process, @avaliacao)
     expect(message).to include(I18n.t("active_scaffold.admissions/admission_process.consolidate_phase.approved", count: 3))
     expect(message).to include(I18n.t("active_scaffold.admissions/admission_process.consolidate_phase.reproved", count: 1))

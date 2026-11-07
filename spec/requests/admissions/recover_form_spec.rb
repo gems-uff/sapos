@@ -18,9 +18,9 @@ RSpec.describe "Admissions recuperacao de inscricao", type: :request do
     @process = FactoryBot.create(
       :admission_process, name: "Mestrado 2026/2", simple_url: "mestrado-2026-2",
       form_template: template, require_session: true,
-      start_date: Date.today - 10.days,
-      end_date: Date.today + 10.days,
-      edit_date: Date.today + 20.days
+      start_date: Date.current - 10.days,
+      end_date: Date.current + 10.days,
+      edit_date: Date.current + 20.days
     )
     @application = FactoryBot.create(
       :admission_application, admission_process: @process,

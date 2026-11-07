@@ -459,7 +459,7 @@ RSpec.describe EnrollmentRequest, type: :model do
             expect(enrollment_request.save).to be_truthy
           end
           it "should work properly with the class schedule enrollment time" do
-            now = Time.now
+            now = Time.current
             class_schedule = FactoryBot.build(
               :class_schedule,
               enrollment_start: now - 1.day,
@@ -490,7 +490,7 @@ RSpec.describe EnrollmentRequest, type: :model do
             expect(enrollment_request.class_enrollment_requests).not_to include(@cer2)
           end
           it "should work properly within the class schedule adjustment time" do
-            now = Time.now
+            now = Time.current
             class_schedule = FactoryBot.build(
               :class_schedule,
               enrollment_start: now - 5.days,
@@ -521,7 +521,7 @@ RSpec.describe EnrollmentRequest, type: :model do
             expect(enrollment_request.class_enrollment_requests).not_to include(@cer2)
           end
           it "should not update anything if the enrollment time is not open in the class schedule" do
-            now = Time.now
+            now = Time.current
             class_schedule = FactoryBot.build(
               :class_schedule,
               enrollment_start: now - 5.days,
@@ -552,7 +552,7 @@ RSpec.describe EnrollmentRequest, type: :model do
             )
           end
           it "should not remove anything if the enrollment time is open only for insertions" do
-            now = Time.now
+            now = Time.current
             class_schedule = FactoryBot.build(
               :class_schedule,
               enrollment_start: now - 5.days,
@@ -582,7 +582,7 @@ RSpec.describe EnrollmentRequest, type: :model do
             expect(enrollment_request).to have_error(:impossible_removal).on :base
           end
           it "should not insert anything if the enrollment time is open only for removals" do
-            now = Time.now
+            now = Time.current
             class_schedule = FactoryBot.build(
               :class_schedule,
               enrollment_start: now - 5.days,
@@ -616,7 +616,7 @@ RSpec.describe EnrollmentRequest, type: :model do
       describe "valid_destroy?" do
         context "should return true when" do
           it "the enrollment schedule is open" do
-            now = Time.now
+            now = Time.current
             class_schedule = FactoryBot.build(
               :class_schedule,
               enrollment_start: now - 1.day,
@@ -628,7 +628,7 @@ RSpec.describe EnrollmentRequest, type: :model do
             expect(enrollment_request.valid_destroy?(class_schedule)).to be_truthy
           end
           it "the enrollment schedule is not open for removals, but there are no effected insertions" do
-            now = Time.now
+            now = Time.current
             class_schedule = FactoryBot.build(
               :class_schedule,
               enrollment_start: now - 5.days,
@@ -642,7 +642,7 @@ RSpec.describe EnrollmentRequest, type: :model do
         end
         context "should return false when" do
           it "the enrollment schedule is not open" do
-            now = Time.now
+            now = Time.current
             class_schedule = FactoryBot.build(
               :class_schedule,
               enrollment_start: now - 5.days,
@@ -654,7 +654,7 @@ RSpec.describe EnrollmentRequest, type: :model do
             expect(enrollment_request.valid_destroy?(class_schedule)).to be_falsey
           end
           it "the enrollment schedule is not open for removals, but there are effected insertions" do
-            now = Time.now
+            now = Time.current
             @cer.status = ClassEnrollmentRequest::EFFECTED
             class_schedule = FactoryBot.build(
               :class_schedule,

@@ -20,8 +20,8 @@ RSpec.describe "Escolaridade da candidatura pelo cocoon", type: :feature, js: tr
     )
     @process = FactoryBot.create(
       :admission_process, name: "Mestrado", simple_url: "cocoon-#{SecureRandom.hex(4)}",
-      form_template: template, start_date: Date.today - 10.days,
-      end_date: Date.today + 10.days, edit_date: Date.today + 20.days
+      form_template: template, start_date: Date.current - 10.days,
+      end_date: Date.current + 10.days, edit_date: Date.current + 20.days
     )
     filled_form = FactoryBot.create(:filled_form, form_template: template, is_filled: true)
     @preenchido = FactoryBot.create(

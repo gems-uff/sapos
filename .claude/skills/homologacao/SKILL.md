@@ -254,6 +254,27 @@ Comparar é diferenciar os dois JSON. Para medir o que ele não mede, acrescente
 seção **e recapture os dois lados**: sonda alterada no meio da rodada mede o
 instrumento, não a aplicação.
 
+O `probe_widgets.rb` mede por amostra e força o bind. Quando o upgrade toca
+`recordselect`, jquery-ui ou o active_scaffold, rode também o
+`probe_campos_widgets.rb`: ele passa por todas as rotas de `routes_html.txt` e,
+em cada formulário (`new` em página inteira, `Adicionar` e `Buscar` por AJAX),
+digita um caractere em **todo** `record_select` e abre **todo** datepicker, sem
+forçar nada e sem submeter.
+
+```bash
+EXPLORE_OUT=$LADO/campos ROTULO=antes bundle exec ruby $S/probe_campos_widgets.rb
+```
+
+Duas leituras do resultado:
+
+- **`dropdown_itens: 0` não distingue busca vazia de busca que respondeu 500.**
+  É a única sonda que faz a busca do `record_select` com termo, caminho que a
+  suíte quase não exercita; conte os 500 do log do servidor no intervalo dela,
+  nos dois lados, e compare a contagem por rota.
+- **Os ids de subform mudam a cada carregamento**, então o nome do campo difere
+  entre os dois JSON sem que nada tenha mudado. Neutralize os ids numéricos
+  antes de diferenciar.
+
 ### Voltar e submeter — o bug que o `autocomplete="off"` contornava
 
 O `probe_voltar_e_submeter.rb` mede o mecanismo do bug de navegador que fez o

@@ -189,7 +189,7 @@ RSpec.describe Admissions::AdmissionApplication, "cópia para o aluno e envio de
       )
       @process = create_closed_admission_process(
         @template, simple_url: "assign-form-spec", letter_template: @letters,
-        end_date: Date.today + 5.days, edit_date: Date.today + 10.days
+        end_date: Date.current + 5.days, edit_date: Date.current + 10.days
       )
       @application = create_application(@process, name: "Ana", filled: false, fields: { "nota" => "5" })
       @nota = @application.filled_form.fields.first

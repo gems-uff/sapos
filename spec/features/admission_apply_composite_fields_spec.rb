@@ -21,9 +21,9 @@ RSpec.describe "Admission apply composite fields", type: :feature, js: true do
     @destroy_later << @process = FactoryBot.create(
       :admission_process, name: "Mestrado 2026.2", simple_url: "mestrado-2026-2",
       form_template: @template,
-      start_date: Date.today - 10.days,
-      end_date: Date.today + 10.days,
-      edit_date: Date.today + 20.days
+      start_date: Date.current - 10.days,
+      end_date: Date.current + 10.days,
+      edit_date: Date.current + 20.days
     )
     @destroy_later << @template
   end
