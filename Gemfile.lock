@@ -310,7 +310,7 @@ GEM
       matrix (~> 0.4)
       pdf-core (~> 0.10.0)
       ttfunk (~> 1.8)
-    prawn-qrcode (0.5.2)
+    prawn-qrcode (0.6.0)
       prawn (>= 1)
       rqrcode (>= 1.0.0)
     prawn-rails (1.6.0)
