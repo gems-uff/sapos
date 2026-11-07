@@ -112,26 +112,31 @@ module EnrollmentSearchConcern
       [sql]
     end
 
+    # O valor vem do formulario de busca: a data e montada de inteiros e a
+    # fase vai como parametro ligado, nunca como texto dentro do SQL.
     def custom_condition_for_accomplishments_column(column, value, like_pattern)
-      return nil if value[:phase].blank?
-      date = value.nil? ? value : "#{value[:year]}-#{
-        (value[:month].size == 1) ? "0" + value[:month] : value[:month]
-      }-#{(value[:day].size == 1) ? "0" + value[:day] : value[:day]}"
-      phase = value[:phase] == "all" ? nil : value[:phase]
+      return nil if value.nil? || value[:phase].blank?
+      date = begin
+        Date.new(value[:year].to_i, value[:month].to_i, value[:day].to_i)
+      rescue ArgumentError
+        nil
+      end
+      # Data incompleta nunca casou: DATE() de texto invalido e NULL.
+      return "1 = 2" if date.nil?
       if value[:phase] == "all"
         enrollments_ids = Enrollment.with_all_phases_accomplished_on(date)
-        query = enrollments_ids.blank? ? "1 = 2" : "enrollments.id in (#{
-          enrollments_ids.join(",")
-        })"
+        enrollments_ids.blank? ? "1 = 2" : ["enrollments.id in (?)", enrollments_ids]
       else
-        query = "enrollments.id in (
-          select enrollment_id
-          from accomplishments
-          where DATE(conclusion_date) <= DATE('#{date}')
-          and phase_id = #{phase}
-        )"
+        [
+          "enrollments.id in (
+            select enrollment_id
+            from accomplishments
+            where DATE(conclusion_date) <= ?
+            and phase_id = ?
+          )",
+          date, value[:phase].to_i
+        ]
       end
-      query
     end
 
     def custom_condition_for_active_column(column, value, like_pattern)

@@ -337,7 +337,7 @@ module EnrollmentsHelper
         </tr></table></td>
         <tr class='record tr_search_result'>
           <td style='text-align: right;'>Etapas atrasadas</td>
-          <td colspan='#{columns.size}'>#{phases}
+          <td colspan='#{columns.size}'>#{h(phases)}
             <table><tr>".html_safe).html_safe
     end
 
