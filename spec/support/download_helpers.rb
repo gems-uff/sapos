@@ -5,7 +5,10 @@ module DownloadHelpers
   # 5 s era apertado para gerar PDF num runner compartilhado, e o estouro vira
   # Timeout::Error sem contexto nenhum.
   TIMEOUT = 15
-  PATH    = Rails.root.join("tmp/test_downloads")
+  # Um diretorio por worker do parallel_rspec: o before(:each) limpa este
+  # diretorio, e compartilhado um worker apagaria o download do outro no meio da
+  # espera. Fora do paralelo TEST_ENV_NUMBER nao existe e o nome e o de sempre.
+  PATH    = Rails.root.join("tmp/test_downloads#{ENV["TEST_ENV_NUMBER"]}")
   # Extensoes que o navegador usa enquanto o arquivo ainda esta sendo escrito.
   PARTIAL = [".part", ".crdownload"].freeze
 
