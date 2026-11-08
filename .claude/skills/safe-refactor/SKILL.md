@@ -202,6 +202,11 @@ que mude o esquema — a armadilha do banco velho do `AGENTS.md` vale para todos
 
     bundle exec rake "parallel:load_schema[2]"
 
+Num checkout recém-clonado, rode antes um comando Rails serial
+(`bundle exec rails runner ''`). Sem `SECRET_KEY_BASE` no ambiente, o primeiro
+boot de teste grava o `tmp/local_secret.txt`, e N processos fazendo isso juntos
+podem ler o arquivo ainda vazio: `secret_key_base ... got: ""`.
+
 Rodada:
 
     PARALLEL_TESTS_EXECUTABLE='bundle exec rspec' SELENIUM_BROWSER=chrome \
