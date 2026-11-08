@@ -14,12 +14,12 @@ RSpec.describe "Admissions::Admissions: entrada do candidato", type: :request do
     @open = FactoryBot.create(
       :admission_process, name: "Mestrado Aberto", simple_url: "landing-aberto",
       form_template: @template, require_session: true,
-      start_date: Date.today - 10.days, end_date: Date.today + 10.days, edit_date: Date.today + 20.days
+      start_date: Date.current - 10.days, end_date: Date.current + 10.days, edit_date: Date.current + 20.days
     )
     @hidden = FactoryBot.create(
       :admission_process, name: "Edital Oculto", simple_url: "landing-oculto",
       form_template: @template, visible: false,
-      start_date: Date.today - 10.days, end_date: Date.today + 10.days, edit_date: Date.today + 20.days
+      start_date: Date.current - 10.days, end_date: Date.current + 10.days, edit_date: Date.current + 20.days
     )
     @closed = create_closed_admission_process(@template, simple_url: "landing-fechado")
   end
@@ -132,7 +132,7 @@ RSpec.describe "Admissions::Admissions: entrada do candidato", type: :request do
     it "restringe ao edital de origem, inclusive pelo id numérico" do
       other = FactoryBot.create(
         :admission_process, name: "Doutorado", simple_url: "landing-outro", form_template: @template,
-        start_date: Date.today - 10.days, end_date: Date.today + 10.days, edit_date: Date.today + 20.days
+        start_date: Date.current - 10.days, end_date: Date.current + 10.days, edit_date: Date.current + 20.days
       )
       create_application(other, name: "Ana", email: "ana@example.com")
 

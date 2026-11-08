@@ -89,8 +89,10 @@ bundle install
 
 ## Execução
 
-**Não edite `config/database.yml`** — ele é versionado e aponta o teste para
-SQLite de propósito. Use `DATABASE_URL`, que o Rails sobrepõe:
+**Não edite `config/database.yml`.** O bloco `test` dele é o SQLite das outras
+rodadas, e um bloco MariaDB esquecido ali faria toda rodada seguinte trocar de
+banco sem aviso. Use `DATABASE_URL`, que o Rails sobrepõe e que morre com o
+shell:
 
 ```bash
 export DATABASE_URL="mysql2://root@127.0.0.1:3307/sapos_test?encoding=utf8mb4&collation=utf8mb4_unicode_ci"
@@ -106,6 +108,39 @@ tabelas e collation única devem bater com produção:
 SELECT COUNT(*), COUNT(DISTINCT TABLE_COLLATION), MIN(TABLE_COLLATION)
   FROM information_schema.TABLES WHERE TABLE_SCHEMA='sapos_test';
 ```
+
+### Em paralelo
+
+Vale o procedimento da skill `safe-refactor` ("Em paralelo"), com uma diferença:
+o `DATABASE_URL` traz o nome do banco, prevalece sobre o `database:` do YAML, e
+o `parallel_tests` o repassa igual a todos os workers. Sem ajuste, todos caem em
+`sapos_test`, e a varredura de vazamento de um apaga o `before(:all)` do outro.
+O `por_worker.sh`, nesta pasta, reescreve a URL para o banco do worker
+(`sapos_test`, `sapos_test2`, ...) antes de executar o comando. Tudo que o
+worker dispara herda a URL reescrita — o cliente próprio do
+`Query.run_read_only_query` e a rake task de notificações, que é outro processo.
+
+Pelo mesmo motivo o `rake parallel:load_schema` não serve aqui: carregaria todos
+os esquemas em `sapos_test`. Crie e carregue cada banco pelo script:
+
+```bash
+P=.claude/skills/suite-mariadb/por_worker.sh
+for n in "" 2; do
+  $M/bin/mysql -h 127.0.0.1 -P 3307 -u root -e \
+    "CREATE DATABASE IF NOT EXISTS sapos_test$n CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+  TEST_ENV_NUMBER=$n RAILS_ENV=test sh $P bundle exec rails db:schema:load
+done
+
+PARALLEL_TESTS_EXECUTABLE="sh $P bundle exec rspec" \
+  bundle exec parallel_rspec -n 2 --serialize-stdout --combine-stderr --verbose-rerun-command \
+  -o '--seed N --format documentation --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log' spec
+```
+
+Confira o esquema com a consulta acima trocando o filtro por
+`TABLE_SCHEMA LIKE 'sapos_test%' GROUP BY TABLE_SCHEMA`: cada banco com o mesmo
+número de tabelas e a mesma collation. A contagem de exemplos em MariaDB não é a
+do SQLite — há exemplos que só existem num dos dois —, então o baseline serial
+desta comparação é o serial em MariaDB.
 
 ## Como interpretar as falhas
 
@@ -127,17 +162,24 @@ produz o diagnóstico mais enganoso.
 ## A instância pode já estar de pé — e o sandbox mente sobre isso
 
 Antes de montar, veja se a instância de uma rodada anterior não continua viva. E
-faça essa checagem **por TCP**, não pelo socket:
+faça essa checagem **fora do sandbox**:
 
 ```bash
 $M/bin/mysql -h 127.0.0.1 -P 3307 -u root -e "SELECT @@version, @@sql_mode;"
 ```
 
-**O sandbox bloqueia conexão a socket unix.** Uma checagem via `--socket=` de
-dentro dele devolve `ERROR 2002 (HY000) ... (1)` — o `(1)` é "operation not
-permitted", e não "servidor não existe", que é o `(2)`. Confundir os dois leva a
-"re-subir" um servidor que já está de pé, e daí o log denuncia o que de fato
-aconteceu:
+**Dentro do sandbox a pergunta não tem resposta.** Ele recusa tanto socket unix
+quanto conexão TCP a 127.0.0.1, e as duas devolvem `ERROR 2002 (HY000) ... (1)`.
+O `(1)` é "operation not permitted" — o sandbox negando, não o servidor
+faltando. Trocar o socket por TCP não contorna: o erro é o mesmo. Fora do
+sandbox a resposta distingue, e é só ali que ela vale: servidor desligado
+devolve `(36)`, servidor de pé responde à consulta.
+
+Vale para a instância inteira, não só para essa checagem — subir o `mysqld_safe`,
+consultar, rodar a suíte e desligar tudo sai do sandbox.
+
+Ler o `(1)` como "não está de pé" leva a "re-subir" um servidor vivo, e daí o log
+denuncia o que de fato aconteceu:
 
 ```
 [ERROR] mariadbd: Can't lock aria control file ... error: 35

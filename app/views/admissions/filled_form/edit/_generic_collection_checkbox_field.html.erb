@@ -55,9 +55,9 @@ $(document).ready(function() {
         let checkboxes = $('#<%= collection_id %> input:checkbox:checked');
         let input = $("#<%= collection_id %> input").get(1)
         if (checkboxes.length < <%= configuration["minselection"].to_i %>) {
-            input.setCustomValidity(`<%= form_field.name %> <%= I18n.t(
+            input.setCustomValidity(<%= raw [form_field.name, I18n.t(
               "activerecord.errors.models.admissions/filled_form_field.minselection",
-              count: configuration["minselection"].to_i) %>`)
+              count: configuration["minselection"].to_i)].join(" ").to_json %>)
             input.reportValidity()
             return false;
         } else {

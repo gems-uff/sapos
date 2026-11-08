@@ -43,7 +43,16 @@ corrija na wiki.
 - **Verde numa ordem não é verde.** A ordem dos exemplos é sorteada. Ao
   investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
   irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo
-  culpado sozinho. O CI registra a seed no resumo do job.
+  culpado sozinho. O CI registra a seed no resumo do job. Lá a suíte roda em
+  4 workers do `parallel_rspec`, e cada worker sorteia a ordem só sobre os seus
+  arquivos: a seed sozinha não repete a ordem que falhou. O resumo transcreve o
+  comando do worker que falhou; rode-o em serial, e o `--bisect` sobre ele.
+- **Vermelho logo depois de trocar de ramo pode ser o banco de teste velho.** O
+  `maintain_test_schema!` não recarrega o `db/test.sqlite3` quando a troca de
+  ramo muda o esquema, então ele fica com as colunas do ramo anterior e o
+  `spec/config/schema_dump_spec.rb` acusa uma divergência que não existe no
+  código. `rm db/test.sqlite3 && RAILS_ENV=test rake db:schema:load` resolve. No
+  CI não acontece: lá o banco nasce a cada job.
 - **Prefira `before(:each)`: o rollback da transação limpa sozinho.** O
   `before(:all)` existe só para amortizar montagem cara entre muitos exemplos, e
   o ganho depende do tamanho do grupo — medido: em grupo de 6 exemplos não muda
@@ -67,9 +76,17 @@ corrija na wiki.
   ramo novo: crie só quando pedirem.
 - Documentação e comentário falam em **"mantenedor"**, não em nome próprio —
   o papel sobrevive a quem o exerce.
-- **Antes de abrir issue, pesquise as existentes — inclusive as fechadas:**
-  `gh issue list --state all --search "<termo>"`, variando termos em português e
-  inglês. Achando issue relacionada, leia também os commits que a fecharam
+- **Antes de abrir issue, pesquise as existentes — inclusive as fechadas —**
+  com o [issuefinder](https://github.com/gems-uff/issuefinder) sobre o rascunho
+  da issue nova: `uv run --project ../issuefinder issuefinder query -f
+  <rascunho>`, de dentro do checkout. Ele compara pelo sentido, entre português
+  e inglês, e pelos tokens exatos (classe de erro, nome de método, caminho), e
+  sincroniza as issues antes de responder. Fica num diretório irmão do
+  checkout; se faltar, clone-o ali (`gh repo clone gems-uff/issuefinder
+  ../issuefinder`). O ambiente e o modelo dele (cerca de 3 GB) ficam fora do
+  checkout, então configurá-lo pede o aval de quem conduz a sessão; até lá,
+  pesquise com `gh issue list --state all --search "<termo>"`, variando termos
+  em português e inglês. Achando issue relacionada, leia também os commits que a fecharam
   (`git log --all --grep="<numero>"`). Não é só evitar duplicata: é ali que está o
   contexto que torna a issue nova útil — decisão de produto já tomada, tentativa
   revertida, correção que só alcançou parte do código.
@@ -81,6 +98,17 @@ corrija na wiki.
   sobre quem usa, não o tamanho do conserto: trabalho perdido, configuração
   existente ignorada, dado exposto a quem não devia e usuário sem saída são Bug —
   mesmo quando corrigir exige construir o que ainda não existe.
+- **Reprodução de defeito: vermelha no PR devolvido, `pending` na issue.** Ao
+  devolver um PR, a reprodução entra quebrando o ramo do autor — o vermelho é o
+  alerta (ver a skill `revisar-pr`). Defeito que vira issue tem a reprodução na
+  `main` com `pending: "issue #NNN"`: ela falha hoje sem deixar a suíte vermelha,
+  e quando o conserto chega o RSpec acusa o pending que passou ("Expected pending
+  … to fail") — é a hora de tirar a marca. O controle do cenário entra junto,
+  **sem** `pending`: o pending aceita qualquer falha, inclusive cenário que nem
+  monta, e só o controle verde prova que ele falha pela issue. Só entra assim
+  reprodução determinística — pending instável vira vermelho no dia em que passa
+  por acaso. A que depende de código fora da `main` (um PR aberto) fica no corpo
+  da issue até o merge.
 - **Type classifica o assunto; label diz a versão — não misture os dois.** O label
   temático foi aposentado quando o Type passou a existir: manter as duas
   taxonomias é mantê-las divergindo, e a que engana é justamente a que ninguém
@@ -150,11 +178,14 @@ referenciado por caminho de uma captura datada, que é descartável.
 ## Atualização de dependências
 
 Uma gem por passo, alvo no patch mais atual da mesma série; **nunca subir major
-ou minor de carona** — isso é decisão separada. **Piso de segurança (`>=`) não se
+ou minor de carona** — isso é decisão separada. A exceção é a campanha: a cauda
+(transitivas, ferramentas de desenvolvimento e teste) anda em lote por nível,
+com `--strict` como teto rígido e bissecção se ficar vermelho, enquanto o
+núcleo continua uma gem por passo. **Piso de segurança (`>=`) não se
 declara no `Gemfile`:** ele envelhece calado quando sai a correção seguinte. Quem
 garante que o lock não carrega CVE conhecida é o `bundle-audit`, que o CI roda
 contra a base de advisories do dia. O resto — conferência do `Gemfile.lock`,
-`--strict`, higiene em lote — está na skill `dependencias`.
+`--strict`, a campanha — está na skill `dependencias`.
 
 ## Pontos cegos da suíte
 
@@ -206,10 +237,26 @@ cada uma explica o porquê no próprio cabeçalho:
 - Rails e active_scaffold: `fix_url_for.rb`,
   `active_scaffold_disable_null_comparators.rb`,
   `fix_session_store_dirty_tracking.rb` (`prepend` no `find_session` privado do
-  `ActiveRecordStore`) e o `LogTruncater` escondido dentro de
-  `filter_parameter_logging.rb`, que chama o `sql` original por `super_method`.
+  `ActiveRecordStore`), `active_scaffold_date_picker_raw_value.rb` (`prepend`
+  em `ActiveScaffold::AttributeParams`, porque o bridge `date_picker` só
+  define o método que ele sobrescreve depois dos initializers) e o
+  `LogTruncater` escondido dentro de `filter_parameter_logging.rb`, que chama
+  o `sql` original por `super_method`.
+- active_scaffold, entrada que a gem aceita da URL sem conferir:
+  `active_scaffold_embedded_conditions.rb` (`prepend` em
+  `ActiveScaffold::Finder`; só o marcador de pendência vale em
+  `embedded[conditions]`), `active_scaffold_date_trend_unit.rb` (`prepend` em
+  `Finder::ClassMethods#datetime_from_to` — não em `condition_for_datetime`, que
+  o bridge `date_picker` apelida e cujo apelido perderia o `super`) e
+  `active_scaffold_return_to.rb` (`prepend` em `Helpers::ControllerHelpers`;
+  `return_to` só interno). Os três entram por `prepend` no módulo porque a
+  chamada `active_scaffold` inclui o módulo em cada controller, na frente de um
+  método do `ApplicationController`.
 - Prawn: `prawn-grouping.rb`, cópia de patch de terceiro que usa `state.page` e
   `@bounding_box`. Suspeito num upgrade do Prawn, não do Rails.
+- prawn-table: `prawn_actual_text.rb` (`prepend` no `draw_content` privado de
+  `Prawn::Table::Cell::Text`, mais o `@pdf` da célula e o `renderer` do Prawn),
+  que faz o quadro de horários falar ao leitor de tela.
 
 `schema_plus_alternative.rb` é o que olhar primeiro: reabre
 `ActiveRecord::Migration` e transforma `add_foreign_key` e `remove_foreign_key`
@@ -235,3 +282,13 @@ O banco de homologação é réplica de produção, com dado real de aluno. Nunc
 transcreva nome, e-mail, CPF ou nota para arquivos de trabalho, documentação ou
 comentários de issue e PR — comentário de issue é público e irreversível.
 Descreva achados genericamente: "aluno com nome acentuado", "registro id NNNN".
+
+**O que cada instalação criou pela tela também não vai para issue nem PR.**
+Consulta, notificação, template e variável são da instalação, e o repositório não
+os conhece; o mesmo vale para contagem medida em produção ou na réplica. Na issue,
+descreva a classe do problema ("consultas criadas pela tela que citam coluna
+renomeada") e o conserto genérico. Nome, SQL, instância e número ficam com o
+mantenedor, na pasta local da rodada. O que vem do seed ou de migration está no
+repositório e pode ser citado. **Editar não apaga:** o GitHub guarda o histórico
+de edição, e a troca de título fica na linha do tempo. O que escapou só sai
+apagando o comentário ou a issue.

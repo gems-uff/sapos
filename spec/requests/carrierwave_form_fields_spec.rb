@@ -25,9 +25,9 @@ RSpec.describe "Carrierwave form fields", type: :request do
       @process = FactoryBot.create(
         :admission_process, name: "Mestrado 2026.2",
         simple_url: "mestrado-2026-2", form_template: @template,
-        start_date: Date.today - 10.days,
-        end_date: Date.today + 10.days,
-        edit_date: Date.today + 20.days
+        start_date: Date.current - 10.days,
+        end_date: Date.current + 10.days,
+        edit_date: Date.current + 20.days
       )
     end
 
@@ -100,9 +100,9 @@ RSpec.describe "Carrierwave form fields", type: :request do
       @process = FactoryBot.create(
         :admission_process, name: "Mestrado 2026.2",
         simple_url: "mestrado-anexo", form_template: @template,
-        start_date: Date.today - 10.days,
-        end_date: Date.today + 10.days,
-        edit_date: Date.today + 20.days
+        start_date: Date.current - 10.days,
+        end_date: Date.current + 10.days,
+        edit_date: Date.current + 20.days
       )
     end
 
@@ -159,7 +159,7 @@ RSpec.describe "Carrierwave form fields", type: :request do
         :admission_process, name: "Mestrado 2026.2",
         simple_url: "mestrado-troca", form_template: @template,
         staff_can_edit: true,
-        start_date: Date.today - 10.days, end_date: Date.today + 10.days
+        start_date: Date.current - 10.days, end_date: Date.current + 10.days
       )
       @application = FactoryBot.create(
         :admission_application, admission_process: @process,

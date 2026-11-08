@@ -25,7 +25,7 @@ CustomVariable.create([
   { description: "Periodo da Avaliação Quadrienal", variable: "quadrennial_period", value: "2021 - 2021" },
   { description: "Ativa a validação de credenciamento de orientadores no nível da matrícula (yes/no)", variable: "enable_advisor_accreditation_validation", value: "yes" },
 ])
-ProgramLevel.create([{ level: "5", start_date: Time.now, end_date: nil }])
+ProgramLevel.create([{ level: "5", start_date: Time.current, end_date: nil }])
 
 
 Role.create([

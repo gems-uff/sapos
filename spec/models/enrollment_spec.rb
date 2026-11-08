@@ -87,12 +87,71 @@ RSpec.describe Enrollment, type: :model do
           enrollment.advisements.build(professor: professor, main_advisor: true)
           expect(enrollment).to have_error(:no_advisor_with_level).on :base
         end
+        it "the only advisor's authorization at the level has been closed (de-accredited)" do
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level,
+                                                    start_date: Date.current - 2.days, end_date: Date.current - 1.day)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          expect(enrollment).to have_error(:no_advisor_with_level).on :base
+        end
+        it "the only advisor's authorization at the level has not started yet (future start_date)" do
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level,
+                                                    start_date: Date.current + 1.day, end_date: nil)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          expect(enrollment).to have_error(:no_advisor_with_level).on :base
+        end
+        # O limite da regra do mês do desligamento, no contexto abaixo: o
+        # credenciamento que só começa no mês seguinte não vale para ele.
+        it "the advisor was accredited only after the dismissal month" do
+          month = Date.new(2021, 6, 1)
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level, start_date: month.next_month)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: month)
+          expect(enrollment).to have_error(:no_advisor_with_level).on :base
+        end
+        # Sem descartar as marcadas para destruicao, o unico credenciado
+        # continua valendo como orientador e a remocao passa calada -- a
+        # matricula fica sem ninguem habilitado no nivel. Trocar o `reject` por
+        # `advisements.to_a` derruba este exemplo, que e o controle dele.
+        #
+        # O nome fala em subform por engano, e o engano custou uma rodada de
+        # homologacao: a tela de matricula NAO marca para destruicao. O link
+        # "Remover" apaga o <tr> e nao emite `_destroy`, entao a associacao
+        # chega ao save ja sem a linha, e por ali a validacao recusa mesmo sem
+        # o `reject`. Medido nos dois lados: recusam igual. Este exemplo cobre
+        # quem marque para destruicao em Ruby -- hoje, defesa, nao um fluxo de
+        # tela conhecido.
+        # Decisão da revisão do PR #690: desligamento não isenta da regra, que
+        # passa a ser avaliada na data dele. Aqui o credenciamento acabou antes
+        # de o aluno sair.
+        it "the enrollment is dismissed after the only advisor's accreditation had ended" do
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level,
+                                                    start_date: @admission_date - 1.year, end_date: @admission_date + 10.days)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: @admission_date + 4.years)
+          expect(enrollment).to have_error(:no_advisor_with_level).on :base
+        end
+        it "the only advisor with authorization was marked for destruction" do
+          authorized = FactoryBot.build(:professor)
+          authorized.advisement_authorizations.build(level: enrollment.level, start_date: Date.current)
+          other = FactoryBot.build(:professor)
+          removed = enrollment.advisements.build(professor: authorized, main_advisor: true)
+          enrollment.advisements.build(professor: other, main_advisor: false)
+
+          expect(enrollment).to have(0).errors_on :base
+
+          removed.mark_for_destruction
+          expect(enrollment).to have_error(:no_advisor_with_level).on :base
+        end
       end
       context "should not have advisor level error when" do
         it "at least one advisor has authorization at enrollment level" do
           professor1 = FactoryBot.build(:professor)
           professor2 = FactoryBot.build(:professor)
-          professor2.advisement_authorizations.build(level: enrollment.level)
+          professor2.advisement_authorizations.build(level: enrollment.level, start_date: Date.current)
           enrollment.advisements.build(professor: professor1, main_advisor: true)
           enrollment.advisements.build(professor: professor2, main_advisor: false)
           expect(enrollment).to have(0).errors_on :base
@@ -101,6 +160,42 @@ RSpec.describe Enrollment, type: :model do
           @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "no")
           professor = FactoryBot.build(:professor)
           enrollment.advisements.build(professor: professor, main_advisor: true)
+          expect(enrollment).to have(0).errors_on :base
+        end
+        # Decisão da revisão do PR #690: em matrícula desligada a regra é
+        # avaliada no mês do desligamento, não hoje. O irmão deste exemplo,
+        # com o desligamento depois do fim do credenciamento, está no contexto
+        # de erro acima.
+        it "the enrollment is dismissed and the advisor was accredited on the dismissal date, though closed since" do
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level,
+                                                    start_date: @admission_date - 1.year, end_date: @admission_date + 10.days)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: @admission_date + 5.days)
+          expect(enrollment).to have(0).errors_on :base
+        end
+        # O desligamento só guarda mês e ano -- a tela de Desligamentos grava
+        # o dia 1 --, então a regra vale para o mês inteiro: basta
+        # credenciamento vigente em algum dia dele. Avaliada só no dia 1, ela
+        # reprovava o credenciado a partir do dia 10. O controle, com o
+        # credenciamento começando no mês seguinte, está no contexto de erro.
+        it "the advisor was accredited only later in the dismissal month" do
+          month = Date.new(2021, 6, 1)
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level, start_date: month + 9.days)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: month)
+          expect(enrollment).to have(0).errors_on :base
+        end
+        # O outro lado da mesma regra: credenciamento encerrado no meio do mês
+        # ainda cobre o desligamento.
+        it "the advisor's accreditation ended earlier in the dismissal month" do
+          month = Date.new(2021, 6, 1)
+          professor = FactoryBot.build(:professor)
+          professor.advisement_authorizations.build(level: enrollment.level,
+                                                    start_date: month - 1.year, end_date: month + 14.days)
+          enrollment.advisements.build(professor: professor, main_advisor: true)
+          enrollment.build_dismissal(dismissal_reason: @dismissal_reason, date: month)
           expect(enrollment).to have(0).errors_on :base
         end
       end
@@ -181,21 +276,21 @@ RSpec.describe Enrollment, type: :model do
       end
       describe "have scholarship(s) but none of them are active today" do
         it "should return false" do
-          scholar1 = FactoryBot.build(:scholarship, start_date: Date.today - 2.years, end_date: Date.today + 2.years)
-          scholar2 = FactoryBot.build(:scholarship, start_date: Date.today - 2.years, end_date: Date.today + 2.years)
-          enrollment.scholarship_durations.build(start_date: Date.today - 12.months, end_date: Date.today - 6.months,
-                                                 cancel_date: Date.today - 6.months, scholarship: scholar1)
-          enrollment.scholarship_durations.build(start_date: Date.today + 6.months, end_date: Date.today + 12.months,
-                                                 cancel_date: Date.today + 12.months, scholarship: scholar2)
+          scholar1 = FactoryBot.build(:scholarship, start_date: Date.current - 2.years, end_date: Date.current + 2.years)
+          scholar2 = FactoryBot.build(:scholarship, start_date: Date.current - 2.years, end_date: Date.current + 2.years)
+          enrollment.scholarship_durations.build(start_date: Date.current - 12.months, end_date: Date.current - 6.months,
+                                                 cancel_date: Date.current - 6.months, scholarship: scholar1)
+          enrollment.scholarship_durations.build(start_date: Date.current + 6.months, end_date: Date.current + 12.months,
+                                                 cancel_date: Date.current + 12.months, scholarship: scholar2)
           expect(enrollment.has_active_scholarship_now?).to be false
         end
       end
       describe "has an active scholarship today" do
         it "should return true" do
-          scholar = FactoryBot.build(:scholarship, start_date: Date.today - 2.years, end_date: Date.today + 2.years)
+          scholar = FactoryBot.build(:scholarship, start_date: Date.current - 2.years, end_date: Date.current + 2.years)
 
-          enrollment.scholarship_durations.build(start_date: Date.today - 6.months, end_date: Date.today + 6.months,
-                                                 cancel_date: Date.today + 6.months, scholarship: scholar)
+          enrollment.scholarship_durations.build(start_date: Date.current - 6.months, end_date: Date.current + 6.months,
+                                                 cancel_date: Date.current + 6.months, scholarship: scholar)
           expect(enrollment.has_active_scholarship_now?).to be true
         end
       end
@@ -392,7 +487,7 @@ RSpec.describe Enrollment, type: :model do
           @destroy_later << FactoryBot.create(:accomplishment, enrollment: @enrollment_accomplished, phase: @two_semesters_phase,
                                              conclusion_date: 1.day.ago)
 
-          result = Enrollment.with_all_phases_accomplished_on(Date.today)
+          result = Enrollment.with_all_phases_accomplished_on(Date.current)
 
           expected_result = [@enrollment_accomplished.id].sort
           expect(result.sort).to eql(expected_result.sort)

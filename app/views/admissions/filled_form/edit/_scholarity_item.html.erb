@@ -138,7 +138,7 @@ function scholarity_item_activate_js(sid) {
     if (!value) {
       return "";
     }
-    const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/;
+    const regex = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
     groups = value.match(regex)
     if (!groups || isNaN(Date.parse(`${groups[3]}-${groups[2]}-${groups[1]}`))) {
       return `${field} <%= I18n.t(

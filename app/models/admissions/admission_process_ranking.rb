@@ -29,6 +29,35 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
   end
 
   def generate_ranking
+    # A failure keeps the results of the previous run
+    self.class.transaction do
+      # Two runs at once could both create the result of a candidate
+      Admissions::RankingConfig.lock.find(self.ranking_config_id)
+      candidates = self.rank_candidates
+      self.clear_results(candidates)
+      candidates
+    end
+  end
+
+  # Candidates that the previous run ranked and this one does not lose their
+  # position and machine, as if never ranked: an empty field would still be
+  # read by conditions and other rankings. Those ranked again keep theirs, and
+  # are written only where something changed.
+  def clear_results(candidates)
+    rconfig = self.ranking_config
+    ranked = candidates.filter_map { |c| c[:__ranking_result].id if !c[:__position].nil? }
+    Admissions::AdmissionRankingResult.where(
+      ranking_config_id: rconfig.id,
+      admission_application_id: self.admission_process.admission_applications.select(:id)
+    ).where.not(id: ranked).each do |result|
+      result.filled_form.fields.where(
+        form_field_id: [rconfig.position_field_id, rconfig.machine_field_id]
+      ).destroy_all
+      result.filled_form.update!(is_filled: false)
+    end
+  end
+
+  def rank_candidates
     rconfig = self.ranking_config
     admission_applications = self.admission_process.admission_applications
     columns = self.ranking_config.ranking_columns.all
@@ -37,11 +66,11 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
     groups = {}
     process_vacancies = {}
     readjust_groups = {}
-    readjust_process_vacancies = {}
     rconfig.ranking_groups.each do |g|
       groups[g.name] = g.total_vacancies
       readjust_groups[g.name] = 0
     end
+    self.check_groups!
 
     machine_should_raise = [
       Admissions::RankingConfig::EXCEPTION_CONDITION,
@@ -54,63 +83,67 @@ class Admissions::AdmissionProcessRanking < ActiveRecord::Base
       processes = rconfig.ranking_processes.where(step: step).order(:order).select do |process|
         remaing_vacancies = process.calculate_remaining(groups, process_vacancies)
         process_vacancies[process.id] = remaing_vacancies
-        readjust_process_vacancies[process.id] = 0
         remaing_vacancies > 0
       end
-      candidates.each_with_index do |candidate, index|
-        next if !candidate[:__position].nil?
-        processes.each do |process|
-          if candidate[:__candidate].satisfies_condition(
-            process.ranking_machine.form_condition,
-            fields: candidate[:__fields],
-            should_raise: machine_should_raise
-          )
-            machine = process.ranking_machine.name
-            machine = "#{machine}/#{step}" if step != 1
-            candidate_position = position
-            self.set_candidate_position(candidate, process, position, machine)
-            position += 1
-            if !process.decrease_vacancies_and_check_remaining!(groups, process_vacancies)
-              processes.delete(process)
-            end
-            # Check ties
-            ((index + 1)..(candidates.size - 1)).each do |next_index|
-              next_candidate = candidates[next_index]
-              if next_candidate[:__candidate].satisfies_condition(
-                process.ranking_machine.form_condition,
-                fields: next_candidate[:__fields],
-                should_raise: machine_should_raise
-              )
-                break if Admissions::AdmissionProcessRanking.compare_candidates(
-                  columns, candidate, next_candidate
-                ) != 0
-                self.set_candidate_position(next_candidate, process, candidate_position, machine)
-                position += 1
-                ngroups = groups
-                nprocess_vacancies = process_vacancies
-                if process_vacancies[process.id] == 0 || (process.group.present? && groups[process.group] == 0)
-                  ngroups = readjust_groups
-                  nprocess_vacancies = readjust_process_vacancies
-                end
-                if !process.decrease_vacancies_and_check_remaining!(ngroups, nprocess_vacancies)
-                  processes.delete(process)
-                end
-              end
-            end
-            break
+      # Candidates tied in every column are ranked together. Each one enters the
+      # first process it satisfies among those with a vacancy, of their own and
+      # of their group, when the tie is reached: once another of them takes the
+      # last one, the others still enter beyond the vacancies, and the excess
+      # is taken from the next step. Those of the same process share a
+      # position, and the processes keep their order.
+      candidates.chunk_while do |first, second|
+        Admissions::AdmissionProcessRanking.compare_candidates(columns, first, second) == 0
+      end.each do |tied|
+        open = processes.select { |p| p.calculate_remaining(groups, process_vacancies) > 0 }
+        entered = {}
+        tied.each do |candidate|
+          next if !candidate[:__position].nil?
+          process = open.find do |p|
+            candidate[:__candidate].satisfies_condition(
+              p.ranking_machine.form_condition,
+              fields: candidate[:__fields],
+              should_raise: machine_should_raise
+            )
           end
+          next if process.nil?
+          if process.calculate_remaining(groups, process_vacancies) > 0
+            process.decrease_vacancies!(groups, process_vacancies)
+          else
+            # Each process belongs to a single step: only its group carries the
+            # excess to the next one
+            process.decrease_group!(readjust_groups)
+          end
+          (entered[process] ||= []) << candidate
+        end
+        processes.each do |process|
+          next if !entered.key?(process)
+          machine = process.ranking_machine.name
+          machine = "#{machine}/#{step}" if step != 1
+          entered[process].each do |candidate|
+            self.set_candidate_position(candidate, process, position, machine)
+          end
+          position += entered[process].size
         end
       end
       readjust_groups.each do |key, value|
         groups[key] += value
         readjust_groups[key] = 0
       end
-      readjust_process_vacancies.each do |key, value|
-        process_vacancies[key] += value
-        readjust_process_vacancies[key] = 0
-      end
     end
     candidates
+  end
+
+  # Configurations saved before the validation of groups, or a group renamed
+  # on its own, would leave a process without a limit of group
+  def check_groups!
+    names = self.ranking_config.ranking_groups.map(&:name)
+    self.ranking_config.ranking_processes.each do |process|
+      next if process.group.blank? || names.include?(process.group)
+      raise Exceptions::MissingGroupException.new(I18n.t(
+        "errors.admissions/admission_process_ranking.group_not_found",
+        group: process.group
+      ))
+    end
   end
 
   def set_candidate_position(candidate, process, position, machine)

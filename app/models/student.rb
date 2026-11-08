@@ -96,10 +96,6 @@ class Student < ApplicationRecord
     nil
   end
 
-  def mount_uploader_name
-    :photo
-  end
-
   def changed_to_different_user
     if (user_id_changed?) && (!user_id.blank?) && (!user_id_was.blank?)
       errors.add(:user, :changed_to_different_user)

@@ -39,15 +39,15 @@ RSpec.describe Allocation, type: :model do
     describe "start_end_time_validation" do
       context "should be valid when" do
         it "end_time is greater_than_start_time" do
-          allocation.start_time = (Time.now.at_beginning_of_day + 10.hours).hour
-          allocation.end_time = (Time.now.at_beginning_of_day + 12.hours).hour
+          allocation.start_time = (Time.current.at_beginning_of_day + 10.hours).hour
+          allocation.end_time = (Time.current.at_beginning_of_day + 12.hours).hour
           expect(allocation).to have(0).errors_on :start_time
         end
       end
       context "should have error end_time_before_start_time when" do
         it "start_time is greater_than_end_time" do
-          allocation.end_time = (Time.now.at_beginning_of_day + 10.hours).hour
-          allocation.start_time = (Time.now.at_beginning_of_day + 12.hours).hour
+          allocation.end_time = (Time.current.at_beginning_of_day + 10.hours).hour
+          allocation.start_time = (Time.current.at_beginning_of_day + 12.hours).hour
           expect(allocation).to have_error(:end_time_before_start_time).on :start_time
         end
       end
@@ -55,9 +55,9 @@ RSpec.describe Allocation, type: :model do
     describe "scheduling_conflict_validation" do
       context "should be valid when" do
         it "does not exists a scheduling conflict" do
-          @destroy_later << other_allocation = FactoryBot.create(:allocation, start_time: (Time.now.at_beginning_of_day + 10.hours).hour, end_time: (Time.now.at_beginning_of_day + 12.hours).hour)
-          allocation.start_time = (Time.now.at_beginning_of_day + 7.hours).hour
-          allocation.end_time = (Time.now.at_beginning_of_day + 9.hours).hour
+          @destroy_later << other_allocation = FactoryBot.create(:allocation, start_time: (Time.current.at_beginning_of_day + 10.hours).hour, end_time: (Time.current.at_beginning_of_day + 12.hours).hour)
+          allocation.start_time = (Time.current.at_beginning_of_day + 7.hours).hour
+          allocation.end_time = (Time.current.at_beginning_of_day + 9.hours).hour
           allocation.course_class = other_allocation.course_class
           allocation.day = other_allocation.day
           expect(allocation).to have(0).errors_on :start_time
@@ -66,18 +66,18 @@ RSpec.describe Allocation, type: :model do
       end
       context "should have error scheduling_conflict when" do
         it "start_time between another allocation's start_time and end_time" do
-          @destroy_later << other_allocation = FactoryBot.create(:allocation, start_time: (Time.now.at_beginning_of_day + 10.hours).hour, end_time: (Time.now.at_beginning_of_day + 12.hours).hour)
-          allocation.start_time = (Time.now.at_beginning_of_day + 11.hours).hour
-          allocation.end_time = (Time.now.at_beginning_of_day + 13.hours).hour
+          @destroy_later << other_allocation = FactoryBot.create(:allocation, start_time: (Time.current.at_beginning_of_day + 10.hours).hour, end_time: (Time.current.at_beginning_of_day + 12.hours).hour)
+          allocation.start_time = (Time.current.at_beginning_of_day + 11.hours).hour
+          allocation.end_time = (Time.current.at_beginning_of_day + 13.hours).hour
           allocation.course_class = other_allocation.course_class
           allocation.day = other_allocation.day
           expect(allocation).to have_error(:scheduling_conflict).on :start_time
           expect(allocation).to have(0).errors_on :end_time
         end
         it "end_time between another allocation's start_time and end_time" do
-          @destroy_later << other_allocation = FactoryBot.create(:allocation, start_time: (Time.now.at_beginning_of_day + 10.hours).hour, end_time: (Time.now.at_beginning_of_day + 12.hours).hour)
-          allocation.start_time = (Time.now.at_beginning_of_day + 9.hours).hour
-          allocation.end_time = (Time.now.at_beginning_of_day + 11.hours).hour
+          @destroy_later << other_allocation = FactoryBot.create(:allocation, start_time: (Time.current.at_beginning_of_day + 10.hours).hour, end_time: (Time.current.at_beginning_of_day + 12.hours).hour)
+          allocation.start_time = (Time.current.at_beginning_of_day + 9.hours).hour
+          allocation.end_time = (Time.current.at_beginning_of_day + 11.hours).hour
           allocation.course_class = other_allocation.course_class
           allocation.day = other_allocation.day
           expect(allocation).to have_error(:scheduling_conflict).on :end_time

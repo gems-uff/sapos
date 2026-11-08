@@ -24,8 +24,4 @@ module PapersHelper
       ) + hidden_field(:record, :period, options)
     end
   end
-
-  def reason_group_form_column(record, options)
-    "aaaa"
-  end
 end

@@ -25,7 +25,7 @@ class ClassSchedule < ApplicationRecord
   end
 
   def show_period_end?(now = nil)
-    now ||= Time.now
+    now ||= Time.current
     self.period_end && self.period_end - 7.days <= now
   end
 
@@ -34,22 +34,22 @@ class ClassSchedule < ApplicationRecord
   end
 
   def main_enroll_open?(now = nil)
-    now ||= Time.now
+    now ||= Time.current
     self.enrollment_start <= now && now <= self.enrollment_end
   end
 
   def adjust_enroll_insert_open?(now = nil)
-    now ||= Time.now
+    now ||= Time.current
     self.period_start <= now && now <= self.enrollment_insert
   end
 
   def adjust_enroll_remove_open?(now = nil)
-    now ||= Time.now
+    now ||= Time.current
     self.period_start <= now && now <= self.enrollment_remove
   end
 
   def enroll_open?(now = nil)
-    now ||= Time.now
+    now ||= Time.current
     return true if main_enroll_open?(now)
     return true if adjust_enroll_insert_open?(now)
     return true if adjust_enroll_remove_open?(now)
@@ -57,29 +57,29 @@ class ClassSchedule < ApplicationRecord
   end
 
   def open_for_removing_class_enrollments?(now = nil)
-    now ||= Time.now
+    now ||= Time.current
     main_enroll_open?(now) || adjust_enroll_remove_open?(now)
   end
 
   def open_for_inserting_class_enrollments?(now = nil)
-    now ||= Time.now
+    now ||= Time.current
     main_enroll_open?(now) || adjust_enroll_insert_open?(now)
   end
 
   def self.arel_main_enroll_open?(now = nil)
-    now ||= Time.now
+    now ||= Time.current
     ClassSchedule.arel_table[:enrollment_start].lteq(now)
     .and(ClassSchedule.arel_table[:enrollment_end].gteq(now))
   end
 
   def self.arel_adjust_enroll_insert_open?(now = nil)
-    now ||= Time.now
+    now ||= Time.current
     ClassSchedule.arel_table[:period_start].lteq(now)
     .and(ClassSchedule.arel_table[:enrollment_insert].gteq(now))
   end
 
   def self.arel_adjust_enroll_remove_open?(now = nil)
-    now ||= Time.now
+    now ||= Time.current
     ClassSchedule.arel_table[:period_start].lteq(now)
     .and(ClassSchedule.arel_table[:enrollment_remove].gteq(now))
   end

@@ -53,7 +53,9 @@ class QueryParam < ApplicationRecord
         val
       when VALUE_TIME
         begin
-          Time.parse(val)
+          # Time.zone.parse devolve nil, em vez de levantar, quando o texto
+          # nao tem hora nenhuma ("abc", ""); a validacao depende da excecao.
+          Time.zone.parse(val) || raise(ArgumentError)
         rescue ArgumentError
           self.errors.add :default_value, :invalid_time
         end
@@ -101,7 +103,7 @@ class QueryParam < ApplicationRecord
           DateTime.parse(value)
         end
       when VALUE_TIME
-        Time.parse(value)
+        Time.zone.parse(value) || raise(ArgumentError, "no time information in #{value.inspect}")
       when VALUE_LIST
         list_value = value.split(",")
         if list_value.find { |i| i =~ /[^0-9.]/ }

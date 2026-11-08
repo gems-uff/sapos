@@ -110,6 +110,7 @@ RSpec.describe Ability, type: :model do
     it "manages the academic domain" do
       expect(ability).to be_able_to(:manage, Student)
       expect(ability).to be_able_to(:manage, Professor)
+      expect(ability).to be_able_to(:manage, AdvisementAuthorization)
       expect(ability).to be_able_to(:manage, Scholarship)
       expect(ability).to be_able_to(:manage, Course)
       expect(ability).to be_able_to(:manage, Query)
@@ -150,6 +151,7 @@ RSpec.describe Ability, type: :model do
     it "manages the academic domain like the other managers" do
       expect(ability).to be_able_to(:manage, Student)
       expect(ability).to be_able_to(:manage, Enrollment)
+      expect(ability).to be_able_to(:manage, AdvisementAuthorization)
       expect(ability).to be_able_to(:manage, Course)
       expect(ability).to be_able_to(:read, :pendency)
       expect(ability).to be_able_to(:read_pendencies, ClassEnrollmentRequest)
@@ -271,6 +273,25 @@ RSpec.describe Ability, type: :model do
       expect(ability).not_to be_able_to(:destroy, other_professor_row)
       expect(ability).not_to be_able_to(:update, other_student_row)
       expect(ability).not_to be_able_to(:destroy, other_student_row)
+    end
+
+    # Accreditation is a decision taken about the professor, not by him. The
+    # only thing standing between a professor and his own accreditation record
+    # is AdvisementAuthorization sitting in PROFESSOR_MODELS, which the
+    # professor branch of initialize_professors grants as :read -- a line added
+    # to that branch would hand it over silently, and no other example here
+    # would notice. The own-record assertion is what pins it: CanCan answers
+    # :update over the instance too, and the rule carries no ownership
+    # condition that could flip the answer.
+    it "reads accreditations without changing its own" do
+      own = AdvisementAuthorization.new(professor: @professor)
+
+      expect(ability).to be_able_to(:read, AdvisementAuthorization)
+      expect(ability).not_to be_able_to(:create, AdvisementAuthorization)
+      expect(ability).not_to be_able_to(:update, AdvisementAuthorization)
+      expect(ability).not_to be_able_to(:destroy, AdvisementAuthorization)
+      expect(ability).not_to be_able_to(:update, own)
+      expect(ability).not_to be_able_to(:destroy, own)
     end
 
     # An ownerless paper never reaches the database -- Paper#owner is

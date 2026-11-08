@@ -6,7 +6,9 @@
 
 module SaposLiquidFilters
   def localize(date, format = :default)
-    time = ((date.class == String) ? Time.parse(date) : date.to_time)
+    # No fuso da aplicacao: Date#to_time e Time.parse seguiriam o do sistema.
+    time = ((date.class == String) ? Time.zone.parse(date) : date.in_time_zone)
+    raise ArgumentError, "no time information in #{date.inspect}" if time.nil?
     I18n.localize(time, format: format.to_sym)
   end
 

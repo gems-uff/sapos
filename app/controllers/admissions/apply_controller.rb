@@ -91,13 +91,21 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
         id: @admission_application.token
       ), notice: notice
     else
-      # Temporary log to understand the reason of why submission is failing
+      # Formulário que a validação do cliente deixou passar e o servidor
+      # recusou (issue #605). O e-mail leva o motivo técnico, atributo e tipo
+      # de cada erro; o que o candidato preencheu fica no log do servidor, que
+      # já registra os parâmetros da requisição, junto com as mensagens.
+      Rails.logger.warn(
+        "Inscrição recusada no servidor: " +
+        @admission_application.errors.full_messages.join("; ")
+      )
       ExceptionNotifier.notify_exception(
         Exception.new("Validação javascript de seleção falhou e form com erro chegou no servidor"),
+        env: request.env,
         data: {
-          params:,
-          full_messages: @admission_application.errors.full_messages,
-          errors: @admission_application.errors
+          errors: @admission_application.errors.map do |error|
+            "#{error.attribute}: #{error.type}"
+          end
         }
       )
       if !was_filled

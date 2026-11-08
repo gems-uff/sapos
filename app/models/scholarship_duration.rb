@@ -73,7 +73,7 @@ class ScholarshipDuration < ApplicationRecord
 
   def init
     if self.start_date.nil?
-      self.start_date = Date.today.beginning_of_month + 1.month
+      self.start_date = Date.current.beginning_of_month + 1.month
     end
     self.update_end_date
   end
@@ -205,7 +205,7 @@ class ScholarshipDuration < ApplicationRecord
   end
 
   def active?(options = {})
-    date = options[:date].nil? ? Date.today : options[:date].to_date
+    date = options[:date].nil? ? Date.current : options[:date].to_date
     return false if date < self.start_date
     return self.end_date.end_of_month >= date if self.cancel_date.nil?
     (self.cancel_date - 1.month).end_of_month >= date

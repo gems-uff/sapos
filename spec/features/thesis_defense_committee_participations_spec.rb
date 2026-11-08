@@ -32,7 +32,7 @@ RSpec.describe "ThesisDefenseCommitteeParticipations features", type: :feature d
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status)
 
-    @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment1, date: Date.today, dismissal_reason: @dismissal_reason)
+    @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment1, date: Date.current, dismissal_reason: @dismissal_reason)
 
     @destroy_all << @record = FactoryBot.create(:thesis_defense_committee_participation, enrollment: @enrollment1, professor: @professor1)
     @destroy_all << FactoryBot.create(:thesis_defense_committee_participation, enrollment: @enrollment2, professor: @professor2)

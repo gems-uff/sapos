@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :program_level do
     sequence(:level)
-    start_date { Time.now }
+    start_date { Time.current }
     end_date { nil }
   end
 end

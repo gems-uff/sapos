@@ -86,11 +86,11 @@ module EnrollmentRequestsHelper
       tr_class = count.even? ? "even-record" : ""
 
       body += "<tr class=\"record #{tr_class}\">
-                  <td>#{cer.action}</td>
-                  <td>#{cer.status}</td>
-                  <td>#{cer.course_class.to_label}</td>
-                  <td>#{cer.allocations}</td>
-                  <td>#{cer.professor}</td>
+                  <td>#{h(cer.action)}</td>
+                  <td>#{h(cer.status)}</td>
+                  <td>#{h(cer.course_class.to_label)}</td>
+                  <td>#{h(cer.allocations)}</td>
+                  <td>#{h(cer.professor)}</td>
                 </tr>"
     end
 
@@ -123,8 +123,8 @@ module EnrollmentRequestsHelper
       tr_class = count.even? ? "even-record" : ""
 
       body += "<tr class=\"record #{tr_class}\">
-                  <td>#{comment.user.to_label}</td>
-                  <td>#{comment.message}</td>
+                  <td>#{h(comment.user.to_label)}</td>
+                  <td>#{h(comment.message)}</td>
                   <td>#{I18n.l(comment.created_at, format: :defaultdatetime)}</td>
                 </tr>"
     end

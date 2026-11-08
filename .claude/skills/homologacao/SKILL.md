@@ -41,7 +41,12 @@ não há como separar diferença de código de diferença de ambiente.
 export SAPOS_STAGING_URL=https://.../staging
 export SAPOS_STAGING_USER=...
 export SAPOS_STAGING_PASS='...'   # aspas SIMPLES: protegem espaço, $, ! e crase
+export SAPOS_STAGING_SSH=...         # host do ssh do servidor de homologação
+export SAPOS_STAGING_INSTANCE=...    # usuário unix da instância (aplicação em ~/instance)
 ```
+
+As duas últimas servem às sondas que precisam do servidor, não só da tela —
+hoje, a limpeza do `probe_submissao.rb`.
 
 Carregue com `set -a; source ~/.sapos_staging_env; set +a` antes de cada script.
 
@@ -53,7 +58,9 @@ A ordem importa: escrita muda o que a captura enxerga, então cada lado escreve
 1. **Deploy da versão atual de produção** em homologação.
 2. **Passada de escrita no lado "antes"** — ver "Passada de escrita". Os scripts
    se limpam sozinhos, então o lado volta ao estado em que começou.
-3. **Captura "antes"** — os três conjuntos, em diretórios separados.
+3. **Captura "antes"** — os três conjuntos, em diretórios separados. Com
+   instrumento novo, duas vezes seguidas: é o controle A/A (ver "Verifique o
+   instrumento, não só o sistema").
 4. **Ações de escrita adicionais** que a rodada queira exercitar e que **não** se
    limpam (disparo de notificação, por exemplo), e **recaptura** dos conjuntos
    afetados, para que os dois lados reflitam o mesmo estado.
@@ -71,6 +78,12 @@ uma delas mudar no meio do ciclo — rota acrescentada, rota removida —, captu
 "depois" com a lista que produziu o "antes" (`git show <commit>:<arquivo>` para
 um caminho fora do repositório) e só então adote a nova. Sem isso a comparação
 acusa a rota que você mexeu, misturada com o que ela deveria medir.
+
+**A réplica padrão vem sem a tabela `versions`**: o `migrate.sh` do servidor só
+a copia com o parâmetro `full`. Mudança que lê o paper_trail — migration que
+reconstrói histórico a partir das versões, tela de log — homologada sobre a
+réplica padrão roda sobre tabela vazia e passa sem medir nada. Peça ao
+mantenedor a réplica `full` antes do passo 1.
 
 ### Onde as capturas ficam
 
@@ -197,7 +210,10 @@ Duas regras:
 ## Verifique o instrumento, não só o sistema
 
 Um comparador quebrado também devolve "nenhuma diferença", e é o mesmo resultado
-que "nada regrediu". Três checagens separam os dois, e nenhuma é opcional:
+que "nada regrediu". As checagens abaixo separam os dois. As cinco primeiras valem
+em toda rodada; as duas últimas, sempre que o instrumento for novo — lista de
+rotas, navegador ou papel que nenhuma rodada anterior capturou, ou script de
+captura ou de comparação alterado desde a última vez que passou por elas.
 
 - **Contagem sem normalizar.** O `compare_html.rb` imprime quantas páginas
   diferem **sem** neutralizar o cabeçalho. Como as duas versões têm strings de
@@ -210,6 +226,71 @@ que "nada regrediu". Três checagens separam os dois, e nenhuma é opcional:
   perfeitamente entre "antes" e "depois" — passa por "sem diferença" sem nunca
   ter sido vista. O `capture_html.rb` avisa (`SESSAO PERDIDA`) comparando a URL
   final; se o aviso aparecer, aquelas rotas não valem como evidência.
+- **Rota sem captura num dos lados é "não comparada", nunca igual.** Os
+  comparadores acusam só parte disso: o `compare_html.rb` lista a rota que falta
+  num dos `results.json` (`so no antes`, `so no depois`) e a que ficou sem PNG;
+  o `compare_binary.rb`, só a que falta no "depois". O resto passa calado. Rota
+  cuja navegação falhou nos dois lados grava texto vazio nos dois, e vazio casa
+  com vazio; PDF ou planilha que não saiu em nenhum dos lados fica com zero
+  artefatos nos dois, e o comparador não imprime linha nenhuma. Confira à mão,
+  em cada par:
+
+  ```bash
+  ruby -rjson -e '
+    a, b = ARGV.map { |f| JSON.parse(File.read(f)).to_h { |r| [r["route"], r] } }
+    puts "so no depois: #{(b.keys - a.keys).join(", ")}"
+    { "antes" => a, "depois" => b }.each do |lado, rotas|
+      rotas.each_value do |r|
+        puts "#{lado} #{r["route"]}: #{r["error"] || "0 artefatos"}" if r["error"] || r["artifacts"] == 0
+      end
+    end' $ANTES/bin/results_binary.json $DEPOIS/bin/results_binary.json
+  ```
+
+  O mesmo comando serve para `html/results.json` e `extra/results.json`, onde
+  só o erro conta. No binário, toda resposta que não é 200 sai com zero
+  artefatos, então o ruído conhecido aparece ali também. E rota que respondeu o
+  mesmo erro nos dois lados comparou a página de erro, não a tela: fora do ruído
+  conhecido, também é não comparada. O que não foi comparado entra no relatório,
+  com o motivo.
+- **Toda diferença declarada tem de aparecer.** A lista de diferenças esperadas
+  (passo 8 da `safe-refactor`; numa revisão, passo 2 da `revisar-pr`) é também
+  checagem do instrumento. Diferença declarada que não aparece na comparação
+  mostra que o instrumento não a alcança — não que a mudança ficou sem efeito.
+  Antes de concluir, meça pelo caminho que alcança: rota acrescentada às listas
+  nos dois lados, sonda da camada exploratória, e para widget ver "Zero diferença
+  na estática não é evidência sobre widget".
+- **Controle A/A.** Com instrumento novo, capture o "antes" duas vezes seguidas,
+  no mesmo deploy e sem escrita entre elas (`$ANTES/aa/{html,extra,bin}` para a
+  segunda), e compare as duas. Mesmo código, mesmo banco: o que diferir ali
+  varia entre duas execuções idênticas, e toda diferença do mesmo tipo no A/B é
+  suspeita até ser entendida. O esperado no A/A é pouco — `/reports` e
+  `/versions`, que a captura alimenta (ver "Duas rotas divergem sempre"), e o
+  rodapé com a hora de geração dos PDFs. As contagens de sanidade do
+  `compare_html.rb`, que medem a troca de versão, caem para perto de zero, e ali
+  isso é o correto. Qualquer
+  outra diferença se corrige no instrumento ou entra em "Ruído conhecido" com a
+  causa, antes de ler o A/B.
+- **Diferença plantada.** Com instrumento novo, prove que o comparador acusa o
+  que deve: copie uma captura, plante uma diferença na cópia e compare a
+  original com ela, de modo que a plantada seja a única diferença que existe.
+  `<rota>` é o nome de um arquivo qualquer de `html/txt/`, sem extensão, e
+  `<doc>` um diretório de `bin/pages/` que tenha PNG:
+
+  ```bash
+  P=$ANTES-plantada; cp -R $ANTES $P
+  echo "LINHA PLANTADA" >> $P/html/txt/<rota>.txt
+  magick $P/html/png/<rota>.png -fill red -draw "rectangle 20,20 120,120" $P/html/png/<rota>.png
+  magick $P/bin/pages/<doc>/p-000.png -fill red -draw "rectangle 20,20 120,120" $P/bin/pages/<doc>/p-000.png
+  ruby $S/compare_html.rb   $ANTES/html $P/html
+  ruby $S/compare_binary.rb $ANTES/bin  $P/bin
+  rm -rf $P
+  ```
+
+  Passa quando o `compare_html.rb` acusa exatamente aquela rota em "texto
+  diferente" e num grupo de pixel só dela, e o `compare_binary.rb` exatamente
+  aquela página — e as contagens de `[sanidade]` saem 1, não altas, porque os
+  dois lados são a mesma captura. A cópia tem dado real — ela fica na pasta das
+  capturas e sai ao fim.
 
 ## Camada exploratória (interativa) — o que a varredura estática não alcança
 
@@ -242,6 +323,27 @@ EXPLORE_OUT=$ANTES/exploratorio ROTULO=antes bundle exec ruby $S/probe_widgets.r
 Comparar é diferenciar os dois JSON. Para medir o que ele não mede, acrescente
 seção **e recapture os dois lados**: sonda alterada no meio da rodada mede o
 instrumento, não a aplicação.
+
+O `probe_widgets.rb` mede por amostra e força o bind. Quando o upgrade toca
+`recordselect`, jquery-ui ou o active_scaffold, rode também o
+`probe_campos_widgets.rb`: ele passa por todas as rotas de `routes_html.txt` e,
+em cada formulário (`new` em página inteira, `Adicionar` e `Buscar` por AJAX),
+digita um caractere em **todo** `record_select` e abre **todo** datepicker, sem
+forçar nada e sem submeter.
+
+```bash
+EXPLORE_OUT=$LADO/campos ROTULO=antes bundle exec ruby $S/probe_campos_widgets.rb
+```
+
+Duas leituras do resultado:
+
+- **`dropdown_itens: 0` não distingue busca vazia de busca que respondeu 500.**
+  É a única sonda que faz a busca do `record_select` com termo, caminho que a
+  suíte quase não exercita; conte os 500 do log do servidor no intervalo dela,
+  nos dois lados, e compare a contagem por rota.
+- **Os ids de subform mudam a cada carregamento**, então o nome do campo difere
+  entre os dois JSON sem que nada tenha mudado. Neutralize os ids numéricos
+  antes de diferenciar.
 
 ### Voltar e submeter — o bug que o `autocomplete="off"` contornava
 
@@ -379,6 +481,16 @@ Campo de arquivo **com** arquivo gravado sem `required` é o esperado: o navegad
 não pré-preenche input de arquivo, e marcar `required` ali trava a submissão
 inteira em silêncio. A exigência fica no servidor.
 
+O **texto** das mensagens dessas validações também se lê sem submeter, e é o
+que o `probe_mensagens_validacao.rb` faz: na edição com override, liga os
+toggles só no navegador, monta o estado que reprova cada validação (data
+inválida, radio e checkbox desmarcados, arquivo grande e depois de extensão
+estranha), chama as funções e lê a mensagem de cada campo, junto com os erros
+de console ao carregar a página. Use quando a mudança tocar o JavaScript dos
+parciais de `filled_form/edit` — script de campo que quebra ao carregar aparece
+ali, e em nenhuma foto. Passe no "depois" os mesmos ids do "antes"; só as
+candidaturas de processo com `staff_can_edit` montam o formulário.
+
 ### Submeter o formulário, que é o que a leitura não alcança
 
 Ler prova o que a página **exige**; só submeter prova o que ela **faz**. O
@@ -481,7 +593,9 @@ lados enxergam a mesma coisa. O rastro que sobra é linha em `/versions` e
 
 ```bash
 # passo 0: o valor VIVO de redirect_email (ver "Regras de segurança"). Sai 0 na
-# trava (""), 1 com endereco (redireciona), 2 AUSENTE (nil: PERIGO, nao escreva).
+# trava (""), 1 com endereco (redireciona), 2 AUSENTE (nil: PERIGO, nao escreva),
+# 3 sem medida (a tela nao listou nada). Roda tambem com a conta de papel unico
+# que a reimportacao deixa, entao vem antes do preparar_aluno_de_teste.rb.
 EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/conferir_redirect_email.rb
 # LADO=$ANTES antes de capturar o antes; LADO=$DEPOIS antes de capturar o depois.
 EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/probe_escrita.rb              # diagnostico
@@ -509,7 +623,23 @@ O que cada um cobre, e o que ler no relatório:
 - `probe_submissao.rb --confirmar` — formulário público de candidatura de ponta
   a ponta: `criou: true` na fase 2 e `restantes com o marcador: 0` na limpeza.
   **Resíduo na réplica é defeito da rodada**, não da aplicação: se sobrar
-  registro com o marcador, apague antes de seguir.
+  registro com o marcador, apague antes de seguir. A limpeza pela tela apaga a
+  candidatura, mas não o formulário preenchido dela — a candidatura só faz
+  `belongs_to` dele, sem `dependent`, e a tela de formulários não tem exclusão.
+  Por isso a sonda apaga o formulário órfão no servidor (`rails runner` por
+  ssh, com `SAPOS_STAGING_SSH` e `SAPOS_STAGING_INSTANCE`), e a linha
+  `formularios orfaos com o marcador` tem de dizer `restantes 0`. `NAO
+  VERIFICADO` deixa um formulário de ~50 campos para trás a cada rodada, e a
+  contagem de `/filled_forms` e `/filled_form_fields` passa a divergir entre as
+  fotos.
+- `probe_salvar_candidatura.rb <ids>` — quando a mudança toca o salvar da
+  edição de candidatura (`assign_form`, formulários de fase, validação de
+  `FilledFormField`). Salva a edição com override **sem mudar valor**, uma vez
+  com os formulários desligados e outra com o de inscrição ligado, e lê o estado
+  pela tela de exibição antes e depois. Compara-se `resultado` e `estado_mudou`
+  entre os lados. "Barrado no navegador" com o formulário de inscrição ligado
+  costuma ser dado real: campo com `required` nativo vazio, que o candidato
+  deixou em branco antes de o template passar a exigir.
 
 O que a passada **não** cobre, e por isso não se conclui dela: disparo de e-mail.
 Só exercite e-mail quando a mudança tocar Devise, `lib/notifier.rb`, template de
@@ -578,8 +708,9 @@ O combo de troca de papel só aparece depois do passo 2 (ele exige dois papéis)
 A réplica não tem processo seletivo aberto, e **todos os processos dela vêm com
 `require_session` ligado** — que faz o `prepare_new_admission_application`
 desviar antes de o pedido chegar ao controller. São dois campos a mexer, não só
-a data. O `abrir_processo_seletivo.rb` abre, exercita e reverte os dois na mesma
-execução, conferindo o que gravou.
+a data de fim; e três quando o processo é novo, com o início ainda no futuro. O
+`abrir_processo_seletivo.rb abrir` guarda os originais e abre; o `fechar` os
+restaura e confere o que gravou.
 
 Prefira exercitar o **create**: ele só precisa do processo aberto, enquanto o
 update exigiria o token de uma inscrição de candidato real.
@@ -616,6 +747,13 @@ captura consiga exercitar tanto a inscrição quanto o período de ajustes.
 - **`execute_script` derruba o chromedriver na tela de novo Quadro de Horários**
   (medido duas vezes seguidas). Nas telas com datepicker, prefira
   `find_element` e `page_source` a JS injetado.
+- **O "Remover" do subform não marca para destruição: ele apaga a linha.** O link
+  tira o `<tr>` do DOM e não deixa nenhum input `_destroy` — a remoção viaja por
+  omissão, e o active_scaffold substitui a associação pelo conjunto submetido
+  (não há `accepts_nested_attributes_for` para ela). Consequência para quem for
+  medir validação: **por esta tela nada fica `marked_for_destruction?`**, então
+  código guardado por essa condição não é exercitado daqui, e sonda montada sobre
+  ela mede o caminho errado.
 - **Confirme pela lista, nunca pela ausência de erro na tela** — ver o 500 abaixo,
   que grava o registro e mostra "Internal Error" ao mesmo tempo.
 
@@ -651,6 +789,13 @@ São diferença de **conteúdo**, não de status, então não entram na lista ac
 Antes de investigar qualquer uma, olhe a autoria e o horário das linhas novas: se
 forem da conta de captura, no intervalo da rodada, são pegada do instrumento.
 
+**Sonda que liga o aluno de teste a alguém faz a página desse alguém divergir.**
+O cenário do `probe_orientador_credenciado.rb`, por exemplo, põe o aluno de teste
+na tabela de orientandos de um professor real: a rota dele sai de "-" para uma
+linha com o marcador, e isso aparece como a maior diferença de pixel da rodada.
+Antes de investigar uma rota que divergiu sozinha, procure o marcador
+`ZZ-TESTE-HOMOLOG` no diff do texto — achando, é pegada, não regressão.
+
 ### Não confunda template oculto com erro na tela
 
 O active_scaffold deixa no DOM, **oculto**, um painel
@@ -671,6 +816,13 @@ JS
 
 E cruze com a rede: sem resposta não-2xx no log de performance **e** sem 500 no
 `log/production.log` do servidor, o erro está na sua sonda, não na aplicação.
+
+**A recusa de gravação não sai em `.errorExplanation` nem em `.error-message`.**
+Ela vem num bloco próprio, encabeçado por "Não foi possível gravar", e repetido
+dentro do subform que causou o erro. Sonda que procura só pelas classes clássicas
+devolve `nil` numa tela que recusou — e `nil` ali se lê como "salvou", que é o
+veredito oposto. Procure pelo texto, exigindo visibilidade, e tire screenshot: é
+ela que desempata quando a leitura do DOM e o resultado discordam.
 
 ## Regras de segurança
 

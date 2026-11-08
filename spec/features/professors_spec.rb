@@ -234,6 +234,63 @@ RSpec.describe "Professors features", type: :feature do
     end
   end
 
+  # Os credenciamentos também se editam no formulário de Professor, um período
+  # por linha. O professor é do exemplo: os do before(:all) são lidos pelos
+  # outros grupos, e a transação do exemplo desfaz o que a tela gravar.
+  describe "accreditation subform", js: true do
+    before(:each) do
+      @eva = FactoryBot.create(:professor, name: "Eva", cpf: "5")
+      @encerrado = FactoryBot.create(:advisement_authorization, professor: @eva, level: @level1,
+                                     start_date: Date.new(2015, 1, 1), end_date: Date.new(2017, 12, 31))
+      @vigente = FactoryBot.create(:advisement_authorization, professor: @eva, level: @level1,
+                                   start_date: Date.new(2018, 1, 1))
+      login_as(@user)
+      visit url_path
+      find("#as_#{plural_name}-edit-#{@eva.id}-link").click
+    end
+
+    let(:subform) { "as_#{plural_name}-#{@eva.id}-advisement_authorizations-subform" }
+
+    def linhas
+      all("##{subform}-list tbody.sub-form-record")
+    end
+
+    # O active_scaffold acrescenta uma linha em branco para o lançamento novo.
+    it "lists each accreditation period with its dates" do
+      expect(all("##{subform}-list input.start_date-input").map(&:value).reject(&:empty?))
+        .to contain_exactly("01/01/2015", "01/01/2018")
+      expect(all("##{subform}-list input.end_date-input").map(&:value).reject(&:empty?))
+        .to contain_exactly("31/12/2017")
+    end
+
+    it "adds a period in another level" do
+      click_link_and_wait "#{subform}-div-create-another"
+      within(linhas.last) do
+        find("select.level-input").select("Doutorado")
+        find("input.start_date-input").set("01/03/2019")
+        find("input.end_date-input").set("31/12/2020")
+      end
+      click_button_and_wait "Atualizar"
+
+      expect(page).to have_no_css(".as_form")
+      novo = @eva.advisement_authorizations.reload.find_by(level: @level2)
+      expect([novo&.start_date, novo&.end_date]).to eq [Date.new(2019, 3, 1), Date.new(2020, 12, 31)]
+    end
+
+    # O "Remover" tira a linha do envio. Ela tem de sair do banco, e não ficar
+    # nele sem professor.
+    it "removes a period" do
+      within(linhas.find { |linha| linha.find("input.start_date-input").value == "01/01/2015" }) do
+        click_link "Remover"
+      end
+      click_button_and_wait "Atualizar"
+
+      expect(page).to have_no_css(".as_form")
+      expect(@eva.advisement_authorizations.reload).to contain_exactly(@vigente)
+      expect(AdvisementAuthorization.exists?(@encerrado.id)).to be(false)
+    end
+  end
+
   describe "search page", js: true do
     before(:each) do
       login_as(@user)

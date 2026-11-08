@@ -107,4 +107,69 @@ RSpec.describe LiquidFormatter, type: :model do
       ).to eq("&lt;i&gt;x&lt;/i&gt;")
     end
   end
+  # Os filtros e tags que o SAPOS registra sobre o Liquid (#720). Eles usam
+  # interno da gem -- Liquid::StandardFilters::InputIterator, Liquid::Utils,
+  # Liquid::Tag e Liquid::Block --, e os templates que os chamam sao os que cada
+  # instalacao escreveu pela tela, que a suite nao conhece.
+  describe "as extensoes do SAPOS" do
+    let(:data) { Date.new(2026, 3, 10) }
+
+    it "localiza uma data pelo formato padrao" do
+      expect(render("{{ d | localize }}", { "d" => data }))
+        .to eq(I18n.localize(data.to_time, format: :default))
+    end
+
+    it "localiza pelo atalho l, com formato" do
+      expect(render("{{ d | l: 'short' }}", { "d" => data }))
+        .to eq(I18n.localize(data.to_time, format: :short))
+    end
+
+    it "localiza uma data escrita como texto" do
+      expect(render("{{ '2026-03-10' | localize }}"))
+        .to eq(I18n.localize(Time.zone.parse("2026-03-10"), format: :default))
+    end
+
+    it "tira a media" do
+      expect(render("{{ n | avg }}", { "n" => [7, 8, 9] })).to eq("8.0")
+    end
+
+    it "tira a media de uma coluna dos registros, convertendo o texto" do
+      expect(render("{{ records | avg: 'nota' }}", { columns: ["nota"], rows: [["7"], ["8.5"]] }))
+        .to eq("7.75")
+    end
+
+    it "tira a mediana de quantidade par e impar" do
+      expect(render("{{ n | median }}", { "n" => [3, 1, 2, 10] })).to eq("2.5")
+      expect(render("{{ n | median }}", { "n" => [5, 1, 3] })).to eq("3.0")
+    end
+
+    it "traduz propriedade invalida em erro do Liquid, sem derrubar a renderizacao" do
+      expect(render("{{ n | avg: 'x' }}", { "n" => [7, 8] }))
+        .to eq("Liquid error: cannot select the property 'x'")
+    end
+
+    it "lista os e-mails de quem tem o papel" do
+      papel = FactoryBot.create(:role_secretaria)
+      create_confirmed_user([papel], "sec1@ic.uff.br", "Sec Um")
+      create_confirmed_user([papel], "sec2@ic.uff.br", "Sec Dois")
+
+      expect(render("{% emails #{papel.name} %}").split(";"))
+        .to contain_exactly("sec1@ic.uff.br", "sec2@ic.uff.br")
+    end
+
+    it "troca o idioma dentro do bloco e volta depois" do
+      saida = render("{% language en %}{{ d | l: 'long' }}{% endlanguage %}|{{ d | l: 'long' }}", { "d" => data })
+
+      expect(saida).to eq(
+        "#{I18n.with_locale(:en) { I18n.localize(data.to_time, format: :long) }}|" \
+        "#{I18n.localize(data.to_time, format: :long)}"
+      )
+      expect(I18n.locale).to eq(:"pt-BR")
+    end
+
+    it "alinha com justificado quando o bloco nao diz" do
+      expect(render("{% align %}x{% endalign %}"))
+        .to eq('<div style="text-align: justify;">x</div>')
+    end
+  end
 end

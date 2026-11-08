@@ -45,8 +45,7 @@ module ApplicationHelper
   # A conversao para Date e deliberada, nao defensiva: o I18n escolhe o formato
   # pela classe do argumento, e time.formats.default e o formato longo por
   # extenso ("sabado, 08 de agosto de 2026, 14:30 h"). Sem o to_date, uma coluna
-  # datetime -- affiliations.start_date, por exemplo -- sairia nesse formato em
-  # vez de 08/08/2026.
+  # datetime sairia nesse formato em vez de 08/08/2026.
   #
   # A fonte do formato e sempre o arquivo de locale (config/locales/
   # datetime.pt-BR.yml). Nao use to_fs(:default) no codigo da aplicacao: ele le
@@ -98,8 +97,8 @@ module ApplicationHelper
       extra[:multiparameter]
     extra[:force_send] ||= extra[:force_send].nil? ? false : extra[:force_send]
     year_range = CustomVariable.month_year_range
-    start_year = Time.now.year - year_range[0]
-    end_year = Time.now.year + year_range[1]
+    start_year = Time.current.year - year_range[0]
+    end_year = Time.current.year + year_range[1]
     start_year, end_year = end_year, start_year if year_range[2]
     date_options = {
       discard_day: true,

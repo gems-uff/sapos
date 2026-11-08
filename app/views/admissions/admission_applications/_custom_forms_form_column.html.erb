@@ -18,7 +18,7 @@
     .where(sync: Admissions::FormField::SYNC_EMAIL).first.blank?
 
   can_edit_override = can?(:override, record) && admission_process.staff_can_edit && @override
-  can_edit_main = can_edit_override || current_phase.try(:can_edit_candidate)
+  can_edit_main = record.can_edit_main_form?(can_edit_override:)
   students = record.students
   student_map = {
     cpf: "CPF",
