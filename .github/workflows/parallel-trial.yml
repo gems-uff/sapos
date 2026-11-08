@@ -1,9 +1,11 @@
 # EXPERIMENTO DA #741 -- sai do ramo antes do merge, junto com
 # .github/parallel_runtime_rspec.log.
 #
-# Mede a suite com parallel_rspec no runner, nos dois navegadores, com 2 e 4
-# workers. A base serial e o job `test` do rubyonrails.yml, que roda no mesmo
-# push e no mesmo commit.
+# Mede a suite no runner com 1 (serial puro), 2 e 4 workers, nos dois
+# navegadores, tres vezes cada. Duas perguntas: quanto o paralelo ganha,
+# dado que o tempo de uma mesma rodada varia muito de uma VM para outra, e se
+# ele produz vermelho intermitente que o serial nao produz. Cada job sorteia a
+# sua seed, para amostrar ordens diferentes.
 name: "Parallel trial (#741)"
 
 on:
@@ -21,8 +23,9 @@ jobs:
       fail-fast: false
       matrix:
         browser: [chrome, firefox]
-        workers: [2, 4]
-    name: parallel (${{ matrix.browser }}, -n ${{ matrix.workers }})
+        workers: [1, 2, 4]
+        trial: [1, 2, 3]
+    name: ${{ matrix.browser }}, -n ${{ matrix.workers }}, trial ${{ matrix.trial }}
 
     services:
       mariadb:
@@ -74,7 +77,8 @@ jobs:
           cache-version: 3
 
       # Um banco por worker: sapos_test, sapos_test2, ... (o primeiro worker
-      # tem TEST_ENV_NUMBER vazio). Encoding e collation de producao.
+      # tem TEST_ENV_NUMBER vazio). Encoding e collation de producao. Com 1
+      # worker sobra so o sapos_test, como no job `test`.
       - name: Configure database.yml
         run: |
           cp config/database.yml.example config/database.yml
@@ -105,24 +109,38 @@ jobs:
 
       # Memoria usada do sistema a cada 5 s: no runner so roda este job, entao
       # o total e o custo dos N Rails + N navegadores + MariaDB.
+      #
+      # A mesma seed vai para todos os workers. Para reproduzir um vermelho do
+      # paralelo, rode em serial a lista de arquivos que o
+      # --verbose-rerun-command imprime para o worker que falhou, com ela.
       - name: Run tests
         run: |
           set -o pipefail
-          nproc
+          seed=$RANDOM
+          echo "seed sorteada: $seed"
           (while true; do free -m | awk '/^Mem:/ {print $3}'; sleep 5; done) > mem.log &
-          bundle exec parallel_rspec -n ${{ matrix.workers }} \
-            --group-by runtime --runtime-log .github/parallel_runtime_rspec.log \
-            --serialize-stdout --combine-stderr --verbose-rerun-command \
-            -o '--seed 25741 --profile 10 --format documentation --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log' \
-            spec | tee rspec.log
+          if [ "${{ matrix.workers }}" = 1 ]; then
+            bundle exec rspec --seed "$seed" --profile 10 | tee rspec.log
+          else
+            bundle exec parallel_rspec -n ${{ matrix.workers }} \
+              --group-by runtime --runtime-log .github/parallel_runtime_rspec.log \
+              --serialize-stdout --combine-stderr --verbose-rerun-command \
+              -o "--seed $seed --profile 10 --format documentation --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log" \
+              spec | tee rspec.log
+          fi
           echo "pico de memoria usada (MB): $(sort -n mem.log | tail -n 1)"
 
       - name: Registrar a contagem e a seed
         if: ${{ !cancelled() }}
         run: |
+          if [ "${{ matrix.workers }}" = 1 ]; then
+            reproduzir="SELENIUM_BROWSER=${{ matrix.browser }} bundle exec rspec"
+          else
+            reproduzir="SELENIUM_BROWSER=${{ matrix.browser }} bundle exec rspec <arquivos do worker que falhou, no log>"
+          fi
           bash .github/scripts/rspec-summary.sh rspec.log \
-            "${{ matrix.browser }}, -n ${{ matrix.workers }}" \
-            "parallel_rspec -n ${{ matrix.workers }} (comando por worker no log)"
+            "${{ matrix.browser }}, -n ${{ matrix.workers }}, trial ${{ matrix.trial }}" \
+            "$reproduzir"
           echo "- pico de memoria usada: $(sort -n mem.log | tail -n 1) MB" >> "$GITHUB_STEP_SUMMARY"
           grep -E "Line Coverage" rspec.log | tail -n 1 | sed 's/^/- /' >> "$GITHUB_STEP_SUMMARY" || true
 
@@ -130,7 +148,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: parallel-${{ matrix.browser }}-n${{ matrix.workers }}
+          name: parallel-${{ matrix.browser }}-n${{ matrix.workers }}-t${{ matrix.trial }}
           path: |
             rspec.log
             mem.log
