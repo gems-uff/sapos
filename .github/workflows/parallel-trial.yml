@@ -46,6 +46,10 @@ jobs:
       # O bin/rspec esta versionado sem bit de execucao, e o parallel_tests o
       # prefere quando existe.
       PARALLEL_TESTS_EXECUTABLE: bundle exec rspec
+      # Sem ela, o primeiro boot de teste grava tmp/local_secret.txt, e os N
+      # processos do parallel:load_schema num checkout novo correm: um le o
+      # arquivo ainda vazio e aborta com `secret_key_base ... got: ""`.
+      SECRET_KEY_BASE: chave_falsa_apenas_para_a_suite
 
     steps:
       - name: Checkout code
