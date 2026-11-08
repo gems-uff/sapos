@@ -191,6 +191,42 @@ racionalizá-la como intencional.
   faz o Capybara esperar para sempre por um elemento que nunca aparece. Aí a causa
   é a mudança, não o ambiente.
 
+### Em paralelo (opcional)
+
+O serial continua sendo o critério de pronto; o paralelo serve para iterar.
+
+Cada worker tem banco próprio (`db/test.sqlite3`, `db/test2.sqlite3`): o
+`database.yml` local precisa do `<%= ENV["TEST_ENV_NUMBER"] %>` no nome do banco
+de teste, como no `.example`. Prepare-os uma vez, e de novo a cada troca de ramo
+que mude o esquema — a armadilha do banco velho do `AGENTS.md` vale para todos:
+
+    bundle exec rake "parallel:load_schema[2]"
+
+Rodada:
+
+    PARALLEL_TESTS_EXECUTABLE='bundle exec rspec' SELENIUM_BROWSER=chrome \
+      bundle exec parallel_rspec -n 2 --serialize-stdout --combine-stderr --verbose-rerun-command \
+      -o '--seed N --format documentation --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log' spec
+
+- `PARALLEL_TESTS_EXECUTABLE`: o `parallel_tests` prefere o `bin/rspec`, que está
+  versionado sem bit de execução, e morre com `EACCES`.
+- `--format documentation` repetido: qualquer `--format` passado em `-o`
+  substitui o do `.rspec`, e a saída perde a linha de contagem.
+- O log de runtime é o que equilibra os workers: com ele em `tmp/`, a divisão
+  passa a ser por tempo; sem ele, por tamanho de arquivo, que deixa um worker com
+  o grosso das features e quase não ganha nada. A primeira rodada o grava.
+- `-n 2`: um terceiro ou quarto worker não encurta a rodada e custa um navegador
+  de memória cada. Os navegadores disputam a máquina, a soma do tempo dos
+  arquivos cresce com cada worker, e o tempo de um mesmo arquivo de feature varia
+  tanto entre rodadas que a divisão por runtime não consegue equilibrar mais que
+  dois.
+- Compare a linha agregada (`N examples, M failures, K pendings`) com o baseline
+  serial, como no passo 7. A mesma seed **não** dá a mesma ordem do serial: cada
+  worker sorteia sobre o seu subconjunto de arquivos. Para reproduzir um
+  vermelho, rode em serial o comando que o `--verbose-rerun-command` imprime para
+  o worker que falhou, com a mesma seed — e o `--bisect` sobre essa lista.
+- Apague `coverage/` antes de comparar cobertura entre rodadas.
+
 ## Quando a suíte não basta
 
 Escale para a skill `homologacao` quando a mudança tocar algo que os testes
