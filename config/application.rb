@@ -155,6 +155,14 @@ module Sapos
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
 
+    # E-mail de erro do exception_notification. Cada ambiente acrescenta só os
+    # destinatários; o resto é o mesmo, para que o spec do e-mail
+    # (spec/requests/error_email_spec.rb) exercite o que produção envia.
+    config.x.error_email = {
+      email_prefix: "[SAPOS: Error] ",
+      sender_address: %{"SAPOS Exception Notifier" <erro-sapos@sapos.ic.uff.br>},
+    }
+
     # Enable escaping HTML in JSON.
     config.active_support.escape_html_entities_in_json = true
 

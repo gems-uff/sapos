@@ -87,11 +87,9 @@ Rails.application.configure do
   config.action_mailer.sendmail_settings = { arguments: ["-i"], location: "/usr/sbin/sendmail" }
 
   config.middleware.use ExceptionNotification::Rack,
-    email: {
-      email_prefix: "[SAPOS: Error] ",
-      sender_address: %{"SAPOS Exception Notifier" <erro-sapos@sapos.ic.uff.br>},
+    email: config.x.error_email.merge(
       exception_recipients: %w{sapos-ic-uff@googlegroups.com}
-    }
+    )
 
   # Use ReCaptcha
   config.should_use_recaptcha = true
