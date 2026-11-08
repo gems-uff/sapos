@@ -29,7 +29,7 @@ RSpec.describe Report, type: :model do
     end
 
     it "is false on the expiration date itself (valid until that day)" do
-      report.expires_at = Date.today
+      report.expires_at = Date.current
       expect(report.expired?).to be false
     end
 
@@ -50,7 +50,7 @@ RSpec.describe Report, type: :model do
   # de uma vez, inclusive o proprio dia do vencimento, que e a unica data em que
   # um erro de `<` para `<=` apareceria.
   describe ".expired" do
-    let(:datas) { { Date.yesterday => true, Date.today => false, Date.tomorrow => false, nil => false } }
+    let(:datas) { { Date.yesterday => true, Date.current => false, Date.tomorrow => false, nil => false } }
 
     it "seleciona exatamente os registros que #expired? aprova" do
       criados = datas.keys.index_with do |data|
@@ -72,7 +72,7 @@ RSpec.describe Report, type: :model do
   describe "#invalidate!" do
     let(:user) { report.user }
 
-    it "apaga o arquivo armazenado e registra quem invalidou" do
+    it "desliga o arquivo e registra quem invalidou" do
       file = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.create!(
         original_filename: "documento.pdf", content_type: "application/pdf",
         binary: "conteudo", medium_hash: SecureRandom.hex(16)
@@ -83,7 +83,7 @@ RSpec.describe Report, type: :model do
 
       expect(report.reload.carrierwave_file).to be_nil
       expect(report.invalidated_by).to eq(user)
-      expect(CarrierWave::Storage::ActiveRecord::ActiveRecordFile.exists?(file.id)).to be false
+      expect(CarrierWave::Storage::ActiveRecord::ActiveRecordFile.exists?(file.id)).to be true
     end
 
     # Chamada por console num documento cuja limpeza ja rodou. Antes disso o
@@ -94,6 +94,27 @@ RSpec.describe Report, type: :model do
 
       expect { report.invalidate!(user: user) }.not_to raise_error
       expect(report.reload.invalidated_by).to eq(user)
+    end
+  end
+
+  # #invalidate! e a rotina de limpeza (#696) passam pelo mesmo metodo. O que
+  # ele garante e que a linha em carrier_wave_files NAO e apagada: a storage
+  # deduplica pelo conteudo, a mesma linha pode ser o anexo de uma inscricao,
+  # e quem apaga e so o coletor de orfaos (#597). Se alguem reintroduzir o
+  # delete aqui, e este exemplo que cai.
+  describe "#release_file!" do
+    it "desliga o report do arquivo e deixa a linha para o coletor" do
+      file = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.create!(
+        original_filename: "documento.pdf", content_type: "application/pdf",
+        binary: "conteudo", medium_hash: SecureRandom.hex(16)
+      )
+      report.update!(carrierwave_file: file)
+
+      report.release_file!
+
+      expect(report.reload.carrierwave_file_id).to be_nil
+      expect(report.invalidated_at).to be_nil
+      expect(CarrierWave::Storage::ActiveRecord::ActiveRecordFile.exists?(file.id)).to be true
     end
   end
 end

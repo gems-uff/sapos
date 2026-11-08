@@ -23,3 +23,5 @@ pt-BR:
 
   active_scaffold:
     create_admission_report_config_label: "Criar Configuração de Relatório"
+    admissions/admission_report_config:
+      ranking_columns_description: "Vazio: ordem do primeiro ranking do edital. Quem não tem as colunas vai para o fim, em ordem de nome"

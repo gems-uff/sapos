@@ -11,6 +11,8 @@ class Admissions::RankingProcess < ActiveRecord::Base
   belongs_to :ranking_machine, optional: false,
     class_name: "Admissions::RankingMachine"
 
+  validates :step, presence: true
+
   def to_label
     "#{self.ranking_machine.name} #{self.vacancies}-#{self.group}"
   end
@@ -26,14 +28,15 @@ class Admissions::RankingProcess < ActiveRecord::Base
     [existing, group_vacancies, this_vacancies].min()
   end
 
-  def decrease_vacancies_and_check_remaining!(groups, process_vacancies)
-    remaining = true
+  def decrease_vacancies!(groups, process_vacancies)
     process_vacancies[self.id] -= 1
-    remaining = false if process_vacancies[self.id] <= 0
-    if self.group.present? && !groups[self.group].nil?
-      groups[self.group] -= 1
-      remaining = false if groups[self.group] <= 0
-    end
-    remaining
+    self.decrease_group!(groups)
+  end
+
+  # A group the hash does not know raises: ignoring it would leave the process
+  # without the limit of its group
+  def decrease_group!(groups)
+    return if self.group.blank?
+    groups[self.group] = groups.fetch(self.group) - 1
   end
 end

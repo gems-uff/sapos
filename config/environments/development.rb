@@ -114,9 +114,7 @@ Rails.application.configure do
   # config.action_cable.disable_request_forgery_protection = true
 
   config.middleware.use ExceptionNotification::Rack,
-    email: {
-      email_prefix: "[SAPOS: Error] ",
-      sender_address: %{"SAPOS Exception Notifier" <erro-sapos@sapos.ic.uff.br>},
+    email: config.x.error_email.merge(
       exception_recipients: %w{letter@saposletteropener.com}
-    }
+    )
 end

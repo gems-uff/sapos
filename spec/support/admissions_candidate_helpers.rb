@@ -193,6 +193,22 @@ module AdmissionsCandidateHelpers
     raise "consolidação recusada: #{flash[:error]}" if flash[:error].present?
     flash[:info]
   end
+
+  # [posição, seletor] gravados para a candidatura no ranking, ou nil se ela
+  # não tem posição (sem resultado, ou resultado com a posição em branco).
+  def position_and_machine(ranking_link, application)
+    result = Admissions::AdmissionRankingResult.find_by(
+      ranking_config: ranking_link.ranking_config, admission_application: application
+    )
+    return nil if result.nil? || result.filled_position.value.blank?
+    [result.filled_position.value.to_i, result.filled_machine.value]
+  end
+
+  # Valor do campo no formulário de consolidação da fase.
+  def consolidation_value(application, phase, field_name)
+    result = application.results.find_by(admission_phase: phase, mode: Admissions::AdmissionPhaseResult::CONSOLIDATION)
+    result.filled_form.fields.find { |f| f.form_field.name == field_name }.value
+  end
 end
 
 RSpec.configure do |config|

@@ -21,6 +21,20 @@ class Admissions::FilledFormField < ActiveRecord::Base
 
   mount_uploader :file, FormFileUploader
 
+  # Extensoes aceitas em campo de arquivo que nao configura a propria lista
+  # ("values"): documentos, imagens, audio, video e compactados. Fica de fora o
+  # que executa no navegador ou no computador (html, svg, xml, js, exe) e o
+  # PostScript, que e linguagem de programacao. O download (FilesController) ja
+  # nao abre como pagina o que nao e PDF ou imagem; esta lista impede que o
+  # formulario publico sirva para distribuir executavel. O limite de tamanho
+  # (size_of_file) vale para todos.
+  DEFAULT_FILE_EXTENSIONS = %w[
+    pdf doc docx odt rtf txt xls xlsx
+    jpg jpeg png gif webp heic
+    mp3 m4a ogg opus mp4 mov webm
+    zip rar 7z tar.gz tgz
+  ].freeze
+
   validate :that_form_field_belongs_to_the_template,
     if: -> { self.new_record? || self.form_field_id_changed? }
   validate :that_either_value_or_file_is_filled
@@ -184,7 +198,8 @@ class Admissions::FilledFormField < ActiveRecord::Base
 
   def validate_date_field(configuration)
     return if self.value.blank?
-    format_ok = self.value.match(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/)
+    # A year of two digits would be read as one of the first century
+    format_ok = self.value.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)
     parseable = Date.strptime(self.value, "%d/%m/%Y") rescue false
     if !format_ok || !parseable
       add_error(:invalid_date)
@@ -195,13 +210,16 @@ class Admissions::FilledFormField < ActiveRecord::Base
     if configuration["required"] && (self.file.blank? || self.file.file.blank?)
       add_error(:blank)
     end
-    if configuration["values"] && !(self.file.blank? || self.file.file.blank?)
+    return if self.file.blank? || self.file.file.blank?
+    filename = self.file.filename.downcase
+    if configuration["values"]
       values = configuration["values"].dup
       values << ".jpg" if is_photo
-      filename = self.file.filename.downcase
       if values.none? { |ext| filename.end_with?(ext.downcase) }
         add_error(:extension, valid: configuration["values"].join(", "))
       end
+    elsif DEFAULT_FILE_EXTENSIONS.none? { |ext| filename.end_with?(".#{ext}") }
+      add_error(:extension, valid: DEFAULT_FILE_EXTENSIONS.join(", "))
     end
   end
 

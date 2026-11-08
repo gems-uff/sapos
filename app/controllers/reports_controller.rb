@@ -51,7 +51,7 @@ class ReportsController < ApplicationController
 
   def before_create_save(record)
     record.user = current_user
-    record.expires_at = Date.today + record.expiration_in_months.to_i.months if record.expiration_in_months.present?
+    record.expires_at = Date.current + record.expiration_in_months.to_i.months if record.expiration_in_months.present?
     document_data = { body: params[:record][:document_body], title: params[:record][:document_title], expiration_in_months: params[:record][:expiration_in_months] }
     extension = File.extname(record.file_name)[1..-1]
     record.file_name = record.file_name + ".pdf" unless extension == "pdf"

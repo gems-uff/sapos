@@ -32,6 +32,7 @@ RSpec.describe Admissions::RankingProcess, type: :model do
   subject { ranking_process }
   describe "Validations" do
     it { should be_valid }
+    it { should validate_presence_of(:step) }
   end
 
   describe "Methods" do
@@ -44,6 +45,32 @@ RSpec.describe Admissions::RankingProcess, type: :model do
       end
     end
     # ToDo: calculate_remaining
-    # ToDo: decrease_vacancies_and_check_remaining!
+    describe "decrease_vacancies!" do
+      it "decreases the process and its group" do
+        ranking_process.group = "AC"
+        groups = { "AC" => 3 }
+        process_vacancies = { ranking_process.id => 2 }
+        ranking_process.decrease_vacancies!(groups, process_vacancies)
+        expect(groups).to eq("AC" => 2)
+        expect(process_vacancies).to eq(ranking_process.id => 1)
+      end
+    end
+    describe "decrease_group!" do
+      it "decreases only the group" do
+        ranking_process.group = "AC"
+        groups = { "AC" => 3 }
+        ranking_process.decrease_group!(groups)
+        expect(groups).to eq("AC" => 2)
+      end
+      it "leaves the groups alone when the process has no group" do
+        groups = { "AC" => 3 }
+        ranking_process.decrease_group!(groups)
+        expect(groups).to eq("AC" => 3)
+      end
+      it "raises for a group it does not know" do
+        ranking_process.group = "Geral"
+        expect { ranking_process.decrease_group!({ "AC" => 3 }) }.to raise_error(KeyError, /Geral/)
+      end
+    end
   end
 end

@@ -13,4 +13,5 @@ module Exceptions
     end
   end
   class EmptyQueryException < StandardError; end
+  class MissingGroupException < StandardError; end
 end

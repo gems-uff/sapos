@@ -23,10 +23,6 @@ module TimelineHelper
       }"
     end
 
-    def add_custom_event(code)
-      @events << code
-    end
-
     def events
       "[#{@events.join(',')}]"
     end

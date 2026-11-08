@@ -3,16 +3,16 @@
 namespace :maintenance do
   desc "Runs every maintenance task needed"
   task run: [:environment] do
-    Rails.logger.info "[Maintenance] #{Time.now.to_fs} - Starting maintenance tasks"
+    Rails.logger.info "[Maintenance] #{Time.current.to_fs} - Starting maintenance tasks"
     Rake::Task["maintenance:remove_expired_reports"].invoke
     Rake::Task["maintenance:clean_upload_cache"].invoke
     Rake::Task["maintenance:trigger_notifications"].invoke
-    Rails.logger.info "[Maintenance] #{Time.now.to_fs} - Finished maintenance tasks"
+    Rails.logger.info "[Maintenance] #{Time.current.to_fs} - Finished maintenance tasks"
   end
 
   desc "Removes stale CarrierWave upload cache (default: older than 24h)"
   task clean_upload_cache: [:environment] do
-    Rails.logger.info "[UploadCache] #{Time.now.to_fs} - Cleaning stale CarrierWave cache"
+    Rails.logger.info "[UploadCache] #{Time.current.to_fs} - Cleaning stale CarrierWave cache"
     # The uploaders set config.root = Rails.root, so the file cache lives in
     # Rails.root/uploads/tmp. CarrierWave.clean_cached_files! would use the base
     # uploader (root = public/) and scan the wrong directory, so we clean from the
@@ -20,30 +20,27 @@ namespace :maintenance do
     # than the threshold (default 24h), never touching DB blobs or stored uploads.
     # The maintenance cron runs daily, so 24h is a safe margin for ongoing uploads.
     [FormFileUploader, ImageUploader].each(&:clean_cached_files!)
-    Rails.logger.info "[UploadCache] #{Time.now.to_fs} - Finished cleaning cache"
+    Rails.logger.info "[UploadCache] #{Time.current.to_fs} - Finished cleaning cache"
   end
 
   task remove_expired_reports: [:environment] do
-    Rails.logger.info "[Reports] #{Time.now.to_fs} Removing expired reports from DB"
+    Rails.logger.info "[Reports] #{Time.current.to_fs} Removing expired reports from DB"
     # O corte da validade e Report.expiry_cutoff, nao uma data repetida aqui: o
-    # download ja recusa o documento vencido (#631), e esta rotina e so a
-    # liberacao do armazenamento. As duas decisoes tem de concordar sobre qual
+    # download ja recusa o documento vencido (#631), e esta rotina so desliga o
+    # documento do arquivo -- o armazenamento e liberado pelo coletor de orfaos
+    # (ver Report#release_file!). As duas decisoes tem de concordar sobre qual
     # documento esta vencido.
     expired_reports = Report.expired.where.not(carrierwave_file_id: nil)
 
-    expired_reports.map do |expired_report|
-      carrierwave_file = expired_report.carrierwave_file
-      expired_report.update!(carrierwave_file_id: nil)
-      carrierwave_file.delete
-    end
+    expired_reports.find_each(&:release_file!)
 
-    Rails.logger.info "[Reports] #{Time.now.to_fs} Finished removing reports"
+    Rails.logger.info "[Reports] #{Time.current.to_fs} Finished removing reports"
   end
 
   task trigger_notifications: [:environment] do
     Notifier.logger.info "Sending Registered Notifications"
 
-    Notifier.logger.info "[Notifications] #{Time.now.to_fs} - Notifications from DB"
+    Notifier.logger.info "[Notifications] #{Time.current.to_fs} - Notifications from DB"
     notifications = []
     notifications_attachments = {}
 
@@ -52,7 +49,7 @@ namespace :maintenance do
 
     # Find notifications that should run
     Notification.where.not(frequency: Notification::MANUAL)
-                .where(next_execution.lt(Time.now)).each do |notification|
+                .where(next_execution.lt(Time.current)).each do |notification|
       result = attachment_renderer.prepare_attachments(notification.execute)
       notifications.concat(result[:notifications])
       notifications_attachments.merge!(result[:notifications_attachments])
@@ -63,7 +60,7 @@ namespace :maintenance do
                            notifications_attachments: notifications_attachments
                          })
 
-    Notifier.logger.info "[Notifications] #{Time.now.to_fs} - Finished sending notifications"
+    Notifier.logger.info "[Notifications] #{Time.current.to_fs} - Finished sending notifications"
   end
 
   private

@@ -239,6 +239,16 @@ cada uma explica o porquê no próprio cabeçalho:
   define o método que ele sobrescreve depois dos initializers) e o
   `LogTruncater` escondido dentro de `filter_parameter_logging.rb`, que chama
   o `sql` original por `super_method`.
+- active_scaffold, entrada que a gem aceita da URL sem conferir:
+  `active_scaffold_embedded_conditions.rb` (`prepend` em
+  `ActiveScaffold::Finder`; só o marcador de pendência vale em
+  `embedded[conditions]`), `active_scaffold_date_trend_unit.rb` (`prepend` em
+  `Finder::ClassMethods#datetime_from_to` — não em `condition_for_datetime`, que
+  o bridge `date_picker` apelida e cujo apelido perderia o `super`) e
+  `active_scaffold_return_to.rb` (`prepend` em `Helpers::ControllerHelpers`;
+  `return_to` só interno). Os três entram por `prepend` no módulo porque a
+  chamada `active_scaffold` inclui o módulo em cada controller, na frente de um
+  método do `ApplicationController`.
 - Prawn: `prawn-grouping.rb`, cópia de patch de terceiro que usa `state.page` e
   `@bounding_box`. Suspeito num upgrade do Prawn, não do Rails.
 - prawn-table: `prawn_actual_text.rb` (`prepend` no `draw_content` privado de

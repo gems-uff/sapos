@@ -41,9 +41,9 @@ RSpec.describe "Deferrals features", type: :feature do
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status)
 
 
-    @destroy_all << @record = FactoryBot.create(:deferral, deferral_type: @deferral_type2, enrollment: @enrollment2, approval_date: Date.today)
-    @destroy_all << FactoryBot.create(:deferral, deferral_type: @deferral_type2, enrollment: @enrollment1, approval_date: Date.today)
-    @destroy_all << FactoryBot.create(:deferral, deferral_type: @deferral_type2, enrollment: @enrollment3, approval_date: Date.today)
+    @destroy_all << @record = FactoryBot.create(:deferral, deferral_type: @deferral_type2, enrollment: @enrollment2, approval_date: Date.current)
+    @destroy_all << FactoryBot.create(:deferral, deferral_type: @deferral_type2, enrollment: @enrollment1, approval_date: Date.current)
+    @destroy_all << FactoryBot.create(:deferral, deferral_type: @deferral_type2, enrollment: @enrollment3, approval_date: Date.current)
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -87,7 +87,7 @@ RSpec.describe "Deferrals features", type: :feature do
       fill_record_select("enrollment_", "enrollments", "M04")
       page.send_keys :escape
       within("#as_#{plural_name}-create--form") do
-        select_month_year_i("record_approval_date", Date.today)
+        select_month_year_i("record_approval_date", Date.current)
         find(:select, "record_deferral_type_").find(:option, text: "Regular").select_option
       end
       click_button_and_wait "Salvar"

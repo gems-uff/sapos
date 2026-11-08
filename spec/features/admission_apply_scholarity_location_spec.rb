@@ -21,8 +21,8 @@ RSpec.describe "Escolaridade com id de item repetido", type: :feature, js: true 
     )
     @process = FactoryBot.create(
       :admission_process, name: "Mestrado", simple_url: "escolaridade-#{SecureRandom.hex(4)}",
-      form_template: template, start_date: Date.today - 10.days,
-      end_date: Date.today + 10.days, edit_date: Date.today + 20.days
+      form_template: template, start_date: Date.current - 10.days,
+      end_date: Date.current + 10.days, edit_date: Date.current + 20.days
     )
     filled_form = FactoryBot.create(:filled_form, form_template: template, is_filled: true)
     preenchido = FactoryBot.create(:filled_form_field, filled_form: filled_form, form_field: campo, value: nil)

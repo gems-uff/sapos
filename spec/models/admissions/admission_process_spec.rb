@@ -129,7 +129,7 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
         it "there are no other processes with the same simple_url in the same range" do
           admission_process.simple_url = "mestrado"
           admission_process.start_date = Date.parse("2024/01/01")
-          admission_process.end_date = Date.today + 1.month
+          admission_process.end_date = Date.current + 1.month
           # Date overlap, different simple url
           @destroy_later << FactoryBot.create(:admission_process,
             start_date: admission_process.start_date,
@@ -160,14 +160,14 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
       context "should have error simple_url_integer when" do
         it "it is a number" do
           admission_process.start_date = Date.parse("2024/01/01")
-          admission_process.end_date = Date.today + 1.month
+          admission_process.end_date = Date.current + 1.month
           admission_process.simple_url = "1"
           expect(admission_process).to have_error(:simple_url_integer).on :simple_url
         end
         it "it overlaps a date" do
           admission_process.simple_url = "mestrado"
           admission_process.start_date = Date.parse("2024/01/01")
-          admission_process.end_date = Date.today + 1.month
+          admission_process.end_date = Date.current + 1.month
           @destroy_later << FactoryBot.create(:admission_process,
             start_date: admission_process.start_date - 1.month,
             end_date: admission_process.end_date - 1.day,
@@ -216,37 +216,37 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
     end
     describe "is_open?" do
       it "should return false if today is before start date" do
-        admission_process.start_date = Date.today + 1.day
-        admission_process.end_date = Date.today + 1.month
+        admission_process.start_date = Date.current + 1.day
+        admission_process.end_date = Date.current + 1.month
         expect(admission_process.is_open?).to eq(false)
       end
       it "should return false if today is after end date" do
-        admission_process.start_date = Date.today - 1.month
-        admission_process.end_date = Date.today - 1.day
+        admission_process.start_date = Date.current - 1.month
+        admission_process.end_date = Date.current - 1.day
         expect(admission_process.is_open?).to eq(false)
       end
       it "should return true if today is between start and end date" do
-        admission_process.start_date = Date.today - 1.month
-        admission_process.end_date = Date.today + 1.month
+        admission_process.start_date = Date.current - 1.month
+        admission_process.end_date = Date.current + 1.month
         expect(admission_process.is_open?).to eq(true)
       end
     end
     describe "is_open_to_edit?" do
       it "should return false if today is before start date" do
-        admission_process.start_date = Date.today + 1.day
-        admission_process.edit_date = Date.today + 1.month
+        admission_process.start_date = Date.current + 1.day
+        admission_process.edit_date = Date.current + 1.month
         admission_process.end_date = admission_process.edit_date
         expect(admission_process.is_open_to_edit?).to eq(false)
       end
       it "should return false if today is after edit date" do
-        admission_process.start_date = Date.today - 1.month
-        admission_process.edit_date = Date.today - 1.day
+        admission_process.start_date = Date.current - 1.month
+        admission_process.edit_date = Date.current - 1.day
         admission_process.end_date = admission_process.edit_date
         expect(admission_process.is_open_to_edit?).to eq(false)
       end
       it "should return true if today is between start and edit date" do
-        admission_process.start_date = Date.today - 1.month
-        admission_process.edit_date = Date.today + 1.month
+        admission_process.start_date = Date.current - 1.month
+        admission_process.edit_date = Date.current + 1.month
         admission_process.end_date = admission_process.edit_date
         expect(admission_process.is_open_to_edit?).to eq(true)
       end

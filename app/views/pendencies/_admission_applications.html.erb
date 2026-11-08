@@ -1,5 +1,5 @@
 <div class="pendency-type-box">
-  <%= render active_scaffold: "admissions/admission_applications", conditions: conditions %>
+  <%= render active_scaffold: "admissions/admission_applications", conditions: ActiveScaffoldEmbeddedConditions::PENDENCY %>
 
   <span class="pendency-description">
     Essa lista de pendências exibe apenas candidaturas não avaliadas. <br>

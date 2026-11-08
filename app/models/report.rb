@@ -19,7 +19,7 @@ class Report < ApplicationRecord
   # convidaria a divergencia de volta. spec/models/report_spec.rb prende escopo
   # e predicado ao mesmo corte.
   def self.expiry_cutoff
-    Date.today
+    Date.current
   end
 
   scope :expired, -> { where(expires_at: ...expiry_cutoff) }
@@ -28,14 +28,25 @@ class Report < ApplicationRecord
     "#{self.user.name} - #{I18n.l(self.created_at, format: '%d/%m/%Y %H:%M')}"
   end
 
-  # Sem arquivo nao ha o que apagar. A chamada estourava NoMethodError em
-  # carrierwave_file.delete *depois* do update!, deixando o registro gravado
-  # como invalidado e a requisicao em 500. O `&.` mantem invalidate! seguro
-  # pelos dois caminhos que o AGENTS.md distingue: a tela e o console.
+  # Desliga o documento do arquivo. A limpeza de vencidos
+  # (maintenance:remove_expired_reports) e invalidate! passam por aqui para
+  # nao divergirem.
+  #
+  # A linha em carrier_wave_files fica. A storage identifica o arquivo pelo
+  # MD5 do conteudo, entao bytes iguais -- a declaracao gerada aqui e o mesmo
+  # PDF anexado a uma inscricao -- sao UMA linha, com mais de um dono; quem a
+  # apagava daqui apagava o anexo do outro. Nenhum ponto de escrita decide
+  # se a linha ainda tem dono: isso e do coletor de orfaos (#597), o unico
+  # que apaga, depois de varrer todas as colunas que referenciam a tabela.
+  #
+  # Zerar a referencia vale mesmo quando ela aponta para linha que nao existe
+  # (#696): e o que havia para consertar, e nao ha mais nada a fazer com ela.
+  def release_file!(**attributes)
+    self.update!(**attributes, carrierwave_file_id: nil)
+  end
+
   def invalidate!(user:)
-    file = self.carrierwave_file
-    self.update!(carrierwave_file_id: nil, invalidated_by: user, invalidated_at: Time.now)
-    file&.delete
+    release_file!(invalidated_by: user, invalidated_at: Time.current)
   end
 
   def expired?

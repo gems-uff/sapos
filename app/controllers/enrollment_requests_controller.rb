@@ -178,17 +178,4 @@ class EnrollmentRequestsController < ApplicationController
         Notifier.send_emails(notifications: emails)
       end
     end
-
-    def help
-      raise CanCan::AccessDenied.new if cannot? :read, ClassEnrollmentRequest
-      respond_to_action(:help)
-    end
-
-    def help_respond_to_html
-      render(action: "help")
-    end
-
-    def help_respond_to_js
-      render(partial: "shared_help")
-    end
 end

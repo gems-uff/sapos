@@ -19,13 +19,13 @@ class YearSemester
 
   def self.selectable_years
     start_year, end_year, swap = CustomVariable.year_semester_range
-    result = ((Date.today.year - start_year)..(Date.today.year + end_year)).to_a
+    result = ((Date.current.year - start_year)..(Date.current.year + end_year)).to_a
     result = result.reverse if swap
     result
   end
 
   def self.current
-    today = Date.today
+    today = Date.current
     self.on_date(today)
   end
 

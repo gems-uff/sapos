@@ -89,7 +89,7 @@ class EnrollmentHold < ApplicationRecord
   end
 
   def active
-    today = Date.today
+    today = Date.current
     today > start_date && today < end_date
   end
 

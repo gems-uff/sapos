@@ -64,8 +64,9 @@ Rails.application.configure do
   # Set to :debug to see everything in the log.
   config.log_level = :info
 
-  # Prepend all log lines with the following tags.
-  # config.log_tags = [ :request_id ]
+  # Prepend all log lines with the following tags. O id da requisição é o que
+  # o e-mail de erro leva para localizar no log o resto do que aconteceu.
+  config.log_tags = [ :request_id ]
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
@@ -87,11 +88,9 @@ Rails.application.configure do
   config.action_mailer.sendmail_settings = { arguments: ["-i"], location: "/usr/sbin/sendmail" }
 
   config.middleware.use ExceptionNotification::Rack,
-    email: {
-      email_prefix: "[SAPOS: Error] ",
-      sender_address: %{"SAPOS Exception Notifier" <erro-sapos@sapos.ic.uff.br>},
+    email: config.x.error_email.merge(
       exception_recipients: %w{sapos-ic-uff@googlegroups.com}
-    }
+    )
 
   # Use ReCaptcha
   config.should_use_recaptcha = true

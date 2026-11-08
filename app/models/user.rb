@@ -174,8 +174,4 @@ class User < ApplicationRecord
     def set_default_actual_role
       self.actual_role = actual_role.present? ? actual_role : user_max_role
     end
-
-    def store_max_role_was
-      self.max_role_was = self.user_max_role
-    end
 end

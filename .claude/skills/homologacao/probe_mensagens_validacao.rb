@@ -22,6 +22,8 @@
 #   EXPLORE_OUT=<dir> bundle exec ruby probe_mensagens_validacao.rb 1502 1514  # ids do "antes"
 #
 # SAPOS_LIMITE limita quantas candidaturas varrer na descoberta (padrao 25).
+# SAPOS_DATA troca a data que reprova (padrao 99/99/9999); um ano de dois
+# digitos, como 01/01/90, mede a regra do ano, que a data impossivel nao mede.
 
 require_relative "explore_common"
 
@@ -30,6 +32,7 @@ abort "URL sem 'staging': #{BASE}" unless BASE.include?("staging")
 LIMITE = (ENV["SAPOS_LIMITE"] || "25").to_i
 IDS_PEDIDOS = ARGV.grep(/\A\d+\z/).map(&:to_i)
 ARQUIVO_GRANDE = 16 * 1024 * 1024
+DATA_INVALIDA = ENV["SAPOS_DATA"] || "99/99/9999"
 
 driver = build_driver
 wait = Selenium::WebDriver::Wait.new(timeout: 90)
@@ -52,12 +55,12 @@ end
 # Liga os formularios so no navegador e poe cada campo validavel no estado que
 # reprova. Os arquivos recebem o nome e o tamanho dados.
 def preparar_falhas(driver, nome_arquivo, tamanho)
-  driver.execute_script(<<~JS, nome_arquivo, tamanho)
-    var nome = arguments[0], tamanho = arguments[1];
+  driver.execute_script(<<~JS, nome_arquivo, tamanho, DATA_INVALIDA)
+    var nome = arguments[0], tamanho = arguments[1], data = arguments[2];
     Array.prototype.forEach.call(document.querySelectorAll("input[type=checkbox][id$='-toggle']"),
       function (t) { if (!t.checked) { jQuery(t).prop('checked', true).trigger('change'); } });
     Array.prototype.forEach.call(document.querySelectorAll("input.hasDatepicker"),
-      function (i) { i.value = "99/99/9999"; });
+      function (i) { i.value = data; });
     Array.prototype.forEach.call(document.querySelectorAll("li.form-element input[type=radio]"),
       function (i) { i.checked = false; });
     Array.prototype.forEach.call(document.querySelectorAll("li.form-element input[type=checkbox]:not([id$='-toggle'])"),
@@ -91,7 +94,7 @@ def mensagens(driver)
   JS
 end
 
-relatorio = { base: BASE, candidaturas: {}, sem_formulario: {} }
+relatorio = { base: BASE, data_invalida: DATA_INVALIDA, candidaturas: {}, sem_formulario: {} }
 
 begin
   login(driver, wait)

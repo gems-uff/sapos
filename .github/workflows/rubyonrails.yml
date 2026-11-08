@@ -201,22 +201,16 @@ jobs:
           set -o pipefail
           bundle exec rspec --profile 10 | tee rspec.log
 
-      # A ordem dos exemplos e sorteada, e a suite ja teve dependencia de ordem
-      # (#643). Sem a seed, um vermelho e irreproduzivel; com ela, o
-      # `rspec --seed <n> --bisect` isola o exemplo culpado sozinho.
-      - name: Registrar a seed
-        if: always()
+      # Contagem, seed e comando de reproducao no resumo do job. A ordem dos
+      # exemplos e sorteada, e a suite ja teve dependencia de ordem (#643): sem
+      # a seed, um vermelho e irreproduzivel. O passo tambem derruba o job
+      # quando a contagem cai abaixo de .github/min-examples ou o log nao tem a
+      # linha de resumo: codigo de saida zero nao prova que os exemplos rodaram.
+      - name: Registrar a contagem e a seed
+        if: ${{ !cancelled() }}
         run: |
-          seed=""
-          if [ -f rspec.log ]; then
-            seed=$(grep -oE 'Randomized with seed [0-9]+' rspec.log | head -1 | grep -oE '[0-9]+$' || true)
-          fi
-          echo "### Seed do RSpec (${{ matrix.browser }}): \`${seed:-desconhecida}\`" >> "$GITHUB_STEP_SUMMARY"
-          echo "Reproduzir localmente:" >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
-          echo "SELENIUM_BROWSER=${{ matrix.browser }} bundle exec rspec --seed ${seed:-0}" >> "$GITHUB_STEP_SUMMARY"
-          echo "SELENIUM_BROWSER=${{ matrix.browser }} bundle exec rspec --seed ${seed:-0} --bisect   # se for dependencia de ordem" >> "$GITHUB_STEP_SUMMARY"
-          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          bash .github/scripts/rspec-summary.sh rspec.log "${{ matrix.browser }}" \
+            "SELENIUM_BROWSER=${{ matrix.browser }} bundle exec rspec"
 
       # Cobertura sai de um navegador so: as duas rodadas exercitam o mesmo Ruby,
       # e publicar as duas contaria o mesmo codigo duas vezes. O Chrome fica com

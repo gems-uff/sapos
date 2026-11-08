@@ -65,8 +65,8 @@ module ScholarshipsHelper
       I18n.t("activerecord.attributes.scholarship.available_label"),
       style: "margin: 0 15px;"
     )
-    html += select_month(Date.today.month, local_options, month_html_options)
-    html += select_year(Date.today.year, local_options, year_html_options)
+    html += select_month(Date.current.month, local_options, month_html_options)
+    html += select_year(Date.current.year, local_options, year_html_options)
     html
   end
 
@@ -159,7 +159,7 @@ module ScholarshipsHelper
       cancel_date = sd.cancel_date.nil? ?
         "-" : I18n.localize(sd.cancel_date, format: :monthyear2)
       body += "<tr class=\"record #{tr_class}\">
-                <td>#{sd.enrollment.to_label}</td>
+                <td>#{h(sd.enrollment.to_label)}</td>
                 <td>#{I18n.localize(sd.start_date, format: :monthyear2)}</td>
                 <td>#{I18n.localize(sd.end_date, format: :monthyear2)}</td>
                 <td>#{cancel_date}</td>
