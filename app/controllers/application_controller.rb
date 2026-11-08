@@ -66,12 +66,14 @@ class ApplicationController < ActionController::Base
       session.to_hash.except("session_id").present?
     end
 
+    # A checagem de CSRF roda antes do prepare_exception_notifier, por isso o
+    # id do usuário vai aqui. Da sessão, só os nomes das chaves: o conteúdo não
+    # vai para o e-mail (ver config.x.error_email).
     def notify_invalid_token(exception)
       ExceptionNotifier.notify_exception(exception,
         env: request.env,
         data: {
           user_id: current_user&.id,
-          url: request.original_url,
           session_keys: session.to_hash.keys,
         }
       )
@@ -82,12 +84,12 @@ class ApplicationController < ActionController::Base
       @show_background = user_signed_in?
     end
 
+    # Vai para a seção "data" de todo e-mail de erro da requisição. Só o id do
+    # usuário: nome e e-mail ficam no banco, e o caminho já está na seção
+    # "contexto" (ver config.x.error_email).
     def prepare_exception_notifier
       request.env["exception_notifier.exception_data"] = {
         user_id: current_user&.id,
-        user_name: current_user&.name,
-        user_email: current_user&.email,
-        url: request.original_url,
       }
     end
 

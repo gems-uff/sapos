@@ -64,8 +64,9 @@ Rails.application.configure do
   # Set to :debug to see everything in the log.
   config.log_level = :info
 
-  # Prepend all log lines with the following tags.
-  # config.log_tags = [ :request_id ]
+  # Prepend all log lines with the following tags. O id da requisição é o que
+  # o e-mail de erro leva para localizar no log o resto do que aconteceu.
+  config.log_tags = [ :request_id ]
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
