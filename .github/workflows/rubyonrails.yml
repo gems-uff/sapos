@@ -134,13 +134,22 @@ jobs:
           --health-timeout=5s
           --health-retries=10
 
+    # A suite roda em 4 workers do parallel_rspec (#741). Medido no runner, com
+    # tres amostras por configuracao: ~2x mais rapido que o serial, e o -n 4
+    # rende mais que o -n 2 sobretudo no Firefox, a perna mais lenta. No Mac o
+    # -n 2 ja satura; por isso o numero aqui nao e o da skill safe-refactor.
+    # O serial continua sendo o criterio de pronto local (AGENTS.md).
     env:
       RAILS_ENV: test
       SELENIUM_BROWSER: ${{ matrix.browser }}
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      # The column collation comes from the CREATE DATABASE below; the
-      # connection collation from this URL. Both match production.
-      DATABASE_URL: "mysql2://root:root@127.0.0.1:3306/sapos_test?encoding=utf8mb4&collation=utf8mb4_unicode_ci"
+      PARALLEL_WORKERS: 4
+      # O parallel_tests prefere o bin/rspec, versionado sem bit de execucao.
+      PARALLEL_TESTS_EXECUTABLE: bundle exec rspec
+      # Sem ela, o primeiro boot de teste grava tmp/local_secret.txt, e os
+      # processos simultaneos de um checkout novo correm: um le o arquivo ainda
+      # vazio e aborta com `secret_key_base ... got: ""`.
+      SECRET_KEY_BASE: chave_falsa_apenas_para_a_suite
 
     steps:
       - name: Checkout code
@@ -169,25 +178,53 @@ jobs:
           bundler-cache: true # runs 'bundle install' and caches installed gems automatically
           cache-version: 3 # Increment this number if you need to re-download cached gems
 
-      # database.yml is no longer tracked, so provide it from the example. Its
-      # test entry is SQLite, but DATABASE_URL above takes precedence and points
-      # the connection at MariaDB; the file only needs to exist.
+      # Um banco por worker: sapos_test, sapos_test2, ... (o primeiro worker tem
+      # TEST_ENV_NUMBER vazio). Num banco comum, a varredura de vazamento ao fim
+      # de cada arquivo apagaria o before(:all) de outro worker. Nao ha
+      # DATABASE_URL: ele traz o nome do banco e prevaleceria sobre o database:
+      # daqui, juntando os workers. Sem test_read_only declarado, o cliente
+      # proprio do Query.run_read_only_query cai neste mesmo bloco e no banco do
+      # worker. A collation da conexao e a de producao.
       - name: Configure database.yml
-        run: cp config/database.yml.example config/database.yml
+        run: |
+          cat > config/database.yml <<'EOF'
+          test:
+            adapter: mysql2
+            encoding: utf8mb4
+            collation: utf8mb4_unicode_ci
+            host: 127.0.0.1
+            port: 3306
+            username: root
+            password: root
+            database: sapos_test<%= ENV["TEST_ENV_NUMBER"] %>
+            pool: 5
+          EOF
 
       # The collation must match production; utf8mb4_unicode_ci is what the
       # tables materialize there. sql_mode is not set here on purpose: the Rails
       # mysql2 adapter overrides the session sql_mode to its strict default on
       # every connection, in CI and in production alike, so a SET GLOBAL would
       # not change what the app sees.
-      - name: Create the test database with production's collation
+      - name: Create the test databases with production's collation
         run: |
-          mysql -h 127.0.0.1 -u root -proot -e "
-            CREATE DATABASE sapos_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-          "
+          for n in "" $(seq 2 "$PARALLEL_WORKERS"); do
+            mysql -h 127.0.0.1 -u root -proot -e \
+              "CREATE DATABASE sapos_test$n CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+          done
 
-      - name: Set up database schema
-        run: bundle exec rake db:schema:load --trace
+      - name: Set up database schemas
+        run: bundle exec rake "parallel:load_schema[$PARALLEL_WORKERS]"
+
+      # O tempo de cada arquivo na ultima rodada verde deste navegador. Com ele
+      # o parallel_tests divide os arquivos por tempo; sem ele (primeira rodada,
+      # ou log cobrindo menos de 2/3 dos arquivos), cai sozinho para tamanho de
+      # arquivo, que equilibra pior mas nao quebra.
+      - name: Restore the runtime log
+        uses: actions/cache/restore@v4
+        with:
+          path: tmp/parallel_runtime_rspec.log
+          key: parallel-runtime-${{ matrix.browser }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: parallel-runtime-${{ matrix.browser }}-
 
       # Audit e Lint moram no job `checks`, acima: aqui só a suíte, para que um
       # vermelho de checagem não esconda o resultado dela.
@@ -195,11 +232,31 @@ jobs:
       # --profile: os dez exemplos mais lentos de cada navegador ficam no log. A
       # matriz mostrou o Firefox 1,5x mais lento que o Chrome no runner (e 2x
       # mais rapido no Mac); so o perfil diz se a diferenca e uniforme, da
-      # plataforma, ou concentrada em poucos specs, que e onde se mexe.
+      # plataforma, ou concentrada em poucos specs, que e onde se mexe. Sai um
+      # perfil por worker.
+      #
+      # Uma seed sorteada aqui vai para todos os workers, e e ela que o resumo
+      # registra. O --format documentation e repetido porque um --format em -o
+      # substitui o do .rspec, e a saida perderia a linha de contagem. O
+      # --verbose-rerun-command imprime o comando de cada worker que falhar,
+      # que o resumo transcreve para a reproducao.
       - name: Run tests
         run: |
           set -o pipefail
-          bundle exec rspec --profile 10 | tee rspec.log
+          seed=$RANDOM
+          bundle exec parallel_rspec -n "$PARALLEL_WORKERS" \
+            --runtime-log tmp/parallel_runtime_rspec.log \
+            --serialize-stdout --combine-stderr --verbose-rerun-command \
+            -o "--seed $seed --profile 10 --format documentation --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log" \
+            spec | tee rspec.log
+
+      # So de rodada verde: um log de rodada cancelada no meio viria truncado.
+      - name: Save the runtime log
+        if: success()
+        uses: actions/cache/save@v4
+        with:
+          path: tmp/parallel_runtime_rspec.log
+          key: parallel-runtime-${{ matrix.browser }}-${{ github.run_id }}-${{ github.run_attempt }}
 
       # Contagem, seed e comando de reproducao no resumo do job. A ordem dos
       # exemplos e sorteada, e a suite ja teve dependencia de ordem (#643): sem
@@ -215,12 +272,15 @@ jobs:
       # Cobertura sai de um navegador so: as duas rodadas exercitam o mesmo Ruby,
       # e publicar as duas contaria o mesmo codigo duas vezes. O Chrome fica com
       # ela para o historico continuar comparavel com o de antes da matriz.
+      #
+      # O Cobertura, e nao o .resultset.json: sob o parallel_rspec o resultset
+      # guarda uma entrada crua por worker, e so o coverage.xml sai juntado.
       - name: Publish code coverage
         if: matrix.browser == 'chrome'
         uses: qltysh/qlty-action/coverage@v1
         with:
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
-          files: coverage/.resultset.json
+          files: coverage/coverage.xml
 
       # A cobertura nativa do GitHub roda em paralelo com o qlty durante o
       # periodo de prova. Quando ela tiver produzido dado, o passo do qlty acima,

@@ -43,7 +43,10 @@ corrija na wiki.
 - **Verde numa ordem não é verde.** A ordem dos exemplos é sorteada. Ao
   investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
   irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo
-  culpado sozinho. O CI registra a seed no resumo do job.
+  culpado sozinho. O CI registra a seed no resumo do job. Lá a suíte roda em
+  4 workers do `parallel_rspec`, e cada worker sorteia a ordem só sobre os seus
+  arquivos: a seed sozinha não repete a ordem que falhou. O resumo transcreve o
+  comando do worker que falhou; rode-o em serial, e o `--bisect` sobre ele.
 - **Vermelho logo depois de trocar de ramo pode ser o banco de teste velho.** O
   `maintain_test_schema!` não recarrega o `db/test.sqlite3` quando a troca de
   ramo muda o esquema, então ele fica com as colunas do ramo anterior e o

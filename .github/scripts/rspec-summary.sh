@@ -28,8 +28,12 @@ linha=""
 seed=""
 if [ -f "$log" ]; then
   # "3521 examples, 0 failures, 26 pending"; com erro fora de exemplo,
-  # "0 examples, 0 failures, 1 error occurred outside of examples".
+  # "0 examples, 0 failures, 1 error occurred outside of examples". Sob o
+  # parallel_rspec cada worker imprime a sua linha e a ultima e a soma deles
+  # ("... 26 pendings"), que nao carrega o erro fora de exemplo: por isso esse
+  # erro e procurado no log inteiro, e nao so na ultima linha.
   linha=$(grep -E '^[0-9]+ examples?, [0-9]+ failures?' "$log" | tail -n 1 || true)
+  fora=$(grep -cE '[0-9]+ errors? occurred outside of examples' "$log" || true)
   seed=$(grep -oE 'Randomized with seed [0-9]+' "$log" | head -n 1 | grep -oE '[0-9]+$' || true)
 fi
 
@@ -42,7 +46,7 @@ if [ -z "$piso" ]; then
   problema="piso ausente em .github/min-examples"
 elif [ -z "$linha" ]; then
   problema="nenhuma linha de resumo do RSpec em $log"
-elif [ "${falhas:-0}" -gt 0 ] || grep -q 'outside of examples' <<<"$linha"; then
+elif [ "${falhas:-0}" -gt 0 ] || [ "${fora:-0}" -gt 0 ]; then
   problema="a rodada tem falhas ou erros"
 elif [ "$exemplos" -lt "$piso" ]; then
   problema="$exemplos exemplos, abaixo do piso de $piso (.github/min-examples)"
@@ -61,6 +65,17 @@ fi
   echo "$reproduzir --seed ${seed:-0}"
   echo "$reproduzir --seed ${seed:-0} --bisect   # se for dependencia de ordem"
   echo '```'
+  # Com o parallel_rspec, a ordem que falhou e a de um worker sobre o seu
+  # subconjunto de arquivos, e a suite inteira com a mesma seed nao a repete.
+  # O --verbose-rerun-command imprime o comando exato de cada worker que
+  # falhou; rodado em serial, ele reproduz a ordem, e o --bisect vai no fim.
+  if [ -f "$log" ] && grep -q 'run the group again' "$log"; then
+    echo
+    echo "Workers do parallel_rspec que falharam (rode cada um em serial):"
+    echo '```'
+    grep -E '^TEST_ENV_NUMBER=' "$log" || true
+    echo '```'
+  fi
 } >>"$resumo"
 
 if [ -n "$problema" ]; then
