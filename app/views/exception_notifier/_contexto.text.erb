@@ -1,0 +1,18 @@
+<%# Seção técnica do e-mail de erro (ver config.x.error_email em
+    config/application.rb). Nada de valor de parâmetro, sessão ou cabeçalho:
+    o caminho sai como o padrão da rota, porque o caminho concreto pode trazer
+    o token da inscrição do candidato e a query string, termo de busca; e dos
+    parâmetros, inclusive os da query, só vão os nomes. %>
+<%
+  params = @request.filtered_parameters.except("controller", "action")
+  param_names = params.map do |name, value|
+    value.is_a?(Hash) ? "#{name}[#{value.keys.join(", ")}]" : name
+  end
+%>
+* Caminho     : <%= raw @request.request_method %> <%= raw safe_encode(@request.route_uri_pattern.presence || "(sem rota)") %>
+* Formato     : <%= raw @request.format.to_s %>
+* Requisição  : <%= raw @request.request_id %>
+* Momento     : <%= raw @timestamp %>
+* Servidor    : <%= raw Socket.gethostname %>
+* Processo    : <%= raw $$ %>
+* Parâmetros  : <%= raw safe_encode param_names.join("; ") %>
