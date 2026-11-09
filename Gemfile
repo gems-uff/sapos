@@ -88,6 +88,9 @@ group :development, :test do
   gem "pry"
   gem "letter_opener_web"               # /letter_opener mostra e-mails "enviados"
   gem "rails-erd"                        # diagrama entidade-relacionamento
+  # parallel_rspec, opcional na maquina de quem desenvolve (#741). Fica tambem
+  # em development porque as rake tasks parallel:* rodam nesse ambiente.
+  gem "parallel_tests"
 end
 
 group :test do

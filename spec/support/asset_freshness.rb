@@ -15,6 +15,8 @@
 #
 # A checagem roda antes de o Rails subir, em rails_helper.rb. Depois do boot o
 # manifesto ja esta em memoria, e recompilar nao mudaria o que a rodada serve.
+require "fileutils"
+
 module AssetFreshness
   MANIFEST_GLOB = "public/assets/.sprockets-manifest-*.json"
 
@@ -37,25 +39,39 @@ module AssetFreshness
   class << self
     # Roda antes do boot, entao Rails.root ainda nao existe: a raiz vem do
     # caminho deste arquivo.
+    #
+    # Sob o parallel_rspec cada worker chega aqui ao mesmo tempo, e N
+    # assets:precompile concorrentes escreveriam no mesmo public/assets. O
+    # flock serializa: o primeiro recompila, os outros esperam e, ao entrar,
+    # encontram o manifesto novo e seguem sem recompilar. Na rodada serial o
+    # lock e livre e nao custa nada.
     def recompile_if_stale!(root = File.expand_path("../..", __dir__))
       root = Pathname.new(root)
-      manifest = newest_manifest(root)
-      # Sem build local nao ha o que sombrear: o sprockets compila do fonte.
-      return if manifest.nil?
-
-      newest = newest_source(root)
-      return if newest.nil? || File.mtime(manifest) >= File.mtime(newest)
-
-      puts "[assets] public/assets esta atrasado em relacao a " \
-           "#{Pathname.new(newest).relative_path_from(root)}; recompilando"
-      # Quando o gatilho e o lock, o cache do sprockets em tmp/cache/assets
-      # tambem e suspeito: sua chave nao inclui a versao de toda gem que
-      # participa da compilacao. Apagar tudo e o unico jeito de garantir que a
-      # saida veio das gems novas.
-      recompile!(root, clobber: File.basename(newest) == "Gemfile.lock")
+      FileUtils.mkdir_p(root.join("tmp"))
+      File.open(root.join("tmp/asset_freshness.lock"), File::RDWR | File::CREAT) do |lock|
+        lock.flock(File::LOCK_EX)
+        recompile_unlocked(root)
+      end
     end
 
     private
+      def recompile_unlocked(root)
+        manifest = newest_manifest(root)
+        # Sem build local nao ha o que sombrear: o sprockets compila do fonte.
+        return if manifest.nil?
+
+        newest = newest_source(root)
+        return if newest.nil? || File.mtime(manifest) >= File.mtime(newest)
+
+        puts "[assets] public/assets esta atrasado em relacao a " \
+             "#{Pathname.new(newest).relative_path_from(root)}; recompilando"
+        # Quando o gatilho e o lock, o cache do sprockets em tmp/cache/assets
+        # tambem e suspeito: sua chave nao inclui a versao de toda gem que
+        # participa da compilacao. Apagar tudo e o unico jeito de garantir que a
+        # saida veio das gems novas.
+        recompile!(root, clobber: File.basename(newest) == "Gemfile.lock")
+      end
+
       def newest_manifest(root)
         Dir[root.join(MANIFEST_GLOB)].max_by { |file| File.mtime(file) }
       end

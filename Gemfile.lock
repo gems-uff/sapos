@@ -295,6 +295,8 @@ GEM
       activerecord (>= 7.1)
       request_store (~> 1.4)
     parallel (2.3.0)
+    parallel_tests (5.9.0)
+      parallel
     parser (3.3.13.0)
       ast (~> 2.4.1)
       racc
@@ -577,6 +579,7 @@ DEPENDENCIES
   liquid
   mysql2
   paper_trail
+  parallel_tests
   pdf-reader
   prawn
   prawn-qrcode

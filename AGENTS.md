@@ -24,12 +24,19 @@ corrija na wiki.
   lista de commits e no `git log --oneline`. Depois do prefixo sobram cerca de
   60 colunas: imperativo, sem ponto final, e o porquê no corpo. Commit que não
   pertence a issue nenhuma — convenção, skill, infraestrutura — vai sem prefixo.
+- **Issue pronta entra na `main` e fecha; a release vem depois.** Verde na
+  suíte local e no CI, o ramo entra na `main` e a issue fecha, para que ninguém
+  a pegue de novo. A versão sai quando o mantenedor decide: homologa-se a `main`
+  e, se estiver tudo certo, lança-se o que se acumulou nela. Issue terminada não
+  força release. O label da versão é aplicado no lançamento, inclusive em issue
+  já fechada (ver a skill `release`).
 - **Cite a issue só pelo prefixo, sem `Fixes` nem `Closes`.** Essas palavras
-  fecham a issue assim que o commit chega na `main`, e fechar é decisão do passo
-  de release, separada de rotular: issue entregue pela metade leva o label e
-  continua aberta (ver a skill `release`).
+  fecham a issue sozinhas quando o commit chega na `main`, e fechar é decisão de
+  quem integra: issue entregue pela metade entra na `main` e continua aberta,
+  com um comentário dizendo o que falta.
 - **Exceção:** vulnerabilidade não ganha issue pública — enumerar o problema
-  expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica.
+  expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica,
+  e a release sai logo depois do merge, sem esperar as próximas issues.
 - Critério de pronto: `bundle exec rspec` inteiro verde. Rode **sem**
   `SKIP_COVERAGE=1` ao menos uma vez antes de fechar: é a configuração real da
   suíte, e o caminho do simplecov só é exercitado assim.
@@ -43,7 +50,10 @@ corrija na wiki.
 - **Verde numa ordem não é verde.** A ordem dos exemplos é sorteada. Ao
   investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
   irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo
-  culpado sozinho. O CI registra a seed no resumo do job.
+  culpado sozinho. O CI registra a seed no resumo do job. Lá a suíte roda em
+  4 workers do `parallel_rspec`, e cada worker sorteia a ordem só sobre os seus
+  arquivos: a seed sozinha não repete a ordem que falhou. O resumo transcreve o
+  comando do worker que falhou; rode-o em serial, e o `--bisect` sobre ele.
 - **Vermelho logo depois de trocar de ramo pode ser o banco de teste velho.** O
   `maintain_test_schema!` não recarrega o `db/test.sqlite3` quando a troca de
   ramo muda o esquema, então ele fica com as colunas do ramo anterior e o
@@ -110,7 +120,7 @@ corrija na wiki.
   temático foi aposentado quando o Type passou a existir: manter as duas
   taxonomias é mantê-las divergindo, e a que engana é justamente a que ninguém
   revisa. O único label que uma issue recebe é o da versão em que ela saiu,
-  aplicado no passo de release.
+  aplicado no lançamento.
 - **Não afirme impacto em produção sem verificar com o mantenedor.** O repositório
   não diz quais funcionalidades estão em uso. Issue é pública e irreversível;
   descreva o que foi medido no código e pergunte o resto.
@@ -142,7 +152,7 @@ ordem do ciclo.
 - `safe-refactor` — mede a mudança pela suíte local, antes e depois.
 - `suite-mariadb` — roda a suíte contra MariaDB em vez do SQLite.
 - `homologacao` — compara o SAPOS antes e depois em homologação.
-- `release` — merge, tag, label, issues e release publicada.
+- `release` — integra a issue pronta na `main` e a fecha; quando o mantenedor decide, homologa a `main` e lança a versão (tag, label, release publicada).
 
 ### Skill é procedimento, não diário de bordo
 
