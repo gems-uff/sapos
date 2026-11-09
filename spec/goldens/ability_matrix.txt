@@ -2319,7 +2319,7 @@ student_enrollment: can? (nada)
   cer_a_efetivada: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   cer_a_status_nulo: = classe
   cer_b_solicitada: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [cer_a_efetivada cer_a_solicitada cer_a_status_nulo cer_b_solicitada] 4/4; {add_existing duplicate edit edit_associated execute_now new_existing notify set_invalid set_requested set_valid update update_column} => ERRO ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: advisements.professor:; {demais} => [] 0/4
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [cer_a_efetivada cer_a_solicitada cer_a_status_nulo cer_b_solicitada] 4/4; {add_existing duplicate edit edit_associated execute_now new_existing notify set_invalid set_requested set_valid update update_column} => [cer_a_solicitada cer_a_status_nulo] 2/4; {demais} => [] 0/4
 -- ClassSchedule
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -2676,7 +2676,7 @@ student_enrollment: can? (nada)
   cer_a_efetivada: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   cer_a_status_nulo: = classe
   cer_b_solicitada: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [cer_a_efetivada cer_a_solicitada cer_a_status_nulo cer_b_solicitada] 4/4; {add_existing duplicate edit edit_associated execute_now new_existing notify set_invalid set_requested set_valid update update_column} => ERRO ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: advisements.professor:; {demais} => [] 0/4
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [cer_a_efetivada cer_a_solicitada cer_a_status_nulo cer_b_solicitada] 4/4; {add_existing duplicate edit edit_associated execute_now new_existing notify set_invalid set_requested set_valid update update_column} => [cer_a_solicitada cer_a_status_nulo] 2/4; {demais} => [] 0/4
 -- ClassSchedule
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -3033,7 +3033,7 @@ student_enrollment: can? (nada)
   cer_a_efetivada: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   cer_a_status_nulo: = classe
   cer_b_solicitada: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [cer_a_efetivada cer_a_solicitada cer_a_status_nulo cer_b_solicitada] 4/4; {add_existing duplicate edit edit_associated execute_now new_existing notify set_invalid set_requested set_valid update update_column} => ERRO ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: advisements.professor:; {demais} => [] 0/4
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [cer_a_efetivada cer_a_solicitada cer_a_status_nulo cer_b_solicitada] 4/4; {add_existing duplicate edit edit_associated execute_now new_existing notify set_invalid set_requested set_valid update update_column} => [cer_a_solicitada cer_a_status_nulo] 2/4; {demais} => [] 0/4
 -- ClassSchedule
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -4104,7 +4104,7 @@ student_enrollment: can? (nada)
   cer_a_efetivada: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   cer_a_status_nulo: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   cer_b_solicitada: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [cer_a_efetivada cer_a_solicitada cer_a_status_nulo cer_b_solicitada] 4/4; {add_existing duplicate edit edit_associated execute_now new_existing notify set_invalid set_requested set_valid update update_column} => ERRO ActiveRecord::StatementInvalid: SQLite3::SQLException: no such column: advisements.professor:; {demais} => [] 0/4
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [cer_a_efetivada cer_a_solicitada cer_a_status_nulo cer_b_solicitada] 4/4; {demais} => [] 0/4
 -- ClassSchedule
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -5013,17 +5013,17 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/147
 
 == ações em String que divergem do Symbol (#905), por usuário
-visitante: 1 pares modelo × ação; ações: download
-desconhecido: 1 pares modelo × ação; ações: download
-administrador: 180 pares modelo × ação; ações: add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify read_advisement_pendencies read_pendencies set_invalid set_requested set_valid update update_column
-coordenacao: 178 pares modelo × ação; ações: add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify read_advisement_pendencies read_pendencies set_invalid set_requested set_valid update update_column
-secretaria: 364 pares modelo × ação; ações: academic_transcript_pdf add_existing browse builtin cancel cities class_schedule_pdf configuration create delete destroy destroy_existing download duplicate edit edit_associated execute_now grades_report_pdf help index invite list map_student map_student_form map_student_form_create_update new new_existing notify override preview read read_advisement_pendencies read_all read_pendencies render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf undo_consolidation update update_column
-suporte: 35 pares modelo × ação; ações: academic_transcript_pdf add_existing browse builtin cities class_schedule_pdf download duplicate edit edit_associated execute_now grades_report_pdf help index list new_existing notify preview read render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf update update_column update_only_photo
-professor (sem lançamento de nota): 1143 pares modelo × ação; ações: academic_transcript_pdf add_existing assertion_pdf browse builtin cities class_schedule_pdf create delete destroy destroy_existing download duplicate edit edit_associated execute_now generate_assertion grades_report_pdf help index list new new_existing notify photo preview read read_advisement_pendencies read_all_fields read_pendencies render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf update update_column
-professor (nota no semestre corrente): 1170 pares modelo × ação; ações: academic_transcript_pdf add_existing assertion_pdf browse builtin cities class_schedule_pdf create delete destroy destroy_existing download duplicate edit edit_associated execute_now generate_assertion grades_report_pdf help index list new new_existing notify photo post_grades preview read read_advisement_pendencies read_all_fields read_pendencies render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf update update_column
-professor (nota em todo semestre): 1170 pares modelo × ação; ações: academic_transcript_pdf add_existing assertion_pdf browse builtin cities class_schedule_pdf create delete destroy destroy_existing download duplicate edit edit_associated execute_now generate_assertion grades_report_pdf help index list new new_existing notify photo post_grades preview read read_advisement_pendencies read_all_fields read_pendencies render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf update update_column
-professor sem professor vinculado: 1058 pares modelo × ação; ações: academic_transcript_pdf add_existing assertion_pdf browse builtin cities class_schedule_pdf create download duplicate edit edit_associated execute_now generate_assertion grades_report_pdf help index list new new_existing notify photo preview read read_all_fields read_pendencies render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf update update_column
-professor e coordenador, atuando como coordenação: 178 pares modelo × ação; ações: add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify read_advisement_pendencies read_pendencies set_invalid set_requested set_valid update update_column
-professor e coordenador, atuando como professor: 1143 pares modelo × ação; ações: academic_transcript_pdf add_existing assertion_pdf browse builtin cities class_schedule_pdf create delete destroy destroy_existing download duplicate edit edit_associated execute_now generate_assertion grades_report_pdf help index list new new_existing notify photo preview read read_advisement_pendencies read_all_fields read_pendencies render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf update update_column
-aluno: 5 pares modelo × ação; ações: academic_transcript_pdf assertion_pdf download generate_assertion grades_report_pdf
-aluno sem aluno vinculado: 1 pares modelo × ação; ações: download
+visitante: nenhuma
+desconhecido: nenhuma
+administrador: nenhuma
+coordenacao: nenhuma
+secretaria: nenhuma
+suporte: nenhuma
+professor (sem lançamento de nota): nenhuma
+professor (nota no semestre corrente): nenhuma
+professor (nota em todo semestre): nenhuma
+professor sem professor vinculado: nenhuma
+professor e coordenador, atuando como coordenação: nenhuma
+professor e coordenador, atuando como professor: nenhuma
+aluno: nenhuma
+aluno sem aluno vinculado: nenhuma
