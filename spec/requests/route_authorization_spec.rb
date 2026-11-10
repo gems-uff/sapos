@@ -7,9 +7,11 @@ require "rails_helper"
 
 # Guarda estrutural das rotas — issue #742.
 #
-# O visitante e um usuário logado sem papel nenhum batem em toda rota da
-# aplicação, com o verbo dela. Quem não tem permissão para nada só pode
-# receber recusa; o que ele consegue abrir tem de estar em
+# Quem não tem permissão para nada bate em toda rota da aplicação, com o verbo
+# dela: o visitante, o usuário com o papel Desconhecido e o usuário sem papel
+# nenhum (sem linha em user_roles e com actual_role nulo, estado que um reparo
+# por console ou script deixa — ver "Pontos cegos da suíte" no AGENTS.md). Os
+# três só podem receber recusa; o que ele consegue abrir tem de estar em
 # RouteProbe::ROTAS_ABERTAS, com o motivo ao lado. Assim um controller novo sem
 # autorização, ou um skip_authorization_check mais largo do que devia, quebra a
 # suíte em vez de passar calado — o check_authorization do ApplicationController
@@ -41,6 +43,10 @@ RSpec.describe "Rotas para quem não tem permissão", type: :request do
       FactoryBot.create(:report, user: @users[:administrador], file_name: "vencido.pdf"),
       "relatorio_sem_arquivo"
     )
+    @sem_papel_nenhum = User.new(email: "sem.papel@matriz.test", name: "Sem papel", password: "A1b2c3d4!")
+    @sem_papel_nenhum.skip_confirmation!
+    @sem_papel_nenhum.save!(validate: false)
+    @sem_papel_nenhum.update_column(:actual_role, nil)
     @extra = {
       admission_id: @labels.key("processo").id,
       medium_hash: arquivo.medium_hash,
@@ -70,7 +76,9 @@ RSpec.describe "Rotas para quem não tem permissão", type: :request do
   end
 
   it "recusa tudo fora das rotas abertas, e mantém o baseline" do
-    resultados = percorrer("visitante" => nil, "sem papel" => @users[:desconhecido])
+    resultados = percorrer(
+      "visitante" => nil, "papel desconhecido" => @users[:desconhecido], "sem papel nenhum" => @sem_papel_nenhum
+    )
 
     linhas = resultados.map do |route, outcomes|
       "#{route} | #{outcomes.map { |name, outcome| "#{name}: #{outcome}" }.join(' | ')}"
