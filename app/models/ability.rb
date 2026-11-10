@@ -93,32 +93,6 @@ class Ability
     initialize_student_pages(user, roles)
 
     can :read, :landing
-    # Define abilities for the passed in user here. For example:
-    #
-    #   user ||= User.new # guest user (not logged in)
-    #   if user.admin?
-    #     can :manage, :all
-    #   else
-    #     can :read, :all
-    #   end
-    #
-    # The first argument to `can` is the action you are giving the user
-    # permission to do.
-    # If you pass :manage it will apply to every action. Other common actions
-    # here are :read, :create, :update and :destroy.
-    #
-    # The second argument is the resource the user can perform the action on.
-    # If you pass :all it will apply to every resource. Otherwise pass a Ruby
-    # class of the resource.
-    #
-    # The third argument is an optional hash of conditions to further filter the
-    # objects.
-    # For example, here the user can only update published articles.
-    #
-    #   can :update, Article, :published => true
-    #
-    # See the wiki for details:
-    # https://github.com/ryanb/cancan/wiki/Defining-Abilities
   end
 
   def initialize_students(user, roles)
@@ -207,7 +181,7 @@ class Ability
       can :manage, Ability::COURSE_MODELS
       can :update_all_fields, ClassEnrollment
       can :update_all_fields, CourseClass
-      if !roles[Role::ROLE_COORDENACAO] && !roles[Role::ROLE_SECRETARIA]
+      if roles[Role::ROLE_ADMINISTRADOR]
         cannot :read_pendencies, ClassEnrollmentRequest
         cannot :read_pendencies, CourseClass
       end
@@ -222,8 +196,7 @@ class Ability
         can :update, ClassEnrollmentRequest, enrollment_request: {
           enrollment: { advisements: { professor: user.professor } }
         }
-        cannot :update, ClassEnrollmentRequest,
-          status: ClassEnrollmentRequest::EFFECTED if !roles[:manager]
+        cannot :update, ClassEnrollmentRequest, status: ClassEnrollmentRequest::EFFECTED
 
         if CustomVariable.professor_login_can_post_grades == "yes_all_semesters"
           can [:update, :post_grades], ClassEnrollment, course_class: {
@@ -259,7 +232,7 @@ class Ability
   end
 
   def initialize_documents(user, roles)
-    alias_action :execute_now, :execute_now, :notify, to: :update
+    alias_action :execute_now, :notify, to: :update
     if roles[:manager]
       can :manage, Ability::DOCUMENT_MODELS
     end
@@ -292,7 +265,6 @@ class Ability
   end
 
   def initialize_configurations(user, roles)
-    alias_action :execute_now, :execute_now, :notify, to: :update
     if roles[Role::ROLE_COORDENACAO]
       can :manage, (Ability::CONFIGURATION_MODELS - [
         CustomVariable
@@ -306,7 +278,7 @@ class Ability
   end
 
   def initialize_student_pages(user, roles)
-    if roles.include?(Role::ROLE_ALUNO) && user.student.present?
+    if roles[Role::ROLE_ALUNO] && user.student.present?
       can [:show, :enroll, :save_enroll], :student_enrollment
       can :academic_transcript_pdf, Enrollment do |enrollment|
         enrollment.dismissal&.dismissal_reason&.thesis_judgement === DismissalReason::APPROVED && enrollment.student_id === user.student.id
