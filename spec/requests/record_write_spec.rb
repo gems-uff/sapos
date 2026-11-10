@@ -99,6 +99,35 @@ RSpec.describe "Escrita por registro, pelo efeito no banco", type: :request do
       caminho: ->(r, _) { "/paper_students/#{r.id}" }, alvo: "ps_a", muda: true, acao: :destroy
     escrita "remove aluno do artigo de outro professor", usuario: :professor, verbo: :delete,
       caminho: ->(r, _) { "/paper_students/#{r.id}" }, alvo: "ps_b", muda: false, acao: :destroy
+    escrita "leva a autoria do próprio artigo para o artigo de outro professor (forja)", usuario: :professor,
+      verbo: :patch, caminho: ->(r, _) { "/paper_professors/#{r.id}" }, alvo: "pp_a",
+      params: ->(t) { { record: { paper: t.rec("paper_b").id } } }, muda: false
+    escrita "leva o aluno do próprio artigo para o artigo de outro professor (forja)", usuario: :professor,
+      verbo: :patch, caminho: ->(r, _) { "/paper_students/#{r.id}" }, alvo: "ps_a",
+      params: ->(t) { { record: { paper: t.rec("paper_b").id } } }, muda: false
+
+    # A criação é liberada à classe (o subform do artigo precisa dela); o que
+    # prende a linha nova ao artigo de quem a cria é a validação do modelo.
+    describe "linha de autoria nova" do
+      def autorias(artigo)
+        [PaperProfessor.where(paper: artigo).count, PaperStudent.where(paper: artigo).count]
+      end
+
+      def criar_autorias(artigo)
+        tentar(@users[:professor], :post, "/paper_professors",
+          record: { paper: artigo.id, professor: rec("prof_c").id })
+        tentar(@users[:professor], :post, "/paper_students",
+          record: { paper: artigo.id, student: rec("st_b").id })
+      end
+
+      it "não entra no artigo de outro professor" do
+        expect { criar_autorias(rec("paper_b")) }.not_to change { autorias(rec("paper_b")) }
+      end
+
+      it "entra no próprio artigo" do
+        expect { criar_autorias(rec("paper_a")) }.to change { autorias(rec("paper_a")) }.from([1, 1]).to([2, 2])
+      end
+    end
   end
 
   describe "professor, sobre notas" do
