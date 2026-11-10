@@ -80,13 +80,18 @@ RSpec.describe "Admissions::Admissions: entrada do candidato", type: :request do
       expect(session[:admission_tokens]).to include(application.token)
     end
 
-    it "reaproveita a inscrição não enviada do mesmo e-mail" do
+    # A pré-inscrição é a mesma, mas o código não: ele não estava na sessão
+    # deste navegador (ver application_code_ownership_spec.rb).
+    it "reaproveita a inscrição não enviada do mesmo e-mail, com código novo" do
       existing = create_application(@open, name: "Ana", email: "ana@example.com", filled: false)
+      old_token = existing.token
       expect {
         post admission_path(@open.simple_url), params: params_for(name: "Ana Maria", email: "ana@example.com")
       }.not_to change { Admissions::AdmissionApplication.count }
       expect(existing.reload.name).to eq("Ana Maria")
+      expect(existing.token).not_to eq(old_token)
       expect(response).to redirect_to(edit_admission_apply_path(admission_id: @open.simple_id, id: existing.token))
+      expect(session[:admission_tokens]).to include(existing.token)
     end
 
     it "recusa novo cadastro de e-mail já inscrito quando o edital não permite repetir" do

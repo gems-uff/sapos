@@ -764,8 +764,12 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       end
     end
 
+    # O codigo e a credencial da inscricao: cada caractere sai do gerador
+    # criptografico. O sample sem `random:` usa o gerador comum do Ruby, cuja
+    # sequencia se reconstroi a partir de saidas observadas.
     def generate_token
-      18.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }
+      alphabet = "2346789BCDFGHJKMPQRTVWXY".chars
+      18.times.map { alphabet.sample(random: SecureRandom) }
         .insert(6, "-").insert(13, "-").join("")
     end
 

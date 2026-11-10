@@ -71,6 +71,30 @@ RSpec.describe "Carta de recomendacao pela rota publica", type: :request do
     expect(@carta.reload.filled_form.is_filled).to be(true)
   end
 
+  # O recomendador preenche a carta; o pedido e o template dela sao do
+  # servidor. A carta valida vai na mesma requisicao, para a recusa do resto
+  # nao ser so uma requisicao que falhou inteira.
+  it "nao deixa o recomendador trocar o id do pedido nem o template da carta" do
+    outro_template = FactoryBot.create(:form_template, name: "Outro", template_type: "Carta de Recomendação")
+    id_do_pedido = @carta.id
+
+    put carta_path, params: {
+      record: {
+        id: 987_654, name: @carta.name, email: @carta.email,
+        filled_form_attributes: {
+          id: @carta.filled_form.id, enable_submission: "1", form_template_id: outro_template.id,
+          fields_attributes: { "0" => { form_field_id: @campo.id, value: "Recomendo" } },
+        },
+      },
+    }
+
+    expect(response).to redirect_to(admissions_path)
+    expect(Admissions::LetterRequest.exists?(987_654)).to be(false)
+    carta = Admissions::LetterRequest.find(id_do_pedido)
+    expect(carta.filled_form.form_template).to eq(@letter_template)
+    expect(carta.filled_form.is_filled).to be(true)
+  end
+
   it "recusa codigo de acesso inexistente" do
     get carta_path("CODIGO-INEXISTENTE")
 

@@ -32,26 +32,44 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
   end
 
   def create
+    # Processo sem sessao nao tem pre-inscricao: a inscricao nasce no envio do
+    # formulario (ApplyController#create), para onde o #show ja encaminha. Uma
+    # pre-inscricao criada aqui ocuparia o e-mail e faria o formulario recusar
+    # o dono dele.
+    if !@admission_process.require_session
+      return redirect_to new_admission_apply_path(
+        admission_id: @admission_process.simple_id
+      )
+    end
+
     @admission_application = Admissions::AdmissionApplication.find_by(
       admission_process: @admission_process,
-      email: admission_application_params[:email]
+      email: new_application_params[:email]
     )
 
     if !@admission_process.allow_multiple_applications && @admission_application.present?
       if @admission_application.filled_form.is_filled
         @admission_application = Admissions::AdmissionApplication.new(
-          admission_application_params.merge(
+          new_application_params.merge(
             admission_process: @admission_process
           )
         )
         flash.now[:alert] = I18n.t("errors.admissions.application_exists")
         return render :show
       else
-        @admission_application.assign_attributes(admission_application_params)
+        @admission_application.assign_attributes(new_application_params)
+        # A pre-inscricao nao enviada e retomada so pelo e-mail, que nao e
+        # segredo. Se o codigo dela nao esta na sessao deste navegador, quem
+        # chega pode ser outra pessoa: o codigo e trocado (set_token gera o
+        # novo) e o anterior deixa de valer. Nada se perde -- a pre-inscricao
+        # nao enviada so guarda o nome e o e-mail.
+        if !(session[:admission_tokens] || []).include?(@admission_application.token)
+          @admission_application.token = nil
+        end
       end
     else
       @admission_application = Admissions::AdmissionApplication.new(
-        admission_application_params.merge(
+        new_application_params.merge(
           admission_process: @admission_process,
           filled_form: Admissions::FilledForm.new(
             is_filled: false,
@@ -205,6 +223,13 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
       params.require(:admissions_admission_application).permit(
         :name, :email, :token, :_source
       )
+    end
+
+    # O que a tela do processo manda para criar a pre-inscricao. O codigo e
+    # gerado pelo servidor; token e _source so existem no formulario de
+    # recuperacao (#find).
+    def new_application_params
+      params.require(:admissions_admission_application).permit(:name, :email)
     end
 
     def optional_admission_application_params
