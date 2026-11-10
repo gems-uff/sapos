@@ -53,4 +53,31 @@ RSpec.describe "Matriz de permissões", type: :model do
 
     expect_matches_golden("ability_matrix", matrix, format: :text)
   end
+
+  # O baseline registra o can? e o accessible_by lado a lado, mas não cobra que
+  # concordem. A listagem de cada scaffold é o accessible_by, e a abertura de
+  # cada registro é o can?: se um deixa passar o que o outro nega, a tela lista
+  # o que não abre, ou abre o que não lista. O cancancan traduz as mesmas
+  # regras por dois caminhos (Ruby e SQL), e foi nessa tradução que os defeitos
+  # das versões anteriores apareceram.
+  it "lista pelo accessible_by exatamente o que o can? permite, registro a registro" do
+    divergencias = []
+    AbilityDataset::PERFIS.each do |perfil|
+      ability = Ability.new(vestir_perfil(perfil))
+      persistidos = @labels.select { |record, _| record.is_a?(ActiveRecord::Base) && record.persisted? }
+      persistidos.group_by { |record, _| record.class }.each do |model, registros|
+        AbilityMatrix::SQL_DUMP_ACTIONS.each do |acao|
+          ids = model.unscoped.accessible_by(ability, acao).pluck(:id)
+          registros.each do |registro, nome|
+            pode = ability.can?(acao, registro)
+            next if pode == ids.include?(registro.id)
+
+            divergencias << "#{perfil.first} | #{model.name} | #{acao} | #{nome}: can? #{pode}, accessible_by #{!pode}"
+          end
+        end
+      end
+    end
+
+    expect(divergencias).to be_empty, "can? e accessible_by discordam:\n#{divergencias.join("\n")}"
+  end
 end
