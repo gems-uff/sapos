@@ -112,5 +112,49 @@ RSpec.describe "Lancamento de notas na edicao da turma", type: :request do
 
       expect(@aprovada.reload.enrollment.enrollment_number).to eq("M-APROV")
     end
+
+    # A guarda das validacoes perguntava ao Ability sobre o registro ja
+    # alterado: trocado o dono, a turma deixava de ser do professor, a guarda
+    # respondia que ele nao lancava nota ali, e a validacao nao rodava.
+    describe "troca de dono" do
+      before(:each) do
+        @outro = FactoryBot.create(:professor, name: "Outro Prof")
+        @turma_do_outro = FactoryBot.create(
+          :course_class, course: @turma.course, professor: @outro, name: "Turma B"
+        )
+      end
+
+      it "recusa passar a turma a outro professor" do
+        lanca({}, professor: @outro.id.to_s)
+
+        expect(@turma.reload.professor).to eq(@professor)
+      end
+
+      it "recusa passar a turma a outro professor junto com as notas, sem gravar as notas" do
+        lanca(notas_de_aprovado_e_reprovado_por_falta, professor: @outro.id.to_s)
+
+        expect(@turma.reload.professor).to eq(@professor)
+        expect(@aprovada.reload.situation).to eq(ClassEnrollment::REGISTERED)
+      end
+
+      it "recusa passar a turma a outro professor pela edicao de uma coluna" do
+        post update_column_course_class_path(@turma), params: { column: "professor", value: @outro.id.to_s }, xhr: true
+
+        expect(@turma.reload.professor).to eq(@professor)
+      end
+
+      it "recusa mover a inscricao para a turma de outro professor" do
+        put class_enrollment_path(@aprovada), params: { record: { course_class: @turma_do_outro.id.to_s } }
+
+        expect(@aprovada.reload.course_class).to eq(@turma)
+      end
+
+      it "recusa mover a inscricao para a turma de outro professor pela edicao de uma coluna" do
+        post update_column_class_enrollment_path(@aprovada),
+          params: { column: "course_class", value: @turma_do_outro.id.to_s }, xhr: true
+
+        expect(@aprovada.reload.course_class).to eq(@turma)
+      end
+    end
   end
 end

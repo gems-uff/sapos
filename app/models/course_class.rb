@@ -5,6 +5,8 @@
 
 # Represents a Class instance of a Course taught by a Professor at a given semester
 class CourseClass < ApplicationRecord
+  include GradePostingGuardConcern
+
   has_paper_trail
 
   belongs_to :course, optional: false
@@ -22,8 +24,7 @@ class CourseClass < ApplicationRecord
   validates :semester,
     presence: true,
     inclusion: { in: YearSemester::SEMESTERS }
-  validate :professor_changed_only_valid_fields,
-    if: -> { can?(:post_grades, self) && cannot?(:update_all_fields, self) }
+  validate :professor_changed_only_valid_fields, if: :restricted_to_grade_fields?
 
 
   attr_reader :changed_from_course_class

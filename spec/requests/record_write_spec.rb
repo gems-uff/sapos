@@ -16,9 +16,9 @@ require "rails_helper"
 # mude quebre os dois lados.
 #
 # As linhas de "forja" mandam um campo que a tela não oferece àquele papel
-# (o dono do artigo, o professor do projeto). Quem barra
-# são as validações dos modelos, que consultam o Ability do usuário da
-# requisição.
+# (o dono do artigo, o professor do projeto, o professor da turma, a turma da
+# inscrição). Quem barra são as validações dos modelos, que consultam o Ability
+# do usuário da requisição.
 RSpec.describe "Escrita por registro, pelo efeito no banco", type: :request do
   include AbilityDataset
 
@@ -114,6 +114,12 @@ RSpec.describe "Escrita por registro, pelo efeito no banco", type: :request do
     escrita "lança observação na própria turma, sem lançamento de nota", usuario: :professor,
       notas: nil, verbo: :patch, caminho: inscricao, alvo: "ce_a_atual",
       params: { record: { obs: "Alterado" } }, muda: false, acao: :post_grades
+    escrita "move a inscrição para a turma de outro professor (forja)", usuario: :professor,
+      notas: "yes_all_semesters", verbo: :patch, caminho: inscricao, alvo: "ce_a_atual",
+      params: ->(t) { { record: { course_class: t.rec("cc_b_atual").id } } }, muda: false
+    escrita "passa a própria turma para outro professor (forja)", usuario: :professor,
+      notas: "yes_all_semesters", verbo: :patch, caminho: ->(r, _) { "/course_classes/#{r.id}" },
+      alvo: "cc_a_atual", params: ->(t) { { record: { professor: t.rec("prof_b").id } } }, muda: false
   end
 
   describe "professor, sobre pedidos de inscrição" do

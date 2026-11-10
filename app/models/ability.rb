@@ -265,7 +265,7 @@ class Ability
     end
     if roles[Role::ROLE_SECRETARIA]
       cannot :read, [ReportConfiguration]
-      cannot [:destroy, :update, :create], [Assertion, Query, Notification]
+      cannot [:destroy, :update, :create], [Assertion, Query, QueryParam, Notification]
     end
     if roles[Role::ROLE_COORDENACAO]
       cannot :manage, ReportConfiguration

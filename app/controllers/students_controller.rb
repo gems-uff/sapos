@@ -87,7 +87,7 @@ class StudentsController < ApplicationController
       if can? :read_all_fields, Student
         active_scaffold_config.show.columns = UPDATE_FIELDS
       elsif can? :update_only_photo, Student
-        active_scaffold_config.update.columns = [:photo, :email]
+        active_scaffold_config.show.columns = [:photo, :email]
       end
     end
 end

@@ -5,6 +5,8 @@
 
 # Represents the ClassEnrollment of a student Enrollment in a Course Class
 class ClassEnrollment < ApplicationRecord
+  include GradePostingGuardConcern
+
   has_paper_trail
 
   belongs_to :course_class, optional: false
@@ -37,8 +39,7 @@ class ClassEnrollment < ApplicationRecord
   validate :grade_for_situation
   validate :disapproved_by_absence_for_situation
   validate :check_multiple_class_enrollment_allowed
-  validate :professor_changed_only_valid_fields,
-    if: -> { can?(:post_grades, self) && cannot?(:update_all_fields, self) }
+  validate :professor_changed_only_valid_fields, if: :restricted_to_grade_fields?
   validate :check_enrollment_hold, if: :dates_affecting_hold_changed?
 
   after_save :notify_student_and_advisor

@@ -1743,7 +1743,7 @@ student_enrollment: can? (nada)
   classe: tudo menos: add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column
   accessible_by: {todas} => [] 0/0
 -- QueryParam
-  classe: (tudo)
+  classe: tudo menos: add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column
   accessible_by: {todas} => [] 0/0
 -- Report
   classe: (tudo)
