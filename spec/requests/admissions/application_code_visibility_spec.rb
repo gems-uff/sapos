@@ -85,4 +85,55 @@ RSpec.describe "Codigo da inscricao nas telas internas", type: :request do
     expect(abrir(admission_application_path(@kim))).to include(@codigo)
     expect(abrir(letter_requests_path)).to include("Kim - #{@kim.identifier}")
   end
+
+  # A secretaria gerencia o processo sem gerenciar cada candidatura (lê e
+  # altera, não apaga): é ela quem socorre o candidato que perdeu o código.
+  context "para a secretaria" do
+    before(:each) do
+      sign_in create_confirmed_user([FactoryBot.create(:role_secretaria)], "codigo-secretaria@example.com")
+    end
+
+    it "mostra o codigo inteiro da inscricao na lista e na ficha" do
+      expect(abrir(admission_applications_path)).to include(@codigo)
+      expect(abrir(admission_application_path(@kim))).to include(@codigo)
+    end
+
+    it "mostra o codigo de acesso da carta, sem o link de quem gerencia a carta" do
+      corpo = abrir(letter_requests_path)
+
+      @kim.letter_requests.each do |carta|
+        expect(corpo).to include(carta.access_token)
+        expect(corpo).not_to include(admission_letter_path(admission_id: @process.simple_id, id: carta.access_token))
+      end
+    end
+  end
+
+  # A busca por campo da lista oferece comparadores às colunas de texto
+  # (contém, não contém, começa com). A do código é um campo simples: o termo
+  # casa com o identificador ou com o código inteiro, e mais nada.
+  it "oferece na busca um campo simples para o codigo, sem comparador" do
+    sign_in @admin
+
+    corpo = abrir(show_search_admission_applications_path, xhr: true)
+
+    expect(corpo).to include('name="search[token]"')
+    expect(corpo).not_to include("search[token][opt]")
+    expect(corpo).to include("search[name][opt]")
+  end
+
+  # O seletor de candidaturas lista o que a lista lista: as candidaturas em
+  # que quem pede tem pendência.
+  it "nao lista no seletor a candidatura de quem nao tem pendencia nela" do
+    outro = FactoryBot.create(:professor)
+    sem_pendencia = create_confirmed_user(
+      [Role.find_by(id: Role::ROLE_PROFESSOR) || FactoryBot.create(:role_professor)],
+      "codigo-outro-professor@example.com", "Outro Professor", professor: outro
+    )
+
+    sign_in sem_pendencia
+    expect(abrir(browse_admission_applications_path, params: { search: "Kim" })).not_to include("Kim - ")
+
+    sign_in @membro
+    expect(abrir(browse_admission_applications_path, params: { search: "Kim" })).to include("Kim - #{@kim.identifier}")
+  end
 end

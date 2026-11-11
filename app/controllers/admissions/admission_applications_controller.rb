@@ -129,6 +129,10 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     config.update.multipart = true
 
 
+    # A busca pelo codigo e um campo simples, sem os comparadores que as
+    # colunas de texto ganham: condition_for_token_column decide o que casa.
+    config.columns[:token].search_ui = :text
+
     config.actions.swap :search, :field_search
     config.field_search.columns = [
       :admission_process,
@@ -412,6 +416,12 @@ class Admissions::AdmissionApplicationsController < ApplicationController
   end
 
   protected
+    # O seletor lista o que a lista lista: a gem parte do modelo cru, e o
+    # Ability so e aplicado na lista (beginning_of_chain).
+    def record_select_conditions_from_controller
+      { id: Admissions::AdmissionApplication.accessible_by(current_ability, :read).select(:id) }
+    end
+
     def do_map_student_form
       prepare_map_student
     rescue Exceptions::MissingFieldException, Exceptions::InvalidStudentFieldException => ex

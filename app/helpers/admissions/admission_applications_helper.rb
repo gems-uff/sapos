@@ -79,10 +79,11 @@ module Admissions::AdmissionApplicationsHelper
   )
 
   # O codigo inteiro e a credencial do candidato na pagina publica da
-  # inscricao. Quem gerencia o processo o ve, para socorrer o candidato que o
-  # perdeu; os demais veem o identificador.
+  # inscricao. Quem gerencia o processo seletivo o ve, para socorrer o
+  # candidato que o perdeu -- a secretaria entre eles, que gerencia o processo
+  # sem gerenciar cada candidatura; os demais veem o identificador.
   def token_column(record, column)
-    can?(:manage, record) ? record.token : record.identifier
+    can?(:manage, record.admission_process) ? record.token : record.identifier
   end
 
   def token_show_column(record, column)
