@@ -446,6 +446,9 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       )
     end
     self.assign_attributes(params)
+    if params[:letter_requests_attributes].present?
+      self.letter_requests.each(&:follow_email_change)
+    end
     all_forms = []
     all_phase_forms = []
     if self.filled_form.try(:enable_submission) == "1"
@@ -463,6 +466,9 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     # editar o candidato altera o resto do formulario.
     if !check_candidate_permission && !can_edit_override && self.email_changed?
       self.email = self.email_was
+      # O campo do formulario sincronizado com o e-mail volta junto, senao a
+      # ficha mostraria um endereco e a candidatura teria outro.
+      self.filled_form.sync_fields_before(self) if self.filled_form.try(:enable_submission) == "1"
     end
     if has_letter_forms
       self.letter_requests.each do |letter_request|
@@ -704,6 +710,11 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     self.admission_phase.try(:name)
   end
 
+  # Mudanca so de caixa ou de espaco em volta nao e outro endereco.
+  def email_address_changed?
+    !email.to_s.strip.casecmp?(email_in_database.to_s.strip)
+  end
+
   # A parte do codigo que cita a candidatura sem abri-la: os seis primeiros
   # caracteres, unicos dentro do processo (generate_valid_token).
   def identifier
@@ -814,7 +825,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     # caracteres) fica, porque e por ele que relatorios e rotulos ja citaram a
     # inscricao; muda so o resto.
     def renew_token_when_email_changes
-      return unless persisted? && email_changed? && self.token?
+      return unless persisted? && email_address_changed? && self.token?
 
       renewed = "#{identifier}#{generate_token[6..]}"
       renewed = "#{identifier}#{generate_token[6..]}" while self.class.exists?(token: renewed)

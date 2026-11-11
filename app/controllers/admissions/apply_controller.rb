@@ -55,7 +55,7 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
     # endereco muda -- pelo campo do formulario sincronizado com o e-mail --, o
     # modelo troca o codigo (renew_token_when_email_changes), e a mensagem
     # abaixo o leva para o endereco novo.
-    email_changed = !creating && @admission_application.email_changed?
+    email_changed = !creating && @admission_application.email_address_changed?
     if @admission_application.save
       emails = [EmailTemplate.load_template(
         was_filled ?
@@ -93,7 +93,7 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
         session[:admission_tokens]&.delete(previous_token)
         key = email_changed ? "email_changed" : "new_token_sent"
         return redirect_to admissions_path, token_delivery_flash(
-          "admissions.apply.update.#{key}", @admission_application.email
+          "admissions.apply.update.#{key}", @admission_application.email, emails.first(1)
         )
       end
       notice = was_filled ?

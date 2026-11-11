@@ -78,6 +78,15 @@ RSpec.describe "Seletor de registros e parametros da URL", type: :request do
       expect(response.body).not_to include("Modelo de inscricao")
     end
 
+    it "compara o tipo por igualdade: curinga nao lista tudo, e parametro em outra forma e ignorado" do
+      get browse_form_templates_path, params: { template_type: "%" }
+      expect(response.body).not_to include("Modelo de carta", "Modelo de inscricao")
+
+      get browse_form_templates_path, params: { template_type: { x: "1" } }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("Modelo de carta", "Modelo de inscricao")
+    end
+
     it "lista todos sem o tipo, e nao filtra por coluna que o seletor nao declara" do
       get browse_form_templates_path, params: { name: "Modelo de carta" }
 

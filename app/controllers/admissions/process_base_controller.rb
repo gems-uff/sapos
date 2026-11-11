@@ -21,13 +21,14 @@ class Admissions::ProcessBaseController < ApplicationController
       end
     end
 
-    # O aviso de para onde o codigo foi. Quando o sistema nao esta enviando
-    # e-mail (variavel redirect_email vazia, ou envio desligado no ambiente),
-    # a tela diz isso em vez de afirmar um envio que nao houve: a inscricao
-    # existe, e quem gerencia o processo ve o codigo e pode passa-lo.
-    def token_delivery_flash(key, email)
-      if Notifier.sending?
-        { notice: I18n.t(key, email: email) }
+    # O aviso de para onde o codigo foi. Quando a mensagem que o leva nao sai
+    # (variavel redirect_email vazia, envio desligado no ambiente, ou modelo
+    # de e-mail desabilitado na instalacao), a tela diz isso em vez de afirmar
+    # um envio que nao houve: a inscricao existe, e quem gerencia o processo ve
+    # o codigo e pode passa-lo.
+    def token_delivery_flash(key, email, messages, **interpolation)
+      if Notifier.sending? && messages.any? { |message| !message[:skip_message] }
+        { notice: I18n.t(key, email: email, **interpolation) }
       else
         { alert: I18n.t("#{key}_without_email") }
       end

@@ -13,7 +13,7 @@ class CourseClass < ApplicationRecord
   belongs_to :professor, optional: false
 
   has_many :class_enrollments, dependent: :destroy,
-    before_remove: :note_removed_class_enrollment
+    before_remove: :keep_class_enrollment_when_posting_grades
   has_many :class_enrollment_requests, dependent: :destroy
   has_many :allocations, dependent: :destroy
   has_many :enrollments, through: :class_enrollments
@@ -126,17 +126,26 @@ class CourseClass < ApplicationRecord
           errors.add(:base, :changes_to_disallowed_fields)
         end
       end
-      # O subformulario grava a associacao inteira: a inscricao que nao vem no
-      # envio sai da turma e, com dependent: :destroy, e apagada na hora. Quem
-      # so lanca nota nao apaga inscricao; o erro aqui desfaz a transacao do
-      # envio, e a inscricao volta.
-      if @removed_class_enrollments.present?
-        errors.add(:base, :changes_to_disallowed_fields)
-      end
+      errors.add(:base, :class_enrollment_removal_not_allowed) if @class_enrollment_removal_refused
     end
 
-    def note_removed_class_enrollment(class_enrollment)
-      (@removed_class_enrollments ||= []) << class_enrollment
+    # O subformulario grava a associacao inteira: a inscricao que nao vem no
+    # envio sai da turma e, com dependent: :destroy, e apagada na hora, com o
+    # aviso de remocao ao professor. Quem so lanca nota nao apaga inscricao: a
+    # recusa vem antes da remocao, e o active_scaffold a trata como associacao
+    # que nao pode ser gravada (RecordNotSaved), sem gravar o resto do envio.
+    # A inscricao que entrou na turma depois de o formulario ser aberto cai
+    # aqui tambem: ela nao vem no envio, e o professor recarrega a pagina.
+    #
+    # O erro e reposto pela validacao a cada vez que ela roda: o controller
+    # chama valid? antes de gravar, e isso apagaria um erro posto so aqui.
+    def keep_class_enrollment_when_posting_grades(_class_enrollment)
+      return unless restricted_to_grade_fields?
+
+      @class_enrollment_removal_refused = true
+      raise ActiveRecord::RecordNotSaved.new(
+        I18n.t("activerecord.errors.models.course_class.class_enrollment_removal_not_allowed"), self
+      )
     end
 
     delegate :can?, :cannot?, to: :ability

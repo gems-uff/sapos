@@ -39,11 +39,25 @@ RSpec.describe "Edicao em linha dos scaffolds", type: :request do
       @aluno = FactoryBot.create(:student, name: "Nome Original")
     end
 
-    it "nao grava pela edicao em linha" do
-      post "/students/#{@aluno.id}/update_column", xhr: true, env: remoto,
-        params: { column: "name", value: "Nome Trocado", record: { x: "1" } }
+    it "nao grava pela edicao em linha, e a recusa nao traz o valor da coluna" do
+      begin
+        post "/students/#{@aluno.id}/update_column", xhr: true, env: remoto,
+          params: { column: "name", value: "Nome Trocado", record: { x: "1" } }
+      rescue ActiveScaffold::ActionNotAllowed
+        nil
+      end
 
       expect(@aluno.reload.name).to eq("Nome Original")
+      expect(response&.body.to_s).not_to include("Nome Original")
+    end
+
+    it "recusa a coluna que nao existe sem quebrar" do
+      post "/students/#{@aluno.id}/update_column", xhr: true, env: remoto,
+        params: { column: "coluna_que_nao_existe", value: "x" }
+    rescue ActiveScaffold::ActionNotAllowed
+      nil
+    else
+      expect(response.status).to be_between(400, 499)
     end
 
     it "nao devolve o campo com o valor" do

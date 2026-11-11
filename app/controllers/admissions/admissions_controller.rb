@@ -89,10 +89,10 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
     # caixa daquele endereco. A tela so diz para onde ele foi. Sem o codigo na
     # sessao, quem chega so apresentou o e-mail, que nao e segredo: a
     # pre-inscricao que ja existia fica como esta e o codigo segue de novo.
-    send_token_by_email(existing)
+    messages = send_token_by_email(existing)
     redirect_to admission_path(
       id: @admission_process.simple_id, email: existing.email
-    ), token_delivery_flash("admissions.admissions.create.token_sent", existing.email)
+    ), token_delivery_flash("admissions.admissions.create.token_sent", existing.email, messages)
   end
 
   def find
@@ -208,9 +208,9 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
       end
       Notifier.send_emails(notifications: emails)
 
-      redirect_to path, notice: I18n.t(
+      redirect_to path, token_delivery_flash(
         "admissions.admissions.find_by_email.success",
-        email: admission_application_params[:email],
+        admission_application_params[:email], emails,
         count: @admission_applications.length
       )
     end
@@ -237,6 +237,7 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
         )
       })]
       Notifier.send_emails(notifications: emails)
+      emails
     end
 
     def admission_application_params

@@ -130,8 +130,10 @@ RSpec.describe "Admissions::AdmissionApplications com parametros fora do formula
   # equipe: quem recebeu o código no endereço antigo deixa de abrir a
   # inscrição. O identificador fica, porque é por ele que a inscrição já foi
   # citada.
-  it "troca o codigo, e mantem o identificador, quando a equipe corrige o e-mail" do
+  it "troca o codigo, mantem o identificador e manda o novo ao endereco novo quando a equipe corrige o e-mail" do
     codigo = @application.token
+    enviadas = []
+    allow(Notifier).to receive(:send_emails) { |notifications:| enviadas.concat(notifications) }
     sign_out @reviewer
     sign_in create_confirmed_user([FactoryBot.create(:role_administrador)], "forjado-admin@ic.uff.br", "Admin")
 
@@ -142,6 +144,24 @@ RSpec.describe "Admissions::AdmissionApplications com parametros fora do formula
     expect(@application.reload.email).to eq("corrigido@example.com")
     expect(@application.token).not_to eq(codigo)
     expect(@application.identifier).to eq(codigo[0, 6])
+    expect(enviadas.map { |mensagem| mensagem[:to] }).to eq(["corrigido@example.com"])
+    expect(enviadas.first[:body]).to include(@application.token)
+  end
+
+  # Controle: mudar só a caixa do endereço não é trocar de endereço.
+  it "mantem o codigo e nao manda mensagem quando so a caixa do e-mail muda" do
+    codigo = @application.token
+    allow(Notifier).to receive(:send_emails)
+    sign_out @reviewer
+    sign_in create_confirmed_user([FactoryBot.create(:role_administrador)], "forjado-admin@ic.uff.br", "Admin")
+
+    put admission_application_path(@application), xhr: true, params: {
+      can_edit_override: "1", record: { email: @application.email.upcase }
+    }
+
+    expect(@application.reload.email).to eq(@application.email.upcase)
+    expect(@application.token).to eq(codigo)
+    expect(Notifier).not_to have_received(:send_emails)
   end
 
   # A fase pode deixar o comitê editar o formulário do candidato. O e-mail fica
@@ -163,6 +183,32 @@ RSpec.describe "Admissions::AdmissionApplications com parametros fora do formula
       expect(own_evaluation_value).to eq "9"
       expect(@application.reload.email).to eq(email)
       expect(@application.token).to eq(codigo)
+    end
+
+    # O campo do formulário sincronizado com o e-mail volta junto: a ficha não
+    # fica mostrando um endereço que a candidatura não tem.
+    it "nao deixa o membro trocar o e-mail pelo campo sincronizado, nem deixa o campo com o endereco digitado" do
+      correio = FactoryBot.create(
+        :form_field, form_template: @template, name: "Correio", field_type: Admissions::FormField::STRING,
+        sync: Admissions::FormField::SYNC_EMAIL
+      )
+      email = @application.email
+      filled_form = @application.filled_form
+
+      put admission_application_path(@application), xhr: true, params: { record: {
+        filled_form_attributes: {
+          id: filled_form.id, enable_submission: "1",
+          fields_attributes: {
+            "0" => { id: field_of(filled_form, "nota").id, value: "8" },
+            "1" => { form_field_id: correio.id, value: "membro@example.com" },
+          }
+        },
+        evaluations_attributes: { "0" => own_evaluation_entry }
+      } }
+
+      expect(@application.reload.email).to eq(email)
+      gravado = @application.filled_form.fields.find_by(form_field_id: correio.id)
+      expect(gravado&.value).to eq(email)
     end
 
     # Controle: o que a fase libera ao comitê segue liberado.

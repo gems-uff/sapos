@@ -25,12 +25,14 @@ module RecordSelectUrlConditions
       []
     end
 
+    # Igualdade, e so com valor simples: o LIKE da gem aceitaria o curinga que
+    # vem na URL, e um parametro em forma de hash quebraria a consulta.
     def record_select_conditions_from_params
       record_select_url_columns.filter_map do |name|
-        column = record_select_config.model.columns_hash[name.to_s]
-        next if column.nil? || !params.key?(name)
+        value = params[name]
+        next unless record_select_config.model.columns_hash.key?(name.to_s) && value.is_a?(String)
 
-        record_select_condition_for_column(column, params[name])
+        { name => value }
       end
     end
 end

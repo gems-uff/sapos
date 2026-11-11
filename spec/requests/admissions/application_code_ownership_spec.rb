@@ -456,6 +456,17 @@ RSpec.describe "Posse do codigo de inscricao", type: :request do
       expect(pagina).to include("não está enviando e-mails")
     end
 
+    it "nao afirma que mandou os codigos na recuperacao por e-mail" do
+      create_application(@com_sessao, name: "Pessoa", email: "pessoa@example.com")
+      sessao = navegador
+
+      entrar(sessao, @com_sessao, "pessoa@example.com", "forgot")
+
+      pagina = resposta_inteira(sessao)
+      expect(pagina).not_to include("Email enviado para")
+      expect(pagina).to include("não está enviando e-mails")
+    end
+
     it "nao afirma que mandou o codigo da inscricao enviada sem sessao" do
       sessao = navegador
 

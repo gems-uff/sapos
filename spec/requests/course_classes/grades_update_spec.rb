@@ -113,17 +113,29 @@ RSpec.describe "Lancamento de notas na edicao da turma", type: :request do
       expect(@aprovada.reload.enrollment.enrollment_number).to eq("M-APROV")
     end
 
-    # A guarda das validacoes perguntava ao Ability sobre o registro ja
-    # alterado: trocado o dono, a turma deixava de ser do professor, a guarda
-    # respondia que ele nao lancava nota ali, e a validacao nao rodava.
     # O subformulário grava a associação inteira: a inscrição que não vem no
     # envio sai da turma, e com dependent: :destroy é apagada. O professor que
     # lança nota não apaga inscrição.
     describe "inscricao que nao vem no envio" do
-      it "nao apaga a inscricao que ficou de fora" do
+      it "nao apaga a inscricao que ficou de fora, nem grava as notas das outras" do
         expect {
           lanca({ @aprovada => { situation: ClassEnrollment::APPROVED, grade: "8.5", disapproved_by_absence: "0" } })
         }.not_to change { ClassEnrollment.where(course_class_id: @turma.id).count }
+
+        expect(ClassEnrollment.exists?(@faltosa.id)).to be(true)
+        expect(@aprovada.reload.situation).to eq(ClassEnrollment::REGISTERED)
+        expect(response.body).to include(
+          CGI.escapeHTML(I18n.t("activerecord.errors.models.course_class.class_enrollment_removal_not_allowed"))
+        )
+      end
+
+      # A recusa vem antes da remoção: a inscrição não chega a ser apagada, e
+      # o que a exclusão dispara (o aviso de inscrição removida ao professor,
+      # no período de ajuste) não roda.
+      it "nao chega a apagar a inscricao, nem dispara o que a exclusao dispara" do
+        expect_any_instance_of(ClassEnrollment).not_to receive(:notify_professor)
+
+        lanca({ @aprovada => { situation: ClassEnrollment::REGISTERED } })
 
         expect(ClassEnrollment.exists?(@faltosa.id)).to be(true)
       end
@@ -137,6 +149,9 @@ RSpec.describe "Lancamento de notas na edicao da turma", type: :request do
       end
     end
 
+    # A guarda das validacoes perguntava ao Ability sobre o registro ja
+    # alterado: trocado o dono, a turma deixava de ser do professor, a guarda
+    # respondia que ele nao lancava nota ali, e a validacao nao rodava.
     describe "troca de dono" do
       before(:each) do
         @outro = FactoryBot.create(:professor, name: "Outro Prof")

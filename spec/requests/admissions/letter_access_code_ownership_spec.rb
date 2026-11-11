@@ -96,6 +96,24 @@ RSpec.describe "Posse do codigo de acesso da carta", type: :request do
       expect(abre_a_carta?(novo)).to be(true)
     end
 
+    # Na página pública da carta quem altera o e-mail é o próprio recomendador,
+    # que já tem o código: o link dele segue valendo.
+    it "mantem o codigo quando o proprio recomendador corrige o e-mail ao preencher a carta" do
+      antigo = @pedido.access_token
+
+      put admission_letter_path(admission_id: @process.simple_id, id: antigo), params: { record: {
+        name: @pedido.name, email: "recomendador.novo@example.com",
+        filled_form_attributes: {
+          id: @pedido.filled_form.id, enable_submission: "1",
+          fields_attributes: { "0" => { form_field_id: @carta.fields.first.id, value: "parecer" } },
+        },
+      } }
+
+      expect(@pedido.reload.is_filled).to be(true)
+      expect(@pedido.access_token).to eq(antigo)
+      expect(abre_a_carta?(antigo)).to be(true)
+    end
+
     # Controle: sem trocar o endereço, o código fica e nenhuma mensagem sai.
     it "mantem o codigo quando a edicao nao troca o endereco" do
       antigo = @pedido.access_token

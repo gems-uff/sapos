@@ -18,13 +18,14 @@
 # Prepend nos modulos, porque sao incluidos em cada controller pela chamada
 # active_scaffold e ficariam na frente de um metodo do ApplicationController.
 module ActiveScaffoldInplaceEditUpdate
-  protected
-    def record_for_update_column
-      record = super
-      raise ActiveScaffold::ActionNotAllowed unless @column&.inplace_edit
+  # A recusa vem antes de a acao da gem carregar o registro: a resposta dela,
+  # mesmo a de falha, traz o valor da coluna pedida.
+  def update_column
+    column = active_scaffold_config.columns[params[:column]]
+    raise ActiveScaffold::ActionNotAllowed unless column&.inplace_edit
 
-      record
-    end
+    super
+  end
 end
 
 module ActiveScaffoldInplaceEditField

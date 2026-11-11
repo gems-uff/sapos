@@ -35,6 +35,7 @@ pt-BR:
         success:
           one: Email enviado para %{email} com código de identificação
           other: Email enviado para %{email} com códigos de identificação
+        success_without_email: "O sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o código de identificação."
 
     apply:
       show:

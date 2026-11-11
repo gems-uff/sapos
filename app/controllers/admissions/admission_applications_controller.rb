@@ -607,6 +607,32 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       params.delete :can_edit_override if params.include? :can_edit_override
     end
 
+    # O codigo acompanha o endereco (renew_token_when_email_changes e
+    # LetterRequest#follow_email_change). Quando a troca do e-mail e feita por
+    # esta tela, o codigo novo segue para o endereco novo daqui: o candidato
+    # recebe a mensagem de inscricao alterada, e o recomendador, o pedido de
+    # carta. So entra o que mudou neste envio.
+    def after_update_save(record)
+      process = record.admission_process
+      messages = []
+      if record.saved_change_to_token?
+        messages << EmailTemplate.load_template("admissions/apply:edit_email_to_student").prepare_message({
+          record: record, admission_process: process,
+          admission_apply_url: admission_apply_url(admission_id: process.simple_id, id: record.token)
+        })
+      end
+      record.letter_requests.each do |letter_request|
+        next unless letter_request.saved_change_to_access_token? && !letter_request.saved_change_to_id?
+
+        messages << EmailTemplate.load_template("admissions/apply:request_letter").prepare_message({
+          record: record, admission_process: process, letter_request: letter_request,
+          fill_letter_url: admission_letter_url(admission_id: process.simple_id, id: letter_request.access_token)
+        })
+        letter_request.update(sent_email: letter_request.email)
+      end
+      Notifier.send_emails(notifications: messages) if messages.any?
+    end
+
     def admission_application_params
       params.require(:record).permit(
         :name, :email,
