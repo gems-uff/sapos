@@ -97,6 +97,15 @@ corrija na wiki.
   (`git log --all --grep="<numero>"`). Não é só evitar duplicata: é ali que está o
   contexto que torna a issue nova útil — decisão de produto já tomada, tentativa
   revertida, correção que só alcançou parte do código.
+- **Issue em que se trabalha tem dono no GitHub.** A que é aberta para trabalho
+  já começado nasce atribuída a quem conduz a sessão (`gh issue create
+  --assignee @me`); a que já existia é atribuída antes do primeiro commit (`gh
+  issue edit <N> --add-assignee @me`). O dono é o único sinal que o colaborador
+  vê: commit local, sem push, não aparece para ninguém, e a issue sem dono é a
+  que alguém pega — o trabalho sai em dobro e o PR de quem não sabia volta
+  recusado. Antes de pegar uma issue, confira o dono; a de outra pessoa não se
+  pega sem combinar nela. Vale também para a correção sem issue pública que
+  cobre uma issue aberta: atribua a issue que ela resolve.
 - **Issue nasce com o campo Type preenchido:** `gh issue create --type Bug`, ou
   `gh issue edit <N> --type Feature` para corrigir depois. Os três valores em uso
   são `Bug` (o sistema faz mal o que já faz), `Feature` (capacidade nova ou

@@ -36,6 +36,14 @@ request implements what is written there.
 A large issue can be split while it is refined: a part whose solution is closed
 can be implemented while the others are still under discussion.
 
+**The assignee tells who is working on an issue.** Check it before you pick
+one: an issue assigned to someone else is taken, even when its branch shows no
+commit — work that was not pushed yet is invisible to you. If the issue has no
+assignee, ask in it and wait for the maintainer's answer; once the two of you
+agree that it is yours, assign it to yourself and only then start. If an
+assigned issue looks stalled, ask in the issue instead of opening a pull
+request for it.
+
 ## Branching model
 
 We use one branch per issue. Every issue gets its own branch named after it (for example, `issue_123`), whether it is a bug fix, a dependency update, or a new feature. All of them are based on _main_.
