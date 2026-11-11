@@ -183,7 +183,10 @@ module FieldMatrix
 
     atual = record[nome]
     case coluna.type
-    when :string, :text then "Forjado pela matriz"
+    # O e-mail é conferido no formato: o texto que não é endereço seria
+    # recusado pela validação, e a matriz não distinguiria isso de recusa
+    # por permissão.
+    when :string, :text then nome.to_s.end_with?("email") ? "forjado-pela-matriz@example.com" : "Forjado pela matriz"
     when :integer, :decimal, :float then (atual || 0) + 1
     when :boolean then atual ? "0" : "1"
     when :date then ((atual || Date.current) + 1).to_s
