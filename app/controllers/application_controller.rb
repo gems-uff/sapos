@@ -129,7 +129,9 @@ class ApplicationController < ActionController::Base
     # here we nullify invalid dates that comes from the request
     # invalid dates consists in dates with year < 1000
     def parse_date
-      if params[:record]
+      # so o formulario (um conjunto de campos) tem datas a conferir; texto
+      # solto ou lista em `record` nao veio de tela nenhuma
+      if params[:record].is_a?(ActionController::Parameters)
         external_key = ""
         invalid_year = false
         params[:record].dup.each { |key, value|

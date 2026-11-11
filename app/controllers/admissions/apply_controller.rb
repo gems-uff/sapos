@@ -162,12 +162,13 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       @submission_method = :post
     end
 
-    # Submissão que chega sem o parâmetro record — upload interrompido, duplo
-    # clique em "Modificar inscrição". Sem isso, o params.require(:record)
-    # estoura e o candidato recebe a página crua de 400 do Rails, sem entender
-    # o que houve nem o que fazer.
+    # Submissão que chega sem o formulário no parâmetro record — upload
+    # interrompido, duplo clique em "Modificar inscrição", envio que não veio
+    # da tela. Sem isso, o params.require(:record).permit estoura e o candidato
+    # recebe a página crua de erro do Rails, sem entender o que houve nem o
+    # que fazer.
     def check_submitted_record
-      return if params[:record].present?
+      return if submitted_record?
 
       target = if @admission_application&.token.present?
         admission_apply_path(
@@ -244,10 +245,16 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
     # Nome e e-mail so sao campos da tela quando a inscricao nasce no envio do
     # formulario (processo sem sessao). Na edicao a tela nao os oferece: eles
     # so mudam pelo campo do formulario sincronizado com cada um.
+    #
+    # O formulario principal, quando a tela o oferece ao candidato, e sempre
+    # submetido (submitted_form).
     def submitted_params(creating:)
-      return admission_application_params if creating
-
-      admission_application_params.except(:name, :email)
+      submitted = admission_application_params
+      submitted = submitted.except(:name, :email) unless creating
+      if @admission_application.can_edit_main_form?(check_candidate_permission: true)
+        submitted[:filled_form_attributes] = submitted_form(submitted[:filled_form_attributes])
+      end
+      submitted
     end
 
     def admission_application_params

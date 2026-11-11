@@ -34,6 +34,25 @@ class Admissions::ProcessBaseController < ApplicationController
       end
     end
 
+    # O formulario da tela chega em params[:record] como um conjunto de campos.
+    # O que chega de outro jeito -- ausente, vazio, texto solto, lista -- nao
+    # veio da tela, e nao segue para o params.require(:record).permit.
+    def submitted_record?
+      params[:record].is_a?(ActionController::Parameters) && params[:record].present?
+    end
+
+    # O formulario que a tela publica oferece e sempre submetido: so a tela
+    # interna, com a edicao total, desliga a submissao de um formulario
+    # (enable_submission). O que chega sem os campos do formulario, ou com eles
+    # em formato que a tela nao manda, e o formulario sem resposta, e e
+    # conferido como tal -- em vez de ser gravado sem conferencia.
+    def submitted_form(attributes)
+      unless attributes.is_a?(ActionController::Parameters)
+        attributes = ActionController::Parameters.new.permit!
+      end
+      attributes.merge(enable_submission: "1")
+    end
+
     def add_token_to_session(token)
       session[:admission_tokens] = Set.new if session[:admission_tokens].blank?
       session[:admission_tokens].add(token)

@@ -95,6 +95,46 @@ RSpec.describe "Carta de recomendacao pela rota publica", type: :request do
     expect(carta.filled_form.is_filled).to be(true)
   end
 
+  # O que a tela manda e sempre o formulario da carta, com os campos dela. O
+  # que chega de outro jeito nao veio da tela: nao pode virar pagina de erro
+  # nem carta dada como enviada.
+  describe "envio que a tela nao faz" do
+    def enviar_cru(parametros)
+      put carta_path, params: parametros, env: { "REMOTE_ADDR" => RouteProbe::REMOTE_ADDR }
+    end
+
+    {
+      "sem o formulario" => {},
+      "com texto solto no lugar do formulario" => { record: "abc" },
+      "com lista no lugar do formulario" => { record: ["abc"] },
+    }.each do |caso, parametros|
+      it "devolve o recomendador a carta, #{caso}" do
+        enviar_cru(parametros)
+
+        expect(response).to redirect_to(carta_path)
+        expect(flash[:alert]).to eq(I18n.t("errors.admissions.empty_submission"))
+        expect(@carta.reload.filled_form.is_filled).to be(false)
+      end
+    end
+
+    {
+      "com lista no lugar dos campos da carta" => { record: { name: "a", filled_form_attributes: ["abc"] } },
+      "com os campos da carta em formato que a tela nao manda" =>
+        { record: { filled_form_attributes: { enable_submission: { a: "1" } } } },
+      "sem os campos da carta" => { record: { x: "" } },
+      "com a submissao do formulario desligada" => { record: { filled_form_attributes: { enable_submission: "0" } } },
+    }.each do |caso, parametros|
+      it "confere a carta como a tela a mandaria, #{caso}" do
+        enviar_cru(parametros)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Avaliacao do candidato")
+        expect(@carta.reload.filled_form.is_filled).to be(false)
+        expect(@carta.filled_form.form_template).to eq(@letter_template)
+      end
+    end
+  end
+
   it "recusa codigo de acesso inexistente" do
     get carta_path("CODIGO-INEXISTENTE")
 
