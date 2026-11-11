@@ -24,6 +24,12 @@ class Admissions::LetterRequest < ActiveRecord::Base
 
   validates :admission_application, presence: true
   validates :email, presence: true
+  # O e-mail e para onde o link da carta viaja; como o da candidatura, e
+  # conferido quando e novo ou alterado (AdmissionApplication).
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true,
+    if: :email_changed?
+
+  before_validation :strip_email
   validates :name, presence: true
 
   before_save :set_access_token
@@ -76,6 +82,11 @@ class Admissions::LetterRequest < ActiveRecord::Base
   end
 
   private
+    # O espaco em volta nao e parte do endereco.
+    def strip_email
+      self.email = email.strip if email.is_a?(String) && email != email.strip
+    end
+
     def generate_access_token
       token = SecureRandom.urlsafe_base64
       while Admissions::LetterRequest.exists?(access_token: token)

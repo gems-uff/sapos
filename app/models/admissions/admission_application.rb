@@ -101,6 +101,13 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
   validates :name, presence: true
   validates :email, presence: true
+  # O e-mail e para onde o codigo de identificacao viaja: texto que nao e
+  # endereco deixa o candidato sem ele. A conferencia vale para o endereco
+  # novo ou alterado, para que a inscricao gravada antes dela, com endereco
+  # fora do formato, continue editavel no resto. O formato e o que o campo de
+  # e-mail do navegador aceita.
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true,
+    if: :email_changed?
   validates_uniqueness_of :email, scope: :admission_process_id, if: ->(apply) {
     apply.admission_process.present? &&
     !apply.admission_process.allow_multiple_applications
@@ -108,6 +115,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
   validate :number_of_letters_in_filled_form
 
+  before_validation :strip_email
   before_save :renew_token_when_email_changes
   before_save :set_token
 
@@ -810,6 +818,11 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
         token = generate_token
       end
       token
+    end
+
+    # O espaco em volta nao e parte do endereco.
+    def strip_email
+      self.email = email.strip if email.is_a?(String) && email != email.strip
     end
 
     def set_token

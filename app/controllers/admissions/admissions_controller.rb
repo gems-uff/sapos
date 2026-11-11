@@ -249,8 +249,12 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
     # O que a tela do processo manda para criar a pre-inscricao. O codigo e
     # gerado pelo servidor; token e _source so existem no formulario de
     # recuperacao (#find).
+    # O e-mail vai sem o espaco em volta, como a inscricao o grava: e por ele
+    # que se procura a pre-inscricao que ja existe.
     def new_application_params
-      params.require(:admissions_admission_application).permit(:name, :email)
+      permitted = params.require(:admissions_admission_application).permit(:name, :email)
+      permitted[:email] = permitted[:email].strip if permitted[:email].is_a?(String)
+      permitted
     end
 
     def optional_admission_application_params
