@@ -37,7 +37,9 @@
         name: "Carta de #{letter_request.name}",
         id: "#{subid}-letter-#{letter_request.id}",
         visible: main_visible,
-        can_edit: can_edit_main,
+        # a carta ainda nao respondida so e preenchida, no lugar do
+        # recomendador, por quem tem a edicao total (assign_form)
+        can_edit: can_edit_main && (local_assigns[:can_edit_override] || letter_request.answered?),
         field: :letter_requests,
         object: letter_request,
         hidden_fields: [],

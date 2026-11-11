@@ -431,8 +431,12 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     # como editavel, e o resto e descartado; o formulario principal, com o nome
     # e o e-mail que a tela mostra junto dele, e as cartas seguem
     # can_edit_main_form?. O template e o formulario preenchido de cada objeto
-    # sao os do servidor, nunca os que vem nos parametros.
+    # sao os do servidor, nunca os que vem nos parametros. E so quem tem a
+    # edicao total desliga a submissao de um formulario (enable_submission):
+    # para os demais a tela submete sempre, e o parametro que diz outra coisa
+    # nao veio dela.
     params = params.to_h.with_indifferent_access
+    always_submitted = !can_edit_override
     self.email_change_needs_confirmation = check_candidate_permission
     phase_params = {
       results: params.delete(:results_attributes),
@@ -442,13 +446,17 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     if self.can_edit_main_form?(can_edit_override:, check_candidate_permission:)
       if params[:filled_form_attributes].present?
         params[:filled_form_attributes] = sanitize_filled_form_params(
-          self.filled_form, params[:filled_form_attributes]
+          self.filled_form, params[:filled_form_attributes], always_submitted:
         )
       end
       if params[:letter_requests_attributes].present?
+        # Quem responde a carta e o recomendador. Pela tela interna, o
+        # formulario da carta ainda nao respondida so e de quem tem a edicao
+        # total, que a preenche no lugar dele; os demais editam a ja
+        # respondida (_candidate_forms oferece a mesma coisa).
         params[:letter_requests_attributes] = sanitize_nested_filled_forms(
-          params[:letter_requests_attributes], self.letter_requests
-        )
+          params[:letter_requests_attributes], self.letter_requests, always_submitted:
+        ) { |letter_request| can_edit_override || letter_request&.answered? }
       end
     else
       params.delete(:filled_form_attributes)
@@ -458,13 +466,10 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
     if can_edit_override && rankings_params.present?
       params[:rankings_attributes] = sanitize_nested_filled_forms(
-        rankings_params, self.rankings
+        rankings_params, self.rankings, always_submitted:
       )
     end
     self.assign_attributes(params)
-    if params[:letter_requests_attributes].present?
-      self.letter_requests.each(&:follow_email_change)
-    end
     all_forms = []
     all_phase_forms = []
     if self.filled_form.try(:enable_submission) == "1"
@@ -489,7 +494,15 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     if has_letter_forms
       self.letter_requests.each do |letter_request|
         if letter_request.filled_form.try(:enable_submission) == "1"
+          # O e-mail do pedido chega pelo campo do pedido e pelo campo da carta
+          # sincronizado com ele, que a tela manda com o endereco de antes. O
+          # campo do pedido, quando quem edita o alterou, e o que vale.
+          requested_email = letter_request.email if letter_request.email_address_changed?
           letter_request.filled_form.sync_fields_after(letter_request)
+          if requested_email
+            letter_request.email = requested_email
+            letter_request.filled_form.sync_fields_before(letter_request)
+          end
           all_forms << {
             was_filled: letter_request.filled_form.is_filled,
             mode: :letter,
@@ -498,6 +511,12 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
           letter_request.filled_form.is_filled = true
         end
       end
+    end
+    # Depois dos formularios de carta: o endereco que fica no pedido e o que
+    # a regra do codigo de acesso confere, venha do campo do pedido ou do
+    # campo da carta.
+    if params[:letter_requests_attributes].present?
+      self.letter_requests.each(&:follow_email_change)
     end
     if has_phases
       self.admission_process.phases.order(:order).each do |p|
@@ -521,7 +540,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
             filled_form.fields.reset
             phase_form[:object].assign_attributes(
               filled_form_attributes: sanitize_filled_form_params(
-                filled_form, entry[:filled_form_attributes]
+                filled_form, entry[:filled_form_attributes], always_submitted:
               )
             )
             filled_form.prepare_missing_fields
@@ -820,7 +839,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
   private
     def nested_entries(entries)
-      entries.is_a?(Hash) ? entries.values : Array(entries)
+      Admissions::FilledForm.nested_entries(entries)
     end
 
     # A entrada dos parametros que corresponde ao objeto do formulario de fase:
@@ -838,8 +857,13 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       end
     end
 
-    def sanitize_filled_form_params(filled_form, attributes)
+    def sanitize_filled_form_params(filled_form, attributes, always_submitted:)
       attributes = attributes.except(:form_template_id, :is_filled)
+      attributes[:enable_submission] = "1" if always_submitted
+      if attributes.key?(:fields_attributes)
+        attributes[:fields_attributes] =
+          Admissions::FilledForm.submitted_fields(attributes[:fields_attributes])
+      end
       if filled_form&.persisted?
         attributes[:id] = filled_form.id
       else
@@ -848,13 +872,14 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       attributes
     end
 
-    def sanitize_nested_filled_forms(entries, owners)
+    def sanitize_nested_filled_forms(entries, owners, always_submitted:)
       nested_entries(entries).map do |entry|
         next entry if entry[:filled_form_attributes].blank?
         owner = owners.find { |o| o.persisted? && o.id.to_s == entry[:id].to_s } if entry[:id].present?
+        next entry.except(:filled_form_attributes) if block_given? && !yield(owner)
         entry.merge(
           filled_form_attributes: sanitize_filled_form_params(
-            owner&.filled_form, entry[:filled_form_attributes]
+            owner&.filled_form, entry[:filled_form_attributes], always_submitted:
           )
         )
       end

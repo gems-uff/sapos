@@ -123,6 +123,8 @@ RSpec.describe "Carta de recomendacao pela rota publica", type: :request do
         { record: { filled_form_attributes: { enable_submission: { a: "1" } } } },
       "sem os campos da carta" => { record: { x: "" } },
       "com a submissao do formulario desligada" => { record: { filled_form_attributes: { enable_submission: "0" } } },
+      "com os campos da carta soltos, fora de uma lista" =>
+        { record: { filled_form_attributes: { fields_attributes: { value: "Recomendo" } } } },
     }.each do |caso, parametros|
       it "confere a carta como a tela a mandaria, #{caso}" do
         enviar_cru(parametros)

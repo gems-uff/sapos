@@ -85,6 +85,13 @@ RSpec.describe "Admissions::ApplyController", type: :request do
         { record: { filled_form_attributes: { enable_submission: { a: "1" } } } },
       "no field of the form" => { record: { x: "" } },
       "the submission of the form turned off" => { record: { filled_form_attributes: { enable_submission: "0" } } },
+      "the fields of the form as one loose field, out of a list" =>
+        { record: { filled_form_attributes: { fields_attributes: { value: "x" } } } },
+      "the schooling of a field as one loose entry, out of a list" => { record: { filled_form_attributes: {
+        fields_attributes: { "0" => { value: "v", scholarities_attributes: { level: "x" } } },
+      } } },
+      "a loose letter request, out of a list" =>
+        { record: { letter_requests_attributes: { name: "R", email: "r@example.com" } } },
     }.each do |shape, params|
       it "checks the form as the screen would send it, with #{shape}" do
         allow(ExceptionNotifier).to receive(:notify_exception)

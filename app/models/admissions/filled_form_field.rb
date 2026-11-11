@@ -207,7 +207,9 @@ class Admissions::FilledFormField < ActiveRecord::Base
   end
 
   def validate_file_field(configuration, is_photo: false)
-    if configuration["required"] && (self.file.blank? || self.file.file.blank?)
+    # O arquivo marcado para remocao ainda esta no campo durante a validacao:
+    # o CarrierWave so o tira ao gravar.
+    if configuration["required"] && (self.file.blank? || self.file.file.blank? || self.remove_file?)
       add_error(:blank)
     end
     return if self.file.blank? || self.file.file.blank?

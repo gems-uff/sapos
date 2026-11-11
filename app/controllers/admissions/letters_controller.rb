@@ -84,10 +84,13 @@ class Admissions::LettersController < Admissions::ProcessBaseController
           Admissions::FilledFormsController.filled_form_params_definition,
       )
       attributes = submitted_form(permitted[:filled_form_attributes])
-        .except(:form_template_id, :is_filled, :id)
+        .except(:form_template_id, :is_filled, :id).to_h.with_indifferent_access
+      if attributes.key?(:fields_attributes)
+        attributes[:fields_attributes] =
+          Admissions::FilledForm.submitted_fields(attributes[:fields_attributes])
+      end
       filled_form = @letter_request.filled_form
       attributes[:id] = filled_form.id if filled_form&.persisted?
-      permitted[:filled_form_attributes] = attributes
-      permitted
+      permitted.to_h.merge(filled_form_attributes: attributes)
     end
 end

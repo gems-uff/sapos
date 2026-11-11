@@ -45,7 +45,9 @@ class Admissions::ProcessBaseController < ApplicationController
     # interna, com a edicao total, desliga a submissao de um formulario
     # (enable_submission). O que chega sem os campos do formulario, ou com eles
     # em formato que a tela nao manda, e o formulario sem resposta, e e
-    # conferido como tal -- em vez de ser gravado sem conferencia.
+    # conferido como tal -- em vez de ser gravado sem conferencia. O formato de
+    # cada colecao dentro dele (campos, escolaridades, pedidos de carta) e
+    # conferido por FilledForm.nested_entries.
     def submitted_form(attributes)
       unless attributes.is_a?(ActionController::Parameters)
         attributes = ActionController::Parameters.new.permit!

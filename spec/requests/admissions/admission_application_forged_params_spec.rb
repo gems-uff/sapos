@@ -72,6 +72,20 @@ RSpec.describe "Admissions::AdmissionApplications com parametros fora do formula
     expect(field_of(@other_evaluation.filled_form, "Parecer").value).to eq "7"
   end
 
+  # A tela manda os pareceres um por indice. O parecer solto, fora da lista,
+  # nao e o de ninguem.
+  it "ignora o parecer que chega solto, fora de uma lista" do
+    put admission_application_path(@application), xhr: true, params: {
+      can_edit_override: "",
+      record: { evaluations_attributes: own_evaluation_entry }
+    }
+
+    expect(response).to have_http_status(:ok)
+    own = @application.evaluations.find_by(user: @reviewer)
+    expect(own&.filled_form&.is_filled).not_to be(true)
+    expect(own&.filled_form&.fields.to_a.map(&:value)).not_to include("9")
+  end
+
   it "nao concede edicao total a quem manda can_edit_override sem ter o papel" do
     put admission_application_path(@application), xhr: true, params: {
       can_edit_override: "1",
@@ -303,6 +317,65 @@ RSpec.describe "Admissions::AdmissionApplications com parametros fora do formula
       } }
 
       expect(@application.reload.name).to eq("Nome Corrigido Pelo Comite")
+    end
+  end
+
+  # Na fase que deixa a comissao editar o candidato, o membro altera o
+  # formulario da candidatura, menos o e-mail: o campo sincronizado com ele vem
+  # somente leitura, e o servidor o repoe. A reposicao vale para o formulario
+  # submetido, e a tela do membro submete sempre -- so quem tem a edicao total
+  # desliga a submissao de um formulario.
+  describe "com a marca de submissao do formulario desligada por quem nao a desliga pela tela" do
+    before(:each) do
+      template = create_admission_template("Com e-mail", {
+        "nota" => Admissions::FormField::NUMBER,
+        "Correio" => { field_type: Admissions::FormField::STRING, sync: Admissions::FormField::SYNC_EMAIL },
+      })
+      process = create_closed_admission_process(template, simple_url: "forjado-email-#{SecureRandom.hex(4)}")
+      phase = add_phase(process, 1, member_form: @member_form, can_edit_candidate: true)
+      add_committee(phase, [@reviewer])
+      @candidate = create_application(
+        process, email: "candidata@example.com", admission_phase: phase,
+        fields: { "nota" => "8", "Correio" => "candidata@example.com" }
+      )
+      phase.create_pendencies_for_candidate(@candidate)
+      allow(Notifier).to receive(:send_emails)
+    end
+
+    def send_main_form(nota:, **flag)
+      form = @candidate.filled_form
+      put admission_application_path(@candidate), xhr: true, params: {
+        can_edit_override: "",
+        record: { filled_form_attributes: {
+          id: form.id, **flag,
+          fields_attributes: {
+            "0" => { id: field_of(form, "nota").id, form_field_id: field_of(form, "nota").form_field_id, value: nota },
+            "1" => {
+              id: field_of(form, "Correio").id, form_field_id: field_of(form, "Correio").form_field_id,
+              value: "membro@example.com"
+            },
+          },
+        } }
+      }
+    end
+
+    { "omitida" => {}, "desligada" => { enable_submission: "0" } }.each do |caso, flag|
+      it "nao grava outro endereco no campo sincronizado com o e-mail, com a marca #{caso}" do
+        send_main_form(nota: "9", **flag)
+
+        expect(field_of(@candidate.filled_form, "Correio").value).to eq("candidata@example.com")
+        expect(@candidate.reload.email).to eq("candidata@example.com")
+        # o resto do formulario, que a fase deixa o membro editar, e gravado
+        expect(field_of(@candidate.filled_form, "nota").value).to eq("9")
+      end
+    end
+
+    # Controle: o que a tela manda.
+    it "nao grava outro endereco no campo com a marca que a tela manda" do
+      send_main_form(nota: "9", enable_submission: "1")
+
+      expect(field_of(@candidate.filled_form, "Correio").value).to eq("candidata@example.com")
+      expect(field_of(@candidate.filled_form, "nota").value).to eq("9")
     end
   end
 end
