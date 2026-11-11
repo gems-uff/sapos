@@ -9,8 +9,10 @@ require "rails_helper"
 # parâmetro da URL com nome de coluna do modelo, e coluna de texto entrava por
 # LIKE com o padrão que vinha da URL. Quem abre o seletor de um modelo
 # confirmava assim, um pedaço de cada vez, o valor de uma coluna que nenhuma
-# tela lhe mostra. Nenhum seletor do SAPOS usa esse filtro; aqui se cobra que
-# o parâmetro não filtre nada.
+# tela lhe mostra. Agora só filtra a coluna que o controller do seletor
+# declara em record_select_url_columns: hoje, o tipo do modelo de formulário,
+# que os formulários do processo seletivo mandam para oferecer só os modelos
+# do tipo certo.
 RSpec.describe "Seletor de registros e parametros da URL", type: :request do
   include ActiveSupport::Testing::TimeHelpers
   include AbilityDataset
@@ -37,7 +39,8 @@ RSpec.describe "Seletor de registros e parametros da URL", type: :request do
         next unless config
 
         modelo = config.model
-        coluna = modelo.columns.find { |c| %i[string text].include?(c.type) }
+        declaradas = controller.new.send(:record_select_url_columns).map(&:to_s)
+        coluna = modelo.columns.find { |c| %i[string text].include?(c.type) && declaradas.exclude?(c.name) }
         next if coluna.nil?
 
         caminho = route_path(rota, id: nil)
@@ -52,6 +55,43 @@ RSpec.describe "Seletor de registros e parametros da URL", type: :request do
 
       expect(conferidos).to be > 10
       expect(filtraram).to be_empty, "o parametro da URL filtrou o seletor: #{filtraram.join(', ')}"
+    end
+  end
+
+  # O filtro que o SAPOS usa: o formulário do processo seletivo abre o seletor
+  # de modelos com o tipo na URL (options[:params] da coluna).
+  describe "no seletor de modelos de formulario" do
+    before(:each) do
+      role = FactoryBot.create(:role_administrador)
+      sign_in create_confirmed_user([role], "seletor-modelos@example.com")
+      create_admission_template("Modelo de inscricao", { "Dado" => Admissions::FormField::STRING })
+      create_admission_template(
+        "Modelo de carta", { "Parecer" => Admissions::FormField::STRING },
+        template_type: Admissions::FormTemplate::RECOMMENDATION_LETTER
+      )
+    end
+
+    it "lista so os modelos do tipo pedido" do
+      get browse_form_templates_path, params: { template_type: Admissions::FormTemplate::RECOMMENDATION_LETTER }
+
+      expect(response.body).to include("Modelo de carta")
+      expect(response.body).not_to include("Modelo de inscricao")
+    end
+
+    it "lista todos sem o tipo, e nao filtra por coluna que o seletor nao declara" do
+      get browse_form_templates_path, params: { name: "Modelo de carta" }
+
+      expect(response.body).to include("Modelo de carta", "Modelo de inscricao")
+    end
+
+    it "manda o tipo no endereco do seletor do formulario do processo" do
+      get new_admission_process_path
+
+      expect(response).to have_http_status(:ok)
+      expect(CGI.unescape(response.body)).to include(
+        "template_type=#{Admissions::FormTemplate::ADMISSION_FORM}",
+        "template_type=#{Admissions::FormTemplate::RECOMMENDATION_LETTER}"
+      )
     end
   end
 

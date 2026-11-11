@@ -10,17 +10,28 @@
 # modelo confirma assim, um pedaco de cada vez, o valor de coluna que nenhuma
 # tela lhe mostra.
 #
-# Nenhum seletor do SAPOS usa esse filtro: os que restringem registros o fazem
-# em record_select_conditions_from_controller, e a busca digitada passa por
-# record_select_conditions_from_search, sobre as colunas de search_on. Aqui o
-# parametro da URL deixa de filtrar.
+# Aqui o seletor so filtra pela URL a coluna que o controller dele declara em
+# record_select_url_columns. Quem usa o filtro e o formulario que abre o
+# seletor com options[:params] na coluna (o tipo do modelo de formulario, nos
+# formularios do processo seletivo); ao acrescentar um, declare a coluna no
+# controller do seletor. A busca digitada segue por
+# record_select_conditions_from_search, sobre as colunas de search_on.
 #
 # Prepend no modulo, porque ele e incluido em cada controller pela chamada
 # record_select e ficaria na frente de um metodo do ApplicationController.
 module RecordSelectUrlConditions
   protected
-    def record_select_conditions_from_params
+    def record_select_url_columns
       []
+    end
+
+    def record_select_conditions_from_params
+      record_select_url_columns.filter_map do |name|
+        column = record_select_config.model.columns_hash[name.to_s]
+        next if column.nil? || !params.key?(name)
+
+        record_select_condition_for_column(column, params[name])
+      end
     end
 end
 
