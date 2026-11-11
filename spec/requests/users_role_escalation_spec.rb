@@ -18,15 +18,16 @@ RSpec.describe "Escalacao de papel pela tela de usuarios", type: :request do
   SENHA = "A1b2c3d4!"
 
   before(:each) do
-    # O formulário de usuário lista os sete papéis: precisam existir todos.
-    @papel = %i[administrador coordenacao secretaria professor aluno suporte desconhecido].index_with do |nome|
+    # O formulário de usuário lista os seis papéis: precisam existir todos.
+    @papel = %i[administrador coordenacao secretaria professor aluno desconhecido].index_with do |nome|
       FactoryBot.create(:"role_#{nome}")
     end
     @administrador = create_confirmed_user([@papel[:administrador]], "adm@escalacao.test", "Administrador", SENHA)
     @coordenacao = create_confirmed_user([@papel[:coordenacao]], "coord@escalacao.test", "Coordenacao", SENHA)
     @comum = create_confirmed_user([@papel[:desconhecido]], "comum@escalacao.test", "Comum", SENHA)
     @dois_papeis = create_confirmed_user(
-      [@papel[:secretaria], @papel[:suporte]], "dois@escalacao.test", "Dois Papeis", SENHA
+      [@papel[:secretaria], @papel[:professor]], "dois@escalacao.test", "Dois Papeis", SENHA,
+      professor: FactoryBot.create(:professor)
     )
     @dois_papeis.update_column(:actual_role, Role::ROLE_SECRETARIA)
   end
@@ -111,9 +112,9 @@ RSpec.describe "Escalacao de papel pela tela de usuarios", type: :request do
     # usuário passa a atuar no maior dos que sobraram; tirados todos, fica com
     # Desconhecido — nunca com um papel que já não é dele.
     it "ao tirar o papel em que outro usuario atua, deixa-o no maior dos que restam" do
-      alterar(@dois_papeis, roles: ids(:suporte))
-      expect(papeis(@dois_papeis)).to eq(ids(:suporte))
-      expect(@dois_papeis.reload.actual_role).to eq(Role::ROLE_SUPORTE)
+      alterar(@dois_papeis, roles: ids(:professor))
+      expect(papeis(@dois_papeis)).to eq(ids(:professor))
+      expect(@dois_papeis.reload.actual_role).to eq(Role::ROLE_PROFESSOR)
 
       alterar(@dois_papeis, name: "Dois Papeis")
       expect(papeis(@dois_papeis)).to eq(ids(:desconhecido))
@@ -121,8 +122,8 @@ RSpec.describe "Escalacao de papel pela tela de usuarios", type: :request do
     end
   end
 
-  # A escada inteira: desconhecido, aluno, suporte, professor, secretaria. Abaixo
-  # da coordenação ninguém administra usuários, então toda tentativa de mexer
+  # A escada inteira: desconhecido, aluno, professor, secretaria. Abaixo da
+  # coordenação ninguém administra usuários, então toda tentativa de mexer
   # em papel, por qualquer das entradas que gravam usuário ou vínculo de papel,
   # tem de deixar o banco como estava: os papéis de todos, o papel em que cada
   # um atua, a senha, o e-mail, o nome e a contagem de usuários e de vínculos.
@@ -133,7 +134,6 @@ RSpec.describe "Escalacao de papel pela tela de usuarios", type: :request do
         aluno: create_confirmed_user(
           [@papel[:aluno]], "aluno@escalacao.test", "Aluno", SENHA, student: FactoryBot.create(:student)
         ),
-        suporte: create_confirmed_user([@papel[:suporte]], "suporte@escalacao.test", "Suporte", SENHA),
         professor: create_confirmed_user(
           [@papel[:professor]], "professor@escalacao.test", "Professor", SENHA, professor: FactoryBot.create(:professor)
         ),
@@ -200,7 +200,7 @@ RSpec.describe "Escalacao de papel pela tela de usuarios", type: :request do
       }
     end
 
-    %i[desconhecido aluno suporte professor secretaria].each do |degrau|
+    %i[desconhecido aluno professor secretaria].each do |degrau|
       it "#{degrau}: nenhuma tentativa muda papel, conta ou vinculo de ninguem" do
         ator = @atores[degrau]
         antes = retrato
@@ -265,8 +265,8 @@ RSpec.describe "Escalacao de papel pela tela de usuarios", type: :request do
       post "/change_role", params: { role_id: Role::ROLE_ADMINISTRADOR }
       expect(@dois_papeis.reload.actual_role).to eq(Role::ROLE_SECRETARIA)
 
-      post "/change_role", params: { role_id: Role::ROLE_SUPORTE }
-      expect(@dois_papeis.reload.actual_role).to eq(Role::ROLE_SUPORTE)
+      post "/change_role", params: { role_id: Role::ROLE_PROFESSOR }
+      expect(@dois_papeis.reload.actual_role).to eq(Role::ROLE_PROFESSOR)
     end
 
     # Fora de IP local a recusa do cancancan sobe como exceção (ver

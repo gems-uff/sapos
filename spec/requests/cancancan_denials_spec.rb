@@ -74,26 +74,15 @@ RSpec.describe "Negacoes do cancancan", type: :request do
     end
   end
 
-  # StudentsController#check_current_user troca as colunas do formulario pelo
-  # can?: quem so pode a foto ve foto e e-mail.
-  describe "ficha do aluno editada pelo suporte" do
-    it "mostra so a foto e o e-mail" do
-      sign_in create_confirmed_user([FactoryBot.create(:role_suporte)], "suporte@ic.uff.br", "Suporte")
-
-      get edit_student_path(@student)
-
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include('name="record[email]"')
-      expect(response.body).to include('name="record[photo]"')
-      expect(response.body).not_to include('name="record[name]"')
-    end
-
+  # Quem edita o aluno edita a ficha inteira: nao ha papel que alcance so
+  # parte dela (#748).
+  describe "ficha do aluno" do
     it "mostra a ficha inteira ao administrador" do
       sign_in create_confirmed_user([FactoryBot.create(:role_administrador)], "adm_ficha@ic.uff.br", "Adm")
 
       get edit_student_path(@student)
 
-      expect(response.body).to include('name="record[name]"')
+      expect(response.body).to include('name="record[name]"', 'name="record[email]"', 'name="record[photo]"')
     end
   end
 end

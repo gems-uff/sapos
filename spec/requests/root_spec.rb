@@ -20,7 +20,6 @@ RSpec.describe "Raiz do SAPOS", type: :request do
     role_coordenacao: {},
     role_secretaria: {},
     role_professor: { professor: -> { FactoryBot.create(:professor) } },
-    role_suporte: {},
     role_aluno: { student: -> { FactoryBot.create(:student) } },
     role_desconhecido: {},
   }.each do |papel, associados|

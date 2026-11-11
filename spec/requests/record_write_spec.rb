@@ -171,11 +171,9 @@ RSpec.describe "Escrita por registro, pelo efeito no banco", type: :request do
       caminho: candidatura, alvo: "app_pendente", muda: false, acao: :destroy
   end
 
-  describe "aluno e suporte" do
-    escrita "aluno altera a própria matrícula", usuario: :aluno, verbo: :patch,
+  describe "aluno" do
+    escrita "altera a própria matrícula", usuario: :aluno, verbo: :patch,
       caminho: ->(r, _) { "/enrollments/#{r.id}" }, alvo: "enr_a_aprovada",
       params: { record: { obs: "Alterado" } }, muda: false, acao: :update
-    escrita "suporte apaga aluno", usuario: :suporte, verbo: :delete,
-      caminho: ->(r, _) { "/students/#{r.id}" }, alvo: "st_b", muda: false, acao: :destroy
   end
 end

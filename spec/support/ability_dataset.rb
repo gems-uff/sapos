@@ -26,7 +26,6 @@ module AbilityDataset
     ["administrador", :administrador, nil, nil],
     ["coordenacao", :coordenacao, nil, nil],
     ["secretaria", :secretaria, nil, nil],
-    ["suporte", :suporte, nil, nil],
     ["professor (sem lançamento de nota)", :professor, nil, nil],
     ["professor (nota no semestre corrente)", :professor, "yes", nil],
     ["professor (nota em todo semestre)", :professor, "yes_all_semesters", nil],
@@ -99,7 +98,6 @@ module AbilityDataset
       secretaria: FactoryBot.create(:role_secretaria),
       professor: FactoryBot.create(:role_professor),
       aluno: FactoryBot.create(:role_aluno),
-      suporte: FactoryBot.create(:role_suporte),
       desconhecido: FactoryBot.create(:role_desconhecido),
     }
 
@@ -117,7 +115,6 @@ module AbilityDataset
       administrador: user_with([roles[:administrador]], "administrador"),
       coordenacao: user_with([roles[:coordenacao]], "coordenacao"),
       secretaria: user_with([roles[:secretaria]], "secretaria"),
-      suporte: user_with([roles[:suporte]], "suporte"),
       desconhecido: user_with([roles[:desconhecido]], "desconhecido"),
       professor: user_with([roles[:professor]], "professor", professor: @prof_a),
       professor_sem_vinculo: user_without_link(roles[:professor], "professor_sem_vinculo"),

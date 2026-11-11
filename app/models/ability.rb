@@ -76,7 +76,7 @@ class Ability
     if roles[Role::ROLE_ADMINISTRADOR]
       can :manage, :all
     end
-    if roles[:manager] || roles[Role::ROLE_PROFESSOR] || roles[Role::ROLE_SUPORTE]
+    if roles[:manager] || roles[Role::ROLE_PROFESSOR]
       can :read, :pendency
     end
 
@@ -98,24 +98,17 @@ class Ability
   def initialize_students(user, roles)
     if roles[:manager]
       can :manage, Ability::STUDENT_MODELS
-      can :update_all_fields, Student
-      can :read_all_fields, Student
       can :override_report_signature_type, Enrollment
       can :generate_report_without_watermark, Enrollment
       can :invite, User
     end
     if roles[Role::ROLE_PROFESSOR]
       can :read, Ability::STUDENT_MODELS
-      can :read_all_fields, Student
       can :photo, Student
       cannot :grades_report_pdf, Enrollment do |enrollment|
         !enrollment.enrollment_status.professor_can_generate_report
       end
     end
-    if roles[Role::ROLE_SUPORTE]
-      can [:read, :update, :update_only_photo], (Student)
-    end
-
     # Keep this at the end or :read STUDENT_MODELS will override it
     cannot :academic_transcript_pdf, Enrollment do |enrollment|
       enrollment.dismissal&.dismissal_reason&.thesis_judgement != DismissalReason::APPROVED

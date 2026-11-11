@@ -11,5 +11,5 @@ require "rails_helper"
 # spec/requests/route_authorization_spec.rb.
 RSpec.describe "Matriz HTTP: gestão", type: :request do
   it_behaves_like "matriz HTTP", "matriz_http_gestao",
-    ["administrador", "coordenacao", "secretaria", "suporte"]
+    ["administrador", "coordenacao", "secretaria"]
 end

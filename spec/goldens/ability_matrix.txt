@@ -12,7 +12,7 @@ read <- index show list row show_search render_field class_schedule_pdf to_pdf s
 update <- edit update_column edit_associated new_existing add_existing duplicate set_invalid set_requested set_valid execute_now notify
 
 == ações verificadas
-academic_transcript_pdf add_existing assertion_pdf browse builtin cancel cities class_schedule_pdf configuration create custom_report custom_report_generate delete destroy destroy_existing download duplicate edit edit_associated edit_professor effect enroll execute_now export field_search generate_assertion generate_report_without_watermark grades_report_pdf help index invite list manage map_student map_student_form map_student_form_create_update mark nested new new_existing notify override override_report_signature_type override_signature_assertion_pdf override_signature_grades_report_pdf override_signature_transcript_pdf photo post_grades preview read read_advisement_pendencies read_all read_all_fields read_pendencies render_field reset_report row save_enroll search set_effected set_invalid set_query_date set_requested set_valid show show_effect show_search simulate states summary_pdf summary_xls to_pdf undo undo_consolidation update update_all_fields update_column update_only_photo
+academic_transcript_pdf add_existing assertion_pdf browse builtin cancel cities class_schedule_pdf configuration create custom_report custom_report_generate delete destroy destroy_existing download duplicate edit edit_associated edit_professor effect enroll execute_now export field_search generate_assertion generate_report_without_watermark grades_report_pdf help index invite list manage map_student map_student_form map_student_form_create_update mark nested new new_existing notify override override_report_signature_type override_signature_assertion_pdf override_signature_grades_report_pdf override_signature_transcript_pdf photo post_grades preview read read_advisement_pendencies read_all read_pendencies render_field reset_report row save_enroll search set_effected set_invalid set_query_date set_requested set_valid show show_effect show_search simulate states summary_pdf summary_xls to_pdf undo undo_consolidation update update_all_fields update_column
 
 == visitante
 pendency: can? (nada)
@@ -331,7 +331,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: (nada)
-  accessible_by: {todas} => [] 0/7
+  accessible_by: {todas} => [] 0/6
 -- Scholarship
   classe: (nada)
   accessible_by: {todas} => [] 0/0
@@ -363,13 +363,13 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- User
   classe: (nada)
-  accessible_by: {todas} => [] 0/10
+  accessible_by: {todas} => [] 0/9
 -- UserRole
   classe: (nada)
-  accessible_by: {todas} => [] 0/11
+  accessible_by: {todas} => [] 0/10
 -- Version
   classe: (nada)
-  accessible_by: {todas} => [] 0/147
+  accessible_by: {todas} => [] 0/143
 
 == desconhecido
 pendency: can? (nada)
@@ -688,7 +688,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: (nada)
-  accessible_by: {todas} => [] 0/7
+  accessible_by: {todas} => [] 0/6
 -- Scholarship
   classe: (nada)
   accessible_by: {todas} => [] 0/0
@@ -720,13 +720,13 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- User
   classe: (nada)
-  accessible_by: {todas} => [] 0/10
+  accessible_by: {todas} => [] 0/9
 -- UserRole
   classe: (nada)
-  accessible_by: {todas} => [] 0/11
+  accessible_by: {todas} => [] 0/10
 -- Version
   classe: (nada)
-  accessible_by: {todas} => [] 0/147
+  accessible_by: {todas} => [] 0/143
 
 == administrador
 pendency: can? (tudo)
@@ -1045,7 +1045,7 @@ student_enrollment: can? tudo menos: enroll save_enroll show
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: tudo menos: add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column
-  accessible_by: {demais} => [+7 sem rótulo] 7/7; {add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column} => [] 0/7
+  accessible_by: {demais} => [+6 sem rótulo] 6/6; {add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column} => [] 0/6
 -- Scholarship
   classe: (tudo)
   accessible_by: {todas} => [] 0/0
@@ -1077,13 +1077,13 @@ student_enrollment: can? tudo menos: enroll save_enroll show
   accessible_by: {todas} => [] 0/0
 -- User
   classe: (tudo)
-  accessible_by: {todas} => [+10 sem rótulo] 10/10
+  accessible_by: {todas} => [+9 sem rótulo] 9/9
 -- UserRole
   classe: (tudo)
-  accessible_by: {todas} => [+11 sem rótulo] 11/11
+  accessible_by: {todas} => [+10 sem rótulo] 10/10
 -- Version
   classe: tudo menos: add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column
-  accessible_by: {demais} => [+147 sem rótulo] 147/147; {add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column} => [] 0/147
+  accessible_by: {demais} => [+143 sem rótulo] 143/143; {add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column} => [] 0/143
 
 == coordenacao
 pendency: can? academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
@@ -1402,7 +1402,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: tudo menos: add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column
-  accessible_by: {demais} => [+7 sem rótulo] 7/7; {add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column} => [] 0/7
+  accessible_by: {demais} => [+6 sem rótulo] 6/6; {add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column} => [] 0/6
 -- Scholarship
   classe: (tudo)
   accessible_by: {todas} => [] 0/0
@@ -1434,13 +1434,13 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- User
   classe: (tudo)
-  accessible_by: {todas} => [+10 sem rótulo] 10/10
+  accessible_by: {todas} => [+9 sem rótulo] 9/9
 -- UserRole
   classe: (tudo)
-  accessible_by: {todas} => [+11 sem rótulo] 11/11
+  accessible_by: {todas} => [+10 sem rótulo] 10/10
 -- Version
   classe: tudo menos: add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column
-  accessible_by: {demais} => [+147 sem rótulo] 147/147; {add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column} => [] 0/147
+  accessible_by: {demais} => [+143 sem rótulo] 143/143; {add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column} => [] 0/143
 
 == secretaria
 pendency: can? academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
@@ -1453,12 +1453,12 @@ student_enrollment: can? (nada)
   classe: (tudo)
   accessible_by: {todas} => [] 0/0
 -- Admissions::AdmissionApplication
-  classe: tudo menos: assertion_pdf create custom_report custom_report_generate delete destroy destroy_existing download edit_professor effect enroll export field_search generate_assertion generate_report_without_watermark invite manage mark nested new override_report_signature_type override_signature_assertion_pdf override_signature_grades_report_pdf override_signature_transcript_pdf photo post_grades read_advisement_pendencies read_all_fields reset_report save_enroll search set_effected show_effect undo update_all_fields update_only_photo
+  classe: tudo menos: assertion_pdf create custom_report custom_report_generate delete destroy destroy_existing download edit_professor effect enroll export field_search generate_assertion generate_report_without_watermark invite manage mark nested new override_report_signature_type override_signature_assertion_pdf override_signature_grades_report_pdf override_signature_transcript_pdf photo post_grades read_advisement_pendencies reset_report save_enroll search set_effected show_effect undo update_all_fields
   app_pendente: = classe
   app_outro: = classe
   app_compartilhada: = classe
   app_sem: = classe
-  accessible_by: {demais} => [app_compartilhada app_outro app_pendente app_sem] 4/4; {assertion_pdf create custom_report custom_report_generate delete destroy destroy_existing download edit_professor effect enroll export field_search generate_assertion generate_report_without_watermark invite manage mark nested new override_report_signature_type override_signature_assertion_pdf override_signature_grades_report_pdf override_signature_transcript_pdf photo post_grades read_advisement_pendencies read_all_fields reset_report save_enroll search set_effected show_effect undo update_all_fields update_only_photo} => [] 0/4
+  accessible_by: {demais} => [app_compartilhada app_outro app_pendente app_sem] 4/4; {assertion_pdf create custom_report custom_report_generate delete destroy destroy_existing download edit_professor effect enroll export field_search generate_assertion generate_report_without_watermark invite manage mark nested new override_report_signature_type override_signature_assertion_pdf override_signature_grades_report_pdf override_signature_transcript_pdf photo post_grades read_advisement_pendencies reset_report save_enroll search set_effected show_effect undo update_all_fields} => [] 0/4
 -- Admissions::AdmissionCommittee
   classe: (tudo)
   accessible_by: {todas} => [] 0/0
@@ -1759,7 +1759,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: (nada)
-  accessible_by: {todas} => [] 0/7
+  accessible_by: {todas} => [] 0/6
 -- Scholarship
   classe: (tudo)
   accessible_by: {todas} => [] 0/0
@@ -1791,370 +1791,13 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- User
   classe: invite
-  accessible_by: {demais} => [] 0/10; {invite} => [+10 sem rótulo] 10/10
+  accessible_by: {demais} => [] 0/9; {invite} => [+9 sem rótulo] 9/9
 -- UserRole
-  classe: (nada)
-  accessible_by: {todas} => [] 0/11
--- Version
-  classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [+147 sem rótulo] 147/147; {demais} => [] 0/147
-
-== suporte
-pendency: can? academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
-landing: can? academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
-student_enrollment: can? (nada)
--- Accomplishment
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- ActiveScaffoldWorkaround
-  classe: (tudo)
-  accessible_by: {todas} => [] 0/0
--- Admissions::AdmissionApplication
-  classe: (nada)
-  app_pendente: = classe
-  app_outro: = classe
-  app_compartilhada: = classe
-  app_sem: = classe
-  accessible_by: {todas} => [] 0/4
--- Admissions::AdmissionCommittee
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Admissions::AdmissionCommitteeMember
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Admissions::AdmissionPendency
-  classe: (nada)
-  pend_professor: = classe
-  pend_outro: = classe
-  pend_compartilhada: = classe
-  accessible_by: {todas} => [] 0/3
--- Admissions::AdmissionPhase
-  classe: (nada)
-  fase: = classe
-  accessible_by: {todas} => [] 0/1
--- Admissions::AdmissionPhaseCommittee
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Admissions::AdmissionPhaseEvaluation
-  classe: (nada)
-  avaliacao_professor: = classe
-  avaliacao_outro: = classe
-  accessible_by: {todas} => [] 0/2
--- Admissions::AdmissionPhaseResult
-  classe: (nada)
-  resultado_app_pendente: = classe
-  resultado_app_sem: = classe
-  accessible_by: {todas} => [] 0/2
--- Admissions::AdmissionProcess
-  classe: (nada)
-  processo: = classe
-  accessible_by: {todas} => [] 0/1
--- Admissions::AdmissionProcessPhase
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Admissions::AdmissionProcessRanking
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Admissions::AdmissionRankingResult
-  classe: (nada)
-  ranking_app_pendente: = classe
-  ranking_app_sem: = classe
-  accessible_by: {todas} => [] 0/2
--- Admissions::AdmissionReportColumn
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Admissions::AdmissionReportConfig
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Admissions::AdmissionReportGroup
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Admissions::FilledForm
-  classe: (nada)
-  ff_app_pendente: = classe
-  ff_app_outro: = classe
-  ff_app_compartilhada: = classe
-  ff_app_sem: = classe
-  ff_carta_app_pendente: = classe
-  ff_resultado_app_pendente: = classe
-  ff_ranking_app_pendente: = classe
-  ff_carta_app_sem: = classe
-  ff_resultado_app_sem: = classe
-  ff_ranking_app_sem: = classe
-  ff_avaliacao_professor: = classe
-  ff_avaliacao_outro: = classe
-  accessible_by: {todas} => [] 0/12
--- Admissions::FilledFormField
-  classe: download
-  campo_app_pendente: = classe
-  accessible_by: {demais} => [] 0/1; {download} => [campo_app_pendente] 1/1
--- Admissions::FilledFormFieldScholarity
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Admissions::FormCondition
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Admissions::FormField
-  classe: (nada)
-  accessible_by: {todas} => [] 0/4
--- Admissions::FormTemplate
-  classe: (nada)
-  accessible_by: {todas} => [] 0/17
--- Admissions::LetterRequest
-  classe: (nada)
-  carta_app_pendente: = classe
-  carta_app_sem: = classe
-  accessible_by: {todas} => [] 0/2
--- Admissions::RankingColumn
-  classe: (nada)
-  accessible_by: {todas} => [] 0/1
--- Admissions::RankingConfig
-  classe: (nada)
-  ranking: = classe
-  accessible_by: {todas} => [] 0/1
--- Admissions::RankingGroup
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Admissions::RankingMachine
-  classe: (nada)
-  accessible_by: {todas} => [] 0/1
--- Admissions::RankingProcess
-  classe: (nada)
-  accessible_by: {todas} => [] 0/1
--- Advisement
-  classe: (nada)
-  adv_a: = classe
-  adv_b: = classe
-  accessible_by: {todas} => [] 0/2
--- AdvisementAuthorization
-  classe: (nada)
-  accessible_by: {todas} => [] 0/2
--- Affiliation
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Allocation
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Assertion
-  classe: (nada)
-  as_aberta: = classe
-  as_aberta(num_enr_a): = classe
-  as_aberta(num_enr_b): = classe
-  as_fechada: = classe
-  as_fechada(num_enr_a): = classe
-  as_fechada(num_enr_b): = classe
-  accessible_by: {todas} => [] 0/0
--- CarrierWave::Storage::ActiveRecord::ActiveRecordFile
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- City
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- ClassEnrollment
-  classe: (nada)
-  ce_a_atual: = classe
-  ce_a_antiga: = classe
-  ce_b_atual: = classe
-  accessible_by: {todas} => [] 0/3
--- ClassEnrollmentRequest
-  classe: (nada)
-  cer_a_solicitada: = classe
-  cer_a_efetivada: = classe
-  cer_a_status_nulo: = classe
-  cer_b_solicitada: = classe
-  accessible_by: {todas} => [] 0/4
--- ClassSchedule
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Country
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Course
-  classe: (nada)
-  accessible_by: {todas} => [] 0/3
--- CourseClass
-  classe: (nada)
-  cc_a_atual: = classe
-  cc_a_antiga: = classe
-  cc_b_atual: = classe
-  accessible_by: {todas} => [] 0/3
--- CourseResearchArea
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- CourseResearchLine
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- CourseType
-  classe: (nada)
-  accessible_by: {todas} => [] 0/3
--- CustomVariable
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Deferral
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- DeferralType
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Dismissal
-  classe: (nada)
-  dis_a_aprovada: = classe
-  dis_b_reprovada: = classe
-  dis_b_aprovada: = classe
-  accessible_by: {todas} => [] 0/3
--- DismissalReason
-  classe: (nada)
-  dr_aprovado: = classe
-  dr_reprovado: = classe
-  accessible_by: {todas} => [] 0/2
--- EmailTemplate
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Enrollment
-  classe: (nada)
-  enr_a_aprovada: = classe
-  enr_a_aberta: = classe
-  enr_b_reprovada: = classe
-  enr_b_aprovada: = classe
-  accessible_by: {academic_transcript_pdf} => ERRO CanCan::Error: The accessible_by call cannot be used with a block 'can' definition.The SQL cannot be determined for :academic_transcript_pdf Enrollment; {demais} => [] 0/4
--- EnrollmentHold
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- EnrollmentRequest
-  classe: (nada)
-  er_a: = classe
-  er_b: = classe
-  accessible_by: {todas} => [] 0/2
--- EnrollmentRequestComment
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- EnrollmentStatus
-  classe: (nada)
-  es_permite: = classe
-  es_proibe: = classe
-  accessible_by: {todas} => [] 0/2
--- Grant
-  classe: (nada)
-  grant_a: = classe
-  grant_b: = classe
-  grant_c: = classe
-  accessible_by: {todas} => [] 0/3
--- Institution
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Level
-  classe: (nada)
-  level: = classe
-  accessible_by: {todas} => [] 0/1
--- Major
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Notification
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- NotificationLog
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Paper
-  classe: (nada)
-  paper_a: = classe
-  paper_b: = classe
-  accessible_by: {todas} => [] 0/2
--- PaperProfessor
-  classe: (nada)
-  pp_a: = classe
-  pp_b: = classe
-  pp_novo_sem_dono: = classe
-  accessible_by: {todas} => [] 0/2
--- PaperStudent
-  classe: (nada)
-  ps_a: = classe
-  ps_b: = classe
-  ps_novo_sem_dono: = classe
-  accessible_by: {todas} => [] 0/2
--- Phase
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- PhaseCompletion
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- PhaseDuration
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Professor
-  classe: (nada)
-  prof_a: = classe
-  prof_b: = classe
-  prof_c: = classe
-  accessible_by: {todas} => [] 0/3
--- ProfessorResearchArea
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- ProfessorResearchLine
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- ProgramLevel
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Query
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- QueryParam
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Report
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- ReportConfiguration
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- ResearchArea
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- ResearchLine
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Role
-  classe: (nada)
-  accessible_by: {todas} => [] 0/7
--- Scholarship
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- ScholarshipDuration
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- ScholarshipSuspension
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- ScholarshipType
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Sponsor
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- State
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- Student
-  classe: academic_transcript_pdf add_existing browse builtin cities class_schedule_pdf duplicate edit edit_associated execute_now grades_report_pdf help index list new_existing notify preview read render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf update update_column update_only_photo
-  st_a: = classe
-  st_b: = classe
-  accessible_by: {academic_transcript_pdf add_existing browse builtin cities class_schedule_pdf duplicate edit edit_associated execute_now grades_report_pdf help index list new_existing notify preview read render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf update update_column update_only_photo} => [st_a st_b] 2/2; {demais} => [] 0/2
--- StudentMajor
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- ThesisDefenseCommitteeParticipation
-  classe: (nada)
-  accessible_by: {todas} => [] 0/0
--- User
   classe: (nada)
   accessible_by: {todas} => [] 0/10
--- UserRole
-  classe: (nada)
-  accessible_by: {todas} => [] 0/11
 -- Version
-  classe: (nada)
-  accessible_by: {todas} => [] 0/147
+  classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [+143 sem rótulo] 143/143; {demais} => [] 0/143
 
 == professor (sem lançamento de nota)
 pendency: can? academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
@@ -2473,7 +2116,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: (nada)
-  accessible_by: {todas} => [] 0/7
+  accessible_by: {todas} => [] 0/6
 -- Scholarship
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -2493,10 +2136,10 @@ student_enrollment: can? (nada)
   classe: (nada)
   accessible_by: {todas} => [] 0/0
 -- Student
-  classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read read_all_fields render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
+  classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   st_a: = classe
   st_b: = classe
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read read_all_fields render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [st_a st_b] 2/2; {demais} => [] 0/2
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [st_a st_b] 2/2; {demais} => [] 0/2
 -- StudentMajor
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -2505,13 +2148,13 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- User
   classe: (nada)
-  accessible_by: {todas} => [] 0/10
+  accessible_by: {todas} => [] 0/9
 -- UserRole
   classe: (nada)
-  accessible_by: {todas} => [] 0/11
+  accessible_by: {todas} => [] 0/10
 -- Version
   classe: (nada)
-  accessible_by: {todas} => [] 0/147
+  accessible_by: {todas} => [] 0/143
 
 == professor (nota no semestre corrente)
 pendency: can? academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
@@ -2830,7 +2473,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: (nada)
-  accessible_by: {todas} => [] 0/7
+  accessible_by: {todas} => [] 0/6
 -- Scholarship
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -2850,10 +2493,10 @@ student_enrollment: can? (nada)
   classe: (nada)
   accessible_by: {todas} => [] 0/0
 -- Student
-  classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read read_all_fields render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
+  classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   st_a: = classe
   st_b: = classe
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read read_all_fields render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [st_a st_b] 2/2; {demais} => [] 0/2
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [st_a st_b] 2/2; {demais} => [] 0/2
 -- StudentMajor
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -2862,13 +2505,13 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- User
   classe: (nada)
-  accessible_by: {todas} => [] 0/10
+  accessible_by: {todas} => [] 0/9
 -- UserRole
   classe: (nada)
-  accessible_by: {todas} => [] 0/11
+  accessible_by: {todas} => [] 0/10
 -- Version
   classe: (nada)
-  accessible_by: {todas} => [] 0/147
+  accessible_by: {todas} => [] 0/143
 
 == professor (nota em todo semestre)
 pendency: can? academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
@@ -3187,7 +2830,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: (nada)
-  accessible_by: {todas} => [] 0/7
+  accessible_by: {todas} => [] 0/6
 -- Scholarship
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -3207,10 +2850,10 @@ student_enrollment: can? (nada)
   classe: (nada)
   accessible_by: {todas} => [] 0/0
 -- Student
-  classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read read_all_fields render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
+  classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   st_a: = classe
   st_b: = classe
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read read_all_fields render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [st_a st_b] 2/2; {demais} => [] 0/2
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [st_a st_b] 2/2; {demais} => [] 0/2
 -- StudentMajor
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -3219,13 +2862,13 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- User
   classe: (nada)
-  accessible_by: {todas} => [] 0/10
+  accessible_by: {todas} => [] 0/9
 -- UserRole
   classe: (nada)
-  accessible_by: {todas} => [] 0/11
+  accessible_by: {todas} => [] 0/10
 -- Version
   classe: (nada)
-  accessible_by: {todas} => [] 0/147
+  accessible_by: {todas} => [] 0/143
 
 == professor sem professor vinculado
 pendency: can? academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
@@ -3544,7 +3187,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: (nada)
-  accessible_by: {todas} => [] 0/7
+  accessible_by: {todas} => [] 0/6
 -- Scholarship
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -3564,10 +3207,10 @@ student_enrollment: can? (nada)
   classe: (nada)
   accessible_by: {todas} => [] 0/0
 -- Student
-  classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read read_all_fields render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
+  classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   st_a: = classe
   st_b: = classe
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read read_all_fields render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [st_a st_b] 2/2; {demais} => [] 0/2
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [st_a st_b] 2/2; {demais} => [] 0/2
 -- StudentMajor
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -3576,13 +3219,13 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- User
   classe: (nada)
-  accessible_by: {todas} => [] 0/10
+  accessible_by: {todas} => [] 0/9
 -- UserRole
   classe: (nada)
-  accessible_by: {todas} => [] 0/11
+  accessible_by: {todas} => [] 0/10
 -- Version
   classe: (nada)
-  accessible_by: {todas} => [] 0/147
+  accessible_by: {todas} => [] 0/143
 
 == professor e coordenador, atuando como coordenação
 pendency: can? academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
@@ -3901,7 +3544,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: tudo menos: add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column
-  accessible_by: {demais} => [+7 sem rótulo] 7/7; {add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column} => [] 0/7
+  accessible_by: {demais} => [+6 sem rótulo] 6/6; {add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column} => [] 0/6
 -- Scholarship
   classe: (tudo)
   accessible_by: {todas} => [] 0/0
@@ -3933,13 +3576,13 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- User
   classe: (tudo)
-  accessible_by: {todas} => [+10 sem rótulo] 10/10
+  accessible_by: {todas} => [+9 sem rótulo] 9/9
 -- UserRole
   classe: (tudo)
-  accessible_by: {todas} => [+11 sem rótulo] 11/11
+  accessible_by: {todas} => [+10 sem rótulo] 10/10
 -- Version
   classe: tudo menos: add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column
-  accessible_by: {demais} => [+147 sem rótulo] 147/147; {add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column} => [] 0/147
+  accessible_by: {demais} => [+143 sem rótulo] 143/143; {add_existing create delete destroy destroy_existing duplicate edit edit_associated execute_now new new_existing notify set_invalid set_requested set_valid update update_column} => [] 0/143
 
 == professor e coordenador, atuando como professor
 pendency: can? academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
@@ -4258,7 +3901,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: (nada)
-  accessible_by: {todas} => [] 0/7
+  accessible_by: {todas} => [] 0/6
 -- Scholarship
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -4278,10 +3921,10 @@ student_enrollment: can? (nada)
   classe: (nada)
   accessible_by: {todas} => [] 0/0
 -- Student
-  classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read read_all_fields render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
+  classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   st_a: = classe
   st_b: = classe
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read read_all_fields render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [st_a st_b] 2/2; {demais} => [] 0/2
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list photo preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [st_a st_b] 2/2; {demais} => [] 0/2
 -- StudentMajor
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -4290,13 +3933,13 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- User
   classe: (nada)
-  accessible_by: {todas} => [] 0/10
+  accessible_by: {todas} => [] 0/9
 -- UserRole
   classe: (nada)
-  accessible_by: {todas} => [] 0/11
+  accessible_by: {todas} => [] 0/10
 -- Version
   classe: (nada)
-  accessible_by: {todas} => [] 0/147
+  accessible_by: {todas} => [] 0/143
 
 == aluno
 pendency: can? (nada)
@@ -4615,7 +4258,7 @@ student_enrollment: can? enroll save_enroll show
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: (nada)
-  accessible_by: {todas} => [] 0/7
+  accessible_by: {todas} => [] 0/6
 -- Scholarship
   classe: (nada)
   accessible_by: {todas} => [] 0/0
@@ -4647,13 +4290,13 @@ student_enrollment: can? enroll save_enroll show
   accessible_by: {todas} => [] 0/0
 -- User
   classe: (nada)
-  accessible_by: {todas} => [] 0/10
+  accessible_by: {todas} => [] 0/9
 -- UserRole
   classe: (nada)
-  accessible_by: {todas} => [] 0/11
+  accessible_by: {todas} => [] 0/10
 -- Version
   classe: (nada)
-  accessible_by: {todas} => [] 0/147
+  accessible_by: {todas} => [] 0/143
 
 == aluno sem aluno vinculado
 pendency: can? (nada)
@@ -4972,7 +4615,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Role
   classe: (nada)
-  accessible_by: {todas} => [] 0/7
+  accessible_by: {todas} => [] 0/6
 -- Scholarship
   classe: (nada)
   accessible_by: {todas} => [] 0/0
@@ -5004,13 +4647,13 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- User
   classe: (nada)
-  accessible_by: {todas} => [] 0/10
+  accessible_by: {todas} => [] 0/9
 -- UserRole
   classe: (nada)
-  accessible_by: {todas} => [] 0/11
+  accessible_by: {todas} => [] 0/10
 -- Version
   classe: (nada)
-  accessible_by: {todas} => [] 0/147
+  accessible_by: {todas} => [] 0/143
 
 == ações em String que divergem do Symbol (#905), por usuário
 visitante: nenhuma
@@ -5018,7 +4661,6 @@ desconhecido: nenhuma
 administrador: nenhuma
 coordenacao: nenhuma
 secretaria: nenhuma
-suporte: nenhuma
 professor (sem lançamento de nota): nenhuma
 professor (nota no semestre corrente): nenhuma
 professor (nota em todo semestre): nenhuma
