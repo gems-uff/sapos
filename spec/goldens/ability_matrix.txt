@@ -2228,7 +2228,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Admissions::FilledForm
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
-  ff_app_pendente: (nada)
+  ff_app_pendente: = classe
   ff_app_outro: (nada)
   ff_app_compartilhada: (nada)
   ff_app_sem: (nada)
@@ -2240,7 +2240,7 @@ student_enrollment: can? (nada)
   ff_ranking_app_sem: (nada)
   ff_avaliacao_professor: = classe
   ff_avaliacao_outro: (nada)
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [ff_avaliacao_professor ff_carta_app_pendente ff_ranking_app_pendente ff_resultado_app_pendente] 4/12; {demais} => [] 0/12
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [ff_app_pendente ff_avaliacao_professor ff_carta_app_pendente ff_ranking_app_pendente ff_resultado_app_pendente] 5/12; {demais} => [] 0/12
 -- Admissions::FilledFormField
   classe: download
   campo_app_pendente: = classe
@@ -2585,7 +2585,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Admissions::FilledForm
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
-  ff_app_pendente: (nada)
+  ff_app_pendente: = classe
   ff_app_outro: (nada)
   ff_app_compartilhada: (nada)
   ff_app_sem: (nada)
@@ -2597,7 +2597,7 @@ student_enrollment: can? (nada)
   ff_ranking_app_sem: (nada)
   ff_avaliacao_professor: = classe
   ff_avaliacao_outro: (nada)
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [ff_avaliacao_professor ff_carta_app_pendente ff_ranking_app_pendente ff_resultado_app_pendente] 4/12; {demais} => [] 0/12
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [ff_app_pendente ff_avaliacao_professor ff_carta_app_pendente ff_ranking_app_pendente ff_resultado_app_pendente] 5/12; {demais} => [] 0/12
 -- Admissions::FilledFormField
   classe: download
   campo_app_pendente: = classe
@@ -2942,7 +2942,7 @@ student_enrollment: can? (nada)
   accessible_by: {todas} => [] 0/0
 -- Admissions::FilledForm
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
-  ff_app_pendente: (nada)
+  ff_app_pendente: = classe
   ff_app_outro: (nada)
   ff_app_compartilhada: (nada)
   ff_app_sem: (nada)
@@ -2954,7 +2954,7 @@ student_enrollment: can? (nada)
   ff_ranking_app_sem: (nada)
   ff_avaliacao_professor: = classe
   ff_avaliacao_outro: (nada)
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [ff_avaliacao_professor ff_carta_app_pendente ff_ranking_app_pendente ff_resultado_app_pendente] 4/12; {demais} => [] 0/12
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [ff_app_pendente ff_avaliacao_professor ff_carta_app_pendente ff_ranking_app_pendente ff_resultado_app_pendente] 5/12; {demais} => [] 0/12
 -- Admissions::FilledFormField
   classe: download
   campo_app_pendente: = classe
@@ -4014,7 +4014,7 @@ student_enrollment: can? (nada)
 -- Admissions::FilledForm
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   ff_app_pendente: (nada)
-  ff_app_outro: (nada)
+  ff_app_outro: = classe
   ff_app_compartilhada: (nada)
   ff_app_sem: (nada)
   ff_carta_app_pendente: (nada)
@@ -4025,7 +4025,7 @@ student_enrollment: can? (nada)
   ff_ranking_app_sem: (nada)
   ff_avaliacao_professor: (nada)
   ff_avaliacao_outro: = classe
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [ff_avaliacao_outro] 1/12; {demais} => [] 0/12
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [ff_app_outro ff_avaliacao_outro] 2/12; {demais} => [] 0/12
 -- Admissions::FilledFormField
   classe: download
   campo_app_pendente: = classe
