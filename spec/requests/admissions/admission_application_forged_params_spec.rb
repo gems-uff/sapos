@@ -251,6 +251,19 @@ RSpec.describe "Admissions::AdmissionApplications com parametros fora do formula
         expect(campo["readonly"]).to be_present
       end
 
+      # Nos modelos em uso, o campo sincronizado costuma ser um campo de aluno.
+      it "mostra ao membro como somente leitura o campo de aluno sincronizado com o e-mail" do
+        correio = FactoryBot.create(
+          :form_field, form_template: @template, name: "Correio", field_type: Admissions::FormField::STUDENT_FIELD,
+          configuration: { field: "email" }.to_json, sync: Admissions::FormField::SYNC_EMAIL
+        )
+
+        campo = campo_sincronizado(tela, correio)
+
+        expect(campo["value"]).to eq(@application.email)
+        expect(campo["readonly"]).to be_present
+      end
+
       # Controles: o nome segue editável para o membro, e quem tem a edição
       # total recebe os dois campos de e-mail editáveis.
       it "mostra ao membro o nome como campo editavel" do
