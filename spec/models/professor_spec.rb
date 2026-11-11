@@ -63,6 +63,13 @@ RSpec.describe Professor, type: :model do
       expect(professor).not_to have_error(:invalid).on(:email)
     end
 
+    it "accepts a valid email with space around it, and stores it without the space" do
+      professor.email = " professor@example.com\n"
+
+      expect(professor).not_to have_error(:invalid).on(:email)
+      expect(professor.email).to eq("professor@example.com")
+    end
+
     describe "user" do
       context "should be valid when" do
         it "user is null" do
