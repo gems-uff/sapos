@@ -270,6 +270,15 @@ cada uma explica o porquê no próprio cabeçalho:
   controller declara em `active_scaffold_list_url_columns`. Tela que abre a
   lista de outro scaffold com coluna na URL precisa da coluna declarada lá.
   `spec/requests/scaffold_list_url_filter_spec.rb` percorre as listas.
+- active_scaffold, agrupamento da lista vindo da URL:
+  `active_scaffold_grouped_search.rb` (`prepend` em
+  `ActiveScaffold::Actions::FieldSearch::InstanceMethods#grouped_search?`). A
+  gem agrupa a lista pelo que a URL nomeia em `search[active_scaffold_group]`
+  — qualquer coluna do modelo, que a lista agrupada imprime — e guarda a busca
+  na sessão, onde o nome que não é coluna derruba a lista a cada visita; aqui
+  só agrupa pelo que o scaffold oferece em `field_search.group_options`, e o
+  SAPOS não oferece nenhum. `spec/requests/scaffold_list_url_filter_spec.rb`
+  cobra isso.
 - active_scaffold, linha de subformulário pedida pelo id:
   `active_scaffold_subform_associated_record.rb` (`prepend` em
   `ActiveScaffold::Actions::Subform`, nos protegidos `find_associated_record`

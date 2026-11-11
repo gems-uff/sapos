@@ -183,5 +183,34 @@ RSpec.describe "Lista dos scaffolds e parametros da URL", type: :request do
     it "nao filtra por coluna que a lista nao declara" do
       expect(listar(token: @sem_fase.token)).to match_array([@sem_fase.id, @na_fase.id, @de_outro.id])
     end
+
+    # A busca por campos da gem agrupa a lista pela coluna que a URL nomeia em
+    # search[active_scaffold_group], qualquer que seja: a lista agrupada imprime
+    # a coluna que tela nenhuma mostra, e o nome que não é coluna derruba a
+    # lista. A busca fica na sessão, então a lista segue derrubada nas visitas
+    # seguintes. Nenhuma tela do SAPOS oferece agrupamento.
+    describe "com agrupamento pedido pela URL" do
+      before(:each) do
+        @sem_fase.update_columns(pending_email: "pendente@example.com")
+      end
+
+      it "nao agrupa por coluna do modelo, nem imprime o valor dela" do
+        expect(listar(search: { active_scaffold_group: "pending_email" }))
+          .to match_array([@sem_fase.id, @na_fase.id, @de_outro.id])
+        expect(response.body).not_to include("pendente@example.com")
+      end
+
+      it "segue listando quando o nome nao e coluna, nesta visita e nas seguintes" do
+        todas = [@sem_fase.id, @na_fase.id, @de_outro.id]
+
+        expect(listar(search: { active_scaffold_group: "nao_e_coluna" })).to match_array(todas)
+        expect(listar({})).to match_array(todas)
+      end
+
+      # Controle: a busca por campos da tela segue filtrando.
+      it "segue filtrando pela busca por campos" do
+        expect(listar(search: { name: "Sem fase" })).to eq([@sem_fase.id])
+      end
+    end
   end
 end
