@@ -6,12 +6,25 @@
 require "rails_helper"
 
 # O código de identificação é a credencial da inscrição, e o e-mail não é
-# segredo. Estes exemplos percorrem o que acontece quando dois navegadores
-# apresentam o mesmo e-mail: quem chega depois não herda o código de quem
-# chegou antes, e quem chegou antes não fica com um código que ainda vale.
+# segredo. A regra que estes exemplos cobram é uma só: o código só viaja por
+# e-mail, para o endereço da inscrição. O navegador que pede a inscrição recebe
+# o aviso de para onde o código foi, nunca o código; quem o apresenta depois
+# leu a caixa daquele endereço. Quando o endereço muda, o código muda junto.
 RSpec.describe "Posse do codigo de inscricao", type: :request do
+  # O formato do código: três blocos de seis caracteres do alfabeto do gerador.
+  def formato_do_codigo
+    /[2346789BCDFGHJKMPQRTVWXY]{6}-[2346789BCDFGHJKMPQRTVWXY]{6}-[2346789BCDFGHJKMPQRTVWXY]{6}/
+  end
+
   before(:each) do
+    @enviados = []
+    allow(Notifier).to receive(:send_emails) { |notifications:| @enviados.concat(notifications) }
+
     @template = create_admission_template("Inscricao", { "Dado" => Admissions::FormField::STRING })
+    @sincronizado = create_admission_template(
+      "Com e-mail", { "Dado" => Admissions::FormField::STRING, "Correio" => Admissions::FormField::STRING }
+    )
+    @sincronizado.fields.find_by!(name: "Correio").update!(sync: Admissions::FormField::SYNC_EMAIL)
     datas = {
       start_date: Date.current - 10.days, end_date: Date.current + 10.days, edit_date: Date.current + 20.days
     }
@@ -23,27 +36,60 @@ RSpec.describe "Posse do codigo de inscricao", type: :request do
       :admission_process, name: "Sem sessao", simple_url: "posse-sem-sessao",
       form_template: @template, require_session: false, **datas
     )
+    @com_campo = FactoryBot.create(
+      :admission_process, name: "Com campo de e-mail", simple_url: "posse-com-campo",
+      form_template: @sincronizado, require_session: false, **datas
+    )
   end
 
   def navegador
     open_session.tap { |sessao| sessao.host! "www.example.com" }
   end
 
-  # Nome e e-mail na tela do processo; devolve o código para onde o navegador
-  # foi levado.
-  def entrar(sessao, processo, nome, email, **extra)
+  # Nome e e-mail na tela do processo.
+  def pedir(sessao, processo, nome, email, **extra)
     sessao.post admission_path(processo.simple_url),
       params: { admissions_admission_application: { name: nome, email: email, **extra } }
-    sessao.response.location.to_s[%r{/apply/([^/?]+)}, 1]
   end
 
-  def enviar(sessao, processo, codigo, valor)
+  # O código que a última mensagem para o endereço traz.
+  def codigo_recebido(email)
+    @enviados.reverse.find { |mensagem| mensagem[:to] == email }&.dig(:body)&.slice(formato_do_codigo)
+  end
+
+  # E-mail e código no formulário de recuperação da tela do processo.
+  def entrar(sessao, processo, email, codigo)
+    sessao.post find_admissions_path, params: {
+      admissions_admission_application: { email: email, token: codigo, _source: processo.simple_id },
+    }
+  end
+
+  def campos(template, inscricao, valores)
+    template.fields.order(:id).each_with_index.to_h do |campo, i|
+      entrada = { form_field_id: campo.id, value: valores[campo.name] }
+      existente = inscricao&.filled_form&.fields&.find_by(form_field_id: campo.id)
+      entrada[:id] = existente.id if existente
+      [i.to_s, entrada]
+    end
+  end
+
+  # Envio do formulário de uma inscrição que já existe.
+  def enviar(sessao, processo, codigo, valores, **extra)
     inscricao = Admissions::AdmissionApplication.find_by!(token: codigo)
     sessao.put admission_apply_path(admission_id: processo.simple_id, id: codigo), params: { record: {
       filled_form_attributes: {
         id: inscricao.filled_form.id, enable_submission: "1",
-        fields_attributes: { "0" => { form_field_id: @template.fields.first.id, value: valor } },
-      },
+        fields_attributes: campos(processo.form_template, inscricao, valores),
+      }, **extra,
+    } }
+  end
+
+  # Envio do formulário que cria a inscrição, em processo sem sessão.
+  def inscrever(sessao, processo, valores, **extra)
+    sessao.post admission_apply_index_path(admission_id: processo.simple_id), params: { record: {
+      filled_form_attributes: {
+        enable_submission: "1", fields_attributes: campos(processo.form_template, nil, valores),
+      }, **extra,
     } }
   end
 
@@ -52,62 +98,125 @@ RSpec.describe "Posse do codigo de inscricao", type: :request do
     sessao.response.successful?
   end
 
-  describe "pre-inscricao retomada pelo e-mail" do
-    it "troca o codigo quando a retomada vem de outro navegador" do
-      primeiro, segundo = navegador, navegador
-      codigo_do_primeiro = entrar(primeiro, @com_sessao, "Primeiro", "pessoa@example.com")
+  # O que o navegador recebeu de volta: para onde foi mandado e a página a que
+  # chegou.
+  def resposta_inteira(sessao)
+    destino = sessao.response.location.to_s
+    sessao.follow_redirect! if sessao.response.redirect?
+    destino + sessao.response.body
+  end
 
-      codigo_do_segundo = nil
+  describe "pre-inscricao, em processo com sessao" do
+    it "manda o codigo para o e-mail e nao o entrega ao navegador" do
+      sessao = navegador
+
       expect {
-        codigo_do_segundo = entrar(segundo, @com_sessao, "Segundo", "pessoa@example.com")
-      }.not_to change { Admissions::AdmissionApplication.count }
+        pedir(sessao, @com_sessao, "Pessoa", "pessoa@example.com")
+      }.to change { Admissions::AdmissionApplication.count }.by(1)
 
-      expect(codigo_do_segundo).to be_present
-      expect(codigo_do_segundo).not_to eq(codigo_do_primeiro)
-      expect(Admissions::AdmissionApplication.exists?(token: codigo_do_primeiro)).to be(false)
+      inscricao = Admissions::AdmissionApplication.find_by!(email: "pessoa@example.com")
+      expect(sessao.response.location).to end_with(
+        admission_path(id: @com_sessao.simple_id, email: "pessoa@example.com")
+      )
+      expect(resposta_inteira(sessao)).not_to include(inscricao.token)
+      expect(sessao.response.body).to include(
+        ERB::Util.html_escape(I18n.t("admissions.admissions.create.token_sent", email: "pessoa@example.com"))
+      )
+      expect(abre?(sessao, @com_sessao, inscricao.token)).to be(false)
+      expect(@enviados.map { |mensagem| mensagem[:to] }).to eq(["pessoa@example.com"])
+      expect(codigo_recebido("pessoa@example.com")).to eq(inscricao.token)
     end
 
-    it "nao deixa quem chegou antes ler nem alterar a inscricao enviada depois" do
+    it "nao deixa quem so apresentou o e-mail ler nem alterar a inscricao enviada depois" do
       primeiro, segundo = navegador, navegador
-      codigo_do_primeiro = entrar(primeiro, @com_sessao, "Primeiro", "pessoa@example.com")
-      codigo_do_segundo = entrar(segundo, @com_sessao, "Segundo", "pessoa@example.com")
-      enviar(segundo, @com_sessao, codigo_do_segundo, "dado de quem enviou")
+      pedir(primeiro, @com_sessao, "Primeiro", "pessoa@example.com")
+      expect(primeiro.response.location).not_to match(formato_do_codigo)
 
-      expect(abre?(primeiro, @com_sessao, codigo_do_primeiro)).to be(false)
-      expect(abre?(primeiro, @com_sessao, codigo_do_segundo)).to be(false)
-      primeiro.put admission_apply_path(admission_id: @com_sessao.simple_id, id: codigo_do_primeiro),
-        params: { record: { name: "Adulterado" } }
-      inscricao = Admissions::AdmissionApplication.find_by!(token: codigo_do_segundo)
-      expect(inscricao.name).to eq("Segundo")
+      expect {
+        pedir(segundo, @com_sessao, "Segundo", "pessoa@example.com")
+      }.not_to change { Admissions::AdmissionApplication.count }
+      codigo = codigo_recebido("pessoa@example.com")
+      entrar(segundo, @com_sessao, "pessoa@example.com", codigo)
+      enviar(segundo, @com_sessao, codigo, { "Dado" => "dado de quem enviou" })
+
+      expect(abre?(primeiro, @com_sessao, codigo)).to be(false)
+      enviar(primeiro, @com_sessao, codigo, { "Dado" => "adulterado" })
+      inscricao = Admissions::AdmissionApplication.find_by!(token: codigo)
       expect(inscricao.filled_form.fields.first.value).to eq("dado de quem enviou")
     end
 
-    # Controle: o mesmo navegador volta à tela do processo e continua de onde
-    # parou, com o mesmo código — e é quem chegou depois que lê o que enviou.
-    it "mantem o codigo quando a retomada vem do mesmo navegador" do
-      sessao = navegador
-      codigo = entrar(sessao, @com_sessao, "Pessoa", "pessoa@example.com")
+    # Reenviar não troca o código: quem já está preenchendo o formulário, neste
+    # ou noutro aparelho, não o perde porque o e-mail foi apresentado de novo.
+    it "reenvia o mesmo codigo quando o e-mail e apresentado de novo, sem tocar a pre-inscricao" do
+      pedir(navegador, @com_sessao, "Pessoa", "pessoa@example.com")
+      codigo = codigo_recebido("pessoa@example.com")
+      @enviados.clear
 
-      expect(entrar(sessao, @com_sessao, "Pessoa Silva", "pessoa@example.com")).to eq(codigo)
-      enviar(sessao, @com_sessao, codigo, "dado de quem enviou")
+      pedir(navegador, @com_sessao, "Outro nome", "pessoa@example.com")
+
+      expect(codigo_recebido("pessoa@example.com")).to eq(codigo)
+      expect(Admissions::AdmissionApplication.find_by!(token: codigo).name).to eq("Pessoa")
+    end
+
+    # Controle: com o código da mensagem, o formulário abre e a inscrição
+    # enviada aparece para quem a enviou.
+    it "leva ao formulario quem apresenta o e-mail e o codigo recebido" do
+      sessao = navegador
+      pedir(sessao, @com_sessao, "Pessoa", "pessoa@example.com")
+      codigo = codigo_recebido("pessoa@example.com")
+
+      entrar(sessao, @com_sessao, "pessoa@example.com", codigo)
+      expect(sessao.response.location).to end_with(
+        edit_admission_apply_path(admission_id: @com_sessao.simple_id, id: codigo)
+      )
+      enviar(sessao, @com_sessao, codigo, { "Dado" => "dado de quem enviou" })
+      expect(sessao.response.location).to end_with(
+        admission_apply_path(admission_id: @com_sessao.simple_id, id: codigo)
+      )
       expect(abre?(sessao, @com_sessao, codigo)).to be(true)
       expect(sessao.response.body).to include("dado de quem enviou")
+    end
+
+    # Controle: o navegador que já entrou com o código volta à tela do processo
+    # e continua de onde parou, sem outra mensagem.
+    it "continua no formulario quando o navegador ja entrou com o codigo" do
+      sessao = navegador
+      pedir(sessao, @com_sessao, "Pessoa", "pessoa@example.com")
+      codigo = codigo_recebido("pessoa@example.com")
+      entrar(sessao, @com_sessao, "pessoa@example.com", codigo)
+      @enviados.clear
+
+      pedir(sessao, @com_sessao, "Pessoa Silva", "pessoa@example.com")
+
+      expect(sessao.response.location).to end_with(
+        edit_admission_apply_path(admission_id: @com_sessao.simple_id, id: codigo)
+      )
+      expect(Admissions::AdmissionApplication.find_by!(token: codigo).name).to eq("Pessoa Silva")
+      expect(@enviados).to be_empty
     end
   end
 
   describe "o que a tela do processo nao manda" do
     it "nao aceita o codigo escolhido por quem se inscreve" do
-      codigo = entrar(navegador, @com_sessao, "Pessoa", "pessoa@example.com", token: "CODIGO-ESCOLHIDO")
+      pedir(navegador, @com_sessao, "Pessoa", "pessoa@example.com", token: "CODIGO-ESCOLHIDO")
 
-      expect(codigo).to be_present
-      expect(codigo).not_to eq("CODIGO-ESCOLHIDO")
+      inscricao = Admissions::AdmissionApplication.find_by!(email: "pessoa@example.com")
+      expect(inscricao.token.sub(formato_do_codigo, "")).to eq("")
       expect(Admissions::AdmissionApplication.exists?(token: "CODIGO-ESCOLHIDO")).to be(false)
     end
 
-    it "nao quebra com a origem do formulario de recuperacao" do
-      codigo = entrar(navegador, @com_sessao, "Pessoa", "pessoa@example.com", _source: "qualquer")
+    it "nao aceita o codigo de outra inscricao" do
+      outra = create_application(@sem_sessao, name: "Outra", email: "outra@example.com")
 
-      expect(codigo).to be_present
+      pedir(navegador, @com_sessao, "Pessoa", "pessoa@example.com", token: outra.token)
+
+      expect(Admissions::AdmissionApplication.where(token: outra.token).count).to eq(1)
+    end
+
+    it "nao quebra com a origem do formulario de recuperacao" do
+      pedir(navegador, @com_sessao, "Pessoa", "pessoa@example.com", _source: "qualquer")
+
+      expect(Admissions::AdmissionApplication.exists?(email: "pessoa@example.com")).to be(true)
     end
   end
 
@@ -116,7 +225,7 @@ RSpec.describe "Posse do codigo de inscricao", type: :request do
       sessao = navegador
 
       expect {
-        entrar(sessao, @sem_sessao, "Pessoa", "pessoa@example.com")
+        pedir(sessao, @sem_sessao, "Pessoa", "pessoa@example.com")
       }.not_to change { Admissions::AdmissionApplication.count }
       expect(sessao.response.location).to end_with(new_admission_apply_path(admission_id: @sem_sessao.simple_id))
     end
@@ -124,20 +233,138 @@ RSpec.describe "Posse do codigo de inscricao", type: :request do
     # Controle: sem a pré-inscrição de outra pessoa no caminho, o formulário
     # aceita o e-mail.
     it "aceita a inscricao pelo formulario depois da tentativa de outra pessoa com o mesmo e-mail" do
-      entrar(navegador, @sem_sessao, "Outra pessoa", "pessoa@example.com")
-      sessao = navegador
+      pedir(navegador, @sem_sessao, "Outra pessoa", "pessoa@example.com")
 
-      sessao.post admission_apply_index_path(admission_id: @sem_sessao.simple_id), params: { record: {
-        name: "Pessoa", email: "pessoa@example.com",
-        filled_form_attributes: {
-          enable_submission: "1",
-          fields_attributes: { "0" => { form_field_id: @template.fields.first.id, value: "dado" } },
-        },
-      } }
+      inscrever(navegador, @sem_sessao, { "Dado" => "dado" }, name: "Pessoa", email: "pessoa@example.com")
 
       inscricao = Admissions::AdmissionApplication.find_by(email: "pessoa@example.com")
       expect(inscricao&.name).to eq("Pessoa")
       expect(inscricao.filled_form.is_filled).to be(true)
+    end
+
+    it "manda o codigo para o e-mail informado e nao o entrega a quem enviou o formulario" do
+      sessao = navegador
+
+      inscrever(sessao, @sem_sessao, { "Dado" => "dado" }, name: "Pessoa", email: "pessoa@example.com")
+
+      inscricao = Admissions::AdmissionApplication.find_by!(email: "pessoa@example.com")
+      expect(sessao.response.location).to end_with(admissions_path)
+      expect(resposta_inteira(sessao)).not_to include(inscricao.token)
+      expect(sessao.response.body).to include(
+        ERB::Util.html_escape(I18n.t("admissions.apply.update.new_token_sent", email: "pessoa@example.com"))
+      )
+      expect(codigo_recebido("pessoa@example.com")).to eq(inscricao.token)
+    end
+
+    # Controle: o link da mensagem abre a inscrição, de qualquer navegador.
+    it "abre a inscricao pelo link que a mensagem traz" do
+      inscrever(navegador, @sem_sessao, { "Dado" => "dado de quem enviou" }, name: "Pessoa", email: "pessoa@example.com")
+      mensagem = @enviados.find { |m| m[:to] == "pessoa@example.com" }
+      link = mensagem[:body][%r{https?://\S+/apply/\S+}]
+
+      outro = navegador
+      outro.get URI(link).path
+
+      expect(outro.response).to be_successful
+      expect(outro.response.body).to include("dado de quem enviou")
+    end
+  end
+
+  describe "troca do e-mail da inscricao" do
+    def inscrita(processo, valores, **extra)
+      inscrever(navegador, processo, valores, **extra)
+      codigo_recebido(valores["Correio"] || extra[:email])
+    end
+
+    it "ignora o nome e o e-mail que a tela de edicao nao oferece" do
+      codigo = inscrita(@sem_sessao, { "Dado" => "dado" }, name: "Pessoa", email: "pessoa@example.com")
+      sessao = navegador
+
+      enviar(sessao, @sem_sessao, codigo, { "Dado" => "dado" }, name: "Trocado", email: "alheio@example.com")
+
+      inscricao = Admissions::AdmissionApplication.find_by!(token: codigo)
+      expect([inscricao.name, inscricao.email]).to eq(["Pessoa", "pessoa@example.com"])
+      expect(sessao.response.location).to end_with(
+        admission_apply_path(admission_id: @sem_sessao.simple_id, id: codigo)
+      )
+    end
+
+    it "troca o codigo e o manda so para o endereco novo quando o campo do formulario muda o e-mail" do
+      antigo = inscrita(@com_campo, { "Dado" => "dado", "Correio" => "pessoa@example.com" }, name: "Pessoa")
+      sessao = navegador
+      @enviados.clear
+
+      enviar(sessao, @com_campo, antigo, { "Dado" => "dado", "Correio" => "alheio@example.com" })
+
+      inscricao = Admissions::AdmissionApplication.find_by!(email: "alheio@example.com")
+      expect(inscricao.token).not_to eq(antigo)
+      expect(sessao.response.location).to end_with(admissions_path)
+      expect(resposta_inteira(sessao)).not_to include(inscricao.token)
+      expect(@enviados.map { |mensagem| mensagem[:to] }).to eq(["alheio@example.com"])
+      expect(codigo_recebido("alheio@example.com")).to eq(inscricao.token)
+      expect(abre?(sessao, @com_campo, antigo)).to be(false)
+    end
+
+    # A ponta do caminho: quem recupera o código pelo e-mail recebe um código
+    # que só a caixa dele viu.
+    it "nao entrega na recuperacao por e-mail um codigo que outra pessoa tenha" do
+      antigo = inscrita(@com_campo, { "Dado" => "dado", "Correio" => "pessoa@example.com" }, name: "Pessoa")
+      quem_trocou = navegador
+      enviar(quem_trocou, @com_campo, antigo, { "Dado" => "dado", "Correio" => "alheio@example.com" })
+      @enviados.clear
+
+      dono = navegador
+      entrar(dono, @com_campo, "alheio@example.com", "forgot")
+
+      recuperado = codigo_recebido("alheio@example.com")
+      expect(recuperado).to be_present
+      expect(recuperado).not_to eq(antigo)
+      enviar(dono, @com_campo, recuperado, { "Dado" => "dado do dono", "Correio" => "alheio@example.com" })
+      expect(abre?(quem_trocou, @com_campo, antigo)).to be(false)
+    end
+
+    it "tira da sessao o codigo antigo, em processo com sessao" do
+      @com_sessao.update!(form_template: @sincronizado)
+      sessao = navegador
+      pedir(sessao, @com_sessao, "Pessoa", "pessoa@example.com")
+      antigo = codigo_recebido("pessoa@example.com")
+      entrar(sessao, @com_sessao, "pessoa@example.com", antigo)
+
+      enviar(sessao, @com_sessao, antigo, { "Dado" => "dado", "Correio" => "alheio@example.com" })
+
+      novo = codigo_recebido("alheio@example.com")
+      expect(novo).to be_present
+      expect(novo).not_to eq(antigo)
+      expect(abre?(sessao, @com_sessao, antigo)).to be(false)
+      expect(abre?(sessao, @com_sessao, novo)).to be(false)
+    end
+
+    # Controle: a edição que não muda o e-mail mantém o código e volta para a
+    # inscrição.
+    it "mantem o codigo quando a edicao nao muda o e-mail" do
+      codigo = inscrita(@com_campo, { "Dado" => "dado", "Correio" => "pessoa@example.com" }, name: "Pessoa")
+      sessao = navegador
+
+      enviar(sessao, @com_campo, codigo, { "Dado" => "outro dado", "Correio" => "pessoa@example.com" })
+
+      expect(sessao.response.location).to end_with(
+        admission_apply_path(admission_id: @com_campo.simple_id, id: codigo)
+      )
+      expect(Admissions::AdmissionApplication.find_by!(token: codigo).filled_form.fields.first.value).to eq("outro dado")
+    end
+
+    # Controle: a edição recusada pelo servidor não troca o código.
+    it "mantem o codigo quando a troca de e-mail e recusada" do
+      create_application(@com_campo, name: "Ocupante", email: "ocupado@example.com")
+      codigo = inscrita(@com_campo, { "Dado" => "dado", "Correio" => "pessoa@example.com" }, name: "Pessoa")
+      sessao = navegador
+      allow(ExceptionNotifier).to receive(:notify_exception)
+
+      enviar(sessao, @com_campo, codigo, { "Dado" => "dado", "Correio" => "ocupado@example.com" })
+
+      expect(sessao.response).to have_http_status(:ok)
+      expect(Admissions::AdmissionApplication.find_by(token: codigo)&.email).to eq("pessoa@example.com")
+      expect(abre?(sessao, @com_campo, codigo)).to be(true)
     end
   end
 
@@ -147,7 +374,7 @@ RSpec.describe "Posse do codigo de inscricao", type: :request do
 
       inscricao = create_application(@com_sessao, name: "Pessoa")
 
-      expect(inscricao.token).to match(/\A[2346789BCDFGHJKMPQRTVWXY]{6}-[2346789BCDFGHJKMPQRTVWXY]{6}-[2346789BCDFGHJKMPQRTVWXY]{6}\z/)
+      expect(inscricao.token.sub(formato_do_codigo, "")).to eq("")
       expect(SecureRandom).to have_received(:rand).at_least(18).times
     end
   end

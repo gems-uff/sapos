@@ -56,17 +56,14 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
         )
         flash.now[:alert] = I18n.t("errors.admissions.application_exists")
         return render :show
-      else
+      elsif holds_token?(@admission_application)
+        # Este navegador ja entrou na pre-inscricao com o codigo: continua de
+        # onde parou, e pode corrigir o nome.
         @admission_application.assign_attributes(new_application_params)
-        # A pre-inscricao nao enviada e retomada so pelo e-mail, que nao e
-        # segredo. Se o codigo dela nao esta na sessao deste navegador, quem
-        # chega pode ser outra pessoa: o codigo e trocado (set_token gera o
-        # novo) e o anterior deixa de valer. Nada se perde -- a pre-inscricao
-        # nao enviada so guarda o nome e o e-mail.
-        if !(session[:admission_tokens] || []).include?(@admission_application.token)
-          @admission_application.token = nil
-        end
       end
+      # Sem o codigo na sessao, quem chega so apresentou o e-mail, que nao e
+      # segredo: a pre-inscricao fica como esta e o codigo segue de novo para
+      # o endereco.
     else
       @admission_application = Admissions::AdmissionApplication.new(
         new_application_params.merge(
@@ -85,17 +82,24 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
       return render :show
     end
 
-    if @admission_application.save
-      if @admission_process.require_session
-        add_token_to_session(@admission_application.token)
-      end
-      redirect_to edit_admission_apply_path(
+    return render :show if !@admission_application.save
+
+    if holds_token?(@admission_application)
+      return redirect_to edit_admission_apply_path(
         admission_id: @admission_process.simple_id,
         id: @admission_application.token
       )
-    else
-      render :show
     end
+
+    # O codigo de identificacao e a credencial da inscricao, e so viaja por
+    # e-mail, para o endereco da inscricao: quem o apresenta leu a caixa
+    # daquele endereco. A tela so diz para onde ele foi.
+    send_token_by_email(@admission_application)
+    redirect_to admission_path(
+      id: @admission_process.simple_id, email: @admission_application.email
+    ), notice: I18n.t(
+      "admissions.admissions.create.token_sent", email: @admission_application.email
+    )
   end
 
   def find
@@ -217,6 +221,25 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
   private
     def set_show_background
       @show_background = true
+    end
+
+    def holds_token?(admission_application)
+      admission_application.token.present? &&
+        (session[:admission_tokens] || []).include?(admission_application.token)
+    end
+
+    def send_token_by_email(admission_application)
+      emails = [EmailTemplate.load_template(
+        "admissions/admissions:send_token"
+      ).prepare_message({
+        record: admission_application,
+        admission_process: @admission_process,
+        url: admission_url(
+          id: @admission_process.simple_id,
+          params: { email: admission_application.email }
+        )
+      })]
+      Notifier.send_emails(notifications: emails)
     end
 
     def admission_application_params

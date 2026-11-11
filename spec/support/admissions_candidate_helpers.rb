@@ -97,12 +97,18 @@ module AdmissionsCandidateHelpers
 
   # Inscrição completa pela rota pública, e devolve a candidatura. Edital com
   # sessão começa pela página do edital (nome e e-mail), que cria a candidatura
-  # vazia e guarda o código na sessão; o formulário vem depois, por PUT. Sem
-  # sessão, o POST do formulário cria tudo de uma vez.
+  # vazia e manda o código para o e-mail; com o e-mail e o código o candidato
+  # entra, e o formulário vem depois, por PUT. Sem sessão, o POST do formulário
+  # cria tudo de uma vez. O código que o candidato leria na mensagem sai aqui
+  # do banco: quem cobra a mensagem é o application_code_ownership_spec.rb.
   def apply_as_candidate(process, name:, email:, values: {}, letters: [])
     if process.require_session
       post admission_path(process.simple_url), params: { admissions_admission_application: { name: name, email: email } }
       application = Admissions::AdmissionApplication.find_by!(admission_process: process, email: email)
+      expect(response).to redirect_to(admission_path(id: process.simple_id, email: email))
+      post find_admissions_path, params: {
+        admissions_admission_application: { email: email, token: application.token, _source: process.simple_id },
+      }
       expect(response).to redirect_to(edit_admission_apply_path(admission_id: process.simple_id, id: application.token))
     end
     # Campos sincronizados levam o nome e o e-mail de volta para a candidatura;

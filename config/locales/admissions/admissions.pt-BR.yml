@@ -27,6 +27,9 @@ pt-BR:
         new_button: Criar nova inscrição
         edit_button: Recuperar inscrição em andamento
 
+      create:
+        token_sent: "Enviamos o código de identificação para %{email}. Informe-o abaixo para continuar a inscrição."
+
       find_by_email:
         success:
           one: Email enviado para %{email} com código de identificação
@@ -66,6 +69,8 @@ pt-BR:
       update:
         new_notice: "Inscrição realizada com sucesso"
         edit_notice: "Inscrição editada com sucesso"
+        new_token_sent: "Inscrição realizada com sucesso. O código de identificação e o link para acompanhar ou alterar a inscrição foram enviados para %{email}."
+        email_changed: "Inscrição editada com sucesso. O e-mail da inscrição mudou e, com ele, o código de identificação: o novo código foi enviado para %{email}."
 
     letters:
       show:
@@ -102,6 +107,8 @@ pt-BR:
       admissions:
         recover_tokens:
           subject: Recuperação de código de inscrição
+        send_token:
+          subject: Código de identificação da inscrição
       apply:
         email_to_student:
           subject: Inscrição realizada

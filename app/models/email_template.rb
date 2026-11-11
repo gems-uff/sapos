@@ -51,6 +51,17 @@ class EmailTemplate < ApplicationRecord
         url: :value,
       }
     },
+    "admissions/admissions:send_token" => {
+      template_type: "Liquid",
+      path: File.join("admissions", "admissions", "mailer", "send_token.text.liquid"),
+      subject: I18n.t("notifications.admissions.admissions.send_token.subject"),
+      to: "{{ record.email }}",
+      variables: {
+        record: Admissions::AdmissionApplicationDrop,
+        admission_process: Admissions::AdmissionProcessDrop,
+        url: :value,
+      }
+    },
     "admissions/apply:email_to_student" => {
       template_type: "Liquid",
       path: File.join("admissions", "apply", "mailer", "email_to_student.text.liquid"),

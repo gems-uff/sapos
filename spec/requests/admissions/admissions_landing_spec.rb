@@ -68,7 +68,11 @@ RSpec.describe "Admissions::Admissions: entrada do candidato", type: :request do
   end
 
   describe "POST create" do
-    it "cria a inscrição, guarda o código na sessão e leva ao formulário" do
+    # O código não volta para o navegador: vai para o e-mail, e a tela do
+    # edital abre a recuperação já com o endereço (ver
+    # application_code_ownership_spec.rb).
+    it "cria a inscrição, manda o código por e-mail e volta à tela do edital" do
+      allow(Notifier).to receive(:send_emails)
       expect {
         post admission_path(@open.simple_url), params: params_for(name: "Ana", email: "ana@example.com")
       }.to change { Admissions::AdmissionApplication.count }.by(1)
@@ -76,22 +80,27 @@ RSpec.describe "Admissions::Admissions: entrada do candidato", type: :request do
       application = Admissions::AdmissionApplication.last
       expect(application.admission_process).to eq(@open)
       expect(application.filled_form.is_filled).to be false
-      expect(response).to redirect_to(edit_admission_apply_path(admission_id: @open.simple_id, id: application.token))
-      expect(session[:admission_tokens]).to include(application.token)
+      expect(response).to redirect_to(admission_path(id: @open.simple_id, email: "ana@example.com"))
+      expect(flash[:notice]).to eq(I18n.t("admissions.admissions.create.token_sent", email: "ana@example.com"))
+      expect(session[:admission_tokens]).to be_blank
+      expect(Notifier).to have_received(:send_emails).with(
+        notifications: [a_hash_including(to: "ana@example.com", body: a_string_including(application.token))]
+      )
     end
 
-    # A pré-inscrição é a mesma, mas o código não: ele não estava na sessão
-    # deste navegador (ver application_code_ownership_spec.rb).
-    it "reaproveita a inscrição não enviada do mesmo e-mail, com código novo" do
+    it "reaproveita a inscrição não enviada do mesmo e-mail e reenvia o mesmo código" do
+      allow(Notifier).to receive(:send_emails)
       existing = create_application(@open, name: "Ana", email: "ana@example.com", filled: false)
       old_token = existing.token
       expect {
         post admission_path(@open.simple_url), params: params_for(name: "Ana Maria", email: "ana@example.com")
       }.not_to change { Admissions::AdmissionApplication.count }
-      expect(existing.reload.name).to eq("Ana Maria")
-      expect(existing.token).not_to eq(old_token)
-      expect(response).to redirect_to(edit_admission_apply_path(admission_id: @open.simple_id, id: existing.token))
-      expect(session[:admission_tokens]).to include(existing.token)
+      expect(existing.reload.name).to eq("Ana")
+      expect(existing.token).to eq(old_token)
+      expect(response).to redirect_to(admission_path(id: @open.simple_id, email: "ana@example.com"))
+      expect(Notifier).to have_received(:send_emails).with(
+        notifications: [a_hash_including(to: "ana@example.com", body: a_string_including(old_token))]
+      )
     end
 
     it "recusa novo cadastro de e-mail já inscrito quando o edital não permite repetir" do

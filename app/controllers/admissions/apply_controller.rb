@@ -36,8 +36,9 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
   def update(creating: false)
     prepare_edit_update_application(creating: creating)
     was_filled = @admission_application.filled_form.is_filled
+    previous_token = @admission_application.token
     @admission_application.assign_form(
-      admission_application_params,
+      submitted_params(creating: creating),
       has_letter_forms: false,
       has_phases: @admission_application.admission_phase.present?,
       has_rankings: true,
@@ -49,6 +50,12 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       @admission_application.submission_time = Time.current
     end
     @admission_application.filled_form.is_filled = true
+    # O codigo de identificacao so viaja por e-mail, para o endereco da
+    # inscricao: quem o apresenta leu a caixa daquele endereco. Quando o
+    # endereco muda -- pelo campo do formulario sincronizado com o e-mail --, o
+    # codigo muda junto (set_token gera o novo) e segue para o endereco novo.
+    email_changed = !creating && @admission_application.email_changed?
+    @admission_application.token = nil if email_changed
     if @admission_application.save
       emails = [EmailTemplate.load_template(
         was_filled ?
@@ -79,6 +86,18 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
         end
       end
       Notifier.send_emails(notifications: emails)
+      # Inscricao que nasce aqui (processo sem sessao) e inscricao que trocou
+      # de e-mail: o navegador nao recebe o codigo, so o aviso de para onde
+      # ele foi.
+      if creating || email_changed
+        session[:admission_tokens]&.delete(previous_token)
+        return redirect_to admissions_path, notice: I18n.t(
+          email_changed ?
+            "admissions.apply.update.email_changed" :
+            "admissions.apply.update.new_token_sent",
+          email: @admission_application.email
+        )
+      end
       notice = was_filled ?
         I18n.t("admissions.apply.update.edit_notice") :
         I18n.t("admissions.apply.update.new_notice")
@@ -91,6 +110,7 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
         id: @admission_application.token
       ), notice: notice
     else
+      @admission_application.token = previous_token if email_changed
       # Formulário que a validação do cliente deixou passar e o servidor
       # recusou (issue #605). O e-mail leva o motivo técnico, atributo e tipo
       # de cada erro; o que o candidato preencheu fica no log do servidor, que
@@ -222,6 +242,15 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       filled_form.prepare_missing_fields
       @admission_application.prepare_missing_letters
       filled_form.sync_fields_before(@admission_application)
+    end
+
+    # Nome e e-mail so sao campos da tela quando a inscricao nasce no envio do
+    # formulario (processo sem sessao). Na edicao a tela nao os oferece: eles
+    # so mudam pelo campo do formulario sincronizado com cada um.
+    def submitted_params(creating:)
+      return admission_application_params if creating
+
+      admission_application_params.except(:name, :email)
     end
 
     def admission_application_params
