@@ -167,7 +167,7 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     pedaco = Admissions::AdmissionApplication.sanitize_sql_like(termo)
     [
       "(#{IDENTIFIER_SQL} LIKE ? OR admission_applications.token = ?)",
-      like_pattern.sub("?", pedaco), termo
+      like_pattern.sub("?") { pedaco }, termo
     ]
   end
 

@@ -17,9 +17,10 @@
 # Prepend no modulo, porque ele e incluido em cada controller pela chamada
 # active_scaffold e ficaria na frente de um metodo do ApplicationController.
 module ActiveScaffoldResponseFormats
-  def default_formats
-    %i[html js]
-  end
+  protected
+    def default_formats
+      %i[html js]
+    end
 end
 
 ActiveScaffold::Actions::Core.prepend(ActiveScaffoldResponseFormats)

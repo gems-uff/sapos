@@ -22,13 +22,17 @@ class RemoveSuporteRole < ActiveRecord::Migration[8.1]
   # Role::ORDER sem o Suporte, do menor papel ao maior.
   ORDEM = [1, 5, 4, 3, 2, 6].freeze
 
+  # Em MariaDB a migration roda sem transacao: cada passo deixa o banco num
+  # estado que a proxima execucao termina. Por isso o papel Desconhecido entra
+  # antes de o vinculo com o Suporte sair, e nenhum usuario fica sem papel no
+  # meio do caminho.
   def up
     com_o_papel = select_values("SELECT DISTINCT user_id FROM user_roles WHERE role_id = #{SUPORTE}")
-    execute("DELETE FROM user_roles WHERE role_id = #{SUPORTE}")
-
     atuando = select_values("SELECT id FROM users WHERE actual_role = #{SUPORTE}")
     (com_o_papel | atuando).map(&:to_i).each do |user_id|
-      restantes = select_values("SELECT role_id FROM user_roles WHERE user_id = #{user_id}").map(&:to_i)
+      restantes = select_values(
+        "SELECT role_id FROM user_roles WHERE user_id = #{user_id} AND role_id <> #{SUPORTE}"
+      ).map(&:to_i)
       if restantes.empty?
         agora = connection.quote(Time.current)
         execute(<<~SQL.squish)
@@ -44,6 +48,7 @@ class RemoveSuporteRole < ActiveRecord::Migration[8.1]
       SQL
     end
 
+    execute("DELETE FROM user_roles WHERE role_id = #{SUPORTE}")
     execute("DELETE FROM roles WHERE id = #{SUPORTE}")
   end
 

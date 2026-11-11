@@ -224,7 +224,9 @@ parte, a diferença é real. Código que os testes nunca executam:
   visível nos modelos vem do active_scaffold e é preenchido **por requisição**;
   fora de uma, ele é nil. `User#roles_valid?` abre com
   `return if current_user.blank?`, então na suíte a linha do `return` executa
-  centenas de vezes e o corpo, poucas — as de erro de escalação de papel, nenhuma.
+  centenas de vezes e o corpo só nos specs de requisição que gravam usuário
+  pela tela (`spec/requests/users_role_escalation_spec.rb` percorre os ramos
+  de escalação de papel). Spec de modelo não alcança nenhum deles.
 
 A consequência sai do teste e alcança o reparo de dado: **a mesma alteração feita
 pela tela e por script produz estados diferentes.** Desmarcar o último papel de um

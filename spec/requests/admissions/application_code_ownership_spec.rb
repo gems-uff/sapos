@@ -356,7 +356,9 @@ RSpec.describe "Posse do codigo de inscricao", type: :request do
       expect(abre?(quem_trocou, @com_campo, antigo)).to be(false)
     end
 
-    it "tira da sessao o codigo antigo, em processo com sessao" do
+    # O código novo vai só para o endereço novo: o navegador que fez a troca
+    # tinha o antigo na sessão e não ganha o novo.
+    it "nao poe o codigo novo na sessao de quem trocou o e-mail, em processo com sessao" do
       @com_sessao.update!(form_template: @sincronizado)
       sessao = navegador
       pedir(sessao, @com_sessao, "Pessoa", "pessoa@example.com")

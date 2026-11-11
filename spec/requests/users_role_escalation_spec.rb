@@ -151,12 +151,13 @@ RSpec.describe "Escalacao de papel pela tela de usuarios", type: :request do
       end << UserRole.count
     end
 
-    # Entra de novo a cada pedido (a recusa derruba a sessão do teste) e
-    # engole a recusa: o que se julga é o banco.
+    # Entra de novo a cada pedido (a recusa derruba a sessão do teste). Só a
+    # recusa do cancancan é engolida: qualquer outra exceção é o pedido
+    # quebrando por motivo que não é o papel, e derruba o exemplo.
     def pedir(ator, verbo, caminho, params)
       sign_in ator
       process(verbo, caminho, params: params, env: { "REMOTE_ADDR" => RouteProbe::REMOTE_ADDR })
-    rescue StandardError
+    rescue CanCan::AccessDenied
       nil
     end
 
@@ -226,7 +227,12 @@ RSpec.describe "Escalacao de papel pela tela de usuarios", type: :request do
     end
 
     # Controle: os mesmos pedidos, feitos pelo administrador, mudam o banco —
-    # o formato de cada um está certo, e a recusa acima é do papel.
+    # o formato de cada um está certo, e a recusa acima é do papel. Os que
+    # ficam de fora são portas que não existem para ninguém: o papel em que o
+    # usuário atua não é campo da tela de usuários, a edição em linha está
+    # desligada em todo scaffold, o perfil só leva e-mail e senha, e a tela de
+    # vínculos de papel não cria nem altera. A troca do papel em que se atua
+    # tem o controle no exemplo "troca para um que tem".
     it "controle: o administrador muda papel, cria usuario e troca senha pelos mesmos pedidos" do
       pedidos = tentativas_de_papel(@administrador, @alvo, @papel[:secretaria].id)
         .merge(tentativas_de_tomada(@atores[:professor]))

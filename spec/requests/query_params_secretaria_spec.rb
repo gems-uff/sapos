@@ -56,28 +56,70 @@ RSpec.describe "Parâmetros de consulta pela secretaria", type: :request do
   end
 
   describe "o que ela não faz com o parâmetro" do
-    def tenta
+    # Fora de IP local a recusa do cancancan sobe como exceção (ver
+    # RouteProbe::REMOTE_ADDR): é ela que separa "o papel não pode" de "o
+    # pedido não gravou por outro motivo".
+    def desfecho
       yield
+      :passou
     rescue CanCan::AccessDenied
-      nil
+      :negado
+    end
+
+    def remoto
+      { "REMOTE_ADDR" => RouteProbe::REMOTE_ADDR }
+    end
+
+    def alterar
+      desfecho { patch query_param_path(@param), params: { record: { default_value: "alterado" } }, env: remoto }
+    end
+
+    def apagar
+      desfecho { delete query_param_path(@param), env: remoto }
+    end
+
+    def criar
+      desfecho do
+        post query_params_path, env: remoto,
+          params: { record: { name: "novo", value_type: "String", query: @query.id } }
+      end
     end
 
     it "não altera o valor padrão" do
-      tenta { patch query_param_path(@param), params: { record: { default_value: "alterado" } } }
-
+      expect(alterar).to eq(:negado)
       expect(@param.reload.default_value).to eq("padrao")
     end
 
     it "não apaga o parâmetro" do
-      tenta { delete query_param_path(@param) }
-
+      expect(apagar).to eq(:negado)
       expect(QueryParam.exists?(@param.id)).to be(true)
     end
 
     it "não cria parâmetro" do
-      expect {
-        tenta { post query_params_path, params: { record: { name: "novo", value_type: "String", query: @query.id } } }
-      }.not_to change(QueryParam, :count)
+      expect { expect(criar).to eq(:negado) }.not_to change(QueryParam, :count)
+    end
+
+    # Controle: os mesmos pedidos, feitos pela coordenação, passam pela
+    # autorização; os que a tela sabe gravar, gravam.
+    context "os mesmos pedidos, pela coordenação" do
+      before(:each) do
+        sign_out :user
+        sign_in create_confirmed_user([FactoryBot.create(:role_coordenacao)], "coord.param@ic.uff.br", "Coordenacao")
+      end
+
+      it "altera o valor padrão" do
+        expect(alterar).to eq(:passou)
+        expect(@param.reload.default_value).to eq("alterado")
+      end
+
+      it "apaga o parâmetro" do
+        expect(apagar).to eq(:passou)
+        expect(QueryParam.exists?(@param.id)).to be(false)
+      end
+
+      it "passa pela autorização ao criar" do
+        expect(criar).to eq(:passou)
+      end
     end
   end
 end
