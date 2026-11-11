@@ -261,6 +261,15 @@ cada uma explica o porquê no próprio cabeçalho:
   `return_to` só interno). Os três entram por `prepend` no módulo porque a
   chamada `active_scaffold` inclui o módulo em cada controller, na frente de um
   método do `ApplicationController`.
+- active_scaffold, filtro da lista vindo da URL:
+  `active_scaffold_list_url_columns.rb` (`prepend` em
+  `ActiveScaffold::Actions::Core#conditions_from_params`). A gem filtra a
+  lista por qualquer parâmetro da URL com nome de coluna do banco do modelo —
+  igualdade, faixa e diferença —, e o filtro vale também para o PDF e o lote
+  montados sobre a lista; aqui só filtra, por igualdade, a coluna que o
+  controller declara em `active_scaffold_list_url_columns`. Tela que abre a
+  lista de outro scaffold com coluna na URL precisa da coluna declarada lá.
+  `spec/requests/scaffold_list_url_filter_spec.rb` percorre as listas.
 - active_scaffold, edição em linha: `active_scaffold_inplace_edit.rb`
   (`prepend` em `ActiveScaffold::Actions::Update#update_column` e em
   `ActiveScaffold::Actions::Core#render_field_for_inplace_editing`). A gem

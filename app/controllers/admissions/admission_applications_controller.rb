@@ -416,6 +416,13 @@ class Admissions::AdmissionApplicationsController < ApplicationController
   end
 
   protected
+    # A situacao do processo seletivo (phase_status) abre esta lista uma vez
+    # por fase, com o processo e a fase na URL; a fase vazia e a das
+    # candidaturas que ainda nao entraram em fase nenhuma.
+    def active_scaffold_list_url_columns
+      [:admission_process_id, :admission_phase_id]
+    end
+
     # O seletor lista o que a lista lista: a gem parte do modelo cru, e o
     # Ability so e aplicado na lista (beginning_of_chain).
     def record_select_conditions_from_controller
