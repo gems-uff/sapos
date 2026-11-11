@@ -15,6 +15,22 @@ Antes de escrever procedimento novo, consulte a [wiki](https://github.com/gems-u
 Referencie essas páginas em vez de duplicá-las. Se algo estiver desatualizado,
 corrija na wiki.
 
+**Mudança no código pede revisão da wiki e do `README.md`.** A wiki é outro
+repositório (`gems-uff/sapos.wiki`): nenhum diff do código a denuncia e nenhum
+teste a cobre, então a página desatualizada só aparece quando alguém a segue.
+Antes de fechar a issue, confira o que a mudança alcança:
+
+- o que o usuário vê ou faz (tela, campo, mensagem, papel, fluxo): o
+  `Manual-do-SAPOS` e os manuais de seleção de alunos e de inscrição em
+  disciplinas;
+- instalação, atualização, dependência do sistema operacional, variável de
+  ambiente, tarefa agendada: as páginas de instalação, a
+  `Upgrading-to-a-new-release` e o `README.md`.
+
+A revisão sai junto com o código, e a wiki é publicada quando a versão que
+traz a mudança é lançada: página que descreve o que ainda não está em produção
+engana quem a lê hoje.
+
 ## Convenções de trabalho
 
 - Uma issue, um ramo `issue_NNN`, sempre baseado na `main`. Detalhes do ciclo em
