@@ -3,7 +3,7 @@
   options[:required] = "required" if configuration["required"]
   # O campo sincronizado com o e-mail e conferido pelo navegador como o campo
   # de e-mail da tela (o servidor confere de novo, no modelo).
-  input = form_field.sync == Admissions::FormField::SYNC_EMAIL ? :email_field : :text_field
+  input = field.object.offered_as_email_input? ? :email_field : :text_field
 %>
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>

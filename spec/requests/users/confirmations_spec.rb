@@ -36,6 +36,20 @@ RSpec.describe "Users::ConfirmationsController", type: :request do
       expect(student.reload.email).to eq("new@ic.uff.br")
     end
 
+    # The student and the professor check the format of the address they are
+    # given. An address they would refuse never becomes a pending change of
+    # the user, or the confirmation would break while copying it to them.
+    it "does not take as a pending change an address that the student would refuse" do
+      student = Student.create!(name: "ana", cpf: "123.456.789-10",
+        email: "old@ic.uff.br")
+      user = create_confirmed_user([@role_aluno], "old@ic.uff.br",
+        student: student)
+
+      expect(user.update(email: "joão@ic.uff.br")).to be(false)
+      expect(user.errors.where(:email, :invalid)).to be_present
+      expect(user.reload.unconfirmed_email).to be_nil
+    end
+
     it "propagates a confirmed email change to the professor of the user" do
       professor = Professor.create!(name: "ana", cpf: "123.456.789-10",
         email: "old@ic.uff.br")

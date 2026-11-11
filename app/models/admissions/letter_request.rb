@@ -27,7 +27,8 @@ class Admissions::LetterRequest < ActiveRecord::Base
   # O e-mail e para onde o link da carta viaja; como o da candidatura, e
   # conferido quando e novo ou alterado (AdmissionApplication).
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true,
-    if: :email_changed?
+    if: :email_address_changed?
+  validates :email, length: { maximum: 255 }, if: :email_address_changed?
 
   before_validation :strip_email
   validates :name, presence: true

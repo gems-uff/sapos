@@ -35,6 +35,7 @@ class Student < ApplicationRecord
 
   validates :name, presence: true
   validates :cpf, presence: true, uniqueness: true
+  validate :email_formats, if: :email_changed?
   validate :changed_to_different_user
 
   before_destroy :handle_user_role_removal
@@ -55,6 +56,12 @@ class Student < ApplicationRecord
   def emails
     return [] unless self.has_email?
     self.email.split(/[\s,;]/).filter { |email| email != "" }
+  end
+
+  def email_formats
+    if emails.any? { |email| !URI::MailTo::EMAIL_REGEXP.match?(email) }
+      errors.add(:email, :invalid)
+    end
   end
 
   def first_email

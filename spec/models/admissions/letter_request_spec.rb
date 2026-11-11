@@ -45,6 +45,31 @@ RSpec.describe Admissions::LetterRequest, type: :model do
     it { should be_valid }
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:email) }
+    it "rejects an invalid new email" do
+      letter_request.email = "not-an-email"
+
+      expect(letter_request).to have_error(:invalid).on(:email)
+    end
+
+    it "accepts a valid new email" do
+      letter_request.email = "ana@example.com"
+
+      expect(letter_request).not_to have_error(:invalid).on(:email)
+    end
+
+    it "allows editing another attribute of an old invalid request" do
+      letter_request.save!(validate: false)
+      letter_request.name = "Ana Maria"
+
+      expect(letter_request).to be_valid
+    end
+
+    it "rejects changing an old request to an invalid email" do
+      letter_request.save!(validate: false)
+      letter_request.email = "not-an-email"
+
+      expect(letter_request).to have_error(:invalid).on(:email)
+    end
   end
   # ToDo: test before_save
   # ToDo: test after_initialize

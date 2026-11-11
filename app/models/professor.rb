@@ -47,6 +47,8 @@ class Professor < ApplicationRecord
   validates :cpf, presence: true, uniqueness: true
   validates :name, presence: true
   validates :email, uniqueness: true, allow_nil: true, allow_blank: true
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP },
+    allow_blank: true, if: :email_changed?
   validates :enrollment_number, uniqueness: true, allow_blank: true
   validate :changed_to_different_user
 

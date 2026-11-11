@@ -222,6 +222,158 @@ RSpec.describe "Formato do e-mail da inscricao", type: :request do
       expect(@inscricao.reload.filled_form.fields.first.value).to eq("outro dado")
       expect(@inscricao.email).to eq("antiga sem formato")
     end
+
+    # O campo de e-mail do navegador não deixa enviar o formulário enquanto o
+    # valor não é endereço, e o valor gravado já vem nele: a inscrição ficaria
+    # sem poder editar campo nenhum.
+    context "no campo sincronizado com o e-mail" do
+      def tipo_do_campo(inscricao)
+        get edit_admission_apply_path(admission_id: @com_campo.simple_id, id: inscricao.token)
+        correio = @sincronizado.fields.find_by!(name: "Correio")
+        pagina = Nokogiri::HTML(response.body)
+        marca = pagina.css("input[type=hidden][name$='[form_field_id]']").find { |e| e["value"] == correio.id.to_s }
+        pagina.at_css("input[name='#{marca['name'].delete_suffix('[form_field_id]')}[value]']")["type"]
+      end
+
+      def inscricao_com(endereco)
+        inscricao = create_application(
+          @com_campo, name: "Antiga", email: "antiga@example.com", fields: { "Dado" => "dado", "Correio" => endereco }
+        )
+        inscricao.update_column(:email, endereco)
+        inscricao
+      end
+
+      it "oferece como texto o endereco gravado fora do formato" do
+        expect(tipo_do_campo(inscricao_com("antiga sem formato"))).to eq("text")
+      end
+
+      it "oferece como texto o endereco gravado fora do formato, quando o campo e de aluno" do
+        de_aluno = create_admission_template("Com e-mail de aluno", {
+          "Dado" => Admissions::FormField::STRING,
+          "Correio" => {
+            field_type: Admissions::FormField::STUDENT_FIELD, configuration: { field: "email" },
+            sync: Admissions::FormField::SYNC_EMAIL,
+          },
+        })
+        @com_campo.update!(form_template: de_aluno)
+        @sincronizado = de_aluno
+
+        expect(tipo_do_campo(inscricao_com("antiga sem formato"))).to eq("text")
+      end
+
+      # O navegador tira o espaço em volta antes de conferir.
+      it "oferece como campo de e-mail o endereco gravado com espaco em volta" do
+        expect(tipo_do_campo(inscricao_com("antiga@example.com "))).to eq("email")
+      end
+
+      # Controle: o endereço gravado no formato.
+      it "oferece como campo de e-mail o endereco gravado no formato" do
+        expect(tipo_do_campo(inscricao_com("antiga@example.com"))).to eq("email")
+      end
+    end
+
+    # A tela antiga gravava o endereço como digitado, com o espaço em volta. O
+    # espaço não faz do endereço gravado um endereço alterado.
+    context "e com espaco em volta" do
+      before(:each) do
+        @inscricao.update_column(:email, "antiga@example.com. ")
+      end
+
+      it "deixa o candidato editar os outros campos" do
+        enviar(@sem_sessao, @inscricao, { "Dado" => "outro dado" })
+
+        expect(response).to redirect_to(admission_apply_path(admission_id: @sem_sessao.simple_id, id: @inscricao.token))
+        expect(@inscricao.reload.filled_form.fields.first.value).to eq("outro dado")
+      end
+
+      it "deixa a equipe gravar o que nao e o e-mail" do
+        expect(@inscricao.reload.update(status: Admissions::AdmissionApplication::CANCELED)).to be(true)
+      end
+
+      it "deixa o candidato pedir a troca pelo campo sincronizado com o e-mail" do
+        inscricao = create_application(
+          @com_campo, name: "Antiga", email: "antiga@example.com",
+          fields: { "Dado" => "dado", "Correio" => "antiga@example.com. " }
+        )
+        inscricao.update_column(:email, "antiga@example.com. ")
+
+        enviar(@com_campo, inscricao, { "Dado" => "dado", "Correio" => "certa@example.com" })
+
+        expect(response).to redirect_to(admission_apply_path(admission_id: @com_campo.simple_id, id: inscricao.token))
+        expect(inscricao.reload.pending_email).to eq("certa@example.com")
+      end
+
+      # Controle: o endereço alterado continua conferido.
+      it "recusa o endereco alterado que continua fora do formato" do
+        expect(@inscricao.reload.update(email: "outra sem formato")).to be(false)
+      end
+    end
+  end
+
+  # O processo deixava mais de uma inscrição por e-mail e deixou de deixar: as
+  # que já repetiam o endereço continuam editáveis, e a saída do candidato é
+  # trocar o endereço.
+  describe "na inscricao que repete o e-mail de outra do processo" do
+    before(:each) do
+      @com_campo.update!(allow_multiple_applications: true)
+      valores = { "Dado" => "dado", "Correio" => "repetido@example.com" }
+      create_application(@com_campo, name: "Primeira", email: "repetido@example.com", fields: valores)
+      @inscricao = create_application(@com_campo, name: "Segunda", email: "repetido@example.com", fields: valores)
+      @com_campo.update!(allow_multiple_applications: false)
+    end
+
+    it "deixa o candidato editar os outros campos" do
+      enviar(@com_campo, @inscricao, { "Dado" => "outro dado", "Correio" => "repetido@example.com" })
+
+      expect(response).to redirect_to(admission_apply_path(admission_id: @com_campo.simple_id, id: @inscricao.token))
+      expect(@inscricao.reload.fields_hash["Dado"].value).to eq("outro dado")
+    end
+
+    it "deixa o candidato pedir a troca do endereco" do
+      enviar(@com_campo, @inscricao, { "Dado" => "dado", "Correio" => "proprio@example.com" })
+
+      expect(response).to redirect_to(admission_apply_path(admission_id: @com_campo.simple_id, id: @inscricao.token))
+      expect(@inscricao.reload.pending_email).to eq("proprio@example.com")
+    end
+
+    # Controle: o endereço novo não pode ser o de outra inscrição do processo.
+    it "recusa a troca para o endereco de outra inscricao" do
+      create_application(@com_campo, name: "Terceira", email: "ocupado@example.com")
+
+      enviar(@com_campo, @inscricao, { "Dado" => "dado", "Correio" => "ocupado@example.com" })
+
+      expect(response).to have_http_status(:ok)
+      expect(@inscricao.reload.pending_email).to be_nil
+    end
+  end
+
+  # O endereço maior que a coluna passa no formato e estoura no banco de
+  # produção, que não trunca; no SQLite da suíte ele seria gravado.
+  describe "no endereco maior que a coluna do banco" do
+    it "recusa na pre-inscricao, sem criar a inscricao" do
+      expect {
+        pedir(@com_sessao, "Pessoa", "#{'a' * 250}@example.com")
+      }.not_to change { Admissions::AdmissionApplication.count }
+
+      expect(response.body).to include(ERB::Util.html_escape(Admissions::AdmissionApplication.human_attribute_name(:email)))
+    end
+
+    it "recusa no pedido de carta" do
+      pedido = Admissions::LetterRequest.new(
+        admission_application: create_application(@sem_sessao), name: "Recomendador",
+        email: "#{'a' * 250}@example.com"
+      )
+
+      expect(pedido).not_to be_valid
+      expect(pedido.errors.where(:email, :too_long)).to be_present
+    end
+
+    # Controle: o endereço do tamanho da coluna entra.
+    it "aceita o endereco do tamanho da coluna" do
+      expect {
+        pedir(@com_sessao, "Pessoa", "#{'a' * 243}@example.com")
+      }.to change { Admissions::AdmissionApplication.count }.by(1)
+    end
   end
 
   describe "no e-mail do recomendador" do
@@ -245,6 +397,22 @@ RSpec.describe "Formato do e-mail da inscricao", type: :request do
         expect(response).to have_http_status(:ok)
         expect(@enviados).to be_empty
       end
+    end
+
+    # O pedido gravado antes da conferência, com endereço fora do formato e
+    # espaço em volta: a página da carta nem mostra o endereço.
+    it "deixa o recomendador responder a carta do pedido com endereco fora do formato" do
+      pedido = Admissions::LetterRequest.create!(
+        admission_application: @inscricao, name: "Recomendador", email: "recomendador@example.com"
+      )
+      pedido.update_column(:email, "recomendador@example.com. ")
+
+      put admission_letter_path(admission_id: @sem_sessao.simple_id, id: pedido.access_token), params: { record: {
+        filled_form_attributes: { id: pedido.filled_form.id, enable_submission: "1" },
+      } }
+
+      expect(response).to redirect_to(admissions_path)
+      expect(pedido.reload.is_filled).to be(true)
     end
 
     # Controle: o mesmo pedido, com endereço.

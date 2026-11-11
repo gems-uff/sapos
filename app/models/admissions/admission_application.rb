@@ -102,15 +102,20 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   validates :name, presence: true
   validates :email, presence: true
   # O e-mail e para onde o codigo de identificacao viaja: texto que nao e
-  # endereco deixa o candidato sem ele. A conferencia vale para o endereco
-  # novo ou alterado, para que a inscricao gravada antes dela, com endereco
-  # fora do formato, continue editavel no resto. O formato e o que o campo de
-  # e-mail do navegador aceita.
+  # endereco deixa o candidato sem ele. A conferencia -- do formato e de que o
+  # processo nao tem outra inscricao com o endereco -- vale para o endereco
+  # novo ou alterado (email_address_changed?), para que a inscricao gravada
+  # antes dela continue editavel no resto: a que tem endereco fora do formato,
+  # e a que repete o endereco de outra num processo que deixou de aceitar a
+  # repeticao. O formato e o que o campo de e-mail do navegador aceita, que
+  # nao limita o tamanho; o limite e o da coluna.
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true,
-    if: :email_changed?
+    if: :email_address_changed?
+  validates :email, length: { maximum: 255 }, if: :email_address_changed?
   validates_uniqueness_of :email, scope: :admission_process_id, if: ->(apply) {
     apply.admission_process.present? &&
-    !apply.admission_process.allow_multiple_applications
+    !apply.admission_process.allow_multiple_applications &&
+    apply.email_address_changed?
   }
 
   validate :number_of_letters_in_filled_form
@@ -721,9 +726,11 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     self.admission_phase.try(:name)
   end
 
-  # Mudanca so de caixa ou de espaco em volta nao e outro endereco.
+  # Mudanca so de caixa ou de espaco em volta nao e outro endereco. A caixa e
+  # a das letras sem acento (casecmp): a equivalencia do Unicode junta
+  # enderecos que sao caixas diferentes, como "ß" e "ss".
   def email_address_changed?
-    !email.to_s.strip.casecmp?(email_in_database.to_s.strip)
+    email.to_s.strip.casecmp(email_in_database.to_s.strip) != 0
   end
 
   # A troca de e-mail pedida pelo candidato so vale depois de confirmada pelo
@@ -875,8 +882,12 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       token
     end
 
-    # O espaco em volta nao e parte do endereco.
+    # O espaco em volta nao e parte do endereco. So no endereco que chega: o
+    # gravado com espaco pela tela antiga fica como esta, senao o save de
+    # qualquer outra coisa o alteraria.
     def strip_email
+      return unless email_changed?
+
       self.email = email.strip if email.is_a?(String) && email != email.strip
     end
 
