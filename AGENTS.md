@@ -270,6 +270,15 @@ cada uma explica o porquê no próprio cabeçalho:
   controller declara em `active_scaffold_list_url_columns`. Tela que abre a
   lista de outro scaffold com coluna na URL precisa da coluna declarada lá.
   `spec/requests/scaffold_list_url_filter_spec.rb` percorre as listas.
+- active_scaffold, linha de subformulário pedida pelo id:
+  `active_scaffold_subform_associated_record.rb` (`prepend` em
+  `ActiveScaffold::Actions::Subform`, nos protegidos `find_associated_record`
+  e `do_edit_associated`). A gem devolve como linha de formulário o registro
+  associado que a URL pede (`associated_id`), buscado pelo id cru; aqui ele
+  sai do `accessible_by` de leitura. A aba da linha nova (`tabbed_by`), que a
+  gem resolve pela classe e pelo nome vindos da URL, é ignorada: o SAPOS não
+  tem subformulário em abas. `spec/requests/edit_associated_scope_spec.rb`
+  percorre os scaffolds por perfil.
 - active_scaffold, edição em linha: `active_scaffold_inplace_edit.rb`
   (`prepend` em `ActiveScaffold::Actions::Update#update_column` e em
   `ActiveScaffold::Actions::Core#render_field_for_inplace_editing`). A gem
