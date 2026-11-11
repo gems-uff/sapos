@@ -109,6 +109,15 @@ RSpec.describe "Admissions::Admissions: entrada do candidato", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include(@open.title)
     end
+
+    it "recusa e-mail sem formato" do
+      expect {
+        post admission_path(@open.simple_url), params: params_for(name: "Ana", email: "nao-e-mail")
+      }.not_to change { Admissions::AdmissionApplication.count }
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(@open.title)
+    end
   end
 
   describe "POST find com 'forgot'" do

@@ -34,8 +34,9 @@ RSpec.describe "Fluxo do processo seletivo: com cartas e comitês por linha", ty
 
     # ── Inscrição com duas cartas ───────────────────────────────────────────
     letters = ->(prefix) {
-      [{ name: "#{prefix} Um", email: "#{prefix.downcase}-um@example.com", telephone: "2199" },
-       { name: "#{prefix} Dois", email: "#{prefix.downcase}-dois@example.com" }]
+      email_prefix = prefix.parameterize
+      [{ name: "#{prefix} Um", email: "#{email_prefix}-um@example.com", telephone: "2199" },
+       { name: "#{prefix} Dois", email: "#{email_prefix}-dois@example.com" }]
     }
     kim = apply_as_candidate(@process, name: "Kim", email: "kim@example.com",
       values: { "Linha de pesquisa" => "Linha 1" }, letters: letters.call("Rec Kim"))

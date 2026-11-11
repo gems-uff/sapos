@@ -58,4 +58,38 @@ RSpec.describe "Admissions::ApplyController", type: :request do
       expect(flash[:alert]).to eq I18n.t("errors.admissions.empty_submission")
     end
   end
+
+  describe "e-mail sincronizado do formulário" do
+    before(:each) do
+      @email_field = FactoryBot.create(
+        :form_field, form_template: @template, name: "E-mail",
+        field_type: Admissions::FormField::STRING,
+        sync: Admissions::FormField::SYNC_EMAIL
+      )
+    end
+
+    it "renders the synchronized field as an email input" do
+      get new_admission_apply_path(admission_id: @process.simple_id)
+
+      expect(response.body).to include('type="email"')
+    end
+
+    it "rejects an invalid synchronized email on the server" do
+      expect {
+        post admission_apply_index_path(admission_id: @process.simple_id), params: {
+          record: {
+            name: "Ana", email: "ana@example.com",
+            filled_form_attributes: {
+              enable_submission: "1",
+              fields_attributes: {
+                "0" => { form_field_id: @email_field.id, value: "nao-e-mail" }
+              }
+            }
+          }
+        }
+      }.not_to change { Admissions::AdmissionApplication.count }
+
+      expect(response).to have_http_status(:ok)
+    end
+  end
 end

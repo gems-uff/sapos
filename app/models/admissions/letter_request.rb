@@ -24,6 +24,8 @@ class Admissions::LetterRequest < ActiveRecord::Base
 
   validates :admission_application, presence: true
   validates :email, presence: true
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP },
+    if: :email_changed?
   validates :name, presence: true
 
   before_save :set_access_token

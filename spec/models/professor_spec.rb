@@ -51,6 +51,18 @@ RSpec.describe Professor, type: :model do
     it { should validate_presence_of(:cpf) }
     it { should validate_presence_of(:name) }
 
+    it "rejects an invalid email" do
+      professor.email = "professor ic.uff.br"
+
+      expect(professor).to have_error(:invalid).on(:email)
+    end
+
+    it "accepts a valid email" do
+      professor.email = "professor@example.com"
+
+      expect(professor).not_to have_error(:invalid).on(:email)
+    end
+
     describe "user" do
       context "should be valid when" do
         it "user is null" do

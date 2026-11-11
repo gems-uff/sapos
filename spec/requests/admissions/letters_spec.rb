@@ -62,6 +62,15 @@ RSpec.describe "Carta de recomendacao pela rota publica", type: :request do
     expect(@carta.reload.filled_form.is_filled).to be(false)
   end
 
+  it "recusa e-mail do recomendador sem formato" do
+    @carta.email = "nao-e-mail"
+    enviar("Recomendo")
+
+    expect(response).to have_http_status(:ok)
+    expect(response.body).to include("Avaliacao do candidato")
+    expect(@carta.reload.filled_form.is_filled).to be(false)
+  end
+
   # Controle do anterior: a mesma carta, com o campo preenchido, e aceita.
   it "aceita a carta valida e volta para a lista de processos" do
     enviar("Recomendo")

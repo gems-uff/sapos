@@ -101,6 +101,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
   validates :name, presence: true
   validates :email, presence: true
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP },
+    if: :email_changed?
   validates_uniqueness_of :email, scope: :admission_process_id, if: ->(apply) {
     apply.admission_process.present? &&
     !apply.admission_process.allow_multiple_applications
