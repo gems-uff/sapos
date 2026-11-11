@@ -412,9 +412,10 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   )
     # Os parametros so alcancam o que a tela oferece a quem submete. Cada
     # formulario de fase vai para o objeto que prepare_application_forms marca
-    # como editavel, e o resto e descartado; o formulario principal e as cartas
-    # seguem can_edit_main_form?. O template e o formulario preenchido de cada
-    # objeto sao os do servidor, nunca os que vem nos parametros.
+    # como editavel, e o resto e descartado; o formulario principal, com o nome
+    # e o e-mail que a tela mostra junto dele, e as cartas seguem
+    # can_edit_main_form?. O template e o formulario preenchido de cada objeto
+    # sao os do servidor, nunca os que vem nos parametros.
     params = params.to_h.with_indifferent_access
     phase_params = {
       results: params.delete(:results_attributes),
@@ -435,6 +436,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     else
       params.delete(:filled_form_attributes)
       params.delete(:letter_requests_attributes)
+      params.delete(:name)
+      params.delete(:email)
     end
     if can_edit_override && rankings_params.present?
       params[:rankings_attributes] = sanitize_nested_filled_forms(

@@ -97,4 +97,32 @@ RSpec.describe "Admissions::AdmissionApplications com parametros fora do formula
     expect(own_evaluation_value).to eq "9"
     expect(field_of(filled_form, "nota").value).to eq "8"
   end
+
+  # O nome e o e-mail fazem parte do formulario do candidato: a tela so os
+  # oferece a quem pode edita-lo.
+  it "nao altera o nome nem o e-mail do candidato" do
+    nome, email = @application.name, @application.email
+
+    put admission_application_path(@application), xhr: true, params: { record: {
+      name: "Nome Trocado", email: "trocado@example.com",
+      evaluations_attributes: { "0" => own_evaluation_entry }
+    } }
+
+    expect(own_evaluation_value).to eq "9"
+    expect(@application.reload.name).to eq(nome)
+    expect(@application.email).to eq(email)
+  end
+
+  # Controle: quem tem a edicao total altera o nome e o e-mail pela mesma tela.
+  it "altera o nome e o e-mail quando quem edita tem a edicao total" do
+    sign_out @reviewer
+    sign_in create_confirmed_user([FactoryBot.create(:role_administrador)], "forjado-admin@ic.uff.br", "Admin")
+
+    put admission_application_path(@application), xhr: true, params: {
+      can_edit_override: "1", record: { name: "Nome Corrigido", email: "corrigido@example.com" }
+    }
+
+    expect(@application.reload.name).to eq("Nome Corrigido")
+    expect(@application.email).to eq("corrigido@example.com")
+  end
 end
