@@ -51,6 +51,7 @@ pt-BR:
       show:
         title: "Inscrição"
         email_change_pending: "Troca de e-mail aguardando confirmação: abra o link enviado para %{email}. Até a confirmação continuam valendo o e-mail e o código de identificação atuais."
+        cancel_email_change: "Desistir da troca de e-mail"
         ongoing: "Inscrição em andamento"
         finished: "Inscrição realizada"
         finished_waiting_letters: "Inscrição realizada (aguardando cartas)"
@@ -80,13 +81,16 @@ pt-BR:
         upload_notice: "Atenção! Caso algum arquivo tenha sido enviado na última submissão, é necessário selecioná-lo novamente!"
         email_locked: "O e-mail da candidatura só é alterado por quem tem a edição total da candidatura."
 
+      cancel_email_change:
+        notice: "Troca de e-mail cancelada. O link de confirmação enviado deixou de valer, e a inscrição continua com o e-mail e o código de identificação atuais."
+
       update:
         new_notice: "Inscrição realizada com sucesso"
         edit_notice: "Inscrição editada com sucesso"
         new_token_sent: "Inscrição realizada com sucesso. O código de identificação e o link para acompanhar ou alterar a inscrição foram enviados para %{email}."
         new_token_sent_without_email: "Inscrição realizada com sucesso, mas o sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o código de identificação."
-        email_change_requested: "Inscrição editada com sucesso. Para trocar o e-mail da inscrição, abra o link de confirmação enviado para %{email}. Até a confirmação continuam valendo o e-mail e o código de identificação atuais."
-        email_change_requested_without_email: "Inscrição editada com sucesso, mas o e-mail da inscrição não foi trocado: a troca depende de um link de confirmação, e o sistema não está enviando e-mails no momento. Procure a secretaria do programa."
+        email_change_requested: "%{saved}. Para trocar o e-mail da inscrição, abra o link de confirmação enviado para %{email}. Até a confirmação continuam valendo o e-mail e o código de identificação atuais."
+        email_change_requested_without_email: "%{saved}, mas o e-mail da inscrição não foi trocado: a troca depende de um link de confirmação, e o sistema não está enviando e-mails no momento. Procure a secretaria do programa."
 
     letters:
       show:

@@ -1467,6 +1467,7 @@ PUT /admissions/email_change/:id admissions/email_changes#update | administrador
 POST /admissions/find admissions/admissions#find | administrador, coordenacao, secretaria: erro ActionController::ParameterMissing
 POST /admissions/:id admissions/admissions#create | administrador, coordenacao, secretaria: 302 /admissions
 POST /admissions/:admission_id/apply/:id admissions/apply#update | administrador, coordenacao, secretaria: 302 /admissions
+DELETE /admissions/:admission_id/apply/:id/email_change admissions/apply#cancel_email_change | administrador, coordenacao, secretaria: 302 /admissions
 POST /admissions/:admission_id/apply admissions/apply#create | administrador, coordenacao, secretaria: 302 /admissions
 GET /admissions/:admission_id/apply/new admissions/apply#new | administrador, coordenacao, secretaria: 302 /admissions
 GET /admissions/:admission_id/apply/:id/edit admissions/apply#edit | administrador, coordenacao, secretaria: 302 /admissions

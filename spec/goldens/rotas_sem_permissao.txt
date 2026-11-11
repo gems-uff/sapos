@@ -1467,6 +1467,7 @@ PUT /admissions/email_change/:id admissions/email_changes#update | visitante: 30
 POST /admissions/find admissions/admissions#find | visitante: erro ActionController::ParameterMissing | papel desconhecido: erro ActionController::ParameterMissing | sem papel nenhum: erro ActionController::ParameterMissing
 POST /admissions/:id admissions/admissions#create | visitante: 302 /admissions | papel desconhecido: 302 /admissions | sem papel nenhum: 302 /admissions
 POST /admissions/:admission_id/apply/:id admissions/apply#update | visitante: 302 /admissions | papel desconhecido: 302 /admissions | sem papel nenhum: 302 /admissions
+DELETE /admissions/:admission_id/apply/:id/email_change admissions/apply#cancel_email_change | visitante: 302 /admissions | papel desconhecido: 302 /admissions | sem papel nenhum: 302 /admissions
 POST /admissions/:admission_id/apply admissions/apply#create | visitante: 302 /admissions | papel desconhecido: 302 /admissions | sem papel nenhum: 302 /admissions
 GET /admissions/:admission_id/apply/new admissions/apply#new | visitante: 302 /admissions | papel desconhecido: 302 /admissions | sem papel nenhum: 302 /admissions
 GET /admissions/:admission_id/apply/:id/edit admissions/apply#edit | visitante: 302 /admissions | papel desconhecido: 302 /admissions | sem papel nenhum: 302 /admissions

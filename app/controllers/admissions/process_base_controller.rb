@@ -30,7 +30,7 @@ class Admissions::ProcessBaseController < ApplicationController
       if Notifier.sending? && messages.any? { |message| !message[:skip_message] }
         { notice: I18n.t(key, email: email, **interpolation) }
       else
-        { alert: I18n.t("#{key}_without_email") }
+        { alert: I18n.t("#{key}_without_email", **interpolation) }
       end
     end
 

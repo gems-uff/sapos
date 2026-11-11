@@ -401,6 +401,8 @@ Rails.application.routes.draw do
       post :create, on: :member
       resources :apply, only: [:show, :new, :create, :edit, :update] do
         post :update, on: :member
+        # O candidato desiste da troca de e-mail pendente (#752).
+        delete :email_change, on: :member, action: :cancel_email_change
       end
       resources :letters, only: [:show, :update]
     end

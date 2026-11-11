@@ -7,7 +7,7 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
   before_action only: [:new, :create] do
     find_admission_process(:admission_id)
   end
-  before_action :find_admission_application, only: [:show, :edit, :update]
+  before_action :find_admission_application, only: [:show, :edit, :update, :cancel_email_change]
   before_action :check_if_process_is_open_to_new, only: [:new, :create]
   before_action :check_if_process_is_open_to_edit, only: [:edit, :update]
   before_action :prepare_new_admission_application, only: [:new, :create]
@@ -101,7 +101,8 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
         # tem como confirmar, e o pedido nao fica pendente.
         flash_message = token_delivery_flash(
           "admissions.apply.update.email_change_requested",
-          @admission_application.pending_email, [email_change]
+          @admission_application.pending_email, [email_change],
+          saved: I18n.t("admissions.apply.update.#{was_filled ? "edit_notice" : "new_notice"}")
         )
         @admission_application.cancel_email_change if flash_message.key?(:alert)
       else
@@ -147,6 +148,17 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       end
       render :edit
     end
+  end
+
+  # O candidato desiste da troca de e-mail pendente, e o link enviado deixa de
+  # valer. Nao depende do prazo de edicao: o pedido e que nao pode ficar de pe
+  # contra a vontade de quem o fez.
+  def cancel_email_change
+    @admission_application.cancel_email_change
+    redirect_to admission_apply_path(
+      admission_id: @admission_process.simple_id,
+      id: @admission_application.token
+    ), notice: I18n.t("admissions.apply.cancel_email_change.notice")
   end
 
   private

@@ -29,6 +29,12 @@
             <% if @admission_application.email_change_pending? %>
               <li class="email-change-pending">
                 <%= t "admissions.apply.show.email_change_pending", email: @admission_application.pending_email %>
+                <%= button_to t("admissions.apply.show.cancel_email_change"),
+                      email_change_admission_apply_path(
+                        admission_id: @admission_process.simple_id,
+                        id: @admission_application.token
+                      ),
+                      method: :delete, class: "cancel-email-change" %>
               </li>
             <% end %>
           </ol>

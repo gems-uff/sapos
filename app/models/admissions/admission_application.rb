@@ -738,10 +738,11 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   # porque ate a confirmacao continuam valendo o e-mail e o codigo de antes.
   #
   # O pedido guarda o endereco novo como pendente, e o link de validacao segue
-  # para ele. O codigo do link so existe na mensagem: o banco guarda o resumo
-  # dele. O link vale por EMAIL_CHANGE_VALIDITY, e deixa de valer quando a
-  # troca e confirmada, quando o candidato pede outra e quando a equipe
-  # corrige o e-mail pela tela interna.
+  # para ele. A candidatura guarda so o resumo do codigo do link; o codigo
+  # esta na mensagem, que fica, como toda mensagem enviada, no registro de
+  # notificacoes. O link vale por EMAIL_CHANGE_VALIDITY, e deixa de valer
+  # quando a troca e confirmada, quando o candidato pede outra ou desiste
+  # dela, e quando a equipe corrige o e-mail pela tela interna.
   EMAIL_CHANGE_VALIDITY = 2.days
 
   # Ligado por assign_form quando quem submete e o candidato.
@@ -902,6 +903,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     def hold_email_change_for_confirmation
       return unless email_change_needs_confirmation && errors.empty?
       return unless persisted? && email_address_changed?
+      # Sem endereco em vigor nao ha caixa a proteger, nem para onde voltar.
+      return if email_in_database.blank?
 
       @email_change_token = SecureRandom.urlsafe_base64(32)
       self.pending_email = email

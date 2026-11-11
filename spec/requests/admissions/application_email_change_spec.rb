@@ -155,7 +155,9 @@ RSpec.describe "Troca de e-mail da inscricao pelo candidato", type: :request do
       expect(link_recebido("pessoa@example.com")).to be_nil
     end
 
-    it "nao guarda no banco o codigo do link" do
+    # A mensagem que leva o link fica, como toda mensagem, no registro de
+    # notificações; a candidatura guarda só o resumo.
+    it "nao guarda na candidatura o codigo do link" do
       pedir_troca
 
       codigo_do_link = link_recebido("nova@example.com").split("/").last
@@ -167,7 +169,10 @@ RSpec.describe "Troca de e-mail da inscricao pelo candidato", type: :request do
     it "avisa, ao gravar e na tela da inscricao, que a troca aguarda confirmacao" do
       pedir_troca
 
-      aviso_do_envio = I18n.t("admissions.apply.update.email_change_requested", email: "nova@example.com")
+      aviso_do_envio = I18n.t(
+        "admissions.apply.update.email_change_requested",
+        email: "nova@example.com", saved: I18n.t("admissions.apply.update.edit_notice")
+      )
       expect(pagina_seguinte(@sessao)).to include(ERB::Util.html_escape(aviso_do_envio))
 
       @sessao.get admission_apply_path(admission_id: @processo.simple_id, id: @antigo)
@@ -213,7 +218,10 @@ RSpec.describe "Troca de e-mail da inscricao pelo candidato", type: :request do
       pedir_troca
 
       expect(pagina_seguinte(@sessao)).to include(
-        ERB::Util.html_escape(I18n.t("admissions.apply.update.email_change_requested_without_email"))
+        ERB::Util.html_escape(I18n.t(
+          "admissions.apply.update.email_change_requested_without_email",
+          saved: I18n.t("admissions.apply.update.edit_notice")
+        ))
       )
       expect(@inscricao.reload.email).to eq("pessoa@example.com")
       expect(@inscricao.pending_email).to be_nil
@@ -236,6 +244,98 @@ RSpec.describe "Troca de e-mail da inscricao pelo candidato", type: :request do
       expect(@inscricao.reload.email).to eq("Pessoa@Example.com")
       expect(@inscricao.token).to eq(@antigo)
       expect(@inscricao.pending_email).to be_nil
+    end
+
+    # A equivalência de caixa do Unicode junta endereços que são caixas
+    # diferentes: "ß" e "ss".
+    it "pede confirmacao quando o endereco novo so iguala o antigo pela equivalencia do Unicode" do
+      @inscricao.update_column(:email, "straße@example.com")
+
+      pedir_troca("strasse@example.com")
+
+      expect(@inscricao.reload.email).to eq("straße@example.com")
+      expect(@inscricao.token).to eq(@antigo)
+      expect(@inscricao.pending_email).to eq("strasse@example.com")
+    end
+
+    # Sem endereço em vigor não há caixa a proteger nem para onde voltar: a
+    # inscrição gravada sem e-mail só se conserta recebendo um.
+    it "nao pede confirmacao quando a inscricao esta sem e-mail" do
+      @inscricao.update_column(:email, "")
+
+      pedir_troca("nova@example.com")
+
+      expect(@inscricao.reload.email).to eq("nova@example.com")
+      expect(@inscricao.pending_email).to be_nil
+    end
+  end
+
+  # Quem pediu a troca para o endereço errado, ou desistiu dela, não fica
+  # esperando o link vencer: enquanto ele vale, quem lê a caixa do endereço
+  # pendente leva a inscrição ao confirmar.
+  describe "a desistencia" do
+    before(:each) do
+      @antigo = inscrita("pessoa@example.com")
+      @inscricao = Admissions::AdmissionApplication.find_by!(token: @antigo)
+      @sessao = navegador
+      enviar(@sessao, @processo, @antigo, { "Dado" => "dado", "Correio" => "errado@example.com" })
+      @link = link_recebido("errado@example.com")
+      @enviados.clear
+    end
+
+    def desistir(sessao, processo = @processo, codigo = @antigo)
+      sessao.delete email_change_admission_apply_path(admission_id: processo.simple_id, id: codigo)
+    end
+
+    it "e oferecida na tela da inscricao enquanto a troca esta pendente" do
+      caminho = email_change_admission_apply_path(admission_id: @processo.simple_id, id: @antigo)
+
+      @sessao.get admission_apply_path(admission_id: @processo.simple_id, id: @antigo)
+      expect(@sessao.response.body).to include(%(action="#{caminho}"))
+
+      desistir(@sessao)
+      @sessao.get admission_apply_path(admission_id: @processo.simple_id, id: @antigo)
+      expect(@sessao.response.body).not_to include(%(action="#{caminho}"))
+    end
+
+    it "acaba com o pedido, e ficam o e-mail e o codigo" do
+      desistir(@sessao)
+
+      expect(@sessao.response.location).to end_with(
+        admission_apply_path(admission_id: @processo.simple_id, id: @antigo)
+      )
+      expect(pagina_seguinte(@sessao)).to include(
+        ERB::Util.html_escape(I18n.t("admissions.apply.cancel_email_change.notice"))
+      )
+      expect(@inscricao.reload.pending_email).to be_nil
+      expect(@inscricao.email_change_digest).to be_nil
+      expect(@inscricao.email).to eq("pessoa@example.com")
+      expect(@inscricao.token).to eq(@antigo)
+      expect(@enviados).to be_empty
+    end
+
+    it "faz o link enviado deixar de valer" do
+      desistir(@sessao)
+
+      quem_confirma = navegador
+      quem_confirma.put @link
+
+      expect(quem_confirma.response.location).to end_with(admissions_path)
+      expect(@inscricao.reload.email).to eq("pessoa@example.com")
+      expect(@inscricao.token).to eq(@antigo)
+    end
+
+    # Controle: sem a desistência o mesmo link troca o e-mail.
+    it "nao acontece sozinha: sem ela o link segue valendo" do
+      navegador.put @link
+
+      expect(@inscricao.reload.email).to eq("errado@example.com")
+    end
+
+    it "nao e de quem nao tem o codigo da inscricao" do
+      desistir(navegador, @processo, "#{@inscricao.identifier}-AAAAAA-AAAAAA")
+
+      expect(@inscricao.reload.pending_email).to eq("errado@example.com")
     end
   end
 
@@ -446,6 +546,30 @@ RSpec.describe "Troca de e-mail da inscricao pelo candidato", type: :request do
       entrar(@sessao, @com_sessao, "pessoa@example.com", @antigo)
       enviar(@sessao, @com_sessao, @antigo, { "Dado" => "dado", "Correio" => "nova@example.com" })
       @inscricao = Admissions::AdmissionApplication.find_by!(token: @antigo)
+    end
+
+    # A primeira submissão do formulário que também pede a troca: a inscrição
+    # foi realizada, não editada.
+    it "diz que a inscricao foi realizada quando o pedido vem na primeira submissao" do
+      pagina = pagina_seguinte(@sessao)
+
+      expect(pagina).to include(ERB::Util.html_escape(I18n.t("admissions.apply.update.new_notice")))
+      expect(pagina).not_to include(ERB::Util.html_escape(I18n.t("admissions.apply.update.edit_notice")))
+      expect(pagina).to include("nova@example.com")
+    end
+
+    it "recusa a desistencia de quem nao abriu a inscricao na sessao" do
+      outro = navegador
+      outro.delete email_change_admission_apply_path(admission_id: @com_sessao.simple_id, id: @antigo)
+
+      expect(outro.response.location).to end_with(admissions_path)
+      expect(@inscricao.reload.pending_email).to eq("nova@example.com")
+    end
+
+    it "aceita a desistencia de quem abriu a inscricao na sessao" do
+      @sessao.delete email_change_admission_apply_path(admission_id: @com_sessao.simple_id, id: @antigo)
+
+      expect(@inscricao.reload.pending_email).to be_nil
     end
 
     it "mantem a inscricao aberta no navegador de quem pediu, com o e-mail de antes" do
