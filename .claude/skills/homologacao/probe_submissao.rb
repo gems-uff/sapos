@@ -116,7 +116,10 @@ def preenche(driver, alvo, marca)
         } else if (el.value === '') {
           var ehData = /data|nascimento/i.test(rotulo) ||
                        (el.className || '').indexOf('datepicker') >= 0;
-          el.value = ehData ? '01/01/2000' : marca;
+          // O e-mail da inscricao e conferido pelo formato, no navegador e no
+          // servidor: o campo leva um endereco com o marcador, nao o marcador.
+          var ehEmail = t === 'email' || /e-?mail/i.test(rotulo);
+          el.value = ehData ? '01/01/2000' : (ehEmail ? marca.toLowerCase() + '@example.com' : marca);
           if (ehData) { rel.data++; } else { rel.texto++; }
           disparar(el);
         }

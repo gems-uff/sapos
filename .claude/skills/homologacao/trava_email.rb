@@ -18,8 +18,10 @@ estado = ->(valor) { valor.nil? ? "AUSENTE" : (valor == "" ? "VAZIA" : "ENDERECO
 variavel = CustomVariable.find_by(variable: "redirect_email")
 abort "redirect_email AUSENTE: nada alterado. Criar a variavel e decisao do mantenedor." if variavel.nil?
 
-novo = ARGV[0] == "VAZIA" ? "" : ARGV[0].to_s
-abort "uso: trava_email.rb <endereco|VAZIA>" unless novo == "" || novo.match?(/\A[^@\s]+@[^@\s]+\z/)
+uso = "uso: trava_email.rb <endereco|VAZIA>"
+abort uso if ARGV[0].to_s.empty?
+novo = ARGV[0] == "VAZIA" ? "" : ARGV[0]
+abort uso unless novo == "" || novo.match?(/\A[^@\s]+@[^@\s]+\z/)
 
 puts "antes=#{estado.call(CustomVariable.redirect_email)}"
 variavel.update!(value: novo)
