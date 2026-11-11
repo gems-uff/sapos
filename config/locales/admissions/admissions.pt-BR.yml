@@ -67,6 +67,7 @@ pt-BR:
         new_phase: "Enviar %{phase}"
         edit_phase: "Modificar %{phase}"
         upload_notice: "Atenção! Caso algum arquivo tenha sido enviado na última submissão, é necessário selecioná-lo novamente!"
+        email_locked: "O e-mail da candidatura só é alterado por quem tem a edição total da candidatura."
 
       update:
         new_notice: "Inscrição realizada com sucesso"

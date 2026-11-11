@@ -1,5 +1,8 @@
 <%
   can_disable_submission ||= false
+  # O campo sincronizado com o e-mail da candidatura vem como somente leitura
+  # para quem nao troca o e-mail por esta tela (ver _candidate_forms).
+  locked_email = local_assigns.fetch(:locked_email, false)
   filled_hash = filled_form.object.fields.index_by(&:form_field_id)
   current_group = []
   groups = [[nil, nil, current_group]]
@@ -51,14 +54,14 @@
         <% end %>
         <%= filled_form.fields_for :fields, fields do |field| %>
           <%= render partial: "admissions/filled_form/edit/generic_field",
-                    locals: { field: field, filled_class: } %>
+                    locals: { field: field, filled_class:, locked_email: } %>
         <% end %>
       <% end %>
     </li>
   <% else %>
     <%= filled_form.fields_for :fields, fields do |field| %>
       <%= render partial: "admissions/filled_form/edit/generic_field",
-                locals: { field: field, filled_class: } %>
+                locals: { field: field, filled_class:, locked_email: } %>
     <% end %>
   <% end %>
 <% end %>

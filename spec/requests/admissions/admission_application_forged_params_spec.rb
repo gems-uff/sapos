@@ -211,6 +211,78 @@ RSpec.describe "Admissions::AdmissionApplications com parametros fora do formula
       expect(gravado&.value).to eq(email)
     end
 
+    # A tela diz o que o servidor faz: quem não tem a edição total vê o e-mail
+    # e não o campo para trocá-lo. Antes o campo vinha editável, o membro
+    # trocava, gravava sem erro, e o endereço antigo voltava calado.
+    describe "na tela de edicao" do
+      def tela(**parametros)
+        get edit_admission_application_path(@application), params: parametros,
+          env: { "REMOTE_ADDR" => RouteProbe::REMOTE_ADDR }
+        expect(response).to have_http_status(:ok)
+        Nokogiri::HTML(response.body)
+      end
+
+      def campo_sincronizado(pagina, form_field)
+        marca = pagina.css("input[type=hidden][name$='[form_field_id]']").find { |e| e["value"] == form_field.id.to_s }
+        pagina.at_css("input[name='#{marca['name'].delete_suffix('[form_field_id]')}[value]']")
+      end
+
+      def como_equipe
+        sign_out @reviewer
+        sign_in create_confirmed_user([FactoryBot.create(:role_administrador)], "tela-admin@ic.uff.br", "Admin")
+      end
+
+      it "mostra ao membro o e-mail da candidatura, sem campo para troca-lo" do
+        pagina = tela
+
+        expect(pagina.at_css("input[name='record[email]']")).to be_nil
+        expect(pagina.text).to include(@application.email)
+      end
+
+      it "mostra ao membro o campo sincronizado com o e-mail como somente leitura" do
+        correio = FactoryBot.create(
+          :form_field, form_template: @template, name: "Correio", field_type: Admissions::FormField::STRING,
+          sync: Admissions::FormField::SYNC_EMAIL
+        )
+
+        campo = campo_sincronizado(tela, correio)
+
+        expect(campo["value"]).to eq(@application.email)
+        expect(campo["readonly"]).to be_present
+      end
+
+      # Controles: o nome segue editável para o membro, e quem tem a edição
+      # total recebe os dois campos de e-mail editáveis.
+      it "mostra ao membro o nome como campo editavel" do
+        campo = tela.at_css("input[name='record[name]']")
+
+        expect(campo).to be_present
+        expect(campo["readonly"]).to be_nil
+      end
+
+      it "mostra o e-mail como campo editavel a quem tem a edicao total" do
+        como_equipe
+
+        campo = tela(override: true).at_css("input[name='record[email]']")
+
+        expect(campo).to be_present
+        expect(campo["readonly"]).to be_nil
+      end
+
+      it "mostra o campo sincronizado como campo editavel a quem tem a edicao total" do
+        correio = FactoryBot.create(
+          :form_field, form_template: @template, name: "Correio", field_type: Admissions::FormField::STRING,
+          sync: Admissions::FormField::SYNC_EMAIL
+        )
+        como_equipe
+
+        campo = campo_sincronizado(tela(override: true), correio)
+
+        expect(campo["value"]).to eq(@application.email)
+        expect(campo["readonly"]).to be_nil
+      end
+    end
+
     # Controle: o que a fase libera ao comitê segue liberado.
     it "deixa o membro corrigir o nome" do
       put admission_application_path(@application), xhr: true, params: { record: {
