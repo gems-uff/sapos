@@ -407,6 +407,33 @@ RSpec.describe "Troca de e-mail da inscricao pelo candidato", type: :request do
     end
   end
 
+  # Nos modelos em uso, o campo sincronizado com o e-mail costuma ser um campo
+  # de aluno, e não um texto simples: o pedido e a confirmação valem igual.
+  describe "quando o campo sincronizado com o e-mail e um campo de aluno" do
+    before(:each) do
+      @correio.update!(field_type: Admissions::FormField::STUDENT_FIELD, configuration: { field: "email" }.to_json)
+      @antigo = inscrita("pessoa@example.com")
+      @inscricao = Admissions::AdmissionApplication.find_by!(token: @antigo)
+      enviar(navegador, @processo, @antigo, { "Dado" => "dado", "Correio" => "nova@example.com" })
+    end
+
+    it "guarda o pedido como pendente, com o campo no endereco em vigor" do
+      @inscricao.reload
+      expect(@inscricao.email).to eq("pessoa@example.com")
+      expect(@inscricao.pending_email).to eq("nova@example.com")
+      expect(valor_do_campo(@inscricao, @correio)).to eq("pessoa@example.com")
+    end
+
+    it "troca o e-mail e o campo na confirmacao" do
+      navegador.put link_recebido("nova@example.com")
+
+      @inscricao.reload
+      expect(@inscricao.email).to eq("nova@example.com")
+      expect(@inscricao.token).not_to eq(@antigo)
+      expect(valor_do_campo(@inscricao, @correio)).to eq("nova@example.com")
+    end
+  end
+
   # Em processo com sessão a pré-inscrição nasce com o e-mail da tela do
   # processo, e o formulário pode trazer outro no campo sincronizado: é uma
   # troca como as outras.
