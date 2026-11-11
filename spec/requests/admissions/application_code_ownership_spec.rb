@@ -9,7 +9,9 @@ require "rails_helper"
 # segredo. A regra que estes exemplos cobram é uma só: o código só viaja por
 # e-mail, para o endereço da inscrição. O navegador que pede a inscrição recebe
 # o aviso de para onde o código foi, nunca o código; quem o apresenta depois
-# leu a caixa daquele endereço. Quando o endereço muda, o código muda junto.
+# leu a caixa daquele endereço. Quando o endereço muda, o código muda junto --
+# e o endereço só muda, a pedido do candidato, depois de confirmado pela caixa
+# nova (application_email_change_spec.rb).
 RSpec.describe "Posse do codigo de inscricao", type: :request do
   # O formato do código: três blocos de seis caracteres do alfabeto do gerador.
   def formato_do_codigo
@@ -321,57 +323,20 @@ RSpec.describe "Posse do codigo de inscricao", type: :request do
       )
     end
 
-    it "troca o codigo e o manda so para o endereco novo quando o campo do formulario muda o e-mail" do
+    # A troca pedida pelo candidato, pelo campo do formulário sincronizado com
+    # o e-mail, só vale depois de confirmada pelo endereço novo: quem a cobra,
+    # do pedido à entrega do código novo, é o application_email_change_spec.rb.
+    it "nao troca o e-mail nem o codigo quando o campo do formulario pede outro endereco" do
       antigo = inscrita(@com_campo, { "Dado" => "dado", "Correio" => "pessoa@example.com" }, name: "Pessoa")
       sessao = navegador
       @enviados.clear
 
       enviar(sessao, @com_campo, antigo, { "Dado" => "dado", "Correio" => "alheio@example.com" })
 
-      inscricao = Admissions::AdmissionApplication.find_by!(email: "alheio@example.com")
-      expect(inscricao.token).not_to eq(antigo)
-      expect(inscricao.identifier).to eq(antigo[0, 6])
-      expect(sessao.response.location).to end_with(admissions_path)
-      expect(resposta_inteira(sessao)).not_to include(inscricao.token)
-      expect(@enviados.map { |mensagem| mensagem[:to] }).to eq(["alheio@example.com"])
-      expect(codigo_recebido("alheio@example.com")).to eq(inscricao.token)
-      expect(abre?(sessao, @com_campo, antigo)).to be(false)
-    end
-
-    # A ponta do caminho: quem recupera o código pelo e-mail recebe um código
-    # que só a caixa dele viu.
-    it "nao entrega na recuperacao por e-mail um codigo que outra pessoa tenha" do
-      antigo = inscrita(@com_campo, { "Dado" => "dado", "Correio" => "pessoa@example.com" }, name: "Pessoa")
-      quem_trocou = navegador
-      enviar(quem_trocou, @com_campo, antigo, { "Dado" => "dado", "Correio" => "alheio@example.com" })
-      @enviados.clear
-
-      dono = navegador
-      entrar(dono, @com_campo, "alheio@example.com", "forgot")
-
-      recuperado = codigo_recebido("alheio@example.com")
-      expect(recuperado).to be_present
-      expect(recuperado).not_to eq(antigo)
-      enviar(dono, @com_campo, recuperado, { "Dado" => "dado do dono", "Correio" => "alheio@example.com" })
-      expect(abre?(quem_trocou, @com_campo, antigo)).to be(false)
-    end
-
-    # O código novo vai só para o endereço novo: o navegador que fez a troca
-    # tinha o antigo na sessão e não ganha o novo.
-    it "nao poe o codigo novo na sessao de quem trocou o e-mail, em processo com sessao" do
-      @com_sessao.update!(form_template: @sincronizado)
-      sessao = navegador
-      pedir(sessao, @com_sessao, "Pessoa", "pessoa@example.com")
-      antigo = codigo_recebido("pessoa@example.com")
-      entrar(sessao, @com_sessao, "pessoa@example.com", antigo)
-
-      enviar(sessao, @com_sessao, antigo, { "Dado" => "dado", "Correio" => "alheio@example.com" })
-
-      novo = codigo_recebido("alheio@example.com")
-      expect(novo).to be_present
-      expect(novo).not_to eq(antigo)
-      expect(abre?(sessao, @com_sessao, antigo)).to be(false)
-      expect(abre?(sessao, @com_sessao, novo)).to be(false)
+      inscricao = Admissions::AdmissionApplication.find_by!(token: antigo)
+      expect(inscricao.email).to eq("pessoa@example.com")
+      expect(codigo_recebido("alheio@example.com")).to be_nil
+      expect(abre?(sessao, @com_campo, antigo)).to be(true)
     end
 
     # Controle: a edição que não muda o e-mail mantém o código e volta para a

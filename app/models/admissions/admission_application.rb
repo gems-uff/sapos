@@ -116,6 +116,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   validate :number_of_letters_in_filled_form
 
   before_validation :strip_email
+  after_validation :hold_email_change_for_confirmation
+  before_save :forget_email_change_when_email_changes
   before_save :renew_token_when_email_changes
   before_save :set_token
 
@@ -426,6 +428,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     # can_edit_main_form?. O template e o formulario preenchido de cada objeto
     # sao os do servidor, nunca os que vem nos parametros.
     params = params.to_h.with_indifferent_access
+    self.email_change_needs_confirmation = check_candidate_permission
     phase_params = {
       results: params.delete(:results_attributes),
       evaluations: params.delete(:evaluations_attributes),
@@ -723,6 +726,58 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     !email.to_s.strip.casecmp?(email_in_database.to_s.strip)
   end
 
+  # A troca de e-mail pedida pelo candidato so vale depois de confirmada pelo
+  # endereco novo (#752): quem digitou o endereco errado nao perde a inscricao,
+  # porque ate a confirmacao continuam valendo o e-mail e o codigo de antes.
+  #
+  # O pedido guarda o endereco novo como pendente, e o link de validacao segue
+  # para ele. O codigo do link so existe na mensagem: o banco guarda o resumo
+  # dele. O link vale por EMAIL_CHANGE_VALIDITY, e deixa de valer quando a
+  # troca e confirmada, quando o candidato pede outra e quando a equipe
+  # corrige o e-mail pela tela interna.
+  EMAIL_CHANGE_VALIDITY = 2.days
+
+  # Ligado por assign_form quando quem submete e o candidato.
+  attr_accessor :email_change_needs_confirmation
+
+  # O codigo do link, logo depois do pedido que o gerou; nil no resto do tempo.
+  attr_reader :email_change_token
+
+  def self.email_change_digest_of(token)
+    Digest::SHA256.hexdigest(token.to_s)
+  end
+
+  # A candidatura que o link de validacao aponta, enquanto ele vale.
+  def self.find_by_email_change_token(token)
+    return nil if token.blank?
+
+    application = find_by(email_change_digest: email_change_digest_of(token))
+    application if application&.email_change_pending?
+  end
+
+  def email_change_pending?
+    pending_email.present? && email_change_digest.present? &&
+      email_change_sent_at.present? && email_change_sent_at > EMAIL_CHANGE_VALIDITY.ago
+  end
+
+  # Efetiva a troca pendente. O endereco passa de novo pelo que o e-mail da
+  # candidatura exige (formato e unicidade no processo): pode ter sido ocupado
+  # depois do pedido. O codigo e renovado por renew_token_when_email_changes,
+  # como em toda troca de e-mail, e o campo do formulario sincronizado com o
+  # e-mail acompanha. Devolve false, com os erros na candidatura, se a troca
+  # nao pode ser feita.
+  def confirm_email_change
+    return false unless email_change_pending?
+
+    self.email = pending_email
+    filled_form.sync_fields_before(self)
+    save
+  end
+
+  def cancel_email_change
+    update_columns(pending_email: nil, email_change_digest: nil, email_change_sent_at: nil)
+  end
+
   # A parte do codigo que cita a candidatura sem abri-la: os seis primeiros
   # caracteres, unicos dentro do processo (generate_valid_token).
   def identifier
@@ -823,6 +878,36 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     # O espaco em volta nao e parte do endereco.
     def strip_email
       self.email = email.strip if email.is_a?(String) && email != email.strip
+    end
+
+    # O endereco que o candidato pediu ja passou pela validacao do e-mail da
+    # candidatura (formato e unicidade), por isso depois dela, e so quando ela
+    # nao achou erro. Ele sai do e-mail e fica pendente; o e-mail e o campo do
+    # formulario sincronizado com ele voltam ao endereco em vigor.
+    #
+    # after_validation, e nao before_save: o formulario preenchido e
+    # belongs_to, gravado antes dos before_save da candidatura, e o campo que
+    # voltasse ali nao seria gravado.
+    def hold_email_change_for_confirmation
+      return unless email_change_needs_confirmation && errors.empty?
+      return unless persisted? && email_address_changed?
+
+      @email_change_token = SecureRandom.urlsafe_base64(32)
+      self.pending_email = email
+      self.email_change_digest = self.class.email_change_digest_of(@email_change_token)
+      self.email_change_sent_at = Time.current
+      self.email = email_in_database
+      filled_form.sync_fields_before(self)
+    end
+
+    # O e-mail mudou de fato -- a troca foi confirmada, ou a equipe o corrigiu
+    # pela tela interna: o pedido pendente, se havia, acabou.
+    def forget_email_change_when_email_changes
+      return unless persisted? && email_address_changed?
+
+      self.pending_email = nil
+      self.email_change_digest = nil
+      self.email_change_sent_at = nil
     end
 
     def set_token

@@ -39,6 +39,7 @@ module RouteProbe
     "admissions/admissions#*" => "processo seletivo público (ProcessBaseController desliga a autorização)",
     "admissions/apply#*" => "processo seletivo público (ProcessBaseController desliga a autorização)",
     "admissions/letters#*" => "carta de recomendação, pública (ProcessBaseController desliga a autorização)",
+    "admissions/email_changes#*" => "confirmação da troca de e-mail da inscrição, pública; o link é a credencial",
     "admissions/form_autocompletes#*" => "autocomplete do formulário público de inscrição",
     "files#download" => "download pelo hash, que funciona como credencial",
     "reports#download_by_identifier" => "validação pública do documento pelo identificador do QR",

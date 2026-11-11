@@ -22,6 +22,11 @@
           authenticity_token: true,
           multipart: true do |form| %>
         <h4> <%= t "admissions.apply.edit.title" %> </h4>
+        <% if @admission_application.email_change_pending? %>
+          <p class="email-change-pending">
+            <%= t "admissions.apply.show.email_change_pending", email: @admission_application.pending_email %>
+          </p>
+        <% end %>
         <div class="messages-container">
           <% count = @admission_application.errors.count + (flash[:alert].present? ? 1 : 0) %>
           <% if count > 0 %>

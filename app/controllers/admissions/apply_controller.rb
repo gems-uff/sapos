@@ -52,10 +52,10 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
     @admission_application.filled_form.is_filled = true
     # O codigo de identificacao so viaja por e-mail, para o endereco da
     # inscricao: quem o apresenta leu a caixa daquele endereco. Quando o
-    # endereco muda -- pelo campo do formulario sincronizado com o e-mail --, o
-    # modelo troca o codigo (renew_token_when_email_changes), e a mensagem
-    # abaixo o leva para o endereco novo.
-    email_changed = !creating && @admission_application.email_address_changed?
+    # candidato muda o endereco -- pelo campo do formulario sincronizado com o
+    # e-mail --, a troca fica pendente (assign_form liga
+    # email_change_needs_confirmation): o e-mail e o codigo continuam os de
+    # antes ate o endereco novo confirmar pelo link que segue abaixo (#752).
     if @admission_application.save
       emails = [EmailTemplate.load_template(
         was_filled ?
@@ -85,20 +85,30 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
           letter_request.update(sent_email: letter_request.email)
         end
       end
+      email_change = email_change_message
+      emails << email_change if email_change
       Notifier.send_emails(notifications: emails)
-      # Inscricao que nasce aqui (processo sem sessao) e inscricao que trocou
-      # de e-mail: o navegador nao recebe o codigo, so o aviso de para onde
-      # ele foi.
-      if creating || email_changed
+      # Inscricao que nasce aqui (processo sem sessao): o navegador nao recebe
+      # o codigo, so o aviso de para onde ele foi.
+      if creating
         session[:admission_tokens]&.delete(previous_token)
-        key = email_changed ? "email_changed" : "new_token_sent"
         return redirect_to admissions_path, token_delivery_flash(
-          "admissions.apply.update.#{key}", @admission_application.email, emails.first(1)
+          "admissions.apply.update.new_token_sent", @admission_application.email, emails.first(1)
         )
       end
-      notice = was_filled ?
-        I18n.t("admissions.apply.update.edit_notice") :
-        I18n.t("admissions.apply.update.new_notice")
+      if email_change
+        # O aviso de para onde o link foi; quando a mensagem nao sai, ninguem
+        # tem como confirmar, e o pedido nao fica pendente.
+        flash_message = token_delivery_flash(
+          "admissions.apply.update.email_change_requested",
+          @admission_application.pending_email, [email_change]
+        )
+        @admission_application.cancel_email_change if flash_message.key?(:alert)
+      else
+        flash_message = { notice: was_filled ?
+          I18n.t("admissions.apply.update.edit_notice") :
+          I18n.t("admissions.apply.update.new_notice") }
+      end
 
       if @admission_application.admission_process.require_session
         add_token_to_session(@admission_application.token)
@@ -106,7 +116,7 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       redirect_to admission_apply_path(
         admission_id: @admission_process.simple_id,
         id: @admission_application.token
-      ), notice: notice
+      ), flash_message
     else
       # Formulário que a validação do cliente deixou passar e o servidor
       # recusou (issue #605). O e-mail leva o motivo técnico, atributo e tipo
@@ -140,6 +150,23 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
   end
 
   private
+    # A mensagem com o link de validacao, quando este envio pediu a troca do
+    # e-mail. Vai para o endereco novo, e nao leva o codigo da inscricao.
+    def email_change_message
+      token = @admission_application.email_change_token
+      return nil if token.blank?
+
+      EmailTemplate.load_template(
+        "admissions/apply:confirm_email_change"
+      ).prepare_message({
+        email: @admission_application.pending_email,
+        identifier: @admission_application.identifier,
+        validity_hours: Admissions::AdmissionApplication::EMAIL_CHANGE_VALIDITY.in_hours.to_i,
+        admission_process: @admission_process,
+        confirm_email_change_url: admission_email_change_url(id: token)
+      })
+    end
+
     def prepare_new_admission_application
       if @admission_process.require_session
         return redirect_to admissions_path,

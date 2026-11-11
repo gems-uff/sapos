@@ -39,6 +39,9 @@ pt-BR:
         enrollment: "Matrícula materializada"
         phase_name: "Fase"
         identifier: "Identificador"
+        pending_email: "Novo email, aguardando confirmação"
+        email_change_digest: "Resumo do link de confirmação do novo email"
+        email_change_sent_at: "Envio do link de confirmação do novo email"
       admissions/admission_application/letter_requests:
         name: "Nome na indicação de carta de recomendação"
         email: "Email na indicação de carta de recomendação"

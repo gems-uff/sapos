@@ -1462,6 +1462,8 @@ GET /letter_requests/:id admissions/letter_requests#show | visitante: 302 /users
 PATCH /letter_requests/:id admissions/letter_requests#update | visitante: 302 /users/sign_in | papel desconhecido: negado | sem papel nenhum: negado
 PUT /letter_requests/:id admissions/letter_requests#update | visitante: 302 /users/sign_in | papel desconhecido: negado | sem papel nenhum: negado
 DELETE /letter_requests/:id admissions/letter_requests#destroy | visitante: 302 /users/sign_in | papel desconhecido: negado | sem papel nenhum: negado
+GET /admissions/email_change/:id admissions/email_changes#show | visitante: 302 /admissions | papel desconhecido: 302 /admissions | sem papel nenhum: 302 /admissions
+PUT /admissions/email_change/:id admissions/email_changes#update | visitante: 302 /admissions | papel desconhecido: 302 /admissions | sem papel nenhum: 302 /admissions
 POST /admissions/find admissions/admissions#find | visitante: erro ActionController::ParameterMissing | papel desconhecido: erro ActionController::ParameterMissing | sem papel nenhum: erro ActionController::ParameterMissing
 POST /admissions/:id admissions/admissions#create | visitante: 302 /admissions | papel desconhecido: 302 /admissions | sem papel nenhum: 302 /admissions
 POST /admissions/:admission_id/apply/:id admissions/apply#update | visitante: 302 /admissions | papel desconhecido: 302 /admissions | sem papel nenhum: 302 /admissions

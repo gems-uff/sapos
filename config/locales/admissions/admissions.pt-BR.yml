@@ -37,9 +37,20 @@ pt-BR:
           other: Email enviado para %{email} com códigos de identificação
         success_without_email: "O sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o código de identificação."
 
+    email_changes:
+      show:
+        title: "Troca do e-mail da inscrição"
+        explanation: "Confirme para que o endereço abaixo passe a ser o e-mail da inscrição. O código de identificação será renovado, e o novo código será enviado para esse endereço."
+        confirm: "Confirmar troca de e-mail"
+      update:
+        success: "E-mail da inscrição alterado. O novo código de identificação foi enviado para %{email}."
+        success_without_email: "E-mail da inscrição alterado, mas o sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o novo código de identificação."
+        refused: "Não foi possível trocar o e-mail da inscrição: %{reasons}. A inscrição continua com o e-mail e o código de identificação atuais."
+
     apply:
       show:
         title: "Inscrição"
+        email_change_pending: "Troca de e-mail aguardando confirmação: abra o link enviado para %{email}. Até a confirmação continuam valendo o e-mail e o código de identificação atuais."
         ongoing: "Inscrição em andamento"
         finished: "Inscrição realizada"
         finished_waiting_letters: "Inscrição realizada (aguardando cartas)"
@@ -74,8 +85,8 @@ pt-BR:
         edit_notice: "Inscrição editada com sucesso"
         new_token_sent: "Inscrição realizada com sucesso. O código de identificação e o link para acompanhar ou alterar a inscrição foram enviados para %{email}."
         new_token_sent_without_email: "Inscrição realizada com sucesso, mas o sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o código de identificação."
-        email_changed: "Inscrição editada com sucesso. O e-mail da inscrição mudou e, com ele, o código de identificação: o novo código foi enviado para %{email}."
-        email_changed_without_email: "Inscrição editada com sucesso. O e-mail da inscrição mudou e, com ele, o código de identificação, mas o sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o código novo."
+        email_change_requested: "Inscrição editada com sucesso. Para trocar o e-mail da inscrição, abra o link de confirmação enviado para %{email}. Até a confirmação continuam valendo o e-mail e o código de identificação atuais."
+        email_change_requested_without_email: "Inscrição editada com sucesso, mas o e-mail da inscrição não foi trocado: a troca depende de um link de confirmação, e o sistema não está enviando e-mails no momento. Procure a secretaria do programa."
 
     letters:
       show:
@@ -106,6 +117,7 @@ pt-BR:
       unauthorized_application: "Acesso não autorizado à inscrição %{token}. Por favor, use a opção de recuperar inscrição para acessá-la por este navegador."
       invalid_captcha: "reCAPTCHA inválido"
       empty_submission: "Nenhuma alteração foi recebida. Por favor, tente enviar novamente."
+      invalid_email_change: "O link de confirmação da troca de e-mail não é válido ou já venceu. Para trocar o e-mail da inscrição, altere-o de novo no formulário."
 
   notifications:
     admissions:
@@ -119,5 +131,7 @@ pt-BR:
           subject: Inscrição realizada
         edit_email_to_student:
           subject: Inscrição em processo seletivo alterada
+        confirm_email_change:
+          subject: Confirmação do novo e-mail da inscrição
         request_letter:
           subject: Carta de recomendação solicitada

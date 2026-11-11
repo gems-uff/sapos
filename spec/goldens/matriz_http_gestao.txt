@@ -1462,6 +1462,8 @@ GET /letter_requests/:id admissions/letter_requests#show | administrador, coorde
 PATCH /letter_requests/:id admissions/letter_requests#update | administrador, coordenacao, secretaria: todos: negado (nega)
 PUT /letter_requests/:id admissions/letter_requests#update | administrador, coordenacao, secretaria: todos: negado (nega)
 DELETE /letter_requests/:id admissions/letter_requests#destroy | administrador, coordenacao, secretaria: todos: negado (nega)
+GET /admissions/email_change/:id admissions/email_changes#show | administrador, coordenacao, secretaria: 302 /admissions
+PUT /admissions/email_change/:id admissions/email_changes#update | administrador, coordenacao, secretaria: 302 /admissions
 POST /admissions/find admissions/admissions#find | administrador, coordenacao, secretaria: erro ActionController::ParameterMissing
 POST /admissions/:id admissions/admissions#create | administrador, coordenacao, secretaria: 302 /admissions
 POST /admissions/:admission_id/apply/:id admissions/apply#update | administrador, coordenacao, secretaria: 302 /admissions

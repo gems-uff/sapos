@@ -26,6 +26,11 @@
                 value: @admission_application.send(attr)
               } %>
             <% end %>
+            <% if @admission_application.email_change_pending? %>
+              <li class="email-change-pending">
+                <%= t "admissions.apply.show.email_change_pending", email: @admission_application.pending_email %>
+              </li>
+            <% end %>
           </ol>
           <p class="links">
             <% can_edit = @admission_application.candidate_can_edit %>
