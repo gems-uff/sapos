@@ -21,6 +21,7 @@ RSpec.describe "E-mail do pedido de carta pelo campo sincronizado da carta", typ
       "Carta", {
         "Parecer" => Admissions::FormField::STRING,
         "Correio" => { field_type: Admissions::FormField::STRING, sync: Admissions::FormField::SYNC_EMAIL },
+        "Nome" => { field_type: Admissions::FormField::STRING, sync: Admissions::FormField::SYNC_NAME },
       }, template_type: Admissions::FormTemplate::RECOMMENDATION_LETTER
     )
     @processo = FactoryBot.create(
@@ -34,7 +35,10 @@ RSpec.describe "E-mail do pedido de carta pelo campo sincronizado da carta", typ
 
   def pedido_de_carta(respondida:)
     formulario = FactoryBot.create(:filled_form, form_template: @carta, is_filled: respondida)
-    fill_fields(formulario, { "Parecer" => (respondida ? "resposta do recomendador" : nil), "Correio" => "recomendador@example.com" })
+    fill_fields(formulario, {
+      "Parecer" => (respondida ? "resposta do recomendador" : nil),
+      "Correio" => "recomendador@example.com", "Nome" => "Recomendador",
+    })
     FactoryBot.create(
       :letter_request, admission_application: @inscricao, name: "Recomendador",
       email: "recomendador@example.com", filled_form: formulario
@@ -46,13 +50,13 @@ RSpec.describe "E-mail do pedido de carta pelo campo sincronizado da carta", typ
   end
 
   # A edição total (override), com o formulário da carta habilitado na
-  # submissão; `pedido_email` é o campo do próprio pedido.
-  def salvar(pedido, correio:, pedido_email: nil)
+  # submissão; `pedido_email` e `pedido_nome` são os campos do próprio pedido.
+  def salvar(pedido, correio:, pedido_email: nil, pedido_nome: nil)
     entrada = {
-      id: pedido.id, name: pedido.name, email: pedido_email || pedido.email,
+      id: pedido.id, name: pedido_nome || pedido.name, email: pedido_email || pedido.email,
       filled_form_attributes: {
         id: pedido.filled_form.id, enable_submission: "1",
-        fields_attributes: %w[Parecer Correio].each_with_index.to_h do |nome, i|
+        fields_attributes: %w[Parecer Correio Nome].each_with_index.to_h do |nome, i|
           gravado = campo(pedido, nome)
           valor = nome == "Correio" ? correio : gravado.value
           [i.to_s, { id: gravado.id, form_field_id: gravado.form_field_id, value: valor }]
@@ -111,6 +115,22 @@ RSpec.describe "E-mail do pedido de carta pelo campo sincronizado da carta", typ
       expect(campo(@pedido, "Correio").value).to eq("certo@example.com")
       expect(@pedido.access_token).not_to eq(@codigo)
       expect(@enviados.map { |mensagem| mensagem[:to] }).to eq(["certo@example.com"])
+    end
+
+    # O mesmo vale para os outros campos do pedido que a carta sincroniza, e
+    # para a correção só da caixa do endereço.
+    it "fica com o nome corrigido no campo do pedido, e o campo da carta o acompanha" do
+      salvar(@pedido, correio: "recomendador@example.com", pedido_nome: "Recomendador Certo")
+
+      expect(@pedido.reload.name).to eq("Recomendador Certo")
+      expect(campo(@pedido, "Nome").value).to eq("Recomendador Certo")
+    end
+
+    it "fica com a caixa do endereco corrigida no campo do pedido, sem trocar o codigo" do
+      salvar(@pedido, correio: "recomendador@example.com", pedido_email: "Recomendador@Example.com")
+
+      expect(@pedido.reload.email).to eq("Recomendador@Example.com")
+      expect(@pedido.access_token).to eq(@codigo)
     end
 
     # Controle: sem mudança de endereço, o código fica e nada é enviado.

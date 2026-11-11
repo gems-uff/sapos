@@ -494,13 +494,16 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     if has_letter_forms
       self.letter_requests.each do |letter_request|
         if letter_request.filled_form.try(:enable_submission) == "1"
-          # O e-mail do pedido chega pelo campo do pedido e pelo campo da carta
-          # sincronizado com ele, que a tela manda com o endereco de antes. O
-          # campo do pedido, quando quem edita o alterou, e o que vale.
-          requested_email = letter_request.email if letter_request.email_address_changed?
+          # O nome, o e-mail e o telefone do pedido chegam pelo campo do
+          # pedido e pelo campo da carta sincronizado com cada um, que a tela
+          # manda com o valor de antes. O campo do pedido, quando quem edita o
+          # alterou, e o que vale.
+          requested = Admissions::FormField::SYNCS_MAP.values
+            .select { |attribute| letter_request.attribute_changed?(attribute) }
+            .index_with { |attribute| letter_request[attribute] }
           letter_request.filled_form.sync_fields_after(letter_request)
-          if requested_email
-            letter_request.email = requested_email
+          if requested.any?
+            letter_request.assign_attributes(requested)
             letter_request.filled_form.sync_fields_before(letter_request)
           end
           all_forms << {
