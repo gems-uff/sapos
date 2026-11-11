@@ -243,6 +243,12 @@ module FieldMatrix
     resultado = { grava: [], recusa: [], linha_grava: [], linha_recusa: [], sem_teste: [], junto: [] }
     resultado[:sozinhos] = mudam_sozinhos(record, user, formulario)
     scaffold[:config].columns.map(&:name).map(&:to_s).sort.each do |nome|
+      # Coluna virtual (sem atributo no banco nem associação) não tem o que
+      # gravar, e há scaffold que as cria conforme os registros que existem
+      # quando a classe carrega: listá-las faria o baseline depender da ordem
+      # dos specs.
+      next if scaffold[:config].columns[nome].association.nil? && !scaffold[:model].columns_hash.key?(nome)
+
       valor = valor_forjado(scaffold[:config].columns[nome], scaffold[:model], record, nome)
       if valor.nil? || SEM_TESTE_DE_GRAVACAO.include?(nome)
         resultado[:sem_teste] << nome
