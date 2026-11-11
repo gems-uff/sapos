@@ -32,9 +32,9 @@ RSpec.describe "Escrita por registro, pelo efeito no banco", type: :request do
     @labels.key(name) || raise("rótulo #{name} não existe no conjunto de dados")
   end
 
-  def tentar(user, verb, path, params = {})
+  def tentar(user, verb, path, params = {}, xhr: false)
     sign_in user
-    process(verb, path, params: params, env: { "REMOTE_ADDR" => RouteProbe::REMOTE_ADDR })
+    process(verb, path, params: params, xhr: xhr, env: { "REMOTE_ADDR" => RouteProbe::REMOTE_ADDR })
   rescue CanCan::AccessDenied, ActiveScaffold::RecordNotAllowed, ActiveScaffold::ActionNotAllowed,
          ActiveRecord::RecordNotFound
     nil
@@ -45,7 +45,7 @@ RSpec.describe "Escrita por registro, pelo efeito no banco", type: :request do
     record.class.unscoped.find_by(id: record.id)&.attributes
   end
 
-  def self.escrita(descricao, usuario:, notas: nil, verbo:, caminho:, alvo:, params: {}, muda:, acao: nil)
+  def self.escrita(descricao, usuario:, notas: nil, verbo:, caminho:, alvo:, params: {}, muda:, acao: nil, xhr: false)
     it "#{descricao}: #{muda ? 'muda' : 'não muda'} o banco" do
       post_grades(notas)
       registro = rec(alvo)
@@ -55,7 +55,7 @@ RSpec.describe "Escrita por registro, pelo efeito no banco", type: :request do
           "o Ability discorda da intenção para #{acao} em #{alvo}"
       end
       antes = estado(registro)
-      tentar(user, verbo, caminho.call(registro, self), params.is_a?(Proc) ? params.call(self) : params)
+      tentar(user, verbo, caminho.call(registro, self), params.is_a?(Proc) ? params.call(self) : params, xhr: xhr)
       depois = estado(registro)
 
       if muda
@@ -99,6 +99,15 @@ RSpec.describe "Escrita por registro, pelo efeito no banco", type: :request do
       caminho: ->(r, _) { "/paper_students/#{r.id}" }, alvo: "ps_a", muda: true, acao: :destroy
     escrita "remove aluno do artigo de outro professor", usuario: :professor, verbo: :delete,
       caminho: ->(r, _) { "/paper_students/#{r.id}" }, alvo: "ps_b", muda: false, acao: :destroy
+    # A tela mostra o período travado a quem não gerencia: é o quadriênio que o
+    # sistema preencheu.
+    escrita "troca o período do próprio artigo (forja)", usuario: :professor, verbo: :patch,
+      caminho: artigo, alvo: "paper_a", params: { record: { period: "1900-1903" } }, muda: false
+    escrita "troca o período do próprio artigo pela edição em linha (forja)", usuario: :professor, verbo: :post,
+      caminho: ->(r, _) { "/papers/#{r.id}/update_column" }, alvo: "paper_a",
+      params: { column: "period", value: "1900-1903" }, muda: false, xhr: true
+    escrita "a secretaria troca o período do artigo", usuario: :secretaria, verbo: :patch,
+      caminho: artigo, alvo: "paper_a", params: { record: { period: "1900-1903" } }, muda: true
     escrita "leva a autoria do próprio artigo para o artigo de outro professor (forja)", usuario: :professor,
       verbo: :patch, caminho: ->(r, _) { "/paper_professors/#{r.id}" }, alvo: "pp_a",
       params: ->(t) { { record: { paper: t.rec("paper_b").id } } }, muda: false
@@ -115,9 +124,9 @@ RSpec.describe "Escrita por registro, pelo efeito no banco", type: :request do
 
       def criar_autorias(artigo)
         tentar(@users[:professor], :post, "/paper_professors",
-          record: { paper: artigo.id, professor: rec("prof_c").id })
+          { record: { paper: artigo.id, professor: rec("prof_c").id } })
         tentar(@users[:professor], :post, "/paper_students",
-          record: { paper: artigo.id, student: rec("st_b").id })
+          { record: { paper: artigo.id, student: rec("st_b").id } })
       end
 
       it "não entra no artigo de outro professor" do

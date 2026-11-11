@@ -33,6 +33,7 @@ class Paper < ApplicationRecord
   }
 
   validate :that_professor_cannot_edit_other_papers, if: -> { cannot?(:edit_professor, self) }
+  validate :that_professor_keeps_the_period, if: -> { cannot?(:edit_professor, self) }
 
   def that_professor_cannot_edit_other_papers
     current_professor = current_user&.professor
@@ -40,6 +41,16 @@ class Paper < ApplicationRecord
     if self.changes[:owner_id].present? && self.changes[:owner_id] != [nil, current_professor.id]
       self.errors.add(:owner, :cannot_edit_other_papers)
     end
+  end
+
+  # O periodo e o quadrienio corrente, que a tela preenche e mostra travado a
+  # quem nao gerencia os artigos: no artigo novo e o do sistema, e no que ja
+  # existe nao muda.
+  def that_professor_keeps_the_period
+    return if current_user&.professor.nil? || !period_changed?
+
+    expected = new_record? ? CustomVariable.quadrennial_period : period_was
+    errors.add(:period, :cannot_edit_period) if period != expected
   end
 
   def to_label
