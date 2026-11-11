@@ -165,6 +165,47 @@ RSpec.describe "Formato do e-mail da inscricao", type: :request do
     end
   end
 
+  # Nos modelos em uso, o campo sincronizado com o e-mail costuma ser um campo
+  # de aluno (o e-mail do aluno que a candidatura vira), e não um texto simples.
+  describe "quando o campo sincronizado com o e-mail e um campo de aluno" do
+    before(:each) do
+      @de_aluno = create_admission_template("Com e-mail de aluno", {
+        "Dado" => Admissions::FormField::STRING,
+        "Correio" => {
+          field_type: Admissions::FormField::STUDENT_FIELD, configuration: { field: "email" },
+          sync: Admissions::FormField::SYNC_EMAIL,
+        },
+      })
+      @com_campo.update!(form_template: @de_aluno)
+    end
+
+    it "oferece o campo como campo de e-mail" do
+      get new_admission_apply_path(admission_id: @com_campo.simple_id)
+
+      correio = @de_aluno.fields.find_by!(name: "Correio")
+      pagina = Nokogiri::HTML(response.body)
+      marca = pagina.css("input[type=hidden][name$='[form_field_id]']").find { |e| e["value"] == correio.id.to_s }
+      campo = pagina.at_css("input[name='#{marca['name'].delete_suffix('[form_field_id]')}[value]']")
+
+      expect(campo["type"]).to eq("email")
+    end
+
+    it "recusa o texto que nao e endereco" do
+      expect {
+        inscrever(@com_campo, { "Dado" => "dado", "Correio" => "pessoa.example.com" }, name: "Pessoa")
+      }.not_to change { Admissions::AdmissionApplication.count }
+
+      expect(response.body).to include(recusa_do_formato)
+    end
+
+    # Controle: o mesmo envio, com endereço.
+    it "aceita o endereco" do
+      inscrever(@com_campo, { "Dado" => "dado", "Correio" => "pessoa@example.com" }, name: "Pessoa")
+
+      expect(Admissions::AdmissionApplication.find_by(email: "pessoa@example.com")&.filled_form&.is_filled).to be(true)
+    end
+  end
+
   # Inscrição gravada antes da conferência pode ter endereço fora do formato.
   # O candidato tem de conseguir editar o resto; a conferência vale para o
   # endereço novo ou alterado.

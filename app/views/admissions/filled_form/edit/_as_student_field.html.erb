@@ -11,6 +11,9 @@
   options[:name] = options[:name][..-(student_field.to_s).size-2] + filled_field_mode.to_s + "]"
   options[:required] = configuration["required"] ? true : false
   options[:class] = filled_class
+  # O campo sincronizado com o e-mail da candidatura e conferido pelo navegador
+  # como campo de e-mail (o servidor confere de novo, no modelo).
+  options[:type] = "email" if form_field.sync == Admissions::FormField::SYNC_EMAIL
 %>
 
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
