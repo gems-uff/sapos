@@ -1,6 +1,11 @@
 <%
   options = {size: 30}
   options[:required] = "required" if configuration["required"]
+  field_method = if form_field.sync == Admissions::FormField::SYNC_EMAIL
+    :email_field
+  else
+    :text_field
+  end
 %>
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
@@ -10,7 +15,7 @@
         <span class="filled-form-description"><%= form_field.description %></span>
       <% end %>
     </dt>
-    <dd> <%= field.text_field :value, class: ["text-input", filled_class],
-             placeholder: configuration["placeholder"], **options %> </dd>
+    <dd> <%= field.public_send(field_method, :value, class: ["text-input", filled_class],
+             placeholder: configuration["placeholder"], **options) %> </dd>
   </dl>
 </li>
