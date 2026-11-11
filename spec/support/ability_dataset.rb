@@ -227,7 +227,10 @@ module AbilityDataset
     label(FactoryBot.create(:grant, professor: @prof_b), "grant_b")
     label(FactoryBot.create(:grant, professor: @prof_c), "grant_c")
     paper_a = label(FactoryBot.create(:paper, owner: @prof_a), "paper_a")
-    paper_b = label(FactoryBot.create(:paper, owner: @prof_b), "paper_b")
+    # Ordem diferente da do paper_a: a ordem é única por período e dono, e com
+    # a mesma ordem a troca de dono seria recusada pela unicidade, não pela
+    # guarda que os specs de escrita querem medir.
+    paper_b = label(FactoryBot.create(:paper, owner: @prof_b, order: 2), "paper_b")
     label(FactoryBot.create(:paper_professor, paper: paper_a, professor: @prof_b), "pp_a")
     label(FactoryBot.create(:paper_professor, paper: paper_b, professor: @prof_a), "pp_b")
     label(FactoryBot.create(:paper_student, paper: paper_a, student: @st_a), "ps_a")

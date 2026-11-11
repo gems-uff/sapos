@@ -12,7 +12,8 @@ class CourseClass < ApplicationRecord
   belongs_to :course, optional: false
   belongs_to :professor, optional: false
 
-  has_many :class_enrollments, dependent: :destroy
+  has_many :class_enrollments, dependent: :destroy,
+    before_remove: :note_removed_class_enrollment
   has_many :class_enrollment_requests, dependent: :destroy
   has_many :allocations, dependent: :destroy
   has_many :enrollments, through: :class_enrollments
@@ -125,6 +126,17 @@ class CourseClass < ApplicationRecord
           errors.add(:base, :changes_to_disallowed_fields)
         end
       end
+      # O subformulario grava a associacao inteira: a inscricao que nao vem no
+      # envio sai da turma e, com dependent: :destroy, e apagada na hora. Quem
+      # so lanca nota nao apaga inscricao; o erro aqui desfaz a transacao do
+      # envio, e a inscricao volta.
+      if @removed_class_enrollments.present?
+        errors.add(:base, :changes_to_disallowed_fields)
+      end
+    end
+
+    def note_removed_class_enrollment(class_enrollment)
+      (@removed_class_enrollments ||= []) << class_enrollment
     end
 
     delegate :can?, :cannot?, to: :ability

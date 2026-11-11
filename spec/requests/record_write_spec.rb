@@ -108,12 +108,57 @@ RSpec.describe "Escrita por registro, pelo efeito no banco", type: :request do
       params: { column: "period", value: "1900-1903" }, muda: false, xhr: true
     escrita "a secretaria troca o período do artigo", usuario: :secretaria, verbo: :patch,
       caminho: artigo, alvo: "paper_a", params: { record: { period: "1900-1903" } }, muda: true
+    # Controle da forja do dono: a mesma troca, feita por quem gerencia os
+    # artigos, grava -- o que recusa o professor é a guarda, não outra validação.
+    escrita "a secretaria passa o artigo para outro professor", usuario: :secretaria, verbo: :patch,
+      caminho: artigo, alvo: "paper_a", params: ->(t) { { record: { owner: t.rec("prof_b").id } } }, muda: true
+
+    it "não cria artigo com período em branco nem com período escolhido (forja)" do
+      criar = lambda do |periodo|
+        tentar(@users[:professor], :post, "/papers", { record: {
+          reference: "Artigo novo", kind: Paper::JOURNAL, doi_issn_event: "10.0/x", reason_justify: "motivo",
+          order: 5, owner: rec("prof_a").id, period: periodo
+        } })
+      end
+
+      expect { criar.call(""); criar.call("1900-1903") }.not_to change(Paper, :count)
+      expect { criar.call(CustomVariable.quadrennial_period) }.to change(Paper, :count).by(1)
+    end
     escrita "leva a autoria do próprio artigo para o artigo de outro professor (forja)", usuario: :professor,
       verbo: :patch, caminho: ->(r, _) { "/paper_professors/#{r.id}" }, alvo: "pp_a",
       params: ->(t) { { record: { paper: t.rec("paper_b").id } } }, muda: false
     escrita "leva o aluno do próprio artigo para o artigo de outro professor (forja)", usuario: :professor,
       verbo: :patch, caminho: ->(r, _) { "/paper_students/#{r.id}" }, alvo: "ps_a",
       params: ->(t) { { record: { paper: t.rec("paper_b").id } } }, muda: false
+
+    # O subformulário do artigo aceita, pelo id, uma linha que já existe. A
+    # linha de autoria do artigo de outro professor não vem para o artigo de
+    # quem envia.
+    describe "linha de autoria de outro artigo, pelo subformulario do proprio" do
+      def puxar(associacao, alheia)
+        proprias = rec("paper_a").public_send(associacao).to_h { |linha| [linha.id.to_s, { id: linha.id.to_s }] }
+        tentar(@users[:professor], :patch, "/papers/#{rec('paper_a').id}",
+          { record: { associacao => proprias.merge(alheia.id.to_s => { id: alheia.id.to_s }) } })
+      end
+
+      it "não traz o docente do artigo de outro professor" do
+        expect { puxar(:paper_professors, rec("pp_b")) }.not_to change { rec("pp_b").reload.paper_id }
+      end
+
+      it "não traz o aluno do artigo de outro professor" do
+        expect { puxar(:paper_students, rec("ps_b")) }.not_to change { rec("ps_b").reload.paper_id }
+      end
+
+      # Controle: reenviar as próprias linhas não muda nada e não é recusado.
+      it "mantém as linhas do próprio artigo" do
+        proprias = rec("paper_a").paper_professors.to_h { |linha| [linha.id.to_s, { id: linha.id.to_s }] }
+        tentar(@users[:professor], :patch, "/papers/#{rec('paper_a').id}",
+          { record: { reference: "Referencia nova", paper_professors: proprias } })
+
+        expect(rec("paper_a").reload.reference).to eq("Referencia nova")
+        expect(rec("pp_a").reload.paper_id).to eq(rec("paper_a").id)
+      end
+    end
 
     # A criação é liberada à classe (o subform do artigo precisa dela); o que
     # prende a linha nova ao artigo de quem a cria é a validação do modelo.

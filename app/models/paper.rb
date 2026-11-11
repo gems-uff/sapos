@@ -47,9 +47,9 @@ class Paper < ApplicationRecord
   # quem nao gerencia os artigos: no artigo novo e o do sistema, e no que ja
   # existe nao muda.
   def that_professor_keeps_the_period
-    return if current_user&.professor.nil? || !period_changed?
+    return if current_user.nil?
 
-    expected = new_record? ? CustomVariable.quadrennial_period : period_was
+    expected = new_record? ? CustomVariable.quadrennial_period : period_in_database
     errors.add(:period, :cannot_edit_period) if period != expected
   end
 

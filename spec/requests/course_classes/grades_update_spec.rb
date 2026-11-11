@@ -116,6 +116,27 @@ RSpec.describe "Lancamento de notas na edicao da turma", type: :request do
     # A guarda das validacoes perguntava ao Ability sobre o registro ja
     # alterado: trocado o dono, a turma deixava de ser do professor, a guarda
     # respondia que ele nao lancava nota ali, e a validacao nao rodava.
+    # O subformulário grava a associação inteira: a inscrição que não vem no
+    # envio sai da turma, e com dependent: :destroy é apagada. O professor que
+    # lança nota não apaga inscrição.
+    describe "inscricao que nao vem no envio" do
+      it "nao apaga a inscricao que ficou de fora" do
+        expect {
+          lanca({ @aprovada => { situation: ClassEnrollment::APPROVED, grade: "8.5", disapproved_by_absence: "0" } })
+        }.not_to change { ClassEnrollment.where(course_class_id: @turma.id).count }
+
+        expect(ClassEnrollment.exists?(@faltosa.id)).to be(true)
+      end
+
+      it "nao apaga as inscricoes quando o envio diz que nao ha nenhuma" do
+        expect {
+          put course_class_path(@turma), params: { record: {
+            name: @turma.name, year: @turma.year, semester: @turma.semester, class_enrollments: { "0" => "" }
+          } }
+        }.not_to change { ClassEnrollment.where(course_class_id: @turma.id).count }
+      end
+    end
+
     describe "troca de dono" do
       before(:each) do
         @outro = FactoryBot.create(:professor, name: "Outro Prof")
