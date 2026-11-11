@@ -17,7 +17,7 @@ RSpec.describe "Formularios do professor que lanca notas", type: :request do
       :custom_variable, variable: "professor_login_can_post_grades", value: "yes_all_semesters"
     )
     @professor = FactoryBot.create(:professor, name: "Professor Notas")
-    @turma = FactoryBot.create(:course_class, professor: @professor, name: "Turma Notas")
+    @turma = FactoryBot.create(:course_class, professors: [@professor], name: "Turma Notas")
     @inscricao = FactoryBot.create(:class_enrollment, course_class: @turma)
   end
 
@@ -42,7 +42,6 @@ RSpec.describe "Formularios do professor que lanca notas", type: :request do
     {
       "record[name]" => "input",
       "record[course]" => "input.recordselect",
-      "record[professor]" => "input.recordselect",
       "record[year]" => "select",
       "record[semester]" => "select",
       "record[not_schedulable]" => "input[type='checkbox']",
@@ -65,6 +64,7 @@ RSpec.describe "Formularios do professor que lanca notas", type: :request do
         expect(campo(seletor, nome)).to be_present, nome
         expect(campo(seletor, nome)["disabled"]).to eq("disabled"), nome
       end
+      expect(html.css("dl").map(&:text).join).to include("Professor Notas")
     end
 
     it "o administrador ve os mesmos campos habilitados" do
@@ -76,6 +76,7 @@ RSpec.describe "Formularios do professor que lanca notas", type: :request do
       campos_da_turma.each do |nome, seletor|
         expect(campo(seletor, nome)["disabled"]).to be_nil, nome
       end
+      expect(campo("input.recordselect", "record[professors][]")["disabled"]).to be_nil
     end
   end
 

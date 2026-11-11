@@ -362,18 +362,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_120000) do
     t.datetime "updated_at", precision: nil, null: false
   end
 
+  create_table "course_class_professors", force: :cascade do |t|
+    t.integer "course_class_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "professor_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_class_id", "professor_id"], name: "index_course_class_professors_on_course_class_and_professor", unique: true
+    t.index ["course_class_id"], name: "index_course_class_professors_on_course_class_id"
+    t.index ["professor_id"], name: "index_course_class_professors_on_professor_id"
+  end
+
   create_table "course_classes", force: :cascade do |t|
     t.integer "course_id"
     t.datetime "created_at", precision: nil, null: false
     t.string "name", limit: 255
     t.boolean "not_schedulable", default: false, null: false
     t.string "obs_schedule"
-    t.integer "professor_id"
     t.integer "semester"
     t.datetime "updated_at", precision: nil, null: false
     t.integer "year"
     t.index ["course_id"], name: "index_course_classes_on_course_id"
-    t.index ["professor_id"], name: "index_course_classes_on_professor_id"
   end
 
   create_table "course_research_areas", force: :cascade do |t|
@@ -1152,22 +1160,4 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_10_120000) do
     t.string "whodunnit", limit: 255
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
-
-  add_foreign_key "course_research_lines", "courses"
-  add_foreign_key "course_research_lines", "research_lines"
-  add_foreign_key "enrollments", "research_lines", on_delete: :nullify
-  add_foreign_key "grants", "professors"
-  add_foreign_key "paper_professors", "papers"
-  add_foreign_key "paper_professors", "professors"
-  add_foreign_key "paper_students", "papers"
-  add_foreign_key "paper_students", "students"
-  add_foreign_key "papers", "professors", column: "owner_id"
-  add_foreign_key "professor_research_lines", "professors"
-  add_foreign_key "professor_research_lines", "research_lines"
-  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
-  add_foreign_key "reports", "users", column: "generated_by_id"
-  add_foreign_key "reports", "users", column: "invalidated_by_id"
-  add_foreign_key "research_lines", "research_areas"
-  add_foreign_key "user_roles", "roles"
-  add_foreign_key "user_roles", "users"
 end

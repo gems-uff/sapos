@@ -51,7 +51,7 @@ RSpec.describe "Notificações do fluxo de inscrição", type: :request do
       :professor, name: "João Pereira", email: "joao.fluxo@ic.uff.br"
     )
     @course_class = FactoryBot.create(
-      :course_class, course: @course, professor: @professor, year: 2020, semester: 1
+      :course_class, course: @course, professors: [@professor], year: 2020, semester: 1
     )
 
     @admin = create_confirmed_user([@role_adm], "fluxo_admin@ic.uff.br")
@@ -109,7 +109,7 @@ RSpec.describe "Notificações do fluxo de inscrição", type: :request do
       credits: 4, workload: 60
     )
     FactoryBot.create(
-      :course_class, course: curso, professor: professor || @professor,
+      :course_class, course: curso, professors: [professor || @professor],
       year: 2020, semester: 1
     )
   end

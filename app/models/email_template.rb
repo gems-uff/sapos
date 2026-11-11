@@ -127,7 +127,7 @@ class EmailTemplate < ApplicationRecord
       subject: I18n.t(
         "notifications.class_enrollment.email_to_professor.subject"
       ),
-      to: "{{ record.course_class.professor.email }}",
+      to: "{{ record.course_class.professors_emails }}",
       variables: {
         record: ClassEnrollmentDrop
       }
@@ -140,7 +140,7 @@ class EmailTemplate < ApplicationRecord
       subject: I18n.t(
         "notifications.class_enrollment.email_to_professor_enrollment.subject"
       ),
-      to: "{{ record.course_class.professor.email }}",
+      to: "{{ record.course_class.professors_emails }}",
       variables: {
         record: ClassEnrollmentDrop,
         destroyed: :value
@@ -190,7 +190,7 @@ class EmailTemplate < ApplicationRecord
       template_type: "Liquid",
       path: File.join("course_classes", "mailer", "email_to_professor.text.liquid"),
       subject: I18n.t("notifications.course_class.email_to_professor.subject"),
-      to: "{{ record.professor.email }}",
+      to: "{{ record.professors_emails }}",
       variables: {
         record: CourseClassDrop
       }

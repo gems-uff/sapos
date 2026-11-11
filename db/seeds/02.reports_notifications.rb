@@ -613,7 +613,7 @@ queries = [
             SUM(c.credits) AS total_creditos
       FROM students s, enrollments e, `class_enrollments` ce,
           courses c, course_types ct, course_classes cc, professors p,
-          enrollment_statuses es, levels l
+          enrollment_statuses es, levels l, course_class_professors ccp
       WHERE s.id = e.student_id
       AND e.id NOT IN (SELECT enrollment_id FROM dismissals)
       AND e.enrollment_status_id = es.id
@@ -627,9 +627,10 @@ queries = [
       AND ct.name = 'Tópicos Avançados'
       AND c.id = cc.course_id
       AND cc.id = ce.course_class_id
-      AND cc.professor_id = p.id
+      AND ccp.course_class_id = cc.id
+      AND ccp.professor_id = p.id
       /* Professor é o orientador */
-      AND cc.professor_id IN (SELECT professor_id FROM advisements WHERE enrollment_id = e.id)
+      AND ccp.professor_id IN (SELECT professor_id FROM advisements WHERE enrollment_id = e.id)
       GROUP BY s.name, e.enrollment_number, p.name
       HAVING SUM(c.credits) > 4
       ORDER BY s.name
@@ -873,8 +874,9 @@ queries = [
     sql: <<~SQL
       SELECT DISTINCT cc.name AS "nome curso", p.name AS "professor", cc.year, cc.semester
       FROM course_classes cc, professors p, class_enrollments ce,
-          courses c, course_types ct
-      WHERE cc.professor_id = p.id
+          courses c, course_types ct, course_class_professors ccp
+      WHERE ccp.course_class_id = cc.id
+      AND ccp.professor_id = p.id
       AND ce.course_class_id = cc.id
       AND ce.situation = 'Incompleto'
       AND c.id = cc.course_id
@@ -920,8 +922,9 @@ queries = [
     ],
     sql: <<~SQL
       SELECT DISTINCT cc.name AS disciplina, p.name AS professor, cc.year, cc.semester
-      FROM course_classes cc, professors p
-      WHERE cc.professor_id = p.id
+      FROM course_classes cc, professors p, course_class_professors ccp
+      WHERE ccp.course_class_id = cc.id
+      AND ccp.professor_id = p.id
       AND cc.id NOT IN (SELECT course_class_id FROM class_enrollments)
       AND cc.year = :ano_semestre_atual
       AND cc.semester = :numero_semestre_atual
@@ -2332,16 +2335,17 @@ queries = [
     ],
     notifications: [],
     sql: <<~SQL
-      SELECT cc.name AS "Disciplina",
-             p.name AS "Professor",
-             COUNT(*) AS "Total de alunos",
-             SUM(case when es.name = 'Regular' then 1 else 0 end) AS "Alunos regulares",
-             SUM(case when es.name = 'Avulso' then 1 else 0 end) AS "Alunos avulsos"
-      FROM course_classes cc, professors p, class_enrollments ce, enrollments e,
-           enrollment_statuses es, courses c, course_types ct
+      SELECT cc.id AS "ID da turma",
+             cc.name AS "Disciplina",
+             GROUP_CONCAT(DISTINCT p.name) AS "Professor",
+             COUNT(DISTINCT ce.id) AS "Total de alunos",
+             COUNT(DISTINCT CASE WHEN es.name = 'Regular' THEN ce.id END) AS "Alunos regulares",
+             COUNT(DISTINCT CASE WHEN es.name = 'Avulso' THEN ce.id END) AS "Alunos avulsos"
+      FROM course_classes cc, professors p, class_enrollments ce, enrollments e, enrollment_statuses es, courses c, course_types ct, course_class_professors ccp
       WHERE cc.year = :ano_semestre_atual
       AND cc.semester = :numero_semestre_atual
-      AND cc.professor_id = p.id
+      AND ccp.course_class_id = cc.id
+      AND ccp.professor_id = p.id
       AND cc.course_id = c.id
       AND c.course_type_id = ct.id
       AND e.enrollment_status_id = es.id
@@ -2354,7 +2358,7 @@ queries = [
       AND cc.id = ce.course_class_id
       AND ce.situation = 'Incompleto'
       AND ce.enrollment_id = e.id
-      GROUP BY cc.name
+      GROUP BY cc.id, cc.name
       ORDER BY cc.name
     SQL
   },
