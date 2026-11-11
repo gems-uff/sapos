@@ -1,0 +1,258 @@
+== admissions/admission_applications | app_compartilhada
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/admission_applications | app_outro
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: admission_phase admission_process email evaluations filled_form letter_requests name rankings results show status token | formulário edita: (nada) | grava: (nada) | recusa: admission_phase admission_phase_id admission_process_id created_at email enrollment enrollment_id filled_form filled_form_id id name status status_message student student_id submission_time token updated_at | em linha grava: (nada) | em linha recusa: admission_phase admission_phase_id admission_process_id created_at email enrollment enrollment_id filled_form filled_form_id id name status status_message student student_id submission_time token updated_at | sem teste: admission_process custom_forms evaluations is_filled letter_requests mapping pendencies pendency rankings results versions
+== admissions/admission_applications | app_pendente
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: admission_phase admission_process email evaluations filled_form letter_requests name rankings results show status token | formulário edita: (nada) | grava: (nada) | recusa: admission_phase admission_phase_id admission_process_id created_at email enrollment enrollment_id filled_form filled_form_id id name status status_message student student_id submission_time token updated_at | em linha grava: (nada) | em linha recusa: admission_phase admission_phase_id admission_process_id created_at email enrollment enrollment_id filled_form filled_form_id id name status status_message student student_id submission_time token updated_at | sem teste: admission_process custom_forms evaluations is_filled letter_requests mapping pendencies pendency rankings results versions
+== admissions/admission_applications | app_sem
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/admission_pendencies | pend_compartilhada
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/admission_pendencies | pend_outro
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/admission_pendencies | pend_professor
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: admission_application admission_phase mode show status user | não edita
+== admissions/admission_phase_evaluations | avaliacao_outro
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: (não abre) | não edita
+== admissions/admission_phase_evaluations | avaliacao_professor
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: (não abre) | não edita
+== admissions/admission_phase_results | resultado_app_pendente
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: (não abre) | não edita
+== admissions/admission_phase_results | resultado_app_sem
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/admission_phases | fase
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: admission_phase_committees approval_condition can_edit_candidate candidate_form consolidation_form keep_in_phase_condition member_form name shared_form show | formulário edita: approval_condition can_edit_candidate candidate_can_edit candidate_can_see_consolidation candidate_can_see_member candidate_can_see_shared candidate_form committee_can_see_other_individual consolidation_form keep_in_phase_condition member_form name shared_form | grava: can_edit_candidate candidate_can_edit candidate_can_see_consolidation candidate_can_see_member candidate_can_see_shared candidate_form committee_can_see_other_individual consolidation_form member_form name shared_form | recusa: approval_condition_id candidate_form_id consolidation_form_id created_at id keep_in_phase_condition_id member_form_id shared_form_id updated_at | em linha grava: approval_condition_id can_edit_candidate candidate_can_edit candidate_can_see_consolidation candidate_can_see_member candidate_can_see_shared candidate_form candidate_form_id committee_can_see_other_individual consolidation_form consolidation_form_id id keep_in_phase_condition_id member_form member_form_id name shared_form shared_form_id | em linha recusa: created_at updated_at | admission_phase_committees[edita: admission_committee; trava: (nada); grava: (nada); recusa: (nada)] | sem teste: admission_applications admission_committees admission_pendencies admission_phase_committees admission_phase_evaluations admission_phase_results admission_process_phases admission_process_rankings approval_condition keep_in_phase_condition versions
+== admissions/admission_processes | processo
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: admission_applications admission_applications_count allow_multiple_applications end_date form_template letter_template max_letters min_letters name require_session show simple_id start_date visible year_semester | formulário edita: admission_date(1i) admission_date(2i) allow_multiple_applications edit_date end_date enrollment_number_field enrollment_status form_template letter_template level max_letters min_letters name require_session semester simple_url staff_can_edit staff_can_undo start_date visible year | grava: allow_multiple_applications enrollment_number_field enrollment_status form_template letter_template level max_letters min_letters name require_session semester simple_url staff_can_edit staff_can_undo visible year | recusa: admission_date created_at edit_date end_date enrollment_status_id form_template_id id letter_template_id level_id start_date updated_at | em linha grava: allow_multiple_applications edit_date enrollment_number_field enrollment_status enrollment_status_id form_template form_template_id letter_template letter_template_id level level_id max_letters min_letters name require_session semester simple_url staff_can_edit staff_can_undo visible year | em linha recusa: admission_date created_at end_date id start_date updated_at | sem teste: admission_applications admission_applications_count phases rankings versions year_semester
+== admissions/admission_ranking_results | ranking_app_pendente
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: (não abre) | formulário edita: (nada) | grava: (nada) | recusa: admission_application admission_application_id created_at filled_form filled_form_id id ranking_config_id updated_at | em linha grava: (nada) | em linha recusa: admission_application admission_application_id created_at filled_form filled_form_id id ranking_config_id updated_at | sem teste: ranking_config versions
+== admissions/admission_ranking_results | ranking_app_sem
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/consolidation_form_fields | (primeiro Admissions::FormField)
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: configuration description field_type form_template name order show | formulário edita: description field_type form_template name order | grava: description form_template name order | recusa: configuration created_at field_type form_template_id id sync updated_at | em linha grava: description form_template form_template_id name order | em linha recusa: configuration created_at field_type id sync updated_at | sem teste: filled_fields ranking_config_as_machine ranking_config_as_position versions
+== admissions/consolidation_templates | (primeiro Admissions::FormTemplate)
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: (não abre) | formulário edita: (nada) | grava: (nada) | recusa: created_at description id name template_type updated_at | em linha grava: (nada) | em linha recusa: created_at description id name template_type updated_at | sem teste: admission_process_forms admission_process_letters admission_report_configs fields phase_consolidation_forms phase_member_forms phase_shared_forms ranking_config versions
+== admissions/filled_form_fields | campo_app_pendente
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: file filled_form form_field list scholarities show value | não edita
+== admissions/filled_forms | ff_app_compartilhada
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/filled_forms | ff_app_outro
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: show | não edita
+== admissions/filled_forms | ff_app_pendente
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: show | não edita
+== admissions/filled_forms | ff_app_sem
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/filled_forms | ff_avaliacao_outro
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: show | não edita
+== admissions/filled_forms | ff_avaliacao_professor
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/filled_forms | ff_carta_app_pendente
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/filled_forms | ff_carta_app_sem
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/filled_forms | ff_ranking_app_pendente
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/filled_forms | ff_ranking_app_sem
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/filled_forms | ff_resultado_app_pendente
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/filled_forms | ff_resultado_app_sem
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/form_fields | (primeiro Admissions::FormField)
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: configuration description field_type form_template name order show sync | formulário edita: description field_type form_template name order sync | grava: description form_template name order | recusa: configuration created_at field_type form_template_id id sync updated_at | em linha grava: description form_template form_template_id name order | em linha recusa: configuration created_at field_type id sync updated_at | sem teste: filled_fields ranking_config_as_machine ranking_config_as_position versions
+== admissions/form_templates | (primeiro Admissions::FormTemplate)
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: admission_process_forms admission_process_letters admission_report_configs description fields name phase_consolidation_forms phase_member_forms phase_shared_forms ranking_config show template_type | formulário edita: description name template_type | grava: description name | recusa: created_at id template_type updated_at | em linha grava: description name | em linha recusa: created_at id template_type updated_at | sem teste: admission_process_forms admission_process_letters admission_report_configs fields phase_consolidation_forms phase_member_forms phase_shared_forms ranking_config versions
+== admissions/letter_requests | carta_app_pendente
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: (não abre) | não edita
+== admissions/letter_requests | carta_app_sem
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+== admissions/ranking_columns | (primeiro Admissions::RankingColumn)
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: name order show | formulário edita: name order | grava: (nada) | recusa: admission_report_config_id created_at id name order ranking_config_id updated_at | em linha grava: admission_report_config_id id | em linha recusa: created_at name order ranking_config_id updated_at | sem teste: admission_report_config ranking_config versions
+== admissions/ranking_configs | ranking
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: behavior_on_invalid_condition behavior_on_invalid_ranking candidate_can_see form_condition name ranking_columns ranking_groups ranking_processes show | formulário edita: behavior_on_invalid_condition behavior_on_invalid_ranking candidate_can_see form_condition name | grava: candidate_can_see name | recusa: behavior_on_invalid_condition behavior_on_invalid_ranking created_at form_condition_id form_template form_template_id id machine_field machine_field_id position_field position_field_id updated_at | em linha grava: candidate_can_see form_condition_id form_template form_template_id machine_field machine_field_id name position_field position_field_id | em linha recusa: behavior_on_invalid_condition behavior_on_invalid_ranking created_at id updated_at | ranking_columns[edita: name order; trava: (nada); grava: (nada); recusa: name order] | ranking_processes[edita: group ranking_machine step vacancies; trava: (nada); grava: step vacancies; recusa: group] | sem teste: admission_process_rankings admission_ranking_results form_condition ranking_columns ranking_groups ranking_processes versions
+== admissions/ranking_machines | (primeiro Admissions::RankingMachine)
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: form_condition name show | formulário edita: form_condition name | grava: name | recusa: created_at form_condition_id id updated_at | em linha grava: form_condition_id id name | em linha recusa: created_at updated_at | sem teste: form_condition ranking_processes versions
+== admissions/ranking_processes | (primeiro Admissions::RankingProcess)
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: group order ranking_config ranking_machine show step vacancies | formulário edita: group order ranking_config ranking_machine step vacancies | grava: group order step vacancies | recusa: created_at id ranking_config_id ranking_machine_id updated_at | em linha grava: group id order step vacancies | em linha recusa: created_at ranking_config_id ranking_machine_id updated_at | sem teste: ranking_config ranking_machine versions
+== advisement_authorizations | (primeiro AdvisementAuthorization)
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: end_date level professor show start_date | formulário edita: end_date level professor start_date | grava: end_date | recusa: created_at id level_id professor professor_id start_date updated_at | em linha grava: end_date | em linha recusa: created_at id level_id professor professor_id start_date updated_at | sem teste: active level versions
+  professor e coordenador, atuando como professor: ficha: end_date level professor show start_date | não edita
+== advisements | adv_a
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: co_advisor_list enrollment main_advisor professor show | formulário edita: enrollment main_advisor professor | grava: enrollment professor | recusa: created_at enrollment_id id main_advisor professor_id updated_at | em linha grava: enrollment enrollment_id professor professor_id | em linha recusa: created_at id main_advisor updated_at | sem teste: active co_advisor enrollment_number level student_name versions
+  professor e coordenador, atuando como professor: ficha: co_advisor_list enrollment main_advisor professor show | não edita
+== advisements | adv_b
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: co_advisor_list enrollment main_advisor professor show | não edita
+== class_enrollment_requests | cer_a_efetivada
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: (não abre) | não edita
+== class_enrollment_requests | cer_a_solicitada
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: (não abre) | formulário edita: (nada) | grava: (nada) | recusa: action class_enrollment class_enrollment_id course_class course_class_id created_at enrollment_request enrollment_request_id id status updated_at | em linha grava: (nada) | em linha recusa: action class_enrollment class_enrollment_id course_class course_class_id created_at enrollment_request enrollment_request_id id status updated_at | sem teste: admission_date advisor allocations course_type enrollment enrollment_level enrollment_status has_advisor professor scholarship_durations_active semester student versions year
+  professor e coordenador, atuando como professor: ficha: (não abre) | não edita
+== class_enrollment_requests | cer_a_status_nulo
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: (não abre) | não edita
+== class_enrollment_requests | cer_b_solicitada
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: (não abre) | não edita
+== class_enrollments | ce_a_antiga
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: course_class created_at disapproved_by_absence enrollment grade_label grade_not_count_in_gpr justification_grade_not_count_in_gpr obs show situation | não edita
+== class_enrollments | ce_a_atual
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: course_class created_at disapproved_by_absence enrollment grade_label grade_not_count_in_gpr justification_grade_not_count_in_gpr obs show situation | formulário edita: course_class disapproved_by_absence enrollment grade grade_not_count_in_gpr justification_grade_not_count_in_gpr obs situation | grava: enrollment grade_not_count_in_gpr justification_grade_not_count_in_gpr obs | recusa: course_class course_class_id created_at disapproved_by_absence enrollment_id grade id situation updated_at | em linha grava: enrollment enrollment_id grade_not_count_in_gpr justification_grade_not_count_in_gpr obs | em linha recusa: course_class course_class_id created_at disapproved_by_absence grade id situation updated_at | sem teste: admission_date advisor class_enrollment_request course_type enrollment_level enrollment_status grade_label has_advisor professor scholarship_durations_active semester student versions year
+  professor e coordenador, atuando como professor: ficha: course_class created_at disapproved_by_absence enrollment grade_label grade_not_count_in_gpr justification_grade_not_count_in_gpr obs show situation | não edita
+== class_enrollments | ce_b_atual
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: course_class created_at disapproved_by_absence enrollment grade_label grade_not_count_in_gpr justification_grade_not_count_in_gpr obs show situation | não edita
+== course_classes | cc_a_antiga
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: allocations class_enrollments class_enrollments_count course enrollments name professor semester show year | não edita
+== course_classes | cc_a_atual
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: allocations class_enrollments class_enrollments_count course enrollments name professor semester show year | formulário edita: course name not_schedulable obs_schedule professor semester year | grava: course name not_schedulable obs_schedule professor semester year | recusa: course_id created_at id professor_id updated_at | em linha grava: course course_id name not_schedulable obs_schedule professor professor_id semester year | em linha recusa: created_at id updated_at | allocations[edita: day end_time room start_time; trava: (nada); grava: (nada); recusa: (nada)] | class_enrollments[edita: disapproved_by_absence enrollment grade grade_not_count_in_gpr justification_grade_not_count_in_gpr obs situation; trava: (nada); grava: enrollment grade_not_count_in_gpr justification_grade_not_count_in_gpr obs; recusa: disapproved_by_absence grade situation] | sem teste: allocations class_enrollment_requests class_enrollments class_enrollments_count enrollment_requests enrollments versions
+  professor e coordenador, atuando como professor: ficha: allocations class_enrollments class_enrollments_count course enrollments name professor semester show year | não edita
+== course_classes | cc_b_atual
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: allocations class_enrollments class_enrollments_count course enrollments name professor semester show year | não edita
+== course_types | (primeiro CourseType)
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: allow_multiple_classes has_score name on_demand schedulable show show_class_name | formulário edita: allow_multiple_classes has_score name on_demand schedulable show_class_name | grava: allow_multiple_classes has_score name on_demand schedulable show_class_name | recusa: created_at id updated_at | em linha grava: allow_multiple_classes has_score name on_demand schedulable show_class_name | em linha recusa: created_at id updated_at | sem teste: courses versions
+  professor e coordenador, atuando como professor: ficha: allow_multiple_classes has_score name on_demand schedulable show show_class_name | não edita
+== courses | (primeiro Course)
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: available code content course_research_areas course_research_lines course_type credits name show workload | formulário edita: available code content course_type credits name workload | grava: available code content course_type credits name workload | recusa: course_type_id created_at id updated_at | em linha grava: available code content course_type course_type_id credits name workload | em linha recusa: created_at id updated_at | sem teste: course_classes course_research_areas course_research_lines research_areas research_lines versions workload_text
+  professor e coordenador, atuando como professor: ficha: available code content course_research_areas course_research_lines course_type credits name show workload | não edita
+== dismissal_reasons | dr_aprovado
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: description name show show_advisor_name thesis_judgement | formulário edita: description name show_advisor_name thesis_judgement | grava: description name show_advisor_name | recusa: created_at id thesis_judgement updated_at | em linha grava: description name show_advisor_name | em linha recusa: created_at id thesis_judgement updated_at | sem teste: versions
+  professor e coordenador, atuando como professor: ficha: description name show show_advisor_name thesis_judgement | não edita
+== dismissal_reasons | dr_reprovado
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: description name show show_advisor_name thesis_judgement | não edita
+== dismissals | dis_a_aprovada
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: dismissal_reason enrollment level obs show | formulário edita: date(1i) date(2i) dismissal_reason enrollment obs | grava: date dismissal_reason enrollment obs | recusa: created_at dismissal_reason_id enrollment_id id updated_at | em linha grava: date dismissal_reason dismissal_reason_id enrollment enrollment_id obs | em linha recusa: created_at id updated_at | sem teste: level versions
+  professor e coordenador, atuando como professor: ficha: dismissal_reason enrollment level obs show | não edita
+== dismissals | dis_b_aprovada
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: dismissal_reason enrollment level obs show | não edita
+== dismissals | dis_b_reprovada
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: dismissal_reason enrollment level obs show | não edita
+== enrollment_requests | er_a
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: class_enrollment_requests enrollment enrollment_request_comments last_staff_change_at last_student_change_at semester show status year | formulário edita: comment_message | grava: (nada) | recusa: created_at enrollment enrollment_id id last_staff_change_at last_student_change_at semester student_view_at updated_at year | em linha grava: (nada) | em linha recusa: created_at enrollment enrollment_id id last_staff_change_at last_student_change_at semester student_view_at updated_at year | class_enrollment_requests[edita: status; trava: (nada); grava: (nada); recusa: status] | sem teste: admission_date advisor class_enrollment_requests course_classes enrollment_level enrollment_request_comments enrollment_status has_advisor scholarship_durations_active status student versions
+  professor e coordenador, atuando como professor: ficha: class_enrollment_requests enrollment enrollment_request_comments last_staff_change_at last_student_change_at semester show status year | não edita
+== enrollment_requests | er_b
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: class_enrollment_requests enrollment enrollment_request_comments last_staff_change_at last_student_change_at semester show status year | não edita
+== enrollment_statuses | es_permite
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: name professor_can_generate_report show user | formulário edita: name professor_can_generate_report user | grava: name professor_can_generate_report user | recusa: created_at id updated_at | em linha grava: name professor_can_generate_report user | em linha recusa: created_at id updated_at | sem teste: application_processes enrollments versions
+  professor e coordenador, atuando como professor: ficha: name professor_can_generate_report show user | não edita
+== enrollment_statuses | es_proibe
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: name professor_can_generate_report show user | não edita
+== enrollments | enr_a_aberta
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: admission_date advisements class_enrollments deferrals dismissal documents enrollment_holds enrollment_number enrollment_status level obs obs_to_academic_transcript phase_due_dates research_area research_line scholarship_durations show student thesis_defense_committee_participations thesis_defense_date thesis_title | não edita
+== enrollments | enr_a_aprovada
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: admission_date advisements class_enrollments deferrals dismissal documents enrollment_holds enrollment_number enrollment_status level obs obs_to_academic_transcript phase_due_dates research_area research_line scholarship_durations show student thesis_defense_committee_participations thesis_defense_date thesis_title | formulário edita: admission_date(1i) admission_date(2i) dismissal enrollment_number enrollment_status obs obs_to_academic_transcript research_area research_line student thesis_defense_date thesis_title | grava: enrollment_number enrollment_status obs obs_to_academic_transcript student thesis_defense_date thesis_title | recusa: admission_date created_at enrollment_status_id id level_id research_area_id research_line_id student_id updated_at | em linha grava: enrollment_number enrollment_status enrollment_status_id obs obs_to_academic_transcript research_area_id research_line_id student student_id thesis_defense_date thesis_title | em linha recusa: admission_date created_at id level_id updated_at | accomplishments[edita: conclusion_date(1i) conclusion_date(2i) obs phase; trava: (nada); grava: (nada); recusa: (nada)] | advisements[edita: main_advisor professor; trava: (nada); grava: professor; recusa: main_advisor] | class_enrollments[edita: course_class disapproved_by_absence grade grade_not_count_in_gpr justification_grade_not_count_in_gpr obs situation; trava: (nada); grava: grade_not_count_in_gpr justification_grade_not_count_in_gpr obs; recusa: course_class disapproved_by_absence grade situation] | deferrals[edita: approval_date(1i) approval_date(2i) deferral_type obs; trava: (nada); grava: (nada); recusa: (nada)] | enrollment_holds[edita: number_of_semesters semester year; trava: (nada); grava: (nada); recusa: (nada)] | scholarship_durations[edita: cancel_date(1i) cancel_date(2i) end_date(1i) end_date(2i) obs scholarship start_date(1i) start_date(2i); trava: (nada); grava: (nada); recusa: (nada)] | thesis_defense_committee_participations[edita: professor; trava: (nada); grava: (nada); recusa: (nada)] | sem teste: accomplishments active admission_applications advisements class_enrollments course_class_year_semester deferral_type deferrals delayed_phase dismissal documents enrollment_hold enrollment_holds level listed_accomplishments listed_advisors listed_class_enrollments listed_deferrals listed_scholarships phase phase_completions phase_due_dates phases professor professors research_area research_line scholarship_durations scholarship_durations_active scholarships thesis_defense_committee_participations thesis_defense_committee_professors versions
+  professor e coordenador, atuando como professor: ficha: admission_date advisements class_enrollments deferrals dismissal documents enrollment_holds enrollment_number enrollment_status level obs obs_to_academic_transcript phase_due_dates research_area research_line scholarship_durations show student thesis_defense_committee_participations thesis_defense_date thesis_title | não edita
+== enrollments | enr_b_aprovada
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: admission_date advisements class_enrollments deferrals dismissal documents enrollment_holds enrollment_number enrollment_status level obs obs_to_academic_transcript phase_due_dates research_area research_line scholarship_durations show student thesis_defense_committee_participations thesis_defense_date thesis_title | não edita
+== enrollments | enr_b_reprovada
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: admission_date advisements class_enrollments deferrals dismissal documents enrollment_holds enrollment_number enrollment_status level obs obs_to_academic_transcript phase_due_dates research_area research_line scholarship_durations show student thesis_defense_committee_participations thesis_defense_date thesis_title | não edita
+== grants | grant_a
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: amount end_year funder kind professor show start_year title | formulário edita: amount end_year funder kind professor start_year title | grava: amount funder professor start_year title | recusa: created_at end_year id kind professor_id updated_at | em linha grava: amount funder professor professor_id start_year title | em linha recusa: created_at end_year id kind updated_at | sem teste: versions
+  professor e coordenador, atuando como professor: ficha: amount end_year funder kind professor show start_year title | não edita
+== grants | grant_b
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: amount end_year funder kind professor show start_year title | não edita
+== grants | grant_c
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: amount end_year funder kind professor show start_year title | formulário edita: amount end_year funder kind start_year title | grava: amount funder start_year title | recusa: created_at end_year id kind professor professor_id updated_at | em linha grava: amount funder id start_year title | em linha recusa: created_at end_year kind professor professor_id updated_at | sem teste: versions
+== levels | level
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: advisement_authorizations course_name default_duration name short_name_showed_in_list_header show show_advisements_points_in_list | formulário edita: course_name default_duration name short_name_showed_in_list_header show_advisements_points_in_list | grava: course_name default_duration name short_name_showed_in_list_header show_advisements_points_in_list | recusa: created_at id updated_at | em linha grava: course_name default_duration id name short_name_showed_in_list_header show_advisements_points_in_list | em linha recusa: created_at updated_at | advisement_authorizations[edita: end_date professor start_date; trava: (nada); grava: end_date; recusa: professor start_date] | sem teste: advisement_authorizations application_processes enrollments majors phase_durations scholarships versions
+  professor e coordenador, atuando como professor: ficha: advisement_authorizations course_name default_duration name short_name_showed_in_list_header show show_advisements_points_in_list | não edita
+== paper_professors | pp_a
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: paper professor show | formulário edita: paper professor | grava: paper professor | recusa: created_at id paper_id professor_id updated_at | em linha grava: paper paper_id professor professor_id | em linha recusa: created_at id updated_at | sem teste: versions
+  professor e coordenador, atuando como professor: ficha: paper professor show | não edita
+== paper_professors | pp_b
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: paper professor show | não edita
+== paper_students | ps_a
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: paper show student | formulário edita: paper student | grava: paper student | recusa: created_at id paper_id student_id updated_at | em linha grava: paper paper_id student student_id | em linha recusa: created_at id updated_at | sem teste: versions
+  professor e coordenador, atuando como professor: ficha: paper show student | não edita
+== paper_students | ps_b
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: paper show student | não edita
+== papers | paper_a
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: doi_issn_event kind order other other_authors owner paper_professors paper_students period reason_citations reason_impact_factor reason_innovation_contribution reason_international_interest reason_international_list reason_justify reason_national_interest reason_national_representativeness reason_other reason_scientific_contribution reason_social_contribution reason_tech_contribution reference show | formulário edita: doi_issn_event kind order other other_authors owner period reason_citations reason_impact_factor reason_innovation_contribution reason_international_interest reason_international_list reason_justify reason_national_interest reason_national_representativeness reason_other reason_scientific_contribution reason_social_contribution reason_tech_contribution reference | grava: doi_issn_event order other other_authors period reason_citations reason_impact_factor reason_innovation_contribution reason_international_interest reason_international_list reason_justify reason_national_interest reason_national_representativeness reason_other reason_scientific_contribution reason_social_contribution reason_tech_contribution reference | recusa: created_at id kind owner owner_id updated_at | em linha grava: doi_issn_event order other other_authors period reason_citations reason_impact_factor reason_innovation_contribution reason_international_interest reason_international_list reason_justify reason_national_interest reason_national_representativeness reason_other reason_scientific_contribution reason_social_contribution reason_tech_contribution reference | em linha recusa: created_at id kind owner owner_id updated_at | paper_professors[edita: professor; trava: (nada); grava: professor; recusa: (nada)] | paper_students[edita: student; trava: (nada); grava: student; recusa: (nada)] | sem teste: paper_professors paper_students professors reason_group reason_group_end students versions
+  professor e coordenador, atuando como professor: ficha: doi_issn_event kind order other other_authors owner paper_professors paper_students period reason_citations reason_impact_factor reason_innovation_contribution reason_international_interest reason_international_list reason_justify reason_national_interest reason_national_representativeness reason_other reason_scientific_contribution reason_social_contribution reason_tech_contribution reference show | não edita
+== papers | paper_b
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: doi_issn_event kind order other other_authors owner paper_professors paper_students period reason_citations reason_impact_factor reason_innovation_contribution reason_international_interest reason_international_list reason_justify reason_national_interest reason_national_representativeness reason_other reason_scientific_contribution reason_social_contribution reason_tech_contribution reference show | não edita
+== professors | prof_a
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: academic_title_country academic_title_date academic_title_institution academic_title_level address advisement_authorizations advisements_with_points birthdate civil_status cpf email enrollment_number identity_expedition_date identity_issuing_body identity_number institutions name neighborhood obs research_areas research_lines scholarships sex show siape telephone1 telephone2 zip_code | formulário edita: academic_title_country academic_title_date academic_title_institution academic_title_level address address_country address_state birthdate city civil_status cpf email enrollment_number identity_expedition_date identity_issuing_body identity_issuing_place identity_number name neighborhood obs scholarships sex siape telephone1 telephone2 zip_code | grava: academic_title_level address civil_status cpf email enrollment_number identity_issuing_body identity_issuing_place identity_number name neighborhood obs sex siape telephone1 telephone2 zip_code | recusa: academic_title_country_id academic_title_date academic_title_institution_id academic_title_level_id birthdate city_id created_at id identity_expedition_date updated_at user user_id | em linha grava: academic_title_country_id academic_title_institution_id academic_title_level academic_title_level_id address city_id civil_status cpf email enrollment_number identity_issuing_body identity_issuing_place identity_number name neighborhood obs sex siape telephone1 telephone2 zip_code | em linha recusa: academic_title_date birthdate created_at id identity_expedition_date updated_at user user_id | advisement_authorizations[edita: end_date level start_date; trava: (nada); grava: end_date; recusa: start_date] | affiliations[edita: end_date institution start_date; trava: (nada); grava: (nada); recusa: (nada)] | professor_research_areas[edita: research_area; trava: (nada); grava: (nada); recusa: (nada)] | professor_research_lines[edita: research_line; trava: (nada); grava: (nada); recusa: (nada)] | sem teste: academic_title_country academic_title_institution advisement_authorizations advisement_points advisements advisements_with_points affiliations city course_classes enrollments institutions professor_research_areas professor_research_lines research_areas research_lines scholarships thesis_defense_committee_enrollments thesis_defense_committee_participations versions
+  professor e coordenador, atuando como professor: ficha: academic_title_country academic_title_date academic_title_institution academic_title_level address advisement_authorizations advisements_with_points birthdate civil_status cpf email enrollment_number identity_expedition_date identity_issuing_body identity_number institutions name neighborhood obs research_areas research_lines scholarships sex show siape telephone1 telephone2 zip_code | não edita
+== professors | prof_b
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: academic_title_country academic_title_date academic_title_institution academic_title_level address advisement_authorizations advisements_with_points birthdate civil_status cpf email enrollment_number identity_expedition_date identity_issuing_body identity_number institutions name neighborhood obs research_areas research_lines scholarships sex show siape telephone1 telephone2 zip_code | não edita
+== professors | prof_c
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: academic_title_country academic_title_date academic_title_institution academic_title_level address advisement_authorizations advisements_with_points birthdate civil_status cpf email enrollment_number identity_expedition_date identity_issuing_body identity_number institutions name neighborhood obs research_areas research_lines scholarships sex show siape telephone1 telephone2 zip_code | não edita
+== roles | (primeiro Role)
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: description name show | não edita
+== students | st_a
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: address birth_city birth_country birth_state birthdate city civil_status cpf email employer father_name gender humanitarian_policy identity_expedition_date identity_issuing_body identity_issuing_place identity_number job_position mother_name name neighborhood obs obs_gender obs_pcd pcd photo sex show skin_color student_majors telephone1 telephone2 zip_code | formulário edita: address address_country address_state birth_city birth_country birth_state birthdate city civil_status cpf email employer father_name gender humanitarian_policy identity_expedition_date identity_issuing_body identity_issuing_place identity_number job_position mother_name name neighborhood obs obs_gender obs_pcd pcd photo sex skin_color telephone1 telephone2 zip_code | grava: address civil_status cpf email employer father_name gender humanitarian_policy identity_issuing_body identity_issuing_place identity_number job_position mother_name name neighborhood obs obs_gender obs_pcd pcd sex skin_color telephone1 telephone2 zip_code | recusa: birth_city_id birth_country_id birth_state_id birthdate city_id created_at id identity_expedition_date photo updated_at user user_id | em linha grava: address birth_city_id birth_country_id birth_state_id city_id civil_status cpf email employer father_name gender humanitarian_policy identity_issuing_body identity_issuing_place identity_number job_position mother_name name neighborhood obs obs_gender obs_pcd pcd sex skin_color telephone1 telephone2 zip_code | em linha recusa: birthdate created_at id identity_expedition_date photo updated_at user user_id | student_majors[edita: major; trava: (nada); grava: (nada); recusa: (nada)] | sem teste: admission_applications birth_city birth_country birth_state city enrollments majors student_majors versions
+  professor e coordenador, atuando como professor: ficha: address birth_city birth_country birth_state birthdate city civil_status cpf email employer father_name gender humanitarian_policy identity_expedition_date identity_issuing_body identity_issuing_place identity_number job_position mother_name name neighborhood obs obs_gender obs_pcd pcd photo sex show skin_color student_majors telephone1 telephone2 zip_code | não edita
+== students | st_b
+  desconhecido, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como professor: ficha: address birth_city birth_country birth_state birthdate city civil_status cpf email employer father_name gender humanitarian_policy identity_expedition_date identity_issuing_body identity_issuing_place identity_number job_position mother_name name neighborhood obs obs_gender obs_pcd pcd photo sex show skin_color student_majors telephone1 telephone2 zip_code | não edita
+== user_roles | (primeiro UserRole)
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: role show user | formulário edita: (nada) | grava: (nada) | recusa: created_at id role role_id updated_at user user_id | em linha grava: (nada) | em linha recusa: created_at id role role_id updated_at user user_id | sem teste: versions
+== users | (primeiro User)
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: email name password password_confirmation professor roles show student | formulário edita: email name password password_confirmation professor roles student | grava: (nada) | recusa: actual_role confirmation_sent_at confirmation_token confirmed_at created_at current_sign_in_at current_sign_in_ip email encrypted_password failed_attempts id invitation_accepted_at invitation_created_at invitation_limit invitation_sent_at invitation_token invitations_count invited_by_id invited_by_type last_sign_in_at last_sign_in_ip locked_at name remember_created_at reset_password_sent_at reset_password_token sign_in_count unconfirmed_email unlock_token updated_at | em linha grava: (nada) | em linha recusa: actual_role confirmation_sent_at confirmation_token confirmed_at created_at current_sign_in_at current_sign_in_ip email encrypted_password failed_attempts id invitation_accepted_at invitation_created_at invitation_limit invitation_sent_at invitation_token invitations_count invited_by_id invited_by_type last_sign_in_at last_sign_in_ip locked_at name remember_created_at reset_password_sent_at reset_password_token sign_in_count unconfirmed_email unlock_token updated_at | sem teste: admission_committee_members admission_pendencies admission_phase_evaluations enrollment_request_comments invited_by password password_confirmation professor roles student user_roles versions
+== versions | (primeiro Version)
+  desconhecido, professor e coordenador, atuando como professor, aluno, aluno sem aluno vinculado: não lê
+  professor e coordenador, atuando como coordenação: ficha: current_object event item_type old_version show user | não edita
