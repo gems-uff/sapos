@@ -1,4 +1,4 @@
 # Piso de exemplos da suite inteira (pending conta), lido por
 # .github/scripts/rspec-summary.sh no CI e no flaky.yml. Suba quando
 # acrescentar exemplos; baixe so com o motivo escrito no commit.
-3986
+3988
