@@ -314,6 +314,10 @@ RSpec.describe "Troca de e-mail da inscricao pelo candidato", type: :request do
       expect(@enviados).to be_empty
     end
 
+    it "fica no historico da inscricao, como o pedido ficou" do
+      expect { desistir(@sessao) }.to change { @inscricao.versions.count }.by(1)
+    end
+
     it "faz o link enviado deixar de valer" do
       desistir(@sessao)
 

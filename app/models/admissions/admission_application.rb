@@ -801,8 +801,12 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     save
   end
 
+  # Sem validacao, porque o pedido acaba como estiver a candidatura; mas com
+  # o save, e nao update_columns, para que o fim do pedido fique no historico
+  # da candidatura como o pedido ficou.
   def cancel_email_change
-    update_columns(pending_email: nil, email_change_digest: nil, email_change_sent_at: nil)
+    assign_attributes(pending_email: nil, email_change_digest: nil, email_change_sent_at: nil)
+    save(validate: false)
   end
 
   # A parte do codigo que cita a candidatura sem abri-la: os seis primeiros
