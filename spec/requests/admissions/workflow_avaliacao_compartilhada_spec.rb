@@ -55,7 +55,10 @@ RSpec.describe "Fluxo do processo seletivo: avaliação compartilhada", type: :r
     expect(ana.filled_form.fields.count).to eq(@process.form_template.fields.count)
     expect(ana.filled_form.fields.count { |f| f.file.present? }).to eq(2)
     expect(ana.filled_form.fields.find { |f| f.form_field.name == "Formação" }.scholarities.count).to eq(1)
-    expect(@sent.count { |n| n[:to] == "ana@example.com" }).to eq(1)
+    # Duas mensagens: o código para começar a inscrição e a confirmação do envio.
+    expect(@sent.filter_map { |n| n[:subject] if n[:to] == "ana@example.com" }).to eq(
+      ["Código de identificação da inscrição", "Inscrição realizada"]
+    )
 
     # ── Consolidação da candidatura: só inscrição enviada entra na fase 1 ────
     sign_in @admin

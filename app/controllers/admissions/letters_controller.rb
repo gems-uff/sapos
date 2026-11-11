@@ -59,11 +59,21 @@ class Admissions::LettersController < Admissions::ProcessBaseController
       filled_form.sync_fields_before(@letter_request)
     end
 
+    # O recomendador preenche os campos da carta. O pedido, o formulario
+    # preenchido e o template sao os do servidor, nunca os que vem nos
+    # parametros -- a mesma regra de AdmissionApplication#assign_form.
     def letter_request_params
-      params.require(:record).permit(
-        :id, :email, :name, :telephone,
+      permitted = params.require(:record).permit(
+        :email, :name, :telephone,
         filled_form_attributes:
           Admissions::FilledFormsController.filled_form_params_definition,
       )
+      if permitted[:filled_form_attributes].present?
+        attributes = permitted[:filled_form_attributes].except(:form_template_id, :is_filled, :id)
+        filled_form = @letter_request.filled_form
+        attributes[:id] = filled_form.id if filled_form&.persisted?
+        permitted[:filled_form_attributes] = attributes
+      end
+      permitted
     end
 end

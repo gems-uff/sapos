@@ -224,7 +224,9 @@ parte, a diferença é real. Código que os testes nunca executam:
   visível nos modelos vem do active_scaffold e é preenchido **por requisição**;
   fora de uma, ele é nil. `User#roles_valid?` abre com
   `return if current_user.blank?`, então na suíte a linha do `return` executa
-  centenas de vezes e o corpo, poucas — as de erro de escalação de papel, nenhuma.
+  centenas de vezes e o corpo só nos specs de requisição que gravam usuário
+  pela tela (`spec/requests/users_role_escalation_spec.rb` percorre os ramos
+  de escalação de papel). Spec de modelo não alcança nenhum deles.
 
 A consequência sai do teste e alcança o reparo de dado: **a mesma alteração feita
 pela tela e por script produz estados diferentes.** Desmarcar o último papel de um
@@ -259,6 +261,28 @@ cada uma explica o porquê no próprio cabeçalho:
   `return_to` só interno). Os três entram por `prepend` no módulo porque a
   chamada `active_scaffold` inclui o módulo em cada controller, na frente de um
   método do `ApplicationController`.
+- active_scaffold, edição em linha: `active_scaffold_inplace_edit.rb`
+  (`prepend` em `ActiveScaffold::Actions::Update#update_column` e em
+  `ActiveScaffold::Actions::Core#render_field_for_inplace_editing`). A gem
+  lê e grava pela edição em linha qualquer coluna do scaffold, antes do que o
+  formulário da tela confere; aqui as duas rotas só valem para a coluna com
+  `inplace_edit` ligado, e o SAPOS não liga nenhuma.
+  `spec/requests/scaffold_inline_edit_spec.rb` cobra isso.
+- recordselect, entrada que a gem aceita da URL sem conferir:
+  `record_select_url_conditions.rb` (`prepend` em `RecordSelect::Conditions`).
+  A gem filtra o seletor por qualquer parâmetro da URL com nome de coluna do
+  modelo, e coluna de texto entra por `LIKE` com o padrão da URL; aqui só
+  filtra a coluna que o controller do seletor declara em
+  `record_select_url_columns`. Formulário que abre um seletor com
+  `options[:params]` precisa da coluna declarada lá.
+  `spec/requests/record_select_url_params_spec.rb` percorre os seletores.
+- active_scaffold, resposta que a gem oferece sem a tela pedir:
+  `active_scaffold_response_formats.rb` (`prepend` em
+  `ActiveScaffold::Actions::Core#default_formats`). O scaffold só responde em
+  HTML e JS; a gem oferece também JSON e XML em toda ação, com a coluna crua e
+  o registro associado inteiro, por fora dos helpers de coluna e do que a tela
+  esconde por papel. `spec/requests/scaffold_response_formats_spec.rb` percorre
+  os scaffolds e acusa o formato que voltar a responder.
 - Prawn: `prawn-grouping.rb`, cópia de patch de terceiro que usa `state.page` e
   `@bounding_box`. Suspeito num upgrade do Prawn, não do Rails.
 - prawn-table: `prawn_actual_text.rb` (`prepend` no `draw_content` privado de

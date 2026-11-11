@@ -32,34 +32,22 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
   end
 
   def create
-    @admission_application = Admissions::AdmissionApplication.find_by(
-      admission_process: @admission_process,
-      email: admission_application_params[:email]
-    )
-
-    if !@admission_process.allow_multiple_applications && @admission_application.present?
-      if @admission_application.filled_form.is_filled
-        @admission_application = Admissions::AdmissionApplication.new(
-          admission_application_params.merge(
-            admission_process: @admission_process
-          )
-        )
-        flash.now[:alert] = I18n.t("errors.admissions.application_exists")
-        return render :show
-      else
-        @admission_application.assign_attributes(admission_application_params)
-      end
-    else
-      @admission_application = Admissions::AdmissionApplication.new(
-        admission_application_params.merge(
-          admission_process: @admission_process,
-          filled_form: Admissions::FilledForm.new(
-            is_filled: false,
-            form_template: @admission_process.form_template
-          )
-        )
+    # Processo sem sessao nao tem pre-inscricao: a inscricao nasce no envio do
+    # formulario (ApplyController#create), para onde o #show ja encaminha. Uma
+    # pre-inscricao criada aqui ocuparia o e-mail e faria o formulario recusar
+    # o dono dele.
+    if !@admission_process.require_session
+      return redirect_to new_admission_apply_path(
+        admission_id: @admission_process.simple_id
       )
     end
+
+    # O que a tela mostra de volta e sempre isto: o nome e o e-mail que quem
+    # pediu digitou. A pre-inscricao que o e-mail encontra no banco nunca vai
+    # para a tela -- o formulario de recuperacao imprimiria o codigo dela.
+    @admission_application = Admissions::AdmissionApplication.new(
+      new_application_params.merge(admission_process: @admission_process)
+    )
     if Rails.application.config.should_use_recaptcha && !verify_recaptcha(
       model: @admission_application,
       message: I18n.t("errors.admissions.invalid_captcha")
@@ -67,17 +55,44 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
       return render :show
     end
 
-    if @admission_application.save
-      if @admission_process.require_session
-        add_token_to_session(@admission_application.token)
-      end
-      redirect_to edit_admission_apply_path(
-        admission_id: @admission_process.simple_id,
-        id: @admission_application.token
-      )
-    else
-      render :show
+    existing = Admissions::AdmissionApplication.find_by(
+      admission_process: @admission_process,
+      email: new_application_params[:email]
+    )
+    if @admission_process.allow_multiple_applications
+      existing = nil
+    elsif existing&.filled_form&.is_filled
+      flash.now[:alert] = I18n.t("errors.admissions.application_exists")
+      return render :show
     end
+
+    if existing.nil?
+      @admission_application.filled_form = Admissions::FilledForm.new(
+        is_filled: false,
+        form_template: @admission_process.form_template
+      )
+      return render :show if !@admission_application.save
+
+      existing = @admission_application
+    elsif holds_token?(existing)
+      # Este navegador ja entrou na pre-inscricao com o codigo: continua de
+      # onde parou, e pode corrigir o nome.
+      existing.update(name: new_application_params[:name]) if new_application_params[:name].present?
+      return redirect_to edit_admission_apply_path(
+        admission_id: @admission_process.simple_id,
+        id: existing.token
+      )
+    end
+
+    # O codigo de identificacao e a credencial da inscricao, e so viaja por
+    # e-mail, para o endereco gravado na inscricao: quem o apresenta leu a
+    # caixa daquele endereco. A tela so diz para onde ele foi. Sem o codigo na
+    # sessao, quem chega so apresentou o e-mail, que nao e segredo: a
+    # pre-inscricao que ja existia fica como esta e o codigo segue de novo.
+    messages = send_token_by_email(existing)
+    redirect_to admission_path(
+      id: @admission_process.simple_id, email: existing.email
+    ), token_delivery_flash("admissions.admissions.create.token_sent", existing.email, messages)
   end
 
   def find
@@ -180,18 +195,22 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
         )
       end
 
-      emails = [EmailTemplate.load_template(
-        "admissions/admissions:recover_tokens"
-      ).prepare_message({
-        email: admission_application_params[:email],
-        admission_applications: @admission_applications,
-        url: path
-      })]
+      # Cada codigo vai para o endereco GRAVADO na inscricao, nunca para o
+      # digitado: em MariaDB a busca casa enderecos que diferem so por caixa
+      # ou acento, e o digitado pode ser de outra caixa.
+      template = EmailTemplate.load_template("admissions/admissions:recover_tokens")
+      emails = @admission_applications.group_by(&:email).map do |stored_email, applications|
+        template.prepare_message({
+          email: stored_email,
+          admission_applications: applications,
+          url: path
+        })
+      end
       Notifier.send_emails(notifications: emails)
 
-      redirect_to path, notice: I18n.t(
+      redirect_to path, token_delivery_flash(
         "admissions.admissions.find_by_email.success",
-        email: admission_application_params[:email],
+        admission_application_params[:email], emails,
         count: @admission_applications.length
       )
     end
@@ -201,10 +220,37 @@ class Admissions::AdmissionsController < Admissions::ProcessBaseController
       @show_background = true
     end
 
+    def holds_token?(admission_application)
+      admission_application.token.present? &&
+        (session[:admission_tokens] || []).include?(admission_application.token)
+    end
+
+    def send_token_by_email(admission_application)
+      emails = [EmailTemplate.load_template(
+        "admissions/admissions:send_token"
+      ).prepare_message({
+        record: admission_application,
+        admission_process: @admission_process,
+        url: admission_url(
+          id: @admission_process.simple_id,
+          params: { email: admission_application.email }
+        )
+      })]
+      Notifier.send_emails(notifications: emails)
+      emails
+    end
+
     def admission_application_params
       params.require(:admissions_admission_application).permit(
         :name, :email, :token, :_source
       )
+    end
+
+    # O que a tela do processo manda para criar a pre-inscricao. O codigo e
+    # gerado pelo servidor; token e _source so existem no formulario de
+    # recuperacao (#find).
+    def new_application_params
+      params.require(:admissions_admission_application).permit(:name, :email)
     end
 
     def optional_admission_application_params

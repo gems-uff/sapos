@@ -4,6 +4,8 @@
 # frozen_string_literal: true
 
 class PaperProfessor < ApplicationRecord
+  include PaperAuthorshipGuardConcern
+
   has_paper_trail
 
   belongs_to :paper, optional: false

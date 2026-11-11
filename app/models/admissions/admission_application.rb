@@ -110,6 +110,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
   validate :number_of_letters_in_filled_form
 
+  before_save :renew_token_when_email_changes
   before_save :set_token
 
   def self.pendency_condition(user = nil)
@@ -148,8 +149,10 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   end
 
+  # O rotulo leva o identificador, nao o codigo: ele aparece em toda tela que
+  # cita a candidatura, e o codigo inteiro e a credencial do candidato.
   def to_label
-    "#{self.name} - #{self.token}"
+    "#{self.name} - #{self.identifier}"
   end
 
   def requested_letters
@@ -412,9 +415,10 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   )
     # Os parametros so alcancam o que a tela oferece a quem submete. Cada
     # formulario de fase vai para o objeto que prepare_application_forms marca
-    # como editavel, e o resto e descartado; o formulario principal e as cartas
-    # seguem can_edit_main_form?. O template e o formulario preenchido de cada
-    # objeto sao os do servidor, nunca os que vem nos parametros.
+    # como editavel, e o resto e descartado; o formulario principal, com o nome
+    # e o e-mail que a tela mostra junto dele, e as cartas seguem
+    # can_edit_main_form?. O template e o formulario preenchido de cada objeto
+    # sao os do servidor, nunca os que vem nos parametros.
     params = params.to_h.with_indifferent_access
     phase_params = {
       results: params.delete(:results_attributes),
@@ -435,6 +439,8 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     else
       params.delete(:filled_form_attributes)
       params.delete(:letter_requests_attributes)
+      params.delete(:name)
+      params.delete(:email)
     end
     if can_edit_override && rankings_params.present?
       params[:rankings_attributes] = sanitize_nested_filled_forms(
@@ -442,6 +448,9 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       )
     end
     self.assign_attributes(params)
+    if params[:letter_requests_attributes].present?
+      self.letter_requests.each(&:follow_email_change)
+    end
     all_forms = []
     all_phase_forms = []
     if self.filled_form.try(:enable_submission) == "1"
@@ -453,6 +462,15 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
         object: self
       }
       self.filled_form.is_filled = true
+    end
+    # O e-mail e o endereco para onde a recuperacao manda o codigo. Pela tela
+    # interna so o troca quem tem a edicao total; o comite que a fase deixa
+    # editar o candidato altera o resto do formulario.
+    if !check_candidate_permission && !can_edit_override && self.email_changed?
+      self.email = self.email_was
+      # O campo do formulario sincronizado com o e-mail volta junto, senao a
+      # ficha mostraria um endereco e a candidatura teria outro.
+      self.filled_form.sync_fields_before(self) if self.filled_form.try(:enable_submission) == "1"
     end
     if has_letter_forms
       self.letter_requests.each do |letter_request|
@@ -694,8 +712,15 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     self.admission_phase.try(:name)
   end
 
+  # Mudanca so de caixa ou de espaco em volta nao e outro endereco.
+  def email_address_changed?
+    !email.to_s.strip.casecmp?(email_in_database.to_s.strip)
+  end
+
+  # A parte do codigo que cita a candidatura sem abri-la: os seis primeiros
+  # caracteres, unicos dentro do processo (generate_valid_token).
   def identifier
-    self.token[..5]
+    self.token.to_s[..5]
   end
 
   def can_edit_itself
@@ -766,8 +791,12 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       end
     end
 
+    # O codigo e a credencial da inscricao: cada caractere sai do gerador
+    # criptografico. O sample sem `random:` usa o gerador comum do Ruby, cuja
+    # sequencia se reconstroi a partir de saidas observadas.
     def generate_token
-      18.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }
+      alphabet = "2346789BCDFGHJKMPQRTVWXY".chars
+      18.times.map { alphabet.sample(random: SecureRandom) }
         .insert(6, "-").insert(13, "-").join("")
     end
 
@@ -789,5 +818,19 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       unless self.token?
         self.token = generate_valid_token
       end
+    end
+
+    # O codigo so viaja por e-mail, para o endereco gravado na inscricao; quem
+    # o apresenta leu a caixa daquele endereco. Quando o endereco muda, por
+    # qualquer tela, o codigo deixa de valer e outro e gerado: quem tinha o
+    # antigo tinha a caixa antiga. O identificador (os seis primeiros
+    # caracteres) fica, porque e por ele que relatorios e rotulos ja citaram a
+    # inscricao; muda so o resto.
+    def renew_token_when_email_changes
+      return unless persisted? && email_address_changed? && self.token?
+
+      renewed = "#{identifier}#{generate_token[6..]}"
+      renewed = "#{identifier}#{generate_token[6..]}" while self.class.exists?(token: renewed)
+      self.token = renewed
     end
 end

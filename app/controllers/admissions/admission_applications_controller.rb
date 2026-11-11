@@ -129,6 +129,10 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     config.update.multipart = true
 
 
+    # A busca pelo codigo e um campo simples, sem os comparadores que as
+    # colunas de texto ganham: condition_for_token_column decide o que casa.
+    config.columns[:token].search_ui = :text
+
     config.actions.swap :search, :field_search
     config.field_search.columns = [
       :admission_process,
@@ -143,11 +147,29 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     ]
     config.actions.exclude :deleted_records, :create
   end
+  # A busca casa pedaco de texto, e o codigo inteiro so e de quem gerencia o
+  # processo: aqui e na busca da lista, o pedaco so casa com o identificador.
+  IDENTIFIER_SQL = "SUBSTR(admission_applications.token, 1, 6)"
+
   record_select(
-    per_page: 10, search_on: [:name, :token],
+    per_page: 10, search_on: [:name, IDENTIFIER_SQL],
     order_by: "submission_time desc", full_text_search: true,
     model: "Admissions::AdmissionApplication"
   )
+
+  # Busca pelo codigo na lista: um pedaco casa com o identificador, e o codigo
+  # inteiro casa com ele mesmo. Um pedaco do resto do codigo nao casa com nada,
+  # senao quem ve so o identificador confirmaria o resto um pedaco de cada vez.
+  def self.condition_for_token_column(column, value, like_pattern)
+    termo = (value.is_a?(Hash) ? value[:from] : value).to_s.strip
+    return if termo.blank?
+
+    pedaco = Admissions::AdmissionApplication.sanitize_sql_like(termo)
+    [
+      "(#{IDENTIFIER_SQL} LIKE ? OR admission_applications.token = ?)",
+      like_pattern.sub("?") { pedaco }, termo
+    ]
+  end
 
   def status_sort_sql
     if current_user
@@ -394,6 +416,12 @@ class Admissions::AdmissionApplicationsController < ApplicationController
   end
 
   protected
+    # O seletor lista o que a lista lista: a gem parte do modelo cru, e o
+    # Ability so e aplicado na lista (beginning_of_chain).
+    def record_select_conditions_from_controller
+      { id: Admissions::AdmissionApplication.accessible_by(current_ability, :read).select(:id) }
+    end
+
     def do_map_student_form
       prepare_map_student
     rescue Exceptions::MissingFieldException, Exceptions::InvalidStudentFieldException => ex
@@ -577,6 +605,32 @@ class Admissions::AdmissionApplicationsController < ApplicationController
       )
     ensure
       params.delete :can_edit_override if params.include? :can_edit_override
+    end
+
+    # O codigo acompanha o endereco (renew_token_when_email_changes e
+    # LetterRequest#follow_email_change). Quando a troca do e-mail e feita por
+    # esta tela, o codigo novo segue para o endereco novo daqui: o candidato
+    # recebe a mensagem de inscricao alterada, e o recomendador, o pedido de
+    # carta. So entra o que mudou neste envio.
+    def after_update_save(record)
+      process = record.admission_process
+      messages = []
+      if record.saved_change_to_token?
+        messages << EmailTemplate.load_template("admissions/apply:edit_email_to_student").prepare_message({
+          record: record, admission_process: process,
+          admission_apply_url: admission_apply_url(admission_id: process.simple_id, id: record.token)
+        })
+      end
+      record.letter_requests.each do |letter_request|
+        next unless letter_request.saved_change_to_access_token? && !letter_request.saved_change_to_id?
+
+        messages << EmailTemplate.load_template("admissions/apply:request_letter").prepare_message({
+          record: record, admission_process: process, letter_request: letter_request,
+          fill_letter_url: admission_letter_url(admission_id: process.simple_id, id: letter_request.access_token)
+        })
+        letter_request.update(sent_email: letter_request.email)
+      end
+      Notifier.send_emails(notifications: messages) if messages.any?
     end
 
     def admission_application_params

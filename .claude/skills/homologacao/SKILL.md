@@ -796,6 +796,17 @@ linha com o marcador, e isso aparece como a maior diferença de pixel da rodada.
 Antes de investigar uma rota que divergiu sozinha, procure o marcador
 `ZZ-TESTE-HOMOLOG` no diff do texto — achando, é pegada, não regressão.
 
+### Duas telas trocam de estado entre capturas do mesmo código
+
+- `/scholarships/:id` — o rótulo do ano na linha do tempo flutua até a borda
+  esquerda por animação, e a foto pega ora antes, ora depois: a faixa dos meses
+  difere em pixel, sem diferença de texto.
+- `/notifications/:id` — o editor do corpo (CodeMirror) ora rende uma linha em
+  branco antes da primeira, ora não: uma linha de texto a mais ou a menos.
+
+Diferença só nessas faixas se confirma com o A/A do lado "depois": recapture a
+rota algumas vezes no mesmo deploy e veja os dois estados aparecerem.
+
 ### Não confunda template oculto com erro na tela
 
 O active_scaffold deixa no DOM, **oculto**, um painel
@@ -843,6 +854,19 @@ ela que desempata quando a leitura do DOM e o resultado discordam.
     dispare nada neste estado.
   - **um endereço** = envia e **redireciona tudo** para ele; assunto ganha
     "(Originalmente para <real>)". É o estado seguro e verificável.
+- **Destravar para exercitar e-mail:** o `trava_email.rb` troca a variável no
+  servidor, por `rails runner`, sem nunca apagá-la; `<endereço>` destrava
+  redirecionando e `VAZIA` repõe a trava. Antes e depois, confira pela tela com
+  o `conferir_redirect_email.rb` (sai 1 destravada, 0 travada). Deixe destravada
+  só enquanto o exercício roda, e fora do horário do `cron.daily`: a rake
+  noturna de manutenção dispara as notificações agendadas, e com a variável
+  destravada elas saem todas para o endereço de teste. O envio grava uma linha
+  em `notification_logs` por mensagem; apague as do exercício ao fim.
+- **Mensagem que a tela só alcança pelo reCAPTCHA** (o `create` e o `find` da
+  inscrição em processo com sessão): componha no servidor, com
+  `EmailTemplate.load_template(...).prepare_message` sobre uma candidatura
+  **não gravada**, e entregue pelo `Notifier.send_emails`. Mede o modelo e a
+  entrega, não o controller.
 - **Ler o e-mail redirecionado:** tente o **Gmail via MCP primeiro** (`/mcp` →
   "claude.ai Gmail") para ler as mensagens e clicar nos links. Se não conectar,
   **peça ao usuário para colar** as mensagens que chegaram — o link de token vem

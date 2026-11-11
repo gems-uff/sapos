@@ -8,6 +8,11 @@ pt-BR:
         paper: "Artigo"
         professor: "Docente"
 
+    errors:
+      models:
+        paper_professor:
+          cannot_edit_other_papers: "não pode ser editado por este usuário"
+
     models:
       paper_professor:
         one: "Docente Autor"

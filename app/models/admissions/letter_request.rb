@@ -52,6 +52,31 @@ class Admissions::LetterRequest < ActiveRecord::Base
     self.filled_form.is_filled
   end
 
+  # O codigo de acesso e a credencial do recomendador, e viaja por e-mail para
+  # o endereco do pedido. Quando quem edita a candidatura muda o endereco do
+  # pedido, o codigo muda junto: quem tinha o antigo tinha a caixa antiga. A
+  # carta ja preenchida nao troca de endereco -- o link novo abriria as
+  # respostas do recomendador numa caixa escolhida por quem editou o pedido;
+  # para trocar o recomendador dela, remove-se o pedido e cria-se outro.
+  #
+  # Quem chama e AdmissionApplication#assign_form, que atende o candidato e a
+  # equipe. A pagina publica da carta nao passa por aqui: ali quem altera o
+  # e-mail e o proprio recomendador, que ja tem o codigo.
+  def follow_email_change
+    return unless persisted? && email_address_changed?
+
+    if Admissions::FilledForm.where(id: filled_form_id, is_filled: true).exists?
+      self.email = email_in_database
+    else
+      self.access_token = generate_access_token
+    end
+  end
+
+  # Mudanca so de caixa ou de espaco em volta nao e outro endereco.
+  def email_address_changed?
+    !email.to_s.strip.casecmp?(email_in_database.to_s.strip)
+  end
+
   private
     def generate_access_token
       token = SecureRandom.urlsafe_base64

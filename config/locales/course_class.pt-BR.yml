@@ -21,6 +21,7 @@ pt-BR:
       models:
         course_class:
           changes_to_disallowed_fields: "houve modificação de campos não válidos"
+          class_enrollment_removal_not_allowed: "a lista de inscrições não é a que está gravada: quem lança notas não remove inscrição. Recarregue a página e lance as notas de novo"
 
     models:
       course_class:
