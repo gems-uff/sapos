@@ -259,6 +259,12 @@ cada uma explica o porquê no próprio cabeçalho:
   `return_to` só interno). Os três entram por `prepend` no módulo porque a
   chamada `active_scaffold` inclui o módulo em cada controller, na frente de um
   método do `ApplicationController`.
+- recordselect, entrada que a gem aceita da URL sem conferir:
+  `record_select_url_conditions.rb` (`prepend` em `RecordSelect::Conditions`).
+  A gem filtra o seletor por qualquer parâmetro da URL com nome de coluna do
+  modelo, e coluna de texto entra por `LIKE` com o padrão da URL; aqui o
+  parâmetro deixa de filtrar. `spec/requests/record_select_url_params_spec.rb`
+  percorre os seletores.
 - active_scaffold, resposta que a gem oferece sem a tela pedir:
   `active_scaffold_response_formats.rb` (`prepend` em
   `ActiveScaffold::Actions::Core#default_formats`). O scaffold só responde em
