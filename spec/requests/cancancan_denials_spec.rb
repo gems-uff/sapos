@@ -99,7 +99,8 @@ RSpec.describe "Negacoes do cancancan", type: :request do
 end
 
 # Admissions::LetterRequestsHelper#access_token_column: so quem gerencia a carta
-# ganha o link de preenchimento; o resto le o token. A Ability e a real.
+# ganha o link de preenchimento; o resto fica sem o token, que e a credencial
+# do recomendador (letter_requests_access_code_spec.rb). A Ability e a real.
 RSpec.describe Admissions::LetterRequestsHelper, type: :helper do
   let(:carta) { FactoryBot.create(:letter_request) }
 
@@ -117,9 +118,9 @@ RSpec.describe Admissions::LetterRequestsHelper, type: :helper do
     expect(helper.access_token_column(carta, nil)).to include("<a ", carta.access_token)
   end
 
-  it "da so o token a quem nao gerencia" do
+  it "nao da o token a quem nao gerencia" do
     com_papel(:role_professor, professor: FactoryBot.create(:professor))
 
-    expect(helper.access_token_column(carta, nil)).to eq(carta.access_token)
+    expect(helper.access_token_column(carta, nil)).to be_nil
   end
 end
