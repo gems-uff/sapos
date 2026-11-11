@@ -259,6 +259,13 @@ cada uma explica o porquê no próprio cabeçalho:
   `return_to` só interno). Os três entram por `prepend` no módulo porque a
   chamada `active_scaffold` inclui o módulo em cada controller, na frente de um
   método do `ApplicationController`.
+- active_scaffold, edição em linha: `active_scaffold_inplace_edit.rb`
+  (`prepend` em `ActiveScaffold::Actions::Update#record_for_update_column` e
+  em `ActiveScaffold::Actions::Core#render_field_for_inplace_editing`). A gem
+  lê e grava pela edição em linha qualquer coluna do scaffold, antes do que o
+  formulário da tela confere; aqui as duas rotas só valem para a coluna com
+  `inplace_edit` ligado, e o SAPOS não liga nenhuma.
+  `spec/requests/scaffold_inline_edit_spec.rb` cobra isso.
 - recordselect, entrada que a gem aceita da URL sem conferir:
   `record_select_url_conditions.rb` (`prepend` em `RecordSelect::Conditions`).
   A gem filtra o seletor por qualquer parâmetro da URL com nome de coluna do

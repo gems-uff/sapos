@@ -46,7 +46,14 @@ module FieldMatrix
     "admissions/admission_applications" => { tudo_menos: [] },
   }.freeze
 
-  IGNORADAS_NO_RASTRO = %w[updated_at lock_version].freeze
+  # O login de cada pedido grava o rastreio do Devise no usuário: quando o
+  # registro medido é o próprio usuário, isso não é a tela gravando.
+  # O login de cada pedido grava o rastreio do Devise no usuário: quando o
+  # registro medido é o próprio usuário, isso não é a tela gravando.
+  SEM_TESTE_DE_GRAVACAO = %w[
+    updated_at lock_version
+    sign_in_count current_sign_in_at last_sign_in_at current_sign_in_ip last_sign_in_ip
+  ].freeze
 
   def matriz_de_campos(rotulos)
     celulas = Hash.new { |hash, chave| hash[chave] = {} }
@@ -185,42 +192,77 @@ module FieldMatrix
     end
   end
 
-  def rastro_de(record)
-    record.class.unscoped.find_by(id: record.id)&.attributes&.except(*IGNORADAS_NO_RASTRO)
+  # O atributo do banco que a coluna grava: ela mesma, ou a chave estrangeira
+  # da associação.
+  def atributo_de(coluna_as, nome)
+    (coluna_as&.association&.foreign_key || nome).to_s
   end
 
-  # Manda uma coluna de cada vez, e desfaz: o que importa é se o banco mudou.
-  def tentar_gravar(record)
+  def valor_no_banco(record, atributo)
+    record.class.unscoped.where(id: record.id).pick(atributo)
+  end
+
+  # Manda uma coluna de cada vez, e desfaz: o que importa é se o valor DELA
+  # mudou no banco. Comparar o registro inteiro contaria como gravação o efeito
+  # de qualquer outra coisa que o pedido faça (o formulário de usuário sem os
+  # papéis os zera, por exemplo).
+  def tentar_gravar(record, atributo)
     mudou = nil
     ActiveRecord::Base.transaction(requires_new: true) do
-      antes = rastro_de(record)
+      antes = valor_no_banco(record, atributo)
       yield
-      mudou = antes != rastro_de(record)
+      mudou = antes != valor_no_banco(record, atributo)
       raise ActiveRecord::Rollback
     end
     mudou
+  end
+
+  # Os atributos que mudam quando o formulário é enviado sem coluna nenhuma: é
+  # efeito do próprio envio (o formulário de usuário sem os papéis os zera, e o
+  # papel em que ele atua muda junto), não gravação da coluna forjada.
+  def mudam_sozinhos(record, user, formulario)
+    return [] if formulario.nil?
+
+    mudaram = []
+    ActiveRecord::Base.transaction(requires_new: true) do
+      antes = record.class.unscoped.find_by(id: record.id)&.attributes || {}
+      pedir_campo(user, :patch, route_path(formulario, id: record.id), { record: { matriz: "1" } })
+      depois = record.class.unscoped.find_by(id: record.id)&.attributes || {}
+      mudaram = antes.keys.select { |atributo| antes[atributo] != depois[atributo] } - SEM_TESTE_DE_GRAVACAO
+      raise ActiveRecord::Rollback
+    end
+    mudaram
   end
 
   def gravacoes_de(scaffold, record, user)
     formulario = rota_de(scaffold[:controller], "update", "PATCH")
     em_linha = rota_de(scaffold[:controller], "update_column", "POST")
     resultado = { grava: [], recusa: [], linha_grava: [], linha_recusa: [], sem_teste: [] }
+    resultado[:sozinhos] = mudam_sozinhos(record, user, formulario)
     scaffold[:config].columns.map(&:name).map(&:to_s).sort.each do |nome|
       valor = valor_forjado(scaffold[:config].columns[nome], scaffold[:model], record, nome)
-      if valor.nil?
+      if valor.nil? || SEM_TESTE_DE_GRAVACAO.include?(nome)
+        resultado[:sem_teste] << nome
+        next
+      end
+      atributo = atributo_de(scaffold[:config].columns[nome], nome)
+      if resultado[:sozinhos].include?(atributo)
         resultado[:sem_teste] << nome
         next
       end
       if formulario
-        mudou = tentar_gravar(record) do
+        mudou = tentar_gravar(record, atributo) do
           pedir_campo(user, :patch, route_path(formulario, id: record.id), { record: { nome => valor } })
         end
         (mudou ? resultado[:grava] : resultado[:recusa]) << nome
       end
       next unless em_linha
 
-      mudou = tentar_gravar(record) do
-        pedir_campo(user, :post, route_path(em_linha, id: record.id), { column: nome, value: valor })
+      # A chave record vai junto porque há tela que a exige antes de gravar
+      # (params.require): sem ela a recusa seria da sonda, não da tela.
+      mudou = tentar_gravar(record, atributo) do
+        pedir_campo(user, :post, route_path(em_linha, id: record.id),
+          { column: nome, value: valor, record: { matriz: "1" } })
       end
       (mudou ? resultado[:linha_grava] : resultado[:linha_recusa]) << nome
     end
@@ -248,7 +290,7 @@ module FieldMatrix
 
           presentes = associados.to_h { |a| [a.id.to_s, { id: a.id.to_s }] }
           presentes[alvo.id.to_s][nome] = valor
-          mudou = tentar_gravar(alvo) do
+          mudou = tentar_gravar(alvo, atributo_de(config.columns[nome], nome)) do
             pedir_campo(user, :patch, route_path(formulario, id: record.id), { record: { associacao => presentes } })
           end
           (mudou ? medida[:grava] : medida[:recusa]) << nome
@@ -272,6 +314,7 @@ module FieldMatrix
       partes << "#{associacao}[edita: #{lista(medida[:edita])}; trava: #{lista(medida[:travado])}; " \
                 "grava: #{lista(medida[:grava])}; recusa: #{lista(medida[:recusa])}]"
     end
+    partes << "muda só de enviar: #{lista(celula[:sozinhos])}" if celula[:sozinhos].present?
     partes << "sem teste: #{lista(celula[:sem_teste])}" if celula[:sem_teste].present?
     partes.join(" | ")
   end
