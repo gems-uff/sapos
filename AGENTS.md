@@ -259,6 +259,13 @@ cada uma explica o porquê no próprio cabeçalho:
   `return_to` só interno). Os três entram por `prepend` no módulo porque a
   chamada `active_scaffold` inclui o módulo em cada controller, na frente de um
   método do `ApplicationController`.
+- active_scaffold, resposta que a gem oferece sem a tela pedir:
+  `active_scaffold_response_formats.rb` (`prepend` em
+  `ActiveScaffold::Actions::Core#default_formats`). O scaffold só responde em
+  HTML e JS; a gem oferece também JSON e XML em toda ação, com a coluna crua e
+  o registro associado inteiro, por fora dos helpers de coluna e do que a tela
+  esconde por papel. `spec/requests/scaffold_response_formats_spec.rb` percorre
+  os scaffolds e acusa o formato que voltar a responder.
 - Prawn: `prawn-grouping.rb`, cópia de patch de terceiro que usa `state.page` e
   `@bounding_box`. Suspeito num upgrade do Prawn, não do Rails.
 - prawn-table: `prawn_actual_text.rb` (`prepend` no `draw_content` privado de
