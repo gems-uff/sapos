@@ -146,8 +146,10 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   end
 
+  # O rotulo leva o identificador, nao o codigo: ele aparece em toda tela que
+  # cita a candidatura, e o codigo inteiro e a credencial do candidato.
   def to_label
-    "#{self.name} - #{self.token}"
+    "#{self.name} - #{self.identifier}"
   end
 
   def requested_letters
@@ -692,8 +694,10 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     self.admission_phase.try(:name)
   end
 
+  # A parte do codigo que cita a candidatura sem abri-la: os seis primeiros
+  # caracteres, unicos dentro do processo (generate_valid_token).
   def identifier
-    self.token[..5]
+    self.token.to_s[..5]
   end
 
   def can_edit_itself

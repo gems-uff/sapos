@@ -157,6 +157,44 @@ module AdmissionsCandidateHelpers
     letter_request.reload
   end
 
+  # Candidatura do processo 3 de workflows.json (cartas de recomendação, comitê
+  # por linha de pesquisa) levada até a fase de avaliação: duas cartas
+  # preenchidas, homologação consolidada, e a pendência de avaliação com os
+  # membros da linha 1. Devolve o processo, a candidatura e um membro com a
+  # pendência.
+  def application_awaiting_committee(admin)
+    workflow = AdmissionsWorkflowLoader.load(process_id: 3)
+    process = workflow.process
+    homologacao = workflow.phase_links.first.admission_phase
+    secretary = workflow.committee_users[1].first
+    member = workflow.committee_users[3].first
+
+    application = apply_as_candidate(
+      process, name: "Kim", email: "kim@example.com", values: { "Linha de pesquisa" => "Linha 1" },
+      letters: [{ name: "Rec Um", email: "rec-um@example.com", telephone: "2199" },
+                { name: "Rec Dois", email: "rec-dois@example.com" }]
+    )
+    application.letter_requests.each do |letter|
+      fill_letter_as_recommender(process, letter, { "Relação com o candidato" => "Orientador", "Avaliação" => "Excelente" })
+    end
+    sign_in admin
+    consolidate_phase_as_staff(process, nil)
+    sign_out admin
+    sign_in secretary
+    submit_phase_form(
+      application, homologacao, homologacao.shared_form, { "Homologação" => "Deferida" },
+      mode: Admissions::AdmissionPhaseResult::SHARED
+    )
+    sign_out secretary
+    sign_in admin
+    consolidate_phase_as_staff(process, homologacao)
+    sign_out admin
+    unless application.pendencies.exists?(user: member, status: Admissions::AdmissionPendency::PENDENT)
+      raise "a candidatura não chegou ao membro da comissão"
+    end
+    [process, application.reload, member]
+  end
+
   # Formulário de fase (compartilhado ou individual) gravado pela edição da
   # candidatura, como o membro do comitê faria. A tela manda o id do resultado
   # ou da avaliação quando ele já existe -- e ele costuma existir: ao abrir a

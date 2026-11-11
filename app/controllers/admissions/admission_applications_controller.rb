@@ -143,11 +143,29 @@ class Admissions::AdmissionApplicationsController < ApplicationController
     ]
     config.actions.exclude :deleted_records, :create
   end
+  # A busca casa pedaco de texto, e o codigo inteiro so e de quem gerencia o
+  # processo: aqui e na busca da lista, o pedaco so casa com o identificador.
+  IDENTIFIER_SQL = "SUBSTR(admission_applications.token, 1, 6)"
+
   record_select(
-    per_page: 10, search_on: [:name, :token],
+    per_page: 10, search_on: [:name, IDENTIFIER_SQL],
     order_by: "submission_time desc", full_text_search: true,
     model: "Admissions::AdmissionApplication"
   )
+
+  # Busca pelo codigo na lista: um pedaco casa com o identificador, e o codigo
+  # inteiro casa com ele mesmo. Um pedaco do resto do codigo nao casa com nada,
+  # senao quem ve so o identificador confirmaria o resto um pedaco de cada vez.
+  def self.condition_for_token_column(column, value, like_pattern)
+    termo = (value.is_a?(Hash) ? value[:from] : value).to_s.strip
+    return if termo.blank?
+
+    pedaco = Admissions::AdmissionApplication.sanitize_sql_like(termo)
+    [
+      "(#{IDENTIFIER_SQL} LIKE ? OR admission_applications.token = ?)",
+      like_pattern.sub("?", pedaco), termo
+    ]
+  end
 
   def status_sort_sql
     if current_user

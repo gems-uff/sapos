@@ -78,6 +78,17 @@ module Admissions::AdmissionApplicationsHelper
     :custom_field_attributes
   )
 
+  # O codigo inteiro e a credencial do candidato na pagina publica da
+  # inscricao. Quem gerencia o processo o ve, para socorrer o candidato que o
+  # perdeu; os demais veem o identificador.
+  def token_column(record, column)
+    can?(:manage, record) ? record.token : record.identifier
+  end
+
+  def token_show_column(record, column)
+    token_column(record, column)
+  end
+
   def letter_requests_column(record, column)
     if record.letter_requests.any?
       "#{record.letter_requests.first(3).filter_map do |letter|

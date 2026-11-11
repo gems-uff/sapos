@@ -15,35 +15,9 @@ RSpec.describe "Codigo de acesso da carta na lista de cartas", type: :request do
     role = FactoryBot.create(:role_administrador)
     @admin = create_confirmed_user([role], "cartas-admin@example.com")
     allow(Notifier).to receive(:send_emails)
-    workflow = AdmissionsWorkflowLoader.load(process_id: 3)
-    @process = workflow.process
-    homologacao, = workflow.phase_links.map(&:admission_phase)
-    secretaria = workflow.committee_users[1].first
-    @membro = workflow.committee_users[3].first
-
-    @kim = apply_as_candidate(
-      @process, name: "Kim", email: "kim@example.com", values: { "Linha de pesquisa" => "Linha 1" },
-      letters: [{ name: "Rec Um", email: "rec-um@example.com", telephone: "2199" },
-                { name: "Rec Dois", email: "rec-dois@example.com" }]
-    )
-    @kim.letter_requests.each do |carta|
-      fill_letter_as_recommender(@process, carta, { "Relação com o candidato" => "Orientador", "Avaliação" => "Excelente" })
-    end
-    sign_in @admin
-    consolidate_phase_as_staff(@process, nil)
-    sign_out @admin
-    sign_in secretaria
-    submit_phase_form(
-      @kim, homologacao, homologacao.shared_form, { "Homologação" => "Deferida" },
-      mode: Admissions::AdmissionPhaseResult::SHARED
-    )
-    sign_out secretaria
-    sign_in @admin
-    consolidate_phase_as_staff(@process, homologacao)
-    sign_out @admin
-    @codigos = @kim.letter_requests.reload.map(&:access_token)
+    @process, @kim, @membro = application_awaiting_committee(@admin)
+    @codigos = @kim.letter_requests.map(&:access_token)
     expect(@codigos.size).to eq(2)
-    expect(@kim.pendencies.where(user: @membro, status: Admissions::AdmissionPendency::PENDENT)).to be_present
   end
 
   def mostra_codigo?
