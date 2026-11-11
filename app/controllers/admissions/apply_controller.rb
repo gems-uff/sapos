@@ -53,9 +53,9 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
     # O codigo de identificacao so viaja por e-mail, para o endereco da
     # inscricao: quem o apresenta leu a caixa daquele endereco. Quando o
     # endereco muda -- pelo campo do formulario sincronizado com o e-mail --, o
-    # codigo muda junto (set_token gera o novo) e segue para o endereco novo.
+    # modelo troca o codigo (renew_token_when_email_changes), e a mensagem
+    # abaixo o leva para o endereco novo.
     email_changed = !creating && @admission_application.email_changed?
-    @admission_application.token = nil if email_changed
     if @admission_application.save
       emails = [EmailTemplate.load_template(
         was_filled ?
@@ -91,11 +91,9 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       # ele foi.
       if creating || email_changed
         session[:admission_tokens]&.delete(previous_token)
-        return redirect_to admissions_path, notice: I18n.t(
-          email_changed ?
-            "admissions.apply.update.email_changed" :
-            "admissions.apply.update.new_token_sent",
-          email: @admission_application.email
+        key = email_changed ? "email_changed" : "new_token_sent"
+        return redirect_to admissions_path, token_delivery_flash(
+          "admissions.apply.update.#{key}", @admission_application.email
         )
       end
       notice = was_filled ?
@@ -110,7 +108,6 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
         id: @admission_application.token
       ), notice: notice
     else
-      @admission_application.token = previous_token if email_changed
       # Formulário que a validação do cliente deixou passar e o servidor
       # recusou (issue #605). O e-mail leva o motivo técnico, atributo e tipo
       # de cada erro; o que o candidato preencheu fica no log do servidor, que

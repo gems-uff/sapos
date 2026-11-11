@@ -196,6 +196,38 @@ RSpec.describe "Posse do codigo de inscricao", type: :request do
     end
   end
 
+  # Em produção a tela do processo confere o reCAPTCHA; a suíte o desliga. A
+  # tela que volta depois da recusa não pode trazer a pré-inscrição que o
+  # e-mail digitado encontrou.
+  describe "captcha recusado na tela do processo" do
+    before(:each) do
+      allow(Rails.application.config).to receive(:should_use_recaptcha).and_return(true)
+      allow_any_instance_of(Admissions::AdmissionsController).to receive(:verify_recaptcha).and_return(false)
+      allow_any_instance_of(ActionView::Base).to receive(:recaptcha_tags).and_return("")
+    end
+
+    it "nao devolve o codigo nem o nome da pre-inscricao de quem ja usou o e-mail" do
+      existente = create_application(@com_sessao, name: "Dono Da Inscricao", email: "pessoa@example.com", filled: false)
+      sessao = navegador
+
+      pedir(sessao, @com_sessao, "Outra Pessoa", "pessoa@example.com")
+
+      expect(sessao.response).to have_http_status(:ok)
+      expect(sessao.response.body).not_to include(existente.token)
+      expect(sessao.response.body).not_to include("Dono Da Inscricao")
+      expect(@enviados).to be_empty
+    end
+
+    # Controle: a tela volta com o que quem pediu digitou.
+    it "volta com o nome e o e-mail digitados" do
+      sessao = navegador
+
+      pedir(sessao, @com_sessao, "Outra Pessoa", "pessoa@example.com")
+
+      expect(sessao.response.body).to include('value="Outra Pessoa"', 'value="pessoa@example.com"')
+    end
+  end
+
   describe "o que a tela do processo nao manda" do
     it "nao aceita o codigo escolhido por quem se inscreve" do
       pedir(navegador, @com_sessao, "Pessoa", "pessoa@example.com", token: "CODIGO-ESCOLHIDO")
@@ -298,6 +330,7 @@ RSpec.describe "Posse do codigo de inscricao", type: :request do
 
       inscricao = Admissions::AdmissionApplication.find_by!(email: "alheio@example.com")
       expect(inscricao.token).not_to eq(antigo)
+      expect(inscricao.identifier).to eq(antigo[0, 6])
       expect(sessao.response.location).to end_with(admissions_path)
       expect(resposta_inteira(sessao)).not_to include(inscricao.token)
       expect(@enviados.map { |mensagem| mensagem[:to] }).to eq(["alheio@example.com"])
@@ -365,6 +398,71 @@ RSpec.describe "Posse do codigo de inscricao", type: :request do
       expect(sessao.response).to have_http_status(:ok)
       expect(Admissions::AdmissionApplication.find_by(token: codigo)&.email).to eq("pessoa@example.com")
       expect(abre?(sessao, @com_campo, codigo)).to be(true)
+    end
+  end
+
+  describe "recuperacao do codigo por e-mail" do
+    it "manda o codigo para o endereco gravado na inscricao" do
+      inscricao = create_application(@sem_sessao, name: "Pessoa", email: "pessoa@example.com")
+
+      entrar(navegador, @sem_sessao, "pessoa@example.com", "forgot")
+
+      expect(@enviados.map { |mensagem| mensagem[:to] }).to eq(["pessoa@example.com"])
+      expect(codigo_recebido("pessoa@example.com")).to eq(inscricao.token)
+    end
+
+    # Em MariaDB a busca pelo e-mail ignora caixa e acento. O endereço digitado
+    # pode ser de outra caixa; o código segue para o gravado. Em SQLite a busca
+    # não casa e nada é enviado, o que também satisfaz o exemplo.
+    it "nao manda o codigo para um endereco que so se parece com o gravado" do
+      create_application(@sem_sessao, name: "Pessoa", email: "joao@example.com")
+
+      ["joão@example.com", "JOAO@example.com", "joao@exámple.com"].each do |parecido|
+        entrar(navegador, @sem_sessao, parecido, "forgot")
+      end
+
+      expect(@enviados.map { |mensagem| mensagem[:to] }.uniq - ["joao@example.com"]).to be_empty
+    end
+  end
+
+  # A mensagem da pré-inscrição vai para um endereço que quem pediu digitou:
+  # ela não repete o nome digitado, que seria texto de terceiro numa mensagem
+  # do programa.
+  it "nao repete na mensagem da pre-inscricao o nome que quem pediu digitou" do
+    pedir(navegador, @com_sessao, "Clique em http://exemplo.invalido", "pessoa@example.com")
+
+    mensagem = @enviados.find { |m| m[:to] == "pessoa@example.com" }
+    expect(mensagem[:body]).not_to include("exemplo.invalido")
+    expect(mensagem[:body]).to include(@com_sessao.title)
+  end
+
+  # A tela só afirma o envio que houve. Com o envio desligado (a variável
+  # redirect_email vazia, por exemplo), a inscrição existe e a tela manda
+  # procurar a secretaria, que vê o código.
+  describe "quando o sistema nao esta enviando e-mail" do
+    before(:each) { allow(Notifier).to receive(:sending?).and_return(false) }
+
+    it "nao afirma que mandou o codigo da pre-inscricao" do
+      sessao = navegador
+
+      pedir(sessao, @com_sessao, "Pessoa", "pessoa@example.com")
+
+      inscricao = Admissions::AdmissionApplication.find_by!(email: "pessoa@example.com")
+      pagina = resposta_inteira(sessao)
+      expect(pagina).not_to include(inscricao.token)
+      expect(pagina).not_to include("Enviamos o código")
+      expect(pagina).to include("não está enviando e-mails")
+    end
+
+    it "nao afirma que mandou o codigo da inscricao enviada sem sessao" do
+      sessao = navegador
+
+      inscrever(sessao, @sem_sessao, { "Dado" => "dado" }, name: "Pessoa", email: "pessoa@example.com")
+
+      pagina = resposta_inteira(sessao)
+      expect(Admissions::AdmissionApplication.exists?(email: "pessoa@example.com")).to be(true)
+      expect(pagina).not_to include("foram enviados para")
+      expect(pagina).to include("não está enviando e-mails")
     end
   end
 

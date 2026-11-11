@@ -108,6 +108,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
   validate :number_of_letters_in_filled_form
 
+  before_save :renew_token_when_email_changes
   before_save :set_token
 
   def self.pendency_condition(user = nil)
@@ -457,6 +458,12 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       }
       self.filled_form.is_filled = true
     end
+    # O e-mail e o endereco para onde a recuperacao manda o codigo. Pela tela
+    # interna so o troca quem tem a edicao total; o comite que a fase deixa
+    # editar o candidato altera o resto do formulario.
+    if !check_candidate_permission && !can_edit_override && self.email_changed?
+      self.email = self.email_was
+    end
     if has_letter_forms
       self.letter_requests.each do |letter_request|
         if letter_request.filled_form.try(:enable_submission) == "1"
@@ -798,5 +805,19 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       unless self.token?
         self.token = generate_valid_token
       end
+    end
+
+    # O codigo so viaja por e-mail, para o endereco gravado na inscricao; quem
+    # o apresenta leu a caixa daquele endereco. Quando o endereco muda, por
+    # qualquer tela, o codigo deixa de valer e outro e gerado: quem tinha o
+    # antigo tinha a caixa antiga. O identificador (os seis primeiros
+    # caracteres) fica, porque e por ele que relatorios e rotulos ja citaram a
+    # inscricao; muda so o resto.
+    def renew_token_when_email_changes
+      return unless persisted? && email_changed? && self.token?
+
+      renewed = "#{identifier}#{generate_token[6..]}"
+      renewed = "#{identifier}#{generate_token[6..]}" while self.class.exists?(token: renewed)
+      self.token = renewed
     end
 end

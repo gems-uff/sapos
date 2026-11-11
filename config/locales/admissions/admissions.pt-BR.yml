@@ -29,6 +29,7 @@ pt-BR:
 
       create:
         token_sent: "Enviamos o código de identificação para %{email}. Informe-o abaixo para continuar a inscrição."
+        token_sent_without_email: "A inscrição foi iniciada, mas o sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o código de identificação."
 
       find_by_email:
         success:
@@ -70,7 +71,9 @@ pt-BR:
         new_notice: "Inscrição realizada com sucesso"
         edit_notice: "Inscrição editada com sucesso"
         new_token_sent: "Inscrição realizada com sucesso. O código de identificação e o link para acompanhar ou alterar a inscrição foram enviados para %{email}."
+        new_token_sent_without_email: "Inscrição realizada com sucesso, mas o sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o código de identificação."
         email_changed: "Inscrição editada com sucesso. O e-mail da inscrição mudou e, com ele, o código de identificação: o novo código foi enviado para %{email}."
+        email_changed_without_email: "Inscrição editada com sucesso. O e-mail da inscrição mudou e, com ele, o código de identificação, mas o sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o código novo."
 
     letters:
       show:

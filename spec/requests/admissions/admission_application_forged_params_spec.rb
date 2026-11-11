@@ -125,4 +125,53 @@ RSpec.describe "Admissions::AdmissionApplications com parametros fora do formula
     expect(@application.reload.name).to eq("Nome Corrigido")
     expect(@application.email).to eq("corrigido@example.com")
   end
+
+  # O código acompanha o endereço também quando quem corrige o e-mail é a
+  # equipe: quem recebeu o código no endereço antigo deixa de abrir a
+  # inscrição. O identificador fica, porque é por ele que a inscrição já foi
+  # citada.
+  it "troca o codigo, e mantem o identificador, quando a equipe corrige o e-mail" do
+    codigo = @application.token
+    sign_out @reviewer
+    sign_in create_confirmed_user([FactoryBot.create(:role_administrador)], "forjado-admin@ic.uff.br", "Admin")
+
+    put admission_application_path(@application), xhr: true, params: {
+      can_edit_override: "1", record: { email: "corrigido@example.com" }
+    }
+
+    expect(@application.reload.email).to eq("corrigido@example.com")
+    expect(@application.token).not_to eq(codigo)
+    expect(@application.identifier).to eq(codigo[0, 6])
+  end
+
+  # A fase pode deixar o comitê editar o formulário do candidato. O e-mail fica
+  # de fora: é para ele que a recuperação manda o código.
+  context "em fase que deixa o comite editar o candidato" do
+    before(:each) do
+      @phase.update!(can_edit_candidate: true)
+      allow(Notifier).to receive(:send_emails)
+    end
+
+    it "nao deixa o membro trocar o e-mail da candidatura" do
+      email, codigo = @application.email, @application.token
+
+      put admission_application_path(@application), xhr: true, params: { record: {
+        name: "Nome Corrigido Pelo Comite", email: "membro@example.com",
+        evaluations_attributes: { "0" => own_evaluation_entry }
+      } }
+
+      expect(own_evaluation_value).to eq "9"
+      expect(@application.reload.email).to eq(email)
+      expect(@application.token).to eq(codigo)
+    end
+
+    # Controle: o que a fase libera ao comitê segue liberado.
+    it "deixa o membro corrigir o nome" do
+      put admission_application_path(@application), xhr: true, params: { record: {
+        name: "Nome Corrigido Pelo Comite", evaluations_attributes: { "0" => own_evaluation_entry }
+      } }
+
+      expect(@application.reload.name).to eq("Nome Corrigido Pelo Comite")
+    end
+  end
 end

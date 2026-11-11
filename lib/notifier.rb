@@ -58,6 +58,12 @@ module Notifier
     Rails.application.config.should_send_emails
   end
 
+  # As duas chaves que fazem send_emails voltar sem enviar nada: o envio
+  # desligado no ambiente e a variavel redirect_email vazia.
+  def self.sending?
+    should_run? && CustomVariable.redirect_email != ""
+  end
+
   def self.send_emails(notifications)
     Notifier.logger.info "Starting send_emails function."
     unless Notifier.should_run?
