@@ -33,7 +33,7 @@ class Admissions::FilledForm < ActiveRecord::Base
 
   # Sem allow_destroy: nenhuma tela remove a linha de um campo, e a linha
   # removida escaparia da conferencia do campo obrigatorio.
-  accepts_nested_attributes_for :fields
+  accepts_nested_attributes_for :fields, reject_if: proc { |attrs| attrs["id"].blank? && attrs["form_field_id"].blank? }
 
   # As entradas de uma colecao aninhada como a tela as manda: uma por indice
   # ({"0" => {...}}) ou em lista. A que chega de outro jeito -- os atributos
@@ -187,6 +187,7 @@ class Admissions::FilledForm < ActiveRecord::Base
 
   def erase_non_filled_file_fields
     self.fields.each do |field|
+      next if field.form_field.nil?
       if field.form_field.is_file_field?
         if field.persisted?
           field.reload

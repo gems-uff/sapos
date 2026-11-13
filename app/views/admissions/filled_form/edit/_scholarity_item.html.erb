@@ -156,7 +156,7 @@ function scholarity_item_activate_js(sid) {
 
     window.customFormValidations["<%= filled_class %>"].push(function() {
       let input = $(`#${sid} input.scholarity-<%= field[:name] %>`).get(0)
-      if (input.disabled) {
+      if (input.matches(":disabled")) {
         return true;
       }
       let label = $("label[for='" + $(input).attr('id') + "']");
