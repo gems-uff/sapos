@@ -116,7 +116,10 @@ def preenche(driver, alvo, marca)
         } else if (el.value === '') {
           var ehData = /data|nascimento/i.test(rotulo) ||
                        (el.className || '').indexOf('datepicker') >= 0;
-          el.value = ehData ? '01/01/2000' : marca;
+          // O e-mail da inscricao e conferido pelo formato, no navegador e no
+          // servidor: o campo leva um endereco com o marcador, nao o marcador.
+          var ehEmail = t === 'email' || /e-?mail/i.test(rotulo);
+          el.value = ehData ? '01/01/2000' : (ehEmail ? marca.toLowerCase() + '@example.com' : marca);
           if (ehData) { rel.data++; } else { rel.texto++; }
           disparar(el);
         }
@@ -345,11 +348,15 @@ begin
     ainda = enviar(driver, wait)
     resultado = driver.execute_script(<<~JS)
       var err = document.querySelector('#errorExplanation, .errorExplanation');
-      var flash = document.querySelector('.flash, #flash_notice, .notice');
+      // O layout sempre traz o .notice, vazio quando nao ha aviso, e o alerta
+      // sai em #error_login: o primeiro elemento achado nao e o que tem texto.
+      var avisos = Array.from(document.querySelectorAll('.flash, #flash_notice, .notice, #error_login'))
+        .map(function (el) { return el.innerText.replace(/\\s+/g, ' ').trim(); })
+        .filter(function (texto) { return texto.length > 0; });
       return {
         url: location.pathname,
         erro: err ? err.innerText.replace(/\\s+/g, ' ').trim().slice(0, 300) : null,
-        aviso: flash ? flash.innerText.replace(/\\s+/g, ' ').trim().slice(0, 200) : null
+        aviso: avisos.length ? avisos[0].slice(0, 200) : null
       };
     JS
     # Sair do formulario NAO e ter criado. Se o servidor recusou e re-renderizou,

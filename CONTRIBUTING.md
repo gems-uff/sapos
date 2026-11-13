@@ -36,6 +36,14 @@ request implements what is written there.
 A large issue can be split while it is refined: a part whose solution is closed
 can be implemented while the others are still under discussion.
 
+**The assignee tells who is working on an issue.** Check it before you pick
+one: an issue assigned to someone else is taken, even when its branch shows no
+commit — work that was not pushed yet is invisible to you. If the issue has no
+assignee, ask in it and wait for the maintainer's answer; once the two of you
+agree that it is yours, assign it to yourself and only then start. If an
+assigned issue looks stalled, ask in the issue instead of opening a pull
+request for it.
+
 ## Branching model
 
 We use one branch per issue. Every issue gets its own branch named after it (for example, `issue_123`), whether it is a bug fix, a dependency update, or a new feature. All of them are based on _main_.
@@ -48,12 +56,12 @@ The lifecycle of a branch is:
 2. Implement and test.
 3. Merge _main_ into `issue_NNN` and test again, so the branch is up to date.
 4. Open a pull request for the maintainer to review.
-5. The maintainer merges `issue_NNN` into _main_. Because of step 3 this is a fast-forward.
-6. The maintainer tags the new release on _main_.
+5. With the suite green locally and in CI, the maintainer merges `issue_NNN` into _main_ and closes the issue. Because of step 3 this is a fast-forward.
+6. When the maintainer decides to release, _main_ is validated in the staging environment and, if all is well, a new version is tagged on it. It carries every issue that reached _main_ since the previous tag; finishing an issue does not force a release.
 
-Steps 5 and 6 are done by the maintainer only, after reviewing the pull request.
+Steps 5 and 6 are done by the maintainer only. A finished issue is merged and closed right away, so nobody picks up work that is already done; the version label is added at release time, even to closed issues.
 
-**Security issues are the exception.** Do not open a public issue for a vulnerability: describing it publicly exposes the attack before the fix is released. Work on a branch created directly from _main_, with a generic description, and release it like any other fix.
+**Security issues are the exception.** Do not open a public issue for a vulnerability: describing it publicly exposes the attack before the fix is released. Work on a branch created directly from _main_, with a generic description. Unlike other issues, a security fix triggers a release right after it reaches _main_.
 
 ## Commit messages
 
@@ -76,8 +84,8 @@ goes without the prefix.
 
 Reference the issue with the prefix alone. Do not write `Fixes #NNN` or
 `Closes #NNN`: GitHub closes the issue as soon as such a commit reaches _main_,
-and closing is decided during the release, separately from labelling. An issue
-delivered in part gets the version label and stays open.
+and closing is decided by whoever merges. An issue delivered in part reaches
+_main_ and stays open, with a comment saying what is left.
 
 ## Testing
 

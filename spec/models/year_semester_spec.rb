@@ -7,7 +7,7 @@ require "spec_helper"
 
 RSpec.describe YearSemester do
   let(:year_semester) { YearSemester.new }
-  let(:current_year) { Date.today.year }
+  let(:current_year) { Date.current.year }
   subject { year_semester }
   describe "Methods" do
     describe "on_date" do
@@ -16,7 +16,7 @@ RSpec.describe YearSemester do
           date = Date.parse("#{current_year}/#{YearSemester::FIRST_SEMESTER_BEGIN_MONTH}/#{YearSemester::FIRST_SEMESTER_BEGIN_DAY + 1}")
           year_semester = YearSemester.on_date(date)
           expect(year_semester.semester).to eql(YearSemester::FIRST_SEMESTER)
-          expect(year_semester.year).to eql(Date.today.year)
+          expect(year_semester.year).to eql(Date.current.year)
         end
       end
       context "should return the second semester of the current year when" do
@@ -80,7 +80,7 @@ RSpec.describe YearSemester do
     end
     describe "current" do
       it "should return the year semester on today's date" do
-        year_semester = YearSemester.on_date(Date.today)
+        year_semester = YearSemester.on_date(Date.current)
         current_year_semester = YearSemester.current
         expect(year_semester.semester).to eql(current_year_semester.semester)
         expect(year_semester.year).to eql(current_year_semester.year)

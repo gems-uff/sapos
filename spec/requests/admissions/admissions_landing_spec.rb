@@ -14,12 +14,12 @@ RSpec.describe "Admissions::Admissions: entrada do candidato", type: :request do
     @open = FactoryBot.create(
       :admission_process, name: "Mestrado Aberto", simple_url: "landing-aberto",
       form_template: @template, require_session: true,
-      start_date: Date.today - 10.days, end_date: Date.today + 10.days, edit_date: Date.today + 20.days
+      start_date: Date.current - 10.days, end_date: Date.current + 10.days, edit_date: Date.current + 20.days
     )
     @hidden = FactoryBot.create(
       :admission_process, name: "Edital Oculto", simple_url: "landing-oculto",
       form_template: @template, visible: false,
-      start_date: Date.today - 10.days, end_date: Date.today + 10.days, edit_date: Date.today + 20.days
+      start_date: Date.current - 10.days, end_date: Date.current + 10.days, edit_date: Date.current + 20.days
     )
     @closed = create_closed_admission_process(@template, simple_url: "landing-fechado")
   end
@@ -68,7 +68,11 @@ RSpec.describe "Admissions::Admissions: entrada do candidato", type: :request do
   end
 
   describe "POST create" do
-    it "cria a inscrição, guarda o código na sessão e leva ao formulário" do
+    # O código não volta para o navegador: vai para o e-mail, e a tela do
+    # edital abre a recuperação já com o endereço (ver
+    # application_code_ownership_spec.rb).
+    it "cria a inscrição, manda o código por e-mail e volta à tela do edital" do
+      allow(Notifier).to receive(:send_emails)
       expect {
         post admission_path(@open.simple_url), params: params_for(name: "Ana", email: "ana@example.com")
       }.to change { Admissions::AdmissionApplication.count }.by(1)
@@ -76,17 +80,27 @@ RSpec.describe "Admissions::Admissions: entrada do candidato", type: :request do
       application = Admissions::AdmissionApplication.last
       expect(application.admission_process).to eq(@open)
       expect(application.filled_form.is_filled).to be false
-      expect(response).to redirect_to(edit_admission_apply_path(admission_id: @open.simple_id, id: application.token))
-      expect(session[:admission_tokens]).to include(application.token)
+      expect(response).to redirect_to(admission_path(id: @open.simple_id, email: "ana@example.com"))
+      expect(flash[:notice]).to eq(I18n.t("admissions.admissions.create.token_sent", email: "ana@example.com"))
+      expect(session[:admission_tokens]).to be_blank
+      expect(Notifier).to have_received(:send_emails).with(
+        notifications: [a_hash_including(to: "ana@example.com", body: a_string_including(application.token))]
+      )
     end
 
-    it "reaproveita a inscrição não enviada do mesmo e-mail" do
+    it "reaproveita a inscrição não enviada do mesmo e-mail e reenvia o mesmo código" do
+      allow(Notifier).to receive(:send_emails)
       existing = create_application(@open, name: "Ana", email: "ana@example.com", filled: false)
+      old_token = existing.token
       expect {
         post admission_path(@open.simple_url), params: params_for(name: "Ana Maria", email: "ana@example.com")
       }.not_to change { Admissions::AdmissionApplication.count }
-      expect(existing.reload.name).to eq("Ana Maria")
-      expect(response).to redirect_to(edit_admission_apply_path(admission_id: @open.simple_id, id: existing.token))
+      expect(existing.reload.name).to eq("Ana")
+      expect(existing.token).to eq(old_token)
+      expect(response).to redirect_to(admission_path(id: @open.simple_id, email: "ana@example.com"))
+      expect(Notifier).to have_received(:send_emails).with(
+        notifications: [a_hash_including(to: "ana@example.com", body: a_string_including(old_token))]
+      )
     end
 
     it "recusa novo cadastro de e-mail já inscrito quando o edital não permite repetir" do
@@ -132,7 +146,7 @@ RSpec.describe "Admissions::Admissions: entrada do candidato", type: :request do
     it "restringe ao edital de origem, inclusive pelo id numérico" do
       other = FactoryBot.create(
         :admission_process, name: "Doutorado", simple_url: "landing-outro", form_template: @template,
-        start_date: Date.today - 10.days, end_date: Date.today + 10.days, edit_date: Date.today + 20.days
+        start_date: Date.current - 10.days, end_date: Date.current + 10.days, edit_date: Date.current + 20.days
       )
       create_application(other, name: "Ana", email: "ana@example.com")
 

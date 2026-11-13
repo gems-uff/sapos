@@ -36,6 +36,12 @@ class User < ApplicationRecord
 
   validates :user_roles, presence: false
   validates :email, presence: true, uniqueness: { case_sensitive: false }
+  # O e-mail confirmado do usuario e copiado para o aluno e o professor dele
+  # (Users::ConfirmationsController), que conferem o formato do endereco novo
+  # ou alterado: o que eles recusariam e recusado aqui, antes de virar troca
+  # pendente.
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true,
+    if: :will_save_change_to_email?
   validates :name, presence: true
   validate :roles_valid?
   validate :role_is_professor_if_the_professor_field_is_filled
@@ -173,9 +179,5 @@ class User < ApplicationRecord
   private
     def set_default_actual_role
       self.actual_role = actual_role.present? ? actual_role : user_max_role
-    end
-
-    def store_max_role_was
-      self.max_role_was = self.user_max_role
     end
 end

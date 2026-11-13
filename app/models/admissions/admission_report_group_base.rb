@@ -16,10 +16,6 @@ class Admissions::AdmissionReportGroupBase
     @sections = []
   end
 
-  def prepare_config
-    self.prepare_header
-  end
-
   def application_sections(application, &block)
   end
 

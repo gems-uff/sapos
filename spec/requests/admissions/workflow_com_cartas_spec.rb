@@ -34,8 +34,8 @@ RSpec.describe "Fluxo do processo seletivo: com cartas e comitês por linha", ty
 
     # ── Inscrição com duas cartas ───────────────────────────────────────────
     letters = ->(prefix) {
-      [{ name: "#{prefix} Um", email: "#{prefix.downcase}-um@example.com", telephone: "2199" },
-       { name: "#{prefix} Dois", email: "#{prefix.downcase}-dois@example.com" }]
+      [{ name: "#{prefix} Um", email: "#{prefix.parameterize}-um@example.com", telephone: "2199" },
+       { name: "#{prefix} Dois", email: "#{prefix.parameterize}-dois@example.com" }]
     }
     kim = apply_as_candidate(@process, name: "Kim", email: "kim@example.com",
       values: { "Linha de pesquisa" => "Linha 1" }, letters: letters.call("Rec Kim"))
@@ -92,7 +92,7 @@ RSpec.describe "Fluxo do processo seletivo: com cartas e comitês por linha", ty
     sign_out @linha2.first
 
     sign_in @admin
-    @process.update!(end_date: Date.today - 1)
+    @process.update!(end_date: Date.current - 1)
     message = consolidate_phase_as_staff(@process, @avaliacao)
     expect(message).to include(I18n.t("active_scaffold.admissions/admission_process.consolidate_phase.approved", count: 2))
     expect(message).to include(I18n.t("active_scaffold.admissions/admission_process.consolidate_phase.reproved", count: 1))

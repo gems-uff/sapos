@@ -31,9 +31,9 @@ RSpec.describe "Admissions::ApplyController com parametros fora do formulario", 
       @process = FactoryBot.create(
         :admission_process, name: "Mestrado", simple_url: "forjado-#{SecureRandom.hex(4)}",
         form_template: template,
-        start_date: Date.today - 40.days,
-        end_date: Date.today - 10.days,
-        edit_date: Date.today - 5.days
+        start_date: Date.current - 40.days,
+        end_date: Date.current - 10.days,
+        edit_date: Date.current - 5.days
       )
       @phase1 = add_phase(@process, 1,
         consolidation_form: create_consolidation_template("Consolidacao", {
@@ -145,9 +145,9 @@ RSpec.describe "Admissions::ApplyController com parametros fora do formulario", 
       @process = FactoryBot.create(
         :admission_process, name: "Mestrado", simple_url: "forjado-#{SecureRandom.hex(4)}",
         form_template: template,
-        start_date: Date.today - 10.days,
-        end_date: Date.today + 10.days,
-        edit_date: Date.today + 20.days
+        start_date: Date.current - 10.days,
+        end_date: Date.current + 10.days,
+        edit_date: Date.current + 20.days
       )
       # O template de outro processo, com um campo de mesmo nome: e o que
       # acontece quando o edital do semestre seguinte copia o anterior.

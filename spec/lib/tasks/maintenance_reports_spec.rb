@@ -38,7 +38,7 @@ RSpec.describe "maintenance:remove_expired_reports", type: :task do
 
   it "esvazia o vencido e poupa o que ainda vale, no mesmo limite do escopo" do
     vencido = report_with_file(Date.yesterday)
-    no_dia = report_with_file(Date.today)
+    no_dia = report_with_file(Date.current)
     futuro = report_with_file(Date.tomorrow)
     arquivo_do_vencido = vencido.carrierwave_file_id
 

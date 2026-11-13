@@ -24,6 +24,13 @@ class Admissions::LetterRequest < ActiveRecord::Base
 
   validates :admission_application, presence: true
   validates :email, presence: true
+  # O e-mail e para onde o link da carta viaja; como o da candidatura, e
+  # conferido quando e novo ou alterado (AdmissionApplication).
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true,
+    if: :email_address_changed?
+  validates :email, length: { maximum: 255 }, if: :email_address_changed?
+
+  before_validation :strip_email
   validates :name, presence: true
 
   before_save :set_access_token
@@ -50,7 +57,51 @@ class Admissions::LetterRequest < ActiveRecord::Base
     self.filled_form.is_filled
   end
 
+  # O codigo de acesso e a credencial do recomendador, e viaja por e-mail para
+  # o endereco do pedido. Quando quem edita a candidatura muda o endereco do
+  # pedido, o codigo muda junto: quem tinha o antigo tinha a caixa antiga. A
+  # carta ja preenchida nao troca de endereco -- o link novo abriria as
+  # respostas do recomendador numa caixa escolhida por quem editou o pedido;
+  # para trocar o recomendador dela, remove-se o pedido e cria-se outro.
+  #
+  # Quem chama e AdmissionApplication#assign_form, que atende o candidato e a
+  # equipe, depois de aplicar o campo do pedido e o campo da carta sincronizado
+  # com o e-mail; este volta junto com o endereco, senao a carta mostraria um
+  # endereco e o pedido teria outro. A pagina publica da carta nao passa por
+  # aqui: ali quem altera o e-mail e o proprio recomendador, que ja tem o
+  # codigo.
+  def follow_email_change
+    return unless persisted? && email_address_changed?
+
+    if answered?
+      self.email = email_in_database
+      filled_form.sync_fields_before(self)
+    else
+      self.access_token = generate_access_token
+    end
+  end
+
+  # Se a carta ja esta respondida, pelo que esta gravado: durante a edicao da
+  # candidatura a marca em memoria ja pode ser a da submissao em curso.
+  def answered?
+    Admissions::FilledForm.where(id: filled_form_id, is_filled: true).exists?
+  end
+
+  # Mudanca so de caixa ou de espaco em volta nao e outro endereco
+  # (AdmissionApplication#email_address_changed?).
+  def email_address_changed?
+    email.to_s.strip.casecmp(email_in_database.to_s.strip) != 0
+  end
+
   private
+    # O espaco em volta nao e parte do endereco que chega; o gravado fica
+    # como esta (AdmissionApplication#strip_email).
+    def strip_email
+      return unless email_changed?
+
+      self.email = email.strip if email.is_a?(String) && email != email.strip
+    end
+
     def generate_access_token
       token = SecureRandom.urlsafe_base64
       while Admissions::LetterRequest.exists?(access_token: token)

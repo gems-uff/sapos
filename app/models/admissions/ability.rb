@@ -107,13 +107,14 @@ module Admissions::Ability
       can :read_pendencies, Admissions::AdmissionApplication
       can :read, Admissions::AdmissionApplication, application_condition
       can :update, Admissions::AdmissionApplication, application_condition
-      # A possible bug in cancan is preventing the following check due to a conflict
-      # with the other FilledForm permissions
-      # Since the only usage of direct filled_form -> application usage is available
-      # under manual queries inside edit and show candidate, we can safely remove
-      # the check without preventing professors from reading filled forms
-      # can :read, Admissions::FilledForm,
-      #  admission_application: application_condition
+      # Cinco regras de leitura de FilledForm, uma por dono do formulario
+      # (candidatura, carta, avaliacao, resultado de fase, resultado de
+      # ranking). A da candidatura ficou comentada de 2024 ate a issue #742: o
+      # cancancan da epoca errava o SQL do accessible_by ao combinar as cinco.
+      # spec/models/admissions/filled_form_rules_spec.rb cobra as cinco juntas,
+      # pelo can? e pelo accessible_by.
+      can :read, Admissions::FilledForm,
+        admission_application: application_condition
       can :read, Admissions::LetterRequest,
         admission_application: application_condition
       can :read, Admissions::FilledForm, letter_request: {

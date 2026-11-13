@@ -270,8 +270,4 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
     end
     self.prepare_row(config, application, &block)
   end
-
-  def group_column
-    true
-  end
 end

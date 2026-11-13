@@ -15,6 +15,22 @@ Antes de escrever procedimento novo, consulte a [wiki](https://github.com/gems-u
 Referencie essas páginas em vez de duplicá-las. Se algo estiver desatualizado,
 corrija na wiki.
 
+**Mudança no código pede revisão da wiki e do `README.md`.** A wiki é outro
+repositório (`gems-uff/sapos.wiki`): nenhum diff do código a denuncia e nenhum
+teste a cobre, então a página desatualizada só aparece quando alguém a segue.
+Antes de fechar a issue, confira o que a mudança alcança:
+
+- o que o usuário vê ou faz (tela, campo, mensagem, papel, fluxo): o
+  `Manual-do-SAPOS` e os manuais de seleção de alunos e de inscrição em
+  disciplinas;
+- instalação, atualização, dependência do sistema operacional, variável de
+  ambiente, tarefa agendada: as páginas de instalação, a
+  `Upgrading-to-a-new-release` e o `README.md`.
+
+A revisão sai junto com o código, e a wiki é publicada quando a versão que
+traz a mudança é lançada: página que descreve o que ainda não está em produção
+engana quem a lê hoje.
+
 ## Convenções de trabalho
 
 - Uma issue, um ramo `issue_NNN`, sempre baseado na `main`. Detalhes do ciclo em
@@ -24,12 +40,19 @@ corrija na wiki.
   lista de commits e no `git log --oneline`. Depois do prefixo sobram cerca de
   60 colunas: imperativo, sem ponto final, e o porquê no corpo. Commit que não
   pertence a issue nenhuma — convenção, skill, infraestrutura — vai sem prefixo.
+- **Issue pronta entra na `main` e fecha; a release vem depois.** Verde na
+  suíte local e no CI, o ramo entra na `main` e a issue fecha, para que ninguém
+  a pegue de novo. A versão sai quando o mantenedor decide: homologa-se a `main`
+  e, se estiver tudo certo, lança-se o que se acumulou nela. Issue terminada não
+  força release. O label da versão é aplicado no lançamento, inclusive em issue
+  já fechada (ver a skill `release`).
 - **Cite a issue só pelo prefixo, sem `Fixes` nem `Closes`.** Essas palavras
-  fecham a issue assim que o commit chega na `main`, e fechar é decisão do passo
-  de release, separada de rotular: issue entregue pela metade leva o label e
-  continua aberta (ver a skill `release`).
+  fecham a issue sozinhas quando o commit chega na `main`, e fechar é decisão de
+  quem integra: issue entregue pela metade entra na `main` e continua aberta,
+  com um comentário dizendo o que falta.
 - **Exceção:** vulnerabilidade não ganha issue pública — enumerar o problema
-  expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica.
+  expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica,
+  e a release sai logo depois do merge, sem esperar as próximas issues.
 - Critério de pronto: `bundle exec rspec` inteiro verde. Rode **sem**
   `SKIP_COVERAGE=1` ao menos uma vez antes de fechar: é a configuração real da
   suíte, e o caminho do simplecov só é exercitado assim.
@@ -43,7 +66,10 @@ corrija na wiki.
 - **Verde numa ordem não é verde.** A ordem dos exemplos é sorteada. Ao
   investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
   irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo
-  culpado sozinho. O CI registra a seed no resumo do job.
+  culpado sozinho. O CI registra a seed no resumo do job. Lá a suíte roda em
+  4 workers do `parallel_rspec`, e cada worker sorteia a ordem só sobre os seus
+  arquivos: a seed sozinha não repete a ordem que falhou. O resumo transcreve o
+  comando do worker que falhou; rode-o em serial, e o `--bisect` sobre ele.
 - **Vermelho logo depois de trocar de ramo pode ser o banco de teste velho.** O
   `maintain_test_schema!` não recarrega o `db/test.sqlite3` quando a troca de
   ramo muda o esquema, então ele fica com as colunas do ramo anterior e o
@@ -87,6 +113,15 @@ corrija na wiki.
   (`git log --all --grep="<numero>"`). Não é só evitar duplicata: é ali que está o
   contexto que torna a issue nova útil — decisão de produto já tomada, tentativa
   revertida, correção que só alcançou parte do código.
+- **Issue em que se trabalha tem dono no GitHub.** A que é aberta para trabalho
+  já começado nasce atribuída a quem conduz a sessão (`gh issue create
+  --assignee @me`); a que já existia é atribuída antes do primeiro commit (`gh
+  issue edit <N> --add-assignee @me`). O dono é o único sinal que o colaborador
+  vê: commit local, sem push, não aparece para ninguém, e a issue sem dono é a
+  que alguém pega — o trabalho sai em dobro e o PR de quem não sabia volta
+  recusado. Antes de pegar uma issue, confira o dono; a de outra pessoa não se
+  pega sem combinar nela. Vale também para a correção sem issue pública que
+  cobre uma issue aberta: atribua a issue que ela resolve.
 - **Issue nasce com o campo Type preenchido:** `gh issue create --type Bug`, ou
   `gh issue edit <N> --type Feature` para corrigir depois. Os três valores em uso
   são `Bug` (o sistema faz mal o que já faz), `Feature` (capacidade nova ou
@@ -110,7 +145,7 @@ corrija na wiki.
   temático foi aposentado quando o Type passou a existir: manter as duas
   taxonomias é mantê-las divergindo, e a que engana é justamente a que ninguém
   revisa. O único label que uma issue recebe é o da versão em que ela saiu,
-  aplicado no passo de release.
+  aplicado no lançamento.
 - **Não afirme impacto em produção sem verificar com o mantenedor.** O repositório
   não diz quais funcionalidades estão em uso. Issue é pública e irreversível;
   descreva o que foi medido no código e pergunte o resto.
@@ -142,7 +177,7 @@ ordem do ciclo.
 - `safe-refactor` — mede a mudança pela suíte local, antes e depois.
 - `suite-mariadb` — roda a suíte contra MariaDB em vez do SQLite.
 - `homologacao` — compara o SAPOS antes e depois em homologação.
-- `release` — merge, tag, label, issues e release publicada.
+- `release` — integra a issue pronta na `main` e a fecha; quando o mantenedor decide, homologa a `main` e lança a versão (tag, label, release publicada).
 
 ### Skill é procedimento, não diário de bordo
 
@@ -214,7 +249,9 @@ parte, a diferença é real. Código que os testes nunca executam:
   visível nos modelos vem do active_scaffold e é preenchido **por requisição**;
   fora de uma, ele é nil. `User#roles_valid?` abre com
   `return if current_user.blank?`, então na suíte a linha do `return` executa
-  centenas de vezes e o corpo, poucas — as de erro de escalação de papel, nenhuma.
+  centenas de vezes e o corpo só nos specs de requisição que gravam usuário
+  pela tela (`spec/requests/users_role_escalation_spec.rb` percorre os ramos
+  de escalação de papel). Spec de modelo não alcança nenhum deles.
 
 A consequência sai do teste e alcança o reparo de dado: **a mesma alteração feita
 pela tela e por script produz estados diferentes.** Desmarcar o último papel de um
@@ -239,6 +276,65 @@ cada uma explica o porquê no próprio cabeçalho:
   define o método que ele sobrescreve depois dos initializers) e o
   `LogTruncater` escondido dentro de `filter_parameter_logging.rb`, que chama
   o `sql` original por `super_method`.
+- active_scaffold, entrada que a gem aceita da URL sem conferir:
+  `active_scaffold_embedded_conditions.rb` (`prepend` em
+  `ActiveScaffold::Finder`; só o marcador de pendência vale em
+  `embedded[conditions]`), `active_scaffold_date_trend_unit.rb` (`prepend` em
+  `Finder::ClassMethods#datetime_from_to` — não em `condition_for_datetime`, que
+  o bridge `date_picker` apelida e cujo apelido perderia o `super`) e
+  `active_scaffold_return_to.rb` (`prepend` em `Helpers::ControllerHelpers`;
+  `return_to` só interno). Os três entram por `prepend` no módulo porque a
+  chamada `active_scaffold` inclui o módulo em cada controller, na frente de um
+  método do `ApplicationController`.
+- active_scaffold, filtro da lista vindo da URL:
+  `active_scaffold_list_url_columns.rb` (`prepend` em
+  `ActiveScaffold::Actions::Core#conditions_from_params`). A gem filtra a
+  lista por qualquer parâmetro da URL com nome de coluna do banco do modelo —
+  igualdade, faixa e diferença —, e o filtro vale também para o PDF e o lote
+  montados sobre a lista; aqui só filtra, por igualdade, a coluna que o
+  controller declara em `active_scaffold_list_url_columns`. Tela que abre a
+  lista de outro scaffold com coluna na URL precisa da coluna declarada lá.
+  `spec/requests/scaffold_list_url_filter_spec.rb` percorre as listas.
+- active_scaffold, agrupamento da lista vindo da URL:
+  `active_scaffold_grouped_search.rb` (`prepend` em
+  `ActiveScaffold::Actions::FieldSearch::InstanceMethods#grouped_search?`). A
+  gem agrupa a lista pelo que a URL nomeia em `search[active_scaffold_group]`
+  — qualquer coluna do modelo, que a lista agrupada imprime — e guarda a busca
+  na sessão, onde o nome que não é coluna derruba a lista a cada visita; aqui
+  só agrupa pelo que o scaffold oferece em `field_search.group_options`, e o
+  SAPOS não oferece nenhum. `spec/requests/scaffold_list_url_filter_spec.rb`
+  cobra isso.
+- active_scaffold, linha de subformulário pedida pelo id:
+  `active_scaffold_subform_associated_record.rb` (`prepend` em
+  `ActiveScaffold::Actions::Subform`, nos protegidos `find_associated_record`
+  e `do_edit_associated`). A gem devolve como linha de formulário o registro
+  associado que a URL pede (`associated_id`), buscado pelo id cru; aqui ele
+  sai do `accessible_by` de leitura. A aba da linha nova (`tabbed_by`), que a
+  gem resolve pela classe e pelo nome vindos da URL, é ignorada: o SAPOS não
+  tem subformulário em abas. `spec/requests/edit_associated_scope_spec.rb`
+  percorre os scaffolds por perfil.
+- active_scaffold, edição em linha: `active_scaffold_inplace_edit.rb`
+  (`prepend` em `ActiveScaffold::Actions::Update#update_column` e em
+  `ActiveScaffold::Actions::Core#render_field_for_inplace_editing`). A gem
+  lê e grava pela edição em linha qualquer coluna do scaffold, antes do que o
+  formulário da tela confere; aqui as duas rotas só valem para a coluna com
+  `inplace_edit` ligado, e o SAPOS não liga nenhuma.
+  `spec/requests/scaffold_inline_edit_spec.rb` cobra isso.
+- recordselect, entrada que a gem aceita da URL sem conferir:
+  `record_select_url_conditions.rb` (`prepend` em `RecordSelect::Conditions`).
+  A gem filtra o seletor por qualquer parâmetro da URL com nome de coluna do
+  modelo, e coluna de texto entra por `LIKE` com o padrão da URL; aqui só
+  filtra a coluna que o controller do seletor declara em
+  `record_select_url_columns`. Formulário que abre um seletor com
+  `options[:params]` precisa da coluna declarada lá.
+  `spec/requests/record_select_url_params_spec.rb` percorre os seletores.
+- active_scaffold, resposta que a gem oferece sem a tela pedir:
+  `active_scaffold_response_formats.rb` (`prepend` em
+  `ActiveScaffold::Actions::Core#default_formats`). O scaffold só responde em
+  HTML e JS; a gem oferece também JSON e XML em toda ação, com a coluna crua e
+  o registro associado inteiro, por fora dos helpers de coluna e do que a tela
+  esconde por papel. `spec/requests/scaffold_response_formats_spec.rb` percorre
+  os scaffolds e acusa o formato que voltar a responder.
 - Prawn: `prawn-grouping.rb`, cópia de patch de terceiro que usa `state.page` e
   `@bounding_box`. Suspeito num upgrade do Prawn, não do Rails.
 - prawn-table: `prawn_actual_text.rb` (`prepend` no `draw_content` privado de

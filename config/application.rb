@@ -155,6 +155,25 @@ module Sapos
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
 
+    # E-mail de erro do exception_notification. Cada ambiente acrescenta só os
+    # destinatários; o resto é o mesmo, para que o spec do e-mail
+    # (spec/requests/error_email_spec.rb) exercite o que produção envia.
+    #
+    # O e-mail leva só a parte técnica. As seções padrão da gem (request,
+    # session, environment) copiam valores de parâmetro, o conteúdo da sessão e
+    # os cabeçalhos da requisição, e o e-mail fica guardado na caixa de todos os
+    # destinatários. As seções próprias (app/views/exception_notifier/) dizem
+    # de que instância veio o erro ("instancia") e onde ele ocorreu, com o id
+    # da requisição, que localiza o resto no log do servidor ("contexto"). A seção "data", que a gem acrescenta sozinha, mostra o que os
+    # chamadores passam em `data:` e em exception_notifier.exception_data: só
+    # dado técnico pode ir ali.
+    config.x.error_email = {
+      email_prefix: "[SAPOS: Error] ",
+      sender_address: %{"SAPOS Exception Notifier" <erro-sapos@sapos.ic.uff.br>},
+      sections: %w[instancia contexto backtrace],
+      background_sections: %w[instancia backtrace data],
+    }
+
     # Enable escaping HTML in JSON.
     config.active_support.escape_html_entities_in_json = true
 

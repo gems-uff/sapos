@@ -37,9 +37,9 @@ RSpec.describe "Accomplishments features", type: :feature do
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status)
 
-    @destroy_all << @record = FactoryBot.create(:accomplishment, enrollment: @enrollment2, phase: @phase2, conclusion_date: Date.today)
-    @destroy_all << FactoryBot.create(:accomplishment, enrollment: @enrollment1, phase: @phase2, conclusion_date: Date.today)
-    @destroy_all << FactoryBot.create(:accomplishment, enrollment: @enrollment3, phase: @phase2, conclusion_date: Date.today)
+    @destroy_all << @record = FactoryBot.create(:accomplishment, enrollment: @enrollment2, phase: @phase2, conclusion_date: Date.current)
+    @destroy_all << FactoryBot.create(:accomplishment, enrollment: @enrollment1, phase: @phase2, conclusion_date: Date.current)
+    @destroy_all << FactoryBot.create(:accomplishment, enrollment: @enrollment3, phase: @phase2, conclusion_date: Date.current)
   end
   after(:each) do
     @destroy_later.each(&:delete)
@@ -83,7 +83,7 @@ RSpec.describe "Accomplishments features", type: :feature do
       fill_record_select("enrollment_", "enrollments", "M04")
       page.send_keys :escape
       within("#as_#{plural_name}-create--form") do
-        select_month_year_i("record_conclusion_date", Date.today)
+        select_month_year_i("record_conclusion_date", Date.current)
         find(:select, "record_phase_").find(:option, text: "Pedido de Banca").select_option
       end
       click_button_and_wait "Salvar"
@@ -102,7 +102,7 @@ RSpec.describe "Accomplishments features", type: :feature do
       # Insert record
       page.send_keys :escape
       within("#as_#{plural_name}-create--form") do
-        select_month_year_i("record_conclusion_date", Date.today)
+        select_month_year_i("record_conclusion_date", Date.current)
         find(:select, "record_phase_").find(:option, text: "Exame de Qualificação").select_option
       end
       fill_record_select("enrollment_", "enrollments", "M01")

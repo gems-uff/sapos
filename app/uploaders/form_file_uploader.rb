@@ -71,11 +71,8 @@ class FormFileUploader < CarrierWave::Uploader::Base
   #   process :resize_to_fit => [50, 50]
   # end
 
-  # Add a white list of extensions which are allowed to be uploaded.
-  # For images you might use something like this:
-  def extension_white_list
-    %w(jpg jpeg gif png pdf doc docx)
-  end
+  # A extensao aceita e conferida em Admissions::FilledFormField
+  # (validate_file_field): a lista do campo ou DEFAULT_FILE_EXTENSIONS.
 
   # Override the filename of the uploaded files:
   # Avoid using model.id or version_name here, see uploader/store.rb for details.

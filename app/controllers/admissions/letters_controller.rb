@@ -6,6 +6,7 @@
 class Admissions::LettersController < Admissions::ProcessBaseController
   before_action :find_letter_request, only: [:show, :update]
   before_action :check_if_process_is_open, only: [:show, :update]
+  before_action :check_submitted_record, only: [:update]
 
   active_scaffold :active_scaffold_workaround # Load helpers
 
@@ -15,6 +16,8 @@ class Admissions::LettersController < Admissions::ProcessBaseController
 
   def update
     @letter_request.assign_attributes(letter_request_params)
+    # o campo que o envio nao trouxe e conferido como campo sem resposta
+    @letter_request.filled_form.prepare_missing_fields
     @letter_request.filled_form.sync_fields_after(@letter_request)
     was_filled = @letter_request.filled_form.is_filled
     @letter_request.filled_form.is_filled = true
@@ -53,17 +56,41 @@ class Admissions::LettersController < Admissions::ProcessBaseController
       end
     end
 
+    # O mesmo de ApplyController#check_submitted_record: o envio que nao traz
+    # o formulario devolve o recomendador a carta, com um aviso.
+    def check_submitted_record
+      return if submitted_record?
+
+      redirect_to admission_letter_path(
+        admission_id: @admission_process.simple_id,
+        id: @letter_request.access_token
+      ), alert: I18n.t("errors.admissions.empty_submission")
+    end
+
     def prepare_letter_request_fields
       filled_form = @letter_request.filled_form
       filled_form.prepare_missing_fields
       filled_form.sync_fields_before(@letter_request)
     end
 
+    # O recomendador preenche os campos da carta. O pedido, o formulario
+    # preenchido e o template sao os do servidor, nunca os que vem nos
+    # parametros -- a mesma regra de AdmissionApplication#assign_form. E a
+    # carta e sempre submetida (submitted_form).
     def letter_request_params
-      params.require(:record).permit(
-        :id, :email, :name, :telephone,
+      permitted = params.require(:record).permit(
+        :email, :name, :telephone,
         filled_form_attributes:
           Admissions::FilledFormsController.filled_form_params_definition,
       )
+      attributes = submitted_form(permitted[:filled_form_attributes])
+        .except(:form_template_id, :is_filled, :id).to_h.with_indifferent_access
+      if attributes.key?(:fields_attributes)
+        attributes[:fields_attributes] =
+          Admissions::FilledForm.submitted_fields(attributes[:fields_attributes])
+      end
+      filled_form = @letter_request.filled_form
+      attributes[:id] = filled_form.id if filled_form&.persisted?
+      permitted.to_h.merge(filled_form_attributes: attributes)
     end
 end

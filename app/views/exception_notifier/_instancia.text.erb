@@ -1,0 +1,7 @@
+<%# Todas as instâncias rodam no mesmo servidor e mandam para a mesma lista: o
+    e-mail diz de qual delas veio, também na exceção notificada sem
+    requisição, em que @request é nil. %>
+* Instância   : <%= raw Rails.root %>
+<% if @request -%>
+* Prefixo     : <%= raw @request.script_name.presence || "/" %>
+<% end -%>

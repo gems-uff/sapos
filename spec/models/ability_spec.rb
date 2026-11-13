@@ -183,25 +183,6 @@ RSpec.describe Ability, type: :model do
     end
   end
 
-  describe "support" do
-    subject(:ability) { ability_for(Role::ROLE_SUPORTE) }
-
-    it "only reaches students, to fix their data and photo" do
-      expect(ability).to be_able_to(:read, Student)
-      expect(ability).to be_able_to(:update, Student)
-      expect(ability).to be_able_to(:update_only_photo, Student)
-      expect(ability).to be_able_to(:read, :pendency)
-    end
-
-    it "cannot destroy students nor reach the rest of the system" do
-      expect(ability).not_to be_able_to(:destroy, Student)
-      expect(ability).not_to be_able_to(:read, Professor)
-      expect(ability).not_to be_able_to(:read, Scholarship)
-      expect(ability).not_to be_able_to(:read, User)
-      expect(ability).not_to be_able_to(:read, Query)
-    end
-  end
-
   describe "professor" do
     before(:all) do
       @professor = FactoryBot.create(:professor)

@@ -58,6 +58,12 @@ module Notifier
     Rails.application.config.should_send_emails
   end
 
+  # As duas chaves que fazem send_emails voltar sem enviar nada: o envio
+  # desligado no ambiente e a variavel redirect_email vazia.
+  def self.sending?
+    should_run? && CustomVariable.redirect_email != ""
+  end
+
   def self.send_emails(notifications)
     Notifier.logger.info "Starting send_emails function."
     unless Notifier.should_run?
@@ -144,13 +150,17 @@ module Notifier
     end
   end
 
+  # What the server log keeps of a delivered message: who was notified and
+  # about what. The body is written for the recipient alone, and its place is
+  # the NotificationLog, which is read behind the permissions of the
+  # application; the server log is read by whoever operates the machine and
+  # is copied to rotated files and backups.
   def self.display_notification_info(notification, attachments_file_name_list)
-    Notifier.logger.info "\n#{Time.now.strftime("%Y/%m/%d %H:%M:%S")}"
+    Notifier.logger.info "\n#{Time.current.strftime("%Y/%m/%d %H:%M:%S")}"
     Notifier.logger.info "########## Notification ##########"
     Notifier.logger.info "Notifying: #{notification[:to]}"
     Notifier.logger.info "Replying: #{notification[:reply_to]}"
     Notifier.logger.info "Subject: #{notification[:subject]}"
-    Notifier.logger.info "body: #{notification[:body]}"
     if attachments_file_name_list
       Notifier.logger.info "Attachments: #{attachments_file_name_list}"
     end

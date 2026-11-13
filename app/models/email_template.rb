@@ -51,6 +51,17 @@ class EmailTemplate < ApplicationRecord
         url: :value,
       }
     },
+    "admissions/admissions:send_token" => {
+      template_type: "Liquid",
+      path: File.join("admissions", "admissions", "mailer", "send_token.text.liquid"),
+      subject: I18n.t("notifications.admissions.admissions.send_token.subject"),
+      to: "{{ record.email }}",
+      variables: {
+        record: Admissions::AdmissionApplicationDrop,
+        admission_process: Admissions::AdmissionProcessDrop,
+        url: :value,
+      }
+    },
     "admissions/apply:email_to_student" => {
       template_type: "Liquid",
       path: File.join("admissions", "apply", "mailer", "email_to_student.text.liquid"),
@@ -71,6 +82,22 @@ class EmailTemplate < ApplicationRecord
         record: Admissions::AdmissionApplicationDrop,
         admission_process: Admissions::AdmissionProcessDrop,
         admission_apply_url: :value,
+      }
+    },
+    # O link de validacao da troca de e-mail (#752) vai para o endereco novo,
+    # que ainda nao e o da inscricao: o modelo recebe o identificador, nao a
+    # candidatura, para que o codigo de identificacao nao tenha como ir junto.
+    "admissions/apply:confirm_email_change" => {
+      template_type: "Liquid",
+      path: File.join("admissions", "apply", "mailer", "confirm_email_change.text.liquid"),
+      subject: I18n.t("notifications.admissions.apply.confirm_email_change.subject"),
+      to: "{{ email }}",
+      variables: {
+        email: :value,
+        identifier: :value,
+        validity_hours: :value,
+        admission_process: Admissions::AdmissionProcessDrop,
+        confirm_email_change_url: :value,
       }
     },
     "admissions/apply:request_letter" => {

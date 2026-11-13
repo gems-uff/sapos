@@ -29,7 +29,7 @@ RSpec.describe Report, type: :model do
     end
 
     it "is false on the expiration date itself (valid until that day)" do
-      report.expires_at = Date.today
+      report.expires_at = Date.current
       expect(report.expired?).to be false
     end
 
@@ -50,7 +50,7 @@ RSpec.describe Report, type: :model do
   # de uma vez, inclusive o proprio dia do vencimento, que e a unica data em que
   # um erro de `<` para `<=` apareceria.
   describe ".expired" do
-    let(:datas) { { Date.yesterday => true, Date.today => false, Date.tomorrow => false, nil => false } }
+    let(:datas) { { Date.yesterday => true, Date.current => false, Date.tomorrow => false, nil => false } }
 
     it "seleciona exatamente os registros que #expired? aprova" do
       criados = datas.keys.index_with do |data|

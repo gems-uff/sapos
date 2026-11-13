@@ -26,14 +26,6 @@ class ReportConfiguration < ApplicationRecord
     self.assign_attributes(attrib)
   end
 
-  def mount_uploader_name
-    :image
-  end
-
-  def signature_footer
-    signature_type === "manual"
-  end
-
   def qr_code_signature
     signature_type === "qr_code"
   end

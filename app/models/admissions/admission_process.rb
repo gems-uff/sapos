@@ -22,7 +22,7 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
 
   scope :open, -> {
     where("start_date <= :start_date AND end_date >= :end_date", {
-      start_date: Date.today, end_date: Date.today
+      start_date: Date.current, end_date: Date.current
     })
   }
 
@@ -79,14 +79,14 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
 
   def simple_url_is_unique_while_open
     return if self.end_date.nil?
-    return if self.end_date < Date.today
+    return if self.end_date < Date.current
 
     if self.simple_url.to_i.to_s == self.simple_url
       self.errors.add(:simple_url, :simple_url_integer)
     end
 
     Admissions::AdmissionProcess.where(
-      "end_date >= ? and simple_url = ?", Date.today, self.simple_url
+      "end_date >= ? and simple_url = ?", Date.current, self.simple_url
     ).each do |other|
       next if other == self
       this_date = self.start_date..self.end_date
@@ -99,11 +99,11 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
   end
 
   def is_open?
-    self.start_date <= Date.today && self.end_date >= Date.today
+    self.start_date <= Date.current && self.end_date >= Date.current
   end
 
   def is_open_to_edit?
-    self.start_date <= Date.today && self.max_edit_date >= Date.today
+    self.start_date <= Date.current && self.max_edit_date >= Date.current
   end
 
   def admission_applications_count
@@ -141,7 +141,7 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
 
   def current_phase(options = {})
     date = options[:date]
-    date ||= Date.today
+    date ||= Date.current
     result = nil
     self.phases.order(:order).each do |p|
       if p.start_date.present? && p.start_date <= date
@@ -162,7 +162,7 @@ class Admissions::AdmissionProcess < ActiveRecord::Base
     ).first
     return if phase_id.nil? || admission_process_phase.partial_consolidation
 
-    if self.end_date >= Date.today
+    if self.end_date >= Date.current
       return I18n.t("#{i18n_prefix}.open_process_error")
     end
 

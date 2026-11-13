@@ -15,16 +15,16 @@ RSpec.describe Affiliation, type: :model do
     it { should validate_presence_of(:start_date) }
     context "Active" do
       let(:professor) { FactoryBot.create :professor }
-      let(:affiliation_active) { FactoryBot.create :affiliation, professor: professor, start_date: Time.now, end_date: nil }
+      let(:affiliation_active) { FactoryBot.create :affiliation, professor: professor, start_date: Time.current, end_date: nil }
       let(:affiliation_inactive) { FactoryBot.create :affiliation,
                                                      professor: professor,
-                                                     start_date: Time.now + 1.day,
-                                                     end_date: Time.now + 2.day}
-      let(:affiliation_teste_active) { FactoryBot.build :affiliation, professor: professor, start_date: Time.now + 2.day }
+                                                     start_date: Time.current + 1.day,
+                                                     end_date: Time.current + 2.day}
+      let(:affiliation_teste_active) { FactoryBot.build :affiliation, professor: professor, start_date: Time.current + 2.day }
       let(:affiliation_teste_inactive) { FactoryBot.build :affiliation,
                                                           professor: professor,
-                                                          start_date: Time.now + 3.day,
-                                                          end_date: Time.now + 4.day }
+                                                          start_date: Time.current + 3.day,
+                                                          end_date: Time.current + 4.day }
 
       it "When active, do not add new affiliation active" do
         affiliation_active
@@ -47,7 +47,7 @@ RSpec.describe Affiliation, type: :model do
     end
     context "Active e End Date" do
       let(:affiliation_active) { FactoryBot.create :affiliation, end_date: nil }
-      let(:affiliation_inactive_valid) { FactoryBot.create :affiliation, end_date: Time.now }
+      let(:affiliation_inactive_valid) { FactoryBot.create :affiliation, end_date: Time.current }
       let(:affiliation_inactive_invalid) { FactoryBot.build :affiliation, professor: affiliation_active.professor, end_date: nil }
       context "When active, don't need end date" do
         it { expect(affiliation_active).to be_valid }

@@ -348,6 +348,29 @@ RSpec.describe Notifier, type: :model do
         expect(log.to).to eq("professor@example.com")
         expect(log.subject).to eq("SAPOS: teste")
       end
+
+      # The server log is read by whoever operates the machine and is kept in
+      # rotated files and backups. A body carries what was written for the
+      # recipient alone: an application code, a grade, a link that opens a
+      # record. The NotificationLog above is the place of the body, behind
+      # the permissions of the application.
+      context "of the server" do
+        let(:lines) { [] }
+
+        before(:each) do
+          allow(Notifier.logger).to receive(:info) { |text| lines << text.to_s }
+          message[:body] = "Seu codigo: SEGREDO-DA-MENSAGEM"
+          Notifier.send_emails(notifications: [message])
+        end
+
+        it "tells who was notified and about what" do
+          expect(lines.join("\n")).to include("professor@example.com", "SAPOS: teste")
+        end
+
+        it "does not copy the body of the message" do
+          expect(lines.join("\n")).not_to include("SEGREDO-DA-MENSAGEM")
+        end
+      end
     end
   end
 end

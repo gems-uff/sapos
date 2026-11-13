@@ -22,8 +22,24 @@ class FilesController < ApplicationController
     if record.blank?
       raise ActionController::RoutingError.new("Não encontrado")
     end
-    send_data(record.read, filename: record.original_filename, disposition: :inline)
+    type = Mime::Type.lookup_by_extension(
+      File.extname(record.original_filename.to_s).delete_prefix(".").downcase
+    ).to_s
+    if INLINE_TYPES.include?(type)
+      send_data(record.read, filename: record.original_filename, type: type, disposition: :inline)
+    else
+      send_data(
+        record.read, filename: record.original_filename,
+        type: "application/octet-stream", disposition: :attachment
+      )
+    end
   end
+
+  # O arquivo vem de quem preenche o formulario de candidatura, e a rota nao
+  # pede login. Abre no navegador so o que nao executa codigo; o resto, inclusive
+  # HTML e SVG, vai como download de tipo generico, para o navegador nunca o
+  # tratar como pagina do SAPOS.
+  INLINE_TYPES = %w[application/pdf image/png image/jpeg image/gif].freeze
 
   private
     def set_show_background

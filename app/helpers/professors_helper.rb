@@ -35,8 +35,8 @@ module ProfessorsHelper
       point = record.advisement_point(advisement.enrollment)
       total_point += point
       body += "<tr class=\"record #{tr_class}\">
-                <td>#{advisement.enrollment.student.name}</td>
-                <td>#{advisement.enrollment.enrollment_number}</td>
+                <td>#{h(advisement.enrollment.student.name)}</td>
+                <td>#{h(advisement.enrollment.enrollment_number)}</td>
                 <td>#{point}</td>
               </tr>"
     end
@@ -72,7 +72,7 @@ module ProfessorsHelper
       count += 1
       tr_class = count.even? ? "even-record" : ""
       body += "<tr class=\"record #{tr_class}\">
-                <td>#{affiliation.institution.name}</td>
+                <td>#{h(affiliation.institution.name)}</td>
                 <td>#{date_br(affiliation.start_date)}</td>
                 <td>#{date_br(affiliation.end_date)}</td>
               </tr>"

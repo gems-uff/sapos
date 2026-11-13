@@ -105,7 +105,7 @@ class Enrollment < ApplicationRecord
   end
 
   def self.with_delayed_phases_on(date, phases)
-    date = Date.today if date.nil?
+    date = Date.current if date.nil?
     phases = Phase.all if phases.nil?
     phases_ids = phases.map(&:id)
 
@@ -124,7 +124,7 @@ class Enrollment < ApplicationRecord
 
   def delayed_phases(options = {})
     date ||= options[:date]
-    date ||= Date.today
+    date ||= Date.current
     self.phase_completions.joins(:phase)
       .where("phases.active" => true)
       .where(PhaseCompletion.arel_table[:due_date].lt(date))

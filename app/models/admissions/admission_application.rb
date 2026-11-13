@@ -101,13 +101,29 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
   validates :name, presence: true
   validates :email, presence: true
+  # O e-mail e para onde o codigo de identificacao viaja: texto que nao e
+  # endereco deixa o candidato sem ele. A conferencia -- do formato e de que o
+  # processo nao tem outra inscricao com o endereco -- vale para o endereco
+  # novo ou alterado (email_address_changed?), para que a inscricao gravada
+  # antes dela continue editavel no resto: a que tem endereco fora do formato,
+  # e a que repete o endereco de outra num processo que deixou de aceitar a
+  # repeticao. O formato e o que o campo de e-mail do navegador aceita, que
+  # nao limita o tamanho; o limite e o da coluna.
+  validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_blank: true,
+    if: :email_address_changed?
+  validates :email, length: { maximum: 255 }, if: :email_address_changed?
   validates_uniqueness_of :email, scope: :admission_process_id, if: ->(apply) {
     apply.admission_process.present? &&
-    !apply.admission_process.allow_multiple_applications
+    !apply.admission_process.allow_multiple_applications &&
+    apply.email_address_changed?
   }
 
   validate :number_of_letters_in_filled_form
 
+  before_validation :strip_email
+  after_validation :hold_email_change_for_confirmation
+  before_save :forget_email_change_when_email_changes
+  before_save :renew_token_when_email_changes
   before_save :set_token
 
   def self.pendency_condition(user = nil)
@@ -146,8 +162,10 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     end
   end
 
+  # O rotulo leva o identificador, nao o codigo: ele aparece em toda tela que
+  # cita a candidatura, e o codigo inteiro e a credencial do candidato.
   def to_label
-    "#{self.name} - #{self.token}"
+    "#{self.name} - #{self.identifier}"
   end
 
   def requested_letters
@@ -410,10 +428,16 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
   )
     # Os parametros so alcancam o que a tela oferece a quem submete. Cada
     # formulario de fase vai para o objeto que prepare_application_forms marca
-    # como editavel, e o resto e descartado; o formulario principal e as cartas
-    # seguem can_edit_main_form?. O template e o formulario preenchido de cada
-    # objeto sao os do servidor, nunca os que vem nos parametros.
+    # como editavel, e o resto e descartado; o formulario principal, com o nome
+    # e o e-mail que a tela mostra junto dele, e as cartas seguem
+    # can_edit_main_form?. O template e o formulario preenchido de cada objeto
+    # sao os do servidor, nunca os que vem nos parametros. E so quem tem a
+    # edicao total desliga a submissao de um formulario (enable_submission):
+    # para os demais a tela submete sempre, e o parametro que diz outra coisa
+    # nao veio dela.
     params = params.to_h.with_indifferent_access
+    always_submitted = !can_edit_override
+    self.email_change_needs_confirmation = check_candidate_permission
     phase_params = {
       results: params.delete(:results_attributes),
       evaluations: params.delete(:evaluations_attributes),
@@ -422,21 +446,27 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     if self.can_edit_main_form?(can_edit_override:, check_candidate_permission:)
       if params[:filled_form_attributes].present?
         params[:filled_form_attributes] = sanitize_filled_form_params(
-          self.filled_form, params[:filled_form_attributes]
+          self.filled_form, params[:filled_form_attributes], always_submitted:
         )
       end
       if params[:letter_requests_attributes].present?
+        # Quem responde a carta e o recomendador. Pela tela interna, o
+        # formulario da carta ainda nao respondida so e de quem tem a edicao
+        # total, que a preenche no lugar dele; os demais editam a ja
+        # respondida (_candidate_forms oferece a mesma coisa).
         params[:letter_requests_attributes] = sanitize_nested_filled_forms(
-          params[:letter_requests_attributes], self.letter_requests
-        )
+          params[:letter_requests_attributes], self.letter_requests, always_submitted:
+        ) { |letter_request| can_edit_override || letter_request&.answered? }
       end
     else
       params.delete(:filled_form_attributes)
       params.delete(:letter_requests_attributes)
+      params.delete(:name)
+      params.delete(:email)
     end
     if can_edit_override && rankings_params.present?
       params[:rankings_attributes] = sanitize_nested_filled_forms(
-        rankings_params, self.rankings
+        rankings_params, self.rankings, always_submitted:
       )
     end
     self.assign_attributes(params)
@@ -452,10 +482,30 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       }
       self.filled_form.is_filled = true
     end
+    # O e-mail e o endereco para onde a recuperacao manda o codigo. Pela tela
+    # interna so o troca quem tem a edicao total; o comite que a fase deixa
+    # editar o candidato altera o resto do formulario.
+    if !check_candidate_permission && !can_edit_override && self.email_changed?
+      self.email = self.email_was
+      # O campo do formulario sincronizado com o e-mail volta junto, senao a
+      # ficha mostraria um endereco e a candidatura teria outro.
+      self.filled_form.sync_fields_before(self) if self.filled_form.try(:enable_submission) == "1"
+    end
     if has_letter_forms
       self.letter_requests.each do |letter_request|
         if letter_request.filled_form.try(:enable_submission) == "1"
+          # O nome, o e-mail e o telefone do pedido chegam pelo campo do
+          # pedido e pelo campo da carta sincronizado com cada um, que a tela
+          # manda com o valor de antes. O campo do pedido, quando quem edita o
+          # alterou, e o que vale.
+          requested = Admissions::FormField::SYNCS_MAP.values
+            .select { |attribute| letter_request.attribute_changed?(attribute) }
+            .index_with { |attribute| letter_request[attribute] }
           letter_request.filled_form.sync_fields_after(letter_request)
+          if requested.any?
+            letter_request.assign_attributes(requested)
+            letter_request.filled_form.sync_fields_before(letter_request)
+          end
           all_forms << {
             was_filled: letter_request.filled_form.is_filled,
             mode: :letter,
@@ -464,6 +514,12 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
           letter_request.filled_form.is_filled = true
         end
       end
+    end
+    # Depois dos formularios de carta: o endereco que fica no pedido e o que
+    # a regra do codigo de acesso confere, venha do campo do pedido ou do
+    # campo da carta.
+    if params[:letter_requests_attributes].present?
+      self.letter_requests.each(&:follow_email_change)
     end
     if has_phases
       self.admission_process.phases.order(:order).each do |p|
@@ -487,7 +543,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
             filled_form.fields.reset
             phase_form[:object].assign_attributes(
               filled_form_attributes: sanitize_filled_form_params(
-                filled_form, entry[:filled_form_attributes]
+                filled_form, entry[:filled_form_attributes], always_submitted:
               )
             )
             filled_form.prepare_missing_fields
@@ -692,8 +748,74 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
     self.admission_phase.try(:name)
   end
 
+  # Mudanca so de caixa ou de espaco em volta nao e outro endereco. A caixa e
+  # a das letras sem acento (casecmp): a equivalencia do Unicode junta
+  # enderecos que sao caixas diferentes, como "ß" e "ss".
+  def email_address_changed?
+    email.to_s.strip.casecmp(email_in_database.to_s.strip) != 0
+  end
+
+  # A troca de e-mail pedida pelo candidato so vale depois de confirmada pelo
+  # endereco novo (#752): quem digitou o endereco errado nao perde a inscricao,
+  # porque ate a confirmacao continuam valendo o e-mail e o codigo de antes.
+  #
+  # O pedido guarda o endereco novo como pendente, e o link de validacao segue
+  # para ele. A candidatura guarda so o resumo do codigo do link; o codigo
+  # esta na mensagem, que fica, como toda mensagem enviada, no registro de
+  # notificacoes. O link vale por EMAIL_CHANGE_VALIDITY, e deixa de valer
+  # quando a troca e confirmada, quando o candidato pede outra ou desiste
+  # dela, e quando a equipe corrige o e-mail pela tela interna.
+  EMAIL_CHANGE_VALIDITY = 2.days
+
+  # Ligado por assign_form quando quem submete e o candidato.
+  attr_accessor :email_change_needs_confirmation
+
+  # O codigo do link, logo depois do pedido que o gerou; nil no resto do tempo.
+  attr_reader :email_change_token
+
+  def self.email_change_digest_of(token)
+    Digest::SHA256.hexdigest(token.to_s)
+  end
+
+  # A candidatura que o link de validacao aponta, enquanto ele vale.
+  def self.find_by_email_change_token(token)
+    return nil if token.blank?
+
+    application = find_by(email_change_digest: email_change_digest_of(token))
+    application if application&.email_change_pending?
+  end
+
+  def email_change_pending?
+    pending_email.present? && email_change_digest.present? &&
+      email_change_sent_at.present? && email_change_sent_at > EMAIL_CHANGE_VALIDITY.ago
+  end
+
+  # Efetiva a troca pendente. O endereco passa de novo pelo que o e-mail da
+  # candidatura exige (formato e unicidade no processo): pode ter sido ocupado
+  # depois do pedido. O codigo e renovado por renew_token_when_email_changes,
+  # como em toda troca de e-mail, e o campo do formulario sincronizado com o
+  # e-mail acompanha. Devolve false, com os erros na candidatura, se a troca
+  # nao pode ser feita.
+  def confirm_email_change
+    return false unless email_change_pending?
+
+    self.email = pending_email
+    filled_form.sync_fields_before(self)
+    save
+  end
+
+  # Sem validacao, porque o pedido acaba como estiver a candidatura; mas com
+  # o save, e nao update_columns, para que o fim do pedido fique no historico
+  # da candidatura como o pedido ficou.
+  def cancel_email_change
+    assign_attributes(pending_email: nil, email_change_digest: nil, email_change_sent_at: nil)
+    save(validate: false)
+  end
+
+  # A parte do codigo que cita a candidatura sem abri-la: os seis primeiros
+  # caracteres, unicos dentro do processo (generate_valid_token).
   def identifier
-    self.token[..5]
+    self.token.to_s[..5]
   end
 
   def can_edit_itself
@@ -724,7 +846,7 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
 
   private
     def nested_entries(entries)
-      entries.is_a?(Hash) ? entries.values : Array(entries)
+      Admissions::FilledForm.nested_entries(entries)
     end
 
     # A entrada dos parametros que corresponde ao objeto do formulario de fase:
@@ -742,8 +864,13 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       end
     end
 
-    def sanitize_filled_form_params(filled_form, attributes)
+    def sanitize_filled_form_params(filled_form, attributes, always_submitted:)
       attributes = attributes.except(:form_template_id, :is_filled)
+      attributes[:enable_submission] = "1" if always_submitted
+      if attributes.key?(:fields_attributes)
+        attributes[:fields_attributes] =
+          Admissions::FilledForm.submitted_fields(attributes[:fields_attributes])
+      end
       if filled_form&.persisted?
         attributes[:id] = filled_form.id
       else
@@ -752,20 +879,25 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       attributes
     end
 
-    def sanitize_nested_filled_forms(entries, owners)
+    def sanitize_nested_filled_forms(entries, owners, always_submitted:)
       nested_entries(entries).map do |entry|
         next entry if entry[:filled_form_attributes].blank?
         owner = owners.find { |o| o.persisted? && o.id.to_s == entry[:id].to_s } if entry[:id].present?
+        next entry.except(:filled_form_attributes) if block_given? && !yield(owner)
         entry.merge(
           filled_form_attributes: sanitize_filled_form_params(
-            owner&.filled_form, entry[:filled_form_attributes]
+            owner&.filled_form, entry[:filled_form_attributes], always_submitted:
           )
         )
       end
     end
 
+    # O codigo e a credencial da inscricao: cada caractere sai do gerador
+    # criptografico. O sample sem `random:` usa o gerador comum do Ruby, cuja
+    # sequencia se reconstroi a partir de saidas observadas.
     def generate_token
-      18.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }
+      alphabet = "2346789BCDFGHJKMPQRTVWXY".chars
+      18.times.map { alphabet.sample(random: SecureRandom) }
         .insert(6, "-").insert(13, "-").join("")
     end
 
@@ -783,9 +915,64 @@ class Admissions::AdmissionApplication < ActiveRecord::Base
       token
     end
 
+    # O espaco em volta nao e parte do endereco. So no endereco que chega: o
+    # gravado com espaco pela tela antiga fica como esta, senao o save de
+    # qualquer outra coisa o alteraria.
+    def strip_email
+      return unless email_changed?
+
+      self.email = email.strip if email.is_a?(String) && email != email.strip
+    end
+
+    # O endereco que o candidato pediu ja passou pela validacao do e-mail da
+    # candidatura (formato e unicidade), por isso depois dela, e so quando ela
+    # nao achou erro. Ele sai do e-mail e fica pendente; o e-mail e o campo do
+    # formulario sincronizado com ele voltam ao endereco em vigor.
+    #
+    # after_validation, e nao before_save: o formulario preenchido e
+    # belongs_to, gravado antes dos before_save da candidatura, e o campo que
+    # voltasse ali nao seria gravado.
+    def hold_email_change_for_confirmation
+      return unless email_change_needs_confirmation && errors.empty?
+      return unless persisted? && email_address_changed?
+      # Sem endereco em vigor nao ha caixa a proteger, nem para onde voltar.
+      return if email_in_database.blank?
+
+      @email_change_token = SecureRandom.urlsafe_base64(32)
+      self.pending_email = email
+      self.email_change_digest = self.class.email_change_digest_of(@email_change_token)
+      self.email_change_sent_at = Time.current
+      self.email = email_in_database
+      filled_form.sync_fields_before(self)
+    end
+
+    # O e-mail mudou de fato -- a troca foi confirmada, ou a equipe o corrigiu
+    # pela tela interna: o pedido pendente, se havia, acabou.
+    def forget_email_change_when_email_changes
+      return unless persisted? && email_address_changed?
+
+      self.pending_email = nil
+      self.email_change_digest = nil
+      self.email_change_sent_at = nil
+    end
+
     def set_token
       unless self.token?
         self.token = generate_valid_token
       end
+    end
+
+    # O codigo so viaja por e-mail, para o endereco gravado na inscricao; quem
+    # o apresenta leu a caixa daquele endereco. Quando o endereco muda, por
+    # qualquer tela, o codigo deixa de valer e outro e gerado: quem tinha o
+    # antigo tinha a caixa antiga. O identificador (os seis primeiros
+    # caracteres) fica, porque e por ele que relatorios e rotulos ja citaram a
+    # inscricao; muda so o resto.
+    def renew_token_when_email_changes
+      return unless persisted? && email_address_changed? && self.token?
+
+      renewed = "#{identifier}#{generate_token[6..]}"
+      renewed = "#{identifier}#{generate_token[6..]}" while self.class.exists?(token: renewed)
+      self.token = renewed
     end
 end

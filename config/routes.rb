@@ -391,11 +391,18 @@ Rails.application.routes.draw do
       concerns :active_scaffold
     end
 
+    # Antes de resources :admissions: o link de validacao da troca de e-mail
+    # da inscricao (#752). GET mostra a pagina; a troca e o PUT do botao.
+    get "admissions/email_change/:id", to: "email_changes#show", as: :admission_email_change
+    put "admissions/email_change/:id", to: "email_changes#update"
+
     resources :admissions, only: [:index, :show] do
       post :find, on: :collection
       post :create, on: :member
       resources :apply, only: [:show, :new, :create, :edit, :update] do
         post :update, on: :member
+        # O candidato desiste da troca de e-mail pendente (#752).
+        delete :email_change, on: :member, action: :cancel_email_change
       end
       resources :letters, only: [:show, :update]
     end

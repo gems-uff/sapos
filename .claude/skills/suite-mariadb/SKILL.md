@@ -89,8 +89,10 @@ bundle install
 
 ## Execução
 
-**Não edite `config/database.yml`** — ele é versionado e aponta o teste para
-SQLite de propósito. Use `DATABASE_URL`, que o Rails sobrepõe:
+**Não edite `config/database.yml`.** O bloco `test` dele é o SQLite das outras
+rodadas, e um bloco MariaDB esquecido ali faria toda rodada seguinte trocar de
+banco sem aviso. Use `DATABASE_URL`, que o Rails sobrepõe e que morre com o
+shell:
 
 ```bash
 export DATABASE_URL="mysql2://root@127.0.0.1:3307/sapos_test?encoding=utf8mb4&collation=utf8mb4_unicode_ci"
@@ -106,6 +108,39 @@ tabelas e collation única devem bater com produção:
 SELECT COUNT(*), COUNT(DISTINCT TABLE_COLLATION), MIN(TABLE_COLLATION)
   FROM information_schema.TABLES WHERE TABLE_SCHEMA='sapos_test';
 ```
+
+### Em paralelo
+
+Vale o procedimento da skill `safe-refactor` ("Em paralelo"), com uma diferença:
+o `DATABASE_URL` traz o nome do banco, prevalece sobre o `database:` do YAML, e
+o `parallel_tests` o repassa igual a todos os workers. Sem ajuste, todos caem em
+`sapos_test`, e a varredura de vazamento de um apaga o `before(:all)` do outro.
+O `por_worker.sh`, nesta pasta, reescreve a URL para o banco do worker
+(`sapos_test`, `sapos_test2`, ...) antes de executar o comando. Tudo que o
+worker dispara herda a URL reescrita — o cliente próprio do
+`Query.run_read_only_query` e a rake task de notificações, que é outro processo.
+
+Pelo mesmo motivo o `rake parallel:load_schema` não serve aqui: carregaria todos
+os esquemas em `sapos_test`. Crie e carregue cada banco pelo script:
+
+```bash
+P=.claude/skills/suite-mariadb/por_worker.sh
+for n in "" 2; do
+  $M/bin/mysql -h 127.0.0.1 -P 3307 -u root -e \
+    "CREATE DATABASE IF NOT EXISTS sapos_test$n CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+  TEST_ENV_NUMBER=$n RAILS_ENV=test sh $P bundle exec rails db:schema:load
+done
+
+PARALLEL_TESTS_EXECUTABLE="sh $P bundle exec rspec" \
+  bundle exec parallel_rspec -n 2 --serialize-stdout --combine-stderr --verbose-rerun-command \
+  -o '--seed N --format documentation --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log' spec
+```
+
+Confira o esquema com a consulta acima trocando o filtro por
+`TABLE_SCHEMA LIKE 'sapos_test%' GROUP BY TABLE_SCHEMA`: cada banco com o mesmo
+número de tabelas e a mesma collation. A contagem de exemplos em MariaDB não é a
+do SQLite — há exemplos que só existem num dos dois —, então o baseline serial
+desta comparação é o serial em MariaDB.
 
 ## Como interpretar as falhas
 

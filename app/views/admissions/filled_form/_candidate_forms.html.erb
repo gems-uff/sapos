@@ -1,7 +1,10 @@
 <%
   record = admission_application
   subid ||= "group_#{SecureRandom.random_number(1_000_000)}"
-
+  # Quem troca o e-mail da candidatura por esta tela. Na tela interna, so quem
+  # tem a edicao total (AdmissionApplication#assign_form repoe o endereco de
+  # quem nao tem); o candidato altera o proprio.
+  can_edit_email = local_assigns.fetch(:can_edit_email, true)
 %>
 <div>
   <%= toggable_area("Candidatura", enabled: show_groups, visible: main_visible, id: "#{subid}-") do %>
@@ -13,6 +16,7 @@
         admission_application: admission_application,
         show_name: show_name,
         show_email: show_email,
+        can_edit_email:,
         can_disable_submission: } %>
     <% else %>
       <%= render partial: "admissions/filled_form/show/filled_form_template", locals: {
@@ -33,7 +37,9 @@
         name: "Carta de #{letter_request.name}",
         id: "#{subid}-letter-#{letter_request.id}",
         visible: main_visible,
-        can_edit: can_edit_main,
+        # a carta ainda nao respondida so e preenchida, no lugar do
+        # recomendador, por quem tem a edicao total (assign_form)
+        can_edit: can_edit_main && (local_assigns[:can_edit_override] || letter_request.answered?),
         field: :letter_requests,
         object: letter_request,
         hidden_fields: [],

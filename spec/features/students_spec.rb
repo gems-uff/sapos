@@ -119,6 +119,19 @@ RSpec.describe "Student features", type: :feature do
       expect(Student.where(name: "Erica")).to be_empty
     end
 
+    it "should reject an invalid email" do
+      within("#as_#{plural_name}-create--form") do
+        fill_in "Nome", with: "Erica"
+        fill_in "CPF", with: "5"
+        fill_in "Email", with: "banshee wf.com"
+      end
+      click_button_and_wait "Salvar"
+
+      expect(page).to have_content("Email não é válido")
+      expect(page).to have_css("#as_#{plural_name}-create--form")
+      expect(Student.where(name: "Erica")).to be_empty
+    end
+
 
     it "should have city widget for birth_city" do
       expect_to_have_city_widget(page, "birth_city_", "birth_state_", "birth_country_")

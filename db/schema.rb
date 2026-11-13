@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
   create_table "accomplishments", force: :cascade do |t|
     t.date "conclusion_date"
     t.datetime "created_at", precision: nil, null: false
@@ -30,9 +30,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.integer "admission_process_id"
     t.datetime "created_at", null: false
     t.string "email"
+    t.string "email_change_digest"
+    t.datetime "email_change_sent_at"
     t.integer "enrollment_id"
     t.integer "filled_form_id"
     t.string "name"
+    t.string "pending_email"
     t.string "status"
     t.text "status_message"
     t.integer "student_id"
@@ -41,6 +44,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
     t.datetime "updated_at", null: false
     t.index ["admission_phase_id"], name: "index_admission_applications_on_admission_phase_id"
     t.index ["admission_process_id"], name: "index_admission_applications_on_admission_process_id"
+    t.index ["email_change_digest"], name: "index_admission_applications_on_email_change_digest"
     t.index ["enrollment_id"], name: "index_admission_applications_on_enrollment_id"
     t.index ["filled_form_id"], name: "index_admission_applications_on_filled_form_id"
     t.index ["student_id"], name: "index_admission_applications_on_student_id"
@@ -294,7 +298,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
   end
 
   create_table "carrier_wave_files", force: :cascade do |t|
-    t.binary "binary"
+    t.binary "binary", limit: 16777215
     t.string "content_type"
     t.datetime "created_at", precision: nil, null: false
     t.string "medium_hash", limit: 255

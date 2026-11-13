@@ -47,8 +47,11 @@ e isso é resultado: encurta a lista do que precisa ser testado à mão.
 
 **O changelog diz a intenção; o diff diz o que mudou.** Quando um item parecer
 tocar o projeto, leia o diff da própria dependência antes de concluir —
-`gh api repos/<owner>/<repo>/compare/v<antiga>...v<nova>` devolve commits e patch.
-Entrada que anuncia "adicionamos X" pode ser lógica que apenas **mudou de lugar**,
+`gh api repos/<owner>/<repo>/compare/<tag antiga>...<tag nova>` devolve commits e
+patch. O nome das tags sai de `gh api --paginate repos/<owner>/<repo>/tags --jq
+'.[].name'` — `--paginate` porque a primeira página traz só as mais novas, e a
+série que o `Gemfile.lock` fixa pode estar bem atrás —, e nem toda gem as prefixa
+com `v`. Entrada que anuncia "adicionamos X" pode ser lógica que apenas **mudou de lugar**,
 sem efeito nenhum na tela; o texto sozinho não distingue as duas coisas. Quando o
 `gh api` não serve — gem fora do GitHub, tag que não bate com a versão publicada,
 rede filtrada —, resta comparar o fonte instalado das duas versões
@@ -115,8 +118,15 @@ Três maneiras de essa checagem mentir:
 
 ### 5. Baseline
 
-Rode a suíte inteira no código **sem a mudança** e anote três números: exemplos,
-falhas e duração.
+Rode a suíte inteira no código **sem a mudança** e anote os três números da última
+linha do RSpec — `N examples, M failures, K pending` — e a duração.
+
+Anote também a seed. A ordem dos exemplos é sorteada a cada run, e a linha
+`Randomized with seed N` diz qual saiu. Rode o "depois" com `--seed N`: sem ela,
+um vermelho que só a ordem nova expõe não se distingue de um que a mudança causou.
+Quando a mudança acrescenta ou move exemplos, a mesma seed já não garante a mesma
+ordem; aí um vermelho novo pede o baseline de novo sob a seed nova — e o
+`--bisect` do `AGENTS.md` — antes de ser cobrado da mudança.
 
 Isso não é formalidade. Sem baseline, uma falha depois da mudança é ambígua —
 pode já estar quebrada. E se o baseline vier vermelho, **conserte o ambiente
@@ -129,12 +139,18 @@ Um passo, uma suíte, um commit. Se algo quebrar, o commit aponta a causa. Para
 dependências, veja as regras em `AGENTS.md` — em especial a de conferir a versão
 que de fato foi resolvida no `Gemfile.lock`.
 
-### 7. Compare, e compare o número de exemplos
+### 7. Compare, e compare a contagem
 
-Não olhe só "0 falhas". **Compare a contagem de exemplos com a do baseline.** Uma
-suíte verde com menos exemplos significa que testes sumiram — arquivo que deixou
-de carregar, spec que virou `pending`, `describe` que não roda mais. Some com o
-mesmo efeito de uma regressão, e sem alarme.
+Não olhe só "0 failures". **Compare os três números da última linha com os do
+baseline, um a um** — exemplos, falhas e pending. Uma suíte verde com menos
+exemplos significa que testes sumiram — arquivo que deixou de carregar,
+`describe` que não roda mais, um `fit` esquecido (o `spec_helper.rb` liga
+`filter_run_when_matching :focus`, então ele sozinho reduz a suíte ao que está
+focado). Some com o mesmo efeito de uma regressão, e sem alarme.
+
+**Pending não diminui a contagem**: o RSpec o conta em `N examples`. Spec que
+virou `pending` ou `skip` mantém o total e só aparece como pending a mais — a
+soma igual esconde. A lista `Pending:` no fim da saída diz qual é e por quê.
 
 ### 8. Interprete conforme a natureza da mudança
 
@@ -162,15 +178,59 @@ racionalizá-la como intencional.
 - **Em background, não bufferize.** `... | tail -N` **esconde tudo até o fim** — o
   `tail` só imprime quando o pipe fecha, então o arquivo de saída fica vazio a run
   inteira e não dá para acompanhar nem ver onde travou. Rode sem o `tail`,
-  deixando a saída fluir para o arquivo, e use `--format progress` (ou
-  `documentation`, mais verboso). O que estiver escrito por último aponta onde
-  parou.
+  deixando a saída fluir para o arquivo, e use `--format documentation`: é o
+  formato que escreve uma linha por exemplo, com o nome, à medida que cada um
+  termina. Com o `progress` o arquivo guarda pontos, e uma run travada não se
+  localiza por eles. A última linha é o último exemplo que terminou: o travado
+  veio logo depois, e os cabeçalhos de grupo acima dela dizem em que arquivo
+  procurar.
 - **Feature spec travado.** Se a run passa muito do tempo normal (~12 min) com um
   `chromedriver` girando, travou — mate e investigue, não espere. Confira Chrome ×
   chromedriver na mesma versão (o Chrome se auto-atualiza). Mas **versão casada não
   descarta o travamento**: página quebrada — asset que não compila, JS que mudou —
   faz o Capybara esperar para sempre por um elemento que nunca aparece. Aí a causa
   é a mudança, não o ambiente.
+
+### Em paralelo (opcional)
+
+O serial continua sendo o critério de pronto; o paralelo serve para iterar.
+
+Cada worker tem banco próprio (`db/test.sqlite3`, `db/test2.sqlite3`): o
+`database.yml` local precisa do `<%= ENV["TEST_ENV_NUMBER"] %>` no nome do banco
+de teste, como no `.example`. Prepare-os uma vez, e de novo a cada troca de ramo
+que mude o esquema — a armadilha do banco velho do `AGENTS.md` vale para todos:
+
+    bundle exec rake "parallel:load_schema[2]"
+
+Num checkout recém-clonado, rode antes um comando Rails serial
+(`bundle exec rails runner ''`). Sem `SECRET_KEY_BASE` no ambiente, o primeiro
+boot de teste grava o `tmp/local_secret.txt`, e N processos fazendo isso juntos
+podem ler o arquivo ainda vazio: `secret_key_base ... got: ""`.
+
+Rodada:
+
+    PARALLEL_TESTS_EXECUTABLE='bundle exec rspec' SELENIUM_BROWSER=chrome \
+      bundle exec parallel_rspec -n 2 --serialize-stdout --combine-stderr --verbose-rerun-command \
+      -o '--seed N --format documentation --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log' spec
+
+- `PARALLEL_TESTS_EXECUTABLE`: o `parallel_tests` prefere o `bin/rspec`, que está
+  versionado sem bit de execução, e morre com `EACCES`.
+- `--format documentation` repetido: qualquer `--format` passado em `-o`
+  substitui o do `.rspec`, e a saída perde a linha de contagem.
+- O log de runtime é o que equilibra os workers: com ele em `tmp/`, a divisão
+  passa a ser por tempo; sem ele, por tamanho de arquivo, que deixa um worker com
+  o grosso das features e quase não ganha nada. A primeira rodada o grava.
+- `-n 2`: um terceiro ou quarto worker não encurta a rodada e custa um navegador
+  de memória cada. Os navegadores disputam a máquina, a soma do tempo dos
+  arquivos cresce com cada worker, e o tempo de um mesmo arquivo de feature varia
+  tanto entre rodadas que a divisão por runtime não consegue equilibrar mais que
+  dois.
+- Compare a linha agregada (`N examples, M failures, K pendings`) com o baseline
+  serial, como no passo 7. A mesma seed **não** dá a mesma ordem do serial: cada
+  worker sorteia sobre o seu subconjunto de arquivos. Para reproduzir um
+  vermelho, rode em serial o comando que o `--verbose-rerun-command` imprime para
+  o worker que falhou, com a mesma seed — e o `--bisect` sobre essa lista.
+- Apague `coverage/` antes de comparar cobertura entre rodadas.
 
 ## Quando a suíte não basta
 

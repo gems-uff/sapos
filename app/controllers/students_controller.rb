@@ -15,8 +15,6 @@ class StudentsController < ApplicationController
     :birth_state, :birth_city, :humanitarian_policy, :father_name, :mother_name, :obs, :student_majors
   ]
 
-  before_action :check_current_user
-
   active_scaffold :student do |config|
     config.list.sorting = { name: "ASC" }
     config.list.columns = [:name, :cpf, :enrollments]
@@ -76,18 +74,4 @@ class StudentsController < ApplicationController
   record_select(
     per_page: 10, search_on: [:name], order_by: "name", full_text_search: true
   )
-
-  private
-    def check_current_user
-      if can? :update_all_fields, Student
-        active_scaffold_config.update.columns = UPDATE_FIELDS
-      elsif can? :update_only_photo, Student
-        active_scaffold_config.update.columns = [:photo, :email]
-      end
-      if can? :read_all_fields, Student
-        active_scaffold_config.show.columns = UPDATE_FIELDS
-      elsif can? :update_only_photo, Student
-        active_scaffold_config.update.columns = [:photo, :email]
-      end
-    end
 end

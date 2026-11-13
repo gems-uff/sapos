@@ -71,7 +71,7 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1,
                                                      level: @level2, enrollment_status: @enrollment_status1,
                                                      admission_date: YearSemester.current.semester_begin - 3.years,
-                                                     research_area: @research_area1, thesis_defense_date: Time.now)
+                                                     research_area: @research_area1, thesis_defense_date: Time.current)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level2, enrollment_status: @enrollment_status1)
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "D01", student: @student1, level: @level1, enrollment_status: @enrollment_status1)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "D02", student: @student1, level: @level1, enrollment_status: @enrollment_status1)

@@ -189,7 +189,7 @@ RSpec.describe Admissions::AdmissionApplication, "cópia para o aluno e envio de
       )
       @process = create_closed_admission_process(
         @template, simple_url: "assign-form-spec", letter_template: @letters,
-        end_date: Date.today + 5.days, edit_date: Date.today + 10.days
+        end_date: Date.current + 5.days, edit_date: Date.current + 10.days
       )
       @application = create_application(@process, name: "Ana", filled: false, fields: { "nota" => "5" })
       @nota = @application.filled_form.fields.first
@@ -221,11 +221,21 @@ RSpec.describe Admissions::AdmissionApplication, "cópia para o aluno e envio de
       expect(@application).to be_valid
     end
 
-    it "não marca como enviada quando a submissão não veio habilitada" do
+    it "não marca como enviada quando quem tem a edição total desliga a submissão" do
+      @application.assign_form({
+        filled_form_attributes: filled_form_params(@application.filled_form, { "nota" => "9", "nome" => "Ana" }, enable: "0"),
+      }, can_edit_override: true)
+      expect(@application.filled_form.is_filled).to be false
+      expect(value_of(@application.filled_form, "nota")).to eq("9")
+    end
+
+    # Só a tela de quem tem a edição total desliga a submissão: para os demais
+    # o formulário é sempre submetido, diga o parâmetro o que disser.
+    it "marca como enviada mesmo com a submissão desligada nos parâmetros de quem não tem a edição total" do
       @application.assign_form({
         filled_form_attributes: filled_form_params(@application.filled_form, { "nota" => "9", "nome" => "Ana" }, enable: "0"),
       }, check_candidate_permission: true)
-      expect(@application.filled_form.is_filled).to be false
+      expect(@application.filled_form.is_filled).to be true
       expect(value_of(@application.filled_form, "nota")).to eq("9")
     end
 

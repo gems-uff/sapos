@@ -7,7 +7,7 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
   before_action only: [:new, :create] do
     find_admission_process(:admission_id)
   end
-  before_action :find_admission_application, only: [:show, :edit, :update]
+  before_action :find_admission_application, only: [:show, :edit, :update, :cancel_email_change]
   before_action :check_if_process_is_open_to_new, only: [:new, :create]
   before_action :check_if_process_is_open_to_edit, only: [:edit, :update]
   before_action :prepare_new_admission_application, only: [:new, :create]
@@ -36,8 +36,9 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
   def update(creating: false)
     prepare_edit_update_application(creating: creating)
     was_filled = @admission_application.filled_form.is_filled
+    previous_token = @admission_application.token
     @admission_application.assign_form(
-      admission_application_params,
+      submitted_params(creating: creating),
       has_letter_forms: false,
       has_phases: @admission_application.admission_phase.present?,
       has_rankings: true,
@@ -49,6 +50,12 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       @admission_application.submission_time = Time.current
     end
     @admission_application.filled_form.is_filled = true
+    # O codigo de identificacao so viaja por e-mail, para o endereco da
+    # inscricao: quem o apresenta leu a caixa daquele endereco. Quando o
+    # candidato muda o endereco -- pelo campo do formulario sincronizado com o
+    # e-mail --, a troca fica pendente (assign_form liga
+    # email_change_needs_confirmation): o e-mail e o codigo continuam os de
+    # antes ate o endereco novo confirmar pelo link que segue abaixo (#752).
     if @admission_application.save
       emails = [EmailTemplate.load_template(
         was_filled ?
@@ -78,10 +85,31 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
           letter_request.update(sent_email: letter_request.email)
         end
       end
+      email_change = email_change_message
+      emails << email_change if email_change
       Notifier.send_emails(notifications: emails)
-      notice = was_filled ?
-        I18n.t("admissions.apply.update.edit_notice") :
-        I18n.t("admissions.apply.update.new_notice")
+      # Inscricao que nasce aqui (processo sem sessao): o navegador nao recebe
+      # o codigo, so o aviso de para onde ele foi.
+      if creating
+        session[:admission_tokens]&.delete(previous_token)
+        return redirect_to admissions_path, token_delivery_flash(
+          "admissions.apply.update.new_token_sent", @admission_application.email, emails.first(1)
+        )
+      end
+      if email_change
+        # O aviso de para onde o link foi; quando a mensagem nao sai, ninguem
+        # tem como confirmar, e o pedido nao fica pendente.
+        flash_message = token_delivery_flash(
+          "admissions.apply.update.email_change_requested",
+          @admission_application.pending_email, [email_change],
+          saved: I18n.t("admissions.apply.update.#{was_filled ? "edit_notice" : "new_notice"}")
+        )
+        @admission_application.cancel_email_change if flash_message.key?(:alert)
+      else
+        flash_message = { notice: was_filled ?
+          I18n.t("admissions.apply.update.edit_notice") :
+          I18n.t("admissions.apply.update.new_notice") }
+      end
 
       if @admission_application.admission_process.require_session
         add_token_to_session(@admission_application.token)
@@ -89,15 +117,23 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       redirect_to admission_apply_path(
         admission_id: @admission_process.simple_id,
         id: @admission_application.token
-      ), notice: notice
+      ), flash_message
     else
-      # Temporary log to understand the reason of why submission is failing
+      # Formulário que a validação do cliente deixou passar e o servidor
+      # recusou (issue #605). O e-mail leva o motivo técnico, atributo e tipo
+      # de cada erro; o que o candidato preencheu fica no log do servidor, que
+      # já registra os parâmetros da requisição, junto com as mensagens.
+      Rails.logger.warn(
+        "Inscrição recusada no servidor: " +
+        @admission_application.errors.full_messages.join("; ")
+      )
       ExceptionNotifier.notify_exception(
         Exception.new("Validação javascript de seleção falhou e form com erro chegou no servidor"),
+        env: request.env,
         data: {
-          params:,
-          full_messages: @admission_application.errors.full_messages,
-          errors: @admission_application.errors
+          errors: @admission_application.errors.map do |error|
+            "#{error.attribute}: #{error.type}"
+          end
         }
       )
       if !was_filled
@@ -114,7 +150,35 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
     end
   end
 
+  # O candidato desiste da troca de e-mail pendente, e o link enviado deixa de
+  # valer. Nao depende do prazo de edicao: o pedido e que nao pode ficar de pe
+  # contra a vontade de quem o fez.
+  def cancel_email_change
+    @admission_application.cancel_email_change
+    redirect_to admission_apply_path(
+      admission_id: @admission_process.simple_id,
+      id: @admission_application.token
+    ), notice: I18n.t("admissions.apply.cancel_email_change.notice")
+  end
+
   private
+    # A mensagem com o link de validacao, quando este envio pediu a troca do
+    # e-mail. Vai para o endereco novo, e nao leva o codigo da inscricao.
+    def email_change_message
+      token = @admission_application.email_change_token
+      return nil if token.blank?
+
+      EmailTemplate.load_template(
+        "admissions/apply:confirm_email_change"
+      ).prepare_message({
+        email: @admission_application.pending_email,
+        identifier: @admission_application.identifier,
+        validity_hours: Admissions::AdmissionApplication::EMAIL_CHANGE_VALIDITY.in_hours.to_i,
+        admission_process: @admission_process,
+        confirm_email_change_url: admission_email_change_url(id: token)
+      })
+    end
+
     def prepare_new_admission_application
       if @admission_process.require_session
         return redirect_to admissions_path,
@@ -137,12 +201,13 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       @submission_method = :post
     end
 
-    # Submissão que chega sem o parâmetro record — upload interrompido, duplo
-    # clique em "Modificar inscrição". Sem isso, o params.require(:record)
-    # estoura e o candidato recebe a página crua de 400 do Rails, sem entender
-    # o que houve nem o que fazer.
+    # Submissão que chega sem o formulário no parâmetro record — upload
+    # interrompido, duplo clique em "Modificar inscrição", envio que não veio
+    # da tela. Sem isso, o params.require(:record).permit estoura e o candidato
+    # recebe a página crua de erro do Rails, sem entender o que houve nem o
+    # que fazer.
     def check_submitted_record
-      return if params[:record].present?
+      return if submitted_record?
 
       target = if @admission_application&.token.present?
         admission_apply_path(
@@ -214,6 +279,21 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       filled_form.prepare_missing_fields
       @admission_application.prepare_missing_letters
       filled_form.sync_fields_before(@admission_application)
+    end
+
+    # Nome e e-mail so sao campos da tela quando a inscricao nasce no envio do
+    # formulario (processo sem sessao). Na edicao a tela nao os oferece: eles
+    # so mudam pelo campo do formulario sincronizado com cada um.
+    #
+    # O formulario principal, quando a tela o oferece ao candidato, e sempre
+    # submetido (submitted_form).
+    def submitted_params(creating:)
+      submitted = admission_application_params
+      submitted = submitted.except(:name, :email) unless creating
+      if @admission_application.can_edit_main_form?(check_candidate_permission: true)
+        submitted[:filled_form_attributes] = submitted_form(submitted[:filled_form_attributes])
+      end
+      submitted
     end
 
     def admission_application_params

@@ -31,7 +31,27 @@ class Admissions::FilledForm < ActiveRecord::Base
   belongs_to :form_template, optional: false,
     class_name: "Admissions::FormTemplate"
 
-  accepts_nested_attributes_for :fields, allow_destroy: true, reject_if: proc { |attrs| attrs["id"].blank? && attrs["form_field_id"].blank? }
+  # Sem allow_destroy: nenhuma tela remove a linha de um campo, e a linha
+  # removida escaparia da conferencia do campo obrigatorio.
+  accepts_nested_attributes_for :fields, reject_if: proc { |attrs| attrs["id"].blank? && attrs["form_field_id"].blank? }
+
+  # As entradas de uma colecao aninhada como a tela as manda: uma por indice
+  # ({"0" => {...}}) ou em lista. A que chega de outro jeito -- os atributos
+  # de um registro so, soltos -- nao veio da tela e e descartada: o Rails a
+  # leria como lista de valores e estouraria na atribuicao.
+  def self.nested_entries(entries)
+    entries = entries.values if entries.is_a?(Hash)
+    Array(entries).select { |entry| entry.is_a?(Hash) }
+  end
+
+  # Os campos de um formulario que chegam nos parametros, e as escolaridades
+  # de cada campo, so no formato que a tela manda (nested_entries).
+  def self.submitted_fields(entries)
+    nested_entries(entries).map do |entry|
+      next entry unless entry.key?(:scholarities_attributes)
+      entry.merge(scholarities_attributes: nested_entries(entry[:scholarities_attributes]))
+    end
+  end
 
   def to_label
     key = "activerecord.attributes.admissions/filled_form.filled_status"
