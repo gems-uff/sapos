@@ -59,16 +59,16 @@ RSpec.describe "Admission phase status: edições inline simultâneas", type: :f
     edit_div = find(edit_div_selector(@application_b))
 
     within(edit_div) do
-      check "Habilitar formulário nesta submissão"
-      wait_for_ajax
+    check "Habilitar formulário nesta submissão"
+    wait_for_ajax
 
-      file_input = find(".webcam-photo input[type='file']", visible: false)
+    file_input = find(".webcam-photo input[type='file']", visible: false)
 
-      attach_file(
-        file_input[:id],
-        sample_photo_path,
-        make_visible: true
-      )
+    attach_file(
+      file_input[:id],
+      sample_photo_path,
+      make_visible: true
+    )
   end
 
     form = edit_div.find(:xpath, "./ancestor::form")
