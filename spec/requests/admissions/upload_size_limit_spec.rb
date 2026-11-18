@@ -10,9 +10,11 @@ require "rails_helper"
 # customFormValidations uma checagem propria, com 15 MB escrito no proprio ERB, e
 # essa checagem roda antes do envio: o edit.html.erb percorre
 # customFormValidations no clique do submit e chama preventDefault na primeira
-# que devolve false. Com a variavel configurada acima de 15, o navegador recusa o
-# arquivo que o servidor aceitaria, e a mensagem ainda fala em 15MB -- a
-# configuracao nao tem efeito no caminho por onde o candidato passa.
+# que devolve false. Com a variavel configurada abaixo de 15, o navegador deixa
+# passar o arquivo que o servidor recusa, e a mensagem ainda fala em 15MB -- o
+# candidato so descobre o limite depois do envio. O valor fica abaixo de 15
+# porque o teto da variavel e 15 enquanto o conteudo dos arquivos estiver no
+# banco.
 RSpec.describe "Admissions upload size limit", type: :request do
   def processo_com(simple_url, field_type:, configuration:)
     template = FactoryBot.create(:form_template, name: "Inscrição")
@@ -34,7 +36,7 @@ RSpec.describe "Admissions upload size limit", type: :request do
   end
 
   it "uses the configured limit in the file field browser check" do
-    CustomVariable.create!(variable: :max_upload_size_mb, value: "20")
+    CustomVariable.create!(variable: :max_upload_size_mb, value: "10")
     processo = processo_com(
       "mestrado-arquivo-configurado",
       field_type: Admissions::FormField::FILE, configuration: {}
@@ -42,12 +44,12 @@ RSpec.describe "Admissions upload size limit", type: :request do
 
     corpo = pagina_de(processo)
 
-    expect(corpo).to include("20 * 1024 * 1024")
+    expect(corpo).to include("10 * 1024 * 1024")
     expect(corpo).not_to include("15 * 1024 * 1024")
   end
 
   it "uses the configured limit in the student photo browser check" do
-    CustomVariable.create!(variable: :max_upload_size_mb, value: "20")
+    CustomVariable.create!(variable: :max_upload_size_mb, value: "10")
     processo = processo_com(
       "mestrado-foto-configurada",
       field_type: Admissions::FormField::STUDENT_FIELD,
@@ -56,7 +58,7 @@ RSpec.describe "Admissions upload size limit", type: :request do
 
     corpo = pagina_de(processo)
 
-    expect(corpo).to include("20 * 1024 * 1024")
+    expect(corpo).to include("10 * 1024 * 1024")
     expect(corpo).not_to include("15 * 1024 * 1024")
   end
 
