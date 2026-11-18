@@ -13,7 +13,7 @@ RSpec.describe "Edicao de turma com inscricoes", type: :request do
     sign_in create_confirmed_user([FactoryBot.create(:role_administrador)], "adm.turma.nota@ic.uff.br", "Adm")
     com_nota = FactoryBot.create(:course, course_type: FactoryBot.create(:course_type, has_score: true))
     @turma = FactoryBot.create(
-      :course_class, course: com_nota, professor: FactoryBot.create(:professor, email: "prof.turma@ic.uff.br")
+      :course_class, course: com_nota, professors: [FactoryBot.create(:professor, email: "prof.turma@ic.uff.br")]
     )
     @inscricao = FactoryBot.create(:class_enrollment, course_class: @turma)
     @enviados = []

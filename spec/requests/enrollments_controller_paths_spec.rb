@@ -100,7 +100,7 @@ RSpec.describe "Matriculas: documentos, usuarios e notas", type: :request do
       com_nota = FactoryBot.create(:course, course_type: FactoryBot.create(:course_type, has_score: true))
       @inscricao = FactoryBot.create(
         :class_enrollment, enrollment: @enrollment, course_class: FactoryBot.create(
-          :course_class, course: com_nota, professor: FactoryBot.create(:professor, email: "prof.nota@ic.uff.br")
+          :course_class, course: com_nota, professors: [FactoryBot.create(:professor, email: "prof.nota@ic.uff.br")]
         )
       )
     end

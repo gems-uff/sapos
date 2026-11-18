@@ -8,7 +8,7 @@
 FactoryBot.define do
   factory :course_class do
     course
-    professor
+    professors { [association(:professor)] }
     year { "2013" }
     semester { "1" }
   end

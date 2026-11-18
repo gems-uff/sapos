@@ -131,7 +131,7 @@ class StudentEnrollmentController < ApplicationController
         semester: @semester.semester,
       ).includes(:allocations)
       .includes(course: [ :course_type ])
-      .includes(:professor)
+      .includes(:professors)
       @on_demand = Course.includes(:course_type)
         .where(course_types: { on_demand: true })
       @advisement_authorizations = Professor
@@ -237,17 +237,29 @@ class StudentEnrollmentController < ApplicationController
 
     def find_or_create_course_class_in_this_semester(course_id, professor_id)
       attributes = {
-        course_id: course_id, professor_id: professor_id,
+        course_id: course_id,
         year: @semester.year, semester: @semester.semester
       }
-      course_class = CourseClass.find_by(attributes)
+      course_class = CourseClass.joins(:course_class_professors).find_by(
+        attributes.merge(course_class_professors: { professor_id: professor_id })
+      )
       return course_class if course_class.present?
 
       course = Course.find(course_id)
       if course.present?
-        course_class = CourseClass.create(
+        course_class = CourseClass.new(
           attributes.merge({ name: course.name })
         )
+
+        if professor_id.present?
+          professor = Professor.find_by(id: professor_id)
+          raise ValidationException, I18n.t(
+            "student_enrollment.enroll.errors.invalid_professor",
+            course: course.name
+          ) if professor.nil?
+          course_class.professors << professor
+        end
+        course_class.save
       end
       course_class
     end

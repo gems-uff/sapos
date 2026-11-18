@@ -26,7 +26,7 @@ RSpec.describe "Pedido de inscricao: radios de situacao", type: :request do
   end
 
   def disciplina(status)
-    turma = FactoryBot.create(:course_class, professor: @professor, year: 2020, semester: 1)
+    turma = FactoryBot.create(:course_class, professors: [@professor], year: 2020, semester: 1)
     FactoryBot.create(
       :class_enrollment_request, enrollment_request: @pedido, course_class: turma, status: status
     )

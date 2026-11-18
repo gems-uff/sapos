@@ -16,7 +16,7 @@ RSpec.describe "Lancamento de notas na edicao da turma", type: :request do
     @professor = FactoryBot.create(:professor, name: "Prof Turma", email: "prof_turma@ic.uff.br")
     tipo = FactoryBot.create(:course_type, has_score: true)
     curso = FactoryBot.create(:course, course_type: tipo, name: "Algoritmos")
-    @turma = FactoryBot.create(:course_class, course: curso, professor: @professor, name: "Turma A")
+    @turma = FactoryBot.create(:course_class, course: curso, professors: [@professor], name: "Turma A")
     @aprovada = FactoryBot.create(
       :class_enrollment, course_class: @turma,
       enrollment: FactoryBot.create(:enrollment, enrollment_number: "M-APROV",

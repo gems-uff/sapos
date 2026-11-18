@@ -1,0 +1,14 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+pt-BR:
+  activerecord:
+    attributes:
+      course_class_professor:
+        course_class: "Turma"
+        professor: "Professor"
+
+    models:
+      course_class_professor:
+        one: "Professor da Turma"
+        other: "Professores da Turma"
