@@ -43,6 +43,7 @@ pt-BR:
       models:
         paper:
           cannot_edit_other_papers: "não pode ser editado por este usuário"
+          cannot_edit_period: "não pode ser alterado por este usuário"
           order_uniqueness: "deve ser única para professor no período quadrienal"
 
     models:

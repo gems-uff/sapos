@@ -41,6 +41,26 @@ RSpec.describe Student, type: :model do
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:cpf) }
 
+    it "rejects an invalid email" do
+      student.email = "banshee wf.com"
+
+      expect(student).to have_error(:invalid).on(:email)
+    end
+
+    it "accepts multiple valid emails" do
+      student.email = "ana@example.com, bia@example.com"
+
+      expect(student).not_to have_error(:invalid).on(:email)
+    end
+
+    it "allows editing another attribute of an old invalid student" do
+      student.email = "banshee wf.com"
+      student.save!(validate: false)
+      student.name = "Ana Maria"
+
+      expect(student).to be_valid
+    end
+
     describe "user" do
       context "should be valid when" do
         it "user is set to null after a predefined value" do

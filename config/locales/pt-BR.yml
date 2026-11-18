@@ -18,6 +18,7 @@ pt-BR:
       greater_than_or_equal_to: "deve ser maior ou igual a %{count}"
       inclusion: "não está incluído na lista"
       invalid: "não é válido"
+      invalid_date: "não é uma data válida"
       less_than: "deve ser menor que %{count}"
       less_than_or_equal_to: "deve ser menor ou igual a %{count}"
       not_a_number: "não é um número"

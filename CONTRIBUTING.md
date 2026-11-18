@@ -1,14 +1,48 @@
 # Contributing to SAPOS
 
-Is this your first time contributing here? Try some [good first issues](https://github.com/gems-uff/sapos/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22) to start. But remember to post your intended solution in the issue to discuss with the team before starting coding.
+Is this your first time contributing here? Try some [good first issues](https://github.com/gems-uff/sapos/issues?q=is%3Aissue%20state%3Aopen%20label%3A%22good%20first%20issue%22) to start. But remember to agree on your solution in the issue before starting to code — see [Before coding](#before-coding-agree-on-the-solution-in-the-issue).
 
 If you want to contribute to our project and **DO NOT BELONG TO THE MAIN TEAM**, follow these steps:
 
-1. Fork the repo
-2. Implement and test your code
-3. Submit a pull request
+1. Agree on the solution in the issue (see [Before coding](#before-coding-agree-on-the-solution-in-the-issue))
+2. Fork the repo
+3. Implement and test your code
+4. Submit a pull request
 
 If you **DO BELONG TO THE MAIN TEAM**, just follow steps below.
+
+## Before coding: agree on the solution in the issue
+
+An issue usually starts as a pain — something slow, confusing or missing — not
+as a solution. Implementing straight from it means guessing rules that nobody
+has written down yet, and every wrong guess comes back as rework during the
+review, when it is most expensive to change.
+
+So before creating a branch, refine the solution in the issue itself:
+
+1. Write your proposal as a comment: what changes, for whom, and how it behaves
+   outside the happy path.
+2. If the change has a screen, attach a mock — a sketch or an annotated
+   screenshot that shows the layout and the messages the user will read.
+3. List the open questions, especially the product decisions: what happens to
+   invalid input, whether an operation applies in part or all-or-nothing, what
+   the user is told afterwards.
+4. Start coding only when the maintainer agrees that the requirement is closed.
+
+Decisions taken later, during the review or the homologation, also go back to
+the issue as a comment. The specification lives in one place, and the pull
+request implements what is written there.
+
+A large issue can be split while it is refined: a part whose solution is closed
+can be implemented while the others are still under discussion.
+
+**The assignee tells who is working on an issue.** Check it before you pick
+one: an issue assigned to someone else is taken, even when its branch shows no
+commit — work that was not pushed yet is invisible to you. If the issue has no
+assignee, ask in it and wait for the maintainer's answer; once the two of you
+agree that it is yours, assign it to yourself and only then start. If an
+assigned issue looks stalled, ask in the issue instead of opening a pull
+request for it.
 
 ## Branching model
 
@@ -18,16 +52,16 @@ The _main_ branch is the baseline and is always stable: every release, correctiv
 
 The lifecycle of a branch is:
 
-1. Create `issue_NNN` from _main_.
+1. Once the solution is agreed in the issue, create `issue_NNN` from _main_.
 2. Implement and test.
 3. Merge _main_ into `issue_NNN` and test again, so the branch is up to date.
 4. Open a pull request for the maintainer to review.
-5. The maintainer merges `issue_NNN` into _main_. Because of step 3 this is a fast-forward.
-6. The maintainer tags the new release on _main_.
+5. With the suite green locally and in CI, the maintainer merges `issue_NNN` into _main_ and closes the issue. Because of step 3 this is a fast-forward.
+6. When the maintainer decides to release, _main_ is validated in the staging environment and, if all is well, a new version is tagged on it. It carries every issue that reached _main_ since the previous tag; finishing an issue does not force a release.
 
-Steps 5 and 6 are done by the maintainer only, after reviewing the pull request.
+Steps 5 and 6 are done by the maintainer only. A finished issue is merged and closed right away, so nobody picks up work that is already done; the version label is added at release time, even to closed issues.
 
-**Security issues are the exception.** Do not open a public issue for a vulnerability: describing it publicly exposes the attack before the fix is released. Work on a branch created directly from _main_, with a generic description, and release it like any other fix.
+**Security issues are the exception.** Do not open a public issue for a vulnerability: describing it publicly exposes the attack before the fix is released. Work on a branch created directly from _main_, with a generic description. Unlike other issues, a security fix triggers a release right after it reaches _main_.
 
 ## Commit messages
 
@@ -50,8 +84,8 @@ goes without the prefix.
 
 Reference the issue with the prefix alone. Do not write `Fixes #NNN` or
 `Closes #NNN`: GitHub closes the issue as soon as such a commit reaches _main_,
-and closing is decided during the release, separately from labelling. An issue
-delivered in part gets the version label and stays open.
+and closing is decided by whoever merges. An issue delivered in part reaches
+_main_ and stays open, with a comment saying what is left.
 
 ## Testing
 

@@ -18,18 +18,16 @@ RSpec.describe Role, type: :model do
       expect(Role::ROLE_PROFESSOR).to eq(4)
       expect(Role::ROLE_ALUNO).to eq(5)
       expect(Role::ROLE_ADMINISTRADOR).to eq(6)
-      expect(Role::ROLE_SUPORTE).to eq(7)
     end
 
-    it "ORDER contains all 7 roles" do
+    it "ORDER contains all 6 roles" do
       expect(Role::ORDER).to contain_exactly(
         Role::ROLE_DESCONHECIDO,
         Role::ROLE_COORDENACAO,
         Role::ROLE_SECRETARIA,
         Role::ROLE_PROFESSOR,
         Role::ROLE_ALUNO,
-        Role::ROLE_ADMINISTRADOR,
-        Role::ROLE_SUPORTE
+        Role::ROLE_ADMINISTRADOR
       )
     end
   end

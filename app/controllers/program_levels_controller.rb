@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ProgramLevelsController < ApplicationController
+  include CurrentPeriodSearchConcern
+
   authorize_resource
 
   active_scaffold :program_level do |config|
@@ -10,9 +12,8 @@ class ProgramLevelsController < ApplicationController
     config.list.columns = [:level, :ordinance, :start_date, :end_date]
 
     config.actions.swap :search, :field_search
-    config.columns.add :active
     config.field_search.columns = [:active]
-    config.columns[:active].form_ui = :select
+    add_current_period_search_column(config)
 
     config.actions.exclude :deleted_records
   end

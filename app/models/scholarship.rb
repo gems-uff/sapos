@@ -30,7 +30,7 @@ class Scholarship < ApplicationRecord
   end
 
   def last_date
-    return (Date.today + 100.years).end_of_month if self.end_date.nil?
+    return (Date.current + 100.years).end_of_month if self.end_date.nil?
     self.end_date.end_of_month
   end
 

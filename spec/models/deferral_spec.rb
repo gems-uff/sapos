@@ -26,7 +26,7 @@ RSpec.describe Deferral, type: :model do
   end
   let(:enrollment) { FactoryBot.create(:enrollment, level: @level) }
   let(:deferral_type) { FactoryBot.create(:deferral_type, phase: phase) }
-  let(:approval_date) { Date.today }
+  let(:approval_date) { Date.current }
   let(:deferral) do
     Deferral.new(
       enrollment: enrollment,

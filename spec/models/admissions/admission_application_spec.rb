@@ -46,6 +46,31 @@ RSpec.describe Admissions::AdmissionProcess, type: :model do
     it { should be_valid }
     it { should validate_presence_of(:name) }
     it { should validate_presence_of(:email) }
+    it "rejects an invalid new email" do
+      admission_application.email = "not-an-email"
+
+      expect(admission_application).to have_error(:invalid).on(:email)
+    end
+
+    it "accepts a valid new email" do
+      admission_application.email = "ana@example.com"
+
+      expect(admission_application).not_to have_error(:invalid).on(:email)
+    end
+
+    it "allows editing another attribute of an old invalid application" do
+      admission_application.save!(validate: false)
+      admission_application.name = "Ana Maria"
+
+      expect(admission_application).to be_valid
+    end
+
+    it "rejects changing an old application to an invalid email" do
+      admission_application.save!(validate: false)
+      admission_application.email = "not-an-email"
+
+      expect(admission_application).to have_error(:invalid).on(:email)
+    end
     # Uniqueness of :email (scoped to admission_process, case- and accent-
     # insensitive) is covered in spec/models/uniqueness_spec.rb (neutral) and
     # spec/models/uniqueness_collation_spec.rb (MariaDB only).

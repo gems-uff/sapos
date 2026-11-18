@@ -43,6 +43,7 @@ require "support/place_widgets_helpers"
 require "support/record_select_helpers"
 require "support/download_helpers"
 require "support/uniqueness_examples"
+require "support/read_only_query_on_test_connection"
 
 Capybara.server = :puma
 

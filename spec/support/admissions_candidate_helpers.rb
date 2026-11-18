@@ -97,12 +97,18 @@ module AdmissionsCandidateHelpers
 
   # Inscrição completa pela rota pública, e devolve a candidatura. Edital com
   # sessão começa pela página do edital (nome e e-mail), que cria a candidatura
-  # vazia e guarda o código na sessão; o formulário vem depois, por PUT. Sem
-  # sessão, o POST do formulário cria tudo de uma vez.
+  # vazia e manda o código para o e-mail; com o e-mail e o código o candidato
+  # entra, e o formulário vem depois, por PUT. Sem sessão, o POST do formulário
+  # cria tudo de uma vez. O código que o candidato leria na mensagem sai aqui
+  # do banco: quem cobra a mensagem é o application_code_ownership_spec.rb.
   def apply_as_candidate(process, name:, email:, values: {}, letters: [])
     if process.require_session
       post admission_path(process.simple_url), params: { admissions_admission_application: { name: name, email: email } }
       application = Admissions::AdmissionApplication.find_by!(admission_process: process, email: email)
+      expect(response).to redirect_to(admission_path(id: process.simple_id, email: email))
+      post find_admissions_path, params: {
+        admissions_admission_application: { email: email, token: application.token, _source: process.simple_id },
+      }
       expect(response).to redirect_to(edit_admission_apply_path(admission_id: process.simple_id, id: application.token))
     end
     # Campos sincronizados levam o nome e o e-mail de volta para a candidatura;
@@ -151,6 +157,44 @@ module AdmissionsCandidateHelpers
     letter_request.reload
   end
 
+  # Candidatura do processo 3 de workflows.json (cartas de recomendação, comitê
+  # por linha de pesquisa) levada até a fase de avaliação: duas cartas
+  # preenchidas, homologação consolidada, e a pendência de avaliação com os
+  # membros da linha 1. Devolve o processo, a candidatura e um membro com a
+  # pendência.
+  def application_awaiting_committee(admin)
+    workflow = AdmissionsWorkflowLoader.load(process_id: 3)
+    process = workflow.process
+    homologacao = workflow.phase_links.first.admission_phase
+    secretary = workflow.committee_users[1].first
+    member = workflow.committee_users[3].first
+
+    application = apply_as_candidate(
+      process, name: "Kim", email: "kim@example.com", values: { "Linha de pesquisa" => "Linha 1" },
+      letters: [{ name: "Rec Um", email: "rec-um@example.com", telephone: "2199" },
+                { name: "Rec Dois", email: "rec-dois@example.com" }]
+    )
+    application.letter_requests.each do |letter|
+      fill_letter_as_recommender(process, letter, { "Relação com o candidato" => "Orientador", "Avaliação" => "Excelente" })
+    end
+    sign_in admin
+    consolidate_phase_as_staff(process, nil)
+    sign_out admin
+    sign_in secretary
+    submit_phase_form(
+      application, homologacao, homologacao.shared_form, { "Homologação" => "Deferida" },
+      mode: Admissions::AdmissionPhaseResult::SHARED
+    )
+    sign_out secretary
+    sign_in admin
+    consolidate_phase_as_staff(process, homologacao)
+    sign_out admin
+    unless application.pendencies.exists?(user: member, status: Admissions::AdmissionPendency::PENDENT)
+      raise "a candidatura não chegou ao membro da comissão"
+    end
+    [process, application.reload, member]
+  end
+
   # Formulário de fase (compartilhado ou individual) gravado pela edição da
   # candidatura, como o membro do comitê faria. A tela manda o id do resultado
   # ou da avaliação quando ele já existe -- e ele costuma existir: ao abrir a
@@ -192,6 +236,22 @@ module AdmissionsCandidateHelpers
       params: { consolidate_phase_id: phase&.id || 0 }.merge(params)
     raise "consolidação recusada: #{flash[:error]}" if flash[:error].present?
     flash[:info]
+  end
+
+  # [posição, seletor] gravados para a candidatura no ranking, ou nil se ela
+  # não tem posição (sem resultado, ou resultado com a posição em branco).
+  def position_and_machine(ranking_link, application)
+    result = Admissions::AdmissionRankingResult.find_by(
+      ranking_config: ranking_link.ranking_config, admission_application: application
+    )
+    return nil if result.nil? || result.filled_position.value.blank?
+    [result.filled_position.value.to_i, result.filled_machine.value]
+  end
+
+  # Valor do campo no formulário de consolidação da fase.
+  def consolidation_value(application, phase, field_name)
+    result = application.results.find_by(admission_phase: phase, mode: Admissions::AdmissionPhaseResult::CONSOLIDATION)
+    result.filled_form.fields.find { |f| f.form_field.name == field_name }.value
   end
 end
 

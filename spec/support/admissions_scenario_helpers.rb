@@ -55,9 +55,9 @@ module AdmissionsScenarioHelpers
         form_template: template,
         simple_url: simple_url,
         name: "Processo #{simple_url}",
-        start_date: Date.today - 40.days,
-        end_date: Date.today - 10.days,
-        edit_date: Date.today - 5.days,
+        start_date: Date.current - 40.days,
+        end_date: Date.current - 10.days,
+        edit_date: Date.current - 5.days,
       }.merge(attrs)
     )
   end

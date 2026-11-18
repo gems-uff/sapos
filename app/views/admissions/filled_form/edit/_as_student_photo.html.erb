@@ -46,9 +46,9 @@ $(document).ready(function() {
       return "";
     }
     if (file.size > 15 * 1024 * 1024) {
-      return `<%= form_field.name %> <%= I18n.t(
+      return <%= raw [form_field.name, I18n.t(
         "activerecord.errors.models.admissions/filled_form_field.filesize",
-        count: 15) %>`
+        count: 15)].join(" ").to_json %>
     }
     <% if configuration["values"] %>
       <%
@@ -58,9 +58,9 @@ $(document).ready(function() {
       let filename = file.name.toLowerCase();
       let extensions = <%= raw extensions.to_json %>;
       if (!extensions.some((ext) => filename.endsWith(ext.toLowerCase()))) {
-        return `<%= form_field.name %> <%= I18n.t(
+        return <%= raw [form_field.name, I18n.t(
           "activerecord.errors.models.admissions/filled_form_field.extension",
-          valid: configuration["values"].join(', ')) %>`
+          valid: configuration["values"].join(', '))].join(" ").to_json %>
       }
     <% end %>
     return "" ;

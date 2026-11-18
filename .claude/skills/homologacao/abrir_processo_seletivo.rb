@@ -8,7 +8,8 @@
 # replica nao tem processo aberto, e todos os processos dela vem com
 # require_session ligado -- ele faz o prepare_new_admission_application desviar
 # antes de o pedido chegar ao controller, entao sao dois campos a mexer, e nao
-# so a data.
+# so a data. Processo novo, com inscricao ainda por comecar, tem tambem o inicio
+# no futuro: o `abrir` o traz para hoje, e o `fechar` o devolve.
 #
 # Uso:
 #   set -a; source ~/.sapos_staging_env; set +a
@@ -70,8 +71,18 @@ def campo(driver, id)
   driver.find_elements(id: id).select(&:displayed?).first
 end
 
-def gravar(driver, wait, id, fim, exigir_sessao)
+# inicio nil deixa a data de inicio como esta: o arquivo de estado gravado
+# pela versao que nao mexia no inicio nao o traz.
+def gravar(driver, wait, id, inicio, fim, exigir_sessao)
   abrir_form(driver, wait, id)
+  if inicio
+    data = campo(driver, "record_start_date_#{id}")
+    abort "campo de data de inicio nao encontrado" if data.nil?
+    data.clear
+    data.send_keys(inicio)
+    data.send_keys(:escape)
+  end
+
   data = campo(driver, "record_end_date_#{id}")
   abort "campo de data de fim nao encontrado" if data.nil?
   data.clear
@@ -106,14 +117,18 @@ begin
     abort "ja existe #{ESTADO}: feche antes de abrir de novo" if File.exist?(ESTADO)
     abrir_form(driver, wait, PROCESSO_ID)
     original = {
+      "start_date" => campo(driver, "record_start_date_#{PROCESSO_ID}")&.attribute("value"),
       "end_date" => campo(driver, "record_end_date_#{PROCESSO_ID}")&.attribute("value"),
       "require_session" => campo(driver, "record_require_session_#{PROCESSO_ID}")&.selected?,
       "simple_url" => campo(driver, "record_simple_url_#{PROCESSO_ID}")&.attribute("value"),
     }
-    abort "nao li os valores originais; sem eles nao mexo" if original["end_date"].to_s.empty?
+    if original["start_date"].to_s.empty? || original["end_date"].to_s.empty?
+      abort "nao li os valores originais; sem eles nao mexo"
+    end
     File.write(ESTADO, JSON.pretty_generate(original))
 
-    gravar(driver, wait, PROCESSO_ID, (Date.today + 2).strftime("%d/%m/%Y"), false)
+    inicio = [Date.strptime(original["start_date"], "%d/%m/%Y"), Date.today].min
+    gravar(driver, wait, PROCESSO_ID, inicio.strftime("%d/%m/%Y"), (Date.today + 2).strftime("%d/%m/%Y"), false)
     puts "processo #{PROCESSO_ID} aberto (#{original['simple_url']})"
     puts "  original guardado em #{ESTADO}"
     puts "  aberto? #{aberto?(driver, wait)}"
@@ -122,13 +137,16 @@ begin
   else
     abort "nao achei #{ESTADO}; sem os valores originais nao reverto" unless File.exist?(ESTADO)
     original = JSON.parse(File.read(ESTADO))
-    gravar(driver, wait, PROCESSO_ID, original["end_date"], original["require_session"])
+    gravar(driver, wait, PROCESSO_ID, original["start_date"], original["end_date"], original["require_session"])
 
     abrir_form(driver, wait, PROCESSO_ID)
+    inicio = campo(driver, "record_start_date_#{PROCESSO_ID}")&.attribute("value")
     fim = campo(driver, "record_end_date_#{PROCESSO_ID}")&.attribute("value")
     sessao = campo(driver, "record_require_session_#{PROCESSO_ID}")&.selected?
-    ok = fim == original["end_date"] && sessao == original["require_session"]
+    ok = (!original.key?("start_date") || inicio == original["start_date"]) &&
+      fim == original["end_date"] && sessao == original["require_session"]
     puts "processo #{PROCESSO_ID} restaurado? #{ok}"
+    puts "  inicio: #{inicio.inspect} (era #{original['start_date'].inspect})"
     puts "  fim: #{fim.inspect} (era #{original['end_date'].inspect})"
     puts "  require_session: #{sessao.inspect} (era #{original['require_session'].inspect})"
     puts "  aberto? #{aberto?(driver, wait)}"

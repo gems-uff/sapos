@@ -60,18 +60,18 @@ RSpec.describe "StudentEnrollment features", type: :feature, js: true do
     @destroy_all << @affiliation2 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor2, start_date: 3.year.ago, end_date: nil)
     @destroy_all << @affiliation3 = FactoryBot.create(:affiliation, institution: @institution, professor: @professor3, start_date: 3.year.ago, end_date: nil)
 
-    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level1)
-    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level2)
-    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level1)
-    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level2)
-    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor3, level: @level1)
-    @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor3, level: @level2)
+    # Credenciados desde antes da admissão: a matrícula M01 é desligada há um
+    # ano, e a regra vale no mês do desligamento.
+    [@professor1, @professor2, @professor3].product([@level1, @level2]).each do |professor, level|
+      @destroy_all << FactoryBot.create(:advisement_authorization, professor: professor, level: level,
+                                        start_date: 10.years.ago.to_date)
+    end
 
     @destroy_all << @student1 = FactoryBot.create(:student, name: "Ana")
     @destroy_all << @enrollment1 = FactoryBot.create(:enrollment, enrollment_number: "M01", student: @student1,
                                                      level: @level2, enrollment_status: @enrollment_status1,
                                                      admission_date: YearSemester.current.semester_begin - 3.years,
-                                                     research_area: @research_area1, thesis_defense_date: Time.now)
+                                                     research_area: @research_area1, thesis_defense_date: Time.current)
     @destroy_all << @enrollment2 = FactoryBot.create(:enrollment, enrollment_number: "M02", student: @student1, level: @level2, enrollment_status: @enrollment_status1)
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "D01", student: @student1, level: @level1, enrollment_status: @enrollment_status1)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "D02", student: @student1, level: @level1, enrollment_status: @enrollment_status1)

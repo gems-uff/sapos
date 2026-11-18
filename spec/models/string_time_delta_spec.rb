@@ -61,4 +61,42 @@ RSpec.describe StringTimeDelta do
       expect(StringTimeDelta.parse("15")).to eq(15.days)
     end
   end
+
+  # Caracterizacao (#720): o algoritmo e copia do Rufus::Scheduler.parse_duration,
+  # mas nao chama a gem. Estes exemplos prendem os cantos que o deslocamento das
+  # notificacoes aceita hoje, inclusive os que truncam.
+  describe "parse, nos cantos" do
+    it "devolve zero para a string vazia" do
+      expect(StringTimeDelta.parse("")).to eq(0.seconds)
+    end
+
+    it "soma unidades encadeadas" do
+      expect(StringTimeDelta.parse("2d12h")).to eq(2.days + 12.hours)
+    end
+
+    it "le o numero solto depois de uma unidade como dias" do
+      expect(StringTimeDelta.parse("1d2")).to eq(3.days)
+    end
+
+    it "trunca a fracao de uma unidade" do
+      expect(StringTimeDelta.parse("1.5d")).to eq(1.day)
+    end
+
+    it "trunca a fracao de um numero solto" do
+      expect(StringTimeDelta.parse("1.5")).to eq(1.day)
+    end
+
+    it "recusa texto fora do formato" do
+      expect { StringTimeDelta.parse("1 dia") }.to raise_error(ArgumentError, "cannot parse '1 dia'")
+    end
+
+    it "recusa unidade sem numero" do
+      expect { StringTimeDelta.parse("d") }.to raise_error(ArgumentError, "cannot parse 'd' (especially 'd')")
+    end
+
+    it "devolve nil em vez de recusar quando pedido" do
+      expect(StringTimeDelta.parse("1 dia", no_error: true)).to be_nil
+      expect(StringTimeDelta.parse("d", no_error: true)).to be_nil
+    end
+  end
 end

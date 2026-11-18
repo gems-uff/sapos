@@ -25,7 +25,7 @@ CustomVariable.create([
   { description: "Periodo da Avaliação Quadrienal", variable: "quadrennial_period", value: "2021 - 2021" },
   { description: "Ativa a validação de credenciamento de orientadores no nível da matrícula (yes/no)", variable: "enable_advisor_accreditation_validation", value: "yes" },
 ])
-ProgramLevel.create([{ level: "5", start_date: Time.now, end_date: nil }])
+ProgramLevel.create([{ level: "5", start_date: Time.current, end_date: nil }])
 
 
 Role.create([
@@ -35,7 +35,6 @@ Role.create([
   { id: 4, name: "Professor", description: "Professor" },
   { id: 5, name: "Aluno", description: "Aluno" },
   { id: 6, name: "Administrador", description: "Administrador" },
-  { id: 7, name: "Suporte", description: "Suporte (inserir fotos de alunos)" },
 ])
 
 user = User.new do |u|

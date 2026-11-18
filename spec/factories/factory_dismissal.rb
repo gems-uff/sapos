@@ -9,6 +9,6 @@ FactoryBot.define do
   factory :dismissal do
     dismissal_reason
     enrollment
-    date { Date.today }
+    date { Date.current }
   end
 end

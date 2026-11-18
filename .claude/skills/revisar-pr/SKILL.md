@@ -1,6 +1,6 @@
 ---
 name: revisar-pr
-description: Conduz um PR do repositório do começo ao fim — ler a issue e o diff, decidir o que é nosso e o que volta para o autor, cobrir o que falta de teste, medir, homologar e lançar. Use ao dizer "vamos trabalhar no PR N", ao revisar contribuição de terceiro, ou ao retomar um ramo parado.
+description: Conduz um PR do repositório do começo ao fim — ler a issue e o diff, decidir o que é nosso e o que volta para o autor, cobrir o que falta de teste, medir e integrar na main. Use ao dizer "vamos trabalhar no PR N", ao revisar contribuição de terceiro, ou ao retomar um ramo parado.
 ---
 
 # Trabalhar num PR
@@ -9,8 +9,8 @@ Esta skill é a **espinha**: ela diz *quando* cada coisa entra e *por quê*. O *
 está nas skills apontadas, e não se repete aqui — passo que cabe numa frase mais um
 ponteiro é uma frase mais um ponteiro.
 
-**Nem todo PR termina em release.** As quatro saídas legítimas estão no passo 4; a
-linha reta até o lançamento é uma delas, não a única. Os passos 6 a 8 pertencem só
+**Nem todo PR termina na `main`.** As quatro saídas legítimas estão no passo 4; a
+linha reta até a integração é uma delas, não a única. Os passos 6 a 8 pertencem só
 a ela e o 9 vale nas quatro; o 5 é dos dois lados — na linha reta cobre as
 lacunas, e ao devolver põe a reprodução em forma de spec do projeto. Veredito
 plausível também atravessa: manda medir em MariaDB ou homologar antes de fechar
@@ -22,11 +22,11 @@ qualquer saída.
 |---|---|
 | `Gemfile` / `Gemfile.lock` | `dependencias` |
 | SQL, unicidade, ordenação, migration | `suite-mariadb` |
-| Asset, tela, PDF, planilha, e-mail | `homologacao` |
+| Asset, tela, PDF, planilha, e-mail | `homologacao`, sobre a `main`, no lançamento |
 | Ramo atrás da `main` | `merge-downstream` |
 | Suspeita de defeito no diff | `provar-candidato` |
 | Qualquer mudança que precise ser medida | `safe-refactor` |
-| Tudo verde e homologado | `release` |
+| Tudo verde, local e no CI | `release` (integrar na `main`) |
 
 ## 1. Reconhecimento
 
@@ -42,15 +42,37 @@ você passa o ciclo inteiro medindo um ramo obsoleto. Ele reseta o ramo local �
 confira antes que não haja commit seu ali.
 
 ```bash
-gh pr view <N> --json title,state,headRefName,mergeable,commits,statusCheckRollup,isCrossRepository,maintainerCanModify
+gh pr view <N> --json title,state,headRefName,mergeable,commits,statusCheckRollup,isCrossRepository,maintainerCanModify,closingIssuesReferences
 git fetch --all --prune
 gh pr checkout <N> --force                  # tudo daqui para a frente lê a árvore
 git log --oneline origin/main..HEAD         # o que o PR traz
 git log --oneline HEAD..origin/main         # o que falta da main entrar
+git merge-tree --write-tree origin/main HEAD   # conflito com a main, sem tocar a árvore
 ```
 
 A segunda lista vazia é o que se quer. Se não estiver, `merge-downstream` antes de
 qualquer medida: base desatualizada mede a defasagem, não o PR.
+
+O `merge-tree` responde já se o merge conflita: com conflito, sai com código 1 e
+lista os arquivos; a primeira linha é a árvore resultante, e `git show
+<árvore>:<arquivo>` mostra o arquivo como o merge o deixaria. Ele só vê conflito
+de texto — o que o merge quebra sem conflitar é assunto do passo 2.
+
+O `closingIssuesReferences` lista as issues que o merge fecharia. Qualquer uma ali
+contraria a regra do `AGENTS.md` — issue se cita só pelo prefixo, e fechar é
+decisão de quem integra —: peça ao autor que tire o `Fixes`/`Closes`. Corpo que cita a
+issue sem palavra de fechamento não aparece ali, e não precisa de nada. A
+mensagem de commit fecha a issue ao chegar na `main` por conta própria; confira-a
+também:
+
+```bash
+git log --format=%B origin/main..HEAD | grep -inE '\b(close[sd]?|fix(e[sd])?|resolve[sd]?):? *#[0-9]+'
+```
+
+**"Tudo daqui para a frente lê a árvore" inclui as skills.** Ramo anterior a uma
+skill, ou a uma mudança nela, fica depois do checkout sem ela no disco, ou com a
+versão velha: as skills que esta aponta, e os scripts que moram nelas, se leem
+pela `main` (`git show origin/main:.claude/skills/<nome>/SKILL.md`).
 
 PR de fork traz o ramo num remote do autor: o `maintainerCanModify` do `gh pr
 view` acima diz se o mantenedor consegue empurrar ali a reprodução que o passo 3
@@ -61,11 +83,11 @@ relacionadas e fechadas. É neles que está a decisão de produto já tomada, a
 tentativa revertida e o que já foi homologado antes; sem isso é fácil tratar como
 novo um trecho já validado, ou refazer discussão encerrada.
 
-Dispare o `/code-review xhigh <N>` e siga o passo 2 enquanto ele roda — o
+Dispare o `/code-review max <N>` e siga o passo 2 enquanto ele roda — o
 número do PR lhe dá também os comentários do autor.
 
-- **`xhigh`, não menos:** abaixo disso ele pode cair numa variante de passada
-  única, sem a varredura final de lacunas.
+- **`max`, não menos:** abaixo de `xhigh` ele pode cair numa variante de passada
+  única, sem a varredura final de lacunas, e `max` é o teto.
 - **Nunca `--comment` nem `--fix`.** O primeiro publica no PR; o segundo aplica
   na árvore fora dos checkpoints, e `/rewind` não desfaz.
 - Ele não verifica o que devolve, e o fim da lista costuma ser piso de achados,
@@ -74,6 +96,13 @@ número do PR lhe dá também os comentários do autor.
   passo 6, contamina a rodada — a falha aparece como regressão do PR e é
   contenção no SQLite. Espere-o terminar antes de medir, ou meça antes de
   dispará-lo.
+- **Ele limpa a árvore ao fechar, e não distingue de quem é o arquivo.** Arquivo
+  não rastreado que apareceu durante a rodada some — inclusive a reprodução que
+  você acabou de escrever, e sem aviso: só se descobre ao rodar o spec.
+  Escreva-a no scratchpad da sessão e copie para `spec/` na hora de rodar.
+- **"Terminou" pode não ser o fim.** A notificação de fim vem mesmo com varredura
+  de segundo plano dele ainda viva: ele volta, manda um adendo — e limpa a árvore
+  de novo. Confira que ele está `completed` antes de tratar a lista como fechada.
 
 ## 2. Ler o diff
 
@@ -102,7 +131,8 @@ porque dependem do que o repositório não guarda:
 - **O que o merge vai encontrar** — qual spec da `main` deixa de compilar contra a
   modelagem nova. Os dois lados passam verdes em separado, e só a suíte completa
   depois do merge acusa; o detalhe está na `merge-downstream`. Vale também com o
-  ramo em dia, então não espere o roteamento do passo 1 para olhar.
+  ramo em dia e com o `merge-tree` do passo 1 limpo, então não espere o
+  roteamento do passo 1 para olhar.
 
 Quando o PR mexe no `Gemfile`, o que decide a revisão é o que mudou **na
 dependência**, não o que o autor escreveu: valem as notas do passo 1 da
@@ -123,6 +153,11 @@ config/database.yml` (o real não é versionado, e sem ele o ambiente não sobe)
 dependência ele nunca é) e `rake db:schema:load`. É também como se descobre que **um candidato já valia antes
 do PR**: não é regressão, e a mensagem ao autor muda de "você quebrou" para "isto
 piorou aqui, conserta agora ou vira issue?".
+
+A worktree é para quando o **ambiente** difere — PR que mexe no `Gemfile`, lock
+diferente. Quando só o código mudou, o controle mais barato **e mais preciso** é
+`git checkout <merge-base> -- <arquivo>` e rodar de novo: isola o hunk, não o
+commit inteiro, e dispensa `bundle install` e carga de esquema.
 
 Crie a worktree **fora** do repositório e remova-a com `git worktree remove` ao
 fechar o passo 6: dentro dele ela derruba a precondição de árvore limpa da
@@ -151,6 +186,12 @@ está obsoleto a ponto de o merge custar mais que refazer. Sai da leitura do pas
 resto do ciclo. Fechar PR de terceiro é decisão do mantenedor: leve o motivo e o
 que sustenta.
 
+**Ao devolver, tire o label `staging-ready`** (`gh pr edit <N> --remove-label
+staging-ready`). É com ele que o autor sinaliza que o PR está pronto para o
+mantenedor revisar e homologar, e é por ele que o mantenedor acha a fila. PR
+devolvido que continua marcado volta para a fila como se nada tivesse
+acontecido; quem repõe o label é o autor, quando terminar a rodada.
+
 **Ao devolver, mande as reproduções junto — não só a prosa.** As do passo 3 já
 afirmam o comportamento correto e falham enquanto o defeito existir, e no ramo do
 autor deixariam a suíte dele vermelha até o conserto. Isso é mais útil que
@@ -168,17 +209,34 @@ vez de comentar achado a achado, que faz o autor perseguir alvo móvel.
 não há sistema no ar exposto: o defeito nasce no merge. Já a pré-existente, achada
 de passagem, segue a regra do `AGENTS.md` — correção imediata, sem issue pública.
 
-Duas coisas que **não** justificam devolver, e viram registro escrito: desvio de
-convenção de mensagem de commit, e achado adjacente fora do escopo do PR — este
-vira issue própria (pesquise as existentes antes, inclusive fechadas).
+Duas coisas que **não** justificam devolver: desvio de convenção de mensagem de
+commit, que vira registro escrito, e achado adjacente fora do escopo do PR.
+**Achado adjacente pequeno e relacionado se corrige no próprio ramo**, com
+reprodução e controle como qualquer outro, e entra no comentário de fechamento.
+Issue própria é só para o que é grande ou não tem relação com o PR — aí pesquise
+as existentes antes, como o `AGENTS.md` manda. Uma issue por achado miúdo enche a
+fila sem que ninguém ganhe com isso.
 
 ## 5. Cobrir as lacunas
 
-A cobertura nova é só do caminho "assumimos nós", e por isso depois do passo 4:
-escrita antes da decisão, ela se perde se o PR voltar para o autor. As
-reproduções do passo 3 são outra coisa — essas já existem, e são elas que viajam;
-ao devolver, é aqui que elas ganham forma de spec do projeto, pelas regras
-abaixo.
+A cobertura nova vem depois do passo 4, porque só ali se sabe para onde ela vai.
+Devolver o PR **não** a joga fora: em ramo do próprio repositório ela viaja junto
+com as reproduções, no mesmo commit, e o autor recebe as duas coisas. Em fork sem
+`maintainerCanModify` só a prosa chega — aí sim escrevê-la antes da decisão é
+trabalho perdido. As reproduções do passo 3 são outra coisa — essas já existem, e
+são elas que viajam; ao devolver, é aqui que elas ganham forma de spec do
+projeto, pelas regras abaixo.
+
+**O commit vai vermelho, e isso se diz na mensagem.** Reprodução que viaja deixa o
+CI do ramo vermelho até o conserto — é o desenho, não quebra nova. Sem essa frase
+no corpo do commit, a rodada seguinte lê o vermelho como regressão e sai
+consertando o teste.
+
+**Meça o que a cobertura do próprio PR alcança, antes de escrever a sua.** Reverta
+cada parte da mudança e rode os exemplos que o PR acrescenta: a parte cuja
+reversão não derruba exemplo nenhum não está coberta — e é onde a regressão passa
+sem a suíte notar. Num PR de quatro partes, três podem vir sem um único exemplo,
+com a suíte fechando verde.
 
 O que a mudança toca e a suíte não executa vira teste, pela `safe-refactor` —
 inclusive a checagem de que o teste não é vazio. O que nem a suíte alcança vira
@@ -214,27 +272,52 @@ medida que alcança os pontos cegos que o `AGENTS.md` lista. A contagem de exemp
 dele é maior que a local; compare-a com a do CI na baseline, não com a sua.
 
 **`gh pr checks <N>` sai com código não-zero enquanto há check pendente** (e
-também quando algum falha), então tratar saída não-zero como erro transitório a
-engolir faz o laço de espera girar calado, e o silêncio fica indistinguível de
-"ainda rodando". Pendente *é* o estado, não uma falha ao consultá-lo: decida pelo
-texto da saída, nunca pelo código de retorno.
+também quando algum falha, e quando o ramo não tem check nenhum — PR anterior ao
+workflow), então tratar saída não-zero como erro transitório a engolir faz o laço
+de espera girar calado, e o silêncio fica indistinguível de "ainda rodando".
+Pendente *é* o estado, não uma falha ao consultá-lo: decida pelo texto da saída,
+nunca pelo código de retorno.
+
+**Vermelho num navegador só é sinal, não ruído** (`AGENTS.md`) — mas antes de
+cobrá-lo do PR, compare com a mesma perna na `main` (`gh run list --workflow
+rubyonrails.yml --branch main --limit 1`, job `test (<navegador>)`): vermelho lá
+também não é do PR. O resumo de cada perna traz a seed e o comando que a repete
+localmente. Três categorias, e a diferença importa:
+
+1. **Teste que supõe um navegador.** Foco, ordem de evento, tempo de animação,
+   espaço e quebra de linha que cada um normaliza a seu modo: o teste afirma o
+   que a aplicação nunca prometeu. Conserta-se o teste.
+2. **Defeito que o outro navegador escondia.** JS que só um motor tolera,
+   atributo que só um honra, contorno de bug de navegador que a mudança removeu
+   — o `autocomplete="off"` nos hidden, que o Rails emitia por causa do Firefox.
+   É defeito de verdade, e é para isso que a matriz existe: vira reprodução que
+   falha naquele navegador, pelas regras do passo 5.
+3. **Artefato do ambiente.** Driver que não casa com o navegador que o runner
+   instalou, navegador atualizado entre duas execuções, timeout de
+   infraestrutura. Não é veredito sobre a mudança.
+
+Descarte a terceira primeiro: é a mais fácil de causar sem perceber, e a que
+produz o diagnóstico mais enganoso. Mas ela se prova — pela perna da `main`, ou
+repetindo a perna —, não se presume: sem prova, o vermelho continua sinal.
 
 `suite-mariadb` quando o diff toca SQL, unicidade, ordenação ou migration; verde
 em SQLite não diz nada sobre esses pontos. Migration que mexe em coluna pede
 também `rake seeds:check` — o porquê está na mesma seção do `AGENTS.md`.
 
-## 7. Homologar
+## 7. Deixar o roteiro da homologação
 
-`homologacao`, quando a mudança toca o que a suíte estruturalmente não alcança —
-adaptador de banco, geração de PDF e planilha, renderização de tela, pipeline de
-assets, e-mail. Ela inclui a passada de escrita nos dois lados: a comparação
-sozinha é toda de leitura.
+A homologação roda sobre a `main`, no lançamento (`release`), e não neste ramo.
+Quando a mudança toca o que a suíte estruturalmente não alcança — adaptador de
+banco, geração de PDF e planilha, renderização de tela, pipeline de assets,
+e-mail —, registre na issue o que ela precisa exercitar, inclusive se há caminho
+de escrita. É de lá que o lançamento tira o roteiro, com a issue já fechada.
 
-## 8. Lançar
+## 8. Integrar na main
 
-`release`. Antes de chamá-la, isto tem de ser verdade: suíte completa verde no
-ramo, homologação feita quando cabia, `main` sincronizada, árvore de trabalho
-limpa e CI verde na ponta.
+`release`, seção "Integrar na main": o ramo entra na `main` e a issue fecha.
+Antes, isto tem de ser verdade: suíte completa verde no ramo, `main`
+sincronizada, árvore de trabalho limpa e CI verde na ponta. Lançar a versão é
+outro momento, decidido pelo mantenedor.
 
 Migration que mexe em coluna deixa uma pendência **para depois do deploy**: `rake
 queries:check` em cada instalação, já com o esquema migrado. É a única rodada que
@@ -249,5 +332,6 @@ procedimento, não diário de bordo".
 
 Uma obrigação antes de considerar o PR encerrado: **conclusão sua que caiu por
 evidência nova se corrige onde foi escrita.** Se virou mensagem de commit ainda
-não empurrada, reescreva o commit — o teste pode sobreviver com outro
-enquadramento, a justificativa errada não pode virar história.
+não empurrada, aponte ao mantenedor o que mudar na mensagem — reescrever o commit
+é dele, como todo commit (`AGENTS.md`). O teste pode sobreviver com outro
+enquadramento; a justificativa errada não pode virar história.

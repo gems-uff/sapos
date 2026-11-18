@@ -42,6 +42,6 @@ class AcceptMonthYearAssignmentOfMatcher
   end
 end
 
-def accept_a_month_year_assignment_of(attribute, presence = false, year = Date.today.year, month = Date.today.month)
+def accept_a_month_year_assignment_of(attribute, presence = false, year = Date.current.year, month = Date.current.month)
   AcceptMonthYearAssignmentOfMatcher.new(attribute, presence, year, month)
 end

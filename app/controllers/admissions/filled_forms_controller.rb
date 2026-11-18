@@ -22,7 +22,7 @@ class Admissions::FilledFormsController < ApplicationController
       [
         :id, :is_filled, :form_template_id, :enable_submission,
         fields_attributes: [
-          :id, :form_field_id, :value, :_destroy, :remove_file, :file,
+          :id, :form_field_id, :value, :remove_file, :file,
           list: [],
           file: [
             :base64_contents, :filename

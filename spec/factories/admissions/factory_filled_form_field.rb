@@ -13,6 +13,7 @@ FactoryBot.define do
     file { nil }
     list { nil }
     filled_form
-    form_field
+    # O campo tem de ser do template do formulario preenchido, como o modelo exige.
+    form_field { association :form_field, form_template: filled_form.form_template }
   end
 end

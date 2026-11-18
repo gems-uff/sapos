@@ -1,66 +1,52 @@
 ---
 name: release
-description: Lança uma nova versão do SAPOS — merge na main, tag anotada, label e issues no GitHub, release publicada. Use quando um ramo estiver homologado e pronto para virar versão, ou quando precisar conferir como as releases anteriores foram feitas.
+description: Integra na main o ramo de uma issue pronta e fecha a issue; e, quando o mantenedor decide soltar a versão, homologa a main e lança o que se acumulou nela — tag anotada, label nas issues, release publicada. Use ao terminar uma issue, ao lançar versão, ou para conferir como as releases anteriores foram feitas.
 ---
 
-# Release do SAPOS
+# Integrar e lançar
 
-Sequência para transformar um ramo pronto em versão publicada. O deploy em
-produção **é do mantenedor**; o último passo da skill é avisá-lo de que a tag
-está pronta, e nada fica depois desse aviso.
+Duas sequências, em momentos diferentes:
 
-É o último passo do ciclo descrito em `revisar-pr`, e chega-se aqui pelo caminho
-dela — que também descreve as saídas em que **não** se lança.
+1. **Integrar**, ao fim de cada issue: verde na suíte local e no CI, o ramo
+   entra na `main` e a issue fecha. Fechada, ninguém a pesca para trabalhar no
+   que já está pronto.
+2. **Lançar**, quando o mantenedor decide: homologa-se a `main` e, se estiver
+   tudo certo, a versão leva o que entrou nela desde a última tag. Issue
+   terminada não força release — uma Task que não muda a aplicação, por
+   exemplo, entra na `main` e espera a próxima versão. A exceção é a correção
+   de vulnerabilidade: o lançamento vem logo depois do merge dela.
 
-## Pré-requisitos
+O deploy em produção **é do mantenedor**; o último passo do lançamento é avisá-lo
+de que a tag está pronta, e nada fica depois desse aviso.
+
+Chega-se aqui pelo caminho da `revisar-pr`, que também descreve as saídas em que
+o ramo **não** entra.
+
+## Integrar na main
+
+### Pré-requisitos
 
 Não comece sem isto:
 
-- Suíte completa verde no ramo (`bundle exec rspec`, ~12 min).
-- Homologação feita, quando a mudança toca o que a suíte não alcança (skill
-  `homologacao`).
-- **Passada de escrita em staging**, quando houver caminho de escrita, PDF,
-  planilha ou e-mail envolvido — a captura da homologação é só leitura, e prova
-  que as telas continuam iguais, não que salvar continua funcionando. Ela é parte
-  da rodada de homologação (ver a seção "Passada de escrita" naquela skill) e
-  **não depende de pedido do mantenedor**: chegar aqui sem ela é chegar sem
-  pré-requisito. O que continua sendo dele é o juízo sobre o que mais exercitar à
-  mão, não a execução.
+- Suíte completa verde no ramo (`bundle exec rspec`, ~12 min) e CI verde na ponta.
 - `main` sincronizada com `origin/main`: `git rev-list --left-right --count origin/main...main` → `0 0`.
 - **Árvore de trabalho limpa: `git status --short` vazio.** Se houver qualquer
   coisa não commitada, **pare e avise o mantenedor antes do merge** — mostrando o
-  quê, e perguntando se entra nesta versão ou fica para a próxima. A decisão é
-  dele; o que não pode é ele descobrir depois da release publicada, quando entrar
-  já custa outra versão.
+  quê, e perguntando se entra agora ou fica para depois. A decisão é dele; o que
+  não pode é ele descobrir depois, quando entrar já custa outro ciclo.
 
   Isso vale inclusive para o que o próprio agente escreveu durante o ciclo:
   anotação em skill, roteiro, script de sonda. Ter avisado no meio do caminho, ao
   criar o arquivo, **não conta** — o aviso tem que estar aqui, junto da decisão
-  de lançar. É por esse caminho que anotação de skill fica de fora da versão que
+  de integrar. É por esse caminho que anotação de skill fica de fora da issue que
   a produziu.
 
-## Passos
+A homologação **não** é pré-requisito daqui: ela roda sobre a `main`, no
+lançamento. Se a mudança toca o que a suíte não alcança (tela, PDF, planilha,
+e-mail, MariaDB), deixe na issue, antes de fechá-la, o que a homologação precisa
+exercitar — é de lá que o lançamento tira o roteiro.
 
-### 1. Levante o que sai na release
-
-```bash
-git log --oneline <tag_anterior>..<ramo>
-git log <tag_anterior>..<ramo> --format='%h %s%n%b' | grep -iE '#[0-9]+' | sort -u
-```
-
-Separe as issues **atendidas** das apenas **citadas**. Um commit que diz "isso
-fica para issue própria (#626)" não atende a #626 — mencionar não é entregar.
-
-Trabalho de vulnerabilidade **não tem issue** (ver `AGENTS.md`): vai aparecer
-como commits sem referência. Isso é esperado, e o passo 6 diz como descrevê-lo.
-
-### 2. O número da versão
-
-Quem define é o mantenedor. Se ele não informar, proponha o incremento de patch
-sobre a última tag (`git tag -l --sort=-v:refname | head -3`; `7.15.20` → `7.15.21`)
-e **peça confirmação antes de criar a tag** — o incremento pode não ser de patch.
-
-### 3. Merge na main, fast-forward
+### Merge na main, fast-forward
 
 ```bash
 git checkout main
@@ -73,7 +59,65 @@ já mergeou a `main` nele antes do PR, então o merge **tem** que ser
 fast-forward. Se o git recusar, não force nem faça merge commit — o ramo está
 desatualizado e precisa integrar a `main` primeiro, com a suíte rodada de novo.
 
-Nem toda release passa por PR; quando o mantenedor dispensa, o merge é direto.
+Nem toda issue passa por PR; quando o mantenedor dispensa, o merge é direto.
+
+### Feche a issue e apague o ramo
+
+```bash
+gh issue close <N> --reason completed
+git push origin --delete <ramo>
+git branch -d <ramo>
+```
+
+- Fechamento é `completed`, sem comentário de encerramento — é o padrão do
+  repositório.
+- **Issue entregue em parte continua aberta**, com um comentário dizendo o que
+  ficou de fora. Sem o comentário, quem vier depois não distingue entrega
+  parcial de esquecimento.
+- **Não rotule agora.** O label é o da versão em que a issue sai, e essa versão
+  ainda não existe; quem rotula é o lançamento, que acha a issue pelos commits.
+- Depois do fast-forward o ramo aponta para um commit que a `main` já contém,
+  então apagá-lo não perde nada.
+
+## Lançar a versão
+
+### 1. Levante o que sai na release
+
+```bash
+git log --oneline <tag_anterior>..main
+git log <tag_anterior>..main --format='%h %s%n%b' | grep -iE '#[0-9]+' | sort -u
+```
+
+Separe as issues **atendidas** das apenas **citadas**. Um commit que diz "isso
+fica para issue própria (#626)" não atende a #626 — mencionar não é entregar. As
+atendidas, em geral, já estão fechadas desde a integração; continuam valendo
+para o label.
+
+Trabalho de vulnerabilidade **não tem issue** (ver `AGENTS.md`): vai aparecer
+como commits sem referência. Isso é esperado, e o passo 6 diz como descrevê-lo.
+
+### 2. Homologue a main
+
+Skill `homologacao`, com a última tag como lado "antes" e a `main` como lado
+"depois". O roteiro sai do passo 1: o que cada issue atendida pede para
+exercitar, anotado nela ao fechar, mais o que o diff toca e a suíte não alcança.
+
+- **Passada de escrita em staging**, quando houver caminho de escrita, PDF,
+  planilha ou e-mail envolvido — a captura da homologação é só leitura, e prova
+  que as telas continuam iguais, não que salvar continua funcionando. Ela é parte
+  da rodada de homologação (ver a seção "Passada de escrita" naquela skill) e
+  **não depende de pedido do mantenedor**: seguir sem ela é seguir sem
+  homologação. O que continua sendo dele é o juízo sobre o que mais exercitar à
+  mão, não a execução.
+- **Divergência para o lançamento.** A issue que a causou já está fechada:
+  reabra-a (ou abra uma, se a causa não for de issue nenhuma), conserte num
+  ramo pelo ciclo normal e homologue de novo depois que ele entrar na `main`.
+
+### 3. O número da versão
+
+Quem define é o mantenedor. Se ele não informar, proponha o incremento de patch
+sobre a última tag (`git tag -l --sort=-v:refname | head -3`; `7.15.20` → `7.15.21`)
+e **peça confirmação antes de criar a tag** — o incremento pode não ser de patch.
 
 ### 4. Tag anotada
 
@@ -108,32 +152,25 @@ comportamento em vez de ler o rodapé.
 Confira o deploy por **comportamento**, não por rodapé: uma medida que separe a
 versão nova da anterior — a skill `homologacao` serve para isso.
 
-### 5. Label e issues
+### 5. Label nas issues
 
 ```bash
 gh label create 7.15.21 --color 0e8a16 --repo gems-uff/sapos
 gh issue edit <N> --add-label 7.15.21
-gh issue close <N> --reason completed
 ```
 
 - Cor `0e8a16` para todo label de versão — é o que dá o verde uniforme na lista.
-- **Crie o label mesmo que a versão não feche issue nenhuma.** Assim a existência
+- **Crie o label mesmo que a versão não atenda issue nenhuma.** Assim a existência
   do label não depende do conteúdo da versão, e não há como confundir "não tinha
   issue" com "esqueci de criar" ao olhar a lista depois. O link do corpo da
   release (passo 6) resolve para uma consulta vazia, que é o resultado correto.
 - **Confira a lista com `--limit` folgado.** O repositório passa de 200 labels, e
   o padrão do `gh label list` trunca — uma varredura truncada some justamente com
   os labels mais recentes e faz parecer que ninguém rotula há várias versões.
-- **Rotular e fechar são decisões separadas.** Uma issue entregue em parte leva o
-  label e **continua aberta** — o label diz "saiu nesta versão", não "acabou". Só
-  feche o que a versão de fato encerra.
-- Fechamento é `completed`, sem comentário de encerramento — é o padrão do
-  repositório.
-- **Issue já fechada também leva o label.** Mudança que quase não altera a
-  aplicação pode entrar na `main` sem disparar release, e o mantenedor fecha a
-  issue nessa hora; ela sai na próxima versão junto com outras. O passo 1 a
-  lista pelo intervalo de commits, e o `gh issue edit --add-label` funciona em
-  issue fechada. Sem o label, a consulta da release não a mostra.
+- **Toda issue atendida leva o label, fechada ou aberta.** Fechada é o caso
+  comum: fechou ao entrar na `main`. Aberta é a entrega parcial — o label diz
+  "saiu nesta versão", não "acabou". O `gh issue edit --add-label` funciona em
+  issue fechada; sem o label, a consulta da release não a mostra.
 
 ### 6. Release no GitHub
 
@@ -172,27 +209,17 @@ gh issue list --label 7.15.21 --state all
 gh issue list --label 7.15.21 --state open
 ```
 
-**A última consulta tem que vir vazia — ou cada linha que sobrar precisa de um
-comentário na própria issue dizendo o que ficou de fora.** Rotulada e aberta é o
-estado legítimo da entrega parcial (passo 5), e sem o comentário ele é
-indistinguível do esquecimento: quem vier depois lê o label como "saiu" e o
-aberto como "falta", sem meio de decidir qual dos dois vale. Quem paga é quem
-pesca a issue para trabalhar e descobre no meio do caminho que já estava pronta.
+**Cada linha da última consulta precisa de um comentário na própria issue dizendo
+o que ficou de fora.** Rotulada e aberta é o estado legítimo da entrega parcial,
+e sem o comentário ele é indistinguível do esquecimento: quem vier depois lê o
+label como "saiu" e o aberto como "falta", sem meio de decidir qual dos dois
+vale. Quem paga é quem pesca a issue para trabalhar e descobre no meio do
+caminho que já estava pronta.
 
 **Confira também o lado que nenhum label denuncia:** issue atendida pela versão
 que não recebeu rótulo nenhum. A separação entre issues atendidas e apenas
 citadas, feita no passo 1, é o gabarito — cada issue atendida ali tem que
 aparecer na consulta por label.
-
-**Apague o ramo lançado, GitHub e local, ainda neste passo:**
-
-```bash
-git push origin --delete <ramo>
-git branch -d <ramo>
-```
-
-Depois do fast-forward do passo 3 o ramo aponta para um commit que a `main` já
-contém, então nada se perde.
 
 Se a release fecha alerta do Dependabot, ele só re-varre o ramo padrão — o
 quadro de alertas leva alguns minutos para refletir o push. Não conclua que o

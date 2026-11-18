@@ -21,6 +21,40 @@ class Admissions::ProcessBaseController < ApplicationController
       end
     end
 
+    # O aviso de para onde o codigo foi. Quando a mensagem que o leva nao sai
+    # (variavel redirect_email vazia, envio desligado no ambiente, ou modelo
+    # de e-mail desabilitado na instalacao), a tela diz isso em vez de afirmar
+    # um envio que nao houve: a inscricao existe, e quem gerencia o processo ve
+    # o codigo e pode passa-lo.
+    def token_delivery_flash(key, email, messages, **interpolation)
+      if Notifier.sending? && messages.any? { |message| !message[:skip_message] }
+        { notice: I18n.t(key, email: email, **interpolation) }
+      else
+        { alert: I18n.t("#{key}_without_email", **interpolation) }
+      end
+    end
+
+    # O formulario da tela chega em params[:record] como um conjunto de campos.
+    # O que chega de outro jeito -- ausente, vazio, texto solto, lista -- nao
+    # veio da tela, e nao segue para o params.require(:record).permit.
+    def submitted_record?
+      params[:record].is_a?(ActionController::Parameters) && params[:record].present?
+    end
+
+    # O formulario que a tela publica oferece e sempre submetido: so a tela
+    # interna, com a edicao total, desliga a submissao de um formulario
+    # (enable_submission). O que chega sem os campos do formulario, ou com eles
+    # em formato que a tela nao manda, e o formulario sem resposta, e e
+    # conferido como tal -- em vez de ser gravado sem conferencia. O formato de
+    # cada colecao dentro dele (campos, escolaridades, pedidos de carta) e
+    # conferido por FilledForm.nested_entries.
+    def submitted_form(attributes)
+      unless attributes.is_a?(ActionController::Parameters)
+        attributes = ActionController::Parameters.new.permit!
+      end
+      attributes.merge(enable_submission: "1")
+    end
+
     def add_token_to_session(token)
       session[:admission_tokens] = Set.new if session[:admission_tokens].blank?
       session[:admission_tokens].add(token)

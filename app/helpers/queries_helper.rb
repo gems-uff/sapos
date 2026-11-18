@@ -13,15 +13,4 @@ module QueriesHelper
       )
     )
   end
-
-  def body_template_form_column(record, options)
-    options[:required] = false
-    code_mirror_text_area_widget(
-      :body_template, "record_body_template_#{record.id}", "text/html",
-      options.merge(
-        value: record.body_template ||
-        I18n.t("active_scaffold.notification.body_template_default_liquid")
-      )
-    )
-  end
 end

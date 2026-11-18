@@ -83,7 +83,7 @@ class AdmissionsWorkflowLoader
     process = Admissions::AdmissionProcess.create!(
       name: @process_json["name"], simple_url: @simple_url,
       year: @process_json["year"], semester: @process_json["semester"],
-      start_date: Date.today - 10.days, end_date: Date.today + 10.days, edit_date: nil,
+      start_date: Date.current - 10.days, end_date: Date.current + 10.days, edit_date: nil,
       admission_date: @process_json["admission_date"],
       min_letters: @process_json["min_letters"], max_letters: @process_json["max_letters"],
       allow_multiple_applications: @process_json["allow_multiple_applications"],

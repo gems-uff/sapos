@@ -3,7 +3,7 @@
   no_phase = @admission_application.admission_phase_id.nil?
   show_groups = !no_phase
   can_edit = @admission_application.candidate_can_edit
-  can_edit_main = no_phase || @admission_application.admission_phase.candidate_can_edit
+  can_edit_main = @admission_application.can_edit_main_form?(check_candidate_permission: true)
   form_id = "apply_form"
 %>
 
@@ -22,6 +22,11 @@
           authenticity_token: true,
           multipart: true do |form| %>
         <h4> <%= t "admissions.apply.edit.title" %> </h4>
+        <% if @admission_application.email_change_pending? %>
+          <p class="email-change-pending">
+            <%= t "admissions.apply.show.email_change_pending", email: @admission_application.pending_email %>
+          </p>
+        <% end %>
         <div class="messages-container">
           <% count = @admission_application.errors.count + (flash[:alert].present? ? 1 : 0) %>
           <% if count > 0 %>
