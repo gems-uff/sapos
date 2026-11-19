@@ -84,6 +84,34 @@ RSpec.describe Student, type: :model do
         end
       end
     end
+
+    describe "photo" do
+      before(:each) do
+        student.photo = Rack::Test::UploadedFile.new(
+          Rails.root.join("spec/fixtures/user.png"), "image/png"
+        )
+      end
+
+      def stub_photo_size(bytes)
+        allow(student.photo).to receive(:file).and_return(double(size: bytes))
+      end
+
+      it "is valid when the photo is within the limit" do
+        stub_photo_size(14.megabytes)
+        expect(student).to be_valid
+      end
+
+      it "is invalid when the photo exceeds the limit" do
+        stub_photo_size(16.megabytes)
+        expect(student).to have_error(:file_too_large).on(:photo).with_parameters(count: 15)
+      end
+
+      it "does not revalidate a photo that is already stored" do
+        stub_photo_size(16.megabytes)
+        allow(student).to receive(:will_save_change_to_photo?).and_return(false)
+        expect(student).to be_valid
+      end
+    end
   end
   describe "Methods" do
     describe "emails" do

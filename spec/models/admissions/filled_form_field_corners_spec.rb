@@ -14,7 +14,7 @@ RSpec.describe Admissions::FilledFormField, "cantos", type: :model do
   end
 
   describe "arquivo acima de 15 MB" do
-    it "descarta o arquivo e acusa o tamanho" do
+    it "acusa o tamanho e mantém o arquivo no registro" do
       campo_de_arquivo = FactoryBot.create(:form_field, field_type: Admissions::FormField::FILE)
       preenchido = Admissions::FilledFormField.new(
         form_field: campo_de_arquivo, filled_form: FactoryBot.create(:filled_form), file: png
@@ -23,7 +23,7 @@ RSpec.describe Admissions::FilledFormField, "cantos", type: :model do
 
       preenchido.valid?
 
-      expect(preenchido.file).to be_blank
+      expect(preenchido.file).to be_present
       expect(preenchido.errors[:file].join).to include(campo_de_arquivo.name)
       expect(preenchido.errors.details[:file]).to be_present
     end

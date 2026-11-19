@@ -117,11 +117,11 @@ class Admissions::FilledFormField < ActiveRecord::Base
 
   def size_of_file
     return unless self.file.present?
+    return unless will_save_change_to_file?
     max_size = CustomVariable.max_upload_size_mb
     size = self.file.file.size.to_f
     if size > max_size.megabytes.to_f
       add_error(:filesize, count: max_size)
-      self.file = nil
     end
   end
 

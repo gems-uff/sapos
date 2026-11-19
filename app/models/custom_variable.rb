@@ -9,8 +9,7 @@ class CustomVariable < ApplicationRecord
 
   SAPOS_MAIL = "sapos@sapos.ic.uff.br"
 
-  DEFAULT_MAX_UPLOAD_SIZE_MB = 15
-  MAX_ALLOWED_UPLOAD_SIZE_MB = 4096
+  MAX_UPLOAD_SIZE_MB = 15
 
   VARIABLES = {
     "single_advisor_points" => :text,
@@ -136,14 +135,16 @@ class CustomVariable < ApplicationRecord
     self.variable.to_s
   end
 
+  def self.parse_max_upload_size(raw)
+    value = raw.to_s.strip
+    return nil unless value.match?(/\A[1-9]\d*\z/)
+    number = value.to_i
+    number <= MAX_UPLOAD_SIZE_MB ? number : nil
+  end
+
   def self.max_upload_size_mb
     config = CustomVariable.find_by_variable(:max_upload_size_mb)
-    value = config.blank? ? nil : config.value.to_s
-    if value.present? && value.match?(/\A[1-9]\d*\z/) && value.to_i <= MAX_ALLOWED_UPLOAD_SIZE_MB
-      value.to_i
-    else
-      DEFAULT_MAX_UPLOAD_SIZE_MB
-    end
+    parse_max_upload_size(config&.value) || MAX_UPLOAD_SIZE_MB
   end
 
   private
@@ -195,10 +196,8 @@ class CustomVariable < ApplicationRecord
         ) if (!self.value.blank?) && ((grade * 10.0).to_i >= minimum)
       when "max_upload_size_mb"
         return if self.value.blank?
-        valid_format = self.value.to_s.match?(/\A[1-9]\d*\z/)
-        within_limit = valid_format && self.value.to_i <= MAX_ALLOWED_UPLOAD_SIZE_MB
-        unless within_limit
-          self.errors.add(:value, :max_upload_size_mb_invalid, max: MAX_ALLOWED_UPLOAD_SIZE_MB)
+        if CustomVariable.parse_max_upload_size(self.value).nil?
+          self.errors.add(:value, :max_upload_size_mb_invalid, max: MAX_UPLOAD_SIZE_MB)
         end
       end
     end
@@ -216,7 +215,7 @@ class CustomVariable < ApplicationRecord
 
     def validate_create
       case self.variable
-      when "minimum_grade_for_approval", "grade_of_disapproval_for_absence"
+      when "max_upload_size_mb", "minimum_grade_for_approval", "grade_of_disapproval_for_absence"
         if CustomVariable.find_by_variable(self.variable).present?
           self.errors.add(:base, :check_duplicate, variable: self.variable)
         end
