@@ -9,6 +9,7 @@ require "rails_helper"
 # ordem do edital nas fases, e nos rankings conta de tras para frente
 # (issue #778).
 RSpec.describe Admissions::AdmissionReportConfig, "numeracao das colunas do relatorio do edital", type: :model do
+  include AdmissionReportFixedGroups
   def report_with(groups, **attrs)
     report = Admissions::AdmissionReportConfig.new(
       { group_column_tabular: Admissions::AdmissionReportConfig::MERGE, hide_empty_sections: false }.merge(attrs)
@@ -23,7 +24,8 @@ RSpec.describe Admissions::AdmissionReportConfig, "numeracao das colunas do rela
   end
 
   def headers(report, process)
-    report.prepare_table(process)[:header].map { |column| column[:header] }
+    config = report.prepare_table(process)
+    config[:header].reject { |column| fixed_section?(column, config) }.map { |column| column[:header] }
   end
 
   describe "numeracao de fases e rankings" do

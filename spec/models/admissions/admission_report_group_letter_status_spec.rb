@@ -8,6 +8,7 @@ require "rails_helper"
 # Relatorio do edital: a situacao da carta ("Preenchida") no grupo de cartas
 # em modo Excluir e no relatorio padrao (issue #757).
 RSpec.describe Admissions::AdmissionReportConfig, "situacao da carta no relatorio do edital", type: :model do
+  include AdmissionReportFixedGroups
   def report_with(groups, **attrs)
     report = Admissions::AdmissionReportConfig.new(
       { group_column_tabular: Admissions::AdmissionReportConfig::MERGE, hide_empty_sections: false }.merge(attrs)
@@ -22,7 +23,8 @@ RSpec.describe Admissions::AdmissionReportConfig, "situacao da carta no relatori
   end
 
   def headers(report, process)
-    report.prepare_table(process)[:header].map { |column| column[:header] }
+    config = report.prepare_table(process)
+    config[:header].reject { |column| fixed_section?(column, config) }.map { |column| column[:header] }
   end
 
   describe "situacao da carta no grupo de cartas" do

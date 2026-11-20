@@ -21,6 +21,9 @@ pt-BR:
           phase_without_committee_reverse: Fase sem comitês (última para a primeira)
           ranking: Ranking
           consolidation: Consolidação do Relatório
+          avulso_courses: Disciplinas como Avulso
+        avulso_columns:
+          courses: "Disciplina (período): nota"
         operation: Operação
         operations:
           include: Incluir

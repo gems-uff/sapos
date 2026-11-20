@@ -10,6 +10,7 @@ require "rails_helper"
 # campos, consolidação), com filtro, ordenação e as três formas de linha que o
 # PDF, a planilha e a tela consomem.
 RSpec.describe Admissions::AdmissionReportConfig, "montagem da tabela", type: :model do
+  include AdmissionReportFixedGroups
   before(:each) do
     @template = create_admission_template("Inscrição", {
       "nota" => Admissions::FormField::NUMBER,
@@ -71,11 +72,11 @@ RSpec.describe Admissions::AdmissionReportConfig, "montagem da tabela", type: :m
   end
 
   def headers(config)
-    config[:header].map { |column| column[:header] }
+    config[:header].reject { |column| fixed_section?(column, config) }.map { |column| column[:header] }
   end
 
   def section_titles(config)
-    config[:groups].flat_map { |group| group.sections.map { |section| section[:title] } }
+    configured_groups(config).flat_map { |group| group.sections.map { |section| section[:title] } }
   end
 
   # As linhas saem dos objetos que a própria tabela carregou: é neles que a
@@ -85,7 +86,8 @@ RSpec.describe Admissions::AdmissionReportConfig, "montagem da tabela", type: :m
   end
 
   def row_values(report, config, application, **options)
-    report.prepare_row(config, in_table(config, application), **options).map { |element| element[:value] }
+    row = report.prepare_row(config, in_table(config, application), **options)
+    row.reject { |element| fixed_section?(element[:column], config) }.map { |element| element[:value] }
   end
 
   describe "#init_default e #init_simple" do
@@ -395,6 +397,18 @@ RSpec.describe Admissions::AdmissionReportConfig, "montagem da tabela", type: :m
       @bia.filled_form.update!(is_filled: false)
       report = report_with([[Admissions::AdmissionReportGroup::FIELD], [Admissions::AdmissionReportGroup::RANKING]], show_partial_candidates: true)
       expect(headers(report.prepare_table(@process))).to eq([])
+    end
+
+    it "acrescenta os grupos fixos por último, fora da configuração salva" do
+      report = report_with(
+        [[Admissions::AdmissionReportGroup::FIELD], [Admissions::AdmissionReportGroup::MAIN]],
+        hide_empty_sections: false
+      )
+      config = report.prepare_table(@process)
+      fixed_count = Admissions::AdmissionReportGroup::FIXED_MODES.size
+      expect(config[:groups].last(fixed_count).map { |group| group.group.mode })
+        .to eq(Admissions::AdmissionReportGroup::FIXED_MODES)
+      expect(report.groups.none?(&:fixed?)).to be(true)
     end
   end
 end
