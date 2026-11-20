@@ -22,8 +22,9 @@ class Admissions::AdmissionReportGroup < ActiveRecord::Base
   MODES = [
     MAIN, MAIN_LETTER, MAIN_ANONYMOUS, FIELD, LETTER,
     PHASE, PHASE_WITHOUT_COMMITTEE, PHASE_REVERSE, PHASE_WITHOUT_COMMITTEE_REVERSE,
-    RANKING, CONSOLIDATION, AVULSO_COURSES
+    RANKING, CONSOLIDATION
   ]
+  FIXED_MODES = [AVULSO_COURSES]
 
   INCLUDE = record_i18n_attr("operations.include")
   EXCLUDE = record_i18n_attr("operations.exclude")
@@ -87,5 +88,9 @@ class Admissions::AdmissionReportGroup < ActiveRecord::Base
     group = cls.new(report_config, self, admission_process, applications, extra)
     group.prepare_config()
     group
+  end
+
+  def fixed?
+    FIXED_MODES.include?(self.mode)
   end
 end

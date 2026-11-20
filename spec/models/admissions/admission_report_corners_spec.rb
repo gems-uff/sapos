@@ -10,6 +10,7 @@ require "rails_helper"
 # (tela/PDF, planilha, HTML); o grupo de fase sem comite em ordem direta; e o
 # grupo de consolidacao com a operacao incluir.
 RSpec.describe Admissions::AdmissionReportConfig, "cantos da tabela", type: :model do
+  include AdmissionReportFixedGroups
   before(:each) do
     @template = create_admission_template("Inscricao", {
       "nota" => Admissions::FormField::NUMBER,
@@ -36,11 +37,11 @@ RSpec.describe Admissions::AdmissionReportConfig, "cantos da tabela", type: :mod
   end
 
   def headers(config)
-    config[:header].map { |column| column[:header] }
+    config[:header].reject { |column| fixed_section?(column, config) }.map { |column| column[:header] }
   end
 
   def section_titles(config)
-    config[:groups].flat_map { |group| group.sections.map { |section| section[:title] } }
+    configured_groups(config).flat_map { |group| group.sections.map { |section| section[:title] } }
   end
 
   def in_table(config, application)
@@ -61,7 +62,8 @@ RSpec.describe Admissions::AdmissionReportConfig, "cantos da tabela", type: :mod
     end
 
     it "sai vazio na linha da tela e do PDF" do
-      expect(@report.prepare_row(@config, @linha).map { |e| e[:value] }).to eq(["8", ""])
+      row = @report.prepare_row(@config, @linha).reject { |e| fixed_section?(e[:column], @config) }
+      expect(row.map { |e| e[:value] }).to eq(["8", ""])
     end
 
     it "sai vazio na planilha, sem formula de link" do
@@ -115,7 +117,8 @@ RSpec.describe Admissions::AdmissionReportConfig, "cantos da tabela", type: :mod
       config = report.prepare_table(@process)
 
       expect(headers(config)).to eq(["quadruplo", "dobro"])
-      expect(report.prepare_row(config, in_table(config, @ana)).map { |e| e[:value] }).to eq(["32", "16"])
+      row = report.prepare_row(config, in_table(config, @ana)).reject { |e| fixed_section?(e[:column], config) }
+      expect(row.map { |e| e[:value] }).to eq(["32", "16"])
     end
   end
 end

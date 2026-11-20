@@ -6,9 +6,8 @@
 require "spec_helper"
 
 RSpec.describe Admissions::AdmissionReportGroupAvulsoCourses, type: :model do
-  COURSE_HEADER = I18n.t("activerecord.attributes.admissions/admission_report_group.avulso_columns.course")
-  PERIOD_HEADER = I18n.t("activerecord.attributes.admissions/admission_report_group.avulso_columns.period")
-  GRADE_HEADER = I18n.t("activerecord.attributes.admissions/admission_report_group.avulso_columns.grade")
+  HEADER_KEY = "activerecord.attributes.admissions/admission_report_group.avulso_columns.courses"
+  COURSES_HEADER = I18n.t(HEADER_KEY)
 
   before(:all) do
     @avulso_status = FactoryBot.create(:enrollment_status, name: "Avulso")
@@ -28,280 +27,154 @@ RSpec.describe Admissions::AdmissionReportGroupAvulsoCourses, type: :model do
     Student.delete_all
   end
 
-  let(:report_group) do
-    config = double("admission_report_config", group_column_tabular: nil)
-    Admissions::AdmissionReportGroupAvulsoCourses.new(config, nil, nil, [], nil)
+  let(:student) { FactoryBot.create(:student) }
+
+  def build_group(applications: [], hide_empty_sections: false)
+    config = double(
+      "admission_report_config", group_column_tabular: nil, hide_empty_sections:
+    )
+    described_class.new(config, nil, nil, applications, nil)
   end
 
-  # application dublê: evita montar FilledForm/FormField só pra achar o CPF,
-  # já que o cruzamento por CPF em si é testado em admission_application_spec.
-  def application_with_students(students)
-    double("admission_application", students_by_cpf: students)
+  # A busca por CPF/e-mail é testada em admission_application_spec
+  def application_with(students)
+    double("admission_application", students:)
   end
 
-  # simula grade_to_view por id, porque avulso_class_enrollments recarrega os
-  # registros do banco, então a instância criada aqui não é a mesma que chega
-  # no format_value.
+  # grade_to_view por id: a consulta recarrega os registros do banco
   def stub_grades(grades_by_class_enrollment_id)
     allow_any_instance_of(ClassEnrollment).to receive(:grade_to_view) do |instance|
       grades_by_class_enrollment_id[instance.id]
     end
   end
 
-  def build_class_enrollment(course_name:, year:, semester:, status:)
+  def build_class_enrollment(course_name:, year:, semester:, student:, status: @avulso_status)
     course = FactoryBot.create(:course, name: course_name)
-    course_class = FactoryBot.create(:course_class, course: course, year: year, semester: semester)
-    enrollment = FactoryBot.create(:enrollment, enrollment_status: status)
-    FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
+    course_class = FactoryBot.create(:course_class, course:, year:, semester:)
+    enrollment = FactoryBot.create(:enrollment, student:, enrollment_status: status)
+    FactoryBot.create(:class_enrollment, course_class:, enrollment:)
   end
 
-  def run_sections_for(application)
-    report_group.prepare_config
-    report_group.application_sections(application)
-    report_group.sections[0][:application_columns]
+  def courses_value(application, group: build_group)
+    group.prepare_config
+    group.application_sections(application)
+    group.sections[0][:application_columns].first[:value]
   end
 
-  def values_for(columns, header)
-    columns.find { |c| c[:column][:header] == header }[:value]
+  it "has a translated header" do
+    expect(I18n.exists?(HEADER_KEY)).to be(true)
   end
 
   describe "prepare_config" do
-    it "builds one section with the three avulso columns" do
-      report_group.prepare_config
-      expect(report_group.sections.size).to eq(1)
-      headers = report_group.sections[0][:columns].map { |c| c[:header] }
-      expect(headers).to eq([COURSE_HEADER, PERIOD_HEADER, GRADE_HEADER])
+    it "builds one section with a single column" do
+      group = build_group
+      group.prepare_config
+      expect(group.sections.size).to eq(1)
+      expect(group.sections[0][:columns].map { |c| c[:header] }).to eq([COURSES_HEADER])
+    end
+
+    it "is hidden when nobody matches and empty sections are hidden" do
+      group = build_group(applications: [application_with({})], hide_empty_sections: true)
+      group.prepare_config
+      expect(group.sections).to be_empty
+    end
+
+    it "is kept when someone matches and empty sections are hidden" do
+      group = build_group(
+        applications: [application_with({}), application_with({ cpf: [student] })],
+        hide_empty_sections: true
+      )
+      group.prepare_config
+      expect(group.sections.size).to eq(1)
     end
   end
 
   describe "application_sections" do
-    context "when the student has no CPF match" do
-      it "returns blank values for all columns" do
-        application = application_with_students(Student.none)
-        columns = run_sections_for(application)
-        expect(values_for(columns, COURSE_HEADER)).to eq("")
-        expect(values_for(columns, PERIOD_HEADER)).to eq("")
-        expect(values_for(columns, GRADE_HEADER)).to eq("")
-      end
+    it "leaves the cell blank, keeping the columns aligned, without a student" do
+      group = build_group
+      group.prepare_config
+      row = group.prepare_group_row(application_with({}))
+      expect(row.size).to eq(group.header.size)
+      expect(row.first[:value]).to eq("")
     end
 
-    context "when the matched student has no 'Avulso' enrollment" do
-      it "returns blank values for all columns" do
-        student = FactoryBot.create(:student)
-        build_class_enrollment(
-          course_name: "Regular Course", year: "2027", semester: "1", status: @regular_status
-        )
-        application = application_with_students([student])
-        columns = run_sections_for(application)
-        expect(values_for(columns, COURSE_HEADER)).to eq("")
-        expect(values_for(columns, PERIOD_HEADER)).to eq("")
-        expect(values_for(columns, GRADE_HEADER)).to eq("")
-      end
+    it "finds a student matched only by e-mail" do
+      ce = build_class_enrollment(course_name: "Curso A", year: "2027", semester: "1", student:)
+      stub_grades({ ce.id => 7 })
+      expect(courses_value(application_with({ email: [student] }))).to eq("Curso A (2027/1): 7")
     end
 
-    context "when there is a single avulso class enrollment with a grade" do
-      it "aligns course, period and grade correctly" do
-        student = FactoryBot.create(:student)
-        enrollment = FactoryBot.create(:enrollment, student: student, enrollment_status: @avulso_status)
-        course = FactoryBot.create(:course, name: "Tem nota")
-        course_class = FactoryBot.create(:course_class, course: course, year: "2027", semester: "1")
-        class_enrollment = FactoryBot.create(:class_enrollment, course_class: course_class, enrollment: enrollment)
-
-        stub_grades({ class_enrollment.id => 10 })
-        application = application_with_students([student])
-
-        columns = run_sections_for(application)
-        expect(values_for(columns, COURSE_HEADER)).to eq("Tem nota")
-        expect(values_for(columns, PERIOD_HEADER)).to eq("2027/1")
-        expect(values_for(columns, GRADE_HEADER)).to eq("10")
-      end
+    it "formats course, period and grade, with comma as decimal separator" do
+      ce = build_class_enrollment(course_name: "Curso A", year: "2027", semester: "1", student:)
+      stub_grades({ ce.id => 9.5 })
+      expect(courses_value(application_with({ cpf: [student] }))).to eq("Curso A (2027/1): 9,5")
     end
 
-    context "when there is a mix of graded and ungraded avulso enrollments" do
-      # Este é o caso do bug: sem placeholder para nota ausente, a lista de
-      # notas fica mais curta que a de disciplinas e desalinha o índice.
-      it "keeps the same number of items and the same order across all three columns" do
-        student = FactoryBot.create(:student)
-        graded_ce = build_class_enrollment(
-          course_name: "Tem nota", year: "2027", semester: "1", status: @avulso_status
-        )
-        graded_ce.enrollment.update!(student: student)
-        ungraded_ce = build_class_enrollment(
-          course_name: "Sem nota", year: "2027", semester: "1", status: @avulso_status
-        )
-        ungraded_ce.enrollment.update!(student: student)
-
-        stub_grades({ graded_ce.id => 10, ungraded_ce.id => nil })
-        application = application_with_students([student])
-
-        columns = run_sections_for(application)
-        courses = values_for(columns, COURSE_HEADER).split("; ")
-        periods = values_for(columns, PERIOD_HEADER).split("; ")
-        grades = values_for(columns, GRADE_HEADER).split("; ")
-
-        expect(courses.size).to eq(2)
-        expect(periods.size).to eq(2)
-        expect(grades.size).to eq(2)
-
-        # reconstrói o mapeamento curso -> nota pela posição, e confirma que
-        # cada disciplina ficou com a nota certa, não com a do vizinho.
-        mapping = courses.zip(grades).to_h
-        expect(mapping["Tem nota"]).to eq("10")
-        expect(mapping["Sem nota"]).to eq("-")
-      end
+    it "uses the placeholder when there is no grade" do
+      ce = build_class_enrollment(course_name: "Curso A", year: "2027", semester: "1", student:)
+      stub_grades({ ce.id => nil })
+      expect(courses_value(application_with({ cpf: [student] }))).to eq("Curso A (2027/1): -")
     end
 
-    context "when there are multiple avulso enrollments all with grades" do
-      it "joins all values in the same relative order" do
-        student = FactoryBot.create(:student)
-        ce1 = build_class_enrollment(
-          course_name: "Curso A", year: "2027", semester: "1", status: @avulso_status
-        )
-        ce1.enrollment.update!(student: student)
-        ce2 = build_class_enrollment(
-          course_name: "Curso B", year: "2027", semester: "2", status: @avulso_status
-        )
-        ce2.enrollment.update!(student: student)
-
-        stub_grades({ ce1.id => 7, ce2.id => 9 })
-        application = application_with_students([student])
-
-        columns = run_sections_for(application)
-        courses = values_for(columns, COURSE_HEADER).split("; ")
-        periods = values_for(columns, PERIOD_HEADER).split("; ")
-        grades = values_for(columns, GRADE_HEADER).split("; ")
-
-        mapping = courses.zip(periods, grades).to_h { |c, p, g| [c, [p, g]] }
-        expect(mapping["Curso A"]).to eq(["2027/1", "7"])
-        expect(mapping["Curso B"]).to eq(["2027/2", "9"])
-      end
+    it "includes avulso and regular enrollments" do
+      ce1 = build_class_enrollment(
+        course_name: "Curso A", year: "2027", semester: "1", student:, status: @avulso_status
+      )
+      ce2 = build_class_enrollment(
+        course_name: "Curso B", year: "2026", semester: "2", student:, status: @regular_status
+      )
+      stub_grades({ ce1.id => 8, ce2.id => 6 })
+      expect(courses_value(application_with({ cpf: [student] })))
+        .to eq("Curso A (2027/1): 8; Curso B (2026/2): 6")
     end
 
-    context "when there are multiple avulso enrollments all without grades" do
-      it "fills every grade slot with the placeholder" do
-        student = FactoryBot.create(:student)
-        ce1 = build_class_enrollment(
-          course_name: "Curso A", year: "2027", semester: "1", status: @avulso_status
-        )
-        ce1.enrollment.update!(student: student)
-        ce2 = build_class_enrollment(
-          course_name: "Curso B", year: "2027", semester: "2", status: @avulso_status
-        )
-        ce2.enrollment.update!(student: student)
-
-        stub_grades({ ce1.id => nil, ce2.id => nil })
-        application = application_with_students([student])
-
-        columns = run_sections_for(application)
-        grades = values_for(columns, GRADE_HEADER).split("; ")
-        expect(grades).to eq(["-", "-"])
-      end
+    it "includes the courses of every enrollment of the student" do
+      ce1 = build_class_enrollment(course_name: "Curso A", year: "2026", semester: "1", student:)
+      ce2 = build_class_enrollment(course_name: "Curso B", year: "2026", semester: "2", student:)
+      stub_grades({ ce1.id => 5, ce2.id => 6 })
+      expect(courses_value(application_with({ cpf: [student] })))
+        .to eq("Curso B (2026/2): 6; Curso A (2026/1): 5")
     end
 
-    context "when students_by_cpf matches more than one student" do
-      it "considers avulso enrollments from every matched student" do
-        student1 = FactoryBot.create(:student)
-        student2 = FactoryBot.create(:student)
-        ce1 = build_class_enrollment(
-          course_name: "Curso A", year: "2027", semester: "1", status: @avulso_status
-        )
-        ce1.enrollment.update!(student: student1)
-        ce2 = build_class_enrollment(
-          course_name: "Curso B", year: "2027", semester: "1", status: @avulso_status
-        )
-        ce2.enrollment.update!(student: student2)
+    it "includes every Student found for the candidate" do
+      other = FactoryBot.create(:student)
+      ce1 = build_class_enrollment(course_name: "Curso A", year: "2027", semester: "1", student:)
+      ce2 = build_class_enrollment(course_name: "Curso B", year: "2026", semester: "1", student: other)
+      stub_grades({ ce1.id => 5, ce2.id => 6 })
+      application = application_with({ cpf: [student], email: [other] })
+      expect(courses_value(application)).to eq("Curso A (2027/1): 5; Curso B (2026/1): 6")
+    end
 
-        stub_grades({ ce1.id => 5, ce2.id => 6 })
-        application = application_with_students([student1, student2])
+    it "orders by period, most recent first" do
+      ce_old = build_class_enrollment(course_name: "Curso A", year: "2026", semester: "2", student:)
+      ce_new = build_class_enrollment(course_name: "Curso B", year: "2027", semester: "1", student:)
+      stub_grades({ ce_old.id => 8, ce_new.id => 9 })
+      expect(courses_value(application_with({ cpf: [student] })))
+        .to eq("Curso B (2027/1): 9; Curso A (2026/2): 8")
+    end
 
-        columns = run_sections_for(application)
-        courses = values_for(columns, COURSE_HEADER).split("; ")
-        expect(courses).to contain_exactly("Curso A", "Curso B")
-      end
+    it "shows a grade released after the application" do
+      ce = build_class_enrollment(course_name: "Curso A", year: "2027", semester: "1", student:)
+      application = application_with({ cpf: [student] })
+      group = build_group
+      stub_grades({ ce.id => nil })
+      expect(courses_value(application, group:)).to eq("Curso A (2027/1): -")
+      stub_grades({ ce.id => 10 })
+      group.application_sections(application)
+      expect(group.sections[0][:application_columns].first[:value]).to eq("Curso A (2027/1): 10")
+    end
+
+    it "does not leak one candidate's courses into another's row" do
+      other = FactoryBot.create(:student)
+      ce_a = build_class_enrollment(course_name: "Curso A", year: "2027", semester: "1", student:)
+      ce_b = build_class_enrollment(course_name: "Curso B", year: "2027", semester: "2", student: other)
+      stub_grades({ ce_a.id => 8, ce_b.id => 4 })
+      group = build_group
+      group.prepare_config
+      row_a = group.prepare_group_row(application_with({ cpf: [student] }))
+      row_b = group.prepare_group_row(application_with({ cpf: [other] }))
+      expect(row_a.first[:value]).to eq("Curso A (2027/1): 8")
+      expect(row_b.first[:value]).to eq("Curso B (2027/2): 4")
     end
   end
-  describe "prepare_group_row across multiple applications (same report_group instance)" do
-  def row_value(row, header)
-    row.find { |c| c[:column][:header] == header }[:value]
-  end
-
-  it "does not leak one candidate's disciplines into another candidate's row" do
-    student_a = FactoryBot.create(:student)
-    ce_a = build_class_enrollment(
-      course_name: "Curso do A", year: "2027", semester: "1", status: @avulso_status
-    )
-    ce_a.enrollment.update!(student: student_a)
-    stub_grades({ ce_a.id => 8 })
-    application_a = application_with_students([student_a])
-
-    student_b = FactoryBot.create(:student)
-    ce_b = build_class_enrollment(
-      course_name: "Curso do B", year: "2027", semester: "2", status: @avulso_status
-    )
-    ce_b.enrollment.update!(student: student_b)
-    stub_grades({ ce_a.id => 8, ce_b.id => 4 })
-    application_b = application_with_students([student_b])
-
-    report_group.prepare_config
-
-    row_a = report_group.prepare_group_row(application_a)
-    row_b = report_group.prepare_group_row(application_b)
-
-    expect(row_value(row_a, COURSE_HEADER)).to eq("Curso do A")
-    expect(row_value(row_a, GRADE_HEADER)).to eq("8")
-    expect(row_value(row_b, COURSE_HEADER)).to eq("Curso do B")
-    expect(row_value(row_b, GRADE_HEADER)).to eq("4")
-  end
-
-  it "keeps the first candidate's already-captured row unchanged after processing the second candidate" do
-    student_a = FactoryBot.create(:student)
-    ce_a = build_class_enrollment(
-      course_name: "Curso do A", year: "2027", semester: "1", status: @avulso_status
-    )
-    ce_a.enrollment.update!(student: student_a)
-
-    student_b = FactoryBot.create(:student)
-    ce_b = build_class_enrollment(
-      course_name: "Curso do B", year: "2027", semester: "2", status: @avulso_status
-    )
-    ce_b.enrollment.update!(student: student_b)
-
-    stub_grades({ ce_a.id => 8, ce_b.id => 4 })
-
-    report_group.prepare_config
-
-    row_a = report_group.prepare_group_row(application_with_students([student_a]))
-    row_a_course_snapshot = row_value(row_a, COURSE_HEADER)
-    row_a_grade_snapshot = row_value(row_a, GRADE_HEADER)
-
-    # processa o segundo candidato DEPOIS de já ter capturado a linha do
-    # primeiro, como o gerador de relatório faz linha a linha
-    report_group.prepare_group_row(application_with_students([student_b]))
-
-    expect(row_value(row_a, COURSE_HEADER)).to eq(row_a_course_snapshot)
-    expect(row_value(row_a, GRADE_HEADER)).to eq(row_a_grade_snapshot)
-    expect(row_value(row_a, COURSE_HEADER)).to eq("Curso do A")
-    expect(row_value(row_a, GRADE_HEADER)).to eq("8")
-  end
-
-  it "does not accumulate disciplines from a previous candidate for one with no avulso enrollments" do
-    student_a = FactoryBot.create(:student)
-    ce_a = build_class_enrollment(
-      course_name: "Curso do A", year: "2027", semester: "1", status: @avulso_status
-    )
-    ce_a.enrollment.update!(student: student_a)
-    stub_grades({ ce_a.id => 8 })
-
-    student_b = FactoryBot.create(:student) # sem nenhuma matrícula avulso
-
-    report_group.prepare_config
-
-    report_group.prepare_group_row(application_with_students([student_a]))
-    row_b = report_group.prepare_group_row(application_with_students([student_b]))
-
-    expect(row_value(row_b, COURSE_HEADER)).to eq("")
-    expect(row_value(row_b, PERIOD_HEADER)).to eq("")
-    expect(row_value(row_b, GRADE_HEADER)).to eq("")
-  end
-end
 end
