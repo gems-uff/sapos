@@ -8,6 +8,11 @@ pt-BR:
         paper: "Artigo"
         student: "Discente"
 
+    errors:
+      models:
+        paper_student:
+          cannot_edit_other_papers: "não pode ser editado por este usuário"
+
     models:
       paper_student:
         one: "Discente Autor"

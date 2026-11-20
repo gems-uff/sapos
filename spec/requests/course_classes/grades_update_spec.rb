@@ -112,5 +112,85 @@ RSpec.describe "Lancamento de notas na edicao da turma", type: :request do
 
       expect(@aprovada.reload.enrollment.enrollment_number).to eq("M-APROV")
     end
+
+    # O subformulário grava a associação inteira: a inscrição que não vem no
+    # envio sai da turma, e com dependent: :destroy é apagada. O professor que
+    # lança nota não apaga inscrição.
+    describe "inscricao que nao vem no envio" do
+      it "nao apaga a inscricao que ficou de fora, nem grava as notas das outras" do
+        expect {
+          lanca({ @aprovada => { situation: ClassEnrollment::APPROVED, grade: "8.5", disapproved_by_absence: "0" } })
+        }.not_to change { ClassEnrollment.where(course_class_id: @turma.id).count }
+
+        expect(ClassEnrollment.exists?(@faltosa.id)).to be(true)
+        expect(@aprovada.reload.situation).to eq(ClassEnrollment::REGISTERED)
+        expect(response.body).to include(
+          CGI.escapeHTML(I18n.t("activerecord.errors.models.course_class.class_enrollment_removal_not_allowed"))
+        )
+      end
+
+      # A recusa vem antes da remoção: a inscrição não chega a ser apagada, e
+      # o que a exclusão dispara (o aviso de inscrição removida ao professor,
+      # no período de ajuste) não roda.
+      it "nao chega a apagar a inscricao, nem dispara o que a exclusao dispara" do
+        expect_any_instance_of(ClassEnrollment).not_to receive(:notify_professor)
+
+        lanca({ @aprovada => { situation: ClassEnrollment::REGISTERED } })
+
+        expect(ClassEnrollment.exists?(@faltosa.id)).to be(true)
+      end
+
+      it "nao apaga as inscricoes quando o envio diz que nao ha nenhuma" do
+        expect {
+          put course_class_path(@turma), params: { record: {
+            name: @turma.name, year: @turma.year, semester: @turma.semester, class_enrollments: { "0" => "" }
+          } }
+        }.not_to change { ClassEnrollment.where(course_class_id: @turma.id).count }
+      end
+    end
+
+    # A guarda das validacoes perguntava ao Ability sobre o registro ja
+    # alterado: trocado o dono, a turma deixava de ser do professor, a guarda
+    # respondia que ele nao lancava nota ali, e a validacao nao rodava.
+    describe "troca de dono" do
+      before(:each) do
+        @outro = FactoryBot.create(:professor, name: "Outro Prof")
+        @turma_do_outro = FactoryBot.create(
+          :course_class, course: @turma.course, professor: @outro, name: "Turma B"
+        )
+      end
+
+      it "recusa passar a turma a outro professor" do
+        lanca({}, professor: @outro.id.to_s)
+
+        expect(@turma.reload.professor).to eq(@professor)
+      end
+
+      it "recusa passar a turma a outro professor junto com as notas, sem gravar as notas" do
+        lanca(notas_de_aprovado_e_reprovado_por_falta, professor: @outro.id.to_s)
+
+        expect(@turma.reload.professor).to eq(@professor)
+        expect(@aprovada.reload.situation).to eq(ClassEnrollment::REGISTERED)
+      end
+
+      it "recusa passar a turma a outro professor pela edicao de uma coluna" do
+        post update_column_course_class_path(@turma), params: { column: "professor", value: @outro.id.to_s }, xhr: true
+
+        expect(@turma.reload.professor).to eq(@professor)
+      end
+
+      it "recusa mover a inscricao para a turma de outro professor" do
+        put class_enrollment_path(@aprovada), params: { record: { course_class: @turma_do_outro.id.to_s } }
+
+        expect(@aprovada.reload.course_class).to eq(@turma)
+      end
+
+      it "recusa mover a inscricao para a turma de outro professor pela edicao de uma coluna" do
+        post update_column_class_enrollment_path(@aprovada),
+          params: { column: "course_class", value: @turma_do_outro.id.to_s }, xhr: true
+
+        expect(@aprovada.reload.course_class).to eq(@turma)
+      end
+    end
   end
 end

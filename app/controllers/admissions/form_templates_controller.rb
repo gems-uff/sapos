@@ -88,6 +88,14 @@ class Admissions::FormTemplatesController < ApplicationController
     end
   end
 
+  protected
+    # Os formularios do processo, da fase e do relatorio abrem este seletor com
+    # o tipo do modelo na URL (options[:params] de cada coluna), para oferecer
+    # so os modelos daquele tipo. Ver record_select_url_conditions.rb.
+    def record_select_url_columns
+      [:template_type]
+    end
+
   private
     def filled_form_params
       params.permit(

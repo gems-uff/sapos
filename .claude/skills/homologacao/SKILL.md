@@ -402,12 +402,79 @@ navegador que a recuperou, e a prova é o token guardado na sessão.
 EXPLORE_OUT=$LADO/tokens bundle exec ruby $S/probe_tokens_admissao.rb
 ```
 
-**Hoje ela não mede nada na réplica, e isso é esperado:** a homologação roda em
-ambiente *production*, onde `should_use_recaptcha` é true, e o `#find` valida o
-reCAPTCHA antes de procurar a inscrição. Selenium headless não passa, nenhum
-token entra na sessão, e a sonda **recusa a medida** em vez de reportar
-"desviou em tudo" — que se leria como defeito da aplicação. Medir de verdade
-exige uma instância com o reCAPTCHA desligado; é decisão do mantenedor.
+**Com o reCAPTCHA ligado ela não mede nada na réplica, e isso é esperado:** a
+homologação roda em ambiente *production*, onde `should_use_recaptcha` é true,
+e o `#find` valida o reCAPTCHA antes de procurar a inscrição. Selenium headless
+não passa, nenhum token entra na sessão, e a sonda **recusa a medida** em vez
+de reportar "desviou em tudo" — que se leria como defeito da aplicação. Para
+medir de verdade, desligue o reCAPTCHA pelo tempo da medida (ver "Exercício de
+e-mail da inscrição").
+
+### Exercício de e-mail da inscrição, com o reCAPTCHA desligado por um momento
+
+Em processo com sessão, a pré-inscrição, a entrada com o código e a recuperação
+passam pelo reCAPTCHA, que o Selenium headless não vence. Para exercitá-las
+pela tela — e com elas a troca de e-mail confirmada por link —, o reCAPTCHA é
+desligado **só na instância de homologação e só enquanto o exercício roda**. O
+exercício escreve na réplica e manda e-mail: vem **depois** da captura do lado
+"depois", nunca entre as duas fotos.
+
+```bash
+set -a; source ~/.sapos_staging_env; set +a
+S=.claude/skills/homologacao
+na_instancia() { ssh "$SAPOS_STAGING_SSH" "sudo -i -u $SAPOS_STAGING_INSTANCE bash -lc \"cd ~/instance && $1\""; }
+runner() { ssh "$SAPOS_STAGING_SSH" "f=\$(mktemp /tmp/r.XXXXXX.rb); chmod 644 \$f; cat > \$f; \
+  sudo -i -u $SAPOS_STAGING_INSTANCE bash -lc \"cd ~/instance && bundle exec rails runner \$f $2\"; rm -f \$f" < "$1"; }
+
+# 1. desligar o reCAPTCHA e destravar o e-mail para o endereço de teste
+na_instancia "sed -i 's/should_use_recaptcha = true/should_use_recaptcha = false/' config/environments/production.rb && touch tmp/restart.txt"
+runner $S/trava_email.rb <endereço de teste>
+bundle exec ruby $S/conferir_redirect_email.rb          # tem de sair 1 (destravada)
+
+# 2. os passos, lendo o código e o link na caixa de teste entre um e outro
+export EXPLORE_OUT=$DEPOIS/email
+E="bundle exec ruby $S/exercicio_email_inscricao.rb"
+$E pre       <edital> "ZZ-TESTE-HOMOLOG Candidata" zz-teste-homolog-a@example.com
+$E enviar    <edital> zz-teste-homolog-a@example.com <código>
+$E enviar    <edital> zz-teste-homolog-a@example.com <código> zz-teste-homolog-b@example.com
+$E desistir  <edital> zz-teste-homolog-a@example.com <código>
+$E confirmar <link do pedido desistido>
+$E enviar    <edital> zz-teste-homolog-a@example.com <código> zz-teste-homolog-b@example.com
+$E confirmar <link do pedido novo>          # e de novo: o link vale uma vez
+$E abrir     <edital> zz-teste-homolog-a@example.com <código antigo>
+$E abrir     <edital> zz-teste-homolog-b@example.com <código novo>
+$E recuperar <edital> zz-teste-homolog-b@example.com
+
+# 3. desfazer, nesta ordem, e conferir pela tela
+runner $S/trava_email.rb VAZIA
+na_instancia "git checkout -- config/environments/production.rb && git status --short && touch tmp/restart.txt"
+runner $S/limpa_exercicio_email.rb
+bundle exec ruby $S/conferir_redirect_email.rb          # tem de sair 0 (travada)
+curl -s "$SAPOS_STAGING_URL/admissions/<edital>" | grep -c g-recaptcha   # tem de ser > 0
+```
+
+`<edital>` é o endereço (`simple_url`) de um processo **aberto e com sessão**;
+a réplica costuma ter algum sem inscrição nenhuma, que é o melhor exemplar
+(`Admissions::AdmissionProcess.open.where(require_session: true)`).
+
+O que cada passo tem de mostrar: a pré-inscrição avisa para onde o código foi,
+sem exibi-lo; o primeiro envio diz "realizada"; o envio com outro endereço
+deixa a troca **pendente** — a mensagem de confirmação vai ao endereço novo
+sem o código, e o e-mail e o código de antes seguem valendo; a desistência mata
+o link; confirmado o pedido novo, o código renovado (mesmo identificador) vai
+**só** ao endereço novo, o link não vale uma segunda vez, o código antigo não
+abre com nenhum dos dois endereços, e a recuperação entrega pelo endereço novo
+e não acha a inscrição pelo antigo.
+
+- **O `deploy.sh` guarda a modificação local em stash e a repõe.** reCAPTCHA
+  desligado e esquecido atravessa o deploy seguinte. O desfazer é o `git
+  checkout` do arquivo, conferido pelo `git status` e pela tela — não "o
+  próximo deploy conserta".
+- **O Gmail junta em uma conversa as mensagens de mesmo assunto.** O link do
+  segundo pedido de troca é a segunda mensagem da conversa do primeiro: leia a
+  conversa inteira, não o resumo da busca, que mostra só a primeira.
+- **O código vem no resumo da mensagem e o link no corpo.** A sonda os mascara
+  no que imprime; não os copie para relatório, issue ou PR.
 
 Três coisas que a sonda carrega e que valem para qualquer medida de autorização:
 
@@ -796,6 +863,17 @@ linha com o marcador, e isso aparece como a maior diferença de pixel da rodada.
 Antes de investigar uma rota que divergiu sozinha, procure o marcador
 `ZZ-TESTE-HOMOLOG` no diff do texto — achando, é pegada, não regressão.
 
+### Duas telas trocam de estado entre capturas do mesmo código
+
+- `/scholarships/:id` — o rótulo do ano na linha do tempo flutua até a borda
+  esquerda por animação, e a foto pega ora antes, ora depois: a faixa dos meses
+  difere em pixel, sem diferença de texto.
+- `/notifications/:id` — o editor do corpo (CodeMirror) ora rende uma linha em
+  branco antes da primeira, ora não: uma linha de texto a mais ou a menos.
+
+Diferença só nessas faixas se confirma com o A/A do lado "depois": recapture a
+rota algumas vezes no mesmo deploy e veja os dois estados aparecerem.
+
 ### Não confunda template oculto com erro na tela
 
 O active_scaffold deixa no DOM, **oculto**, um painel
@@ -843,6 +921,19 @@ ela que desempata quando a leitura do DOM e o resultado discordam.
     dispare nada neste estado.
   - **um endereço** = envia e **redireciona tudo** para ele; assunto ganha
     "(Originalmente para <real>)". É o estado seguro e verificável.
+- **Destravar para exercitar e-mail:** o `trava_email.rb` troca a variável no
+  servidor, por `rails runner`, sem nunca apagá-la; `<endereço>` destrava
+  redirecionando e `VAZIA` repõe a trava. Antes e depois, confira pela tela com
+  o `conferir_redirect_email.rb` (sai 1 destravada, 0 travada). Deixe destravada
+  só enquanto o exercício roda, e fora do horário do `cron.daily`: a rake
+  noturna de manutenção dispara as notificações agendadas, e com a variável
+  destravada elas saem todas para o endereço de teste. O envio grava uma linha
+  em `notification_logs` por mensagem; apague as do exercício ao fim.
+- **Mensagem que a tela só alcança pelo reCAPTCHA** (o `create` e o `find` da
+  inscrição em processo com sessão): exercite pela tela, com o reCAPTCHA
+  desligado pelo tempo do exercício (ver "Exercício de e-mail da inscrição").
+  Compor a mensagem no servidor, com `prepare_message` sobre uma candidatura
+  não gravada, mede o modelo e a entrega, não o controller.
 - **Ler o e-mail redirecionado:** tente o **Gmail via MCP primeiro** (`/mcp` →
   "claude.ai Gmail") para ler as mensagens e clicar nos links. Se não conectar,
   **peça ao usuário para colar** as mensagens que chegaram — o link de token vem

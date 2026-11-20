@@ -1,0 +1,193 @@
+== admissions/admission_applications | app_compartilhada
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/admission_applications | app_outro
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/admission_applications | app_pendente
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: admission_phase admission_process email evaluations filled_form letter_requests name rankings results show status token | formulário edita: (nada) | grava: (nada) | recusa: admission_phase admission_phase_id admission_process_id created_at email email_change_digest email_change_sent_at enrollment enrollment_id filled_form filled_form_id id name pending_email status status_message student student_id submission_time token | em linha grava: (nada) | em linha recusa: admission_phase admission_phase_id admission_process_id created_at email email_change_digest email_change_sent_at enrollment enrollment_id filled_form filled_form_id id name pending_email status status_message student student_id submission_time token | sem teste: admission_process evaluations letter_requests pendencies rankings results updated_at versions
+  professor sem professor vinculado: não lê
+== admissions/admission_applications | app_sem
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/admission_pendencies | pend_compartilhada
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/admission_pendencies | pend_outro
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/admission_pendencies | pend_professor
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/admission_phase_evaluations | avaliacao_outro
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/admission_phase_evaluations | avaliacao_professor
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: (não abre) | não edita
+  professor sem professor vinculado: não lê
+== admissions/admission_phase_results | resultado_app_pendente
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: (não abre) | não edita
+  professor sem professor vinculado: não lê
+== admissions/admission_phase_results | resultado_app_sem
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/admission_phases | fase
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/admission_processes | processo
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/admission_ranking_results | ranking_app_pendente
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: (não abre) | não edita
+  professor sem professor vinculado: não lê
+== admissions/admission_ranking_results | ranking_app_sem
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/consolidation_form_fields | (primeiro Admissions::FormField)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/consolidation_templates | (primeiro Admissions::FormTemplate)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/filled_form_fields | campo_app_pendente
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/filled_forms | ff_app_compartilhada
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/filled_forms | ff_app_outro
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/filled_forms | ff_app_pendente
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: show | não edita
+  professor sem professor vinculado: não lê
+== admissions/filled_forms | ff_app_sem
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/filled_forms | ff_avaliacao_outro
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/filled_forms | ff_avaliacao_professor
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: show | não edita
+  professor sem professor vinculado: não lê
+== admissions/filled_forms | ff_carta_app_pendente
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: show | não edita
+  professor sem professor vinculado: não lê
+== admissions/filled_forms | ff_carta_app_sem
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/filled_forms | ff_ranking_app_pendente
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: show | não edita
+  professor sem professor vinculado: não lê
+== admissions/filled_forms | ff_ranking_app_sem
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/filled_forms | ff_resultado_app_pendente
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: show | não edita
+  professor sem professor vinculado: não lê
+== admissions/filled_forms | ff_resultado_app_sem
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/form_fields | (primeiro Admissions::FormField)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/form_templates | (primeiro Admissions::FormTemplate)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/letter_requests | carta_app_pendente
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: (não abre) | não edita
+  professor sem professor vinculado: não lê
+== admissions/letter_requests | carta_app_sem
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/ranking_columns | (primeiro Admissions::RankingColumn)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/ranking_configs | ranking
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/ranking_machines | (primeiro Admissions::RankingMachine)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== admissions/ranking_processes | (primeiro Admissions::RankingProcess)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== advisement_authorizations | (primeiro AdvisementAuthorization)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: end_date level professor show start_date | não edita
+== advisements | adv_a
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: co_advisor_list enrollment main_advisor professor show | não edita
+== advisements | adv_b
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: co_advisor_list enrollment main_advisor professor show | não edita
+== class_enrollment_requests | cer_a_efetivada
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: (não abre) | não edita
+== class_enrollment_requests | cer_a_solicitada
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: (não abre) | formulário edita: (nada) | grava: (nada) | recusa: action class_enrollment class_enrollment_id course_class course_class_id created_at enrollment_request enrollment_request_id id status | em linha grava: (nada) | em linha recusa: action class_enrollment class_enrollment_id course_class course_class_id created_at enrollment_request enrollment_request_id id status | sem teste: enrollment updated_at versions
+  professor sem professor vinculado: ficha: (não abre) | não edita
+== class_enrollment_requests | cer_a_status_nulo
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: (não abre) | formulário edita: (nada) | grava: (nada) | recusa: action class_enrollment class_enrollment_id course_class course_class_id created_at enrollment_request enrollment_request_id id status | em linha grava: (nada) | em linha recusa: action class_enrollment class_enrollment_id course_class course_class_id created_at enrollment_request enrollment_request_id id status | sem teste: enrollment updated_at versions
+  professor sem professor vinculado: ficha: (não abre) | não edita
+== class_enrollment_requests | cer_b_solicitada
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: (não abre) | não edita
+== class_enrollments | ce_a_antiga
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor sem professor vinculado: ficha: course_class created_at disapproved_by_absence enrollment grade_label grade_not_count_in_gpr justification_grade_not_count_in_gpr obs show situation | não edita
+  professor (nota em todo semestre): ficha: course_class created_at disapproved_by_absence enrollment grade_label grade_not_count_in_gpr justification_grade_not_count_in_gpr obs show situation | formulário edita: disapproved_by_absence grade obs situation | formulário trava: course_class enrollment | grava: obs | recusa: course_class course_class_id created_at disapproved_by_absence enrollment enrollment_id grade grade_not_count_in_gpr id justification_grade_not_count_in_gpr situation | em linha grava: (nada) | em linha recusa: course_class course_class_id created_at disapproved_by_absence enrollment enrollment_id grade grade_not_count_in_gpr id justification_grade_not_count_in_gpr obs situation | sem teste: class_enrollment_request updated_at versions
+== class_enrollments | ce_a_atual
+  professor (sem lançamento de nota), professor sem professor vinculado: ficha: course_class created_at disapproved_by_absence enrollment grade_label grade_not_count_in_gpr justification_grade_not_count_in_gpr obs show situation | não edita
+  professor (nota no semestre corrente), professor (nota em todo semestre): ficha: course_class created_at disapproved_by_absence enrollment grade_label grade_not_count_in_gpr justification_grade_not_count_in_gpr obs show situation | formulário edita: disapproved_by_absence grade obs situation | formulário trava: course_class enrollment | grava: obs | recusa: course_class course_class_id created_at disapproved_by_absence enrollment enrollment_id grade grade_not_count_in_gpr id justification_grade_not_count_in_gpr situation | em linha grava: (nada) | em linha recusa: course_class course_class_id created_at disapproved_by_absence enrollment enrollment_id grade grade_not_count_in_gpr id justification_grade_not_count_in_gpr obs situation | sem teste: class_enrollment_request updated_at versions
+== class_enrollments | ce_b_atual
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: course_class created_at disapproved_by_absence enrollment grade_label grade_not_count_in_gpr justification_grade_not_count_in_gpr obs show situation | não edita
+== course_classes | cc_a_antiga
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor sem professor vinculado: ficha: allocations class_enrollments class_enrollments_count course enrollments name professor semester show year | não edita
+  professor (nota em todo semestre): ficha: allocations class_enrollments class_enrollments_count course enrollments name professor semester show year | formulário edita: (nada) | formulário trava: course name not_schedulable obs_schedule professor semester year | grava: (nada) | recusa: course course_id created_at id name not_schedulable obs_schedule professor professor_id semester year | em linha grava: (nada) | em linha recusa: course course_id created_at id name not_schedulable obs_schedule professor professor_id semester year | class_enrollments[edita: disapproved_by_absence grade obs situation; trava: enrollment; grava: obs; recusa: disapproved_by_absence enrollment grade situation] | sem teste: allocations class_enrollment_requests class_enrollments enrollment_requests enrollments updated_at versions
+== course_classes | cc_a_atual
+  professor (sem lançamento de nota), professor sem professor vinculado: ficha: allocations class_enrollments class_enrollments_count course enrollments name professor semester show year | não edita
+  professor (nota no semestre corrente), professor (nota em todo semestre): ficha: allocations class_enrollments class_enrollments_count course enrollments name professor semester show year | formulário edita: (nada) | formulário trava: course name not_schedulable obs_schedule professor semester year | grava: (nada) | recusa: course course_id created_at id name not_schedulable obs_schedule professor professor_id semester year | em linha grava: (nada) | em linha recusa: course course_id created_at id name not_schedulable obs_schedule professor professor_id semester year | class_enrollments[edita: disapproved_by_absence grade obs situation; trava: enrollment; grava: obs; recusa: disapproved_by_absence enrollment grade situation] | sem teste: allocations class_enrollment_requests class_enrollments enrollment_requests enrollments updated_at versions
+== course_classes | cc_b_atual
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: allocations class_enrollments class_enrollments_count course enrollments name professor semester show year | não edita
+== course_types | (primeiro CourseType)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: allow_multiple_classes has_score name on_demand schedulable show show_class_name | não edita
+== courses | (primeiro Course)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: available code content course_research_areas course_research_lines course_type credits name show workload | não edita
+== custom_variables | (primeiro CustomVariable)
+  professor (nota no semestre corrente), professor (nota em todo semestre): não lê
+== dismissal_reasons | dr_aprovado
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: description name show show_advisor_name thesis_judgement | não edita
+== dismissal_reasons | dr_reprovado
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: description name show show_advisor_name thesis_judgement | não edita
+== dismissals | dis_a_aprovada
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: dismissal_reason enrollment level obs show | não edita
+== dismissals | dis_b_aprovada
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: dismissal_reason enrollment level obs show | não edita
+== dismissals | dis_b_reprovada
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: dismissal_reason enrollment level obs show | não edita
+== enrollment_requests | er_a
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: class_enrollment_requests enrollment enrollment_request_comments last_staff_change_at last_student_change_at semester show status year | formulário edita: comment_message | grava: (nada) | recusa: created_at enrollment enrollment_id id last_staff_change_at last_student_change_at semester student_view_at year | em linha grava: (nada) | em linha recusa: created_at enrollment enrollment_id id last_staff_change_at last_student_change_at semester student_view_at year | class_enrollment_requests[edita: status; trava: (nada); grava: (nada); recusa: status] | sem teste: class_enrollment_requests course_classes enrollment_request_comments updated_at versions
+  professor sem professor vinculado: ficha: class_enrollment_requests enrollment enrollment_request_comments last_staff_change_at last_student_change_at semester show status year | não edita
+== enrollment_requests | er_b
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: class_enrollment_requests enrollment enrollment_request_comments last_staff_change_at last_student_change_at semester show status year | não edita
+== enrollment_statuses | es_permite
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: name professor_can_generate_report show user | não edita
+== enrollment_statuses | es_proibe
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: name professor_can_generate_report show user | não edita
+== enrollments | enr_a_aberta
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: admission_date advisements class_enrollments deferrals dismissal documents enrollment_holds enrollment_number enrollment_status level obs obs_to_academic_transcript phase_due_dates research_area research_line scholarship_durations show student thesis_defense_committee_participations thesis_defense_date thesis_title | não edita
+== enrollments | enr_a_aprovada
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: admission_date advisements class_enrollments deferrals dismissal documents enrollment_holds enrollment_number enrollment_status level obs obs_to_academic_transcript phase_due_dates research_area research_line scholarship_durations show student thesis_defense_committee_participations thesis_defense_date thesis_title | não edita
+== enrollments | enr_b_aprovada
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: admission_date advisements class_enrollments deferrals dismissal documents enrollment_holds enrollment_number enrollment_status level obs obs_to_academic_transcript phase_due_dates research_area research_line scholarship_durations show student thesis_defense_committee_participations thesis_defense_date thesis_title | não edita
+== enrollments | enr_b_reprovada
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: admission_date advisements class_enrollments deferrals dismissal documents enrollment_holds enrollment_number enrollment_status level obs obs_to_academic_transcript phase_due_dates research_area research_line scholarship_durations show student thesis_defense_committee_participations thesis_defense_date thesis_title | não edita
+== grants | grant_a
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: amount end_year funder kind professor show start_year title | formulário edita: amount end_year funder kind start_year title | grava: amount funder start_year title | recusa: created_at end_year id kind professor professor_id | em linha grava: (nada) | em linha recusa: amount created_at end_year funder id kind professor professor_id start_year title | sem teste: updated_at versions
+  professor sem professor vinculado: ficha: amount end_year funder kind professor show start_year title | não edita
+== grants | grant_b
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: amount end_year funder kind professor show start_year title | não edita
+== grants | grant_c
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: amount end_year funder kind professor show start_year title | não edita
+== levels | level
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: advisement_authorizations course_name default_duration name short_name_showed_in_list_header show show_advisements_points_in_list | não edita
+== paper_professors | pp_a
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: paper professor show | formulário edita: paper professor | grava: professor | recusa: created_at id paper paper_id professor_id | em linha grava: (nada) | em linha recusa: created_at id paper paper_id professor professor_id | sem teste: updated_at versions
+  professor sem professor vinculado: ficha: paper professor show | não edita
+== paper_professors | pp_b
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: paper professor show | não edita
+== paper_students | ps_a
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: paper show student | formulário edita: paper student | grava: student | recusa: created_at id paper paper_id student_id | em linha grava: (nada) | em linha recusa: created_at id paper paper_id student student_id | sem teste: updated_at versions
+  professor sem professor vinculado: ficha: paper show student | não edita
+== paper_students | ps_b
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: paper show student | não edita
+== papers | paper_a
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre): ficha: doi_issn_event kind order other other_authors owner paper_professors paper_students period reason_citations reason_impact_factor reason_innovation_contribution reason_international_interest reason_international_list reason_justify reason_national_interest reason_national_representativeness reason_other reason_scientific_contribution reason_social_contribution reason_tech_contribution reference show | formulário edita: doi_issn_event kind order other other_authors reason_citations reason_impact_factor reason_innovation_contribution reason_international_interest reason_international_list reason_justify reason_national_interest reason_national_representativeness reason_other reason_scientific_contribution reason_social_contribution reason_tech_contribution reference | grava: doi_issn_event order other other_authors reason_citations reason_impact_factor reason_innovation_contribution reason_international_interest reason_international_list reason_justify reason_national_interest reason_national_representativeness reason_other reason_scientific_contribution reason_social_contribution reason_tech_contribution reference | recusa: created_at id kind owner owner_id period | em linha grava: (nada) | em linha recusa: created_at doi_issn_event id kind order other other_authors owner owner_id period reason_citations reason_impact_factor reason_innovation_contribution reason_international_interest reason_international_list reason_justify reason_national_interest reason_national_representativeness reason_other reason_scientific_contribution reason_social_contribution reason_tech_contribution reference | paper_professors[edita: professor; trava: (nada); grava: professor; recusa: (nada)] | paper_students[edita: student; trava: (nada); grava: student; recusa: (nada)] | sem teste: paper_professors paper_students professors students updated_at versions
+  professor sem professor vinculado: ficha: doi_issn_event kind order other other_authors owner paper_professors paper_students period reason_citations reason_impact_factor reason_innovation_contribution reason_international_interest reason_international_list reason_justify reason_national_interest reason_national_representativeness reason_other reason_scientific_contribution reason_social_contribution reason_tech_contribution reference show | não edita
+== papers | paper_b
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: doi_issn_event kind order other other_authors owner paper_professors paper_students period reason_citations reason_impact_factor reason_innovation_contribution reason_international_interest reason_international_list reason_justify reason_national_interest reason_national_representativeness reason_other reason_scientific_contribution reason_social_contribution reason_tech_contribution reference show | não edita
+== professors | prof_a
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: academic_title_country academic_title_date academic_title_institution academic_title_level address advisement_authorizations advisements_with_points birthdate civil_status cpf email enrollment_number identity_expedition_date identity_issuing_body identity_number institutions name neighborhood obs research_areas research_lines scholarships sex show siape telephone1 telephone2 zip_code | não edita
+== professors | prof_b
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: academic_title_country academic_title_date academic_title_institution academic_title_level address advisement_authorizations advisements_with_points birthdate civil_status cpf email enrollment_number identity_expedition_date identity_issuing_body identity_number institutions name neighborhood obs research_areas research_lines scholarships sex show siape telephone1 telephone2 zip_code | não edita
+== professors | prof_c
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: academic_title_country academic_title_date academic_title_institution academic_title_level address advisement_authorizations advisements_with_points birthdate civil_status cpf email enrollment_number identity_expedition_date identity_issuing_body identity_number institutions name neighborhood obs research_areas research_lines scholarships sex show siape telephone1 telephone2 zip_code | não edita
+== roles | (primeiro Role)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== students | st_a
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: address birth_city birth_country birth_state birthdate city civil_status cpf email employer father_name gender humanitarian_policy identity_expedition_date identity_issuing_body identity_issuing_place identity_number job_position mother_name name neighborhood obs obs_gender obs_pcd pcd photo sex show skin_color student_majors telephone1 telephone2 zip_code | não edita
+== students | st_b
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: ficha: address birth_city birth_country birth_state birthdate city civil_status cpf email employer father_name gender humanitarian_policy identity_expedition_date identity_issuing_body identity_issuing_place identity_number job_position mother_name name neighborhood obs obs_gender obs_pcd pcd photo sex show skin_color student_majors telephone1 telephone2 zip_code | não edita
+== user_roles | (primeiro UserRole)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== users | (primeiro User)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê
+== versions | (primeiro Version)
+  professor (sem lançamento de nota), professor (nota no semestre corrente), professor (nota em todo semestre), professor sem professor vinculado: não lê

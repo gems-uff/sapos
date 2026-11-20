@@ -608,8 +608,13 @@ module PdfHelper
     config
   end
 
+  # A chave abre o documento assinado pelo endereco que o QR code leva
+  # (download_by_identifier): e credencial, e cada caractere sai do gerador
+  # criptografico. O sample sem `random:` usa o gerador comum do Ruby, cuja
+  # sequencia se reconstroi a partir de saidas observadas.
   def generate_qr_code_key
-    10.times.map { "2346789BCDFGHJKMPQRTVWXY".split("").sample }
+    alphabet = "2346789BCDFGHJKMPQRTVWXY".chars
+    10.times.map { alphabet.sample(random: SecureRandom) }
       .insert(5, "-").join("")
   end
 

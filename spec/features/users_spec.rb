@@ -18,7 +18,6 @@ RSpec.describe "Users features", type: :feature do
     @destroy_all << FactoryBot.create(:role_professor)
     @destroy_all << FactoryBot.create(:role_aluno)
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << FactoryBot.create(:role_suporte)
 
     @destroy_all << @user = create_confirmed_user([@role_adm])
     @destroy_all << FactoryBot.create(:user, email: "user3@ic.uff.br", name: "carol")
@@ -80,7 +79,7 @@ RSpec.describe "Users features", type: :feature do
 
     it "should have a selection for role options" do
       labels = page.all("li.form-element.select dl dd label").map(&:text)
-      expect(labels).to eq ["Administrador", "Coordenação", "Secretaria", "Professor", "Suporte", "Aluno"]
+      expect(labels).to eq ["Administrador", "Coordenação", "Secretaria", "Professor", "Aluno"]
     end
 
     it "should have a record_select widget for professor" do

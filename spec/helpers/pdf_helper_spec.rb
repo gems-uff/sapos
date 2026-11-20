@@ -343,4 +343,28 @@ RSpec.describe PdfHelper, type: :helper do
         .to eq(watermark_center(:no_signature))
     end
   end
+
+  # The key printed in the QR code is what opens the signed document by its
+  # address (download_by_identifier), so it is a credential, as the code of an
+  # application is.
+  describe "generate_qr_code_key" do
+    def key_after_seeding(seed)
+      previous = Kernel.srand(seed)
+      helper.send(:generate_qr_code_key)
+    ensure
+      Kernel.srand(previous)
+    end
+
+    it "keeps the format that documents already carry" do
+      expect(helper.send(:generate_qr_code_key))
+        .to match(/\A[2346789BCDFGHJKMPQRTVWXY]{5}-[2346789BCDFGHJKMPQRTVWXY]{5}\z/)
+    end
+
+    # The common generator of Ruby repeats its sequence from a seed, and the
+    # sequence is rebuilt from outputs that were seen. The cryptographic one
+    # does not listen to the seed.
+    it "does not draw the key from the common random generator" do
+      expect(key_after_seeding(20_261_111)).not_to eq(key_after_seeding(20_261_111))
+    end
+  end
 end

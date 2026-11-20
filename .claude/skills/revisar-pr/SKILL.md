@@ -1,6 +1,6 @@
 ---
 name: revisar-pr
-description: Conduz um PR do repositório do começo ao fim — ler a issue e o diff, decidir o que é nosso e o que volta para o autor, cobrir o que falta de teste, medir, homologar e lançar. Use ao dizer "vamos trabalhar no PR N", ao revisar contribuição de terceiro, ou ao retomar um ramo parado.
+description: Conduz um PR do repositório do começo ao fim — ler a issue e o diff, decidir o que é nosso e o que volta para o autor, cobrir o que falta de teste, medir e integrar na main. Use ao dizer "vamos trabalhar no PR N", ao revisar contribuição de terceiro, ou ao retomar um ramo parado.
 ---
 
 # Trabalhar num PR
@@ -9,8 +9,8 @@ Esta skill é a **espinha**: ela diz *quando* cada coisa entra e *por quê*. O *
 está nas skills apontadas, e não se repete aqui — passo que cabe numa frase mais um
 ponteiro é uma frase mais um ponteiro.
 
-**Nem todo PR termina em release.** As quatro saídas legítimas estão no passo 4; a
-linha reta até o lançamento é uma delas, não a única. Os passos 6 a 8 pertencem só
+**Nem todo PR termina na `main`.** As quatro saídas legítimas estão no passo 4; a
+linha reta até a integração é uma delas, não a única. Os passos 6 a 8 pertencem só
 a ela e o 9 vale nas quatro; o 5 é dos dois lados — na linha reta cobre as
 lacunas, e ao devolver põe a reprodução em forma de spec do projeto. Veredito
 plausível também atravessa: manda medir em MariaDB ou homologar antes de fechar
@@ -22,11 +22,11 @@ qualquer saída.
 |---|---|
 | `Gemfile` / `Gemfile.lock` | `dependencias` |
 | SQL, unicidade, ordenação, migration | `suite-mariadb` |
-| Asset, tela, PDF, planilha, e-mail | `homologacao` |
+| Asset, tela, PDF, planilha, e-mail | `homologacao`, sobre a `main`, no lançamento |
 | Ramo atrás da `main` | `merge-downstream` |
 | Suspeita de defeito no diff | `provar-candidato` |
 | Qualquer mudança que precise ser medida | `safe-refactor` |
-| Tudo verde e homologado | `release` |
+| Tudo verde, local e no CI | `release` (integrar na `main`) |
 
 ## 1. Reconhecimento
 
@@ -59,8 +59,8 @@ lista os arquivos; a primeira linha é a árvore resultante, e `git show
 de texto — o que o merge quebra sem conflitar é assunto do passo 2.
 
 O `closingIssuesReferences` lista as issues que o merge fecharia. Qualquer uma ali
-contraria a regra do `AGENTS.md` — issue se cita só pelo prefixo, e fechar é do
-passo de release —: peça ao autor que tire o `Fixes`/`Closes`. Corpo que cita a
+contraria a regra do `AGENTS.md` — issue se cita só pelo prefixo, e fechar é
+decisão de quem integra —: peça ao autor que tire o `Fixes`/`Closes`. Corpo que cita a
 issue sem palavra de fechamento não aparece ali, e não precisa de nada. A
 mensagem de commit fecha a issue ao chegar na `main` por conta própria; confira-a
 também:
@@ -304,18 +304,20 @@ repetindo a perna —, não se presume: sem prova, o vermelho continua sinal.
 em SQLite não diz nada sobre esses pontos. Migration que mexe em coluna pede
 também `rake seeds:check` — o porquê está na mesma seção do `AGENTS.md`.
 
-## 7. Homologar
+## 7. Deixar o roteiro da homologação
 
-`homologacao`, quando a mudança toca o que a suíte estruturalmente não alcança —
-adaptador de banco, geração de PDF e planilha, renderização de tela, pipeline de
-assets, e-mail. Ela inclui a passada de escrita nos dois lados: a comparação
-sozinha é toda de leitura.
+A homologação roda sobre a `main`, no lançamento (`release`), e não neste ramo.
+Quando a mudança toca o que a suíte estruturalmente não alcança — adaptador de
+banco, geração de PDF e planilha, renderização de tela, pipeline de assets,
+e-mail —, registre na issue o que ela precisa exercitar, inclusive se há caminho
+de escrita. É de lá que o lançamento tira o roteiro, com a issue já fechada.
 
-## 8. Lançar
+## 8. Integrar na main
 
-`release`. Antes de chamá-la, isto tem de ser verdade: suíte completa verde no
-ramo, homologação feita quando cabia, `main` sincronizada, árvore de trabalho
-limpa e CI verde na ponta.
+`release`, seção "Integrar na main": o ramo entra na `main` e a issue fecha.
+Antes, isto tem de ser verdade: suíte completa verde no ramo, `main`
+sincronizada, árvore de trabalho limpa e CI verde na ponta. Lançar a versão é
+outro momento, decidido pelo mantenedor.
 
 Migration que mexe em coluna deixa uma pendência **para depois do deploy**: `rake
 queries:check` em cada instalação, já com o esquema migrado. É a única rodada que

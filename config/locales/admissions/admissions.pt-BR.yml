@@ -27,14 +27,31 @@ pt-BR:
         new_button: Criar nova inscrição
         edit_button: Recuperar inscrição em andamento
 
+      create:
+        token_sent: "Enviamos o código de identificação para %{email}. Informe-o abaixo para continuar a inscrição."
+        token_sent_without_email: "A inscrição foi iniciada, mas o sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o código de identificação."
+
       find_by_email:
         success:
           one: Email enviado para %{email} com código de identificação
           other: Email enviado para %{email} com códigos de identificação
+        success_without_email: "O sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o código de identificação."
+
+    email_changes:
+      show:
+        title: "Troca do e-mail da inscrição"
+        explanation: "Confirme para que o endereço abaixo passe a ser o e-mail da inscrição. O código de identificação será renovado, e o novo código será enviado para esse endereço."
+        confirm: "Confirmar troca de e-mail"
+      update:
+        success: "E-mail da inscrição alterado. O novo código de identificação foi enviado para %{email}."
+        success_without_email: "E-mail da inscrição alterado, mas o sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o novo código de identificação."
+        refused: "Não foi possível trocar o e-mail da inscrição: %{reasons}. A inscrição continua com o e-mail e o código de identificação atuais."
 
     apply:
       show:
         title: "Inscrição"
+        email_change_pending: "Troca de e-mail aguardando confirmação: abra o link enviado para %{email}. Até a confirmação continuam valendo o e-mail e o código de identificação atuais."
+        cancel_email_change: "Desistir da troca de e-mail"
         ongoing: "Inscrição em andamento"
         finished: "Inscrição realizada"
         finished_waiting_letters: "Inscrição realizada (aguardando cartas)"
@@ -62,10 +79,18 @@ pt-BR:
         new_phase: "Enviar %{phase}"
         edit_phase: "Modificar %{phase}"
         upload_notice: "Atenção! Caso algum arquivo tenha sido enviado na última submissão, é necessário selecioná-lo novamente!"
+        email_locked: "O e-mail da candidatura só é alterado por quem tem a edição total da candidatura."
+
+      cancel_email_change:
+        notice: "Troca de e-mail cancelada. O link de confirmação enviado deixou de valer, e a inscrição continua com o e-mail e o código de identificação atuais."
 
       update:
         new_notice: "Inscrição realizada com sucesso"
         edit_notice: "Inscrição editada com sucesso"
+        new_token_sent: "Inscrição realizada com sucesso. O código de identificação e o link para acompanhar ou alterar a inscrição foram enviados para %{email}."
+        new_token_sent_without_email: "Inscrição realizada com sucesso, mas o sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o código de identificação."
+        email_change_requested: "%{saved}. Para trocar o e-mail da inscrição, abra o link de confirmação enviado para %{email}. Até a confirmação continuam valendo o e-mail e o código de identificação atuais."
+        email_change_requested_without_email: "%{saved}, mas o e-mail da inscrição não foi trocado: a troca depende de um link de confirmação, e o sistema não está enviando e-mails no momento. Procure a secretaria do programa."
 
     letters:
       show:
@@ -96,16 +121,21 @@ pt-BR:
       unauthorized_application: "Acesso não autorizado à inscrição %{token}. Por favor, use a opção de recuperar inscrição para acessá-la por este navegador."
       invalid_captcha: "reCAPTCHA inválido"
       empty_submission: "Nenhuma alteração foi recebida. Por favor, tente enviar novamente."
+      invalid_email_change: "O link de confirmação da troca de e-mail não é válido ou já venceu. Para trocar o e-mail da inscrição, altere-o de novo no formulário."
 
   notifications:
     admissions:
       admissions:
         recover_tokens:
           subject: Recuperação de código de inscrição
+        send_token:
+          subject: Código de identificação da inscrição
       apply:
         email_to_student:
           subject: Inscrição realizada
         edit_email_to_student:
           subject: Inscrição em processo seletivo alterada
+        confirm_email_change:
+          subject: Confirmação do novo e-mail da inscrição
         request_letter:
           subject: Carta de recomendação solicitada

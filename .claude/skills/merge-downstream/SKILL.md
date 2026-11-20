@@ -1,6 +1,6 @@
 ---
 name: merge-downstream
-description: Traz a main para dentro de um ramo de issue e confere se ela entrou inteira — inclusive o que o git não vê. Use ao atualizar um ramo atrasado, ao revisar merge que outra pessoa fez, ou antes de aceitar um ramo para release.
+description: Traz a main para dentro de um ramo de issue e confere se ela entrou inteira — inclusive o que o git não vê. Use ao atualizar um ramo atrasado, ao revisar merge que outra pessoa fez, ou antes de integrar um ramo na main.
 ---
 
 # Merge da main para o ramo

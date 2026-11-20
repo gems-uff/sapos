@@ -58,6 +58,7 @@ module GoldenMaster
     case format
     when :pdf  then pdf_representation(content)
     when :xlsx then xlsx_representation(content)
+    when :text then content
     else raise ArgumentError, "sem normalizador para #{format.inspect}"
     end
   end

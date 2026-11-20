@@ -207,7 +207,9 @@ class Admissions::FilledFormField < ActiveRecord::Base
   end
 
   def validate_file_field(configuration, is_photo: false)
-    if configuration["required"] && (self.file.blank? || self.file.file.blank?)
+    # O arquivo marcado para remocao ainda esta no campo durante a validacao:
+    # o CarrierWave so o tira ao gravar.
+    if configuration["required"] && (self.file.blank? || self.file.file.blank? || self.remove_file?)
       add_error(:blank)
     end
     return if self.file.blank? || self.file.file.blank?
@@ -221,6 +223,18 @@ class Admissions::FilledFormField < ActiveRecord::Base
     elsif DEFAULT_FILE_EXTENSIONS.none? { |ext| filename.end_with?(".#{ext}") }
       add_error(:extension, valid: DEFAULT_FILE_EXTENSIONS.join(", "))
     end
+  end
+
+  # Se o campo sincronizado com o e-mail pode ser oferecido como campo de
+  # e-mail do navegador, que nao deixa enviar o formulario enquanto o valor
+  # nao e endereco. O valor gravado antes da conferencia do formato, que nao
+  # e endereco, vai como texto: o candidato tem de conseguir editar o resto
+  # (AdmissionApplication valida so o endereco novo ou alterado). O navegador
+  # tira o espaco em volta antes de conferir.
+  def offered_as_email_input?
+    return false if self.form_field&.sync != Admissions::FormField::SYNC_EMAIL
+
+    self.value.blank? || self.value.strip.match?(URI::MailTo::EMAIL_REGEXP)
   end
 
   def to_label

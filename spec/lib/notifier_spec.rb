@@ -348,6 +348,76 @@ RSpec.describe Notifier, type: :model do
         expect(log.to).to eq("professor@example.com")
         expect(log.subject).to eq("SAPOS: teste")
       end
+
+      # The server log is read by whoever operates the machine and is kept in
+      # rotated files and backups. A body carries what was written for the
+      # recipient alone: an application code, a grade, a link that opens a
+      # record. The NotificationLog above is the place of the body, behind
+      # the permissions of the application.
+      context "of the server" do
+        let(:lines) { [] }
+
+        before(:each) do
+          allow(Notifier.logger).to receive(:info) { |text| lines << text.to_s }
+          message[:body] = "Seu codigo: SEGREDO-DA-MENSAGEM"
+          Notifier.send_emails(notifications: [message])
+        end
+
+        it "tells who was notified and about what" do
+          expect(lines.join("\n")).to include("professor@example.com", "SAPOS: teste")
+        end
+
+        it "does not copy the body of the message" do
+          expect(lines.join("\n")).not_to include("SEGREDO-DA-MENSAGEM")
+        end
+      end
+    end
+
+    # The SMTP server refuses one recipient (550) and mail.deliver! raises.
+    # The messages are delivered one by one, so a refusal in the middle of a
+    # batch -- an individual notification, or the daily run of
+    # maintenance:trigger_notifications -- must not cost the messages after it
+    # (issue #699). The examples rescue the error: whether send_emails reports
+    # the failure by raising or by logging is up to the fix.
+    context "a message refused by the server" do
+      let(:messages) do
+        %w[primeiro recusado terceiro].map do |name|
+          message.merge(to: "#{name}@example.com", body: body.dup)
+        end
+      end
+
+      def send_all
+        Notifier.send_emails(notifications: messages)
+      rescue StandardError
+        nil
+      end
+
+      def delivered_to
+        ActionMailer::Base.deliveries.flat_map(&:to)
+      end
+
+      it "control: without the refusal, every message is delivered and logged" do
+        send_all
+
+        expect(delivered_to).to eq(%w[primeiro@example.com recusado@example.com terceiro@example.com])
+        expect(NotificationLog.pluck(:to)).to contain_exactly(
+          "primeiro@example.com", "recusado@example.com", "terceiro@example.com"
+        )
+      end
+
+      it "does not keep the messages after it from being delivered", pending: "issue #699" do
+        allow_any_instance_of(Mail::TestMailer).to receive(:deliver!).and_wrap_original do |original, mail|
+          if mail.to.include?("recusado@example.com")
+            raise Net::SMTPFatalError.new(Net::SMTP::Response.parse("550 5.1.1 mailbox unavailable"))
+          end
+          original.call(mail)
+        end
+
+        send_all
+
+        expect(delivered_to).to eq(%w[primeiro@example.com terceiro@example.com])
+        expect(NotificationLog.pluck(:to)).to contain_exactly("primeiro@example.com", "terceiro@example.com")
+      end
     end
   end
 end

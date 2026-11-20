@@ -107,4 +107,49 @@ RSpec.describe "maintenance:trigger_notifications", type: :task do
     expect(ActionMailer::Base.deliveries).to be_empty
     expect(notificacao.reload.next_execution).to eq(Time.zone.local(2026, 3, 11))
   end
+
+  # Uma consulta criada pela tela que deixou de casar com o esquema (o caso da
+  # #697) levanta excecao no meio do laco. Hoje o laco para ali e o envio, que
+  # vem depois dele, nao acontece: a notificacao que veio antes ja foi
+  # reagendada e perde a ocorrencia, a que viria depois nem roda (issue #699).
+  # O exemplo engole a excecao: se a tarefa termina em falha ou so registra no
+  # log fica a cargo do conserto.
+  context "com a consulta de uma notificacao quebrada" do
+    let!(:boa) { agrupada(subject_template: "Boa") }
+    let!(:quebrada) { agrupada(subject_template: "Quebrada") }
+
+    def dispara_engolindo
+      dispara
+    rescue StandardError
+      nil
+    end
+
+    def assuntos
+      ActionMailer::Base.deliveries.map(&:subject)
+    end
+
+    it "controle: com as duas consultas validas, as duas saem e sao reagendadas" do
+      dispara_engolindo
+
+      expect(assuntos).to contain_exactly("Boa", "Quebrada")
+      expect(boa.reload.next_execution).to eq(Time.zone.local(2026, 3, 11))
+      expect(quebrada.reload.next_execution).to eq(Time.zone.local(2026, 3, 11))
+    end
+
+    it "envia a outra e deixa a quebrada vencida, para tentar de novo", pending: "issue #699" do
+      consulta_quebrada = quebrada.query
+      allow_any_instance_of(Query).to receive(:execute).and_wrap_original do |original, *args|
+        if original.receiver == consulta_quebrada
+          raise ActiveRecord::StatementInvalid, "no such column: coluna_renomeada"
+        end
+        { rows: [["Ana", "ana@sapos.test"]], columns: ["nome", "email"], query: "" }
+      end
+
+      dispara_engolindo
+
+      expect(assuntos).to eq(["Boa"])
+      expect(boa.reload.next_execution).to eq(Time.zone.local(2026, 3, 11))
+      expect(quebrada.reload.next_execution).to eq(agora - 2.days)
+    end
+  end
 end

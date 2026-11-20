@@ -16,7 +16,6 @@ RSpec.describe "Travas de papel e vinculo do usuario", type: :request do
     @papeis = {
       desconhecido: FactoryBot.create(:role_desconhecido),
       aluno: FactoryBot.create(:role_aluno),
-      suporte: FactoryBot.create(:role_suporte),
       professor: FactoryBot.create(:role_professor),
       secretaria: FactoryBot.create(:role_secretaria),
       coordenacao: FactoryBot.create(:role_coordenacao),
@@ -51,11 +50,11 @@ RSpec.describe "Travas de papel e vinculo do usuario", type: :request do
       sign_in @coordenacao
 
       put user_path(@secretaria), params: {
-        record: { email: @secretaria.email, name: @secretaria.name, roles: [@papeis[:suporte].id.to_s] }
+        record: { email: @secretaria.email, name: @secretaria.name, roles: [@papeis[:desconhecido].id.to_s] }
       }
 
       expect(response).to have_http_status(:found)
-      expect(papeis_de(@secretaria)).to eq([@papeis[:suporte].id])
+      expect(papeis_de(@secretaria)).to eq([@papeis[:desconhecido].id])
     end
   end
 
