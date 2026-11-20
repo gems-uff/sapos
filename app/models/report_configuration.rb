@@ -8,6 +8,8 @@ class ReportConfiguration < ApplicationRecord
   has_paper_trail
   attr_accessor :preview
 
+  MAX_IMAGE_SIZE_MB = 15
+
   validates :text, presence: true
   validates :order, presence: true
   validates :x, presence: true
@@ -15,6 +17,7 @@ class ReportConfiguration < ApplicationRecord
   validates :scale, presence: true
   validates :expiration_in_months, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validate :expiration_in_months_only_for_qr_code
+  validate :image_size_within_limit
 
   mount_uploader :image, ImageUploader
 
@@ -31,6 +34,12 @@ class ReportConfiguration < ApplicationRecord
   end
 
   private
+    def image_size_within_limit
+      return unless image.present? && will_save_change_to_image?
+      if image.file.size > MAX_IMAGE_SIZE_MB.megabytes
+        errors.add(:image, :file_too_large, count: MAX_IMAGE_SIZE_MB)
+      end
+    end
     def expiration_in_months_only_for_qr_code
       if expiration_in_months.present? && signature_type != "qr_code"
         errors.add(:expiration_in_months, :only_for_qr_code)

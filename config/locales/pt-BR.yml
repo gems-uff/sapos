@@ -29,6 +29,7 @@ pt-BR:
       too_short: "é muito curto (mínimo: %{count} caracteres)"
       wrong_length: "não possui o tamanho esperado (%{count} caracteres)"
       required: "não pode ficar em branco"
+      file_too_large: "não pode ser maior do que %{count}MB"
 
     session_expired: "Sua sessão expirou. Entre novamente para continuar."
     invalid_form_token: "Não foi possível confirmar o envio deste formulário. Atualize a página e tente novamente."

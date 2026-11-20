@@ -12,6 +12,7 @@
     field.object.file.blank?
   file_id = "file_#{SecureRandom.random_number(1_000_000)}"
   options[:class] = filled_class
+  max_upload_size_mb = CustomVariable.max_upload_size_mb
 %>
 <li class="form-element <%= configuration["required"] ? "required" : "" %>">
   <dl>
@@ -34,15 +35,13 @@
       if (!file) {
         return "";
       }
-      if (file.size > 15 * 1024 * 1024) {
+      if (file.size > <%= max_upload_size_mb %> * 1024 * 1024) {
         return <%= raw [form_field.name, I18n.t(
           "activerecord.errors.models.admissions/filled_form_field.filesize",
-          count: 15)].join(" ").to_json %>
+          count: max_upload_size_mb)].join(" ").to_json %>
       }
       <% if configuration["values"] %>
-        <%
-          extensions = configuration["values"]
-        %>
+        <% extensions = configuration["values"] %>
         let filename = file.name.toLowerCase();
         let extensions = <%= raw extensions.to_json %>;
         if (!extensions.some((ext) => filename.endsWith(ext.toLowerCase()))) {
