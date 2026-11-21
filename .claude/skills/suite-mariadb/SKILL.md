@@ -147,7 +147,7 @@ desta comparação é o serial em MariaDB.
 
 ## Como interpretar as falhas
 
-Falha aqui **não é sinônimo de bug**. Há três categorias, e a diferença importa:
+Falha aqui **não é sinônimo de bug**. Há quatro categorias, e a diferença importa:
 
 1. **Asserção que só vale no SQLite.** Exemplo típico: um spec afirmando
    unicidade *case-sensitive* quando a collation de produção é
@@ -158,6 +158,16 @@ Falha aqui **não é sinônimo de bug**. Há três categorias, e a diferença im
    de ordenação. Vale issue.
 3. **Artefato do setup.** Collation, `sql_mode` ou versão diferentes do servidor.
    Antes de concluir 1 ou 2, confirme que o ambiente está fiel.
+4. **Cache de associação que o SQLite remendava.** Assinatura: passa rodando o
+   exemplo sozinho, passa em SQLite na mesma seed, falha em MariaDB, e a falha
+   muda com a ordem — tipicamente validação dizendo que não acha o registro
+   que o exemplo acabou de criar. Mecanismo: objeto de `before(:all)` guarda
+   uma associação carregada num exemplo anterior. No SQLite o rollback devolve
+   os ids, o registro novo renasce com o id que o cache aponta e o erro se
+   cancela; no MariaDB o `AUTO_INCREMENT` não volta, o cache aponta para linha
+   inexistente e a validação recusa. Conserto: `objeto.associacao.reload`
+   antes de criar no exemplo o que a validação vai ler. Não é diferença de
+   banco nem instabilidade.
 
 Suspeite da categoria 3 primeiro: é a mais fácil de causar sem perceber e a que
 produz o diagnóstico mais enganoso.
