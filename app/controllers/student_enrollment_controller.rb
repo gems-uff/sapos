@@ -252,23 +252,81 @@ class StudentEnrollmentController < ApplicationController
       course_class
     end
 
+    # O pedido só leva o que a tela ofereceu: a oferta é a mesma tabela que a
+    # view desenha, montada pelo mesmo prepare_class_schedule_table. Turma já
+    # presente no pedido continua aceita, ainda que tenha saído da grade. Tudo
+    # é conferido antes de criar a primeira turma sob demanda, para que o
+    # pedido recusado não deixe turma para trás.
     def prepare_course_class_ids
       course_class_ids = enrollment_request_params[:course_class_ids] || []
       on_demand_course_ids = enrollment_request_params[:course_ids] || []
 
-      on_demand_course_ids.each do |course_id, data|
+      course_class_ids.each do |course_class_id|
+        next if course_class_id.blank?
+        next if offered[:class_ids].include?(course_class_id.to_s)
+        raise_not_offered unless already_requested?(course_class_id)
+      end
+
+      on_demand = on_demand_course_ids.to_h.filter_map do |course_id, data|
         next if data[:selected] != "1"
         raise ValidationException.new I18n.t(
           "student_enrollment.enroll.errors.select_on_demand_professor",
           course: Course.find(course_id.to_i).name
         ) if data[:professor].blank?
 
+        pair = [course_id.to_i, data[:professor].to_i]
+        raise_not_offered unless on_demand_offered?(*pair)
+        pair
+      end
+
+      on_demand.each do |course_id, professor_id|
         course_class = find_or_create_course_class_in_this_semester(
-          course_id.to_i, data[:professor].to_i
+          course_id, professor_id
         )
         course_class_ids << course_class.id.to_s if course_class.present?
       end
       course_class_ids.uniq
+    end
+
+    def offered
+      @offered ||= begin
+        table = helpers.prepare_class_schedule_table(
+          @available_classes, @on_demand, @advisement_authorizations
+        )
+        offer = { class_ids: Set.new, professors: {} }
+        table[:data].each do |row|
+          if row[0][:on_demand]
+            offer[:professors][row[0][:course_id]] =
+              row[0][:professors].map(&:id)
+          else
+            offer[:class_ids] << row[0][:id].to_s
+          end
+        end
+        offer
+      end
+    end
+
+    def already_requested?(course_class_id)
+      @enrollment_request.class_enrollment_requests.any? do |cer|
+        cer.course_class_id.to_s == course_class_id.to_s
+      end
+    end
+
+    def on_demand_offered?(course_id, professor_id)
+      return true if offered[:professors].fetch(course_id, [])
+        .include?(professor_id)
+
+      course_class = CourseClass.find_by(
+        course_id: course_id, professor_id: professor_id,
+        year: @semester.year, semester: @semester.semester
+      )
+      course_class.present? && already_requested?(course_class.id)
+    end
+
+    def raise_not_offered
+      raise ValidationException.new I18n.t(
+        "student_enrollment.enroll.errors.not_offered"
+      )
     end
 
     def notify_enrollment_request_change(
