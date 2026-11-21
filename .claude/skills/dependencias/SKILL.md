@@ -107,7 +107,9 @@ nada: carrega um arquivo de nome diferente do da gem.
 - Uma gem por passo: `bundle update --conservative <gem>`, suíte completa,
   commit individual. Se quebrar, o commit aponta a gem exata.
 - Alvo é o patch mais atual da mesma série minor/major. Nunca subir major ou
-  minor de carona — isso é decisão separada.
+  minor de carona — isso é decisão separada. Isso vale para a gem do passo:
+  transitiva que a resolução arrasta junto sobe; relate no resumo do passo,
+  sem pin.
 - **Confira a versão resolvida no `Gemfile.lock`; não confie no `~>`.** Num
   update de segurança, `"~> 7.2.0"` resolveu para 7.2.3 em vez de 7.2.3.1 — a
   versão sem a correção — e a suíte verde não acusaria nada. Quem acusa é o
