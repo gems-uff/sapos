@@ -177,6 +177,7 @@ DELETE /course_classes/:id/destroy_existing course_classes#destroy_existing | vi
 GET /course_classes/browse course_classes#browse | visitante: 302 /users/sign_in | papel desconhecido: negado | sem papel nenhum: negado
 GET /course_classes/:id/summary_pdf course_classes#summary_pdf | visitante: 302 /users/sign_in | papel desconhecido: negado | sem papel nenhum: negado
 GET /course_classes/:id/summary_xls course_classes#summary_xls | visitante: 302 /users/sign_in | papel desconhecido: negado | sem papel nenhum: negado
+GET /course_classes/:id/import_grades_xls course_classes#import_grades_xls | visitante: 302 /users/sign_in | papel desconhecido: negado | sem papel nenhum: negado
 GET /course_classes/class_schedule_pdf course_classes#class_schedule_pdf | visitante: 302 /users/sign_in | papel desconhecido: negado | sem papel nenhum: negado
 GET /course_classes course_classes#index | visitante: 302 /users/sign_in | papel desconhecido: negado | sem papel nenhum: negado
 POST /course_classes course_classes#create | visitante: 302 /users/sign_in | papel desconhecido: negado | sem papel nenhum: negado

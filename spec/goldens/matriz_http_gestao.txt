@@ -177,6 +177,7 @@ DELETE /course_classes/:id/destroy_existing course_classes#destroy_existing | ad
 GET /course_classes/browse course_classes#browse | administrador, coordenacao, secretaria: 200 (pode)
 GET /course_classes/:id/summary_pdf course_classes#summary_pdf | administrador, coordenacao, secretaria: todos: erro ActionController::UnknownFormat (pode)
 GET /course_classes/:id/summary_xls course_classes#summary_xls | administrador, coordenacao, secretaria: todos: erro ActionController::UnknownFormat (pode)
+GET /course_classes/:id/import_grades_xls course_classes#import_grades_xls | administrador, coordenacao, secretaria: todos: 200 (pode)
 GET /course_classes/class_schedule_pdf course_classes#class_schedule_pdf | administrador, coordenacao, secretaria: 302 /course_classes (pode)
 GET /course_classes course_classes#index | administrador, coordenacao, secretaria: 200 (pode)
 POST /course_classes course_classes#create | administrador, coordenacao, secretaria: erro NoMethodError (pode)

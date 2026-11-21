@@ -12,7 +12,7 @@ read <- index show list row show_search render_field class_schedule_pdf to_pdf s
 update <- edit update_column edit_associated new_existing add_existing duplicate set_invalid set_requested set_valid execute_now notify
 
 == ações verificadas
-academic_transcript_pdf add_existing assertion_pdf browse builtin cancel cities class_schedule_pdf configuration create custom_report custom_report_generate delete destroy destroy_existing download duplicate edit edit_associated edit_professor effect enroll execute_now export field_search generate_assertion generate_report_without_watermark grades_report_pdf help index invite list manage map_student map_student_form map_student_form_create_update mark nested new new_existing notify override override_report_signature_type override_signature_assertion_pdf override_signature_grades_report_pdf override_signature_transcript_pdf photo post_grades preview read read_advisement_pendencies read_all read_pendencies render_field reset_report row save_enroll search set_effected set_invalid set_query_date set_requested set_valid show show_effect show_search simulate states summary_pdf summary_xls to_pdf undo undo_consolidation update update_all_fields update_column
+academic_transcript_pdf add_existing assertion_pdf browse builtin cancel cities class_schedule_pdf configuration create custom_report custom_report_generate delete destroy destroy_existing download duplicate edit edit_associated edit_professor effect enroll execute_now export field_search generate_assertion generate_report_without_watermark grades_report_pdf help import_grades_xls index invite list manage map_student map_student_form map_student_form_create_update mark nested new new_existing notify override override_report_signature_type override_signature_assertion_pdf override_signature_grades_report_pdf override_signature_transcript_pdf photo post_grades preview read read_advisement_pendencies read_all read_pendencies render_field reset_report row save_enroll search set_effected set_invalid set_query_date set_requested set_valid show show_effect show_search simulate states summary_pdf summary_xls to_pdf undo undo_consolidation update update_all_fields update_column
 
 == visitante
 pendency: can? (nada)
@@ -254,6 +254,9 @@ student_enrollment: can? (nada)
   grant_b: = classe
   grant_c: = classe
   accessible_by: {todas} => [] 0/3
+-- ImportGradePreview
+  classe: (nada)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: (nada)
   accessible_by: {todas} => [] 0/0
@@ -611,6 +614,9 @@ student_enrollment: can? (nada)
   grant_b: = classe
   grant_c: = classe
   accessible_by: {todas} => [] 0/3
+-- ImportGradePreview
+  classe: (nada)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: (nada)
   accessible_by: {todas} => [] 0/0
@@ -968,6 +974,9 @@ student_enrollment: can? tudo menos: enroll save_enroll show
   grant_b: = classe
   grant_c: = classe
   accessible_by: {todas} => [grant_a grant_b grant_c] 3/3
+-- ImportGradePreview
+  classe: (tudo)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: (tudo)
   accessible_by: {todas} => [] 0/0
@@ -1325,6 +1334,9 @@ student_enrollment: can? (nada)
   grant_b: = classe
   grant_c: = classe
   accessible_by: {todas} => [grant_a grant_b grant_c] 3/3
+-- ImportGradePreview
+  classe: (nada)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: (tudo)
   accessible_by: {todas} => [] 0/0
@@ -1453,12 +1465,12 @@ student_enrollment: can? (nada)
   classe: (tudo)
   accessible_by: {todas} => [] 0/0
 -- Admissions::AdmissionApplication
-  classe: tudo menos: assertion_pdf create custom_report custom_report_generate delete destroy destroy_existing download edit_professor effect enroll export field_search generate_assertion generate_report_without_watermark invite manage mark nested new override_report_signature_type override_signature_assertion_pdf override_signature_grades_report_pdf override_signature_transcript_pdf photo post_grades read_advisement_pendencies reset_report save_enroll search set_effected show_effect undo update_all_fields
+  classe: tudo menos: assertion_pdf create custom_report custom_report_generate delete destroy destroy_existing download edit_professor effect enroll export field_search generate_assertion generate_report_without_watermark import_grades_xls invite manage mark nested new override_report_signature_type override_signature_assertion_pdf override_signature_grades_report_pdf override_signature_transcript_pdf photo post_grades read_advisement_pendencies reset_report save_enroll search set_effected show_effect undo update_all_fields
   app_pendente: = classe
   app_outro: = classe
   app_compartilhada: = classe
   app_sem: = classe
-  accessible_by: {demais} => [app_compartilhada app_outro app_pendente app_sem] 4/4; {assertion_pdf create custom_report custom_report_generate delete destroy destroy_existing download edit_professor effect enroll export field_search generate_assertion generate_report_without_watermark invite manage mark nested new override_report_signature_type override_signature_assertion_pdf override_signature_grades_report_pdf override_signature_transcript_pdf photo post_grades read_advisement_pendencies reset_report save_enroll search set_effected show_effect undo update_all_fields} => [] 0/4
+  accessible_by: {demais} => [app_compartilhada app_outro app_pendente app_sem] 4/4; {assertion_pdf create custom_report custom_report_generate delete destroy destroy_existing download edit_professor effect enroll export field_search generate_assertion generate_report_without_watermark import_grades_xls invite manage mark nested new override_report_signature_type override_signature_assertion_pdf override_signature_grades_report_pdf override_signature_transcript_pdf photo post_grades read_advisement_pendencies reset_report save_enroll search set_effected show_effect undo update_all_fields} => [] 0/4
 -- Admissions::AdmissionCommittee
   classe: (tudo)
   accessible_by: {todas} => [] 0/0
@@ -1682,6 +1694,9 @@ student_enrollment: can? (nada)
   grant_b: = classe
   grant_c: = classe
   accessible_by: {todas} => [grant_a grant_b grant_c] 3/3
+-- ImportGradePreview
+  classe: (nada)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: (tudo)
   accessible_by: {todas} => [] 0/0
@@ -2039,6 +2054,9 @@ student_enrollment: can? (nada)
   grant_b: academic_transcript_pdf browse builtin cities class_schedule_pdf create grades_report_pdf help index list new preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   grant_c: academic_transcript_pdf browse builtin cities class_schedule_pdf create grades_report_pdf help index list new preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf create grades_report_pdf help index list new preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [grant_a grant_b grant_c] 3/3; {add_existing delete destroy destroy_existing duplicate edit edit_associated execute_now new_existing notify set_invalid set_requested set_valid update update_column} => [grant_a] 1/3; {demais} => [] 0/3
+-- ImportGradePreview
+  classe: (nada)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -2330,11 +2348,11 @@ student_enrollment: can? (nada)
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [+3 sem rótulo] 3/3; {demais} => [] 0/3
 -- CourseClass
-  classe: academic_transcript_pdf add_existing browse builtin cities class_schedule_pdf duplicate edit edit_associated execute_now grades_report_pdf help index list new_existing notify post_grades preview read read_pendencies render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf update update_column
+  classe: academic_transcript_pdf add_existing browse builtin cities class_schedule_pdf duplicate edit edit_associated execute_now grades_report_pdf help import_grades_xls index list new_existing notify post_grades preview read read_pendencies render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf update update_column
   cc_a_atual: = classe
   cc_a_antiga: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   cc_b_atual: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [cc_a_antiga cc_a_atual cc_b_atual] 3/3; {add_existing duplicate edit edit_associated execute_now new_existing notify post_grades read_pendencies set_invalid set_requested set_valid update update_column} => [cc_a_atual] 1/3; {demais} => [] 0/3
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [cc_a_antiga cc_a_atual cc_b_atual] 3/3; {add_existing duplicate edit edit_associated execute_now import_grades_xls new_existing notify post_grades read_pendencies set_invalid set_requested set_valid update update_column} => [cc_a_atual] 1/3; {demais} => [] 0/3
 -- CourseResearchArea
   classe: (nada)
   accessible_by: {todas} => [] 0/0
@@ -2396,6 +2414,9 @@ student_enrollment: can? (nada)
   grant_b: academic_transcript_pdf browse builtin cities class_schedule_pdf create grades_report_pdf help index list new preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   grant_c: academic_transcript_pdf browse builtin cities class_schedule_pdf create grades_report_pdf help index list new preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf create grades_report_pdf help index list new preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [grant_a grant_b grant_c] 3/3; {add_existing delete destroy destroy_existing duplicate edit edit_associated execute_now new_existing notify set_invalid set_requested set_valid update update_column} => [grant_a] 1/3; {demais} => [] 0/3
+-- ImportGradePreview
+  classe: (nada)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -2687,11 +2708,11 @@ student_enrollment: can? (nada)
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [+3 sem rótulo] 3/3; {demais} => [] 0/3
 -- CourseClass
-  classe: academic_transcript_pdf add_existing browse builtin cities class_schedule_pdf duplicate edit edit_associated execute_now grades_report_pdf help index list new_existing notify post_grades preview read read_pendencies render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf update update_column
+  classe: academic_transcript_pdf add_existing browse builtin cities class_schedule_pdf duplicate edit edit_associated execute_now grades_report_pdf help import_grades_xls index list new_existing notify post_grades preview read read_pendencies render_field row set_invalid set_query_date set_requested set_valid show show_search simulate states summary_pdf summary_xls to_pdf update update_column
   cc_a_atual: = classe
   cc_a_antiga: = classe
   cc_b_atual: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
-  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [cc_a_antiga cc_a_atual cc_b_atual] 3/3; {add_existing duplicate edit edit_associated execute_now new_existing notify post_grades read_pendencies set_invalid set_requested set_valid update update_column} => [cc_a_antiga cc_a_atual] 2/3; {demais} => [] 0/3
+  accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [cc_a_antiga cc_a_atual cc_b_atual] 3/3; {add_existing duplicate edit edit_associated execute_now import_grades_xls new_existing notify post_grades read_pendencies set_invalid set_requested set_valid update update_column} => [cc_a_antiga cc_a_atual] 2/3; {demais} => [] 0/3
 -- CourseResearchArea
   classe: (nada)
   accessible_by: {todas} => [] 0/0
@@ -2753,6 +2774,9 @@ student_enrollment: can? (nada)
   grant_b: academic_transcript_pdf browse builtin cities class_schedule_pdf create grades_report_pdf help index list new preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   grant_c: academic_transcript_pdf browse builtin cities class_schedule_pdf create grades_report_pdf help index list new preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf create grades_report_pdf help index list new preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [grant_a grant_b grant_c] 3/3; {add_existing delete destroy destroy_existing duplicate edit edit_associated execute_now new_existing notify set_invalid set_requested set_valid update update_column} => [grant_a] 1/3; {demais} => [] 0/3
+-- ImportGradePreview
+  classe: (nada)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -3110,6 +3134,9 @@ student_enrollment: can? (nada)
   grant_b: = classe
   grant_c: = classe
   accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf create grades_report_pdf help index list new preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [grant_a grant_b grant_c] 3/3; {demais} => [] 0/3
+-- ImportGradePreview
+  classe: (nada)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -3467,6 +3494,9 @@ student_enrollment: can? (nada)
   grant_b: = classe
   grant_c: = classe
   accessible_by: {todas} => [grant_a grant_b grant_c] 3/3
+-- ImportGradePreview
+  classe: (nada)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: (tudo)
   accessible_by: {todas} => [] 0/0
@@ -3824,6 +3854,9 @@ student_enrollment: can? (nada)
   grant_b: academic_transcript_pdf browse builtin cities class_schedule_pdf create grades_report_pdf help index list new preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   grant_c: = classe
   accessible_by: {academic_transcript_pdf browse builtin cities class_schedule_pdf create grades_report_pdf help index list new preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf} => [grant_a grant_b grant_c] 3/3; {add_existing delete destroy destroy_existing duplicate edit edit_associated execute_now new_existing notify set_invalid set_requested set_valid update update_column} => [grant_c] 1/3; {demais} => [] 0/3
+-- ImportGradePreview
+  classe: (nada)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: academic_transcript_pdf browse builtin cities class_schedule_pdf grades_report_pdf help index list preview read render_field row set_query_date show show_search simulate states summary_pdf summary_xls to_pdf
   accessible_by: {todas} => [] 0/0
@@ -4181,6 +4214,9 @@ student_enrollment: can? enroll save_enroll show
   grant_b: = classe
   grant_c: = classe
   accessible_by: {todas} => [] 0/3
+-- ImportGradePreview
+  classe: (nada)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: (nada)
   accessible_by: {todas} => [] 0/0
@@ -4538,6 +4574,9 @@ student_enrollment: can? (nada)
   grant_b: = classe
   grant_c: = classe
   accessible_by: {todas} => [] 0/3
+-- ImportGradePreview
+  classe: (nada)
+  accessible_by: {todas} => [] 0/0
 -- Institution
   classe: (nada)
   accessible_by: {todas} => [] 0/0

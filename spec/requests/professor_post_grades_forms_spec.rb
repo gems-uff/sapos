@@ -17,7 +17,9 @@ RSpec.describe "Formularios do professor que lanca notas", type: :request do
       :custom_variable, variable: "professor_login_can_post_grades", value: "yes_all_semesters"
     )
     @professor = FactoryBot.create(:professor, name: "Professor Notas")
-    @turma = FactoryBot.create(:course_class, professor: @professor, name: "Turma Notas")
+    tipo = FactoryBot.create(:course_type, has_score: true)
+    disciplina = FactoryBot.create(:course, course_type: tipo)
+    @turma = FactoryBot.create(:course_class, professor: @professor, name: "Turma Notas", course: disciplina)
     @inscricao = FactoryBot.create(:class_enrollment, course_class: @turma)
   end
 
