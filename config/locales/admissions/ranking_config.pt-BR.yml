@@ -33,5 +33,10 @@ pt-BR:
         one: "Configuração de Ranking"
         other: "Configurações de Ranking"
 
+    errors:
+      models:
+        admissions/ranking_config:
+          group_not_found: "com grupo \"%{group}\" que não existe nos grupos de vagas"
+
   active_scaffold:
     create_ranking_config_label: "Criar Configuração de Ranking"

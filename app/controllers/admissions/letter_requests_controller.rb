@@ -15,6 +15,12 @@ class Admissions::LetterRequestsController < ApplicationController
     config.list.columns = columns
     config.show.columns = columns
 
+    # O codigo de acesso e credencial (ver LetterRequestsHelper): a busca e a
+    # ordenacao por ele deixariam quem nao o ve confirmar um pedaco de cada
+    # vez.
+    config.search.columns = [:name, :email, :telephone]
+    config.columns[:access_token].sort = false
+
     config.actions.exclude :deleted_records, :delete, :update, :create, :show
   end
 end

@@ -37,7 +37,7 @@ RSpec.describe "Advisements features", type: :feature do
     @destroy_all << @enrollment3 = FactoryBot.create(:enrollment, enrollment_number: "M03", student: @student3, level: @level1, enrollment_status: @enrollment_status)
     @destroy_all << @enrollment4 = FactoryBot.create(:enrollment, enrollment_number: "M04", student: @student4, level: @level1, enrollment_status: @enrollment_status, research_area: @research_area1)
 
-    @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment1, date: Date.today, dismissal_reason: @dismissal_reason)
+    @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment1, date: Date.current, dismissal_reason: @dismissal_reason)
 
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor1, level: @level2)
     @destroy_all << FactoryBot.create(:advisement_authorization, professor: @professor2, level: @level2)
@@ -138,7 +138,7 @@ RSpec.describe "Advisements features", type: :feature do
       fill_record_select("enrollment_", "enrollments", "M04")
       find(:css, "#record_main_advisor_").set(true)
       click_button_and_wait "Salvar"
-      expect(page).to have_content "Ao menos um orientador deve ter credenciamento no nível da matrícula"
+      expect(page).to have_content "Ao menos um orientador deve ter credenciamento vigente no nível da matrícula"
     end
 
     it "should show error when advisor research area is different from enrollment" do

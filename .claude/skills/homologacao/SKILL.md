@@ -41,7 +41,12 @@ não há como separar diferença de código de diferença de ambiente.
 export SAPOS_STAGING_URL=https://.../staging
 export SAPOS_STAGING_USER=...
 export SAPOS_STAGING_PASS='...'   # aspas SIMPLES: protegem espaço, $, ! e crase
+export SAPOS_STAGING_SSH=...         # host do ssh do servidor de homologação
+export SAPOS_STAGING_INSTANCE=...    # usuário unix da instância (aplicação em ~/instance)
 ```
+
+As duas últimas servem às sondas que precisam do servidor, não só da tela —
+hoje, a limpeza do `probe_submissao.rb`.
 
 Carregue com `set -a; source ~/.sapos_staging_env; set +a` antes de cada script.
 
@@ -53,7 +58,9 @@ A ordem importa: escrita muda o que a captura enxerga, então cada lado escreve
 1. **Deploy da versão atual de produção** em homologação.
 2. **Passada de escrita no lado "antes"** — ver "Passada de escrita". Os scripts
    se limpam sozinhos, então o lado volta ao estado em que começou.
-3. **Captura "antes"** — os três conjuntos, em diretórios separados.
+3. **Captura "antes"** — os três conjuntos, em diretórios separados. Com
+   instrumento novo, duas vezes seguidas: é o controle A/A (ver "Verifique o
+   instrumento, não só o sistema").
 4. **Ações de escrita adicionais** que a rodada queira exercitar e que **não** se
    limpam (disparo de notificação, por exemplo), e **recaptura** dos conjuntos
    afetados, para que os dois lados reflitam o mesmo estado.
@@ -203,7 +210,10 @@ Duas regras:
 ## Verifique o instrumento, não só o sistema
 
 Um comparador quebrado também devolve "nenhuma diferença", e é o mesmo resultado
-que "nada regrediu". Três checagens separam os dois, e nenhuma é opcional:
+que "nada regrediu". As checagens abaixo separam os dois. As cinco primeiras valem
+em toda rodada; as duas últimas, sempre que o instrumento for novo — lista de
+rotas, navegador ou papel que nenhuma rodada anterior capturou, ou script de
+captura ou de comparação alterado desde a última vez que passou por elas.
 
 - **Contagem sem normalizar.** O `compare_html.rb` imprime quantas páginas
   diferem **sem** neutralizar o cabeçalho. Como as duas versões têm strings de
@@ -216,6 +226,71 @@ que "nada regrediu". Três checagens separam os dois, e nenhuma é opcional:
   perfeitamente entre "antes" e "depois" — passa por "sem diferença" sem nunca
   ter sido vista. O `capture_html.rb` avisa (`SESSAO PERDIDA`) comparando a URL
   final; se o aviso aparecer, aquelas rotas não valem como evidência.
+- **Rota sem captura num dos lados é "não comparada", nunca igual.** Os
+  comparadores acusam só parte disso: o `compare_html.rb` lista a rota que falta
+  num dos `results.json` (`so no antes`, `so no depois`) e a que ficou sem PNG;
+  o `compare_binary.rb`, só a que falta no "depois". O resto passa calado. Rota
+  cuja navegação falhou nos dois lados grava texto vazio nos dois, e vazio casa
+  com vazio; PDF ou planilha que não saiu em nenhum dos lados fica com zero
+  artefatos nos dois, e o comparador não imprime linha nenhuma. Confira à mão,
+  em cada par:
+
+  ```bash
+  ruby -rjson -e '
+    a, b = ARGV.map { |f| JSON.parse(File.read(f)).to_h { |r| [r["route"], r] } }
+    puts "so no depois: #{(b.keys - a.keys).join(", ")}"
+    { "antes" => a, "depois" => b }.each do |lado, rotas|
+      rotas.each_value do |r|
+        puts "#{lado} #{r["route"]}: #{r["error"] || "0 artefatos"}" if r["error"] || r["artifacts"] == 0
+      end
+    end' $ANTES/bin/results_binary.json $DEPOIS/bin/results_binary.json
+  ```
+
+  O mesmo comando serve para `html/results.json` e `extra/results.json`, onde
+  só o erro conta. No binário, toda resposta que não é 200 sai com zero
+  artefatos, então o ruído conhecido aparece ali também. E rota que respondeu o
+  mesmo erro nos dois lados comparou a página de erro, não a tela: fora do ruído
+  conhecido, também é não comparada. O que não foi comparado entra no relatório,
+  com o motivo.
+- **Toda diferença declarada tem de aparecer.** A lista de diferenças esperadas
+  (passo 8 da `safe-refactor`; numa revisão, passo 2 da `revisar-pr`) é também
+  checagem do instrumento. Diferença declarada que não aparece na comparação
+  mostra que o instrumento não a alcança — não que a mudança ficou sem efeito.
+  Antes de concluir, meça pelo caminho que alcança: rota acrescentada às listas
+  nos dois lados, sonda da camada exploratória, e para widget ver "Zero diferença
+  na estática não é evidência sobre widget".
+- **Controle A/A.** Com instrumento novo, capture o "antes" duas vezes seguidas,
+  no mesmo deploy e sem escrita entre elas (`$ANTES/aa/{html,extra,bin}` para a
+  segunda), e compare as duas. Mesmo código, mesmo banco: o que diferir ali
+  varia entre duas execuções idênticas, e toda diferença do mesmo tipo no A/B é
+  suspeita até ser entendida. O esperado no A/A é pouco — `/reports` e
+  `/versions`, que a captura alimenta (ver "Duas rotas divergem sempre"), e o
+  rodapé com a hora de geração dos PDFs. As contagens de sanidade do
+  `compare_html.rb`, que medem a troca de versão, caem para perto de zero, e ali
+  isso é o correto. Qualquer
+  outra diferença se corrige no instrumento ou entra em "Ruído conhecido" com a
+  causa, antes de ler o A/B.
+- **Diferença plantada.** Com instrumento novo, prove que o comparador acusa o
+  que deve: copie uma captura, plante uma diferença na cópia e compare a
+  original com ela, de modo que a plantada seja a única diferença que existe.
+  `<rota>` é o nome de um arquivo qualquer de `html/txt/`, sem extensão, e
+  `<doc>` um diretório de `bin/pages/` que tenha PNG:
+
+  ```bash
+  P=$ANTES-plantada; cp -R $ANTES $P
+  echo "LINHA PLANTADA" >> $P/html/txt/<rota>.txt
+  magick $P/html/png/<rota>.png -fill red -draw "rectangle 20,20 120,120" $P/html/png/<rota>.png
+  magick $P/bin/pages/<doc>/p-000.png -fill red -draw "rectangle 20,20 120,120" $P/bin/pages/<doc>/p-000.png
+  ruby $S/compare_html.rb   $ANTES/html $P/html
+  ruby $S/compare_binary.rb $ANTES/bin  $P/bin
+  rm -rf $P
+  ```
+
+  Passa quando o `compare_html.rb` acusa exatamente aquela rota em "texto
+  diferente" e num grupo de pixel só dela, e o `compare_binary.rb` exatamente
+  aquela página — e as contagens de `[sanidade]` saem 1, não altas, porque os
+  dois lados são a mesma captura. A cópia tem dado real — ela fica na pasta das
+  capturas e sai ao fim.
 
 ## Camada exploratória (interativa) — o que a varredura estática não alcança
 
@@ -248,6 +323,27 @@ EXPLORE_OUT=$ANTES/exploratorio ROTULO=antes bundle exec ruby $S/probe_widgets.r
 Comparar é diferenciar os dois JSON. Para medir o que ele não mede, acrescente
 seção **e recapture os dois lados**: sonda alterada no meio da rodada mede o
 instrumento, não a aplicação.
+
+O `probe_widgets.rb` mede por amostra e força o bind. Quando o upgrade toca
+`recordselect`, jquery-ui ou o active_scaffold, rode também o
+`probe_campos_widgets.rb`: ele passa por todas as rotas de `routes_html.txt` e,
+em cada formulário (`new` em página inteira, `Adicionar` e `Buscar` por AJAX),
+digita um caractere em **todo** `record_select` e abre **todo** datepicker, sem
+forçar nada e sem submeter.
+
+```bash
+EXPLORE_OUT=$LADO/campos ROTULO=antes bundle exec ruby $S/probe_campos_widgets.rb
+```
+
+Duas leituras do resultado:
+
+- **`dropdown_itens: 0` não distingue busca vazia de busca que respondeu 500.**
+  É a única sonda que faz a busca do `record_select` com termo, caminho que a
+  suíte quase não exercita; conte os 500 do log do servidor no intervalo dela,
+  nos dois lados, e compare a contagem por rota.
+- **Os ids de subform mudam a cada carregamento**, então o nome do campo difere
+  entre os dois JSON sem que nada tenha mudado. Neutralize os ids numéricos
+  antes de diferenciar.
 
 ### Voltar e submeter — o bug que o `autocomplete="off"` contornava
 
@@ -306,12 +402,79 @@ navegador que a recuperou, e a prova é o token guardado na sessão.
 EXPLORE_OUT=$LADO/tokens bundle exec ruby $S/probe_tokens_admissao.rb
 ```
 
-**Hoje ela não mede nada na réplica, e isso é esperado:** a homologação roda em
-ambiente *production*, onde `should_use_recaptcha` é true, e o `#find` valida o
-reCAPTCHA antes de procurar a inscrição. Selenium headless não passa, nenhum
-token entra na sessão, e a sonda **recusa a medida** em vez de reportar
-"desviou em tudo" — que se leria como defeito da aplicação. Medir de verdade
-exige uma instância com o reCAPTCHA desligado; é decisão do mantenedor.
+**Com o reCAPTCHA ligado ela não mede nada na réplica, e isso é esperado:** a
+homologação roda em ambiente *production*, onde `should_use_recaptcha` é true,
+e o `#find` valida o reCAPTCHA antes de procurar a inscrição. Selenium headless
+não passa, nenhum token entra na sessão, e a sonda **recusa a medida** em vez
+de reportar "desviou em tudo" — que se leria como defeito da aplicação. Para
+medir de verdade, desligue o reCAPTCHA pelo tempo da medida (ver "Exercício de
+e-mail da inscrição").
+
+### Exercício de e-mail da inscrição, com o reCAPTCHA desligado por um momento
+
+Em processo com sessão, a pré-inscrição, a entrada com o código e a recuperação
+passam pelo reCAPTCHA, que o Selenium headless não vence. Para exercitá-las
+pela tela — e com elas a troca de e-mail confirmada por link —, o reCAPTCHA é
+desligado **só na instância de homologação e só enquanto o exercício roda**. O
+exercício escreve na réplica e manda e-mail: vem **depois** da captura do lado
+"depois", nunca entre as duas fotos.
+
+```bash
+set -a; source ~/.sapos_staging_env; set +a
+S=.claude/skills/homologacao
+na_instancia() { ssh "$SAPOS_STAGING_SSH" "sudo -i -u $SAPOS_STAGING_INSTANCE bash -lc \"cd ~/instance && $1\""; }
+runner() { ssh "$SAPOS_STAGING_SSH" "f=\$(mktemp /tmp/r.XXXXXX.rb); chmod 644 \$f; cat > \$f; \
+  sudo -i -u $SAPOS_STAGING_INSTANCE bash -lc \"cd ~/instance && bundle exec rails runner \$f $2\"; rm -f \$f" < "$1"; }
+
+# 1. desligar o reCAPTCHA e destravar o e-mail para o endereço de teste
+na_instancia "sed -i 's/should_use_recaptcha = true/should_use_recaptcha = false/' config/environments/production.rb && touch tmp/restart.txt"
+runner $S/trava_email.rb <endereço de teste>
+bundle exec ruby $S/conferir_redirect_email.rb          # tem de sair 1 (destravada)
+
+# 2. os passos, lendo o código e o link na caixa de teste entre um e outro
+export EXPLORE_OUT=$DEPOIS/email
+E="bundle exec ruby $S/exercicio_email_inscricao.rb"
+$E pre       <edital> "ZZ-TESTE-HOMOLOG Candidata" zz-teste-homolog-a@example.com
+$E enviar    <edital> zz-teste-homolog-a@example.com <código>
+$E enviar    <edital> zz-teste-homolog-a@example.com <código> zz-teste-homolog-b@example.com
+$E desistir  <edital> zz-teste-homolog-a@example.com <código>
+$E confirmar <link do pedido desistido>
+$E enviar    <edital> zz-teste-homolog-a@example.com <código> zz-teste-homolog-b@example.com
+$E confirmar <link do pedido novo>          # e de novo: o link vale uma vez
+$E abrir     <edital> zz-teste-homolog-a@example.com <código antigo>
+$E abrir     <edital> zz-teste-homolog-b@example.com <código novo>
+$E recuperar <edital> zz-teste-homolog-b@example.com
+
+# 3. desfazer, nesta ordem, e conferir pela tela
+runner $S/trava_email.rb VAZIA
+na_instancia "git checkout -- config/environments/production.rb && git status --short && touch tmp/restart.txt"
+runner $S/limpa_exercicio_email.rb
+bundle exec ruby $S/conferir_redirect_email.rb          # tem de sair 0 (travada)
+curl -s "$SAPOS_STAGING_URL/admissions/<edital>" | grep -c g-recaptcha   # tem de ser > 0
+```
+
+`<edital>` é o endereço (`simple_url`) de um processo **aberto e com sessão**;
+a réplica costuma ter algum sem inscrição nenhuma, que é o melhor exemplar
+(`Admissions::AdmissionProcess.open.where(require_session: true)`).
+
+O que cada passo tem de mostrar: a pré-inscrição avisa para onde o código foi,
+sem exibi-lo; o primeiro envio diz "realizada"; o envio com outro endereço
+deixa a troca **pendente** — a mensagem de confirmação vai ao endereço novo
+sem o código, e o e-mail e o código de antes seguem valendo; a desistência mata
+o link; confirmado o pedido novo, o código renovado (mesmo identificador) vai
+**só** ao endereço novo, o link não vale uma segunda vez, o código antigo não
+abre com nenhum dos dois endereços, e a recuperação entrega pelo endereço novo
+e não acha a inscrição pelo antigo.
+
+- **O `deploy.sh` guarda a modificação local em stash e a repõe.** reCAPTCHA
+  desligado e esquecido atravessa o deploy seguinte. O desfazer é o `git
+  checkout` do arquivo, conferido pelo `git status` e pela tela — não "o
+  próximo deploy conserta".
+- **O Gmail junta em uma conversa as mensagens de mesmo assunto.** O link do
+  segundo pedido de troca é a segunda mensagem da conversa do primeiro: leia a
+  conversa inteira, não o resumo da busca, que mostra só a primeira.
+- **O código vem no resumo da mensagem e o link no corpo.** A sonda os mascara
+  no que imprime; não os copie para relatório, issue ou PR.
 
 Três coisas que a sonda carrega e que valem para qualquer medida de autorização:
 
@@ -384,6 +547,16 @@ elementos por id —, não o que ela verifica. Duas medidas para não refazer:
 Campo de arquivo **com** arquivo gravado sem `required` é o esperado: o navegador
 não pré-preenche input de arquivo, e marcar `required` ali trava a submissão
 inteira em silêncio. A exigência fica no servidor.
+
+O **texto** das mensagens dessas validações também se lê sem submeter, e é o
+que o `probe_mensagens_validacao.rb` faz: na edição com override, liga os
+toggles só no navegador, monta o estado que reprova cada validação (data
+inválida, radio e checkbox desmarcados, arquivo grande e depois de extensão
+estranha), chama as funções e lê a mensagem de cada campo, junto com os erros
+de console ao carregar a página. Use quando a mudança tocar o JavaScript dos
+parciais de `filled_form/edit` — script de campo que quebra ao carregar aparece
+ali, e em nenhuma foto. Passe no "depois" os mesmos ids do "antes"; só as
+candidaturas de processo com `staff_can_edit` montam o formulário.
 
 ### Submeter o formulário, que é o que a leitura não alcança
 
@@ -487,7 +660,9 @@ lados enxergam a mesma coisa. O rastro que sobra é linha em `/versions` e
 
 ```bash
 # passo 0: o valor VIVO de redirect_email (ver "Regras de segurança"). Sai 0 na
-# trava (""), 1 com endereco (redireciona), 2 AUSENTE (nil: PERIGO, nao escreva).
+# trava (""), 1 com endereco (redireciona), 2 AUSENTE (nil: PERIGO, nao escreva),
+# 3 sem medida (a tela nao listou nada). Roda tambem com a conta de papel unico
+# que a reimportacao deixa, entao vem antes do preparar_aluno_de_teste.rb.
 EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/conferir_redirect_email.rb
 # LADO=$ANTES antes de capturar o antes; LADO=$DEPOIS antes de capturar o depois.
 EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/probe_escrita.rb              # diagnostico
@@ -515,7 +690,23 @@ O que cada um cobre, e o que ler no relatório:
 - `probe_submissao.rb --confirmar` — formulário público de candidatura de ponta
   a ponta: `criou: true` na fase 2 e `restantes com o marcador: 0` na limpeza.
   **Resíduo na réplica é defeito da rodada**, não da aplicação: se sobrar
-  registro com o marcador, apague antes de seguir.
+  registro com o marcador, apague antes de seguir. A limpeza pela tela apaga a
+  candidatura, mas não o formulário preenchido dela — a candidatura só faz
+  `belongs_to` dele, sem `dependent`, e a tela de formulários não tem exclusão.
+  Por isso a sonda apaga o formulário órfão no servidor (`rails runner` por
+  ssh, com `SAPOS_STAGING_SSH` e `SAPOS_STAGING_INSTANCE`), e a linha
+  `formularios orfaos com o marcador` tem de dizer `restantes 0`. `NAO
+  VERIFICADO` deixa um formulário de ~50 campos para trás a cada rodada, e a
+  contagem de `/filled_forms` e `/filled_form_fields` passa a divergir entre as
+  fotos.
+- `probe_salvar_candidatura.rb <ids>` — quando a mudança toca o salvar da
+  edição de candidatura (`assign_form`, formulários de fase, validação de
+  `FilledFormField`). Salva a edição com override **sem mudar valor**, uma vez
+  com os formulários desligados e outra com o de inscrição ligado, e lê o estado
+  pela tela de exibição antes e depois. Compara-se `resultado` e `estado_mudou`
+  entre os lados. "Barrado no navegador" com o formulário de inscrição ligado
+  costuma ser dado real: campo com `required` nativo vazio, que o candidato
+  deixou em branco antes de o template passar a exigir.
 
 O que a passada **não** cobre, e por isso não se conclui dela: disparo de e-mail.
 Só exercite e-mail quando a mudança tocar Devise, `lib/notifier.rb`, template de
@@ -584,8 +775,9 @@ O combo de troca de papel só aparece depois do passo 2 (ele exige dois papéis)
 A réplica não tem processo seletivo aberto, e **todos os processos dela vêm com
 `require_session` ligado** — que faz o `prepare_new_admission_application`
 desviar antes de o pedido chegar ao controller. São dois campos a mexer, não só
-a data. O `abrir_processo_seletivo.rb` abre, exercita e reverte os dois na mesma
-execução, conferindo o que gravou.
+a data de fim; e três quando o processo é novo, com o início ainda no futuro. O
+`abrir_processo_seletivo.rb abrir` guarda os originais e abre; o `fechar` os
+restaura e confere o que gravou.
 
 Prefira exercitar o **create**: ele só precisa do processo aberto, enquanto o
 update exigiria o token de uma inscrição de candidato real.
@@ -671,6 +863,17 @@ linha com o marcador, e isso aparece como a maior diferença de pixel da rodada.
 Antes de investigar uma rota que divergiu sozinha, procure o marcador
 `ZZ-TESTE-HOMOLOG` no diff do texto — achando, é pegada, não regressão.
 
+### Duas telas trocam de estado entre capturas do mesmo código
+
+- `/scholarships/:id` — o rótulo do ano na linha do tempo flutua até a borda
+  esquerda por animação, e a foto pega ora antes, ora depois: a faixa dos meses
+  difere em pixel, sem diferença de texto.
+- `/notifications/:id` — o editor do corpo (CodeMirror) ora rende uma linha em
+  branco antes da primeira, ora não: uma linha de texto a mais ou a menos.
+
+Diferença só nessas faixas se confirma com o A/A do lado "depois": recapture a
+rota algumas vezes no mesmo deploy e veja os dois estados aparecerem.
+
 ### Não confunda template oculto com erro na tela
 
 O active_scaffold deixa no DOM, **oculto**, um painel
@@ -718,6 +921,19 @@ ela que desempata quando a leitura do DOM e o resultado discordam.
     dispare nada neste estado.
   - **um endereço** = envia e **redireciona tudo** para ele; assunto ganha
     "(Originalmente para <real>)". É o estado seguro e verificável.
+- **Destravar para exercitar e-mail:** o `trava_email.rb` troca a variável no
+  servidor, por `rails runner`, sem nunca apagá-la; `<endereço>` destrava
+  redirecionando e `VAZIA` repõe a trava. Antes e depois, confira pela tela com
+  o `conferir_redirect_email.rb` (sai 1 destravada, 0 travada). Deixe destravada
+  só enquanto o exercício roda, e fora do horário do `cron.daily`: a rake
+  noturna de manutenção dispara as notificações agendadas, e com a variável
+  destravada elas saem todas para o endereço de teste. O envio grava uma linha
+  em `notification_logs` por mensagem; apague as do exercício ao fim.
+- **Mensagem que a tela só alcança pelo reCAPTCHA** (o `create` e o `find` da
+  inscrição em processo com sessão): exercite pela tela, com o reCAPTCHA
+  desligado pelo tempo do exercício (ver "Exercício de e-mail da inscrição").
+  Compor a mensagem no servidor, com `prepare_message` sobre uma candidatura
+  não gravada, mede o modelo e a entrega, não o controller.
 - **Ler o e-mail redirecionado:** tente o **Gmail via MCP primeiro** (`/mcp` →
   "claude.ai Gmail") para ler as mensagens e clicar nos links. Se não conectar,
   **peça ao usuário para colar** as mensagens que chegaram — o link de token vem

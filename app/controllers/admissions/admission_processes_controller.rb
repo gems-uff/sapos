@@ -185,6 +185,12 @@ class Admissions::AdmissionProcessesController < ApplicationController
     )
     return if @exception.present?
 
+    rankings = @admission_process.rankings
+      .where(admission_phase_id: params[:consolidate_phase_id].to_i)
+      .order(:order)
+    # A ranking that cannot run fails before any candidate is consolidated
+    rankings.each(&:check_groups!)
+
     @buckets[:reproved][:candidates].each do |candidate|
       candidate.update!(status: Admissions::AdmissionApplication::REPROVED)
     end
@@ -205,10 +211,7 @@ class Admissions::AdmissionProcessesController < ApplicationController
       end
     end
 
-    @admission_process.rankings
-      .where(admission_phase_id: params[:consolidate_phase_id].to_i)
-      .order(:order)
-      .each(&:generate_ranking)
+    rankings.each(&:generate_ranking)
 
     if index < phases.size - 1
       next_phase_id = phases[index + 1]
@@ -346,14 +349,6 @@ class Admissions::AdmissionProcessesController < ApplicationController
       end
     end
 
-    def consolidate_phase_respond_on_iframe
-      flash[:info] = @message
-      flash[:error] = @exception
-      responds_to_parent do
-        render action: "on_consolidate_phase", formats: [:js], layout: false
-      end
-    end
-
     def consolidate_phase_respond_to_html
       flash[:info] = @message
       flash[:error] = @exception
@@ -366,13 +361,6 @@ class Admissions::AdmissionProcessesController < ApplicationController
       do_refresh_list
       @popstate = true
       render action: "on_consolidate_phase", formats: [:js]
-    end
-
-    def calculate_ranking_respond_on_iframe
-      flash[:error] = @errors
-      responds_to_parent do
-        render action: "on_calculate_ranking", formats: [:js], layout: false
-      end
     end
 
     def calculate_ranking_respond_to_html

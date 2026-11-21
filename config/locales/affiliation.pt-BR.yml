@@ -15,3 +15,8 @@ pt-BR:
       affiliation:
         one: "Afiliação"
         other: "Afiliações"
+
+    errors:
+      models:
+        affiliation:
+          overlapping_period: "Já existe uma afiliação deste professor que se sobrepõe a este período"

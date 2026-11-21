@@ -34,7 +34,17 @@
 #
 # DADO REAL: preenche com o marcador ZZ-TESTE-HOMOLOG, que e o que permite achar
 # e apagar depois. Nao transcreve valor de campo nenhum para o relatorio.
+#
+# A limpeza tem duas metades. Pela tela ela apaga a candidatura -- mas a
+# candidatura so faz belongs_to do formulario preenchido, sem dependent, e a
+# tela de formularios nao tem exclusao: o formulario (com os ~50 campos) fica
+# orfao na replica a cada rodada, e muda a contagem de /filled_forms entre as
+# fotos. A segunda metade roda no servidor (rails runner por ssh) e apaga so o
+# formulario orfao cujos campos levam o marcador. Pede SAPOS_STAGING_SSH (host
+# do ssh) e SAPOS_STAGING_INSTANCE (usuario unix da instancia, que tem a
+# aplicacao em ~/instance); sem eles a sonda avisa e o orfao fica.
 
+require "open3"
 require_relative "explore_common"
 
 CONFIRMAR = ARGV.include?("--confirmar")
@@ -106,7 +116,10 @@ def preenche(driver, alvo, marca)
         } else if (el.value === '') {
           var ehData = /data|nascimento/i.test(rotulo) ||
                        (el.className || '').indexOf('datepicker') >= 0;
-          el.value = ehData ? '01/01/2000' : marca;
+          // O e-mail da inscricao e conferido pelo formato, no navegador e no
+          // servidor: o campo leva um endereco com o marcador, nao o marcador.
+          var ehEmail = t === 'email' || /e-?mail/i.test(rotulo);
+          el.value = ehData ? '01/01/2000' : (ehEmail ? marca.toLowerCase() + '@example.com' : marca);
           if (ehData) { rel.data++; } else { rel.texto++; }
           disparar(el);
         }
@@ -225,6 +238,49 @@ def apaga_criadas(driver, wait, marca)
   JS
 end
 
+# So apaga formulario que (a) tem campo com o marcador e (b) nao pertence a
+# nada: nem candidatura, nem carta, nem avaliacao, resultado ou ranking. Imprime
+# "apagados=N restantes=M", onde restantes conta orfaos marcados que sobraram.
+RUNNER_ORFAOS = <<~'RUBY'
+  marca = ARGV.fetch(0)
+  ids = Admissions::FilledFormField.where("value LIKE ?", "%#{marca}%")
+    .distinct.pluck(:filled_form_id)
+  orfao = ->(f) {
+    f.admission_application.nil? && f.letter_request.nil? &&
+      f.admission_phase_evaluation.nil? && f.admission_phase_result.nil? &&
+      f.admission_ranking_result.nil?
+  }
+  alvos = Admissions::FilledForm.where(id: ids).select(&orfao)
+  alvos.each(&:destroy!)
+  restantes = Admissions::FilledForm.where(id: ids).count { |f| orfao.(f) }
+  puts "apagados=#{alvos.size} restantes=#{restantes}"
+RUBY
+
+def apaga_formularios_orfaos(marca)
+  host = ENV["SAPOS_STAGING_SSH"].to_s
+  inst = ENV["SAPOS_STAGING_INSTANCE"].to_s
+  if host.empty? || inst.empty?
+    puts "  AVISO: SAPOS_STAGING_SSH/SAPOS_STAGING_INSTANCE ausentes -- o " \
+         "formulario preenchido da candidatura apagada ficou orfao na replica"
+    return { verificado: false }
+  end
+  abort "INSTANCIA sem 'staging': #{inst}" unless inst.include?("staging")
+
+  # Aspas DUPLAS no bash -lc: o $f tem de expandir no shell do ssh, que e quem
+  # o criou; o shell do sudo e outro usuario e nao o conhece.
+  remoto = "f=$(mktemp /tmp/orfaos.XXXXXX.rb); chmod 644 $f; cat > $f; " \
+           "sudo -i -u #{inst} bash -lc \"cd ~/instance && bundle exec rails runner $f #{marca}\"; " \
+           "rc=$?; rm -f $f; exit $rc"
+  saida, status = Open3.capture2e("ssh", host, remoto, stdin_data: RUNNER_ORFAOS)
+  linha = saida.lines.grep(/^apagados=/).last.to_s.strip
+  unless status.success? && linha =~ /^apagados=(\d+) restantes=(\d+)$/
+    puts "  AVISO: limpeza dos formularios orfaos falhou (exit #{status.exitstatus}):"
+    puts saida.lines.last(5).map { |l| "    #{l}" }
+    return { verificado: false }
+  end
+  { verificado: true, apagados: $1.to_i, restantes: $2.to_i }
+end
+
 begin
   driver.navigate.to("#{BASE}/admissions/#{PROCESSO_URL}/apply/new")
   settle(driver, wait)
@@ -292,11 +348,15 @@ begin
     ainda = enviar(driver, wait)
     resultado = driver.execute_script(<<~JS)
       var err = document.querySelector('#errorExplanation, .errorExplanation');
-      var flash = document.querySelector('.flash, #flash_notice, .notice');
+      // O layout sempre traz o .notice, vazio quando nao ha aviso, e o alerta
+      // sai em #error_login: o primeiro elemento achado nao e o que tem texto.
+      var avisos = Array.from(document.querySelectorAll('.flash, #flash_notice, .notice, #error_login'))
+        .map(function (el) { return el.innerText.replace(/\\s+/g, ' ').trim(); })
+        .filter(function (texto) { return texto.length > 0; });
       return {
         url: location.pathname,
         erro: err ? err.innerText.replace(/\\s+/g, ' ').trim().slice(0, 300) : null,
-        aviso: flash ? flash.innerText.replace(/\\s+/g, ' ').trim().slice(0, 200) : null
+        aviso: avisos.length ? avisos[0].slice(0, 200) : null
       };
     JS
     # Sair do formulario NAO e ter criado. Se o servidor recusou e re-renderizou,
@@ -323,8 +383,11 @@ begin
 
     unless MANTER
       restantes = apaga_criadas(driver, wait, MARCA)
-      relatorio[:limpeza] = { restantes_com_marcador: restantes }
+      orfaos = apaga_formularios_orfaos(MARCA)
+      relatorio[:limpeza] = { restantes_com_marcador: restantes, formularios_orfaos: orfaos }
       puts "limpeza -- restantes com o marcador: #{restantes}"
+      puts "limpeza -- formularios orfaos com o marcador: " +
+           (orfaos[:verificado] ? "apagados #{orfaos[:apagados]}, restantes #{orfaos[:restantes]}" : "NAO VERIFICADO")
     end
   elsif CONFIRMAR
     puts "FASE 2 pulada: a fase 1 nao bloqueou, entao o formulario ja foi enviado."

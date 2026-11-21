@@ -147,7 +147,7 @@ class ScholarshipDurationsController < ApplicationController
         return nil
       end
 
-      [sql, Time.now, Time.now]
+      [sql, Time.current, Time.current]
     end
   end
 

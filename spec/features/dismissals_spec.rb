@@ -28,8 +28,8 @@ RSpec.describe "Dismissal features", type: :feature do
     @destroy_all << @dismissal_reason1 = FactoryBot.create(:dismissal_reason, name: "Reprovado", thesis_judgement: "Reprovado")
     @destroy_all << @dismissal_reason2 = FactoryBot.create(:dismissal_reason, name: "Titulação", thesis_judgement: "Aprovado")
 
-    @destroy_all << @record = FactoryBot.create(:dismissal, enrollment: @enrollment1, date: Date.today, dismissal_reason: @dismissal_reason1)
-    @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment2, date: Date.today, dismissal_reason: @dismissal_reason2)
+    @destroy_all << @record = FactoryBot.create(:dismissal, enrollment: @enrollment1, date: Date.current, dismissal_reason: @dismissal_reason1)
+    @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment2, date: Date.current, dismissal_reason: @dismissal_reason2)
     @destroy_all << FactoryBot.create(:dismissal, enrollment: @enrollment3, date: 2.years.ago.at_beginning_of_month.to_date, dismissal_reason: @dismissal_reason1)
   end
   after(:each) do
@@ -73,7 +73,7 @@ RSpec.describe "Dismissal features", type: :feature do
       fill_record_select("enrollment_", "enrollments", "M04")
       within("#as_#{plural_name}-create--form") do
         find(:select, "record_dismissal_reason_").find(:option, text: @dismissal_reason1.name).select_option
-        select_month_year_i("record_date", Date.today)
+        select_month_year_i("record_date", Date.current)
       end
       click_button_and_wait "Salvar"
       expect(page).to have_no_css(".as_form")

@@ -20,7 +20,6 @@ RSpec.describe "Roles features", type: :feature do
     @destroy_all << FactoryBot.create(:role_professor)
     @destroy_all << FactoryBot.create(:role_aluno)
     @destroy_all << @role_adm = FactoryBot.create(:role_administrador)
-    @destroy_all << FactoryBot.create(:role_suporte)
     @destroy_all << @user = create_confirmed_user([@role_adm])
   end
   after(:each) do
@@ -47,7 +46,7 @@ RSpec.describe "Roles features", type: :feature do
     end
 
     it "should sort the list by created_at, desc" do
-      expect(page.all("tr td.name-column").map(&:text)).to eq ["Desconhecido", "Coordenação", "Secretaria", "Professor", "Aluno", "Administrador", "Suporte"]
+      expect(page.all("tr td.name-column").map(&:text)).to eq ["Desconhecido", "Coordenação", "Secretaria", "Professor", "Aluno", "Administrador"]
     end
 
     it "should not have insert link" do

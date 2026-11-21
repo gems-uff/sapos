@@ -187,7 +187,7 @@ RSpec.describe Notification, type: :model do
         it "should be 01/04 if today is 01/03" do
           notification = FactoryBot.create(:notification)
           notification.frequency = Notification::DAILY
-          expect(notification.calculate_next_notification_date(time: Time.parse("01/03"))).to eq(Time.parse("01/04"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("01/03"))).to eq(Time.zone.parse("01/04"))
         end
       end
 
@@ -195,25 +195,25 @@ RSpec.describe Notification, type: :model do
         it "should be 2014/01/20(monday) if today is 2014/01/14(tuesday)" do
           notification = FactoryBot.create(:notification)
           notification.frequency = Notification::WEEKLY
-          expect(notification.calculate_next_notification_date(time: Time.parse("2014/01/14"))).to eq(Time.parse("2014/01/20"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("2014/01/14"))).to eq(Time.zone.parse("2014/01/20"))
         end
 
         it "should be 2014/01/16(thursday) if today is 2014/01/14(tuesday) and offset is 3" do
           notification = FactoryBot.create(:notification, notification_offset: "3")
           notification.frequency = Notification::WEEKLY
-          expect(notification.calculate_next_notification_date(time: Time.parse("2014/01/14"))).to eq(Time.parse("2014/01/16"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("2014/01/14"))).to eq(Time.zone.parse("2014/01/16"))
         end
 
         it "should be 2014/01/18(saturday) if today is 2014/01/14(tuesday) and offset is -2" do
           notification = FactoryBot.create(:notification, notification_offset: "-2")
           notification.frequency = Notification::WEEKLY
-          expect(notification.calculate_next_notification_date(time: Time.parse("2014/01/14"))).to eq(Time.parse("2014/01/18"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("2014/01/14"))).to eq(Time.zone.parse("2014/01/18"))
         end
 
         it "should be 2014/02/01(saturday) if today is 2014/01/25(saturday) and offset is -2" do
           notification = FactoryBot.create(:notification, notification_offset: "-2")
           notification.frequency = Notification::WEEKLY
-          expect(notification.calculate_next_notification_date(time: Time.parse("2014/01/25"))).to eq(Time.parse("2014/02/01"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("2014/01/25"))).to eq(Time.zone.parse("2014/02/01"))
         end
       end
 
@@ -221,19 +221,19 @@ RSpec.describe Notification, type: :model do
         it "should be 02/01 if today is 01/17" do
           notification = FactoryBot.create(:notification)
           notification.frequency = Notification::MONTHLY
-          expect(notification.calculate_next_notification_date(time: Time.parse("01/17"))).to eq(Time.parse("02/01"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("01/17"))).to eq(Time.zone.parse("02/01"))
         end
 
         it "should be 02/15 if today is 01/17 and offset is 14" do
           notification = FactoryBot.create(:notification, notification_offset: "14")
           notification.frequency = Notification::MONTHLY
-          expect(notification.calculate_next_notification_date(time: Time.parse("01/17"))).to eq(Time.parse("02/15"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("01/17"))).to eq(Time.zone.parse("02/15"))
         end
 
         it "should be 02/08 if today is 01/17 and offset is 1w" do
           notification = FactoryBot.create(:notification, notification_offset: "1w")
           notification.frequency = Notification::MONTHLY
-          expect(notification.calculate_next_notification_date(time: Time.parse("01/17"))).to eq(Time.parse("02/08"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("01/17"))).to eq(Time.zone.parse("02/08"))
         end
       end
 
@@ -241,31 +241,31 @@ RSpec.describe Notification, type: :model do
         it "should be 03/01 of this year if today is 09/01 of last year" do
           notification = FactoryBot.create(:notification)
           notification.frequency = Notification::SEMIANNUAL
-          expect(notification.calculate_next_notification_date(time: Time.parse("09/01") - 1.year)).to eq(Time.parse("03/01"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("09/01") - 1.year)).to eq(Time.zone.parse("03/01"))
         end
 
         it "should be 03/01 of this year if today is 02/01" do
           notification = FactoryBot.create(:notification)
           notification.frequency = Notification::SEMIANNUAL
-          expect(notification.calculate_next_notification_date(time: Time.parse("02/01"))).to eq(Time.parse("03/01"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("02/01"))).to eq(Time.zone.parse("03/01"))
         end
 
         it "should be 08/01 if today is 04/01" do
           notification = FactoryBot.create(:notification)
           notification.frequency = Notification::SEMIANNUAL
-          expect(notification.calculate_next_notification_date(time: Time.parse("04/01"))).to eq(Time.parse("08/01"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("04/01"))).to eq(Time.zone.parse("08/01"))
         end
 
         it "should be 03/01 of next year if today is 09/01" do
           notification = FactoryBot.create(:notification)
           notification.frequency = Notification::SEMIANNUAL
-          expect(notification.calculate_next_notification_date(time: Time.parse("09/01"))).to eq((Time.parse("03/01") + 1.year))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("09/01"))).to eq((Time.zone.parse("03/01") + 1.year))
         end
 
         it "should be 07/01 if today is 02/15 and offset is -31" do
           notification = FactoryBot.create(:notification, notification_offset: "-31")
           notification.frequency = Notification::SEMIANNUAL
-          expect(notification.calculate_next_notification_date(time: Time.parse("02/15"))).to eq(Time.parse("07/01"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("02/15"))).to eq(Time.zone.parse("07/01"))
         end
       end
 
@@ -273,7 +273,7 @@ RSpec.describe Notification, type: :model do
         it "should be 2015/01/01 if today is 2014/06/27" do
           notification = FactoryBot.create(:notification)
           notification.frequency = Notification::ANNUAL
-          expect(notification.calculate_next_notification_date(time: Time.parse("2014/06/27"))).to eq(Time.parse("2015/01/01"))
+          expect(notification.calculate_next_notification_date(time: Time.zone.parse("2014/06/27"))).to eq(Time.zone.parse("2015/01/01"))
         end
       end
     end

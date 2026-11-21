@@ -105,7 +105,7 @@ RSpec.describe PhaseCompletion, type: :model do
     describe "calculate_completion_date" do
       it "sets completion_date to nil when there is no accomplishment" do
         pc = PhaseCompletion.new(phase: @pc_phase, enrollment: @pc_enrollment)
-        pc.completion_date = Date.today
+        pc.completion_date = Date.current
         pc.calculate_completion_date
         expect(pc.completion_date).to be_nil
       end

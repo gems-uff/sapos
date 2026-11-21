@@ -25,7 +25,7 @@ RSpec.describe Accomplishment, type: :model do
     @destroy_later.clear
   end
   let(:enrollment) { FactoryBot.build(:enrollment, level: @level) }
-  let(:conclusion_date) { Date.today }
+  let(:conclusion_date) { Date.current }
   let(:accomplishment) do
     Accomplishment.new(
       enrollment: enrollment,

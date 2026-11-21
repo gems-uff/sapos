@@ -78,24 +78,9 @@ module NotificationsHelper
     I18n.localize(record.next_execution, format: :day)
   end
 
-  def sql_query_show_column(record, column)
-    code_mirror_view_widget(
-      "sql_query-view-#{record.id}", "text/x-mysql",
-      (record.query.try(:sql) || "")
-    )
-  end
-
   def body_template_show_column(record, column)
     code_mirror_view_widget(
       "body_template-view-#{record.id}", "liquid", record.body_template
     )
-  end
-
-  def notification_param_query_param_form_column(record, options)
-    options[:value] = record.query_param_id
-    label(
-      :record_value_1_params, record.id,
-      ("(#{record.value_type}) ") + record.name
-    ) + hidden_field(:record, :query_param, options)
   end
 end

@@ -105,7 +105,7 @@ class Enrollment < ApplicationRecord
   end
 
   def self.with_delayed_phases_on(date, phases)
-    date = Date.today if date.nil?
+    date = Date.current if date.nil?
     phases = Phase.all if phases.nil?
     phases_ids = phases.map(&:id)
 
@@ -124,7 +124,7 @@ class Enrollment < ApplicationRecord
 
   def delayed_phases(options = {})
     date ||= options[:date]
-    date ||= Date.today
+    date ||= Date.current
     self.phase_completions.joins(:phase)
       .where("phases.active" => true)
       .where(PhaseCompletion.arel_table[:due_date].lt(date))
@@ -173,6 +173,25 @@ class Enrollment < ApplicationRecord
     end
   end
 
+  # Dias em que a regra de credenciamento vale para esta matrícula: hoje, ou o
+  # mês do desligamento. Decisões da revisão do PR #690 -- matrícula desligada
+  # não fica isenta, é avaliada quando o aluno saiu; e, como o desligamento só
+  # guarda mês e ano, basta um orientador credenciado em algum dia daquele mês.
+  # Dismissal passa a própria data, que ainda pode não estar na associação.
+  def advisor_accreditation_period(dismissal_date = dismissal&.date)
+    return Date.current..Date.current if dismissal_date.blank?
+    dismissal_date.all_month
+  end
+
+  # Algum dos orientadores é credenciado no nível da matrícula em algum dia de
+  # +period+. A regra de enrollment_has_authorized_advisor, para quem precisa
+  # avaliá-la sobre outra lista ou outra data: Advisement e Dismissal.
+  def any_accredited_advisor?(advisements, period = advisor_accreditation_period)
+    advisements.any? do |a|
+      a.professor.present? && a.professor.accredited_on?(level, period)
+    end
+  end
+
   def enrollment_has_authorized_advisor
     return unless CustomVariable.enable_advisor_accreditation_validation
     return if advisements.blank? || level.blank?
@@ -183,11 +202,7 @@ class Enrollment < ApplicationRecord
     # marcadas -- aqui ficou de fora.
     remaining = advisements.reject(&:marked_for_destruction?)
     return if remaining.blank?
-    has_authorized = remaining.any? do |a|
-      a.professor.present? &&
-        a.professor.advisement_authorizations.any? { |auth| auth.level == level }
-    end
-    errors.add(:base, :no_advisor_with_level) unless has_authorized
+    errors.add(:base, :no_advisor_with_level) unless any_accredited_advisor?(remaining)
   end
 
   def verify_research_area_with_advisors

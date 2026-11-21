@@ -189,7 +189,7 @@ RSpec.describe Admissions::AdmissionApplication, "cópia para o aluno e envio de
       )
       @process = create_closed_admission_process(
         @template, simple_url: "assign-form-spec", letter_template: @letters,
-        end_date: Date.today + 5.days, edit_date: Date.today + 10.days
+        end_date: Date.current + 5.days, edit_date: Date.current + 10.days
       )
       @application = create_application(@process, name: "Ana", filled: false, fields: { "nota" => "5" })
       @nota = @application.filled_form.fields.first
@@ -214,18 +214,28 @@ RSpec.describe Admissions::AdmissionApplication, "cópia para o aluno e envio de
     it "marca a inscrição como enviada e sincroniza o nome quando a submissão está habilitada" do
       @application.assign_form({
         filled_form_attributes: filled_form_params(@application.filled_form, { "nota" => "9", "nome" => "Ana Maria" }),
-      })
+      }, check_candidate_permission: true)
       expect(@application.filled_form.is_filled).to be true
       expect(value_of(@application.filled_form, "nota")).to eq("9")
       expect(@application.name).to eq("Ana Maria")
       expect(@application).to be_valid
     end
 
-    it "não marca como enviada quando a submissão não veio habilitada" do
+    it "não marca como enviada quando quem tem a edição total desliga a submissão" do
       @application.assign_form({
         filled_form_attributes: filled_form_params(@application.filled_form, { "nota" => "9", "nome" => "Ana" }, enable: "0"),
-      })
+      }, can_edit_override: true)
       expect(@application.filled_form.is_filled).to be false
+      expect(value_of(@application.filled_form, "nota")).to eq("9")
+    end
+
+    # Só a tela de quem tem a edição total desliga a submissão: para os demais
+    # o formulário é sempre submetido, diga o parâmetro o que disser.
+    it "marca como enviada mesmo com a submissão desligada nos parâmetros de quem não tem a edição total" do
+      @application.assign_form({
+        filled_form_attributes: filled_form_params(@application.filled_form, { "nota" => "9", "nome" => "Ana" }, enable: "0"),
+      }, check_candidate_permission: true)
+      expect(@application.filled_form.is_filled).to be true
       expect(value_of(@application.filled_form, "nota")).to eq("9")
     end
 
@@ -233,7 +243,7 @@ RSpec.describe Admissions::AdmissionApplication, "cópia para o aluno e envio de
       @process.update!(min_letters: 2, max_letters: 2)
       @application.assign_form({
         filled_form_attributes: filled_form_params(@application.filled_form, { "nota" => "9", "nome" => "Ana" }),
-      })
+      }, check_candidate_permission: true)
       expect(@application.filled_form.is_filled).to be false
       expect(@application.errors[:base]).not_to be_empty
     end
@@ -247,7 +257,7 @@ RSpec.describe Admissions::AdmissionApplication, "cópia para o aluno e envio de
           "0" => { id: sent.id, filled_form_attributes: filled_form_params(sent.filled_form, {}) },
           "1" => { id: kept.id, filled_form_attributes: filled_form_params(kept.filled_form, {}, enable: "0") },
         },
-      }, has_letter_forms: true)
+      }, has_letter_forms: true, can_edit_override: true)
       letters = @application.letter_requests.index_by(&:id)
       expect(letters[sent.id].filled_form.is_filled).to be true
       expect(letters[kept.id].filled_form.is_filled).to be false

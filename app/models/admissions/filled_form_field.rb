@@ -21,6 +21,22 @@ class Admissions::FilledFormField < ActiveRecord::Base
 
   mount_uploader :file, FormFileUploader
 
+  # Extensoes aceitas em campo de arquivo que nao configura a propria lista
+  # ("values"): documentos, imagens, audio, video e compactados. Fica de fora o
+  # que executa no navegador ou no computador (html, svg, xml, js, exe) e o
+  # PostScript, que e linguagem de programacao. O download (FilesController) ja
+  # nao abre como pagina o que nao e PDF ou imagem; esta lista impede que o
+  # formulario publico sirva para distribuir executavel. O limite de tamanho
+  # (size_of_file) vale para todos.
+  DEFAULT_FILE_EXTENSIONS = %w[
+    pdf doc docx odt rtf txt xls xlsx
+    jpg jpeg png gif webp heic
+    mp3 m4a ogg opus mp4 mov webm
+    zip rar 7z tar.gz tgz
+  ].freeze
+
+  validate :that_form_field_belongs_to_the_template,
+    if: -> { self.new_record? || self.form_field_id_changed? }
   validate :that_either_value_or_file_is_filled
   validate :that_value_follows_configuration_rules
   validate :size_of_file
@@ -50,6 +66,15 @@ class Admissions::FilledFormField < ActiveRecord::Base
     when Admissions::FormField::TEXT, Admissions::FormField::NUMBER, Admissions::FormField::DATE
       self.value = configuration["default"] if self.value.nil?
     end
+  end
+
+  # O campo vem do formulario que o cliente submete: um form_field de outro
+  # template gravaria valor que nenhuma tela oferece e que, pelo nome, tomaria
+  # o lugar do campo verdadeiro em to_fields_hash.
+  def that_form_field_belongs_to_the_template
+    return if self.form_field.nil? || self.filled_form.nil?
+    return if self.form_field.form_template_id == self.filled_form.form_template_id
+    self.errors.add(:form_field, :invalid)
   end
 
   def that_either_value_or_file_is_filled
@@ -173,7 +198,8 @@ class Admissions::FilledFormField < ActiveRecord::Base
 
   def validate_date_field(configuration)
     return if self.value.blank?
-    format_ok = self.value.match(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/)
+    # A year of two digits would be read as one of the first century
+    format_ok = self.value.match(/^\d{1,2}\/\d{1,2}\/\d{4}$/)
     parseable = Date.strptime(self.value, "%d/%m/%Y") rescue false
     if !format_ok || !parseable
       add_error(:invalid_date)
@@ -181,17 +207,34 @@ class Admissions::FilledFormField < ActiveRecord::Base
   end
 
   def validate_file_field(configuration, is_photo: false)
-    if configuration["required"] && (self.file.blank? || self.file.file.blank?)
+    # O arquivo marcado para remocao ainda esta no campo durante a validacao:
+    # o CarrierWave so o tira ao gravar.
+    if configuration["required"] && (self.file.blank? || self.file.file.blank? || self.remove_file?)
       add_error(:blank)
     end
-    if configuration["values"] && !(self.file.blank? || self.file.file.blank?)
+    return if self.file.blank? || self.file.file.blank?
+    filename = self.file.filename.downcase
+    if configuration["values"]
       values = configuration["values"].dup
       values << ".jpg" if is_photo
-      filename = self.file.filename.downcase
       if values.none? { |ext| filename.end_with?(ext.downcase) }
         add_error(:extension, valid: configuration["values"].join(", "))
       end
+    elsif DEFAULT_FILE_EXTENSIONS.none? { |ext| filename.end_with?(".#{ext}") }
+      add_error(:extension, valid: DEFAULT_FILE_EXTENSIONS.join(", "))
     end
+  end
+
+  # Se o campo sincronizado com o e-mail pode ser oferecido como campo de
+  # e-mail do navegador, que nao deixa enviar o formulario enquanto o valor
+  # nao e endereco. O valor gravado antes da conferencia do formato, que nao
+  # e endereco, vai como texto: o candidato tem de conseguir editar o resto
+  # (AdmissionApplication valida so o endereco novo ou alterado). O navegador
+  # tira o espaco em volta antes de conferir.
+  def offered_as_email_input?
+    return false if self.form_field&.sync != Admissions::FormField::SYNC_EMAIL
+
+    self.value.blank? || self.value.strip.match?(URI::MailTo::EMAIL_REGEXP)
   end
 
   def to_label

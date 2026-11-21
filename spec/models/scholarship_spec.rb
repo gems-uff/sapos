@@ -65,7 +65,7 @@ RSpec.describe Scholarship, type: :model do
       end
       it "should be greater or equal to 100 years if there is no end_date" do
         scholarship.end_date = nil
-        expect(scholarship.last_date).to be >= Date.today + 100.years - 1.day
+        expect(scholarship.last_date).to be >= Date.current + 100.years - 1.day
       end
     end
   end

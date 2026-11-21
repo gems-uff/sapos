@@ -1,0 +1,32 @@
+<div class="content">
+  <div class="active-scaffold default-theme">
+    <div class="active-scaffold-header">
+      <h2><%= @admission_process.title %></h2>
+    </div>
+    <div class="admission-inner show">
+      <%= form_with url: admission_email_change_path(id: params[:id]),
+          method: :put,
+          id: "email_change_form",
+          class: "as_form create",
+          authenticity_token: true do |form| %>
+        <h4><%= t "admissions.email_changes.show.title" %></h4>
+        <div id="main-section">
+          <ol>
+            <li><p><%= t "admissions.email_changes.show.explanation" %></p></li>
+            <%= render partial: "admissions/apply/show_value", locals: {
+              name: t("activerecord.attributes.admissions/admission_application.identifier"),
+              value: @admission_application.identifier
+            } %>
+            <%= render partial: "admissions/apply/show_value", locals: {
+              name: t("activerecord.attributes.admissions/admission_application.pending_email"),
+              value: @admission_application.pending_email
+            } %>
+          </ol>
+        </div>
+        <p class="form-footer">
+          <%= form.submit t("admissions.email_changes.show.confirm"), id: "submit" %>
+        </p>
+      <% end %>
+    </div>
+  </div>
+</div>

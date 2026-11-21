@@ -14,11 +14,14 @@ RSpec.describe "ProgramLevels features", type: :feature do
     @destroy_all = []
     @role_adm = FactoryBot.create :role_administrador
 
+    # Encerrado no dia em que começa o conceito que o exemplo de inserção
+    # grava: o programa tem um conceito por vez, e com término exclusivo os
+    # dois apenas se encostam.
     @destroy_all << @record = FactoryBot.create(:program_level,
       level: 5,
       ordinance: "Portaria MEC 1234/2020",
       start_date: Date.new(2020, 1, 1),
-      end_date: nil
+      end_date: Date.new(2021, 8, 13)
     )
     @destroy_all << FactoryBot.create(:program_level,
       level: 4,

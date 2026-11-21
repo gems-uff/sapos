@@ -73,6 +73,63 @@ RSpec.describe ProfessorsHelper, type: :helper do
     end
   end
 
+  # O :advisement_authorizations padrão usa to_label (só o nome do nível), sem
+  # período: com mais de três linhas o associated_limit pode esconder
+  # justamente a vigente (achado C1 da revisão do PR #690).
+  describe "professor_advisement_authorizations_show_column" do
+    let(:professor) { FactoryBot.create(:professor) }
+
+    it "renders a dash when the professor has no accreditation" do
+      expect(helper.professor_advisement_authorizations_show_column(professor, {})).to eq "-"
+    end
+
+    it "shows the level and the period" do
+      level = FactoryBot.create(:level, name: "Doutorado")
+      FactoryBot.create(
+        :advisement_authorization, professor: professor, level: level,
+        start_date: Date.new(2018, 3, 1), end_date: Date.new(2021, 12, 31)
+      )
+      html = helper.professor_advisement_authorizations_show_column(professor, {})
+
+      expect(html).to include("<td>Doutorado</td>")
+      expect(html).to include("<td>01/03/2018</td>")
+      expect(html).to include("<td>31/12/2021</td>")
+    end
+
+    it "falls back to the blank text on an open accreditation" do
+      FactoryBot.create(:advisement_authorization, professor: professor, end_date: nil)
+      html = helper.professor_advisement_authorizations_show_column(professor, {})
+
+      expect(html).to include("<td>#{I18n.t('rescue_blank_text')}</td>")
+    end
+
+    it "orders the rows by start_date, not by insertion order" do
+      level = FactoryBot.create(:level)
+      recente = FactoryBot.create(
+        :advisement_authorization, professor: professor, level: level,
+        start_date: Date.new(2022, 1, 1), end_date: nil
+      )
+      antigo = FactoryBot.create(
+        :advisement_authorization, professor: professor, level: FactoryBot.create(:level),
+        start_date: Date.new(2015, 1, 1), end_date: Date.new(2021, 12, 31)
+      )
+      html = helper.professor_advisement_authorizations_show_column(professor, {})
+
+      expect(html.index(antigo.level.name)).to be < html.index(recente.level.name)
+    end
+
+    # O nome do nível entra na tabela por interpolação de string, sem o
+    # auto-escape das views: sem h(), um nível com `<` quebraria a tabela.
+    it "escapes the level name" do
+      level = FactoryBot.create(:level, name: "<script>")
+      FactoryBot.create(:advisement_authorization, professor: professor, level: level)
+      html = helper.professor_advisement_authorizations_show_column(professor, {})
+
+      expect(html).to include("&lt;script&gt;")
+      expect(html).not_to include("<script>")
+    end
+  end
+
   # As duas tabelas montadas a mao neste helper abriam <tboby>, erro de
   # digitacao. O navegador expulsava o elemento desconhecido e criava um <tbody>
   # sozinho, entao a tela nunca quebrou -- mas o HTML era invalido e a classe
