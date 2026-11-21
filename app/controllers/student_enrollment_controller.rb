@@ -231,7 +231,9 @@ class StudentEnrollmentController < ApplicationController
       end
       false
     rescue ValidationException => e
-      flash.alert = e.message
+      # A recusa redesenha a página (render :enroll), sem redirecionar:
+      # flash.now, para o alerta não reaparecer na página seguinte.
+      flash.now.alert = e.message
       false
     end
 

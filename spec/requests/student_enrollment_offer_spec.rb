@@ -147,6 +147,21 @@ RSpec.describe "StudentEnrollmentController offer check", type: :request do
       rejected!
     end
 
+    # A recusa redesenha a própria página, e a mensagem pede para recarregá-la:
+    # a página recarregada não pode repetir o alerta.
+    it "shows the refusal alert only on the page that refused" do
+      submit(course_ids: { @course => @outsider })
+      rejected!
+      alerta = I18n.t("student_enrollment.enroll.errors.not_offered")
+      expect(response.body).to include(alerta)
+
+      get "/enrollment/#{@enrollment.id}/enroll/2026-2"
+
+      expect(response).to have_http_status(:ok)
+      expect(flash[:alert]).to be_nil
+      expect(response.body).not_to include(alerta)
+    end
+
     it "rejects a course that is not on demand without creating a class" do
       regular = FactoryBot.create(
         :course, course_type: FactoryBot.create(:course_type, on_demand: false)
