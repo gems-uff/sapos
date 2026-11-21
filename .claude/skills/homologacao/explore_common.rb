@@ -21,6 +21,15 @@ OUT = ENV["EXPLORE_OUT"] ||
   abort("defina EXPLORE_OUT com o diretório da rodada (fora do repositório)")
 FileUtils.mkdir_p(OUT)
 
+# Variavel sem default: o valor e dado da instalacao (um processo seletivo, por
+# exemplo), e um padrao fixado aqui miraria registro que outra instalacao nao
+# tem. `como` diz onde achar o valor.
+def env_obrigatoria(nome, como)
+  valor = ENV[nome].to_s.strip
+  abort "defina #{nome}: #{como}" if valor.empty?
+  valor
+end
+
 def build_driver
   novo_driver(largura: 1440, altura: 1600)
 end

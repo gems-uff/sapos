@@ -5,6 +5,9 @@ description: Sobe um MariaDB local fiel ao de produção e roda a suíte contra 
 
 # Suíte contra MariaDB local
 
+Se a instalação mantém parâmetros locais para esta skill (o contexto da sessão
+aponta onde), leia-os antes de começar.
+
 A suíte roda em **SQLite**; produção roda em **MariaDB**. Não é só diferença de
 conexão — a semântica muda:
 
@@ -34,8 +37,8 @@ SELECT DISTINCT TABLE_COLLATION FROM information_schema.TABLES
 ```
 
 **`lower_case_table_names` é um ponto cego do MariaDB no macOS.** No Linux
-(Debian de produção) o default é `0` — nomes de tabela **case-sensitive**, então
-`SELECT * FROM USERS` não encontra a tabela `users`. No macOS o default é `2`
+(o do servidor, em geral, e o do CI) o default é `0` — nomes de tabela
+**case-sensitive**, então `SELECT * FROM USERS` não encontra a tabela `users`. No macOS o default é `2`
 (case-insensitive), e uma consulta com o nome em caixa errada **passa local e
 quebra em produção**. É uma variável que a instância efêmera **não** consegue
 casar com produção quando a máquina é um Mac (o valor é fixado na inicialização e
@@ -59,7 +62,7 @@ não há motivo para um banco de teste subir no login da máquina.
 
 ```bash
 M=/opt/homebrew/opt/mariadb@10.5      # a série do servidor
-D=$HOME/sapos-mariadb-test
+D=<datadir local>                     # fora do repositório; reusável
 
 brew install mariadb@10.5
 mkdir -p $D/data
@@ -206,7 +209,7 @@ $M/bin/mysqladmin -h 127.0.0.1 -P 3307 -u root shutdown
 ps -eo pid,args | grep -E 'chromedriver|Chrome.*headless' | grep -v grep
 ```
 
-O datadir (`~/sapos-mariadb-test`, ~200 MB) é **estado reusável, não lixo**:
+O datadir (`$D`, ~200 MB) é **estado reusável, não lixo**:
 mantê-lo poupa o `mysql_install_db` da próxima rodada e, com o servidor
 desligado, não custa memória nenhuma. Apague só quando quiser o disco de volta ou
 quando a fidelidade do ambiente estiver em dúvida.

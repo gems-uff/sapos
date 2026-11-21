@@ -1,9 +1,15 @@
 ---
 name: release
-description: Integra na main o ramo de uma issue pronta e fecha a issue; e, quando o mantenedor decide soltar a versão, homologa a main e lança o que se acumulou nela — tag anotada, label nas issues, release publicada. Use ao terminar uma issue, ao lançar versão, ou para conferir como as releases anteriores foram feitas.
+description: Integra na main o ramo de uma issue pronta e fecha a issue; e, quando o mantenedor decide soltar a versão, homologa a main e lança o que se acumulou nela — tag anotada, label nas issues, release publicada. Use ao terminar uma issue, ao lançar versão, ou para conferir como as releases anteriores foram feitas. Integrar exige push na main; lançar é do mantenedor.
 ---
 
 # Integrar e lançar
+
+**Pré-condições.** Integrar: quem tem push na `main`. Lançar: o mantenedor,
+mais as pré-condições da skill `homologacao`, que o lançamento percorre.
+
+Se a instalação mantém parâmetros locais para esta skill (o contexto da sessão
+aponta onde), leia-os antes de começar.
 
 Duas sequências, em momentos diferentes:
 
@@ -146,11 +152,10 @@ Sem isso, o checkout de destino continua na tag antiga — e, porque o
 `git describe` roda lá, sobre as refs de lá, **o rodapé exibe a versão nova
 enquanto a aplicação serve o código velho**. É pior do que rodapé errado: o
 sinal em que se confia para conferir o deploy passa a confirmar o engano.
-Já aconteceu, em homologação, e só apareceu porque uma sonda mediu o
-comportamento em vez de ler o rodapé.
 
-Confira o deploy por **comportamento**, não por rodapé: uma medida que separe a
-versão nova da anterior — a skill `homologacao` serve para isso.
+Confira o deploy por **comportamento**, não por rodapé: só uma medida que separe
+a versão nova da anterior denuncia o checkout velho — a skill `homologacao`
+serve para isso.
 
 ### 5. Label nas issues
 
@@ -230,7 +235,7 @@ alerta ficou aberto antes disso.
 É o último passo, e é uma mensagem, não uma ação no repositório. Ela diz:
 
 - **A tag a passar no deploy**, pelo número. Versão errada no rodapé de
-  produção costuma ser a tag passada no deploy, não o Passenger.
+  produção costuma ser a tag passada no deploy, não o servidor de aplicação.
 - Se a tag foi **movida** (passo 4), que o destino precisa de
   `git fetch --tags --force` antes, senão o rodapé mente a favor.
 - **Como conferir o deploy por comportamento**, e não só pelo rodapé: a medida

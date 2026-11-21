@@ -361,17 +361,18 @@ comportamento.
 
 ## Dados sensíveis
 
-O banco de homologação é réplica de produção, com dado real de aluno. Nunca
-transcreva nome, e-mail, CPF ou nota para arquivos de trabalho, documentação ou
-comentários de issue e PR — comentário de issue é público e irreversível.
-Descreva achados genericamente: "aluno com nome acentuado", "registro id NNNN".
+Dado de pessoa real — nome, e-mail, CPF, matrícula, nota — não vai para o que
+se publica: commit, documentação, wiki, release, issue, PR e seus comentários.
+Nem para arquivo dentro do checkout, mesmo ignorado: está a um `git add` de ser
+publicado. Descreva achados genericamente: "aluno com nome acentuado",
+"registro id NNNN".
 
 **O que cada instalação criou pela tela também não vai para issue nem PR.**
 Consulta, notificação, template e variável são da instalação, e o repositório não
-os conhece; o mesmo vale para contagem medida em produção ou na réplica. Na issue,
+os conhece; o mesmo vale para contagem medida numa instalação. Na issue,
 descreva a classe do problema ("consultas criadas pela tela que citam coluna
-renomeada") e o conserto genérico. Nome, SQL, instância e número ficam com o
-mantenedor, na pasta local da rodada. O que vem do seed ou de migration está no
-repositório e pode ser citado. **Editar não apaga:** o GitHub guarda o histórico
+renomeada") e o conserto genérico, sem nome, SQL, instância nem número. O que
+vem do seed ou de migration está no repositório e pode ser citado.
+**Editar não apaga:** o GitHub guarda o histórico
 de edição, e a troca de título fica na linha do tempo. O que escapou só sai
 apagando o comentário ou a issue.

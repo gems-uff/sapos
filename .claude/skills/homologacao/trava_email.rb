@@ -6,7 +6,7 @@
 #
 #   set -a; source ~/.sapos_staging_env; set +a
 #   ssh "$SAPOS_STAGING_SSH" "f=\$(mktemp /tmp/trava.XXXXXX.rb); chmod 644 \$f; cat > \$f; \
-#     sudo -i -u $SAPOS_STAGING_INSTANCE bash -lc \"cd ~/instance && bundle exec rails runner \$f <endereco|VAZIA>\"; \
+#     sudo -i -u $SAPOS_STAGING_APP_USER bash -lc \"cd $SAPOS_STAGING_APP_DIR && bundle exec rails runner \$f <endereco|VAZIA>\"; \
 #     rm -f \$f" < trava_email.rb
 #
 # <endereco> destrava redirecionando; VAZIA repoe a trava mestra. O script

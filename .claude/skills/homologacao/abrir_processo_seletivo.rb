@@ -5,7 +5,7 @@
 # publico de inscricao fique alcancavel enquanto a rodada o exercita.
 #
 # QUANDO USAR: sempre que precisar do fluxo publico de inscricao (apply). A
-# replica nao tem processo aberto, e todos os processos dela vem com
+# copia nao tem processo aberto, e todos os processos dela vem com
 # require_session ligado -- ele faz o prepare_new_admission_application desviar
 # antes de o pedido chegar ao controller, entao sao dois campos a mexer, e nao
 # so a data. Processo novo, com inscricao ainda por comecar, tem tambem o inicio
@@ -21,7 +21,7 @@
 # `fechar` os restaura de la e confere o que gravou. Sao dois comandos, e nao um
 # so, porque o que se mede no meio muda a cada rodada.
 #
-# NAO ESQUECA O FECHAR. Processo aberto na replica aparece na tela publica e
+# NAO ESQUECA O FECHAR. Processo aberto na copia aparece na tela publica e
 # muda o que a proxima captura enxerga.
 #
 # Prefira exercitar o create: ele so precisa do processo aberto, enquanto o

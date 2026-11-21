@@ -28,7 +28,8 @@
 #   EXPLORE_OUT=<dir> bundle exec ruby probe_submissao.rb --confirmar
 #   bundle exec ruby abrir_processo_seletivo.rb fechar 5
 #
-# Env: SAPOS_PROCESSO_URL (padrao doutorado-2025-1) e SAPOS_CAMPO_ALVO, o rotulo
+# Env: SAPOS_PROCESSO_URL (obrigatoria, o simple_url do processo que o
+# abrir_processo_seletivo.rb abriu) e SAPOS_CAMPO_ALVO, o rotulo
 # do campo deixado em branco (padrao "local de expedi", casado no inicio do
 # rotulo -- "expedi" sozinho tambem casaria "Orgao expeditor").
 #
@@ -38,18 +39,20 @@
 # A limpeza tem duas metades. Pela tela ela apaga a candidatura -- mas a
 # candidatura so faz belongs_to do formulario preenchido, sem dependent, e a
 # tela de formularios nao tem exclusao: o formulario (com os ~50 campos) fica
-# orfao na replica a cada rodada, e muda a contagem de /filled_forms entre as
+# orfao na copia a cada rodada, e muda a contagem de /filled_forms entre as
 # fotos. A segunda metade roda no servidor (rails runner por ssh) e apaga so o
-# formulario orfao cujos campos levam o marcador. Pede SAPOS_STAGING_SSH (host
-# do ssh) e SAPOS_STAGING_INSTANCE (usuario unix da instancia, que tem a
-# aplicacao em ~/instance); sem eles a sonda avisa e o orfao fica.
+# formulario orfao cujos campos levam o marcador. Pede SAPOS_STAGING_SSH (destino
+# do ssh), SAPOS_STAGING_APP_USER (conta que roda a aplicacao) e
+# SAPOS_STAGING_APP_DIR (pasta da aplicacao); sem eles a sonda avisa e o orfao
+# fica.
 
 require "open3"
 require_relative "explore_common"
 
 CONFIRMAR = ARGV.include?("--confirmar")
 MANTER = ARGV.include?("--manter")
-PROCESSO_URL = ENV.fetch("SAPOS_PROCESSO_URL", "doutorado-2025-1")
+PROCESSO_URL = env_obrigatoria("SAPOS_PROCESSO_URL",
+  "simple_url do processo que o abrir_processo_seletivo.rb abriu")
 CAMPO_ALVO = ENV.fetch("SAPOS_CAMPO_ALVO", "local de expedi")
 MARCA = "ZZ-TESTE-HOMOLOG"
 RE_ALVO = /^#{CAMPO_ALVO}/i
@@ -193,7 +196,7 @@ def apaga_criadas(driver, wait, marca)
   sleep 2
   if driver.current_url.include?("sign_in")
     abort "LIMPEZA ABORTADA: a lista caiu no login. Nada foi apagado, e a " \
-          "candidatura marcada continua na replica -- apague-a antes da " \
+          "candidatura marcada continua na copia -- apague-a antes da " \
           "proxima rodada."
   end
   ids = driver.execute_script(<<~JS)
@@ -258,18 +261,20 @@ RUBY
 
 def apaga_formularios_orfaos(marca)
   host = ENV["SAPOS_STAGING_SSH"].to_s
-  inst = ENV["SAPOS_STAGING_INSTANCE"].to_s
-  if host.empty? || inst.empty?
-    puts "  AVISO: SAPOS_STAGING_SSH/SAPOS_STAGING_INSTANCE ausentes -- o " \
-         "formulario preenchido da candidatura apagada ficou orfao na replica"
+  app_user = ENV["SAPOS_STAGING_APP_USER"].to_s
+  app_dir = ENV["SAPOS_STAGING_APP_DIR"].to_s
+  if host.empty? || app_user.empty? || app_dir.empty?
+    puts "  AVISO: SAPOS_STAGING_SSH/SAPOS_STAGING_APP_USER/SAPOS_STAGING_APP_DIR " \
+         "ausentes -- o formulario preenchido da candidatura apagada ficou orfao " \
+         "na copia"
     return { verificado: false }
   end
-  abort "INSTANCIA sem 'staging': #{inst}" unless inst.include?("staging")
+  abort "APP_USER sem 'staging': #{app_user}" unless app_user.include?("staging")
 
   # Aspas DUPLAS no bash -lc: o $f tem de expandir no shell do ssh, que e quem
   # o criou; o shell do sudo e outro usuario e nao o conhece.
   remoto = "f=$(mktemp /tmp/orfaos.XXXXXX.rb); chmod 644 $f; cat > $f; " \
-           "sudo -i -u #{inst} bash -lc \"cd ~/instance && bundle exec rails runner $f #{marca}\"; " \
+           "sudo -i -u #{app_user} bash -lc \"cd #{app_dir} && bundle exec rails runner $f #{marca}\"; " \
            "rc=$?; rm -f $f; exit $rc"
   saida, status = Open3.capture2e("ssh", host, remoto, stdin_data: RUNNER_ORFAOS)
   linha = saida.lines.grep(/^apagados=/).last.to_s.strip
