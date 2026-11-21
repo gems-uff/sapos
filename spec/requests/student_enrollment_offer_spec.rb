@@ -100,6 +100,53 @@ RSpec.describe "StudentEnrollmentController offer check", type: :request do
       expect(classes_of(@course, @accredited)).to be_empty
     end
 
+    # A gravação recusada pelo modelo (aqui, choque de horário) acontece
+    # depois de criada a turma sob demanda, e a página volta com ela marcada
+    # entre as turmas. Reenviar a página, sem o choque, tem de valer.
+    it "accepts on resubmit the class created by a save the model refused" do
+      regular_type = FactoryBot.create(:course_type, on_demand: false)
+      first, second = 2.times.map do
+        course_class = FactoryBot.create(
+          :course_class,
+          course: FactoryBot.create(:course, course_type: regular_type),
+          professor: @outsider, year: 2026, semester: 2
+        )
+        FactoryBot.create(:allocation, course_class: course_class)
+        course_class
+      end
+
+      submit(
+        course_class_ids: [first.id, second.id],
+        course_ids: { @course => @accredited }
+      )
+      expect(response).to have_http_status(:ok)
+      expect(ClassEnrollmentRequest.count).to eq(0)
+      created = classes_of(@course, @accredited).sole
+
+      post "/enrollment/#{@enrollment.id}/enroll/2026-2", params: {
+        enrollment_request: {
+          course_class_ids: ["", first.id.to_s, created.id.to_s], message: "",
+          course_ids: {
+            @course.id.to_s => { selected: "0", professor: @accredited.id.to_s }
+          }
+        }
+      }
+
+      expect(response).to redirect_to(student_enrollment_path(@enrollment.id))
+      expect(ClassEnrollmentRequest.where(course_class: created).count).to eq(1)
+    end
+
+    it "rejects a class of the course from another semester" do
+      course_class = FactoryBot.create(
+        :course_class, course: @course, professor: @accredited,
+        year: 2020, semester: 1
+      )
+
+      submit(course_class_ids: [course_class.id])
+
+      rejected!
+    end
+
     it "rejects a course that is not on demand without creating a class" do
       regular = FactoryBot.create(
         :course, course_type: FactoryBot.create(:course_type, on_demand: false)

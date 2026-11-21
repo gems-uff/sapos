@@ -256,15 +256,14 @@ class StudentEnrollmentController < ApplicationController
     # view desenha, montada pelo mesmo prepare_class_schedule_table. Turma já
     # presente no pedido continua aceita, ainda que tenha saído da grade. Tudo
     # é conferido antes de criar a primeira turma sob demanda, para que o
-    # pedido recusado não deixe turma para trás.
+    # pedido recusado pela oferta não deixe turma para trás.
     def prepare_course_class_ids
       course_class_ids = enrollment_request_params[:course_class_ids] || []
       on_demand_course_ids = enrollment_request_params[:course_ids] || []
 
       course_class_ids.each do |course_class_id|
         next if course_class_id.blank?
-        next if offered[:class_ids].include?(course_class_id.to_s)
-        raise_not_offered unless already_requested?(course_class_id)
+        raise_not_offered unless class_offered?(course_class_id)
       end
 
       on_demand = on_demand_course_ids.to_h.filter_map do |course_id, data|
@@ -304,6 +303,21 @@ class StudentEnrollmentController < ApplicationController
         end
         offer
       end
+    end
+
+    # A turma sob demanda não vira linha da grade: ela entra pela linha da
+    # disciplina, e o professor dela, pelo seletor. Mesmo assim ela chega como
+    # turma quando a página volta de uma gravação que o modelo recusou depois
+    # de criá-la; vale se o professor está no seletor da disciplina.
+    def class_offered?(course_class_id)
+      return true if offered[:class_ids].include?(course_class_id.to_s)
+      return true if already_requested?(course_class_id)
+
+      course_class = CourseClass.find_by(
+        id: course_class_id, year: @semester.year, semester: @semester.semester
+      )
+      course_class.present? && offered[:professors]
+        .fetch(course_class.course_id, []).include?(course_class.professor_id)
     end
 
     def already_requested?(course_class_id)
