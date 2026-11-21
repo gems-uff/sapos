@@ -348,6 +348,18 @@ cada uma explica o porquê no próprio cabeçalho:
   o registro associado inteiro, por fora dos helpers de coluna e do que a tela
   esconde por papel. `spec/requests/scaffold_response_formats_spec.rb` percorre
   os scaffolds e acusa o formato que voltar a responder.
+- carrierwave-activerecord (o fork), as duas saem com ele:
+  `carrierwave_activerecord_no_overwrite.rb` (`prepend` na classe singleton
+  de `CarrierWave::Storage::ActiveRecord::File`, em `create!`): a linha de
+  `carrier_wave_files` já guardada não é regravada por envio novo com o
+  mesmo identificador. `carrierwave_activerecord_safe_delete.rb` (`prepend`
+  em `File`, `create!` e `delete_all` na singleton, `delete` e `destroy!` na
+  classe; `before_destroy` e `destroy_unreferenced!` no `ActiveRecordFile`):
+  a linha só se apaga por `destroy_unreferenced!`, que a trava e confere
+  todas as referências; o CarrierWave apagava o arquivo dos outros donos ao
+  excluir um dono ou desfazer uma gravação. Coluna nova que guarde arquivo
+  entra em `REFERENCES_BY_HASH`; `spec/config/carrierwave_safe_delete_spec.rb`
+  cobra isso.
 - Prawn: `prawn-grouping.rb`, cópia de patch de terceiro que usa `state.page` e
   `@bounding_box`. Suspeito num upgrade do Prawn, não do Rails.
 - prawn-table: `prawn_actual_text.rb` (`prepend` no `draw_content` privado de

@@ -16,14 +16,17 @@ RSpec.describe "Reports features", type: :feature do
     @destroy_all << @user = create_confirmed_user([@role_adm])
     @destroy_all << @user2 = create_confirmed_user([@role_adm], "user2@test.com", "User2")
 
-    @destroy_all << @carrierwave_file1 = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.create!(
+    # Os arquivos ficam para a varredura de fim de arquivo (LeakDetector), que
+    # apaga em bloco: a linha de carrier_wave_files nao se apaga pelo model
+    # (config/initializers/carrierwave_activerecord_no_overwrite.rb).
+    @carrierwave_file1 = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.create!(
       original_filename: "documento1.pdf",
       content_type: "application/pdf",
       binary: "test content",
       medium_hash: SecureRandom.hex(16)
     )
 
-    @destroy_all << @carrierwave_file2 = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.create!(
+    @carrierwave_file2 = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.create!(
       original_filename: "documento2.pdf",
       content_type: "application/pdf",
       binary: "test content",
