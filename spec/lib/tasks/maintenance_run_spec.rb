@@ -44,4 +44,17 @@ RSpec.describe "maintenance:run", type: :task do
     expect(Rails.logger).to have_received(:info).with(/\[Maintenance\] .* - Starting maintenance tasks/)
     expect(Rails.logger).to have_received(:info).with(/\[Maintenance\] .* - Finished maintenance tasks/)
   end
+
+  # Uma falha numa limpeza nao pode suspender as notificacoes, que vem por
+  # ultimo; e isolar nao pode virar silenciar: a task termina em falha depois
+  # de rodar todas (issue #699). O controle e o "invoca as tres subtarefas".
+  it "roda as seguintes quando uma subtarefa falha, e termina em falha", pending: "issue #699" do
+    allow(Rake::Task[subtarefas.first]).to receive(:invoke) do
+      @chamadas << subtarefas.first
+      raise NoMethodError, "falha numa limpeza"
+    end
+
+    expect { Rake::Task["maintenance:run"].invoke }.to raise_error(StandardError)
+    expect(@chamadas).to eq(subtarefas)
+  end
 end
