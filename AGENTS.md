@@ -137,6 +137,10 @@ engana quem a lê hoje.
   sobre quem usa, não o tamanho do conserto: trabalho perdido, configuração
   existente ignorada, dado exposto a quem não devia e usuário sem saída são Bug —
   mesmo quando corrigir exige construir o que ainda não existe.
+- **Defeito se conserta depois da reprodução.** Antes de mexer no código, o
+  spec que reproduz o defeito entra e é visto falhando pelo motivo certo, com um
+  controle que passa; só então vem o conserto, e o mesmo spec passa a ser a
+  cobertura dele. Spec escrito depois do conserto não prova que falharia sem ele.
 - **Reprodução de defeito: vermelha no PR devolvido, `pending` na issue.** Ao
   devolver um PR, a reprodução entra quebrando o ramo do autor — o vermelho é o
   alerta (ver a skill `revisar-pr`). Defeito que vira issue tem a reprodução na
