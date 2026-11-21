@@ -18,7 +18,7 @@ RSpec.describe "Reports features", type: :feature do
 
     # Os arquivos ficam para a varredura de fim de arquivo (LeakDetector), que
     # apaga em bloco: a linha de carrier_wave_files nao se apaga pelo model
-    # (config/initializers/carrierwave_activerecord_no_overwrite.rb).
+    # (config/initializers/carrierwave_activerecord_safe_delete.rb).
     @carrierwave_file1 = CarrierWave::Storage::ActiveRecord::ActiveRecordFile.create!(
       original_filename: "documento1.pdf",
       content_type: "application/pdf",

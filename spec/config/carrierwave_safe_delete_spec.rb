@@ -7,9 +7,8 @@ require "rails_helper"
 require "tmpdir"
 
 # config/initializers/carrierwave_activerecord_safe_delete.rb: a linha de
-# carrier_wave_files so se apaga por destroy_unreferenced!, depois de conferir
-# que nada aponta para ela.
-RSpec.describe "Arquivo guardado so se apaga sem dono" do
+# carrier_wave_files nao se apaga pela aplicacao.
+RSpec.describe "Arquivo guardado nao se apaga pela aplicacao" do
   let(:tabela) { CarrierWave::Storage::ActiveRecord::ActiveRecordFile }
 
   before(:each) do
@@ -82,18 +81,20 @@ RSpec.describe "Arquivo guardado so se apaga sem dono" do
       expect(tabela.find_by(medium_hash: campo.file_before_type_cast)).to be_present
     end
 
-    it "reaproveitar uma linha atualiza a data dela" do
+    # Escrever na linha compartilhada dentro da gravacao do dono derruba, em
+    # MariaDB, a gravacao simultanea de outro dono do mesmo arquivo.
+    it "reaproveitar uma linha nao escreve nela" do
       primeiro = grava("primeiro.pdf", "%PDF-1 conteudo A")
       linha = tabela.find_by(medium_hash: primeiro.file_before_type_cast)
       linha.update_column(:updated_at, 2.hours.ago)
 
       grava("segundo.pdf", "%PDF-1 conteudo A")
 
-      expect(linha.reload.updated_at).to be > 1.minute.ago
+      expect(linha.reload.updated_at).to be < 1.hour.ago
     end
   end
 
-  describe "apagar por fora do caminho seguro" do
+  describe "apagar a linha" do
     it "o model recusa" do
       linha = linha_antiga
 
@@ -109,70 +110,5 @@ RSpec.describe "Arquivo guardado so se apaga sem dono" do
         .to raise_error(CarrierWaveActiveRecordSafeDelete::Blocked)
       expect(tabela.count).to eq 1
     end
-  end
-
-  describe "#destroy_unreferenced!" do
-    it "apaga a linha sem dono gravada ha mais de uma hora (controle)" do
-      linha = linha_antiga
-
-      expect(linha.destroy_unreferenced!).to be true
-      expect(tabela.exists?(linha.id)).to be false
-    end
-
-    it "nao apaga a linha gravada ou reaproveitada ha menos do prazo" do
-      linha = linha_antiga
-      linha.touch
-
-      expect(linha.destroy_unreferenced!).to be false
-      expect(linha.destroy_unreferenced!(older_than: 0.seconds)).to be true
-    end
-
-    it "nao apaga a linha que um campo de formulario usa" do
-      campo = grava("primeiro.pdf", "%PDF-1 conteudo A")
-      linha = tabela.find_by(medium_hash: campo.file_before_type_cast)
-      linha.update_column(:updated_at, 2.hours.ago)
-
-      expect(linha.destroy_unreferenced!).to be false
-      expect(tabela.exists?(linha.id)).to be true
-    end
-
-    it "nao apaga a foto de um aluno" do
-      linha = linha_antiga("#{SecureRandom.hex(16)}.png")
-      FactoryBot.create(:student).update_column(:photo, linha.medium_hash)
-
-      expect(linha.destroy_unreferenced!).to be false
-    end
-
-    it "nao apaga a imagem de uma configuracao de relatorio" do
-      linha = linha_antiga("#{SecureRandom.hex(16)}.png")
-      FactoryBot.create(:report_configuration, scale: 1, x: 0, y: 0, image: nil)
-        .update_column(:image, linha.medium_hash)
-
-      expect(linha.destroy_unreferenced!).to be false
-    end
-
-    it "nao apaga o arquivo de um documento gerado" do
-      linha = linha_antiga
-      FactoryBot.create(:report, carrierwave_file: linha)
-
-      expect(linha.destroy_unreferenced!).to be false
-    end
-  end
-
-  # Coluna nova que guarde arquivo tem de entrar na lista, ou o caminho
-  # seguro apagaria o arquivo dela.
-  it "a lista de referencias cobre todo uploader montado e todo ponteiro para a tabela" do
-    Rails.application.eager_load!
-    modelos = ActiveRecord::Base.descendants.reject(&:abstract_class?)
-
-    montados = modelos.flat_map { |m| m.uploaders.keys.map { |c| [m.name, c.to_sym] } }.uniq
-    ponteiros = modelos.flat_map do |m|
-      m.reflect_on_all_associations(:belongs_to).filter_map do |a|
-        [m.name, a.foreign_key.to_sym] if a.options[:class_name] == tabela.name
-      end
-    end
-
-    expect(montados).to match_array(CarrierWaveActiveRecordSafeDelete::REFERENCES_BY_HASH.to_a)
-    expect(ponteiros).to eq [["Report", :carrierwave_file_id]]
   end
 end

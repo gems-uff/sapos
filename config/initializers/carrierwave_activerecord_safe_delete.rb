@@ -9,67 +9,27 @@
 # dono (after_commit do destroy) e ao desfazer uma gravacao (after_rollback),
 # e, antes da #696, a limpeza de documento vencido.
 #
-# Aqui a linha so se apaga por destroy_unreferenced!, que trava a linha,
-# confere que nenhuma coluna aponta para ela e so entao apaga. E o caminho do
-# coletor de orfaos. O resto:
+# Aqui a linha nao se apaga pela aplicacao:
 #
 # - a storage ignora o pedido de apagar, que o CarrierWave faz nos fluxos
 #   normais de excluir e desfazer;
-# - o model (destroy, delete) e a limpeza em bloco da storage recusam com
+# - o registro (destroy, delete) e a limpeza em bloco da storage recusam com
 #   erro, para que um codigo novo que tente apagar falhe a vista.
 #
-# O reaproveitamento de uma linha existente trava a linha e atualiza a data
-# dela dentro da gravacao do dono novo. Assim o coletor ou espera essa
-# gravacao terminar e ve o dono novo, ou apaga antes e a gravacao cria outra
-# linha; e o arquivo gerado sem model (PdfUploader), que grava o dono depois,
-# fica protegido pela idade minima.
+# Nao ha caminho de apagar, nem para a linha sem dono: decidir que uma linha
+# ficou sem dono exige travar a linha ou renovar a data dela dentro da gravacao
+# de cada dono novo, e isso, em MariaDB, derruba gravacoes simultaneas (a busca
+# com trava que nao acha linha segura o intervalo do indice ate o commit; a
+# escrita em linha alterada depois do retrato da transacao e recusada). As
+# linhas sem dono ficam ate a tabela sair, na troca do armazenamento (#672),
+# junto com o fork e com este arquivo.
 #
-# Sai junto com o fork, na troca do armazenamento (#672).
+# O bloqueio alcanca o registro e a storage. Exclusao pela classe ou por
+# relation (delete_all, delete_by) nao passa por callback e nao e barrada.
 module CarrierWaveActiveRecordSafeDelete
   class Blocked < StandardError
-    def initialize(msg = "arquivo guardado so se apaga por destroy_unreferenced!")
+    def initialize(msg = "arquivo guardado nao se apaga pela aplicacao")
       super
-    end
-  end
-
-  # Toda coluna que guarda o identificador (medium_hash) de um arquivo.
-  # spec/config/carrierwave_safe_delete_spec.rb confere a lista contra os
-  # uploaders montados.
-  REFERENCES_BY_HASH = {
-    "Admissions::FilledFormField" => :file,
-    "Student" => :photo,
-    "ReportConfiguration" => :image
-  }.freeze
-
-  def self.referenced?(row)
-    REFERENCES_BY_HASH.any? { |model, column| model.constantize.exists?(column => row.medium_hash) } ||
-      Report.exists?(carrierwave_file_id: row.id)
-  end
-
-  def self.permitting
-    previous = ActiveSupport::IsolatedExecutionState[:carrierwave_safe_delete]
-    ActiveSupport::IsolatedExecutionState[:carrierwave_safe_delete] = true
-    yield
-  ensure
-    ActiveSupport::IsolatedExecutionState[:carrierwave_safe_delete] = previous
-  end
-
-  def self.permitted?
-    ActiveSupport::IsolatedExecutionState[:carrierwave_safe_delete] == true
-  end
-
-  # O model da tabela.
-  module Row
-    # Apaga a linha se nada aponta para ela e se ela nao foi gravada nem
-    # reaproveitada ha menos de older_than. Devolve true se apagou.
-    def destroy_unreferenced!(older_than: 1.hour)
-      self.class.transaction do
-        lock!
-        next false if updated_at > older_than.ago
-        next false if CarrierWaveActiveRecordSafeDelete.referenced?(self)
-        CarrierWaveActiveRecordSafeDelete.permitting { destroy! }
-        true
-      end
     end
   end
 
@@ -85,23 +45,14 @@ module CarrierWaveActiveRecordSafeDelete
   end
 
   module StoredFileClassMethods
-    def create!(uploader, new_file, identifier)
-      CarrierWave::Storage::ActiveRecord::ActiveRecordFile.transaction do
-        CarrierWave::Storage::ActiveRecord::ActiveRecordFile
-          .lock.find_by(medium_hash: identifier)&.touch
-        super
-      end
-    end
-
     def delete_all
       raise Blocked
     end
   end
 end
 
-CarrierWave::Storage::ActiveRecord::ActiveRecordFile.include(CarrierWaveActiveRecordSafeDelete::Row)
 CarrierWave::Storage::ActiveRecord::ActiveRecordFile.before_destroy do
-  raise CarrierWaveActiveRecordSafeDelete::Blocked unless CarrierWaveActiveRecordSafeDelete.permitted?
+  raise CarrierWaveActiveRecordSafeDelete::Blocked
 end
 CarrierWave::Storage::ActiveRecord::File.prepend(CarrierWaveActiveRecordSafeDelete::StoredFile)
 CarrierWave::Storage::ActiveRecord::File.singleton_class.prepend(
