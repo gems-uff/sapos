@@ -55,7 +55,9 @@ engana quem a lê hoje.
   com um comentário dizendo o que falta.
 - **Exceção:** vulnerabilidade não ganha issue pública — enumerar o problema
   expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica,
-  e a release sai logo depois do merge, sem esperar as próximas issues.
+  e a release sai logo depois do merge, sem esperar as próximas issues. O
+  relato de fora chega pelo canal privado do GitHub que o `SECURITY.md`
+  descreve; se a política mudar, os dois mudam juntos.
 - Critério de pronto: `bundle exec rspec` inteiro verde. Rode **sem**
   `SKIP_COVERAGE=1` ao menos uma vez antes de fechar: é a configuração real da
   suíte, e o caminho do simplecov só é exercitado assim.
