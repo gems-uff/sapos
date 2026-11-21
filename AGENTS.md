@@ -287,13 +287,18 @@ cada uma explica o porquê no próprio cabeçalho:
 - active_scaffold, entrada que a gem aceita da URL sem conferir:
   `active_scaffold_embedded_conditions.rb` (`prepend` em
   `ActiveScaffold::Finder`; só o marcador de pendência vale em
-  `embedded[conditions]`), `active_scaffold_date_trend_unit.rb` (`prepend` em
+  `embedded[conditions]`), `active_scaffold_embedded_constraints.rb`
+  (`prepend` em `ActiveScaffold::Constraints`; nada de `embedded[constraints]`
+  vale, nem no filtro da lista nem no setter do registro novo — o SAPOS não
+  embute lista com `constraints:`, e quem passar a embutir precisa mexer
+  aqui), `active_scaffold_date_trend_unit.rb` (`prepend` em
   `Finder::ClassMethods#datetime_from_to` — não em `condition_for_datetime`, que
   o bridge `date_picker` apelida e cujo apelido perderia o `super`) e
   `active_scaffold_return_to.rb` (`prepend` em `Helpers::ControllerHelpers`;
-  `return_to` só interno). Os três entram por `prepend` no módulo porque a
+  `return_to` só interno). Os quatro entram por `prepend` no módulo porque a
   chamada `active_scaffold` inclui o módulo em cada controller, na frente de um
   método do `ApplicationController`.
+  `spec/requests/scaffold_embedded_constraints_spec.rb` percorre os scaffolds.
 - active_scaffold, filtro da lista vindo da URL:
   `active_scaffold_list_url_columns.rb` (`prepend` em
   `ActiveScaffold::Actions::Core#conditions_from_params`). A gem filtra a
