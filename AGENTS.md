@@ -34,7 +34,10 @@ engana quem a lê hoje.
 ## Convenções de trabalho
 
 - Uma issue, um ramo `issue_NNN`, sempre baseado na `main`. Detalhes do ciclo em
-  `CONTRIBUTING.md`.
+  `CONTRIBUTING.md`. **O mantenedor é a exceção:** o que está na `main` é o que
+  ele lança, então numa sessão com várias issues para uma release ele trabalha
+  direto na `main`, um commit por assunto, e o push sai com a release. Não
+  proponha ramo a ele por pureza de escopo.
 - **O assunto do commit começa por `Issue #NNN: `**, com o número da issue do
   ramo. O GitHub transforma o número em link, e o assunto é o que aparece na
   lista de commits e no `git log --oneline`. Depois do prefixo sobram cerca de
@@ -96,7 +99,9 @@ engana quem a lê hoje.
   trabalho, mostre o diff e o resultado da suíte, e espere o mantenedor revisar.
   Commit, tag e push são dele — inclusive nos passos de baby-step, onde é fácil
   achar que "um commit por gem" autoriza commitar sozinho. Vale também para
-  ramo novo: crie só quando pedirem.
+  ramo novo: crie só quando pedirem. Reescrever commit já publicado
+  (`--amend`, `rebase`) exige force-push: pergunte antes de reescrever,
+  dizendo isso, mesmo com autorização para mudar a mensagem.
 - Documentação e comentário falam em **"mantenedor"**, não em nome próprio —
   o papel sobrevive a quem o exerce.
 - **Antes de abrir issue, pesquise as existentes — inclusive as fechadas —**
@@ -179,14 +184,15 @@ ordem do ciclo.
 - `homologacao` — compara o SAPOS antes e depois em homologação.
 - `release` — integra a issue pronta na `main` e a fecha; quando o mantenedor decide, homologa a `main` e lança a versão (tag, label, release publicada).
 
-### Skill é procedimento, não diário de bordo
+### Skill e `AGENTS.md` são procedimento, não diário de bordo
 
 Ao anotar aprendizado numa skill, o teste é: **uma rodada futura faria algo
 diferente por causa desta linha?** Passa o mecanismo e a consequência ("a rota X
 responde 500 no papel Aluno, ignore"; "`--flatten` é obrigatório, senão a bbox vem
 vazia"). Não passa *quando* foi medido, em que versão, qual issue descobriu, nem
 que o problema já foi corrigido — isso o `git log` já guarda, e na skill só
-cresce.
+cresce. No `AGENTS.md`, o teste é se a frase continua verdadeira quando o
+trabalho atual terminar: "estes 4 specs falham hoje em MariaDB" não passa.
 
 Esse contexto tem para onde ir: **comentário na issue**. Medida de antes e
 depois, versão em que o defeito aparecia, caminho que a rodada usou para
