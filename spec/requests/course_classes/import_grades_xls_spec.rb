@@ -250,9 +250,11 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
 
     it "ignora valores forjados no payload de confirmacao, usando os calculados no servidor" do
       enviar(inscricao, nota: "8,7")
+      token = Nokogiri::HTML(response.body).at_css("input[name=token]")["value"]
 
       post import_grades_xls_course_class_path(turma), params: {
         confirm: "1",
+        token: token,
         changes: [{
           class_enrollment_id: inscricao.id, status: "pending",
           final_grade: "999", final_attendance: true,
@@ -703,6 +705,56 @@ RSpec.describe "Importacao de notas por planilha", type: :request do
 
       get import_grades_xls_course_class_path(turma, cancel: 1, token: token)
       post import_grades_xls_course_class_path(turma),
+        params: { confirm: "1", token: token }
+
+      expect(inscricao.reload.grade).to be_nil
+    end
+    it "substitui a previa anterior do mesmo usuario na mesma turma" do
+      enviar(inscricao, nota: "8,7")
+      token_antigo = token_da_previa
+      enviar(inscricao, nota: "5,0")
+
+      expect(ImportGradePreview.where(course_class_id: turma.id).count).to eq(1)
+      expect(ImportGradePreview.exists?(token: token_antigo)).to eq(false)
+    end
+
+    it "apaga a previa ao confirmar" do
+      enviar(inscricao, nota: "8,7")
+      confirmar
+
+      expect(ImportGradePreview.count).to eq(0)
+    end
+
+    it "apaga a previa ao cancelar" do
+      enviar(inscricao, nota: "8,7")
+      get import_grades_xls_course_class_path(turma, cancel: 1, token: token_da_previa)
+
+      expect(ImportGradePreview.count).to eq(0)
+    end
+
+    it "recusa o token de previa de outro usuario" do
+      enviar(inscricao, nota: "8,7")
+      outro = create_confirmed_user([FactoryBot.create(:role_administrador)], "outro@ic.uff.br")
+      alheia = ImportGradePreview.create!(
+        user: outro, course_class: turma, token: SecureRandom.hex(16),
+        data: ImportGradePreview.last.data
+      )
+
+      post import_grades_xls_course_class_path(turma),
+        params: { confirm: "1", token: alheia.token }
+
+      expect(inscricao.reload.grade).to be_nil
+      expect(flash[:error]).to eq(
+        I18n.t("xls_content.course_class.import_grades_xls_stale_preview")
+      )
+    end
+
+    it "recusa o token de previa de outra turma" do
+      enviar(inscricao, nota: "8,7")
+      token = token_da_previa
+      outra_turma = FactoryBot.create(:course_class, course: course)
+
+      post import_grades_xls_course_class_path(outra_turma),
         params: { confirm: "1", token: token }
 
       expect(inscricao.reload.grade).to be_nil

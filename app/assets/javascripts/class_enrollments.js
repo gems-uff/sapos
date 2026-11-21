@@ -1,36 +1,45 @@
 $(function() {
+  function rowOf(el) {
+    return $(el).closest('tr, .as_form, form');
+  }
+  function changeSituationInput(context, situation){
+    if (!situation) return;
+    var situationSelect = rowOf(context).find('.situation-input');
+    if(situationSelect.val() != situation){
+      situationSelect.val(situation).trigger('change');
+    }
+  }
+
   $(document).on('change', '.disapproved_by_absence-input', function() {
-    if(this.checked){
-      var course_has_grade = this.getAttribute("course_has_grade");
-      var target_row = $(this).closest("tr");
-      if (course_has_grade == "true") {
-        var grade_of_disapproval_for_absence = this.getAttribute("grade_of_disapproval_for_absence");
-        if (grade_of_disapproval_for_absence != "") {
-          var grade = target_row.find(".grade-input").val().replace(/\s+/g, '').replace(",", ".");
-          if (grade == ""){
-            target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
+    if (!this.checked) return;
+    var target_row = rowOf(this);
+    var gradeInput = target_row.find(".grade-input");
+    var disapproved_label = this.getAttribute('data_disapproved') || gradeInput.attr('data_disapproved');
+    if (this.getAttribute("course_has_grade") == "true") {
+      var grade_for_absence = this.getAttribute("grade_of_disapproval_for_absence");
+      if (grade_for_absence) {
+        var grade = gradeInput.val().replace(/\s+/g, '').replace(",", ".");
+        if (grade == ""){
+          gradeInput.val(grade_for_absence).trigger("input");
+        }
+        else{
+          var msg = this.getAttribute('overwrite_confirm_msg').replace('%{actual_grade}', grade.replace('.', ',')).replace('%{grade_for_disapproval}', grade_for_absence.replace('.', ','));
+          if(confirm(msg)){
+            gradeInput.val(grade_for_absence).trigger("input");
           }
           else{
-            var msg = this.getAttribute('overwrite_confirm_msg').replace('%{actual_grade}', grade.replace('.', ',')).replace('%{grade_for_disapproval}', grade_of_disapproval_for_absence.replace('.', ','));
-            if(confirm(msg)){
-              target_row.find(".grade-input").val(grade_of_disapproval_for_absence).trigger("input");
-            }
-            else{
-              this.checked = false;
-            }
+            this.checked = false;
+            return;
           }
         }
       }
-      else{
-        var disapproved_label = this.getAttribute('data_disapproved');
-        changeSituationInput(target_row,disapproved_label);
-      }
     }
+    changeSituationInput(target_row, disapproved_label);
   });
   $(document).on('change', '.grade_not_count_in_gpr-input', function() {
     if (this.checked) return;
 
-    var row = $(this).closest('tr');
+    var row = rowOf(this);
 
     if (row.find('.disapproved_by_absence-input').is(':checked')) return;
 
@@ -38,28 +47,25 @@ $(function() {
 
     if (gradeInput.val() !== ''){ gradeInput.trigger('input');}
   });
-  function changeSituationInput(context,situation){
-    var row = context.closest('tr');
-    var situationSelect = row.find('.situation-input');
-    if(situationSelect.val() != situation){
-      situationSelect.val(situation).trigger('change');
-    }
-  }
+
   $(document).on('focus','.grade-input',function(){
-    var placeholder = this.getAttribute('grade_placeholder');
-    $(this).attr('placeholder',placeholder);
+    $(this).attr('placeholder', this.getAttribute('grade_placeholder'));
   });
   $(document).on('blur','.grade-input',function(){
     $(this).attr('placeholder','');
   });
   $(document).on('input', '.grade-input', function() {
     var input = this;
+    var target_row = rowOf(this);
+    var not_count_checkbox = target_row.find(".grade_not_count_in_gpr-input");
+    var not_counting = not_count_checkbox.length > 0 && not_count_checkbox.is(":checked");
     var cursorPos = input.selectionStart;
     var oldLength = input.value.length;
     var digits = $(this).val().replace(/\D/g, '');
     if (digits === ''){
-      var registered_label = this.getAttribute('data_registered');
-      changeSituationInput($(this), registered_label);
+      if (!not_counting) {
+        changeSituationInput($(this), this.getAttribute('data_registered'));
+      }
       return;
     }
     var number = parseInt(digits, 10);
@@ -72,21 +78,17 @@ $(function() {
     var newCursorPos = cursorPos + (newLength - oldLength);
     newCursorPos = Math.max(0, Math.min(newCursorPos,newLength));
     input.setSelectionRange(newCursorPos,newCursorPos);
-    var target_row = $(this).closest("tr");
-    var not_count_checkbox = target_row.find(".grade_not_count_in_gpr-input");
-    if (not_count_checkbox.length && not_count_checkbox.is(":checked")) {
+    if (not_counting) {
       return;
     }
 
     var minimum_grade = this.getAttribute('minimum_grade_for_approval');
     var actual_grade = parseFloat(formatted.replace(',','.'));
     if(actual_grade >= minimum_grade){
-      var approved_label = this.getAttribute('data_approved');
-      changeSituationInput($(this),approved_label);
+      changeSituationInput($(this), this.getAttribute('data_approved'));
     }
     else{
-      var disapproved_label = this.getAttribute('data_disapproved');
-      changeSituationInput($(this),disapproved_label);
+      changeSituationInput($(this), this.getAttribute('data_disapproved'));
     }
   });
   $(document).on('keydown','.grade-input',function(e){
@@ -108,7 +110,7 @@ $(function() {
       var input = this;
       if (input.selectionStart !== input.selectionEnd){
         return;
-      }      
+      }
       if (/^0[,.]\d$/.test($(this).val())){
         e.preventDefault();
         $(this).val('').trigger('input');

@@ -9,7 +9,10 @@ module SubformColumnsHelper
   def subform_column_omitted?(column, parent_record)
     return false unless COLUMNS_WITHOUT_SCORE.include?(column.name)
     return false unless parent_record.respond_to?(:course)
+    return false unless parent_record.course.try(:course_type).try(:has_score) == false
 
-    parent_record.course.try(:course_type).try(:has_score) == false
+    return true unless column.name == :grade
+
+    parent_record.class_enrollments.none? { |ce| !ce.grade.nil? }
   end
 end

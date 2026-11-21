@@ -1,4 +1,9 @@
 <%= form_tag import_grades_xls_course_class_path(@course_class), multipart: true, class: "as_form update", "data-loading": true do %>
+    <% if flash[:error].present? %>
+        <div class="import-error" style="background:#f8d7da; color:#842029; padding:8px 12px; border:1px solid #f5c2c7; border-radius:4px; margin:10px;">
+            <%= flash[:error] %>
+        </div>
+    <% end %>
     <h4 style="text-align: center;"> <%= I18n.t("xls_content.course_class.import_grades_xls_title", course: @course_class.label_with_course) %></h4>
     <div style="padding-top: 0.3em;display: flex; align-items: center; justify-content: center; width: 100%; gap: 20px;">
         <div style="margin: 0 auto; display: flex; align-items: center; gap: 10px;">

@@ -129,6 +129,7 @@
                 <% has_invalid_grade = true %>
               <% elsif result[:grade_diff] %>
                 <span style="color:#b00;" title="<%= I18n.t("xls_content.course_class.import_grades_xls_results.grade_diff_tooltip") %>">*</span>
+                <% has_situation_diff = true %>
               <% end %>
             </td>
 
@@ -155,6 +156,9 @@
             </td>
 
             <td>
+              <% if result[:final_obs].present? %>
+                <div><%= result[:final_obs] %></div>
+              <% end %>
               <% if result[:validation_errors].present? %>
                 <div style="color:#b00; font-size:0.85em;">
                   <%= result[:validation_errors].join("; ") %>

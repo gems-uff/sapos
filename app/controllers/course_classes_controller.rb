@@ -9,6 +9,8 @@ class CourseClassesController < ApplicationController
   include SharedXlsConcern
   include NumbersHelper
 
+  IMPORT_SESSION_KEY = "xls_import_grades"
+
   before_action :remove_constraint_to_show_enrollment_column, only: [:edit]
 
   active_scaffold :course_class do |config|
@@ -159,9 +161,8 @@ class CourseClassesController < ApplicationController
     authorize! :import_grades_xls, @course_class
 
     if request.get? && params[:cancel] == "1"
-      stored_results = session[xls_import_session_key(@course_class)]
-      if stored_results.present? && stored_results[:token] == params[:token]
-        session.delete(xls_import_session_key(@course_class))
+      if find_import_preview(params[:token])
+        discard_import_preview
       else
         flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_stale_preview")
       end
@@ -169,27 +170,27 @@ class CourseClassesController < ApplicationController
     end
 
     if request.post? && params[:confirm] == "1"
-      stored_results = session[xls_import_session_key(@course_class)]
-      if stored_results.blank? || stored_results[:rows].blank?
-        flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_nothing_saved")
-        redirect_to course_classes_path and return
-      end
-
-      if stored_results[:has_rejected_rows]
-        flash[:error] = t(".import_grades_xls_rejected_rows")
-        redirect_to action: :import_grades_xls
-        return
-      end
-
-      if params[:token].present? && stored_results[:token] != params[:token]
+      preview = find_import_preview(params[:token])
+      unless preview
+        if session[IMPORT_SESSION_KEY].blank?
+          flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_nothing_saved")
+          redirect_to course_classes_path and return
+        end
         flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_stale_preview")
         redirect_to import_grades_xls_course_class_path(@course_class) and return
       end
 
-      if stored_results[:stored_at] < CustomVariable.import_grades_session_timeout.ago
-        session.delete(xls_import_session_key(@course_class))
+      if preview.expired?
+        discard_import_preview
         flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_expired")
         redirect_to import_grades_xls_course_class_path(@course_class) and return
+      end
+
+      stored_results = preview.payload
+      if stored_results[:rows].blank?
+        discard_import_preview
+        flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_nothing_saved")
+        redirect_to course_classes_path and return
       end
 
       recomputed = stored_results[:rows].map do |row|
@@ -209,15 +210,20 @@ class CourseClassesController < ApplicationController
           class_enrollment.grade != row[:snapshot_grade] ||
           class_enrollment.situation != row[:snapshot_situation] ||
           class_enrollment.disapproved_by_absence != row[:snapshot_attendance] ||
-          class_enrollment.grade_not_count_in_gpr != row[:snapshot_grade_not_count_in_gpr]
+          class_enrollment.grade_not_count_in_gpr != row[:snapshot_grade_not_count_in_gpr] ||
+          class_enrollment.obs.to_s != row[:snapshot_obs].to_s
         )
         result
       end
 
+      total_rows = stored_results[:total_rows] || recomputed.size
+
       if recomputed.any? { |r| r[:diverged] || r[:status] != "pending" }
         @results = recomputed
-        @token = stored_results[:token]
-        store_import_preview(recomputed, stored_at: stored_results[:stored_at], token: @token)
+        @token = preview.token
+        # created_at fica como estava: a expiracao conta do envio original.
+        preview.payload = build_preview_payload(recomputed, total_rows)
+        preview.save!
         flash.now[:warning] = I18n.t("xls_content.course_class.import_grades_xls_results.data_changed_warning")
         render :import_grades_xls_results and return
       end
@@ -234,21 +240,27 @@ class CourseClassesController < ApplicationController
         }
       end
 
-      saved_count, failed, notification_failures = apply_xls_import_changes(changes)
-      session.delete(xls_import_session_key(@course_class))
+      saved_count, failure, notification_failures = apply_xls_import_changes(changes)
+      discard_import_preview
 
-      if saved_count > 0
-        flash[:info] = I18n.t("xls_content.course_class.import_grades_xls_success", count: saved_count)
+      if failure
+        flash[:error] = I18n.t(
+          "xls_content.course_class.import_grades_xls_none_saved",
+          details: "#{failure[:enrollment_number]}: #{failure[:errors].join(", ")}"
+        )
+      elsif saved_count == 0
+        flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_nothing_saved")
+      else
+        pending_count = total_rows - saved_count
+        flash[:info] =
+          if pending_count <= 0
+            I18n.t("xls_content.course_class.import_grades_xls_success", count: saved_count)
+          else
+            I18n.t("xls_content.course_class.import_grades_xls_success_with_pending", saved: saved_count, total: total_rows, pending: pending_count)
+          end
         if notification_failures.any?
           flash[:warning] = I18n.t("xls_content.course_class.import_grades_xls_notification_failure", enrollment_numbers: notification_failures.join(", "))
         end
-      end
-
-      if failed.any?
-        flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_partial_failure",
-        details: failed.map { |f| "#{f[:enrollment_number]}: #{f[:errors].join(", ")}" }.join("; "))
-      elsif saved_count == 0
-        flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_nothing_saved")
       end
 
       redirect_to course_classes_path and return
@@ -258,6 +270,12 @@ class CourseClassesController < ApplicationController
         @token = SecureRandom.hex(16)
         store_import_preview(@results, token: @token)
         render :import_grades_xls_results and return
+      rescue SpreadsheetTooLarge
+        flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_too_large")
+        redirect_to import_grades_xls_course_class_path(@course_class) and return
+      rescue SpreadsheetEmpty
+        flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_empty")
+        redirect_to import_grades_xls_course_class_path(@course_class) and return
       rescue ArgumentError
         flash[:error] = I18n.t("xls_content.course_class.import_grades_xls_error")
         redirect_to import_grades_xls_course_class_path(@course_class) and return
@@ -295,10 +313,6 @@ class CourseClassesController < ApplicationController
       Thread.current[:constraint_columns]["class_enrollment-subform"]
         .delete(:enrollment)
     rescue
-    end
-
-    def xls_import_session_key(course_class)
-      "xls_import_grades_#{course_class.id}"
     end
 
     def build_xls_import_preview(file)
@@ -378,13 +392,11 @@ class CourseClassesController < ApplicationController
       minimum_grade_for_approval = CustomVariable.minimum_grade_for_approval
 
       if data[:grade].present?
-        normalized_grade = data[:grade].to_s.strip.tr(",", ".")
-        if normalized_grade.match?(/\A\d+(\.\d)?\z/) && normalized_grade.to_f.between?(0, 10)
-          imported_grade_scaled = normalized_grade.to_f * 10
+        imported_grade_scaled = parse_import_grade(data[:grade])
+        if imported_grade_scaled
           final_grade = imported_grade_scaled
           invalid_grade = false
         else
-          imported_grade_scaled = nil
           final_grade = class_enrollment.grade
           invalid_grade = true
         end
@@ -418,7 +430,9 @@ class CourseClassesController < ApplicationController
 
       if !final_attendance
         final_situation = ClassEnrollment::DISAPPROVED
-        final_grade = grade_of_disapproval_for_absence if class_enrollment.course_has_grade
+        if class_enrollment.course_has_grade && !grade_of_disapproval_for_absence.nil?
+          final_grade = grade_of_disapproval_for_absence
+        end
       elsif final_grade.present? && !class_enrollment.grade_not_count_in_gpr?
         final_situation = final_grade.to_f >= minimum_grade_for_approval ? ClassEnrollment::APPROVED : ClassEnrollment::DISAPPROVED
       end
@@ -426,7 +440,16 @@ class CourseClassesController < ApplicationController
       final_obs = data[:obs].present? ? data[:obs] : class_enrollment.obs
       final_grade_view = final_grade.present? ? (final_grade.to_f / 10.0).to_s.tr(".", ",") : nil
       validation_errors = prospective_validation_errors(class_enrollment, final_grade, final_attendance, final_situation, final_obs)
-      status = (invalid_grade || validation_errors.any?) ? "invalid" : "pending"
+      nothing_to_launch = data[:grade].blank? &&
+        final_grade == class_enrollment.grade &&
+        final_situation == class_enrollment.situation &&
+        final_attendance == !class_enrollment.disapproved_by_absence &&
+        final_obs.to_s == class_enrollment.obs.to_s
+      status =
+        if invalid_grade || validation_errors.any? then "invalid"
+        elsif nothing_to_launch then "unchanged"
+        else "pending"
+        end
 
       {
         enrollment_number: enrollment_number,
@@ -434,6 +457,7 @@ class CourseClassesController < ApplicationController
         status: status,
         current_grade: class_enrollment.grade_to_view.to_s.tr(".", ","),
         current_grade_raw: class_enrollment.grade,
+        current_obs_raw: class_enrollment.obs,
         imported_grade: data[:grade],
         final_grade: final_grade,
         final_grade_view: final_grade_view,
@@ -455,8 +479,6 @@ class CourseClassesController < ApplicationController
         final_obs: final_obs,
         imported_obs: data[:obs],
         diverged: false,
-
-
         validation_errors: validation_errors
       }
     end
@@ -471,11 +493,20 @@ class CourseClassesController < ApplicationController
       probe.errors.full_messages
     end
 
-    def store_import_preview(results, stored_at: Time.current, token:)
-      session[xls_import_session_key(@course_class)] = {
-        stored_at: stored_at,
-        token: token,
-        has_rejected_rows: results.any? { |r| r[:status] != "pending" },
+    def find_import_preview(token)
+      return nil if token.blank?
+      preview = ImportGradePreview.find_by(token: token.to_s)
+      preview if preview&.owned_by?(current_user, @course_class)
+    end
+
+    def discard_import_preview
+      token = session.delete(IMPORT_SESSION_KEY)
+      ImportGradePreview.where(token: token).delete_all if token.present?
+    end
+
+    def build_preview_payload(results, total_rows)
+      {
+        total_rows: total_rows,
         rows: results.filter_map do |r|
           next unless r[:status] == "pending"
           {
@@ -488,40 +519,65 @@ class CourseClassesController < ApplicationController
             snapshot_grade: r[:current_grade_raw],
             snapshot_situation: r[:current_situation],
             snapshot_attendance: r[:current_attendance_raw],
-            snapshot_grade_not_count_in_gpr: r[:current_grade_not_count_in_gpr_raw]
+            snapshot_grade_not_count_in_gpr: r[:current_grade_not_count_in_gpr_raw],
+            snapshot_obs: r[:current_obs_raw]
           }
         end
       }
     end
 
+    def store_import_preview(results, token:)
+      ImportGradePreview.replace!(
+        user: current_user, course_class: @course_class, token: token,
+        payload: build_preview_payload(results, results.size)
+      )
+      session[IMPORT_SESSION_KEY] = token
+    end
+
     def apply_xls_import_changes(changes)
-      saved_count = 0
-      failed = []
-      updated_enrollments = []
-      changes.each do |change|
-        next unless change[:status] == "pending"
-        class_enrollment = @course_class.class_enrollments.find_by(id: change[:class_enrollment_id])
-        next unless class_enrollment
-        ClassEnrollment.transaction(requires_new: true) do
-          class_enrollment.grade = change[:final_grade]
-          class_enrollment.disapproved_by_absence = !change[:final_attendance]
-          class_enrollment.situation = change[:final_situation]
-          class_enrollment.obs = change[:final_obs]
-          class_enrollment.skip_notification = true
-          if class_enrollment.save
-            saved_count += 1
-            updated_enrollments << class_enrollment
-          else
-            failed << {
-              enrollment_number: change[:enrollment_number],
-              errors: class_enrollment.errors.full_messages
-            }
-            raise ActiveRecord::Rollback
+      updated = []
+      failure = nil
+      current_number = nil
+      notify_professor = false
+      begin
+        ClassEnrollment.transaction do
+          changes.each do |change|
+            next unless change[:status] == "pending"
+            class_enrollment = @course_class.class_enrollments.find_by(id: change[:class_enrollment_id])
+            next unless class_enrollment
+            current_number = change[:enrollment_number]
+
+            class_enrollment.grade = change[:final_grade]
+            class_enrollment.disapproved_by_absence = !change[:final_attendance]
+            class_enrollment.situation = change[:final_situation]
+            class_enrollment.obs = change[:final_obs]
+            class_enrollment.skip_notification = true
+            notify_professor ||= class_enrollment.should_send_email_to_professor?
+
+            unless class_enrollment.save
+              failure = {
+                enrollment_number: current_number,
+                errors: class_enrollment.errors.full_messages
+              }
+              raise ActiveRecord::Rollback
+            end
+            updated << class_enrollment
           end
         end
+      rescue ActiveRecord::ActiveRecordError => e
+        log_import_exception("gravacao", e)
+        failure = { enrollment_number: current_number, errors: [e.message] }
       end
-      notification_failures = notify_import_changed(updated_enrollments)
-      [saved_count, failed, notification_failures]
+      return [0, failure, []] if failure
+      notification_failures = notify_import_changed(updated)
+      if notify_professor && !notify_professor_of_import
+        notification_failures << @course_class.professor.email
+      end
+      [updated.size, nil, notification_failures]
+    end
+
+    def log_import_exception(context, error)
+      Rails.logger.error("[import_grades_xls] #{context}: #{error.class}: #{error.message}")
     end
 
     def notify_import_changed(enrollments)
@@ -530,10 +586,36 @@ class CourseClassesController < ApplicationController
         class_enrollment.skip_notification = false
         begin
           class_enrollment.send(:notify_student_and_advisor)
-        rescue StandardError
+        rescue StandardError => e
+          log_import_exception("notificacao de aluno/orientador", e)
           notification_failures << class_enrollment.enrollment.enrollment_number
         end
       end
       notification_failures
+    end
+
+    def notify_professor_of_import
+      professor_email = @course_class.professor&.email
+      return true if professor_email.blank?
+      email = EmailTemplate.load_template("course_classes:email_to_professor")
+        .prepare_message({ record: @course_class })
+      Notifier.send_emails(notifications: [email])
+      true
+    rescue StandardError => e
+      log_import_exception("notificacao do professor", e)
+      false
+    end
+
+    def parse_import_grade(raw)
+      if raw.is_a?(Numeric)
+        value = raw.to_f
+      else
+        text = raw.to_s.strip.tr(",", ".")
+        return nil unless text.match?(/\A\d+(\.\d)?\z/)
+        value = text.to_f
+      end
+      scaled = (value * 10).round
+      return nil unless (value * 10 - scaled).abs < 1e-6 && scaled.between?(0, 100)
+      scaled
     end
 end

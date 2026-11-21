@@ -37,7 +37,7 @@ RSpec.describe SharedXlsConcern, type: :concern do
     it "returns the grade value for filled cells" do
       result = parse_rows_xls(xlsx_file)
       row = result.find { |row| row[:enrollment_number] == "101" }
-      expect(row[:grade]).to eq("8.7")
+      expect(row[:grade]).to eq(8.7)
     end
 
     it "returns nil for empty grade cells" do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_17_164902) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_18_120000) do
   create_table "accomplishments", force: :cascade do |t|
     t.date "conclusion_date"
     t.datetime "created_at", precision: nil, null: false
@@ -620,6 +620,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_17_164902) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.index ["professor_id"], name: "index_grants_on_professor_id"
+  end
+
+  create_table "import_grade_previews", force: :cascade do |t|
+    t.integer "course_class_id", null: false
+    t.datetime "created_at", null: false
+    t.text "data", limit: 16777216, null: false
+    t.string "token", null: false
+    t.integer "user_id", null: false
+    t.index ["course_class_id"], name: "index_import_grade_previews_on_course_class_id"
+    t.index ["token"], name: "index_import_grade_previews_on_token", unique: true
+    t.index ["user_id"], name: "index_import_grade_previews_on_user_id"
   end
 
   create_table "institutions", force: :cascade do |t|
