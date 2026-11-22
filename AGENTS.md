@@ -91,9 +91,9 @@ engana quem a lê hoje.
 - **O que o `before(:all)` cria é commitado** e atravessaria a fronteira entre
   grupos, inclusive o que as factories criam por associação. Uma varredura ao fim
   de cada arquivo apaga o que sobrou, então **não escreva limpeza manual em
-  `after(:all)`** — foi ela que errou em 90 arquivos (#643). A suíte avisa no fim
-  se algo escapar, `LEAK_AUDIT=1` diz de qual grupo veio, `LEAK_CHECK=strict`
-  transforma o aviso em falha.
+  `after(:all)`** — foi ela que errou em 90 arquivos (#643). A suíte falha no fim
+  se algo escapar, `LEAK_AUDIT=1` diz de qual grupo veio, `LEAK_CHECK=warn`
+  rebaixa a falha a aviso para investigar sem travar.
 - **Envolver o contexto em transação parece o conserto e não é.** Passa inteira
   em SQLite e quebra sete exemplos em MariaDB: `Query#run_read_only_query` abre
   cliente próprio e a rake task de notificações é outro processo — nenhum dos
