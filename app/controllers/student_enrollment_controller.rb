@@ -258,7 +258,8 @@ class StudentEnrollmentController < ApplicationController
     # view desenha, montada pelo mesmo prepare_class_schedule_table. Turma já
     # presente no pedido continua aceita, ainda que tenha saído da grade. Tudo
     # é conferido antes de criar a primeira turma sob demanda, para que o
-    # pedido recusado pela oferta não deixe turma para trás.
+    # pedido recusado pela oferta não deixe turma para trás. A recusa do
+    # modelo, que vem depois da criação, ainda deixa (#375).
     def prepare_course_class_ids
       course_class_ids = enrollment_request_params[:course_class_ids] || []
       on_demand_course_ids = enrollment_request_params[:course_ids] || []
