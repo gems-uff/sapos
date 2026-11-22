@@ -34,10 +34,12 @@ engana quem a lê hoje.
 ## Convenções de trabalho
 
 - Uma issue, um ramo `issue_NNN`, sempre baseado na `main`. Detalhes do ciclo em
-  `CONTRIBUTING.md`. **O mantenedor é a exceção:** o que está na `main` é o que
-  ele lança, então numa sessão com várias issues para uma release ele trabalha
-  direto na `main`, um commit por assunto, e o push sai com a release. Não
-  proponha ramo a ele por pureza de escopo.
+  `CONTRIBUTING.md`. **O mantenedor é a exceção:** ele pode trabalhar direto
+  na `main`, um commit por assunto, ou abrir ramo quando a issue pede; a
+  escolha é dele, e não se propõe ramo a ele por pureza de escopo. Commit e
+  push também são decisões separadas: o commit demarca a mudança, o push a
+  publica, e quando publicar é com ele. Correção de vulnerabilidade só se
+  publica quando o lançamento pode vir em seguida (ver a exceção abaixo).
 - **O assunto do commit começa por `Issue #NNN: `**, com o número da issue do
   ramo. O GitHub transforma o número em link, e o assunto é o que aparece na
   lista de commits e no `git log --oneline`. Depois do prefixo sobram cerca de

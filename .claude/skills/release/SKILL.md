@@ -67,6 +67,13 @@ desatualizado e precisa integrar a `main` primeiro, com a suíte rodada de novo.
 
 Nem toda issue passa por PR; quando o mantenedor dispensa, o merge é direto.
 
+**Quando o mantenedor trabalha direto na `main`** (exceção do `AGENTS.md`),
+não há ramo: integrar é o commit na `main`, e a issue fecha quando ele entra —
+sem label ainda, o que diz que ela caminha para a release. Os pré-requisitos
+de sincronia e o `--ff-only` não se aplicam, e o push sai quando ele decide.
+Não há homologação da `main` local: qualquer ramo só se homologa depois do
+push.
+
 ### Feche a issue e apague o ramo
 
 ```bash
