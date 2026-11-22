@@ -8,6 +8,10 @@ class ClassEnrollmentRequest < ApplicationRecord
   has_paper_trail
 
   attr_accessor :student_saving, :db_status, :db_action
+  # Pedido de turma que a página do aluno não desenha e que o servidor devolve
+  # ao envio (StudentEnrollmentController#hidden_insertion_class_ids): a
+  # gravação do aluno não o revalida nem o grava.
+  attr_accessor :out_of_page
 
   belongs_to :enrollment_request,
     inverse_of: :class_enrollment_requests, optional: false

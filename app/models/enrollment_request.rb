@@ -160,7 +160,7 @@ class EnrollmentRequest < ApplicationRecord
     self.student_saving = true
     return false if !valid?
     result = class_enrollment_requests.all? do |cer|
-      cer.save
+      cer.out_of_page || cer.save
     end && save
     self.student_saving = false
     result
@@ -251,7 +251,7 @@ class EnrollmentRequest < ApplicationRecord
 
     def that_all_requests_are_valid
       invalid = class_enrollment_requests.filter do |cer|
-        next false if cer.marked_for_destruction?
+        next false if cer.marked_for_destruction? || cer.out_of_page
         old = cer.student_saving
         cer.student_saving = student_saving
         result = !cer.valid?

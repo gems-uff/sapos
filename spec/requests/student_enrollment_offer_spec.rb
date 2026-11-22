@@ -310,6 +310,42 @@ RSpec.describe "StudentEnrollmentController offer check", type: :request do
         expect(ClassEnrollmentRequest.where(course_class: @other).count).to eq(1)
       end
 
+      # O pedido da turma oculta volta ao envio, mas o aluno não o vê nem o
+      # desmarca: se ele deixou de validar (aqui, a troca cuja remoção a
+      # secretaria negou), revalidá-lo barraria toda gravação do aluno. Fica
+      # intocado, para a secretaria resolver.
+      it "saves with a hidden insertion that no longer validates" do
+        single = FactoryBot.create(
+          :course_type, on_demand: false, allow_multiple_classes: false
+        )
+        course = FactoryBot.create(:course, course_type: single)
+        current = FactoryBot.create(
+          :course_class, course: course, professor: @accredited,
+          year: 2026, semester: 2
+        )
+        wanted = FactoryBot.create(
+          :course_class, course: course, professor: @outsider,
+          year: 2026, semester: 2
+        )
+        removal = request_of(
+          current, action: ClassEnrollmentRequest::REMOVE,
+          status: ClassEnrollmentRequest::REQUESTED
+        )
+        insertion = request_of(
+          wanted, action: ClassEnrollmentRequest::INSERT,
+          status: ClassEnrollmentRequest::REQUESTED
+        )
+        removal.set_status!(ClassEnrollmentRequest::INVALID)
+        wanted.update!(not_schedulable: true)
+
+        submit_page_adding(@other)
+
+        expect(response).to redirect_to(student_enrollment_path(@enrollment.id))
+        expect(insertion.reload.action).to eq(ClassEnrollmentRequest::INSERT)
+        expect(insertion.status).to eq(ClassEnrollmentRequest::REQUESTED)
+        expect(ClassEnrollmentRequest.where(course_class: @other).count).to eq(1)
+      end
+
       it "keeps an effected removal of the hidden class" do
         cer = request_of(
           @hidden, action: ClassEnrollmentRequest::REMOVE,

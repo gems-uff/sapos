@@ -295,12 +295,15 @@ class StudentEnrollmentController < ApplicationController
     # desmarcar: a adição solicitada sumiria, a efetivada viraria remoção, e
     # com a remoção fechada o aluno não gravaria mais nada. O pedido de adição
     # dessas turmas volta à lista; o de remoção não precisa, porque fora da
-    # lista ele já fica como está.
+    # lista ele já fica como está. Volta intocado: o aluno não o vê nem o
+    # desmarca, então ele não é revalidado (out_of_page), para que o pedido
+    # que deixou de valer não barre toda gravação.
     def hidden_insertion_class_ids
       @enrollment_request.class_enrollment_requests.filter_map do |cer|
         next if cer.action != ClassEnrollmentRequest::INSERT
         next if offered[:class_ids].include?(cer.course_class_id.to_s)
         next if offered[:professors].key?(cer.course_class.course_id)
+        cer.out_of_page = true
         cer.course_class_id.to_s
       end
     end
