@@ -204,7 +204,7 @@ envelhece. Repare no `%3A` — é o `:` de `label:7.15.21` codificado.
 descreva em prosa antes do link e troque o rótulo dele:
 
 ```
-Atualização do Rails de 7.1.6 para 7.2.3.1.
+Atualização de <gem> de <versão> para <versão>.
 
 Demais issues atendidas: https://github.com/gems-uff/sapos/issues?q=label%3A7.15.21
 ```
@@ -217,7 +217,7 @@ principal não está em issue nenhuma.
 ```
 Esta versão traz correções de segurança: atualize assim que possível.
 
-Atualização do Rails de 7.1.6 para 7.2.3.1.
+Atualização de <gem> de <versão> para <versão>.
 
 Demais issues atendidas: https://github.com/gems-uff/sapos/issues?q=label%3A7.15.21
 ```
