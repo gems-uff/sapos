@@ -68,8 +68,12 @@ a configuração do banco são dela.
 
 **`SAPOS_STAGING_URL` e `SAPOS_STAGING_APP_USER` têm de conter `staging`.** É
 a trava contra apontar para produção: os scripts recusam a URL sem a palavra
-(alguns aceitam `--force`), e a limpeza do `probe_submissao.rb` recusa a conta.
-A palavra é fixa de propósito — configurável, ela viria do mesmo arquivo que a
+(alguns aceitam `--force`; os que carregam o `explore_common.rb` recusam por
+ele); o que roda no servidor recusa a conta — as funções `na_instancia` e
+`runner` olham a variável, e o `trava_email.rb` e o `limpa_exercicio_email.rb`
+olham a conta que de fato os executa, o que vale também para quem copiar o
+comando do cabeçalho. Script novo que roda no servidor confere a conta do mesmo
+jeito. A palavra é fixa de propósito — configurável, ela viria do mesmo arquivo que a
 URL e erraria junto com ela. Instância de homologação com outro nome precisa
 de `staging` na URL e na conta.
 
@@ -451,8 +455,11 @@ exercício escreve na cópia e manda e-mail: vem **depois** da captura do lado
 ```bash
 set -a; source ~/.sapos_staging_env; set +a
 S=.claude/skills/homologacao
-na_instancia() { ssh "$SAPOS_STAGING_SSH" "sudo -i -u $SAPOS_STAGING_APP_USER bash -lc \"cd $SAPOS_STAGING_APP_DIR && $1\""; }
-runner() { ssh "$SAPOS_STAGING_SSH" "f=\$(mktemp /tmp/r.XXXXXX.rb); chmod 644 \$f; cat > \$f; \
+eh_staging() { [[ $SAPOS_STAGING_APP_USER == *staging* ]] || { echo "APP_USER sem 'staging': $SAPOS_STAGING_APP_USER" >&2; return 1; }; }
+na_instancia() { eh_staging || return 1
+  ssh "$SAPOS_STAGING_SSH" "sudo -i -u $SAPOS_STAGING_APP_USER bash -lc \"cd $SAPOS_STAGING_APP_DIR && $1\""; }
+runner() { eh_staging || return 1
+  ssh "$SAPOS_STAGING_SSH" "f=\$(mktemp /tmp/r.XXXXXX.rb); chmod 644 \$f; cat > \$f; \
   sudo -i -u $SAPOS_STAGING_APP_USER bash -lc \"cd $SAPOS_STAGING_APP_DIR && bundle exec rails runner \$f $2\"; rm -f \$f" < "$1"; }
 
 # 1. desligar o reCAPTCHA e destravar o e-mail para o endereço de teste

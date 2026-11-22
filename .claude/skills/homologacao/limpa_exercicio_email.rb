@@ -13,6 +13,10 @@
 # ZZ-TESTE-HOMOLOG e cujo e-mail e zz-teste-homolog...@example.com, e mensagem
 # cujo assunto ou destinatario cita esse endereco. Imprime contagens, nunca
 # conteudo.
+require "etc"
+conta = Etc.getpwuid(Process.uid).name
+abort "Conta sem 'staging': #{conta}. Nada apagado." unless conta.include?("staging")
+
 MARCA = "ZZ-TESTE-HOMOLOG"
 ENDERECO = "zz-teste-homolog%@example.com"
 

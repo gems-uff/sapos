@@ -14,6 +14,9 @@ require "fileutils"
 BASE = (ENV["SAPOS_STAGING_URL"] || abort("defina SAPOS_STAGING_URL")).sub(%r{/\z}, "")
 USER = ENV["SAPOS_STAGING_USER"] || abort("defina SAPOS_STAGING_USER")
 PASS = ENV["SAPOS_STAGING_PASS"] || abort("defina SAPOS_STAGING_PASS")
+# Trava contra produção (ver "SAPOS_STAGING_URL ... têm de conter staging" na
+# SKILL.md): vale para todo script que carrega esta base.
+abort "URL sem 'staging': #{BASE}" unless BASE.include?("staging")
 
 # Sem default: um diretório fixo aqui apontaria para a captura de uma rodada
 # antiga e misturaria as saídas de rodadas diferentes.

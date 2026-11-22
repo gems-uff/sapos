@@ -13,6 +13,10 @@
 # NUNCA apaga a variavel: ausente, ela manda o e-mail ao destinatario real.
 # Imprime so o estado (AUSENTE, VAZIA, ENDERECO), nao o endereco. Confira o
 # resultado pela tela, com o conferir_redirect_email.rb, antes e depois.
+require "etc"
+conta = Etc.getpwuid(Process.uid).name
+abort "Conta sem 'staging': #{conta}. Nada alterado." unless conta.include?("staging")
+
 estado = ->(valor) { valor.nil? ? "AUSENTE" : (valor == "" ? "VAZIA" : "ENDERECO") }
 
 variavel = CustomVariable.find_by(variable: "redirect_email")
