@@ -62,6 +62,7 @@ class ClassEnrollmentRequest < ApplicationRecord
   validate :that_course_class_does_not_exist_in_a_class_enrollment,
     if: -> { !marked_for_destruction? }
   validate :check_enrollment_hold, unless: -> { status == INVALID }
+  validate :that_removal_can_be_undone, if: :undoing_effected_removal?
 
   before_validation :create_or_destroy_class_enrollment, on: %i[create update]
   after_save :destroy_or_create_class_enrollment
@@ -197,6 +198,29 @@ class ClassEnrollmentRequest < ApplicationRecord
       end
       return nil if status != EFFECTED
       :remove_first
+    end
+
+    # Desfazer a remoção efetivada recria a inscrição removida (after_save
+    # destroy_or_create_class_enrollment), e a gravação dela, recusada, não
+    # chegaria a ninguém: o autosave do belongs_to a descarta. Monta-se aqui a
+    # inscrição que seria recriada e recusa-se com o motivo dela -- por
+    # exemplo, a adição da troca já efetivada na mesma disciplina.
+    def undoing_effected_removal?
+      action == REMOVE && status != EFFECTED &&
+        status_in_database == EFFECTED && class_enrollment.blank? &&
+        !marked_for_destruction?
+    end
+
+    def that_removal_can_be_undone
+      return if enrollment_request.blank? || course_class.blank?
+      restored = ClassEnrollment.new(
+        enrollment: enrollment_request.enrollment,
+        course_class: course_class,
+        situation: ClassEnrollment::REGISTERED
+      )
+      return if restored.valid?
+
+      restored.errors.full_messages.each { |message| errors.add(:base, message) }
     end
 
     def create_or_destroy_class_enrollment

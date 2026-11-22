@@ -219,6 +219,39 @@ RSpec.describe "Troca de professor em disciplina sob demanda", type: :request do
       expect(enrolled_professors).to eq([@p1])
     end
 
+    # Desfazer a remoção efetivada recria a inscrição removida. Com a adição
+    # da troca já efetivada, a inscrição recriada seria a segunda na
+    # disciplina e não grava: a recusa tem de chegar à secretaria, e a remoção
+    # continuar efetivada.
+    it "recusa desfazer a remoção depois da troca efetivada" do
+      put set_effected_class_enrollment_request_path(@removal)
+      put set_effected_class_enrollment_request_path(insertion)
+
+      put set_requested_class_enrollment_request_path(@removal)
+
+      expect(@removal.reload.status).to eq(ClassEnrollmentRequest::EFFECTED)
+      expect(flash[:error]).to eq([
+        ClassEnrollment.new.errors.full_message(
+          :course_class,
+          I18n.t(
+            "activerecord.errors.models.class_enrollment.attributes." \
+            "course_class.multiple_class_enrollments_not_allowed"
+          )
+        )
+      ])
+      expect(enrolled_professors).to eq([@p2])
+    end
+
+    it "desfaz a remoção efetivada antes da adição, recriando a inscrição (controle)" do
+      put set_effected_class_enrollment_request_path(@removal)
+
+      put set_requested_class_enrollment_request_path(@removal)
+
+      expect(@removal.reload.status).to eq(ClassEnrollmentRequest::REQUESTED)
+      expect(@removal.class_enrollment).to be_present
+      expect(enrolled_professors).to eq([@p1])
+    end
+
     it "com a remoção negada, recusa a adição pela inscrição registrada" do
       put set_invalid_class_enrollment_request_path(@removal)
       put set_effected_class_enrollment_request_path(insertion)
