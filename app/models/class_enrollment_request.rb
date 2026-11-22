@@ -151,14 +151,45 @@ class ClassEnrollmentRequest < ApplicationRecord
       return if enrollment.blank?
 
       course = course_class.course
-      return if enrollment.class_enrollments.none? do |enrollment_class|
+      return if course.course_type.allow_multiple_classes
+
+      conflicts = enrollment.class_enrollments.select do |enrollment_class|
         enrollment_class.course_class.course_id == course.id &&
           enrollment_class != class_enrollment &&
-          !course.course_type.allow_multiple_classes &&
           enrollment_class.situation != ClassEnrollment::DISAPPROVED
       end
+      return if conflicts.empty?
 
-      errors.add(:course_class, :previously_approved)
+      if conflicts.any? { |ce| ce.situation == ClassEnrollment::APPROVED }
+        return errors.add(:course_class, :previously_approved)
+      end
+      blocking = conflicts.filter_map { |ce| conflict_with_registered(ce) }
+      return if blocking.empty?
+
+      if blocking.include?(:already_enrolled)
+        errors.add(:course_class, :already_enrolled)
+      else
+        errors.add(:course_class, :remove_first)
+      end
+    end
+
+    # Troca de turma (#781): a inscrição registrada na disciplina não impede o
+    # pedido de outra turma se o mesmo pedido de inscrição traz a remoção dela.
+    # Na efetivação a regra volta a ser estrita -- nunca duas inscrições
+    # ativas --, a menos que a remoção seja efetivada na mesma gravação (o
+    # formulário do pedido de inscrição). Devolve o erro, ou nil se não barra.
+    #
+    # A remoção se acha pela turma, não pela inscrição: efetivada na mesma
+    # gravação, ela apaga a inscrição já na validação e perde o vínculo.
+    def conflict_with_registered(enrollment_class)
+      removal = enrollment_request.class_enrollment_requests.find do |cer|
+        cer != self && cer.action == REMOVE &&
+          cer.course_class_id == enrollment_class.course_class_id
+      end
+      return :already_enrolled if removal.nil? || removal.status == INVALID
+      return nil if removal.status == EFFECTED
+      return nil if status != EFFECTED
+      :remove_first
     end
 
     def create_or_destroy_class_enrollment

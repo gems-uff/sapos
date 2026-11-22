@@ -317,7 +317,14 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     enrollment_request_id = nil
     effected = []
-    class_enrollment_requests.sort_by(&:enrollment_request_id).each do |record|
+    # Dentro de cada pedido de inscrição, as remoções antes das adições: na
+    # troca de turma (#781) a adição só se efetiva depois da remoção da turma
+    # atual. O índice mantém a ordem da lista entre os demais.
+    ordered = class_enrollment_requests.each_with_index.sort_by do |record, index|
+      removal = record.action == ClassEnrollmentRequest::REMOVE ? 0 : 1
+      [record.enrollment_request_id, removal, index]
+    end.map(&:first)
+    ordered.each do |record|
       if record.enrollment_request_id != enrollment_request_id
         if effected.present?
           enrollment_request = effected[0].enrollment_request
