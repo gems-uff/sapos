@@ -303,6 +303,9 @@ cada uma explica o porquê no próprio cabeçalho:
   chamada `active_scaffold` inclui o módulo em cada controller, na frente de um
   método do `ApplicationController`.
   `spec/requests/scaffold_embedded_constraints_spec.rb` percorre os scaffolds.
+  O método redefinido mantém a visibilidade da gem: público, ele vira ação em
+  todo controller que inclui o módulo, e o
+  `spec/config/initializer_action_methods_spec.rb` acusa.
 - active_scaffold, filtro da lista vindo da URL:
   `active_scaffold_list_url_columns.rb` (`prepend` em
   `ActiveScaffold::Actions::Core#conditions_from_params`). A gem filtra a

@@ -18,11 +18,13 @@
 #
 # Prepend no modulo, nao override no ApplicationController: Constraints e
 # incluido em cada controller pela chamada active_scaffold e ficaria na frente
-# de um metodo herdado.
+# de um metodo herdado. protected como na gem: publico, viraria acao em todo
+# controller.
 module ActiveScaffoldEmbeddedConstraints
-  def active_scaffold_constraints
-    @active_scaffold_constraints ||= {}
-  end
+  protected
+    def active_scaffold_constraints
+      @active_scaffold_constraints ||= {}
+    end
 end
 
 ActiveScaffold::Constraints.prepend(ActiveScaffoldEmbeddedConstraints)
