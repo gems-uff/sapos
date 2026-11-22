@@ -219,5 +219,110 @@ RSpec.describe "StudentEnrollmentController offer check", type: :request do
       expect(flash[:alert]).to be_nil
       expect(ClassEnrollmentRequest.count).to eq(1)
     end
+
+    # A turma marcada "Não aparecer no QH" (turma cancelada, por exemplo) sai
+    # da página, e o envio não a traz. O save do aluno, que só acrescenta
+    # outra turma, não pode ler isso como desmarcar.
+    describe "class the page no longer draws" do
+      before(:each) do
+        @hidden = FactoryBot.create(
+          :course_class, course: @regular, professor: @accredited,
+          year: 2026, semester: 2
+        )
+        @other = FactoryBot.create(
+          :course_class,
+          course: FactoryBot.create(:course, course_type: @regular.course_type),
+          professor: @accredited, year: 2026, semester: 2
+        )
+      end
+
+      def request_of(course_class, action:, status:)
+        enrollment_request = EnrollmentRequest.find_or_create_by!(
+          enrollment: @enrollment, year: 2026, semester: 2
+        )
+        ClassEnrollmentRequest.create!(
+          enrollment_request: enrollment_request, course_class: course_class,
+          action: action, status: status
+        )
+      end
+
+      # O que a página real envia: as caixas que ela desenha marcadas.
+      def submit_page_adding(course_class)
+        get "/enrollment/#{@enrollment.id}/enroll/2026-2"
+        checked = Nokogiri::HTML(response.body).css(
+          "input[name='enrollment_request[course_class_ids][]'][checked]"
+        ).map { |input| input["value"] }
+        expect(checked).not_to include(@hidden.id.to_s)
+        submit(course_class_ids: checked + [course_class.id])
+      end
+
+      it "adds the other class (control)" do
+        submit_page_adding(@other)
+
+        expect(response).to redirect_to(student_enrollment_path(@enrollment.id))
+        expect(ClassEnrollmentRequest.where(course_class: @other).count).to eq(1)
+      end
+
+      it "keeps a requested insertion of the hidden class" do
+        cer = request_of(
+          @hidden, action: ClassEnrollmentRequest::INSERT,
+          status: ClassEnrollmentRequest::REQUESTED
+        )
+        @hidden.update!(not_schedulable: true)
+
+        submit_page_adding(@other)
+
+        expect(response).to redirect_to(student_enrollment_path(@enrollment.id))
+        expect(cer.reload.action).to eq(ClassEnrollmentRequest::INSERT)
+        expect(cer.status).to eq(ClassEnrollmentRequest::REQUESTED)
+      end
+
+      it "keeps an effected insertion of the hidden class" do
+        cer = request_of(
+          @hidden, action: ClassEnrollmentRequest::INSERT,
+          status: ClassEnrollmentRequest::EFFECTED
+        )
+        @hidden.update!(not_schedulable: true)
+
+        submit_page_adding(@other)
+
+        expect(response).to redirect_to(student_enrollment_path(@enrollment.id))
+        expect(cer.reload.action).to eq(ClassEnrollmentRequest::INSERT)
+        expect(cer.status).to eq(ClassEnrollmentRequest::EFFECTED)
+      end
+
+      it "saves while removal is closed, with an effected insertion of the hidden class" do
+        cer = request_of(
+          @hidden, action: ClassEnrollmentRequest::INSERT,
+          status: ClassEnrollmentRequest::EFFECTED
+        )
+        @hidden.update!(not_schedulable: true)
+        ClassSchedule.last.update!(
+          enrollment_start: 30.days.ago, enrollment_end: 20.days.ago,
+          period_start: 10.days.ago, enrollment_insert: 3.days.from_now,
+          enrollment_remove: 1.day.ago
+        )
+
+        submit_page_adding(@other)
+
+        expect(response).to redirect_to(student_enrollment_path(@enrollment.id))
+        expect(cer.reload.action).to eq(ClassEnrollmentRequest::INSERT)
+        expect(ClassEnrollmentRequest.where(course_class: @other).count).to eq(1)
+      end
+
+      it "keeps an effected removal of the hidden class" do
+        cer = request_of(
+          @hidden, action: ClassEnrollmentRequest::REMOVE,
+          status: ClassEnrollmentRequest::EFFECTED
+        )
+        @hidden.update!(not_schedulable: true)
+
+        submit_page_adding(@other)
+
+        expect(response).to redirect_to(student_enrollment_path(@enrollment.id))
+        expect(cer.reload.action).to eq(ClassEnrollmentRequest::REMOVE)
+        expect(cer.status).to eq(ClassEnrollmentRequest::EFFECTED)
+      end
+    end
   end
 end
