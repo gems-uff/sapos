@@ -222,11 +222,13 @@ referenciado por caminho de uma captura datada, que é descartável.
 ## Atualização de dependências
 
 Uma gem por passo, alvo no patch mais atual da mesma série; **nunca subir major
-ou minor de carona** — isso é decisão separada. A exceção é a campanha: a cauda
-(transitivas, ferramentas de desenvolvimento e teste) anda em lote por nível,
-com `--strict` como teto rígido e bissecção se ficar vermelho, enquanto o
-núcleo continua uma gem por passo. **Piso de segurança (`>=`) não se
-declara no `Gemfile`:** ele envelhece calado quando sai a correção seguinte. Quem
+ou minor da gem do passo de carona** — isso é decisão separada. A transitiva
+que a versão nova exige sobe junto e é relatada; arrastada a major, desfaz o
+passo. A exceção é a campanha: no patch tudo anda em lote; do minor em diante a
+cauda (transitivas, ferramentas de desenvolvimento e teste) anda em lote por
+nível, com `--strict` como teto rígido e bissecção se ficar vermelho, enquanto
+o núcleo continua uma gem por passo. Major é sempre um passo à parte. **Piso
+de segurança (`>=`) não se declara no `Gemfile`:** ele envelhece calado quando sai a correção seguinte. Quem
 garante que o lock não carrega CVE conhecida é o `bundle-audit`, que o CI roda
 contra a base de advisories do dia. O resto — conferência do `Gemfile.lock`,
 `--strict`, a campanha — está na skill `dependencias`.

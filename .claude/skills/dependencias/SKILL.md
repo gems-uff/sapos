@@ -104,12 +104,20 @@ nada: carrega um arquivo de nome diferente do da gem.
 
 ### O passo
 
-- Uma gem por passo: `bundle update --conservative <gem>`, suíte completa,
-  commit individual. Se quebrar, o commit aponta a gem exata.
+- Uma gem por passo: `bundle update --conservative --patch <gem>`, suíte
+  completa, commit individual. Se quebrar, o commit aponta a gem exata.
 - Alvo é o patch mais atual da mesma série minor/major. Nunca subir major ou
-  minor de carona — isso é decisão separada. Isso vale para a gem do passo:
-  transitiva que a resolução arrasta junto sobe; relate no resumo do passo,
-  sem pin.
+  minor da gem do passo de carona — isso é decisão separada. Os dois flags
+  fazem isso juntos: o `--conservative` libera só a gem nomeada (sem ele,
+  `bundle update <gem>` sobe também toda dependência dela, precise ou não), e
+  o `--patch` a segura na série (sem ele, ela mesma sobe minor, e a gem
+  declarada de que ela depende sobe junto). Com os dois, gem declarada no
+  `Gemfile` não anda; a transitiva que a versão nova exige sobe, mesmo de
+  minor — relate no resumo do passo, sem pin. Transitiva arrastada a major
+  desfaz o passo: é major, e vai pelo caminho dos majors (Campanha).
+- **Sem `--strict` aqui, de propósito.** Com ele o passo para no último patch
+  que não arrasta nada, e esse pode não ser o que traz a correção que se
+  queria.
 - **Confira a versão resolvida no `Gemfile.lock`; não confie no `~>`.** Num
   update de segurança, `"~> 7.2.0"` resolveu para 7.2.3 em vez de 7.2.3.1 — a
   versão sem a correção — e a suíte verde não acusaria nada. Quem acusa é o
@@ -117,10 +125,9 @@ nada: carrega um arquivo de nome diferente do da gem.
   dar o passo por concluído. O CI repete a checagem.
 - Gem transitiva não entra no `Gemfile` só para travar série. Use
   `bundle update <gem> --patch`, que restringe o bump sem tocar no arquivo.
-- A exceção à regra de um passo por gem é a campanha (abaixo): a cauda anda em
-  lote por nível — `bundle update --patch --strict`, depois `--minor
-  --strict` —, com bissecção **só se quebrar**; o núcleo continua uma gem por
-  passo.
+- A exceção à regra de um passo por gem é a campanha (abaixo): no patch tudo
+  anda em lote, núcleo incluído; do minor em diante a cauda anda em lote por
+  nível e o núcleo continua uma gem por passo. Bissecção **só se quebrar**.
 
 ### `--strict` quer dizer duas coisas
 
@@ -132,8 +139,11 @@ Não é o mesmo flag nos dois comandos, e a confusão é cara:
 | `bundle outdated` **sem filtro de nível** | mostra o último publicado no rubygems | só o que o **Gemfile permite** |
 | `bundle outdated --patch/--minor` | já resolve dentro do Gemfile | **sem efeito** — o filtro de nível já restringiu |
 
-Em `bundle update`, **sempre `--strict`** — sem ele o `--patch` deixa passar minor
-e o `--minor` deixa passar major, calados.
+Nos lotes, **sempre `--strict`** — sem ele o `--patch` deixa passar minor e o
+`--minor` deixa passar major, calados. Ficam sem ele só os comandos que nomeiam
+as gems com `--conservative --patch` — o passo isolado (acima) e o degrau do
+arraste da campanha —, porque ali a gem declarada não anda, e o que passou do
+nível é a transitiva exigida: o diff do lock é lido e ela é relatada.
 
 ### Diagnóstico: algum pin está bloqueando alguma coisa?
 
@@ -179,25 +189,28 @@ os alertas do Dependabot se acumulam. Uma issue (Task) a acompanha, cada
 degrau é uma sessão que termina com um comentário de resultados nela, e os
 degraus vão nesta ordem: os pontos de uso, os patches, os minors, os majors.
 
-**O regime.** A regra do passo (`AGENTS.md`) vale para o núcleo; a cauda anda
-em lote.
+**O regime.** No patch, tudo anda em lote, núcleo incluído. Do minor em diante,
+a regra do passo (`AGENTS.md`) vale para o núcleo, e a cauda anda em lote.
 
 - **Núcleo:** a gem sobre a qual o código é construído — os pontos de uso dela
   se espalham por muitos arquivos, ou a suíte alcança poucos deles, ou os
-  minors dela trazem migração documentada. Uma gem por passo, até o minor mais
+  minors dela trazem migração documentada. No patch, entra no lote, com o
+  changelog de cada uma lido. No minor, uma gem por passo, até o minor mais
   novo da série, lendo antes todos os changelogs entre a versão travada e o
   alvo, e o guia de atualização. O passo se divide no minor cujo changelog
   anuncia migração (API removida, configuração que muda, default novo do
-  framework), e esse minor é um passo à parte, com issue própria. Num framework
-  em que todo minor é migração, como o Rails e o active_scaffold, a regra dá um
-  minor por vez.
+  framework), e esse minor é um passo à parte, com issue própria.
+- **Dominante:** a gem do núcleo em que todo minor é migração, como o Rails e o
+  active_scaffold. Um minor por vez, num degrau depois do resto do núcleo.
 - **Cauda:** todo o resto — gem transitiva que o código não nomeia, ferramenta
-  de desenvolvimento e teste, plugin do rubocop. Um lote por nível, todos os
-  patches e depois todos os minors, sempre com `--strict` (o teto rígido da
-  tabela acima), o diff do `Gemfile.lock` lido entrada a entrada, e bissecção
-  só se ficar vermelho.
+  de desenvolvimento e teste, plugin do rubocop. Um lote por nível, sempre com
+  `--strict` (o teto rígido da tabela acima), o diff do `Gemfile.lock` lido
+  entrada a entrada, e bissecção só se ficar vermelho.
 - **Major** nunca entra em lote: os majors são primeiro um experimento
-  (abaixo), e cada um que entra é um passo à parte.
+  (abaixo), e cada um que entra é um passo à parte. A unidade é a gem e o que
+  ela arrasta: duas gems em que uma exige o major da outra sobem juntas. O
+  major transitivo que a restrição de outra gem segura não é passo: anda
+  quando ela andar, e o experimento o registra como dependente dela.
 
 Quais gems são núcleo se mede no primeiro degrau e fica escrito na issue da
 campanha; não se supõe.
@@ -220,18 +233,40 @@ trazem, e os pontos delas é que a verificam.
 nível de cada salto se lê das duas versões, e o que o `Gemfile` não deixa
 entrar é decisão, não lote (ver "Diagnóstico").
 
-**3. O lote.** `bundle update --patch --strict` num degrau e `bundle update
---minor --strict` no seguinte. O commit lista cada gem que andou. Um diff do
-lock com gem fora do nível (um minor no lote de patch) é lote vermelho: o
-`--strict` faltou.
+Para ver antes o que cada degrau moveria, sem tocar no checkout: copie
+`Gemfile` e `Gemfile.lock` para uma pasta de rascunho e rode lá
+`BUNDLE_GEMFILE=<rascunho>/Gemfile bundle lock --update <flags> --lockfile=<rascunho>/saida.lock`,
+encadeando a saída de um degrau como base do seguinte. O `--lockfile` é também
+o lock que se **lê**: copie a base para ele antes, senão a resolução parte do
+zero e um `--patch --strict` aparece subindo major.
 
-**4. Lote vermelho se bissecta** (delta debugging): a partir do lock da base
+**3. Os patches**, em dois degraus:
+
+- **Estrito:** `bundle update --patch --strict`, tudo de uma vez. Um diff do
+  lock com gem fora do nível (um minor) é lote vermelho: o `--strict` faltou.
+- **Arraste:** as gems que o estrito deixou abaixo do último patch, porque o
+  patch delas exige subir minor de uma transitiva (`bundle outdated --patch`
+  as lista), por `bundle update --conservative --patch <gem> <gem> ...`. A
+  declarada não anda; a transitiva exigida sobe, e o commit a relata.
+  Transitiva arrastada a major sai do degrau e vai para os majors.
+
+**4. Os minors**, em quatro degraus: a cauda em lote (`bundle update --minor
+--strict <gem> <gem> ...`, nomeando as da cauda); o núcleo, uma gem por passo
+(`bundle update --conservative --minor --strict <gem>`); as dominantes, um
+minor por vez; e um **repasse** do lote da cauda e do núcleo. O repasse existe
+porque o `--conservative` segura a gem cujo minor novo exige a dominante nova
+(um plugin do active_scaffold que pede a série seguinte dele): ela só anda
+depois da dominante.
+
+Em cada degrau, o commit lista cada gem que andou.
+
+**5. Lote vermelho se bissecta** (delta debugging): a partir do lock da base
 (`git checkout Gemfile.lock && bundle install`), refaça o lote com a primeira
 metade dos nomes (`bundle update --patch --strict <gem> <gem> ...`); a metade
 que continua vermelha se divide de novo, até sobrar uma gem. Ela sai do lote e
 vira passo à parte, no regime do núcleo; o resto do lote entra.
 
-**5. Cada degrau**, lote ou gem: a suíte inteira antes e depois
+**6. Cada degrau**, lote ou gem: a suíte inteira antes e depois
 (`safe-refactor`; sem `SKIP_COVERAGE` ao menos uma vez), o `bundle-audit check
 --update`, o `rake javascript:check` quando o JS muda, e as conferências da
 parte 4 que os pontos de uso pedirem — o golden-master e a `homologacao`
@@ -239,7 +274,7 @@ quando anda gem que desenha documento ou página, a recompilação dos assets
 quando anda gem de asset. Um commit por lote e um por gem do núcleo, cada
 mensagem listando o que andou e o que foi lido e medido.
 
-**6. Os majors: primeiro um experimento**, numa árvore descartável, nunca no
+**7. Os majors: primeiro um experimento**, numa árvore descartável, nunca no
 checkout (`git worktree add --detach <rascunho>/majors main`). Na árvore,
 afrouxe a restrição do `Gemfile`, `bundle update <gem> --conservative`, e a
 suíte; agrupe as falhas pela mensagem do erro. Quando uma mensagem cobre quase
