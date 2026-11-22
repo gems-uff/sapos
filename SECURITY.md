@@ -26,10 +26,12 @@ not on an installation run by someone else.
 ## What happens next
 
 We confirm the problem, fix it on `main` and publish a release soon after the
-fix is merged, without waiting for other work. The fix is published with a
-generic description, and the details stay in the private advisory until
-installations have had the chance to upgrade. If you want, we credit you in
-the advisory.
+fix is merged, without waiting for other work. The commit and the release
+notes describe the fix in generic terms; the fix itself is public like the
+rest of SAPOS, and its code and tests show what changed. Your report — the
+steps, the impact you found and who sent it — stays in the private advisory
+until installations have had the chance to upgrade. If you want, we credit
+you in the advisory.
 
 ## Supported versions
 

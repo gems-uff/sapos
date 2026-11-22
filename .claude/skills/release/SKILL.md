@@ -203,8 +203,23 @@ Demais issues atendidas: https://github.com/gems-uff/sapos/issues?q=label%3A7.15
 ```
 
 Sem isso, a release diz "issues atendidas" sobre uma versão cuja mudança
-principal não está em issue nenhuma. Para vulnerabilidade, descreva a
-atualização (gem, de → para) **sem citar CVE nem descrever o ataque**.
+principal não está em issue nenhuma.
+
+**Vulnerabilidade abre o corpo com o pedido de atualização:**
+
+```
+Esta versão traz correções de segurança: atualize assim que possível.
+
+Atualização do Rails de 7.1.6 para 7.2.3.1.
+
+Demais issues atendidas: https://github.com/gems-uff/sapos/issues?q=label%3A7.15.21
+```
+
+Sem a primeira linha, quem roda outra instalação lê uma mudança comum e não
+tem pressa — o SAPOS é aplicação, não gem, e nenhum alerta automático avisa
+ninguém. O resto é genérico: a gem (de → para) ou o assunto do commit, **sem
+citar CVE nem descrever o ataque**. Advisory só existe para relato de fora
+(`SECURITY.md`); a correção que nós mesmos achamos não ganha um.
 
 ### 7. Confira
 
