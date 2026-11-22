@@ -197,6 +197,28 @@ RSpec.describe "Troca de professor em disciplina sob demanda", type: :request do
       expect(enrolled_professors).to eq([@p2])
     end
 
+    # A remoção efetivada libera a adição porque apagou a inscrição. Se a
+    # inscrição voltou depois (recriada pela tela de inscrições), o status da
+    # remoção não vale mais: efetivar a adição deixaria duas inscrições, e a
+    # da adição seria recusada em silêncio.
+    it "recusa a adição se a inscrição removida voltou pela tela de inscrições" do
+      put set_effected_class_enrollment_request_path(@removal)
+      post class_enrollments_path, params: {
+        record: {
+          enrollment: @enrollment.id.to_s, course_class: @class_p1.id.to_s,
+          situation: ClassEnrollment::REGISTERED
+        }
+      }
+      expect(enrolled_professors).to eq([@p1])
+
+      put set_effected_class_enrollment_request_path(insertion)
+
+      expect(insertion.status).to eq(ClassEnrollmentRequest::REQUESTED)
+      expect(insertion.class_enrollment).to be_nil
+      expect(flash[:error]).to eq([message(:already_enrolled)])
+      expect(enrolled_professors).to eq([@p1])
+    end
+
     it "com a remoção negada, recusa a adição pela inscrição registrada" do
       put set_invalid_class_enrollment_request_path(@removal)
       put set_effected_class_enrollment_request_path(insertion)

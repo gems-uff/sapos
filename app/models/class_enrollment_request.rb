@@ -181,13 +181,20 @@ class ClassEnrollmentRequest < ApplicationRecord
     #
     # A remoção se acha pela turma, não pela inscrição: efetivada na mesma
     # gravação, ela apaga a inscrição já na validação e perde o vínculo.
+    # Efetivada, ela só libera se a inscrição de fato sumiu: a inscrição pode
+    # voltar pela tela de inscrições sem que o status da remoção mude. Quem
+    # responde é o banco: a lista de inscrições do aluno, carregada antes, não
+    # traz o objeto que a remoção apagou, e sim uma cópia que não sabe disso.
     def conflict_with_registered(enrollment_class)
       removal = enrollment_request.class_enrollment_requests.find do |cer|
         cer != self && cer.action == REMOVE &&
           cer.course_class_id == enrollment_class.course_class_id
       end
       return :already_enrolled if removal.nil? || removal.status == INVALID
-      return nil if removal.status == EFFECTED
+      if removal.status == EFFECTED
+        return nil unless ClassEnrollment.unscoped.exists?(enrollment_class.id)
+        return :already_enrolled
+      end
       return nil if status != EFFECTED
       :remove_first
     end

@@ -43,7 +43,7 @@ pt-BR:
               must_represent_the_same_enrollment_and_class: "deve estar associada à mesma matrícula e turma"
             course_class:
               previously_approved: "já foi cursada anteriormente com aprovação"
-              already_enrolled: "pertence a disciplina em que o aluno já tem inscrição; a troca de turma exige a remoção da atual no mesmo pedido"
+              already_enrolled: "pertence a disciplina em que o aluno já tem inscrição; a troca de turma exige a remoção da atual"
               remove_first: "só pode ser efetivada depois da remoção da turma atual da disciplina, pedida junto"
               taken: "duplicada"
             enrollment:
