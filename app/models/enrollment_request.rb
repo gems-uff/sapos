@@ -27,6 +27,9 @@ class EnrollmentRequest < ApplicationRecord
   validate :that_valid_insertion_is_not_set_to_false, if: :student_saving
   validate :that_valid_removal_is_not_set_to_false, if: :student_saving
   validate :that_all_requests_are_valid, if: :student_saving
+  validate :that_releases_came_first, unless: :student_saving
+
+  before_validation :remember_releasing
 
   def self.pendency_condition(user = nil)
     user ||= current_user
@@ -203,6 +206,30 @@ class EnrollmentRequest < ApplicationRecord
   end
 
   protected
+    # Troca de turma (#781): as linhas que liberam inscrição nesta gravação
+    # (ClassEnrollmentRequest#releases_class_enrollment?), guardadas antes
+    # que a validação de cada uma mexa na inscrição.
+    def remember_releasing
+      @releasing = class_enrollment_requests.target
+        .select(&:releases_class_enrollment?)
+    end
+
+    # O formulário valida as linhas na ordem em que foram criadas, e a linha
+    # que ocupa a inscrição é recusada se vier antes da que a libera na mesma
+    # disciplina. A gravação em dois passos resolve, e a mensagem diz qual
+    # vem primeiro.
+    def that_releases_came_first
+      return if @releasing.blank?
+
+      blocked = class_enrollment_requests.target.any? do |cer|
+        cer.errors.any? && cer.occupies_class_enrollment? &&
+          @releasing.any? do |release|
+            release.course_class&.course_id == cer.course_class&.course_id
+          end
+      end
+      errors.add(:base, :release_first) if blocked
+    end
+
     def insertions
       class_enrollment_requests.filter do |cer|
         cer.action == ClassEnrollmentRequest::INSERT &&

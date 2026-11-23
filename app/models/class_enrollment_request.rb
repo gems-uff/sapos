@@ -112,6 +112,19 @@ class ClassEnrollmentRequest < ApplicationRecord
     changed && save
   end
 
+  # Troca de turma (#781): numa gravação que mexe nas duas metades da troca,
+  # uma LIBERA a inscrição na disciplina -- a remoção que vira Efetivada, a
+  # adição que deixa de ser -- e a outra a OCUPA -- a adição que vira
+  # Efetivada, a remoção que deixa de ser. A que ocupa só passa depois que a
+  # que libera foi gravada.
+  def releases_class_enrollment?
+    crosses_effected? && (status == EFFECTED) == (action == REMOVE)
+  end
+
+  def occupies_class_enrollment?
+    crosses_effected? && (status == EFFECTED) == (action == INSERT)
+  end
+
   def insert_effected?
     self.action == ClassEnrollmentRequest::INSERT &&
     self.status == ClassEnrollmentRequest::EFFECTED
@@ -225,7 +238,9 @@ class ClassEnrollmentRequest < ApplicationRecord
       )
       return if restored.valid?
 
-      restored.errors.full_messages.each { |message| errors.add(:base, message) }
+      # Por atributo, não em :base: o erro em :base desta linha chega ao
+      # formulário do pedido como "Class enrollment requests <mensagem>".
+      restored.errors.each { |error| errors.add(error.attribute, error.message) }
     end
 
     def create_or_destroy_class_enrollment
@@ -271,6 +286,14 @@ class ClassEnrollmentRequest < ApplicationRecord
         )
         save
       end
+    end
+
+    # Mudança de ação (a adição que o aluno desmarca vira remoção) não é
+    # liberar nem ocupar: só a passagem por Efetivada conta.
+    def crosses_effected?
+      return false if persisted? && action_changed?
+
+      (status == EFFECTED) != (status_in_database == EFFECTED)
     end
 
     def set_db_status
