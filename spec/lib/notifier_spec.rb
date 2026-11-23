@@ -373,12 +373,146 @@ RSpec.describe Notifier, type: :model do
       end
     end
 
+    # The messages are sent from model callbacks and controllers, in the
+    # middle of a save that can still be refused. A message announces what was
+    # saved, so it waits for the transaction to commit.
+    context "a transaction open around it" do
+      def sent
+        ActionMailer::Base.deliveries.size
+      end
+
+      it "control: without a transaction, delivers at once" do
+        Notifier.send_emails(notifications: [message])
+
+        expect(sent).to eq(1)
+      end
+
+      it "delivers only after the commit" do
+        during = nil
+        ActiveRecord::Base.transaction do
+          Notifier.send_emails(notifications: [message])
+          during = sent
+        end
+
+        expect(during).to eq(0)
+        expect(sent).to eq(1)
+        expect(NotificationLog.count).to eq(1)
+      end
+
+      it "does not deliver when the transaction is rolled back" do
+        ActiveRecord::Base.transaction do
+          Notifier.send_emails(notifications: [message])
+          raise ActiveRecord::Rollback
+        end
+
+        expect(sent).to eq(0)
+        expect(NotificationLog.count).to eq(0)
+      end
+
+      it "does not deliver when the outer transaction is rolled back" do
+        ActiveRecord::Base.transaction do
+          ActiveRecord::Base.transaction(requires_new: true) do
+            Notifier.send_emails(notifications: [message])
+          end
+          raise ActiveRecord::Rollback
+        end
+
+        expect(sent).to eq(0)
+      end
+    end
+
+    # What fails after the commit can no longer undo the save. A message that
+    # is not delivered, or not logged, costs only itself: the save stands, the
+    # other messages are delivered, the other callbacks of the commit run, and
+    # the failure is reported.
+    context "a failure after the commit" do
+      let(:messages) do
+        %w[primeiro segundo].map do |name|
+          message.merge(to: "#{name}@example.com", subject: name, body: body.dup)
+        end
+      end
+      let(:errors) { [] }
+
+      before(:each) do
+        allow(Notifier.logger).to receive(:error) { |text| errors << text.to_s }
+        allow(ExceptionNotifier).to receive(:notify_exception)
+      end
+
+      def save_and_send
+        outcome = { other_callback: false }
+        ActiveRecord::Base.transaction do
+          outcome[:level] = FactoryBot.create(:level, name: "Nivel do envio")
+          Notifier.send_emails(notifications: messages)
+          ActiveRecord.after_all_transactions_commit { outcome[:other_callback] = true }
+        end
+        outcome
+      end
+
+      def fail_first(klass, method, error)
+        calls = 0
+        allow_any_instance_of(klass).to receive(method).and_wrap_original do |original, *args|
+          calls += 1
+          raise error if calls == 1
+          original.call(*args)
+        end
+      end
+
+      it "control: without a failure, every message is delivered and logged" do
+        outcome = save_and_send
+
+        expect(Level.exists?(outcome[:level].id)).to be(true)
+        expect(ActionMailer::Base.deliveries.map(&:subject)).to eq(%w[primeiro segundo])
+        expect(NotificationLog.pluck(:subject)).to contain_exactly("primeiro", "segundo")
+        expect(outcome[:other_callback]).to be(true)
+        expect(ExceptionNotifier).not_to have_received(:notify_exception)
+      end
+
+      it "keeps the save and the rest when a delivery fails" do
+        fail_first(Mail::TestMailer, :deliver!, Errno::ECONNREFUSED)
+
+        outcome = nil
+        expect { outcome = save_and_send }.not_to raise_error
+
+        expect(Level.exists?(outcome[:level].id)).to be(true)
+        expect(ActionMailer::Base.deliveries.map(&:subject)).to eq(%w[segundo])
+        expect(NotificationLog.pluck(:subject)).to eq(%w[segundo])
+        expect(outcome[:other_callback]).to be(true)
+        expect(ExceptionNotifier).to have_received(:notify_exception)
+          .with(an_instance_of(Errno::ECONNREFUSED), data: { notification_id: nil }).once
+        expect(errors.join("\n")).to include("Errno::ECONNREFUSED", "primeiro@example.com", "primeiro")
+      end
+
+      it "keeps the save and the rest when the log of a delivery fails" do
+        fail_first(NotificationLog, :save, ActiveRecord::ConnectionNotEstablished)
+
+        outcome = nil
+        expect { outcome = save_and_send }.not_to raise_error
+
+        expect(Level.exists?(outcome[:level].id)).to be(true)
+        expect(ActionMailer::Base.deliveries.map(&:subject)).to eq(%w[primeiro segundo])
+        expect(NotificationLog.pluck(:subject)).to eq(%w[segundo])
+        expect(outcome[:other_callback]).to be(true)
+        expect(ExceptionNotifier).to have_received(:notify_exception)
+          .with(an_instance_of(ActiveRecord::ConnectionNotEstablished), data: { notification_id: nil }).once
+      end
+
+      it "does not copy the body of the message into the server log" do
+        messages.first[:body] = "Seu codigo: SEGREDO-DA-MENSAGEM"
+        fail_first(Mail::TestMailer, :deliver!, Errno::ECONNREFUSED)
+
+        save_and_send
+
+        expect(errors).not_to be_empty
+        expect(errors.join("\n")).not_to include("SEGREDO-DA-MENSAGEM")
+      end
+    end
+
     # The SMTP server refuses one recipient (550) and mail.deliver! raises.
     # The messages are delivered one by one, so a refusal in the middle of a
     # batch -- an individual notification, or the daily run of
     # maintenance:trigger_notifications -- must not cost the messages after it
-    # (issue #699). The examples rescue the error: whether send_emails reports
-    # the failure by raising or by logging is up to the fix.
+    # (issue #699). send_emails reports the failure instead of raising it
+    # (see "a failure after the commit").
     context "a message refused by the server" do
       let(:messages) do
         %w[primeiro recusado terceiro].map do |name|
@@ -388,8 +522,6 @@ RSpec.describe Notifier, type: :model do
 
       def send_all
         Notifier.send_emails(notifications: messages)
-      rescue StandardError
-        nil
       end
 
       def delivered_to
@@ -405,7 +537,7 @@ RSpec.describe Notifier, type: :model do
         )
       end
 
-      it "does not keep the messages after it from being delivered", pending: "issue #699" do
+      it "does not keep the messages after it from being delivered" do
         allow_any_instance_of(Mail::TestMailer).to receive(:deliver!).and_wrap_original do |original, mail|
           if mail.to.include?("recusado@example.com")
             raise Net::SMTPFatalError.new(Net::SMTP::Response.parse("550 5.1.1 mailbox unavailable"))

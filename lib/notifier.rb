@@ -76,6 +76,18 @@ module Notifier
       return
     end
 
+    # A entrega espera a transação aberta confirmar, e não acontece se ela for
+    # desfeita. Os envios saem de callbacks de modelo e de controllers, no
+    # meio de gravações que ainda podem ser recusadas: entregues na hora,
+    # anunciariam o que não foi gravado, e o NotificationLog do envio seria
+    # desfeito com a gravação. Fora de transação, a entrega é imediata. A
+    # falha de uma mensagem não sobe (report_failure).
+    ActiveRecord.after_all_transactions_commit do
+      Notifier.deliver_emails(notifications)
+    end
+  end
+
+  def self.deliver_emails(notifications)
     messages = notifications[:notifications]
     messages_attachments = notifications[:notifications_attachments] || {}
 
@@ -147,7 +159,25 @@ module Notifier
         ).save
         Notifier.display_notification_info(m, attachments_file_name_list)
       end
+    rescue StandardError => error
+      Notifier.report_failure(error, message)
     end
+  end
+
+  # A message that could not be delivered or logged costs only itself. The
+  # delivery runs after the commit, so raising would not undo what was saved:
+  # it would turn a saved change into an error page, keep the messages after
+  # this one from being delivered and skip the other callbacks of the commit.
+  # The failure goes to the server log, without the body (see
+  # display_notification_info), and to the error email, with technical data
+  # only (see config.x.error_email).
+  def self.report_failure(error, message)
+    Notifier.logger.error "Notification not delivered: #{error.class}: #{error.message}"
+    Notifier.logger.error "Notifying: #{message[:to]}"
+    Notifier.logger.error "Subject: #{message[:subject]}"
+    ExceptionNotifier.notify_exception(
+      error, data: { notification_id: message[:notification_id] }
+    )
   end
 
   # What the server log keeps of a delivered message: who was notified and
