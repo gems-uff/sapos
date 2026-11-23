@@ -234,6 +234,8 @@ class ClassEnrollmentRequest < ApplicationRecord
 
     def that_removal_can_be_undone
       return if enrollment_request.blank? || course_class.blank?
+      return if returned_class_enrollment.present?
+
       restored = ClassEnrollment.new(
         enrollment: enrollment_request.enrollment,
         course_class: course_class,
@@ -282,13 +284,22 @@ class ClassEnrollmentRequest < ApplicationRecord
         released.destroy
       end
       if action == REMOVE && class_enrollment.blank?
-        self.class_enrollment = ClassEnrollment.new(
+        self.class_enrollment = returned_class_enrollment || ClassEnrollment.new(
           enrollment: enrollment_request.enrollment,
           course_class: course_class,
           situation: ClassEnrollment::REGISTERED
         )
         save
       end
+    end
+
+    # A inscrição que a remoção efetivada apagou e que a secretaria recriou
+    # pela tela de inscrições, por fora do pedido: desfazer a remoção a
+    # religa, em vez de criar uma segunda, que a unicidade da turma recusaria.
+    def returned_class_enrollment
+      ClassEnrollment.find_by(
+        enrollment: enrollment_request&.enrollment, course_class: course_class
+      )
     end
 
     # Mudança de ação (a adição que o aluno desmarca vira remoção) não é
