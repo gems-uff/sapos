@@ -66,7 +66,10 @@ class ClassEnrollmentRequest < ApplicationRecord
   # A adição negada não ocupa a disciplina: não há conflito a conferir.
   validate :that_course_class_does_not_exist_in_a_class_enrollment,
     if: -> { !marked_for_destruction? && status != INVALID }
-  validate :check_enrollment_hold, unless: -> { status == INVALID }
+  # A remoção não ocupa o período trancado; desfazer a remoção efetivada, que
+  # recriaria a inscrição, esbarra no trancamento em that_removal_can_be_undone.
+  validate :check_enrollment_hold,
+    unless: -> { status == INVALID || action == REMOVE }
   validate :that_removal_can_be_undone, if: :undoing_effected_removal?
 
   before_validation :create_or_destroy_class_enrollment, on: %i[create update]
