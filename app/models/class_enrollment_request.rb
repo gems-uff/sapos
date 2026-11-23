@@ -63,8 +63,9 @@ class ClassEnrollmentRequest < ApplicationRecord
 
   validate :that_class_enrollment_matches_course_and_enrollment,
     if: -> { !student_saving && !marked_for_destruction? }
+  # A adição negada não ocupa a disciplina: não há conflito a conferir.
   validate :that_course_class_does_not_exist_in_a_class_enrollment,
-    if: -> { !marked_for_destruction? }
+    if: -> { !marked_for_destruction? && status != INVALID }
   validate :check_enrollment_hold, unless: -> { status == INVALID }
   validate :that_removal_can_be_undone, if: :undoing_effected_removal?
 
@@ -253,12 +254,14 @@ class ClassEnrollmentRequest < ApplicationRecord
         action == INSERT &&
         class_enrollment.present? && class_enrollment.can_destroy?
       )
+      # Desliga antes de apagar: o after_destroy da inscrição
+      # (ClassEnrollment#set_request_status_after_destroy), pensado para a
+      # exclusão pela tela de inscrições, marcaria esta linha como Inválida.
       if inserting_removal
-        old_status = status
-        class_enrollment.destroy
-        self.status = old_status
+        released = class_enrollment
         self.class_enrollment = nil
-        save
+        update_column(:class_enrollment_id, nil)
+        released.destroy
       end
       if action == REMOVE && class_enrollment.blank?
         self.class_enrollment = ClassEnrollment.new(

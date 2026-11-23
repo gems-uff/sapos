@@ -58,7 +58,9 @@
       <tbody>
         <% table[:data].each do |row| %>
           <tr>
-            <% cer = @record.class_enrollment_requests.find_by(course_class_id: row[0][:id]) %>
+            <%# A linha em memória, não uma cópia do banco: na volta de uma
+                gravação recusada, ela traz a escolha enviada e o erro. %>
+            <% cer = @record.class_enrollment_requests.to_a.find { |line| line.course_class_id == row[0][:id] } %>
             <input
               type="hidden"
               name="record[class_enrollment_requests][<%=cer.id%>][id]"
@@ -88,6 +90,13 @@
               </td>
             <% end %>
           </tr>
+          <% if cer.errors.any? %>
+            <tr class="association-record-errors">
+              <td colspan="<%= 1 + ClassEnrollmentRequest::STATUSES.size + row.size - 1 %>">
+                <%= active_scaffold_error_messages_for(:record, object: cer) %>
+              </td>
+            </tr>
+          <% end %>
         <% end %>
       </tbody>
     </table>

@@ -317,6 +317,8 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     enrollment_request_id = nil
     effected = []
+    # A linha recusada não muda; sem isto, o lote só contaria as efetivadas.
+    refused = []
     # Dentro de cada pedido de inscrição, as remoções antes das adições: na
     # troca de turma (#781) a adição só se efetiva depois da remoção da turma
     # atual. O índice mantém a ordem da lista entre os demais.
@@ -349,6 +351,13 @@ class ClassEnrollmentRequestsController < ApplicationController
       if record.set_status!(ClassEnrollmentRequest::EFFECTED)
         count += 1
         effected << record
+      elsif record.errors.any?
+        refused << I18n.t(
+          "class_enrollment_request.effected.refused",
+          request: "#{record.enrollment_request.enrollment.to_label}, " \
+            "#{record.course_class.to_label}",
+          errors: record.errors.full_messages.join("; ")
+        )
       end
     end
     if effected.present?
@@ -372,6 +381,7 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     do_refresh_list
     @message = I18n.t("class_enrollment_request.effected.applied", count: count)
+    @errors = refused.presence
     respond_to_action(:effect)
   end
 
@@ -394,6 +404,7 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     def effect_respond_on_iframe
       flash[:info] = @message
+      flash[:error] = @errors if @errors
       responds_to_parent do
         render action: "on_effect", formats: [:js], layout: false
       end
@@ -401,11 +412,13 @@ class ClassEnrollmentRequestsController < ApplicationController
 
     def effect_respond_to_html
       flash[:info] = @message
+      flash[:error] = @errors if @errors
       return_to_main
     end
 
     def effect_respond_to_js
       flash.now[:info] = @message
+      flash.now[:error] = @errors if @errors
       do_refresh_list
       @popstate = true
       render action: "on_effect", formats: [:js]

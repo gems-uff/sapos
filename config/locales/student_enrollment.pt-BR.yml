@@ -103,6 +103,7 @@ pt-BR:
         zero: "Nenhuma inscrição efetivada"
         one: "Uma inscrição efetivada"
         other: "%{count} inscrições efetivadas"
+      refused: "Não efetivada: %{request} (%{errors})"
       count:
         zero: "Nenhuma inscrição da lista pode ser efetivada!"
         one: "Uma inscrição da lista pode ser efetivada"
