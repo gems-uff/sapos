@@ -126,14 +126,21 @@ $("#<%= cer_subform_id %>-div .enrollment-request-all").click(function() {
   let attr = $(this).data("attr")
   $(this).parents(".enroll-table").find(".radio-" + attr).click();
   return false;
-})
+});
 
-$("#<%= cer_subform_id %>-div .effected-item").on("change", function(event) {
-  var count = $('#<%= cer_subform_id %>-div .effected-item.radio-efetivada:not(":checked")').length;
-  if (count > 0) {
-    $("#<%= cer_subform_id %>-div .effected-change-alert").show();
-  } else {
-    $("#<%= cer_subform_id %>-div .effected-change-alert").hide();
+// O aviso vale também ao abrir: a página devolvida por uma gravação recusada
+// traz a escolha enviada, que pode ter tirado de Efetivada uma linha gravada
+// como Efetivada (effected-item segue o status gravado).
+(function() {
+  function toggleEffectedChangeAlert() {
+    var count = $('#<%= cer_subform_id %>-div .effected-item.radio-efetivada:not(":checked")').length;
+    if (count > 0) {
+      $("#<%= cer_subform_id %>-div .effected-change-alert").show();
+    } else {
+      $("#<%= cer_subform_id %>-div .effected-change-alert").hide();
+    }
   }
-})
+  $("#<%= cer_subform_id %>-div .effected-item").on("change", toggleEffectedChangeAlert);
+  toggleEffectedChangeAlert();
+})();
 </script>
