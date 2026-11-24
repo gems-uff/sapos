@@ -220,10 +220,27 @@ module Notifier
   # call: with the mail server down every message waits for its timeout, and
   # a process killed before the end would report nothing. The server log has
   # a line for each message (report_failure).
+  #
+  # The failure goes without the addresses in its message: sendmail, the
+  # delivery of production, fails with the whole command, recipient
+  # included. The exception keeps its class and backtrace; the address
+  # stays in the server log (report_failure).
   def self.notify_failure(error, message, delivered:)
     ExceptionNotifier.notify_exception(
-      error, data: { notification_id: message[:notification_id], delivered: delivered }
+      without_addresses(error),
+      data: { notification_id: message[:notification_id], delivered: delivered }
     )
+  end
+
+  # Anything shaped like an address: no quote, bracket, comma or space
+  # around an @. Loose on purpose, as it masks rather than validates.
+  ADDRESS = /[^\s"'<>()\[\],;:]+@[^\s"'<>()\[\],;:]+/
+
+  def self.without_addresses(error)
+    masked = error.message.gsub(ADDRESS, "<address>")
+    return error if masked == error.message
+
+    error.exception(masked)
   end
 
   # What the server log keeps of a delivered message: who was notified and

@@ -632,6 +632,54 @@ RSpec.describe Notifier, type: :model do
         end
       end
 
+      # Production delivers through sendmail, whose failure message carries
+      # the whole command, recipient included. The error email takes only
+      # technical data (config.x.error_email): the address stays in the
+      # server log, next to the notification it came from.
+      describe "an address in the failure" do
+        let(:sendmail_failure) do
+          Mail::Sendmail::DeliveryError.new(
+            'Delivery failed with exitstatus 75: ["/usr/sbin/sendmail", "-i", ' \
+            '"-f", "sapos@example.com", "--", "primeiro@example.com"]'
+          )
+        end
+
+        before(:each) do
+          @reported = []
+          allow(ExceptionNotifier).to receive(:notify_exception) { |error, **| @reported << error }
+          fail_first(Mail::TestMailer, :deliver!, sendmail_failure)
+        end
+
+        it "control: the server log keeps the address" do
+          save_and_send
+
+          expect(errors.join("\n")).to include("primeiro@example.com")
+        end
+
+        it "does not go to the error email, and the rest of the failure does" do
+          save_and_send
+
+          expect(@reported.size).to eq(1)
+          reported = @reported.first
+          expect(reported).to be_a(Mail::Sendmail::DeliveryError)
+          expect(reported.message).not_to include("@example.com")
+          expect(reported.message).to include("exitstatus 75", "/usr/sbin/sendmail")
+          expect(reported.backtrace).to be_present
+        end
+
+        it "does not go to the error email from an SMTP refusal either" do
+          refusal = Net::SMTPFatalError.new(
+            Net::SMTP::Response.parse("550 5.1.1 <segundo@example.com>: mailbox unavailable")
+          )
+          fail_first(Mail::TestMailer, :deliver!, refusal)
+
+          save_and_send
+
+          expect(@reported.first).to be_a(Net::SMTPFatalError)
+          expect(@reported.first.message).to eq("550 5.1.1 <<address>>: mailbox unavailable")
+        end
+      end
+
       it "does not copy the body of the message into the server log" do
         messages.first[:body] = "Seu codigo: SEGREDO-DA-MENSAGEM"
         fail_first(Mail::TestMailer, :deliver!, Errno::ECONNREFUSED)
