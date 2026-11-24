@@ -491,7 +491,7 @@ RSpec.describe Notifier, type: :model do
         expect(NotificationLog.pluck(:subject)).to eq(%w[segundo])
         expect(outcome[:other_callback]).to be(true)
         expect(ExceptionNotifier).to have_received(:notify_exception)
-          .with(an_instance_of(Errno::ECONNREFUSED), data: { notification_id: nil }).once
+          .with(an_instance_of(Errno::ECONNREFUSED), data: { notification_id: nil, failed_messages: 1 }).once
         expect(errors.join("\n")).to include("Errno::ECONNREFUSED", "primeiro@example.com", "primeiro")
       end
 
@@ -506,7 +506,7 @@ RSpec.describe Notifier, type: :model do
         expect(NotificationLog.pluck(:subject)).to eq(%w[segundo])
         expect(outcome[:other_callback]).to be(true)
         expect(ExceptionNotifier).to have_received(:notify_exception)
-          .with(an_instance_of(ActiveRecord::ConnectionNotEstablished), data: { notification_id: nil }).once
+          .with(an_instance_of(ActiveRecord::ConnectionNotEstablished), data: { notification_id: nil, failed_messages: 1 }).once
       end
 
       # The operator reads the server log to decide whether to send again: a
@@ -527,6 +527,20 @@ RSpec.describe Notifier, type: :model do
 
         expect(errors.join("\n")).not_to include("Notification not delivered")
         expect(errors.join("\n")).to include("Notification delivered, but not logged")
+      end
+
+      # A failure that hits every message of a call -- the mail server down
+      # during the daily run -- is one error email, not one per message. The
+      # server log keeps a line for each message.
+      it "reports the failures of one call in one error email" do
+        allow_any_instance_of(Mail::TestMailer).to receive(:deliver!).and_raise(Errno::ECONNREFUSED)
+
+        save_and_send
+
+        expect(ExceptionNotifier).to have_received(:notify_exception).once
+        expect(ExceptionNotifier).to have_received(:notify_exception)
+          .with(an_instance_of(Errno::ECONNREFUSED), data: { notification_id: nil, failed_messages: 2 })
+        expect(errors.join("\n")).to include("primeiro@example.com", "segundo@example.com")
       end
 
       it "does not copy the body of the message into the server log" do

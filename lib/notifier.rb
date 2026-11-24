@@ -93,6 +93,7 @@ module Notifier
   def self.deliver_emails(notifications)
     messages = notifications[:notifications]
     messages_attachments = notifications[:notifications_attachments] || {}
+    failures = []
 
     messages.each do |message|
       delivered = false
@@ -166,7 +167,9 @@ module Notifier
       end
     rescue StandardError => error
       Notifier.report_failure(error, message, delivered: delivered)
+      failures << [error, message]
     end
+    Notifier.notify_failures(failures) if failures.any?
   end
   private_class_method :deliver_emails
 
@@ -175,8 +178,8 @@ module Notifier
   # it would turn a saved change into an error page, keep the messages after
   # this one from being delivered and skip the other callbacks of the commit.
   # The failure goes to the server log, without the body (see
-  # display_notification_info), and to the error email, with technical data
-  # only (see config.x.error_email). The log tells a message that was
+  # display_notification_info), and to the error email (notify_failures). The
+  # log tells a message that was
   # delivered and only failed to be logged from one that was not delivered:
   # it is what the operator reads to decide whether to send it again.
   def self.report_failure(error, message, delivered: false)
@@ -184,8 +187,19 @@ module Notifier
     Notifier.logger.error "Notification #{outcome}: #{error.class}: #{error.message}"
     Notifier.logger.error "Notifying: #{message[:to]}"
     Notifier.logger.error "Subject: #{message[:subject]}"
+  end
+
+  # One error email for the failures of one call, with technical data only
+  # (see config.x.error_email): the first failure and how many messages
+  # failed. A failure that hits every message -- the mail server down during
+  # the daily run -- would otherwise be one email per message. The server
+  # log has a line for each (report_failure).
+  def self.notify_failures(failures)
+    error, message = failures.first
     ExceptionNotifier.notify_exception(
-      error, data: { notification_id: message[:notification_id] }
+      error, data: {
+        notification_id: message[:notification_id], failed_messages: failures.size
+      }
     )
   end
 
