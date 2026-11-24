@@ -31,6 +31,11 @@
       @record.class_enrollment_requests.collect(&:course_class), [], [],
       keep_on_demand = true
     ) %>
+    <%# A inscrição de cada linha gravada, lida no banco: ver o campo oculto
+        class_enrollment abaixo. %>
+    <% saved_class_enrollment_ids = ClassEnrollmentRequest
+      .where(enrollment_request_id: @record.id)
+      .pluck(:id, :class_enrollment_id).to_h %>
     <table class="disable-pointer enroll-table <%= sub_form_list_id(
       association: :class_enrollment_requests
     ) %>">
@@ -59,7 +64,13 @@
         <% table[:data].each do |row| %>
           <tr>
             <%# A linha em memória, não uma cópia do banco: na volta de uma
-                gravação recusada, ela traz a escolha enviada e o erro. %>
+                gravação recusada, ela traz a escolha enviada e o erro. A
+                inscrição da linha é a exceção e vem do banco: a remoção que
+                a gravação recusada efetivaria apagou a inscrição, e o
+                dependent: :nullify dela soltou a linha em memória por
+                update_columns, que o rollback não desfaz (nem o
+                class_enrollment_id_in_database). O campo vazio regravaria a
+                remoção sem apagar a inscrição. %>
             <% cer = @record.class_enrollment_requests.to_a.find { |line| line.course_class_id == row[0][:id] } %>
             <input
               type="hidden"
@@ -72,7 +83,7 @@
             <input
               type="hidden"
               name="record[class_enrollment_requests][<%=cer.id%>][class_enrollment]"
-              value="<%=cer.class_enrollment_id%>">
+              value="<%=saved_class_enrollment_ids.fetch(cer.id) { cer.class_enrollment_id }%>">
             <td class="cell-action">
               <label> <%= cer.action %> </label>
             </td>

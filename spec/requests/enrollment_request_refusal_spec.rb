@@ -89,6 +89,28 @@ RSpec.describe "Pedido de inscrição: recusa com mensagem", type: :request do
     Nokogiri::HTML(response.body)
   end
 
+  # Envia o formulário que a página mostra, como o navegador: cada campo com
+  # o valor que veio nela, inclusive os ocultos, e só o status das linhas de
+  # `mudancas` trocado. É assim que a secretaria regrava a página que voltou
+  # de uma recusa; o `grava` acima lê a inscrição da linha no banco, como a
+  # página aberta de novo.
+  def envia_pagina(mudancas = {})
+    form = pagina.at_css("form[id^='as_enrollment_requests-update']")
+    campos = form.css(
+      "input[type='hidden']:not([name^='_']), input[type='radio'][checked], textarea"
+    ).map { |campo| [campo["name"], campo.name == "textarea" ? campo.text : campo["value"]] }
+    mudancas.each do |cer, status|
+      nome = "record[class_enrollment_requests][#{cer.id}][status]"
+      campos.reject! { |par| par.first == nome }
+      campos << [nome, status]
+    end
+    patch form["action"], params: Rack::Utils.parse_nested_query(URI.encode_www_form(campos))
+  end
+
+  def inscrito?(class_enrollment)
+    ClassEnrollment.where(id: class_enrollment.id).exists?
+  end
+
   def erros_visiveis
     pagina.css(".errorExplanation li, .association-record-errors li").map { |li| li.text.squish }
   end
@@ -144,6 +166,51 @@ RSpec.describe "Pedido de inscrição: recusa com mensagem", type: :request do
     end
   end
 
+  # A remoção leva num campo oculto a inscrição que retira. A gravação
+  # recusada apaga a inscrição e solta a linha antes de desfazer tudo no
+  # banco; a página que volta é montada com a linha em memória. Se o campo
+  # oculto vier dela, vem vazio, e a remoção regravada fica Efetivada sem
+  # apagar inscrição nenhuma: o aluno continua na turma.
+  describe "formulário regravado como voltou da recusa" do
+    before(:each) do
+      a = FactoryBot.create(
+        :course_class, professor: @professor, year: 2026, semester: 2,
+        course: FactoryBot.create(:course, name: "Estatistica", course_type: @type)
+      )
+      @inscricao = ClassEnrollment.create!(
+        enrollment: @enrollment, course_class: a, situation: ClassEnrollment::REGISTERED
+      )
+      @remocao = FactoryBot.create(
+        :class_enrollment_request, enrollment_request: @pedido, course_class: a,
+        class_enrollment: @inscricao, action: ClassEnrollmentRequest::REMOVE, status: requested
+      )
+      ActionMailer::Base.deliveries.clear
+    end
+
+    it "controle: a página recém-aberta efetiva a remoção e apaga a inscrição" do
+      get edit_enrollment_request_path(@pedido)
+      envia_pagina(@remocao => effected)
+
+      expect(response).to have_http_status(:redirect)
+      expect(@remocao.reload.status).to eq(effected)
+      expect(inscrito?(@inscricao)).to be(false)
+    end
+
+    it "a página devolvida, com a disciplina bloqueada negada, efetiva a remoção e apaga a inscrição" do
+      aprova_c_depois
+      get edit_enrollment_request_path(@pedido)
+      envia_pagina(@remocao => effected)
+      expect(erros_visiveis).to include(mensagem(:course_class, :previously_approved))
+      expect(inscrito?(@inscricao)).to be(true)
+
+      envia_pagina(@cx => invalid)
+
+      expect(response).to have_http_status(:redirect)
+      expect([@cx.reload.status, @remocao.reload.status]).to eq([invalid, effected])
+      expect(inscrito?(@inscricao)).to be(false)
+    end
+  end
+
   describe "lote" do
     def efetiva_lista
       get class_enrollment_requests_path
@@ -173,18 +240,20 @@ RSpec.describe "Pedido de inscrição: recusa com mensagem", type: :request do
   end
 
   # Troca de turma na mesma disciplina (#781): remoção de A e adição de B,
-  # as duas Solicitadas. Negar só a remoção deixa a adição em conflito com a
-  # inscrição em A, e a adição, que não mudou, é revalidada.
-  describe "formulário, troca com a remoção negada" do
+  # as duas Solicitadas, a adição mais antiga. Negar só a remoção deixa a
+  # adição em conflito com a inscrição em A, e a adição, que não mudou, é
+  # revalidada. Efetivar as duas numa gravação é recusado com o pedido de
+  # gravar a remoção primeiro, e a página devolvida tem de aceitar esse passo.
+  describe "formulário, troca de turma" do
     before(:each) do
       @anterior.destroy!
       a = FactoryBot.create(:course_class, course: @course_c, professor: @professor, year: 2026, semester: 2)
-      inscricao = ClassEnrollment.create!(
+      @inscricao = ClassEnrollment.create!(
         enrollment: @enrollment, course_class: a, situation: ClassEnrollment::REGISTERED
       )
       @remocao = FactoryBot.create(
         :class_enrollment_request, enrollment_request: @pedido, course_class: a,
-        class_enrollment: inscricao, action: ClassEnrollmentRequest::REMOVE, status: requested
+        class_enrollment: @inscricao, action: ClassEnrollmentRequest::REMOVE, status: requested
       )
       @cx.update!(course_class: FactoryBot.create(
         :course_class, course: @course_c, professor: @professor, year: 2026, semester: 2
@@ -199,6 +268,20 @@ RSpec.describe "Pedido de inscrição: recusa com mensagem", type: :request do
       expect(destinatarios).to eq([])
       expect(erros_visiveis).to include(mensagem(:course_class, :already_enrolled))
       expect(marcado(@remocao)).to eq(invalid)
+    end
+
+    it "a página devolvida pela troca numa gravação aceita gravar a remoção primeiro" do
+      get edit_enrollment_request_path(@pedido)
+      envia_pagina(@remocao => effected, @cx => effected)
+      expect(erros_visiveis).to include(
+        I18n.t("activerecord.errors.models.enrollment_request.attributes.base.release_first")
+      )
+
+      envia_pagina(@cx => requested)
+
+      expect(response).to have_http_status(:redirect)
+      expect([@remocao.reload.status, @cx.reload.status]).to eq([effected, requested])
+      expect(inscrito?(@inscricao)).to be(false)
     end
   end
 
