@@ -14,7 +14,10 @@ require "rails_helper"
 RSpec.describe "E-mail do pedido de carta pelo campo sincronizado da carta", type: :request do
   before(:each) do
     @enviados = []
-    allow(Notifier).to receive(:send_emails) { |notifications:| @enviados.concat(notifications) }
+    allow(Notifier).to receive(:send_emails) do |notifications:|
+      @enviados.concat(notifications)
+      nil # entregue: send_emails devolve só o que não saiu
+    end
 
     inscricao = create_admission_template("Inscricao", { "Dado" => Admissions::FormField::STRING })
     @carta = create_admission_template(

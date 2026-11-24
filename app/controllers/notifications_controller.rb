@@ -77,10 +77,20 @@ class NotificationsController < ApplicationController
   def execute_now
     process_action_link_action do |notification|
       result = notification.execute(override_params: get_query_params(notification))
-      Notifier.send_emails(prepare_attachments(result))
+      undelivered = Array(Notifier.send_emails(prepare_attachments(result)))
       self.successful = true
 
-      flash[:info] = I18n.t("active_scaffold.notification.execute_now_success")
+      # A falha de entrega não derruba a tela (Notifier.report_failure), e com
+      # o servidor de e-mail parado nem o e-mail de erro sai: é aqui que quem
+      # disparou fica sabendo.
+      if undelivered.any?
+        flash[:error] = I18n.t(
+          "active_scaffold.notification.execute_now_failure",
+          count: undelivered.size, total: result[:notifications].size
+        )
+      else
+        flash[:info] = I18n.t("active_scaffold.notification.execute_now_success")
+      end
     end
   end
 

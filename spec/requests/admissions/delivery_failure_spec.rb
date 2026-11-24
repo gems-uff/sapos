@@ -16,6 +16,7 @@ RSpec.describe "Falha de entrega no processo seletivo", type: :request do
     allow(Notifier).to receive(:send_emails) do |notifications:|
       raise Errno::EPIPE, "sendmail" if @falhar
       @enviados.concat(notifications)
+      nil # entregue: send_emails devolve só o que não saiu
     end
     allow(ExceptionNotifier).to receive(:notify_exception)
 

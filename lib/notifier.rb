@@ -82,9 +82,17 @@ module Notifier
     # anunciariam o que não foi gravado, e o NotificationLog do envio seria
     # desfeito com a gravação. Fora de transação, a entrega é imediata. A
     # falha de uma mensagem não sobe (report_failure).
+    #
+    # Devolve as mensagens que não foram entregues, quando a entrega foi
+    # imediata: a tela que anuncia o envio não pode afirmar o que não saiu,
+    # e com o servidor de e-mail parado nem o e-mail de erro sai. Devolve
+    # nil quando a entrega não aconteceu agora (envio desligado, ou à espera
+    # do commit).
+    undelivered = nil
     ActiveRecord.after_all_transactions_commit do
-      deliver_emails(notifications)
+      undelivered = deliver_emails(notifications)
     end
+    undelivered
   end
 
   # Privado: chamado direto, pularia os portões de send_emails (envio
@@ -94,6 +102,7 @@ module Notifier
     messages = notifications[:notifications]
     messages_attachments = notifications[:notifications_attachments] || {}
     reported = Set.new
+    undelivered = []
 
     messages.each do |message|
       delivered = false
@@ -169,10 +178,12 @@ module Notifier
       end
     rescue StandardError => error
       Notifier.report_failure(error, message, delivered: delivered, logged: logged)
+      undelivered << message unless delivered
       # one error email per kind of failure of the call, at once (see
       # notify_failure)
       Notifier.notify_failure(error, message, delivered: delivered) if reported.add?([error.class, delivered])
     end
+    undelivered
   end
   private_class_method :deliver_emails
 

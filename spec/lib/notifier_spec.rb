@@ -603,6 +603,35 @@ RSpec.describe Notifier, type: :model do
         expect(errors.grep(/not delivered/)).to all(include("notification 7"))
       end
 
+      # What the screens that announce a delivery read (see
+      # Admissions::ProcessBaseController#token_delivery_flash).
+      describe "the messages it returns" do
+        it "control: none, when every message is delivered" do
+          expect(Notifier.send_emails(notifications: messages)).to eq([])
+        end
+
+        it "the ones not delivered, when it delivers at once" do
+          fail_first(Mail::TestMailer, :deliver!, Errno::ECONNREFUSED)
+
+          expect(Notifier.send_emails(notifications: messages)).to eq([messages.first])
+        end
+
+        it "not the ones delivered whose log failed" do
+          fail_first(NotificationLog, :save, ActiveRecord::ConnectionNotEstablished)
+
+          expect(Notifier.send_emails(notifications: messages)).to eq([])
+        end
+
+        it "nothing, when the delivery waits for the commit" do
+          returned = :not_called
+          ActiveRecord::Base.transaction do
+            returned = Notifier.send_emails(notifications: messages)
+          end
+
+          expect(returned).to be_nil
+        end
+      end
+
       it "does not copy the body of the message into the server log" do
         messages.first[:body] = "Seu codigo: SEGREDO-DA-MENSAGEM"
         fail_first(Mail::TestMailer, :deliver!, Errno::ECONNREFUSED)
