@@ -95,6 +95,7 @@ module Notifier
     messages_attachments = notifications[:notifications_attachments] || {}
 
     messages.each do |message|
+      delivered = false
       options = {}
       m = message.merge(options)
       next if m[:skip_message]
@@ -149,6 +150,7 @@ module Notifier
           format.html { Notifier.body_whitespace_to_html(m[:body]).html_safe }
         end
         mail.deliver!
+        delivered = true
         m[:to] = old_to
         m[:reply_to] = old_reply_to unless old_reply_to.nil?
 
@@ -163,7 +165,7 @@ module Notifier
         Notifier.display_notification_info(m, attachments_file_name_list)
       end
     rescue StandardError => error
-      Notifier.report_failure(error, message)
+      Notifier.report_failure(error, message, delivered: delivered)
     end
   end
   private_class_method :deliver_emails
@@ -174,9 +176,12 @@ module Notifier
   # this one from being delivered and skip the other callbacks of the commit.
   # The failure goes to the server log, without the body (see
   # display_notification_info), and to the error email, with technical data
-  # only (see config.x.error_email).
-  def self.report_failure(error, message)
-    Notifier.logger.error "Notification not delivered: #{error.class}: #{error.message}"
+  # only (see config.x.error_email). The log tells a message that was
+  # delivered and only failed to be logged from one that was not delivered:
+  # it is what the operator reads to decide whether to send it again.
+  def self.report_failure(error, message, delivered: false)
+    outcome = delivered ? "delivered, but not logged" : "not delivered"
+    Notifier.logger.error "Notification #{outcome}: #{error.class}: #{error.message}"
     Notifier.logger.error "Notifying: #{message[:to]}"
     Notifier.logger.error "Subject: #{message[:subject]}"
     ExceptionNotifier.notify_exception(

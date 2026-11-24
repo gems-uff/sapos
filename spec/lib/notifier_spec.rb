@@ -509,6 +509,26 @@ RSpec.describe Notifier, type: :model do
           .with(an_instance_of(ActiveRecord::ConnectionNotEstablished), data: { notification_id: nil }).once
       end
 
+      # The operator reads the server log to decide whether to send again: a
+      # message that was delivered and only failed to be logged must not read
+      # as not delivered, or the recipient gets it twice.
+      it "control: a failed delivery is logged as not delivered" do
+        fail_first(Mail::TestMailer, :deliver!, Errno::ECONNREFUSED)
+
+        save_and_send
+
+        expect(errors.join("\n")).to include("Notification not delivered")
+      end
+
+      it "tells a delivered message whose log failed from one not delivered" do
+        fail_first(NotificationLog, :save, ActiveRecord::ConnectionNotEstablished)
+
+        save_and_send
+
+        expect(errors.join("\n")).not_to include("Notification not delivered")
+        expect(errors.join("\n")).to include("Notification delivered, but not logged")
+      end
+
       it "does not copy the body of the message into the server log" do
         messages.first[:body] = "Seu codigo: SEGREDO-DA-MENSAGEM"
         fail_first(Mail::TestMailer, :deliver!, Errno::ECONNREFUSED)
