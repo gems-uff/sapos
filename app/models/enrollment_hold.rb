@@ -81,9 +81,26 @@ class EnrollmentHold < ApplicationRecord
 
     enrollment_requests.each do |enrollment_request|
       enrollment_request.class_enrollment_requests.each do |class_enrollment_request|
-        class_enrollment_request.set_status!(ClassEnrollmentRequest::INVALID)
+        invalidate_request(class_enrollment_request)
       end
     end
+  end
+
+  # A remoção efetivada fica Efetivada, como se espera: a inscrição não pode
+  # voltar no período trancado (ClassEnrollmentRequest#
+  # that_removal_can_be_undone). A linha que não grava por outro motivo --
+  # dado legado que a validação recusa -- continua pendente e travando o
+  # formulário do pedido; o log do servidor diz qual e por quê.
+  def invalidate_request(class_enrollment_request)
+    return if class_enrollment_request.status == ClassEnrollmentRequest::INVALID
+    removal_effected = class_enrollment_request.remove_effected?
+    return if class_enrollment_request.set_status!(ClassEnrollmentRequest::INVALID)
+    return if removal_effected
+
+    Rails.logger.warn(
+      "EnrollmentHold #{id}: class enrollment request #{class_enrollment_request.id} " \
+      "not invalidated: #{class_enrollment_request.errors.full_messages.join("; ")}"
+    )
   end
 
   def verify_class_enrollments

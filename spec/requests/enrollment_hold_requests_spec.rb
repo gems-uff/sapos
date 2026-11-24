@@ -163,6 +163,39 @@ RSpec.describe "Trancamento e pedidos de inscrição", type: :request do
       expect(@pedido_seguinte.enrollment_request_comments.count).to eq(1)
     end
 
+    # Linha que não grava ao ser invalidada (aqui, ligada à inscrição de
+    # outra turma: dado legado, montado por fora da tela) continua
+    # Solicitada e travando o formulário; o log do servidor diz qual e por quê.
+    it "registra no log a linha que não conseguiu invalidar" do
+      outra = ClassEnrollment.create!(
+        enrollment: FactoryBot.create(:enrollment), course_class: @a,
+        situation: ClassEnrollment::REGISTERED
+      )
+      @cer.update_column(:class_enrollment_id, outra.id)
+      avisos = []
+      allow(Rails.logger).to receive(:warn) { |texto| avisos << texto.to_s }
+
+      tranca_por(2)
+
+      expect(@cer.reload.status).to eq(requested)
+      expect(avisos.grep(/#{@cer.id}/).join).to include(
+        I18n.t(
+          "activerecord.errors.models.class_enrollment_request.attributes." \
+          "class_enrollment.must_represent_the_same_enrollment_and_class"
+        )
+      )
+    end
+
+    it "controle: a linha que invalida não vai para o log" do
+      avisos = []
+      allow(Rails.logger).to receive(:warn) { |texto| avisos << texto.to_s }
+
+      tranca_por(2)
+
+      expect(@cer.reload.status).to eq(invalid)
+      expect(avisos).to be_empty
+    end
+
     it "controle: trancamento de um semestre não toca o pedido do seguinte" do
       tranca_por(1)
 
