@@ -217,12 +217,19 @@ class EnrollmentRequest < ApplicationRecord
     # O formulário valida as linhas na ordem em que foram criadas, e a linha
     # que ocupa a inscrição é recusada se vier antes da que a libera na mesma
     # disciplina. A gravação em dois passos resolve, e a mensagem diz qual
-    # vem primeiro.
+    # vem primeiro -- só quando o erro da linha é de ordem: barrada por outro
+    # motivo (previously_approved, trancamento), gravar a remoção antes não
+    # resolve, e a mensagem mandaria fazer o que não adianta.
+    ORDER_ERRORS = %i[
+      already_enrolled remove_first multiple_class_enrollments_not_allowed
+    ].freeze
+
     def that_releases_came_first
       return if @releasing.blank?
 
       blocked = class_enrollment_requests.target.any? do |cer|
-        cer.errors.any? && cer.occupies_class_enrollment? &&
+        cer.errors.any? { |error| ORDER_ERRORS.include?(error.type) } &&
+          cer.occupies_class_enrollment? &&
           @releasing.any? do |release|
             release.course_class&.course_id == cer.course_class&.course_id
           end

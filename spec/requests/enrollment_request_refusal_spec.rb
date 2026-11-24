@@ -285,6 +285,45 @@ RSpec.describe "Pedido de inscrição: recusa com mensagem", type: :request do
     end
   end
 
+  # Troca na disciplina C com a nota da turma anterior revista para aprovado:
+  # a adição da troca não passa por previously_approved, que gravar a remoção
+  # primeiro não resolve. O aviso de ordem (release_first) só cabe quando o
+  # que barra a adição é a inscrição que a remoção libera.
+  describe "formulário, troca de turma barrada por outro motivo" do
+    before(:each) do
+      a = FactoryBot.create(:course_class, course: @course_c, professor: @professor, year: 2026, semester: 2)
+      @inscricao = ClassEnrollment.create!(
+        enrollment: @enrollment, course_class: a, situation: ClassEnrollment::REGISTERED
+      )
+      @remocao = FactoryBot.create(
+        :class_enrollment_request, enrollment_request: @pedido, course_class: a,
+        class_enrollment: @inscricao, action: ClassEnrollmentRequest::REMOVE, status: requested
+      )
+      ActionMailer::Base.deliveries.clear
+    end
+
+    let(:release_first) do
+      I18n.t("activerecord.errors.models.enrollment_request.attributes.base.release_first")
+    end
+
+    it "controle: sem a aprovação posterior, pede para gravar a remoção primeiro" do
+      grava(@remocao => effected, @cx => effected, @cy => requested)
+
+      expect(erros_visiveis).to include(release_first)
+      expect(erros_visiveis).to include(mensagem(:course_class, :already_enrolled))
+    end
+
+    it "com a aprovação posterior, diz o que impede a adição e não pede a ordem" do
+      aprova_c_depois
+
+      grava(@remocao => effected, @cx => effected, @cy => requested)
+
+      expect(erros_visiveis).to include(mensagem(:course_class, :previously_approved))
+      expect(erros_visiveis).not_to include(release_first)
+      expect([@remocao.reload.status, @cx.reload.status]).to eq([requested, requested])
+    end
+  end
+
   # A adição Inválida não confere conflito com a inscrição. Desfazer a adição
   # efetivada apaga a inscrição dela, e o after_destroy da inscrição
   # (ClassEnrollment#set_request_status_after_destroy, da exclusão pela tela

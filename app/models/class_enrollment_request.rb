@@ -244,8 +244,10 @@ class ClassEnrollmentRequest < ApplicationRecord
       return if restored.valid?
 
       # Por atributo, não em :base: o erro em :base desta linha chega ao
-      # formulário do pedido como "Class enrollment requests <mensagem>".
-      restored.errors.each { |error| errors.add(error.attribute, error.message) }
+      # formulário do pedido como "Class enrollment requests <mensagem>". O
+      # import mantém o tipo do erro, que o pedido lê para saber se é de
+      # ordem (EnrollmentRequest#that_releases_came_first).
+      restored.errors.each { |error| errors.import(error) }
     end
 
     def create_or_destroy_class_enrollment
