@@ -182,10 +182,20 @@ RSpec.describe "Pedido de inscrição: recusa com mensagem", type: :request do
       ActionMailer::Base.deliveries.clear
     end
 
+    # Um rádio por status, ou a linha não está na página: sem rádio, o all?
+    # seria verdadeiro por vacuidade.
     def avisa?(cer)
-      pagina.css(
+      radios = pagina.css(
         "input[name='record[class_enrollment_requests][#{cer.id}][status]']"
-      ).all? { |radio| radio["class"].split.include?("effected-item") }
+      )
+      expect(radios.size).to eq(ClassEnrollmentRequest::STATUSES.size)
+      radios.all? { |radio| radio["class"].split.include?("effected-item") }
+    end
+
+    it "não conta como marcada a linha que não está na página" do
+      get edit_enrollment_request_path(@pedido)
+
+      expect { avisa?(double(id: 0)) }.to raise_error(RSpec::Expectations::ExpectationNotMetError)
     end
 
     it "controle: a página recém-aberta marca só a linha efetivada" do
