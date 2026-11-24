@@ -83,9 +83,12 @@ module Notifier
     # desfeito com a gravação. Fora de transação, a entrega é imediata. A
     # falha de uma mensagem não sobe (report_failure).
     ActiveRecord.after_all_transactions_commit do
-      Notifier.deliver_emails(notifications)
+      deliver_emails(notifications)
     end
   end
+
+  # Privado: chamado direto, pularia os portões de send_emails (envio
+  # desligado, redirect_email vazio) e a espera pelo commit.
 
   def self.deliver_emails(notifications)
     messages = notifications[:notifications]
@@ -163,6 +166,7 @@ module Notifier
       Notifier.report_failure(error, message)
     end
   end
+  private_class_method :deliver_emails
 
   # A message that could not be delivered or logged costs only itself. The
   # delivery runs after the commit, so raising would not undo what was saved:

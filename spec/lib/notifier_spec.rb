@@ -376,6 +376,19 @@ RSpec.describe Notifier, type: :model do
     # The messages are sent from model callbacks and controllers, in the
     # middle of a save that can still be refused. A message announces what was
     # saved, so it waits for the transaction to commit.
+    # send_emails is the way in: it holds the switches that turn delivery off
+    # (should_run?, an empty redirect_email) and waits for the commit. The
+    # delivery behind it is not a second way in that skips them.
+    context "the delivery behind it" do
+      it "control: send_emails is the way in" do
+        expect(Notifier).to respond_to(:send_emails)
+      end
+
+      it "is not called from outside" do
+        expect(Notifier).not_to respond_to(:deliver_emails)
+      end
+    end
+
     context "a transaction open around it" do
       def sent
         ActionMailer::Base.deliveries.size
