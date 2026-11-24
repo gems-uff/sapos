@@ -97,6 +97,7 @@ module Notifier
 
     messages.each do |message|
       delivered = false
+      logged = false
       options = {}
       m = message.merge(options)
       next if m[:skip_message]
@@ -163,10 +164,11 @@ module Notifier
           reply_to: m[:reply_to],
           attachments_file_names: attachments_file_name_list
         ).save
+        logged = true
         Notifier.display_notification_info(m, attachments_file_name_list)
       end
     rescue StandardError => error
-      Notifier.report_failure(error, message, delivered: delivered)
+      Notifier.report_failure(error, message, delivered: delivered, logged: logged)
       # one error email per kind of failure of the call, at once (see
       # notify_failure)
       Notifier.notify_failure(error, message, delivered: delivered) if reported.add?([error.class, delivered])
@@ -182,9 +184,16 @@ module Notifier
   # display_notification_info), and to the error email (notify_failures). The
   # log tells a message that was
   # delivered and only failed to be logged from one that was not delivered:
-  # it is what the operator reads to decide whether to send it again.
-  def self.report_failure(error, message, delivered: false)
-    outcome = delivered ? "delivered, but not logged" : "not delivered"
+  # it is what the operator reads to decide whether to send it again. "Not
+  # delivered" is what the application knows: deliver! did not return. The
+  # mail server may still have taken the message, when the failure comes
+  # after it accepted the data (a timeout on QUIT, say).
+  def self.report_failure(error, message, delivered: false, logged: false)
+    outcome =
+      if logged then "delivered and logged, but failed after"
+      elsif delivered then "delivered, but not logged"
+      else "not delivered"
+      end
     Notifier.logger.error "Notification #{outcome} (notification #{message[:notification_id]}): " \
       "#{error.class}: #{error.message}"
     Notifier.logger.error "Notifying: #{message[:to]}"

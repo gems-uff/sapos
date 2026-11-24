@@ -520,6 +520,21 @@ RSpec.describe Notifier, type: :model do
         expect(errors.join("\n")).to include("Notification not delivered")
       end
 
+      it "tells a failure after the log from one before it" do
+        calls = 0
+        allow(Notifier).to receive(:display_notification_info).and_wrap_original do |original, *args|
+          calls += 1
+          raise IOError if calls == 1
+          original.call(*args)
+        end
+
+        save_and_send
+
+        expect(NotificationLog.pluck(:subject)).to contain_exactly("primeiro", "segundo")
+        expect(errors.join("\n")).not_to include("not logged")
+        expect(errors.join("\n")).to include("Notification delivered and logged")
+      end
+
       it "tells a delivered message whose log failed from one not delivered" do
         fail_first(NotificationLog, :save, ActiveRecord::ConnectionNotEstablished)
 
