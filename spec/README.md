@@ -58,6 +58,12 @@ Chrome/Selenium defects are handled once, in `spec/support`:
 
 - Chrome 116+ CDP stale-node errors: retried by the `synchronize` patch in
   `wait_for_ajax_helpers.rb`.
+- Chrome 158+ refusing the `*` origin in the `reset!` between examples:
+  `capybara_chrome_reset.rb` patches the private `execute_cdp` of the Chrome
+  driver.
+
+Both patches depend on Capybara internals; `AGENTS.md` ("Monkey-patches")
+lists them for whoever upgrades Capybara.
 - Clicks intercepted by a stray record-select dropdown: retried inside
   `record_select_helpers.rb`.
 
