@@ -31,11 +31,16 @@
       @record.class_enrollment_requests.collect(&:course_class), [], [],
       keep_on_demand = true
     ) %>
-    <%# A inscrição de cada linha gravada, lida no banco: ver o campo oculto
-        class_enrollment abaixo. %>
-    <% saved_class_enrollment_ids = ClassEnrollmentRequest
+    <%# A inscrição e o status de cada linha gravada, lidos no banco: ver o
+        campo oculto class_enrollment abaixo. O status gravado decide o aviso
+        de pedido já efetivado (effected-change-alert), que fala do que
+        estava efetivado antes da alteração, não da escolha que voltou de uma
+        gravação recusada. %>
+    <% saved_lines = ClassEnrollmentRequest
       .where(enrollment_request_id: @record.id)
-      .pluck(:id, :class_enrollment_id).to_h %>
+      .pluck(:id, :class_enrollment_id, :status) %>
+    <% saved_class_enrollment_ids = saved_lines.to_h { |id, ce_id, _| [id, ce_id] } %>
+    <% saved_statuses = saved_lines.to_h { |id, _, status| [id, status] } %>
     <table class="disable-pointer enroll-table <%= sub_form_list_id(
       association: :class_enrollment_requests
     ) %>">
@@ -90,7 +95,9 @@
             <% ClassEnrollmentRequest::STATUSES.each do |status| %>
               <td>
                 <label>
-                  <input <%= class_request_attribute(cer, status) %>
+                  <input <%= class_request_attribute(
+                           cer, status, saved_statuses.fetch(cer.id) { cer.status }
+                         ) %>
                          name="record[class_enrollment_requests][<%=cer.id%>][status]"/>
                 </label>
               </td>

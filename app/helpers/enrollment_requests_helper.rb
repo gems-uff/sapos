@@ -7,7 +7,10 @@ module EnrollmentRequestsHelper
   include EnrollmentSearchHelperConcern
   include ClassScheduleHelperConcern
 
-  def class_request_attribute(record, column_status)
+  # saved_status: o status gravado da linha, que decide a marca
+  # effected-item (o aviso de pedido já efetivado). Na volta de uma gravação
+  # recusada, o status do registro é o da escolha enviada.
+  def class_request_attribute(record, column_status, saved_status = record.status)
     record_status = record.status
     result = [
       'type="radio"',
@@ -22,7 +25,7 @@ module EnrollmentRequestsHelper
       result << 'disabled="disabled"' unless checked
     end
 
-    classes << "effected-item" if record_status == ClassEnrollmentRequest::EFFECTED
+    classes << "effected-item" if saved_status == ClassEnrollmentRequest::EFFECTED
     result << "class=\"#{classes.join(' ')}\""
     result.join(" ").html_safe
   end

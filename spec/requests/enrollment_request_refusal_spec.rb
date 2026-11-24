@@ -171,6 +171,38 @@ RSpec.describe "Pedido de inscrição: recusa com mensagem", type: :request do
   # banco; a página que volta é montada com a linha em memória. Se o campo
   # oculto vier dela, vem vazio, e a remoção regravada fica Efetivada sem
   # apagar inscrição nenhuma: o aluno continua na turma.
+  # O aviso de "pedido já efetivado" (effected-change-alert) acende quando a
+  # secretaria tira de Efetivada uma linha que estava efetivada antes da
+  # alteração. A página devolvida pela recusa traz a escolha enviada, e o
+  # aviso tem de seguir o que está gravado, não a escolha.
+  describe "formulário devolvido, aviso de pedido já efetivado" do
+    before(:each) do
+      expect(@cy.set_status!(effected)).to be(true)
+      aprova_c_depois
+      ActionMailer::Base.deliveries.clear
+    end
+
+    def avisa?(cer)
+      pagina.css(
+        "input[name='record[class_enrollment_requests][#{cer.id}][status]']"
+      ).all? { |radio| radio["class"].split.include?("effected-item") }
+    end
+
+    it "controle: a página recém-aberta marca só a linha efetivada" do
+      get edit_enrollment_request_path(@pedido)
+
+      expect([avisa?(@cy), avisa?(@cx)]).to eq([true, false])
+    end
+
+    it "na página devolvida, marca a linha efetivada no banco, não a escolha enviada" do
+      grava(@cx => effected, @cy => requested)
+      expect(erros_visiveis).to include(mensagem(:course_class, :previously_approved))
+      expect([marcado(@cx), marcado(@cy)]).to eq([effected, requested])
+
+      expect([avisa?(@cy), avisa?(@cx)]).to eq([true, false])
+    end
+  end
+
   describe "formulário regravado como voltou da recusa" do
     before(:each) do
       a = FactoryBot.create(
