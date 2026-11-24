@@ -36,6 +36,7 @@ require "rspec/collection_matchers"
 
 require "capybara/rails"
 require "capybara/rspec"
+require "support/capybara_chrome_reset"
 
 require "support/date_helpers"
 require "support/user_helpers"

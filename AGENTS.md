@@ -375,6 +375,12 @@ cada uma explica o porquê no próprio cabeçalho:
 - prawn-table: `prawn_actual_text.rb` (`prepend` no `draw_content` privado de
   `Prawn::Table::Cell::Text`, mais o `@pdf` da célula e o `renderer` do Prawn),
   que faz o quadro de horários falar ao leitor de tela.
+- Capybara, fora dos initializers, só nos testes:
+  `spec/support/capybara_chrome_reset.rb` (`prepend` no `execute_cdp` privado
+  de `Capybara::Selenium::Driver::ChromeDriver`). O `reset!` entre exemplos
+  limpa o Chrome com a origem `*`, que o Chrome passou a recusar, e todo
+  feature spec quebrava nele; sai quando o Capybara corrigir (a issue está
+  no cabeçalho do arquivo).
 
 `schema_plus_alternative.rb` é o que olhar primeiro: reabre
 `ActiveRecord::Migration` e transforma `add_foreign_key` e `remove_foreign_key`
