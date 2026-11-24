@@ -23,6 +23,12 @@ require "rails_helper"
 #   (cada uma com cada metade primeiro). O lote só efetiva: entra com a troca
 #   pedida, nas duas ordens da lista.
 #
+# O formulário grava como o navegador: envia os campos da página, os
+# ocultos com o valor que vieram nela. Quando a gravação numa vez é recusada
+# com o pedido de gravar primeiro a metade que libera a inscrição, a
+# secretaria segue o pedido a partir da página que voltou, e as duas
+# gravações seguintes passam pelo mesmo oráculo até o alvo.
+#
 # O oráculo, em cada gravação:
 # - Estado. Nunca a adição Efetivada com a remoção não Efetivada (duas
 #   inscrições na disciplina). Aceita, cada metade fica no status pedido, e o
@@ -130,20 +136,33 @@ RSpec.describe "Troca de turma na secretaria: tabela verdade", type: :request do
     Array(flash[:error])
   end
 
-  # Gravação do formulário do pedido: todas as linhas vão no envio, na ordem
-  # dada, como a tela as mostra agora; só as de `changes` mudam de status.
-  def form_save(order, changes)
-    rows = { "0" => "" }
-    order.each(&:reload).each do |cer|
-      rows[cer.id.to_s] = {
-        id: cer.id.to_s, course_class: cer.course_class_id.to_s,
-        class_enrollment: cer.class_enrollment_id.to_s,
-        status: changes.fetch(cer, cer.status)
-      }
+  # Gravação do formulário do pedido, como o navegador: os campos da página,
+  # ocultos inclusive, com o valor que vieram nela. A página é a recém-aberta
+  # ou, em `html`, a que voltou de uma recusa. A secretaria põe o status de
+  # cada linha: o de `changes`, e nas outras o gravado. As linhas vão no
+  # envio na ordem dada.
+  def form_save(order, changes, html: nil)
+    unless html
+      get edit_enrollment_request_path(@pedido)
+      html = response.body
     end
-    put enrollment_request_path(@pedido), params: {
-      record: { comment_message: "", class_enrollment_requests: rows }
-    }
+    form = Nokogiri::HTML(html).at_css("form[id^='as_enrollment_requests-update']")
+    fields = form.css(
+      "input[type='hidden']:not([name^='_']), input[type='radio'][checked], textarea"
+    ).map { |field| [field["name"], field.name == "textarea" ? field.text : field["value"]] }
+    order.each(&:reload).each do |cer|
+      name = "record[class_enrollment_requests][#{cer.id}][status]"
+      status = changes.fetch(cer, cer.status)
+      expect(form.at_css("input[type='radio'][name='#{name}'][value='#{status}']:not([disabled])"))
+        .to be_present
+      fields.reject! { |field, _| field == name }
+      fields << [name, status]
+    end
+    rank = order.each_with_index.to_h { |cer, index| [cer.id.to_s, index] }
+    fields = fields.each_with_index.sort_by do |(field, _), index|
+      [rank.fetch(field[/\[class_enrollment_requests\]\[(\d+)\]/, 1], -1), index]
+    end.map(&:first)
+    patch form["action"], params: Rack::Utils.parse_nested_query(URI.encode_www_form(fields))
     return [] if response.redirect?
 
     Nokogiri::HTML(response.body)
@@ -295,8 +314,11 @@ RSpec.describe "Troca de turma na secretaria: tabela verdade", type: :request do
     expect(enrolled).to eq(enrolled_in(expected))
   end
 
-  # Uma gravação pelo caminho dado, conferida contra o oráculo.
-  def save_and_check(path, changes)
+  # Uma gravação pelo caminho dado, conferida contra o oráculo. Na recusa
+  # do formulário que pede para gravar primeiro a metade que libera a
+  # inscrição, guarda em @returned_page a página que voltou.
+  def save_and_check(path, changes, html: nil)
+    @returned_page = nil
     before = state
     target = before.merge(changes)
     lines = { removal: line(@from), insertion: line(@to) }
@@ -309,7 +331,7 @@ RSpec.describe "Troca de turma na secretaria: tabela verdade", type: :request do
       else
         order = [lines[:removal], lines[:insertion]]
         order.reverse! if path == :form_insertion_first
-        form_save(order, changes.transform_keys { |half| lines[half] })
+        form_save(order, changes.transform_keys { |half| lines[half] }, html: html)
       end
 
     if acceptable?(target) && !form_refuses?(path, before, changes)
@@ -320,7 +342,22 @@ RSpec.describe "Troca de turma na secretaria: tabela verdade", type: :request do
       expect(errors).to match_array(refusal(path, before, target, changes))
       expect_state(before)
       expect(delivered_to).to eq([])
+      @returned_page = response.body if form?(path) && releases_first?(before, changes)
     end
+  end
+
+  # A secretaria segue a recusa: na página que voltou, grava só a metade que
+  # libera a inscrição (efetivar a remoção ou desfazer a adição), com a outra
+  # de volta ao status gravado; depois, na página aberta de novo, a outra.
+  # Cada gravação passa pelo oráculo, e no fim a troca está no alvo.
+  def follow_release_first(path, changes)
+    releasing = changes[:removal] == ClassEnrollmentRequest::EFFECTED ? :removal : :insertion
+    other = releasing == :removal ? :insertion : :removal
+    target = state.merge(changes)
+
+    save_and_check(path, { releasing => changes[releasing] }, html: @returned_page)
+    save_and_check(path, { other => changes[other] })
+    expect_state(target)
   end
 
   starts = {
@@ -361,6 +398,7 @@ RSpec.describe "Troca de turma na secretaria: tabela verdade", type: :request do
               one_save.each do |path_label, path|
                 it path_label do
                   save_and_check(path, changes)
+                  follow_release_first(path, changes) if @returned_page
                 end
               end
 
@@ -370,7 +408,7 @@ RSpec.describe "Troca de turma na secretaria: tabela verdade", type: :request do
                     sequence.each do |half|
                       next unless changes.key?(half)
 
-                      save_and_check(path, half => changes[half])
+                      save_and_check(path, { half => changes[half] })
                     end
                   end
                 end
