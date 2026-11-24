@@ -345,6 +345,28 @@ RSpec.describe "Pedido de inscrição: recusa com mensagem", type: :request do
       expect(erros_visiveis).to include(mensagem(:course_class, :already_enrolled))
     end
 
+    # Gravar a remoção antes só resolve metade: a adição tem também um erro
+    # que a ordem não muda (aqui, inscrição de outra turma ligada a ela, dado
+    # que só se monta por fora da tela).
+    it "com erro de ordem e outro na mesma linha, diz os dois e não pede a ordem" do
+      outra = ClassEnrollment.create!(
+        enrollment: @enrollment, situation: ClassEnrollment::REGISTERED,
+        course_class: FactoryBot.create(
+          :course_class, course: FactoryBot.create(:course, name: "Estatistica", course_type: @type),
+          professor: @professor, year: 2026, semester: 2
+        )
+      )
+      @cx.update_column(:class_enrollment_id, outra.id)
+
+      grava(@remocao => effected, @cx => effected, @cy => requested)
+
+      expect(erros_visiveis).to include(mensagem(:course_class, :already_enrolled))
+      expect(erros_visiveis).to include(
+        mensagem(:class_enrollment, :must_represent_the_same_enrollment_and_class)
+      )
+      expect(erros_visiveis).not_to include(release_first)
+    end
+
     it "com a aprovação posterior, diz o que impede a adição e não pede a ordem" do
       aprova_c_depois
 
