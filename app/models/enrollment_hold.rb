@@ -65,12 +65,19 @@ class EnrollmentHold < ApplicationRecord
     enrollment.create_phase_completions
   end
 
+  # Invalida os pedidos de todos os semestres que o trancamento cobre, e nao
+  # so o do primeiro: hold_in_date e o check_enrollment_hold da linha do
+  # pedido valem ate o end_date, e a adicao que ficasse Solicitada num
+  # semestre seguinte travaria toda gravacao do formulario daquele pedido.
   def invalidate_enrollment_requests
-    enrollment_requests = EnrollmentRequest.where(
-      enrollment: enrollment,
-      year: year,
-      semester: semester
-    ).includes(:class_enrollment_requests)
+    first = YearSemester.new(year: year, semester: semester)
+    semesters = (0...number_of_semesters).map { |offset| first + offset }
+    by_semester = semesters.map do |ys|
+      EnrollmentRequest.where(year: ys.year, semester: ys.semester)
+    end
+    enrollment_requests = EnrollmentRequest.where(enrollment: enrollment)
+      .and(by_semester.reduce(:or))
+      .includes(:class_enrollment_requests)
 
     enrollment_requests.each do |enrollment_request|
       enrollment_request.class_enrollment_requests.each do |class_enrollment_request|

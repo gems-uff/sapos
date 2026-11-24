@@ -115,6 +115,61 @@ RSpec.describe "Trancamento e pedidos de inscrição", type: :request do
     expect(cer.reload.status).to eq(invalid)
   end
 
+  describe "trancamento de mais de um semestre" do
+    before(:each) do
+      @c = FactoryBot.create(
+        :course_class, course: FactoryBot.create(:course, name: "Gama"),
+        professor: @a.professor, year: 2027, semester: 1
+      )
+      @pedido_seguinte = FactoryBot.create(
+        :enrollment_request, enrollment: @enrollment, year: 2027, semester: 1
+      )
+      @cer = FactoryBot.create(
+        :class_enrollment_request, enrollment_request: @pedido_seguinte, course_class: @c,
+        action: ClassEnrollmentRequest::INSERT, status: requested
+      )
+    end
+
+    def tranca_por(semestres)
+      EnrollmentHold.create!(
+        enrollment: @enrollment, year: 2026, semester: 2, number_of_semesters: semestres
+      )
+      ActionMailer::Base.deliveries.clear
+    end
+
+    it "invalida também a adição pendente do semestre seguinte" do
+      tranca_por(2)
+
+      expect(@cer.reload.status).to eq(invalid)
+    end
+
+    it "deixa a secretaria gravar comentário no pedido do semestre seguinte" do
+      tranca_por(2)
+      sign_in @admin
+
+      put enrollment_request_path(@pedido_seguinte), params: { record: {
+        comment_message: "Trancamento registrado",
+        class_enrollment_requests: {
+          "0" => "",
+          @cer.id.to_s => {
+            id: @cer.id.to_s, course_class: @c.id.to_s, class_enrollment: "",
+            status: @cer.reload.status
+          }
+        }
+      } }
+
+      expect(erros_visiveis).to eq([])
+      expect(response).to have_http_status(:redirect)
+      expect(@pedido_seguinte.enrollment_request_comments.count).to eq(1)
+    end
+
+    it "controle: trancamento de um semestre não toca o pedido do seguinte" do
+      tranca_por(1)
+
+      expect(@cer.reload.status).to eq(requested)
+    end
+  end
+
   describe "remoção efetivada antes do trancamento" do
     before(:each) do
       inscricao = ClassEnrollment.create!(
