@@ -491,7 +491,7 @@ RSpec.describe Notifier, type: :model do
         expect(NotificationLog.pluck(:subject)).to eq(%w[segundo])
         expect(outcome[:other_callback]).to be(true)
         expect(ExceptionNotifier).to have_received(:notify_exception)
-          .with(an_instance_of(Errno::ECONNREFUSED), data: { notification_id: nil, failed_messages: 1 }).once
+          .with(an_instance_of(Errno::ECONNREFUSED), data: { notification_id: nil, delivered: false }).once
         expect(errors.join("\n")).to include("Errno::ECONNREFUSED", "primeiro@example.com", "primeiro")
       end
 
@@ -506,7 +506,7 @@ RSpec.describe Notifier, type: :model do
         expect(NotificationLog.pluck(:subject)).to eq(%w[segundo])
         expect(outcome[:other_callback]).to be(true)
         expect(ExceptionNotifier).to have_received(:notify_exception)
-          .with(an_instance_of(ActiveRecord::ConnectionNotEstablished), data: { notification_id: nil, failed_messages: 1 }).once
+          .with(an_instance_of(ActiveRecord::ConnectionNotEstablished), data: { notification_id: nil, delivered: true }).once
       end
 
       # The operator reads the server log to decide whether to send again: a
@@ -532,15 +532,60 @@ RSpec.describe Notifier, type: :model do
       # A failure that hits every message of a call -- the mail server down
       # during the daily run -- is one error email, not one per message. The
       # server log keeps a line for each message.
-      it "reports the failures of one call in one error email" do
+      it "reports the same failure of one call in one error email" do
         allow_any_instance_of(Mail::TestMailer).to receive(:deliver!).and_raise(Errno::ECONNREFUSED)
 
         save_and_send
 
         expect(ExceptionNotifier).to have_received(:notify_exception).once
         expect(ExceptionNotifier).to have_received(:notify_exception)
-          .with(an_instance_of(Errno::ECONNREFUSED), data: { notification_id: nil, failed_messages: 2 })
+          .with(an_instance_of(Errno::ECONNREFUSED), data: { notification_id: nil, delivered: false })
         expect(errors.join("\n")).to include("primeiro@example.com", "segundo@example.com")
+      end
+
+      # Two different failures in one call -- the daily run puts every due
+      # notification in one -- are two defects, and each one reaches the
+      # error email with the notification it came from.
+      it "reports each kind of failure of one call" do
+        messages.first[:notification_id] = 5
+        messages.last[:notification_id] = 9
+        fail_first(Mail::TestMailer, :deliver!, Errno::ECONNREFUSED)
+        fail_first(NotificationLog, :save, ActiveRecord::ConnectionNotEstablished)
+
+        save_and_send
+
+        expect(ExceptionNotifier).to have_received(:notify_exception).twice
+        expect(ExceptionNotifier).to have_received(:notify_exception)
+          .with(an_instance_of(Errno::ECONNREFUSED), data: hash_including(notification_id: 5, delivered: false))
+        expect(ExceptionNotifier).to have_received(:notify_exception)
+          .with(an_instance_of(ActiveRecord::ConnectionNotEstablished),
+            data: hash_including(notification_id: 9, delivered: true))
+      end
+
+      # The error email does not wait for the rest of the call: with the
+      # mail server down, every message waits for its own timeout, and a
+      # process killed before the end would not report at all.
+      it "reports a failure before delivering the messages after it" do
+        delivered_before_report = nil
+        allow(ExceptionNotifier).to receive(:notify_exception) do
+          delivered_before_report = ActionMailer::Base.deliveries.size
+        end
+        fail_first(Mail::TestMailer, :deliver!, Errno::ECONNREFUSED)
+
+        save_and_send
+
+        expect(delivered_before_report).to eq(0)
+        expect(ActionMailer::Base.deliveries.map(&:subject)).to eq(%w[segundo])
+      end
+
+      it "names the notification of each failure in the server log" do
+        messages.each { |m| m[:notification_id] = 7 }
+        allow_any_instance_of(Mail::TestMailer).to receive(:deliver!).and_raise(Errno::ECONNREFUSED)
+
+        save_and_send
+
+        expect(errors.grep(/not delivered/).size).to eq(2)
+        expect(errors.grep(/not delivered/)).to all(include("notification 7"))
       end
 
       it "does not copy the body of the message into the server log" do

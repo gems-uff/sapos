@@ -93,7 +93,7 @@ module Notifier
   def self.deliver_emails(notifications)
     messages = notifications[:notifications]
     messages_attachments = notifications[:notifications_attachments] || {}
-    failures = []
+    reported = Set.new
 
     messages.each do |message|
       delivered = false
@@ -167,9 +167,10 @@ module Notifier
       end
     rescue StandardError => error
       Notifier.report_failure(error, message, delivered: delivered)
-      failures << [error, message]
+      # one error email per kind of failure of the call, at once (see
+      # notify_failure)
+      Notifier.notify_failure(error, message, delivered: delivered) if reported.add?([error.class, delivered])
     end
-    Notifier.notify_failures(failures) if failures.any?
   end
   private_class_method :deliver_emails
 
@@ -184,22 +185,24 @@ module Notifier
   # it is what the operator reads to decide whether to send it again.
   def self.report_failure(error, message, delivered: false)
     outcome = delivered ? "delivered, but not logged" : "not delivered"
-    Notifier.logger.error "Notification #{outcome}: #{error.class}: #{error.message}"
+    Notifier.logger.error "Notification #{outcome} (notification #{message[:notification_id]}): " \
+      "#{error.class}: #{error.message}"
     Notifier.logger.error "Notifying: #{message[:to]}"
     Notifier.logger.error "Subject: #{message[:subject]}"
   end
 
-  # One error email for the failures of one call, with technical data only
-  # (see config.x.error_email): the first failure and how many messages
-  # failed. A failure that hits every message -- the mail server down during
-  # the daily run -- would otherwise be one email per message. The server
-  # log has a line for each (report_failure).
-  def self.notify_failures(failures)
-    error, message = failures.first
+  # The error email, with technical data only (see config.x.error_email):
+  # one per kind of failure of a call -- its class, and whether the message
+  # was delivered before it --, sent at once. A failure that hits every
+  # message -- the mail server down during the daily run -- would otherwise
+  # be one email per message; a second, different failure in the same call
+  # is another defect and gets its own. It is not held until the end of the
+  # call: with the mail server down every message waits for its timeout, and
+  # a process killed before the end would report nothing. The server log has
+  # a line for each message (report_failure).
+  def self.notify_failure(error, message, delivered:)
     ExceptionNotifier.notify_exception(
-      error, data: {
-        notification_id: message[:notification_id], failed_messages: failures.size
-      }
+      error, data: { notification_id: message[:notification_id], delivered: delivered }
     )
   end
 
