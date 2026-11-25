@@ -121,6 +121,19 @@ RSpec.describe "Tela que anuncia envio de e-mail, com a entrega falhando", type:
       )
     end
 
+    # A variável redirect_email vazia desliga o envio (homologação): nada
+    # sai, nada vai para o NotificationLog.
+    it "com o envio desligado, não diz que disparou" do
+      FactoryBot.create(:custom_variable, variable: "redirect_email", value: nil)
+
+      post execute_now_notification_path(@notification), xhr: true
+
+      expect(ActionMailer::Base.deliveries).to be_empty
+      expect(NotificationLog.count).to eq(0)
+      expect(response.body).not_to include(sucesso)
+      expect(response.body).to include(I18n.t("active_scaffold.notification.execute_now_not_sending"))
+    end
+
     it "com destinatário vazio numa linha, diz que ela não saiu" do
       @notification.query.update!(sql: "select 'a@example.com' as email union all select '' as email")
       @notification.update!(to_template: "{{ email }}")

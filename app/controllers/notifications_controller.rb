@@ -82,8 +82,11 @@ class NotificationsController < ApplicationController
 
       # A falha de entrega não derruba a tela (Notifier.report_failure), e com
       # o servidor de e-mail parado nem o e-mail de erro sai: é aqui que quem
-      # disparou fica sabendo.
-      if undelivered.any?
+      # disparou fica sabendo. Com o envio desligado, send_emails volta sem
+      # tentar nada (nil), e não há o que contar.
+      if !Notifier.sending?
+        flash[:error] = I18n.t("active_scaffold.notification.execute_now_not_sending")
+      elsif undelivered.any?
         flash[:error] = I18n.t(
           "active_scaffold.notification.execute_now_failure",
           count: undelivered.size, total: result[:notifications].size
