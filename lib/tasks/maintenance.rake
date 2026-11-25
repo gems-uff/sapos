@@ -5,6 +5,7 @@ namespace :maintenance do
   task run: [:environment] do
     Rails.logger.info "[Maintenance] #{Time.current.to_fs} - Starting maintenance tasks"
     Rake::Task["maintenance:remove_expired_reports"].invoke
+    Rake::Task["maintenance:remove_expired_import_grade_previews"].invoke
     Rake::Task["maintenance:clean_upload_cache"].invoke
     Rake::Task["maintenance:trigger_notifications"].invoke
     Rails.logger.info "[Maintenance] #{Time.current.to_fs} - Finished maintenance tasks"
@@ -35,6 +36,12 @@ namespace :maintenance do
     expired_reports.find_each(&:release_file!)
 
     Rails.logger.info "[Reports] #{Time.current.to_fs} Finished removing reports"
+  end
+
+  task remove_expired_import_grade_previews: [:environment] do
+    Rails.logger.info "[ImportGradePreviews] #{Time.zone.now.to_fs} Removing expired grade import previews"
+    removed = ImportGradePreview.purge_expired
+    Rails.logger.info "[ImportGradePreviews] #{Time.zone.now.to_fs} Removed #{removed} preview(s)"
   end
 
   task trigger_notifications: [:environment] do

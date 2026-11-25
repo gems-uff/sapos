@@ -27,6 +27,7 @@ class CustomVariable < ApplicationRecord
     "quadrennial_period" => :text,
     "instance_name" => :text,
     "enable_advisor_accreditation_validation" => :text,
+    "import_grades_session_timeout" => :text
   }
 
   validates :variable, presence: true
@@ -128,6 +129,13 @@ class CustomVariable < ApplicationRecord
     config.value.strip.downcase != "no"
   end
 
+  def self.import_grades_session_timeout
+    config = CustomVariable.find_by_variable(:import_grades_session_timeout)
+    value = config&.value.to_s.strip
+    return 45.minutes unless value.match?(/\A[1-9]\d*\z/)
+    value.to_i.minutes
+  end
+
   def to_label
     self.variable.to_s
   end
@@ -179,6 +187,10 @@ class CustomVariable < ApplicationRecord
             minimum_grade_for_approval: (minimum.to_f / 10.0).to_s
           }
         ) if (!self.value.blank?) && ((grade * 10.0).to_i >= minimum)
+      when "import_grades_session_timeout"
+        unless self.value.blank? || self.value.strip.match?(/\A[1-9]\d*\z/)
+          self.errors.add(:value, :import_grades_session_timeout_not_positive_integer)
+        end
       end
     end
 

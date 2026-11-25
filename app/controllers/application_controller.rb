@@ -26,6 +26,8 @@ class ApplicationController < ActionController::Base
 
   clear_helpers
 
+  helper SubformColumnsHelper
+
   # Todo usuario autenticado le a pagina inicial (Ability), e e o
   # LandingController#index que escolhe a tela de cada papel.
   def root

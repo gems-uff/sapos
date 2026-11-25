@@ -32,6 +32,8 @@ class ClassEnrollment < ApplicationRecord
   )
   SITUATIONS = [REGISTERED, APPROVED, DISAPPROVED]
 
+  attr_accessor :skip_notification
+
   validates :enrollment, presence: true
   validates :course_class, presence: true
   validates :course_class, uniqueness: { scope: :enrollment_id }
@@ -42,7 +44,7 @@ class ClassEnrollment < ApplicationRecord
   validate :professor_changed_only_valid_fields, if: :restricted_to_grade_fields?
   validate :check_enrollment_hold, if: :dates_affecting_hold_changed?
 
-  after_save :notify_student_and_advisor
+  after_save :notify_student_and_advisor, unless: :skip_notification
   after_save :class_enrollment_request_cascade
   after_destroy :set_request_status_after_destroy
 
