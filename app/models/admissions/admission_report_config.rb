@@ -167,7 +167,7 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
       admission_process: admission_process,
       base_url: ENV["RAILS_RELATIVE_URL_ROOT"] || ""
     }
-    self.groups.each do |group|
+    (self.groups.to_a + fixed_groups).each do |group|
       group_config = group.tabular_config(self, admission_process, applications)
       config[:header] += group_config.header
       config[:groups] << group_config
@@ -270,4 +270,16 @@ class Admissions::AdmissionReportConfig < ActiveRecord::Base
     end
     self.prepare_row(config, application, &block)
   end
+
+  private
+    def fixed_groups
+      Admissions::AdmissionReportGroup::FIXED_MODES.map do |mode|
+        Admissions::AdmissionReportGroup.new(
+          mode:,
+          operation: Admissions::AdmissionReportGroup::EXCLUDE,
+          in_simple: false,
+          pdf_format: Admissions::AdmissionReportGroup::TABLE
+        )
+      end
+    end
 end

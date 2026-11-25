@@ -17,12 +17,14 @@ class Admissions::AdmissionReportGroup < ActiveRecord::Base
   PHASE_WITHOUT_COMMITTEE_REVERSE = record_i18n_attr("modes.phase_without_committee_reverse")
   RANKING = record_i18n_attr("modes.ranking")
   CONSOLIDATION = record_i18n_attr("modes.consolidation")
+  AVULSO_COURSES = record_i18n_attr("modes.avulso_courses")
 
   MODES = [
     MAIN, MAIN_LETTER, MAIN_ANONYMOUS, FIELD, LETTER,
     PHASE, PHASE_WITHOUT_COMMITTEE, PHASE_REVERSE, PHASE_WITHOUT_COMMITTEE_REVERSE,
     RANKING, CONSOLIDATION
   ]
+  FIXED_MODES = [AVULSO_COURSES]
 
   INCLUDE = record_i18n_attr("operations.include")
   EXCLUDE = record_i18n_attr("operations.exclude")
@@ -80,9 +82,15 @@ class Admissions::AdmissionReportGroup < ActiveRecord::Base
       cls = Admissions::AdmissionReportGroupRanking
     when CONSOLIDATION
       cls = Admissions::AdmissionReportGroupConsolidation
+    when AVULSO_COURSES
+      cls = Admissions::AdmissionReportGroupAvulsoCourses
     end
     group = cls.new(report_config, self, admission_process, applications, extra)
     group.prepare_config()
     group
+  end
+
+  def fixed?
+    FIXED_MODES.include?(self.mode)
   end
 end
