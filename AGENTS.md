@@ -34,7 +34,12 @@ engana quem a lê hoje.
 ## Convenções de trabalho
 
 - Uma issue, um ramo `issue_NNN`, sempre baseado na `main`. Detalhes do ciclo em
-  `CONTRIBUTING.md`.
+  `CONTRIBUTING.md`. **O mantenedor é a exceção:** ele pode trabalhar direto
+  na `main`, um commit por assunto, ou abrir ramo quando a issue pede; a
+  escolha é dele, e não se propõe ramo a ele por pureza de escopo. Commit e
+  push também são decisões separadas: o commit demarca a mudança, o push a
+  publica, e quando publicar é com ele. Correção de vulnerabilidade só se
+  publica quando o lançamento pode vir em seguida (ver a exceção abaixo).
 - **O assunto do commit começa por `Issue #NNN: `**, com o número da issue do
   ramo. O GitHub transforma o número em link, e o assunto é o que aparece na
   lista de commits e no `git log --oneline`. Depois do prefixo sobram cerca de
@@ -52,7 +57,9 @@ engana quem a lê hoje.
   com um comentário dizendo o que falta.
 - **Exceção:** vulnerabilidade não ganha issue pública — enumerar o problema
   expõe o ataque antes da correção. Ramo direto da `main`, descrição genérica,
-  e a release sai logo depois do merge, sem esperar as próximas issues.
+  e a release sai logo depois do merge, sem esperar as próximas issues. O
+  relato de fora chega pelo canal privado do GitHub que o `SECURITY.md`
+  descreve; se a política mudar, os dois mudam juntos.
 - Critério de pronto: `bundle exec rspec` inteiro verde. Rode **sem**
   `SKIP_COVERAGE=1` ao menos uma vez antes de fechar: é a configuração real da
   suíte, e o caminho do simplecov só é exercitado assim.
@@ -84,9 +91,9 @@ engana quem a lê hoje.
 - **O que o `before(:all)` cria é commitado** e atravessaria a fronteira entre
   grupos, inclusive o que as factories criam por associação. Uma varredura ao fim
   de cada arquivo apaga o que sobrou, então **não escreva limpeza manual em
-  `after(:all)`** — foi ela que errou em 90 arquivos (#643). A suíte avisa no fim
-  se algo escapar, `LEAK_AUDIT=1` diz de qual grupo veio, `LEAK_CHECK=strict`
-  transforma o aviso em falha.
+  `after(:all)`** — foi ela que errou em 90 arquivos (#643). A suíte falha no fim
+  se algo escapar, `LEAK_AUDIT=1` diz de qual grupo veio, `LEAK_CHECK=warn`
+  rebaixa a falha a aviso para investigar sem travar.
 - **Envolver o contexto em transação parece o conserto e não é.** Passa inteira
   em SQLite e quebra sete exemplos em MariaDB: `Query#run_read_only_query` abre
   cliente próprio e a rake task de notificações é outro processo — nenhum dos
@@ -96,7 +103,9 @@ engana quem a lê hoje.
   trabalho, mostre o diff e o resultado da suíte, e espere o mantenedor revisar.
   Commit, tag e push são dele — inclusive nos passos de baby-step, onde é fácil
   achar que "um commit por gem" autoriza commitar sozinho. Vale também para
-  ramo novo: crie só quando pedirem.
+  ramo novo: crie só quando pedirem. Reescrever commit já publicado
+  (`--amend`, `rebase`) exige force-push: pergunte antes de reescrever,
+  dizendo isso, mesmo com autorização para mudar a mensagem.
 - Documentação e comentário falam em **"mantenedor"**, não em nome próprio —
   o papel sobrevive a quem o exerce.
 - **Antes de abrir issue, pesquise as existentes — inclusive as fechadas —**
@@ -130,6 +139,10 @@ engana quem a lê hoje.
   sobre quem usa, não o tamanho do conserto: trabalho perdido, configuração
   existente ignorada, dado exposto a quem não devia e usuário sem saída são Bug —
   mesmo quando corrigir exige construir o que ainda não existe.
+- **Defeito se conserta depois da reprodução.** Antes de mexer no código, o
+  spec que reproduz o defeito entra e é visto falhando pelo motivo certo, com um
+  controle que passa; só então vem o conserto, e o mesmo spec passa a ser a
+  cobertura dele. Spec escrito depois do conserto não prova que falharia sem ele.
 - **Reprodução de defeito: vermelha no PR devolvido, `pending` na issue.** Ao
   devolver um PR, a reprodução entra quebrando o ramo do autor — o vermelho é o
   alerta (ver a skill `revisar-pr`). Defeito que vira issue tem a reprodução na
@@ -179,14 +192,15 @@ ordem do ciclo.
 - `homologacao` — compara o SAPOS antes e depois em homologação.
 - `release` — integra a issue pronta na `main` e a fecha; quando o mantenedor decide, homologa a `main` e lança a versão (tag, label, release publicada).
 
-### Skill é procedimento, não diário de bordo
+### Skill e `AGENTS.md` são procedimento, não diário de bordo
 
 Ao anotar aprendizado numa skill, o teste é: **uma rodada futura faria algo
 diferente por causa desta linha?** Passa o mecanismo e a consequência ("a rota X
 responde 500 no papel Aluno, ignore"; "`--flatten` é obrigatório, senão a bbox vem
 vazia"). Não passa *quando* foi medido, em que versão, qual issue descobriu, nem
 que o problema já foi corrigido — isso o `git log` já guarda, e na skill só
-cresce.
+cresce. No `AGENTS.md`, o teste é se a frase continua verdadeira quando o
+trabalho atual terminar: "estes 4 specs falham hoje em MariaDB" não passa.
 
 Esse contexto tem para onde ir: **comentário na issue**. Medida de antes e
 depois, versão em que o defeito aparecia, caminho que a rodada usou para
@@ -210,11 +224,13 @@ referenciado por caminho de uma captura datada, que é descartável.
 ## Atualização de dependências
 
 Uma gem por passo, alvo no patch mais atual da mesma série; **nunca subir major
-ou minor de carona** — isso é decisão separada. A exceção é a campanha: a cauda
-(transitivas, ferramentas de desenvolvimento e teste) anda em lote por nível,
-com `--strict` como teto rígido e bissecção se ficar vermelho, enquanto o
-núcleo continua uma gem por passo. **Piso de segurança (`>=`) não se
-declara no `Gemfile`:** ele envelhece calado quando sai a correção seguinte. Quem
+ou minor da gem do passo de carona** — isso é decisão separada. A transitiva
+que a versão nova exige sobe junto e é relatada; arrastada a major, desfaz o
+passo. A exceção é a campanha: no patch tudo anda em lote; do minor em diante a
+cauda (transitivas, ferramentas de desenvolvimento e teste) anda em lote por
+nível, com `--strict` como teto rígido e bissecção se ficar vermelho, enquanto
+o núcleo continua uma gem por passo. Major é sempre um passo à parte. **Piso
+de segurança (`>=`) não se declara no `Gemfile`:** ele envelhece calado quando sai a correção seguinte. Quem
 garante que o lock não carrega CVE conhecida é o `bundle-audit`, que o CI roda
 contra a base de advisories do dia. O resto — conferência do `Gemfile.lock`,
 `--strict`, a campanha — está na skill `dependencias`.
@@ -279,13 +295,21 @@ cada uma explica o porquê no próprio cabeçalho:
 - active_scaffold, entrada que a gem aceita da URL sem conferir:
   `active_scaffold_embedded_conditions.rb` (`prepend` em
   `ActiveScaffold::Finder`; só o marcador de pendência vale em
-  `embedded[conditions]`), `active_scaffold_date_trend_unit.rb` (`prepend` em
+  `embedded[conditions]`), `active_scaffold_embedded_constraints.rb`
+  (`prepend` em `ActiveScaffold::Constraints`; nada de `embedded[constraints]`
+  vale, nem no filtro da lista nem no setter do registro novo — o SAPOS não
+  embute lista com `constraints:`, e quem passar a embutir precisa mexer
+  aqui), `active_scaffold_date_trend_unit.rb` (`prepend` em
   `Finder::ClassMethods#datetime_from_to` — não em `condition_for_datetime`, que
   o bridge `date_picker` apelida e cujo apelido perderia o `super`) e
   `active_scaffold_return_to.rb` (`prepend` em `Helpers::ControllerHelpers`;
-  `return_to` só interno). Os três entram por `prepend` no módulo porque a
+  `return_to` só interno). Os quatro entram por `prepend` no módulo porque a
   chamada `active_scaffold` inclui o módulo em cada controller, na frente de um
   método do `ApplicationController`.
+  `spec/requests/scaffold_embedded_constraints_spec.rb` percorre os scaffolds.
+  O método redefinido mantém a visibilidade da gem: público, ele vira ação em
+  todo controller que inclui o módulo, e o
+  `spec/config/initializer_action_methods_spec.rb` acusa.
 - active_scaffold, filtro da lista vindo da URL:
   `active_scaffold_list_url_columns.rb` (`prepend` em
   `ActiveScaffold::Actions::Core#conditions_from_params`). A gem filtra a
@@ -335,11 +359,31 @@ cada uma explica o porquê no próprio cabeçalho:
   o registro associado inteiro, por fora dos helpers de coluna e do que a tela
   esconde por papel. `spec/requests/scaffold_response_formats_spec.rb` percorre
   os scaffolds e acusa o formato que voltar a responder.
+- carrierwave-activerecord (o fork), as duas saem com ele:
+  `carrierwave_activerecord_no_overwrite.rb` (`prepend` na classe singleton
+  de `CarrierWave::Storage::ActiveRecord::File`, em `create!`): a linha de
+  `carrier_wave_files` já guardada não é regravada por envio novo com o
+  mesmo identificador. `carrierwave_activerecord_safe_delete.rb` (`prepend`
+  em `File`, `delete_all` na singleton, `delete` e `destroy!` na classe;
+  `before_destroy` no `ActiveRecordFile`): a linha não se apaga pela
+  aplicação, nem a que ficou sem dono; o CarrierWave apagava o arquivo dos
+  outros donos ao excluir um dono ou desfazer uma gravação. O reaproveitamento
+  não escreve na linha compartilhada: trava ou data renovada ali derruba, em
+  MariaDB, gravações simultâneas.
 - Prawn: `prawn-grouping.rb`, cópia de patch de terceiro que usa `state.page` e
   `@bounding_box`. Suspeito num upgrade do Prawn, não do Rails.
 - prawn-table: `prawn_actual_text.rb` (`prepend` no `draw_content` privado de
   `Prawn::Table::Cell::Text`, mais o `@pdf` da célula e o `renderer` do Prawn),
   que faz o quadro de horários falar ao leitor de tela.
+- Capybara, fora dos initializers, só nos testes (o `spec/README.md`, §4,
+  lista os mesmos):
+  `spec/support/capybara_chrome_reset.rb` (`prepend` no `execute_cdp` privado
+  de `Capybara::Selenium::Driver::ChromeDriver`). O `reset!` entre exemplos
+  limpa o Chrome com a origem `*`, que o Chrome passou a recusar, e todo
+  feature spec quebrava nele; sai quando o Capybara corrigir (a issue está
+  no cabeçalho do arquivo). E `spec/support/wait_for_ajax_helpers.rb`
+  (`prepend` em `Capybara::Node::Base#synchronize`), que repete a espera
+  quando o Chrome acusa nó obsoleto do CDP depois de navegar.
 
 `schema_plus_alternative.rb` é o que olhar primeiro: reabre
 `ActiveRecord::Migration` e transforma `add_foreign_key` e `remove_foreign_key`
@@ -361,17 +405,18 @@ comportamento.
 
 ## Dados sensíveis
 
-O banco de homologação é réplica de produção, com dado real de aluno. Nunca
-transcreva nome, e-mail, CPF ou nota para arquivos de trabalho, documentação ou
-comentários de issue e PR — comentário de issue é público e irreversível.
-Descreva achados genericamente: "aluno com nome acentuado", "registro id NNNN".
+Dado de pessoa real — nome, e-mail, CPF, matrícula, nota — não vai para o que
+se publica: commit, documentação, wiki, release, issue, PR e seus comentários.
+Nem para arquivo dentro do checkout, mesmo ignorado: está a um `git add` de ser
+publicado. Descreva achados genericamente: "aluno com nome acentuado",
+"registro id NNNN".
 
 **O que cada instalação criou pela tela também não vai para issue nem PR.**
 Consulta, notificação, template e variável são da instalação, e o repositório não
-os conhece; o mesmo vale para contagem medida em produção ou na réplica. Na issue,
+os conhece; o mesmo vale para contagem medida numa instalação. Na issue,
 descreva a classe do problema ("consultas criadas pela tela que citam coluna
-renomeada") e o conserto genérico. Nome, SQL, instância e número ficam com o
-mantenedor, na pasta local da rodada. O que vem do seed ou de migration está no
-repositório e pode ser citado. **Editar não apaga:** o GitHub guarda o histórico
+renomeada") e o conserto genérico, sem nome, SQL, instância nem número. O que
+vem do seed ou de migration está no repositório e pode ser citado.
+**Editar não apaga:** o GitHub guarda o histórico
 de edição, e a troca de título fica na linha do tempo. O que escapou só sai
 apagando o comentário ou a issue.

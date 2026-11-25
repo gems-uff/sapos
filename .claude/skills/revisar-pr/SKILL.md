@@ -1,9 +1,11 @@
 ---
 name: revisar-pr
-description: Conduz um PR do repositório do começo ao fim — ler a issue e o diff, decidir o que é nosso e o que volta para o autor, cobrir o que falta de teste, medir e integrar na main. Use ao dizer "vamos trabalhar no PR N", ao revisar contribuição de terceiro, ou ao retomar um ramo parado.
+description: Conduz um PR do repositório do começo ao fim — ler a issue e o diff, decidir o que é nosso e o que volta para o autor, cobrir o que falta de teste, medir e integrar na main. Use ao dizer "vamos trabalhar no PR N", ao revisar contribuição de terceiro, ou ao retomar um ramo parado. Exige permissão para integrar na main e fechar PR.
 ---
 
 # Trabalhar num PR
+
+**Pré-condições.** Quem conduz pode integrar na `main` e fechar PR.
 
 Esta skill é a **espinha**: ela diz *quando* cada coisa entra e *por quê*. O *como*
 está nas skills apontadas, e não se repete aqui — passo que cabe numa frase mais um

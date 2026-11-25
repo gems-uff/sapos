@@ -21,7 +21,10 @@ RSpec.describe "Troca de e-mail da inscricao pelo candidato", type: :request do
 
   before(:each) do
     @enviados = []
-    allow(Notifier).to receive(:send_emails) { |notifications:| @enviados.concat(notifications) }
+    allow(Notifier).to receive(:send_emails) do |notifications:|
+      @enviados.concat(notifications)
+      nil # entregue: send_emails devolve só o que não saiu
+    end
     allow(ExceptionNotifier).to receive(:notify_exception)
 
     @template = create_admission_template(

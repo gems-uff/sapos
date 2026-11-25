@@ -178,4 +178,24 @@ class EnrollmentRequestsController < ApplicationController
         Notifier.send_emails(notifications: emails)
       end
     end
+
+    # O active_scaffold valida também as linhas que não mudaram e deixa o erro
+    # nelas, não no pedido; sem erro no pedido, a tela não diria por que
+    # recusou. As linhas com erro aparecem na tabela, cada uma com o seu; no
+    # alto, só o que é do pedido, e não a cópia que o autosave faz do erro de
+    # cada linha alterada (a mesma mensagem duas vezes).
+    def update_save(**)
+      super
+      return if successful?
+
+      @record.errors.attribute_names
+        .select { |name| name.to_s.start_with?("class_enrollment_requests.") }
+        .each { |name| @record.errors.delete(name) }
+      invalid = @record.class_enrollment_requests.target.count do |cer|
+        cer.errors.any?
+      end
+      return if invalid.zero?
+
+      @record.errors.add(:base, :invalid_class, count: invalid)
+    end
 end

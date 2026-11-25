@@ -20,7 +20,10 @@ RSpec.describe "Posse do codigo de inscricao", type: :request do
 
   before(:each) do
     @enviados = []
-    allow(Notifier).to receive(:send_emails) { |notifications:| @enviados.concat(notifications) }
+    allow(Notifier).to receive(:send_emails) do |notifications:|
+      @enviados.concat(notifications)
+      nil # entregue: send_emails devolve só o que não saiu
+    end
 
     @template = create_admission_template("Inscricao", { "Dado" => Admissions::FormField::STRING })
     @sincronizado = create_admission_template(

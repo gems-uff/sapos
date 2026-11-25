@@ -6,13 +6,17 @@
 #
 #   set -a; source ~/.sapos_staging_env; set +a
 #   ssh "$SAPOS_STAGING_SSH" "f=\$(mktemp /tmp/trava.XXXXXX.rb); chmod 644 \$f; cat > \$f; \
-#     sudo -i -u $SAPOS_STAGING_INSTANCE bash -lc \"cd ~/instance && bundle exec rails runner \$f <endereco|VAZIA>\"; \
+#     sudo -i -u $SAPOS_STAGING_APP_USER bash -lc \"cd $SAPOS_STAGING_APP_DIR && bundle exec rails runner \$f <endereco|VAZIA>\"; \
 #     rm -f \$f" < trava_email.rb
 #
 # <endereco> destrava redirecionando; VAZIA repoe a trava mestra. O script
 # NUNCA apaga a variavel: ausente, ela manda o e-mail ao destinatario real.
 # Imprime so o estado (AUSENTE, VAZIA, ENDERECO), nao o endereco. Confira o
 # resultado pela tela, com o conferir_redirect_email.rb, antes e depois.
+require "etc"
+conta = Etc.getpwuid(Process.uid).name
+abort "Conta sem 'staging': #{conta}. Nada alterado." unless conta.include?("staging")
+
 estado = ->(valor) { valor.nil? ? "AUSENTE" : (valor == "" ? "VAZIA" : "ENDERECO") }
 
 variavel = CustomVariable.find_by(variable: "redirect_email")

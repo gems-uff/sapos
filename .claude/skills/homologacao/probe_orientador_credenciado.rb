@@ -161,7 +161,7 @@ begin
   JS
   relatorio[:variavel_credenciamento] = valor
   if valor.to_s.strip.downcase != "yes"
-    relatorio[:medida] = "RECUSADA: variavel #{valor.inspect} -- a validacao nao executa nesta replica"
+    relatorio[:medida] = "RECUSADA: variavel #{valor.inspect} -- a validacao nao executa nesta copia"
     puts relatorio[:medida]
     raise SystemExit
   end

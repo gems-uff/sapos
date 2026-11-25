@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Le o valor VIVO de CustomVariable.redirect_email na tela de Variaveis e diz em
-# qual dos tres estados da tabela verdade do SKILL.md a replica esta. E o passo 0
+# qual dos tres estados da tabela verdade do SKILL.md a copia esta. E o passo 0
 # de qualquer escrita em homologacao, e nao substitui a leitura pela tela quando
 # o resultado for PERIGO -- ai a decisao e do mantenedor.
 #
@@ -15,7 +15,7 @@ driver = build_driver
 wait = Selenium::WebDriver::Wait.new(timeout: 30)
 begin
   login(driver, wait)
-  # Logo depois de reimportar a replica a conta tem um papel so, e o combo so
+  # Logo depois de reimportar a copia a conta tem um papel so, e o combo so
   # aparece com dois -- quem acrescenta o segundo e o preparar_aluno_de_teste.rb,
   # que ja escreve e por isso vem depois deste script.
   combo = driver.find_elements(css: "form[action*='change_role'] select[name='role_id']")

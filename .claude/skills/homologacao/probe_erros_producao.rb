@@ -9,7 +9,7 @@
 #
 # Uso:
 #   set -a; source ~/.sapos_staging_env; set +a
-#   EXPLORE_OUT=~/capturas-sapos-staging/<pasta>/sonda \
+#   EXPLORE_OUT=<pasta de capturas>/<pasta>/sonda \
 #     bundle exec ruby probe_erros_producao.rb
 #
 # NAO ESCREVE. O POST do CSRF e recusado antes de tocar em registro; a medida do
@@ -89,7 +89,7 @@ begin
   # valor nos visiveis SEM disparar evento -- e o que autofill, gerenciador de
   # senha e script fazem -- e confere se o escondido acompanhou.
   #
-  # Mede na tela do admin porque a replica nao tem processo seletivo aberto: o
+  # Mede na tela do admin porque a copia nao tem processo seletivo aberto: o
   # widget e o mesmo parcial do formulario publico do candidato.
   # Ordenar por id decrescente: o campo de cidade e do formulario dos processos
   # recentes, e a ordem natural da lista traz inscricoes antigas, sem ele.

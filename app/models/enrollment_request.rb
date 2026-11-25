@@ -27,6 +27,9 @@ class EnrollmentRequest < ApplicationRecord
   validate :that_valid_insertion_is_not_set_to_false, if: :student_saving
   validate :that_valid_removal_is_not_set_to_false, if: :student_saving
   validate :that_all_requests_are_valid, if: :student_saving
+  validate :that_releases_came_first, unless: :student_saving
+
+  before_validation :remember_releasing
 
   def self.pendency_condition(user = nil)
     user ||= current_user
@@ -160,7 +163,7 @@ class EnrollmentRequest < ApplicationRecord
     self.student_saving = true
     return false if !valid?
     result = class_enrollment_requests.all? do |cer|
-      cer.save
+      cer.out_of_page || cer.save
     end && save
     self.student_saving = false
     result
@@ -203,6 +206,38 @@ class EnrollmentRequest < ApplicationRecord
   end
 
   protected
+    # Troca de turma (#781): as linhas que liberam inscrição nesta gravação
+    # (ClassEnrollmentRequest#releases_class_enrollment?), guardadas antes
+    # que a validação de cada uma mexa na inscrição.
+    def remember_releasing
+      @releasing = class_enrollment_requests.target
+        .select(&:releases_class_enrollment?)
+    end
+
+    # O formulário valida as linhas na ordem em que foram criadas, e a linha
+    # que ocupa a inscrição é recusada se vier antes da que a libera na mesma
+    # disciplina. A gravação em dois passos resolve, e a mensagem diz qual
+    # vem primeiro -- só quando todo erro da linha é de ordem: barrada também
+    # por outro motivo (previously_approved, trancamento), gravar a remoção
+    # antes não resolve, e a mensagem mandaria fazer o que não adianta.
+    ORDER_ERRORS = %i[
+      already_enrolled remove_first multiple_class_enrollments_not_allowed
+    ].freeze
+
+    def that_releases_came_first
+      return if @releasing.blank?
+
+      blocked = class_enrollment_requests.target.any? do |cer|
+        cer.errors.any? &&
+          cer.errors.all? { |error| ORDER_ERRORS.include?(error.type) } &&
+          cer.occupies_class_enrollment? &&
+          @releasing.any? do |release|
+            release.course_class&.course_id == cer.course_class&.course_id
+          end
+      end
+      errors.add(:base, :release_first) if blocked
+    end
+
     def insertions
       class_enrollment_requests.filter do |cer|
         cer.action == ClassEnrollmentRequest::INSERT &&
@@ -251,7 +286,7 @@ class EnrollmentRequest < ApplicationRecord
 
     def that_all_requests_are_valid
       invalid = class_enrollment_requests.filter do |cer|
-        next false if cer.marked_for_destruction?
+        next false if cer.marked_for_destruction? || cer.out_of_page
         old = cer.student_saving
         cer.student_saving = student_saving
         result = !cer.valid?

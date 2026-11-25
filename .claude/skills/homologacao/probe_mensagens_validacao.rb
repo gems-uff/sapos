@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 # Le as mensagens que as validacoes de cliente dos formularios de candidatura
-# montam, sobre os templates reais da replica. A mensagem leva o nome do campo e,
+# montam, sobre os templates reais da copia. A mensagem leva o nome do campo e,
 # nos campos de arquivo, a lista de extensoes -- texto que quem configura o
 # template escreve, e que vive dentro de um <script>.
 #

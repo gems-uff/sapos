@@ -5,6 +5,9 @@ description: Sobe um MariaDB local fiel ao de produção e roda a suíte contra 
 
 # Suíte contra MariaDB local
 
+Se a instalação mantém parâmetros locais para esta skill (o contexto da sessão
+aponta onde), leia-os antes de começar.
+
 A suíte roda em **SQLite**; produção roda em **MariaDB**. Não é só diferença de
 conexão — a semântica muda:
 
@@ -34,8 +37,8 @@ SELECT DISTINCT TABLE_COLLATION FROM information_schema.TABLES
 ```
 
 **`lower_case_table_names` é um ponto cego do MariaDB no macOS.** No Linux
-(Debian de produção) o default é `0` — nomes de tabela **case-sensitive**, então
-`SELECT * FROM USERS` não encontra a tabela `users`. No macOS o default é `2`
+(o do servidor, em geral, e o do CI) o default é `0` — nomes de tabela
+**case-sensitive**, então `SELECT * FROM USERS` não encontra a tabela `users`. No macOS o default é `2`
 (case-insensitive), e uma consulta com o nome em caixa errada **passa local e
 quebra em produção**. É uma variável que a instância efêmera **não** consegue
 casar com produção quando a máquina é um Mac (o valor é fixado na inicialização e
@@ -59,7 +62,7 @@ não há motivo para um banco de teste subir no login da máquina.
 
 ```bash
 M=/opt/homebrew/opt/mariadb@10.5      # a série do servidor
-D=$HOME/sapos-mariadb-test
+D=<datadir local>                     # fora do repositório; reusável
 
 brew install mariadb@10.5
 mkdir -p $D/data
@@ -144,7 +147,7 @@ desta comparação é o serial em MariaDB.
 
 ## Como interpretar as falhas
 
-Falha aqui **não é sinônimo de bug**. Há três categorias, e a diferença importa:
+Falha aqui **não é sinônimo de bug**. Há quatro categorias, e a diferença importa:
 
 1. **Asserção que só vale no SQLite.** Exemplo típico: um spec afirmando
    unicidade *case-sensitive* quando a collation de produção é
@@ -155,6 +158,16 @@ Falha aqui **não é sinônimo de bug**. Há três categorias, e a diferença im
    de ordenação. Vale issue.
 3. **Artefato do setup.** Collation, `sql_mode` ou versão diferentes do servidor.
    Antes de concluir 1 ou 2, confirme que o ambiente está fiel.
+4. **Cache de associação que o SQLite remendava.** Assinatura: passa rodando o
+   exemplo sozinho, passa em SQLite na mesma seed, falha em MariaDB, e a falha
+   muda com a ordem — tipicamente validação dizendo que não acha o registro
+   que o exemplo acabou de criar. Mecanismo: objeto de `before(:all)` guarda
+   uma associação carregada num exemplo anterior. No SQLite o rollback devolve
+   os ids, o registro novo renasce com o id que o cache aponta e o erro se
+   cancela; no MariaDB o `AUTO_INCREMENT` não volta, o cache aponta para linha
+   inexistente e a validação recusa. Conserto: `objeto.associacao.reload`
+   antes de criar no exemplo o que a validação vai ler. Não é diferença de
+   banco nem instabilidade.
 
 Suspeite da categoria 3 primeiro: é a mais fácil de causar sem perceber e a que
 produz o diagnóstico mais enganoso.
@@ -206,7 +219,7 @@ $M/bin/mysqladmin -h 127.0.0.1 -P 3307 -u root shutdown
 ps -eo pid,args | grep -E 'chromedriver|Chrome.*headless' | grep -v grep
 ```
 
-O datadir (`~/sapos-mariadb-test`, ~200 MB) é **estado reusável, não lixo**:
+O datadir (`$D`, ~200 MB) é **estado reusável, não lixo**:
 mantê-lo poupa o `mysql_install_db` da próxima rodada e, com o servidor
 desligado, não custa memória nenhuma. Apague só quando quiser o disco de volta ou
 quando a fidelidade do ambiente estiver em dúvida.

@@ -231,7 +231,9 @@ class StudentEnrollmentController < ApplicationController
       end
       false
     rescue ValidationException => e
-      flash.alert = e.message
+      # A recusa redesenha a página (render :enroll), sem redirecionar:
+      # flash.now, para o alerta não reaparecer na página seguinte.
+      flash.now.alert = e.message
       false
     end
 
@@ -252,23 +254,114 @@ class StudentEnrollmentController < ApplicationController
       course_class
     end
 
+    # O pedido só leva o que a tela ofereceu: a oferta é a mesma tabela que a
+    # view desenha, montada pelo mesmo prepare_class_schedule_table. Turma já
+    # presente no pedido continua aceita, ainda que tenha saído da grade. Tudo
+    # é conferido antes de criar a primeira turma sob demanda, para que o
+    # pedido recusado pela oferta não deixe turma para trás. A recusa do
+    # modelo, que vem depois da criação, ainda deixa (#375).
     def prepare_course_class_ids
       course_class_ids = enrollment_request_params[:course_class_ids] || []
       on_demand_course_ids = enrollment_request_params[:course_ids] || []
 
-      on_demand_course_ids.each do |course_id, data|
+      course_class_ids.each do |course_class_id|
+        next if course_class_id.blank?
+        raise_not_offered unless class_offered?(course_class_id)
+      end
+
+      on_demand = on_demand_course_ids.to_h.filter_map do |course_id, data|
         next if data[:selected] != "1"
         raise ValidationException.new I18n.t(
           "student_enrollment.enroll.errors.select_on_demand_professor",
           course: Course.find(course_id.to_i).name
         ) if data[:professor].blank?
 
+        pair = [course_id.to_i, data[:professor].to_i]
+        raise_not_offered unless on_demand_offered?(*pair)
+        pair
+      end
+
+      on_demand.each do |course_id, professor_id|
         course_class = find_or_create_course_class_in_this_semester(
-          course_id.to_i, data[:professor].to_i
+          course_id, professor_id
         )
         course_class_ids << course_class.id.to_s if course_class.present?
       end
-      course_class_ids.uniq
+      (course_class_ids + hidden_insertion_class_ids).uniq
+    end
+
+    # Turma que a página não desenha (marcada "Não aparecer no QH", como a
+    # turma cancelada) não vem no envio, e o modelo leria a ausência como
+    # desmarcar: a adição solicitada sumiria, a efetivada viraria remoção, e
+    # com a remoção fechada o aluno não gravaria mais nada. O pedido de adição
+    # dessas turmas volta à lista; o de remoção não precisa, porque fora da
+    # lista ele já fica como está. Volta intocado: o aluno não o vê nem o
+    # desmarca, então ele não é revalidado (out_of_page), para que o pedido
+    # que deixou de valer não barre toda gravação.
+    def hidden_insertion_class_ids
+      @enrollment_request.class_enrollment_requests.filter_map do |cer|
+        next if cer.action != ClassEnrollmentRequest::INSERT
+        next if offered[:class_ids].include?(cer.course_class_id.to_s)
+        next if offered[:professors].key?(cer.course_class.course_id)
+        cer.out_of_page = true
+        cer.course_class_id.to_s
+      end
+    end
+
+    def offered
+      @offered ||= begin
+        table = helpers.prepare_class_schedule_table(
+          @available_classes, @on_demand, @advisement_authorizations
+        )
+        offer = { class_ids: Set.new, professors: {} }
+        table[:data].each do |row|
+          if row[0][:on_demand]
+            offer[:professors][row[0][:course_id]] =
+              row[0][:professors].map(&:id)
+          else
+            offer[:class_ids] << row[0][:id].to_s
+          end
+        end
+        offer
+      end
+    end
+
+    # A turma sob demanda não vira linha da grade: ela entra pela linha da
+    # disciplina, e o professor dela, pelo seletor. Mesmo assim ela chega como
+    # turma quando a página volta de uma gravação que o modelo recusou depois
+    # de criá-la; vale se o professor está no seletor da disciplina.
+    def class_offered?(course_class_id)
+      return true if offered[:class_ids].include?(course_class_id.to_s)
+      return true if already_requested?(course_class_id)
+
+      course_class = CourseClass.find_by(
+        id: course_class_id, year: @semester.year, semester: @semester.semester
+      )
+      course_class.present? && offered[:professors]
+        .fetch(course_class.course_id, []).include?(course_class.professor_id)
+    end
+
+    def already_requested?(course_class_id)
+      @enrollment_request.class_enrollment_requests.any? do |cer|
+        cer.course_class_id.to_s == course_class_id.to_s
+      end
+    end
+
+    def on_demand_offered?(course_id, professor_id)
+      return true if offered[:professors].fetch(course_id, [])
+        .include?(professor_id)
+
+      course_class = CourseClass.find_by(
+        course_id: course_id, professor_id: professor_id,
+        year: @semester.year, semester: @semester.semester
+      )
+      course_class.present? && already_requested?(course_class.id)
+    end
+
+    def raise_not_offered
+      raise ValidationException.new I18n.t(
+        "student_enrollment.enroll.errors.not_offered"
+      )
     end
 
     def notify_enrollment_request_change(
