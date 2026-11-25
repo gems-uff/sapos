@@ -61,11 +61,11 @@ Chrome/Selenium defects are handled once, in `spec/support`:
 - Chrome 158+ refusing the `*` origin in the `reset!` between examples:
   `capybara_chrome_reset.rb` patches the private `execute_cdp` of the Chrome
   driver.
-
-Both patches depend on Capybara internals; `AGENTS.md` ("Monkey-patches")
-lists them for whoever upgrades Capybara.
 - Clicks intercepted by a stray record-select dropdown: retried inside
   `record_select_helpers.rb`.
+
+The first two patch Capybara internals; `AGENTS.md` ("Monkey-patches")
+lists them for whoever upgrades Capybara.
 
 Do not add ad-hoc `rescue`/retry blocks in individual specs; if a new driver
 issue shows up, handle it in a support file so every spec benefits.
