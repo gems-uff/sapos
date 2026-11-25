@@ -230,10 +230,10 @@ module Notifier
   # a process killed before the end would report nothing. The server log has
   # a line for each message (report_failure).
   #
-  # The failure goes without the addresses in its message: sendmail, the
-  # delivery of production, fails with the whole command, recipient
-  # included. The exception keeps its class and backtrace; the address
-  # stays in the server log (report_failure).
+  # The failure goes without the addresses in its message, nor the
+  # recipients of sendmail, the delivery of production, which fails with
+  # the whole command. The exception keeps its class and backtrace; the
+  # recipient stays in the server log (report_failure).
   def self.notify_failure(error, message, delivered:)
     ExceptionNotifier.notify_exception(
       without_addresses(error),
@@ -245,8 +245,13 @@ module Notifier
   # around an @. Loose on purpose, as it masks rather than validates.
   ADDRESS = /[^\s"'<>()\[\],;:]+@[^\s"'<>()\[\],;:]+/
 
+  # The recipients of the sendmail command, after its "--": each one goes as
+  # the template rendered it, and one that is not an address (a name where
+  # the address goes) would get past ADDRESS.
+  SENDMAIL_RECIPIENTS = /(?<="--", ).*(?=\]\z)/
+
   def self.without_addresses(error)
-    masked = error.message.gsub(ADDRESS, "<address>")
+    masked = error.message.sub(SENDMAIL_RECIPIENTS, '"<recipients>"').gsub(ADDRESS, "<address>")
     return error if masked == error.message
 
     error.exception(masked)

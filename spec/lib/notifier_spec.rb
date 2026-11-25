@@ -682,6 +682,23 @@ RSpec.describe Notifier, type: :model do
           expect(reported.backtrace).to be_present
         end
 
+        # A recipient that is not an address -- a template that puts the
+        # name of the student where the address goes -- reaches the command
+        # as it is, and the mask of the address leaves the name.
+        it "does not take a malformed recipient to the error email" do
+          malformed = Mail::Sendmail::DeliveryError.new(
+            'Delivery failed with exitstatus 67: ["/usr/sbin/sendmail", "-i", ' \
+            '"-f", "sapos@example.com", "--", "Fulano da Silva <fulano@example.com", "Beltrana Souza"]'
+          )
+          fail_first(Mail::TestMailer, :deliver!, malformed)
+
+          save_and_send
+
+          expect(@reported.size).to eq(1)
+          expect(@reported.first.message).not_to include("Fulano", "Silva", "Beltrana", "@example.com")
+          expect(@reported.first.message).to include("exitstatus 67", "/usr/sbin/sendmail", '"-f"')
+        end
+
         it "does not go to the error email from an SMTP refusal either" do
           refusal = Net::SMTPFatalError.new(
             Net::SMTP::Response.parse("550 5.1.1 <segundo@example.com>: mailbox unavailable")
