@@ -89,4 +89,72 @@ RSpec.describe "StudentEnrollmentController", type: :request do
       expect(response.body).not_to include("OrientadorFuturo")
     end
   end
+
+  describe "GET enroll professor selector of an on-demand course" do
+    # O seletor da disciplina sob demanda junta o professor de cada turma do
+    # semestre com os orientadores credenciados. Cada professor tem de aparecer
+    # uma vez, ainda que tenha duas turmas da disciplina.
+    before(:each) do
+      FactoryBot.create(
+        :class_schedule, year: 2026, semester: 2,
+        enrollment_start: 3.days.ago, enrollment_end: 3.days.from_now
+      )
+      on_demand_type = FactoryBot.create(:course_type, on_demand: true)
+      @course = FactoryBot.create(:course, course_type: on_demand_type)
+      @professor = FactoryBot.create(:professor, name: "ProfessorDaTurma")
+    end
+
+    def create_class(professor, name)
+      FactoryBot.create(
+        :course_class, course: @course, professor: professor,
+        year: 2026, semester: 2, name: name
+      )
+    end
+
+    def options_for(professor)
+      get "/enrollment/#{@enrollment.id}/enroll/2026-2"
+      expect(response).to have_http_status(:ok)
+      select = Nokogiri::HTML(response.body).at_css(
+        "select#enrollment_request-course_ids-#{@course.id}-professor"
+      )
+      expect(select).not_to be_nil
+      select.css("option[value='#{professor.id}']").size
+    end
+
+    it "lists the professor of a single class once" do
+      create_class(@professor, "A")
+
+      expect(options_for(@professor)).to eq(1)
+    end
+
+    it "lists each professor once when the classes belong to different professors" do
+      other = FactoryBot.create(:professor, name: "OutroProfessorDaTurma")
+      create_class(@professor, "A")
+      create_class(other, "B")
+
+      expect(options_for(@professor)).to eq(1)
+      expect(options_for(other)).to eq(1)
+    end
+
+    # O credenciado sai da lista das turmas e entra pela dos orientadores, que
+    # vem sem repetição: por isso o defeito só alcança quem não é credenciado.
+    it "lists an accredited advisor with two classes once" do
+      FactoryBot.create(
+        :advisement_authorization, professor: @professor, level: @level,
+        start_date: Date.current - 1.day, end_date: nil
+      )
+      create_class(@professor, "A")
+      create_class(@professor, "B")
+
+      expect(options_for(@professor)).to eq(1)
+    end
+
+    it "lists a non-accredited professor with two classes once",
+       pending: "issue #780" do
+      create_class(@professor, "A")
+      create_class(@professor, "B")
+
+      expect(options_for(@professor)).to eq(1)
+    end
+  end
 end

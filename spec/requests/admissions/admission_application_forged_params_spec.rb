@@ -147,7 +147,10 @@ RSpec.describe "Admissions::AdmissionApplications com parametros fora do formula
   it "troca o codigo, mantem o identificador e manda o novo ao endereco novo quando a equipe corrige o e-mail" do
     codigo = @application.token
     enviadas = []
-    allow(Notifier).to receive(:send_emails) { |notifications:| enviadas.concat(notifications) }
+    allow(Notifier).to receive(:send_emails) do |notifications:|
+      enviadas.concat(notifications)
+      nil # entregue: send_emails devolve só o que não saiu
+    end
     sign_out @reviewer
     sign_in create_confirmed_user([FactoryBot.create(:role_administrador)], "forjado-admin@ic.uff.br", "Admin")
 

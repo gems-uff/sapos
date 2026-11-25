@@ -8,6 +8,10 @@ class ClassEnrollmentRequest < ApplicationRecord
   has_paper_trail
 
   attr_accessor :student_saving, :db_status, :db_action
+  # Pedido de turma que a página do aluno não desenha e que o servidor devolve
+  # ao envio (StudentEnrollmentController#hidden_insertion_class_ids): a
+  # gravação do aluno não o revalida nem o grava.
+  attr_accessor :out_of_page
 
   belongs_to :enrollment_request,
     inverse_of: :class_enrollment_requests, optional: false
@@ -59,9 +63,14 @@ class ClassEnrollmentRequest < ApplicationRecord
 
   validate :that_class_enrollment_matches_course_and_enrollment,
     if: -> { !student_saving && !marked_for_destruction? }
+  # A adição negada não ocupa a disciplina: não há conflito a conferir.
   validate :that_course_class_does_not_exist_in_a_class_enrollment,
-    if: -> { !marked_for_destruction? }
-  validate :check_enrollment_hold, unless: -> { status == INVALID }
+    if: -> { !marked_for_destruction? && status != INVALID }
+  # A remoção não ocupa o período trancado; desfazer a remoção efetivada, que
+  # recriaria a inscrição, esbarra no trancamento em that_removal_can_be_undone.
+  validate :check_enrollment_hold,
+    unless: -> { status == INVALID || action == REMOVE }
+  validate :that_removal_can_be_undone, if: :undoing_effected_removal?
 
   before_validation :create_or_destroy_class_enrollment, on: %i[create update]
   after_save :destroy_or_create_class_enrollment
@@ -104,6 +113,19 @@ class ClassEnrollmentRequest < ApplicationRecord
       (new_status == EFFECTED && action == REMOVE && class_enrollment.present?)
     self.status = new_status
     changed && save
+  end
+
+  # Troca de turma (#781): numa gravação que mexe nas duas metades da troca,
+  # uma LIBERA a inscrição na disciplina -- a remoção que vira Efetivada, a
+  # adição que deixa de ser -- e a outra a OCUPA -- a adição que vira
+  # Efetivada, a remoção que deixa de ser. A que ocupa só passa depois que a
+  # que libera foi gravada.
+  def releases_class_enrollment?
+    crosses_effected? && (status == EFFECTED) == (action == REMOVE)
+  end
+
+  def occupies_class_enrollment?
+    crosses_effected? && (status == EFFECTED) == (action == INSERT)
   end
 
   def insert_effected?
@@ -151,14 +173,81 @@ class ClassEnrollmentRequest < ApplicationRecord
       return if enrollment.blank?
 
       course = course_class.course
-      return if enrollment.class_enrollments.none? do |enrollment_class|
+      return if course.course_type.allow_multiple_classes
+
+      conflicts = enrollment.class_enrollments.select do |enrollment_class|
         enrollment_class.course_class.course_id == course.id &&
           enrollment_class != class_enrollment &&
-          !course.course_type.allow_multiple_classes &&
           enrollment_class.situation != ClassEnrollment::DISAPPROVED
       end
+      return if conflicts.empty?
 
-      errors.add(:course_class, :previously_approved)
+      if conflicts.any? { |ce| ce.situation == ClassEnrollment::APPROVED }
+        return errors.add(:course_class, :previously_approved)
+      end
+      blocking = conflicts.filter_map { |ce| conflict_with_registered(ce) }
+      return if blocking.empty?
+
+      if blocking.include?(:already_enrolled)
+        errors.add(:course_class, :already_enrolled)
+      else
+        errors.add(:course_class, :remove_first)
+      end
+    end
+
+    # Troca de turma (#781): a inscrição registrada na disciplina não impede o
+    # pedido de outra turma se o mesmo pedido de inscrição traz a remoção dela.
+    # Na efetivação a regra volta a ser estrita -- nunca duas inscrições
+    # ativas --, a menos que a remoção seja efetivada na mesma gravação (o
+    # formulário do pedido de inscrição). Devolve o erro, ou nil se não barra.
+    #
+    # A remoção se acha pela turma, não pela inscrição: efetivada na mesma
+    # gravação, ela apaga a inscrição já na validação e perde o vínculo.
+    # Efetivada, ela só libera se a inscrição de fato sumiu: a inscrição pode
+    # voltar pela tela de inscrições sem que o status da remoção mude. Quem
+    # responde é o banco: a lista de inscrições do aluno, carregada antes, não
+    # traz o objeto que a remoção apagou, e sim uma cópia que não sabe disso.
+    def conflict_with_registered(enrollment_class)
+      removal = enrollment_request.class_enrollment_requests.find do |cer|
+        cer != self && cer.action == REMOVE &&
+          cer.course_class_id == enrollment_class.course_class_id
+      end
+      return :already_enrolled if removal.nil? || removal.status == INVALID
+      if removal.status == EFFECTED
+        return nil unless ClassEnrollment.unscoped.exists?(enrollment_class.id)
+        return :already_enrolled
+      end
+      return nil if status != EFFECTED
+      :remove_first
+    end
+
+    # Desfazer a remoção efetivada recria a inscrição removida (after_save
+    # destroy_or_create_class_enrollment), e a gravação dela, recusada, não
+    # chegaria a ninguém: o autosave do belongs_to a descarta. Monta-se aqui a
+    # inscrição que seria recriada e recusa-se com o motivo dela -- por
+    # exemplo, a adição da troca já efetivada na mesma disciplina.
+    def undoing_effected_removal?
+      action == REMOVE && status != EFFECTED &&
+        status_in_database == EFFECTED && class_enrollment.blank? &&
+        !marked_for_destruction?
+    end
+
+    def that_removal_can_be_undone
+      return if enrollment_request.blank? || course_class.blank?
+      return if returned_class_enrollment.present?
+
+      restored = ClassEnrollment.new(
+        enrollment: enrollment_request.enrollment,
+        course_class: course_class,
+        situation: ClassEnrollment::REGISTERED
+      )
+      return if restored.valid?
+
+      # Por atributo, não em :base: o erro em :base desta linha chega ao
+      # formulário do pedido como "Class enrollment requests <mensagem>". O
+      # import mantém o tipo do erro, que o pedido lê para saber se é de
+      # ordem (EnrollmentRequest#that_releases_came_first).
+      restored.errors.each { |error| errors.import(error) }
     end
 
     def create_or_destroy_class_enrollment
@@ -187,21 +276,40 @@ class ClassEnrollmentRequest < ApplicationRecord
         action == INSERT &&
         class_enrollment.present? && class_enrollment.can_destroy?
       )
+      # Desliga antes de apagar: o after_destroy da inscrição
+      # (ClassEnrollment#set_request_status_after_destroy), pensado para a
+      # exclusão pela tela de inscrições, marcaria esta linha como Inválida.
       if inserting_removal
-        old_status = status
-        class_enrollment.destroy
-        self.status = old_status
+        released = class_enrollment
         self.class_enrollment = nil
-        save
+        update_column(:class_enrollment_id, nil)
+        released.destroy
       end
       if action == REMOVE && class_enrollment.blank?
-        self.class_enrollment = ClassEnrollment.new(
+        self.class_enrollment = returned_class_enrollment || ClassEnrollment.new(
           enrollment: enrollment_request.enrollment,
           course_class: course_class,
           situation: ClassEnrollment::REGISTERED
         )
         save
       end
+    end
+
+    # A inscrição que a remoção efetivada apagou e que a secretaria recriou
+    # pela tela de inscrições, por fora do pedido: desfazer a remoção a
+    # religa, em vez de criar uma segunda, que a unicidade da turma recusaria.
+    def returned_class_enrollment
+      ClassEnrollment.find_by(
+        enrollment: enrollment_request&.enrollment, course_class: course_class
+      )
+    end
+
+    # Mudança de ação (a adição que o aluno desmarca vira remoção) não é
+    # liberar nem ocupar: só a passagem por Efetivada conta.
+    def crosses_effected?
+      return false if persisted? && action_changed?
+
+      (status == EFFECTED) != (status_in_database == EFFECTED)
     end
 
     def set_db_status

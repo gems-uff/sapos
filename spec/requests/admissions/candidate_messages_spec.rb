@@ -14,7 +14,10 @@ require "rails_helper"
 RSpec.describe "Mensagens do processo seletivo pelos modelos embutidos", type: :request do
   before(:each) do
     @enviadas = []
-    allow(Notifier).to receive(:send_emails) { |notifications:| @enviadas.concat(notifications) }
+    allow(Notifier).to receive(:send_emails) do |notifications:|
+      @enviadas.concat(notifications)
+      nil # entregue: send_emails devolve só o que não saiu
+    end
 
     inscricao = create_admission_template("Inscricao", { "Dado" => Admissions::FormField::STRING })
     carta = create_admission_template(

@@ -1,0 +1,336 @@
+# Copyright (c) Universidade Federal Fluminense (UFF).
+# This file is part of SAPOS. Please, consult the license terms in the LICENSE file.
+
+# frozen_string_literal: true
+
+require "rails_helper"
+
+# Trancamento da matrícula no semestre e os pedidos de inscrição em disciplina.
+# O efeito que se quer ao trancar é que o aluno não fique inscrito em nada
+# naquele semestre: o trancamento só é aceito sem inscrição no período
+# (EnrollmentHold#verify_class_enrollments), invalida os pedidos pendentes, e
+# nada que ocupe o período passa depois dele -- nem efetivação pela
+# secretaria, nem pedido novo do aluno. A remoção já efetivada continua
+# Efetivada: o aluno saiu da turma, e é isso que ela diz.
+#
+# A entrega do e-mail é conferida no ActionMailer::Base.deliveries, sem stub do
+# Notifier.
+RSpec.describe "Trancamento e pedidos de inscrição", type: :request do
+  requested = ClassEnrollmentRequest::REQUESTED
+  valid = ClassEnrollmentRequest::VALID
+  invalid = ClassEnrollmentRequest::INVALID
+  effected = ClassEnrollmentRequest::EFFECTED
+
+  before(:each) do
+    student = FactoryBot.create(:student, email: "aluno.trancado@example.com")
+    @enrollment = FactoryBot.create(
+      :enrollment, student: student, level: FactoryBot.create(:level),
+      admission_date: Date.new(2024, 3, 1),
+      enrollment_status: FactoryBot.create(:enrollment_status, user: true)
+    )
+    @student_user = create_confirmed_user(
+      [FactoryBot.create(:role_aluno)], "aluno.trancado@ic.uff.br", "Aluno",
+      "A1b2c3d4!", student: student
+    )
+    @admin = create_confirmed_user(
+      [FactoryBot.create(:role_administrador)], "adm.trancado@ic.uff.br", "Adm"
+    )
+    FactoryBot.create(
+      :class_schedule, year: 2026, semester: 2,
+      enrollment_start: 3.days.ago, enrollment_end: 3.days.from_now,
+      period_start: 10.days.from_now,
+      enrollment_insert: 3.days.from_now, enrollment_remove: 3.days.from_now
+    )
+    type = FactoryBot.create(:course_type, on_demand: false, allow_multiple_classes: false)
+    professor = FactoryBot.create(:professor, email: "professor.trancado@example.com")
+    @a = FactoryBot.create(
+      :course_class, course: FactoryBot.create(:course, name: "Alfa", course_type: type),
+      professor: professor, year: 2026, semester: 2
+    )
+    @b = FactoryBot.create(
+      :course_class, course: FactoryBot.create(:course, name: "Beta", course_type: type),
+      professor: professor, year: 2026, semester: 2
+    )
+    @pedido = FactoryBot.create(:enrollment_request, enrollment: @enrollment, year: 2026, semester: 2)
+  end
+
+  after(:each) do
+    ActionMailer::Base.deliveries.clear
+  end
+
+  def tranca
+    EnrollmentHold.create!(enrollment: @enrollment, year: 2026, semester: 2, number_of_semesters: 1)
+    ActionMailer::Base.deliveries.clear
+  end
+
+  def adicao(status)
+    FactoryBot.create(
+      :class_enrollment_request, enrollment_request: @pedido, course_class: @a,
+      action: ClassEnrollmentRequest::INSERT, status: status
+    )
+  end
+
+  def grava(cer, status, comentario: "")
+    put enrollment_request_path(@pedido), params: { record: {
+      comment_message: comentario,
+      class_enrollment_requests: {
+        "0" => "",
+        cer.id.to_s => {
+          id: cer.id.to_s, course_class: cer.course_class_id.to_s,
+          class_enrollment: cer.reload.class_enrollment_id.to_s, status: status
+        }
+      }
+    } }
+  end
+
+  def erros_visiveis
+    Nokogiri::HTML(response.body)
+      .css(".errorExplanation li, .association-record-errors li, #error_explanation li")
+      .map { |li| li.text.squish }
+  end
+
+  def inscricoes
+    ClassEnrollment.where(enrollment: @enrollment).count
+  end
+
+  def destinatarios
+    ActionMailer::Base.deliveries.flat_map(&:to)
+  end
+
+  def trancada
+    ClassEnrollmentRequest.new.errors.full_message(
+      :enrollment,
+      I18n.t(
+        "activerecord.errors.models.class_enrollment_request.attributes." \
+        "enrollment.enrollment_is_held"
+      )
+    )
+  end
+
+  it "invalida a adição pendente ao trancar" do
+    cer = adicao(requested)
+
+    tranca
+
+    expect(cer.reload.status).to eq(invalid)
+  end
+
+  describe "trancamento de mais de um semestre" do
+    before(:each) do
+      @c = FactoryBot.create(
+        :course_class, course: FactoryBot.create(:course, name: "Gama"),
+        professor: @a.professor, year: 2027, semester: 1
+      )
+      @pedido_seguinte = FactoryBot.create(
+        :enrollment_request, enrollment: @enrollment, year: 2027, semester: 1
+      )
+      @cer = FactoryBot.create(
+        :class_enrollment_request, enrollment_request: @pedido_seguinte, course_class: @c,
+        action: ClassEnrollmentRequest::INSERT, status: requested
+      )
+    end
+
+    def tranca_por(semestres)
+      EnrollmentHold.create!(
+        enrollment: @enrollment, year: 2026, semester: 2, number_of_semesters: semestres
+      )
+      ActionMailer::Base.deliveries.clear
+    end
+
+    it "invalida também a adição pendente do semestre seguinte" do
+      tranca_por(2)
+
+      expect(@cer.reload.status).to eq(invalid)
+    end
+
+    it "deixa a secretaria gravar comentário no pedido do semestre seguinte" do
+      tranca_por(2)
+      sign_in @admin
+
+      put enrollment_request_path(@pedido_seguinte), params: { record: {
+        comment_message: "Trancamento registrado",
+        class_enrollment_requests: {
+          "0" => "",
+          @cer.id.to_s => {
+            id: @cer.id.to_s, course_class: @c.id.to_s, class_enrollment: "",
+            status: @cer.reload.status
+          }
+        }
+      } }
+
+      expect(erros_visiveis).to eq([])
+      expect(response).to have_http_status(:redirect)
+      expect(@pedido_seguinte.enrollment_request_comments.count).to eq(1)
+    end
+
+    # Linha que não grava ao ser invalidada (aqui, ligada à inscrição de
+    # outra turma: dado legado, montado por fora da tela) continua
+    # Solicitada e travando o formulário; o log do servidor diz qual e por quê.
+    # A linha que EnrollmentHold#invalidate_request escreve sobre @cer; o
+    # resto do que vai para o log não é deste exemplo.
+    def linha_no_log
+      /class enrollment request #{@cer.id} not invalidated/
+    end
+
+    it "registra no log a linha que não conseguiu invalidar" do
+      outra = ClassEnrollment.create!(
+        enrollment: FactoryBot.create(:enrollment), course_class: @a,
+        situation: ClassEnrollment::REGISTERED
+      )
+      @cer.update_column(:class_enrollment_id, outra.id)
+      avisos = []
+      allow(Rails.logger).to receive(:warn) { |texto| avisos << texto.to_s }
+
+      tranca_por(2)
+
+      expect(@cer.reload.status).to eq(requested)
+      expect(avisos.grep(linha_no_log).join).to include(
+        I18n.t(
+          "activerecord.errors.models.class_enrollment_request.attributes." \
+          "class_enrollment.must_represent_the_same_enrollment_and_class"
+        )
+      )
+    end
+
+    it "controle: a linha que invalida não vai para o log" do
+      avisos = []
+      allow(Rails.logger).to receive(:warn) { |texto| avisos << texto.to_s }
+
+      tranca_por(2)
+
+      expect(@cer.reload.status).to eq(invalid)
+      expect(avisos.grep(linha_no_log)).to be_empty
+    end
+
+    it "controle: trancamento de um semestre não toca o pedido do seguinte" do
+      tranca_por(1)
+
+      expect(@cer.reload.status).to eq(requested)
+    end
+  end
+
+  describe "remoção efetivada antes do trancamento" do
+    before(:each) do
+      inscricao = ClassEnrollment.create!(
+        enrollment: @enrollment, course_class: @a, situation: ClassEnrollment::REGISTERED
+      )
+      @remocao = FactoryBot.create(
+        :class_enrollment_request, enrollment_request: @pedido, course_class: @a,
+        class_enrollment: inscricao, action: ClassEnrollmentRequest::REMOVE, status: requested
+      )
+      expect(@remocao.set_status!(effected)).to be(true)
+      tranca
+      sign_in @admin
+    end
+
+    it "continua Efetivada, sem inscrição" do
+      expect(@remocao.reload.status).to eq(effected)
+      expect(inscricoes).to eq(0)
+    end
+
+    it "não impede gravar o pedido pelo formulário" do
+      grava(@remocao, effected, comentario: "Trancamento registrado")
+
+      expect(response).to have_http_status(:redirect)
+      expect(@pedido.enrollment_request_comments.count).to eq(1)
+      expect(destinatarios).to eq(["aluno.trancado@example.com"])
+    end
+
+    it "não volta atrás, porque a inscrição não pode voltar" do
+      put set_requested_class_enrollment_request_path(@remocao)
+
+      expect(@remocao.reload.status).to eq(effected)
+      expect(inscricoes).to eq(0)
+      errors = ClassEnrollment.new.errors
+      expect(flash[:error]).to include(
+        errors.full_message(:enrollment, errors.generate_message(:enrollment, :enrollment_is_held))
+      )
+      expect(destinatarios).to eq([])
+    end
+  end
+
+  describe "secretaria efetivando com o aluno trancado" do
+    before(:each) do
+      @cer = adicao(requested)
+      tranca
+      sign_in @admin
+    end
+
+    it "pelo ícone, recusa e diz por quê" do
+      put set_effected_class_enrollment_request_path(@cer)
+
+      expect(flash[:error]).to eq([trancada])
+      expect([@cer.reload.status, inscricoes, destinatarios]).to eq([invalid, 0, []])
+    end
+
+    it "pelo formulário, recusa e diz por quê" do
+      grava(@cer, effected)
+
+      expect(erros_visiveis).to include(trancada)
+      expect([@cer.reload.status, inscricoes, destinatarios]).to eq([invalid, 0, []])
+    end
+
+    it "pelo lote, recusa e diz por quê" do
+      get class_enrollment_requests_path
+      post effect_class_enrollment_requests_path
+
+      expect(Array(flash[:error]).join).to include(trancada)
+      expect([@cer.reload.status, inscricoes, destinatarios]).to eq([invalid, 0, []])
+    end
+
+    it "também não deixa validar" do
+      put set_valid_class_enrollment_request_path(@cer)
+
+      expect(flash[:error]).to eq([trancada])
+      expect(@cer.reload.status).not_to eq(valid)
+    end
+  end
+
+  describe "aluno pedindo disciplina depois do trancamento" do
+    def pede(*turmas)
+      sign_in @student_user
+      post "/enrollment/#{@enrollment.id}/enroll/2026-2", params: { enrollment_request: {
+        course_class_ids: [""] + turmas.map { |turma| turma.id.to_s }, message: ""
+      } }
+    end
+
+    def turmas_pedidas
+      ClassEnrollmentRequest.joins(:enrollment_request)
+        .where(enrollment_requests: { enrollment_id: @enrollment.id })
+        .map(&:course_class)
+    end
+
+    it "com pedido no semestre, recusa e diz por quê" do
+      adicao(requested)
+      tranca
+
+      pede(@a, @b)
+
+      expect(response).to have_http_status(:ok)
+      expect(erros_visiveis).to include(trancada)
+      expect(turmas_pedidas).to eq([@a])
+      expect(destinatarios).to eq([])
+    end
+
+    it "sem pedido no semestre, recusa e não grava pedido", pending: "issue #784" do
+      @pedido.destroy!
+      tranca
+
+      pede(@b)
+
+      expect(response).to have_http_status(:ok)
+      expect(turmas_pedidas).to eq([])
+      expect(EnrollmentRequest.where(enrollment: @enrollment)).to be_empty
+      expect(erros_visiveis).to include(trancada)
+    end
+
+    it "controle: sem trancamento, sem pedido no semestre, grava o pedido" do
+      @pedido.destroy!
+
+      pede(@b)
+
+      expect(response).to have_http_status(:redirect)
+      expect(turmas_pedidas).to eq([@b])
+    end
+  end
+end

@@ -14,7 +14,7 @@
 #   2. o papel Aluno ACRESCENTADO a conta, e a conta associada ao aluno;
 #   3. matricula regular, para as telas de inscricao;
 #   4. matricula desligada, com banca e SEM data de defesa -- combinacao que a
-#      replica nunca tem, e que a tela do proprio aluno precisa.
+#      copia nunca tem, e que a tela do proprio aluno precisa.
 #
 # POR QUE A ORDEM E ESSA. O after_create da matricula chama
 # Enrollment#create_user!, cujo rescue faz
@@ -56,7 +56,7 @@ end
 
 ALUNO = "ZZ-TESTE-HOMOLOG"
 # CPF e so presenca + unicidade no modelo; um valor marcado evita colidir com
-# dado real da replica e se reconhece na tela.
+# dado real da copia e se reconhece na tela.
 CPF_ALUNO = "99999999999"
 ROLE_ALUNO = 5          # Role::ROLE_ALUNO
 ROLE_ADMINISTRADOR = 6  # Role::ROLE_ADMINISTRADOR
@@ -273,12 +273,12 @@ begin
       Ela tem de existir ANTES do aluno: e a existencia dela que faz
       Student#has_user? ser verdadeiro e impede o rescue do
       Enrollment#create_user! de apagar a propria conta ao criar a matricula.
-      Crie a conta (o script de migracao da homologacao ja faz isso) e rode de novo.
+      Crie a conta e rode de novo.
     FIM
   end
   puts "  conta id #{uid}"
 
-  # A pergunta que importa nao e "existe aluno com o marcador?" -- a replica
+  # A pergunta que importa nao e "existe aluno com o marcador?" -- a copia
   # pode ter varios, de rodadas antigas, e `achar` devolveria o primeiro por id
   # decrescente, que nao e necessariamente o associado. A autoridade e a
   # ASSOCIACAO da conta: e ela que as telas do aluno consultam.

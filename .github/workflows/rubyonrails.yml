@@ -205,10 +205,16 @@ jobs:
       # mysql2 adapter overrides the session sql_mode to its strict default on
       # every connection, in CI and in production alike, so a SET GLOBAL would
       # not change what the app sees.
+      #
+      # --skip-ssl: o cliente da serie 11.4 em diante (o do apt desde a imagem
+      # ubuntu-26.04) exige TLS quando a conta tem senha, e o mariadb:10.5 do
+      # servico nao oferece TLS. So o cliente de linha de comando: a
+      # libmariadb, que o mysql2 usa, conecta sem TLS quando o servidor nao o
+      # oferece.
       - name: Create the test databases with production's collation
         run: |
           for n in "" $(seq 2 "$PARALLEL_WORKERS"); do
-            mysql -h 127.0.0.1 -u root -proot -e \
+            mysql --skip-ssl -h 127.0.0.1 -u root -proot -e \
               "CREATE DATABASE sapos_test$n CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
           done
 
@@ -401,9 +407,10 @@ jobs:
       - name: Configure database.yml
         run: cp config/database.yml.example config/database.yml
 
+      # --skip-ssl: ver o mesmo passo no job test.
       - name: Create the seed-check database with production's collation
         run: |
-          mysql -h 127.0.0.1 -u root -proot -e "
+          mysql --skip-ssl -h 127.0.0.1 -u root -proot -e "
             CREATE DATABASE sapos_seed_check CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
           "
 

@@ -65,18 +65,42 @@ class EnrollmentHold < ApplicationRecord
     enrollment.create_phase_completions
   end
 
+  # Invalida os pedidos de todos os semestres que o trancamento cobre, e nao
+  # so o do primeiro: hold_in_date e o check_enrollment_hold da linha do
+  # pedido valem ate o end_date, e a adicao que ficasse Solicitada num
+  # semestre seguinte travaria toda gravacao do formulario daquele pedido.
   def invalidate_enrollment_requests
-    enrollment_requests = EnrollmentRequest.where(
-      enrollment: enrollment,
-      year: year,
-      semester: semester
-    ).includes(:class_enrollment_requests)
+    first = YearSemester.new(year: year, semester: semester)
+    semesters = (0...number_of_semesters).map { |offset| first + offset }
+    by_semester = semesters.map do |ys|
+      EnrollmentRequest.where(year: ys.year, semester: ys.semester)
+    end
+    enrollment_requests = EnrollmentRequest.where(enrollment: enrollment)
+      .and(by_semester.reduce(:or))
+      .includes(:class_enrollment_requests)
 
     enrollment_requests.each do |enrollment_request|
       enrollment_request.class_enrollment_requests.each do |class_enrollment_request|
-        class_enrollment_request.set_status!(ClassEnrollmentRequest::INVALID)
+        invalidate_request(class_enrollment_request)
       end
     end
+  end
+
+  # A remoção efetivada fica Efetivada, como se espera: a inscrição não pode
+  # voltar no período trancado (ClassEnrollmentRequest#
+  # that_removal_can_be_undone). A linha que não grava por outro motivo --
+  # dado legado que a validação recusa -- continua pendente e travando o
+  # formulário do pedido; o log do servidor diz qual e por quê.
+  def invalidate_request(class_enrollment_request)
+    return if class_enrollment_request.status == ClassEnrollmentRequest::INVALID
+    removal_effected = class_enrollment_request.remove_effected?
+    return if class_enrollment_request.set_status!(ClassEnrollmentRequest::INVALID)
+    return if removal_effected
+
+    Rails.logger.warn(
+      "EnrollmentHold #{id}: class enrollment request #{class_enrollment_request.id} " \
+      "not invalidated: #{class_enrollment_request.errors.full_messages.join("; ")}"
+    )
   end
 
   def verify_class_enrollments

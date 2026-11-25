@@ -87,13 +87,14 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       end
       email_change = email_change_message
       emails << email_change if email_change
-      Notifier.send_emails(notifications: emails)
+      undelivered = Notifier.send_emails(notifications: emails)
       # Inscricao que nasce aqui (processo sem sessao): o navegador nao recebe
       # o codigo, so o aviso de para onde ele foi.
       if creating
         session[:admission_tokens]&.delete(previous_token)
         return redirect_to admissions_path, token_delivery_flash(
-          "admissions.apply.update.new_token_sent", @admission_application.email, emails.first(1)
+          "admissions.apply.update.new_token_sent", @admission_application.email, emails.first(1),
+          undelivered: undelivered
         )
       end
       if email_change
@@ -102,7 +103,7 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
         flash_message = token_delivery_flash(
           "admissions.apply.update.email_change_requested",
           @admission_application.pending_email, [email_change],
-          saved: I18n.t("admissions.apply.update.#{was_filled ? "edit_notice" : "new_notice"}")
+          undelivered: undelivered, saved: I18n.t("admissions.apply.update.#{was_filled ? "edit_notice" : "new_notice"}")
         )
         @admission_application.cancel_email_change if flash_message.key?(:alert)
       else

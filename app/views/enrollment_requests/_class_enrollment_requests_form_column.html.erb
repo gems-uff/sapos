@@ -31,6 +31,16 @@
       @record.class_enrollment_requests.collect(&:course_class), [], [],
       keep_on_demand = true
     ) %>
+    <%# A inscrição e o status de cada linha gravada, lidos no banco: ver o
+        campo oculto class_enrollment abaixo. O status gravado decide o aviso
+        de pedido já efetivado (effected-change-alert), que fala do que
+        estava efetivado antes da alteração, não da escolha que voltou de uma
+        gravação recusada. %>
+    <% saved_lines = ClassEnrollmentRequest
+      .where(enrollment_request_id: @record.id)
+      .pluck(:id, :class_enrollment_id, :status) %>
+    <% saved_class_enrollment_ids = saved_lines.to_h { |id, ce_id, _| [id, ce_id] } %>
+    <% saved_statuses = saved_lines.to_h { |id, _, status| [id, status] } %>
     <table class="disable-pointer enroll-table <%= sub_form_list_id(
       association: :class_enrollment_requests
     ) %>">
@@ -58,7 +68,15 @@
       <tbody>
         <% table[:data].each do |row| %>
           <tr>
-            <% cer = @record.class_enrollment_requests.find_by(course_class_id: row[0][:id]) %>
+            <%# A linha em memória, não uma cópia do banco: na volta de uma
+                gravação recusada, ela traz a escolha enviada e o erro. A
+                inscrição da linha é a exceção e vem do banco: a remoção que
+                a gravação recusada efetivaria apagou a inscrição, e o
+                dependent: :nullify dela soltou a linha em memória por
+                update_columns, que o rollback não desfaz (nem o
+                class_enrollment_id_in_database). O campo vazio regravaria a
+                remoção sem apagar a inscrição. %>
+            <% cer = @record.class_enrollment_requests.to_a.find { |line| line.course_class_id == row[0][:id] } %>
             <input
               type="hidden"
               name="record[class_enrollment_requests][<%=cer.id%>][id]"
@@ -70,14 +88,16 @@
             <input
               type="hidden"
               name="record[class_enrollment_requests][<%=cer.id%>][class_enrollment]"
-              value="<%=cer.class_enrollment_id%>">
+              value="<%=saved_class_enrollment_ids.fetch(cer.id) { cer.class_enrollment_id }%>">
             <td class="cell-action">
               <label> <%= cer.action %> </label>
             </td>
             <% ClassEnrollmentRequest::STATUSES.each do |status| %>
               <td>
                 <label>
-                  <input <%= class_request_attribute(cer, status) %>
+                  <input <%= class_request_attribute(
+                           cer, status, saved_statuses.fetch(cer.id) { cer.status }
+                         ) %>
                          name="record[class_enrollment_requests][<%=cer.id%>][status]"/>
                 </label>
               </td>
@@ -88,6 +108,13 @@
               </td>
             <% end %>
           </tr>
+          <% if cer.errors.any? %>
+            <tr class="association-record-errors">
+              <td colspan="<%= 1 + ClassEnrollmentRequest::STATUSES.size + row.size - 1 %>">
+                <%= active_scaffold_error_messages_for(:record, object: cer) %>
+              </td>
+            </tr>
+          <% end %>
         <% end %>
       </tbody>
     </table>
@@ -99,14 +126,21 @@ $("#<%= cer_subform_id %>-div .enrollment-request-all").click(function() {
   let attr = $(this).data("attr")
   $(this).parents(".enroll-table").find(".radio-" + attr).click();
   return false;
-})
+});
 
-$("#<%= cer_subform_id %>-div .effected-item").on("change", function(event) {
-  var count = $('#<%= cer_subform_id %>-div .effected-item.radio-efetivada:not(":checked")').length;
-  if (count > 0) {
-    $("#<%= cer_subform_id %>-div .effected-change-alert").show();
-  } else {
-    $("#<%= cer_subform_id %>-div .effected-change-alert").hide();
+// O aviso vale também ao abrir: a página devolvida por uma gravação recusada
+// traz a escolha enviada, que pode ter tirado de Efetivada uma linha gravada
+// como Efetivada (effected-item segue o status gravado).
+(function() {
+  function toggleEffectedChangeAlert() {
+    var count = $('#<%= cer_subform_id %>-div .effected-item.radio-efetivada:not(":checked")').length;
+    if (count > 0) {
+      $("#<%= cer_subform_id %>-div .effected-change-alert").show();
+    } else {
+      $("#<%= cer_subform_id %>-div .effected-change-alert").hide();
+    }
   }
-})
+  $("#<%= cer_subform_id %>-div .effected-item").on("change", toggleEffectedChangeAlert);
+  toggleEffectedChangeAlert();
+})();
 </script>

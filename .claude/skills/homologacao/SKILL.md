@@ -1,9 +1,19 @@
 ---
 name: homologacao
-description: Compara o SAPOS antes e depois de uma mudança em homologação, capturando telas, PDFs e planilhas nas duas versões e apontando o que divergiu. Use ao validar upgrade de dependência, atualização de framework ou refatoração ampla, quando a suíte verde não é evidência suficiente.
+description: Compara o SAPOS antes e depois de uma mudança em homologação, capturando telas, PDFs e planilhas nas duas versões e apontando o que divergiu. Use ao validar upgrade de dependência, atualização de framework ou refatoração ampla, quando a suíte verde não é evidência suficiente. Exige uma instância de homologação separada da de produção; executada pelo mantenedor ou por quem ele designar.
 ---
 
 # Homologação comparativa (safe refactor)
+
+**Pré-condições.** Executada pelo mantenedor ou por quem ele designar. Existe
+uma instância de homologação separada da de produção, cujo banco é cópia do de
+produção, com conta administrativa na aplicação, shell no servidor e o arquivo
+de credenciais descrito em "Pré-requisitos". O banco traz dado real: valem a
+seção "Dados sensíveis" do `AGENTS.md` e a trava de e-mail descrita em "Regras
+de segurança".
+
+Se a instalação mantém parâmetros locais para esta skill (o contexto da sessão
+aponta onde), leia-os antes de começar.
 
 Valida uma mudança rodando a aplicação **duas vezes contra o mesmo banco** — antes
 e depois — e comparando o resultado. Serve para o que a suíte não cobre: MariaDB
@@ -33,20 +43,39 @@ não há como separar diferença de código de diferença de ambiente.
   navegador"). O geckodriver o Selenium Manager resolve sozinho:
   `... selenium-manager --browser firefox --output json`.
 - Um arquivo de credenciais **fora do repositório**, com `chmod 600`, contendo as
-  três variáveis. Elas ficam juntas de propósito: amarrar a URL às credenciais
+  variáveis abaixo. Elas ficam juntas de propósito: amarrar a URL às credenciais
   evita apontar uma senha de homologação para outro ambiente.
 
 ```bash
 # ~/.sapos_staging_env
+
+# Login na tela do SAPOS: scripts de captura e sondas
 export SAPOS_STAGING_URL=https://.../staging
-export SAPOS_STAGING_USER=...
-export SAPOS_STAGING_PASS='...'   # aspas SIMPLES: protegem espaço, $, ! e crase
-export SAPOS_STAGING_SSH=...         # host do ssh do servidor de homologação
-export SAPOS_STAGING_INSTANCE=...    # usuário unix da instância (aplicação em ~/instance)
+export SAPOS_STAGING_USER=...          # login de administrador na aplicação
+export SAPOS_STAGING_PASS='...'        # aspas SIMPLES: protegem espaço, $, ! e crase
+
+# Comando dentro da aplicação, no servidor:
+#   ssh $SAPOS_STAGING_SSH "sudo -i -u $SAPOS_STAGING_APP_USER bash -lc 'cd $SAPOS_STAGING_APP_DIR && …'"
+export SAPOS_STAGING_SSH=...           # destino do ssh (host ou alias do ~/.ssh/config)
+export SAPOS_STAGING_APP_USER=...      # conta do sistema operacional que roda a aplicação
+export SAPOS_STAGING_APP_DIR=...       # pasta da aplicação (caminho absoluto)
 ```
 
-As duas últimas servem às sondas que precisam do servidor, não só da tela —
-hoje, a limpeza do `probe_submissao.rb`.
+As três últimas servem só ao que roda dentro da aplicação, no servidor: a trava
+de e-mail, a limpeza do exercício de e-mail e a do `probe_submissao.rb`. O
+`sudo -i` abre a sessão da conta que roda a aplicação — o Ruby, as permissões e
+a configuração do banco são dela.
+
+**`SAPOS_STAGING_URL` e `SAPOS_STAGING_APP_USER` têm de conter `staging`.** É
+a trava contra apontar para produção: os scripts recusam a URL sem a palavra
+(alguns aceitam `--force`; os que carregam o `explore_common.rb` recusam por
+ele); o que roda no servidor recusa a conta — as funções `na_instancia` e
+`runner` olham a variável, e o `trava_email.rb` e o `limpa_exercicio_email.rb`
+olham a conta que de fato os executa, o que vale também para quem copiar o
+comando do cabeçalho. Script novo que roda no servidor confere a conta do mesmo
+jeito. A palavra é fixa de propósito — configurável, ela viria do mesmo arquivo que a
+URL e erraria junto com ela. Instância de homologação com outro nome precisa
+de `staging` na URL e na conta.
 
 Carregue com `set -a; source ~/.sapos_staging_env; set +a` antes de cada script.
 
@@ -69,7 +98,7 @@ A ordem importa: escrita muda o que a captura enxerga, então cada lado escreve
 7. **Captura "depois"**, idêntica à do passo 3.
 8. **Comparação** — as capturas e os JSON das duas passadas de escrita.
 
-Entre 3 e 7 o banco **não pode ser reimportado**. Uma réplica nova traria
+Entre 3 e 7 o banco **não pode ser reimportado**. Uma cópia nova traria
 edições feitas em produção no meio do caminho, e diferenças de dado apareceriam
 como se fossem de código.
 
@@ -79,16 +108,16 @@ uma delas mudar no meio do ciclo — rota acrescentada, rota removida —, captu
 um caminho fora do repositório) e só então adote a nova. Sem isso a comparação
 acusa a rota que você mexeu, misturada com o que ela deveria medir.
 
-**A réplica padrão vem sem a tabela `versions`**: o `migrate.sh` do servidor só
-a copia com o parâmetro `full`. Mudança que lê o paper_trail — migration que
-reconstrói histórico a partir das versões, tela de log — homologada sobre a
-réplica padrão roda sobre tabela vazia e passa sem medir nada. Peça ao
-mantenedor a réplica `full` antes do passo 1.
+**A cópia pode vir sem a tabela `versions`**, se o processo de cópia a omitir.
+Mudança que lê o paper_trail — migration que reconstrói histórico a partir das
+versões, tela de log — homologada sem ela roda sobre tabela vazia e passa sem
+medir nada. Nesse caso, peça ao mantenedor a cópia completa antes do passo 1.
 
 ### Onde as capturas ficam
 
-Tudo mora em `~/capturas-sapos-staging/`, **fora do repositório** (contêm dado
-real — ver "Regras de segurança"). Uma pasta por versão capturada, nomeada
+Tudo mora numa pasta de capturas **fora do repositório** (contêm dado real —
+ver "Regras de segurança"); onde ela fica é parâmetro local da instalação (ver
+"Pré-condições"). Uma pasta por versão capturada, nomeada
 `<data>_v<versão>_<rótulo>`, com `html/`, `extra/` e `bin/` dentro:
 
 - `<data>` — dia da captura (`AAAA-MM-DD`), para ordenar cronologicamente.
@@ -105,7 +134,7 @@ começar uma nova. Cada rodada compara duas dessas pastas — a "antes" e a "dep
 ```bash
 set -a; source ~/.sapos_staging_env; set +a
 S=.claude/skills/homologacao
-CAP=~/capturas-sapos-staging
+CAP=<pasta de capturas>          # fora do repositório
 
 # Ajuste as duas versões à rodada. Nomeie pela versão do cabeçalho de cada deploy.
 ANTES=$CAP/<data>_v<versão>_<rótulo>
@@ -271,7 +300,7 @@ captura ou de comparação alterado desde a última vez que passou por elas.
   outra diferença se corrige no instrumento ou entra em "Ruído conhecido" com a
   causa, antes de ler o A/B.
 - **Diferença plantada.** Com instrumento novo, prove que o comparador acusa o
-  que deve: copie uma captura, plante uma diferença na cópia e compare a
+  que deve: duplique uma captura, plante uma diferença na duplicata e compare a
   original com ela, de modo que a plantada seja a única diferença que existe.
   `<rota>` é o nome de um arquivo qualquer de `html/txt/`, sem extensão, e
   `<doc>` um diretório de `bin/pages/` que tenha PNG:
@@ -289,7 +318,7 @@ captura ou de comparação alterado desde a última vez que passou por elas.
   Passa quando o `compare_html.rb` acusa exatamente aquela rota em "texto
   diferente" e num grupo de pixel só dela, e o `compare_binary.rb` exatamente
   aquela página — e as contagens de `[sanidade]` saem 1, não altas, porque os
-  dois lados são a mesma captura. A cópia tem dado real — ela fica na pasta das
+  dois lados são a mesma captura. A duplicata tem dado real — ela fica na pasta das
   capturas e sai ao fim.
 
 ## Camada exploratória (interativa) — o que a varredura estática não alcança
@@ -399,10 +428,14 @@ requisições: processo com `require_session` só deixa abrir a inscrição no
 navegador que a recuperou, e a prova é o token guardado na sessão.
 
 ```bash
-EXPLORE_OUT=$LADO/tokens bundle exec ruby $S/probe_tokens_admissao.rb
+SAPOS_PROCESSO_TOKENS_NOME='<nome do processo>' SAPOS_PROCESSO_TOKENS_URL=<simple_url> \
+  EXPLORE_OUT=$LADO/tokens bundle exec ruby $S/probe_tokens_admissao.rb
 ```
 
-**Com o reCAPTCHA ligado ela não mede nada na réplica, e isso é esperado:** a
+O processo tem `require_session` ligado e ao menos duas candidaturas; o mesmo
+nos dois lados.
+
+**Com o reCAPTCHA ligado ela não mede nada na cópia, e isso é esperado:** a
 homologação roda em ambiente *production*, onde `should_use_recaptcha` é true,
 e o `#find` valida o reCAPTCHA antes de procurar a inscrição. Selenium headless
 não passa, nenhum token entra na sessão, e a sonda **recusa a medida** em vez
@@ -416,15 +449,18 @@ Em processo com sessão, a pré-inscrição, a entrada com o código e a recuper
 passam pelo reCAPTCHA, que o Selenium headless não vence. Para exercitá-las
 pela tela — e com elas a troca de e-mail confirmada por link —, o reCAPTCHA é
 desligado **só na instância de homologação e só enquanto o exercício roda**. O
-exercício escreve na réplica e manda e-mail: vem **depois** da captura do lado
+exercício escreve na cópia e manda e-mail: vem **depois** da captura do lado
 "depois", nunca entre as duas fotos.
 
 ```bash
 set -a; source ~/.sapos_staging_env; set +a
 S=.claude/skills/homologacao
-na_instancia() { ssh "$SAPOS_STAGING_SSH" "sudo -i -u $SAPOS_STAGING_INSTANCE bash -lc \"cd ~/instance && $1\""; }
-runner() { ssh "$SAPOS_STAGING_SSH" "f=\$(mktemp /tmp/r.XXXXXX.rb); chmod 644 \$f; cat > \$f; \
-  sudo -i -u $SAPOS_STAGING_INSTANCE bash -lc \"cd ~/instance && bundle exec rails runner \$f $2\"; rm -f \$f" < "$1"; }
+eh_staging() { [[ $SAPOS_STAGING_APP_USER == *staging* ]] || { echo "APP_USER sem 'staging': $SAPOS_STAGING_APP_USER" >&2; return 1; }; }
+na_instancia() { eh_staging || return 1
+  ssh "$SAPOS_STAGING_SSH" "sudo -i -u $SAPOS_STAGING_APP_USER bash -lc \"cd $SAPOS_STAGING_APP_DIR && $1\""; }
+runner() { eh_staging || return 1
+  ssh "$SAPOS_STAGING_SSH" "f=\$(mktemp /tmp/r.XXXXXX.rb); chmod 644 \$f; cat > \$f; \
+  sudo -i -u $SAPOS_STAGING_APP_USER bash -lc \"cd $SAPOS_STAGING_APP_DIR && bundle exec rails runner \$f $2\"; rm -f \$f" < "$1"; }
 
 # 1. desligar o reCAPTCHA e destravar o e-mail para o endereço de teste
 na_instancia "sed -i 's/should_use_recaptcha = true/should_use_recaptcha = false/' config/environments/production.rb && touch tmp/restart.txt"
@@ -454,7 +490,7 @@ curl -s "$SAPOS_STAGING_URL/admissions/<edital>" | grep -c g-recaptcha   # tem d
 ```
 
 `<edital>` é o endereço (`simple_url`) de um processo **aberto e com sessão**;
-a réplica costuma ter algum sem inscrição nenhuma, que é o melhor exemplar
+a cópia costuma ter algum sem inscrição nenhuma, que é o melhor exemplar
 (`Admissions::AdmissionProcess.open.where(require_session: true)`).
 
 O que cada passo tem de mostrar: a pré-inscrição avisa para onde o código foi,
@@ -470,15 +506,15 @@ e não acha a inscrição pelo antigo.
   desligado e esquecido atravessa o deploy seguinte. O desfazer é o `git
   checkout` do arquivo, conferido pelo `git status` e pela tela — não "o
   próximo deploy conserta".
-- **O Gmail junta em uma conversa as mensagens de mesmo assunto.** O link do
-  segundo pedido de troca é a segunda mensagem da conversa do primeiro: leia a
-  conversa inteira, não o resumo da busca, que mostra só a primeira.
+- **Cliente de e-mail que agrupa por assunto esconde o segundo pedido.** O link
+  do segundo pedido de troca vira a segunda mensagem da conversa do primeiro:
+  leia a conversa inteira, não o resumo da busca, que mostra só a primeira.
 - **O código vem no resumo da mensagem e o link no corpo.** A sonda os mascara
   no que imprime; não os copie para relatório, issue ou PR.
 
 Três coisas que a sonda carrega e que valem para qualquer medida de autorização:
 
-- **Escolher o exemplar é parte da medida.** A réplica tem processos com e sem
+- **Escolher o exemplar é parte da medida.** A cópia tem processos com e sem
   `require_session`, e a coluna não aparece na lista de processos. Candidatura de
   processo sem a trava abre para qualquer navegador: a sonda diria "abriu" nos
   dois lados, e isso se leria como correção funcionando.
@@ -527,7 +563,7 @@ Três coisas que essa leitura ensina, e valem para qualquer sonda de formulário
   medida, não preliminar dela.
 - **Página que não montou o formulário devolve lista vazia**, e zero se lê como
   "nada exigido" em vez de "não medi". Recuse a medida e registre o que havia na
-  página. Na réplica, a maioria das candidaturas cai nisso e a causa é uma só: o
+  página. Na cópia, a maioria das candidaturas cai nisso e a causa é uma só: o
   parcial devolve a string `Acesso inválido` quando o processo está com
   `staff_can_edit` desligado. É desenho — escolha outra candidatura.
 
@@ -567,10 +603,14 @@ qual campo.
 
 ```bash
 bundle exec ruby $S/abrir_processo_seletivo.rb abrir 5
+export SAPOS_PROCESSO_URL=<simple_url do 5>
 EXPLORE_OUT=$OUT bundle exec ruby $S/probe_submissao.rb              # só o bloqueio, não escreve
 EXPLORE_OUT=$OUT bundle exec ruby $S/probe_submissao.rb --confirmar  # submete e apaga o que criou
 bundle exec ruby $S/abrir_processo_seletivo.rb fechar 5
 ```
+
+As sondas que dependem de processo seletivo não têm processo padrão — ele é
+dado da instalação — e param pedindo a variável quando ela falta.
 
 O modo padrão não cria nada e já serve de regressão barata: obrigatório que
 deixou de ser exigido no cliente aparece como **não bloqueou**, ou como bloqueio
@@ -630,7 +670,7 @@ fluxo seguinte, que os reporta como se fossem da tela dele.
 lista renderiza cada booleano como o par do Rails — um `input[type=hidden]` com
 valor `0` mais um `input[type=checkbox]` —, então o oculto vale `0` em **toda**
 linha, marcada ou não. Ler o oculto responde "nenhum registro tem a flag" para
-qualquer coluna, e o falso negativo parece medida: leva a criar na réplica um
+qualquer coluna, e o falso negativo parece medida: leva a criar na cópia um
 caso que ela já tinha. O `innerText` da célula também não serve — vem vazio nos
 dois estados.
 
@@ -669,7 +709,8 @@ EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/probe_escrita.rb              # di
 EXPLORE_OUT=$LADO/escrita bundle exec ruby $S/probe_escrita.rb --confirmar  # ciclo de foto
 
 bundle exec ruby $S/abrir_processo_seletivo.rb abrir 5
-EXPLORE_OUT=$LADO/submissao_escrita bundle exec ruby $S/probe_submissao.rb --confirmar
+SAPOS_PROCESSO_URL=<simple_url do 5> EXPLORE_OUT=$LADO/submissao_escrita \
+  bundle exec ruby $S/probe_submissao.rb --confirmar
 bundle exec ruby $S/abrir_processo_seletivo.rb fechar 5
 
 diff $ANTES/escrita/probe_escrita.json $DEPOIS/escrita/probe_escrita.json
@@ -689,12 +730,12 @@ O que cada um cobre, e o que ler no relatório:
   deles é caminho de escrita quebrado, não ruído.
 - `probe_submissao.rb --confirmar` — formulário público de candidatura de ponta
   a ponta: `criou: true` na fase 2 e `restantes com o marcador: 0` na limpeza.
-  **Resíduo na réplica é defeito da rodada**, não da aplicação: se sobrar
+  **Resíduo na cópia é defeito da rodada**, não da aplicação: se sobrar
   registro com o marcador, apague antes de seguir. A limpeza pela tela apaga a
   candidatura, mas não o formulário preenchido dela — a candidatura só faz
   `belongs_to` dele, sem `dependent`, e a tela de formulários não tem exclusão.
   Por isso a sonda apaga o formulário órfão no servidor (`rails runner` por
-  ssh, com `SAPOS_STAGING_SSH` e `SAPOS_STAGING_INSTANCE`), e a linha
+  ssh, com as três variáveis do servidor), e a linha
   `formularios orfaos com o marcador` tem de dizer `restantes 0`. `NAO
   VERIFICADO` deixa um formulário de ~50 campos para trás a cada rodada, e a
   contagem de `/filled_forms` e `/filled_form_fields` passa a divergir entre as
@@ -712,7 +753,7 @@ O que a passada **não** cobre, e por isso não se conclui dela: disparo de e-ma
 Só exercite e-mail quando a mudança tocar Devise, `lib/notifier.rb`, template de
 mensagem ou a entrega — e aí siga as "Regras de segurança", que pedem o valor
 vivo de `redirect_email` antes de qualquer disparo. Upgrade que não toca nada
-disso não justifica destravar a variável numa réplica de produção.
+disso não justifica destravar a variável numa cópia de produção.
 
 ### Zero diferença na estática não é evidência sobre widget
 
@@ -742,13 +783,12 @@ Todo dado inserido por uma rodada some nessas horas, e com ele as rotas do
 existe, e imprime as linhas prontas para o `routes_aluno.txt` — os ids mudam a
 cada regeração. Rodar sem necessidade não custa nada.
 
-O script cobre o conjunto inteiro, na ordem certa, e confere cada etapa. Os dois
-primeiros passos já foram manuais, pela armadilha descrita adiante; deixaram de
-ser quando a conta de captura passou a ser criada pelo script de migração da
-réplica — é a existência dela que arma a trava, então o script agora exige a
-conta e aborta sem ela, em vez de confiar em quem executa.
+O script cobre o conjunto inteiro, na ordem certa, e confere cada etapa. Ele
+exige a conta de captura e aborta sem ela, em vez de confiar em quem executa: é
+a existência dela que arma a trava descrita adiante. Se o processo de cópia não
+a recria, crie-a antes de rodar o script.
 
-As telas do aluno precisam de três coisas que a réplica de produção não traz
+As telas do aluno precisam de três coisas que a cópia de produção não traz
 prontas. **A ordem não é indiferente.**
 
 1. **Criar o aluno**, com rótulo `ZZ-TESTE-HOMOLOG` no nome (é por ele que a
@@ -772,7 +812,7 @@ O combo de troca de papel só aparece depois do passo 2 (ele exige dois papéis)
 
 ### Se precisar do formulário público de inscrição
 
-A réplica não tem processo seletivo aberto, e **todos os processos dela vêm com
+A cópia não tem processo seletivo aberto, e **todos os processos dela vêm com
 `require_session` ligado** — que faz o `prepare_new_admission_application`
 desviar antes de o pedido chegar ao controller. São dois campos a mexer, não só
 a data de fim; e três quando o processo é novo, com o início ainda no futuro. O
@@ -910,9 +950,10 @@ ela que desempata quando a leitura do DOM e o resultado discordam.
   Notificação `individual` gera uma mensagem por linha do resultado — uma
   consulta ampla enche a caixa de quem recebe. As de prefixo `CORD` mandam um
   e-mail só.
-- **A homologação envia e-mail de verdade.** Roda em ambiente **production**
-  (não há `staging.rb`; entrega por `sendmail`, `should_send_emails = true`). O
-  que impede vazamento é **uma** variável de banco, `CustomVariable.redirect_email`
+- **Trate a homologação como se enviasse e-mail de verdade.** Ela roda em
+  ambiente **production** (o repositório não tem `staging.rb`), com a entrega
+  que a instalação configurou, e a cópia tem endereços reais. O que impede
+  vazamento é **uma** variável de banco, `CustomVariable.redirect_email`
   (tela *Configurações → Variáveis*), e ela vale tanto para notificações
   (`lib/notifier.rb`) quanto para o Devise (`app/mailers/devise_mailer.rb`).
   Tabela verdade — **confira o valor vivo antes de qualquer disparo**:
@@ -925,8 +966,8 @@ ela que desempata quando a leitura do DOM e o resultado discordam.
   servidor, por `rails runner`, sem nunca apagá-la; `<endereço>` destrava
   redirecionando e `VAZIA` repõe a trava. Antes e depois, confira pela tela com
   o `conferir_redirect_email.rb` (sai 1 destravada, 0 travada). Deixe destravada
-  só enquanto o exercício roda, e fora do horário do `cron.daily`: a rake
-  noturna de manutenção dispara as notificações agendadas, e com a variável
+  só enquanto o exercício roda, e fora do horário em que a instalação agenda a
+  `maintenance:run`: ela dispara as notificações agendadas, e com a variável
   destravada elas saem todas para o endereço de teste. O envio grava uma linha
   em `notification_logs` por mensagem; apague as do exercício ao fim.
 - **Mensagem que a tela só alcança pelo reCAPTCHA** (o `create` e o `find` da
@@ -934,10 +975,10 @@ ela que desempata quando a leitura do DOM e o resultado discordam.
   desligado pelo tempo do exercício (ver "Exercício de e-mail da inscrição").
   Compor a mensagem no servidor, com `prepare_message` sobre uma candidatura
   não gravada, mede o modelo e a entrega, não o controller.
-- **Ler o e-mail redirecionado:** tente o **Gmail via MCP primeiro** (`/mcp` →
-  "claude.ai Gmail") para ler as mensagens e clicar nos links. Se não conectar,
-  **peça ao usuário para colar** as mensagens que chegaram — o link de token vem
-  no corpo e basta para prosseguir.
+- **Ler o e-mail redirecionado:** se a sessão tem acesso à caixa do endereço de
+  teste, leia as mensagens e os links por ele. Senão, **peça ao usuário para
+  colar** as mensagens que chegaram — o link de token vem no corpo e basta para
+  prosseguir.
 - **Reset de senha da conta de captura:** ao completar um reset de teste,
   redefina para o **mesmo valor** do env (`SAPOS_STAGING_PASS`) — trocar quebra o
   login dos scripts de captura.

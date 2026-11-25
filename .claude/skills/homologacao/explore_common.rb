@@ -14,12 +14,24 @@ require "fileutils"
 BASE = (ENV["SAPOS_STAGING_URL"] || abort("defina SAPOS_STAGING_URL")).sub(%r{/\z}, "")
 USER = ENV["SAPOS_STAGING_USER"] || abort("defina SAPOS_STAGING_USER")
 PASS = ENV["SAPOS_STAGING_PASS"] || abort("defina SAPOS_STAGING_PASS")
+# Trava contra produção (ver "SAPOS_STAGING_URL ... têm de conter staging" na
+# SKILL.md): vale para todo script que carrega esta base.
+abort "URL sem 'staging': #{BASE}" unless BASE.include?("staging")
 
 # Sem default: um diretório fixo aqui apontaria para a captura de uma rodada
 # antiga e misturaria as saídas de rodadas diferentes.
 OUT = ENV["EXPLORE_OUT"] ||
   abort("defina EXPLORE_OUT com o diretório da rodada (fora do repositório)")
 FileUtils.mkdir_p(OUT)
+
+# Variavel sem default: o valor e dado da instalacao (um processo seletivo, por
+# exemplo), e um padrao fixado aqui miraria registro que outra instalacao nao
+# tem. `como` diz onde achar o valor.
+def env_obrigatoria(nome, como)
+  valor = ENV[nome].to_s.strip
+  abort "defina #{nome}: #{como}" if valor.empty?
+  valor
+end
 
 def build_driver
   novo_driver(largura: 1440, altura: 1600)

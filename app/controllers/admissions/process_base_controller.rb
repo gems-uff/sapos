@@ -26,8 +26,19 @@ class Admissions::ProcessBaseController < ApplicationController
     # de e-mail desabilitado na instalacao), a tela diz isso em vez de afirmar
     # um envio que nao houve: a inscricao existe, e quem gerencia o processo ve
     # o codigo e pode passa-lo.
-    def token_delivery_flash(key, email, messages, **interpolation)
-      if Notifier.sending? && messages.any? { |message| !message[:skip_message] }
+    #
+    # undelivered: o que Notifier.send_emails devolveu, as mensagens que ele
+    # tentou entregar na hora e nao entregou. Com o servidor de e-mail parado,
+    # a tela e o unico lugar em que o candidato fica sabendo. Com varias
+    # mensagens (find_by_email: uma por endereco gravado), o aviso de envio
+    # exige todas: a que falhou pode ser a do endereco que ele digitou.
+    def token_delivery_flash(key, email, messages, undelivered: nil, **interpolation)
+      undelivered = Array(undelivered)
+      sent = messages.reject { |message| message[:skip_message] }
+      delivered = sent.any? && sent.all? do |message|
+        undelivered.none? { |failed| failed.equal?(message) }
+      end
+      if Notifier.sending? && delivered
         { notice: I18n.t(key, email: email, **interpolation) }
       else
         { alert: I18n.t("#{key}_without_email", **interpolation) }
