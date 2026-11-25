@@ -190,7 +190,8 @@ module Notifier
       undelivered << message unless delivered
       # one error email per kind of failure of the call, at once (see
       # notify_failure)
-      Notifier.notify_failure(error, message, delivered: delivered) if reported.add?([error.class, delivered])
+      kind = [error.class, Notifier.without_addresses(error).message, delivered]
+      Notifier.notify_failure(error, message, delivered: delivered) if reported.add?(kind)
     end
     undelivered
   end
@@ -221,11 +222,14 @@ module Notifier
   end
 
   # The error email, with technical data only (see config.x.error_email):
-  # one per kind of failure of a call -- its class, and whether the message
-  # was delivered before it --, sent at once. A failure that hits every
-  # message -- the mail server down during the daily run -- would otherwise
-  # be one email per message; a second, different failure in the same call
-  # is another defect and gets its own. It is not held until the end of the
+  # one per kind of failure of a call -- its class, its message without the
+  # addresses, and whether the message was delivered before it --, sent at
+  # once. A failure that hits every message -- the mail server down during
+  # the daily run -- would otherwise be one email per message; a second,
+  # different failure in the same call is another defect and gets its own.
+  # The message is part of the kind because every failure of sendmail is
+  # one class, told apart by its exit status; the recipient, masked, is
+  # not. It is not held until the end of the
   # call: with the mail server down every message waits for its timeout, and
   # a process killed before the end would report nothing. The server log has
   # a line for each message (report_failure).

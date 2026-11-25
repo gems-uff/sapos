@@ -577,6 +577,39 @@ RSpec.describe Notifier, type: :model do
             data: hash_including(notification_id: 9, delivered: true))
       end
 
+      # Every failure of sendmail, the delivery of production, is a
+      # Mail::Sendmail::DeliveryError: its exit status is what tells one
+      # defect from another, and the recipient is not.
+      def sendmail_failure(status, recipient)
+        Mail::Sendmail::DeliveryError.new(
+          "Delivery failed with exitstatus #{status}: " \
+          "[\"/usr/sbin/sendmail\", \"-i\", \"-f\", \"sapos@example.com\", \"--\", \"#{recipient}\"]"
+        )
+      end
+
+      def fail_each(*failures)
+        allow_any_instance_of(Mail::TestMailer).to receive(:deliver!) { raise failures.shift }
+      end
+
+      it "control: reports the same sendmail failure to different recipients once" do
+        fail_each(sendmail_failure(75, "primeiro@example.com"), sendmail_failure(75, "segundo@example.com"))
+
+        save_and_send
+
+        expect(ExceptionNotifier).to have_received(:notify_exception).once
+      end
+
+      it "reports each sendmail failure of one call" do
+        fail_each(sendmail_failure(67, "primeiro@example.com"), sendmail_failure(75, "segundo@example.com"))
+        reported = []
+        allow(ExceptionNotifier).to receive(:notify_exception) { |error, **| reported << error.message }
+
+        save_and_send
+
+        expect(reported.size).to eq(2)
+        expect(reported).to contain_exactly(include("exitstatus 67"), include("exitstatus 75"))
+      end
+
       # The error email does not wait for the rest of the call: with the
       # mail server down, every message waits for its own timeout, and a
       # process killed before the end would not report at all.
