@@ -24,6 +24,8 @@
 //= require cocoon
 //= require_tree .
 
+$.rails.requiredInputSelector = 'input[name][required]:enabled, textarea[name][required]:enabled';
+
 
 var I18nExitConfirmation = 'Existem campos preenchidos! Você pode perder suas alterações!';
 

@@ -32,7 +32,7 @@ $(document).ready(function() {
   <% if configuration["required"] %>
     window.customFormValidations["<%= filled_class %>"].push(function() {
       let input = $(`#<%= field_id %> input`).get(1);
-      if (input.disabled) {
+      if (input.matches(":disabled")) {
         return true;
       }
       let error_msg = "";
