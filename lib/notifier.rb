@@ -134,7 +134,7 @@ module Notifier
         # not a failure of the delivery, and does not go to the error email;
         # but nothing was delivered, and the screen that announces it has to
         # know (see send_emails).
-        Notifier.logger.warn "Notification not delivered (notification #{message[:notification_id]}): no recipient"
+        Notifier.logger.warn "Notification not delivered#{notification_label(message)}: no recipient"
         Notifier.logger.warn "Subject: #{message[:subject]}"
         undelivered << message
       else
@@ -215,10 +215,17 @@ module Notifier
       elsif delivered then "delivered, but not logged"
       else "not delivered"
       end
-    Notifier.logger.error "Notification #{outcome} (notification #{message[:notification_id]}): " \
+    Notifier.logger.error "Notification #{outcome}#{notification_label(message)}: " \
       "#{error.class}: #{error.message}"
     Notifier.logger.error "Notifying: #{message[:to]}"
     Notifier.logger.error "Subject: #{message[:subject]}"
+  end
+
+  # The notification a failed message came from, for the server log. A
+  # message of an email template (admissions, enrollment) has none.
+  def self.notification_label(message)
+    id = message[:notification_id]
+    id.present? ? " (notification #{id})" : ""
   end
 
   # The error email, with technical data only (see config.x.error_email):

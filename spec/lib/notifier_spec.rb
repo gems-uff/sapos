@@ -626,6 +626,20 @@ RSpec.describe Notifier, type: :model do
         expect(ActionMailer::Base.deliveries.map(&:subject)).to eq(%w[segundo])
       end
 
+      # A message of an email template (admissions, enrollment) belongs to
+      # no notification.
+      it "does not name a notification that the message does not have" do
+        fail_first(Mail::TestMailer, :deliver!, Errno::ECONNREFUSED)
+        warnings = []
+        allow(Notifier.logger).to receive(:warn) { |text| warnings << text.to_s }
+        messages.last[:to] = ""
+
+        save_and_send
+
+        expect(errors.grep(/not delivered/).first).to start_with("Notification not delivered: Errno::ECONNREFUSED")
+        expect(warnings.first).to eq("Notification not delivered: no recipient")
+      end
+
       it "names the notification of each failure in the server log" do
         messages.each { |m| m[:notification_id] = 7 }
         allow_any_instance_of(Mail::TestMailer).to receive(:deliver!).and_raise(Errno::ECONNREFUSED)
