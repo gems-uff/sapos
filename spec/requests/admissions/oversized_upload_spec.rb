@@ -25,8 +25,8 @@ RSpec.describe "Admissions oversized upload", type: :request do
     @process = FactoryBot.create(
       :admission_process, name: "Mestrado 2026.2",
       simple_url: "mestrado-arquivo-grande", form_template: @template,
-      start_date: Date.today - 10.days, end_date: Date.today + 10.days,
-      edit_date: Date.today + 20.days
+      start_date: Time.zone.today - 10.days, end_date: Time.zone.today + 10.days,
+      edit_date: Time.zone.today + 20.days
     )
   end
 
