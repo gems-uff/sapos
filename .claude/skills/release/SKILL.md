@@ -1,9 +1,15 @@
 ---
 name: release
-description: Integra na main o ramo de uma issue pronta e fecha a issue; e, quando o mantenedor decide soltar a versão, homologa a main e lança o que se acumulou nela — tag anotada, label nas issues, release publicada. Use ao terminar uma issue, ao lançar versão, ou para conferir como as releases anteriores foram feitas.
+description: Integra na main o ramo de uma issue pronta e fecha a issue; e, quando o mantenedor decide soltar a versão, homologa a main e lança o que se acumulou nela — tag anotada, label nas issues, release publicada. Use ao terminar uma issue, ao lançar versão, ou para conferir como as releases anteriores foram feitas. Integrar exige push na main; lançar é do mantenedor.
 ---
 
 # Integrar e lançar
+
+**Pré-condições.** Integrar: quem tem push na `main`. Lançar: o mantenedor,
+mais as pré-condições da skill `homologacao`, que o lançamento percorre.
+
+Se a instalação mantém parâmetros locais para esta skill (o contexto da sessão
+aponta onde), leia-os antes de começar.
 
 Duas sequências, em momentos diferentes:
 
@@ -60,6 +66,13 @@ fast-forward. Se o git recusar, não force nem faça merge commit — o ramo est
 desatualizado e precisa integrar a `main` primeiro, com a suíte rodada de novo.
 
 Nem toda issue passa por PR; quando o mantenedor dispensa, o merge é direto.
+
+**Quando o mantenedor trabalha direto na `main`** (exceção do `AGENTS.md`),
+não há ramo: integrar é o commit na `main`, e a issue fecha quando ele entra —
+sem label ainda, o que diz que ela caminha para a release. Os pré-requisitos
+de sincronia e o `--ff-only` não se aplicam, e o push sai quando ele decide.
+Não há homologação da `main` local: qualquer ramo só se homologa depois do
+push.
 
 ### Feche a issue e apague o ramo
 
@@ -146,11 +159,10 @@ Sem isso, o checkout de destino continua na tag antiga — e, porque o
 `git describe` roda lá, sobre as refs de lá, **o rodapé exibe a versão nova
 enquanto a aplicação serve o código velho**. É pior do que rodapé errado: o
 sinal em que se confia para conferir o deploy passa a confirmar o engano.
-Já aconteceu, em homologação, e só apareceu porque uma sonda mediu o
-comportamento em vez de ler o rodapé.
 
-Confira o deploy por **comportamento**, não por rodapé: uma medida que separe a
-versão nova da anterior — a skill `homologacao` serve para isso.
+Confira o deploy por **comportamento**, não por rodapé: só uma medida que separe
+a versão nova da anterior denuncia o checkout velho — a skill `homologacao`
+serve para isso.
 
 ### 5. Label nas issues
 
@@ -192,14 +204,29 @@ envelhece. Repare no `%3A` — é o `:` de `label:7.15.21` codificado.
 descreva em prosa antes do link e troque o rótulo dele:
 
 ```
-Atualização do Rails de 7.1.6 para 7.2.3.1.
+Atualização de <gem> de <versão> para <versão>.
 
 Demais issues atendidas: https://github.com/gems-uff/sapos/issues?q=label%3A7.15.21
 ```
 
 Sem isso, a release diz "issues atendidas" sobre uma versão cuja mudança
-principal não está em issue nenhuma. Para vulnerabilidade, descreva a
-atualização (gem, de → para) **sem citar CVE nem descrever o ataque**.
+principal não está em issue nenhuma.
+
+**Vulnerabilidade abre o corpo com o pedido de atualização:**
+
+```
+Esta versão traz correções de segurança: atualize assim que possível.
+
+Atualização de <gem> de <versão> para <versão>.
+
+Demais issues atendidas: https://github.com/gems-uff/sapos/issues?q=label%3A7.15.21
+```
+
+Sem a primeira linha, quem roda outra instalação lê uma mudança comum e não
+tem pressa — o SAPOS é aplicação, não gem, e nenhum alerta automático avisa
+ninguém. O resto é genérico: a gem (de → para) ou o assunto do commit, **sem
+citar CVE nem descrever o ataque**. Advisory só existe para relato de fora
+(`SECURITY.md`); a correção que nós mesmos achamos não ganha um.
 
 ### 7. Confira
 
@@ -230,7 +257,7 @@ alerta ficou aberto antes disso.
 É o último passo, e é uma mensagem, não uma ação no repositório. Ela diz:
 
 - **A tag a passar no deploy**, pelo número. Versão errada no rodapé de
-  produção costuma ser a tag passada no deploy, não o Passenger.
+  produção costuma ser a tag passada no deploy, não o servidor de aplicação.
 - Se a tag foi **movida** (passo 4), que o destino precisa de
   `git fetch --tags --force` antes, senão o rodapé mente a favor.
 - **Como conferir o deploy por comportamento**, e não só pelo rodapé: a medida

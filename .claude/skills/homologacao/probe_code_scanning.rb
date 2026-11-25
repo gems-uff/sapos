@@ -28,7 +28,7 @@
 #
 # Uso:
 #   set -a; source ~/.sapos_staging_env; set +a
-#   EXPLORE_OUT=~/capturas-sapos-staging/<rodada>/exploratorio \
+#   EXPLORE_OUT=<pasta de capturas>/<rodada>/exploratorio \
 #     bundle exec ruby .claude/skills/homologacao/probe_code_scanning.rb
 #
 # Sai um resultado.json por rodada; comparar antes/depois e diferenciar o JSON.

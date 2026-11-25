@@ -15,7 +15,7 @@
 # submissao, mas a mudanca em si esta no que a pagina diz -- e o que a pagina
 # diz se le sem escrever nada.
 #
-# DADO REAL: a replica tem dado de aluno. Este script NUNCA grava o conteudo de
+# DADO REAL: a copia tem dado de aluno. Este script NUNCA grava o conteudo de
 # um campo; classifica o valor em vazio/iso/br/outro e reporta so a classe. O
 # rotulo do campo e nome de campo do template, nao dado pessoal.
 #

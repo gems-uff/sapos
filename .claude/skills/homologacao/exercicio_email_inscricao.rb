@@ -6,7 +6,7 @@
 # envio do formulario, troca de e-mail confirmada por link, desistencia da
 # troca e recuperacao do codigo. Cada passo e uma execucao, com navegador novo,
 # porque entre um e outro o codigo ou o link tem de ser lido na caixa de
-# e-mail (Gmail via MCP, ou colado pelo mantenedor).
+# e-mail de teste (por acesso da sessao a ela, ou colado pelo usuario).
 #
 # PRE-REQUISITOS, nesta ordem (ver "Exercicio de e-mail da inscricao" no
 # SKILL.md): reCAPTCHA desligado na instancia de homologacao, e redirect_email
@@ -29,7 +29,7 @@
 #
 # O que imprime: o caminho final com o codigo mascarado (so o identificador),
 # os avisos da tela e o que o navegador barrou. Nao imprime o codigo nem o
-# link. A inscricao de teste fica na replica: apague-a ao fim (ver SKILL.md).
+# link. A inscricao de teste fica na copia: apague-a ao fim (ver SKILL.md).
 
 require_relative "explore_common"
 

@@ -1,18 +1,22 @@
 # frozen_string_literal: true
 
-# Apaga o que o exercicio_email_inscricao.rb deixou na replica: a inscricao de
+# Apaga o que o exercicio_email_inscricao.rb deixou na copia: a inscricao de
 # teste, o formulario preenchido dela e as linhas de notification_logs das
 # mensagens do exercicio. Roda NO SERVIDOR, por rails runner:
 #
 #   set -a; source ~/.sapos_staging_env; set +a
 #   ssh "$SAPOS_STAGING_SSH" "f=\$(mktemp /tmp/limpa.XXXXXX.rb); chmod 644 \$f; cat > \$f; \
-#     sudo -i -u $SAPOS_STAGING_INSTANCE bash -lc \"cd ~/instance && bundle exec rails runner \$f\"; \
+#     sudo -i -u $SAPOS_STAGING_APP_USER bash -lc \"cd $SAPOS_STAGING_APP_DIR && bundle exec rails runner \$f\"; \
 #     rm -f \$f" < limpa_exercicio_email.rb
 #
 # So alcanca o que leva o marcador: inscricao cujo nome comeca por
 # ZZ-TESTE-HOMOLOG e cujo e-mail e zz-teste-homolog...@example.com, e mensagem
 # cujo assunto ou destinatario cita esse endereco. Imprime contagens, nunca
 # conteudo.
+require "etc"
+conta = Etc.getpwuid(Process.uid).name
+abort "Conta sem 'staging': #{conta}. Nada apagado." unless conta.include?("staging")
+
 MARCA = "ZZ-TESTE-HOMOLOG"
 ENDERECO = "zz-teste-homolog%@example.com"
 

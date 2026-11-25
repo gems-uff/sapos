@@ -27,7 +27,10 @@ RSpec.describe "Fluxo do processo seletivo: avaliação compartilhada", type: :r
     @secretary = @workflow.committee_users[1].first
     @evaluators = @workflow.committee_users[2]
     @sent = []
-    allow(Notifier).to receive(:send_emails) { |notifications:| @sent.concat(notifications) }
+    allow(Notifier).to receive(:send_emails) do |notifications:|
+      @sent.concat(notifications)
+      nil # entregue: send_emails devolve só o que não saiu
+    end
   end
 
   it "percorre inscrição, homologação, avaliação, ranking e relatórios" do

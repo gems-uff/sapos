@@ -14,7 +14,7 @@
 # cria, nao apaga e nao envia e-mail (o fluxo de recuperacao por token nao
 # dispara mensagem; ainda assim confira redirect_email antes, por regra).
 #
-# DADO REAL: usa duas candidaturas existentes da replica. Token e e-mail sao
+# DADO REAL: usa duas candidaturas existentes da copia. Token e e-mail sao
 # lidos da tela e ficam SO em memoria -- o relatorio guarda booleanos e rotulos
 # genericos ("A", "B"), nunca o valor. Nao tira screenshot por isso.
 #
@@ -34,13 +34,16 @@
 # do candidato na QUERY STRING. Nao imprima nem guarde a URL desta tela.
 
 # O processo TEM de ter require_session ligado, senao a tela abre para qualquer
-# navegador e a sonda mede o nada. A replica tem processos dos dois tipos, e a
-# coluna nao aparece na lista -- por isso o processo vem fixado aqui, e o passo
-# de controle confere que a trava esta mesmo ativa antes de valer a medida.
-PROCESSO_NOME = ENV.fetch("SAPOS_PROCESSO_TOKENS_NOME", "Doutorado 2025/1")
-PROCESSO_URL = ENV.fetch("SAPOS_PROCESSO_TOKENS_URL", "doutorado-2025-1")
-
+# navegador e a sonda mede o nada. A copia tem processos dos dois tipos, e a
+# coluna nao aparece na lista -- por isso quem roda escolhe o processo, e o
+# passo de controle confere que a trava esta mesmo ativa antes de valer a
+# medida. Sem default: o processo e dado da instalacao.
 require_relative "explore_common"
+
+COMO_ACHAR = "processo com require_session ligado e duas candidaturas, no minimo " \
+             "(Admissions::AdmissionProcess.where(require_session: true))"
+PROCESSO_NOME = env_obrigatoria("SAPOS_PROCESSO_TOKENS_NOME", "nome do #{COMO_ACHAR}")
+PROCESSO_URL = env_obrigatoria("SAPOS_PROCESSO_TOKENS_URL", "simple_url do #{COMO_ACHAR}")
 
 wait = Selenium::WebDriver::Wait.new(timeout: 30)
 driver = build_driver

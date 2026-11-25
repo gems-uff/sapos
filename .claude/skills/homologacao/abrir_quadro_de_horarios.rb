@@ -6,7 +6,7 @@
 #
 # QUANDO USAR: so quando a captura precisar da tela de inscricao
 # (/enrollment/:id/enroll/:ano-:semestre) e nao houver periodo aberto. O banco de
-# homologacao e replica de producao: se o ultimo quadro ja estiver aberto, NAO
+# homologacao e copia de producao: se o ultimo quadro ja estiver aberto, NAO
 # rode isto -- capture com o que esta la. O script recusa duplicar um quadro que
 # ja exista para o mesmo ano/semestre.
 #

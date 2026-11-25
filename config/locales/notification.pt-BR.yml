@@ -59,6 +59,10 @@ pt-BR:
       notification_offset_description: "Data de execução. Frequência Mensal com offset 3d executará todo dia 04 do mês"
       query_offset_description: "Data de consulta. Frequência Semestral com offset -1M terá variavel para dias 01/02 ou 01/07"
       execute_now_success: 'Notificação disparada com sucesso'
+      execute_now_failure:
+        one: "Notificação disparada, mas 1 mensagem (de %{total}) não pôde ser enviada. O motivo está no log do servidor."
+        other: "Notificação disparada, mas %{count} mensagens (de %{total}) não puderam ser enviadas. O motivo está no log do servidor."
+      execute_now_not_sending: "Notificação não disparada: o envio de e-mails está desligado nesta instalação (variável redirect_email vazia, ou envio desligado no ambiente). Nenhuma mensagem saiu."
       query_date: "Data de Consulta"
       set_query_date: "Escolher Data de Consulta"
       should_send_emails: "Enviar e-mails"

@@ -115,7 +115,10 @@ RSpec.describe "Matriculas: documentos, usuarios e notas", type: :request do
     # sai depois, do callback do modelo.
     it "avisa o professor quando a nota muda" do
       enviados = []
-      allow(Notifier).to receive(:send_emails) { |notifications:| enviados.concat(notifications) }
+      allow(Notifier).to receive(:send_emails) do |notifications:|
+        enviados.concat(notifications)
+        nil # entregue: send_emails devolve só o que não saiu
+      end
 
       atualizar(situation: ClassEnrollment::APPROVED, grade: "8.5")
 

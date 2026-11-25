@@ -16,11 +16,13 @@
 module ActiveScaffoldEmbeddedConditions
   PENDENCY = "pendency"
 
-  def active_scaffold_embedded_conditions
-    return nil unless active_scaffold_embedded_params[:conditions] == PENDENCY
-    model = active_scaffold_config.model
-    model.pendency_condition(current_user) if model.respond_to?(:pendency_condition)
-  end
+  # protected como na gem: publico, viraria acao em todo controller.
+  protected
+    def active_scaffold_embedded_conditions
+      return nil unless active_scaffold_embedded_params[:conditions] == PENDENCY
+      model = active_scaffold_config.model
+      model.pendency_condition(current_user) if model.respond_to?(:pendency_condition)
+    end
 end
 
 ActiveScaffold::Finder.prepend(ActiveScaffoldEmbeddedConditions)

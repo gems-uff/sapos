@@ -24,6 +24,15 @@ class YearSemester
     result
   end
 
+  # A mesma lista, recalculada a cada vez que e percorrida. E a que vai nas
+  # opcoes de coluna da configuracao do active_scaffold, que o controller
+  # avalia uma vez so, ao carregar a classe: com o Array, o ano corrente e a
+  # faixa da variavel year_semester_range ficavam os daquele momento ate o
+  # processo reiniciar.
+  def self.selectable_years_options
+    Enumerator.new { |years| selectable_years.each { |year| years << year } }
+  end
+
   def self.current
     today = Date.current
     self.on_date(today)

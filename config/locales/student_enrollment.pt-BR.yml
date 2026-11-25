@@ -40,6 +40,7 @@ pt-BR:
       on_demand_select: Selecione
       errors:
         select_on_demand_professor: É necessário selecionar um professor para %{course}
+        not_offered: O pedido inclui disciplina ou professor fora da oferta deste semestre. Recarregue a página e refaça a seleção.
 
       message:
         author: "%{author} enviou:"
@@ -102,6 +103,7 @@ pt-BR:
         zero: "Nenhuma inscrição efetivada"
         one: "Uma inscrição efetivada"
         other: "%{count} inscrições efetivadas"
+      refused: "Não efetivada: %{request} (%{errors})"
       count:
         zero: "Nenhuma inscrição da lista pode ser efetivada!"
         one: "Uma inscrição da lista pode ser efetivada"

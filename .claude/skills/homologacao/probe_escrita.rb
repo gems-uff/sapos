@@ -50,14 +50,14 @@
 #
 # NAO ESCREVE em candidatura real. Para exercitar criacao de candidatura com
 # anexo, use abrir_processo_seletivo.rb e o formulario publico -- e lembre que a
-# replica costuma exigir campos que o HTML5 nao marca como invalidos, porque a
+# copia costuma exigir campos que o HTML5 nao marca como invalidos, porque a
 # obrigatoriedade tambem e validada no servidor, e que os campos de arquivo
 # costumam aceitar apenas pdf.
 
 require_relative "explore_common"
 
 CONFIRMAR = ARGV.include?("--confirmar")
-# O id do aluno de teste MUDA a cada regeracao da replica, e o padrao aqui
+# O id do aluno de teste MUDA a cada regeracao da copia, e o padrao aqui
 # envelhece calado: quando ele passa a apontar para um aluno real, o ciclo de
 # escrita aborta pela guarda do nome -- que e o comportamento certo, mas o
 # sintoma ("o registro N nao e o aluno de teste") nao diz onde achar o novo.
