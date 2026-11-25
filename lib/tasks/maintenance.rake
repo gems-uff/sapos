@@ -39,9 +39,9 @@ namespace :maintenance do
   end
 
   task remove_expired_import_grade_previews: [:environment] do
-    Rails.logger.info "[ImportGradePreviews] #{Time.now.to_fs} Removing expired grade import previews"
+    Rails.logger.info "[ImportGradePreviews] #{Time.zone.now.to_fs} Removing expired grade import previews"
     removed = ImportGradePreview.purge_expired
-    Rails.logger.info "[ImportGradePreviews] #{Time.now.to_fs} Removed #{removed} preview(s)"
+    Rails.logger.info "[ImportGradePreviews] #{Time.zone.now.to_fs} Removed #{removed} preview(s)"
   end
 
   task trigger_notifications: [:environment] do

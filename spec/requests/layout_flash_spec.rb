@@ -30,8 +30,8 @@ RSpec.describe "Mensagens de flash no layout", type: :request do
       processo = FactoryBot.create(
         :admission_process, name: "Processo", simple_url: "processo-flash",
         form_template: template, require_session: true,
-        start_date: Date.today - 10.days, end_date: Date.today + 10.days,
-        edit_date: Date.today + 20.days
+        start_date: Time.zone.today - 10.days, end_date: Time.zone.today + 10.days,
+        edit_date: Time.zone.today + 20.days
       )
       @inscricao = FactoryBot.create(
         :admission_application, admission_process: processo,
