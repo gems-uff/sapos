@@ -56,6 +56,36 @@ RSpec.describe "Tela que anuncia envio de e-mail, com a entrega falhando", type:
       expect(flash[:notice]).to be_nil
       expect(flash[:alert]).to eq(I18n.t("admissions.admissions.create.token_sent_without_email"))
     end
+
+    # O modelo do e-mail é editável pela tela; um destinatário que renderiza
+    # vazio (variável com erro de digitação) não entrega nada.
+    def modelo_do_codigo(to)
+      FactoryBot.create(
+        :email_template, name: "admissions/admissions:send_token", template_type: "Liquid",
+        enabled: true, to: to, subject: "Código", body: "Seu código: {{ record.token }}"
+      )
+    end
+
+    it "controle: com o modelo editado e o destinatário certo, diz para onde foi" do
+      modelo_do_codigo("{{ record.email }}")
+
+      pede_inscricao
+
+      expect(ActionMailer::Base.deliveries.flat_map(&:to)).to eq(["pessoa@example.com"])
+      expect(flash[:notice]).to eq(
+        I18n.t("admissions.admissions.create.token_sent", email: "pessoa@example.com")
+      )
+    end
+
+    it "com o destinatário do modelo vazio, não diz que enviou" do
+      modelo_do_codigo("{{ record.emial }}")
+
+      pede_inscricao
+
+      expect(ActionMailer::Base.deliveries).to be_empty
+      expect(flash[:notice]).to be_nil
+      expect(flash[:alert]).to eq(I18n.t("admissions.admissions.create.token_sent_without_email"))
+    end
   end
 
   describe "Enviar agora, na notificação" do
@@ -88,6 +118,19 @@ RSpec.describe "Tela que anuncia envio de e-mail, com a entrega falhando", type:
       expect(response.body).not_to include(sucesso)
       expect(response.body).to include(
         I18n.t("active_scaffold.notification.execute_now_failure", count: 1, total: 1)
+      )
+    end
+
+    it "com destinatário vazio numa linha, diz que ela não saiu" do
+      @notification.query.update!(sql: "select 'a@example.com' as email union all select '' as email")
+      @notification.update!(to_template: "{{ email }}")
+
+      post execute_now_notification_path(@notification), xhr: true
+
+      expect(ActionMailer::Base.deliveries.flat_map(&:to)).to eq(["a@example.com"])
+      expect(response.body).not_to include(sucesso)
+      expect(response.body).to include(
+        I18n.t("active_scaffold.notification.execute_now_failure", count: 1, total: 2)
       )
     end
   end

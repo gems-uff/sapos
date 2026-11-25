@@ -83,8 +83,8 @@ module Notifier
     # desfeito com a gravação. Fora de transação, a entrega é imediata. A
     # falha de uma mensagem não sobe (report_failure).
     #
-    # Devolve as mensagens que não foram entregues, quando a entrega foi
-    # imediata: a tela que anuncia o envio não pode afirmar o que não saiu,
+    # Devolve as mensagens que não foram entregues, a sem destinatário
+    # inclusive, quando a entrega foi imediata: a tela que anuncia o envio não pode afirmar o que não saiu,
     # e com o servidor de e-mail parado nem o e-mail de erro sai. Devolve
     # nil quando a entrega não aconteceu agora (envio desligado, ou à espera
     # do commit).
@@ -128,7 +128,16 @@ module Notifier
         Notifier.logger.info "Custom Variable 'reply_to' is set. Forwarding email"
         m[:reply_to] = reply_to
       end
-      unless m[:to].blank?
+      if m[:to].blank?
+        # A recipient that renders empty -- a misspelled variable in a
+        # template edited on the screen, a student without an email -- is
+        # not a failure of the delivery, and does not go to the error email;
+        # but nothing was delivered, and the screen that announces it has to
+        # know (see send_emails).
+        Notifier.logger.warn "Notification not delivered (notification #{message[:notification_id]}): no recipient"
+        Notifier.logger.warn "Subject: #{message[:subject]}"
+        undelivered << message
+      else
         actionmailer_base = ActionMailer::Base.new
 
         attachments_file_name_list = nil

@@ -616,6 +616,21 @@ RSpec.describe Notifier, type: :model do
           expect(Notifier.send_emails(notifications: messages)).to eq([messages.first])
         end
 
+        # A template whose recipient renders empty (a misspelled variable,
+        # a student without an email) delivers nothing, and the screen
+        # cannot announce it.
+        it "the ones without a recipient, which it logs" do
+          warnings = []
+          allow(Notifier.logger).to receive(:warn) { |text| warnings << text.to_s }
+          messages.first[:to] = ""
+          messages.first[:notification_id] = 3
+
+          expect(Notifier.send_emails(notifications: messages)).to eq([messages.first])
+          expect(ActionMailer::Base.deliveries.map(&:subject)).to eq(%w[segundo])
+          expect(warnings.join("\n")).to include("not delivered (notification 3): no recipient", "primeiro")
+          expect(ExceptionNotifier).not_to have_received(:notify_exception)
+        end
+
         it "not the ones delivered whose log failed" do
           fail_first(NotificationLog, :save, ActiveRecord::ConnectionNotEstablished)
 
