@@ -202,9 +202,10 @@ module Notifier
   # it would turn a saved change into an error page, keep the messages after
   # this one from being delivered and skip the other callbacks of the commit.
   # The failure goes to the server log, without the body (see
-  # display_notification_info), and to the error email (notify_failures). The
-  # log tells a message that was
-  # delivered and only failed to be logged from one that was not delivered:
+  # display_notification_info), and to the error email (notify_failure, one
+  # per kind of failure). The log has a line for each message, and tells a
+  # message that was delivered and only failed to be logged from one that
+  # was not delivered:
   # it is what the operator reads to decide whether to send it again. "Not
   # delivered" is what the application knows: deliver! did not return. The
   # mail server may still have taken the message, when the failure comes
