@@ -9,6 +9,8 @@ class Student < ApplicationRecord
 
   has_paper_trail
 
+  MAX_PHOTO_SIZE_MB = 15
+
   mount_uploader :photo, ProfileUploader
 
   belongs_to :city, optional: true
@@ -37,6 +39,7 @@ class Student < ApplicationRecord
   validates :cpf, presence: true, uniqueness: true
   validate :email_formats, if: :email_changed?
   validate :changed_to_different_user
+  validate :photo_size_within_limit
 
   before_destroy :handle_user_role_removal
 
@@ -115,6 +118,12 @@ class Student < ApplicationRecord
     end
 
   private
+    def photo_size_within_limit
+      return unless photo.present? && will_save_change_to_photo?
+      if photo.file.size > MAX_PHOTO_SIZE_MB.megabytes
+        errors.add(:photo, :file_too_large, count: MAX_PHOTO_SIZE_MB)
+      end
+    end
     def handle_user_role_removal
       return unless user.present?
 

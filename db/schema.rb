@@ -30,18 +30,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
     t.integer "admission_process_id"
     t.datetime "created_at", null: false
     t.string "email"
-    t.string "email_change_digest"
-    t.datetime "email_change_sent_at"
     t.integer "enrollment_id"
     t.integer "filled_form_id"
     t.string "name"
-    t.string "pending_email"
     t.string "status"
     t.text "status_message"
     t.integer "student_id"
     t.datetime "submission_time"
     t.string "token"
     t.datetime "updated_at", null: false
+    t.string "pending_email"
+    t.string "email_change_digest"
+    t.datetime "email_change_sent_at"
     t.index ["admission_phase_id"], name: "index_admission_applications_on_admission_phase_id"
     t.index ["admission_process_id"], name: "index_admission_applications_on_admission_process_id"
     t.index ["email_change_digest"], name: "index_admission_applications_on_email_change_digest"
@@ -244,11 +244,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
 
   create_table "advisement_authorizations", force: :cascade do |t|
     t.datetime "created_at", precision: nil, null: false
-    t.date "end_date"
     t.integer "level_id"
     t.integer "professor_id"
-    t.date "start_date", null: false
     t.datetime "updated_at", precision: nil, null: false
+    t.date "start_date", null: false
+    t.date "end_date"
     t.index ["level_id"], name: "index_advisement_authorizations_on_level_id"
     t.index ["professor_id"], name: "index_advisement_authorizations_on_professor_id"
   end
@@ -265,11 +265,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
 
   create_table "affiliations", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.date "end_date"
     t.integer "institution_id"
     t.integer "professor_id"
-    t.date "start_date"
     t.datetime "updated_at", null: false
+    t.date "start_date"
+    t.date "end_date"
     t.index ["institution_id"], name: "index_affiliations_on_institution_id"
     t.index ["professor_id"], name: "index_affiliations_on_professor_id"
   end
@@ -1156,22 +1156,4 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_120000) do
     t.string "whodunnit", limit: 255
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
-
-  add_foreign_key "course_research_lines", "courses"
-  add_foreign_key "course_research_lines", "research_lines"
-  add_foreign_key "enrollments", "research_lines", on_delete: :nullify
-  add_foreign_key "grants", "professors"
-  add_foreign_key "paper_professors", "papers"
-  add_foreign_key "paper_professors", "professors"
-  add_foreign_key "paper_students", "papers"
-  add_foreign_key "paper_students", "students"
-  add_foreign_key "papers", "professors", column: "owner_id"
-  add_foreign_key "professor_research_lines", "professors"
-  add_foreign_key "professor_research_lines", "research_lines"
-  add_foreign_key "reports", "carrier_wave_files", column: "carrierwave_file_id"
-  add_foreign_key "reports", "users", column: "generated_by_id"
-  add_foreign_key "reports", "users", column: "invalidated_by_id"
-  add_foreign_key "research_lines", "research_areas"
-  add_foreign_key "user_roles", "roles"
-  add_foreign_key "user_roles", "users"
 end

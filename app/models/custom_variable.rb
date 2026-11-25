@@ -9,6 +9,8 @@ class CustomVariable < ApplicationRecord
 
   SAPOS_MAIL = "sapos@sapos.ic.uff.br"
 
+  MAX_UPLOAD_SIZE_MB = 15
+
   VARIABLES = {
     "single_advisor_points" => :text,
     "multiple_advisor_points" => :text,
@@ -27,6 +29,7 @@ class CustomVariable < ApplicationRecord
     "quadrennial_period" => :text,
     "instance_name" => :text,
     "enable_advisor_accreditation_validation" => :text,
+    "max_upload_size_mb" => :text
   }
 
   validates :variable, presence: true
@@ -132,6 +135,18 @@ class CustomVariable < ApplicationRecord
     self.variable.to_s
   end
 
+  def self.parse_max_upload_size(raw)
+    value = raw.to_s.strip
+    return nil unless value.match?(/\A[1-9]\d*\z/)
+    number = value.to_i
+    number <= MAX_UPLOAD_SIZE_MB ? number : nil
+  end
+
+  def self.max_upload_size_mb
+    config = CustomVariable.find_by_variable(:max_upload_size_mb)
+    parse_max_upload_size(config&.value) || MAX_UPLOAD_SIZE_MB
+  end
+
   private
     def self.parse_range(config, default)
       return default if config.blank? || config.value.blank?
@@ -179,6 +194,11 @@ class CustomVariable < ApplicationRecord
             minimum_grade_for_approval: (minimum.to_f / 10.0).to_s
           }
         ) if (!self.value.blank?) && ((grade * 10.0).to_i >= minimum)
+      when "max_upload_size_mb"
+        return if self.value.blank?
+        if CustomVariable.parse_max_upload_size(self.value).nil?
+          self.errors.add(:value, :max_upload_size_mb_invalid, max: MAX_UPLOAD_SIZE_MB)
+        end
       end
     end
 
@@ -195,7 +215,7 @@ class CustomVariable < ApplicationRecord
 
     def validate_create
       case self.variable
-      when "minimum_grade_for_approval", "grade_of_disapproval_for_absence"
+      when "max_upload_size_mb", "minimum_grade_for_approval", "grade_of_disapproval_for_absence"
         if CustomVariable.find_by_variable(self.variable).present?
           self.errors.add(:base, :check_duplicate, variable: self.variable)
         end

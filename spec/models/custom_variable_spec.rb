@@ -24,6 +24,57 @@ RSpec.describe CustomVariable, type: :model do
   describe "Validations" do
     it { should be_valid }
     it { should validate_presence_of(:variable) }
+
+    context "max_upload_size_mb" do
+     before(:each) do
+       config = CustomVariable.find_by_variable(:max_upload_size_mb)
+       config.delete unless config.nil?
+     end
+
+     let(:max) { CustomVariable::MAX_UPLOAD_SIZE_MB }
+
+     it "is invalid when value is zero" do
+       cv = CustomVariable.new(variable: :max_upload_size_mb, value: "0")
+       expect(cv).to have_error(:max_upload_size_mb_invalid).on(:value).with_parameters(max: max)
+     end
+
+     it "is invalid when value is negative" do
+       cv = CustomVariable.new(variable: :max_upload_size_mb, value: "-5")
+       expect(cv).to have_error(:max_upload_size_mb_invalid).on(:value).with_parameters(max: max)
+     end
+
+     it "is invalid when value is not a number" do
+       cv = CustomVariable.new(variable: :max_upload_size_mb, value: "abc")
+       expect(cv).to have_error(:max_upload_size_mb_invalid).on(:value).with_parameters(max: max)
+     end
+
+     it "is invalid when value exceeds the maximum" do
+       cv = CustomVariable.new(variable: :max_upload_size_mb, value: (max + 1).to_s)
+       expect(cv).to have_error(:max_upload_size_mb_invalid).on(:value).with_parameters(max: max)
+     end
+
+     it "is valid when value is the maximum" do
+       cv = CustomVariable.new(variable: :max_upload_size_mb, value: max.to_s)
+       expect(cv).to be_valid
+     end
+
+     it "is valid when value is within range" do
+       cv = CustomVariable.new(variable: :max_upload_size_mb, value: "10")
+       expect(cv).to be_valid
+     end
+
+     it "is valid when value has surrounding whitespace" do
+       cv = CustomVariable.new(variable: :max_upload_size_mb, value: " 10 ")
+       expect(cv).to be_valid
+     end
+
+     it "does not allow a second variable with the same name" do
+       @destroy_later << CustomVariable.create!(variable: :max_upload_size_mb, value: "10")
+       duplicate = CustomVariable.new(variable: :max_upload_size_mb, value: "12")
+
+       expect(duplicate).to have_error(:check_duplicate).on(:base).with_parameters(variable: "max_upload_size_mb")
+     end
+   end
   end
 
   describe "Methods" do
@@ -395,6 +446,50 @@ RSpec.describe CustomVariable, type: :model do
         @destroy_later << CustomVariable.create!(variable: :enable_advisor_accreditation_validation, value: "no")
 
         expect(CustomVariable.enable_advisor_accreditation_validation).to eq(false)
+      end
+    end
+    context "max upload size mb" do
+      before(:each) do
+        config = CustomVariable.find_by_variable(:max_upload_size_mb)
+        config.delete unless config.nil?
+      end
+
+      it "should return 15 when there is no variable defined" do
+        expect(CustomVariable.max_upload_size_mb).to eq(15)
+      end
+
+      it "should return 15 when the value is blank" do
+        @destroy_later << CustomVariable.create!(variable: :max_upload_size_mb, value: "")
+
+        expect(CustomVariable.max_upload_size_mb).to eq(15)
+      end
+
+      it "should return 10 when it is defined to 10" do
+        @destroy_later << CustomVariable.create!(variable: :max_upload_size_mb, value: "10")
+
+        expect(CustomVariable.max_upload_size_mb).to eq(10)
+      end
+
+      it "should ignore surrounding whitespace" do
+        @destroy_later << CustomVariable.create!(variable: :max_upload_size_mb, value: " 10 ")
+
+        expect(CustomVariable.max_upload_size_mb).to eq(10)
+      end
+
+      it "should return the maximum allowed when it is defined to it" do
+        max = CustomVariable::MAX_UPLOAD_SIZE_MB
+        @destroy_later << CustomVariable.create!(variable: :max_upload_size_mb, value: max.to_s)
+
+        expect(CustomVariable.max_upload_size_mb).to eq(max)
+      end
+
+      it "should fall back to 15 when a stored value is invalid" do
+        # Linha gravada sem passar pelo validador (console, rake, paper_trail)
+        cv = CustomVariable.new(variable: :max_upload_size_mb, value: "abc")
+        cv.save!(validate: false)
+        @destroy_later << cv
+
+        expect(CustomVariable.max_upload_size_mb).to eq(15)
       end
     end
   end
