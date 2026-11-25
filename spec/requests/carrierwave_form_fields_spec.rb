@@ -196,10 +196,12 @@ RSpec.describe "Carrierwave form fields", type: :request do
     end
 
     # O nome tem de mudar: comparar presenca nao distingue substituicao de
-    # "continua o arquivo antigo".
+    # "continua o arquivo antigo". O conteudo tambem: a linha ja guardada nao
+    # e regravada (carrierwave_activerecord_no_overwrite.rb), entao bytes
+    # iguais com outro nome continuam com o nome de quem os gravou primeiro.
     it "replaces the file with the newly sent one" do
       outro = File.join(Dir.mktmpdir, "outro.png")
-      FileUtils.cp(Rails.root.join("spec", "fixtures", "user.png"), outro)
+      File.binwrite(outro, File.binread(Rails.root.join("spec", "fixtures", "user.png")) + "\0")
 
       atualiza(file: Rack::Test::UploadedFile.new(outro, "image/png"))
 

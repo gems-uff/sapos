@@ -17,7 +17,10 @@ RSpec.describe "Edicao de turma com inscricoes", type: :request do
     )
     @inscricao = FactoryBot.create(:class_enrollment, course_class: @turma)
     @enviados = []
-    allow(Notifier).to receive(:send_emails) { |notifications:| @enviados.concat(notifications) }
+    allow(Notifier).to receive(:send_emails) do |notifications:|
+      @enviados.concat(notifications)
+      nil # entregue: send_emails devolve só o que não saiu
+    end
   end
 
   def atualizar(campos)

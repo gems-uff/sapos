@@ -2,7 +2,7 @@
 # Sonda: propagacao de Professor#name para o nome do usuario associado.
 #
 # Irma do probe_nome_usuario.rb, que mede o mesmo pelo lado do aluno. Existe
-# separada porque o cenario tem de ser MONTADO: a replica nao traz professor de
+# separada porque o cenario tem de ser MONTADO: a copia nao traz professor de
 # teste, e o formulario de Professor nao expoe o campo de usuario -- a ligacao
 # so acontece pela tela de Usuarios, num record_select.
 #

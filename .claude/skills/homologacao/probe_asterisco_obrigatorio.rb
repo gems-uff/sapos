@@ -18,15 +18,16 @@
 #   EXPLORE_OUT=<dir> ROTULO=antes  bundle exec ruby probe_asterisco_obrigatorio.rb
 #   EXPLORE_OUT=<dir> ROTULO=depois bundle exec ruby probe_asterisco_obrigatorio.rb
 #
-# Variaveis opcionais: SAPOS_PROCESSO_URL (default doutorado-2025-1; o processo
-# tem de estar ABERTO, ver abrir_processo_seletivo.rb) e SAPOS_CANDIDATURA_ID
-# (default 1502, a mesma de routes_extra.txt). Comparar e diferenciar os dois
-# JSON; o que tem de ser igual e a lista de rotulos com asterisco e a cor.
+# Variavel obrigatoria: SAPOS_PROCESSO_URL, o simple_url de um processo ABERTO
+# (ver abrir_processo_seletivo.rb). Opcional: SAPOS_CANDIDATURA_ID (default
+# 1502, a mesma de routes_extra.txt). Comparar e diferenciar os dois JSON; o
+# que tem de ser igual e a lista de rotulos com asterisco e a cor.
 
 require_relative "explore_common"
 
 ROTULO = ENV.fetch("ROTULO", "sonda")
-PROCESSO_URL = ENV.fetch("SAPOS_PROCESSO_URL", "doutorado-2025-1")
+PROCESSO_URL = env_obrigatoria("SAPOS_PROCESSO_URL",
+  "simple_url de um processo seletivo aberto (lista de processos; abrir_processo_seletivo.rb abre um)")
 CANDIDATURA_ID = ENV.fetch("SAPOS_CANDIDATURA_ID", "1502")
 abort "URL sem 'staging': #{BASE}" unless BASE.include?("staging")
 

@@ -21,7 +21,7 @@
 require_relative "explore_common"
 
 CONFIRMAR = ARGV.include?("--confirmar")
-# Muda a cada regeracao da replica; ache pela lista de Alunos buscando o
+# Muda a cada regeracao da copia; ache pela lista de Alunos buscando o
 # marcador, ou passe SAPOS_ALUNO_TESTE.
 ALUNO_TESTE = ENV.fetch("SAPOS_ALUNO_TESTE", "2258")
 MARCADOR = "ZZ-TESTE-HOMOLOG"

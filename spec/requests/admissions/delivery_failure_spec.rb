@@ -7,15 +7,16 @@ require "rails_helper"
 
 # Entrega que falha durante a requisicao (issue #755). O formulario de
 # inscricao grava (pedido de troca de e-mail, sent_email da carta) e so depois
-# chama Notifier.send_emails, sem tratamento; a confirmacao da troca faz o
-# mesmo. A falha e simulada no Notifier, onde o mail.deliver! levantaria.
+# chama Notifier.send_emails; a confirmacao da troca faz o mesmo. A falha se
+# monta no Mail::TestMailer, onde o mail.deliver! levanta, sem stub do
+# Notifier: ele captura a falha de cada mensagem e devolve as nao entregues
+# (issue #782), e e esse o caminho que o conserto da #755 tem de seguir.
 RSpec.describe "Falha de entrega no processo seletivo", type: :request do
   before(:each) do
-    @enviados = []
     @falhar = false
-    allow(Notifier).to receive(:send_emails) do |notifications:|
+    allow_any_instance_of(Mail::TestMailer).to receive(:deliver!).and_wrap_original do |original, *args|
       raise Errno::EPIPE, "sendmail" if @falhar
-      @enviados.concat(notifications)
+      original.call(*args)
     end
     allow(ExceptionNotifier).to receive(:notify_exception)
 
@@ -34,7 +35,15 @@ RSpec.describe "Falha de entrega no processo seletivo", type: :request do
       name: "Pessoa", filled_form_attributes: { enable_submission: "1", fields_attributes: campos(nil, "pessoa@example.com") },
     } }
     @inscricao = Admissions::AdmissionApplication.find_by!(email: "pessoa@example.com")
-    @enviados.clear
+    ActionMailer::Base.deliveries.clear
+  end
+
+  after(:each) do
+    ActionMailer::Base.deliveries.clear
+  end
+
+  def enviados
+    ActionMailer::Base.deliveries.flat_map(&:to)
   end
 
   def campos(inscricao, correio)
@@ -57,14 +66,14 @@ RSpec.describe "Falha de entrega no processo seletivo", type: :request do
 
   it "controle: sem falha, o pedido de carta chega ao recomendador" do
     enviar("pessoa@example.com", cartas: carta)
-    expect(@enviados.map { |m| m[:to] }).to include("rec@example.com")
+    expect(enviados).to include("rec@example.com")
   end
 
   it "controle: o reenvio do formulario manda a carta que ainda nao foi mandada" do
     @inscricao.letter_requests.create!(name: "Rec", email: "rec@example.com",
       filled_form: Admissions::FilledForm.create!(form_template: @processo.letter_template, is_filled: false))
     enviar("pessoa@example.com")
-    expect(@enviados.map { |m| m[:to] }).to include("rec@example.com")
+    expect(enviados).to include("rec@example.com")
   end
 
   it "carta cuja mensagem nao saiu segue no proximo envio do formulario", pending: "issue #755" do
@@ -72,12 +81,13 @@ RSpec.describe "Falha de entrega no processo seletivo", type: :request do
     enviar("pessoa@example.com", cartas: carta)
     @falhar = false
     enviar("pessoa@example.com")
-    expect(@enviados.map { |m| m[:to] }).to include("rec@example.com")
+    expect(enviados).to include("rec@example.com")
   end
 
-  it "o candidato nao recebe erro 500 quando a entrega falha", pending: "issue #755" do
+  it "o candidato nao recebe erro 500 quando a entrega falha" do
     @falhar = true
     enviar("nova@example.com")
+    expect(enviados).to be_empty
     expect(response.status).not_to eq(500)
   end
 end

@@ -85,7 +85,7 @@ class CourseClassesController < ApplicationController
       default: nil
     }
     config.columns[:year].options = {
-      options: YearSemester.selectable_years,
+      options: YearSemester.selectable_years_options,
       include_blank: true,
       default: nil
     }

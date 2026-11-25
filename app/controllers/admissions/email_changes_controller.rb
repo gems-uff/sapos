@@ -38,9 +38,9 @@ class Admissions::EmailChangesController < Admissions::ProcessBaseController
         id: @admission_application.token
       )
     })]
-    Notifier.send_emails(notifications: messages)
+    undelivered = Notifier.send_emails(notifications: messages)
     redirect_to admissions_path, token_delivery_flash(
-      "admissions.email_changes.update.success", new_email, messages
+      "admissions.email_changes.update.success", new_email, messages, undelivered: undelivered
     )
   end
 
