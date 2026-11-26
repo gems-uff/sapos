@@ -249,9 +249,16 @@ module Notifier
   def self.notify_failure(error, message, delivered:)
     ExceptionNotifier.notify_exception(
       without_addresses(error),
-      data: { notification_id: message[:notification_id], delivered: delivered }
+      data: { notification_id: message[:notification_id], delivered: delivered, note: FAILURE_NOTE }
     )
   end
+
+  # What the error email cannot tell by itself: being one per kind of
+  # failure, it may stand for more messages than the one it names. Fixed, and
+  # not a count: the email goes at the first failure, before the call knows
+  # how many will follow.
+  FAILURE_NOTE = "Outras mensagens deste envio podem ter falhado pelo mesmo motivo sem gerar outro " \
+    "e-mail de erro; o log do servidor tem uma linha por mensagem."
 
   # Anything shaped like an address: no quote, bracket, comma or space
   # around an @. Loose on purpose, as it masks rather than validates.

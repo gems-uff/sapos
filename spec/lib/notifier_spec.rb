@@ -491,7 +491,7 @@ RSpec.describe Notifier, type: :model do
         expect(NotificationLog.pluck(:subject)).to eq(%w[segundo])
         expect(outcome[:other_callback]).to be(true)
         expect(ExceptionNotifier).to have_received(:notify_exception)
-          .with(an_instance_of(Errno::ECONNREFUSED), data: { notification_id: nil, delivered: false }).once
+          .with(an_instance_of(Errno::ECONNREFUSED), data: { notification_id: nil, delivered: false, note: Notifier::FAILURE_NOTE }).once
         expect(errors.join("\n")).to include("Errno::ECONNREFUSED", "primeiro@example.com", "primeiro")
       end
 
@@ -506,7 +506,7 @@ RSpec.describe Notifier, type: :model do
         expect(NotificationLog.pluck(:subject)).to eq(%w[segundo])
         expect(outcome[:other_callback]).to be(true)
         expect(ExceptionNotifier).to have_received(:notify_exception)
-          .with(an_instance_of(ActiveRecord::ConnectionNotEstablished), data: { notification_id: nil, delivered: true }).once
+          .with(an_instance_of(ActiveRecord::ConnectionNotEstablished), data: { notification_id: nil, delivered: true, note: Notifier::FAILURE_NOTE }).once
       end
 
       # The operator reads the server log to decide whether to send again: a
@@ -554,8 +554,20 @@ RSpec.describe Notifier, type: :model do
 
         expect(ExceptionNotifier).to have_received(:notify_exception).once
         expect(ExceptionNotifier).to have_received(:notify_exception)
-          .with(an_instance_of(Errno::ECONNREFUSED), data: { notification_id: nil, delivered: false })
+          .with(an_instance_of(Errno::ECONNREFUSED), data: { notification_id: nil, delivered: false, note: Notifier::FAILURE_NOTE })
         expect(errors.join("\n")).to include("primeiro@example.com", "segundo@example.com")
+      end
+
+      # The error email is one per kind of failure: whoever reads it learns
+      # that it may stand for more messages than the one it names.
+      it "says in the error email that other messages of the call may have failed alike" do
+        allow_any_instance_of(Mail::TestMailer).to receive(:deliver!).and_raise(Errno::ECONNREFUSED)
+
+        save_and_send
+
+        expect(ExceptionNotifier).to have_received(:notify_exception)
+          .with(an_instance_of(Errno::ECONNREFUSED), data: hash_including(note: Notifier::FAILURE_NOTE))
+        expect(Notifier::FAILURE_NOTE).to include("log do servidor")
       end
 
       # Two different failures in one call -- the daily run puts every due
