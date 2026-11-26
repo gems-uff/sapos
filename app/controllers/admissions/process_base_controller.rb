@@ -33,16 +33,20 @@ class Admissions::ProcessBaseController < ApplicationController
     # mensagens (find_by_email: uma por endereco gravado), o aviso de envio
     # exige todas: a que falhou pode ser a do endereco que ele digitou.
     def token_delivery_flash(key, email, messages, undelivered: nil, **interpolation)
-      undelivered = Array(undelivered)
       sent = messages.reject { |message| message[:skip_message] }
-      delivered = sent.any? && sent.all? do |message|
-        undelivered.none? { |failed| failed.equal?(message) }
-      end
-      if Notifier.sending? && delivered
+      if sent.any? && sent.all? { |message| delivered?(message, undelivered) }
         { notice: I18n.t(key, email: email, **interpolation) }
       else
         { alert: I18n.t("#{key}_without_email", **interpolation) }
       end
+    end
+
+    # Se a mensagem saiu, segundo o que Notifier.send_emails devolveu
+    # (undelivered). Nao saiu a que o modelo desabilitado pula, nem nenhuma com
+    # o envio desligado.
+    def delivered?(message, undelivered)
+      Notifier.sending? && !message[:skip_message] &&
+        Array(undelivered).none? { |failed| failed.equal?(message) }
     end
 
     # O formulario da tela chega em params[:record] como um conjunto de campos.

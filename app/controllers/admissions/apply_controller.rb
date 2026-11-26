@@ -69,9 +69,12 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
           id: @admission_application.token
         )
       })]
+      # O pedido de carta so fica marcado como enviado depois de entregue: o
+      # que nao saiu segue no proximo envio do formulario (issue #755).
+      letters = {}
       @admission_application.letter_requests.each do |letter_request|
         if letter_request.sent_email != letter_request.email
-          emails << EmailTemplate.load_template(
+          letters[letter_request] = EmailTemplate.load_template(
             "admissions/apply:request_letter"
           ).prepare_message({
             record: @admission_application,
@@ -82,20 +85,26 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
               id: letter_request.access_token
             )
           })
-          letter_request.update(sent_email: letter_request.email)
         end
       end
+      emails.concat(letters.values)
       email_change = email_change_message
       emails << email_change if email_change
       undelivered = Notifier.send_emails(notifications: emails)
+      unsent_letters = letters.filter_map do |letter_request, message|
+        next letter_request unless delivered?(message, undelivered)
+
+        letter_request.update(sent_email: letter_request.email)
+        nil
+      end
       # Inscricao que nasce aqui (processo sem sessao): o navegador nao recebe
       # o codigo, so o aviso de para onde ele foi.
       if creating
         session[:admission_tokens]&.delete(previous_token)
-        return redirect_to admissions_path, token_delivery_flash(
+        return redirect_to admissions_path, with_unsent_letters(token_delivery_flash(
           "admissions.apply.update.new_token_sent", @admission_application.email, emails.first(1),
           undelivered: undelivered
-        )
+        ), unsent_letters)
       end
       if email_change
         # O aviso de para onde o link foi; quando a mensagem nao sai, ninguem
@@ -118,7 +127,7 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
       redirect_to admission_apply_path(
         admission_id: @admission_process.simple_id,
         id: @admission_application.token
-      ), flash_message
+      ), with_unsent_letters(flash_message, unsent_letters)
     else
       # Formulário que a validação do cliente deixou passar e o servidor
       # recusou (issue #605). O e-mail leva o motivo técnico, atributo e tipo
@@ -163,6 +172,17 @@ class Admissions::ApplyController < Admissions::ProcessBaseController
   end
 
   private
+    # O aviso de que o pedido de carta nao saiu, nomeando o recomendador: a
+    # inscricao foi gravada, e o pedido segue no proximo envio do formulario.
+    def with_unsent_letters(flash_message, letter_requests)
+      return flash_message if letter_requests.empty?
+
+      recommenders = letter_requests.map { |letter_request| "#{letter_request.name} (#{letter_request.email})" }
+      unsent = I18n.t("admissions.apply.update.letters_not_sent",
+        count: letter_requests.size, recommenders: recommenders.to_sentence)
+      flash_message.merge(alert: [flash_message[:alert], unsent].compact.join(" "))
+    end
+
     # A mensagem com o link de validacao, quando este envio pediu a troca do
     # e-mail. Vai para o endereco novo, e nao leva o codigo da inscricao.
     def email_change_message

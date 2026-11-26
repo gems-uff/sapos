@@ -91,6 +91,9 @@ pt-BR:
         new_token_sent_without_email: "Inscrição realizada com sucesso, mas o sistema não está enviando e-mails no momento. Procure a secretaria do programa para receber o código de identificação."
         email_change_requested: "%{saved}. Para trocar o e-mail da inscrição, abra o link de confirmação enviado para %{email}. Até a confirmação continuam valendo o e-mail e o código de identificação atuais."
         email_change_requested_without_email: "%{saved}, mas o e-mail da inscrição não foi trocado: a troca depende de um link de confirmação, e o sistema não está enviando e-mails no momento. Procure a secretaria do programa."
+        letters_not_sent:
+          one: "O pedido de carta de recomendação para %{recommenders} não foi enviado: o sistema não conseguiu enviar o e-mail. O pedido será enviado de novo na próxima vez que a inscrição for salva; se o problema continuar, procure a secretaria do programa."
+          other: "Os pedidos de carta de recomendação para %{recommenders} não foram enviados: o sistema não conseguiu enviar os e-mails. Os pedidos serão enviados de novo na próxima vez que a inscrição for salva; se o problema continuar, procure a secretaria do programa."
 
     letters:
       show:

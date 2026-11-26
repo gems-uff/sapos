@@ -14,9 +14,10 @@ require "rails_helper"
 RSpec.describe "Falha de entrega no processo seletivo", type: :request do
   before(:each) do
     @falhar = false
-    allow_any_instance_of(Mail::TestMailer).to receive(:deliver!).and_wrap_original do |original, *args|
-      raise Errno::EPIPE, "sendmail" if @falhar
-      original.call(*args)
+    @falhar_para = []
+    allow_any_instance_of(Mail::TestMailer).to receive(:deliver!).and_wrap_original do |original, mail|
+      raise Errno::EPIPE, "sendmail" if @falhar || Array(mail.to).intersect?(@falhar_para)
+      original.call(mail)
     end
     allow(ExceptionNotifier).to receive(:notify_exception)
 
@@ -76,12 +77,73 @@ RSpec.describe "Falha de entrega no processo seletivo", type: :request do
     expect(enviados).to include("rec@example.com")
   end
 
-  it "carta cuja mensagem nao saiu segue no proximo envio do formulario", pending: "issue #755" do
+  it "carta cuja mensagem nao saiu segue no proximo envio do formulario" do
     @falhar = true
     enviar("pessoa@example.com", cartas: carta)
     @falhar = false
     enviar("pessoa@example.com")
     expect(enviados).to include("rec@example.com")
+  end
+
+  it "controle: carta entregue fica marcada e nao segue de novo no proximo envio" do
+    enviar("pessoa@example.com", cartas: carta)
+    expect(@inscricao.letter_requests.reload.map(&:sent_email)).to eq(["rec@example.com"])
+    expect(flash[:alert]).to be_nil
+    ActionMailer::Base.deliveries.clear
+    enviar("pessoa@example.com")
+    expect(enviados).to eq(["pessoa@example.com"])
+  end
+
+  context "com duas cartas, uma delas sem entrega" do
+    let(:cartas) do
+      { "0" => { name: "Rec Um", email: "um@example.com" }, "1" => { name: "Rec Dois", email: "dois@example.com" } }
+    end
+
+    before(:each) do
+      @falhar_para = ["dois@example.com"]
+      enviar("pessoa@example.com", cartas: cartas)
+    end
+
+    it "a tela grava a inscricao e nomeia so o recomendador cuja carta nao saiu" do
+      expect(response).to redirect_to(admission_apply_path(admission_id: @processo.simple_id, id: @inscricao.reload.token))
+      expect(flash[:notice]).to eq(I18n.t("admissions.apply.update.edit_notice"))
+      expect(flash[:alert]).to include("Rec Dois (dois@example.com)")
+      expect(flash[:alert]).not_to include("um@example.com")
+    end
+
+    it "so a carta entregue fica marcada como enviada" do
+      marcadas = @inscricao.letter_requests.reload.to_h { |pedido| [pedido.email, pedido.sent_email] }
+      expect(marcadas).to eq("um@example.com" => "um@example.com", "dois@example.com" => nil)
+    end
+
+    it "o proximo envio manda so a carta que nao saiu, e a tela deixa de avisar" do
+      follow_redirect! # o aviso do primeiro envio e mostrado e sai do flash
+      @falhar_para = []
+      ActionMailer::Base.deliveries.clear
+      enviar("pessoa@example.com")
+      expect(enviados).to contain_exactly("pessoa@example.com", "dois@example.com")
+      expect(flash[:alert]).to be_nil
+    end
+  end
+
+  it "inscricao nova: o aviso da carta que nao saiu acompanha o do codigo" do
+    @falhar_para = ["rec@example.com"]
+    post admission_apply_index_path(admission_id: @processo.simple_id), params: { record: {
+      name: "Outra", letter_requests_attributes: carta,
+      filled_form_attributes: { enable_submission: "1", fields_attributes: campos(nil, "outra@example.com") },
+    } }
+    expect(response).to redirect_to(admissions_path)
+    expect(flash[:notice]).to eq(I18n.t("admissions.apply.update.new_token_sent", email: "outra@example.com"))
+    expect(flash[:alert]).to include("Rec (rec@example.com)")
+    nova = Admissions::AdmissionApplication.find_by!(email: "outra@example.com")
+    expect(nova.letter_requests.map(&:sent_email)).to eq([nil])
+  end
+
+  it "com o envio desligado, a carta fica pendente e a tela avisa" do
+    allow(CustomVariable).to receive(:redirect_email).and_return("")
+    enviar("pessoa@example.com", cartas: carta)
+    expect(@inscricao.letter_requests.reload.map(&:sent_email)).to eq([nil])
+    expect(flash[:alert]).to include("Rec (rec@example.com)")
   end
 
   it "o candidato nao recebe erro 500 quando a entrega falha" do
