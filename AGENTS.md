@@ -63,20 +63,23 @@ engana quem a lê hoje.
 - Critério de pronto: `bundle exec rspec` inteiro verde. Rode **sem**
   `SKIP_COVERAGE=1` ao menos uma vez antes de fechar: é a configuração real da
   suíte, e o caminho do simplecov só é exercitado assim.
-- **Os feature specs rodam em Firefox por padrão e em Chrome no CI também.**
-  `SELENIUM_BROWSER=chrome` troca localmente; o CI roda os dois em matriz. O
-  Firefox é o default porque faz a mesma suíte em menos da metade do tempo; o
-  Chrome fica no CI porque é o navegador da maioria dos usuários. Vermelho num
-  navegador só é sinal, não ruído — foi para isso que a matriz existe. Na
-  homologação (skill `homologacao`) o default é o Chrome, o único que expõe
-  console e log de rede pelo WebDriver.
+- **Os feature specs rodam em Firefox por padrão e em Chrome no CI.**
+  `SELENIUM_BROWSER=chrome` troca localmente. O Firefox é o default porque faz
+  a mesma suíte em menos da metade do tempo; o Chrome roda a cada push porque
+  é o navegador da maioria dos usuários. O Firefox também tem CI, no
+  `firefox.yml`, por disparo manual e toda segunda-feira sobre a `main`:
+  dispare-o antes de integrar mudança que mexe no que o navegador executa.
+  Vermelho num navegador só é sinal, não ruído — é para isso que os dois
+  rodam. Na homologação (skill `homologacao`) o default é o Chrome, o único
+  que expõe console e log de rede pelo WebDriver.
 - **Verde numa ordem não é verde.** A ordem dos exemplos é sorteada. Ao
   investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
   irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo
   culpado sozinho. O CI registra a seed no resumo do job. Lá a suíte roda em
-  4 workers do `parallel_rspec`, e cada worker sorteia a ordem só sobre os seus
-  arquivos: a seed sozinha não repete a ordem que falhou. O resumo transcreve o
-  comando do worker que falhou; rode-o em serial, e o `--bisect` sobre ele.
+  workers do `parallel_rspec` (4 por máquina, e o Chrome em duas máquinas), e
+  cada worker sorteia a ordem só sobre os seus arquivos: a seed sozinha não
+  repete a ordem que falhou. O resumo transcreve o comando do worker que
+  falhou; rode-o em serial, e o `--bisect` sobre ele.
 - **Vermelho logo depois de trocar de ramo pode ser o banco de teste velho.** O
   `maintain_test_schema!` não recarrega o `db/test.sqlite3` quando a troca de
   ramo muda o esquema, então ele fica com as colunas do ramo anterior e o

@@ -56,8 +56,8 @@ jobs:
       - name: Registrar a contagem e a seed
         if: ${{ !cancelled() }}
         run: |
-          bash .github/scripts/rspec-summary.sh "test-log-trial-${{ matrix.trial }}.log" \
-            "trial ${{ matrix.trial }}" "bundle exec rspec"
+          bash .github/scripts/rspec-summary.sh "trial ${{ matrix.trial }}" "bundle exec rspec" \
+            "test-log-trial-${{ matrix.trial }}.log"
 
       - name: Upload logs
         if: always()

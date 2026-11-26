@@ -203,12 +203,12 @@ RSpec.configure do |config|
   #
   # Firefox e o default local porque a mesma suite roda nele em menos da metade
   # do tempo (medido: 4 min 23 s contra ~10 min em Chrome, mesmo arquivo 10,5 s
-  # contra 23,7 s). O CI roda os dois em matriz, e e la que o Chrome -- o
-  # navegador da maioria dos usuarios -- continua sendo exercitado; localmente,
-  # SELENIUM_BROWSER=chrome. Ter os dois vale por um motivo concreto: parte do
-  # que o Rails emite e contorno de bug de navegador (o autocomplete="off" nos
-  # hidden era contorno de um bug do Firefox), e so o navegador que tinha o bug
-  # acusa a regressao.
+  # contra 23,7 s). O CI roda o Chrome -- o navegador da maioria dos usuarios
+  # -- a cada push, e o Firefox no firefox.yml, por disparo manual e toda
+  # semana; localmente, SELENIUM_BROWSER=chrome. Ter os dois vale por um
+  # motivo concreto: parte do que o Rails emite e contorno de bug de navegador
+  # (o autocomplete="off" nos hidden era contorno de um bug do Firefox), e so o
+  # navegador que tinha o bug acusa a regressao.
   SELENIUM_BROWSER = (ENV["SELENIUM_BROWSER"] || "firefox").to_sym
   Capybara.register_driver :selenium do |app|
     case SELENIUM_BROWSER

@@ -1,6 +1,13 @@
 # This workflow will install a prebuilt Ruby version, install dependencies, and run tests.
 name: "Ruby on Rails CI"
 
+# Ramo deste repositorio roda pelo push; o pull_request so vale para PR de
+# fork, cujo push acontece no fork e nao dispara nada aqui. PR de ramo daqui
+# disparava os dois gatilhos e rodava a suite duas vezes sobre o mesmo commit.
+# O pull_request nao sai da lista porque o filtro de fork nao existe no
+# gatilho: cada job o aplica no `if`, com a condicao repetida (sem ela, o job
+# roda). A main nao exige check obrigatorio, entao job pulado ou renomeado
+# nao trava merge.
 on:
   push:
   pull_request:
@@ -28,6 +35,7 @@ jobs:
   # problema de volta e atrasaria a suíte; portão, se quiser, é branch
   # protection exigindo os dois status (#682).
   checks:
+    if: (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)
     runs-on: ubuntu-latest
     env:
       RAILS_ENV: test
@@ -101,21 +109,61 @@ jobs:
         if: github.event_name != 'schedule'
         run: bundle exec rspec spec/config/schema_dump_spec.rb
 
+  # A seed e o log de tempos que as duas maquinas do `test` compartilham. As
+  # duas dividem os arquivos com o mesmo algoritmo do parallel_rspec, e so
+  # chegam aos mesmos grupos partindo do mesmo log: restaurado em cada
+  # maquina, o cache podia trazer entradas diferentes (outra rodada salvando
+  # entre as duas restauracoes), e arquivo rodaria nas duas ou em nenhuma.
+  # Restaurado uma vez aqui, segue por artefato. O re-run de uma maquina que
+  # falhou reaproveita este job, e portanto os grupos e a seed dela.
+  test-plan:
+    if: github.event_name != 'schedule' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)
+    runs-on: ubuntu-latest
+    outputs:
+      seed: ${{ steps.seed.outputs.seed }}
+
+    steps:
+      # O tempo de cada arquivo na ultima rodada verde. Com ele o parallel_tests
+      # divide os arquivos por tempo; sem ele (primeira rodada), por tamanho de
+      # arquivo, que equilibra pior mas nao quebra.
+      - name: Restore the runtime log
+        uses: actions/cache/restore@v4
+        with:
+          path: tmp/parallel_runtime_rspec.log
+          key: parallel-runtime-chrome-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: parallel-runtime-chrome-
+
+      # Uma seed para as duas maquinas, e e ela que os resumos registram.
+      - name: Sortear a seed
+        id: seed
+        run: |
+          mkdir -p tmp
+          touch tmp/parallel_runtime_rspec.log
+          echo "seed=$RANDOM" >> "$GITHUB_OUTPUT"
+
+      - name: Pass the runtime log on
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-log-plan
+          path: tmp/parallel_runtime_rspec.log
+          if-no-files-found: error
+          overwrite: true
+
   test:
-    if: github.event_name != 'schedule'
+    needs: test-plan
     runs-on: ubuntu-latest
 
-    # A suite roda nos dois navegadores que a aplicacao encontra: Chrome, que e o
-    # da maioria dos usuarios, e Firefox, que e o default local (mais rapido) e o
-    # unico que acusa regressao em contorno de bug dele -- o autocomplete="off"
-    # nos hidden, que o Rails 8.1 removeu, era um. Os jobs sao independentes:
-    # um vermelho nao cancela o outro, para que se saiba se a falha e de um
-    # navegador so.
+    # A suite roda em Chrome, o navegador da maioria dos usuarios, dividida em
+    # duas maquinas: o parallel_rspec separa os arquivos em 8 grupos por tempo,
+    # e cada maquina roda 4 deles, em 4 workers. Numa maquina so o job levava
+    # mais de 20 min. O Firefox, default local, roda no firefox.yml, por
+    # disparo manual e toda semana. As maquinas sao independentes: um vermelho
+    # nao cancela a outra.
     strategy:
       fail-fast: false
       matrix:
-        browser: [chrome, firefox]
-    name: test (${{ matrix.browser }})
+        part: [1, 2]
+    name: test (chrome ${{ matrix.part }}/2)
 
     # Production runs on MariaDB, so CI does too. SQLite stays available for
     # local development (it needs no database server), but the collation there
@@ -134,37 +182,36 @@ jobs:
           --health-timeout=5s
           --health-retries=10
 
-    # A suite roda em 4 workers do parallel_rspec (#741). Medido no runner, com
-    # tres amostras por configuracao: ~2x mais rapido que o serial, e o -n 4
-    # rende mais que o -n 2 sobretudo no Firefox, a perna mais lenta. No Mac o
-    # -n 2 ja satura; por isso o numero aqui nao e o da skill safe-refactor.
-    # O serial continua sendo o criterio de pronto local (AGENTS.md).
+    # 4 workers por maquina (#741). Medido no runner, com tres amostras por
+    # configuracao: ~2x mais rapido que o serial, e o -n 4 rende mais que o
+    # -n 2. No Mac o -n 2 ja satura; por isso o numero aqui nao e o da skill
+    # safe-refactor. O serial continua sendo o criterio de pronto local
+    # (AGENTS.md).
     env:
       RAILS_ENV: test
-      SELENIUM_BROWSER: ${{ matrix.browser }}
+      SELENIUM_BROWSER: chrome
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       PARALLEL_WORKERS: 4
+      # Os grupos da suite inteira: PARALLEL_WORKERS por maquina, nas duas.
+      PARALLEL_GROUPS: 8
       # O parallel_tests prefere o bin/rspec, versionado sem bit de execucao.
       PARALLEL_TESTS_EXECUTABLE: bundle exec rspec
       # Sem ela, o primeiro boot de teste grava tmp/local_secret.txt, e os
       # processos simultaneos de um checkout novo correm: um le o arquivo ainda
       # vazio e aborta com `secret_key_base ... got: ""`.
       SECRET_KEY_BASE: chave_falsa_apenas_para_a_suite
+      SEED: ${{ needs.test-plan.outputs.seed }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
 
-      # O driver de cada navegador vem pelo Selenium Manager, embutido no
-      # selenium-webdriver, que casa a versao com a do navegador instalado.
+      # O driver vem pelo Selenium Manager, embutido no selenium-webdriver, que
+      # casa a versao com a do navegador instalado.
       - uses: browser-actions/setup-chrome@v2
-        if: matrix.browser == 'chrome'
         with:
           install-dependencies: true
           install-chromedriver: false
-
-      - uses: browser-actions/setup-firefox@v1
-        if: matrix.browser == 'firefox'
 
       # Before setup-ruby: the mysql2 gem is a native extension and needs the
       # client development headers to compile during bundle install. The client
@@ -221,68 +268,127 @@ jobs:
       - name: Set up database schemas
         run: bundle exec rake "parallel:load_schema[$PARALLEL_WORKERS]"
 
-      # O tempo de cada arquivo na ultima rodada verde deste navegador. Com ele
-      # o parallel_tests divide os arquivos por tempo; sem ele (primeira rodada,
-      # ou log cobrindo menos de 2/3 dos arquivos), cai sozinho para tamanho de
-      # arquivo, que equilibra pior mas nao quebra.
-      - name: Restore the runtime log
-        uses: actions/cache/restore@v4
+      - name: Download the runtime log
+        uses: actions/download-artifact@v4
         with:
-          path: tmp/parallel_runtime_rspec.log
-          key: parallel-runtime-${{ matrix.browser }}-${{ github.run_id }}-${{ github.run_attempt }}
-          restore-keys: parallel-runtime-${{ matrix.browser }}-
+          name: runtime-log-plan
+          path: tmp/plan
 
       # Audit e Lint moram no job `checks`, acima: aqui só a suíte, para que um
       # vermelho de checagem não esconda o resultado dela.
       #
-      # --profile: os dez exemplos mais lentos de cada navegador ficam no log. A
-      # matriz mostrou o Firefox 1,5x mais lento que o Chrome no runner (e 2x
-      # mais rapido no Mac); so o perfil diz se a diferenca e uniforme, da
-      # plataforma, ou concentrada em poucos specs, que e onde se mexe. Sai um
-      # perfil por worker.
+      # --only-group: os grupos desta maquina entre os PARALLEL_GROUPS. Com
+      # ele o parallel_tests agrupa por tamanho de arquivo, salvo --group-by
+      # explicito; --allowed-missing 100 aceita o arquivo novo sem tempo
+      # (entra com a media). Os workers desta maquina usam TEST_ENV_NUMBER
+      # vazio, 2, 3 e 4, os bancos criados acima.
       #
-      # Uma seed sorteada aqui vai para todos os workers, e e ela que o resumo
-      # registra. O --format documentation e repetido porque um --format em -o
+      # --profile: os dez exemplos mais lentos ficam no log, um perfil por
+      # worker. O --format documentation e repetido porque um --format em -o
       # substitui o do .rspec, e a saida perderia a linha de contagem. O
       # --verbose-rerun-command imprime o comando de cada worker que falhar,
-      # que o resumo transcreve para a reproducao.
+      # que o resumo transcreve para a reproducao. O RuntimeLogger grava o
+      # tempo dos arquivos desta maquina; o job `test-summary` junta as duas.
       - name: Run tests
         run: |
           set -o pipefail
-          seed=$RANDOM
-          bundle exec parallel_rspec -n "$PARALLEL_WORKERS" \
-            --runtime-log tmp/parallel_runtime_rspec.log \
+          if [ "${{ matrix.part }}" = 1 ]; then grupos=1,2,3,4; else grupos=5,6,7,8; fi
+          if [ -s tmp/plan/parallel_runtime_rspec.log ]; then
+            agrupar="--group-by runtime --allowed-missing 100 --runtime-log tmp/plan/parallel_runtime_rspec.log"
+          else
+            agrupar="--group-by filesize"
+          fi
+          bundle exec parallel_rspec -n "$PARALLEL_GROUPS" --only-group "$grupos" $agrupar \
             --serialize-stdout --combine-stderr --verbose-rerun-command \
-            -o "--seed $seed --profile 10 --format documentation --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log" \
+            -o "--seed $SEED --profile 10 --format documentation --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log" \
             spec | tee rspec.log
-
-      # So de rodada verde: um log de rodada cancelada no meio viria truncado.
-      - name: Save the runtime log
-        if: success()
-        uses: actions/cache/save@v4
-        with:
-          path: tmp/parallel_runtime_rspec.log
-          key: parallel-runtime-${{ matrix.browser }}-${{ github.run_id }}-${{ github.run_attempt }}
 
       # Contagem, seed e comando de reproducao no resumo do job. A ordem dos
       # exemplos e sorteada, e a suite ja teve dependencia de ordem (#643): sem
-      # a seed, um vermelho e irreproduzivel. O passo tambem derruba o job
-      # quando a contagem cai abaixo de .github/min-examples ou o log nao tem a
-      # linha de resumo: codigo de saida zero nao prova que os exemplos rodaram.
+      # a seed, um vermelho e irreproduzivel. O piso de exemplos e conferido
+      # na soma das duas maquinas, no `test-summary`.
       - name: Registrar a contagem e a seed
         if: ${{ !cancelled() }}
+        env:
+          SEM_PISO: 1
         run: |
-          bash .github/scripts/rspec-summary.sh rspec.log "${{ matrix.browser }}" \
-            "SELENIUM_BROWSER=${{ matrix.browser }} bundle exec rspec"
+          bash .github/scripts/rspec-summary.sh "chrome ${{ matrix.part }}/2" \
+            "SELENIUM_BROWSER=chrome bundle exec rspec" rspec.log
 
-      # Cobertura sai de um navegador so: as duas rodadas exercitam o mesmo Ruby,
-      # e publicar as duas contaria o mesmo codigo duas vezes. O Chrome fica com
-      # ela para o historico continuar comparavel com o de antes da matriz.
-      #
-      # O Cobertura, e nao o .resultset.json: sob o parallel_rspec o resultset
-      # guarda uma entrada crua por worker, e so o coverage.xml sai juntado.
+      # O .resultset.json, e nao o coverage.xml: o desta maquina cobre so a
+      # parte dela, e e o resultset que se junta. Comeca com ponto, e o
+      # upload-artifact deixa de fora arquivo oculto sem include-hidden-files.
+      - name: Pass the results on
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-chrome-${{ matrix.part }}
+          path: |
+            rspec.log
+            tmp/parallel_runtime_rspec.log
+            coverage/.resultset.json
+          include-hidden-files: true
+          if-no-files-found: error
+          overwrite: true
+
+  # O que so a rodada inteira diz: o piso de exemplos, a cobertura e o log de
+  # tempos da proxima rodada, somando as duas maquinas.
+  test-summary:
+    needs: test
+    if: ${{ !cancelled() && needs.test.result == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      RAILS_ENV: test
+      # Sem banco aqui: so o simplecov roda, e o mysql2 nao tem por que
+      # compilar.
+      BUNDLE_WITHOUT: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install Ruby and gems
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          cache-version: 3
+
+      - name: Download the results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: test-chrome-*
+          path: partes
+
+      # Arquivo que rodou nas duas maquinas quer dizer que elas chegaram a
+      # grupos diferentes, e algum outro nao rodou em nenhuma: a soma de
+      # exemplos podia ate passar do piso. O log de tempos de cada maquina
+      # tem uma linha por arquivo que ela rodou.
+      - name: Registrar a contagem e a seed
+        run: |
+          repetidos=$(cat partes/*/tmp/parallel_runtime_rspec.log | sed 's/:[^:]*$//' | sort | uniq -d)
+          if [ -n "$repetidos" ]; then
+            echo "::error title=RSpec (chrome)::arquivos rodados nas duas maquinas: $repetidos"
+            exit 1
+          fi
+          bash .github/scripts/rspec-summary.sh "chrome, as duas maquinas" \
+            "SELENIUM_BROWSER=chrome bundle exec rspec" partes/*/rspec.log
+
+      - name: Join the runtime logs
+        run: |
+          mkdir -p tmp
+          cat partes/*/tmp/parallel_runtime_rspec.log > tmp/parallel_runtime_rspec.log
+
+      # So de rodada verde: um log de rodada cancelada no meio viria truncado.
+      - name: Save the runtime log
+        uses: actions/cache/save@v4
+        with:
+          path: tmp/parallel_runtime_rspec.log
+          key: parallel-runtime-chrome-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Join the coverage
+        run: bundle exec ruby .github/scripts/collate-coverage.rb partes/*/coverage/.resultset.json
+
       - name: Publish code coverage
-        if: matrix.browser == 'chrome'
         uses: qltysh/qlty-action/coverage@v1
         with:
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
@@ -293,20 +399,20 @@ jobs:
       # o secret QLTY_COVERAGE_TOKEN e os GitHub Apps do qlty saem juntos.
       #
       # O upload em si e outro job: a acao exige code-quality:write, e este job
-      # nao precisa dessa permissao para rodar a suite. PR de fork nao consegue
-      # escrever no repositorio base, dai a guarda.
+      # nao precisa dessa permissao. PR de fork nao consegue escrever no
+      # repositorio base, dai a guarda.
       - name: Upload the Cobertura report
-        if: matrix.browser == 'chrome' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report-ruby
           path: coverage/coverage.xml
+          overwrite: true
 
   upload-coverage:
-    needs: test
-    if: ${{ !cancelled() && needs.test.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
+    needs: test-summary
+    if: ${{ !cancelled() && needs.test-summary.result == 'success' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
       code-quality: write
@@ -329,9 +435,8 @@ jobs:
           language: Ruby
           label: code-coverage/simplecov
           fail-on-error: false
-
   smoke-test:
-    if: github.event_name != 'schedule'
+    if: github.event_name != 'schedule' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)
     runs-on: ubuntu-latest
 
     env:
@@ -371,7 +476,7 @@ jobs:
   # Roda em MariaDB porque e o banco de producao, e porque so nele carrega o
   # bloco atras de `unless is_sqlite` em db/seeds/02.reports_notifications.rb.
   seed:
-    if: github.event_name != 'schedule'
+    if: github.event_name != 'schedule' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository)
     runs-on: ubuntu-latest
 
     services:

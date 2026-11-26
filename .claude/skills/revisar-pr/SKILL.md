@@ -282,9 +282,10 @@ nunca pelo código de retorno.
 
 **Vermelho num navegador só é sinal, não ruído** (`AGENTS.md`) — mas antes de
 cobrá-lo do PR, compare com a mesma perna na `main` (`gh run list --workflow
-rubyonrails.yml --branch main --limit 1`, job `test (<navegador>)`): vermelho lá
-também não é do PR. O resumo de cada perna traz a seed e o comando que a repete
-localmente. Três categorias, e a diferença importa:
+rubyonrails.yml --branch main --limit 1`, jobs `test (chrome 1/2)` e `2/2`; o
+Firefox, no `firefox.yml`, que só roda por disparo manual e toda semana):
+vermelho lá também não é do PR. O resumo de cada perna traz a seed e o comando
+que a repete localmente. Três categorias, e a diferença importa:
 
 1. **Teste que supõe um navegador.** Foco, ordem de evento, tempo de animação,
    espaço e quebra de linha que cada um normaliza a seu modo: o teste afirma o
@@ -292,7 +293,7 @@ localmente. Três categorias, e a diferença importa:
 2. **Defeito que o outro navegador escondia.** JS que só um motor tolera,
    atributo que só um honra, contorno de bug de navegador que a mudança removeu
    — o `autocomplete="off"` nos hidden, que o Rails emitia por causa do Firefox.
-   É defeito de verdade, e é para isso que a matriz existe: vira reprodução que
+   É defeito de verdade, e é para isso que os dois navegadores rodam: vira reprodução que
    falha naquele navegador, pelas regras do passo 5.
 3. **Artefato do ambiente.** Driver que não casa com o navegador que o runner
    instalou, navegador atualizado entre duas execuções, timeout de
