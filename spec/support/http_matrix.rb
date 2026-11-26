@@ -47,12 +47,73 @@ module HttpMatrix
     "render_field" => ->(coluna) { { column: coluna, update_column: coluna } },
   }.freeze
 
+  # Os perfis de AbilityDataset::PERFIS, em três grupos. Cada grupo percorre
+  # cada menu num arquivo próprio (spec/requests/matriz_http/<grupo>/<menu>):
+  # o arquivo é a unidade que o parallel_rspec distribui, e a matriz inteira
+  # num exemplo só passava de dez minutos na CI.
+  GRUPOS = {
+    "gestao" => ["administrador", "coordenacao", "secretaria"],
+    "professores" => ["professor (sem lançamento de nota)", "professor (nota no semestre corrente)",
+                      "professor (nota em todo semestre)", "professor sem professor vinculado"],
+    "demais" => ["professor e coordenador, atuando como coordenação", "professor e coordenador, atuando como professor",
+                 "aluno", "aluno sem aluno vinculado"],
+  }.freeze
+
+  # Os controllers de cada menu de config/navigation.rb. A tela aninhada, que
+  # não tem item próprio, fica no menu da tela que a abre (user_roles em
+  # Configurações, com users). O que não está em menu nenhum -- o menu
+  # Principal, as páginas públicas, o login -- fica em "Fora do menu".
+  # Controller com rota e sem menu derruba spec/requests/matriz_http/menus_spec.rb:
+  # sem isso, ele sairia da matriz calado.
+  MENUS = {
+    "alunos" => %w[
+      students dismissals enrollments enrollment_holds levels dismissal_reasons enrollment_statuses
+      student_majors
+    ],
+    "professores" => %w[
+      professors advisements advisement_authorizations thesis_defense_committee_participations grants papers
+      affiliation paper_professors paper_students professor_research_areas professor_research_lines
+    ],
+    "bolsas" => %w[sponsors scholarship_durations scholarships scholarship_types scholarship_suspensions],
+    "etapas" => %w[deferrals accomplishments phases deferral_types phase_durations],
+    "disciplinas" => %w[
+      research_areas research_lines courses course_types course_classes class_schedules class_enrollments
+      allocations enrollment_requests class_enrollment_requests
+      course_research_areas course_research_lines enrollment_request_comments
+    ],
+    "informativos" => %w[assertions notifications reports notification_logs report_configurations queries query_params],
+    "formacao" => %w[majors institutions],
+    "localidades" => %w[cities states countries],
+    "selecao" => %w[
+      admissions/admission_processes admissions/form_templates admissions/consolidation_templates
+      admissions/admission_committees admissions/admission_phases admissions/ranking_configs
+      admissions/ranking_machines admissions/admission_applications
+      admissions/admission_committee_members admissions/admission_pendencies admissions/admission_phase_committees
+      admissions/admission_phase_evaluations admissions/admission_phase_results admissions/admission_process_phases
+      admissions/admission_process_rankings admissions/admission_ranking_results admissions/admission_report_columns
+      admissions/admission_report_configs admissions/admission_report_groups admissions/consolidation_form_fields
+      admissions/filled_form_field_scholarities admissions/filled_form_fields admissions/filled_forms
+      admissions/form_conditions admissions/form_fields admissions/letter_requests admissions/ranking_columns
+      admissions/ranking_groups admissions/ranking_processes
+    ],
+    "configuracoes" => %w[users roles versions email_templates custom_variables program_levels user_roles],
+    "fora_do_menu" => %w[
+      application landing pendencies credits files student_enrollment
+      admissions/admissions admissions/apply admissions/letters admissions/email_changes admissions/form_autocompletes
+      users/confirmations users/passwords users/registrations users/sessions users/unlocks users/user_invitations
+    ],
+  }.freeze
+
+  def self.rotas_do_menu(menu)
+    controllers = MENUS.fetch(menu)
+    RouteProbe.routes.select { |route| controllers.include?(route.controller) }
+  end
+
   ABRE = /\A(2\d\d|3\d\d)/
   RECUSA_POR_REDIRECIONAMENTO = ["302 /users/sign_in"].freeze
 
-  def matriz_http(rotulos)
+  def matriz_http(rotulos, routes)
     perfis = rotulos.map { |rotulo| perfil(rotulo) }
-    routes = RouteProbe.routes
     extra = { admission_id: @labels.key("processo").id }
     celulas = Hash.new { |hash, route| hash[route] = {} }
     violacoes = []
@@ -194,7 +255,7 @@ module HttpMatrix
   end
 end
 
-RSpec.shared_examples "matriz HTTP" do |golden, rotulos|
+RSpec.shared_examples "matriz HTTP" do |grupo, menu|
   include GoldenMaster
   include AbilityDataset
   include RouteProbe
@@ -207,10 +268,10 @@ RSpec.shared_examples "matriz HTTP" do |golden, rotulos|
   after(:each) { travel_back }
 
   it "não abre nem muda o que o Ability nega, e mantém o baseline" do
-    matriz, violacoes = matriz_http(rotulos)
+    matriz, violacoes = matriz_http(HttpMatrix::GRUPOS.fetch(grupo), HttpMatrix.rotas_do_menu(menu))
 
     expect(violacoes).to be_empty,
       "rotas que contrariam o Ability:\n#{violacoes.join("\n")}"
-    expect_matches_golden(golden, matriz, format: :text)
+    expect_matches_golden("matriz_http/#{grupo}/#{menu}", matriz, format: :text)
   end
 end
