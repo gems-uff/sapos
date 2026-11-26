@@ -109,11 +109,11 @@ jobs:
         if: github.event_name != 'schedule'
         run: bundle exec rspec spec/config/schema_dump_spec.rb
 
-  # A seed e o log de tempos que as duas maquinas do `test` compartilham. As
-  # duas dividem os arquivos com o mesmo algoritmo do parallel_rspec, e so
+  # A seed e o log de tempos que as maquinas do `test` compartilham. Elas
+  # dividem os arquivos com o mesmo algoritmo do parallel_rspec, e so
   # chegam aos mesmos grupos partindo do mesmo log: restaurado em cada
   # maquina, o cache podia trazer entradas diferentes (outra rodada salvando
-  # entre as duas restauracoes), e arquivo rodaria nas duas ou em nenhuma.
+  # entre duas restauracoes), e arquivo rodaria em duas ou em nenhuma.
   # Restaurado uma vez aqui, segue por artefato. O re-run de uma maquina que
   # falhou reaproveita este job, e portanto os grupos e a seed dela.
   test-plan:
@@ -133,7 +133,7 @@ jobs:
           key: parallel-runtime-chrome-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: parallel-runtime-chrome-
 
-      # Uma seed para as duas maquinas, e e ela que os resumos registram.
+      # Uma seed para todas as maquinas, e e ela que os resumos registram.
       - name: Sortear a seed
         id: seed
         run: |
@@ -153,17 +153,20 @@ jobs:
     needs: test-plan
     runs-on: ubuntu-latest
 
-    # A suite roda em Chrome, o navegador da maioria dos usuarios, dividida em
-    # duas maquinas: o parallel_rspec separa os arquivos em 8 grupos por tempo,
-    # e cada maquina roda 4 deles, em 4 workers. Numa maquina so o job levava
-    # mais de 20 min. O Firefox, default local, roda no firefox.yml, por
+    # A suite roda em Chrome, o navegador da maioria dos usuarios, dividida
+    # entre as maquinas da lista `part`: o parallel_rspec separa os arquivos
+    # em PARALLEL_WORKERS grupos por maquina, por tempo, e cada maquina roda os
+    # seus, um por worker. Numa maquina so o job levava mais de 20 min; com
+    # duas, 11 a 12. A partir de tres o ganho encolhe: o arquivo mais lento
+    # (uma fatia da matriz HTTP, ~4 min) nao se divide. Para mudar o numero
+    # de maquinas, basta a lista. O Firefox, default local, roda no firefox.yml, por
     # disparo manual e toda semana. As maquinas sao independentes: um vermelho
     # nao cancela a outra.
     strategy:
       fail-fast: false
       matrix:
-        part: [1, 2]
-    name: test (chrome ${{ matrix.part }}/2)
+        part: [1, 2, 3]
+    name: test (chrome ${{ matrix.part }}/${{ strategy.job-total }})
 
     # Production runs on MariaDB, so CI does too. SQLite stays available for
     # local development (it needs no database server), but the collation there
@@ -192,8 +195,6 @@ jobs:
       SELENIUM_BROWSER: chrome
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       PARALLEL_WORKERS: 4
-      # Os grupos da suite inteira: PARALLEL_WORKERS por maquina, nas duas.
-      PARALLEL_GROUPS: 8
       # O parallel_tests prefere o bin/rspec, versionado sem bit de execucao.
       PARALLEL_TESTS_EXECUTABLE: bundle exec rspec
       # Sem ela, o primeiro boot de teste grava tmp/local_secret.txt, e os
@@ -277,7 +278,7 @@ jobs:
       # Audit e Lint moram no job `checks`, acima: aqui só a suíte, para que um
       # vermelho de checagem não esconda o resultado dela.
       #
-      # --only-group: os grupos desta maquina entre os PARALLEL_GROUPS. Com
+      # --only-group: os grupos desta maquina entre os da suite inteira. Com
       # ele o parallel_tests agrupa por tamanho de arquivo, salvo --group-by
       # explicito; --allowed-missing 100 aceita o arquivo novo sem tempo
       # (entra com a media). Os workers desta maquina usam TEST_ENV_NUMBER
@@ -288,17 +289,19 @@ jobs:
       # substitui o do .rspec, e a saida perderia a linha de contagem. O
       # --verbose-rerun-command imprime o comando de cada worker que falhar,
       # que o resumo transcreve para a reproducao. O RuntimeLogger grava o
-      # tempo dos arquivos desta maquina; o job `test-summary` junta as duas.
+      # tempo dos arquivos desta maquina; o job `test-summary` junta todas.
       - name: Run tests
         run: |
           set -o pipefail
-          if [ "${{ matrix.part }}" = 1 ]; then grupos=1,2,3,4; else grupos=5,6,7,8; fi
+          total=$(( ${{ strategy.job-total }} * PARALLEL_WORKERS ))
+          inicio=$(( (${{ matrix.part }} - 1) * PARALLEL_WORKERS + 1 ))
+          grupos=$(seq -s, "$inicio" $(( inicio + PARALLEL_WORKERS - 1 )))
           if [ -s tmp/plan/parallel_runtime_rspec.log ]; then
             agrupar="--group-by runtime --allowed-missing 100 --runtime-log tmp/plan/parallel_runtime_rspec.log"
           else
             agrupar="--group-by filesize"
           fi
-          bundle exec parallel_rspec -n "$PARALLEL_GROUPS" --only-group "$grupos" $agrupar \
+          bundle exec parallel_rspec -n "$total" --only-group "$grupos" $agrupar \
             --serialize-stdout --combine-stderr --verbose-rerun-command \
             -o "--seed $SEED --profile 10 --format documentation --format ParallelTests::RSpec::RuntimeLogger --out tmp/parallel_runtime_rspec.log" \
             spec | tee rspec.log
@@ -306,13 +309,13 @@ jobs:
       # Contagem, seed e comando de reproducao no resumo do job. A ordem dos
       # exemplos e sorteada, e a suite ja teve dependencia de ordem (#643): sem
       # a seed, um vermelho e irreproduzivel. O piso de exemplos e conferido
-      # na soma das duas maquinas, no `test-summary`.
+      # na soma das maquinas, no `test-summary`.
       - name: Registrar a contagem e a seed
         if: ${{ !cancelled() }}
         env:
           SEM_PISO: 1
         run: |
-          bash .github/scripts/rspec-summary.sh "chrome ${{ matrix.part }}/2" \
+          bash .github/scripts/rspec-summary.sh "chrome ${{ matrix.part }}/${{ strategy.job-total }}" \
             "SELENIUM_BROWSER=chrome bundle exec rspec" rspec.log
 
       # O .resultset.json, e nao o coverage.xml: o desta maquina cobre so a
@@ -332,7 +335,7 @@ jobs:
           overwrite: true
 
   # O que so a rodada inteira diz: o piso de exemplos, a cobertura e o log de
-  # tempos da proxima rodada, somando as duas maquinas.
+  # tempos da proxima rodada, somando as maquinas.
   test-summary:
     needs: test
     if: ${{ !cancelled() && needs.test.result == 'success' }}
@@ -359,7 +362,7 @@ jobs:
           pattern: test-chrome-*
           path: partes
 
-      # Arquivo que rodou nas duas maquinas quer dizer que elas chegaram a
+      # Arquivo que rodou em duas maquinas quer dizer que elas chegaram a
       # grupos diferentes, e algum outro nao rodou em nenhuma: a soma de
       # exemplos podia ate passar do piso. O log de tempos de cada maquina
       # tem uma linha por arquivo que ela rodou.
@@ -367,10 +370,10 @@ jobs:
         run: |
           repetidos=$(cat partes/*/tmp/parallel_runtime_rspec.log | sed 's/:[^:]*$//' | sort | uniq -d)
           if [ -n "$repetidos" ]; then
-            echo "::error title=RSpec (chrome)::arquivos rodados nas duas maquinas: $repetidos"
+            echo "::error title=RSpec (chrome)::arquivos rodados em mais de uma maquina: $repetidos"
             exit 1
           fi
-          bash .github/scripts/rspec-summary.sh "chrome, as duas maquinas" \
+          bash .github/scripts/rspec-summary.sh "chrome, todas as maquinas" \
             "SELENIUM_BROWSER=chrome bundle exec rspec" partes/*/rspec.log
 
       - name: Join the runtime logs

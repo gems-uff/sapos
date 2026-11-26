@@ -282,7 +282,7 @@ nunca pelo código de retorno.
 
 **Vermelho num navegador só é sinal, não ruído** (`AGENTS.md`) — mas antes de
 cobrá-lo do PR, compare com a mesma perna na `main` (`gh run list --workflow
-rubyonrails.yml --branch main --limit 1`, jobs `test (chrome 1/2)` e `2/2`; o
+rubyonrails.yml --branch main --limit 1`, jobs `test (chrome N/M)`, um por máquina; o
 Firefox, no `firefox.yml`, que só roda por disparo manual e toda semana):
 vermelho lá também não é do PR. O resumo de cada perna traz a seed e o comando
 que a repete localmente. Três categorias, e a diferença importa:

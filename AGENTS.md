@@ -76,7 +76,7 @@ engana quem a lê hoje.
   investigar vermelho, anote a seed que o RSpec imprime — sem ela a falha é
   irreproduzível — e use `rspec --seed <n> --bisect`, que isola o exemplo
   culpado sozinho. O CI registra a seed no resumo do job. Lá a suíte roda em
-  workers do `parallel_rspec` (4 por máquina, e o Chrome em duas máquinas), e
+  workers do `parallel_rspec` (4 por máquina, e o Chrome em três máquinas), e
   cada worker sorteia a ordem só sobre os seus arquivos: a seed sozinha não
   repete a ordem que falhou. O resumo transcreve o comando do worker que
   falhou; rode-o em serial, e o `--bisect` sobre ele.
