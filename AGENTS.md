@@ -179,6 +179,25 @@ engana quem a lê hoje.
   fato já está no repositório, a memória certa é nenhuma.
 - **Quando um comando falhar por bloqueio de sandbox, tente novamente fora do
   sandbox.** Isso dispara a pergunta de permissão; o usuário decide se executa.
+  Estes vão direto para fora, porque no sandbox do Claude Code falham — e
+  alguns falham parecendo outra coisa:
+  - **Feature specs, e portanto a suíte inteira.** O Selenium Manager não
+    grava o cache do driver, e a rodada vira centenas de falhas de feature
+    com "Operation not permitted", mais dezenas de request specs em cascata.
+    O núcleo sem feature specs roda dentro.
+  - **Git que reescreve arquivo em `.claude/skills/`, `.claude/hooks/` ou nos
+    `settings` (`checkout`, `switch`, `merge`, `rebase`, `reset`, `stash`).**
+    Essas pastas são somente leitura no sandbox, e o comando para pela
+    metade ("unable to unlink ... Operation not permitted"): o arquivo fica
+    na versão anterior e aparece como modificado. Para sair, fora do
+    sandbox: `git checkout -- <arquivo>` e repita o comando. Editar esses
+    arquivos pelo shell também falha.
+  - **`gh` e `git push`**: o proxy do sandbox quebra o TLS ("failed to
+    verify certificate").
+  - **MariaDB local**: socket e porta são negados, e "servidor desligado"
+    não se distingue de "sandbox negando" (skill `suite-mariadb`).
+  - **`rubocop` sem cache**: "0 files inspected, no offenses" é o cache
+    negado, não código limpo. Rode com `--cache false`, ou fora.
 
 ## Skills do repositório
 
